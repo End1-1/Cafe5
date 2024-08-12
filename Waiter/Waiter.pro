@@ -58,6 +58,7 @@ SOURCES += \
     ../Cafe5/calendar.cpp \
     ../Classes/QProgressIndicator.cpp \
     ../Classes/amkbd.cpp \
+    ../Classes/axreporting.cpp \
     ../Classes/c5airlog.cpp \
     ../Classes/c5combodelegate.cpp \
     ../Classes/c5crypt.cpp \
@@ -86,7 +87,6 @@ SOURCES += \
     ../Classes/checkforupdatethread.cpp \
     ../Classes/dataonline.cpp \
     ../Classes/dlgpassword.cpp \
-    ../Classes/doubledatabase.cpp \
     ../Classes/idram.cpp \
     ../Classes/notificationwidget.cpp \
     ../Classes/outputofheader.cpp \
@@ -123,8 +123,6 @@ SOURCES += \
     ../DbData/dbmenuname.cpp \
     ../DbData/dbmenupackagelist.cpp \
     ../DbData/dbmenupackages.cpp \
-    ../DbData/dboheader.cpp \
-    ../DbData/dbopreorder.cpp \
     ../DbData/dbpartner.cpp \
     ../DbData/dbservicevalues.cpp \
     ../DbData/dbstore.cpp \
@@ -237,6 +235,7 @@ SOURCES += \
     ../Forms/dlgselectcurrency.cpp \
     ../Forms/dlgsemireadyinout.cpp \
     ../Forms/dlgsetwaiterordercl.cpp \
+    ../Forms/dlgsplashscreen.cpp \
     ../Forms/dlgstoreutils.cpp \
     ../Forms/dlgviewcashreport.cpp \
     ../Forms/goodsasmap.cpp \
@@ -422,7 +421,6 @@ SOURCES += \
     ../Classes/c5witerconf.cpp \
     ../Classes/c5waiterserver.cpp \
     ../Classes/c5ordertabledelegate.cpp \
-    ../Classes/c5halltabledelegate.cpp \
     ../Classes/c5printing.cpp \
     ../Classes/c5printservicethread.cpp \
     ../Classes/QRCodeGenerator.cpp \
@@ -490,6 +488,7 @@ HEADERS += \
     ../Cafe5/calendar.h \
     ../Classes/QProgressIndicator.h \
     ../Classes/amkbd.h \
+    ../Classes/axreporting.h \
     ../Classes/barcode5.h \
     ../Classes/c5airlog.h \
     ../Classes/c5combodelegate.h \
@@ -520,7 +519,6 @@ HEADERS += \
     ../Classes/checkforupdatethread.h \
     ../Classes/dataonline.h \
     ../Classes/dlgpassword.h \
-    ../Classes/doubledatabase.h \
     ../Classes/goodsreserve.h \
     ../Classes/idram.h \
     ../Classes/notificationwidget.h \
@@ -558,8 +556,6 @@ HEADERS += \
     ../DbData/dbmenuname.h \
     ../DbData/dbmenupackagelist.h \
     ../DbData/dbmenupackages.h \
-    ../DbData/dboheader.h \
-    ../DbData/dbopreorder.h \
     ../DbData/dbpartner.h \
     ../DbData/dbservicevalues.h \
     ../DbData/dbstore.h \
@@ -672,6 +668,7 @@ HEADERS += \
     ../Forms/dlgselectcurrency.h \
     ../Forms/dlgsemireadyinout.h \
     ../Forms/dlgsetwaiterordercl.h \
+    ../Forms/dlgsplashscreen.h \
     ../Forms/dlgstoreutils.h \
     ../Forms/dlgviewcashreport.h \
     ../Forms/goodsasmap.h \
@@ -846,7 +843,6 @@ HEADERS += \
     ../Classes/c5witerconf.h \
     ../Classes/c5waiterserver.h \
     ../Classes/c5ordertabledelegate.h \
-    ../Classes/c5halltabledelegate.h \
     ../Classes/c5printing.h \
     ../Classes/c5printservicethread.h \
     ../Classes/QRCodeGenerator.h \
@@ -1013,6 +1009,7 @@ FORMS += \
     ../Forms/dlgselectcurrency.ui \
     ../Forms/dlgsemireadyinout.ui \
     ../Forms/dlgsetwaiterordercl.ui \
+    ../Forms/dlgsplashscreen.ui \
     ../Forms/dlgstoreutils.ui \
     ../Forms/dlgviewcashreport.ui \
     ../Forms/goodsasmap.ui \

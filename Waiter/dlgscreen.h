@@ -18,6 +18,10 @@ public:
     ~DlgScreen();
 
 private slots:
+    void initResponse(const QJsonObject &jdoc);
+
+    void serviceTimeout();
+
     void newConnection();
 
     void loginResponse(const QJsonObject &jdoc);

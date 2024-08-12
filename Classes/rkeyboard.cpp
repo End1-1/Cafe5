@@ -64,6 +64,7 @@ RKeyboard::RKeyboard(QWidget *parent) :
     fCapsOn = false;
     setupEnglish();
     setStyleSheet("");
+    ui->btnRu->setVisible(false);
     switch (__c5config.getRegValue("kbd").toInt()) {
         case 1:
             setupEnglish();
@@ -79,6 +80,7 @@ RKeyboard::RKeyboard(QWidget *parent) :
             break;
     }
     ui->leResult->installEventFilter(this);
+    ui->btnAm->click();
 }
 
 RKeyboard::~RKeyboard()
@@ -264,6 +266,8 @@ void RKeyboard::on_btnRShift_clicked()
 void RKeyboard::on_btnEn_clicked()
 {
     fCurrentLanguage = "en";
+    ui->btnRu->setChecked(false);
+    ui->btnAm->setChecked(false);
     setupKbd();
     __c5config.setRegValue("kbd", 1);
 }
@@ -271,6 +275,8 @@ void RKeyboard::on_btnEn_clicked()
 void RKeyboard::on_btnAm_clicked()
 {
     fCurrentLanguage = "am";
+    ui->btnRu->setChecked(false);
+    ui->btnEn->setChecked(false);
     setupKbd();
     ui->leResult->setFocus();
     ui->leResult->setSelection(ui->leResult->text().length(), 1);

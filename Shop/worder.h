@@ -2,12 +2,10 @@
 #define WORDER_H
 
 #include "c5database.h"
-#include "c5dbrecord.h"
 #include "bhistory.h"
 #include "oheader.h"
 #include "ogoods.h"
 #include "odraftsale.h"
-#include "jsons.h"
 #include "ninterface.h"
 #include <QWidget>
 #include <QDate>
@@ -109,6 +107,8 @@ public:
 
     void addGoods(const QString &barcode);
 
+    void addGoods2(const QString &barcode, double price);
+
 private slots:
     void reponseProcessCode(const QJsonObject &jdoc);
 
@@ -144,8 +144,6 @@ private:
     int fGiftCard;
 
     BHistory fBHistory;
-
-    QJsonObject fAccCard;
 
     QVector<OGoods> fOGoods;
 

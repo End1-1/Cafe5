@@ -19,6 +19,7 @@
 #include "dlglistdishspecial.h"
 #include "dlgreceiptlanguage.h"
 #include "c5translator.h"
+#include "dlgpreorderw.h"
 #include "dlglist.h"
 #include "dlglistofpackages.h"
 #include "dlgsplitorder.h"
@@ -233,6 +234,8 @@ QList<WOrder *> DlgOrder::worders()
 
 void DlgOrder::load(int table)
 {
+    fHttp->fErrorSlot = (char *)SLOT(openReserveError(QString));
+    fHttp->fErrorObject = this;
 	fHttp->createHttpQuery("/engine/waiter/order.php",
 	QJsonObject{
         {"action", "open"},
@@ -1580,6 +1583,20 @@ void DlgOrder::discountOrder(C5User *u, const QString &code)
 	}
 }
 
+void DlgOrder::openReserveError(const QString &err)
+{
+    fHttp->fErrorSlot = nullptr;
+    fHttp->httpQueryFinished(sender());
+    if (err.contains("open reservation")) {
+        emit allDone();
+        emit openNewReserve();
+        reject();
+        deleteLater();
+    } else {
+        C5Message::error(err);
+    }
+}
+
 void DlgOrder::openReservationResponse(const QJsonObject &jdoc)
 {
 	fHttp->httpQueryFinished(sender());
@@ -2635,7 +2652,7 @@ void DlgOrder::on_btnCashout_clicked()
 	dw.writeAHeader(cashUUID, tr("Delivery"), DOC_STATE_SAVED, DOC_TYPE_CASH,
 	                wo->fOrderDriver->headerValue("f_currentstaff").toInt(),
 	                QDate::currentDate(), QDate::currentDate(), QTime::currentTime(), 0, max, purpose, 1, 1);
-	dw.writeAHeaderCash(cashUUID, 0, 1, 0, "", wo->fOrderDriver->headerValue("f_id").toString(), 0);
+    dw.writeAHeaderCash(cashUUID, 0, 1, 0, "", wo->fOrderDriver->headerValue("f_id").toString());
 	dw.writeECash(idout, cashUUID, 1, -1, purpose, max, idout, 1);
 	C5Message::info(purpose);
 }

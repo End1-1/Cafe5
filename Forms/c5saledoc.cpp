@@ -783,7 +783,7 @@ void C5SaleDoc::saveDataChanges()
         db[":f_flag"] = ui->cbHall->currentData();
         db.insert("b_clients_debts", false);
     }
-    if (isnew) {
+    if (isnew && !__c5config.httpServerIP().isEmpty()) {
         for (int i = 0; i < ui->tblGoods->rowCount(); i++) {
             QJsonObject jo;
             jo["action"] = 1; //MSG_GOODS_RESERVE;

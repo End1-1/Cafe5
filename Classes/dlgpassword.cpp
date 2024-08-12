@@ -2,7 +2,6 @@
 #include "ui_dlgpassword.h"
 #include "c5config.h"
 #include "c5user.h"
-#include "c5database.h"
 #include <QCryptographicHash>
 #include <QDoubleValidator>
 
@@ -13,6 +12,10 @@ DlgPassword::DlgPassword(C5User *u) :
 {
     ui->setupUi(this);
     fMax = 0;
+    connect(this, &DlgPassword::rejected, []() {
+        qApp->quit();
+        exit(0);
+    });
 }
 
 DlgPassword::~DlgPassword()

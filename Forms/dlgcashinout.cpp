@@ -115,16 +115,12 @@ void DlgCashinOut::on_btnCloseSession_clicked()
             "from s_working_sessions sws "
             "left join s_user u on u.f_id=sws.f_user "
             "where sws.f_id=:f_id ");
-#ifdef QT_DEBUG
-    Q_ASSERT(db.nextRow());
-#else
     if (db.nextRow() == false) {
         C5Message::error(QString("No session with %1").arg(__c5config.getRegValue("sessionid").toInt()));
         return;
     }
-#endif
-    QString open = db.getDateTime("f_open").toString(FORMAT_DATETIME_TO_STR);
-    QString close = db.getDateTime("f_close").toString(FORMAT_DATETIME_TO_STR);
+    QDateTime open = db.getDateTime("f_open");
+    QDateTime close = db.getDateTime("f_close");
     QString staff = db.getString("f_fullname");
     QFont font(qApp->font());
     font.setPointSize(__c5config.getValue(param_receipt_print_font_size).toInt());
@@ -137,15 +133,15 @@ void DlgCashinOut::on_btnCloseSession_clicked()
         p.br();
     }
     p.setFontBold(true);
-    p.ctext(QString("%1 %2").arg(tr("Close session"), close));
+    p.ctext(QString("%1 #%2").arg(tr("Close session"), QString::number(db.getInt("f_id"))));
     p.br();
     p.ctext(staff);
     p.br();
-    p.ctext(QString("%1").arg(open));
+    p.ctext(QString("%1").arg(open.toString(FORMAT_DATETIME_TO_STR)));
     p.br();
     p.ctext("-");
     p.br();
-    p.ctext(QString("%1").arg(close));
+    p.ctext(QString("%1").arg(close.toString(FORMAT_DATETIME_TO_STR)));
     p.br();
     p.line();
     p.br();

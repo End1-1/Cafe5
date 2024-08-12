@@ -153,7 +153,6 @@ bool C5StoreDraftWriter::removeStoreDocument(C5Database &db, const QString &id, 
     }
     db[":f_document"] = id;
     db.exec("delete from a_store_dish_waste where f_document=:f_document");
-    writeASaleStore(storei, storeo);
     return err.isEmpty();
 }
 
@@ -740,6 +739,7 @@ bool C5StoreDraftWriter::writeOBody(QString &id, const QString &header, int stat
     fDb[":f_package"] = package;
     fDb[":f_row"] = row;
     fDb[":f_emarks"] = emarks;
+    fDb[":f_working_day"] = __c5config.dateCash();
     if (u) {
         return returnResult(fDb.update("o_body", where_id(id)));
     } else {

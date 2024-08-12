@@ -13,7 +13,6 @@ CR5SalesByDishes::CR5SalesByDishes(const QStringList &dbParams, QWidget *parent)
     fIcon = ":/delete.png";
     fLabel = tr("Sales, dishes");
     fSimpleQuery = false;
-
     fMainTable = "o_body ob";
     fLeftJoinTables << "left join o_header oh on oh.f_id=ob.f_header [oh]"
                     << "left join h_halls h on h.f_id=oh.f_hall [h]"
@@ -24,8 +23,7 @@ CR5SalesByDishes::CR5SalesByDishes(const QStringList &dbParams, QWidget *parent)
                     << "left join d_part2 dp on dp.f_id=d.f_part [dp]"
                     << "left join d_part1 dpd on dpd.f_id=dp.f_part [dpd]"
                     << "left join c_storages cst on cst.f_id=ob.f_store [cst]"
-                       ;
-
+                    ;
     fColumnsFields << "oh.f_id as f_header"
                    << "concat(oh.f_prefix, oh.f_hallid) as f_order"
                    << "os.f_name as f_statename"
@@ -41,10 +39,9 @@ CR5SalesByDishes::CR5SalesByDishes(const QStringList &dbParams, QWidget *parent)
                    << "cst.f_name as f_storename"
                    << "ob.f_removereason"
                    << "sum(ob.f_qty2) as f_qty"
-                   << "sum(ob.f_total) as f_total"
+                   << "sum(ob.f_grandtotal) as f_grandtotal"
                    << "oh.f_comment"
-                      ;
-
+                   ;
     fColumnsGroup << "oh.f_id as f_header"
                   << "concat(oh.f_prefix, oh.f_hallid) as f_order"
                   << "h.f_name as f_hallname"
@@ -58,17 +55,14 @@ CR5SalesByDishes::CR5SalesByDishes(const QStringList &dbParams, QWidget *parent)
                   << "d.f_name as f_dishname"
                   << "bs.f_name as f_dishstate"
                   << "ob.f_removereason"
-                  <<"cst.f_name as f_storename"
-                 << "oh.f_comment"
-                      ;
-
+                  << "cst.f_name as f_storename"
+                  << "oh.f_comment"
+                  ;
     fColumnsSum << "f_qty"
-                << "f_total"
-                      ;
-
+                << "f_grandtotal"
+                ;
     fColumnsOrder << "oh.f_datecash"
                   << "oh.f_timeclose";
-
     fTranslation["f_header"] = tr("Header");
     fTranslation["f_order"] = tr("Order");
     fTranslation["f_hallname"] = tr("Hall");
@@ -84,9 +78,8 @@ CR5SalesByDishes::CR5SalesByDishes(const QStringList &dbParams, QWidget *parent)
     fTranslation["f_removereason"] = tr("Remove reason");
     fTranslation["f_storename"] = tr("Store");
     fTranslation["f_qty"] = tr("Qty");
-    fTranslation["f_total"] = tr("Total");
+    fTranslation["f_grandtotal"] = tr("Total");
     fTranslation["f_comment"] = tr("Comment");
-
     fColumnsVisible["oh.f_id as f_header"] = true;
     fColumnsVisible["oh.f_datecash"] = true;
     fColumnsVisible["oh.f_timeclose"] = true;
@@ -104,9 +97,7 @@ CR5SalesByDishes::CR5SalesByDishes(const QStringList &dbParams, QWidget *parent)
     fColumnsVisible["sum(ob.f_qty2) as f_qty"] = true;
     fColumnsVisible["sum(ob.f_total) as f_total"] = true;
     fColumnsVisible["oh.f_comment"] = false;
-
     restoreColumnsVisibility();
-
     fFilterWidget = new CR5SalesByDishesFilter(dbParams);
 }
 
@@ -160,7 +151,8 @@ void CR5SalesByDishes::actionShowDish()
         return;
     }
     C5DishWidget *ep = new C5DishWidget(fDBParams);
-    C5Editor *e = C5Editor::createEditor(fDBParams, ep, fModel->data(r, fModel->fColumnNameIndex["f_dishid"], Qt::EditRole).toInt());
+    C5Editor *e = C5Editor::createEditor(fDBParams, ep, fModel->data(r, fModel->fColumnNameIndex["f_dishid"],
+                                         Qt::EditRole).toInt());
     QList<QMap<QString, QVariant> > data;
     e->getResult(data);
     delete e;

@@ -418,6 +418,13 @@ bool C5Database::execNetwork(const QString &sqlQuery)
     }
     QByteArray ba = r->readAll();
     quint64 elapsed = t.elapsed();
+#ifdef QT_DEBUG
+    logEvent(host + " " + QJsonDocument(jo).toJson());
+#else
+    if (__c5config.getValue(param_debuge_mode).toInt() > 0) {
+        logEvent(host + " " + QJsonDocument(jo).toJson());
+    }
+#endif
     jo = QJsonDocument::fromJson(ba).object();
     if (jo["status"].toInt() == 0) {
         fLastError = ba;
@@ -476,7 +483,7 @@ bool C5Database::execNetwork(const QString &sqlQuery)
                     r.append(QTime::fromString(jar[j].toString()));
                     break;
                 case 7:
-                    r.append(QDateTime::fromString(jar[j].toString()));
+                    r.append(QDateTime::fromString(jar[j].toString(), FORMAT_DATETIME_TO_STR_MYSQL));
                     break;
                 default:
                     r.append(jar[j].toString());

@@ -124,8 +124,9 @@ Working::Working(C5User *user, QWidget *parent) :
     ui->lbConfig->setText(__c5config.fSettingsName);
     ui->lbStore->setText(dbstore->name(__c5config.defaultStore()));
     ui->lbCashier->setText(fUser->fullName());
-    http = new NInterface(this);
-    http->createHttpQuery("/engine/shop/create-a-store-sale.php", QJsonObject{{"store", __c5config.defaultStore()}, {"forceupdate", true}},
+    fHttp = new NInterface(this);
+    fHttp->createHttpQuery("/engine/shop/create-a-store-sale.php",
+    QJsonObject{{"store", __c5config.defaultStore()}, {"forceupdate", true}},
     SLOT(astoresaleResponse(QJsonObject)));
     mMovie = new QMovie(":/progressbar.gif");
 }
@@ -322,6 +323,9 @@ void Working::startStoreUpdate()
 {
     ui->lbStatus->setMovie(mMovie);
     mMovie->start();
+    fHttp->createHttpQuery("/engine/shop/create-a-store-sale.php",
+    QJsonObject{{"store", __c5config.defaultStore()}, {"forceupdate", true}},
+    SLOT(astoresaleResponse(QJsonObject)), "nosale", false);
 }
 
 void Working::getGoods(int id)
@@ -406,38 +410,29 @@ int Working::ordersCount()
 void Working::timeout()
 {
     fTimerCounter++;
-    if (fTimerCounter % 10 == 0) {
+    if (fTimerCounter % 15 == 0) {
         auto *tcm = new ThreadCheckMessage();
         connect(tcm, &ThreadCheckMessage::threadError, this, &Working::threadMessageError);
         connect(tcm, &ThreadCheckMessage::data, this, &Working::threadMessageData);
         tcm->start();
-    }
-    if (__c5config.rdbReplica()) {
-        if (fTimerCounter % 20 == 0 && fUpFinished && __c5config.rdbReplica()) {
-            //            fUpFinished = false;
-            //            auto *r = new C5Replication();
-            //            connect(r, SIGNAL(finished()), this, SLOT(uploadDataFinished()));
-            //            r->start(SLOT(uploadToServer()));
-        }
-        //        if (fTimerCounter % 120 == 0) {
-        //            auto *r = new C5Replication();
-        //            connect(r, SIGNAL(haveChanges(bool)), this, SLOT(haveChanges(bool)));
-        //            r->start(SLOT(downloadFromServer()));
-        //        }
+        //startStoreUpdate();
     }
 }
 
 void Working::astoresaleResponse(const QJsonObject &jdoc)
 {
     Q_UNUSED(jdoc);
-    newSale(SALE_RETAIL);
-    http->httpQueryFinished(sender());
+    if (sender()->property("marks").toString() != "nosale") {
+        newSale(SALE_RETAIL);
+    }
+    fHttp->httpQueryFinished(sender());
+    ui->lbStatus->setPixmap(QPixmap(":/checked.png"));
 }
 
 void Working::checkStoreResponse(const QJsonObject &jdoc)
 {
     Q_UNUSED(jdoc);
-    http->httpQueryFinished(sender());
+    fHttp->httpQueryFinished(sender());
     auto *dg = new DlgGoodsList(C5Config::getValue(param_default_currency).toInt());
     connect(dg, &DlgGoodsList::getGoods, this, &Working::getGoods);
     dg->showMaximized();
@@ -678,6 +673,7 @@ void Working::shortcutComma()
 
 void Working::qtyRemains(const QJsonObject &jdoc)
 {
+    //TODO:: BY OPTIONS
     QJsonObject jo = jdoc["data"].toObject();
     QJsonArray ja = jo["qty"].toArray();
     bool print = false;
@@ -709,7 +705,7 @@ void Working::qtyRemains(const QJsonObject &jdoc)
     if (print) {
         p.ltext(tr("Printed"), 0);
         p.rtext(QDateTime::currentDateTime().toString(FORMAT_DATETIME_TO_STR2));
-        p.print(C5Config::localReceiptPrinter(), QPrinter::Custom);
+        //p.print(C5Config::localReceiptPrinter(), QPrinter::Custom);
     }
     sender()->deleteLater();
 }
@@ -819,7 +815,7 @@ void Working::on_btnNewWhosale_clicked()
 
 void Working::on_btnGoodsList_clicked()
 {
-    http->createHttpQuery("/engine/shop/create-a-store-sale.php", QJsonObject{{"store", __c5config.defaultStore()}}, SLOT(
+    fHttp->createHttpQuery("/engine/shop/create-a-store-sale.php", QJsonObject{{"store", __c5config.defaultStore()}}, SLOT(
         checkStoreResponse(QJsonObject)));
 }
 
@@ -899,8 +895,7 @@ void Working::on_btnGiftCard_clicked()
             return;
         }
         DbGoods dd(d.fGiftGoodsId);
-        wo->addGoods(dd.scancode());
-        wo->changePrice(d.fGiftPrice);
+        wo->addGoods2(dd.scancode(), d.fGiftPrice);
         wo->fOHeader.saleType = -1;
     }
 }

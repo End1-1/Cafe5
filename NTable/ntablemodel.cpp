@@ -263,6 +263,9 @@ void NTableModel::countSum()
                 d += fColSum[ja.at(j).toInt()];
             }
             fColSum[jo["column"].toInt()] = d;
+        } else if (jo["formula"].toString() == "percent") {
+            QJsonArray jc = jo["cols"].toArray();
+            fColSum[jo["column"].toInt()] = fColSum[jc.at(0).toInt()] / fColSum[jc.at(1).toInt()] * 100;
         }
     }
 }

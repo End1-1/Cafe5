@@ -6,6 +6,7 @@
 #include "ogoods.h"
 
 class CR5ConsumptionBySalesFilter;
+class C5ProgressDialog;
 class C5StoreDoc;
 class C5User;
 
@@ -28,6 +29,10 @@ protected:
 private:
     CR5ConsumptionBySalesFilter *fFilter;
 
+    C5ProgressDialog *fPd;
+
+    QList<QStringList> fIDs;
+
     QHash<QString, int> fColumnNameIndex;
 
     QString documentForInventory(int store);
@@ -39,6 +44,10 @@ private:
     void writeInvQty(C5Database &db, double qty, int row, int column, int goods, bool checkSR = true);
 
 private slots:
+    void storeOutError(const QString &err);
+
+    void storeoutResponse(const QJsonObject &jdoc);
+
     void makeOutput(bool v);
 
     void salesOutput(bool v);

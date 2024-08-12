@@ -60,7 +60,7 @@ public:
 
     double total();
 
-    virtual void hotKey(const QString &key);
+    virtual void hotKey(const QString &key) override;
 
     static void writeAStoreSale(int storei, int storeo);
 

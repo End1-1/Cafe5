@@ -117,7 +117,6 @@ int main(int argc, char *argv[])
     dlgsplash->hide();
     dlgsplash->deleteLater();
     w.showFullScreen();
-    a.processEvents();
     w.login();
     return a.exec();
 }

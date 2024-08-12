@@ -19,7 +19,6 @@
      <property name="font">
       <font>
        <pointsize>16</pointsize>
-       <weight>75</weight>
        <bold>true</bold>
       </font>
      </property>
@@ -33,6 +32,9 @@
    </item>
    <item>
     <widget class="QTableWidget" name="tbl">
+     <property name="focusPolicy">
+      <enum>Qt::NoFocus</enum>
+     </property>
      <property name="verticalScrollBarPolicy">
       <enum>Qt::ScrollBarAlwaysOff</enum>
      </property>
@@ -106,7 +108,11 @@
        </spacer>
       </item>
       <item>
-       <widget class="RKeyboard" name="kbd" native="true"/>
+       <widget class="RKeyboard" name="kbd" native="true">
+        <property name="focusPolicy">
+         <enum>Qt::NoFocus</enum>
+        </property>
+       </widget>
       </item>
       <item>
        <spacer name="horizontalSpacer_4">
@@ -134,6 +140,10 @@
    <container>1</container>
   </customwidget>
  </customwidgets>
+ <tabstops>
+  <tabstop>kbd</tabstop>
+  <tabstop>tbl</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

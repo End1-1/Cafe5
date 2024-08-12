@@ -18,6 +18,7 @@
 #include "nloadingdlg.h"
 #include "dlgqty.h"
 #include "oheader.h"
+#include "dlgservicevalues.h"
 #include "idram.h"
 #include "change.h"
 #include "menudialog.h"
@@ -134,6 +135,8 @@ bool Workspace::login()
     if (!DlgPassword::getPassword(tr("ENTER"), pin)) {
         accept();
         return false;
+    } else {
+        qApp->quit();
     }
     createHttpRequest("/engine/login.php", QJsonObject{{"method", 2}, {"pin", pin}}, SLOT(loginResponse(QJsonObject)),
     "login");
@@ -145,6 +148,7 @@ void Workspace::reject()
     if (C5Message::question(tr("Confirm to close application"))) {
         C5Dialog::reject();
     }
+    qApp->quit();
 }
 
 void Workspace::setQty(double qty, int mode, int rownum, const QString &packageuuid)
@@ -447,7 +451,7 @@ void Workspace::createHttpRequest(const QString &route, QJsonObject params, cons
 {
     params["sessionkey"] = __c5config.getRegValue("sessionkey").toString();
     params["host"] = hostinfo;
-    params["config_id"] = __c5config.getRegValue("json_config_id").toInt();
+    params["config_id"] = __c5config.fSettingsName;
     params["user_session"] = __c5config.getRegValue("session").toString();
     auto np = new NDataProvider(this);
     np->setProperty("marks", marks);
@@ -455,6 +459,13 @@ void Workspace::createHttpRequest(const QString &route, QJsonObject params, cons
     connect(np, SIGNAL(done(QJsonObject)), this, responseOkSlot);
     connect(np, &NDataProvider::started, this, &Workspace::httpQueryLoading);
     np->getData(route, params);
+}
+
+bool Workspace::service()
+{
+    for (int i = 0 ; i < ui->tblOrder->rowCount(); i++) {
+    }
+    return false;
 }
 
 void Workspace::on_tblPart2_itemClicked(QTableWidgetItem *item)
@@ -778,10 +789,13 @@ void Workspace::on_leReadCode_returnPressed()
             ui->leCard->setDouble(cardvalue);
         }
     }
-    QString code = newcode.replace("?", "").replace(";", "");
+    QString code = newcode; //.replace("?", "").replace(";", "");
     code = code.replace("\'", "\\\'");
     QString emarks;
     if (code.length() > 20) {
+        if (code.length() > 29) {
+            code = code.left(29);
+        }
         emarks = code;
         code = code.left(14);
         while (code.at(0) == "0") {
@@ -824,10 +838,10 @@ void Workspace::on_leReadCode_returnPressed()
 
 void Workspace::on_btnCostumer_clicked()
 {
-    //    QString phone;
-    //    if (TouchDlgPhoneNumber::getPhoneNumber(phone)) {
-    //        setCustomerPhoneNumber(phone);
-    //    }
+    if (fTable == 0) {
+        C5Message::error(tr("Select table"));
+        return;
+    }
     if (ui->lbCostumerPhone->isVisible()) {
         if (C5Message::question(tr("Confirm to remove customer informaion")) == QDialog::Accepted) {
             fCustomer = 0;
@@ -856,6 +870,10 @@ void Workspace::setCustomerPhoneNumber(const QString &number)
 
 void Workspace::on_tblDishes_cellClicked(int row, int column)
 {
+    if (fTable == 0) {
+        C5Message::error(tr("Select table"));
+        return;
+    }
     MenuDish *md = static_cast<MenuDish *>(ui->tblDishes->cellWidget(row, column));
     if (md == nullptr) {
         return;
@@ -1593,7 +1611,7 @@ void Workspace::loginResponse(const QJsonObject &jdoc)
     httpStop(sender());
     QJsonArray jsessions = jdoc["data"].toObject()["sessions"].toArray();
     createHttpRequest("/engine/smart/init.php",
-    QJsonObject{{"config_id", __c5config.getRegValue("json_config_id").toInt()}},
+    QJsonObject{{"config_id", __c5config.fSettingsName}},
     SLOT(initResponse(QJsonObject)), "init");
 }
 
@@ -1842,6 +1860,15 @@ void Workspace::receiptResponse(const QJsonObject &jdoc)
     qDebug() << jo;
 }
 
+void Workspace::serviceValuesResponse(const QJsonObject &jdoc)
+{
+    httpStop(sender());
+    DlgServiceValues d;
+    d.config(jdoc);
+    if (d.exec() == QDialog::Accepted) {
+    }
+}
+
 void Workspace::voidResponse(const QJsonObject &jdoc)
 {
     QJsonObject jo = jdoc["data"].toObject();
@@ -1885,10 +1912,17 @@ void Workspace::openTableResponse(const QJsonObject &jdoc)
     resetOrder();
     QJsonObject jo = jdoc["data"].toObject();
     fTable = jo["table"].toInt();
+    if (!jo["locked"].toString().isEmpty()) {
+        httpStop(sender());
+        fTable = 0;
+        C5Message::error(tr("Table locked by") + "<br>" + jo["locked"].toString());
+        return;
+    }
     QTableWidgetItem *currentItem = nullptr;
     for (int i = 0; i < ui->tblTables->columnCount(); i++) {
         if (fTable == ui->tblTables->item(0, i)->data(Qt::UserRole).toInt()) {
             currentItem = ui->tblTables->item(0, i);
+            currentItem->setData(Qt::UserRole + 2, true);
             ui->tblTables->setCurrentItem(currentItem);
             break;
         }
@@ -1986,11 +2020,6 @@ void Workspace::on_btnAppMenu_clicked()
     if (fUser->property("session_close").toBool()) {
         qApp->quit();
     }
-}
-
-void Workspace::on_btnP05_2_clicked()
-{
-    setQty(0.25, 1, -1, "");
 }
 
 void Workspace::on_btnP3_clicked()
@@ -2148,7 +2177,7 @@ void Workspace::on_tblTables_itemClicked(QTableWidgetItem *item)
             ti->setData(Qt::UserRole + 2, false);
         }
     }
-    item->setData(Qt::UserRole + 2, true);
+    //item->setData(Qt::UserRole + 2, true);
     createHttpRequest("/engine/smart/opentable.php", QJsonObject{{"table", item->data(Qt::UserRole).toInt()}}, SLOT(
         openTableResponse(QJsonObject)));
 }
@@ -2319,4 +2348,15 @@ void Workspace::on_btnFlagTakeAway_clicked(bool checked)
     }
     createHttpRequest("/engine/smart/take-away-flag.php", QJsonObject{{"header", fOrderUuid}, {"flag", checked ? 1 : 0}},
     SLOT(voidResponse(QJsonObject)));
+}
+
+void Workspace::on_btnService_clicked()
+{
+    if (service()) {
+        if (C5Message::question(tr("Remove service fee?")) == QDialog::Accepted) {
+        } else {
+            return;
+        }
+    }
+    createHttpRequest("/engine/smart/get-service-values.php", QJsonObject(), SLOT(serviceValuesResponse(QJsonObject)));
 }

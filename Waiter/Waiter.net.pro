@@ -394,6 +394,7 @@ SOURCES += \
     dlglist.cpp \
     dlglistdishspecial.cpp \
     dlglistofpackages.cpp \
+    dlglistofreservation.cpp \
     dlgmanagertools.cpp \
     dlgmenuset.cpp \
     dlgprecheckoptions.cpp \
@@ -836,6 +837,7 @@ HEADERS += \
     dlglist.h \
     dlglistdishspecial.h \
     dlglistofpackages.h \
+    dlglistofreservation.h \
     dlgmanagertools.h \
     dlgmenuset.h \
     dlgorder.h \
@@ -1078,6 +1080,7 @@ FORMS += \
     dlglist.ui \
     dlglistdishspecial.ui \
     dlglistofpackages.ui \
+    dlglistofreservation.ui \
     dlgmanagertools.ui \
     dlgmenuset.ui \
     dlgorder.ui \

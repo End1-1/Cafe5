@@ -12,7 +12,7 @@ class AXReporting : public QObject
 public:
     explicit AXReporting(QObject *parent = nullptr);
 
-    void printReservation(const QJsonObject &jo);
+    void printReservation(const QJsonObject &jo, int langid);
 
     void replaceString(QAxObject *find, const QString &oldStr, const QString &newStr);
 

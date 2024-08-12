@@ -4,7 +4,6 @@
 #include "database.h"
 #include "dlglicenses.h"
 #include "c5crypt.h"
-#include "c5license.h"
 #include "os.h"
 #include <QMessageBox>
 #include <QFileDialog>
@@ -43,7 +42,7 @@ Monitor::Monitor(QWidget *parent)
     }
     if (ui->leMariaDBInstallationPath->text().isEmpty()) {
         QSettings s("HKEY_LOCAL_MACHINE\\SOFTWARE", QSettings::Registry64Format);
-        for (const auto &c: s.childGroups()) {
+        for (const auto &c : s.childGroups()) {
             if (c.contains("MariaDB", Qt::CaseInsensitive)) {
                 s.beginGroup(c);
                 ui->leMariaDBInstallationPath->setText(s.value("INSTALLDIR").toString());
@@ -52,12 +51,10 @@ Monitor::Monitor(QWidget *parent)
             }
         }
     }
-
     ui->leServerPort->setText(ConfigIni::value("server/port"));
     if (ui->leServerPort->text().isEmpty()) {
         ui->leServerPort->setText("10002");
     }
-
     Database db;
     if (db.open(ui->leMainHost->text(), "", ui->leMainusername->text(), ui->leMainPassword->text())) {
         bool ok = false;
@@ -88,11 +85,9 @@ Monitor::Monitor(QWidget *parent)
         }
         ui->lbWorkingDBStatus->setText(ok ? tr("Created") : tr("Need to create"));
     }
-
     QString app = qApp->applicationFilePath();
     DWORD dwHandle;
     DWORD dwLen = GetFileVersionInfoSize(app.toStdWString().c_str(), &dwHandle);
-
     // GetFileVersionInfo
     QString v = "?.?.?.?";
     BYTE *lpData = new BYTE[dwLen];
@@ -102,17 +97,15 @@ Monitor::Monitor(QWidget *parent)
         // VerQueryValue
         VS_FIXEDFILEINFO *lpBuffer = nullptr;
         UINT uLen;
-        if(VerQueryValue(lpData, QString("\\").toStdWString().c_str(), (LPVOID*)&lpBuffer, &uLen)) {
+        if(VerQueryValue(lpData, QString("\\").toStdWString().c_str(), (LPVOID * ) &lpBuffer, &uLen)) {
             v =
                 QString::number((lpBuffer->dwFileVersionMS >> 16) & 0xffff) + "." +
                 QString::number((lpBuffer->dwFileVersionMS) & 0xffff ) + "." +
                 QString::number((lpBuffer->dwFileVersionLS >> 16 ) & 0xffff ) + "." +
                 QString::number((lpBuffer->dwFileVersionLS) & 0xffff );
         }
-        }
+    }
     ui->lbVersion->setText(v);
-
-    readLicense();
 }
 
 Monitor::~Monitor()
@@ -172,8 +165,8 @@ void Monitor::on_btnCreateDatabases_clicked()
         }
         if (dbempty) {
             QString cmd = QString("\"%1/bin/mysql\" -uroot -p%2 server5")
-                    .arg(ui->leMariaDBInstallationPath->text())
-                    .arg(ui->leMainPassword->text());
+                          .arg(ui->leMariaDBInstallationPath->text())
+                          .arg(ui->leMainPassword->text());
             QProcess p;
             p.setStandardInputFile(server5);
             p.setStandardOutputFile(log);
@@ -188,7 +181,6 @@ void Monitor::on_btnCreateDatabases_clicked()
         } else {
             QMessageBox::critical(this, tr("Error"), tr("Server database exists"));
         }
-
         dbempty = true;
         if (db.execDirect("create database airlog default character set utf8 collate utf8_general_ci") == false) {
             db.execDirect("use airlog");
@@ -199,7 +191,7 @@ void Monitor::on_btnCreateDatabases_clicked()
         }
         if (dbempty) {
             QString cmd = QString("\"%1/bin/mysql\" -uroot -p%2 airlog")
-                    .arg(ui->leMariaDBInstallationPath->text(), ui->leMainPassword->text());
+                          .arg(ui->leMariaDBInstallationPath->text(), ui->leMainPassword->text());
             QProcess p;
             p.setStandardInputFile(airlog);
             p.setStandardOutputFile(log);
@@ -224,7 +216,7 @@ void Monitor::on_btnCreateDatabases_clicked()
         }
         if (dbempty) {
             QString cmd = QString("\"%1/bin/mysql\" -uroot -p%2 cafe5")
-                    .arg(ui->leMariaDBInstallationPath->text(), ui->leMainPassword->text());
+                          .arg(ui->leMariaDBInstallationPath->text(), ui->leMainPassword->text());
             QProcess p;
             p.setStandardInputFile(cafe5);
             p.setStandardOutputFile(log);
@@ -264,7 +256,6 @@ void Monitor::on_btnRegister_clicked()
     if (cryptoKey.isEmpty()) {
         cryptoKey = c.machineUuid();
     }
-
 #ifdef QT_DEBUG
     QString address = "10.1.0.2";
 #else
@@ -330,12 +321,6 @@ void Monitor::on_btnRegister_clicked()
                     return;
                 }
                 replyData = QByteArray::fromBase64(jo["license"].toString().toLatin1());
-                C5License lic;
-                if (lic.write(replyData) == false) {
-                    QMessageBox::critical(this, tr("Error"), tr("Cannot open file to write license information"));
-                    return;
-                }
-                readLicense();
             } else {
                 QMessageBox::critical(this, tr("Error"), http->errorString());
             }
@@ -345,24 +330,6 @@ void Monitor::on_btnRegister_clicked()
     }
     http->deleteLater();
 }
-
-void Monitor::readLicense()
-{
-    ui->grLicense->setVisible(false);
-    C5License l;
-    QDate d;
-    QString t;
-    if (l.read(d, t)) {
-        ui->grLicense->setVisible(true);
-        ui->grRegistration->setVisible(false);
-        ui->lbLicenseDate->setText(QString("%1: %2").arg(tr("Expiration"), d.toString("dd/MM/yyyy")));
-        ui->lbLicenseType->setText(QString("%1: %2").arg(tr("License type"), t));
-        if (!d.isValid() || d < QDate::currentDate()) {
-            ui->lbLicenseDate->setStyleSheet("color: red");
-        }
-    }
-}
-
 
 void Monitor::on_btnStopServer_clicked()
 {

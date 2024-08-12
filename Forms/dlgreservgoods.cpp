@@ -106,9 +106,6 @@ void DlgReservGoods::on_btnSave_clicked()
         return;
     }
     insertReserve(__c5config.dbParams());
-    if (__c5config.rdbReplica()) {
-        insertReserve(__c5config.dbParams());
-    }
     ui->btnSave->setVisible(false);
     ui->btnCancelReserve->setVisible(true);
     ui->btnCompleteReserve->setVisible(true);
@@ -139,9 +136,7 @@ void DlgReservGoods::on_btnCancelReserve_clicked()
 void DlgReservGoods::setState(int state)
 {
     updateState(__c5config.dbParams(), state);
-    if (__c5config.rdbReplica()) {
-        updateState(__c5config.dbParams(), state);
-    }
+    updateState(__c5config.dbParams(), state);
     ui->btnCancelReserve->setVisible(false);
     ui->btnCompleteReserve->setVisible(false);
 #if(!defined FRONTDESK && !defined WAITER)

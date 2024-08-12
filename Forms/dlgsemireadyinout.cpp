@@ -52,14 +52,16 @@ void DlgSemireadyInOut::on_btnSelectGoods_clicked()
     QList<QVariant> vals;
     QHash<QString, QString> trans;
     if (!C5Selector::getValues(fDBParams,
-                               "select distinct(g.f_id), g.f_name, g.f_complectout "
+                               "select distinct(g.f_id), g.f_name, g.f_complectout, u.f_name as f_unitname "
                                "from c_goods_complectation gc "
-                               "left join c_goods g on g.f_id=gc.f_base", vals, trans)) {
+                               "left join c_goods g on g.f_id=gc.f_base "
+                               "left join c_units u on u.f_id=g.f_unit ", vals, trans)) {
         return;
     }
     ui->tbl->setRowCount(0);
     ui->leQty->setProperty("qty", vals.at(3));
     ui->leQty->setDouble(vals.at(3).toDouble());
+    ui->lbMeas->setText(vals.at(4).toString());
     ui->leGoods->setText(vals.at(2).toString());
     C5Database db(fDBParams);
     db[":f_base"] = vals.at(1);
@@ -79,7 +81,7 @@ void DlgSemireadyInOut::on_btnSelectGoods_clicked()
     do {
         alldone = true;
         int removerow = 0;
-        for (int i = ui->tbl->rowCount() - 1; i> -1; i--) {
+        for (int i = ui->tbl->rowCount() - 1; i > -1; i--) {
             db[":f_base"] = ui->tbl->getInteger(i, 0);
             db.exec("select g.f_name, gc.f_goods, gc.f_qty / g.f_complectout as f_qty "
                     "from c_goods_complectation gc "
@@ -91,8 +93,8 @@ void DlgSemireadyInOut::on_btnSelectGoods_clicked()
                 int r = ui->tbl->addEmptyRow();
                 ui->tbl->setInteger(r, 0, db.getInt("f_goods"));
                 ui->tbl->setString(r, 1, db.getString("f_name"));
-                ui->tbl->setDouble(r, 2, db.getDouble("f_qty") * ui->tbl->item(i, 2)->data(Qt::UserRole).toDouble());
-                ui->tbl->item(r, 2)->setData(Qt::UserRole, db.getDouble("f_qty") * ui->tbl->item(i, 2)->data(Qt::UserRole).toDouble());
+                ui->tbl->setDouble(r, 2, db.getDouble("f_qty") *ui->tbl->item(i, 2)->data(Qt::UserRole).toDouble());
+                ui->tbl->item(r, 2)->setData(Qt::UserRole, db.getDouble("f_qty") *ui->tbl->item(i, 2)->data(Qt::UserRole).toDouble());
             }
             if (removerow > 0) {
                 ui->tbl->removeRow(removerow);

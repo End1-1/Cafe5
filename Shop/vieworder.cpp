@@ -1,5 +1,6 @@
 #include "vieworder.h"
 #include "ui_vieworder.h"
+#include "jsons.h"
 #include "c5config.h"
 #include "c5message.h"
 #include "goodsreturnreason.h"
@@ -119,6 +120,10 @@ void ViewOrder::removeOrderResponse(const QJsonObject &jdoc)
 
 void ViewOrder::on_btnReturn_clicked()
 {
+    if (ui->leDate->date().daysTo(QDate::currentDate()) > 14 ) {
+        C5Message::error(tr("You cannot return this item"));
+        return;
+    }
     GoodsReturnReason r;
     r.exec();
     int reason = r.fReason;
@@ -395,6 +400,14 @@ void ViewOrder::on_btnPrintReceiptA4_clicked()
 
 void ViewOrder::on_btnMakeDraft_clicked()
 {
+    if (ui->leDate->date().daysTo(QDate::currentDate()) > 14 ) {
+        C5Message::error(tr("You cannot return this item"));
+        return;
+    }
+    if (ui->leDate->date().daysTo(QDate::currentDate()) > 14 ) {
+        C5Message::error(tr("You cannot return this item"));
+        return;
+    }
     if (C5Message::question(tr("Confirm to make draft")) != QDialog::Accepted) {
         return;
     }

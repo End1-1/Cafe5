@@ -42,11 +42,6 @@
 #define param_autoinput_salecash 38
 #define param_tax_cashier_login 39
 #define param_tax_cashier_pin 40
-#define param_rootdb_replica 42
-#define param_rootdb_host 43
-#define param_rootdb_schema 44
-#define param_rootdb_user 45
-#define param_rootdb_pass 46
 #define param_shop_noF1 47
 #define param_shop_noF2 48
 #define param_shop_noPriceChange 49
@@ -244,16 +239,6 @@ public:
     static QString taxCashier();
 
     static QString taxPin();
-
-    static bool rdbReplica();
-
-    static QString rdbHost();
-
-    static QString rdbSchema();
-
-    static QString rdbUser();
-
-    static QString rdbPassword();
 
     static bool shopDenyF1();
 

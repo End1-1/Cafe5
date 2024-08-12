@@ -59,6 +59,7 @@ DWORD WINAPI ThreadProc(CONST LPVOID lpParam)
             QStringList ac = a.split("=");
             if (ac.length() == 2) {
                 configFile = ac.at(1);
+                LogWriter::write(LogWriterLevel::verbose, "Config file", configFile);
             }
         }
     }

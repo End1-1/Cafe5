@@ -101,10 +101,20 @@ void C5Editor::EditorAccepted()
 
 void C5Editor::on_btnSave_clicked()
 {
-    if (on_btnSaveAndNew_clicked()) {
-        if (!fEditor->acceptOnSave()) {
-            accept();
-        }
+    QString err;
+    if (!fEditor->checkData(err)) {
+        C5Message::error(err);
+        return;
+    }
+    err = "";
+    if (!fEditor->save(err, fData)) {
+        C5Message::error(err);
+        return;
+    }
+    setProperty("saveandnew", false);
+    if (!fEditor->acceptOnSave()) {
+        fEditor->clear();
+        accept();
     }
 }
 
@@ -120,6 +130,7 @@ bool C5Editor::on_btnSaveAndNew_clicked()
         C5Message::error(err);
         return false;
     }
+    setProperty("saveandnew", true);
     if (!fEditor->acceptOnSave()) {
         fEditor->clear();
     }

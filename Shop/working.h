@@ -80,6 +80,8 @@ private:
 
     static Working *fInstance;
 
+    NInterface *fHttp;
+
     C5User *fUser;
 
     WCustomerDisplay *fCustomerDisplay;
@@ -93,8 +95,6 @@ private:
     bool fHaveChanges;
 
     bool fUpFinished;
-
-    NInterface *http;
 
     QMovie *mMovie;
 

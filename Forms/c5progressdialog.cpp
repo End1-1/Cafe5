@@ -1,5 +1,8 @@
 #include "c5progressdialog.h"
 #include "ui_c5progressdialog.h"
+#include <QMutex>
+
+QMutex mutex;
 
 C5ProgressDialog::C5ProgressDialog(QWidget *parent) :
     QDialog(parent),
@@ -27,14 +30,16 @@ int C5ProgressDialog::exec()
 
 void C5ProgressDialog::updateProgressValue(int value)
 {
+    QMutexLocker ml( &mutex);
     ui->lbHint->setText(QString("%1/%2").arg(value).arg(fMax));
     ui->progressBar->setValue(value);
-    qApp->processEvents();
+    //qApp->processEvents();
 }
 
 void C5ProgressDialog::updateProgressValueWithMessage(int value, const QString &msg)
 {
+    QMutexLocker ml( &mutex);
     ui->lbHint->setText(QString("%1/%2 %3").arg(value).arg(fMax).arg(msg));
     ui->progressBar->setValue(value);
-    qApp->processEvents();
+    //qApp->processEvents();
 }

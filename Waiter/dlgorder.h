@@ -106,6 +106,8 @@ private:
     void discountOrder(C5User *u, const QString &code);
 
 private slots:
+    void openReserveError(const QString &err);
+
     void openReservationResponse(const QJsonObject &jdoc);
 
     void openTableResponse(const QJsonObject &jdoc);
@@ -278,6 +280,8 @@ private slots:
 
 signals:
     void allDone();
+
+    void openNewReserve();
 };
 
 #endif // DLGORDER_H

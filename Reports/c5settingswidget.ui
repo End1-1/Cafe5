@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>800</width>
-    <height>580</height>
+    <height>631</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -53,38 +53,48 @@
           <enum>Qt::NoFocus</enum>
          </property>
          <property name="currentIndex">
-          <number>0</number>
+          <number>6</number>
          </property>
          <widget class="QWidget" name="tab">
           <attribute name="title">
            <string>Main</string>
           </attribute>
           <layout class="QGridLayout" name="gridLayout_3">
-           <item row="9" column="1">
-            <widget class="C5LineEdit" name="leRDBUser">
+           <item row="1" column="0">
+            <widget class="QLabel" name="label_15">
+             <property name="text">
+              <string>Name</string>
+             </property>
+            </widget>
+           </item>
+           <item row="11" column="1">
+            <widget class="C5ComboBox" name="cbDefaultCurrency">
              <property name="Tag" stdset="0">
-              <number>45</number>
+              <string>116</string>
              </property>
             </widget>
            </item>
-           <item row="6" column="0">
-            <widget class="QLabel" name="label_44">
+           <item row="0" column="0">
+            <widget class="QLabel" name="label_14">
              <property name="text">
-              <string>Transfer to root DB</string>
+              <string>Code</string>
              </property>
             </widget>
            </item>
-           <item row="13" column="0">
-            <widget class="QLabel" name="label_107">
+           <item row="8" column="0">
+            <widget class="QLabel" name="label_79">
              <property name="text">
-              <string>Mobile application connection string</string>
+              <string>Debug mode</string>
              </property>
             </widget>
            </item>
-           <item row="9" column="0">
-            <widget class="QLabel" name="label_47">
-             <property name="text">
-              <string>Root DB user</string>
+           <item row="9" column="1">
+            <widget class="C5LineEdit" name="leSystemThouthandSeparator">
+             <property name="maxLength">
+              <number>1</number>
+             </property>
+             <property name="Tag" stdset="0">
+              <number>106</number>
              </property>
             </widget>
            </item>
@@ -98,14 +108,117 @@
              </property>
             </widget>
            </item>
-           <item row="11" column="0">
-            <widget class="QLabel" name="label_79">
-             <property name="text">
-              <string>Debug mode</string>
+           <item row="7" column="1">
+            <widget class="C5ComboBox" name="cbFronDeskMode">
+             <property name="Tag" stdset="0">
+              <number>33</number>
              </property>
             </widget>
            </item>
-           <item row="15" column="1">
+           <item row="6" column="0">
+            <widget class="QLabel" name="label_90">
+             <property name="text">
+              <string>Application font family</string>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="1">
+            <widget class="C5LineEditWithSelector" name="leSettingsName">
+             <property name="Field" stdset="0">
+              <string>f_name</string>
+             </property>
+            </widget>
+           </item>
+           <item row="10" column="1">
+            <widget class="C5LineEdit" name="leMobileAppConStr">
+             <property name="maxLength">
+              <number>1</number>
+             </property>
+             <property name="Tag" stdset="0">
+              <number>114</number>
+             </property>
+            </widget>
+           </item>
+           <item row="3" column="1">
+            <widget class="C5LineEditWithSelector" name="leCompanyInfo"/>
+           </item>
+           <item row="10" column="0">
+            <widget class="QLabel" name="label_107">
+             <property name="text">
+              <string>Mobile application connection string</string>
+             </property>
+            </widget>
+           </item>
+           <item row="5" column="0">
+            <widget class="QLabel" name="label_32">
+             <property name="text">
+              <string>Applicatin font base size</string>
+             </property>
+            </widget>
+           </item>
+           <item row="2" column="1">
+            <widget class="C5LineEditWithSelector" name="leCompanyname"/>
+           </item>
+           <item row="11" column="0">
+            <widget class="QLabel" name="label_215">
+             <property name="text">
+              <string>Default currency</string>
+             </property>
+            </widget>
+           </item>
+           <item row="3" column="0">
+            <widget class="QLabel" name="label_114">
+             <property name="text">
+              <string>Company info for documents</string>
+             </property>
+            </widget>
+           </item>
+           <item row="8" column="1">
+            <widget class="C5CheckBox" name="chDebugMode">
+             <property name="text">
+              <string/>
+             </property>
+             <property name="Tag" stdset="0">
+              <number>83</number>
+             </property>
+            </widget>
+           </item>
+           <item row="9" column="0">
+            <widget class="QLabel" name="label_99">
+             <property name="text">
+              <string>System thouthand separator</string>
+             </property>
+            </widget>
+           </item>
+           <item row="7" column="0">
+            <widget class="QLabel" name="label_35">
+             <property name="text">
+              <string>Frontdesk mode</string>
+             </property>
+            </widget>
+           </item>
+           <item row="4" column="1">
+            <widget class="C5LineEditWithSelector" name="lineEdit_3">
+             <property name="Field" stdset="0">
+              <string>f_description</string>
+             </property>
+            </widget>
+           </item>
+           <item row="4" column="0">
+            <widget class="QLabel" name="label_16">
+             <property name="text">
+              <string>Description</string>
+             </property>
+            </widget>
+           </item>
+           <item row="5" column="1">
+            <widget class="C5LineEdit" name="leFDFontSize">
+             <property name="Tag" stdset="0">
+              <number>28</number>
+             </property>
+            </widget>
+           </item>
+           <item row="12" column="1">
             <spacer name="verticalSpacer_3">
              <property name="orientation">
               <enum>Qt::Vertical</enum>
@@ -119,182 +232,16 @@
             </spacer>
            </item>
            <item row="2" column="0">
-            <widget class="QLabel" name="label_16">
+            <widget class="QLabel" name="label_113">
              <property name="text">
-              <string>Description</string>
-             </property>
-            </widget>
-           </item>
-           <item row="7" column="0">
-            <widget class="QLabel" name="label_45">
-             <property name="text">
-              <string>Root DB host</string>
-             </property>
-            </widget>
-           </item>
-           <item row="12" column="0">
-            <widget class="QLabel" name="label_99">
-             <property name="text">
-              <string>System thouthand separator</string>
-             </property>
-            </widget>
-           </item>
-           <item row="7" column="1">
-            <widget class="C5LineEdit" name="leRDBHost">
-             <property name="Tag" stdset="0">
-              <number>43</number>
+              <string>Company name</string>
              </property>
             </widget>
            </item>
            <item row="6" column="1">
-            <widget class="C5CheckBox" name="chRDB">
-             <property name="text">
-              <string/>
-             </property>
-             <property name="Tag" stdset="0">
-              <number>42</number>
-             </property>
-            </widget>
-           </item>
-           <item row="5" column="0">
-            <widget class="QLabel" name="label_35">
-             <property name="text">
-              <string>Frontdesk mode</string>
-             </property>
-            </widget>
-           </item>
-           <item row="8" column="0">
-            <widget class="QLabel" name="label_46">
-             <property name="text">
-              <string>Root DB schema</string>
-             </property>
-            </widget>
-           </item>
-           <item row="10" column="0">
-            <widget class="QLabel" name="label_48">
-             <property name="text">
-              <string>Root DB password</string>
-             </property>
-            </widget>
-           </item>
-           <item row="2" column="1">
-            <widget class="C5LineEditWithSelector" name="lineEdit_3">
-             <property name="Field" stdset="0">
-              <string>f_description</string>
-             </property>
-            </widget>
-           </item>
-           <item row="4" column="1">
             <widget class="QFontComboBox" name="fnApp">
              <property name="Tag" stdset="0">
               <number>97</number>
-             </property>
-            </widget>
-           </item>
-           <item row="3" column="0">
-            <widget class="QLabel" name="label_32">
-             <property name="text">
-              <string>Applicatin font base size</string>
-             </property>
-            </widget>
-           </item>
-           <item row="1" column="1">
-            <widget class="C5LineEditWithSelector" name="lineEdit_2">
-             <property name="Field" stdset="0">
-              <string>f_name</string>
-             </property>
-            </widget>
-           </item>
-           <item row="1" column="0">
-            <widget class="QLabel" name="label_15">
-             <property name="text">
-              <string>Name</string>
-             </property>
-            </widget>
-           </item>
-           <item row="12" column="1">
-            <widget class="C5LineEdit" name="leSystemThouthandSeparator">
-             <property name="maxLength">
-              <number>1</number>
-             </property>
-             <property name="Tag" stdset="0">
-              <number>106</number>
-             </property>
-            </widget>
-           </item>
-           <item row="5" column="1">
-            <widget class="C5ComboBox" name="cbFronDeskMode">
-             <property name="Tag" stdset="0">
-              <number>33</number>
-             </property>
-            </widget>
-           </item>
-           <item row="11" column="1">
-            <widget class="C5CheckBox" name="chDebugMode">
-             <property name="text">
-              <string/>
-             </property>
-             <property name="Tag" stdset="0">
-              <number>83</number>
-             </property>
-            </widget>
-           </item>
-           <item row="4" column="0">
-            <widget class="QLabel" name="label_90">
-             <property name="text">
-              <string>Application font family</string>
-             </property>
-            </widget>
-           </item>
-           <item row="3" column="1">
-            <widget class="C5LineEdit" name="leFDFontSize">
-             <property name="Tag" stdset="0">
-              <number>28</number>
-             </property>
-            </widget>
-           </item>
-           <item row="0" column="0">
-            <widget class="QLabel" name="label_14">
-             <property name="text">
-              <string>Code</string>
-             </property>
-            </widget>
-           </item>
-           <item row="8" column="1">
-            <widget class="C5LineEdit" name="leRDBSchema">
-             <property name="Tag" stdset="0">
-              <number>44</number>
-             </property>
-            </widget>
-           </item>
-           <item row="13" column="1">
-            <widget class="C5LineEdit" name="leMobileAppConStr">
-             <property name="maxLength">
-              <number>1</number>
-             </property>
-             <property name="Tag" stdset="0">
-              <number>114</number>
-             </property>
-            </widget>
-           </item>
-           <item row="10" column="1">
-            <widget class="C5LineEdit" name="leRDBPassword">
-             <property name="Tag" stdset="0">
-              <number>46</number>
-             </property>
-            </widget>
-           </item>
-           <item row="14" column="0">
-            <widget class="QLabel" name="label_215">
-             <property name="text">
-              <string>Default currency</string>
-             </property>
-            </widget>
-           </item>
-           <item row="14" column="1">
-            <widget class="C5ComboBox" name="cbDefaultCurrency">
-             <property name="Tag" stdset="0">
-              <string>116</string>
              </property>
             </widget>
            </item>
@@ -2200,6 +2147,39 @@
            </item>
           </layout>
          </widget>
+         <widget class="QWidget" name="tab_10">
+          <attribute name="title">
+           <string>Mobile</string>
+          </attribute>
+          <layout class="QFormLayout" name="formLayout_3">
+           <item row="0" column="0">
+            <widget class="QLabel" name="label_112">
+             <property name="text">
+              <string>Dashboard type</string>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="1">
+            <widget class="QComboBox" name="cbMobileDashboard">
+             <item>
+              <property name="text">
+               <string>reports</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>store</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>hotel</string>
+              </property>
+             </item>
+            </widget>
+           </item>
+          </layout>
+         </widget>
         </widget>
        </item>
       </layout>
@@ -2220,34 +2200,29 @@
    <header location="global">c5lineeditwithselector.h</header>
   </customwidget>
   <customwidget>
-   <class>C5CheckBox</class>
-   <extends>QCheckBox</extends>
-   <header location="global">c5checkbox.h</header>
-  </customwidget>
-  <customwidget>
    <class>C5ComboBox</class>
    <extends>QComboBox</extends>
    <header location="global">c5combobox.h</header>
   </customwidget>
+  <customwidget>
+   <class>C5CheckBox</class>
+   <extends>QCheckBox</extends>
+   <header location="global">c5checkbox.h</header>
+  </customwidget>
  </customwidgets>
  <tabstops>
   <tabstop>leCode</tabstop>
-  <tabstop>lineEdit_2</tabstop>
+  <tabstop>leSettingsName</tabstop>
+  <tabstop>leCompanyname</tabstop>
+  <tabstop>leCompanyInfo</tabstop>
   <tabstop>lineEdit_3</tabstop>
   <tabstop>leFDFontSize</tabstop>
   <tabstop>fnApp</tabstop>
   <tabstop>cbFronDeskMode</tabstop>
-  <tabstop>chRDB</tabstop>
-  <tabstop>leRDBHost</tabstop>
-  <tabstop>leRDBSchema</tabstop>
-  <tabstop>leRDBUser</tabstop>
-  <tabstop>leRDBPassword</tabstop>
   <tabstop>chDebugMode</tabstop>
   <tabstop>leSystemThouthandSeparator</tabstop>
   <tabstop>leMobileAppConStr</tabstop>
   <tabstop>cbDefaultCurrency</tabstop>
-  <tabstop>cbMenu</tabstop>
-  <tabstop>leServiceFactor</tabstop>
   <tabstop>leAutoDiscount</tabstop>
   <tabstop>leHall</tabstop>
   <tabstop>leTable</tabstop>
@@ -2355,6 +2330,9 @@
   <tabstop>leCardId</tabstop>
   <tabstop>chAutomaticallyStoreOutWaiter</tabstop>
   <tabstop>chAutoCash</tabstop>
+  <tabstop>leServiceFactor</tabstop>
+  <tabstop>cbMenu</tabstop>
+  <tabstop>cbMobileDashboard</tabstop>
  </tabstops>
  <resources/>
  <connections/>

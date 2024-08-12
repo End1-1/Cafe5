@@ -40,17 +40,17 @@ void C5SettingsWidget::setId(int id)
     db.exec("select f_id, f_counter from a_type");
     while (db.nextRow()) {
         switch (db.getInt(0)) {
-        case DOC_TYPE_STORE_INPUT:
-            ui->leInputDocCounter->setInteger(db.getInt(1));
-            break;
-        case DOC_TYPE_STORE_OUTPUT:
-            ui->leOutDocCounter->setInteger(db.getInt(1));
-            break;
-        case DOC_TYPE_STORE_MOVE:
-            ui->leMoveDocCounter->setInteger(db.getInt(1));
-            break;
-        default:
-            break;
+            case DOC_TYPE_STORE_INPUT:
+                ui->leInputDocCounter->setInteger(db.getInt(1));
+                break;
+            case DOC_TYPE_STORE_OUTPUT:
+                ui->leOutDocCounter->setInteger(db.getInt(1));
+                break;
+            case DOC_TYPE_STORE_MOVE:
+                ui->leMoveDocCounter->setInteger(db.getInt(1));
+                break;
+            default:
+                break;
         }
     }
 }
@@ -96,11 +96,6 @@ bool C5SettingsWidget::save(QString &err, QList<QMap<QString, QVariant> > &data)
     fTags[ui->leCardIdPrefix->getTag()] = ui->leCardIdPrefix->text();
     fTags[ui->leCashierLogin->getTag()] = ui->leCashierLogin->text();
     fTags[ui->leCashierPin->getTag()] = ui->leCashierPin->text();
-    fTags[ui->chRDB->getTag()] = ui->chRDB->isChecked() ? "1" : "0";
-    fTags[ui->leRDBHost->getTag()] = ui->leRDBHost->text();
-    fTags[ui->leRDBSchema->getTag()] = ui->leRDBSchema->text();
-    fTags[ui->leRDBUser->getTag()] = ui->leRDBUser->text();
-    fTags[ui->leRDBPassword->getTag()] = ui->leRDBPassword->text();
     fTags[ui->chDenyPriceChange->getTag()] = ui->chDenyPriceChange->isChecked() ? "1" : "0";
     fTags[ui->chDenyReatail->getTag()] = ui->chDenyReatail->isChecked() ? "1" : "0";
     fTags[ui->chDenyWhosale->getTag()] = ui->chDenyWhosale->isChecked() ? "1" : "0";
@@ -196,6 +191,15 @@ bool C5SettingsWidget::save(QString &err, QList<QMap<QString, QVariant> > &data)
     db.update("a_type", where_id(DOC_TYPE_STORE_OUTPUT));
     db[":f_counter"] = ui->leMoveDocCounter->getInteger();
     db.update("a_type", where_id(DOC_TYPE_STORE_MOVE));
+    QJsonObject jc;
+    jc["store"] = ui->cbDefaultStore->currentData().toInt();
+    jc["store_name"] = ui->cbDefaultStore->currentText();
+    jc["first_page_title"] = ui->leSettingsName->text();
+    jc["hall"] = ui->leHall->getInteger();
+    jc["menu"] = ui->cbMenu->currentData().toInt();
+    jc["dashboard"] = ui->cbMobileDashboard->currentText();
+    jc["companydata"] = ui->leCompanyInfo->text();
+    jc["companyname"] = ui->leCompanyname->text();
     __c5config.initParamsFromDb();
     return true;
 }
@@ -203,34 +207,35 @@ bool C5SettingsWidget::save(QString &err, QList<QMap<QString, QVariant> > &data)
 void C5SettingsWidget::clearWidgetValue(QWidget *w)
 {
     if (!strcmp(w->metaObject()->className(), "C5LineEdit")) {
-        static_cast<C5LineEdit*>(w)->clear();
+        static_cast<C5LineEdit *>(w)->clear();
     } else if (!strcmp(w->metaObject()->className(), "C5ComboBox")) {
-        static_cast<C5ComboBox*>(w)->setCurrentIndex(-1);
+        static_cast<C5ComboBox *>(w)->setCurrentIndex(-1);
     } else if  (!strcmp(w->metaObject()->className(), "QRadioButton")) {
-        static_cast<QRadioButton*>(w)->setAutoExclusive(false);
-        static_cast<QRadioButton*>(w)->setChecked(false);
-        static_cast<QRadioButton*>(w)->setAutoExclusive(true);
+        static_cast<QRadioButton *>(w)->setAutoExclusive(false);
+        static_cast<QRadioButton *>(w)->setChecked(false);
+        static_cast<QRadioButton *>(w)->setAutoExclusive(true);
     } else if (!strcmp(w->metaObject()->className(), "QComboBox")) {
-        static_cast<QComboBox*>(w)->setCurrentIndex(-1);
+        static_cast<QComboBox *>(w)->setCurrentIndex(-1);
     } else if (!strcmp(w->metaObject()->className(), "QFontComboBox")) {
-        static_cast<QFontComboBox*>(w)->setCurrentIndex(-1);
+        static_cast<QFontComboBox *>(w)->setCurrentIndex(-1);
     }
 }
 
 void C5SettingsWidget::setWidgetValue(QWidget *w, const QString &value)
 {
-    if (!strcmp(w->metaObject()->className(), "C5LineEdit") || !strcmp(w->metaObject()->className(), "C5LineEditWithSelector")) {
-        static_cast<C5LineEdit*>(w)->setText(value);
+    if (!strcmp(w->metaObject()->className(), "C5LineEdit")
+            || !strcmp(w->metaObject()->className(), "C5LineEditWithSelector")) {
+        static_cast<C5LineEdit *>(w)->setText(value);
     } else if (!strcmp(w->metaObject()->className(), "C5ComboBox")) {
-        static_cast<C5ComboBox*>(w)->setIndexForValue(value);
+        static_cast<C5ComboBox *>(w)->setIndexForValue(value);
     } else if (!strcmp(w->metaObject()->className(), "C5CheckBox")) {
-        static_cast<C5CheckBox*>(w)->setChecked(value == "1");
+        static_cast<C5CheckBox *>(w)->setChecked(value == "1");
     } else if  (!strcmp(w->metaObject()->className(), "QRadioButton")) {
-        static_cast<QRadioButton*>(w)->setChecked(value == "1");
+        static_cast<QRadioButton *>(w)->setChecked(value == "1");
     } else if (!strcmp(w->metaObject()->className(), "QComboBox")) {
-        static_cast<QComboBox*>(w)->setCurrentText(value);
+        static_cast<QComboBox *>(w)->setCurrentText(value);
     } else if (!strcmp(w->metaObject()->className(), "QFontComboBox")) {
-        static_cast<QFontComboBox*>(w)->setCurrentText(value);
+        static_cast<QFontComboBox *>(w)->setCurrentText(value);
     }
 }
 
@@ -243,15 +248,15 @@ void C5SettingsWidget::clear(QWidget *parent)
     QObjectList ol = parent->children();
     foreach (QObject *o, ol) {
         if (o->children().count() > 0) {
-            clear(static_cast<QWidget*>(o));
+            clear(static_cast<QWidget *>(o));
         }
         QVariant p = o->property("Tag");
         if (p.isValid()) {
-            clearWidgetValue(static_cast<QWidget*>(o));
+            clearWidgetValue(static_cast<QWidget *>(o));
         } else {
             p = o->property("tag");
             if (p.isValid()) {
-                clearWidgetValue(static_cast<QWidget*>(o));
+                clearWidgetValue(static_cast<QWidget *>(o));
             }
         }
     }
@@ -267,35 +272,35 @@ QWidget *C5SettingsWidget::widget(QWidget *parent, int tag)
     foreach (QObject *o, ol) {
         if (!strcmp(o->metaObject()->className(), "C5LineEdit")
                 || !strcmp(o->metaObject()->className(), "C5LineEditWithSelector")) {
-            C5LineEdit *l = static_cast<C5LineEdit*>(o);
+            C5LineEdit *l = static_cast<C5LineEdit *>(o);
             if (l->getTag() == tag) {
                 return l;
             }
         } else if (!strcmp(o->metaObject()->className(), "QComboBox")) {
-           QComboBox *c = static_cast<QComboBox*>(o);
-           if (c->property("Tag").toInt() == tag) {
-               return c;
-           }
+            QComboBox *c = static_cast<QComboBox *>(o);
+            if (c->property("Tag").toInt() == tag) {
+                return c;
+            }
         } else if (!strcmp(o->metaObject()->className(), "C5ComboBox")) {
-            C5ComboBox *l = static_cast<C5ComboBox*>(o);
+            C5ComboBox *l = static_cast<C5ComboBox *>(o);
             if (l->getTag() == tag) {
                 return l;
             }
         } else if (!strcmp(o->metaObject()->className(), "C5CheckBox")) {
-            C5CheckBox *c = static_cast<C5CheckBox*>(o);
+            C5CheckBox *c = static_cast<C5CheckBox *>(o);
             if (c->getTag() == tag) {
                 return c;
             }
         } else if (!strcmp(o->metaObject()->className(), "QRadioButton")) {
             if (o->property("tag").toInt() == tag) {
-                return static_cast<QRadioButton*>(o);
+                return static_cast<QRadioButton *>(o);
             }
         } else if (!strcmp(o->metaObject()->className(), "QFontComboBox")) {
             if (o->property("Tag").toInt() == tag) {
-                return static_cast<QFontComboBox*>(o);
+                return static_cast<QFontComboBox *>(o);
             }
         } else if (o->children().count() > 0) {
-            QWidget *w = widget(static_cast<QWidget*>(o), tag);
+            QWidget *w = widget(static_cast<QWidget *>(o), tag);
             if (w) {
                 return w;
             }

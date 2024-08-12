@@ -292,6 +292,7 @@ bool CE5Editor::checkData(QString &err)
 
 void CE5Editor::clear()
 {
+    setProperty("saveandnew", false);
     foreach (C5LineEditWithSelector *le, fLines) {
         if(le->cacheId() == 0) {
             le->clear();

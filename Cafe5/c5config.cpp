@@ -287,31 +287,6 @@ QString C5Config::taxPin()
     return getValue(param_tax_cashier_pin);
 }
 
-bool C5Config::rdbReplica()
-{
-    return getValue(param_rootdb_replica).toInt() == 1;
-}
-
-QString C5Config::rdbHost()
-{
-    return getValue(param_rootdb_host);
-}
-
-QString C5Config::rdbSchema()
-{
-    return getValue(param_rootdb_schema);
-}
-
-QString C5Config::rdbUser()
-{
-    return getValue(param_rootdb_user);
-}
-
-QString C5Config::rdbPassword()
-{
-    return getValue(param_rootdb_pass);
-}
-
 bool C5Config::shopDenyF1()
 {
     return getValue(param_shop_noF1).toInt() == 1;

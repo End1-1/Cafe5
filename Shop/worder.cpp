@@ -23,7 +23,6 @@
 #include "datadriver.h"
 #include "wcustomerdisplay.h"
 #include "c5utils.h"
-#include "odraftsalebody.h"
 #include "QRCodeGenerator.h"
 #include "c5checkbox.h"
 #include <QInputDialog>
@@ -339,12 +338,12 @@ bool WOrder::writeOrder()
     }
     jdoc["goods"] = jg;
     QJsonObject jhistory;
-    if (!fAccCard.isEmpty()) {
-        QJsonObject jtemp = fAccCard["card"].toObject();
+    if (fBHistory.card > 0 && fBHistory.type == CARD_TYPE_ACCUMULATIVE) {
+        QJsonObject jtemp;
+        jtemp["card"] = fBHistory.card;
         jtemp["accumulate"] = ui->leCurrentAccumulated->getDouble();
         jtemp["accumulatespend"] = ui->leUseAccumulated->getDouble();
-        fAccCard["card"] = jtemp;
-        jdoc["accumulate"] = fAccCard;
+        jdoc["accumulate"] = jtemp;
     }
     jhistory["f_card"] = fBHistory.card;
     jhistory["f_data"] = fBHistory.data;
@@ -766,7 +765,7 @@ void WOrder::countTotal()
     double accAmount = 0;
     fOHeader.countAmount(fOGoods, fBHistory);
     ui->leTotal->setDouble(fOHeader.amountTotal);
-    if (fAccCard.isEmpty()) {
+    if (fBHistory.type == CARD_TYPE_DISCOUNT) {
         ui->leDisc->setDouble(fOHeader.amountDiscount);
     }
     for (int i = 0; i < fOGoods.count(); i++) {
@@ -793,10 +792,10 @@ void WOrder::countTotal()
         }
         connect(btn, &QPushButton::clicked, this, &WOrder::readEmarks);
         ui->tblData->setCellWidget(i, col_qr, btn);
-        if (fAccCard.isEmpty() == false) {
+        if (fBHistory.card > 0 && fBHistory.type == CARD_TYPE_ACCUMULATIVE) {
             auto *ch = static_cast<C5CheckBox *>(ui->tblData->cellWidget(i, col_check_discount));
             if (ch->isChecked()) {
-                accAmount += og.total *fAccCard["card"].toObject()["f_value"].toDouble();
+                accAmount += og.total *fBHistory.value;
             }
         }
     }
@@ -921,6 +920,16 @@ void WOrder::addGoods(const QString &barcode)
     SLOT(reponseProcessCode(QJsonObject)));
 }
 
+void WOrder::addGoods2(const QString &barcode, double price)
+{
+    fHttp->createHttpQuery("/engine/shop/process-barcode.php",
+    QJsonObject{{"code", barcode},
+        {"store", __c5config.defaultStore()},
+        {"draft_header", fDraftSale._id()},
+        {"retail", fOHeader.saleType == SALE_RETAIL}},
+    SLOT(reponseProcessCode(QJsonObject)), QJsonObject{{"price", price}});
+}
+
 void WOrder::reponseProcessCode(const QJsonObject &jdoc)
 {
     switch (jdoc["barcode"].toInt()) {
@@ -929,15 +938,17 @@ void WOrder::reponseProcessCode(const QJsonObject &jdoc)
             QJsonObject card = jdoc["card"].toObject();
             QJsonObject history = jdoc["history"].toObject();
             QJsonObject partner = jdoc["partner"].toObject();
+            ui->leContact->setText(partner["f_contact"].toString());
+            ui->leOrganization->setText(partner["f_taxname"].toString());
+            fBHistory.card = card["f_id"].toInt();
+            fBHistory.type = card["f_mode"].toInt();
+            fBHistory.value = card["f_value"].toDouble();
             if (card["f_mode"].toInt() == CARD_TYPE_DISCOUNT) {
                 ui->leDisc->setText(QString("%1%").arg(float_str(card["f_value"].toDouble() * 100, 2)));
                 ui->leDisc->setVisible(true);
                 ui->lbDisc->setVisible(true);
                 ui->leGiftCardAmount->setDouble(history["f_amount"].toDouble());
                 ui->leContact->setText(partner["f_name"].toString());
-                fBHistory.card = card["f_id"].toInt();
-                fBHistory.type = CARD_TYPE_DISCOUNT;
-                fBHistory.value = card["f_value"].toDouble();
                 for (int i = 0; i < fOGoods.count(); i++) {
                     OGoods &og = fOGoods[i];
                     og.discountFactor = fBHistory.value / 100;
@@ -950,7 +961,6 @@ void WOrder::reponseProcessCode(const QJsonObject &jdoc)
                 ui->lbDisc->setVisible(true);
                 ui->leGiftCardAmount->setDouble(history["f_amount"].toDouble());
                 ui->leContact->setText(partner["f_name"].toString());
-                fAccCard = jdoc;
                 ui->leUseAccumulated->setReadOnly(!(ui->leGiftCardAmount->getDouble() > 0));
                 ui->lbUseAccumulated->setVisible(true);
                 ui->leUseAccumulated->setVisible(true);
@@ -968,6 +978,7 @@ void WOrder::reponseProcessCode(const QJsonObject &jdoc)
             QJsonObject goods = jdoc["goods"].toObject();
             QJsonObject store = jdoc["store"].toObject();
             double price = 0;
+            QJsonObject jm = sender()->property("marks").toJsonObject();
             switch (fOHeader.saleType) {
                 case SALE_RETAIL:
                     price = goods["f_price1"].toDouble();
@@ -978,6 +989,9 @@ void WOrder::reponseProcessCode(const QJsonObject &jdoc)
                 default:
                     price = goods["f_price1"].toDouble();
                     break;
+            }
+            if (!jm.isEmpty()) {
+                price = jm["price"].toDouble();
             }
             ls(QString("%1: %2, %3: %4, %5: %6")
                .arg(tr("New goods with code"))

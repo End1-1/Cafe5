@@ -58,6 +58,8 @@ private slots:
 
     void on_tblPayment_cellClicked(int row, int column);
 
+    void on_btnCopyID_clicked();
+
 private:
     Ui::DlgPreorder *ui;
 

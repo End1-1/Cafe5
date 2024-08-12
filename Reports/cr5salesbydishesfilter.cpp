@@ -7,13 +7,15 @@ CR5SalesByDishesFilter::CR5SalesByDishesFilter(const QStringList &dbParams, QWid
     ui(new Ui::CR5SalesByDishesFilter)
 {
     ui->setupUi(this);
+    ui->leOrderState->setSelector(dbParams, ui->leOrderStateName, cache_order_state);
     ui->leDishState->setSelector(dbParams, ui->leStateName, cache_dish_state).setMultiselection(true);
     ui->leDishState->setValue(DISH_STATE_OK);
     ui->lePart1->setSelector(dbParams, ui->lePart1Name, cache_dish_part1).setMultiselection(true);
     ui->lePart2->setSelector(dbParams, ui->lePart2Name, cache_dish_part2).setMultiselection(true);
     ui->leStore->setSelector(dbParams, ui->leStoreName, cache_goods_store).setMultiselection(true);
     ui->dt1->setDateTime(QDateTime::fromString(QDate::currentDate().toString("dd.MM.yyyy") + " 00:00", "dd.MM.yyyy HH:mm"));
-    ui->dt2->setDateTime(QDateTime::fromString(QDate::currentDate().addDays(1).toString("dd.MM.yyyy") + " 00:00", "dd.MM.yyyy HH:mm"));
+    ui->dt2->setDateTime(QDateTime::fromString(QDate::currentDate().addDays(1).toString("dd.MM.yyyy") + " 00:00",
+                         "dd.MM.yyyy HH:mm"));
 }
 
 CR5SalesByDishesFilter::~CR5SalesByDishesFilter()
@@ -26,10 +28,14 @@ QString CR5SalesByDishesFilter::condition()
     QString result;
     if (ui->chUseCloseDateTime->isChecked()) {
         result = QString(" cast(concat(oh.f_dateclose, ' ', oh.f_timeclose) as datetime) between '%1' and '%2'")
-                .arg(ui->dt1->dateTime().toString(FORMAT_DATETIME_TO_STR_MYSQL))
-                .arg(ui->dt2->dateTime().toString(FORMAT_DATETIME_TO_STR_MYSQL));
+                 .arg(ui->dt1->dateTime().toString(FORMAT_DATETIME_TO_STR_MYSQL))
+                 .arg(ui->dt2->dateTime().toString(FORMAT_DATETIME_TO_STR_MYSQL));
     } else {
-        result = QString(" oh.f_datecash between '%1' and '%2' ").arg(ui->deStart->date().toString(FORMAT_DATE_TO_STR_MYSQL)).arg(ui->deEnd->date().toString(FORMAT_DATE_TO_STR_MYSQL));
+        result = QString(" oh.f_datecash between '%1' and '%2' ").arg(ui->deStart->date().toString(
+                     FORMAT_DATE_TO_STR_MYSQL)).arg(ui->deEnd->date().toString(FORMAT_DATE_TO_STR_MYSQL));
+    }
+    if (!ui->leOrderState->isEmpty()) {
+        result += QString(" and oh.f_state in (%1)").arg(ui->leOrderState->text());
     }
     if (!ui->leDishState->isEmpty()) {
         result += QString(" and ob.f_state in (%1) ").arg(ui->leDishState->text());
@@ -62,7 +68,7 @@ QString CR5SalesByDishesFilter::filterText()
     inFilterText(s, ui->lePart1Name);
     inFilterText(s, ui->lePart2Name);
     inFilterText(s, ui->leStoreName);
-    if (ui->rbNoRecipt->isChecked()){
+    if (ui->rbNoRecipt->isChecked()) {
         s += ", " + tr("No recipe");
     } else if (ui->rbWithRecipe->isChecked()) {
         s += ", " + tr("With recipe");

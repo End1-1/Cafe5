@@ -50,7 +50,7 @@
          <string>Back</string>
         </property>
         <property name="icon">
-         <iconset resource="../resources/res.qrc">
+         <iconset>
           <normaloff>:/back-arrow.png</normaloff>:/back-arrow.png</iconset>
         </property>
         <property name="iconSize">
@@ -114,7 +114,6 @@
         <property name="font">
          <font>
           <pointsize>16</pointsize>
-          <weight>75</weight>
           <bold>true</bold>
          </font>
         </property>
@@ -270,7 +269,7 @@
          <string/>
         </property>
         <property name="icon">
-         <iconset resource="../resources/resources.qrc">
+         <iconset resource="../resources/res.qrc">
           <normaloff>:/chair.png</normaloff>:/chair.png</iconset>
         </property>
         <property name="iconSize">
@@ -286,7 +285,6 @@
         <property name="font">
          <font>
           <pointsize>16</pointsize>
-          <weight>75</weight>
           <bold>true</bold>
          </font>
         </property>
@@ -439,7 +437,7 @@
             <string/>
            </property>
            <property name="icon">
-            <iconset resource="../resources/resources.qrc">
+            <iconset resource="../resources/res.qrc">
              <normaloff>:/down.png</normaloff>:/down.png</iconset>
            </property>
            <property name="iconSize">
@@ -468,7 +466,7 @@
             <string/>
            </property>
            <property name="icon">
-            <iconset resource="../resources/resources.qrc">
+            <iconset resource="../resources/res.qrc">
              <normaloff>:/up.png</normaloff>:/up.png</iconset>
            </property>
            <property name="iconSize">
@@ -531,7 +529,7 @@
             <string/>
            </property>
            <property name="icon">
-            <iconset resource="../resources/resources.qrc">
+            <iconset resource="../resources/res.qrc">
              <normaloff>:/down.png</normaloff>:/down.png</iconset>
            </property>
            <property name="iconSize">
@@ -560,7 +558,7 @@
             <string/>
            </property>
            <property name="icon">
-            <iconset resource="../resources/resources.qrc">
+            <iconset resource="../resources/res.qrc">
              <normaloff>:/up.png</normaloff>:/up.png</iconset>
            </property>
            <property name="iconSize">
@@ -602,7 +600,7 @@
  </customwidgets>
  <resources>
   <include location="../resources/res.qrc"/>
-  <include location="../resources/resources.qrc"/>
+  <include location="../resources/res.qrc"/>
  </resources>
  <connections/>
 </ui>

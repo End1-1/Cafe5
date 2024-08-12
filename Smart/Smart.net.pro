@@ -66,14 +66,16 @@ RESOURCES += \
     transres.qrc
 
 FORMS += \
-    ../NTable/nloadingdlg.ui
+    ../NTable/nloadingdlg.ui \
+    dlgservicevalues.ui
 
 HEADERS += \
     ../Classes/QProgressIndicator.h \
     ../Classes/amkbd.h \
     ../NTable/ndataprovider.h \
     ../NTable/ninterface.h \
-    ../NTable/nloadingdlg.h
+    ../NTable/nloadingdlg.h \
+    dlgservicevalues.h
 
 SOURCES += \
     ../Classes/QProgressIndicator.cpp \
@@ -81,7 +83,8 @@ SOURCES += \
     ../NTable/ndataprovider.cpp \
     ../NTable/ninterface.cpp \
     ../NTable/nloadingdlg.cpp \
-    ../Service5Working/utils/logwriter.cpp
+    ../Service5Working/utils/logwriter.cpp \
+    dlgservicevalues.cpp
 
 win32-g++ {
    QMAKE_CXXFLAGS += -Werror

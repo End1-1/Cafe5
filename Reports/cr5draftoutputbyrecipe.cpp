@@ -13,7 +13,6 @@ CR5DraftOutputByRecipe::CR5DraftOutputByRecipe(const QStringList &dbParams, QWid
     fIcon = ":/goods.png";
     fLabel = tr("Draft output by receipes");
     fSimpleQuery = false;
-
     fLeftJoinTables << "inner join o_header oh on oh.f_id=ob.f_header [oh]"
                     << "inner join d_dish d on d.f_id=ob.f_dish [d]"
                     << "inner join d_part2 dp on dp.f_id=d.f_part [dp]"
@@ -22,7 +21,6 @@ CR5DraftOutputByRecipe::CR5DraftOutputByRecipe(const QStringList &dbParams, QWid
                     << "inner join c_goods g on g.f_id=dr.f_goods [g]"
                     << "inner join c_groups gr on gr.f_id=g.f_group [gr]"
                     << "inner join c_units u on u.f_id=g.f_unit [u]";
-
     fColumnsFields << "concat(oh.f_prefix, oh.f_hallid) as f_prefix"
                    << "oh.f_id"
                    << "oh.f_datecash"
@@ -35,18 +33,16 @@ CR5DraftOutputByRecipe::CR5DraftOutputByRecipe(const QStringList &dbParams, QWid
                    << "sum(ob.f_qty1) as f_saleqty"
                    << "sum(dr.f_qty*ob.f_qty1) as f_storeqty"
                    << "u.f_name as f_unitname";
-
     fColumnsGroup << "concat(oh.f_prefix, oh.f_hallid) as f_prefix"
-                   << "oh.f_id"
-                   << "oh.f_datecash"
-                   << "st.f_name as f_storename"
-                   << "dp.f_name as f_part2name"
-                   << "d.f_name as f_dishname"
-                   << "gr.f_name as f_goodsgroupname"
-                   << "dr.f_goods"
-                   << "g.f_name as f_goodsname"
-                   << "u.f_name as f_unitname";
-
+                  << "oh.f_id"
+                  << "oh.f_datecash"
+                  << "st.f_name as f_storename"
+                  << "dp.f_name as f_part2name"
+                  << "d.f_name as f_dishname"
+                  << "gr.f_name as f_goodsgroupname"
+                  << "dr.f_goods"
+                  << "g.f_name as f_goodsname"
+                  << "u.f_name as f_unitname";
     fTranslation["f_prefix"] = tr("Head");
     fTranslation["f_id"] = tr("Code");
     fTranslation["f_datecash"] = tr("Date cash");
@@ -59,7 +55,6 @@ CR5DraftOutputByRecipe::CR5DraftOutputByRecipe(const QStringList &dbParams, QWid
     fTranslation["f_saleqty"] = tr("Dish qty");
     fTranslation["f_storeqty"] = tr("Store qty");
     fTranslation["f_unitname"] = tr("Unit");
-
     fColumnsVisible["concat(oh.f_prefix, oh.f_hallid) as f_prefix"] = false;
     fColumnsVisible["oh.f_id"] = false;
     fColumnsVisible["oh.f_datecash"] = false;
@@ -72,16 +67,12 @@ CR5DraftOutputByRecipe::CR5DraftOutputByRecipe(const QStringList &dbParams, QWid
     fColumnsVisible["sum(ob.f_qty1) as f_saleqty"] = true;
     fColumnsVisible["sum(dr.f_qty*ob.f_qty1) as f_storeqty"] = true;
     fColumnsVisible["u.f_name as f_unitname"] = true;
-
     fColumnsOrder << "oh.f_datecash";
-
     fColumnsSum << "f_saleqty"
                 << "f_storeqty";
-
     fMainTable = "o_body ob";
-
     fFilterWidget = new CR5DraftOutputByRecipeFilter(dbParams);
-    fFilter = static_cast<CR5DraftOutputByRecipeFilter*>(fFilterWidget);
+    fFilter = static_cast<CR5DraftOutputByRecipeFilter *>(fFilterWidget);
 }
 
 QToolBar *CR5DraftOutputByRecipe::toolBar()
@@ -105,33 +96,33 @@ void CR5DraftOutputByRecipe::buildQuery()
 {
     fSimpleQuery = true;
     fSqlQuery = "select st.f_name as f_storename,gr.f_name as f_goodsgroupname,dr.f_goods,g.f_name as f_goodsname,"
-        "sum(ob.f_qty1) as f_saleqty,sum(dr.f_qty*ob.f_qty1) as f_storeqty,u.f_name as f_unitname "
-         "from o_body ob "
-         "inner join c_storages st on st.f_id=ob.f_store "
-       "inner join d_dish d on d.f_id=ob.f_dish "
-       "inner join d_recipes dr on dr.f_dish=d.f_id  "
-       "inner join c_goods g on g.f_id=dr.f_goods "
-       "inner join c_groups gr on gr.f_id=g.f_group "
-       "inner join c_units u on u.f_id=g.f_unit "
-       "inner join o_header oh on oh.f_id=ob.f_header "
-       "where  oh.f_datecash between '%d1' and '%d2' and ob.f_state in(1,3) and st.f_id in (%store) "
-        "group by st.f_name,gr.f_name,dr.f_goods,g.f_name,u.f_name  "
-        "UNION "
-        "select st.f_name as f_storename,gr.f_name as f_goodsgroupname,dr.f_goods,g.f_name as f_goodsname, "
-        "sum(ob.f_qty1) as f_saleqty,sum(dr.f_qty*ob.f_qty1*ds.f_qty) as f_storeqty,u.f_name as f_unitname "
-         " from o_body ob "
-    "inner join d_dish d on d.f_id=ob.f_dish "
-    "INNER JOIN d_dish_set ds ON ds.f_dish=ob.f_dish "
-    "inner join d_recipes dr on dr.f_dish=ds.f_part "
-    "inner join c_goods g on g.f_id=dr.f_goods "
-    "inner join c_groups gr on gr.f_id=g.f_group  "
-    "inner join c_units u on u.f_id=g.f_unit "
-    "inner join o_header oh on oh.f_id=ob.f_header  "
-    "inner join c_storages st on st.f_id=ob.f_store "
-    "where  oh.f_datecash between '%d1' and '%d2' and ob.f_state in(1,3) and st.f_id in (%store) "
+                "sum(ob.f_qty1) as f_saleqty,sum(dr.f_qty*ob.f_qty1) as f_storeqty,u.f_name as f_unitname "
+                "from o_body ob "
+                "inner join c_storages st on st.f_id=ob.f_store "
+                "inner join d_dish d on d.f_id=ob.f_dish "
+                "inner join d_recipes dr on dr.f_dish=d.f_id  "
+                "inner join c_goods g on g.f_id=dr.f_goods "
+                "inner join c_groups gr on gr.f_id=g.f_group "
+                "inner join c_units u on u.f_id=g.f_unit "
+                "inner join o_header oh on oh.f_id=ob.f_header "
+                "where  oh.f_datecash between '%d1' and '%d2' and ob.f_state in(1,3) and st.f_id in (%store) and oh.f_state=2 "
+                "group by st.f_name,gr.f_name,dr.f_goods,g.f_name,u.f_name  "
+                "UNION "
+                "select st.f_name as f_storename,gr.f_name as f_goodsgroupname,dr.f_goods,g.f_name as f_goodsname, "
+                "sum(ob.f_qty1) as f_saleqty,sum(dr.f_qty*ob.f_qty1*ds.f_qty) as f_storeqty,u.f_name as f_unitname "
+                " from o_body ob "
+                "inner join d_dish d on d.f_id=ob.f_dish "
+                "INNER JOIN d_dish_set ds ON ds.f_dish=ob.f_dish "
+                "inner join d_recipes dr on dr.f_dish=ds.f_part "
+                "inner join c_goods g on g.f_id=dr.f_goods "
+                "inner join c_groups gr on gr.f_id=g.f_group  "
+                "inner join c_units u on u.f_id=g.f_unit "
+                "inner join o_header oh on oh.f_id=ob.f_header  "
+                "inner join c_storages st on st.f_id=ob.f_store "
+                "where  oh.f_datecash between '%d1' and '%d2' and ob.f_state in(1,3) and st.f_id in (%store)  and oh.f_state=2 "
                 "group by st.f_name,gr.f_name,dr.f_goods,g.f_name,u.f_name  ";
-
-    fSqlQuery.replace("%d1", fFilter->d1()).replace("%d2", fFilter->d2()).replace("%store", QString::number(fFilter->store()));
+    fSqlQuery.replace("%d1", fFilter->d1()).replace("%d2", fFilter->d2()).replace("%store",
+             QString::number(fFilter->store()));
     C5ReportWidget::buildQuery();
 }
 
@@ -162,17 +153,18 @@ void CR5DraftOutputByRecipe::createStoreOutput()
         QString documentId;
         QString cashid;
         QString comment = QString("%1 %2-%3")
-                .arg(tr("Output of sale"))
-                .arg(fFilter->date1().toString(FORMAT_DATE_TO_STR))
-                .arg(fFilter->date2().toString(FORMAT_DATE_TO_STR));
-        dw.writeAHeader(documentId, dw.storeDocNum(DOC_TYPE_STORE_OUTPUT, fFilter->store(), true, 0), DOC_STATE_DRAFT, DOC_TYPE_STORE_OUTPUT, __user->id(), fFilter->date2(),
+                          .arg(tr("Output of sale"))
+                          .arg(fFilter->date1().toString(FORMAT_DATE_TO_STR))
+                          .arg(fFilter->date2().toString(FORMAT_DATE_TO_STR));
+        dw.writeAHeader(documentId, dw.storeDocNum(DOC_TYPE_STORE_OUTPUT, fFilter->store(), true, 0), DOC_STATE_DRAFT,
+                        DOC_TYPE_STORE_OUTPUT, __user->id(), fFilter->date2(),
                         QDate::currentDate(), QTime::currentTime(), 0, 0, comment, 0, __c5config.getValue(param_default_currency).toInt());
-
         dw.writeAHeaderStore(documentId, __user->id(), __user->id(), "", QDate(), 0, fFilter->store(), 0, cashid, 0, 0, "");
         int rownum = 1;
         foreach (const OGoods &g, goodsSale) {
             QString sdid;
-            dw.writeAStoreDraft(sdid, documentId, fFilter->store(), -1, g.goods, g.qty, g.price, g.price * g.qty, DOC_REASON_SALE, "", rownum++, "");
+            dw.writeAStoreDraft(sdid, documentId, fFilter->store(), -1, g.goods, g.qty, g.price, g.price *g.qty, DOC_REASON_SALE,
+                                "", rownum++, "");
         }
         //= dw.writeDraft(docDate, doctype, store, reason, data, comment);
         auto *sd = __mainWindow->createTab<C5StoreDoc>(fDBParams);

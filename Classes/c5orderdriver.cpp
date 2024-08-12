@@ -505,6 +505,7 @@ bool C5OrderDriver::addDish(int menuid, const QString &comment, double price)
     db[":f_row"] = dishesCount();
     db[":f_appenduser"] = headerValue("f_currentstaff");
     db[":f_appendtime"] = QDateTime::currentDateTime();
+    db[":f_working_day"] = __c5config.dateCash();
     if (!db.insert("o_body", false)) {
         fLastError = db.fLastError;
         return false;
@@ -748,7 +749,7 @@ void C5OrderDriver::writeCashDoc(C5StoreDraftWriter &dw, const QString &uuid, co
         err = dw.fErrorMsg;
     }
     if (!dw.writeAHeaderCash(cashdocid, cashboxid,
-                             0, 1, "", uuid, 0)) {
+                             0, 1, "", uuid)) {
         err = dw.fErrorMsg;
     }
     QString cashUUID;

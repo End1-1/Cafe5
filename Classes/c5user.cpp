@@ -171,7 +171,10 @@ bool C5User::loadFromDB(int id)
 {
     C5Database db(__c5config.dbParams());
     db[":f_id"] = id;
-    db.exec("select u.*, s.f_name as f_settingsname from s_user u left join s_settings_names s on s.f_id=u.f_config where s.f_id=:f_id ");
+    db.exec("select u.*, s.f_name as f_settingsname "
+            "from s_user u "
+            "left join s_settings_names s on s.f_id=u.f_config "
+            "where u.f_id=:f_id ");
     if (!db.nextRow()) {
         fError = tr("Access denied");
         fValid = false;

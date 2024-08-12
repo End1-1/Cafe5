@@ -1,5 +1,6 @@
 #include "dlgface.h"
 #include "dlgmanagertools.h"
+#include "jsons.h"
 #include "ui_dlgface.h"
 #include "dlgpassword.h"
 #include "c5user.h"
@@ -14,6 +15,7 @@
 #include "datadriver.h"
 #include "tablewidget.h"
 #include "dlgexitwithmessage.h"
+#include "c5socketmessage.h"
 #include "fileversion.h"
 #include "c5cafecommon.h"
 #include "dlgreservation.h"
@@ -183,6 +185,14 @@ void DlgFace::tableClicked(int id)
     connect(d, &DlgOrder::allDone, [this]() {
         refreshTables();
         fTimer.start(TIMER_TIMEOUT_INTERVAL);
+    });
+    connect(d, &DlgOrder::openNewReserve, [id]() {
+        int hall = tds("h_tables", "f_hall", id).toInt();
+        DlgPreorder(QJsonObject{
+            {"f_table", id},
+            {"f_hall", hall}
+        })
+        .setHotelMode(true).exec();
     });
 }
 
@@ -422,10 +432,14 @@ void DlgFace::on_btnGuests_clicked()
 
 void DlgFace::on_btnChart_clicked()
 {
+    fTimer.stop();
     DlgReservation(fUser).exec();
+    fTimer.start(TIMER_TIMEOUT_INTERVAL);
 }
 
 void DlgFace::on_btnTools_clicked()
 {
+    fTimer.stop();
     DlgManagerTools(__user).exec();
+    fTimer.start(TIMER_TIMEOUT_INTERVAL);
 }

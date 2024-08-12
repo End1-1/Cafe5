@@ -171,11 +171,10 @@ void CR5ConsumptionBySales::buildQuery()
     db[":f_store"] = f->store();
     db[":f_date"] = f->date1().addDays(-1);
     db.exec(QString("select s.f_goods, sum(%1*s.f_type) as f_qty "
-                    "from a_store s "
+                    "from a_store_draft s "
                     "inner join a_header d on d.f_id=s.f_document "
                     "where s.f_store=:f_store and d.f_date<=:f_date "
-                    "group by 1 "
-                    "having sum(%1*s.f_type) > 0.001")
+                    "group by 1 ")
             .arg(fFilter->reportType() == REPORTTYPE_AMOUNTS ? "s.f_total" : "s.f_qty"));
     while (db.nextRow()) {
         if (!goodsMap.contains(db.getInt(0))) {
@@ -192,7 +191,7 @@ void CR5ConsumptionBySales::buildQuery()
     db[":f_store"] = f->store();
     db[":f_state"] = DOC_STATE_SAVED;
     db.exec(QString("select s.f_goods, sum(%1) "
-                    "from a_store s "
+                    "from a_store_draft s "
                     "left join a_header h on h.f_id=s.f_document "
                     "where h.f_date between :f_date1 and :f_date2 and s.f_store=:f_store "
                     "and h.f_state=:f_state and s.f_type=:f_type "
@@ -238,7 +237,7 @@ void CR5ConsumptionBySales::buildQuery()
     db[":f_state"] = DOC_STATE_SAVED;
     db[":f_reason"] = DOC_REASON_SALE;
     db.exec(QString("select s.f_goods, sum(%1) as f_qty "
-                    "from a_store s "
+                    "from a_store_draft s "
                     "left join a_header h on h.f_id=s.f_document "
                     "where h.f_date between :f_date1 and :f_date2 and s.f_store=:f_store "
                     "and s.f_type=:f_type and h.f_state=:f_state  "
@@ -256,11 +255,10 @@ void CR5ConsumptionBySales::buildQuery()
     db[":f_store"] = f->store();
     db[":f_date"] = f->date2();
     db.exec(QString("select s.f_goods, sum(%1*s.f_type) as f_qty "
-                    "from a_store s "
+                    "from a_store_draft s "
                     "inner join a_header d on d.f_id=s.f_document "
                     "where s.f_store=:f_store and d.f_date<=:f_date "
-                    "group by 1 "
-                    "having sum(%1*s.f_type) > 0.001")
+                    "group by 1 ")
             .arg(fFilter->reportType() == REPORTTYPE_AMOUNTS ? "s.f_total" : "s.f_qty"));
     while (db.nextRow()) {
         if (!goodsMap.contains(db.getInt(0))) {
@@ -414,6 +412,47 @@ void CR5ConsumptionBySales::writeInvQty(C5Database &db, double qty, int row, int
     countRowQty(row);
 }
 
+void CR5ConsumptionBySales::storeOutError(const QString &err)
+{
+    sender()->deleteLater();
+    //C5Message::error(err);
+    // if (fPd) {
+    //     fPd->deleteLater();
+    //     fPd = nullptr;
+    // }
+}
+
+void CR5ConsumptionBySales::storeoutResponse(const QJsonObject &jdoc)
+{
+    QString id = jdoc["id"].toString();
+    fHttp->httpQueryFinished(sender());
+    for (int i = 0; i < fIDs.count(); i++) {
+        QStringList &sl = fIDs[i];
+        if (sl.contains(id)) {
+            sl.removeOne(id);
+            id = "";
+            if (!sl.isEmpty()) {
+                id = sl.first();
+            }
+        }
+    }
+    int remain = 0;
+    for (const QStringList &sl : fIDs) {
+        remain += sl.size();
+    }
+    if (!id.isEmpty()) {
+        emit updateProgressValue(remain);
+        fHttp->createHttpQuery("/engine/worker/create-store-out.php",
+        QJsonObject{{"id", id}},
+        SLOT(storeoutResponse(QJsonObject)),
+        id, false);
+    }
+    if (fPd && remain == 0) {
+        fPd->deleteLater();
+        fPd = nullptr;
+    }
+}
+
 bool CR5ConsumptionBySales::tblDoubleClicked(int row, int column, const QList<QVariant> &values)
 {
     if (values.count() == 0) {
@@ -500,9 +539,9 @@ void CR5ConsumptionBySales::makeOutput(bool v)
     QMap<int, double> goodsSale, goodsLost, goodsOver;
     QList<QList<QVariant> > &rows = fModel->fRawData;
     for (int i = 0; i < rows.count(); i++) {
-        if (rows[i][col_qtyinv].toString().isEmpty()) {
-            //continue;
-        }
+        // if (rows[i][col_qtyinv].toString().isEmpty()) {
+        //     //continue;
+        // }
         double qty = rows[i][col_qtydiff].toDouble();
         if (rows[i][col_qtydiff].toDouble() > 0.0001) {
             qty = rows[i][col_qtydiff].toDouble();
@@ -572,7 +611,7 @@ void CR5ConsumptionBySales::salesOutput(bool v)
     }
     if (goodsSale.count() > 0) {
         QList<OGoods> gl;
-        for (QMap<int, double>::const_iterator it = goodsSale.begin(); it != goodsSale.end(); it++) {
+        for (QMap<int, double>::const_iterator it = goodsSale.constBegin(); it != goodsSale.constEnd(); it++) {
             OGoods g;
             g.goods = it.key();
             g.qty = it.value();
@@ -592,30 +631,37 @@ void CR5ConsumptionBySales::rollbackGoodsOutput(bool v)
 
 void CR5ConsumptionBySales::countOutputBasedOnRecipes()
 {
-    C5ProgressDialog *pd = new C5ProgressDialog(this);
-    connect(this, SIGNAL(updateProgressValue(int)), pd, SLOT(updateProgressValue(int)));
-    C5Database db(fDBParams);
-    db[":f_datecash1"] = fFilter->date1();
-    db[":f_datecash2"] = fFilter->date2();
-    db.exec("select f_id from o_header where f_datecash between :f_datecash1 and :f_datecash2 order by f_datecash");
-    QStringList idList;
+    fPd = new C5ProgressDialog(this);
+    connect(this, SIGNAL(updateProgressValue(int)), fPd, SLOT(updateProgressValue(int)));
+    C5Database db;
+    db[":d1"] = fFilter->date1();
+    db[":d2"] = fFilter->date2();
+    db.exec("select * from o_header where f_datecash between :d1 and :d2 and f_state=2");
+    int remain = db.rowCount();
+    int threads = 30;
+    fIDs.clear();
+    for (int i = 0; i < threads; i++) {
+        fIDs.append(QStringList());
+    }
+    int r = 0;
     while (db.nextRow()) {
-        idList.append(db.getString(0));
+        fIDs[r++ % threads].append(db.getString(0));
     }
-    pd->setMax(idList.count());
-    pd->show();
-    QString err;
-    int count = 0;
-    for (const QString &id : idList) {
-        C5WaiterOrderDoc(id, db).makeOutputOfStore(db, err, DOC_STATE_SAVED);
-        count++;
-        emit updateProgressValue(count);
+    if (r == 0) {
+        return;
     }
-    delete pd;
-    if (err.isEmpty()) {
-        C5Message::info(tr("Done"));
-    } else {
-        C5Message::error(tr("Complete with errors"));
+    fPd->setMax(remain);
+    fPd->show();
+    emit updateProgressValue(fIDs.size());
+    fHttp->fErrorSlot = (char *) SLOT(storeOutError(QString));
+    fHttp->fErrorObject = this;
+    for (int i = 0; i < threads; i++) {
+        if (!fIDs[i].isEmpty()) {
+            fHttp->createHttpQuery("/engine/worker/create-store-out.php",
+            QJsonObject{{"id", fIDs[i].first()}},
+            SLOT(storeoutResponse(QJsonObject)),
+            fIDs[i].first(), false);
+        }
     }
 }
 

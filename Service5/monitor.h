@@ -4,7 +4,10 @@
 #include <QDialog>
 
 QT_BEGIN_NAMESPACE
-namespace Ui { class Monitor; }
+namespace Ui
+{
+class Monitor;
+}
 QT_END_NAMESPACE
 
 class Monitor : public QDialog
@@ -27,6 +30,5 @@ private slots:
 
 private:
     Ui::Monitor *ui;
-    void readLicense();
 };
 #endif // MONITOR_H

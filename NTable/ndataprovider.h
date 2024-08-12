@@ -12,15 +12,22 @@ class NDataProvider : public QObject
     Q_OBJECT
 public:
     explicit NDataProvider(QObject *parent = nullptr);
+
     ~NDataProvider();
+
     void getData(const QString &route, const QJsonObject &data);
+
     void changeTimeout(int value);
+
     static bool mDebug;
+
     static QString mHost;
+
     static QString sessionKey;
 
 private:
     QElapsedTimer *mTimer;
+
     QNetworkAccessManager *mNetworkAccessManager;
 
 private slots:
@@ -28,7 +35,9 @@ private slots:
 
 signals:
     void started();
+
     void error(const QString &);
+
     void done(const QJsonObject &);
 };
 

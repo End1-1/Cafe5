@@ -7,7 +7,6 @@ bool DatabaseConnectionManager::nodb = false;
 
 DatabaseConnectionManager::DatabaseConnectionManager()
 {
-
 }
 
 bool DatabaseConnectionManager::init(const QString &configFile)
@@ -16,9 +15,10 @@ bool DatabaseConnectionManager::init(const QString &configFile)
         ConfigIni::init(configFile);
     }
     if (ConfigIni::value("db/nodb") == "true") {
-        nodb =true;
+        nodb = true;
         return true;
     }
+    LogWriter::write(LogWriterLevel::verbose, "NoDB", nodb ? "true" : false);
     DatabaseConnection dc;
     dc.name = SYSTEM;
     dc.host = ConfigIni::value("db/host");

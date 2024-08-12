@@ -5,7 +5,10 @@
 #include "dlgface.h"
 #include "c5waiterserver.h"
 #include "c5cafecommon.h"
+#include "c5tabledata.h"
 #include "ndataprovider.h"
+#include "jsons.h"
+#include "c5socketmessage.h"
 #include <QTimer>
 
 DlgScreen::DlgScreen() :
@@ -24,11 +27,53 @@ DlgScreen::DlgScreen() :
     while (db.nextRow()) {
         C5CafeCommon::fHallConfigs[db.getInt("f_settings")][db.getInt("f_key")] = db.getString("f_value");
     }
+    fHttp->createHttpQuery("/engine/waiter/init.php", QJsonObject{{"version", C5TableData::instance()->version()}, {"dick", 1}},
+    SLOT(
+        initResponse(QJsonObject)), "", false);
+    auto *t2 = new QTimer();
+    connect(t2, &QTimer::timeout, this, &DlgScreen::serviceTimeout);
+    t2->start(10000);
 }
 
 DlgScreen::~DlgScreen()
 {
     delete ui;
+}
+
+void DlgScreen::initResponse(const QJsonObject &jdoc)
+{
+    QJsonObject jo = jdoc["data"].toObject();
+    if (jo["nochanges"].toBool() == false) {
+        C5TableData::instance()->setData(jdoc["data"].toObject());
+    }
+    fHttp->httpQueryFinished(sender());
+}
+
+void DlgScreen::serviceTimeout()
+{
+    auto *timer = static_cast<QTimer *>(sender());
+    timer->stop();
+    C5Database db;
+    db.exec("select * from sys_mobile where f_state=1");
+    QList<int> ids;
+    while (db.nextRow()) {
+        ids.append(db.getInt("f_id"));
+        QJsonObject jo = __strjson(db.getString("f_order"));
+        if (jo["action"].toString() == "printservice") {
+            C5SocketHandler *sh = createSocketHandler(SLOT(handlePrintService(QJsonObject)));
+            sh->bind("cmd", sm_printservice);
+            sh->bind("order", jo["id"].toString());
+            sh->bind("booking", 0);
+            sh->bind("alias", __c5config.getValue(param_force_use_print_alias).toInt());
+            sh->send();
+            //logRecord(fUser->fullName(), jo["id"].toString(), "", "Send to cooking", "", "");
+        }
+    }
+    for (int id : ids) {
+        db[":f_id"] = id;
+        db.exec("update sys_mobile set f_state=2 where f_id=:f_id");
+    }
+    timer->start(3000);
 }
 
 void DlgScreen::newConnection()

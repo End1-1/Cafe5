@@ -360,6 +360,16 @@ void PrintReceiptGroup::print2(const QString &id, C5Database &db)
             db.nextRow();
         }
     }
+    db[":f_trsale"] = id;
+    db.exec("select * from b_gift_card_history where f_trsale=:f_trsale");
+    QMap<QString, QVariant> acc;
+    if (db.nextRow()) {
+        db.rowToMap(acc);
+        db[":f_card"] = db.getInt("f_card");
+        db.exec("select sum(f_amount) as f_totalamount from b_gift_card_history where f_card=:f_card");
+        db.nextRow();
+        db.rowToMap(acc);
+    }
     CPartners partner;
     if (oh.partner > 0) {
         db[":f_id"] = oh.partner;
@@ -588,6 +598,13 @@ void PrintReceiptGroup::print2(const QString &id, C5Database &db)
     if (!oh.comment.isEmpty()) {
         p.br();
         p.ltext(oh.comment, 0);
+        p.br();
+    }
+    if (!acc.isEmpty()) {
+        p.br();
+        p.lrtext(tr("Accumulated"), float_str(acc["f_amount"].toDouble(), 1));
+        p.br();
+        p.lrtext(tr("Accumulated amount"), float_str(acc["f_totalamount"].toDouble(), 1));
         p.br();
     }
     if (!__c5config.getValue(param_static_qr_text).isEmpty()) {

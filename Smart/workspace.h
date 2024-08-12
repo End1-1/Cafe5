@@ -58,6 +58,8 @@ private slots:
 
     void receiptResponse(const QJsonObject &jdoc);
 
+    void serviceValuesResponse(const QJsonObject &jdoc);
+
     void voidResponse(const QJsonObject &jdoc);
 
     void removeDishResponse(const QJsonObject &jdoc);
@@ -126,8 +128,6 @@ private slots:
 
     void on_btnAppMenu_clicked();
 
-    void on_btnP05_2_clicked();
-
     void on_btnP3_clicked();
 
     void on_btnP4_clicked();
@@ -163,6 +163,8 @@ private slots:
     void on_btnFiscal_clicked(bool checked);
 
     void on_btnFlagTakeAway_clicked(bool checked);
+
+    void on_btnService_clicked();
 
 private:
     Ui::Workspace *ui;
@@ -236,5 +238,7 @@ private:
     void createHttpRequest(const QString &route, QJsonObject params, const char *responseOkSlot,
                            const QVariant &marks = QVariant(),
                            const char *responseErrorSlot = SLOT(slotHttpError(QString)));
+
+    bool service();
 };
 #endif // WORKSPACE_H

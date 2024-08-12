@@ -1,6 +1,7 @@
 #include "c5storedoc.h"
 #include "ui_c5storedoc.h"
 #include "c5selector.h"
+#include "jsons.h"
 #include "c5cache.h"
 #include "c5printing.h"
 #include "c5cashdoc.h"
@@ -15,7 +16,6 @@
 #include "c5user.h"
 #include "c5storedraftwriter.h"
 #include "calculator.h"
-#include "chatmessage.h"
 #include "c5storedocselectprinttemplate.h"
 #include "threadsendmessage.h"
 #include "bclientdebts.h"
@@ -477,14 +477,14 @@ bool C5StoreDoc::removeDoc(const QStringList &dbParams, QString id, bool showmes
     }
     QString err;
     C5Database db(dbParams);
-    C5StoreDraftWriter dw(db);
-    if (!dw.removeStoreDocument(db, id, err)) {
-        if (showmessage) {
-            C5Message::error(err);
-        }
-        return false;
+    QJsonObject jo;
+    jo["removeid"] = id;
+    db.exec(QString("select sf_remove_store_doc('%1')").arg(json_str(jo)));
+    if (db.nextRow()) {
+        jo = str_json(db.getString(0));
+        return jo["status"] == 1;
     }
-    return true;
+    return false;
 }
 
 QVariant C5StoreDoc::docProperty(const QString &field) const

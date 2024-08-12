@@ -5,6 +5,8 @@
 #include "c5tabledata.h"
 #include "c5tabledata.h"
 #include "axreporting.h"
+#include "dlgreceiptlanguage.h"
+#include <QClipboard>
 #include <QCalendarWidget>
 #include <QDateEdit>
 #include <QCompleter>
@@ -17,8 +19,9 @@ DlgPreorder::DlgPreorder(const QJsonObject &jdoc) :
     fDoc(jdoc)
 {
     ui->setupUi(this);
-    ui->leDate->setMinimumDate(QDate::fromString(__c5config.getValue(param_date_cash), FORMAT_DATE_TO_STR_MYSQL));
-    ui->leDateCheckout->setMinimumDate(QDate::fromString(__c5config.getValue(param_date_cash), FORMAT_DATE_TO_STR_MYSQL));
+    //ui->leDate->setMinimumDate(QDate::fromString(__c5config.getValue(param_date_cash), FORMAT_DATE_TO_STR_MYSQL));
+    //ui->leDateCheckout->setMinimumDate(QDate::fromString(__c5config.getValue(param_date_cash), FORMAT_DATE_TO_STR_MYSQL));
+    ui->leDate->setDate(QDate::fromString(__c5config.getValue(param_date_cash), FORMAT_DATE_TO_STR_MYSQL));
     ui->leDateCheckout->setDate(ui->leDate->date().addDays(1));
     fPrevRow = -1;
     fPrevColumn = -1;
@@ -78,7 +81,11 @@ void DlgPreorder::openReservationResponse(const QJsonObject &jdoc)
 {
     fHttp->httpQueryFinished(sender());
     AXReporting a(this);
-    a.printReservation(jdoc);
+    int r = DlgReceiptLanguage::receipLanguage();
+    if (r < 0) {
+        return;
+    }
+    a.printReservation(jdoc, r);
 }
 
 void DlgPreorder::checkinResponse(const QJsonObject &jdoc)
@@ -190,13 +197,16 @@ void DlgPreorder::openDoc()
     ui->leTable->setText(tds("h_tables", "f_name", jheader["f_table"].toInt()));
     ui->lePhone->setText(jpreorder["f_phone"].toString());
     ui->leGuestName->setText(jpreorder["f_guestname"].toString());
-    ui->leGuest->setValue(jpreorder["f_guests"].toInt());
-    ui->leRoomRate->setText(jhotel["f_roomrate"].toString());
+    ui->leGuest->setValue(jhotel["f_guestcount"].toInt());
+    ui->leRoomRate->setDouble(jhotel["f_roomrate"].toDouble());
     ui->leDate->setDate(QDate::fromString(jhotel["f_checkin"].toString(), "yyyy-MM-dd"));
     ui->leDateCheckout->setDate(QDate::fromString(jhotel["f_checkout"].toString(), "yyyy-MM-dd"));
     ui->timeEdit->setTime(QTime::fromString(jpreorder["f_timefor"].toString()));
     ui->leDays->setValue(ui->leDate->date().daysTo(ui->leDateCheckout->date()));
     ui->cbMealPlan->setCurrentIndex(jhotel["f_mealplan"].toInt() - 1);
+    ui->cbVatMode->setCurrentIndex(jhotel["f_vatmode"].toInt() - 1);
+    ui->leEmail->setText(jpreorder["f_email"].toString());
+    ui->lePassport->setText(jpreorder["f_passport"].toString());
     setHotelMode(true);
 }
 
@@ -217,9 +227,11 @@ void DlgPreorder::save(bool withcheckin)
     j["f_datefor"] = ui->leDate->date().toString(FORMAT_DATE_TO_STR_MYSQL);
     j["f_timefor"] = ui->timeEdit->time().toString(FORMAT_TIME_TO_STR);
     j["f_fortable"] = ui->leTable->property("id").toInt();
-    j["f_guest"] = ui->leGuest->value();
+    j["f_guests"] = ui->leGuest->value();
     j["f_guestname"] = ui->leGuestName->text();
     j["f_phone"] = ui->lePhone->text();
+    j["f_email"] = ui->leEmail->text();
+    j["f_passport"] = ui->lePassport->text();
     fDoc["preorder"] = j;
     j = QJsonObject();
     j["f_guest"] = ui->leGuestName->property("id").toInt();
@@ -228,6 +240,7 @@ void DlgPreorder::save(bool withcheckin)
     j["f_checkout"] = ui->leDateCheckout->date().toString(FORMAT_DATE_TO_STR_MYSQL);
     j["f_roomrate"] = ui->leRoomRate->getDouble();
     j["f_mealplan"] = ui->cbMealPlan->currentIndex() + 1;
+    j["f_vatmode"] = ui->cbVatMode->currentIndex() + 1;
     fDoc["hoteldata"] = j;
     fDoc["checkin"] = withcheckin;
     fHttp->createHttpQuery("/engine/waiter/reservation-save.php", fDoc, SLOT(saveResponse(QJsonObject)));
@@ -287,4 +300,9 @@ void DlgPreorder::on_tblPayment_cellClicked(int row, int column)
         ui->tblPayment->setCellWidget(row, column, c);
         c->setFocus();
     }
+}
+
+void DlgPreorder::on_btnCopyID_clicked()
+{
+    qApp->clipboard()->setText(fDoc["header"].toObject()["f_id"].toString());
 }

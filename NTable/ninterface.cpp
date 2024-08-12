@@ -5,6 +5,8 @@
 
 NInterface::NInterface(QWidget *parent)
     : QObject{parent},
+      fErrorSlot(nullptr),
+      fErrorObject(nullptr),
       fLoadingDlg(nullptr)
 {
 }
@@ -20,10 +22,15 @@ void NInterface::createHttpQuery(const QString &route, const QJsonObject &params
                                  const QVariant &marks, bool progress)
 {
     fProgress = progress;
-    auto *np = new NDataProvider(this->parent());
+    auto *np = new NDataProvider();
     connect(np, &NDataProvider::started, this, &NInterface::httpQueryStarted);
-    connect(np, &NDataProvider::error, this, &NInterface::httpQueryError);
+    if (fErrorSlot == nullptr) {
+        connect(np, &NDataProvider::error, this, &NInterface::httpQueryError);
+    } else {
+        connect(np, SIGNAL(error(QString)), fErrorObject, fErrorSlot);
+    }
     connect(np, SIGNAL(done(QJsonObject)), this->parent(), slotResponse);
+    qDebug() << marks;
     np->setProperty("marks", marks);
     np->getData(route, params);
 }
@@ -33,7 +40,7 @@ void NInterface::httpQueryStarted()
     if (!fLoadingDlg) {
         fLoadingDlg = new NLoadingDlg(static_cast<QWidget *>(this->parent()));
     }
-    fLoadingDlg->mSecond = 0;
+    fLoadingDlg->resetSeconds();
     if (fProgress) {
         fLoadingDlg->open();
     }

@@ -15,13 +15,19 @@ class NLoadingDlg : public QDialog
 public:
     explicit NLoadingDlg(QWidget *parent = nullptr);
     ~NLoadingDlg();
-    int mSecond;
+
     virtual void open() override;
+
     virtual void reject() override;
+
     virtual void accept() override;
+
+    void resetSeconds();
 
 private:
     Ui::NLoadingDlg *ui;
+
+    int mSecond;
 
 private slots:
     void timeout();

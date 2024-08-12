@@ -45,6 +45,12 @@ void DlgReturnItem::on_btnSearchReceiptNumber_clicked()
         int r = ui->tblOrder->addEmptyRow();
         for (int i = 0; i < db.columnCount(); i++) {
             ui->tblOrder->setData(r, i, db.getValue(i));
+            if (db.getDate("f_datecash").daysTo(QDate::currentDate()) > 14) {
+                ui->tblOrder->item(r, 0)->setData(Qt::BackgroundColorRole, QVariant::fromValue(Qt::red));
+            }
+        }
+        if (db.getDate("f_datecash").daysTo(QDate::currentDate()) > 14) {
+            ui->tblOrder->item(r, 0)->setData(Qt::UserRole, 14);
         }
     }
 }
@@ -55,6 +61,11 @@ void DlgReturnItem::on_tblOrder_cellClicked(int row, int column)
     ui->tblBody->clearContents();
     ui->tblBody->setRowCount(0);
     C5Database db(fDBParams);
+    int d14 = ui->tblOrder->item(row, 0)->data(Qt::UserRole).toInt();
+    if (d14 > 0) {
+        C5Message::error(tr("You cannot return this item"));
+        return;
+    }
     db[":f_header"] = ui->tblOrder->getString(row, 0);
     db.exec("select b.f_id, 0, g.f_scancode, g.f_name, b.f_qty, u.f_name, b.f_price, b.f_total, b.f_goods, b.f_return "
             "from o_goods b "
@@ -157,7 +168,6 @@ void DlgReturnItem::on_btnReturn_clicked()
     QString saledoc = ui->tblOrder->getString(ui->tblOrder->currentRow(), 2);
     if (haveStore) {
         storeDocComment = QString("%1 %2").arg(tr("Return of sale"), saledoc);
-        storeDocId;
         storedocUserNum = dw.storeDocNum(DOC_TYPE_STORE_INPUT, __c5config.defaultStore(), true, 0);
         if (!dw.writeAHeader(storeDocId, storedocUserNum, DOC_STATE_DRAFT, DOC_TYPE_STORE_INPUT,
                              oheader.staff, QDate::currentDate(), QDate::currentDate(), QTime::currentTime(), 0, 0,

@@ -33,6 +33,12 @@ void NLoadingDlg::accept()
 {
 }
 
+void NLoadingDlg::resetSeconds()
+{
+    mSecond = 0;
+    ui->label->setText(QString("%1 sec").arg(mSecond));
+}
+
 void NLoadingDlg::timeout()
 {
     mSecond++;

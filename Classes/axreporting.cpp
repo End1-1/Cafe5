@@ -16,10 +16,25 @@ AXReporting::AXReporting(QObject *parent)
 {
 }
 
-void AXReporting::printReservation(const QJsonObject &jo)
+void AXReporting::printReservation(const QJsonObject &jo, int langid)
 {
+    QString lang = "hy";
+    switch (langid) {
+        case 0:
+            lang = "hy";
+            break;
+        case 1:
+            lang = "en";
+            break;
+        case 2:
+            lang =  "ru";
+            break;
+        default:
+            lang = "hy";
+            break;
+    }
     QString filename = QDir::tempPath() + "/" + C5Database::uuid() + "_waiter.docx";
-    QString srcFile = qApp->applicationDirPath() + "/templates/reservation_voucher_en.docx";
+    QString srcFile = qApp->applicationDirPath() + QString("/templates/reservation_voucher_%1.docx").arg(lang);
     if (!QFile::copy(srcFile,  filename)) {
         C5Message::error("Cannot copy template file.");
         return;
@@ -37,20 +52,27 @@ void AXReporting::printReservation(const QJsonObject &jo)
     QJsonObject jpreorder = jo["preorder"].toObject();
     QJsonObject jhotel = jo["hoteldata"].toObject();
     QJsonObject jconfig = jo["config"].toObject();
+    QDate d1 = QDate::fromString(jhotel["f_checkin"].toString(), FORMAT_DATE_TO_STR_MYSQL);
+    QDate d2 = QDate::fromString(jhotel["f_checkout"].toString(), FORMAT_DATE_TO_STR_MYSQL);
     replaceString(find, "#voucher_number", jheader["f_prefix"].toString() + QString::number(jheader["f_hallid"].toInt()));
     replaceString(find, "#date", QDate::currentDate().toString(FORMAT_DATE_TO_STR));
-    replaceString(find, "#guest", jpreorder["f_guestname"].toString());
+    replaceString(find, "#guest_name", jpreorder["f_guestname"].toString());
     replaceString(find, "#arrival_date", QDate::fromString(jhotel["f_checkin"].toString(), FORMAT_DATE_TO_STR_MYSQL)
                   .toString(FORMAT_DATE_TO_STR));
     replaceString(find, "#arrival_time", jpreorder["f_timefor"].toString());
     replaceString(find, "#departure_date", QDate::fromString(jhotel["f_checkout"].toString(), FORMAT_DATE_TO_STR_MYSQL)
                   .toString(FORMAT_DATE_TO_STR));
     replaceString(find, "#departure_time", "12:00");
-    replaceString(find, "#number_of_nights", QString::number(jhotel["f_nights"].toInt()));
+    replaceString(find, "#number_of_nights", QString::number(d1.daysTo(d2)));
+    replaceString(find, "#guest_count", QString::number(jhotel["f_guestcount"].toInt()));
     replaceString(find, "#category", jheader["f_hallname"].toString());
     replaceString(find, "#room", jheader["f_tablename"].toString());
     replaceString(find, "#price_per_night", float_str(jhotel["f_roomrate"].toDouble(), 2));
     replaceString(find, "#meal_plan", jhotel["f_mealplanname"].toString());
+    replaceString(find, "#vat_mode", jhotel["f_vatmodename"].toString());
+    replaceString(find, "#email", jpreorder["f_email"].toString());
+    replaceString(find, "#passport", jpreorder["f_passport"].toString());
+    replaceString(find, "#contact_phone", jpreorder["f_phone"].toString());
     replaceString(find, "#operator", __user->fullName());
     replaceString(find, "#printed", QDateTime::currentDateTime().toString(FORMAT_DATETIME_TO_STR));
     active->dynamicCall("Activate()");

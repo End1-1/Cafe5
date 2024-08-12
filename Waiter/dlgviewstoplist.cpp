@@ -28,9 +28,11 @@ void DlgViewStopList::getStopListResponse(const QJsonObject &jdoc)
             ui->tbl->addEmptyRow();
         }
         QJsonObject o = ja.at(i).toObject();
-        C5TableWidgetItem *item = new C5TableWidgetItem(QString("[%1] %2").arg(o["qty"].toDouble()).arg(dbdish->name(
-                o["dish"].toInt())));
-        item->setData(Qt::UserRole, o["dish"].toInt());
+        C5TableWidgetItem *item = new C5TableWidgetItem(QString("[%1] %2")
+            .arg(o["f_qty"].toDouble())
+            .arg(dbdish->name(
+                     o["f_dish"].toInt())));
+        item->setData(Qt::UserRole, o["f_dish"].toInt());
         ui->tbl->setItem(r, c, item);
         if (++c > ui->tbl->columnCount() - 1) {
             c = 0;

@@ -14,6 +14,10 @@ public:
 
     ~NInterface();
 
+    char *fErrorSlot;
+
+    QObject *fErrorObject;
+
     void createHttpQuery(const QString &route, const QJsonObject &params, const char *slotResponse,
                          const QVariant &marks = QVariant(), bool progress = true);
 

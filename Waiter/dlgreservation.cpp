@@ -3,10 +3,13 @@
 #include "dlgpreorderw.h"
 #include "c5orderdriver.h"
 #include "c5logtoserverthread.h"
+#include "dlglistofreservation.h"
 #include "c5user.h"
 #include <QPainter>
 #include <QItemDelegate>
 #include <QScrollBar>
+
+#define chart_days 360
 
 class TblItemDelegate : public QItemDelegate
 {
@@ -133,7 +136,7 @@ void DlgReservation::loadTable()
     int hpos = ui->tbl->horizontalScrollBar()->value();
     ui->tblDate->clearContents();
     ui->tbl->clearContents();
-    int colCount = 60;
+    int colCount = chart_days;
     ui->tbl->setColumnCount(colCount);
     ui->tblDate->setColumnCount(colCount);
     db.exec("select h.f_name, h.f_id "
@@ -180,7 +183,7 @@ void DlgReservation::loadTable()
     QDate d1 = QDate::fromString(__c5config.getValue(param_date_cash), FORMAT_DATE_TO_STR_MYSQL);
     QDate d2 = d1;
     int colSpan = 0;
-    for (int i = 0; i < 60; i++) {
+    for (int i = 0; i < chart_days; i++) {
         if (d2.month() != d1.month()) {
             ui->tblDate->setSpan(0, colSpan, 1, i - colSpan);
             ui->tblDate->setItem(0, colSpan, new QTableWidgetItem(d2.toString("MMMM, yyyy")));
@@ -191,7 +194,7 @@ void DlgReservation::loadTable()
         ui->tblDate->setItem(1, i, new QTableWidgetItem(QString::number(d1.day())));
         d1 = d1.addDays(1);
     }
-    ui->tblDate->setSpan(0, colSpan, 1, 60);
+    ui->tblDate->setSpan(0, colSpan, 1, chart_days);
     ui->tblDate->setItem(0, colSpan, new QTableWidgetItem(d2.toString("MMMM")));
     ui->tblDate->item(0, colSpan)->setTextAlignment(Qt::AlignCenter);
     d1 = QDate::fromString(__c5config.getValue(param_date_cash), FORMAT_DATE_TO_STR_MYSQL);
@@ -207,6 +210,9 @@ void DlgReservation::loadTable()
             continue;
         }
         int c = d1.daysTo(db.getDate("f_date"));
+        if (c < 0) {
+            continue;
+        }
         QTableWidgetItem *item = new QTableWidgetItem();
         item->setData(Qt::UserRole + 1, db.getInt("f_1"));
         item->setData(Qt::UserRole + 2, db.getInt("f_2"));
@@ -279,4 +285,10 @@ void DlgReservation::on_btnClearFilter_clicked()
         it.value() = true;
     }
     filterHall();
+}
+
+void DlgReservation::on_btnList_clicked()
+{
+    DlgListOfReservation(this).exec();
+    loadTable();
 }
