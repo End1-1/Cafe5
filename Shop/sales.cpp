@@ -650,8 +650,7 @@ void Sales::printTaxReport(int report_type)
                  C5Config::taxCashier(), C5Config::taxPin(), this);
     QString jsnin, jsnout, err;
     int result;
-    result = pt.printReport(QDateTime::fromString(ui->deStart->date().toString("yyyy-MM-dd"), "yyyy-MM-dd 00:00:00"),
-                            QDateTime::fromString(ui->deEnd->date().toString("yyyy-MM-dd"), "yyyy-MM-dd 00:00:00"),
+    result = pt.printReport(ui->deStart->date(), ui->deEnd->date(),
                             report_type, jsnin, jsnout, err);
     C5Database db(C5Config::dbParams());
     db[":f_id"] = db.uuid();

@@ -535,91 +535,7 @@ void Workspace::on_btnCheckout_clicked()
     saveOrder(ORDER_STATE_CLOSE, true);
     C5Airlog::write(hostinfo, fUser->fullName(), 1, "", fOrderUuid, "", tr("Order saved"), "", "");
     if (ui->btnSetIdram->isChecked()) {
-        //        double amount;
-        //        QByteArray out;
-        //        if (!Idram::check(__c5config.getValue(param_idram_server),
-        //                          __c5config.getValue(param_idram_session_id),
-        //                          fOrderUuid, amount, out)) {
-        //            if (amount < 0) {
-        //                C5Message::error(tr("Idram payment was not received"));
-        //            } else {
-        //                C5Message::error(out);
-        //            }
-        //            return;
-        //        }
     }
-    // db[":f_id"] = fOrderUuid;
-    // db.exec("select * from o_header where f_id=:f_id");
-    // if (!db.nextRow()) {
-    //     C5Message::error(db.fLastError);
-    //     return;
-    // }
-    // QString headerNum = db.getString("f_prefix") + db.getString("f_hallid");
-    // int cashid = ui->btnSetCash->isChecked() ? __c5config.cashId() : __c5config.nocashId();
-    // QString cashprefix = ui->btnSetCash->isChecked() ? __c5config.cashPrefix() : __c5config.nocashPrefix();
-    // C5StoreDraftWriter dw(db);
-    // int counter;
-    // QString cashdoc;
-    // QString cashUUID;
-    // if (fFlagEdited == 0) {
-    //     counter = dw.counterAType(DOC_TYPE_CASH);
-    //     if (counter == 0) {
-    //         C5Message::error(dw.fErrorMsg);
-    //         return;
-    //     }
-    // } else {
-    //     db[":f_oheader"] = fOrderUuid;
-    //     db.exec("select * from a_header_cash where f_oheader=:f_oheader");
-    //     if (db.nextRow()) {
-    //         cashdoc = db.getString("f_id");
-    //         db[":f_header"] = cashdoc;
-    //         db.exec("select f_id from e_cash where f_header=:f_header");
-    //         if (db.nextRow()) {
-    //             cashUUID = db.getString("f_id");
-    //         } else {
-    //             C5Message::error(tr("Application error. Cannot retrieve record of cash document."));
-    //             return;
-    //         }
-    //     } else {
-    //     }
-    // }
-    // if (otherAmount < 0.01) {
-    //     if (!dw.writeAHeader(cashdoc, QString::number(counter), DOC_STATE_SAVED, DOC_TYPE_CASH,
-    //                          fUser->id(), QDate::currentDate(), QDate::currentDate(), QTime::currentTime(),
-    //                          0, ui->leTotal->getDouble(), cashprefix + " " + headerNum, 1, __c5config.getValue(param_default_currency).toInt())) {
-    //         C5Message::error(dw.fErrorMsg);
-    //         return;
-    //     }
-    //     if (!dw.writeAHeaderCash(cashdoc, cashid, 0, 1, "", fOrderUuid, __c5config.getRegValue("session").toString())) {
-    //         C5Message::error(dw.fErrorMsg);
-    //         return;
-    //     }
-    //     if (!dw.writeECash(cashUUID, cashdoc, cashid, 1, cashprefix + " " + headerNum, ui->leTotal->getDouble(), cashUUID, 1)) {
-    //         C5Message::error(dw.fErrorMsg);
-    //         return;
-    //     }
-    // }
-    // fPreviouseUuid = fOrderUuid;
-    // bool printsecond = __c5config.getValue(param_shop_print_v2) == "1";
-    // if (idramAmount > 0.001) {
-    //     //printsecond = true;
-    // }
-    // if (__c5config.getValue(param_smart_dont_print_receipt).toInt() == 0) {
-    //     if (printReceipt(fOrderUuid, printsecond, false)) {
-    //     }
-    // }
-    // if (__c5config.getValue(param_waiter_automatially_storeout).toInt() == 1) {
-    //     auto *t = new Thread("C5WaiterOrderDoc");
-    //     C5WaiterOrderDoc *d = new C5WaiterOrderDoc(fOrderUuid, db, true);
-    //     connect(t, &QThread::started, d, &C5WaiterOrderDoc::run);
-    //     connect(d, &C5WaiterOrderDoc::finished, t, &QThread::quit);
-    //     connect(t, &QThread::finished, t, &QThread::deleteLater);
-    //     d->moveToThread(t);
-    //     t->start();
-    // }
-    // C5Airlog::write(hostinfo, fUser->fullName(), 1, "", fOrderUuid, "", tr("Close order"), "", "");
-    // ordcount ++;
-    // resetOrder();
 }
 
 void Workspace::on_btnClearFilter_clicked()
@@ -1123,7 +1039,8 @@ int Workspace::printTax(double cardAmount, double idramAmount)
     C5Database db(fDBParams);
     db[":f_header"] = fOrderUuid;
     db[":f_state"] = DISH_STATE_OK;
-    db.exec("select b.f_adgcode, b.f_dish, d.f_name, b.f_price, b.f_discount, b.f_qty1, b.f_emarks, d.f_part, "
+    db.exec("select b.f_adgcode, b.f_dish, d.f_name, b.f_price, b.f_discount, b.f_qty1,"
+            "b.f_emarks, d.f_part, "
             "p2.f_taxdept "
             "from o_body b "
             "left join d_dish d on d.f_id=b.f_dish "
@@ -2105,7 +2022,7 @@ void Workspace::addDishToOrder(Dish *d)
         on_btnEmarks_clicked();
     }
     if (d->f_emarks.isEmpty() == false) {
-        ui->btnFiscal->setChecked(true);
+        //ui->btnFiscal->setChecked(true);
     }
 }
 

@@ -4,6 +4,7 @@
 #include <QDir>
 #include <QMutex>
 #include <QDebug>
+#include <QJsonDocument>
 #include <QSettings>
 #include <QApplication>
 
@@ -22,6 +23,8 @@ C5Config __c5config;
 C5User *__user;
 QStringList __databases;
 QMap<int, QString> C5Config::fSettings;
+QJsonObject C5Config::fMainJson;
+
 static QMutex settingsMutex;
 
 C5Config::C5Config()
@@ -207,6 +210,11 @@ void C5Config::initParamsFromDb()
         while (db.nextRow()) {
             fSettings[db.getInt(0)] = db.getString(1);
         }
+    }
+    db[":f_id"] = 1;
+    db.exec("select * from sys_json_config where f_id=:f_id");
+    if (db.nextRow()) {
+        fMainJson = QJsonDocument::fromJson(db.getString("f_config").toUtf8()).object();
     }
 }
 

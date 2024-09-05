@@ -15,6 +15,7 @@
 #include "cr5consumptionbysalesdraft.h"
 #include "cr5storereason.h"
 #include "cr5documents.h"
+#include "c5goodsprice.h"
 #include "c5translatorform.h"
 #include "ntablewidget.h"
 #include "c5goodsspecialprices.h"
@@ -660,6 +661,9 @@ void C5MainWindow::on_listWidgetItemClicked(const QModelIndex &index)
         case cp_t6_goods:
             createTab<CR5Goods>(dbParams);
             break;
+        case cp_t6_goods_price:
+            createTab<C5GoodsPriceOrder>(dbParams);
+            break;
         case cp_t6_goods_special_prices:
             createTab<C5GoodsSpecialPrices>(dbParams);
             break;
@@ -719,6 +723,9 @@ void C5MainWindow::on_listWidgetItemClicked(const QModelIndex &index)
             break;
         case cp_t8_cash_movement:
             createTab<CR5CashMovement>(dbParams);
+            break;
+        case cp_t8_shifts:
+            createNTab("/engine/cash/shifts.php");
             break;
         case cp_t8_currency:
             createTab<CR5Currencies>(dbParams);
@@ -902,6 +909,7 @@ void C5MainWindow::setDB()
         addTreeL3Item(l, cp_t8_cash_doc, tr("New cash document"), ":/cash.png");
         addTreeL3Item(l, cp_t8_cash_detailed_report, tr("Cash detailed report"), ":/cash.png");
         addTreeL3Item(l, cp_t8_cash_movement, tr("Movement in the cash"), ":/cash.png");
+        addTreeL3Item(l, cp_t8_shifts, tr("Cash shifts"), ":/cash.png");
         addTreeL3Item(l, cp_t8_cash_names, tr("Cash names"), ":/cash.png");
         addTreeL3Item(l, cp_t8_currency, tr("Currency"), ":/cash.png");
         addTreeL3Item(l, cp_t8_edit_currency, tr("Currency rates"), ":/cash.png");
@@ -933,6 +941,10 @@ void C5MainWindow::setDB()
         addTreeL3Item(l, cp_t6_storage, tr("Storages"), ":/goods.png");
         addTreeL3Item(l, cp_t6_groups, tr("Groups of goods"), ":/goods.png");
         addTreeL3Item(l, cp_t6_goods, tr("Goods"), ":/goods.png");
+        if (C5Permissions::fPermissions[C5Permissions::fPermissions.firstKey()].contains(cp_t6_goods)) {
+            C5Permissions::fPermissions[C5Permissions::fPermissions.firstKey()].append(cp_t6_goods_price);
+        }
+        addTreeL3Item(l, cp_t6_goods_price, tr("Group discount"), ":/goods.png");
         addTreeL3Item(l, cp_t6_waste, tr("Autowaste"), ":/goods.png");
         addTreeL3Item(l, cp_t6_units, tr("Units"), ":/goods.png");
         addTreeL3Item(l, cp_t6_goods_images, tr("Images"), ":/images.png");

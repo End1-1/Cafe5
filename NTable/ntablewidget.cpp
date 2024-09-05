@@ -151,6 +151,11 @@ void NTableWidget::queryFinished(const QJsonObject &ba)
     static_cast<NTableModel * >(ui->mTableView->model())->setDatasource(jcols, jdata);
     auto *model = static_cast<NTableModel * >(ui->mTableView->model());
     model->fSumColumnsSpecial = jo["sumspecial"].toArray();
+    model->mRowColors.clear();
+    for (int i = 0; i < jo["rowcolors"].toArray().size(); i++) {
+        const QJsonObject &jao = jo["rowcolors"].toArray().at(i).toObject();
+        model->mRowColors[jao["row"].toInt()] = jao["color"].toInt();
+    }
     model->setSumColumns(colSum);
     sum();
     ui->mTableView->resizeColumnsToContents();

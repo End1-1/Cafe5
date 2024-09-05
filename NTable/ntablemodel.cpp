@@ -85,8 +85,12 @@ QVariant NTableModel::data(const QModelIndex &index, int role) const
             }
             break;
         }
-        case Qt::BackgroundColorRole:
+        case Qt::BackgroundColorRole: {
+            if (mRowColors.contains(row)) {
+                return QColor::fromRgb(mRowColors[row]);
+            }
             return QColor(Qt::white).toRgb();
+        }
     }
     return QVariant();
 }

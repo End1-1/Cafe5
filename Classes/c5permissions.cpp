@@ -116,6 +116,7 @@ void C5Permissions::init(C5Database &db, int group)
               << cp_t6_qty_reminder
               << cp_t6_complectations
               << cp_t6_goods_special_prices
+              << cp_t6_goods_price
               << cp_t7_other
               << cp_t7_credit_card
               << cp_t7_discount_system
@@ -139,6 +140,7 @@ void C5Permissions::init(C5Database &db, int group)
               << cp_t8_edit_currency
               << cp_t8_currency_cross_rate
               << cp_t8_currency_cross_rate_history
+              << cp_t8_shifts
               << cp_t9_salary
               << cp_t9_salary_doc
               << cp_t9_report

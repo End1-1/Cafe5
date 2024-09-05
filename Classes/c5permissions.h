@@ -118,6 +118,7 @@
 #define cp_t6_complectations 610
 #define cp_t6_goods_only_price_edit 611
 #define cp_t6_goods_special_prices 612
+#define cp_t6_goods_price 613
 
 #define cp_t7_other 700
 #define cp_t7_credit_card 701
@@ -143,6 +144,7 @@
 #define cp_t8_edit_currency 809
 #define cp_t8_currency_cross_rate 810
 #define cp_t8_currency_cross_rate_history 811
+#define cp_t8_shifts 812
 
 #define cp_t9_salary 900
 #define cp_t9_salary_doc 901

@@ -137,12 +137,18 @@ void WOrder::clearCode()
 
 void WOrder::keyMinus()
 {
+    if (ui->leCode->text().length() > 1) {
+        return;
+    }
     clearCode();
     removeRow();
 }
 
 void WOrder::keyPlus()
 {
+    if (ui->leCode->text().length() > 1) {
+        return;
+    }
     clearCode();
     if (__c5config.getValue(param_shop_deny_qtychange).toInt() == 0) {
         changeQty();
@@ -151,6 +157,9 @@ void WOrder::keyPlus()
 
 void WOrder::keyAsterix()
 {
+    if (ui->leCode->text().length() > 1) {
+        return;
+    }
     clearCode();
     changePrice();
 }
@@ -433,12 +442,16 @@ bool WOrder::writeOrder()
             file.write("\r\n");
             file.write(jsonOut.toUtf8());
             file.write("\r\n");
+            file.write("\r\n ERROR JSON");
+            jerr.errorString();
+            file.write("\r\n");
             file.close();
         }
+        QJsonParseError jsonErr;
         QJsonObject jtax;
         jtax["f_order"] = fOHeader._id();
         jtax["f_elapsed"] = et.elapsed();
-        jtax["f_in"] = QJsonDocument::fromJson(jsonIn.toUtf8()).object();
+        jtax["f_in"] = QJsonDocument::fromJson(jsonIn.replace("'", "''").toUtf8(), &jsonErr).object();
         jtax["f_out"] = jod.object();
         jtax["f_err"] = err;
         jtax["f_result"] = result;
@@ -1025,6 +1038,7 @@ void WOrder::reponseProcessCode(const QJsonObject &jdoc)
             og.discountFactor = fBHistory.value;
             og.discountMode = fBHistory.type;
             og.discountAmount = 0;
+            og.emarks = jdoc["emarks"].toString();
             og.canDiscount = goods["f_candiscount"].toInt();
             fOGoods.append(og);
             ui->tblData->setCurrentCell(row, 0);
@@ -1152,7 +1166,8 @@ void WOrder::on_leCode_textChanged(const QString &arg1)
 
 void WOrder::on_leCode_returnPressed()
 {
-    QString code = C5ReplaceCharacter::replace(ui->leCode->text());
+    //QString code = C5ReplaceCharacter::replace(ui->leCode->text());
+    QString code = ui->leCode->text();
     if (code.isEmpty()) {
         return;
     }
@@ -1191,12 +1206,20 @@ void WOrder::on_leCode_returnPressed()
             }
         }
     }
+    if (code.length() >= 29) {
+        if (code.length() == 29) {
+            //cigarette
+        }
+        if (code.length() == 31) {
+            //wines
+        }
+    }
     if (code.at(0).toLower() == '/') {
         code.remove(0, 1);
         discountRow(code);
         return;
     }
-    code.replace(";", "").replace("?", "");
+    //code.replace(";", "").replace("?", "");
     addGoods(code);
 }
 

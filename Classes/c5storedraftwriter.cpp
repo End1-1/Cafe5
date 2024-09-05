@@ -363,7 +363,8 @@ bool C5StoreDraftWriter::returnResult(bool r, const QString &msg)
 bool C5StoreDraftWriter::writeAHeader(QString &id, const QString &userid, int state, int type, int op,
                                       const QDate &docDate, const QDate &dateCreate,
                                       const QTime &timeCreate, int partner, double amount,
-                                      const QString &comment, int paid, int currency)
+                                      const QString &comment, int paid, int currency,
+                                      int working_session)
 {
     bool u = true;
     if (id.isEmpty()) {
@@ -384,6 +385,7 @@ bool C5StoreDraftWriter::writeAHeader(QString &id, const QString &userid, int st
     fDb[":f_amount"] = amount;
     fDb[":f_comment"] = comment;
     fDb[":f_paid"] = paid;
+    fDb[":f_working_session"] = working_session;
     fDb[":f_currency"] = currency;
     if (u) {
         return returnResult(fDb.update("a_header", where_id(id)));

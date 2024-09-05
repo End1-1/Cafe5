@@ -15,6 +15,7 @@ CE5UserGroup::~CE5UserGroup()
 
 void CE5UserGroup::clear()
 {
+    CE5Editor::clear();
     ui->leFixed->clear();
     ui->leMin->clear();
     ui->leMax->clear();

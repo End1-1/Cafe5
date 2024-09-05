@@ -50,6 +50,8 @@ public:
 
     const QSet<QString> &uniqueValuesForColumn(int column);
 
+    QMap<int, int> mRowColors;
+
 private:
     QMap<int, QSet<QString> > mUniqueValuesForColumn;
 

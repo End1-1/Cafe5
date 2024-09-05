@@ -1,0 +1,294 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>C5GoodsPriceOrder</class>
+ <widget class="QWidget" name="C5GoodsPriceOrder">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1169</width>
+    <height>722</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <layout class="QHBoxLayout" name="horizontalLayout">
+   <property name="leftMargin">
+    <number>0</number>
+   </property>
+   <property name="topMargin">
+    <number>0</number>
+   </property>
+   <property name="rightMargin">
+    <number>0</number>
+   </property>
+   <property name="bottomMargin">
+    <number>0</number>
+   </property>
+   <item>
+    <layout class="QGridLayout" name="gridLayout">
+     <item row="1" column="1">
+      <widget class="C5TableWidget" name="tblDoc">
+       <property name="contextMenuPolicy">
+        <enum>Qt::ContextMenuPolicy::CustomContextMenu</enum>
+       </property>
+       <column>
+        <property name="text">
+         <string>Group id</string>
+        </property>
+       </column>
+       <column>
+        <property name="text">
+         <string>Group name</string>
+        </property>
+       </column>
+       <column>
+        <property name="text">
+         <string>Sold</string>
+        </property>
+       </column>
+       <column>
+        <property name="text">
+         <string>Stock</string>
+        </property>
+       </column>
+       <column>
+        <property name="text">
+         <string>Percent %</string>
+        </property>
+       </column>
+       <column>
+        <property name="text">
+         <string>Retail</string>
+        </property>
+       </column>
+       <column>
+        <property name="text">
+         <string>Whosale</string>
+        </property>
+       </column>
+       <column>
+        <property name="text">
+         <string>Retaile discounted</string>
+        </property>
+       </column>
+       <column>
+        <property name="text">
+         <string>Whosale discounted</string>
+        </property>
+       </column>
+      </widget>
+     </item>
+     <item row="0" column="0" colspan="2">
+      <widget class="QWidget" name="widget" native="true">
+       <layout class="QHBoxLayout" name="horizontalLayout_2">
+        <property name="leftMargin">
+         <number>0</number>
+        </property>
+        <property name="topMargin">
+         <number>0</number>
+        </property>
+        <property name="rightMargin">
+         <number>0</number>
+        </property>
+        <property name="bottomMargin">
+         <number>0</number>
+        </property>
+        <item>
+         <widget class="QToolButton" name="btnAddNew">
+          <property name="text">
+           <string>...</string>
+          </property>
+          <property name="icon">
+           <iconset resource="../resources/res.qrc">
+            <normaloff>:/add.png</normaloff>:/add.png</iconset>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QToolButton" name="btnNewGroup">
+          <property name="text">
+           <string>...</string>
+          </property>
+          <property name="icon">
+           <iconset resource="../resources/res.qrc">
+            <normaloff>:/add_work.png</normaloff>:/add_work.png</iconset>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QToolButton" name="btnSave">
+          <property name="text">
+           <string>...</string>
+          </property>
+          <property name="icon">
+           <iconset resource="../resources/res.qrc">
+            <normaloff>:/save.png</normaloff>:/save.png</iconset>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QToolButton" name="btnShowGoods">
+          <property name="text">
+           <string>...</string>
+          </property>
+          <property name="icon">
+           <iconset resource="../resources/res.qrc">
+            <normaloff>:/eye.png</normaloff>:/eye.png</iconset>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QToolButton" name="btnApply">
+          <property name="text">
+           <string>...</string>
+          </property>
+          <property name="icon">
+           <iconset resource="../resources/res.qrc">
+            <normaloff>:/checkall.png</normaloff>:/checkall.png</iconset>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QToolButton" name="btnRollback">
+          <property name="text">
+           <string>...</string>
+          </property>
+          <property name="icon">
+           <iconset resource="../resources/res.qrc">
+            <normaloff>:/minus.png</normaloff>:/minus.png</iconset>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <spacer name="horizontalSpacer">
+          <property name="orientation">
+           <enum>Qt::Orientation::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>40</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item>
+         <widget class="QLabel" name="lbDateRange">
+          <property name="text">
+           <string>01/01/2024 - 01/01/2025</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QToolButton" name="btnChangeRange">
+          <property name="text">
+           <string>...</string>
+          </property>
+          <property name="icon">
+           <iconset resource="../resources/res.qrc">
+            <normaloff>:/constructor.png</normaloff>:/constructor.png</iconset>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QToolButton" name="btnRefresh">
+          <property name="text">
+           <string>...</string>
+          </property>
+          <property name="icon">
+           <iconset resource="../resources/res.qrc">
+            <normaloff>:/refresh.png</normaloff>:/refresh.png</iconset>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+     </item>
+     <item row="1" column="0">
+      <widget class="QListWidget" name="lwNames">
+       <property name="maximumSize">
+        <size>
+         <width>200</width>
+         <height>16777215</height>
+        </size>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="2">
+      <widget class="C5TableWidget" name="tblGoods">
+       <property name="contextMenuPolicy">
+        <enum>Qt::ContextMenuPolicy::CustomContextMenu</enum>
+       </property>
+       <column>
+        <property name="text">
+         <string>Goods id</string>
+        </property>
+       </column>
+       <column>
+        <property name="text">
+         <string>Goods name</string>
+        </property>
+       </column>
+       <column>
+        <property name="text">
+         <string>Barcode</string>
+        </property>
+       </column>
+       <column>
+        <property name="text">
+         <string>Retail discounted</string>
+        </property>
+       </column>
+       <column>
+        <property name="text">
+         <string>Whosale discounted</string>
+        </property>
+       </column>
+      </widget>
+     </item>
+    </layout>
+   </item>
+  </layout>
+  <action name="actionRemove">
+   <property name="icon">
+    <iconset theme="QIcon::ThemeIcon::EditDelete"/>
+   </property>
+   <property name="text">
+    <string>Remove</string>
+   </property>
+   <property name="menuRole">
+    <enum>QAction::MenuRole::NoRole</enum>
+   </property>
+  </action>
+  <action name="actionChangeGoodsPrice">
+   <property name="text">
+    <string>Set retail price of selected goods</string>
+   </property>
+   <property name="menuRole">
+    <enum>QAction::MenuRole::NoRole</enum>
+   </property>
+  </action>
+  <action name="actionSet_whosale_price_of_selected_goods">
+   <property name="text">
+    <string>Set whosale price of selected goods</string>
+   </property>
+   <property name="menuRole">
+    <enum>QAction::MenuRole::NoRole</enum>
+   </property>
+  </action>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>C5TableWidget</class>
+   <extends>QTableWidget</extends>
+   <header location="global">c5tablewidget.h</header>
+  </customwidget>
+ </customwidgets>
+ <resources>
+  <include location="../resources/res.qrc"/>
+  <include location="../resources/res.qrc"/>
+ </resources>
+ <connections/>
+</ui>

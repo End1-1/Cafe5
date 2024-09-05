@@ -4,6 +4,7 @@
 #include <QString>
 #include <QVariant>
 #include <QSslCertificate>
+#include <QJsonObject>
 
 #define param_local_receipt_printer 1
 #define param_service_factor 2
@@ -266,8 +267,11 @@ public:
 
     static void setValues(const QMap<int, QString> &values);
 
+    static QJsonObject fMainJson;
+
 private:
     static QMap<int, QString> fSettings;
+
 };
 
 extern C5Config __c5config;

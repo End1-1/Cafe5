@@ -16,7 +16,6 @@ C5TableWidgetItem::C5TableWidgetItem(int type) :
 C5TableWidgetItem::C5TableWidgetItem(const QString &text, int type) :
     QTableWidgetItem (text, type)
 {
-
 }
 
 C5ClearTableWidget::C5ClearTableWidget(QWidget *parent) :
@@ -33,7 +32,7 @@ C5ClearTableWidget::C5ClearTableWidget(QWidget *parent) :
 
 C5TableWidgetItem *C5ClearTableWidget::item(int row, int column) const
 {
-    return static_cast<C5TableWidgetItem*>(QTableWidget::item(row, column));
+    return static_cast<C5TableWidgetItem *>(QTableWidget::item(row, column));
 }
 
 void C5ClearTableWidget::setColumnWidths(int count, ...)
@@ -74,7 +73,7 @@ void C5ClearTableWidget::fitRowToHeight(int dec)
 {
     int rh = verticalHeader()->defaultSectionSize();
     int visibleRows = (height() - dec) / rh;
-    int delta = (height() - dec) - (visibleRows * rh);
+    int delta = (height() - dec) - (visibleRows *rh);
     verticalHeader()->setDefaultSectionSize(rh + (delta / visibleRows));
 }
 
@@ -281,7 +280,7 @@ C5CheckBox *C5ClearTableWidget::createCheckbox(int row, int column)
 
 C5CheckBox *C5ClearTableWidget::checkBox(int row, int column)
 {
-    return static_cast<C5CheckBox*>(cellWidget(row, column));
+    return static_cast<C5CheckBox *>(cellWidget(row, column));
 }
 
 C5LineEdit *C5ClearTableWidget::createLineEdit(int row, int column)
@@ -290,42 +289,49 @@ C5LineEdit *C5ClearTableWidget::createLineEdit(int row, int column)
     l->setProperty("row", row);
     l->setProperty("column", column);
     l->setFrame(false);
-    connect(l, SIGNAL(textChanged(QString)), this, SLOT(lineEditTextChanged(QString)));
     setCellWidget(row, column, l);
+    connect(l, SIGNAL(textChanged(QString)), this, SLOT(lineEditTextChanged(QString)));
+    connect(l, &C5LineEdit::focusIn, [this, l, column]() {
+        int r, c = column;
+        if (findWidget(l, r, c)) {
+            if (r != currentRow()) {
+                setCurrentCell(r, c);
+            }
+        }
+    });
     return l;
 }
 
 C5LineEdit *C5ClearTableWidget::lineEdit(int row, int column)
 {
-    return static_cast<C5LineEdit*>(cellWidget(row, column));
+    return static_cast<C5LineEdit *>(cellWidget(row, column));
 }
 
 QVariant C5TableWidgetItem::data(int role) const
 {
     QVariant v = QTableWidgetItem::data(role);
     if (role == Qt::DisplayRole) {
-       switch (v.type()) {
-       case QVariant::Int:
-           return v.toString();
-       case QVariant::Date:
-           return v.toDate().toString(FORMAT_DATE_TO_STR);
-       case QVariant::DateTime:
-           return v.toDateTime().toString(FORMAT_DATETIME_TO_STR);
-       case QVariant::Time:
-           return v.toTime().toString(FORMAT_TIME_TO_STR);
-       case QVariant::Double:
-           return float_str(v.toDouble(), fDecimals);
-       default:
-           return v.toString();
-       }
+        switch (v.type()) {
+            case QVariant::Int:
+                return v.toString();
+            case QVariant::Date:
+                return v.toDate().toString(FORMAT_DATE_TO_STR);
+            case QVariant::DateTime:
+                return v.toDateTime().toString(FORMAT_DATETIME_TO_STR);
+            case QVariant::Time:
+                return v.toTime().toString(FORMAT_TIME_TO_STR);
+            case QVariant::Double:
+                return float_str(v.toDouble(), fDecimals);
+            default:
+                return v.toString();
+        }
     }
     return v;
 }
 
-
 void C5ClearTableWidget::lineEditTextChanged(const QString arg1)
 {
-    C5LineEdit *l = static_cast<C5LineEdit*>(sender());
+    C5LineEdit *l = static_cast<C5LineEdit *>(sender());
     int row, col;
     findWidget(l, row, col);
     setString(row, col, arg1);
@@ -333,7 +339,7 @@ void C5ClearTableWidget::lineEditTextChanged(const QString arg1)
 
 void C5ClearTableWidget::checkBoxChecked(bool v)
 {
-    C5CheckBox *c = static_cast<C5CheckBox*>(sender());
+    C5CheckBox *c = static_cast<C5CheckBox *>(sender());
     int row, col;
     findWidget(c, row, col);
     setString(row, col, (v ? "1" : "0"));

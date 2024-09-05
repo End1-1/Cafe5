@@ -97,6 +97,6 @@ void NDataProvider::queryFinished(QNetworkReply *r)
         emit done(jdoc);
     } else {
         LogWriter::write(LogWriterLevel::errors, err.errorString(), ba);
-        emit error(err.errorString());
+        emit error(ba);
     }
 }

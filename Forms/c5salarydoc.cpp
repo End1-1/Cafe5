@@ -4,7 +4,10 @@
 #include "c5cache.h"
 #include "c5daterange.h"
 #include "c5cashdoc.h"
+#include "c5storedraftwriter.h"
 #include "c5mainwindow.h"
+#include "c5dateedit.h"
+#include "c5cashdoc.h"
 #include "c5user.h"
 #include "c5lineeditwithselector.h"
 
@@ -15,9 +18,12 @@ C5SalaryDoc::C5SalaryDoc(const QStringList &dbParams, QWidget *parent) :
     ui->setupUi(this);
     fIcon = ":/employee.png";
     fLabel = tr("Salary document");
-    ui->tbl->setColumnWidths(ui->tbl->columnCount(), 0, 150, 200, 0, 300, 100, 80, 80, 80, 80);
-    ui->deDate->setDate(QDate::currentDate());
-    openDoc(ui->deDate->date());
+    ui->tbl->setColumnWidths(ui->tbl->columnCount(), 0, 150, 200, 0, 300, 100, 80, 80, 80, 80, 100);
+    fDate = QDate::currentDate();
+    fDate = fDate.addDays((fDate.day() - 1) * -1);
+    ui->deDate->setText(fDate.toString("MMMM-yyyy"));
+    getSessions();
+    openDoc();
 }
 
 C5SalaryDoc::~C5SalaryDoc()
@@ -25,18 +31,21 @@ C5SalaryDoc::~C5SalaryDoc()
     delete ui;
 }
 
-bool C5SalaryDoc::openDoc(const QDate &date)
+bool C5SalaryDoc::openDoc()
 {
-    ui->deDate->setDate(date);
+    if (ui->cbShift->currentData().toInt() == 0) {
+        return false;
+    }
+    double total = 0;
     C5Database db(fDBParams);
-    db[":f_date"] = ui->deDate->date();
+    db[":f_shift"] = ui->cbShift->currentData();
     db.exec("select b.f_id, b.f_worker, b.f_position, g.f_name,"
             "concat(u.f_last, ' ', u.f_first) as f_employee, b.f_amount, "
-            "b.f_indate, b.f_intime, b.f_outdate, b.f_outtime "
+            "b.f_indate, b.f_intime, b.f_outdate, b.f_outtime, b.f_paid "
             "from s_salary_attendance b "
             "left join s_user u on u.f_id=b.f_worker "
             "inner join s_user_group g on g.f_id=u.f_group "
-            "where b.f_date=:f_date");
+            "where b.f_shift=:f_shift");
     ui->tbl->setRowCount(0);
     while (db.nextRow()) {
         int row = newRow();
@@ -49,7 +58,11 @@ bool C5SalaryDoc::openDoc(const QDate &date)
         ui->tbl->lineEdit(row, 7)->setText(db.getTime("f_intime").toString("HH:mm:ss"));
         ui->tbl->getWidget<C5DateEdit>(row, 8)->setDate(db.getDate("f_outdate"));
         ui->tbl->lineEdit(row, 9)->setText(db.getTime("f_outtime").toString("HH:mm:ss"));
+        qDebug() << db.getString("f_paid").isEmpty() << db.getDateTime("f_paid");
+        ui->tbl->setString(row, 10, db.getString("f_paid").isEmpty()  ? tr("No") : tr("Yes") );
+        total += db.getDouble("f_amount");
     }
+    ui->leTotal->setDouble(total);
     return true;
 }
 
@@ -67,6 +80,7 @@ QToolBar *C5SalaryDoc::toolBar()
 
 void C5SalaryDoc::save()
 {
+    removeSalaryOfShift();
     QString error;
     for (int i = 0; i < ui->tbl->rowCount(); i++) {
         if (ui->tbl->lineEditWithSelector(i, 1)->getInteger() == 0) {
@@ -79,12 +93,12 @@ void C5SalaryDoc::save()
         return;
     }
     C5Database db(fDBParams);
-    db[":f_date"] = ui->deDate->date();
-    db.exec("delete from s_salary_attendance where f_date=:f_date");
-    db[":f_date"] = ui->deDate->date();
+    db[":f_shift"] = ui->cbShift->currentData();
+    db.exec("delete from s_salary_attendance where f_shift=:f_shift");
+    db[":f_shift"] = ui->cbShift->currentData();
     db.exec("delete from s_salary_payment where f_date=:f_date");
     for (int i = 0; i < ui->tbl->rowCount(); i++) {
-        db[":f_date"] = ui->deDate->date();
+        db[":f_shift"] = ui->cbShift->currentData();
         db[":f_worker"] = ui->tbl->getInteger(i, 3);
         db[":f_position"] = ui->tbl->getInteger(i, 1);
         db[":f_amount"] = ui->tbl->lineEdit(i, 5)->getDouble();
@@ -95,17 +109,47 @@ void C5SalaryDoc::save()
         ui->tbl->setInteger(i, 0, db.insert("s_salary_attendance"));
     }
     countSalary();
-    db[":f_date"] = ui->deDate->date();
-    db.exec("insert into s_salary_payment (f_worker, f_date, f_amount)  "
-            "select distinct(f_worker), :f_date, sum(f_amount) from s_salary_attendance "
-            "where f_date=:f_date group by 1 ");
+    db[":f_shift"] = ui->cbShift->currentData();
+    db.exec("insert into s_salary_payment (f_worker, f_shift, f_amount)  "
+            "select distinct(f_worker), :f_shift, sum(f_amount) from s_salary_attendance "
+            "where f_shift=:f_shift group by 1 ");
+}
+
+void C5SalaryDoc::createCashDocument()
+{
+    removeSalaryOfShift();
+    C5Database db(fDBParams);
+    C5StoreDraftWriter dw(db);
+    int docnum = genNumber(DOC_TYPE_CASH);
+    updateGenNumber(docnum, DOC_TYPE_CASH);
+    QString fUuid;
+    dw.writeAHeader(fUuid, QString::number(docnum), DOC_STATE_SAVED, DOC_TYPE_CASH, __user->id(),
+                    QDate::currentDate(),
+                    QDate::currentDate(), QTime::currentTime(),
+                    0, ui->leTotal->getDouble(),
+                    QString("%1 %2").arg("Salary").arg(ui->cbShift->currentText()), 1, 1,
+                    ui->cbShift->currentData().toInt());
+    dw.writeAHeaderCash(fUuid, 0, 1, 0, "", "");
+    QString idout;
+    dw.writeECash(idout, fUuid, 1, -1, QString("%1 %2").arg("Salary").arg(ui->cbShift->currentText()),
+                  ui->leTotal->getDouble(), idout, 0);
+    db[":f_shift"] = ui->cbShift->currentData();
+    db[":f_paid"] = fUuid;
+    db.exec("update s_salary_attendance set f_paid=:f_paid where f_shift=:f_shift");
+    openDoc();
+}
+
+void C5SalaryDoc::countSalaryResponse(const QJsonObject &jdoc)
+{
+    openDoc();
+    fHttp->httpQueryFinished(sender());
     C5Message::info(tr("Saved"));
 }
 
 void C5SalaryDoc::getEmployesInOutList()
 {
     C5Database db(fDBParams);
-    db[":f_date"] = ui->deDate->date();
+    //db[":f_shift"] = ui->deDate->date();
     db.exec("select u.f_group, ug.f_name as position_name, u.f_id, concat(u.f_last, ' ', u.f_first) as employee_name "
             "from s_salary_inout io "
             "left join s_user u on u.f_id=io.f_user "
@@ -145,9 +189,10 @@ void C5SalaryDoc::on_btnAddEmployee_clicked()
         ui->tbl->lineEditWithSelector(row, 1)->setValue(db.getInt(0));
         ui->tbl->setInteger(row, 3, vals.at(1).toInt());
         ui->tbl->setString(row, 4, db.getString(1));
-        ui->tbl->getWidget<C5DateEdit>(row, 6)->setDate(ui->deDate->date());
+        ui->tbl->getWidget<C5DateEdit>(row, 6)->setDate(ui->cbShift->currentData(Qt::UserRole + 1).toDate());
         ui->tbl->lineEdit(row, 7)->setText(db.getString("f_starttime"));
-        QDateTime dt = QDateTime::fromString(QString("%1 %2").arg(ui->deDate->text(), ui->tbl->lineEdit(row, 7)->text()),
+        QDateTime dt = QDateTime::fromString(QString("%1 %2").arg(ui->deDate->text(),
+                                             ui->tbl->lineEdit(row, 7)->text()),
                                              "dd/MM/yyyy HH:mm:ss");
         dt = dt.addSecs(60 * 60 * db.getInt("f_duration"));
         ui->tbl->getWidget<C5DateEdit>(row, 8)->setDate(dt.date());
@@ -182,32 +227,60 @@ int C5SalaryDoc::newRow()
     return row;
 }
 
+void C5SalaryDoc::getSessions()
+{
+    ui->cbShift->clear();
+    C5Database db(fDBParams);
+    QString ds =  QString("%1-%2-01")
+                  .arg(fDate.year(), 4, 10, QChar('0'))
+                  .arg(fDate.month(),  2, 10,  QChar('0'));
+    QDate date1 = QDate::fromString(ds, FORMAT_DATE_TO_STR_MYSQL);
+    QDate date2 = date1.addDays(date1.daysInMonth() - 1);
+    db[":date1"] = date1;
+    db[":date2"] = date2;
+    db.exec("select * from s_working_sessions where cast(f_close as date) between :date1 and :date2 order by f_id desc");
+    while (db.nextRow()) {
+        ui->cbShift->addItem(
+            QString("%1, %2 - %3").arg(QString::number(db.getInt("f_id")),
+                                       db.getDateTime("f_open").toString(FORMAT_DATETIME_TO_STR),
+                                       db.getDateTime("f_close").toString(FORMAT_DATETIME_TO_STR)),
+            db.getInt("f_id"));
+        int i = ui->cbShift->count() - 1;
+        ui->cbShift->setItemData(i, db.getDateTime("f_open"), Qt::UserRole + 1);
+    }
+}
+
 void C5SalaryDoc::countSalary()
 {
+    fHttp->createHttpQuery("/engine/cash/countsalary.php",
+    QJsonObject{{"action", "count"}, {"cashsession", ui->cbShift->currentData().toInt()}},
+    SLOT(countSalaryResponse(QJsonObject)));
+}
+
+void C5SalaryDoc::removeSalaryOfShift()
+{
     C5Database db(fDBParams);
-    db[":f_date"] = ui->deDate->date();
-    db.exec("delete from s_salary_payment where f_date=:f_date");
-    for (int i = 0; i < ui->tbl->rowCount(); i++) {
-        double amount = salaryOfPosition(db, ui->tbl->getInteger(i, 1), ui->tbl->getInteger(i, 3));
-        if (amount < 0) {
-            amount = ui->tbl->lineEdit(i, 5)->getDouble();
-        }
-        ui->tbl->lineEdit(i, 5)->setDouble(amount);
-        db[":f_amount"] = ui->tbl->lineEdit(i, 5)->getDouble();
-        db.update("s_salary_attendance", "f_id", ui->tbl->getInteger(i, 0));
+    db[":f_shift"] = ui->cbShift->currentData();
+    db.exec("select f_paid from s_salary_attendance where f_shift=:f_shift");
+    QStringList paid;
+    while (db.nextRow()) {
+        paid.append(db.getString("f_paid"));
+    }
+    for (const QString &s : paid) {
+        C5CashDoc::removeDoc(db, s);
     }
 }
 
 double C5SalaryDoc::salaryOfPosition(C5Database &db, int pos, int worker)
 {
-    db[":f_date"] = ui->deDate->date();
+    db[":f_shift"] = ui->cbShift->currentData();
     db[":f_position"] = pos;
-    db.exec("select count(f_id) from s_salary_attendance where f_position=:f_position and f_date=:f_date");
+    db.exec("select count(f_id) from s_salary_attendance where f_position=:f_position and f_shift=:f_shift");
     db.nextRow();
     int posCount = db.getInt(0);
     db[":f_worker"] = worker;
-    db[":f_date"] = ui->deDate->date();
-    db.exec("select * from s_salary_attendance where f_date=:f_date and f_worker=:f_worker");
+    db[":f_shift"] = ui->cbShift->currentData();
+    db.exec("select * from s_salary_attendance where f_shift=:f_shift and f_worker=:f_worker");
     if (db.nextRow() == false) {
         return 0;
     }
@@ -245,10 +318,10 @@ double C5SalaryDoc::salaryOfPosition(C5Database &db, int pos, int worker)
     }
     if (totalVal > 0.0) {
         db[":f_state"] = 2;
-        db[":f_datecash"] = ui->deDate->date();
+        db[":f_working_session"] = ui->cbShift->currentData();
         db[":f_totalval"] = totalVal / 100;
         db.exec("select sum(oh.f_amounttotal) * :f_totalval from o_header oh "
-                "where oh.f_state=:f_state and f_datecash=:f_datecash");
+                "where oh.f_state=:f_state and f_working_session=:f_working_session");
         db.nextRow();
         totalVal = db.getDouble(0);
     }
@@ -256,8 +329,11 @@ double C5SalaryDoc::salaryOfPosition(C5Database &db, int pos, int worker)
         db[":f_state"] = 2;
         db[":f_owntotal"] = own;
         db[":f_staff"] = worker;
+        db[":f_working_session"] = ui->cbShift->currentData();
         db.exec("select sum(oh.f_amounttotal) * :f_owntotal from o_header oh "
-                "where oh.f_state=:f_state and oh.f_datecash=:f_datecash and oh.f_staff=:f_staff");
+                "where oh.f_state=:f_state "
+                "and oh.f_working_session=:f_working_session "
+                "and oh.f_staff=:f_staff");
         db.nextRow();
         own = db.getDouble(0);
     }
@@ -271,17 +347,25 @@ double C5SalaryDoc::salaryOfPosition(C5Database &db, int pos, int worker)
 
 void C5SalaryDoc::on_toolButton_clicked()
 {
-    ui->deDate->setDate(ui->deDate->date().addDays(-1));
-    openDoc(ui->deDate->date());
+    fDate = fDate.addDays(fDate.daysInMonth());
+    ui->deDate->setText(fDate.toString("MMMM-yyyy"));
+    getSessions();
 }
 
 void C5SalaryDoc::on_toolButton_2_clicked()
 {
-    ui->deDate->setDate(ui->deDate->date().addDays(1));
-    openDoc(ui->deDate->date());
+    fDate = fDate.addDays(-1);
+    fDate = fDate.addDays(-1 * (fDate.daysInMonth() - 1));
+    ui->deDate->setText(fDate.toString("MMMM-yyyy"));
+    getSessions();
 }
 
 void C5SalaryDoc::on_deDate_returnPressed()
 {
-    openDoc(ui->deDate->date());
+    openDoc();
+}
+
+void C5SalaryDoc::on_cbShift_currentIndexChanged(int index)
+{
+    openDoc();
 }

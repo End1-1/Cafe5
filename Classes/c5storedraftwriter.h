@@ -19,27 +19,39 @@ class C5StoreDraftWriter : QObject
 public:
     C5StoreDraftWriter(C5Database &db);
 
-    bool writeAHeader(QString &id, const QString &userid, int state, int type, int op, const QDate &docDate, const QDate &dateCreate, const QTime &timeCreate, int partner, double amount, const QString &comment, int paid, int currency);
+    bool writeAHeader(QString &id, const QString &userid, int state, int type, int op, const QDate &docDate,
+                      const QDate &dateCreate, const QTime &timeCreate, int partner, double amount, const QString &comment, int paid,
+                      int currency, int working_session = 0);
 
-    bool writeAHeaderPartial(QString &id, const QString &userid, int op, const QDate &dateCreate, const QTime &timeCreate, int partner, const QString &comment);
+    bool writeAHeaderPartial(QString &id, const QString &userid, int op, const QDate &dateCreate, const QTime &timeCreate,
+                             int partner, const QString &comment);
 
-    bool writeAHeaderStore(const QString &id, int userAccept, int userPass, const QString &invoice, const QDate &invoiceDate, int storeIn, int storeOut, int basedOnSale, const QString &cashUUID, int complectation, double complectationQty, const QString &saleuuid);
+    bool writeAHeaderStore(const QString &id, int userAccept, int userPass, const QString &invoice,
+                           const QDate &invoiceDate, int storeIn, int storeOut, int basedOnSale, const QString &cashUUID, int complectation,
+                           double complectationQty, const QString &saleuuid);
 
-    bool writeAHeaderCash(const QString &id, int cashin, int cashout, int related, const QString &storedoc, const QString &oheader);
+    bool writeAHeaderCash(const QString &id, int cashin, int cashout, int related, const QString &storedoc,
+                          const QString &oheader);
 
     bool writeAHeader2ShopStore(const QString &id, int store, int accept);
 
-    bool writeAStoreDraft(QString &id, const QString &docId, int store, int type, int goods, double qty, double price, double total, int reason, const QString &baseid, int rownum, const QString &comment);
+    bool writeAStoreDraft(QString &id, const QString &docId, int store, int type, int goods, double qty, double price,
+                          double total, int reason, const QString &baseid, int rownum, const QString &comment);
 
     bool writeACalcPrice(const QString &id, const QString &docId, double price2, double margin);
 
-    bool writeAStoreInventory(QString &id, const QString &docId, int store, int goods, double qty, double price, double total);
+    bool writeAStoreInventory(QString &id, const QString &docId, int store, int goods, double qty, double price,
+                              double total);
 
     bool writeAStoreDishWaste(QString &id, const QString &docId, int dish, double qty, const QString &data);
 
-    bool writeECash(QString &id, const QString &header, int cash, int sign, const QString &purpose, double amount, QString &base, int rownum);
+    bool writeECash(QString &id, const QString &header, int cash, int sign, const QString &purpose, double amount,
+                    QString &base, int rownum);
 
-    bool writeOBody(QString &id, const QString &header, int state, int dish, double qty1, double qty2, double price, double total, double service, double discount, int store, const QString &print1, const QString &print2, const QString &comment, int remind, const QString &adgcode, int removereason, int timeorder, int package, int row, const QDateTime &appendTime, const QString &emarks);
+    bool writeOBody(QString &id, const QString &header, int state, int dish, double qty1, double qty2, double price,
+                    double total, double service, double discount, int store, const QString &print1, const QString &print2,
+                    const QString &comment, int remind, const QString &adgcode, int removereason, int timeorder, int package, int row,
+                    const QDateTime &appendTime, const QString &emarks);
 
     bool writeOBodyToOGoods(const QString &id, const QString &headerid);
 
@@ -75,7 +87,8 @@ public:
 
     int counterAType(int type);
 
-    bool updateField(const QString &tableName, const QString &fieldName, const QVariant &fieldValue, const QString &whereFieldName, const QVariant &whereFieldValue);
+    bool updateField(const QString &tableName, const QString &fieldName, const QVariant &fieldValue,
+                     const QString &whereFieldName, const QVariant &whereFieldValue);
 
     QString fErrorMsg;
 

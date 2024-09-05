@@ -3,7 +3,8 @@
 
 #include "c5document.h"
 
-namespace Ui {
+namespace Ui
+{
 class C5SalaryDoc;
 }
 
@@ -16,7 +17,7 @@ public:
 
     ~C5SalaryDoc();
 
-    bool openDoc(const QDate &date);
+    bool openDoc();
 
     virtual QToolBar *toolBar() override;
 
@@ -24,6 +25,10 @@ public slots:
     void save();
 
 private slots:
+
+    void createCashDocument();
+
+    void countSalaryResponse(const QJsonObject &jdoc);
 
     void getEmployesInOutList();
 
@@ -37,12 +42,20 @@ private slots:
 
     void on_deDate_returnPressed();
 
+    void on_cbShift_currentIndexChanged(int index);
+
 private:
     Ui::C5SalaryDoc *ui;
 
     int newRow();
 
+    QDate fDate;
+
+    void getSessions();
+
     void countSalary();
+
+    void removeSalaryOfShift();
 
     double salaryOfPosition(C5Database &db, int pos, int worker);
 };
