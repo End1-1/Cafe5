@@ -77,7 +77,6 @@ FORMS += \
     ../Forms/dlgnewcl.ui \
     ../Forms/dlgpaymentchoose.ui \
     ../Forms/dlgprintrecipesoptions.ui \
-    ../Forms/dlgqrcode.ui \
     ../Forms/dlgqty.ui \
     ../Forms/dlgreservgoods.ui \
     ../NTable/ntablewidget.ui \
@@ -287,7 +286,6 @@ HEADERS += \
         ../Forms/dlgnewcl.h \
         ../Forms/dlgpaymentchoose.h \
         ../Forms/dlgprintrecipesoptions.h \
-        ../Forms/dlgqrcode.h \
         ../Forms/dlgqty.h \
         ../Forms/dlgreservgoods.h \
         ../Forms/dlgselectcurrency.h \
@@ -611,7 +609,6 @@ SOURCES += \
         ../Forms/dlgnewcl.cpp \
         ../Forms/dlgpaymentchoose.cpp \
         ../Forms/dlgprintrecipesoptions.cpp \
-        ../Forms/dlgqrcode.cpp \
         ../Forms/dlgqty.cpp \
         ../Forms/dlgreservgoods.cpp \
         ../Forms/dlgselectcurrency.cpp \

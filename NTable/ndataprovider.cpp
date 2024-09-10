@@ -70,6 +70,7 @@ void NDataProvider::queryFinished(QNetworkReply *r)
         } else {
             err = err.mid(err.indexOf("Server error") + 12, err.length());
         }
+        LogWriter::write(LogWriterLevel::errors, "Error", err);
         emit error(err);
         r->deleteLater();
         return;

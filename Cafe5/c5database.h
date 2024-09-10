@@ -56,6 +56,8 @@ public:
 
     void close(bool commit = true);
 
+    QString execDry(const QString &sqlQuery);
+
     bool exec(const QString &sqlQuery);
 
     bool exec(const QString &sqlQuery, QList<QList<QVariant> > &dbrows);
@@ -65,6 +67,8 @@ public:
     bool exec(const QString &sqlQuery, QMap<QString, QList<QVariant> > &dbrows, QMap<QString, int> &columns);
 
     bool execDirect(const QString &sqlQuery);
+
+    bool execSqlList(const QStringList &sqlList);
 
     bool execNetwork(const QString &sqlQuery);
 
@@ -94,6 +98,8 @@ public:
 
     bool update(const QString &tableName, const QString &whereClause);
 
+    QString updateDry(const QString tableName, const QString &field, const QVariant &value);
+
     bool update(const QString &tableName, const QString &field, const QVariant &value);
 
     bool deleteFromTable(const QString &tableName, const QVariant &id);
@@ -112,51 +118,120 @@ public:
 
     bool deleteTableEntry(const QString &table, const QVariant &id);
 
-    inline QVariant getValue(int column) { return fDbRows.at(fCursorPos).at(column); }
+    inline QVariant getValue(int column)
+    {
+        return fDbRows.at(fCursorPos).at(column);
+    }
 
-    inline QVariant getValue(const QString &columnName) { return fDbRows.at(fCursorPos).at(fNameColumnMap[columnName.toLower()]); }
+    inline QVariant getValue(const QString &columnName)
+    {
+        return fDbRows.at(fCursorPos).at(fNameColumnMap[columnName.toLower()]);
+    }
 
-    inline QVariant getValue(int row, int column) {return fDbRows.at(row).at(column); }
+    inline QVariant getValue(int row, int column)
+    {
+        return fDbRows.at(row).at(column);
+    }
 
-    inline QVariant getValue(int row, const QString &columnName) {return fDbRows.at(row).at(fNameColumnMap[columnName.toLower()]); }
+    inline QVariant getValue(int row, const QString &columnName)
+    {
+        return fDbRows.at(row).at(fNameColumnMap[columnName.toLower()]);
+    }
 
-    inline QString getString (int column) {return fDbRows.at(fCursorPos).at(column).toString(); }
+    inline QString getString (int column)
+    {
+        return fDbRows.at(fCursorPos).at(column).toString();
+    }
 
-    inline QString getString (const QString &columnName) { return fDbRows.at(fCursorPos).at(fNameColumnMap[columnName.toLower()]).toString(); }
+    inline QString getString (const QString &columnName)
+    {
+        return fDbRows.at(fCursorPos).at(fNameColumnMap[columnName.toLower()]).toString();
+    }
 
-    inline QString getString(int row, int column) {return fDbRows.at(row).at(column).toString(); }
+    inline QString getString(int row, int column)
+    {
+        return fDbRows.at(row).at(column).toString();
+    }
 
-    inline QString getString(int row, const QString &columnName) {return fDbRows.at(row).at(fNameColumnMap[columnName.toLower()]).toString(); }
+    inline QString getString(int row, const QString &columnName)
+    {
+        return fDbRows.at(row).at(fNameColumnMap[columnName.toLower()]).toString();
+    }
 
-    inline int getInt(int row, const QString &columnName) {return fDbRows.at(row).at(fNameColumnMap[columnName.toLower()]).toInt(); }
+    inline int getInt(int row, const QString &columnName)
+    {
+        return fDbRows.at(row).at(fNameColumnMap[columnName.toLower()]).toInt();
+    }
 
-    inline int getInt(int column) {return fDbRows.at(fCursorPos).at(column).toInt(); }
+    inline int getInt(int column)
+    {
+        return fDbRows.at(fCursorPos).at(column).toInt();
+    }
 
-    inline int getInt(const QString &columnName) {return fDbRows.at(fCursorPos).at(fNameColumnMap[columnName.toLower()]).toInt(); }
+    inline int getInt(const QString &columnName)
+    {
+        return fDbRows.at(fCursorPos).at(fNameColumnMap[columnName.toLower()]).toInt();
+    }
 
-    inline double getDouble(int row, const QString &columnName) {return fDbRows.at(row).at(fNameColumnMap[columnName.toLower()]).toDouble();}
+    inline double getDouble(int row, const QString &columnName)
+    {
+        return fDbRows.at(row).at(fNameColumnMap[columnName.toLower()]).toDouble();
+    }
 
-    inline double getDouble(int column) {return fDbRows.at(fCursorPos).at(column).toDouble(); }
+    inline double getDouble(int column)
+    {
+        return fDbRows.at(fCursorPos).at(column).toDouble();
+    }
 
-    inline double getDouble(const QString &columnName) {return fDbRows.at(fCursorPos).at(fNameColumnMap[columnName.toLower()]).toDouble(); }
+    inline double getDouble(const QString &columnName)
+    {
+        return fDbRows.at(fCursorPos).at(fNameColumnMap[columnName.toLower()]).toDouble();
+    }
 
-    inline QDate getDate(int row, const QString &columnName) { return fDbRows.at(row).at(fNameColumnMap[columnName.toLower()]).toDate(); }
+    inline QDate getDate(int row, const QString &columnName)
+    {
+        return fDbRows.at(row).at(fNameColumnMap[columnName.toLower()]).toDate();
+    }
 
-    inline QDate getDate(const QString &columnName) { return fDbRows.at(fCursorPos).at(fNameColumnMap[columnName.toLower()]).toDate(); }
+    inline QDate getDate(const QString &columnName)
+    {
+        return fDbRows.at(fCursorPos).at(fNameColumnMap[columnName.toLower()]).toDate();
+    }
 
-    inline QDate getDate(int column) { return fDbRows.at(fCursorPos).at(column).toDate(); }
+    inline QDate getDate(int column)
+    {
+        return fDbRows.at(fCursorPos).at(column).toDate();
+    }
 
-    inline QTime getTime(int column) { return fDbRows.at(fCursorPos).at(column).toTime(); }
+    inline QTime getTime(int column)
+    {
+        return fDbRows.at(fCursorPos).at(column).toTime();
+    }
 
-    inline QTime getTime(const QString &columnName) { return fDbRows.at(fCursorPos).at(fNameColumnMap[columnName.toLower()]).toTime(); }
+    inline QTime getTime(const QString &columnName)
+    {
+        return fDbRows.at(fCursorPos).at(fNameColumnMap[columnName.toLower()]).toTime();
+    }
 
-    inline QDateTime getDateTime(int row, const QString &columnName) { return fDbRows.at(row).at(fNameColumnMap[columnName.toLower()]).toDateTime(); }
+    inline QDateTime getDateTime(int row, const QString &columnName)
+    {
+        return fDbRows.at(row).at(fNameColumnMap[columnName.toLower()]).toDateTime();
+    }
 
-    inline QDateTime getDateTime(const QString &columnName) { return fDbRows.at(fCursorPos).at(fNameColumnMap[columnName.toLower()]).toDateTime(); }
+    inline QDateTime getDateTime(const QString &columnName)
+    {
+        return fDbRows.at(fCursorPos).at(fNameColumnMap[columnName.toLower()]).toDateTime();
+    }
 
-    inline QDateTime getDateTime(int column) { return fDbRows.at(fCursorPos).at(column).toDateTime(); }
+    inline QDateTime getDateTime(int column)
+    {
+        return fDbRows.at(fCursorPos).at(column).toDateTime();
+    }
 
-    inline QList<QVariant> &row() {return fDbRows[fCursorPos]; }
+    inline QList<QVariant> &row()
+    {
+        return fDbRows[fCursorPos];
+    }
 
     QString columnName(int index);
 
@@ -178,13 +253,25 @@ public:
 
     void logEvent(const QString &event);
 
-    inline QString host() {return fDb.hostName(); }
+    inline QString host()
+    {
+        return fDb.hostName();
+    }
 
-    inline QString database() {return fDb.databaseName(); }
+    inline QString database()
+    {
+        return fDb.databaseName();
+    }
 
-    inline QString username() {return fDb.userName(); }
+    inline QString username()
+    {
+        return fDb.userName();
+    }
 
-    inline QString password() {return fDb.password(); }
+    inline QString password()
+    {
+        return fDb.password();
+    }
 
     QSqlDatabase fDb;
 
@@ -207,7 +294,8 @@ private:
 
     qint64 fTimerCount;
 
-    void configureDatabase(QSqlDatabase &cn, const QString &host, const QString &db, const QString &user, const QString &password);
+    void configureDatabase(QSqlDatabase &cn, const QString &host, const QString &db, const QString &user,
+                           const QString &password);
 
     QString lastQuery(QSqlQuery *q);
 

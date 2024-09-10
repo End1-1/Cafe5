@@ -71,13 +71,15 @@ bool C5PrintServiceThread::run()
         print(s, "f_print2", false);
     }
     if (fHeaderData["f_state"].toInt() == ORDER_STATE_OPEN) {
+        QStringList sqls;
         db[":f_header"] = fHeader;
-        db.exec("update o_body set f_qty2=f_qty1, f_reprint=abs(f_reprint) where f_header=:f_header");
+        sqls.append(db.execDry("update o_body set f_qty2=f_qty1, f_reprint=abs(f_reprint) where f_header=:f_header"));
         for (int i = 0; i < fBodyData.count(); i++) {
             const QMap<QString, QVariant> &o = fBodyData.at(i);
             db[":f_id"] = o["f_id"];
-            db.exec("update o_body set f_printtime=current_timestamp() where f_id=:f_id");
+            sqls.append(db.execDry("update o_body set f_printtime=current_timestamp() where f_id=:f_id"));
         }
+        db.execSqlList(sqls);
     }
     if (!fReprintList.isEmpty()) {
         fBodyData.clear();

@@ -273,8 +273,8 @@ void DlgReports::on_btnPrintTaxX_clicked()
 {
     C5SocketHandler *sh = createSocketHandler(SLOT(handleTaxReport(QJsonObject)));
     sh->bind("cmd", sm_tax_report);
-    sh->bind("d1", ui->date1->date().toString(FORMAT_DATE_TO_STR));
-    sh->bind("d2", ui->date1->date().toString(FORMAT_DATE_TO_STR));
+    sh->bind("d1", ui->date1->date().toString(FORMAT_DATE_TO_STR_MYSQL));
+    sh->bind("d2", ui->date2->date().toString(FORMAT_DATE_TO_STR_MYSQL));
     sh->bind("type", report_x);
     sh->send();
 }
@@ -283,8 +283,8 @@ void DlgReports::on_btnPrintTaxZ_clicked()
 {
     C5SocketHandler *sh = createSocketHandler(SLOT(handleTaxReport(QJsonObject)));
     sh->bind("cmd", sm_tax_report);
-    sh->bind("d1", ui->date1->date().toString(FORMAT_DATE_TO_STR));
-    sh->bind("d2", ui->date1->date().toString(FORMAT_DATE_TO_STR));
+    sh->bind("d1", ui->date1->date().toString(FORMAT_DATE_TO_STR_MYSQL));
+    sh->bind("d2", ui->date2->date().toString(FORMAT_DATE_TO_STR_MYSQL));
     sh->bind("type", report_z);
     sh->send();
 }

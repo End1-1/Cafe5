@@ -152,7 +152,7 @@ void C5OrderDriver::fromJson(const QJsonObject &jdoc)
 bool C5OrderDriver::save()
 {
     C5Database db(fDbParams);
-    db.startTransaction();
+    QStringList sqls;
     if (headerValue("f_state").toInt() == ORDER_STATE_EMPTY) {
         for (int i = 0; i < fDishes.count(); i++) {
             if (dishesValue("f_state", i).toInt() == DISH_STATE_OK) {
@@ -165,24 +165,16 @@ bool C5OrderDriver::save()
         for (QMap<QString, QVariant>::const_iterator it = fTableData[t].constBegin(); it != fTableData[t].constEnd(); it++) {
             db[":" + it.key()] = it.value();
         }
-        if (!db.update(t, "f_id", fCurrentOrderId)) {
-            fLastError = db.fLastError;
-            db.rollback();
-            return false;
-        }
+        sqls.append(db.updateDry(t, "f_id", fCurrentOrderId));
     }
     for (const QString &d : fDishesTableData.keys()) {
         for (QMap<QString, QVariant>::const_iterator it = fDishesTableData[d].constBegin();
                 it != fDishesTableData[d].constEnd(); it++) {
             db[":" + it.key()] = it.value();
         }
-        if (!db.update("o_body", "f_id", d)) {
-            fLastError = db.fLastError;
-            db.rollback();
-            return false;
-        }
+        sqls.append(db.updateDry("o_body", "f_id", d));
     }
-    db.commit();
+    db.execSqlList(sqls);
     fTableData.clear();
     fDishesTableData.clear();
     return true;

@@ -37,7 +37,7 @@ public:
 
     QJsonArray dishes(int menu, int part2);
 
-    QJsonArray part2(int menu, int part1);
+    QJsonArray part2(int menu, int part1, int parentid);
 
     QMap<QString, int> cashNames();
 

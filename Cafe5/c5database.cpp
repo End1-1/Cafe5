@@ -212,6 +212,60 @@ void C5Database::close(bool commit)
     fDb.close();
 }
 
+QString C5Database::execDry(const QString &sqlQuery)
+{
+    QString sql = sqlQuery;
+    QMapIterator<QString, QVariant> it(fBindValues);
+    while (it.hasNext()) {
+        it.next();
+        QVariant value = it.value();
+        if(!it.value().isValid()) {
+            value = "null";
+        } else {
+            switch (it.value().type()) {
+                case QVariant::String:
+                    value = QString("'%1'").arg(value.toString().replace("'", "''"));
+                    break;
+                case QVariant::Date:
+                    if (value.toDate().isValid()) {
+                        value = QString("'%1'").arg(value.toDate().toString("yyyy-MM-dd"));
+                    } else {
+                        value = "null";
+                    }
+                    break;
+                case QVariant::DateTime:
+                    if (value.toDateTime().isValid()) {
+                        value = QString("'%1'").arg(value.toDateTime().toString("yyyy-MM-dd HH:mm:ss"));
+                    } else {
+                        value = "null";
+                    }
+                    break;
+                case QVariant::Double:
+                    value = QString("%1").arg(QString::number(value.toDouble(), 'f', 4));
+                    break;
+                case QVariant::Int:
+                    value = QString("%1").arg(value.toInt());
+                    break;
+                case QVariant::Time:
+                    if (value.toTime().isValid()) {
+                        value = QString("'%1'").arg(value.toTime().toString("HH:mm:ss"));
+                    } else {
+                        value = "null";
+                    }
+                    break;
+                case QVariant::ByteArray:
+                    value = QString("'%1'").arg(QString(value.toByteArray().toHex()));
+                    break;
+                default:
+                    break;
+            }
+        }
+        sql.replace(QRegExp(it.key() + "\\b"), value.toString());
+    }
+    fBindValues.clear();
+    return sql;
+}
+
 bool C5Database::exec(const QString &sqlQuery)
 {
     if (!open()) {
@@ -336,6 +390,124 @@ bool C5Database::execDirect(const QString &sqlQuery)
     return true;
 }
 
+bool C5Database::execSqlList(const QStringList &sqlList)
+{
+    if (fDbParamsForUuid.isEmpty()) {
+        fLastError = "Database not configured";
+        return false;
+    }
+    QElapsedTimer t;
+    t.start();
+    QNetworkAccessManager m;
+    QString host = "https://" + fDbParamsForUuid.at(0);
+    QNetworkRequest rq(host);
+    m.setTransferTimeout(60000);
+    rq.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
+    QSslConfiguration sslConf = rq.sslConfiguration();
+    sslConf.setPeerVerifyMode(QSslSocket::VerifyNone);
+    sslConf.setProtocol(QSsl::AnyProtocol);
+    rq.setSslConfiguration(sslConf);
+    QJsonObject jo;
+    jo["query"] = 3;
+    jo["call"] = "sqllist";
+    jo["sql"] = sqlList.join(";;;");
+    jo["sk"] = "5cfafe13-a886-11ee-ac3e-1078d2d2b808";
+#ifdef QT_DEBUG
+    jo["debug"] = true;
+#else
+    if (__c5config.getValue(param_debuge_mode).toInt() > 0) {
+        jo["debug"] = true;
+    }
+#endif
+    auto *r = m.post(rq, QJsonDocument(jo).toJson());
+    while (!r->isFinished()) {
+        qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
+        QThread::msleep(10);
+    }
+    if (r->error() != QNetworkReply::NoError) {
+        fLastError = r->errorString();
+        return false;
+    }
+    QByteArray ba = r->readAll();
+    quint64 elapsed = t.elapsed();
+#ifdef QT_DEBUG
+    logEvent(host + " " + QJsonDocument(jo).toJson());
+#else
+    if (__c5config.getValue(param_debuge_mode).toInt() > 0) {
+        logEvent(host + " " + QJsonDocument(jo).toJson());
+    }
+#endif
+    jo = QJsonDocument::fromJson(ba).object();
+    if (jo["status"].toInt() == 0) {
+        fLastError = ba;
+        logEvent(ba);
+        return false;
+    }
+#ifdef QT_DEBUG
+    logEvent(host + " (" + QString::number(elapsed) + "-" + QString::number(
+                 t.elapsed()) + " ms):" + " " + sqlList.join("\r\n"));
+#else
+    if (__c5config.getValue(param_debuge_mode).toInt() > 0) {
+        logEvent("(" + QString::number(elapsed) + "-" + QString::number(t.elapsed()) + " ms):" + " " + sqlList.join("\r\nb"));
+    }
+#endif
+    jo = jo["data"].toObject();
+    QJsonArray ja = jo["columns"].toObject()["column_index_name"].toArray();
+    fNameColumnMap.clear();
+    for (int i = 0; i < ja.size(); i++) {
+        const QJsonObject &jc = ja[i].toObject();
+        fNameColumnMap[jc["name"].toString()] = jc["value"].toInt();
+    }
+    ja = jo["columns"].toObject()["column_name_index"].toArray();
+    QJsonArray jtype = jo["types"].toArray();
+    // fNameColumnMap.clear();
+    // for (int i = 0; i < ja.size(); i++) {
+    //     const QJsonObject &jc = ja[i].toObject();
+    //     fNameColumnMap[jc["name"].toString()] = jc["value"].toInt();
+    // }
+    ja = jo["data"].toArray();
+    fDbRows.clear();
+    for (int i = 0; i < ja.size(); i++) {
+        QList<QVariant> r;
+        QJsonArray jar = ja[i].toArray();
+        for (int j = 0; j < jar.size(); j++) {
+            switch (jtype[j].toInt()) {
+                case 3:
+                    r.append(jar[j].toInt());
+                    break;
+                case 4:
+                case 5:
+                case 246:
+                    r.append(jar[j].toDouble());
+                    break;
+                case 10:
+                    r.append(QDate::fromString(jar[j].toString(), FORMAT_DATE_TO_STR_MYSQL));
+                    break;
+                case 11:
+                    r.append(QTime::fromString(jar[j].toString()));
+                    break;
+                case 7:
+                    r.append(QDateTime::fromString(jar[j].toString(), FORMAT_DATETIME_TO_STR_MYSQL));
+                    break;
+                default:
+                    r.append(jar[j].toString());
+                    break;
+            }
+        }
+        fDbRows.append(r);
+    }
+    fCursorPos = -1;
+#ifdef QT_DEBUG
+    logEvent(fDbParamsForUuid.at(0) + " (" + QString::number(elapsed) + "-" + QString::number(
+                 t.elapsed()) + " ms):" + " " + ba.left(5000));
+#else
+    if (__c5config.getValue(param_debuge_mode).toInt() > 0) {
+        logEvent("(" + QString::number(elapsed) + "-" + QString::number(t.elapsed()) + " ms):" + " " + ba);
+    }
+#endif
+    return true;
+}
+
 bool C5Database::execNetwork(const QString &sqlQuery)
 {
     if (fDbParamsForUuid.isEmpty()) {
@@ -344,55 +516,7 @@ bool C5Database::execNetwork(const QString &sqlQuery)
     }
     QElapsedTimer t;
     t.start();
-    QString sql = sqlQuery;
-    QMapIterator<QString, QVariant> it(fBindValues);
-    while (it.hasNext()) {
-        it.next();
-        QVariant value = it.value();
-        if(!it.value().isValid()) {
-            value = "null";
-        } else {
-            switch (it.value().type()) {
-                case QVariant::String:
-                    value = QString("'%1'").arg(value.toString().replace("'", "''"));
-                    break;
-                case QVariant::Date:
-                    if (value.toDate().isValid()) {
-                        value = QString("'%1'").arg(value.toDate().toString("yyyy-MM-dd"));
-                    } else {
-                        value = "null";
-                    }
-                    break;
-                case QVariant::DateTime:
-                    if (value.toDateTime().isValid()) {
-                        value = QString("'%1'").arg(value.toDateTime().toString("yyyy-MM-dd HH:mm:ss"));
-                    } else {
-                        value = "null";
-                    }
-                    break;
-                case QVariant::Double:
-                    value = QString("%1").arg(QString::number(value.toDouble(), 'f', 4));
-                    break;
-                case QVariant::Int:
-                    value = QString("%1").arg(value.toInt());
-                    break;
-                case QVariant::Time:
-                    if (value.toTime().isValid()) {
-                        value = QString("'%1'").arg(value.toTime().toString("HH:mm:ss"));
-                    } else {
-                        value = "null";
-                    }
-                    break;
-                case QVariant::ByteArray:
-                    value = QString("'%1'").arg(QString(value.toByteArray().toHex()));
-                    break;
-                default:
-                    break;
-            }
-        }
-        sql.replace(QRegExp(it.key() + "\\b"), value.toString());
-    }
-    fBindValues.clear();
+    QString sql = execDry(sqlQuery);
     QNetworkAccessManager m;
     QString host = "https://" + fDbParamsForUuid.at(0);
     QNetworkRequest rq(host);
@@ -586,6 +710,24 @@ bool C5Database::update(const QString &tableName, const QString &whereClause)
         sql += " " + whereClause;
     }
     return exec(sql);
+}
+
+QString C5Database::updateDry(const QString tableName, const QString &field, const QVariant &value)
+{
+    QString sql = "update " + tableName + " set ";
+    bool first = true;
+    for (QMap<QString, QVariant>::const_iterator it = fBindValues.constBegin(); it != fBindValues.constEnd(); it++) {
+        if (first) {
+            first = false;
+        } else {
+            sql += ",";
+        }
+        QString f = it.key();
+        sql += f.remove(0, 1) + "=" + it.key();
+    }
+    sql += QString(" where %1=:%1").arg(field);
+    fBindValues[":" + field] = value;
+    return execDry(sql);
 }
 
 bool C5Database::update(const QString &tableName, const QString &field, const QVariant &value)

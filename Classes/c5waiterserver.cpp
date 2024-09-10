@@ -56,16 +56,16 @@ void C5WaiterServer::reply(QJsonObject &o)
                                  .arg(hallFilter.isEmpty() ? "" : " where f_id in (" + hallFilter + ")"), jHall);
             QJsonArray jTables;
             srh.getJsonFromQuery(QString("select t.f_id, t.f_hall, t.f_name, t.f_lock, t.f_lockSrc, \
-             h.f_id as f_header, concat(u.f_last, ' ', left(u.f_first, 1), '.') as f_staffName, \
-                      h.f_amounttotal as f_amount, h.f_print, bc.f_govnumber, \
-                      date_format(h.f_dateopen, '%d.%m.%Y') as f_dateopen, h.f_timeOpen, \
-                      t.f_special_config \
-                      from h_tables t \
-                      left join o_header h on h.f_table=t.f_id and h.f_state=1 \
- left join o_header_options o on o.f_id=h.f_id \
- left join b_car bc on bc.f_id=o.f_car \
- left join s_user u on u.f_id=h.f_staff  %1 \
- order by f_id")
+         h.f_id as f_header, concat(u.f_last, ' ', left(u.f_first, 1), '.') as f_staffName, \
+                  h.f_amounttotal as f_amount, h.f_print, bc.f_govnumber, \
+                  date_format(h.f_dateopen, '%d.%m.%Y') as f_dateopen, h.f_timeOpen, \
+                  t.f_special_config \
+                  from h_tables t \
+                  left join o_header h on h.f_table=t.f_id and h.f_state=1 \
+left join o_header_options o on o.f_id=h.f_id \
+left join b_car bc on bc.f_id=o.f_car \
+left join s_user u on u.f_id=h.f_staff  %1 \
+order by f_id")
                                  .arg(hallFilter.isEmpty() ? "" : " where t.f_hall in (" + hallFilter + ") "), jTables);
             //srh.getJsonFromQuery("select f_id, f_hall, f_name, f_lock, f_lockSrc from h_tables order by f_id", jTables);
             QJsonArray jShift;
@@ -80,18 +80,18 @@ void C5WaiterServer::reply(QJsonObject &o)
             QJsonArray jMenu;
             QString query =
                 "select d.f_id as f_dish, mn.f_name as menu_name, p1.f_name as part1, p2.f_name as part2, p2.f_adgCode, d.f_name, \
- m.f_price, m.f_store, m.f_print1, m.f_print2, d.f_remind, d.f_comment as f_description, \
- s.f_name as f_storename, d.f_color as dish_color, p2.f_color as type_color, 1 as f_timeorder, d.f_hourlypayment, \
- d.f_service as f_canservice, d.f_discount as f_candiscount, dsl.f_qty as f_stoplistqty \
- from d_menu m \
- left join d_menu_names mn on mn.f_id=m.f_menu \
- left join d_dish d on d.f_id=m.f_dish \
- left join d_part2 p2 on p2.f_id=d.f_part \
- left join d_part1 p1 on p1.f_id=p2.f_part \
- left join c_storages s on s.f_id=m.f_store \
- left join d_stoplist dsl on dsl.f_dish=d.f_id \
- where m.f_state=1 \
- order by d.f_queue, d.f_name ";
+m.f_price, m.f_store, m.f_print1, m.f_print2, d.f_remind, d.f_comment as f_description, \
+s.f_name as f_storename, d.f_color as dish_color, p2.f_color as type_color, 1 as f_timeorder, d.f_hourlypayment, \
+d.f_service as f_canservice, d.f_discount as f_candiscount, dsl.f_qty as f_stoplistqty \
+from d_menu m \
+left join d_menu_names mn on mn.f_id=m.f_menu \
+left join d_dish d on d.f_id=m.f_dish \
+left join d_part2 p2 on p2.f_id=d.f_part \
+left join d_part1 p1 on p1.f_id=p2.f_part \
+left join c_storages s on s.f_id=m.f_store \
+left join d_stoplist dsl on dsl.f_dish=d.f_id \
+where m.f_state=1 \
+order by d.f_queue, d.f_name ";
             srh.getJsonFromQuery(query, jMenu);
             QJsonArray jMenuNames;
             srh.getJsonFromQuery("select f_id, f_name from d_menu_names", jMenuNames);
@@ -821,6 +821,9 @@ int C5WaiterServer::printTax(const QMap<QString, QVariant> &header, const QList<
         if (m["f_state"].toInt() != DISH_STATE_OK) {
             continue;
         }
+        if (!m["f_emarks"].toString().isEmpty()) {
+            pt.fEmarks.append(m["f_emarks"].toString());
+        }
         pt.addGoods(C5Config::taxDept().toInt(),
                     dbdishpart2->adgcode(dbdish->part2(m["f_dish"].toInt())),
                     m["f_dish"].toString(),
@@ -853,8 +856,11 @@ int C5WaiterServer::printTax(const QMap<QString, QVariant> &header, const QList<
     jtax["f_state"] = result == pt_err_ok ? 1 : 0;
     if (jsonErr.error != QJsonParseError::NoError) {
     }
-    if (!db.exec(QString("call sf_create_shop_tax('%1')").arg(QString(QJsonDocument(jtax).toJson(
-                     QJsonDocument::Compact))))) {
+    QString jtaxstr = QString(QJsonDocument(jtax).toJson(
+                                  QJsonDocument::Compact));
+    jtaxstr.replace("\\\"", "\\\\\"");
+    jtaxstr.replace("'", "\\'");
+    if (!db.exec(QString("call sf_create_shop_tax('%1')").arg(jtaxstr))) {
     }
     return result;
 }
@@ -893,7 +899,7 @@ bool C5WaiterServer::printReceipt(QString &err, C5Database &db, bool isBill, boo
     if (!db.exec("select f_state, f_dish, f_price, f_canservice, f_candiscount, ob.f_discount, "
                  "d.f_name as f_dishname, d.f_adgt, d.f_hourlypayment, d.f_extra, "
                  "sum(f_qty1) as f_qty1, sum(f_qty2) as f_qty2, "
-                 "sum(f_total) as f_total, f_adgcode, ob.f_comment "
+                 "sum(f_total) as f_total, f_adgcode, ob.f_comment, ob.f_emarks "
                  "from o_body ob "
                  "left join d_dish d on d.f_id=ob.f_dish "
                  "where f_header=:f_header "
@@ -1315,8 +1321,8 @@ void C5WaiterServer::processTaxReport(QJsonObject &o)
                  C5Config::taxCashier(), C5Config::taxPin(), this);
     QString jsnin, jsnout, err;
     int result;
-    result = pt.printReport(QDateTime::fromString(fIn["d1"].toString(), FORMAT_DATE_TO_STR),
-                            QDateTime::fromString(fIn["d2"].toString(), FORMAT_DATE_TO_STR),
+    result = pt.printReport(QDate::fromString(fIn["d1"].toString(), FORMAT_DATE_TO_STR_MYSQL),
+                            QDate::fromString(fIn["d2"].toString(), FORMAT_DATE_TO_STR_MYSQL),
                             fIn["type"].toInt(), jsnin, jsnout, err);
     C5Database db(C5Config::dbParams());
     db[":f_id"] = db.uuid();

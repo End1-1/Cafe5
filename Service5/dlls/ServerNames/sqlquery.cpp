@@ -37,44 +37,7 @@ bool office(const QByteArray &indata, QByteArray &outdata, const QHash<QString, 
     }
 
 QJsonArray ja;
-#ifdef REMOTE_VALSH
-    jo = QJsonObject();
-    jo["name"] = "Archive";
-    jo["waiter_server"] = "";
-    jo["host"] = "valsh.picassocloud.com/info.php";
-    jo["database"] = "https://valsh.picassocloud.com/";
-    jo["username"] = "";
-    jo["password"] = "";
-    jo["settings"] = "Main";
-    jo["fullscreen"] = "";
-    jo["local"] = 0;
-    ja.append(jo);
-#ifdef QT_DEBUG
-    jo = QJsonObject();
-    jo["name"] = "ValShin";
-    jo["waiter_server"] = "";
-    jo["host"] = "127.0.0.1/engine/info.php";
-    jo["database"] = "https://127.0.0.1/";
-    jo["username"] = "";
-    jo["password"] = "";
-    jo["settings"] = "Main";
-    jo["fullscreen"] = "";
-    jo["local"] = 1;
-    ja.append(jo);
-#else
-    jo = QJsonObject();
-    jo["name"] = "ValShin";
-    jo["waiter_server"] = "";
-    jo["host"] = "192.168.88.5/engine/info.php";
-    jo["database"] = "https://192.168.88.5/";
-    jo["username"] = "";
-    jo["password"] = "";
-    jo["settings"] = "Main";
-    jo["fullscreen"] = "";
-    jo["local"] = 1;
-    ja.append(jo);
-#endif
-#endif
+
 
 #ifdef REMOTE_ELINA
     jo = QJsonObject();
@@ -117,16 +80,6 @@ QJsonArray ja;
 
 #ifdef REMOTE_DEBUG
     jo = QJsonObject();
-    jo["name"] = "Valsh";
-    jo["waiter_server"] = "";
-    jo["host"] = "valsh.picassocloud.com/info.php";
-    jo["database"] = "https://valsh.picassocloud.com/";
-    jo["username"] = "";
-    jo["password"] = "";
-    jo["settings"] = "Main";
-    jo["fullscreen"] = "";
-    jo["local"] = 0;
-    ja.append(jo);
     jo = QJsonObject();
     jo["name"] = "Elina";
     jo["waiter_server"] = "";

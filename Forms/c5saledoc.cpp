@@ -544,6 +544,7 @@ void C5SaleDoc::saveDataChanges()
         prefix = db.getString(1);
         db[":f_counter"] = db.getInt(0);
         db.update("h_halls", where_id(ui->cbHall->currentData().toInt()));
+        ui->leDocnumber->setText(QString("%1%2").arg(prefix, QString::number(hallid)));
     } else {
         C5Message::error(tr("No hall with id") + "<br>" + ui->cbHall->currentText());
         return;
@@ -593,6 +594,7 @@ void C5SaleDoc::saveDataChanges()
             db[":f_timeopen"] = QTime::fromString(ui->leTime->text(), FORMAT_TIME_TO_STR);
         } else {
             uuid = db.uuid();
+            ui->leUuid->setText(uuid);
             db[":f_id"] = uuid;
         }
         db.insert("o_header");
@@ -624,7 +626,7 @@ void C5SaleDoc::saveDataChanges()
             db.insert("o_goods");
             ui->tblGoods->setString(i, col_uuid, guuid);
         } else {
-            db.update("o_goods", "f_id", guuid);
+            db.update("o_goods", "f_id", ui->tblGoods->getString(i, col_uuid));
         }
     }
     db[":f_guests"] = 0;
@@ -676,6 +678,13 @@ void C5SaleDoc::saveDataChanges()
     //Output of storage not equal to current storage
     QMap<QString, QString> outInPrices;
     C5StoreDraftWriter dw(db);
+    if (!isnew) {
+        db[":f_saleuuid"] = uuid;
+        db.exec("select f_id from a_header_store where f_saleuuid=:f_saleuuid");
+        if (db.nextRow()) {
+            dw.removeStoreDocument(db, db.getString(0), err);
+        }
+    }
     for (int store : usedStores) {
         QString outStoreDocComment = QString("%1 %2%3").arg(tr("Output of sale"), prefix, QString::number(hallid));
         QString outStoreDocId;
@@ -710,9 +719,6 @@ void C5SaleDoc::saveDataChanges()
         //WRITE OTHER OUTPUT
         if (!dw.writeOutput(id, err)) {
             db.rollback();
-            for (int i = 0; i < ui->tblGoods->rowCount(); i++) {
-                ui->tblGoods->setString(i, col_uuid, "");
-            }
             C5Message::error(err + "#1");
             return;
         }

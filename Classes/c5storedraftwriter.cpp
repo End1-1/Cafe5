@@ -126,6 +126,7 @@ bool C5StoreDraftWriter::removeStoreDocument(C5Database &db, const QString &id, 
     }
     int storei = 0;
     int storeo = 0;
+    QStringList sqls;
     db[":f_id"] = id;
     db.exec("select f_storein, f_storeout from a_header_store where f_id=:f_id");
     if (db.nextRow()) {
@@ -134,25 +135,26 @@ bool C5StoreDraftWriter::removeStoreDocument(C5Database &db, const QString &id, 
     }
     db[":f_id1"] = storei;
     db[":f_id2"] = storeo;
-    db.exec("update c_storages set f_have_changes=1 where f_id=:f_id1 or f_id=:f_id2");
+    sqls.append(db.execDry("update c_storages set f_have_changes=1 where f_id=:f_id1 or f_id=:f_id2"));
     db[":f_document"] = id;
-    db.exec("delete from a_store_draft where f_document=:f_document");
+    sqls.append(db.execDry("delete from a_store_draft where f_document=:f_document"));
     db[":f_storedoc"] = id;
-    db.exec("delete from b_clients_debts where f_storedoc=:f_storedoc");
+    sqls.append(db.execDry("delete from b_clients_debts where f_storedoc=:f_storedoc"));
     db[":f_id"] = id;
-    db.exec("delete from a_header where f_id=:f_id");
+    sqls.append(db.execDry("delete from a_header where f_id=:f_id"));
     db[":f_id"] = id;
-    db.exec("delete from a_header_store where f_id=:f_id");
+    sqls.append(db.execDry("delete from a_header_store where f_id=:f_id"));
     if (!cashDoc.isEmpty()) {
         db[":f_header"] = cashDoc;
-        db.exec("delete from e_cash where f_header=:f_header");
+        sqls.append(db.execDry("delete from e_cash where f_header=:f_header"));
         db[":f_id"] = cashDoc;
-        db.exec("delete from a_header_cash where f_id=:f_id");
+        sqls.append(db.execDry("delete from a_header_cash where f_id=:f_id"));
         db[":f_id"] = cashDoc;
-        db.exec("delete from a_header where f_id=:f_id");
+        sqls.append(db.execDry("delete from a_header where f_id=:f_id"));
     }
     db[":f_document"] = id;
-    db.exec("delete from a_store_dish_waste where f_document=:f_document");
+    sqls.append(db.execDry("delete from a_store_dish_waste where f_document=:f_document"));
+    db.execSqlList(sqls);
     return err.isEmpty();
 }
 

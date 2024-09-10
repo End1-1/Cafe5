@@ -3,7 +3,6 @@
 #include "ui_dlgorder.h"
 #include "c5cafecommon.h"
 #include "c5user.h"
-#include "dlgqrcode.h"
 #include "c5tabledata.h"
 #include "dlgdishremovereason.h"
 #include "c5orderdriver.h"
@@ -47,6 +46,7 @@
 #include <QScrollBar>
 #include <QInputDialog>
 #include <QPaintEvent>
+#include <QJsonObject>
 #include <QPainter>
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
@@ -112,6 +112,7 @@ DlgOrder::DlgOrder(C5User *user) :
 	}
 	fMenuID = C5Config::defaultMenu();
 	fPart1 = 0;
+    fPart2Parent = 0;
 	fStoplistMode = false;
 	connect(ui->scrollAreaDish->verticalScrollBar(), &QScrollBar::valueChanged, this, [this](int value) {
 		for (QObject *o : ui->scrollAreaWidgetContentsDish->children()) {
@@ -295,7 +296,7 @@ void DlgOrder::buildMenu(int menuid, int part1, int part2)
 	int colCount = 2;
 	int col = 0;
 	int row = 0;
-	QJsonArray jpart2 = C5TableData::instance()->part2(fMenuID, fPart1);
+    QJsonArray jpart2 = C5TableData::instance()->part2(fMenuID, fPart1, fPart2Parent);
 	for (int i = 0; i  <  jpart2.size(); i++) {
 		const QJsonObject &j = jpart2.at(i).toObject();
 		QDishPart2Button *btn = new QDishPart2Button();
@@ -800,6 +801,23 @@ void DlgOrder::processMenuID(int menuid)
 		}
 		return;
 	}
+}
+
+void DlgOrder::qrListResponse(const QJsonObject &obj)
+{
+    auto *wo = worder();
+    int index = -1;
+    for (int i = 0; i < wo->fOrderDriver->dishesCount(); i++) {
+        if (wo->fOrderDriver->dishesValue("f_id", i).toString() == obj["bodyid"].toString()) {
+            index = i;
+            break;
+        }
+    }
+    if (index > -1) {
+        wo->fOrderDriver->setDishesValue("f_emarks", obj["emarks"].toString(), index);
+        itemsToTable();
+    }
+    fHttp->httpQueryFinished(sender());
 }
 
 void DlgOrder::dishPart2Clicked()
@@ -2677,7 +2695,7 @@ void DlgOrder::on_btnMenuSet_clicked()
 
 void DlgOrder::on_btnQR_clicked()
 {
-	int index = 0;
+    int index = -1;
 	WOrder *wo = worder();
 	if (!wo) {
 		return;
@@ -2685,8 +2703,22 @@ void DlgOrder::on_btnQR_clicked()
 	if (!wo->currentRow(index)) {
 		return;
 	}
-	// if (wo->fOrderDriver->dishesValue("f_emarks", index).toInt() != DISH_STATE_OK) {
-	//     return;
-	// }
-	DlgQrCode(wo->fOrderDriver->dishesValue("f_dish", index).toInt()).exec();
+    if (wo->fOrderDriver->dishesValue("f_state", index).toInt() != DISH_STATE_OK) {
+        return;
+    }
+    bool ok;
+    QString qr = QInputDialog::getText(this, tr("Emarks"), tr("Emarks"), QLineEdit::Normal, "", &ok);
+    if (!ok) {
+        return;
+    }
+    if  (qr.length() < 29 && qr.length() > 0) {
+        C5Message::error(tr("Invalid Emarks"));
+        return;
+    }
+    fHttp->createHttpQuery("/engine/waiter/qr-list.php",
+    QJsonObject {
+        {"action", "add"},
+        {"bodyid", wo->fOrderDriver->dishesValue("f_id", index).toString()},
+        {"emarks", qr}},
+    SLOT(qrListResponse(QJsonObject)));
 }

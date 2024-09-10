@@ -54,6 +54,8 @@ private:
 
     int fPart1;
 
+    int fPart2Parent;
+
     QTimer fTimer;
 
     int fTimerCounter;
@@ -119,6 +121,8 @@ private slots:
     void dishpart1Clicked();
 
     void processMenuID(int menuid);
+
+    void qrListResponse(const QJsonObject &obj);
 
     //void handleVisit(const QJsonObject &obj);
 

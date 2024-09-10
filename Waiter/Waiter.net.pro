@@ -186,6 +186,7 @@ SOURCES += \
     ../Forms/c5dlgselectreporttemplate.cpp \
     ../Forms/c5filtervalues.cpp \
     ../Forms/c5goodsimage.cpp \
+    ../Forms/c5goodsprice.cpp \
     ../Forms/c5goodspricing.cpp \
     ../Forms/c5goodsspecialprices.cpp \
     ../Forms/c5grouppermissionseditor.cpp \
@@ -230,7 +231,6 @@ SOURCES += \
     ../Forms/dlgnewcl.cpp \
     ../Forms/dlgpaymentchoose.cpp \
     ../Forms/dlgprintrecipesoptions.cpp \
-    ../Forms/dlgqrcode.cpp \
     ../Forms/dlgqty.cpp \
     ../Forms/dlgreservgoods.cpp \
     ../Forms/dlgselectcurrency.cpp \
@@ -620,6 +620,7 @@ HEADERS += \
     ../Forms/c5dlgselectreporttemplate.h \
     ../Forms/c5filtervalues.h \
     ../Forms/c5goodsimage.h \
+    ../Forms/c5goodsprice.h \
     ../Forms/c5goodspricing.h \
     ../Forms/c5goodsspecialprices.h \
     ../Forms/c5grouppermissionseditor.h \
@@ -664,7 +665,6 @@ HEADERS += \
     ../Forms/dlgnewcl.h \
     ../Forms/dlgpaymentchoose.h \
     ../Forms/dlgprintrecipesoptions.h \
-    ../Forms/dlgqrcode.h \
     ../Forms/dlgqty.h \
     ../Forms/dlgreservgoods.h \
     ../Forms/dlgselectcurrency.h \
@@ -736,9 +736,15 @@ HEADERS += \
     ../Reports/cr5dishremovereason.h \
     ../Reports/cr5documents.h \
     ../Reports/cr5documentsfilter.h \
+    ../Reports/cr5draftoutputbyrecipe.cpp~RFf1daf29.TMP \
+    ../Reports/cr5draftoutputbyrecipe.cpp~RFf316443.TMP \
     ../Reports/cr5draftoutputbyrecipe.h \
     ../Reports/cr5draftoutputbyrecipefilter.h \
     ../Reports/cr5generalreportonlydate.h \
+    ../Reports/cr5goods.cpp~RF27725e9.TMP \
+    ../Reports/cr5goods.cpp~RF2783df1.TMP \
+    ../Reports/cr5goods.cpp~RF370d2a9.TMP \
+    ../Reports/cr5goods.cpp~RF8ee5758.TMP \
     ../Reports/cr5goods.h \
     ../Reports/cr5goodsfilter.h \
     ../Reports/cr5goodsgroup.h \
@@ -962,6 +968,7 @@ FORMS += \
     ../Forms/c5dlgselectreporttemplate.ui \
     ../Forms/c5filtervalues.ui \
     ../Forms/c5goodsimage.ui \
+    ../Forms/c5goodsprice.ui \
     ../Forms/c5goodspricing.ui \
     ../Forms/c5goodsspecialprices.ui \
     ../Forms/c5grouppermissionseditor.ui \
@@ -1004,7 +1011,6 @@ FORMS += \
     ../Forms/dlgnewcl.ui \
     ../Forms/dlgpaymentchoose.ui \
     ../Forms/dlgprintrecipesoptions.ui \
-    ../Forms/dlgqrcode.ui \
     ../Forms/dlgqty.ui \
     ../Forms/dlgreservgoods.ui \
     ../Forms/dlgselectcurrency.ui \
