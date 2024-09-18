@@ -53,7 +53,7 @@ void MenuDialog::on_btnFiscalZReport_clicked()
                  C5Config::taxCashier(), C5Config::taxPin(), this);
     QString jsnin, jsnout, err;
     int result;
-    result = pt.printReport(QDateTime(date1), QDateTime(date2), reporttype, jsnin, jsnout, err);
+    result = pt.printReport(date1, date2, reporttype, jsnin, jsnout, err);
     C5Database db(C5Config::dbParams());
     db[":f_id"] = db.uuid();
     db[":f_order"] = QString("Report %1").arg(reporttype == report_x ? "X" : "Z");

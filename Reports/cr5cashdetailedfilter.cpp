@@ -41,3 +41,8 @@ int CR5CashDetailedFilter::cash()
 {
     return ui->leCash->getInteger();
 }
+
+int CR5CashDetailedFilter::shift()
+{
+    return ui->leShift->getInteger();
+}

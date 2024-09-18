@@ -39,6 +39,13 @@ C5CashDoc::C5CashDoc(const QStringList &dbParams, QWidget *parent) :
     while (db.nextRow()) {
         ui->cbCurrency->addItem(db.getString("f_name"), db.getInt("f_id"));
     }
+    db.exec("select * from s_working_sessions order by f_id desc limit 100 ");
+    while (db.nextRow()) {
+        ui->cbShift->addItem(QString("%1, %2 - %3")
+                             .arg(db.getString(0),
+                                  db.getDateTime("f_open").toString(FORMAT_DATE_TO_STR_MYSQL),
+                                  db.getDateTime("f_close").toString(FORMAT_DATETIME_TO_STR)), db.getInt("f_id"));
+    }
 }
 
 C5CashDoc::~C5CashDoc()
@@ -317,7 +324,7 @@ bool C5CashDoc::save(bool writedebt, bool fromrelation)
     }
     dw.writeAHeader(fUuid, ui->leDocNum->text(), DOC_STATE_SAVED, DOC_TYPE_CASH, __user->id(), ui->deDate->date(),
                     QDate::currentDate(), QTime::currentTime(), ui->lePartner->getInteger(), ui->leTotal->getDouble(),
-                    ui->cbComment->currentText(), 1, ui->cbCurrency->currentData().toInt());
+                    ui->cbComment->currentText(), 1, ui->cbCurrency->currentData().toInt(), ui->cbShift->currentData().toInt());
     dw.writeAHeaderCash(fUuid, ui->leInput->getInteger(), ui->leOutput->getInteger(), fRelation, fStoreUuid, "");
     for (int i = 0; i < ui->tbl->rowCount(); i++) {
         QString idin = ui->tbl->getString(i, 0);

@@ -57,7 +57,8 @@ C5StoreDoc::C5StoreDoc(const QStringList &dbParams, QWidget *parent) :
 #else
     ui->tblDishes->setColumnWidths(ui->tblDishes->columnCount(), 0, 0, 400, 80, 0);
 #endif
-    ui->tblGoods->setColumnWidths(ui->tblGoods->columnCount(), 0, 0, 0, 0, 400, 80, 80, 80, 80, 80, 300);
+    ui->tblGoods->setColumnWidths(ui->tblGoods->columnCount(), 0, 0, 0, 0, 365, 80, 80, 80, 80, 80, 300);
+    ui->tblGoods->setColumnHidden(9, true);
     ui->tblGoodsStore->setColumnWidths(7, 0, 0, 200, 70, 50, 50, 70);
     ui->btnNewPartner->setEnabled(__user->check(cp_t7_partners));
     ui->btnNewGoods->setEnabled(__user->check(cp_t6_goods));
@@ -1248,6 +1249,11 @@ void C5StoreDoc::setGoodsPanelHidden(bool v)
         }
         ui->tblGoodsGroup->fitColumnsToWidth(45);
         ui->tblGoodsStore->fitColumnsToWidth(45);
+        int dx = ui->tblGoodsGroup->width() - (ui->tblGoodsGroup->columnWidth(0) * ui->tblGoodsGroup->columnCount()) - 20;
+        dx /= ui->tblGoodsGroup->columnCount();
+        for (int i = 0; i < ui->tblGoodsGroup->columnCount(); i++) {
+            ui->tblGoodsGroup->setColumnWidth(i, dx + ui->tblGoodsGroup->columnWidth(i));
+        }
         markGoodsComplited();
     }
     if (lst.count() > 0) {
@@ -2629,7 +2635,11 @@ void C5StoreDoc::on_tblGoodsGroup_itemClicked(QTableWidgetItem *item)
 
 void C5StoreDoc::on_tblGoodsStore_itemDoubleClicked(QTableWidgetItem *item)
 {
-    if (fDocState == DOC_STATE_SAVED) {
+    // if (fDocState == DOC_STATE_SAVED) {
+    //     C5Message::error(tr("Document is saved, unable to make changes"));
+    //     return;
+    // }
+    if (!ui->tblGoods->isEnabled()) {
         C5Message::error(tr("Document is saved, unable to make changes"));
         return;
     }

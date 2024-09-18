@@ -114,15 +114,14 @@ QJsonArray C5TableData::dishes(int menu, int part2)
 QJsonArray C5TableData::part2(int menu, int part1, int parentid)
 {
     QJsonObject jmenu = data["fullmenu"].toObject()[QString::number(menu)].toObject();
-    QJsonObject jpart1 = jmenu[QString::number(part1)].toObject();
-    const QJsonArray &ja = mPart2List[QString::number(menu)];
+    QJsonObject jpart1 = jmenu["children"].toObject();
+    QJsonObject jpart2 = jpart1[QString::number(part1)].toObject()["children"].toObject();
+    QStringList part2Keys = jpart2.keys();
     QJsonArray jr;
-    for (int i = 0; i < ja.size(); i++) {
-        const QJsonObject &j = C5TableData::instance()->jsonObject("d_part2", QString::number(ja.at(i).toInt()));
-        if (j["f_part"].toInt() == part1) {
-            if (j["f_parent"].toInt() == parentid) {
-                jr.append(j);
-            }
+    for (const QString &key : part2Keys) {
+        const QJsonObject &j = jpart2[key].toObject();
+        if (j["f_parent"].toInt() == parentid) {
+            jr.append(j);
         }
     }
     return jr;

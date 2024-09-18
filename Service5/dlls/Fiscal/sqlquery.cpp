@@ -43,9 +43,17 @@ bool fiscal(const QByteArray &indata, QByteArray &outdata, const QHash<QString, 
                  jo["opcode"].toString(),
                  jo["oppin"].toString());
     int res = pt.printJSON(body, err, (quint8) jo["action"].toInt());
+#ifdef QT_DEBUG
+    QJsonObject jr ;
+    jr["response"] = jo["debug_res"].toInt() == 0 ?  res : jo["debug_res"].toInt();
+    jr["error"] = err;
+    jr["data"] = QJsonDocument::fromJson(
+                     QString("{\"rseq\":77,\"crn\":\"63219817\",\"sn\":\"V98745506068\",\"tin\":\"01588771\",\"taxpayer\":\"«Ռոգա էնդ կոպիտա ՍՊԸ»\",\"address\":\"Արշակունյանց 34\",\"time\":1676794194840,\"fiscal\":\"98198105\",\"lottery\":\"00000000\",\"prize\":0,\"total\":1540.0,\"change\":0.0}").toUtf8()).object();
+#else
     QJsonObject jr ;
     jr["response"] = res;
     jr["error"] = err;
     jr["data"] = QJsonDocument::fromJson(body).object();
+#endif
     return rh.setResponse(HTTP_OK, QJsonDocument(jr).toJson(QJsonDocument::Compact));
 }

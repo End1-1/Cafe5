@@ -3,7 +3,8 @@
 
 #include "c5filterwidget.h"
 
-namespace Ui {
+namespace Ui
+{
 class CR5CashDetailedFilter;
 }
 
@@ -25,6 +26,8 @@ public:
     QDate date2() const;
 
     int cash();
+
+    int shift();
 
 private:
     Ui::CR5CashDetailedFilter *ui;

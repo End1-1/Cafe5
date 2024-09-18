@@ -450,7 +450,7 @@ void Workspace::createHttpRequest(const QString &route, QJsonObject params, cons
                                   const char *responseErrorSlot)
 {
     params["sessionkey"] = __c5config.getRegValue("sessionkey").toString();
-    params["host"] = hostinfo;
+    params["host"] = "t2";//hostinfo;
     params["config_id"] = __c5config.fSettingsName;
     params["user_session"] = __c5config.getRegValue("session").toString();
     auto np = new NDataProvider(this);
@@ -1544,6 +1544,7 @@ void Workspace::initResponse(const QJsonObject &jdoc)
         QJsonObject j = jta.at(i).toObject();
         fPrinterAliases[j["f_alias"].toString()] = j["f_printer"].toString();
     }
+    LogWriter::write(LogWriterLevel::verbose, "init", "part2");
     jta = jo["part2"].toArray();
     int row = 0, col = 0;
     ui->tblPart2->setRowCount(1);
@@ -1571,6 +1572,7 @@ void Workspace::initResponse(const QJsonObject &jdoc)
             col = 0;
         }
     }
+    LogWriter::write(LogWriterLevel::verbose, "init", "menu");
     jta = jo["menu"].toArray();
     for (int i = 0; i < jta.size(); i++) {
         const QJsonObject &j = jta.at(i).toObject();
@@ -1601,6 +1603,7 @@ void Workspace::initResponse(const QJsonObject &jdoc)
             }
         }
     }
+    LogWriter::write(LogWriterLevel::verbose, "init", "package");
     jta = jo["package"].toArray();
     for (int i = 0; i < jta.size(); i++) {
         const QJsonObject &j = jta.at(i).toObject();
@@ -1631,6 +1634,7 @@ void Workspace::initResponse(const QJsonObject &jdoc)
     if (s.value("customerdisplay").toBool() && qApp->desktop()->screenCount() > 1) {
         showCustomerDisplay();
     }
+    LogWriter::write(LogWriterLevel::verbose, "init", "tables");
     jta = jo["tables"].toArray();
     for (int i = 0; i < jta.size(); i++) {
         const QJsonObject &j = jta.at(i).toObject();
@@ -1640,6 +1644,7 @@ void Workspace::initResponse(const QJsonObject &jdoc)
         item->setData(Qt::UserRole, j["f_id"].toInt());
         ui->tblTables->setItem(0, c, item);
     }
+    LogWriter::write(LogWriterLevel::verbose, "init", "opentables");
     jta = jo["opentables"].toArray();
     for (int i = 0; i < jta.size(); i++) {
         const QJsonObject &j = jta.at(i).toObject();
@@ -1651,7 +1656,9 @@ void Workspace::initResponse(const QJsonObject &jdoc)
             }
         }
     }
+    LogWriter::write(LogWriterLevel::verbose, "init", "before stop");
     httpStop(sender());
+    LogWriter::write(LogWriterLevel::verbose, "init", "after stop");
     if (jo["welcome"].toObject()["ok"].toBool()) {
         __c5config.setRegValue("sessionid", jo["welcome"].toObject()["sessionid"].toInt());
         C5Message::info(tr("Welcome") + "<br>" + __c5config.getRegValue("username").toString());
@@ -1661,7 +1668,9 @@ void Workspace::initResponse(const QJsonObject &jdoc)
         return;
     }
     if (ui->tblTables->columnCount() > 0) {
+        LogWriter::write(LogWriterLevel::verbose, "init", "first table click");
         on_tblTables_itemClicked(ui->tblTables->item(0, 0));
+        LogWriter::write(LogWriterLevel::verbose, "init", "first table click");
     } else {
         C5Message::info(tr("Please, configure hall"));
         qApp->exit();

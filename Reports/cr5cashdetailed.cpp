@@ -14,14 +14,13 @@ static const int col_debit = 5;
 static const int col_credit = 4;
 static const int col_balance = 6;
 
-
 CR5CashDetailed::CR5CashDetailed(const QStringList &dbParams, QWidget *parent) :
     C5ReportWidget(dbParams, parent)
 {
     fIcon = ":/cash.png";
     fLabel = tr("Cash movement");
     fFilterWidget = new CR5CashDetailedFilter(dbParams);
-    fFilter = static_cast<CR5CashDetailedFilter*>(fFilterWidget);
+    fFilter = static_cast<CR5CashDetailedFilter *>(fFilterWidget);
     fColumnNameIndex["f_header"] = col_header;
     fColumnNameIndex["f_date"] = col_date;
     fColumnNameIndex["f_remarks"] = col_remark;
@@ -84,13 +83,20 @@ void CR5CashDetailed::buildQuery()
     er << QVariant() << QVariant() << QVariant() << QVariant() << QVariant() << QVariant() << QVariant();
     QList<QList<QVariant> > &rows = fModel->fRawData;
     rows.clear();
+    QString where = "where 1=1 ";
+    if (fFilter->shift() > 0) {
+        where += QString(" and h.f_working_session<%1 ").arg(fFilter->shift());
+    }  else {
+        where += QString(" and h.f_date<'%1' ").arg(fFilter->date1().toString(FORMAT_DATE_TO_STR_MYSQL));
+    }
     QString query = QString("select '' as f_header, '%1' as f_date, '%2' as f_remarks, "
                             "c.f_sign, sum(c.f_amount*c.f_sign) as f_amount "
                             "from e_cash c "
                             "inner join a_header h on h.f_id=c.f_header and h.f_type=:f_type "
-                            "where f_cash=:f_cash and h.f_date<'%1' and h.f_state=:f_state ")
-            .arg(fFilter->date1().toString(FORMAT_DATE_TO_STR_MYSQL))
-            .arg(tr("Brought forward"));
+                            + where +
+                            "and f_cash=:f_cash and h.f_state=:f_state ")
+                    .arg(fFilter->date1().toString(FORMAT_DATE_TO_STR_MYSQL))
+                    .arg(tr("Brought forward"));
     C5Database db(fDBParams);
     db[":f_cash"] = fFilter->cash();
     db[":f_type"] = DOC_TYPE_CASH;
@@ -112,15 +118,22 @@ void CR5CashDetailed::buildQuery()
             rows[r][col_debit] = abs(db.getDouble("f_amount"));
         }
     }
+    where = "where 1=1 ";
+    if (fFilter->shift() > 0) {
+        where += QString(" and h.f_working_session=%1 ").arg(fFilter->shift());
+    }  else {
+        where += QString(" and h.f_date between '%1' and '%2' ")
+                 .arg(fFilter->date1().toString(FORMAT_DATE_TO_STR_MYSQL))
+                 .arg(fFilter->date2().toString(FORMAT_DATE_TO_STR_MYSQL));;
+    }
     query = "select c.f_header, h.f_date, h.f_comment, c.f_remarks, c.f_sign, c.f_amount "
-                                "from e_cash c "
-                                "inner join a_header h on h.f_id=c.f_header and h.f_type=:f_type "
-                                "where f_cash=:f_cash and h.f_date between :f_date1 and :f_date2 "
-                                "and h.f_state=:f_state "
-                                "order by h.f_date, h.f_userid ";
+            "from e_cash c "
+            "inner join a_header h on h.f_id=c.f_header and h.f_type=:f_type "
+            + where +
+            "and f_cash=:f_cash  "
+            "and h.f_state=:f_state "
+            "order by h.f_date, h.f_userid ";
     db[":f_cash"] = fFilter->cash();
-    db[":f_date1"] = fFilter->date1();
-    db[":f_date2"] = fFilter->date2();
     db[":f_type"] = DOC_TYPE_CASH;
     db[":f_state"] = DOC_STATE_SAVED;
     db.exec(query);
@@ -176,7 +189,8 @@ void CR5CashDetailed::sum()
     for (int i = 0; i < fModel->rowCount(); i++) {
         debit += fModel->data(i, col_credit, Qt::EditRole).toDouble();
         credit += fModel->data(i, col_debit, Qt::EditRole).toDouble();
-        total = total + fModel->data(i, col_credit, Qt::EditRole).toDouble() - fModel->data(i, col_debit, Qt::EditRole).toDouble();
+        total = total + fModel->data(i, col_credit, Qt::EditRole).toDouble() - fModel->data(i, col_debit,
+                Qt::EditRole).toDouble();
         fModel->setData(i, col_balance, total);
     }
     QStringList vheader;

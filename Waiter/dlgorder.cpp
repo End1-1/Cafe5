@@ -304,6 +304,7 @@ void DlgOrder::buildMenu(int menuid, int part1, int part2)
 		btn->setText(j["f_name"].toString());
 		btn->setProperty("bgcolor", j["f_color"].toInt());
 		btn->setProperty("id", j["f_id"].toInt());
+        btn->setProperty("children", j["f_children"].toString());
 		ui->glDishPart2->addWidget(btn, row, col++, 1, 1);
 		if (col == colCount) {
 			col = 0;
@@ -765,6 +766,7 @@ void DlgOrder::handleError(int err, const QString &msg)
 
 void DlgOrder::dishpart1Clicked()
 {
+    fPart2Parent = 0;
 	QPushButton *btn = static_cast<QPushButton *>(sender());
 	buildMenu(fMenuID, btn->property("id").toInt(), 0);
 }
@@ -824,8 +826,12 @@ void DlgOrder::dishPart2Clicked()
 {
 	QDishPart2Button *btn = static_cast<QDishPart2Button *>(sender());
 	int part2 = btn->property("id").toInt();
+    QString children = btn->property("children").toString();
 	Q_ASSERT(part2 > 0);
-	buildMenu(fMenuID, fPart1, part2);
+    if (!children.isEmpty()) {
+        fPart2Parent = part2;
+    }
+    buildMenu(fMenuID, fPart1, part2);
 }
 
 void DlgOrder::dishClicked()
