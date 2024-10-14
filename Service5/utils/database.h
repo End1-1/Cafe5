@@ -31,28 +31,76 @@ public:
     bool update(const QString &table);
     bool update(const QString &table, const QString &field, const QVariant &value);
     bool deleteFromTable(const QString &table, const QString &field, const QVariant &value);
-    inline int rowCount() {return fQuery->size();}
-    inline int columnCount() {return fColumnsNames.count();}
-    inline QString columnName(int index) {return fColumnsIndexes[index];}
-    inline bool next() {return fQuery->next();}
-    inline QVariant value(int column) const {return fQuery->value(column);}
-    inline QVariant value(const QString &columnName) {return fQuery->value(fColumnsNames[columnName]);}
-    inline QString string(const QString &columnName) {return value(columnName).toString(); }
-    inline QString string(int colIndex) {return value(colIndex).toString(); }
-    inline int integer(const QString &columnName) {return value(columnName).toInt(); }
-    inline int integer(int colIndex) {return value(colIndex).toInt(); }
-    inline double doubleValue(const QString &columnName) {return value(columnName).toDouble(); }
-    inline double doubleValue(int colIndex) {return value(colIndex).toDouble(); }
-    inline QDate date(const QString &columnName) {return value(columnName).toDate(); }
-    inline QTime time(const QString &columnName) {return value(columnName).toTime(); }
-    inline QDateTime dateTimeValue(const QString &columnName) {return value(columnName).toDateTime(); }
-    QString uuid();
+    inline int rowCount()
+    {
+        return fQuery->size();
+    }
+    inline int columnCount()
+    {
+        return fColumnsNames.count();
+    }
+    inline QString columnName(int index)
+    {
+        return fColumnsIndexes[index];
+    }
+    inline bool next()
+    {
+        return fQuery->next();
+    }
+    inline QVariant value(int column) const
+    {
+        return fQuery->value(column);
+    }
+    inline QVariant value(const QString &columnName)
+    {
+        return fQuery->value(fColumnsNames[columnName]);
+    }
+    inline QString string(const QString &columnName)
+    {
+        return value(columnName).toString();
+    }
+    inline QString string(int colIndex)
+    {
+        return value(colIndex).toString();
+    }
+    inline int integer(const QString &columnName)
+    {
+        return value(columnName).toInt();
+    }
+    inline int integer(int colIndex)
+    {
+        return value(colIndex).toInt();
+    }
+    inline double doubleValue(const QString &columnName)
+    {
+        return value(columnName).toDouble();
+    }
+    inline double doubleValue(int colIndex)
+    {
+        return value(colIndex).toDouble();
+    }
+    inline QDate date(const QString &columnName)
+    {
+        return value(columnName).toDate();
+    }
+    inline QTime time(const QString &columnName)
+    {
+        return value(columnName).toTime();
+    }
+    inline QDateTime dateTimeValue(const QString &columnName)
+    {
+        return value(columnName).toDateTime();
+    }
+    static QString uuid();
     void setBindValues(const QMap<QString, QVariant> &v);
     QMap<QString, QVariant> getBindValues();
     void close();
     QSqlQuery *fQuery;
     QVariant &operator [](const QString &name);
-    inline const QVariant operator ()(const QString &name) {return fQuery->value(fColumnsNames[name]); }
+    inline const QVariant operator ()(const QString &name)
+    {
+        return fQuery->value(fColumnsNames[name]);
+    }
     const QString lastQuery();
     QString lastDbError() const;
     QString fDatabaseNumber;

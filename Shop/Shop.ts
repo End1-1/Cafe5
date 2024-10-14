@@ -312,7 +312,7 @@
 <context>
     <name>C5OrderDriver</name>
     <message>
-        <location filename="../Classes/c5orderdriver.cpp" line="748"/>
+        <location filename="../Classes/c5orderdriver.cpp" line="740"/>
         <source>Revenue</source>
         <translation type="unfinished"></translation>
     </message>
@@ -539,62 +539,62 @@
 <context>
     <name>C5PrintServiceThread</name>
     <message>
-        <location filename="../Classes/c5printservicethread.cpp" line="125"/>
+        <location filename="../Classes/c5printservicethread.cpp" line="127"/>
         <source>PREORDER</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Classes/c5printservicethread.cpp" line="130"/>
+        <location filename="../Classes/c5printservicethread.cpp" line="132"/>
         <source>Guests</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Classes/c5printservicethread.cpp" line="140"/>
+        <location filename="../Classes/c5printservicethread.cpp" line="142"/>
         <source>REPRINT</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Classes/c5printservicethread.cpp" line="146"/>
+        <location filename="../Classes/c5printservicethread.cpp" line="148"/>
         <source>New order</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Classes/c5printservicethread.cpp" line="148"/>
+        <location filename="../Classes/c5printservicethread.cpp" line="150"/>
         <source>Table</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Classes/c5printservicethread.cpp" line="153"/>
+        <location filename="../Classes/c5printservicethread.cpp" line="155"/>
         <source>Order no</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Classes/c5printservicethread.cpp" line="156"/>
+        <location filename="../Classes/c5printservicethread.cpp" line="158"/>
         <source>Date</source>
         <translation type="unfinished">Ամսաթիվ</translation>
     </message>
     <message>
-        <location filename="../Classes/c5printservicethread.cpp" line="159"/>
+        <location filename="../Classes/c5printservicethread.cpp" line="161"/>
         <source>Time</source>
         <translation type="unfinished">Ժամ</translation>
     </message>
     <message>
-        <location filename="../Classes/c5printservicethread.cpp" line="162"/>
+        <location filename="../Classes/c5printservicethread.cpp" line="164"/>
         <source>Staff</source>
         <translation type="unfinished">Սպասարկող</translation>
     </message>
     <message>
-        <location filename="../Classes/c5printservicethread.cpp" line="194"/>
+        <location filename="../Classes/c5printservicethread.cpp" line="196"/>
         <source>Extra price</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Classes/c5printservicethread.cpp" line="220"/>
+        <location filename="../Classes/c5printservicethread.cpp" line="222"/>
         <source>Printer: </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Classes/c5printservicethread.cpp" line="224"/>
+        <location filename="../Classes/c5printservicethread.cpp" line="226"/>
         <source>Storage: </source>
         <translation type="unfinished"></translation>
     </message>
@@ -663,47 +663,47 @@
         <translation>Ելք ըստ վաճառքի</translation>
     </message>
     <message>
-        <location filename="../Classes/c5storedraftwriter.cpp" line="223"/>
+        <location filename="../Classes/c5storedraftwriter.cpp" line="225"/>
         <source>No hall with id</source>
         <translation>Սխալ սրահի կոդ</translation>
     </message>
     <message>
-        <location filename="../Classes/c5storedraftwriter.cpp" line="269"/>
+        <location filename="../Classes/c5storedraftwriter.cpp" line="271"/>
         <source>Error in store document, partial data was lost</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Classes/c5storedraftwriter.cpp" line="320"/>
+        <location filename="../Classes/c5storedraftwriter.cpp" line="322"/>
         <source>Error in cash document, partial data was lost</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Classes/c5storedraftwriter.cpp" line="330"/>
+        <location filename="../Classes/c5storedraftwriter.cpp" line="332"/>
         <source>Empty cash document</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Classes/c5storedraftwriter.cpp" line="432"/>
+        <location filename="../Classes/c5storedraftwriter.cpp" line="434"/>
         <source>Document not exists</source>
         <translation>Փասթաթուղթը գոյություն չունի</translation>
     </message>
     <message>
-        <location filename="../Classes/c5storedraftwriter.cpp" line="874"/>
+        <location filename="../Classes/c5storedraftwriter.cpp" line="876"/>
         <source>Invalid document id</source>
         <translation>Փասթաթուղթը գոյություն չունի</translation>
     </message>
     <message>
-        <location filename="../Classes/c5storedraftwriter.cpp" line="909"/>
+        <location filename="../Classes/c5storedraftwriter.cpp" line="911"/>
         <source>Emtpy document</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Classes/c5storedraftwriter.cpp" line="1006"/>
+        <location filename="../Classes/c5storedraftwriter.cpp" line="1008"/>
         <source>Not enough materials in the store</source>
         <translation>Բացասական քանակ</translation>
     </message>
     <message>
-        <location filename="../Classes/c5storedraftwriter.cpp" line="1104"/>
+        <location filename="../Classes/c5storedraftwriter.cpp" line="1106"/>
         <source>This order used in next documents</source>
         <translation>Փասթաթուղթը օգտագործվում է հետևյալ փասթաթղթերում</translation>
     </message>
@@ -1470,68 +1470,6 @@ MS Excel</source>
         <location filename="dlgpin.ui" line="456"/>
         <source>0</source>
         <translation></translation>
-    </message>
-</context>
-<context>
-    <name>DlgQrCode</name>
-    <message>
-        <location filename="../Forms/dlgqrcode.ui" line="14"/>
-        <source>Dialog</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../Forms/dlgqrcode.ui" line="20"/>
-        <source>Emarks</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../Forms/dlgqrcode.ui" line="27"/>
-        <location filename="../Forms/dlgqrcode.ui" line="69"/>
-        <source>Quantity</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../Forms/dlgqrcode.ui" line="37"/>
-        <location filename="../Forms/dlgqrcode.ui" line="64"/>
-        <source>QR</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../Forms/dlgqrcode.ui" line="47"/>
-        <location filename="../Forms/dlgqrcode.ui" line="87"/>
-        <location filename="../Forms/dlgqrcode.ui" line="98"/>
-        <source>...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../Forms/dlgqrcode.ui" line="59"/>
-        <source>Date</source>
-        <translation type="unfinished">Ամսաթիվ</translation>
-    </message>
-    <message>
-        <location filename="../Forms/dlgqrcode.ui" line="74"/>
-        <source>Remain</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../Forms/dlgqrcode.ui" line="79"/>
-        <source>O</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../Forms/dlgqrcode.cpp" line="38"/>
-        <source>Remove</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../Forms/dlgqrcode.cpp" line="90"/>
-        <source>Invalid emarks</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../Forms/dlgqrcode.cpp" line="94"/>
-        <source>Unknown quantity</source>
-        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

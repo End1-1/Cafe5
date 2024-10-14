@@ -431,7 +431,7 @@ bool WOrder::writeOrder()
         }
         QDir dir = QDir::tempPath();
         QFile file(dir.tempPath() + "/printtax_errors.txt");
-        if (file.open(QIODevice::WriteOnly)) {
+        if (file.open(QIODevice::Append)) {
             file.write(QDateTime::currentDateTime().toString("dd/MM/yyyy HH:mm:ss").toUtf8());
             file.write("\r\n");
             file.write("IN");
@@ -532,6 +532,9 @@ void WOrder::fixCostumer(const QString &code)
     if (!db.nextRow()) {
         return;
     }
+    if (!checkDiscountRight()) {
+        return;
+    }
     if (fBHistory.value < 0) {
         double v;
         if (!getDiscountValue(fBHistory.type, v)) {
@@ -593,6 +596,9 @@ void WOrder::changeQty(double qty)
 
 void WOrder::discountRow(const QString &code)
 {
+    if (!checkDiscountRight()) {
+        return;
+    }
     int row = ui->tblData->currentRow();
     if (row < 0) {
         return;
@@ -860,6 +866,28 @@ void WOrder::removeDraft()
     }
 }
 
+bool WOrder::checkDiscountRight()
+{
+    C5User *u = fUser;
+    if (!u->check(cp_t5_discount)) {
+        QString password = QInputDialog::getText(this, tr("Password"), tr("Password"), QLineEdit::Password);
+        C5User *tmp = new C5User(password);
+        if (tmp->error().isEmpty()) {
+            if (!tmp->check(cp_t5_discount)) {
+                delete tmp;
+                C5Message::error(tr("Access denied"));
+                return false;
+            }
+            return true;
+        } else {
+            C5Message::error(tmp->error());
+            delete tmp;
+            return false;
+        }
+    }
+    return true;
+}
+
 bool WOrder::setQtyOfRow(int row, double qty)
 {
     OGoods &og = fOGoods[row];
@@ -949,6 +977,12 @@ void WOrder::reponseProcessCode(const QJsonObject &jdoc)
         case 1: {
             //GIFT CARD
             QJsonObject card = jdoc["card"].toObject();
+            if (card["f_mode"].toInt() == CARD_TYPE_DISCOUNT) {
+                if (!checkDiscountRight()) {
+                    fHttp->httpQueryFinished(sender());
+                    return;
+                }
+            }
             QJsonObject history = jdoc["history"].toObject();
             QJsonObject partner = jdoc["partner"].toObject();
             ui->leContact->setText(partner["f_contact"].toString());
@@ -957,6 +991,14 @@ void WOrder::reponseProcessCode(const QJsonObject &jdoc)
             fBHistory.type = card["f_mode"].toInt();
             fBHistory.value = card["f_value"].toDouble();
             if (card["f_mode"].toInt() == CARD_TYPE_DISCOUNT) {
+                if (fBHistory.value < 0) {
+                    double v = fBHistory.value;
+                    if (!getDiscountValue(CARD_TYPE_DISCOUNT, v)) {
+                        return;
+                    }
+                    //v /= 100;
+                    fBHistory.value = v;
+                }
                 ui->leDisc->setText(QString("%1%").arg(float_str(card["f_value"].toDouble() * 100, 2)));
                 ui->leDisc->setVisible(true);
                 ui->lbDisc->setVisible(true);

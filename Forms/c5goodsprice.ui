@@ -129,6 +129,17 @@
          </widget>
         </item>
         <item>
+         <widget class="QToolButton" name="btnPrint">
+          <property name="text">
+           <string>...</string>
+          </property>
+          <property name="icon">
+           <iconset resource="../resources/res.qrc">
+            <normaloff>:/print.png</normaloff>:/print.png</iconset>
+          </property>
+         </widget>
+        </item>
+        <item>
          <widget class="QToolButton" name="btnShowGoods">
           <property name="text">
            <string>...</string>
@@ -214,6 +225,9 @@
          <height>16777215</height>
         </size>
        </property>
+       <property name="contextMenuPolicy">
+        <enum>Qt::ContextMenuPolicy::CustomContextMenu</enum>
+       </property>
       </widget>
      </item>
      <item row="1" column="2">
@@ -273,6 +287,22 @@
   <action name="actionSet_whosale_price_of_selected_goods">
    <property name="text">
     <string>Set whosale price of selected goods</string>
+   </property>
+   <property name="menuRole">
+    <enum>QAction::MenuRole::NoRole</enum>
+   </property>
+  </action>
+  <action name="actionEdit_name">
+   <property name="text">
+    <string>Edit name</string>
+   </property>
+   <property name="menuRole">
+    <enum>QAction::MenuRole::NoRole</enum>
+   </property>
+  </action>
+  <action name="actionRemovelwName">
+   <property name="text">
+    <string>Remove</string>
    </property>
    <property name="menuRole">
     <enum>QAction::MenuRole::NoRole</enum>

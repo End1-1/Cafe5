@@ -388,7 +388,7 @@ void CR5ConsumptionBySales::countRowQty(int row)
                     - fModel->data(row, col_qtyout, Qt::EditRole).toDouble());
     fModel->setData(row, col_qtydiff,
                     fModel->data(row, col_qtyinv, Qt::EditRole).toDouble()
-                    - fModel->data(row, fFilter->draft() ? col_qtyafter : col_qtystore, Qt::EditRole).toDouble());
+                    - fModel->data(row, !fFilter->draft() ? col_qtyafter : col_qtystore, Qt::EditRole).toDouble());
 }
 
 void CR5ConsumptionBySales::writeInvQty(C5Database &db, double qty, int row, int column, int goods, bool checkSR)
@@ -443,7 +443,7 @@ void CR5ConsumptionBySales::storeoutResponse(const QJsonObject &jdoc)
     if (!id.isEmpty()) {
         emit updateProgressValue(remain);
         fHttp->createHttpQuery("/engine/worker/create-store-out.php",
-        QJsonObject{{"id", id}},
+        QJsonObject{{"id", id}, {"action", "handle"}},
         SLOT(storeoutResponse(QJsonObject)),
         id, false);
     }
@@ -658,7 +658,7 @@ void CR5ConsumptionBySales::countOutputBasedOnRecipes()
     for (int i = 0; i < threads; i++) {
         if (!fIDs[i].isEmpty()) {
             fHttp->createHttpQuery("/engine/worker/create-store-out.php",
-            QJsonObject{{"id", fIDs[i].first()}},
+            QJsonObject{{"id", fIDs[i].first()}, {"action", "handle"}},
             SLOT(storeoutResponse(QJsonObject)),
             fIDs[i].first(), false);
         }

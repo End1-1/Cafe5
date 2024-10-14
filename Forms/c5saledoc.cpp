@@ -1136,6 +1136,63 @@ void C5SaleDoc::exportToAs(int doctype)
     jo["vattype"] = index == 0 ? (doctype == 5 ? "1" : "5") : "3";
     jo["pricewithoutvat"] = index == 0 ? (doctype == 5 ? 1.2 : 1) : 1;
     jo["withvat"] = index == 0 ? (doctype == 5 ? 0.2 : 0) : 0;
+    QMap<QString, QVariant> m;
+    QJsonObject jh;
+    db[":f_id"] = ui->leUuid->text();
+    db.exec("select ds.f_saletype, oh.* from o_header oh left join o_draft_sale ds on oh.f_id=ds.f_id where oh.f_id=:f_id ");
+    db.nextRow();
+    db.rowToMap(m);
+    jh = QJsonObject::fromVariantMap(m);
+    m.clear();
+    jo["header"] = jh;
+    //AS PARTNER CODE
+    db[":f_asdbid"] = jo["asdbid"].toInt();
+    db[":f_table"] = "c_partners";
+    db[":f_tableid"] = jh["f_partner"].toInt();
+    db.exec("select * from as_convert where f_asdbid=:f_asdbid and f_table=:f_table and f_tableid=:f_tableid");
+    if (db.nextRow()) {
+        jh["f_aspartnerid"] = db.getInt("f_ascode");
+    } else {
+        C5Message::error("No partner with specified id");
+        return;
+    }
+    //PRICE POLITIC
+    db[":f_id"] = jh["f_partner"].toInt();
+    db.exec("select * from c_partners where f_id=:f_id");
+    if (db.nextRow()) {
+        jh["f_price_politic"] = db.getInt("f_price_politic");
+        jh["f_address"] = db.getString("f_address");
+        jh["f_legaladdress"] = db.getString("f_legaladdress");
+        jh["f_taxcode"] = db.getString("f_taxcode");
+    } else {
+        C5Message::error("Cannot find partner price politic");
+        return;
+    }
+    jo["header"] = jh;
+    //GET GOODS
+    QJsonArray ja;
+    db[":f_header"] = ui->leUuid->text();
+    db[":f_asdbid"] = jo["asdbid"].toInt();
+    db.exec("SELECT ds.f_goods, a.f_ascode, g.f_name, ds.f_price - (ds.f_price * ds.f_discountfactor) as f_price, ds.f_qty, "
+            "ds.f_price as f_initprice, ds.f_discountfactor as f_discount, "
+            "g.f_service, a2.f_ascode as f_asstore "
+            "FROM o_goods ds "
+            "LEFT JOIN c_goods g ON g.f_id=ds.f_goods "
+            "left join as_convert a on a.f_tableid=g.f_id and a.f_table='c_goods' and a.f_asdbid=:f_asdbid "
+            "left join as_convert a2 on a2.f_tableid=ds.f_store and a2.f_table='c_storages' and a2.f_asdbid=:f_asdbid "
+            "where ds.f_header=:f_header  ");
+    while (db.nextRow()) {
+        if (db.getString("f_ascode").isEmpty()) {
+            C5Message::error(QString("%1 %2. \r\n").arg(tr("No goods code exists for"), db.getString("f_name")));
+            return;
+        }
+        m.clear();
+        QJsonObject jtemp;
+        db.rowToMap(m);
+        jtemp = QJsonObject::fromVariantMap(m);
+        ja.append(jtemp);
+    }
+    jo["body"] = ja;
     HttpQueryDialog *qd = new HttpQueryDialog(fDBParams, QString("https://%1:%2/magnit").arg(b->ipAddress,
         QString::number(b->port)), jo, this);
     qd->exec();

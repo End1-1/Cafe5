@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE QtCreatorProject>
-<!-- Written by QtCreator 14.0.1, 2024-09-16T21:50:35. -->
+<!-- Written by QtCreator 14.0.1, 2024-09-24T13:50:40. -->
 <qtcreator>
  <data>
   <variable>EnvironmentId</variable>
@@ -253,7 +253,7 @@
     <value type="QString" key="ProjectExplorer.ProjectConfiguration.Id">Qt4ProjectManager.Qt4RunConfiguration:C:/projects/Cafe5/Smart/Smart.net.pro</value>
     <value type="QString" key="ProjectExplorer.RunConfiguration.BuildKey">C:/projects/Cafe5/Smart/Smart.net.pro</value>
     <value type="bool" key="ProjectExplorer.RunConfiguration.Customized">true</value>
-    <value type="QString" key="RunConfiguration.Arguments">/servername=127.0.0.1 /config=SaleB /name=smartread</value>
+    <value type="QString" key="RunConfiguration.Arguments">/servername=127.0.0.1 /config=Sale /name=smart</value>
     <value type="bool" key="RunConfiguration.UseCppDebuggerAuto">true</value>
     <value type="bool" key="RunConfiguration.UseLibrarySearchPath">true</value>
     <value type="bool" key="RunConfiguration.UseQmlDebuggerAuto">true</value>

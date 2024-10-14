@@ -155,6 +155,8 @@ private:
 
     void removeDraft();
 
+    bool checkDiscountRight();
+
 };
 
 #endif // WORDER_H

@@ -453,6 +453,7 @@ void Workspace::createHttpRequest(const QString &route, QJsonObject params, cons
     params["host"] = "t2";//hostinfo;
     params["config_id"] = __c5config.fSettingsName;
     params["user_session"] = __c5config.getRegValue("session").toString();
+    params["sessionid"] = __c5config.getRegValue("cashsession").toInt();
     auto np = new NDataProvider(this);
     np->setProperty("marks", marks);
     connect(np, SIGNAL(error(QString)), this, responseErrorSlot);
@@ -1524,6 +1525,7 @@ void Workspace::loginResponse(const QJsonObject &jdoc)
     __c5config.setRegValue("json_config_id",
                            jo["f_config"].toInt() > 0 ? jo["f_config"].toInt() : __c5config.fJsonConfigId);
     __c5config.setRegValue("session", C5Database::uuid());
+    __c5config.setRegValue("cashsession", jdoc["data"].toObject()["cashsession"].toObject()["f_id"].toInt());
     fUser = new C5User(jo["f_id"].toInt());
     httpStop(sender());
     QJsonArray jsessions = jdoc["data"].toObject()["sessions"].toArray();

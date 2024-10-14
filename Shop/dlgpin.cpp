@@ -13,6 +13,7 @@ DlgPin::DlgPin(QWidget *parent) :
     Q_UNUSED(parent);
     ui->setupUi(this);
     fPinEmpty = true;
+    fLastError = false;
     installEventFilter(this);
 }
 
@@ -53,7 +54,10 @@ void DlgPin::btnNumPressed()
 
 void DlgPin::on_btnEnter_clicked()
 {
+    fLastError = false;
     NDataProvider::mHost = __c5config.dbParams().at(1);
+    fHttp->fErrorObject = this;
+    fHttp->fErrorSlot = const_cast<char *>(SLOT(errorResponse(QString)));
     if (ui->lePin->text().length() == 4 && ui->leUser->text().length() == 4) {
         fHttp->createHttpQuery("/engine/login.php", QJsonObject{{"method", 2}, {"pin", ui->lePin->text()}},
         SLOT(loginResponse(QJsonObject)));
@@ -136,13 +140,18 @@ void DlgPin::keyReleaseEvent(QKeyEvent *event)
             }
             break;
     }
+    if (ui->lePin->text().length() < 4 || ui->leUser->text().length() < 4) {
+        fLastError = false;
+    }
     if (ui->leUser->hasFocus() && ui->leUser->text().length() == 4) {
         ui->lePin->setFocus();
         event->accept();
+        return;
     }
-    if (ui->lePin->hasFocus() && ui->lePin->text().length() == 4) {
+    if (ui->lePin->hasFocus() && ui->lePin->text().length() == 4 && !fLastError) {
         on_btnEnter_clicked();
         event->accept();
+        return;
     }
     if (ui->lePin->isEmpty()) {
         fPinEmpty = true;
@@ -158,6 +167,13 @@ void DlgPin::loginResponse(const QJsonObject &jdoc)
     NDataProvider::sessionKey = jo["sessionkey"].toString();
     fHttp->httpQueryFinished(sender());
     accept();
+}
+
+void DlgPin::errorResponse(const QString &err)
+{
+    fLastError = true;
+    fHttp->httpQueryFinished(sender());
+    C5Message::error(err);
 }
 
 void DlgPin::queryLoading()

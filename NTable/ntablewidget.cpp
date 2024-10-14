@@ -41,7 +41,8 @@ NTableWidget::NTableWidget(const QString &route, QWidget *parent) :
             &NTableWidget::tableViewHeaderResized);
     connect(ui->mTableView->selectionModel(), SIGNAL(selectionChanged(QItemSelection, QItemSelection)), this,
             SLOT(selectionChanged(QItemSelection, QItemSelection)));
-    connect(ui->tblTotal->horizontalScrollBar(), SIGNAL(valueChanged(int)), this, SLOT(tblValueChanged(int)));
+    connect(ui->mTableView->horizontalScrollBar(), SIGNAL(valueChanged(int)), this, SLOT(tblValueChanged(int)));
+    connect(ui->tblTotal->horizontalScrollBar(), SIGNAL(valueChanged(int)), this, SLOT(tblValueChanged2(int)));
     ui->widget->setVisible(false);
     mHandler = new NHandler(this);
 }
@@ -240,7 +241,19 @@ void NTableWidget::exportToExcel()
             if (fModel->data(j, i, Qt::FontRole).value<QFont>().bold()) {
                 bgStyle = bgFillb[bgColor];
             }
-            s->addCell(j + 2, i + 1, fModel->data(j, i, Qt::EditRole), d.style()->styleNum(bgStyle));
+            QVariant v = fModel->data(j, i, Qt::EditRole);
+            switch (v.type()) {
+                case QVariant::LongLong:
+                case QVariant::Double:
+                case QVariant::Int:
+                    if (v.toDouble() < 0.01) {
+                        v = "";
+                    }
+                    break;
+                default:
+                    break;
+            }
+            s->addCell(j + 2, i + 1, v, d.style()->styleNum(bgStyle));
         }
     }
     /* MERGE cells */
@@ -324,6 +337,11 @@ void NTableWidget::tableViewHeaderResized(int column, int oldSize, int newSize)
 }
 
 void NTableWidget::tblValueChanged(int v)
+{
+    ui->tblTotal->horizontalScrollBar()->setValue(v);
+}
+
+void NTableWidget::tblValueChanged2(int v)
 {
     ui->mTableView->horizontalScrollBar()->setValue(v);
 }

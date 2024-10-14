@@ -45,7 +45,7 @@ INCLUDEPATH += C:/Projects/Cafe5/Service5/utils
 
 DEFINES += _APPLICATION_=\\\"Magnit\\\"
 DEFINES += _MODULE_=\\\"Service5_magnit_dll\\\"
-
+DEFINES += _DBDRIVER_=\\\"QMARIADB\\\"
 # Default rules for deployment.
 unix {
     target.path = /usr/lib

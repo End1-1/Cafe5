@@ -24,7 +24,8 @@ int main(int argc, char *argv[])
 #endif
     QApplication a(argc, argv);
     QTextCodec::setCodecForLocale(QTextCodec::codecForName("utf8") );
-    QString serverName, configName;
+    QString serverName, configName, showName;
+    QJsonObject jdirectConnection;
     for (const QString &sn : a.arguments()) {
         if (sn.contains("/servername")) {
             QStringList snconf = sn.split("=");
@@ -38,9 +39,30 @@ int main(int argc, char *argv[])
             if (snconf.length() == 2) {
                 configName = snconf.at(1);
             }
+        } else if (sn.contains("/host")) {
+            QStringList h = sn.split("=", Qt::SkipEmptyParts);
+            if (h.length() == 2) {
+                QJsonObject jo;
+                jdirectConnection["host"] = QString("%1/engine/info.php").arg(h.at(1));
+                jdirectConnection["database"] = QString("https://%1").arg(h.at(1));
+                jdirectConnection["waiterserver"] = "";
+            }
+        } else if (sn.contains("/showname")) {
+            QStringList s = sn.split("=");
+            if (s.length() == 2) {
+                showName = s.at(1);
+            }
         }
     }
-    if (serverName.isEmpty()) {
+    if (configName.isEmpty()) {
+        configName = "Main";
+    }
+    if (!jdirectConnection.isEmpty()) {
+        jdirectConnection["settings"] = configName;
+        jdirectConnection["name"] = showName;
+        C5ServerName::mServers.append(jdirectConnection);
+    }
+    if (serverName.isEmpty() && C5ServerName::mServers.isEmpty()) {
         C5Message::error("Servername parameter must be pass as argument");
         return 1;
     }

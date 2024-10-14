@@ -120,7 +120,7 @@ int main(int argc, char *argv[])
         }
         pin.clear();
         user.clear();
-    };
+    }
     if (__user->value("f_settingsname").toString() != __c5config.fSettingsName) {
         if (__user->value("f_settingsname").toString().isEmpty() == false ) {
             __c5config.fSettingsName = __user->value("f_settingsname").toString();

@@ -47,6 +47,7 @@ private slots:
     void setSearchParameters();
     virtual void tableViewHeaderResized(int column, int oldSize, int newSize);
     void tblValueChanged(int v);
+    void tblValueChanged2(int v);
     void on_leFilterLineedit_textEdited(const QString &arg1);
     void on_mTableView_doubleClicked(const QModelIndex &index);
     virtual void tableViewHeaderContextMenuRequested(const QPoint &point);

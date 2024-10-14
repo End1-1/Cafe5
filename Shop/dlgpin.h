@@ -28,6 +28,8 @@ protected:
 private slots:
     void loginResponse(const QJsonObject &jdoc);
 
+    void errorResponse(const QString &err);
+
     void queryLoading();
 
     void queryStopped(QObject *sender);
@@ -70,6 +72,8 @@ private:
     bool fPinEmpty;
 
     NLoadingDlg *fLoadingDlg;
+
+    bool fLastError;
 
 };
 

@@ -54,14 +54,14 @@ INCLUDEPATH += C:/Projects/Cafe5/Cafe5
 INCLUDEPATH += C:/Projects/Cafe5/Service5/handlers
 INCLUDEPATH += C:/Projects/Cafe5/Service5/utils
 INCLUDEPATH += C:/projects/newtax/src
-INCLUDEPATH += C:/Soft/OpenSSL-Win64/include
-INCLUDEPATH += C:/Soft/OpenSSL-Win64/include/openssl
+INCLUDEPATH += C:/Soft/OpenSSLWin64/include
+INCLUDEPATH += C:/Soft/OpenSSLWin64/include/openssl
 
 DEFINES += _APPLICATION_=\\\"VIPClient\\\"
 DEFINES += _MODULE_=\\\"Service5_vipclient_dll\\\"
 DEFINES += _DBDRIVER_=\\\"QMARIADB\\\"
 
-LIBS += -LC:/Soft/OpenSSL-Win64/lib
+LIBS += -LC:/soft/OpenSSLWin64/lib/VC/x64/MD
 LIBS += -lopenssl
 LIBS += -llibcrypto
 LIBS += -lVersion

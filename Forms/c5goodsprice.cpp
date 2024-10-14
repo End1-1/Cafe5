@@ -5,6 +5,8 @@
 #include "c5selector.h"
 #include "c5cache.h"
 #include "c5lineedit.h"
+#include "c5printing.h"
+#include "c5printpreview.h"
 #include <QInputDialog>
 #include <QMenu>
 #include <QJsonArray>
@@ -31,6 +33,7 @@ C5GoodsPriceOrder::C5GoodsPriceOrder(const QStringList &dbParams)
     fHttp->createHttpQuery("/engine/goods/create-group-discount.php", QJsonObject{{"action", "getAll"}}, SLOT(
         getAllResponse(QJsonObject)));
     ui->tblGoods->setVisible(false);
+    connect(ui->lwNames, &QListWidget::customContextMenuRequested, this, &C5GoodsPriceOrder::lwNamesContextMenu);
     connect(ui->tblGoods, &C5TableWidget::customContextMenuRequested, this, &C5GoodsPriceOrder::tblGoodsContextMenu);
     fDate1 = QDate::currentDate();
     fDate2 = QDate::currentDate();
@@ -114,6 +117,28 @@ void C5GoodsPriceOrder::addGroupResponse(const QJsonObject &jdoc)
     fHttp->httpQueryFinished(sender());
 }
 
+void C5GoodsPriceOrder::editLwNameReponse(const QJsonObject &jdoc)
+{
+    for (int i = 0; i < ui->lwNames->count(); i++) {
+        if (ui->lwNames->item(i)->data(Qt::UserRole).toInt() == jdoc["id"].toInt()) {
+            ui->lwNames->item(i)->setText(jdoc["name"].toString());
+            break;
+        }
+    }
+    fHttp->httpQueryFinished(sender());
+}
+
+void C5GoodsPriceOrder::removeLwName(const QJsonObject &jdoc)
+{
+    for (int i = 0; i < ui->lwNames->count(); i++) {
+        if (ui->lwNames->item(i)->data(Qt::UserRole).toInt() == jdoc["id"].toInt()) {
+            delete ui->lwNames->item(i);
+            break;
+        }
+    }
+    fHttp->httpQueryFinished(sender());
+}
+
 void C5GoodsPriceOrder::saveResponse(const QJsonObject &jdoc)
 {
     fHttp->httpQueryFinished(sender());
@@ -151,6 +176,14 @@ void C5GoodsPriceOrder::refreshSaleStoreResponse(const QJsonObject &jdoc)
         }
     }
     fHttp->httpQueryFinished(sender());
+}
+
+void C5GoodsPriceOrder::lwNamesContextMenu(const QPoint &p)
+{
+    auto *m = new QMenu(this);
+    m->addAction(ui->actionEdit_name);
+    m->addAction(ui->actionRemovelwName);
+    m->popup(ui->lwNames->mapToGlobal(p));
 }
 
 void C5GoodsPriceOrder::tblGoodsContextMenu(const QPoint &p)
@@ -517,4 +550,316 @@ void C5GoodsPriceOrder::on_btnChangeRange_clicked()
 void C5GoodsPriceOrder::on_btnRefresh_clicked()
 {
     getSaledQty();
+}
+
+void C5GoodsPriceOrder::on_actionEdit_name_triggered()
+{
+    bool ok;
+    QString newName = QInputDialog::getText(this, tr("New name"), "", QLineEdit::Normal, "", &ok).trimmed();
+    if (!ok || newName.isEmpty()) {
+        return;
+    }
+    QListWidgetItem *item = ui->lwNames->currentItem();
+    if (!item) {
+        return;
+    }
+    fHttp->createHttpQuery("/engine/goods/create-group-discount.php",
+    QJsonObject{{"name", newName}, {"id", item->data(Qt::UserRole).toInt()}, {"action", "editLwName"}}, SLOT(
+        editLwNameReponse(QJsonObject)));
+}
+
+void C5GoodsPriceOrder::on_actionRemovelwName_triggered()
+{
+    if (C5Message::question(tr("Confirm to remove")) != QDialog::Accepted) {
+        return;
+    }
+    QListWidgetItem *item = ui->lwNames->currentItem();
+    if (!item) {
+        return;
+    }
+    fHttp->createHttpQuery("/engine/goods/create-group-discount.php",
+    QJsonObject{{"id", item->data(Qt::UserRole).toInt()}, {"action", "removeLwName"}}, SLOT(
+        removeLwName(QJsonObject)));
+}
+
+void C5GoodsPriceOrder::on_btnPrint_clicked()
+{
+    if (ui->lwNames->currentItem() == nullptr) {
+        return;
+    }
+    QModelIndexList ml = ui->tblDoc->selectionModel()->selectedIndexes();
+    if (ml.isEmpty()) {
+        return;
+    }
+    QSet<int> rows;
+    for (const QModelIndex &i : ml) {
+        rows.insert(i.row());
+    }
+    C5Printing p;
+    QFont f(qApp->font());
+    p.setFont(f);
+    p.setSceneParams(2000, 2700, QPrinter::Portrait);
+    p.setFontSize(25);
+    for (int row : rows) {
+        p.setFontSize(25);
+        p.setFontBold(true);
+        p.ctext(QString("%1 %2 / %3")
+                .arg(tr("Discount document"),
+                     ui->lwNames->currentItem()->text(),
+                     ui->tblDoc->getString(row, 1)));
+        p.br();
+        p.br();
+        ui->tblDoc->setCurrentCell(row, 0);
+        QList<qreal> points;
+        QStringList vals;
+        p.setFontSize(18);
+        p.setFontBold(false);
+        points << 10 << 400 << 200 << 200 << 200;
+        vals << tr("Name") << tr("Barcode") << tr("Retail") << tr("Whosale");
+        for (int i = 0; i < ui->tblGoods->rowCount(); i++) {
+            vals.clear();
+            vals << ui->tblGoods->getString(i, 1)
+                 << ui->tblGoods->getString(i, 2)
+                 << ui->tblGoods->lineEdit(i, 3)->text()
+                 << ui->tblGoods->lineEdit(i, 4)->text();
+            p.tableText(points, vals, p.fLineHeight + 20);
+            p.br(p.fLineHeight + 20);
+        }
+    }
+    QList<qreal> points;
+    QStringList vals;
+    p.setSceneParams(2000, 2700, QPrinter::Portrait);
+    p.setFontSize(25);
+    p.setFontBold(true);
+    QString docTypeText;
+    /*
+    p.br();
+    p.ctext(ui->leReasonName->text());
+    p.br();
+    p.br();
+    p.setFontSize(20);
+    p.setFontBold(false);
+    QString storeInName, storeOutName;
+    if (ui->leStoreInput->getInteger() > 0) {
+        storeInName = ui->leStoreInputName->text();
+    }
+    if (ui->leStoreOutput->getInteger() > 0) {
+        storeOutName = ui->leStoreOutputName->text();
+    }
+    if (!ui->leComment->isEmpty()) {
+        p.ltext(ui->leComment->text(), 50);
+        p.br();
+    }
+    p.br();
+    p.setFontBold(true);
+    points.clear();
+    points << 50 << 200;
+    vals << tr("Date");
+    if (!storeInName.isEmpty()) {
+        vals << tr("Store, input");
+        points << 500;
+    }
+    if (!storeOutName.isEmpty()) {
+        vals << tr("Store, output");
+        points << 500;
+    }
+    p.tableText(points, vals, p.fLineHeight + 20);
+    p.br(p.fLineHeight + 20);
+    p.setFontBold(false);
+    vals.clear();
+    vals << ui->deDate->text();
+    if (!storeInName.isEmpty()) {
+        vals << ui->leStoreInputName->text();
+    }
+    if (!storeOutName.isEmpty()) {
+        vals << ui->leStoreOutputName->text();
+    }
+    p.tableText(points, vals, p.fLineHeight + 20);
+    p.br(p.fLineHeight + 20);
+    p.br(p.fLineHeight + 20);
+    points.clear();
+    vals.clear();
+    p.setFontBold(true);
+    points << 50;
+    if (ui->lePartner->getInteger() > 0) {
+        vals << tr("Supplier");
+        points << 1000;
+    }
+    if (!ui->leInvoiceNumber->isEmpty()) {
+        vals << tr("Purchase document");
+        points << 800;
+    }
+    p.tableText(points, vals, p.fLineHeight + 20);
+    p.br(p.fLineHeight + 20);
+    p.setFontBold(false);
+    points.clear();
+    vals.clear();
+    points << 50;
+    if (ui->lePartner->getInteger() > 0) {
+        vals << ui->lePartnerName->text();
+        points << 1000;
+    }
+    if (!ui->leInvoiceNumber->isEmpty()) {
+        vals << ui->leInvoiceNumber->text() + " /    " + ui->deInvoiceDate->text();
+        points << 800;
+    }
+    p.tableText(points, vals, p.fLineHeight + 20);
+    p.br();
+    p.br();
+    p.br();
+    if (fDocType == DOC_TYPE_COMPLECTATION) {
+        points.clear();
+        points << 50 << 100 << 800 << 250;
+        vals.clear();
+        vals.append(tr("NN"));
+        vals.append(tr("Other charges"));
+        vals.append(tr("Amount"));
+        p.setFontBold(true);
+        p.tableText(points, vals, p.fLineHeight + 20);
+        p.br(p.fLineHeight + 20);
+        for (int i = 0; i < ui->tblAdd->rowCount(); i++) {
+            vals.clear();
+            vals.append(QString::number(i + 1));
+            vals.append(ui->tblAdd->getString(i, 1));
+            vals.append(float_str(ui->tblAdd->lineEdit(i, 2)->getDouble(), 2));
+            p.setFontBold(false);
+            p.tableText(points, vals, p.fLineHeight + 20);
+            p.br(p.fLineHeight + 20);
+        }
+        p.br();
+        points.clear();
+        points << 50 << 100 << 200 << 600 << 250 << 250 << 250;
+        vals.clear();
+        vals.append(tr("NN"));
+        vals.append(tr("Code"));
+        vals.append(tr("Input material"));
+        vals.append(tr("Qty"));
+        vals.append(tr("Price"));
+        vals.append(tr("Amount"));
+        p.setFontBold(true);
+        p.tableText(points, vals, p.fLineHeight + 20);
+        p.br(p.fLineHeight + 20);
+        vals.clear();
+        vals.append("1");
+        vals.append(ui->leComplectationCode->text());
+        vals.append(ui->leComplectationName->text());
+        vals.append(ui->leComplectationQty->text());
+        vals.append(float_str(ui->leTotal->getDouble() / ui->leComplectationQty->getDouble(), 2));
+        vals.append(ui->leTotal->text());
+        p.setFontBold(false);
+        p.tableText(points, vals, p.fLineHeight + 20);
+        p.br(p.fLineHeight + 20);
+    }
+    p.br();
+    QMap<int, int> goodsGroupMap;
+    QList<QStringList> goodsGroupData;
+    for (int i = 0; i < ui->tblGoods->rowCount(); i++) {
+        QStringList val  = {"", "", "", "0", "", "", "0"};
+        if (ui->chLeaveFocusOnBarcode->isChecked()) {
+            if (goodsGroupMap.contains(ui->tblGoods->getInteger(i, 3))) {
+                val = goodsGroupData[goodsGroupMap[ui->tblGoods->getInteger(i, 3)]];
+            } else {
+                val[0] = QString::number(goodsGroupData.count() + 1);
+            }
+        } else {
+            val[0] = QString::number(i + 1);
+        }
+        //val <<
+        val[1] = ui->tblGoods->getString(i, 3);
+        val[2] = ui->tblGoods->getString(i, 4);
+        if (ui->chLeaveFocusOnBarcode->isChecked()) {
+            val[3] = float_str(str_float(val[3]) + ui->tblGoods->lineEdit(i, 5)->getDouble(), 3);
+        } else {
+            val[3] = ui->tblGoods->lineEdit(i, 5)->text();
+        }
+        val[4] = ui->tblGoods->getString(i, 6);
+        val[5] = ui->tblGoods->lineEdit(i, 7)->text();
+        if (ui->chLeaveFocusOnBarcode->isChecked()) {
+            val[6] = float_str(str_float(val[6]) + ui->tblGoods->lineEdit(i, 8)->getDouble(), 2);
+        } else {
+            val[6] = ui->tblGoods->lineEdit(i, 8)->text();
+        }
+        val[5] = float_str(str_float(val[6]) / str_float(val[3]), 2);
+        if (ui->chLeaveFocusOnBarcode->isChecked()) {
+            if (goodsGroupMap.contains(ui->tblGoods->getInteger(i, 3))) {
+                goodsGroupData[goodsGroupMap[ui->tblGoods->getInteger(i, 3)]] = val;
+            } else {
+                goodsGroupData.append(val);
+                goodsGroupMap[ui->tblGoods->getInteger(i, 3)] = goodsGroupData.count() - 1;
+            }
+        } else {
+            goodsGroupData.append(val);
+        }
+    }
+    QString goodsColName = tr("Goods");
+    if (fDocType == DOC_TYPE_COMPLECTATION) {
+        goodsColName = tr("Output material");
+    }
+    points.clear();
+    points << 50 << 100 << 200 << 600 << 250 << 250 << 250 << 250;
+    vals.clear();
+    vals << tr("NN")
+         << tr("Material code")
+         << goodsColName
+         << tr("Qty")
+         << tr("Unit")
+         << tr("Price")
+         << tr("Total");
+    p.setFontBold(true);
+    p.tableText(points, vals, p.fLineHeight + 20);
+    p.br(p.fLineHeight + 20);
+    p.setFontBold(false);
+    for (int i = 0; i < goodsGroupData.count(); i++) {
+        if (p.checkBr(p.fLineHeight + 20)) {
+            p.br(p.fLineHeight + 20);
+            p.br();
+        }
+        vals = goodsGroupData[i];
+        //        vals << QString::number(i + 1);
+        //        vals << ui->tblGoods->getString(i, 3);
+        //        vals << ui->tblGoods->getString(i, 4);
+        //        vals << ui->tblGoods->lineEdit(i, 5)->text();
+        //        vals << ui->tblGoods->getString(i, 6);
+        //        vals << ui->tblGoods->lineEdit(i, 7)->text();
+        //        vals << ui->tblGoods->lineEdit(i, 8)->text();
+        p.tableText(points, vals, p.fLineHeight + 20);
+        if (p.checkBr(p.fLineHeight + 20)) {
+            p.br(p.fLineHeight + 20);
+        }
+        p.br(p.fLineHeight + 20);
+    }
+    p.setFontBold(true);
+    points.clear();
+    points << 950
+           << 750
+           << 250;
+    vals.clear();
+    vals << tr("Total amount");
+    vals << ui->leTotal->text();
+    p.tableText(points, vals, p.fLineHeight + 20);
+    p.br(p.fLineHeight + 20);
+    p.br(p.fLineHeight + 20);
+    p.br(p.fLineHeight + 20);
+    switch (fDocType) {
+    case DOC_TYPE_STORE_MOVE:
+        p.ltext(tr("Passed"), 50);
+        p.ltext(tr("Accepted"), 1000);
+        p.br(p.fLineHeight + 20);
+        p.ltext(ui->lePassedName->text(), 50);
+        p.ltext(ui->leAcceptedName->text(), 1000);
+        break;
+    default:
+        p.ltext(tr("Accepted"), 50);
+        p.ltext(tr("Passed"), 1000);
+        p.br(p.fLineHeight + 20);
+        p.ltext(ui->leAcceptedName->text(), 1000);
+        p.ltext(ui->lePassedName->text(), 50);
+        break;
+    }
+    p.line(50, p.fTop, 700, p.fTop);
+    p.line(1000, p.fTop, 1650, p.fTop);
+    p.setFontBold(false);
+    */
+    C5PrintPreview pp( &p, fDBParams);
+    pp.exec();
 }

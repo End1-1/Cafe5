@@ -29,11 +29,17 @@ private slots:
 
     void addGroupResponse(const QJsonObject &jdoc);
 
+    void editLwNameReponse(const QJsonObject &jdoc);
+
+    void removeLwName(const QJsonObject &jdoc);
+
     void saveResponse(const QJsonObject &jdoc);
 
     void discountResponse(const QJsonObject &jdoc);
 
     void refreshSaleStoreResponse(const QJsonObject &jdoc);
+
+    void lwNamesContextMenu(const QPoint &p);
 
     void tblGoodsContextMenu(const QPoint &p);
 
@@ -64,6 +70,12 @@ private slots:
     void on_btnChangeRange_clicked();
 
     void on_btnRefresh_clicked();
+
+    void on_actionEdit_name_triggered();
+
+    void on_actionRemovelwName_triggered();
+
+    void on_btnPrint_clicked();
 
 private:
     Ui::C5GoodsPriceOrder *ui;

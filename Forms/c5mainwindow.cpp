@@ -295,20 +295,28 @@ void C5MainWindow::menuListReponse(const QJsonObject &jdoc)
 {
     QListWidget *lw = nullptr;
     for (QListWidget *ll : fMenuLists) {
+        qDebug() << ll->property("reportlevel");
         if (ll->property("reportlevel").toInt() == 2) {
             lw = ll;
             break;
         }
     }
-    QJsonObject jo = jdoc["data"].toObject();
-    QJsonArray ja = jo["reports"].toArray();
-    for (int i = 0; i < ja.size(); i++) {
-        const QJsonObject &j = ja.at(i).toObject();
-        if (lw) {
+    if (lw) {
+        QJsonObject jo = jdoc["data"].toObject();
+        QJsonArray ja = jo["reports"].toArray();
+        for (int i = 0; i < ja.size(); i++) {
+            const QJsonObject &j = ja.at(i).toObject();
             // QPixmap p;
             // p.loadFromData(QByteArray::fromBase64(j["image"].toString().toLatin1()));
             auto *l = addTreeL3Item(lw, 0, j["title"].toString(), QString(":/%1").arg(j["image"].toString()));
             l->setData(Qt::UserRole + 105, j["route"].toString());
+        }
+        for (QListWidget *ll : fMenuLists) {
+            int size = ll->count() == 0 ? 0 : (ll->count() * (ll->item(0)->sizeHint().height() + 1));
+            ll->setMinimumHeight(size);
+            ll->setMaximumHeight(ll->minimumHeight());
+            ll->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+            animateMenu(ll, __c5config.getRegValue(QString("btnmenushow-%1").arg(ll->property("cp").toInt()), false).toBool());
         }
     }
     http->httpQueryFinished(sender());
