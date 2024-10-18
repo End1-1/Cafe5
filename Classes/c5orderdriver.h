@@ -67,7 +67,7 @@ public:
 
     const QMap<QString, QVariant> &dish(int index) const;
 
-    bool addDish(int menuid, const QString &comment, double price = 0.0);
+    bool addDish(int menuid, const QString &comment, double price, const QString &emark);
 
     bool addDish2(int packageid, double qty);
 

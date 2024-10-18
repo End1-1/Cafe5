@@ -44,10 +44,10 @@
    <item>
     <widget class="QFrame" name="frame">
      <property name="frameShape">
-      <enum>QFrame::Box</enum>
+      <enum>QFrame::Shape::Box</enum>
      </property>
      <property name="frameShadow">
-      <enum>QFrame::Raised</enum>
+      <enum>QFrame::Shadow::Raised</enum>
      </property>
      <property name="smartdlg" stdset="0">
       <bool>true</bool>
@@ -71,7 +71,7 @@
          <item>
           <spacer name="horizontalSpacer_3">
            <property name="orientation">
-            <enum>Qt::Horizontal</enum>
+            <enum>Qt::Orientation::Horizontal</enum>
            </property>
            <property name="sizeHint" stdset="0">
             <size>
@@ -111,7 +111,7 @@
             <bool>true</bool>
            </property>
            <property name="alignment">
-            <set>Qt::AlignCenter</set>
+            <set>Qt::AlignmentFlag::AlignCenter</set>
            </property>
            <property name="wordWrap">
             <bool>true</bool>
@@ -121,7 +121,7 @@
          <item>
           <spacer name="horizontalSpacer_4">
            <property name="orientation">
-            <enum>Qt::Horizontal</enum>
+            <enum>Qt::Orientation::Horizontal</enum>
            </property>
            <property name="sizeHint" stdset="0">
             <size>
@@ -136,11 +136,14 @@
       </item>
       <item>
        <widget class="QScrollArea" name="scrollArea">
+        <property name="focusPolicy">
+         <enum>Qt::FocusPolicy::NoFocus</enum>
+        </property>
         <property name="widgetResizable">
          <bool>true</bool>
         </property>
         <property name="alignment">
-         <set>Qt::AlignCenter</set>
+         <set>Qt::AlignmentFlag::AlignCenter</set>
         </property>
         <widget class="QWidget" name="scrollAreaWidgetContents">
          <property name="geometry">
@@ -185,7 +188,7 @@
              <bool>false</bool>
             </property>
             <property name="alignment">
-             <set>Qt::AlignCenter</set>
+             <set>Qt::AlignmentFlag::AlignCenter</set>
             </property>
             <property name="wordWrap">
              <bool>true</bool>
@@ -220,10 +223,10 @@
          <item>
           <spacer name="horizontalSpacer">
            <property name="orientation">
-            <enum>Qt::Horizontal</enum>
+            <enum>Qt::Orientation::Horizontal</enum>
            </property>
            <property name="sizeType">
-            <enum>QSizePolicy::Expanding</enum>
+            <enum>QSizePolicy::Policy::Expanding</enum>
            </property>
            <property name="sizeHint" stdset="0">
             <size>
@@ -288,10 +291,10 @@
          <item>
           <spacer name="horizontalSpacer_2">
            <property name="orientation">
-            <enum>Qt::Horizontal</enum>
+            <enum>Qt::Orientation::Horizontal</enum>
            </property>
            <property name="sizeType">
-            <enum>QSizePolicy::Expanding</enum>
+            <enum>QSizePolicy::Policy::Expanding</enum>
            </property>
            <property name="sizeHint" stdset="0">
             <size>
@@ -309,7 +312,15 @@
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>btnYes</tabstop>
+  <tabstop>btnA3</tabstop>
+  <tabstop>btnCancel</tabstop>
+  <tabstop>btnCopy</tabstop>
+  <tabstop>scrollArea</tabstop>
+ </tabstops>
  <resources>
+  <include location="../resources/res.qrc"/>
   <include location="../resources/res.qrc"/>
  </resources>
  <connections/>

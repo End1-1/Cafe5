@@ -53,7 +53,7 @@ bool C5Editor::getJsonObject(QJsonObject &j)
 {
     fEditor->focusFirst();
     if (exec() == QDialog::Accepted) {
-        j = fEditor->fData;
+        j = fEditor->fJsonData;
         return true;
     }
     return false;
@@ -112,6 +112,9 @@ void C5Editor::on_btnSave_clicked()
         return;
     }
     setProperty("saveandnew", false);
+    if (fEditor->isOnline()) {
+        return;
+    }
     if (!fEditor->acceptOnSave()) {
         fEditor->clear();
         accept();
@@ -131,6 +134,9 @@ bool C5Editor::on_btnSaveAndNew_clicked()
         return false;
     }
     setProperty("saveandnew", true);
+    if (fEditor->isOnline()) {
+        return true;
+    }
     if (!fEditor->acceptOnSave()) {
         fEditor->clear();
     }

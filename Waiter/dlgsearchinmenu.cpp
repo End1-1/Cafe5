@@ -78,6 +78,6 @@ void DlgSearchInMenu::kbdAccept()
         return;
     }
     int menuid = ui->tbl->getInteger(ml.at(0).row(), 0);
-    emit dish(menuid);
+    emit dish(menuid, "");
     accept();
 }

@@ -203,7 +203,7 @@ QPushButton *CE5Goods::b1()
 
 QJsonObject CE5Goods::makeJsonObject()
 {
-    fData = QJsonObject();
+    fJsonData = QJsonObject();
     QJsonObject j;
     j["f_id"] = ui->leCode->getInteger();
     j["f_name"] = ui->leName->text();
@@ -232,11 +232,11 @@ QJsonObject CE5Goods::makeJsonObject()
     j["f_queue"] = ui->leQueue->getInteger();
     j["f_description"] = ui->plainTextEdit->toPlainText();
     j["f_acc"] = ui->leAcc->text();
-    fData["goods"] = j;
-    fData["samestore"] = ui->chSameStoreId->isChecked();
-    fData["scangenerated"] = fScancodeGenerated;
-    fData["scancounter"] = ui->leScanCode->text().left(7).toInt();
-    fData["image"] = fImage.isEmpty() ? QJsonValue() : fImage;
+    fJsonData["goods"] = j;
+    fJsonData["samestore"] = ui->chSameStoreId->isChecked();
+    fJsonData["scangenerated"] = fScancodeGenerated;
+    fJsonData["scancounter"] = ui->leScanCode->text().left(7).toInt();
+    fJsonData["image"] = fImage.isEmpty() ? QJsonValue() : fImage;
     QJsonArray ja;
     for (int i = 0; i < ui->tblGoods->rowCount(); i++) {
         j = QJsonObject();
@@ -246,7 +246,7 @@ QJsonObject CE5Goods::makeJsonObject()
         j["f_price"] = ui->tblGoods->lineEdit(i, 5)->getDouble();
         ja.append(j);
     }
-    fData["c_goods_complectation"] = ja;
+    fJsonData["c_goods_complectation"] = ja;
     ja = QJsonArray();
     for (int i = 0; i < ui->tblPricing->columnCount(); i++) {
         j = QJsonObject();
@@ -258,9 +258,9 @@ QJsonObject CE5Goods::makeJsonObject()
         j["f_currency"] = ui->tblPricing->lineEdit(0, i)->property("c").toInt();
         ja.append(j);
     }
-    fData["c_goods_prices"] = ja;
-    fData["astable"] = "c_goods";
-    fData["astableid"] = ui->leCode->getInteger();
+    fJsonData["c_goods_prices"] = ja;
+    fJsonData["astable"] = "c_goods";
+    fJsonData["astableid"] = ui->leCode->getInteger();
     ja = QJsonArray();
     for (int i = 0; i < ui->tblAs->rowCount(); i++) {
         j = QJsonObject();
@@ -270,17 +270,22 @@ QJsonObject CE5Goods::makeJsonObject()
         j["f_ascode"] = ui->tblAs->lineEdit(i, 2)->text();
         ja.append(j);
     }
-    fData["asconver"] = ja;
+    fJsonData["asconver"] = ja;
     if (ui->leCode->getInteger() > 0) {
         if (ui->chSameStoreId->isChecked() && ui->leStoreId->getInteger() == 0) {
             ui->leStoreId->setInteger(ui->leCode->getInteger());
         }
     }
-    fData["f_unitname"] = ui->leUnitName->text();
-    return fData;
+    fJsonData["f_unitname"] = ui->leUnitName->text();
+    return fJsonData;
 }
 
 bool CE5Goods::acceptOnSave() const
+{
+    return true;
+}
+
+bool CE5Goods::isOnline()
 {
     return true;
 }
@@ -289,9 +294,10 @@ void CE5Goods::saveResponse(const QJsonObject &jdoc)
 {
     // data[0]["f_saleprice1"] = ui->tblPricing->lineEdit(0, 0)->getDouble();
     // data[0]["f_saleprice2"] = ui->tblPricing->lineEdit(1, 0)->getDouble();
-    QJsonObject j = fData["goods"].toObject();
+    QJsonObject j = fJsonData["goods"].toObject();
     j["f_id"] = jdoc["f_id"].toInt();
-    fData["goods"] = j;
+    j["f_unitname"] = ui->leUnitName->text();
+    fJsonData["goods"] = j;
     fHttp->httpQueryFinished(sender());
     if (acceptOnSave()) {
         emit Accept();

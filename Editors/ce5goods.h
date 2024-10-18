@@ -37,6 +37,8 @@ public:
 
     virtual bool acceptOnSave() const override;
 
+    virtual bool isOnline() override;
+
 private slots:
     void saveResponse(const QJsonObject &jdoc);
 

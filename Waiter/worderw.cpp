@@ -84,9 +84,9 @@ QList<int> WOrder::checkedItems()
     return result;
 }
 
-int WOrder::addItem(int menuid, const QString &comment, double price)
+int WOrder::addItem(int menuid, const QString &comment, double price, const QString &emark)
 {
-    if (!fOrderDriver->addDish(menuid, comment, price)) {
+    if (!fOrderDriver->addDish(menuid, comment, price, emark)) {
         C5Message::error(fOrderDriver->error());
         return -1;
     }

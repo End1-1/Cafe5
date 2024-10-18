@@ -3,7 +3,8 @@
 
 #include <QWidget>
 
-namespace Ui {
+namespace Ui
+{
 class WOrder;
 }
 
@@ -28,7 +29,7 @@ public:
 
     QList<int> checkedItems();
 
-    int addItem(int menuid, const QString &comment, double price = 0.0);
+    int addItem(int menuid, const QString &comment, double price, const QString &emark);
 
     void updateItem(int index);
 
@@ -53,7 +54,7 @@ private:
 
     bool fSelected;
 
-    QList<DishItem*> fItems;
+    QList<DishItem *> fItems;
 
     void setChanges();
 

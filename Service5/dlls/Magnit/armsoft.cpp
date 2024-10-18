@@ -1,5 +1,6 @@
 #include "armsoft.h"
 #include "database.h"
+#include "logwriter.h"
 #include <QSqlDatabase>
 #include <QSqlQuery>
 #include <QSqlRecord>
@@ -107,13 +108,22 @@ bool ArmSoft::exportToAS(const QString &orderUuid, QString &err)
     }
     int rowid = 1;
     for (QList<QMap<QString, QVariant> >::const_iterator bi = items.constBegin(); bi != items.constEnd(); bi++) {
+        LogWriter::write(LogWriterLevel::special, ( *bi)["f_service"].toString(),
+                         ( *bi)["f_service"].toInt() == 1 ?
+                         servicesMap[( *bi)["f_ascode"].toString()]["funit"].toString()
+                         : goodsMap[( *bi)["f_ascode"].toString()]["funit"].toString());
+        LogWriter::write(LogWriterLevel::special, "", unitsMap.keys().join(","));
         dbas[":fISN"] = docid;
         dbas[":fROWNUM"] = rowid;
         dbas[":fITEMTYPE"] = ( *bi)["f_service"].toInt() == 1 ? 2 : 1;
         dbas[":fITEMID"] = ( *bi)["f_service"].toInt() == 1 ? servicesMap[( *bi)["f_ascode"].toString()]["fservid"] :
                            goodsMap[( *bi)["f_ascode"].toString()]["fmtid"];
         dbas[":fITEMNAME"] = ( *bi)["f_name"];
-        dbas[":fUNITBRIEF"] = unitsMap[servicesMap[( *bi)["f_ascode"].toString()]["funit"].toString()];
+        // dbas[":fUNITBRIEF"] = unitsMap[
+        //                           ( *bi)["f_service"].toInt() == 1 ?
+        //                           servicesMap[( *bi)["f_ascode"].toString()]["funit"].toString()
+        //                           : goodsMap[( *bi)["f_ascode"].toString()]["funit"].toString()]["fbrief"].toString();
+        dbas[":fUNITBRIEF"] = "հատ";
         dbas[":fSTORAGE"] = ( *bi)["f_store"];
         dbas[":fQUANTITY"] = ( *bi)["f_qty"];
         dbas[":fINITPRICE"] = ( *bi)["f_initprice"];
@@ -138,6 +148,7 @@ bool ArmSoft::exportToAS(const QString &orderUuid, QString &err)
                        ":fUNITBRIEF, :fSTORAGE, :fQUANTITY, :fINITPRICE, :fDISCOUNT, :fPRICE, :fSUMMA, :fSUMMA1, "
                        ":fENVFEEPERCENT, :fENVFEESUMMA, :fVAT, :fEXPMETHOD, :fACCEXPENSE, :fACCINCOME, :fPARTYMETHOD, :fROWID)")) {
             err = dbas.lastDbError();
+            dbas.rollback();
             return false;
         }
     }

@@ -114,19 +114,23 @@ private slots:
 
     void openTableResponse(const QJsonObject &jdoc);
 
+    void moveTableResponse(const QJsonObject &jdoc);
+
+    void checkQrResponse(const QJsonObject &jdoc);
+
     void timeout();
 
     void worderActivated();
 
     void dishpart1Clicked();
 
-    void processMenuID(int menuid);
+    void processMenuID(int menuid, const QString &emark);
 
     void qrListResponse(const QJsonObject &obj);
 
     //void handleVisit(const QJsonObject &obj);
 
-    void addDishToOrder(int menuid);
+    void addDishToOrder(int menuid, const QString &emark);
 
     void handlePrintService(const QJsonObject &obj);
 
@@ -281,6 +285,10 @@ private slots:
     void on_btnMenuSet_clicked();
 
     void on_btnQR_clicked();
+
+    void on_btnTable_clicked();
+
+    void on_leCmd_returnPressed();
 
 signals:
     void allDone();

@@ -88,6 +88,7 @@ private:
     void exportToAs(int doctype);
     bool fOpenedFromDraft;
     QStringList fEmarks;
+    QStringList fRowToDelete;
     QMap<int, QString> fListOfStorages;
     QMap<int, double> fSpecialPrices;
 };

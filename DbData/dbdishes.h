@@ -29,6 +29,8 @@ public:
     int group(int id);
 
     bool isExtra(int id);
+
+    QString emarks(int id);
 };
 
 #endif // DBDISHES_H

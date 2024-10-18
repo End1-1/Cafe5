@@ -290,6 +290,11 @@ bool CE5Editor::checkData(QString &err)
     return err.isEmpty();
 }
 
+bool CE5Editor::isOnline()
+{
+    return false;
+}
+
 void CE5Editor::clear()
 {
     setProperty("saveandnew", false);
@@ -437,7 +442,7 @@ void CE5Editor::setDatabase(const QStringList &dbParams)
 
 QJsonObject CE5Editor::makeJsonObject()
 {
-    return fData;
+    return fJsonData;
 }
 
 bool CE5Editor::acceptOnSave() const

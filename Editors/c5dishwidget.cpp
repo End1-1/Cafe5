@@ -570,13 +570,14 @@ void C5DishWidget::on_btnNewGoods_clicked()
 {
     CE5Goods *ep = new CE5Goods(fDBParams);
     C5Editor *e = C5Editor::createEditor(fDBParams, ep, 0);
-    QList<QMap<QString, QVariant> > data;
-    if(e->getResult(data)) {
+    QJsonObject data;
+    if(e->getJsonObject(data)) {
+        data = data["goods"].toObject();
         int row = addRecipeRow();
         ui->tblRecipe->setInteger(row, 0, 0);
-        ui->tblRecipe->setInteger(row, 1, data.at(0)["f_id"].toInt());
-        ui->tblRecipe->setString(row, 2, data.at(0)["f_name"].toString());
-        ui->tblRecipe->setString(row, 6, data.at(0)["f_unitname"].toString());
+        ui->tblRecipe->setInteger(row, 1, data["f_id"].toInt());
+        ui->tblRecipe->setString(row, 2, data["f_name"].toString());
+        ui->tblRecipe->setString(row, 4, data["f_unitname"].toString());
     }
     delete e;
 }

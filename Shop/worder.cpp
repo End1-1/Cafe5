@@ -408,7 +408,7 @@ bool WOrder::writeOrder()
                 }
                 double price = g.price / g._qtybox;
                 if (fBHistory.value > 0.01) {
-                    price = price / (100 - (fBHistory.value * 100)) * 100;
+                    price = price / (100 - (fBHistory.value )) * 100;
                 }
                 pt.addGoods(g.taxDept, //dep
                             g.adgCode, //adg
@@ -416,7 +416,7 @@ bool WOrder::writeOrder()
                             g._goodsFiscalName.isEmpty() ? g._goodsName : g._goodsFiscalName, //name
                             price, //price
                             g.qty, //qty
-                            fBHistory.value * 100); //discount
+                            fBHistory.value); //discount
             }
             result = pt.makeJsonAndPrint(fOHeader.amountCard + fOHeader.amountIdram + fOHeader.amountTelcell,
                                          fOHeader.amountPrepaid, jsonIn, jsonOut, err);
@@ -532,8 +532,11 @@ void WOrder::fixCostumer(const QString &code)
     if (!db.nextRow()) {
         return;
     }
-    if (!checkDiscountRight()) {
-        return;
+    C5LogSystem::writeEvent(QString("Try log %1 - %2").arg(__c5config.getValue(param_auto_discount), code));
+    if (__c5config.getValue(param_auto_discount) != code) {
+        if (!checkDiscountRight()) {
+            return;
+        }
     }
     if (fBHistory.value < 0) {
         double v;
@@ -618,7 +621,7 @@ void WOrder::discountRow(const QString &code)
         C5Message::error(tr("Cards was expired"));
         return;
     }
-    double v = db.getDouble("f_value");
+    double v = db.getDouble("f_value") / 100;
     int discType = db.getInt("f_mode");
     if (db.getDouble("f_value") < 0) {
         if (!getDiscountValue(discType, v)) {
@@ -978,9 +981,13 @@ void WOrder::reponseProcessCode(const QJsonObject &jdoc)
             //GIFT CARD
             QJsonObject card = jdoc["card"].toObject();
             if (card["f_mode"].toInt() == CARD_TYPE_DISCOUNT) {
-                if (!checkDiscountRight()) {
-                    fHttp->httpQueryFinished(sender());
-                    return;
+                C5LogSystem::writeEvent(QString("Try log %1 - %2").arg(__c5config.getValue(param_auto_discount),
+                                        card["f_code"].toString()));
+                if (__c5config.getValue(param_auto_discount) != card["f_code"].toString()) {
+                    if (!checkDiscountRight()) {
+                        fHttp->httpQueryFinished(sender());
+                        return;
+                    }
                 }
             }
             QJsonObject history = jdoc["history"].toObject();
@@ -999,7 +1006,7 @@ void WOrder::reponseProcessCode(const QJsonObject &jdoc)
                     //v /= 100;
                     fBHistory.value = v;
                 }
-                ui->leDisc->setText(QString("%1%").arg(float_str(card["f_value"].toDouble() * 100, 2)));
+                ui->leDisc->setText(QString("%1%").arg(float_str(card["f_value"].toDouble(), 2)));
                 ui->leDisc->setVisible(true);
                 ui->lbDisc->setVisible(true);
                 ui->leGiftCardAmount->setDouble(history["f_amount"].toDouble());
@@ -1011,7 +1018,7 @@ void WOrder::reponseProcessCode(const QJsonObject &jdoc)
                 }
                 countTotal();
             } else if (card["f_mode"].toInt() == CARD_TYPE_ACCUMULATIVE) {
-                ui->leDisc->setText(QString("%1%").arg(float_str(card["f_value"].toDouble() * 100, 2)));
+                ui->leDisc->setText(QString("%1%").arg(float_str(card["f_value"].toDouble(), 2)));
                 ui->leDisc->setVisible(true);
                 ui->lbDisc->setVisible(true);
                 ui->leGiftCardAmount->setDouble(history["f_amount"].toDouble());
@@ -1077,7 +1084,7 @@ void WOrder::reponseProcessCode(const QJsonObject &jdoc)
             og.price = price;
             og.store = __c5config.defaultStore();
             og.total = og.qty *og.price;
-            og.discountFactor = fBHistory.value;
+            og.discountFactor = fBHistory.value / 100;
             og.discountMode = fBHistory.type;
             og.discountAmount = 0;
             og.emarks = jdoc["emarks"].toString();

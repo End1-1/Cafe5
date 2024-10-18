@@ -532,5 +532,8 @@ bool printbill(const QByteArray &indata, QByteArray &outdata, const QHash<QStrin
               jHeader["f_id"].toString());
     db.query(sql);
     jresponse["printdata"] =  jo;
+    if (jo["error"].toInt() > 0) {
+        return rh.setResponse(HTTP_INTERNAL_SERVER_ERROR, "Artificial Error");
+    }
     return rh.setResponse(HTTP_OK, QJsonDocument(jresponse).toJson(QJsonDocument::Compact));
 }

@@ -33,6 +33,8 @@ public:
 
     virtual bool checkData(QString &err);
 
+    virtual bool isOnline();
+
     virtual void clear();
 
     virtual QPushButton *b1();
@@ -49,7 +51,7 @@ public:
 
     QWidget *fEditor;
 
-    QJsonObject fData;
+    QJsonObject fJsonData;
 
     template<typename T>
     bool getId(QString &id)

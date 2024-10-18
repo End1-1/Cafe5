@@ -32,7 +32,7 @@ private slots:
     void kbdAccept();
 
 signals:
-    void dish(int);
+    void dish(int, QString);
 };
 
 #endif // DLGSEARCHINMENU_H

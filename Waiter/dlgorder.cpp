@@ -26,6 +26,7 @@
 #include "cashboxconfig.h"
 #include "dlgprecheckoptions.h"
 #include "worderw.h"
+#include "dlgface.h"
 #include "dlglistofmenu.h"
 #include "dishitem.h"
 #include "datadriver.h"
@@ -123,6 +124,14 @@ DlgOrder::DlgOrder(C5User *user) :
 		}
 		ui->scrollAreaDish->viewport()->update();
 	});
+    connect(ui->leCmd, &C5LineEdit::focusIn, this, [this]() {
+        ui->leCmd->setFocus();
+    });
+    auto *t = new QTimer(this);
+    connect(t, &QTimer::timeout, this, [this]() {
+        ui->leCmd->setFocus();
+    });
+    t->start(1000);
 }
 
 DlgOrder::~DlgOrder()
@@ -315,7 +324,7 @@ void DlgOrder::buildMenu(int menuid, int part1, int part2)
 	buildDishes(menuid, part2);
 }
 
-void DlgOrder::addDishToOrder(int menuid)
+void DlgOrder::addDishToOrder(int menuid, const QString &emark)
 {
 	WOrder *wo = worder();
 	int dishid = dbmenu->dishid(menuid);
@@ -348,7 +357,7 @@ void DlgOrder::addDishToOrder(int menuid)
 	QString comment = "";
 	comment = special;
 	if (!found) {
-        wo->addItem(menuid, comment, price);
+        wo->addItem(menuid, comment, price, emark);
 		logRecord(fUser->fullName(), wo->fOrderDriver->headerValue("f_id").toString(), "", "New dish",
 		          dbdish->name(dishid) + " " + comment, "");
 	}
@@ -748,12 +757,12 @@ void DlgOrder::addStopListResponse(const QJsonObject &jdoc)
 void DlgOrder::checkStopListResponse(const QJsonObject &jdoc)
 {
     if (jdoc["ok"].toBool()) {
-        addDishToOrder(jdoc["f_menu"].toInt());
+        addDishToOrder(jdoc["f_menu"].toInt(), jdoc["emark"].toString());
         fHttp->httpQueryFinished(sender());
         return;
     }
     C5TableData::instance()->mStopList[jdoc["f_dish"].toInt()] = jdoc["f_newqty"].toDouble();
-    addDishToOrder(jdoc["f_menu"].toInt());
+    addDishToOrder(jdoc["f_menu"].toInt(), "");
     fHttp->httpQueryFinished(sender());
 }
 
@@ -771,7 +780,7 @@ void DlgOrder::dishpart1Clicked()
 	buildMenu(fMenuID, btn->property("id").toInt(), 0);
 }
 
-void DlgOrder::processMenuID(int menuid)
+void DlgOrder::processMenuID(int menuid, const QString &emark)
 {
 	WOrder *wo = worder();
 	if (wo) {
@@ -795,10 +804,14 @@ void DlgOrder::processMenuID(int menuid)
         SLOT(addStopListResponse(QJsonObject)));
 	} else {
 		if (dbdish->isExtra(dishid)) {
-			addDishToOrder(menuid);
+            addDishToOrder(menuid, "");
 		} else {
             fHttp->createHttpQuery("/engine/waiter/stoplist.php",
-            QJsonObject{{"action", "check"}, {"f_menu", menuid}, {"f_dish", dishid}, {"f_qty", 1}},
+            QJsonObject{{"action", "check"},
+                {"f_menu", menuid},
+                {"f_dish", dishid},
+                {"emark", emark},
+                {"f_qty", 1}},
             SLOT(checkStopListResponse(QJsonObject)));
 		}
 		return;
@@ -839,7 +852,7 @@ void DlgOrder::dishClicked()
 	if (!worder()) {
 	}
 	QDishButton *btn = static_cast<QDishButton *>(sender());
-	processMenuID(btn->property("id").toInt());
+    processMenuID(btn->property("id").toInt(), "");
 }
 
 void DlgOrder::dishPartClicked()
@@ -881,6 +894,7 @@ void DlgOrder::on_btnVoid_clicked()
 		wo->fOrderDriver->setDishesValue("f_state", DISH_STATE_NONE, index);
 		wo->fOrderDriver->setDishesValue("f_removetime", QDateTime::currentDateTime(), index);
 		wo->fOrderDriver->setDishesValue("f_removeuser", tmp->id(), index);
+        wo->fOrderDriver->setDishesValue("f_emarks", QVariant(), index);
 		wo->fOrderDriver->save();
 		logRecord(fUser->fullName(), wo->fOrderDriver->headerValue("f_id").toString(),
 		          wo->fOrderDriver->dishesValue("f_id", index).toString(),
@@ -1021,7 +1035,7 @@ void DlgOrder::on_btnChangeMenu_clicked()
 void DlgOrder::on_btnSearchInMenu_clicked()
 {
 	DlgSearchInMenu *d = new DlgSearchInMenu();
-	connect(d, SIGNAL(dish(int)), this, SLOT(processMenuID(int)));
+    connect(d, SIGNAL(dish(int, QString)), this, SLOT(processMenuID(int, QString)));
 	d->exec();
 	delete d;
 }
@@ -1658,7 +1672,7 @@ void DlgOrder::openTableResponse(const QJsonObject &jdoc)
         discountOrder(fUser, __c5config.getValue(param_auto_discount));
     }
     if (dbtable->hourlyId(wo->fOrderDriver->headerValue("f_table").toInt()) > 0) {
-        addDishToOrder(dbtable->hourlyId(wo->fOrderDriver->headerValue("f_table").toInt()));
+        addDishToOrder(dbtable->hourlyId(wo->fOrderDriver->headerValue("f_table").toInt()), "");
     }
     ui->vs->addStretch();
     itemsToTable();
@@ -1670,6 +1684,41 @@ void DlgOrder::openTableResponse(const QJsonObject &jdoc)
     if (ex) {
         exec();
     }
+}
+
+void DlgOrder::moveTableResponse(const QJsonObject &jdoc)
+{
+    fHttp->httpQueryFinished(sender());
+    load(jdoc["newTableId"].toInt());
+}
+
+void DlgOrder::checkQrResponse(const QJsonObject &jdoc)
+{
+    switch (jdoc["qrstatus"].toInt()) {
+        //DISH FOUNDED
+        case 1: {
+            QJsonArray jmenu = C5TableData::instance()->dishes(0, 0);
+            QJsonArray dishes = jdoc["dishes"].toArray();
+            bool done = false;
+            for (int j = 0; j < dishes.size(); j++) {
+                const QJsonObject &jd = dishes.at(j).toObject();
+                for (int i = 0; i < jmenu.size(); i++) {
+                    const QJsonObject &jo = jmenu.at(i).toObject();
+                    if (jd["f_id"].toInt() == jo["f_id"].toInt() && jd["f_menu"].toInt() == fMenuID) {
+                        processMenuID(jd["f_id"].toInt(), jdoc["qr"].toString());
+                        done = true;
+                        break;
+                    }
+                }
+                if (done) {
+                    break;
+                }
+            }
+            break;
+        }
+    }
+    ui->leCmd->setFocus();
+    fHttp->httpQueryFinished(sender());
 }
 
 void DlgOrder::on_btnCalcCard_clicked()
@@ -2052,7 +2101,11 @@ void DlgOrder::on_btnPlus1_clicked()
 	if (dbdish->isHourlyPayment(wo->fOrderDriver->dishesValue("f_dish", index).toInt())) {
 		C5Message::error(tr("Cannot add comment to hourly payment"));
 		return;
-	}
+    }
+    if (dbdish->emarks(wo->fOrderDriver->dishesValue("f_dish", index).toInt()).isEmpty() == false) {
+        C5Message::error(tr("Cannot change qty of dishes thats contains emarks"));
+        return;
+    }
 	if (wo->fOrderDriver->dishesValue("f_qty2", index).toDouble() > 0.0001) {
 		QString special;
 		if (!wo->fOrderDriver->dishesValue("f_comment2", index).toString().isEmpty()) {
@@ -2116,6 +2169,8 @@ void DlgOrder::on_btnMinus1_clicked()
 			          wo->fOrderDriver->dishesValue("f_qty1", index).toString());
 		} else if (C5Message::question(tr("Do you want to remove this item")) == QDialog::Accepted) {
 			wo->fOrderDriver->setDishesValue("f_state", DISH_STATE_NONE, index);
+            wo->fOrderDriver->setDishesValue("f_emarks", QVariant(), index);
+            wo->fOrderDriver->save();
 			logRecord(fUser->fullName(), wo->fOrderDriver->headerValue("f_id").toString(),
 			          wo->fOrderDriver->dishesValue("f_id", index).toString(),
 			          "Remove not printed " + dbdish->name(wo->fOrderDriver->dishesValue("f_dish", index).toInt()),
@@ -2147,6 +2202,10 @@ void DlgOrder::on_btnAnyqty_clicked()
 		C5Message::error(tr("Use removal tool"));
 		return;
 	}
+    if (dbdish->emarks(wo->fOrderDriver->dishesValue("f_dish", index).toInt()).isEmpty() == false) {
+        C5Message::error(tr("Cannot change qty of dishes thats contains emarks"));
+        return;
+    }
 	//TODO: PACKAGE HANDLER
 	//    if (wo->fOrderDriver->dishesValue("d_package", index).toInt() > 0) {
 	//        C5Message::error(tr("You cannot change the quantity of items of package"));
@@ -2511,12 +2570,15 @@ void DlgOrder::on_btnRemoveSelected_clicked()
 		int i = indexes.at(in);
 		if (wo->fOrderDriver->dishesValue("f_qty2", i).toDouble() < 0.001) {
 			wo->fOrderDriver->setDishesValue("f_state", DISH_STATE_NONE, i);
+            wo->fOrderDriver->setDishesValue("f_emarks", QVariant(), i);
+            wo->fOrderDriver->save();
 		} else {
 			wo->fOrderDriver->setDishesValue("f_state", reasonid, i);
 			wo->fOrderDriver->setDishesValue("f_removetime", QDateTime::currentDateTime(), i);
 			wo->fOrderDriver->setDishesValue("f_removeuser", tmp->id(), i);
 			wo->fOrderDriver->setDishesValue("f_removereason", reasonname, i);
 			wo->fOrderDriver->setDishesValue("f_removeprecheck", wo->fOrderDriver->headerValue("f_precheck"), i);
+            wo->fOrderDriver->setDishesValue("f_emarks", QVariant(), i);
 			wo->fOrderDriver->save();
 			C5SocketHandler *sh = createSocketHandler(SLOT(handlePrintRemovedService(QJsonObject)));
 			sh->bind("cmd", sm_print_removed_service);
@@ -2727,4 +2789,34 @@ void DlgOrder::on_btnQR_clicked()
         {"bodyid", wo->fOrderDriver->dishesValue("f_id", index).toString()},
         {"emarks", qr}},
     SLOT(qrListResponse(QJsonObject)));
+}
+
+void DlgOrder::on_btnTable_clicked()
+{
+    auto *wo = worder();
+    int newTableId;
+    if (!DlgFace::getTable(newTableId, wo->fOrderDriver->headerValue("f_hall").toInt(), fUser)) {
+        return;
+    }
+    if (newTableId == wo->fOrderDriver->headerValue("f_table").toInt()) {
+        C5Message::error(tr("Same table"));
+        return;
+    }
+    fHttp->createHttpQuery("/engine/waiter/move-table.php",
+    QJsonObject {{"action", "moveTable"}, {"order", wo->fOrderDriver->headerValue("f_id").toString()},
+        {"oldtable", wo->fOrderDriver->headerValue("f_table").toInt()},
+        {"newtable", newTableId}},
+    SLOT(moveTableResponse(QJsonObject)));
+}
+
+void DlgOrder::on_leCmd_returnPressed()
+{
+    if (ui->leCmd->text().trimmed().isEmpty()) {
+        return;
+    }
+    QString code = ui->leCmd->text().trimmed();
+    ui->leCmd->clear();
+    //Check qr exists
+    fHttp->createHttpQuery("/engine/waiter/check-qr.php", QJsonObject{{"action", "checkQr"},
+        {"qr", code}}, SLOT(checkQrResponse(QJsonObject)));
 }

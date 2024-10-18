@@ -5,7 +5,6 @@
 DbDishes::DbDishes() :
     DbData("d_dish")
 {
-
 }
 
 bool DbDishes::isHourlyPayment(int id)
@@ -61,4 +60,9 @@ int DbDishes::group(int id)
 bool DbDishes::isExtra(int id)
 {
     return get(id, "f_extra").toInt() == 1;
+}
+
+QString DbDishes::emarks(int id)
+{
+    return get(id, "f_emarks").toString();
 }

@@ -432,7 +432,7 @@ void C5SaleDoc::returnItems()
     oh.dateClose = QDate::currentDate();
     oh.timeOpen = QTime::currentTime();
     oh.timeClose = QTime::currentTime();
-    oh.dateCash = ui->leDate->date();
+    oh.dateCash = QDate::currentDate();
     oh.cashier = __user->id();
     oh.staff = ui->leDeluveryMan->property("id").toInt();
     oh.comment = QString("%1 %2").arg(tr("Return from"), ui->leDocnumber->text());
@@ -587,6 +587,10 @@ void C5SaleDoc::saveDataChanges()
     db[":f_amountpayx"] = 0;
     db[":f_cash"] = ui->leCountCash->getDouble();
     db[":f_change"] = ui->leChange->getDouble();
+    for (const QString &s : fRowToDelete) {
+        db[":f_id"] = s;
+        db.exec("delete from o_goods where f_id=:f_id");
+    }
     if (ui->leUuid->isEmpty() || fOpenedFromDraft) {
         if (fOpenedFromDraft) {
             db[":f_id"] = uuid;
@@ -1217,6 +1221,9 @@ void C5SaleDoc::on_btnRemoveGoods_clicked()
 {
     for (int i = ui->tblGoods->rowCount() - 1; i > -1; i--) {
         if (ui->tblGoods->checkBox(i, col_checkbox)->isChecked()) {
+            if (ui->tblGoods->getString(i, 0).isEmpty() == false) {
+                fRowToDelete.append(ui->tblGoods->getString(i, 0));
+            }
             ui->tblGoods->removeRow(i);
         }
     }
@@ -1360,6 +1367,7 @@ void C5SaleDoc::saveReturnItems()
     oheader.amountTotal = ui->leGrandTotal->getDouble() * -1;
     oheader.amountCash = ui->leCash->getDouble() * -1;
     oheader.amountBank = ui->leBankTransfer->getDouble() * -1;
+    oheader.partner = fPartner.id.toInt();
     oheader.saleType = SALE_RETURN;
     oheader.hall = ui->cbHall->currentData().toInt();
     if (!dw.hallId(oheader.prefix, oheader.hallId, ui->cbHall->currentData().toInt())) {
@@ -1374,6 +1382,10 @@ void C5SaleDoc::saveReturnItems()
         return;
     }
     bool empty = true;
+    for (const QString &s : fRowToDelete) {
+        db[":f_id"] = s;
+        db.exec("delete from o_goods where f_id=:f_id");
+    }
     for (int i = 0; i < ui->tblGoods->rowCount(); i++) {
         empty = false;
         OGoods g;
@@ -1401,6 +1413,7 @@ void C5SaleDoc::saveReturnItems()
     js["storein"] = ui->cbStorage->currentData().toInt();
     js["currency"] = ui->cbCurrency->currentData().toInt();
     js["date"] = ui->leDate->date().toString(FORMAT_DATE_TO_STR_MYSQL);
+    js["partner"] = fPartner.id.toInt();
     db.exec(QString("call sf_create_return_of_sale('%1')").arg(json_str(js)));
     fActionSave->setEnabled(false);
     fActionDraft->setEnabled(false);
