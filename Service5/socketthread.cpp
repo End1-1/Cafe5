@@ -17,7 +17,6 @@ SocketThread::SocketThread(int handle, const QSslCertificate &cert, const QSslKe
     fSslPrivateKey(key),
     fSslProtocol(proto),
     fSslChain(chain),
-    fRawHandler(0),
     fSocketDescriptor(handle)
 {
     fMessageNumber = 0;
@@ -36,8 +35,6 @@ SocketThread::~SocketThread()
         delete fSslSocket;
     }
     delete fTimeoutControl;
-    if (fRawHandler)
-        delete fRawHandler;
 }
 
 void SocketThread::run()
@@ -46,7 +43,6 @@ void SocketThread::run()
     fTimeoutControl = new QTimer();
     connect(fTimeoutControl, &QTimer::timeout, this, &SocketThread::timeoutControl);
     fTimeoutControl->start(10000);
-
     fSslSocket = new SslSocket();
     fSslSocket->setSocketDescriptor(fSocketDescriptor);
     fSslSocket->setProperty("session", property("session"));
@@ -56,25 +52,16 @@ void SocketThread::run()
     fSslSocket->setProtocol(fSslProtocol);
     fSslSocket->setLocalCertificateChain(fSslChain);
     fSslSocket->startServerEncryption();
-    //    if (!fSslSocket->waitForEncrypted()) {
-    //        LogWriter::write(LogWriterLevel::errors, "!fSslSocket->waitForEncrypted()", fSslSocket->errorString());
-    //        emit finished();
-    //        return;
-    //    }
-    fRawHandler = new RawHandler(fSslSocket, property("session").toString());
-    connect(fRawHandler, &RawHandler::writeToSocket, this, &SocketThread::writeToSocket);
     fTimer.start();
     fContentLenght = 0;
     qRegisterMetaType <QAbstractSocket::SocketError> ("QAbstractSocket::SocketError");
     connect(fSslSocket, SIGNAL(readyRead()), this, SLOT(readyRead()));
     connect(fSslSocket, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(error(QAbstractSocket::SocketError)));
     connect(fSslSocket, SIGNAL(disconnected()), this, SLOT(disconnected()));
-
     LogWriter::write(LogWriterLevel::verbose, property("session").toString(),
                      QString("New connection from %1:%2")
                      .arg(QHostAddress(fSslSocket->peerAddress().toIPv4Address()).toString())
                      .arg(fSslSocket->peerPort()));
-
 }
 
 void SocketThread::httpRequest()
@@ -290,24 +277,6 @@ HttpRequestMethod SocketThread::parseRequest(HttpRequestMethod &requestMethod, Q
         }
     }
     return requestMethod;
-}
-
-void SocketThread::parseBody(quint16 msgType, const QByteArray &data)
-{
-    switch (fRawHandler->run(fPreviouseMessageNumber, fMessageId, msgType, data)) {
-        case 1:
-            fTimeoutControl->stop();
-            break;
-        case 2:
-            fTimeoutControl->stop();
-            fTimeoutControl->start(60000);
-            break;
-        case 3:
-            fDoNotRemovePluginSocket = true;
-            break;
-        default:
-            break;
-    }
 }
 
 void SocketThread::parseBody(const QString &request, int offset)

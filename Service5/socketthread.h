@@ -8,8 +8,6 @@
 #include <QSslCertificate>
 #include <QSslKey>
 
-class RawHandler;
-
 class SocketThread : public QObject
 {
     Q_OBJECT
@@ -29,7 +27,6 @@ private:
     QSsl::SslProtocol fSslProtocol;
     QList<QSslCertificate> fSslChain;
 
-    RawHandler *fRawHandler;
     QTimer *fTimeoutControl;
     QElapsedTimer fTimer;
     int fSocketDescriptor;
@@ -48,7 +45,6 @@ private:
     QString fBoundary;
     void httpRequest();
     HttpRequestMethod parseRequest(HttpRequestMethod &requestMethod, QString &httpVersion, QString &route);
-    void parseBody(quint16 msgType, const QByteArray &data);
     void parseBody(const QString &request, int offset);
     QString header(const QString &name) const;
     QString request(const QString &name) const;
