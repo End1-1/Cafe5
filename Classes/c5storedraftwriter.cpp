@@ -3,7 +3,6 @@
 #include "c5config.h"
 #include "chatmessage.h"
 #include "ogoods.h"
-#include "threadsendmessage.h"
 #include <QVariant>
 #include <QJsonDocument>
 #include <QJsonObject>
@@ -577,27 +576,6 @@ QVariant C5StoreDraftWriter::value(int container, int row, const QString &key)
     QList<QVariant> &datarow = ( *c)[row];
     int column = d->value(key);
     return datarow.at(column);
-}
-
-void C5StoreDraftWriter::writeASaleStore(int storei, int storeo)
-{
-    if (__c5config.getValue(param_fd_update_a_temp_store).toInt() == 0) {
-        return;
-    }
-    QJsonObject jo;
-    jo["action"] = MSG_UPDATE_TEMP_STORE;
-    jo["storei"] = storei;
-    jo["storeo"] = storeo;
-    QJsonDocument jdoc(jo);
-    //connect(t, SIGNAL(result(QJsonObject)), this, SLOT(messageResult(QJsonObject)));
-    if (storei > 0) {
-        auto *t = new ThreadSendMessage();
-        t->send(storei, jdoc.toJson(QJsonDocument::Compact));
-    }
-    if (storeo > 0) {
-        auto *t = new ThreadSendMessage();
-        t->send(storeo, jdoc.toJson(QJsonDocument::Compact));
-    }
 }
 
 bool C5StoreDraftWriter::writeAStoreDraft(QString &id, const QString &docId, int store, int type, int goods,

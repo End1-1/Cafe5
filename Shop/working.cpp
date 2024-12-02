@@ -18,17 +18,14 @@
 #include "goodsreserve.h"
 #include "c5logsystem.h"
 #include "storeinput.h"
-#include "taxprint.h"
-#include "messagelist.h"
-#include "threadcheckmessage.h"
 #include "chatmessage.h"
-#include "threadreadmessage.h"
 #include "selectprinters.h"
 #include "c5printing.h"
 #include "dlggiftcardsale.h"
 #include "dlgregistercard.h"
 #include "printreceiptgroup.h"
 #include "dlgshowcolumns.h"
+#include "dlgcashout.h"
 #include "c5tempsale.h"
 #include <QShortcut>
 #include <QInputDialog>
@@ -229,33 +226,33 @@ bool Working::eventFilter(QObject *watched, QEvent *event)
                     }
                 }
                 break;
-            case Qt::Key_T:
-                if (ke->modifiers() &Qt::ControlModifier) {
-                    C5Database db(__c5config.dbParams());
-                    db[":f_hall"] = __c5config.defaultHall();
-                    db[":f_datecash"] = QDate::currentDate();
-                    db[":f_state"] = ORDER_STATE_CLOSE;
-                    db.exec("select concat(w.f_last, ' ', w.f_first) as f_staff, if(f_amounttotal<0,-1,1) as f_sign,"
-                            "sum(oh.f_amounttotal) as f_amounttotal "
-                            "from o_header oh "
-                            "left join s_user w on w.f_id=oh.f_staff  "
-                            "where oh.f_hall=:f_hall and oh.f_datecash=:f_datecash  and oh.f_state=:f_state and oh.f_amounttotal>0 "
-                            "group by 1, 2 "
-                            "union "
-                            "select '-' as f_staff, if(f_amounttotal<0,-1,1) as f_sign,"
-                            "sum(oh.f_amounttotal) as f_amounttotal "
-                            "from o_header oh "
-                            "left join s_user w on w.f_id=oh.f_staff  "
-                            "where oh.f_hall=:f_hall and oh.f_datecash=:f_datecash  and oh.f_state=:f_state and oh.f_amounttotal<0 "
-                            "group by 1, 2 ");
-                    QString info = tr("Total today") + "<br>";
-                    while (db.nextRow()) {
-                        info += QString("%1: %2<br>").arg(db.getString("f_staff"), float_str(db.getDouble("f_amounttotal"), 2));
-                    }
-                    C5Message::info(info);
-                    event->accept();
-                }
-                break;
+            // case Qt::Key_T:
+            //     if (ke->modifiers() &Qt::ControlModifier) {
+            //         C5Database db(__c5config.dbParams());
+            //         db[":f_hall"] = __c5config.defaultHall();
+            //         db[":f_datecash"] = QDate::currentDate();
+            //         db[":f_state"] = ORDER_STATE_CLOSE;
+            //         db.exec("select concat(w.f_last, ' ', w.f_first) as f_staff, if(f_amounttotal<0,-1,1) as f_sign,"
+            //                 "sum(oh.f_amounttotal) as f_amounttotal "
+            //                 "from o_header oh "
+            //                 "left join s_user w on w.f_id=oh.f_staff  "
+            //                 "where oh.f_hall=:f_hall and oh.f_datecash=:f_datecash  and oh.f_state=:f_state and oh.f_amounttotal>0 "
+            //                 "group by 1, 2 "
+            //                 "union "
+            //                 "select '-' as f_staff, if(f_amounttotal<0,-1,1) as f_sign,"
+            //                 "sum(oh.f_amounttotal) as f_amounttotal "
+            //                 "from o_header oh "
+            //                 "left join s_user w on w.f_id=oh.f_staff  "
+            //                 "where oh.f_hall=:f_hall and oh.f_datecash=:f_datecash  and oh.f_state=:f_state and oh.f_amounttotal<0 "
+            //                 "group by 1, 2 ");
+            //         QString info = tr("Total today") + "<br>";
+            //         while (db.nextRow()) {
+            //             info += QString("%1: %2<br>").arg(db.getString("f_staff"), float_str(db.getDouble("f_amounttotal"), 2));
+            //         }
+            //         C5Message::info(info);
+            //         event->accept();
+            //     }
+            //     break;
             case Qt::Key_H:
                 if (ke->modifiers() &Qt::ControlModifier) {
                     auto *l = new LogHistory(this);
@@ -409,54 +406,24 @@ int Working::ordersCount()
 
 void Working::timeout()
 {
+#ifdef QT_DEBUG
+    int div = 10;
+#else
+    int div = 30;
+#endif
     fTimerCounter++;
-    if (fTimerCounter % 15 == 0) {
-        auto *tcm = new ThreadCheckMessage();
-        connect(tcm, &ThreadCheckMessage::threadError, this, &Working::threadMessageError);
-        connect(tcm, &ThreadCheckMessage::data, this, &Working::threadMessageData);
-        tcm->start();
-        //startStoreUpdate();
+    if (fTimerCounter % div == 0) {
+        QJsonObject jo;
+        jo["action"] = MSG_GET_UNREAD;
+        jo["userfrom"] = __c5config.defaultStore();
+        fHttp->createHttpQuery("/engine/shop/create-reserve.php", jo, SLOT(checkMessageResponse(QJsonObject)), QVariant(),
+                               false);
     }
 }
 
-void Working::astoresaleResponse(const QJsonObject &jdoc)
+void Working::checkMessageResponse(const QJsonObject &jdoc)
 {
-    Q_UNUSED(jdoc);
-    if (sender()->property("marks").toString() != "nosale") {
-        newSale(SALE_RETAIL);
-    }
-    fHttp->httpQueryFinished(sender());
-    ui->lbStatus->setPixmap(QPixmap(":/checked.png"));
-}
-
-void Working::checkStoreResponse(const QJsonObject &jdoc)
-{
-    Q_UNUSED(jdoc);
-    fHttp->httpQueryFinished(sender());
-    auto *dg = new DlgGoodsList(C5Config::getValue(param_default_currency).toInt());
-    connect(dg, &DlgGoodsList::getGoods, this, &Working::getGoods);
-    dg->showMaximized();
-}
-
-void Working::uploadDataFinished()
-{
-    fUpFinished = true;
-}
-
-void Working::threadMessageError(int code, const QString &message)
-{
-    qDebug() << code << message;
-    C5LogSystem::writeEvent(message);
-}
-
-void Working::threadMessageData(int code, const QVariant &data)
-{
-    qDebug() << code << data;
-    int start = data.toString().indexOf("\r\n\r\n") + 4;
-    int len = data.toString().length() - start;
-    QString msg = data.toString().mid(start, len);
-    QJsonObject jo = QJsonDocument::fromJson(msg.toUtf8()).object();
-    if (jo["messages"].toArray().isEmpty()) {
+    if (jdoc["messages"].toArray().isEmpty()) {
         return;
     }
     QFont font(qApp->font());
@@ -470,11 +437,11 @@ void Working::threadMessageData(int code, const QVariant &data)
     p.image(img, Qt::AlignCenter);
     p.br(img.height() / 2);
     p.br(img.height() / 2);
-    for (int i = 0; i < jo["messages"].toArray().count(); i++) {
-        QJsonObject jom = jo["messages"].toArray().at(i).toObject();
+    for (int i = 0; i < jdoc["messages"].toArray().count(); i++) {
+        QJsonObject jom = jdoc["messages"].toArray().at(i).toObject();
         qDebug() << jom;
         QJsonParseError jerr;
-        QJsonDocument jdocmsg = QJsonDocument::fromJson(jom["message"].toString().toUtf8(), &jerr);
+        QJsonDocument jdocmsg = QJsonDocument::fromJson(jom["f_body"].toString().toUtf8(), &jerr);
         p.ctext(tr("Message date and time"));
         p.br();
         p.ctext(jom["msgdate"].toString());
@@ -564,8 +531,30 @@ void Working::threadMessageData(int code, const QVariant &data)
     p.ltext(tr("Printed"), 0);
     p.rtext(QDateTime::currentDateTime().toString(FORMAT_DATETIME_TO_STR2));
     p.print(C5Config::localReceiptPrinter(), QPrinter::Custom);
-    auto *trm = new ThreadReadMessage(jo["idlist"].toString());
-    trm->start();
+}
+
+void Working::astoresaleResponse(const QJsonObject &jdoc)
+{
+    Q_UNUSED(jdoc);
+    if (sender()->property("marks").toString() != "nosale") {
+        newSale(SALE_RETAIL);
+    }
+    fHttp->httpQueryFinished(sender());
+    ui->lbStatus->setPixmap(QPixmap(":/checked.png"));
+}
+
+void Working::checkStoreResponse(const QJsonObject &jdoc)
+{
+    Q_UNUSED(jdoc);
+    fHttp->httpQueryFinished(sender());
+    auto *dg = new DlgGoodsList(C5Config::getValue(param_default_currency).toInt());
+    connect(dg, &DlgGoodsList::getGoods, this, &Working::getGoods);
+    dg->showMaximized();
+}
+
+void Working::uploadDataFinished()
+{
+    fUpFinished = true;
 }
 
 void Working::shortcutEscape()
@@ -860,13 +849,6 @@ void Working::on_btnHelp_clicked()
     C5Message::info(info);
 }
 
-void Working::on_btnManualTax_clicked()
-{
-    TaxPrint *tp = new TaxPrint();
-    tp->exec();
-    tp->deleteLater();
-}
-
 void Working::on_btnMinimize_clicked()
 {
     showMinimized();
@@ -895,7 +877,7 @@ void Working::on_btnGiftCard_clicked()
             return;
         }
         DbGoods dd(d.fGiftGoodsId);
-        wo->addGoods2(dd.scancode(), d.fGiftPrice);
+        wo->addGoods2(d.fGiftScancode, d.fGiftPrice);
         wo->fOHeader.saleType = -1;
     }
 }
@@ -951,4 +933,9 @@ void Working::on_btnColumns_clicked()
 void Working::on_chRegisterCard_clicked()
 {
     DlgRegisterCard().exec();
+}
+
+void Working::on_btnCashout_clicked()
+{
+    DlgCashout().exec();
 }

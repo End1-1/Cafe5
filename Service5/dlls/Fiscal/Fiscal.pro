@@ -1,6 +1,6 @@
 QT -= gui
 
-QT += sql network
+QT += sql network printsupport
 
 TEMPLATE = lib
 DEFINES += SQLQUERY_LIBRARY
@@ -13,36 +13,39 @@ CONFIG += c++11
 
 SOURCES += \
     ../../../../NewTax/Src/printtaxn.cpp \
+    ../../../Cafe5/c5utils.cpp \
+    ../../../Classes/c5networkdb.cpp \
+    ../../../Classes/c5printing.cpp \
+    ../../../Classes/c5tr.cpp \
     ../../../Service5Working/utils/logwriter.cpp \
     sqlquery.cpp
 
 HEADERS += \
     ../../../../NewTax/Src/printtaxn.h \
+    ../../../Cafe5/c5utils.h \
+    ../../../Classes/c5networkdb.h \
+    ../../../Classes/c5printing.h \
+    ../../../Classes/c5tr.h \
     ../../../Service5Working/utils/logwriter.h \
     sqlquery.h
 
 SOURCES += \
     ../../handlers/httpheader.cpp \
-    ../../handlers/requesthandler.cpp \
-    ../../handlers/socketdata.cpp \
     ../../utils/commandline.cpp \
     ../../utils/configini.cpp \
     ../../utils/database.cpp \
-    ../../utils/jsonhandler.cpp \
-    ../../utils/logwriter.cpp \
+    ../../utils/logwriter.cpp
 
 
 HEADERS += \
     ../../handlers/httpheader.h \
-    ../../handlers/requesthandler.h \
-    ../../handlers/socketdata.h \
     ../../utils/commandline.h \
     ../../utils/configini.h \
     ../../utils/database.h \
-    ../../utils/jsonhandler.h \
-    ../../utils/logwriter.h \
+    ../../utils/logwriter.h
 
 
+INCLUDEPATH += C:/Projects/Cafe5/Cafe5
 INCLUDEPATH += C:/Projects/Cafe5/Classes
 INCLUDEPATH += C:/Projects/Cafe5/Service5/handlers
 INCLUDEPATH += C:/Projects/Cafe5/Service5/utils

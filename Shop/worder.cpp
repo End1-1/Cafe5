@@ -102,6 +102,9 @@ WOrder::WOrder(C5User *user, int saleType, WCustomerDisplay *customerDisplay, QW
     C5Database db;
     QString err;
     fDraftSale.write(db, err);
+#ifdef BF10
+    addGoods("10BF");
+#endif
 }
 
 WOrder::~WOrder()
@@ -242,7 +245,8 @@ bool WOrder::writeOrder()
     if (!DlgPaymentChoose::getValues(fOHeader.amountTotal, fOHeader.amountCash, fOHeader.amountCard, fOHeader.amountIdram,
                                      fOHeader.amountTelcell, fOHeader.amountBank, fOHeader.amountCredit,
                                      fOHeader.amountPrepaid, fOHeader.amountDebt,
-                                     fOHeader.amountCashIn, fOHeader.amountChange, fOHeader._printFiscal, prepaidReadonly)) {
+                                     fOHeader.amountCashIn, fOHeader.amountChange, fOHeader._printFiscal, prepaidReadonly,
+                                     ui->leGiftCardAmount->getDouble())) {
         return false;
     }
     QElapsedTimer t;
@@ -277,6 +281,8 @@ bool WOrder::writeOrder()
     jdoc["session"] = C5Database::uuid();
     jdoc["giftcard"] = fGiftCard;
     jdoc["settings"] = __c5config.fSettingsName;
+    jdoc["organization"] = ui->leOrganization->text();
+    jdoc["contact"] = ui->leContact->text();
     QJsonObject jh;
     jh["f_id"] = fOHeader._id().isEmpty() ? fDraftSale.id.toString() : fOHeader._id();
     jh["f_hallid"] = fOHeader.hallId;
@@ -979,6 +985,7 @@ void WOrder::reponseProcessCode(const QJsonObject &jdoc)
     switch (jdoc["barcode"].toInt()) {
         case 1: {
             //GIFT CARD
+            C5LogSystem::writeEvent(QString("response case 1: Try log %1 - %2").arg(__c5config.getValue(param_auto_discount)));
             QJsonObject card = jdoc["card"].toObject();
             if (card["f_mode"].toInt() == CARD_TYPE_DISCOUNT) {
                 C5LogSystem::writeEvent(QString("Try log %1 - %2").arg(__c5config.getValue(param_auto_discount),
@@ -1031,12 +1038,102 @@ void WOrder::reponseProcessCode(const QJsonObject &jdoc)
             break;
         }
         case 2: {
+            C5LogSystem::writeEvent(QString("response case 2: Try log %1 - %2").arg(__c5config.getValue(param_auto_discount)));
             if (fOHeader.saleType == -1) {
                 if (fOGoods.count() > 0) {
                     C5Message::error(tr("Cannot add goods in prepaid mode"));
                     break;
                 }
             }
+            QJsonObject goods = jdoc["goods"].toObject();
+            QJsonObject store = jdoc["store"].toObject();
+            double price = 0;
+            QJsonObject jm = sender()->property("marks").toJsonObject();
+            switch (fOHeader.saleType) {
+                case SALE_RETAIL:
+                    price = goods["f_price1"].toDouble();
+                    break;
+                case SALE_WHOSALE:
+                    price = goods["f_price2"].toDouble();;
+                    break;
+                default:
+                    price = goods["f_price1"].toDouble();
+                    break;
+            }
+            if (!jm.isEmpty()) {
+                price = jm["price"].toDouble();
+            }
+            ls(QString("%1: %2, %3: %4, %5: %6")
+               .arg(tr("New goods with code"))
+               .arg(goods["f_scancode"].toString())
+               .arg(tr("name"))
+               .arg(goods["f_name"].toString())
+               .arg(tr("Price"))
+               .arg(price));
+            int row = ui->tblData->addEmptyRow();
+            auto *ch = new C5CheckBox();
+            ch->setCheckable(s.value("learnaccumulate").toBool());
+            ch->setChecked(goods["f_candiscount"].toInt() == 1);
+            connect(ch, &C5CheckBox::clicked, this, &WOrder::checkCardClicked);
+            ui->tblData->setCellWidget(row, col_check_discount, ch);
+            OGoods og;
+            og._groupName = goods["f_groupname"].toString();
+            og._goodsName = goods["f_name"].toString();
+            og._goodsFiscalName = goods["f_fiscalname"].toString();
+            og._unitName = goods["f_unitname"].toString();
+            og._barcode = goods["f_scancode"].toString();
+            og._qtybox = goods["f_qtybox"].toDouble();
+            og.header = fOHeader._id();
+            og.goods = goods["f_id"].toInt();
+            og.taxDept = goods["f_taxdept"].toInt();
+            og.adgCode = goods["f_adgcode"].toString();
+            og.isService = goods["f_service"].toInt();
+            og.qty = goods["f_defaultqty"].toDouble();
+            og.price = price;
+            og.store = __c5config.defaultStore();
+            og.total = og.qty *og.price;
+            og.discountFactor = fBHistory.value / 100;
+            og.discountMode = fBHistory.type;
+            og.discountAmount = 0;
+            og.emarks = jdoc["emarks"].toString();
+            og.canDiscount = goods["f_candiscount"].toInt();
+            fOGoods.append(og);
+            ui->tblData->setCurrentCell(row, 0);
+            //ui->tblData->setDouble(row, col_stock, (g.unit()->defaultQty()/og._qtybox) + (qtyStore / og._qtybox));
+            ui->tblData->setDouble(row, col_stock, (store["f_qty"].toDouble() / og._qtybox));
+            countTotal();
+            ui->tblData->item(row, 0)->setData(Qt::UserRole + 101, jdoc["draftid"].toString());
+            ImageLoader *il = new ImageLoader(goods["f_id"].toInt(), this);
+            connect(il, SIGNAL(imageLoaded(QPixmap)), this, SLOT(imageLoaded(QPixmap)));
+            connect(il, SIGNAL(noImage()), this, SLOT(noImage()));
+            il->start();
+        }
+        break;
+        //SALE GIFT CARD
+        case 3: {
+            C5LogSystem::writeEvent(QString("response case 3: Try log %1 - %2").arg(__c5config.getValue(param_auto_discount)));
+            if (fOHeader.saleType == -1) {
+                if (fOGoods.count() > 0) {
+                    C5Message::error(tr("Cannot add goods in prepaid mode"));
+                    break;
+                }
+            }
+            fGiftCard = jdoc["card"].toObject()["f_id"].toInt();
+            if (jdoc["used"].toDouble() > 0) {
+                ui->leGiftCardAmount->setDouble(jdoc["used"].toDouble());
+                fHttp->httpQueryFinished(sender());
+                return;
+            } else {
+                if ( jdoc["card"].toObject()["f_datesaled"].toString().isEmpty() == false) {
+                    C5Message::error(tr("Card balance is 0"));
+                    fHttp->httpQueryFinished(sender());
+                    return;
+                }
+            }
+            ui->leOrganization->setReadOnly(false);
+            ui->leContact->setReadOnly(false);
+            ui->lbPartner->setText(tr("Costumer"));
+            ui->lbContact->setText(tr("Phone"));
             QJsonObject goods = jdoc["goods"].toObject();
             QJsonObject store = jdoc["store"].toObject();
             double price = 0;

@@ -36,6 +36,10 @@ public:
 
     int reportType();
 
+private slots:
+
+    void on_chDraft_clicked(bool checked);
+
 private:
     Ui::CR5ConsumptionBySalesFilter *ui;
 };

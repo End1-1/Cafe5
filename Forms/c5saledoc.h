@@ -40,7 +40,6 @@ private slots:
     void makeStoreOutput();
     void exportToExcel();
     void returnItems();
-    void messageResult(QJsonObject jo);
     void saveDataChanges();
     void saveAsDraft();
     void saveCopy();
@@ -91,6 +90,7 @@ private:
     QStringList fRowToDelete;
     QMap<int, QString> fListOfStorages;
     QMap<int, double> fSpecialPrices;
+
 };
 
 #endif // C5SALEDOC_H

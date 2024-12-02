@@ -175,7 +175,7 @@ private:
 
     QList<Dish *> fDishes;
 
-    QHash<QString, Dish *> fDishesBarcode;
+    QMap<QString, Dish *> fDishesBarcode;
 
     QString fOrderUuid;
 

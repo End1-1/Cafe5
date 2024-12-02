@@ -7,6 +7,7 @@
 #include "c5lineedit.h"
 #include "c5checkbox.h"
 #include "dlgselectcurrency.h"
+#include "QRCodeGenerator.h"
 #include <QPainter>
 #include <QDebug>
 #include <QGraphicsScene>
@@ -96,20 +97,47 @@ bool C5StoreBarcode::printOneBarcode(const QString &code, const QString &price, 
     QPainter p( &printer);
     Barcode93 b;
     bool r = b.Encode93(code.toLatin1().data());
+    BarcodeEan13 e13;
+    bool r_e13 = e13.EncodeEan13(code.toLatin1().data());
     QFont f(__c5config.getValue(param_app_font_family), 25, QFont::Normal);
+    int levelIndex = 1;
+    int versionIndex = 0;
+    bool bExtent = true;
+    int maskIndex = -1;
+    QString encodeString = QString("%1").arg(code);
+    CQR_Encode qrEncode;
+    bool successfulEncoding = qrEncode.EncodeData( levelIndex, versionIndex, bExtent, maskIndex,
+                              encodeString.toUtf8().data() );
+    if (!successfulEncoding) {
+        //            fLog.append("Cannot encode qr image");
+    }
+    int qrImageSize = qrEncode.m_nSymbleSize;
+    int encodeImageSize = qrImageSize + ( QR_MARGIN * 2 );
+    QImage encodeImage(encodeImageSize, encodeImageSize, QImage::Format_Mono);
+    encodeImage.fill(1);
+    for ( int i = 0; i < qrImageSize; i++ ) {
+        for ( int j = 0; j < qrImageSize; j++ ) {
+            if ( qrEncode.m_byModuleData[i][j] ) {
+                encodeImage.setPixel(i + QR_MARGIN, j + QR_MARGIN, 0);
+            }
+        }
+    }
+    QPixmap pix = QPixmap::fromImage(encodeImage);
+    pix = pix.scaled(300, 300);
+    p.drawPixmap(180, 80, 120, 120, pix);
     p.setFont(f);
     qreal plen = 2;
     QTextOption to;
     to.setWrapMode(QTextOption::WordWrap);
-    f.setPointSize(8);
+    f.setPointSize(7);
     f.setBold(true);
     p.setFont(f);
     p.drawText(QRectF(0, 0, 350, 80), name, to);
-    b.DrawBarcode(p, 100, 85, 70, 130, plen);
-    p.drawText(250, 185, code);
-    f.setPointSize(10);
+    //b.DrawBarcode(p, 5, 85, 70, 130, plen);
+    f.setPointSize(8);
     p.setFont(f);
-    p.drawText(5, 185, QString("%1: %2").arg(tr("Price"), price));
+    p.drawText(00, 185, code);
+    p.drawText(0, 155, QString("%1: %2").arg(tr("Price"), price));
     return printer.printerState() != QPrinter::Error;
 }
 

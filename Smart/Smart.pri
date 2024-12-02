@@ -58,7 +58,6 @@ SOURCES += \
     ../Classes/notificationwidget.cpp \
     ../Classes/rkeyboard.cpp \
     ../Classes/thread.cpp \
-    ../Classes/threadsendmessage.cpp \
     ../Controls/c5checkbox.cpp \
     ../Controls/c5combobox.cpp \
     ../Controls/c5dateedit.cpp \
@@ -166,7 +165,6 @@ HEADERS += \
     ../Classes/notificationwidget.h \
     ../Classes/rkeyboard.h \
     ../Classes/thread.h \
-    ../Classes/threadsendmessage.h \
     ../Controls/c5checkbox.h \
     ../Controls/c5combobox.h \
     ../Controls/c5dateedit.h \

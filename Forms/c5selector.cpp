@@ -5,7 +5,7 @@
 #include "c5tablemodel.h"
 #include <QKeyEvent>
 
-QMap<QString, QMap<int, C5Selector*> > C5Selector::fSelectorList;
+QMap<QString, QMap<int, C5Selector *> > C5Selector::fSelectorList;
 
 C5Selector::C5Selector(const QStringList &dbParams) :
     C5Dialog(dbParams),
@@ -15,9 +15,11 @@ C5Selector::C5Selector(const QStringList &dbParams) :
     fGrid = new C5Grid(dbParams, nullptr);
     fGrid->fTableView->setSelectionBehavior(QAbstractItemView::SelectRows);
     ui->hl->addWidget(fGrid);
-    connect(fGrid, SIGNAL(tblDoubleClick(int,int,QList<QVariant>)), this, SLOT(tblDoubleClicked(int,int,QList<QVariant>)));
+    connect(fGrid, SIGNAL(tblDoubleClick(int, int, QList<QVariant>)), this, SLOT(tblDoubleClicked(int, int,
+            QList<QVariant>)));
     //connect(fGrid, SIGNAL(tblSingleClick(QModelIndex)), this, SLOT(tblSingleClick(QModelIndex)));
-    connect(fGrid->fTableView->selectionModel(), SIGNAL(selectionChanged(QItemSelection,QItemSelection)), this, SLOT(selectionChanged(QItemSelection,QItemSelection)));
+    connect(fGrid->fTableView->selectionModel(), SIGNAL(selectionChanged(QItemSelection, QItemSelection)), this,
+            SLOT(selectionChanged(QItemSelection, QItemSelection)));
     fReset = true;
     fSearchColumn = -1;
     fCache = 0;
@@ -59,7 +61,6 @@ bool C5Selector::getValue(const QStringList &dbParams, const QString &query, QLi
 {
     C5Selector *c = new C5Selector(dbParams);
     c->fQuery = query;
-
     c->fSearchColumn = -1;
     c->fMultipleSelection = false;
     c->fGrid->fModel->setSingleCheckBoxSelection(true);
@@ -78,7 +79,7 @@ bool C5Selector::getValueOfColumn(const QStringList &dbParams, int cache, QList<
     C5Selector *c = nullptr;
     if (!fSelectorList[cacheName].contains(cache)) {
         c = new C5Selector(dbParams);
-        c->fQuery = C5Cache(dbParams).query(cache);
+        c->fQuery = C5Cache(dbParams).query(cache).replace("%idcond%", "");
         c->fCache = cache;
         fSelectorList[cacheName][cache] = c;
     } else {
@@ -103,7 +104,7 @@ bool C5Selector::getMultipleValues(const QStringList &dbParams, int cache, QList
     C5Selector *c = nullptr;
     if (!fSelectorList[cacheName].contains(cache)) {
         c = new C5Selector(dbParams);
-        c->fQuery = C5Cache(dbParams).query(cache);
+        c->fQuery = C5Cache(dbParams).query(cache).replace("%idcond%", "");
         c->fCache = cache;
         fSelectorList[cacheName][cache] = c;
     } else {
@@ -127,7 +128,8 @@ bool C5Selector::getMultipleValues(const QStringList &dbParams, int cache, QList
     return result;
 }
 
-bool C5Selector::getValues(const QStringList &dbParams, const QString &sql, QList<QVariant> &values, const QHash<QString, QString> &translator)
+bool C5Selector::getValues(const QStringList &dbParams, const QString &sql, QList<QVariant> &values,
+                           const QHash<QString, QString> &translator)
 {
     C5Selector *c = new C5Selector(dbParams);
     c->fQuery = sql;
@@ -144,24 +146,24 @@ void C5Selector::keyPressEvent(QKeyEvent *key)
     int row = fGrid->fTableView->currentIndex().row();
     QModelIndex index = fGrid->fTableView->model()->index(row, 0);
     switch (key->key()) {
-    case Qt::Key_Up:
-        if (row > 0) {
-            row--;
-        }
-        break;
-    case Qt::Key_Down:
-        if (row < fGrid->fModel->rowCount() - 1) {
-            row++;
-        }
-        break;
-    case Qt::Key_Enter:
-    case Qt::Key_Return:
-        if (key->modifiers() & Qt::ControlModifier) {
-            fGrid->on_tblView_doubleClicked(index);
-        }
-        break;
-    default:
-        break;
+        case Qt::Key_Up:
+            if (row > 0) {
+                row--;
+            }
+            break;
+        case Qt::Key_Down:
+            if (row < fGrid->fModel->rowCount() - 1) {
+                row++;
+            }
+            break;
+        case Qt::Key_Enter:
+        case Qt::Key_Return:
+            if (key->modifiers() &Qt::ControlModifier) {
+                fGrid->on_tblView_doubleClicked(index);
+            }
+            break;
+        default:
+            break;
     }
     index = fGrid->fTableView->model()->index(row, 0);
     fGrid->fTableView->setCurrentIndex(index);
@@ -180,11 +182,10 @@ void C5Selector::resetCache(const QStringList &dbParams, int cacheId)
 
 void C5Selector::selectionChanged(const QItemSelection &selected, const QItemSelection &deselected)
 {
-    for (QModelIndex i: deselected.indexes()) {
+    for (QModelIndex i : deselected.indexes()) {
         fGrid->fModel->setData(i.row(), 0, 0, Qt::CheckStateRole);
     }
-
-    for (QModelIndex i: selected.indexes()) {
+    for (QModelIndex i : selected.indexes()) {
         fGrid->fModel->setData(i.row(), 0, 1, Qt::CheckStateRole);
     }
 }
@@ -212,7 +213,7 @@ void C5Selector::refresh()
     }
     fGrid->setCheckboxes(true);
     fGrid->fModel->setSingleCheckBoxSelection(!fMultipleSelection);
-    fGrid->buildQuery(fQuery);
+    fGrid->buildQuery(fQuery.replace("%idcond%", ""));
     fGrid->fTableView->setColumnWidth(0, 25);
 }
 

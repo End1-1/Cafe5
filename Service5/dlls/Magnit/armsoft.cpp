@@ -4,6 +4,7 @@
 #include <QSqlDatabase>
 #include <QSqlQuery>
 #include <QSqlRecord>
+#include <QJsonDocument>
 
 ArmSoft::ArmSoft(const QJsonObject &data, QObject *parent) :
     QObject(parent),
@@ -11,8 +12,9 @@ ArmSoft::ArmSoft(const QJsonObject &data, QObject *parent) :
 {
 }
 
-bool ArmSoft::exportToAS(const QString &orderUuid, QString &err)
+bool ArmSoft::exportToAS(QString &err)
 {
+    LogWriter::write(LogWriterLevel::verbose, "DATA OF MAGNIT PAYLOAD", QJsonDocument(fData).toJson());
     Database dbas ("QODBC");
     if (!dbas.open("", fData["asconnectionstring"].toString(), "sa", "SaSa111")) {
         err = dbas.lastDbError();

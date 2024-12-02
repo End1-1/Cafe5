@@ -96,8 +96,9 @@ void C5SalaryDoc::save()
     db[":f_shift"] = ui->cbShift->currentData();
     db.exec("delete from s_salary_attendance where f_shift=:f_shift");
     db[":f_shift"] = ui->cbShift->currentData();
-    db.exec("delete from s_salary_payment where f_date=:f_date");
+    db.exec("delete from s_salary_payment where f_shift=:f_shift");
     for (int i = 0; i < ui->tbl->rowCount(); i++) {
+        db[":f_date"] = ui->tbl->getWidget<C5DateEdit>(i, 6)->date();
         db[":f_shift"] = ui->cbShift->currentData();
         db[":f_worker"] = ui->tbl->getInteger(i, 3);
         db[":f_position"] = ui->tbl->getInteger(i, 1);
@@ -109,9 +110,10 @@ void C5SalaryDoc::save()
         ui->tbl->setInteger(i, 0, db.insert("s_salary_attendance"));
     }
     countSalary();
+    db[":f_date"] = ui->cbShift->currentData(Qt::UserRole + 2);
     db[":f_shift"] = ui->cbShift->currentData();
-    db.exec("insert into s_salary_payment (f_worker, f_shift, f_amount)  "
-            "select distinct(f_worker), :f_shift, sum(f_amount) from s_salary_attendance "
+    db.exec("insert into s_salary_payment (f_worker, f_date, f_shift, f_amount)  "
+            "select  distinct(f_worker), :f_date, :f_shift, sum(f_amount) from s_salary_attendance "
             "where f_shift=:f_shift group by 1 ");
 }
 
@@ -239,6 +241,7 @@ void C5SalaryDoc::getSessions()
     db[":date1"] = date1;
     db[":date2"] = date2;
     db.exec("select * from s_working_sessions where cast(f_close as date) between :date1 and :date2 order by f_id desc");
+    QSet<QDate> dates;
     while (db.nextRow()) {
         ui->cbShift->addItem(
             QString("%1, %2 - %3").arg(QString::number(db.getInt("f_id")),
@@ -247,6 +250,21 @@ void C5SalaryDoc::getSessions()
             db.getInt("f_id"));
         int i = ui->cbShift->count() - 1;
         ui->cbShift->setItemData(i, db.getDateTime("f_open"), Qt::UserRole + 1);
+        ui->cbShift->setItemData(i, db.getDateTime("f_close").date(), Qt::UserRole + 2);
+        dates.insert(db.getDate("f_close"));
+    }
+    bool getagain = false;
+    for (QDate d1 = date1; d1 < date2; d1 = d1.addDays(1)) {
+        if (!dates.contains(d1)) {
+            db[":f_open"] = d1;
+            db[":f_close"] = d1;
+            db[":f_user"] = 1;
+            db.insert("s_working_sessions");
+            getagain = true;
+        }
+    }
+    if (getagain) {
+        getSessions();
     }
 }
 
@@ -347,15 +365,14 @@ double C5SalaryDoc::salaryOfPosition(C5Database &db, int pos, int worker)
 
 void C5SalaryDoc::on_toolButton_clicked()
 {
-    fDate = fDate.addDays(fDate.daysInMonth());
+    fDate = fDate.addDays(fDate.daysInMonth() * -1);
     ui->deDate->setText(fDate.toString("MMMM-yyyy"));
     getSessions();
 }
 
 void C5SalaryDoc::on_toolButton_2_clicked()
 {
-    fDate = fDate.addDays(-1);
-    fDate = fDate.addDays(-1 * (fDate.daysInMonth() - 1));
+    fDate = fDate.addDays(1 * (fDate.daysInMonth() - 1));
     ui->deDate->setText(fDate.toString("MMMM-yyyy"));
     getSessions();
 }

@@ -14,20 +14,14 @@
    <string>Form</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
-   <item row="2" column="3">
-    <widget class="C5LineEdit" name="leGroupname">
-     <property name="enabled">
-      <bool>true</bool>
-     </property>
-     <property name="focusPolicy">
-      <enum>Qt::NoFocus</enum>
-     </property>
-     <property name="readOnly">
-      <bool>true</bool>
+   <item row="8" column="0">
+    <widget class="QLabel" name="label_5">
+     <property name="text">
+      <string>Show drafts</string>
      </property>
     </widget>
    </item>
-   <item row="6" column="2">
+   <item row="7" column="2">
     <widget class="C5LineEditWithSelector" name="leCurrency">
      <property name="minimumSize">
       <size>
@@ -46,53 +40,29 @@
      </property>
     </widget>
    </item>
-   <item row="5" column="2">
-    <widget class="C5LineEditWithSelector" name="leUnit">
-     <property name="minimumSize">
-      <size>
-       <width>100</width>
-       <height>0</height>
-      </size>
-     </property>
-     <property name="maximumSize">
-      <size>
-       <width>100</width>
-       <height>16777215</height>
-      </size>
-     </property>
-     <property name="FilterName" stdset="0">
-      <string>unit</string>
-     </property>
-    </widget>
-   </item>
-   <item row="1" column="2">
-    <widget class="C5LineEditWithSelector" name="leStore">
-     <property name="minimumSize">
-      <size>
-       <width>100</width>
-       <height>0</height>
-      </size>
-     </property>
-     <property name="maximumSize">
-      <size>
-       <width>100</width>
-       <height>16777215</height>
-      </size>
-     </property>
-     <property name="FilterName" stdset="0">
-      <string>store</string>
-     </property>
-    </widget>
-   </item>
-   <item row="3" column="0">
-    <widget class="QLabel" name="label_3">
+   <item row="5" column="0">
+    <widget class="QLabel" name="label_12">
      <property name="text">
-      <string>Material</string>
+      <string>Partner</string>
+     </property>
+    </widget>
+   </item>
+   <item row="7" column="0">
+    <widget class="QLabel" name="label_11">
+     <property name="text">
+      <string>Currency</string>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="0">
+    <widget class="QLabel" name="label">
+     <property name="text">
+      <string>Date</string>
      </property>
     </widget>
    </item>
    <item row="6" column="3">
-    <widget class="C5LineEdit" name="leCurrencyName">
+    <widget class="C5LineEdit" name="leUnitName">
      <property name="enabled">
       <bool>true</bool>
      </property>
@@ -104,49 +74,45 @@
      </property>
     </widget>
    </item>
+   <item row="1" column="0">
+    <widget class="QLabel" name="label_2">
+     <property name="text">
+      <string>Store</string>
+     </property>
+    </widget>
+   </item>
    <item row="6" column="0">
-    <widget class="QLabel" name="label_11">
+    <widget class="QLabel" name="label_10">
      <property name="text">
-      <string>Currency</string>
+      <string>Unit</string>
      </property>
     </widget>
    </item>
-   <item row="7" column="2">
-    <widget class="C5CheckBox" name="chShowDrafts">
-     <property name="text">
-      <string/>
+   <item row="2" column="3">
+    <widget class="C5LineEdit" name="leGroupname">
+     <property name="enabled">
+      <bool>true</bool>
      </property>
-     <property name="FilterName" stdset="0">
-      <string>showdrafts</string>
+     <property name="focusPolicy">
+      <enum>Qt::NoFocus</enum>
      </property>
-    </widget>
-   </item>
-   <item row="4" column="0">
-    <widget class="QLabel" name="label_12">
-     <property name="text">
-      <string>Partner</string>
+     <property name="readOnly">
+      <bool>true</bool>
      </property>
     </widget>
    </item>
-   <item row="2" column="0">
-    <widget class="QLabel" name="label_4">
-     <property name="text">
-      <string>Material group</string>
+   <item row="4" column="3">
+    <widget class="C5LineEdit" name="leMaterialName">
+     <property name="enabled">
+      <bool>true</bool>
+     </property>
+     <property name="focusPolicy">
+      <enum>Qt::NoFocus</enum>
+     </property>
+     <property name="readOnly">
+      <bool>true</bool>
      </property>
     </widget>
-   </item>
-   <item row="9" column="1">
-    <spacer name="verticalSpacer">
-     <property name="orientation">
-      <enum>Qt::Vertical</enum>
-     </property>
-     <property name="sizeHint" stdset="0">
-      <size>
-       <width>20</width>
-       <height>345</height>
-      </size>
-     </property>
-    </spacer>
    </item>
    <item row="0" column="2">
     <widget class="C5DateEdit" name="deDate">
@@ -167,16 +133,64 @@
      </property>
     </widget>
    </item>
-   <item row="0" column="3">
-    <widget class="QToolButton" name="toolButton">
+   <item row="4" column="2">
+    <widget class="C5LineEditWithSelector" name="leMaterial">
+     <property name="minimumSize">
+      <size>
+       <width>100</width>
+       <height>0</height>
+      </size>
+     </property>
+     <property name="maximumSize">
+      <size>
+       <width>100</width>
+       <height>16777215</height>
+      </size>
+     </property>
+     <property name="FilterName" stdset="0">
+      <string>material</string>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="3">
+    <widget class="C5LineEdit" name="leStoreName">
+     <property name="enabled">
+      <bool>true</bool>
+     </property>
+     <property name="focusPolicy">
+      <enum>Qt::NoFocus</enum>
+     </property>
+     <property name="readOnly">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="8" column="2">
+    <widget class="C5CheckBox" name="chShowDrafts">
      <property name="text">
       <string/>
      </property>
-     <property name="icon">
-      <iconset resource="../resources/res.qrc">
-       <normaloff>:/pushpin.png</normaloff>:/pushpin.png</iconset>
+     <property name="FilterName" stdset="0">
+      <string>showdrafts</string>
      </property>
-     <property name="FixDate" stdset="0">
+    </widget>
+   </item>
+   <item row="2" column="0">
+    <widget class="QLabel" name="label_4">
+     <property name="text">
+      <string>Material group</string>
+     </property>
+    </widget>
+   </item>
+   <item row="7" column="3">
+    <widget class="C5LineEdit" name="leCurrencyName">
+     <property name="enabled">
+      <bool>true</bool>
+     </property>
+     <property name="focusPolicy">
+      <enum>Qt::NoFocus</enum>
+     </property>
+     <property name="readOnly">
       <bool>true</bool>
      </property>
     </widget>
@@ -200,31 +214,8 @@
      </property>
     </widget>
    </item>
-   <item row="5" column="3">
-    <widget class="C5LineEdit" name="leUnitName">
-     <property name="enabled">
-      <bool>true</bool>
-     </property>
-     <property name="focusPolicy">
-      <enum>Qt::NoFocus</enum>
-     </property>
-     <property name="readOnly">
-      <bool>true</bool>
-     </property>
-    </widget>
-   </item>
-   <item row="8" column="2">
-    <widget class="C5CheckBox" name="chShowZeroes">
-     <property name="text">
-      <string/>
-     </property>
-     <property name="FilterName" stdset="0">
-      <string>showzero</string>
-     </property>
-    </widget>
-   </item>
-   <item row="3" column="2">
-    <widget class="C5LineEditWithSelector" name="leMaterial">
+   <item row="6" column="2">
+    <widget class="C5LineEditWithSelector" name="leUnit">
      <property name="minimumSize">
       <size>
        <width>100</width>
@@ -238,85 +229,49 @@
       </size>
      </property>
      <property name="FilterName" stdset="0">
-      <string>material</string>
+      <string>unit</string>
      </property>
     </widget>
    </item>
-   <item row="1" column="0">
-    <widget class="QLabel" name="label_2">
+   <item row="4" column="0">
+    <widget class="QLabel" name="label_3">
      <property name="text">
-      <string>Store</string>
+      <string>Material</string>
      </property>
     </widget>
    </item>
-   <item row="3" column="3">
-    <widget class="C5LineEdit" name="leMaterialName">
-     <property name="enabled">
-      <bool>true</bool>
-     </property>
-     <property name="focusPolicy">
-      <enum>Qt::NoFocus</enum>
-     </property>
-     <property name="readOnly">
-      <bool>true</bool>
-     </property>
-    </widget>
-   </item>
-   <item row="0" column="0">
-    <widget class="QLabel" name="label">
+   <item row="9" column="2">
+    <widget class="C5CheckBox" name="chShowZeroes">
      <property name="text">
-      <string>Date</string>
+      <string/>
+     </property>
+     <property name="FilterName" stdset="0">
+      <string>showzero</string>
      </property>
     </widget>
    </item>
-   <item row="5" column="0">
-    <widget class="QLabel" name="label_10">
+   <item row="0" column="3">
+    <widget class="QToolButton" name="toolButton">
      <property name="text">
-      <string>Unit</string>
+      <string/>
      </property>
-    </widget>
-   </item>
-   <item row="1" column="3">
-    <widget class="C5LineEdit" name="leStoreName">
-     <property name="enabled">
-      <bool>true</bool>
+     <property name="icon">
+      <iconset resource="../resources/res.qrc">
+       <normaloff>:/pushpin.png</normaloff>:/pushpin.png</iconset>
      </property>
-     <property name="focusPolicy">
-      <enum>Qt::NoFocus</enum>
-     </property>
-     <property name="readOnly">
+     <property name="FixDate" stdset="0">
       <bool>true</bool>
      </property>
     </widget>
    </item>
-   <item row="4" column="3">
-    <widget class="C5LineEdit" name="lePartnerName">
-     <property name="enabled">
-      <bool>true</bool>
-     </property>
-     <property name="focusPolicy">
-      <enum>Qt::NoFocus</enum>
-     </property>
-     <property name="readOnly">
-      <bool>true</bool>
-     </property>
-    </widget>
-   </item>
-   <item row="7" column="0">
-    <widget class="QLabel" name="label_5">
-     <property name="text">
-      <string>Show drafts</string>
-     </property>
-    </widget>
-   </item>
-   <item row="8" column="0">
+   <item row="9" column="0">
     <widget class="QLabel" name="label_13">
      <property name="text">
       <string>Show zeroes</string>
      </property>
     </widget>
    </item>
-   <item row="4" column="2">
+   <item row="5" column="2">
     <widget class="C5LineEditWithSelector" name="lePartner">
      <property name="minimumSize">
       <size>
@@ -335,18 +290,89 @@
      </property>
     </widget>
    </item>
+   <item row="10" column="1">
+    <spacer name="verticalSpacer">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>345</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item row="1" column="2">
+    <widget class="C5LineEditWithSelector" name="leStore">
+     <property name="minimumSize">
+      <size>
+       <width>100</width>
+       <height>0</height>
+      </size>
+     </property>
+     <property name="maximumSize">
+      <size>
+       <width>100</width>
+       <height>16777215</height>
+      </size>
+     </property>
+     <property name="FilterName" stdset="0">
+      <string>store</string>
+     </property>
+    </widget>
+   </item>
+   <item row="5" column="3">
+    <widget class="C5LineEdit" name="lePartnerName">
+     <property name="enabled">
+      <bool>true</bool>
+     </property>
+     <property name="focusPolicy">
+      <enum>Qt::NoFocus</enum>
+     </property>
+     <property name="readOnly">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="0">
+    <widget class="QLabel" name="label_6">
+     <property name="text">
+      <string>Class</string>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="2">
+    <widget class="C5LineEditWithSelector" name="leClass">
+     <property name="minimumSize">
+      <size>
+       <width>100</width>
+       <height>0</height>
+      </size>
+     </property>
+     <property name="maximumSize">
+      <size>
+       <width>100</width>
+       <height>16777215</height>
+      </size>
+     </property>
+     <property name="FilterName" stdset="0">
+      <string>class</string>
+     </property>
+    </widget>
+   </item>
   </layout>
  </widget>
  <customwidgets>
   <customwidget>
-   <class>C5LineEdit</class>
-   <extends>QLineEdit</extends>
-   <header location="global">c5lineedit.h</header>
-  </customwidget>
-  <customwidget>
    <class>C5LineEditWithSelector</class>
    <extends>QLineEdit</extends>
    <header location="global">c5lineeditwithselector.h</header>
+  </customwidget>
+  <customwidget>
+   <class>C5LineEdit</class>
+   <extends>QLineEdit</extends>
+   <header location="global">c5lineedit.h</header>
   </customwidget>
   <customwidget>
    <class>C5CheckBox</class>
@@ -370,6 +396,7 @@
   <tabstop>toolButton</tabstop>
  </tabstops>
  <resources>
+  <include location="../resources/res.qrc"/>
   <include location="../resources/res.qrc"/>
  </resources>
  <connections/>

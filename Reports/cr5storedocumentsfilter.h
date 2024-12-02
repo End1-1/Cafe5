@@ -3,7 +3,8 @@
 
 #include "c5filterwidget.h"
 
-namespace Ui {
+namespace Ui
+{
 class CR5StoreDocumentsFilter;
 }
 
@@ -19,8 +20,6 @@ public:
     virtual QString condition();
 
     QString storages() const;
-
-    QString reason() const;
 
     void setPartnerFilter(int partner);
 

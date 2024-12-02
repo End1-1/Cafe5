@@ -351,7 +351,7 @@
           </widget>
          </item>
          <item row="3" column="0">
-          <widget class="QLabel" name="lbPartner_3">
+          <widget class="QLabel" name="lbContact">
            <property name="sizePolicy">
             <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
              <horstretch>0</horstretch>
@@ -474,7 +474,7 @@
             </font>
            </property>
            <property name="focusPolicy">
-            <enum>Qt::NoFocus</enum>
+            <enum>Qt::ClickFocus</enum>
            </property>
            <property name="readOnly">
             <bool>true</bool>
@@ -525,7 +525,7 @@
             </font>
            </property>
            <property name="focusPolicy">
-            <enum>Qt::NoFocus</enum>
+            <enum>Qt::ClickFocus</enum>
            </property>
            <property name="readOnly">
             <bool>true</bool>
@@ -800,13 +800,13 @@
  </customwidgets>
  <tabstops>
   <tabstop>leCode</tabstop>
-  <tabstop>btnF4</tabstop>
-  <tabstop>btnF5</tabstop>
-  <tabstop>btnF1</tabstop>
-  <tabstop>btnF2</tabstop>
-  <tabstop>btnF3</tabstop>
+  <tabstop>leCustomerTaxpayerId</tabstop>
+  <tabstop>leGiftCardAmount</tabstop>
+  <tabstop>leComment</tabstop>
+  <tabstop>btnSearchPartner</tabstop>
  </tabstops>
  <resources>
+  <include location="../resources/res.qrc"/>
   <include location="../resources/res.qrc"/>
  </resources>
  <connections/>

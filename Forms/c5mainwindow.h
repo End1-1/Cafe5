@@ -40,7 +40,7 @@ public:
         return t;
     }
 
-    NTableWidget *createNTab(const QString &route);
+    NTableWidget *createNTab(const QString &route, const QJsonObject &initParams);
 
     void nTabDesign(const QIcon &icon, const QString &label, NTableWidget *widget);
 

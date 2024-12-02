@@ -29,6 +29,10 @@ public:
 
     virtual bool checkData(QString &err) override;
 
+    virtual bool canCopy() override;
+
+    virtual void copyObject() override;
+
 private slots:
     void on_btnClearManager_clicked();
 

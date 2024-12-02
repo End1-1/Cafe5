@@ -49,7 +49,6 @@
 #define cp_t3_sale_effectiveness 316
 #define cp_t3_storage_uncomplected 317
 #define cp_t3_move_uncomplected 318
-#define cp_t3_count_output_of_sale_draft 319
 #define cp_t3_custom_reports 320
 #define cp_t3_draft_output_recipes 321
 #define cp_t3_debts_customer 322
@@ -111,7 +110,6 @@
 #define cp_t6_units 601
 #define cp_t6_groups 602
 #define cp_t6_goods 603
-#define cp_t6_waste 604
 #define cp_t6_storage 605
 #define cp_t6_goods_images 608
 #define cp_t6_qty_reminder 609
@@ -161,6 +159,9 @@
 #define cp_t10_actions_stages 1007
 #define cp_t10_active_tasks 1008
 #define cp_t10_create_task 1009
+
+#define cp_t11_miscelanous 1100
+#define cp_t11_do_now_show_input_prices 1101
 
 class C5Permissions
 {

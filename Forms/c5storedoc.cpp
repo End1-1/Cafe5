@@ -17,7 +17,6 @@
 #include "c5storedraftwriter.h"
 #include "calculator.h"
 #include "c5storedocselectprinttemplate.h"
-#include "threadsendmessage.h"
 #include "bclientdebts.h"
 #include "xlsxall.h"
 #include <QMenu>
@@ -29,6 +28,9 @@
 #include <QJsonObject>
 #include <QShortcut>
 #include <QSqlQuery>
+
+#define col_price 7
+#define col_total 8
 
 C5StoreDoc::C5StoreDoc(const QStringList &dbParams, QWidget *parent) :
     C5Document(dbParams, parent),
@@ -111,6 +113,8 @@ C5StoreDoc::C5StoreDoc(const QStringList &dbParams, QWidget *parent) :
         ui->cbCurrency->addItem(db.getString("f_name"), db.getInt("f_id"));
     }
     ui->cbCurrency->setCurrentIndex(ui->cbCurrency->findData(__c5config.getValue(param_default_currency).toInt()));
+    ui->tblGoods->setColumnHidden(col_price, __user->check(cp_t11_do_now_show_input_prices));
+    ui->tblGoods->setColumnHidden(col_total, __user->check(cp_t11_do_now_show_input_prices));
 }
 
 C5StoreDoc::~C5StoreDoc()
@@ -156,16 +160,6 @@ bool C5StoreDoc::openDoc(QString id, QString &err)
     ui->leTotal->setDouble(doc_header["f_amount"].toDouble());
     ui->cbCurrency->setCurrentIndex(ui->cbCurrency->findData(doc_header["f_currency"].toInt()));
     setMode(static_cast<STORE_DOC>(fDocType));
-    //    for (int i = 0; i < dw.rowCount(container_astoredishwaste); i++) {
-    //        int row = ui->tblDishes->addEmptyRow();
-    //        ui->tblDishes->createLineEdit(row, 3);
-    //        ui->tblDishes->setString(row, 0, dw.value(container_astoredishwaste, i, "f_id").toString());
-    //        ui->tblDishes->setString(row, 1, dw.value(container_astoredishwaste, i, "f_dish").toString());
-    //        ui->tblDishes->setString(row, 2, dw.value(container_astoredishwaste, i, "f_dishname").toString());
-    //        ui->tblDishes->lineEdit(row, 3)->setDouble(dw.value(container_astoredishwaste, i, "f_qty").toDouble());
-    //        ui->tblDishes->setString(row, 4, dw.value(container_astoredishwaste, i, "f_data").toString());
-    //        connect(ui->tblDishes->lineEdit(row, 3), SIGNAL(textChanged(QString)), this, SLOT(tblDishQtyChanged(QString)));
-    //    }
     ui->tblGoods->setRowCount(0);
     for (int i = 0; i < doc_body.size(); i++) {
         const QJsonObject &jo = doc_body.at(i).toObject();
@@ -1012,7 +1006,7 @@ void C5StoreDoc::writeDocumentWithState(int state)
             db[":f_state"] = 6;
             db.exec("update o_draft_sale set f_state=:f_state where f_id=:f_id");
         }
-        writeAStoreSale(ui->leStoreInput->getInteger(), ui->leStoreOutput->getInteger());
+#pragma message( " DONT FORGET DO THIS FOR STORE UPDATE IN SHOP")
         C5Message::info(tr("Saved"));
         if (fFlags.contains("outputservice")) {
             for (int i = 0; i < ui->tblGoods->rowCount(); i++) {
@@ -1976,11 +1970,6 @@ double C5StoreDoc::additionalCostForEveryGoods()
         return additionalCost() / ui->leTotalQty->getDouble();
     }
     return 0;
-}
-
-void C5StoreDoc::writeAStoreSale(int storei, int storeo)
-{
-    C5StoreDraftWriter::writeASaleStore(storei, storeo);
 }
 
 void C5StoreDoc::lineEditKeyPressed(const QChar &key)

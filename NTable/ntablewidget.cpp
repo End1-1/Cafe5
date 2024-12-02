@@ -58,7 +58,13 @@ void NTableWidget::query()
     connect(nd, &NDataProvider::started, this, &NTableWidget::queryStarted);
     connect(nd, &NDataProvider::error, this, &NTableWidget::queryError);
     connect(nd, &NDataProvider::done, this, &NTableWidget::queryFinished);
-    nd->getData(mRoute, fFilter ? fFilter->filter() : QJsonObject());
+    QJsonObject jf = fFilter ? fFilter->filter() : QJsonObject();
+    if (!fInitParams.isEmpty()) {
+        for (const QString &k : fInitParams.keys()) {
+            jf[k] = fInitParams[k];
+        }
+    }
+    nd->getData(mRoute, jf);
 }
 
 QToolBar *NTableWidget::toolBar()
@@ -89,6 +95,11 @@ void NTableWidget::hotKey(const QString &key)
     } else {
         C5Widget::hotKey(key);
     }
+}
+
+void NTableWidget::initParams(const QJsonObject &o)
+{
+    fInitParams = o;
 }
 
 void NTableWidget::sum()

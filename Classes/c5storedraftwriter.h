@@ -96,8 +96,6 @@ public:
 
     QVariant value(int container, int row, const QString &key);
 
-    static void writeASaleStore(int storei, int storeo);
-
 private:
     C5Database &fDb;
 

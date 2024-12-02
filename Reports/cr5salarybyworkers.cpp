@@ -10,7 +10,8 @@ CR5SalaryByWorkers::CR5SalaryByWorkers(const QStringList &dbParams, QWidget *par
     fIcon = ":/employee.png";
     fLabel = tr("Salary by workers");
     fSimpleQuery = true;
-    fQuery = "SELECT sp.f_id, sp.f_date AS `Ամսաթիվ`, g.f_name AS `Հաստիկ`, concat_ws(' ', u.f_last, u.f_first) AS `Աշխատող`, "
+    fQuery = "SELECT sp.f_id, sp.f_date AS `Ամսաթիվ`, g.f_name AS `Հաստիկ`, "
+             "concat_ws(' ', u.f_last, u.f_first) AS `Աշխատող`, "
              "if (sp.f_cashdoc is NULL, sp.f_amount, sp.f_amount*-1) AS `Գումար`  "
              "FROM s_salary_payment sp "
              "LEFT JOIN s_user u ON u.f_id=sp.f_worker "

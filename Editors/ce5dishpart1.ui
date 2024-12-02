@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>400</width>
-    <height>73</height>
+    <height>308</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -30,8 +30,30 @@
      </property>
     </widget>
    </item>
+   <item row="3" column="0" colspan="2">
+    <widget class="QLabel" name="lbImg">
+     <property name="minimumSize">
+      <size>
+       <width>0</width>
+       <height>200</height>
+      </size>
+     </property>
+     <property name="contextMenuPolicy">
+      <enum>Qt::CustomContextMenu</enum>
+     </property>
+     <property name="text">
+      <string>Image</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+    </widget>
+   </item>
    <item row="0" column="1">
-    <widget class="C5LineEditWithSelector" name="lineEdit">
+    <widget class="C5LineEditWithSelector" name="leCode">
+     <property name="focusPolicy">
+      <enum>Qt::NoFocus</enum>
+     </property>
      <property name="Field" stdset="0">
       <string>f_id</string>
      </property>
@@ -63,6 +85,32 @@
      </property>
      <property name="First" stdset="0">
       <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="0">
+    <widget class="QLabel" name="label_3">
+     <property name="text">
+      <string>Image UUID</string>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="1">
+    <widget class="C5LineEditWithSelector" name="leImageUUID">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
+     <property name="focusPolicy">
+      <enum>Qt::NoFocus</enum>
+     </property>
+     <property name="readOnly">
+      <bool>false</bool>
+     </property>
+     <property name="Type" stdset="0">
+      <number>0</number>
+     </property>
+     <property name="Field" stdset="0">
+      <string>f_image</string>
      </property>
     </widget>
    </item>

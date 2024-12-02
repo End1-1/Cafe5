@@ -1,13 +1,17 @@
 #ifndef SQLQUERY_H
 #define SQLQUERY_H
 
-#include "socketdata.h"
-#include <QStringList>
+#include <QJsonObject>
 
-extern "C" Q_DECL_EXPORT void routes(QStringList &r);
-extern "C" Q_DECL_EXPORT bool networkdb(const QByteArray &indata, QByteArray &outdata, const QHash<QString, DataAddress> &dataMap, const ContentType &contentType);
-extern "C" Q_DECL_EXPORT bool printservice(const QByteArray &indata, QByteArray &outdata, const QHash<QString, DataAddress> &dataMap, const ContentType &contentType);
-extern "C" Q_DECL_EXPORT bool printfiscal(const QByteArray &indata, QByteArray &outdata, const QHash<QString, DataAddress> &dataMap, const ContentType &contentType);
-extern "C" Q_DECL_EXPORT bool printbill(const QByteArray &indata, QByteArray &outdata, const QHash<QString, DataAddress> &dataMap, const ContentType &contentType);
+#ifdef MYLIB_EXPORTS
+    #define MYLIB_SHARED_EXPORT Q_DECL_EXPORT
+#else
+    #define MYLIB_SHARED_EXPORT Q_DECL_IMPORT
+#endif
+
+extern "C" MYLIB_SHARED_EXPORT bool networkdb();
+extern "C" MYLIB_SHARED_EXPORT bool printservice(const QJsonObject &jreq, QJsonObject &jrep, QString &err);
+extern "C" MYLIB_SHARED_EXPORT bool printfiscal(const QJsonObject &jreq, QJsonObject &jrep, QString &err);
+extern "C" MYLIB_SHARED_EXPORT bool printbill(const QJsonObject &jreq, QJsonObject &jrep, QString &err);
 
 #endif // SQLQUERY_H

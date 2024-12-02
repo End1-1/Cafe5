@@ -30,6 +30,7 @@ C5Editor *C5Editor::createEditor(const QStringList &dbParams, CE5Editor *e, int 
     e->getLineEdit(e);
     e->clear();
     e->setId(id);
+    de->ui->btnCopy->setVisible(e->canCopy());
     de->setWindowTitle(e->title());
     if (e->b1()) {
         de->insertButton(e->b1());
@@ -147,4 +148,9 @@ void C5Editor::on_btnCancel_clicked()
 {
     fEditor->clear();
     reject();
+}
+
+void C5Editor::on_btnCopy_clicked()
+{
+    fEditor->copyObject();
 }

@@ -19,7 +19,8 @@ public:
     ~DlgPaymentChoose();
     static bool getValues(double total, double &cash, double &card, double &idram, double &telcell, double &bank,
                           double &credit,
-                          double &prepaid, double &debt, double &cashin, double &change, bool &fiscal, bool readOnlyPrepaid);
+                          double &prepaid, double &debt, double &cashin, double &change,
+                          bool &fiscal, bool readOnlyPrepaid, double maxPrepaid);
 
     virtual void keyEnter() override;
 
@@ -94,6 +95,8 @@ private:
     void clearAll(QLineEdit *le);
 
     void countChange();
+
+    double fMaxPrepaid;
 };
 
 #endif // DLGPAYMENTCHOOSE_H

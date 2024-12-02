@@ -54,7 +54,6 @@ void C5Permissions::init(C5Database &db, int group)
               << cp_t3_sale_effectiveness
               << cp_t3_storage_uncomplected
               << cp_t3_move_uncomplected
-              << cp_t3_count_output_of_sale_draft
               << cp_t3_custom_reports
               << cp_t3_draft_output_recipes
               << cp_t4_menu
@@ -111,7 +110,6 @@ void C5Permissions::init(C5Database &db, int group)
               << cp_t6_goods
               << cp_t6_units
               << cp_t6_groups
-              << cp_t6_waste
               << cp_t6_goods_images
               << cp_t6_qty_reminder
               << cp_t6_complectations

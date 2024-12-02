@@ -8,7 +8,6 @@ JsonReponse::JsonReponse(Database &db, const QJsonObject &ji, QJsonObject &jo) :
     fJsonIn(ji),
     fJsonOut(jo)
 {
-
 }
 
 void JsonReponse::getResponse()
@@ -19,67 +18,67 @@ void JsonReponse::getResponse()
         }
     }
     switch (fJsonIn["pkAction"] .toInt()) {
-    case hqRegisterDevice:
-        registerDevice();
-        break;
-    case hqLogin:
-        login();
-        break;
-    case hqDownloadData:
-        downloadData();
-        break;
-    case hqCheckPassHash:
-        checkHashOfPass();
-        break;
-    case hqStock:
-        stock();
-        break;
-    case hqSaveOrder:
-        saveOrder();
-        break;
-    case hqPreorders:
-        preordersList();
-        break;
-    case hqPreorderDetails:
-        preorderDetails();
-        break;
-    case hqDebt:
-        getDebts();
-        break;
-    case hqRoute:
-        getRoute();
-        break;
-    case hqPreorderStock:
-        orderList();
-        break;
-    case hqOpenOrder:
-        openOrder();
-        break;
-    case hqRemoveOrderRow:
-        removeOrderRow();
-        break;
-    case hqExportToAS:
-        exportToAS();
-        break;
-    case hqDriverList:
-        getDriversList();
-        break;
-    case hqVisit:
-        visit();
-        break;
-    case hqCompleteDelivery:
-        completeDelivery();
-        break;
-    case hqGoodsPartners:
-        goodsPartners();
-        break;
-    case hqSaleHistory:
-        saleHistory();
-        break;
-    default:
-        fJsonOut["ok"] = 0;
-        fJsonOut["message"] = QString("%1 %2").arg(lkUnknownProtocol, fJsonIn["pkAction"].toString());
-        break;
+        case hqRegisterDevice:
+            registerDevice();
+            break;
+        case hqLogin:
+            login();
+            break;
+        case hqDownloadData:
+            downloadData();
+            break;
+        case hqCheckPassHash:
+            checkHashOfPass();
+            break;
+        case hqStock:
+            stock();
+            break;
+        case hqSaveOrder:
+            saveOrder();
+            break;
+        case hqPreorders:
+            preordersList();
+            break;
+        case hqPreorderDetails:
+            preorderDetails();
+            break;
+        case hqDebt:
+            getDebts();
+            break;
+        case hqRoute:
+            getRoute();
+            break;
+        case hqPreorderStock:
+            orderList();
+            break;
+        case hqOpenOrder:
+            openOrder();
+            break;
+        case hqRemoveOrderRow:
+            removeOrderRow();
+            break;
+        case hqExportToAS:
+            exportToAS();
+            break;
+        case hqDriverList:
+            getDriversList();
+            break;
+        case hqVisit:
+            visit();
+            break;
+        case hqCompleteDelivery:
+            completeDelivery();
+            break;
+        case hqGoodsPartners:
+            goodsPartners();
+            break;
+        case hqSaleHistory:
+            saleHistory();
+            break;
+        default:
+            fJsonOut["ok"] = 0;
+            fJsonOut["message"] = QString("%1 %2").arg(lkUnknownProtocol, fJsonIn["pkAction"].toString());
+            break;
     }
 }
 
@@ -112,18 +111,18 @@ void JsonReponse::dbToArray(Database &db, QJsonArray &ja)
         for (int i = 0; i < db.columnCount(); i++) {
             //qDebug() << db.value(i).type();
             switch (db.value(i).type()) {
-            case QVariant::Int:
-            case QVariant::Char:
-            case QVariant::LongLong:
-            case QVariant::ULongLong:
-                jo[db.columnName(i)] = db.integer(i);
-                break;
-            case QVariant::Double:
-                jo[db.columnName(i)] = db.doubleValue(i);
-                break;
-            default:
-                jo[db.columnName(i)] = db.string(i);
-                break;
+                case QVariant::Int:
+                case QVariant::Char:
+                case QVariant::LongLong:
+                case QVariant::ULongLong:
+                    jo[db.columnName(i)] = db.integer(i);
+                    break;
+                case QVariant::Double:
+                    jo[db.columnName(i)] = db.doubleValue(i);
+                    break;
+                default:
+                    jo[db.columnName(i)] = db.string(i);
+                    break;
             }
         }
         ja.append(jo);
@@ -146,7 +145,8 @@ bool JsonReponse::checkAPIandFCMToken()
     }
     fDeviceId = fDb.integer("f_id");
     //If pass hash not exists, use username and password to authenticate
-    if (fJsonIn[pkAction].toInt() != hqLogin && fJsonIn[pkAction].toInt() != hqRegisterDevice && fJsonIn.contains(pkUsername)) {
+    if (fJsonIn[pkAction].toInt() != hqLogin && fJsonIn[pkAction].toInt() != hqRegisterDevice && fJsonIn.contains(
+                pkUsername)) {
         fDb[":f_login"] = fJsonIn[pkUsername].toString();
         fDb[":f_password"] = fJsonIn[pkPassword].toString();
         fDb.exec("select * from s_user where f_login=:f_login and f_password=md5(:f_password)");
@@ -222,7 +222,6 @@ bool JsonReponse::downloadData()
     }
     dbToArray(fDb, ja);
     fJsonOut["goods"] = ja;
-
     ja = QJsonArray();
     fDb[":f_enabled"] = 1;
     if (!fDb.exec("select distinct(gr.f_id) as `id`, gr.f_name as `name` "
@@ -233,7 +232,6 @@ bool JsonReponse::downloadData()
     }
     dbToArray(fDb, ja);
     fJsonOut["goodsgroup"] = ja;
-
     if (!fDb.exec("select pc.f_name as category, pg.f_name as `group`, ps.f_name as status, p.f_id as id, p.f_name as name, "
                   "p.f_address as address, p.f_taxname as taxName, p.f_taxcode as taxCode, p.f_contact as contact, "
                   "p.f_phone as phonenumber, p.f_permanent_discount as discount, p.f_price_politic as pricepolitic "
@@ -246,21 +244,18 @@ bool JsonReponse::downloadData()
     ja = QJsonArray();
     dbToArray(fDb, ja);
     fJsonOut["partners"] = ja;
-
     if (!fDb.exec("select f_partner as partner, f_goods as goods, f_price as price from c_goods_special_prices")) {
         return dbFail();
     }
     ja = QJsonArray();
     dbToArray(fDb, ja);
     fJsonOut["specialprices"] = ja;
-
     if (!fDb.exec("select f_id as id, f_name as name from c_storages where f_state=1 ")) {
         return dbFail();
     }
     ja = QJsonArray();
     dbToArray(fDb, ja);
     fJsonOut["storages"] = ja;
-
     if (!fDb.exec("select distinct(u.f_id) as id, concat_ws(' ', u.f_last, u.f_first) as name "
                   "from o_route_drivers r "
                   "left join s_user u on u.f_id=r.f_user ")) {
@@ -269,14 +264,12 @@ bool JsonReponse::downloadData()
     ja = QJsonArray();
     dbToArray(fDb, ja);
     fJsonOut["drivers"] = ja;
-
     if (!fDb.exec("select f_partner as partner, f_goods as goods from c_goods_partner")) {
         return dbFail();
     }
     ja = QJsonArray();
     dbToArray(fDb, ja);
     fJsonOut["partnersgoods"] = ja;
-
     fDb[":f_id"] = fUserId;
     if (!fDb.exec("select f_config from s_user where f_id=:f_id")) {
         return dbFail();
@@ -289,15 +282,15 @@ bool JsonReponse::downloadData()
     } else {
         fDb[":f_settings"] = config;
         fDb.exec("select f_key, f_value from s_settings_values "
-                "where f_settings=:f_settings and f_key in (14) ");
+                 "where f_settings=:f_settings and f_key in (14) ");
         while (fDb.next()) {
             switch (fDb.integer("f_key")) {
-            case 14: jConfig["storage"] = fDb.string("f_value").toInt();
+                case 14:
+                    jConfig["storage"] = fDb.string("f_value").toInt();
             }
         }
     }
     fJsonOut["config"] = jConfig;
-
     fJsonOut["ok"] = 1;
     return true;
 }
@@ -317,11 +310,12 @@ bool JsonReponse::stock()
 {
     int stock = fJsonIn[pkStock].toInt();
     int group = fJsonIn[pkGroup].toInt();
-    QString sql = "select s.f_goods as goodsid, gr.f_name as groupname, g.f_name as goodsname, sum(s.f_qty*s.f_type) as qty "
-            "from a_store s "
-            "left join c_goods g on g.f_id=s.f_goods "
-            "left join c_groups gr on gr.f_id=g.f_group "
-            "left join c_storages st on st.f_id=s.f_store ";
+    QString sql =
+        "select s.f_goods as goodsid, gr.f_name as groupname, g.f_name as goodsname, sum(s.f_qty*s.f_type) as qty "
+        "from a_store s "
+        "left join c_goods g on g.f_id=s.f_goods "
+        "left join c_groups gr on gr.f_id=g.f_group "
+        "left join c_storages st on st.f_id=s.f_store ";
     QString where = "where g.f_enabled=1 and st.f_state=1 ";
     if (stock > 0) {
         where += QString(" and s.f_store=%1 ").arg(stock);
@@ -336,7 +330,6 @@ bool JsonReponse::stock()
     }
     QJsonArray ja;
     dbToArray(fDb, ja);
-
     fJsonOut[pkData] = ja;
     fJsonOut[pkOk] = 1;
     return true;
@@ -358,9 +351,7 @@ bool JsonReponse::saveOrder()
     sale[":f_comment"] = fJsonIn["comment"].toString();
     sale[":f_datefor"] = QDate::fromString(fJsonIn["deliverydate"].toString(), "dd/MM/yyyy");
     sale[":f_flag"] = fJsonIn["mark"].toInt();
-
     QList<QMap<QString, QVariant> > saleBody;
-
     QMap<QString, QVariant> back;
     back[":f_staff"] = fUserId;
     back[":f_cashier"] = fUserId;
@@ -372,9 +363,7 @@ bool JsonReponse::saveOrder()
     back[":f_saletype"] = 3;
     back[":f_discount"] = fJsonIn["partner"]["discount"].toDouble() / 100;
     back[":f_comment"] = fJsonIn["comment"].toString();
-
     QList<QMap<QString, QVariant> > backBody;
-
     QJsonArray ja = fJsonIn["goods"].toArray();
     for (int i = 0; i < ja.size(); i++) {
         QJsonObject o = ja.at(i).toObject();
@@ -402,7 +391,6 @@ bool JsonReponse::saveOrder()
             back[":f_amount"] = back[":f_amount"].toDouble() + (o["qtyback"].toDouble() * o["price"].toDouble());
         }
     }
-
     fDb.startTransaction();
     if (!saleBody.isEmpty()) {
         bool u = !sale[":f_id"].toString().isEmpty();
@@ -431,9 +419,8 @@ bool JsonReponse::saveOrder()
             if (!fDb.insert("o_route_exec")) {
                 return dbFail();
             }
-
         }
-        for (QMap<QString, QVariant> &l: saleBody) {
+        for (QMap<QString, QVariant> &l : saleBody) {
             u = !l[":f_id"].toString().isEmpty();
             if (!u) {
                 l[":f_id"] = fDb.uuid();
@@ -453,7 +440,6 @@ bool JsonReponse::saveOrder()
                 }
             }
         }
-
         fDb[":f_partner"] = fJsonIn["partner"]["id"].toInt();
         fDb.exec("select f_goods from c_goods_partner where f_partner=:f_partner");
         QSet<int> oldgoods;
@@ -475,18 +461,16 @@ bool JsonReponse::saveOrder()
             fDb.insert("c_goods_partner");
         }
     }
-
     if (!backBody.isEmpty()) {
         back[":f_id"] = fDb.uuid();
         for (QMap<QString, QVariant>::const_iterator it = back.constBegin(); it != back.constEnd(); it++) {
             fDb[it.key()] = it.value();
         }
-
         if (!fDb.insert("o_draft_sale")) {
             fDb.rollback();
             return dbFail();
         }
-        for (QMap<QString, QVariant> &l: backBody) {
+        for (QMap<QString, QVariant> &l : backBody) {
             l[":f_header"] = back[":f_id"];
             l[":f_id"] = fDb.uuid();
             for (QMap<QString, QVariant>::const_iterator lt = l.constBegin(); lt != l.constEnd(); lt++) {
@@ -498,7 +482,6 @@ bool JsonReponse::saveOrder()
             }
         }
     }
-
     fDb.commit();
     fJsonOut[pkOk] = 1;
     return true;
@@ -521,17 +504,16 @@ void JsonReponse::preordersList()
         where += QString(" and o.f_staff=%1").arg(driver);
     }
     switch (state) {
-    case 1:
-        where += " and o.f_datefor=:f_datefor";
-        break;
-    case 2:
-        //where += " and o.f_datefor=:f_datefor";
-        break;
-    default:
-        where += " and o.f_datefor=:f_datefor";
-        break;
+        case 1:
+            where += " and o.f_datefor=:f_datefor";
+            break;
+        case 2:
+            //where += " and o.f_datefor=:f_datefor";
+            break;
+        default:
+            where += " and o.f_datefor=:f_datefor";
+            break;
     }
-
     fDb[":f_datefor"] = date;
     if (!fDb.exec(QString("select o.f_id as `id`, date_format(o.f_datefor, '%d/%m/%Y')as `date`, "
                           "p.f_name as `partnername`, p.f_address as `address`, o.f_amount as `amount`, "
@@ -566,7 +548,6 @@ void JsonReponse::preorderDetails()
         fDb.rollback();
         return;
     }
-
     QJsonArray ja;
     dbToArray(fDb, ja);
     fJsonOut[pkData] = ja;
@@ -580,10 +561,11 @@ void JsonReponse::getDebts()
     if (partner > 0) {
         where += QString(" and bc.f_costumer=%1").arg(partner);
     }
-    if (!fDb.exec(QString("select p.f_id as partnerid, p.f_name as name, p.f_address as address, sum(bc.f_amount) as amount "
-                          "from b_clients_debts bc "
-                          "left join c_partners p on p.f_id=bc.f_costumer %1 "
-                          "group by p.f_id ").arg(where))) {
+    if (!fDb.exec(
+                QString("select p.f_id as partnerid, p.f_name as name, p.f_address as address, sum(bc.f_amount) as amount "
+                        "from b_clients_debts bc "
+                        "left join c_partners p on p.f_id=bc.f_costumer %1 "
+                        "group by p.f_id ").arg(where))) {
         fJsonOut[pkOk] = 0;
         fJsonOut[pkMessage] = fDb.lastDbError();
         fDb.rollback();
@@ -600,12 +582,13 @@ bool JsonReponse::orderList()
     int stock = fJsonIn[pkStock].toInt();
     int group = fJsonIn[pkGroup].toInt();
     QString date = fJsonIn[pkDate].toString();
-    QString sql = "select o.f_datefor, st.f_name as stockname, g.f_id as goodsid, gr.f_name as groupname, g.f_name as goodsname, sum(s.f_qty) as qty "
-           "from o_draft_sale_body s "
-           "left join o_draft_sale o on o.f_id=s.f_header "
-           "left join c_storages st on st.f_id=s.f_store "
-           "left join c_goods g on g.f_id=s.f_goods "
-           "left join c_groups gr on gr.f_id=g.f_group ";
+    QString sql =
+        "select o.f_datefor, st.f_name as stockname, g.f_id as goodsid, gr.f_name as groupname, g.f_name as goodsname, sum(s.f_qty) as qty "
+        "from o_draft_sale_body s "
+        "left join o_draft_sale o on o.f_id=s.f_header "
+        "left join c_storages st on st.f_id=s.f_store "
+        "left join c_goods g on g.f_id=s.f_goods "
+        "left join c_groups gr on gr.f_id=g.f_group ";
     QString where = "where g.f_enabled=1 and o.f_state<4 and o.f_saletype in (1,2) ";
     if (stock > 0) {
         where += QString(" and s.f_store=%1 ").arg(stock);
@@ -618,7 +601,6 @@ bool JsonReponse::orderList()
     if (!fDb.exec(sql)) {
         return dbFail();
     }
-
     QJsonArray ja;
     dbToArray(fDb, ja);
     fJsonOut[pkOk] = 1;
@@ -659,7 +641,7 @@ bool JsonReponse::getRoute()
                           "left join o_route r on p.f_id=r.f_partner "
                           "left join o_draft_sale o on o.f_partner=r.f_partner and o.f_datefor=:f_datefor "
                           "left join (select f_partner, group_concat(f_action) as f_action "
-                            "from o_route_exec where f_date=:f_datefor group by 1) re on re.f_partner=r.f_partner "
+                          "from o_route_exec where f_date=:f_datefor group by 1) re on re.f_partner=r.f_partner "
                           "where ((r.f_%1=1 and r.f_driver=:f_driver and r.f_round=:f_round) "
                           "or (weekday(o.f_datefor)=%2 and o.f_state=2)) or (length(re.f_action) > 0) %3 "
                           "group by 1, 5, 6 "
@@ -701,7 +683,6 @@ bool JsonReponse::openOrder()
     ja = QJsonArray();
     dbToArray(fDb, ja);
     fJsonOut["goods"] = ja;
-
     fDb[":f_id"] = jorder["f_partner"].toInt();
     if (!fDb.exec("select pc.f_name as category, pg.f_name as `group`, ps.f_name as status, p.f_id as id, p.f_name as name, "
                   "p.f_address as address, p.f_taxname as taxName, p.f_taxcode as taxCode, p.f_contact as contact, "
@@ -716,7 +697,6 @@ bool JsonReponse::openOrder()
     ja = QJsonArray();
     dbToArray(fDb, ja);
     if (ja.count() == 0) {
-
     } else {
         fJsonOut["partner"] = ja.at(0).toObject();
     }
@@ -739,7 +719,7 @@ bool JsonReponse::exportToAS()
 {
     QString err;
     ArmSoft a(fJsonIn);
-    if (!a.exportToAS(fJsonIn["draftid"].toString(), err)) {
+    if (!a.exportToAS(err)) {
         return error(err);
     }
     fJsonOut[pkOk] = 1;
@@ -768,15 +748,15 @@ bool JsonReponse::visit()
     fDb[":f_driver"] = fUserId;
     fDb[":f_action_datetime"] = QDateTime::currentDateTime();
     switch (fJsonIn["action"].toInt()) {
-    case 1:
-        fDb[":f_action_comment"] = QString("Այց, ապրանք պետք չէ");
-        break;
-    case 2:
-        fDb[":f_action_comment"] = QString("Վաճառք");
-        break;
-    case 3:
-        fDb[":f_action_comment"] = QString("Խանութը փակ էր");
-        break;
+        case 1:
+            fDb[":f_action_comment"] = QString("Այց, ապրանք պետք չէ");
+            break;
+        case 2:
+            fDb[":f_action_comment"] = QString("Վաճառք");
+            break;
+        case 3:
+            fDb[":f_action_comment"] = QString("Խանութը փակ էր");
+            break;
     }
     if (!fDb.insert("o_route_exec")) {
         return dbFail();
@@ -793,12 +773,11 @@ bool JsonReponse::completeDelivery()
     }
     fDb[":f_id"] = fJsonIn["id"].toString();
     if (!fDb.exec("select * from o_draft_sale where f_id=:f_id")) {
-            return dbFail();
+        return dbFail();
     }
     if (!fDb.next()) {
         return error("Invalid order id");
     }
-
     fDb[":f_partner"] = fDb.integer("f_partner");
     fDb[":f_action"] = 4;
     fDb[":f_date"] = QDate::currentDate();
@@ -809,7 +788,6 @@ bool JsonReponse::completeDelivery()
     if (!fDb.insert("o_route_exec")) {
         return dbFail();
     }
-
     return ok();
 }
 
@@ -832,23 +810,22 @@ bool JsonReponse::saleHistory()
     int reportType = fJsonIn["pkReportType"].toInt();
     QJsonObject reply;
     switch (reportType) {
-    case 1:
-        fDb[":f_datecash1"] = d1;
-        fDb[":f_datecash2"] = d2;
-        if (fDb.exec("select h.f_name as f_hallname, sum(o.f_amounttotal) as f_amounttotal, "
-                     "count(o.f_id) as f_ordercount, sum(o.f_amountcash) as f_amountcash "
-                     "from o_header o "
-                     "left join h_halls h on h.f_id=o.f_hall "
-                     "where o.f_datecash between :f_datecash1 and :f_datecash2 "
-                     "group by 1") == false) {
-            return dbFail();
-        }
-        QJsonArray ja;
-        dbToArray(fDb, ja);
-        reply["total"] = ja;
-        break;
+        case 1:
+            fDb[":f_datecash1"] = d1;
+            fDb[":f_datecash2"] = d2;
+            if (fDb.exec("select h.f_name as f_hallname, sum(o.f_amounttotal) as f_amounttotal, "
+                         "count(o.f_id) as f_ordercount, sum(o.f_amountcash) as f_amountcash "
+                         "from o_header o "
+                         "left join h_halls h on h.f_id=o.f_hall "
+                         "where o.f_datecash between :f_datecash1 and :f_datecash2 "
+                         "group by 1") == false) {
+                return dbFail();
+            }
+            QJsonArray ja;
+            dbToArray(fDb, ja);
+            reply["total"] = ja;
+            break;
     }
-
     fJsonOut[pkData] = reply;
     return ok();
 }

@@ -55,5 +55,11 @@ void NInterface::httpQueryFinished(QObject *sender)
 void NInterface::httpQueryError(const QString &err)
 {
     httpQueryFinished(sender());
-    C5Message::error(err);
+    QString e = err;
+    if (err.contains("Unauthorized")) {
+        e = tr("Unauthorized");
+    }
+    if (fProgress) {
+        C5Message::error(e);
+    }
 }

@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core gui printsupport network sql multimedia
+QT       += core gui printsupport network sql multimedia websockets
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -19,6 +19,7 @@ RC_FILE = res.rc
 # deprecated API in order to know how to port your code away from it.
 DEFINES += QT_DEPRECATED_WARNINGS
 DEFINES += NETWORKDB
+DEFINES += BF10
 
 # You can also make your code fail to compile if you use deprecated APIs.
 # In order to do so, uncomment the following line.
@@ -93,7 +94,6 @@ SOURCES += \
     ../Classes/outputofheader.cpp \
     ../Classes/proxytablewidgetdatabase.cpp \
     ../Classes/thread.cpp \
-    ../Classes/threadsendmessage.cpp \
     ../Configs/breezeconfig.cpp \
     ../Configs/cashboxconfig.cpp \
     ../Configs/configs.cpp \
@@ -125,7 +125,6 @@ SOURCES += \
     ../DbData/dbtables.cpp \
     ../DbData/dbunit.cpp \
     ../DbData/dbusers.cpp \
-    ../Forms/c5printtaxanywhere.cpp \
     ../Forms/dlgdataonline.cpp \
     ../Forms/dlgpaymentchoose.cpp \
     ../Forms/dlgreservgoods.cpp \
@@ -136,31 +135,17 @@ SOURCES += \
     ../Printing/printreceipt.cpp \
     ../Printing/printreceiptgroup.cpp \
     ../Printing/selectprinters.cpp \
-    ../Service5/handlers/httpheader.cpp \
-    ../Service5/handlers/requesthandler.cpp \
-    ../Service5/handlers/socketdata.cpp \
-    ../Service5/socket/sslsocket.cpp \
     ../Service5/utils/commandline.cpp \
     ../Service5/utils/configini.cpp \
     ../Service5/utils/database.cpp \
     ../Service5/utils/gtranslator.cpp \
-    ../Service5/utils/jsonhandler.cpp \
     ../Service5/utils/logwriter.cpp \
-    ../Service5/utils/os.cpp \
-    ../Service5/utils/sqlqueries.cpp \
-    ../Service5/utils/storemovement.cpp \
     ../Service5/utils/tablerecord.cpp \
-    ../Service5Working/socket/sslserver.cpp \
-    ../Service5Working/socket/sslsocket.cpp \
     ../Service5Working/utils/commandline.cpp \
     ../Service5Working/utils/configini.cpp \
     ../Service5Working/utils/database.cpp \
     ../Service5Working/utils/gtranslator.cpp \
-    ../Service5Working/utils/jsonhandler.cpp \
     ../Service5Working/utils/logwriter.cpp \
-    ../Service5Working/utils/os.cpp \
-    ../Service5Working/utils/sqlqueries.cpp \
-    ../Service5Working/utils/storemovement.cpp \
     ../Service5Working/utils/tablerecord.cpp \
     ../TableRecord/aheader.cpp \
     ../TableRecord/bclientdebts.cpp \
@@ -175,10 +160,12 @@ SOURCES += \
     ../TableRecord/otax.cpp \
     c5tempsale.cpp \
     cashcollection.cpp \
+    dlgcashout.cpp \
     dlgdate.cpp \
     dlggetidname.cpp \
     dlggiftcardsale.cpp \
     dlggoodslist.cpp \
+    dlgmovement.cpp \
     dlgpin.cpp \
     dlgregistercard.cpp \
     dlgreturnitem.cpp \
@@ -193,9 +180,6 @@ SOURCES += \
     selectstaff.cpp \
     settingsselection.cpp \
     storeinput.cpp \
-    taxprint.cpp \
-    threadcheckmessage.cpp \
-    threadreadmessage.cpp \
     threadworker.cpp \
     userphoto.cpp \
     viewinputitem.cpp \
@@ -288,7 +272,6 @@ HEADERS += \
     ../Classes/outputofheader.h \
     ../Classes/proxytablewidgetdatabase.h \
     ../Classes/thread.h \
-    ../Classes/threadsendmessage.h \
     ../Configs/breezeconfig.h \
     ../Configs/cashboxconfig.h \
     ../Configs/configs.h \
@@ -320,7 +303,6 @@ HEADERS += \
     ../DbData/dbtables.h \
     ../DbData/dbunit.h \
     ../DbData/dbusers.h \
-    ../Forms/c5printtaxanywhere.h \
     ../Forms/dlgdataonline.h \
     ../Forms/dlgpaymentchoose.h \
     ../Forms/dlgreservgoods.h \
@@ -331,33 +313,17 @@ HEADERS += \
     ../Printing/printreceipt.h \
     ../Printing/printreceiptgroup.h \
     ../Printing/selectprinters.h \
-    ../Service5/handlers/httpheader.h \
-    ../Service5/handlers/requesthandler.h \
-    ../Service5/handlers/socketdata.h \
-    ../Service5/socket/sslsocket.h \
     ../Service5/utils/commandline.h \
     ../Service5/utils/configini.h \
     ../Service5/utils/database.h \
     ../Service5/utils/gtranslator.h \
-    ../Service5/utils/jsonhandler.h \
     ../Service5/utils/logwriter.h \
-    ../Service5/utils/os.h \
-    ../Service5/utils/sqlqueries.h \
-    ../Service5/utils/storemovement.h \
     ../Service5/utils/tablerecord.h \
-    ../Service5Working/raw/messagelist.h \
-    ../Service5Working/raw/structs.h \
-    ../Service5Working/socket/sslserver.h \
-    ../Service5Working/socket/sslsocket.h \
     ../Service5Working/utils/commandline.h \
     ../Service5Working/utils/configini.h \
     ../Service5Working/utils/database.h \
     ../Service5Working/utils/gtranslator.h \
-    ../Service5Working/utils/jsonhandler.h \
     ../Service5Working/utils/logwriter.h \
-    ../Service5Working/utils/os.h \
-    ../Service5Working/utils/sqlqueries.h \
-    ../Service5Working/utils/storemovement.h \
     ../Service5Working/utils/tablerecord.h \
     ../TableRecord/aheader.h \
     ../TableRecord/bclientdebts.h \
@@ -372,10 +338,12 @@ HEADERS += \
     ../TableRecord/otax.h \
     c5tempsale.h \
     cashcollection.h \
+    dlgcashout.h \
     dlgdate.h \
     dlggetidname.h \
     dlggiftcardsale.h \
     dlggoodslist.h \
+    dlgmovement.h \
     dlgpin.h \
     dlgregistercard.h \
     dlgreturnitem.h \
@@ -389,9 +357,6 @@ HEADERS += \
     selectstaff.h \
     settingsselection.h \
     storeinput.h \
-    taxprint.h \
-    threadcheckmessage.h \
-    threadreadmessage.h \
     threadworker.h \
     userphoto.h \
     viewinputitem.h \
@@ -422,7 +387,6 @@ FORMS += \
     ../Classes/dlgpassword.ui \
     ../Classes/notificationwidget.ui \
     ../Controls/c5tablewithtotal.ui \
-    ../Forms/c5printtaxanywhere.ui \
     ../Forms/dlgdataonline.ui \
     ../Forms/dlgpaymentchoose.ui \
     ../Forms/dlgreservgoods.ui \
@@ -431,10 +395,12 @@ FORMS += \
     ../Printing/selectprinters.ui \
     c5tempsale.ui \
     cashcollection.ui \
+    dlgcashout.ui \
     dlgdate.ui \
     dlggetidname.ui \
     dlggiftcardsale.ui \
     dlggoodslist.ui \
+    dlgmovement.ui \
     dlgpin.ui \
     dlgregistercard.ui \
     dlgreturnitem.ui \
@@ -447,7 +413,6 @@ FORMS += \
     selectstaff.ui \
     settingsselection.ui \
     storeinput.ui \
-    taxprint.ui \
     userphoto.ui \
     viewinputitem.ui \
     vieworder.ui \
@@ -475,8 +440,6 @@ INCLUDEPATH += ../Configs
 INCLUDEPATH += ../Service
 INCLUDEPATH += ../Printing
 INCLUDEPATH += ../Service5
-INCLUDEPATH += ../Service5/raw
-INCLUDEPATH += ../Service5Working/raw
 INCLUDEPATH += ../Service5/socket
 INCLUDEPATH += ../Service5/utils
 INCLUDEPATH += ../Service5/handlers

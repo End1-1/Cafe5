@@ -90,6 +90,13 @@
        </widget>
       </item>
       <item>
+       <widget class="QPushButton" name="btnCopy">
+        <property name="text">
+         <string>Copy</string>
+        </property>
+       </widget>
+      </item>
+      <item>
        <widget class="QPushButton" name="btnCancel">
         <property name="text">
          <string>Close</string>

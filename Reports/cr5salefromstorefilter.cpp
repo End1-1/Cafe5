@@ -48,6 +48,9 @@ QString CR5SaleFromStoreFilter::condition()
     if (ui->rbSrvNo->isChecked()) {
         w += " and gg.f_service=0 ";
     }
+    if (!ui->leClass->isEmpty()) {
+        w += " and gr.f_class='" + ui->leClass->text() + "' ";
+    }
     w += fFlags;
     return w;
 }

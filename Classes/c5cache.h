@@ -20,7 +20,6 @@
 #define cache_users 14
 #define cache_waiter_printers 15
 #define cache_dish 17
-#define cache_goods_waste 18
 #define cache_credit_card 19
 #define cache_dish_remove_reason 20
 #define cache_settings_names 21
@@ -109,6 +108,8 @@ public:
     }
 
     void refresh();
+
+    void refreshId(const QString &whereField, int id);
 
     static C5Cache *cache(const QStringList &dbParams, int cacheId);
 

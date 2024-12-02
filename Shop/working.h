@@ -1,7 +1,6 @@
 #ifndef WORKING_H
 #define WORKING_H
 
-#include "c5storedraftwriter.h"
 #include "ninterface.h"
 #include <QWidget>
 
@@ -101,15 +100,13 @@ private:
 private slots:
     void timeout();
 
+    void checkMessageResponse(const QJsonObject &jdoc);
+
     void astoresaleResponse(const QJsonObject &jdoc);
 
     void checkStoreResponse(const QJsonObject &jdoc);
 
     void uploadDataFinished();
-
-    void threadMessageError(int code, const QString &message);
-
-    void threadMessageData(int code, const QVariant &data);
 
     void shortcutEscape();
 
@@ -171,8 +168,6 @@ private slots:
 
     void on_btnHelp_clicked();
 
-    void on_btnManualTax_clicked();
-
     void on_btnMinimize_clicked();
 
     void on_btnClientConfigQR_clicked();
@@ -186,6 +181,7 @@ private slots:
     void on_btnColumns_clicked();
 
     void on_chRegisterCard_clicked();
+    void on_btnCashout_clicked();
 };
 
 #endif // WORKING_H

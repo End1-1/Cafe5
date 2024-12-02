@@ -12,7 +12,6 @@
 #include "printreceipt.h"
 #include "printtaxn.h"
 #include "printreceiptgroup.h"
-#include "c5printtaxanywhere.h"
 #include "worder.h"
 #include "selectprinters.h"
 #include "dlggetidname.h"
@@ -303,18 +302,9 @@ void ViewOrder::on_btnPrintFiscal_clicked()
         return;
     }
     QString rseq;
-    if (__c5config.taxPort() == 0) {
-        C5PrintTaxAnywhere p(__c5config.dbParams(), ui->leUUID->text());
-        if (p.exec() == QDialog::Accepted) {
-            rseq = p.fReceiptNumber;
-            ui->leTaxNumber->setText(rseq);
-        }
-        on_btnPrintReceipt_clicked();
-    } else {
-        C5Database db(__c5config.dbParams());
-        if (printCheckWithTax(db, ui->leUUID->text(), rseq)) {
-            ui->leTaxNumber->setText(rseq);
-        }
+    C5Database db(__c5config.dbParams());
+    if (printCheckWithTax(db, ui->leUUID->text(), rseq)) {
+        ui->leTaxNumber->setText(rseq);
     }
 }
 

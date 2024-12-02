@@ -4,6 +4,8 @@ QT += network printsupport
 
 TEMPLATE = lib
 DEFINES += SQLQUERY_LIBRARY
+DEFINES += MYLIB_EXPORTS
+TARGET = waiterservice
 
 CONFIG += c++11
 
@@ -30,22 +32,14 @@ HEADERS += \
     sqlquery.h
 
 SOURCES += \
-    ../../handlers/httpheader.cpp \
-    ../../handlers/requesthandler.cpp \
-    ../../handlers/socketdata.cpp \
     ../../utils/commandline.cpp \
     ../../utils/configini.cpp \
-    ../../utils/jsonhandler.cpp \
     ../../utils/logwriter.cpp \
 
 
 HEADERS += \
-    ../../handlers/httpheader.h \
-    ../../handlers/requesthandler.h \
-    ../../handlers/socketdata.h \
     ../../utils/commandline.h \
     ../../utils/configini.h \
-    ../../utils/jsonhandler.h \
     ../../utils/logwriter.h \
 
 

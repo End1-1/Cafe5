@@ -3,7 +3,8 @@
 
 #include "ce5editor.h"
 
-namespace Ui {
+namespace Ui
+{
 class CE5DishPart1;
 }
 
@@ -19,6 +20,17 @@ public:
     virtual QString title();
 
     virtual QString table();
+
+    virtual void setId(int id) override;
+
+    virtual void clear() override;
+
+private slots:
+    void uploadImage();
+
+    void removeImage();
+
+    void on_lbImg_customContextMenuRequested(const QPoint &pos);
 
 private:
     Ui::CE5DishPart1 *ui;

@@ -3,7 +3,8 @@
 
 #include "c5dialog.h"
 
-namespace Ui {
+namespace Ui
+{
 class Sales;
 }
 
@@ -56,6 +57,10 @@ private slots:
 
     void on_btnChangeDate_clicked();
 
+    void on_deStart_textChanged(const QString &arg1);
+
+    void on_deEnd_textChanged(const QString &arg1);
+
 private:
     Ui::Sales *ui;
 
@@ -76,8 +81,6 @@ private:
     void refreshGroups();
 
     int fViewMode;
-
-    QString userCond() const;
 
     void printpreview();
 

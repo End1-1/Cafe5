@@ -6,6 +6,10 @@
 #include "c5saledoc.h"
 #include "cr5reportsfilter.h"
 #include "c5salefromstoreorder.h"
+#include "ntablewidget.h"
+#include <QJsonObject>
+
+#define REPORT_HANDLER_GIFT_CARD_TOTAL "ff64e987-a0b2-11ef-b479-022165c6dab1"
 
 CR5Reports::CR5Reports(const QStringList &dbParams, QWidget *parent) :
     C5ReportWidget(dbParams, parent)
@@ -24,7 +28,6 @@ QToolBar *CR5Reports::toolBar()
             << ToolBarButtons::tbExcel
             << ToolBarButtons::tbPrint;
         createStandartToolbar(btn);
-
     }
     return fToolBar;
 }
@@ -43,12 +46,10 @@ void CR5Reports::setReport(int id)
     fFilterHandler = db.getString("f_filterhandler");
     fQuery = db.getString("f_query");
     fLabel = db.getString("f_name");
-
     QStringList sumColumns = db.getString("f_sumcolumn_indexes").split(",", Qt::SkipEmptyParts);
-    for (const QString &s: qAsConst(sumColumns)) {
+    for (const QString &s : qAsConst(sumColumns)) {
         fColumnsSumIndex.append(s.toInt());
     }
-
     db[":f_id"] = fFilterHandler;
     db.exec("select * from reports_handler where f_id=:f_id");
     if (db.nextRow()) {
@@ -110,15 +111,14 @@ bool CR5Reports::tblDoubleClicked(int row, int column, const QList<QVariant> &va
                 C5Message::error(err);
                 return false;
             }
-
-
         } else {
-                auto *retaildoc = __mainWindow->createTab<C5SaleDoc>(fDBParams);
-                retaildoc->setMode(1);
-                if (!retaildoc->reportHandler(REPORT_HANDLER_SALE_DOC_OPEN_DRAFT, values.at(0))) {
-
-                }
+            auto *retaildoc = __mainWindow->createTab<C5SaleDoc>(fDBParams);
+            retaildoc->setMode(1);
+            if (!retaildoc->reportHandler(REPORT_HANDLER_SALE_DOC_OPEN_DRAFT, values.at(0))) {
+            }
         }
+    } else if (fHandlerUuid == REPORT_HANDLER_GIFT_CARD_TOTAL) {
+        __mainWindow->createNTab("/engine/reports/gifthistorydetails.php", QJsonObject{{"card", values.at(1).toString()}});
     }
     return true;
 }
@@ -151,21 +151,20 @@ void CR5Reports::removeHandler(bool checked)
         return;
     }
     QSet<int> rowsSet;
-    for (const QModelIndex &ml: mil) {
+    for (const QModelIndex &ml : mil) {
         rowsSet.insert(ml.row());
     }
     QList<int> rows = rowsSet.toList();
     qSort(rows);
     QStringList queries = fDeleteHandler.split(";", Qt::SkipEmptyParts);
     C5Database db(fDBParams);
-    for (int r: rows) {
-        for (QString &q: queries) {
+    for (int r : rows) {
+        for (QString &q : queries) {
             db.exec(q.replace("%handler%", fModel->data(r, 0, Qt::EditRole).toString()));
         }
     }
     std::reverse(rows.begin(), rows.end());
-    for (int r: rows) {
+    for (int r : rows) {
         fModel->removeRow(r);
     }
 }
-

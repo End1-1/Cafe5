@@ -20,8 +20,10 @@ const quint32 col1_orwhosale = 6;
 const quint32 col1_retail = 7;
 const quint32 col1_whosale = 8;
 
-const quint32 col2_retail = 3;
-const quint32 col2_whosale = 4;
+const quint32 col2_retail_price = 3;
+const quint32 col2_whosale_price = 4;
+const quint32 col2_retail = 5;
+const quint32 col2_whosale = 6;
 
 C5GoodsPriceOrder::C5GoodsPriceOrder(const QStringList &dbParams)
     : C5Widget(dbParams)
@@ -110,6 +112,7 @@ void C5GoodsPriceOrder::addGroupResponse(const QJsonObject &jdoc)
     int row = newRow();
     ui->tblDoc->setData(row, 0, jdoc["group"].toInt());
     ui->tblDoc->setData(row, 1, jdoc["groupname"].toString());
+    ui->tblDoc->setData(row, 3, jdoc["qty"].toDouble());
     ui->tblDoc->setData(row, col1_orretail, jdoc["retail"].toDouble());
     ui->tblDoc->setData(row, col1_orwhosale, jdoc["whosale"].toDouble());
     ui->tblDoc->setCurrentCell(row, 0);
@@ -240,8 +243,9 @@ int C5GoodsPriceOrder::newRow()
     l->setValidator(new QDoubleValidator(0, 999999999, 0));
     connect(l, &C5LineEdit::textChanged, [this, row](QString s) {
         setGroupPriceJson(row, 1, s.toDouble());
+        ui->tblDoc->lineEdit(row, col1_whosale)->setDouble(s.toDouble() - (s.toDouble() * 0.3));
         for (int i = 0; i < ui->tblGoods->rowCount(); i++) {
-            ui->tblGoods->lineEdit(i, 3)->setText(s);
+            ui->tblGoods->lineEdit(i, col2_whosale)->setText(s);
         }
     });
     l = ui->tblDoc->createLineEdit(row, col1_whosale);
@@ -249,7 +253,7 @@ int C5GoodsPriceOrder::newRow()
     connect(l, &C5LineEdit::textChanged, [this, row](QString s) {
         setGroupPriceJson(row, 2, s.toDouble());
         for (int i = 0; i < ui->tblGoods->rowCount(); i++) {
-            ui->tblGoods->lineEdit(i, 4)->setText(s);
+            ui->tblGoods->lineEdit(i, col2_retail)->setText(s);
         }
     });
     l = ui->tblDoc->createLineEdit(row, col1_percent);
@@ -261,10 +265,6 @@ int C5GoodsPriceOrder::newRow()
         ui->tblDoc->lineEdit(row, col1_whosale)
         ->setDouble(ui->tblDoc->getDouble(row, col1_orwhosale)  - (ui->tblDoc->getDouble(row,
                     col1_orwhosale) * (s.toDouble() / 100)));
-        // setGroupPriceJson(row, 2, s.toDouble());
-        // for (int i = 0; i < ui->tblGoods->rowCount(); i++) {
-        //     ui->tblGoods->lineEdit(i, 4)->setText(s);
-        // }
     });
     return row;
 }
@@ -276,9 +276,9 @@ int C5GoodsPriceOrder::newGoodsRow()
     ui->tblGoods->setData(row, 0, 0);
     ui->tblGoods->setData(row, 1, "");
     ui->tblGoods->setData(row, 2, "");
-    auto *l = ui->tblGoods->createLineEdit(row, 3);
+    auto *l = ui->tblGoods->createLineEdit(row, col2_retail);
     l->setValidator(new QDoubleValidator(0, 999999999, 0));
-    l = ui->tblGoods->createLineEdit(row, 4);
+    l = ui->tblGoods->createLineEdit(row, col2_whosale);
     l->setValidator(new QDoubleValidator(0, 999999999, 0));
     return row;
 }
@@ -311,6 +311,8 @@ void C5GoodsPriceOrder::setCurrentGroup(int group)
         ui->tblGoods->setData(r, 0, j["f_id"].toInt());
         ui->tblGoods->setData(r, 1, j["f_name"].toString());
         ui->tblGoods->setData(r, 2, j["f_scancode"].toString());
+        ui->tblGoods->setData(r, col2_retail_price, j["f_price1"].toDouble());
+        ui->tblGoods->setData(r, col2_whosale_price, j["f_price2"].toDouble());
         ui->tblGoods->lineEdit(r, col2_retail)->setDouble(j["f_price1disc"].toDouble());
         ui->tblGoods->lineEdit(r, col2_whosale)->setDouble(j["f_price2disc"].toDouble());
     }
@@ -387,6 +389,7 @@ void C5GoodsPriceOrder::on_lwNames_currentItemChanged(QListWidgetItem *current, 
             int r = newRow();
             ui->tblDoc->setData(r, 0, j["f_id"].toInt());
             ui->tblDoc->setData(r, 1, j["f_name"].toString());
+            ui->tblDoc->setData(r, 3, j["qty"].toDouble());
             ui->tblDoc->lineEdit(r, col1_percent)->setDouble(j["f_percent"].toDouble());
             ui->tblDoc->setDouble(r, col1_orretail, j["retail"].toDouble());
             ui->tblDoc->setDouble(r, col1_orwhosale, j["whosale"].toDouble());
@@ -420,6 +423,8 @@ void C5GoodsPriceOrder::on_tblDoc_currentCellChanged(int currentRow, int current
                         ji["f_id"] = ui->tblGoods->getInteger(j, 0);
                         ji["f_name"] = ui->tblGoods->getString(j, 1);
                         ji["f_scancode"] = ui->tblGoods->getString(j, 2);
+                        ji["f_price1"] = ui->tblGoods->getDouble(j,  col2_retail_price);
+                        ji["f_price2"] = ui->tblGoods->getDouble(j, col2_whosale_price);
                         ji["f_price1disc"] = ui->tblGoods->lineEdit(j, col2_retail)->getDouble();
                         ji["f_price2disc"] = ui->tblGoods->lineEdit(j, col2_whosale)->getDouble();
                         jitems.append(ji);
@@ -432,8 +437,8 @@ void C5GoodsPriceOrder::on_tblDoc_currentCellChanged(int currentRow, int current
                 }
             }
         }
-        setCurrentGroup(ui->tblDoc->getInteger(currentRow, 0));
     }
+    setCurrentGroup(ui->tblDoc->getInteger(currentRow, 0));
 }
 
 void C5GoodsPriceOrder::on_btnRollback_clicked()
@@ -514,7 +519,7 @@ void C5GoodsPriceOrder::on_actionChangeGoodsPrice_triggered()
         return;
     }
     for (const QModelIndex &m : ml) {
-        ui->tblGoods->lineEdit(m.row(), 3)->setDouble(v);
+        ui->tblGoods->lineEdit(m.row(), col2_whosale)->setDouble(v);
     }
 }
 
@@ -530,7 +535,7 @@ void C5GoodsPriceOrder::on_actionSet_whosale_price_of_selected_goods_triggered()
         return;
     }
     for (const QModelIndex &m : ml) {
-        ui->tblGoods->lineEdit(m.row(), 4)->setDouble(v);
+        ui->tblGoods->lineEdit(m.row(), col2_retail)->setDouble(v);
     }
 }
 
@@ -599,14 +604,19 @@ void C5GoodsPriceOrder::on_btnPrint_clicked()
     QFont f(qApp->font());
     p.setFont(f);
     p.setSceneParams(2000, 2700, QPrinter::Portrait);
+    p.setFontSize(30);
+    p.ctext(tr("Discount document"));
+    p.br();
     p.setFontSize(25);
     for (int row : rows) {
         p.setFontSize(25);
         p.setFontBold(true);
-        p.ctext(QString("%1 %2 / %3")
-                .arg(tr("Discount document"),
-                     ui->lwNames->currentItem()->text(),
-                     ui->tblDoc->getString(row, 1)));
+        p.ltext(QString("%1 / %2 / %3 - %4 (%5%) ")
+                .arg(ui->lwNames->currentItem()->text(),
+                     ui->tblDoc->getString(row, 1),
+                     ui->tblDoc->lineEdit(row, col1_whosale)->text(),
+                     ui->tblDoc->lineEdit(row, col1_retail)->text(),
+                     ui->tblDoc->lineEdit(row, 4)->text()), 0);
         p.br();
         p.br();
         ui->tblDoc->setCurrentCell(row, 0);
@@ -617,11 +627,17 @@ void C5GoodsPriceOrder::on_btnPrint_clicked()
         points << 10 << 400 << 200 << 200 << 200;
         vals << tr("Name") << tr("Barcode") << tr("Retail") << tr("Whosale");
         for (int i = 0; i < ui->tblGoods->rowCount(); i++) {
+            if ( ui->tblGoods->lineEdit(i, col2_whosale)->text().toDouble()
+                    - ui->tblDoc->lineEdit(row, col1_whosale)->text().toDouble() == 0
+                    && ui->tblGoods->lineEdit(i, col2_retail)->text().toDouble()
+                    - ui->tblDoc->lineEdit(row, col1_retail)->text().toDouble() == 0) {
+                continue;
+            }
             vals.clear();
             vals << ui->tblGoods->getString(i, 1)
                  << ui->tblGoods->getString(i, 2)
-                 << ui->tblGoods->lineEdit(i, 3)->text()
-                 << ui->tblGoods->lineEdit(i, 4)->text();
+                 << ui->tblGoods->lineEdit(i, col2_whosale)->text()
+                 << ui->tblGoods->lineEdit(i, col2_retail)->text();
             p.tableText(points, vals, p.fLineHeight + 20);
             p.br(p.fLineHeight + 20);
         }

@@ -3,7 +3,8 @@
 
 #include "c5dialog.h"
 
-namespace Ui {
+namespace Ui
+{
 class DlgReservGoods;
 }
 
@@ -21,7 +22,8 @@ public:
     ~DlgReservGoods();
 
 private slots:
-    void messageResult(const QJsonObject &jo);
+
+    void createReserveResponse(const QJsonObject &jdoc);
 
     void on_btnClose_clicked();
 

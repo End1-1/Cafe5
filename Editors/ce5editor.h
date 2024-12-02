@@ -37,6 +37,10 @@ public:
 
     virtual void clear();
 
+    virtual bool canCopy();
+
+    virtual void copyObject();
+
     virtual QPushButton *b1();
 
     void getLineEdit(QObject *parent);

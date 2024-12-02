@@ -3,15 +3,16 @@
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
 #include <QJsonObject>
+#include <QWebSocket>
 #include <QJsonDocument>
 #include <QTimer>
 
-
-HttpQueryDialog::HttpQueryDialog(const QStringList &dbParams, const QString &url, const QJsonObject &jo, QWidget *parent) :
+HttpQueryDialog::HttpQueryDialog(const QStringList &dbParams, const QString &url, const QJsonObject &jo,
+                                 QWidget *parent) :
     C5Dialog(dbParams, parent),
     ui(new Ui::HttpQueryDialog),
-    jRequest(jo),
-    fUrl(url)
+    fUrl(url),
+    jRequest(jo)
 {
     ui->setupUi(this);
 }
@@ -24,7 +25,7 @@ HttpQueryDialog::~HttpQueryDialog()
 int HttpQueryDialog::exec()
 {
     QTimer *t = new QTimer(this);
-    connect(t, &QTimer::timeout, this, [=]{
+    connect(t, &QTimer::timeout, this, [ = ] {
         sendRequest();
     });
     t->start(1000);
@@ -33,36 +34,33 @@ int HttpQueryDialog::exec()
 
 void HttpQueryDialog::sendRequest()
 {
-    static_cast<QTimer*>(sender())->stop();
+    static_cast<QTimer *>(sender())->stop();
     sender()->deleteLater();
-    QNetworkAccessManager *mgr = new QNetworkAccessManager(this);
-    const QUrl url(fUrl);
-    QNetworkRequest request(url);
-    QSslConfiguration sslConf = request.sslConfiguration();
-    sslConf.setPeerVerifyMode(QSslSocket::VerifyNone);
-    sslConf.setProtocol(QSsl::AnyProtocol);
-    request.setSslConfiguration(sslConf);
-    request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
-
-
-    QJsonDocument doc(jRequest);
-    QByteArray data = doc.toJson();
-    QNetworkReply *reply = mgr->post(request, data);
-
-    QObject::connect(reply, &QNetworkReply::finished, [=](){
-        if(reply->error() == QNetworkReply::NoError){
-            QString contents = QString::fromUtf8(reply->readAll());
-            QJsonObject jo = QJsonDocument::fromJson(contents.toUtf8()).object();
-            if (jo["ok"].toInt() == 1) {
-                ui->label->setText(contents);
-                accept();
-            } else {
-                ui->label->setText(contents);
-            }
-        } else {
-            QString err = reply->errorString();
-            ui->label->setText(err);
-        }
-        reply->deleteLater();
+    QWebSocket *s = new QWebSocket();
+    QUrl url(QString("%1").arg(fUrl));
+    QEventLoop l1;
+    connect(s, &QWebSocket::connected, &l1, &QEventLoop::quit);
+    connect(s, &QWebSocket::disconnected, &l1, &QEventLoop::quit);
+    connect(this, &HttpQueryDialog::exitLoop, &l1, &QEventLoop::quit);
+    connect(this, &HttpQueryDialog::messageReceived, &l1, &QEventLoop::quit);
+    s->open(url);
+    l1.exec();
+    QEventLoop l2;
+    connect(s, &QWebSocket::textMessageReceived, this, [this](const QString &s) {
+        qDebug() << s;
+        QJsonObject jrep = QJsonDocument::fromJson(s.toUtf8()).object();
+        emit messageReceived();
+        accept();
     });
+    connect(this, &HttpQueryDialog::messageReceived, &l2, &QEventLoop::quit);
+    connect(s, &QWebSocket::disconnected, &l2, &QEventLoop::quit);
+    connect(this, &HttpQueryDialog::messageReceived, &l2, &QEventLoop::quit);
+    connect(s, &QWebSocket::disconnected, &l2, &QEventLoop::quit);
+    s->sendTextMessage(QJsonDocument(jRequest).toJson(QJsonDocument::Compact));
+    l2.exec();
+}
+
+void HttpQueryDialog::connectError(QAbstractSocket::SocketError error)
+{
+    emit exitLoop();
 }

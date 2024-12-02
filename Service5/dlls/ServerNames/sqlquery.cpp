@@ -1,7 +1,5 @@
 #include "sqlquery.h"
-#include "jsonhandler.h"
 #include "logwriter.h"
-#include "requesthandler.h"
 #include "commandline.h"
 #include "database.h"
 #include <QDebug>
@@ -10,37 +8,19 @@
 #include <QJsonArray>
 #include <QFile>
 
-void routes(QStringList &r)
-{
-    r.append("office");
-    r.append("shop");
-}
-
-bool office(const QByteArray &indata, QByteArray &outdata, const QHash<QString, DataAddress> &dataMap, const ContentType &contentType)
+bool office(const QJsonObject &jreq, QJsonObject &jret, QString &err)
 {
     CommandLine cl;
     QString path;
     cl.value("dllpath", path);
-    Database db;
-    JsonHandler jh;
-    RequestHandler rh(outdata);
-
-    if (contentType != ContentType::ApplilcationJson) {
-        return rh.setDataValidationError("Accept content type: Application/Json");
+    qDebug() << "office request" << jreq;
+    if (jreq["key"].toString() != "asdf7fa8kk49888d!!jjdjmskkak98983mj???m") {
+        err = "Unauthorized";
+        return false;
     }
-
-    qDebug() << indata;
-    QJsonObject jo = QJsonDocument::fromJson(getData(indata, dataMap["json"])).object();
-    qDebug() << jo["key"].toString();
-    if (jo["key"].toString() != "asdf7fa8kk49888d!!jjdjmskkak98983mj???m") {
-        return rh.setResponse(HTTP_FORBIDDEN, "Access denied");
-    }
-
-QJsonArray ja;
-
-
+    QJsonArray ja;
 #ifdef REMOTE_ELINA
-    jo = QJsonObject();
+    QJsonObject jo = QJsonObject();
     jo["name"] = "Archive";
     jo["waiter_server"] = "";
     jo["host"] = "e3.picasso.am/info.php";
@@ -77,7 +57,6 @@ QJsonArray ja;
     ja.append(jo);
 #endif
 #endif
-
 #ifdef REMOTE_DEBUG
     jo = QJsonObject();
     jo = QJsonObject();
@@ -103,46 +82,34 @@ QJsonArray ja;
     jo["local"] = 0;
     ja.append(jo);
 #endif
-
 #ifdef REMOTE_ALL
     QString configFile = path + "/servername.ini";
     if (!QFile::exists(configFile)) {
         LogWriter::write(LogWriterLevel::errors, "", QString("sqlquery config path not exists: %1").arg(configFile));
-        jh["message"] = "Server not configured";
-        return rh.setInternalServerError(jh.toString());
+        err = "Server not configured";
+        return false;
     }
     QFile f(configFile);
     f.open(QIODevice::ReadOnly);
     QJsonObject jconf = QJsonDocument::fromJson(f.readAll()).object();
     f.close();
-    ja = jconf[jo["params"].toObject()["name"].toString()].toArray();
+    ja = jconf[jreq["params"].toObject()["name"].toString()].toArray();
 #endif
-
-    return rh.setResponse(HTTP_OK, QJsonDocument(ja).toJson(QJsonDocument::Compact));
+    jret["result"] = ja;
+    return true;
 }
 
-bool shop(const QByteArray &indata, QByteArray &outdata, const QHash<QString, DataAddress> &dataMap, const ContentType &contentType)
+bool shop(const QJsonObject &jreq, QJsonObject &jret, QString &err)
 {
     CommandLine cl;
     QString path;
     cl.value("dllpath", path);
-    Database db;
-    JsonHandler jh;
-    RequestHandler rh(outdata);
-
-    if (contentType != ContentType::ApplilcationJson) {
-        return rh.setDataValidationError("Accept content type: Application/Json");
+    qDebug() << "office request" << jreq;
+    if (jreq["key"].toString() != "asdf7fa8kk49888d!!jjdjmskkak98983mj???m") {
+        err = "Unauthorized";
+        return false;
     }
-
-    qDebug() << indata;
-    QJsonObject jo = QJsonDocument::fromJson(getData(indata, dataMap["json"])).object();
-    qDebug() << jo["key"].toString();
-    if (jo["key"].toString() != "asdf7fa8kk49888d!!jjdjmskkak98983mj???m") {
-        return rh.setResponse(HTTP_FORBIDDEN, "Access denied");
-    }
-
-
-QJsonArray ja;
+    QJsonArray ja;
 #ifdef REMOTE_VALSH
 #ifdef QT_DEBUG
     jo = QJsonObject();
@@ -168,7 +135,6 @@ QJsonArray ja;
     ja.append(jo);
 #endif
 #endif
-
 #ifdef REMOTE_ELINA
 #ifdef QT_DEBUG
     jo = QJsonObject();
@@ -182,7 +148,7 @@ QJsonArray ja;
     jo["fullscreen"] = "";
     ja.append(jo);
 #else
-    jo = QJsonObject();
+    QJsonObject jo = QJsonObject();
     jo["name"] = "Archive";
     jo["waiter_server"] = "";
     jo["host"] = "e3.picasso.am/info.php";
@@ -194,7 +160,6 @@ QJsonArray ja;
     ja.append(jo);
 #endif
 #endif
-
 #ifdef REMOTE_DEBUG
     jo = QJsonObject();
     jo["name"] = "ValShin";
@@ -207,24 +172,24 @@ QJsonArray ja;
     jo["fullscreen"] = "";
     ja.append(jo);
 #endif
-
 #ifdef REMOTE_ALL
     QString configFile = path + "/servername.ini";
     if (!QFile::exists(configFile)) {
         LogWriter::write(LogWriterLevel::errors, "", QString("sqlquery config path not exists: %1").arg(configFile));
-        jh["message"] = "Server not configured";
-        return rh.setInternalServerError(jh.toString());
+        err = "Server not configured";
+        return false;
     }
     QFile f(configFile);
     f.open(QIODevice::ReadOnly);
     QJsonObject jconf = QJsonDocument::fromJson(f.readAll()).object();
     f.close();
-    if (!jconf.contains(jo["params"].toObject()["name"].toString())) {
-        return rh.setInternalServerError(QString("Params %1 not declare %2").arg(jo["params"].toObject()["name"].toString(),
-                                                                                 QJsonDocument(jconf).toJson()));
+    if (!jconf.contains(jreq["params"].toObject()["name"].toString())) {
+        err = QString("Params %1 not declare %2").arg(jreq["params"].toObject()["name"].toString(),
+              QJsonDocument(jconf).toJson());
+        return false;
     }
-    ja.append(jconf[jo["params"].toObject()["name"].toString()].toObject());
+    ja.append(jconf[jreq["params"].toObject()["name"].toString()].toObject());
 #endif
-
-    return rh.setResponse(HTTP_OK, QJsonDocument(ja).toJson(QJsonDocument::Compact));
+    jret["result"] = ja;
+    return true;
 }

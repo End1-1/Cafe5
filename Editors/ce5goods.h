@@ -102,6 +102,8 @@ private slots:
 
     void on_leScanCode_returnPressed();
 
+    void on_leBarcode_returnPressed();
+
 private:
     Ui::CE5Goods *ui;
 

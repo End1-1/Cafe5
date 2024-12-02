@@ -9,6 +9,7 @@ CR5ConsumptionBySalesFilter::CR5ConsumptionBySalesFilter(const QStringList &dbPa
     ui->setupUi(this);
     ui->leStore->setSelector(dbParams, ui->leStoreName, cache_goods_store);
     ui->leGroup->setSelector(dbParams, ui->leGroupName, cache_goods_group);
+    ui->chDraft->setChecked(__c5config.getRegValue("draftconsuption", false).toBool());
 }
 
 CR5ConsumptionBySalesFilter::~CR5ConsumptionBySalesFilter()
@@ -60,4 +61,9 @@ int CR5ConsumptionBySalesFilter::reportType()
         return REPORTTYPE_AMOUNTS;
     }
     return 0;
+}
+
+void CR5ConsumptionBySalesFilter::on_chDraft_clicked(bool checked)
+{
+    __c5config.setRegValue("draftconsuption", checked);
 }

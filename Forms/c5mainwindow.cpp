@@ -12,13 +12,13 @@
 #include "nloadingdlg.h"
 #include "cr5materialinstoreuncomplect.h"
 #include "cr5consumptionbysales.h"
-#include "cr5consumptionbysalesdraft.h"
 #include "cr5storereason.h"
 #include "cr5documents.h"
 #include "c5goodsprice.h"
 #include "c5translatorform.h"
 #include "ntablewidget.h"
 #include "c5goodsspecialprices.h"
+#include "c5login.h"
 #include "cr5breezeservice.h"
 #include "cr5reports.h"
 #include "cr5mfgeneralreport.h"
@@ -77,7 +77,6 @@
 #include "cr5salarybyworkers.h"
 #include "cr5goodspartners.h"
 #include "cr5discountstatisics.h"
-#include "cr5goodswaste.h"
 #include "cr5salefromstore.h"
 #include "cr5goodsunit.h"
 #include "c5datasynchronize.h"
@@ -132,7 +131,6 @@ C5MainWindow::C5MainWindow(QWidget *parent) :
     fToolbarWidget = new C5ToolBarWidget(this);
     fToolbarWidget->setUpdateButtonVisible(false);
     fRightToolbar->addWidget(fToolbarWidget);
-    ui->actionHome->setEnabled(false);
     QShortcut *f3 = new QShortcut(QKeySequence("Ctrl+F"), this);
     connect(f3, SIGNAL(activated()), this, SLOT(hotKey()));
     QShortcut *esc = new QShortcut(QKeySequence("ESC"), this);
@@ -157,12 +155,6 @@ C5MainWindow::C5MainWindow(QWidget *parent) :
 #endif
     ui->wMenu->resize(C5Config::getRegValue("twdbsize", 300).toInt(), 0);
     http = new NInterface(this);
-    setDB();
-    enableMenu(true);
-    ui->actionHome->setEnabled(true);
-    ui->actionLogout->setVisible(true);
-    ui->actionChange_password->setVisible(true);
-    C5ReportTemplateDriver::init(__user->group());
 }
 
 C5MainWindow::~C5MainWindow()
@@ -181,13 +173,14 @@ void C5MainWindow::closeEvent(QCloseEvent *event)
     QMainWindow::closeEvent(event);
 }
 
-NTableWidget *C5MainWindow::createNTab(const QString &route)
+NTableWidget *C5MainWindow::createNTab(const QString &route, const QJsonObject &initParams = QJsonObject{})
 {
     auto *t = new NTableWidget(route);
     t->mMainWindow = this;
     fTab->addTab(t, "");
     fTab->setCurrentIndex(fTab->count() - 1);
     t->mHost = __c5config.dbParams().at(1);
+    t->initParams(initParams);
     t->query();
     return t;
 }
@@ -280,6 +273,11 @@ void C5MainWindow::currentTabChange(int index)
 void C5MainWindow::on_actionLogin_triggered()
 {
     showMaximized();
+    setDB();
+    enableMenu(true);
+    ui->actionLogout->setVisible(true);
+    ui->actionChange_password->setVisible(true);
+    C5ReportTemplateDriver::init(__user->group());
     fStatusLabel->setText(__user->fullName());
     C5Database db(C5Config::fDBHost, C5Config::fDBPath, C5Config::fDBUser, C5Config::fDBPassword);
     db[":f_user"] = __user->id();
@@ -624,9 +622,6 @@ void C5MainWindow::on_listWidgetItemClicked(const QModelIndex &index)
         case cp_t3_move_uncomplected:
             createTab<CR5MaterialMoveUncomplect>(dbParams);
             break;
-        case cp_t3_count_output_of_sale_draft:
-            createTab<CR5ConsumptionBySalesDraft>(dbParams);
-            break;
         case cp_t3_custom_reports:
             createTab<CR5Custom>(dbParams);
             break;
@@ -674,9 +669,6 @@ void C5MainWindow::on_listWidgetItemClicked(const QModelIndex &index)
             break;
         case cp_t6_goods_special_prices:
             createTab<C5GoodsSpecialPrices>(dbParams);
-            break;
-        case cp_t6_waste:
-            createTab<CR5GoodsWaste>(dbParams);
             break;
         case cp_t6_storage:
             createTab<CR5GoodsStorages>(dbParams);
@@ -799,8 +791,8 @@ void C5MainWindow::on_actionClose_application_triggered()
 
 void C5MainWindow::on_actionLogout_triggered()
 {
-    //    qDeleteAll(fMenuLists);
-    //    fMenuLists.clear();
+    qDeleteAll(fMenuLists);
+    fMenuLists.clear();
     for (int i = ui->tabWidget->count() - 1; i > -1 ; i--) {
         QWidget *w = ui->tabWidget->widget(i);
         w->deleteLater();
@@ -814,6 +806,13 @@ void C5MainWindow::on_actionLogout_triggered()
     fMenuLists.clear();
     ui->actionLogout->setVisible(false);
     ui->actionChange_password->setVisible(false);
+    C5Login l;
+    if (l.exec() == QDialog::Accepted) {
+        C5Config::initParamsFromDb();
+        on_actionLogin_triggered();
+    } else {
+        qApp->quit();
+    }
 }
 
 void C5MainWindow::on_actionChange_password_triggered()
@@ -898,7 +897,6 @@ void C5MainWindow::setDB()
         addTreeL3Item(l, cp_t3_sale_from_store_total, tr("Detailed movement in the storage"), ":/graph.png");
         addTreeL3Item(l, cp_t3_tstore_extra, tr("T-account, extra"), ":/documents.png");
         addTreeL3Item(l, cp_t2_count_output_of_sale, tr("Consumption of goods based on sales"), ":/goods.png");
-        addTreeL3Item(l, cp_t3_count_output_of_sale_draft, tr("Consumption of goods based on sales, draft"), ":/goods.png");
         addTreeL3Item(l, cp_t3_draft_output_recipes, tr("Draft output by recipes"), ":/goods.png");
         addTreeL3Item(l, cp_t3_consuption_reason, tr("Reason for consuption"), ":/goods.png");
         addTreeL3Item(l, cp_t3_sales_common, tr("Sales by tickets"), ":/graph.png");
@@ -953,7 +951,6 @@ void C5MainWindow::setDB()
             C5Permissions::fPermissions[C5Permissions::fPermissions.firstKey()].append(cp_t6_goods_price);
         }
         addTreeL3Item(l, cp_t6_goods_price, tr("Group discount"), ":/goods.png");
-        addTreeL3Item(l, cp_t6_waste, tr("Autowaste"), ":/goods.png");
         addTreeL3Item(l, cp_t6_units, tr("Units"), ":/goods.png");
         addTreeL3Item(l, cp_t6_goods_images, tr("Images"), ":/images.png");
         addTreeL3Item(l, cp_t6_qty_reminder, tr("Quantity reminder"), ":/goods.png");

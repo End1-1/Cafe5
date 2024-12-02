@@ -1,10 +1,15 @@
 #ifndef MAGNIT_H
 #define MAGNIT_H
 
-#include "socketdata.h"
+#include <QJsonObject>
 #include <QStringList>
 
-extern "C" Q_DECL_EXPORT void routes(QStringList &r);
-extern "C" Q_DECL_EXPORT bool magnit(const QByteArray &indata, QByteArray &outdata, const QHash<QString, DataAddress> &dataMap, const ContentType &contentType);
+#ifdef BUILDING_MAGNIT_DLL
+    #define MAGNIT_EXPORT Q_DECL_EXPORT
+#else
+    #define MAGNIT_EXPORT Q_DECL_IMPORT
+#endif
+
+extern "C" MAGNIT_EXPORT bool armsoft(const QJsonObject &jreq, QJsonObject &jret, QString &err);
 
 #endif // MAGNIT_H

@@ -62,8 +62,6 @@ public:
 
     virtual void hotKey(const QString &key) override;
 
-    static void writeAStoreSale(int storei, int storeo);
-
     bool openDraft(const QString &id, QString &err);
 
 public slots:

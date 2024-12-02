@@ -10,7 +10,7 @@ class ArmSoft : public QObject
     Q_OBJECT
 public:
     explicit ArmSoft(const QJsonObject &data, QObject *parent = nullptr);
-    bool exportToAS(const QString &orderUuid, QString &err);
+    bool exportToAS(QString &err);
 
 private:
     QJsonObject fData;

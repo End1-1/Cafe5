@@ -339,6 +339,35 @@
        </widget>
       </item>
       <item>
+       <widget class="QPushButton" name="btnDocs">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">                QPushButton:checked{
+                    background-color: rgb(0, 150, 0);
+					font-weight:bold;
+                }</string>
+        </property>
+        <property name="text">
+         <string>Ելքեր</string>
+        </property>
+        <property name="icon">
+         <iconset resource="../resources/res.qrc">
+          <normaloff>:/reports.png</normaloff>:/reports.png</iconset>
+        </property>
+        <property name="checkable">
+         <bool>true</bool>
+        </property>
+        <property name="checked">
+         <bool>false</bool>
+        </property>
+       </widget>
+      </item>
+      <item>
        <widget class="QPushButton" name="btnAccept">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
@@ -365,6 +394,23 @@
         </property>
         <property name="text">
          <string>View</string>
+        </property>
+        <property name="icon">
+         <iconset resource="../resources/res.qrc">
+          <normaloff>:/package.png</normaloff>:/package.png</iconset>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="btnNewMovement">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="text">
+         <string>Նոր ելք</string>
         </property>
         <property name="icon">
          <iconset resource="../resources/res.qrc">
@@ -558,6 +604,11 @@
  </widget>
  <customwidgets>
   <customwidget>
+   <class>C5ClearTableWidget</class>
+   <extends>QTableWidget</extends>
+   <header location="global">c5cleartablewidget.h</header>
+  </customwidget>
+  <customwidget>
    <class>C5LineEdit</class>
    <extends>QLineEdit</extends>
    <header location="global">c5lineedit.h</header>
@@ -567,13 +618,9 @@
    <extends>QLineEdit</extends>
    <header location="global">c5dateedit.h</header>
   </customwidget>
-  <customwidget>
-   <class>C5ClearTableWidget</class>
-   <extends>QTableWidget</extends>
-   <header location="global">c5cleartablewidget.h</header>
-  </customwidget>
  </customwidgets>
  <resources>
+  <include location="../resources/res.qrc"/>
   <include location="../resources/res.qrc"/>
  </resources>
  <connections/>

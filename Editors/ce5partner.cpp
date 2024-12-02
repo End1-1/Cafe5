@@ -114,6 +114,16 @@ bool CE5Partner::checkData(QString &err)
     return err.isEmpty();
 }
 
+bool CE5Partner::canCopy()
+{
+    return true;
+}
+
+void CE5Partner::copyObject()
+{
+    ui->leCode->clear();
+}
+
 void CE5Partner::on_btnClearManager_clicked()
 {
     if (ui->leCode->getInteger() == 0) {

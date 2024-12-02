@@ -466,7 +466,7 @@ bool C5WaiterOrderDoc::makeOutputOfStore(C5Database &db, QString &err, int store
         db[":f_total"] = t.price *t.qtyGoods;
         db[":f_row"] = row++;
         db[":f_tax"] = 0;
-        db[":f_taxdept"] = "";
+        db[":f_taxdept"] = 0;
         db.insert("o_goods", false);
     }
     C5StoreDraftWriter dw(db);
@@ -528,7 +528,7 @@ void C5WaiterOrderDoc::removeDocument(C5Database &db, const QString &id)
     db[":f_state"] = DISH_STATE_MISTAKE;
     db[":f_state_normal"] = DISH_STATE_OK;
     db[":f_header"] = id;
-    db.exec("update o_body set f_state=:f_state where f_header=:f_header and f_state=:f_state_normal");
+    db.exec("update o_body set f_state=:f_state, f_emarks=null where f_header=:f_header and f_state=:f_state_normal");
     db[":f_id"] = id;
     db[":f_state"] = ORDER_STATE_VOID;
     db.exec("update o_header set f_state=:f_state where f_id=:f_id");

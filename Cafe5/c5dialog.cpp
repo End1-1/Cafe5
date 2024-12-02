@@ -39,6 +39,7 @@ C5Dialog::C5Dialog(const QStringList &dbParams, bool noparent) :
     if (!noparent && __mainWindow == nullptr) {
         __mainWindow = this;
     }
+    fHttp = new NInterface(this);
 }
 
 C5Dialog::~C5Dialog()

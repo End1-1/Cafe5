@@ -9,11 +9,11 @@
 #include "c5printrecipta4.h"
 #include "ce5goods.h"
 #include "c5storedraftwriter.h"
-#include "threadsendmessage.h"
 #include "c5daterange.h"
 #include "breezeconfig.h"
 #include "armsoftexportoptions.h"
 #include "dlglist2.h"
+#include "chatmessage.h"
 #include "../../Xlsx/src/xlsxall.h"
 #include "httpquerydialog.h"
 #include "c5mainwindow.h"
@@ -450,6 +450,10 @@ void C5SaleDoc::returnItems()
         C5Message::error(err);
         return;
     }
+    for (const QString &s : fRowToDelete) {
+        db[":f_id"] = s;
+        db.exec("delete from o_goods where f_id=:f_id");
+    }
     for (int i = 0; i < ui->tblGoods->rowCount(); i++) {
         OGoods g;
         g.header = oh._id();
@@ -471,14 +475,6 @@ void C5SaleDoc::returnItems()
     db.commit();
     auto *a = __mainWindow->createTab<C5SaleDoc>(fDBParams);
     a->openDoc(oh._id());
-}
-
-void C5SaleDoc::messageResult(QJsonObject jo)
-{
-    sender()->deleteLater();
-    if (jo["status"].toInt() > 0) {
-        C5Message::error(jo["data"].toString());
-    }
 }
 
 void C5SaleDoc::saveDataChanges()
@@ -796,7 +792,7 @@ void C5SaleDoc::saveDataChanges()
     if (isnew && !__c5config.httpServerIP().isEmpty()) {
         for (int i = 0; i < ui->tblGoods->rowCount(); i++) {
             QJsonObject jo;
-            jo["action"] = 1; //MSG_GOODS_RESERVE;
+            jo["action"] = MSG_GOODS_RESERVE;
             jo["goods"] = ui->tblGoods->getInteger(i, col_goods_code);
             jo["qty"] = ui->tblGoods->getDouble(i, col_qty);
             jo["goodsname"] = ui->tblGoods->getString(i, col_name);
@@ -804,19 +800,10 @@ void C5SaleDoc::saveDataChanges()
             jo["unit"] = ui->tblGoods->getString(i, col_unit);
             jo["usermessage"] = tr("Online shop") + " " + ui->leDocnumber->text();
             jo["enddate"] = ui->leDate->date().addDays(7).toString(FORMAT_DATE_TO_STR);
-            QJsonDocument jdoc(jo);
-            auto *t = new ThreadSendMessage();
-            connect(t, SIGNAL(result(QJsonObject)), this, SLOT(messageResult(QJsonObject)));
-            t->send(ui->tblGoods->comboBox(i, col_store)->currentData().toInt(),
-                    jdoc.toJson(QJsonDocument::Compact));
-            if (ui->tblGoods->comboBox(i, col_store)->currentData().toInt() != ui->cbStorage->currentData().toInt()) {
-                jo["usermessage"] = ui->tblGoods->comboBox(i, col_store)->currentText() + " " + ui->leDocnumber->text();
-                jdoc = QJsonDocument(jo);
-                auto *t = new ThreadSendMessage();
-                connect(t, SIGNAL(result(QJsonObject)), this, SLOT(messageResult(QJsonObject)));
-                t->send(ui->cbStorage->currentData().toInt(),
-                        jdoc.toJson(QJsonDocument::Compact));
-            }
+            jo["userfrom"] = __c5config.defaultStore();
+            jo["userto"] = ui->tblGoods->comboBox(i, col_store)->currentData().toInt();
+            fHttp->createHttpQuery("/engine/shop/create-reserve.php", jo, SLOT(createReserveResponse(QJsonObject)), QVariant(),
+                                   false);
         }
     }
     for (int r = 0; r < ui->tblGoods->rowCount(); r++) {
@@ -1197,7 +1184,11 @@ void C5SaleDoc::exportToAs(int doctype)
         ja.append(jtemp);
     }
     jo["body"] = ja;
-    HttpQueryDialog *qd = new HttpQueryDialog(fDBParams, QString("https://%1:%2/magnit").arg(b->ipAddress,
+    jo["params"] = jo;
+    jo["command"] = "magnit";
+    jo["handler"] = "armsoft";
+    jo["key"] = "asdf7fa8kk49888d!!jjdjmskkak98983mj???m";
+    HttpQueryDialog *qd = new HttpQueryDialog(fDBParams, QString("ws://%1:%2").arg(b->ipAddress,
         QString::number(b->port)), jo, this);
     qd->exec();
     qd->deleteLater();
@@ -1368,6 +1359,7 @@ void C5SaleDoc::saveReturnItems()
     oheader.amountCash = ui->leCash->getDouble() * -1;
     oheader.amountBank = ui->leBankTransfer->getDouble() * -1;
     oheader.partner = fPartner.id.toInt();
+    oheader.dateCash = ui->leDate->date();
     oheader.saleType = SALE_RETURN;
     oheader.hall = ui->cbHall->currentData().toInt();
     if (!dw.hallId(oheader.prefix, oheader.hallId, ui->cbHall->currentData().toInt())) {

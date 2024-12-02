@@ -18,24 +18,16 @@ HEADERS += \
     sqlquery.h
 
 SOURCES += \
-    ../../handlers/httpheader.cpp \
-    ../../handlers/requesthandler.cpp \
-    ../../handlers/socketdata.cpp \
     ../../utils/commandline.cpp \
     ../../utils/configini.cpp \
     ../../utils/database.cpp \
-    ../../utils/jsonhandler.cpp \
     ../../utils/logwriter.cpp \
 
 
 HEADERS += \
-    ../../handlers/httpheader.h \
-    ../../handlers/requesthandler.h \
-    ../../handlers/socketdata.h \
     ../../utils/commandline.h \
     ../../utils/configini.h \
     ../../utils/database.h \
-    ../../utils/jsonhandler.h \
     ../../utils/logwriter.h \
 
 

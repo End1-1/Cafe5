@@ -9,7 +9,6 @@ CR5StoreDocumentsFilter::CR5StoreDocumentsFilter(const QStringList &dbParams, QW
     ui->setupUi(this);
     ui->leStore->setSelector(dbParams, ui->leStoreName, cache_goods_store).setMultiselection(true);
     ui->leType->setSelector(dbParams, ui->leTypeName, cache_doc_type).setMultiselection(true);
-    ui->leReason->setSelector(dbParams, ui->leReasonName, cache_store_reason).setMultiselection(true);
     ui->lePayment->setSelector(dbParams, ui->lePaymentName, cache_header_payment).setMultiselection(true);
     ui->lePartner->setSelector(dbParams, ui->lePartnerName, cache_goods_partners).setMultiselection(true);
     ui->leState->setSelector(dbParams, ui->leStateName, cache_doc_state);
@@ -41,6 +40,9 @@ QString CR5StoreDocumentsFilter::condition()
     if (!ui->lePartner->isEmpty()) {
         result += " and h.f_partner in (" + ui->lePartner->text() + ") ";
     }
+    if (!ui->leStore->isEmpty()) {
+        result += QString (" and (hs.f_storein in (%1) or hs.f_storeout in (%1)) ").arg(ui->leStore->text());
+    }
     in(result, "h.f_state", ui->leState);
     return result;
 }
@@ -48,11 +50,6 @@ QString CR5StoreDocumentsFilter::condition()
 QString CR5StoreDocumentsFilter::storages() const
 {
     return ui->leStore->text();
-}
-
-QString CR5StoreDocumentsFilter::reason() const
-{
-    return ui->leReason->text();
 }
 
 void CR5StoreDocumentsFilter::setPartnerFilter(int partner)
@@ -69,19 +66,19 @@ void CR5StoreDocumentsFilter::setDateFilter(const QDate &d1, const QDate &d2)
 void CR5StoreDocumentsFilter::setPaidFilter(int paid)
 {
     switch (paid) {
-    case 0 :
-        ui->rbpAll->setChecked(true);
-        break;
-    case 1:
-        ui->rbpNo->setChecked(true);
-        break;
-    case 2:
-        ui->rbpYes->setChecked(true);
-        break;
-    case 4:
-        ui->rbpPartial->setChecked(true);
-        break;
-    default:
-        break;
+        case 0 :
+            ui->rbpAll->setChecked(true);
+            break;
+        case 1:
+            ui->rbpNo->setChecked(true);
+            break;
+        case 2:
+            ui->rbpYes->setChecked(true);
+            break;
+        case 4:
+            ui->rbpPartial->setChecked(true);
+            break;
+        default:
+            break;
     }
 }

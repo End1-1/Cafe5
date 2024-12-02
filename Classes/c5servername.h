@@ -17,8 +17,10 @@ public:
 private:
     QString mServer;
     QString mRoute;
-signals:
+    QString fLastTextMessage;
 
+signals:
+    void messageReceived();
 };
 
 #endif // C5SERVERNAME_H

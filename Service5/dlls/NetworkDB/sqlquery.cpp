@@ -1,9 +1,5 @@
-#include "sqlquery.h"
-#include "jsonhandler.h"
 #include "logwriter.h"
-#include "requesthandler.h"
 #include "commandline.h"
-#include "queryjsonresponse.h"
 #include "c5networkdb.h"
 #include "c5utils.h"
 #include "c5tr.h"
@@ -16,92 +12,44 @@
 #include <QSettings>
 #include <QFile>
 
-void routes(QStringList &r)
-{
-    r.append("networkdb");
-    r.append("printservice");
-    r.append("printfiscal");
-    r.append("printbill");
-}
-
-bool networkdb(const QByteArray &indata, QByteArray &outdata, const QHash<QString, DataAddress> &dataMap,
-               const ContentType &contentType)
+bool printservice(const QJsonObject &jreq, QJsonObject &jrep, QString &err)
 {
     CommandLine cl;
     QString path;
     cl.value("dllpath", path);
-    JsonHandler jh;
-    RequestHandler rh(outdata);
-    if (contentType != ContentType::ApplilcationJson) {
-        return rh.setDataValidationError("Accept content type: Applilcation/Json");
-    }
     QString configFile = path + "/networkdb.ini";
     if (!QFile::exists(configFile)) {
         LogWriter::write(LogWriterLevel::errors, "", QString("sqlquery config path not exists: %1").arg(configFile));
-        jh["message"] = "Server not configured";
-        return rh.setInternalServerError(jh.toString());
+        err = "Server not configured";
+        return false;
     }
     QSettings s(configFile, QSettings::IniFormat);
-    QJsonObject jo = QJsonDocument::fromJson(getData(indata, dataMap["json"])).object();
-    QJsonObject jresponse;
-    QueryJsonResponse(s.value("host/host").toString(), jo, jresponse).getResponse();
-    return rh.setResponse(HTTP_OK, QJsonDocument(jresponse).toJson(QJsonDocument::Compact));
-}
-
-bool printservice(const QByteArray &indata, QByteArray &outdata, const QHash<QString, DataAddress> &dataMap,
-                  const ContentType &contentType)
-{
-    CommandLine cl;
-    QString path;
-    cl.value("dllpath", path);
-    JsonHandler jh;
-    RequestHandler rh(outdata);
-    if (contentType != ContentType::ApplilcationJson) {
-        return rh.setDataValidationError("Accept content type: Applilcation/Json");
-    }
-    QString configFile = path + "/networkdb.ini";
-    if (!QFile::exists(configFile)) {
-        LogWriter::write(LogWriterLevel::errors, "", QString("sqlquery config path not exists: %1").arg(configFile));
-        jh["message"] = "Server not configured";
-        return rh.setInternalServerError(jh.toString());
-    }
-    QSettings s(configFile, QSettings::IniFormat);
-    QJsonObject jo = QJsonDocument::fromJson(getData(indata, dataMap["json"])).object();
-    QJsonObject jresponse;
     QString sql = "select ";
-    return rh.setResponse(HTTP_OK, QJsonDocument(jresponse).toJson(QJsonDocument::Compact));
+    return true;
 }
 
-bool printfiscal(const QByteArray &indata, QByteArray &outdata, const QHash<QString, DataAddress> &dataMap,
-                 const ContentType &contentType)
+bool printfiscal(const QJsonObject &jreq, QJsonObject &jrep, QString &err)
 {
     QElapsedTimer et;
     et.start();
     CommandLine cl;
     QString path;
     cl.value("dllpath", path);
-    JsonHandler jh;
-    RequestHandler rh(outdata);
-    if (contentType != ContentType::ApplilcationJson) {
-        return rh.setDataValidationError("Accept content type: Applilcation/Json");
-    }
     QString configFile = path + "/networkdb.ini";
     if (!QFile::exists(configFile)) {
         LogWriter::write(LogWriterLevel::errors, "", QString("sqlquery config path not exists: %1").arg(configFile));
-        jh["message"] = "Server not configured";
-        return rh.setInternalServerError(jh.toString());
+        err = "Server not configured";
+        return false;
     }
     QSettings s(configFile, QSettings::IniFormat);
-    QJsonObject jo = QJsonDocument::fromJson(getData(indata, dataMap["json"])).object();
-    QJsonObject jresponse;
-    bool fiscal = jo["mode"].toInt() == 1;
-    QString sql = QString("select sf_bill_info('{\"id\":\"%1\"}')").arg(jo["id"].toString());
+    bool fiscal = jreq["mode"].toInt() == 1;
+    QString sql = QString("select sf_bill_info('{\"id\":\"%1\"}')").arg(jreq["id"].toString());
     C5NetworkDB db(sql, s.value("host/host").toString());
     if (!db.query()) {
         return false;
     }
     QJsonArray jaaj;
-    jo = db.fJsonOut["data"].toObject();
+    QJsonObject jo = db.fJsonOut["data"].toObject();
     jaaj = jo["data"].toArray();
     jaaj = jaaj[0].toArray();
     jo = QJsonDocument::fromJson(jaaj[0].toString().toUtf8()).object();
@@ -110,7 +58,7 @@ bool printfiscal(const QByteArray &indata, QByteArray &outdata, const QHash<QStr
     QJsonObject jHeader = jo["header"].toObject();
     QJsonArray jDishes = jo["dishes"].toArray();
     QJsonObject jfiscal = jo["fiscal"].toObject();
-    int result = HTTP_OK;
+    int fiscal_result = 0;
     if (jfiscal["rseq"].toInt() == 0 && fiscal) {
         PrintTaxN pt(jConfig["fiscal_ip"].toString(),
                      jConfig["fiscal_port"].toInt(),
@@ -130,7 +78,7 @@ bool printfiscal(const QByteArray &indata, QByteArray &outdata, const QHash<QStr
                         jdish["f_discount"].toDouble());
         }
         QString inJson, outJson, err;
-        int fiscal_result = pt.makeJsonAndPrint(amountcard, 0, inJson, outJson, err);
+        fiscal_result = pt.makeJsonAndPrint(amountcard, 0, inJson, outJson, err);
 #ifdef QT_DEBUG
         outJson =
             "{\"address\":\"ԿԵՆՏՐՈՆ ԹԱՂԱՄԱՍ Ամիրյան 4/3 \",\"change\":0.0,\"crn\":\"53235782\",\"fiscal\":\"54704153\",\"lottery\":\"\",\"prize\":0,\"rseq\":1327,\"sn\":\"00022154380\",\"taxpayer\":\"«ՊԼԱԶԱ ՍԻՍՏԵՄՍ»\",\"time\":1719133867473,\"tin\":\"02596277\",\"total\":93600.0}";
@@ -152,48 +100,39 @@ bool printfiscal(const QByteArray &indata, QByteArray &outdata, const QHash<QStr
         if (!db.query(QString("call sf_create_shop_tax('%1')").arg(QString(QJsonDocument(jtax).toJson(
                           QJsonDocument::Compact))))) {
             fJsonOut["data"] = db.fLastError;
-            result = HTTP_INTERNAL_SERVER_ERROR;
         }
         if (fiscal_result != pt_err_ok) {
             fJsonOut["data"] = err;
-            result = HTTP_INTERNAL_SERVER_ERROR;
         }
-        jresponse["fiscal_result"] = fiscal_result;
-        jresponse["fiscal_data"]  = jtax["f_out"];
+        jrep["fiscal_result"] = fiscal_result;
+        jrep["fiscal_data"]  = jtax["f_out"];
     }
-    if (result != HTTP_OK) {
-        return rh.setResponse(result, QJsonDocument(jresponse).toJson(QJsonDocument::Compact));
+    if (fiscal_result != 0) {
+        err = QJsonDocument(jrep).toJson(QJsonDocument::Compact);
+        return false;
     }
-    return printbill(indata, outdata, dataMap, contentType);
+    return true;
 }
 
-bool printbill(const QByteArray &indata, QByteArray &outdata, const QHash<QString, DataAddress> &dataMap,
-               const ContentType &contentType)
+bool printbill(const QJsonObject &jreq, QJsonObject &jrep, QString &err)
 {
     CommandLine cl;
     QString path;
     cl.value("dllpath", path);
-    JsonHandler jh;
-    RequestHandler rh(outdata);
-    if (contentType != ContentType::ApplilcationJson) {
-        return rh.setDataValidationError("Accept content type: Applilcation/Json");
-    }
     QString configFile = path + "/networkdb.ini";
     if (!QFile::exists(configFile)) {
         LogWriter::write(LogWriterLevel::errors, "", QString("sqlquery config path not exists: %1").arg(configFile));
-        jh["message"] = "Server not configured";
-        return rh.setInternalServerError(jh.toString());
+        err = "Server not configured";
+        return false;
     }
     QSettings s(configFile, QSettings::IniFormat);
-    QJsonObject jo = QJsonDocument::fromJson(getData(indata, dataMap["json"])).object();
-    QJsonObject jresponse;
-    QString sql = QString("select sf_bill_info('{\"id\":\"%1\"}')").arg(jo["id"].toString());
+    QString sql = QString("select sf_bill_info('{\"id\":\"%1\"}')").arg(jreq["id"].toString());
     C5NetworkDB db(sql, s.value("host/host").toString());
     if (!db.query()) {
         return false;
     }
     QJsonArray jaaj;
-    jo = db.fJsonOut["data"].toObject();
+    QJsonObject jo = db.fJsonOut["data"].toObject();
     jaaj = jo["data"].toArray();
     jaaj = jaaj[0].toArray();
     jo = QJsonDocument::fromJson(jaaj[0].toString().toUtf8()).object();
@@ -526,14 +465,17 @@ bool printbill(const QByteArray &indata, QByteArray &outdata, const QHash<QStrin
         p.br();
     }
     p.print(jConfig["recipe_printer"].toString(), QPrinter::Custom);
-    jresponse["status"] = 1;
-    jresponse["data"] = "ok";
     sql = QString("update o_header set f_print=abs(coalesce(f_print, 0))+1 where f_id='%1'").arg(
               jHeader["f_id"].toString());
     db.query(sql);
-    jresponse["printdata"] =  jo;
-    if (jo["error"].toInt() > 0) {
-        return rh.setResponse(HTTP_INTERNAL_SERVER_ERROR, "Artificial Error");
+    if (jreq["error"].toInt() > 0) {
+        err = "Artificial Error";
+        return false;
     }
-    return rh.setResponse(HTTP_OK, QJsonDocument(jresponse).toJson(QJsonDocument::Compact));
+    return true;
+}
+
+bool networkdb()
+{
+    return true;
 }

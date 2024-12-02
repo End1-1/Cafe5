@@ -3,7 +3,8 @@
 
 #include "c5dialog.h"
 
-namespace Ui {
+namespace Ui
+{
 class StoreInput;
 }
 
@@ -20,6 +21,8 @@ public:
 
 private slots:
     void checkboxCheck(bool v);
+
+    void checkBoxAcceptResponse(const QJsonObject &jdoc);
 
     void on_btnView_clicked();
 
@@ -47,6 +50,10 @@ private slots:
 
     void on_btnMinimize_clicked();
 
+    void on_btnDocs_clicked();
+
+    void on_btnNewMovement_clicked();
+
 private:
     Ui::StoreInput *ui;
 
@@ -61,6 +68,8 @@ private:
     void storeByGroup();
 
     void storeByItems();
+
+    void docs();
 
     void changeDate(int d);
 

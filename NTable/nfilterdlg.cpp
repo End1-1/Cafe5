@@ -99,6 +99,11 @@ void NFilterDlg::setup(const QJsonArray &fields)
             ch->setProperty("field", jo["field"].toString());
             ch->setProperty("type", jo["type"].toString());
             ui->gl->addWidget(ch, i, 1);
+        } else if (jo["type"].toString() == "text") {
+            auto *c = new C5LineEdit(this);
+            c->setProperty("field", jo["field"].toString());
+            c->setProperty("type", jo["type"].toString());
+            ui->gl->addWidget(c, i, 1, 1, 2);
         }
     }
     ui->gl->setColumnStretch(3, 1);
@@ -124,6 +129,11 @@ QJsonObject NFilterDlg::filter() const
                 jo[o->property("field").toString()] = static_cast<QLineEdit *>(o)->text();
             } else if (o->property("type").toString() == "checkbox") {
                 jo[o->property("field").toString()] = static_cast<QCheckBox *>(o)->isChecked() ? 1 : 0;
+            } else if (o->property("type").toString() == "text") {
+                auto *l = static_cast<C5LineEdit *>(o);
+                if (l->text().isEmpty() == false) {
+                    jo[o->property("field").toString()] = l->text();
+                }
             }
         }
     }

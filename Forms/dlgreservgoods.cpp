@@ -3,12 +3,12 @@
 #include "c5database.h"
 #include "goodsreserve.h"
 #include "c5message.h"
-#include "threadsendmessage.h"
 #include "chatmessage.h"
 #include "dataonline.h"
 #include "dlgdataonline.h"
 #include "c5config.h"
 #include "printtaxn.h"
+#include "c5user.h"
 #if(!defined FRONTDESK && !defined WAITER)
     #include "worder.h"
     #include "working.h"
@@ -75,13 +75,10 @@ DlgReservGoods::~DlgReservGoods()
     delete ui;
 }
 
-void DlgReservGoods::messageResult(const QJsonObject &jo)
+void DlgReservGoods::createReserveResponse(const QJsonObject &jdoc)
 {
-    sender()->deleteLater();
-    if (jo["status"].toInt() > 0) {
-        C5Message::error(jo["data"].toString());
-    } else {
-    }
+    Q_UNUSED(jdoc);
+    fHttp->httpQueryFinished(sender());
 }
 
 void DlgReservGoods::on_btnClose_clicked()
@@ -101,6 +98,9 @@ void DlgReservGoods::on_btnSave_clicked()
     if (!ui->leEndDay->date().isValid()) {
         err += tr("The end date is not valid") + "<br>";
     }
+    if (ui->leEndDay->date() > QDate::currentDate().addDays(1)) {
+        err += tr("The end date can be tomorrow");
+    }
     if (!err.isEmpty()) {
         C5Message::error(err);
         return;
@@ -112,16 +112,15 @@ void DlgReservGoods::on_btnSave_clicked()
     QJsonObject jo;
     jo["action"] = MSG_GOODS_RESERVE;
     jo["goods"] = fGoods;
+    jo["userfrom"] = __c5config.defaultStore();
+    jo["userto"] = fStore;
     jo["qty"] = ui->leReservedQty->getDouble();
     jo["goodsname"] = ui->leName->text();
     jo["scancode"] = ui->leScancode->text();
     jo["unit"] = dbo_str("c_goods", tr("Unit"), fGoods);
     jo["usermessage"] = ui->leMessage->text();
     jo["enddate"] = ui->leEndDay->text();
-    QJsonDocument jdoc(jo);
-    auto *t = new ThreadSendMessage();
-    connect(t, SIGNAL(result(QJsonObject)), this, SLOT(messageResult(QJsonObject)));
-    t->send(fStore, jdoc.toJson(QJsonDocument::Compact));
+    fHttp->createHttpQuery("/engine/shop/create-reserve.php", jo, SLOT(createReserveResponse(QJsonObject)));
 }
 
 void DlgReservGoods::on_btnCancelReserve_clicked()

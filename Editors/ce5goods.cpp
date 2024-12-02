@@ -22,6 +22,7 @@
 #include <QBuffer>
 #include <QStringListModel>
 #include <QInputDialog>
+#include <QPushButton>
 #include <QPaintEngine>
 #include <stdexcept>
 
@@ -160,6 +161,7 @@ bool CE5Goods::save(QString &err, QList<QMap<QString, QVariant> > &data)
 void CE5Goods::clear()
 {
     int scancode = ui->leScanCode->getInteger();
+    ui->tblBarcodes->setRowCount(0);
     CE5Editor::clear();
     ui->tblGoods->clearContents();
     ui->tblGoods->setRowCount(0);
@@ -277,6 +279,11 @@ QJsonObject CE5Goods::makeJsonObject()
         }
     }
     fJsonData["f_unitname"] = ui->leUnitName->text();
+    QJsonArray barcodes;
+    for (int i = 0; i < ui->tblBarcodes->rowCount(); i++) {
+        barcodes.append(ui->tblBarcodes->getString(i, 0));
+    }
+    fJsonData["f_barcodes"] = barcodes;
     return fJsonData;
 }
 
@@ -299,6 +306,9 @@ void CE5Goods::saveResponse(const QJsonObject &jdoc)
     j["f_unitname"] = ui->leUnitName->text();
     fJsonData["goods"] = j;
     fHttp->httpQueryFinished(sender());
+    if (jdoc["isnew"].toBool()) {
+        C5Cache::cache(fDBParams, cache_goods)->refreshId("g.f_id", j["f_id"].toInt());
+    }
     if (acceptOnSave()) {
         emit Accept();
     }
@@ -325,13 +335,13 @@ void CE5Goods::openResponse(const QJsonObject &jdoc)
     ui->leMargin->setDouble(j["f_price_margin"].toDouble());
     ui->leMargin2->setDouble(j["f_price_margin2"].toDouble());
     ui->cbCurrency->setCurrentIndex(ui->cbCurrency->findData(j["f_base_currency"].toInt()));
-    ui->leStoreId->setInteger(j["f_storeid"].toInt());
+    ui->leStoreId->setValue(j["f_storeid"].toInt());
     ui->chSameStoreId->setChecked(ui->leStoreId->getInteger() == ui->leCode->getInteger());
-    emit ui->chSameStoreId->clicked();
     ui->chEnabled->setChecked(j["f_enabled"].toInt() > 0);
     ui->chOnlyWholeNumber->setChecked(j["f_wholenumber"].toInt() > 0);
     ui->chService->setEnabled(j["f_service"].toInt() > 0);
     ui->chNoSpecialPrice->setEnabled(j["f_nospecial_price"].toInt() > 0);
+    ui->leComplectOutputQty->setDouble(j["f_complectout"].toDouble());
     ui->chComponentExit->setEnabled(j["f_component_exit"].toInt() > 0);
     ui->leWebLink->setText(j["f_weblink"].toString());
     ui->leQueue->setInteger(j["f_queue"].toInt());
@@ -388,6 +398,18 @@ void CE5Goods::openResponse(const QJsonObject &jdoc)
         ui->leGroup->setEnabled(enabled);
         ui->leName->setEnabled(enabled);
         ui->leScanCode->setEnabled(enabled);
+    }
+    QJsonArray jbarcodes = jdoc["barcodes"].toArray();
+    for (int i = 0; i < jbarcodes.count(); i++) {
+        int r = ui->tblBarcodes->addEmptyRow();
+        ui->tblBarcodes->setString(i, 0, jbarcodes.at(i).toString());
+        auto *b = static_cast<QPushButton *>( ui->tblBarcodes->createWidget2<QPushButton>(r, 1));
+        connect(b, &QPushButton::clicked, this, [this, b]() {
+            int r, c;
+            if (ui->tblBarcodes->findWidget(b, r, c)) {
+                ui->tblBarcodes->removeRow(r);
+            }
+        });
     }
     fHttp->httpQueryFinished(sender());
 }
@@ -862,4 +884,20 @@ void CE5Goods::on_btnNewModel_clicked()
 void CE5Goods::on_leScanCode_returnPressed()
 {
     ui->leScanCode->setText(C5ReplaceCharacter::replace(ui->leScanCode->text()));
+}
+
+void CE5Goods::on_leBarcode_returnPressed()
+{
+    int r = ui->tblBarcodes->addEmptyRow();
+    ui->tblBarcodes->setString(r, 0, ui->leBarcode->text());
+    auto *b = static_cast<QPushButton *>( ui->tblBarcodes->createWidget2<QPushButton>(r, 1));
+    connect(b, &QPushButton::clicked, this, [this, b]() {
+        int r, c;
+        if (ui->tblBarcodes->findWidget(b, r, c)) {
+            ui->tblBarcodes->removeRow(r);
+        }
+    });
+    ui->leBarcode->clear();
+    ui->tblBarcodes->resizeColumnsToContents();
+    ui->leBarcode->setFocus();
 }

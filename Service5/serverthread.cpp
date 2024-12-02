@@ -1,67 +1,105 @@
 #include "serverthread.h"
-#include "sslserver.h"
-#include "sslsocket.h"
-#include "socketthread.h"
 #include "logwriter.h"
-#include "thread.h"
 #include "configini.h"
-#include <QSslConfiguration>
+#include <QWebSocketServer>
+#include <QWebSocket>
+#include <QJsonObject>
+#include <QJsonDocument>
+#include <QJsonArray>
+#include <QApplication>
+#include <QLibrary>
+
+typedef bool ( *handler) (const QJsonObject &, QJsonObject &, QString &);
 
 ServerThread::ServerThread(const QString &configPath) :
-    ThreadWorker(),
+    QObject(),
     fConfigPath(configPath)
 {
 }
 
 ServerThread::~ServerThread()
 {
-    for (SslServer *s: fSslServer) {
-        s->deleteLater();
-    }
+    qDebug() << "ServerThread destructor";
+    fServer->deleteLater();
 }
 
 void ServerThread::run()
 {
-    QStringList ports = ConfigIni::value("server/port").split(",", Qt::SkipEmptyParts);
-    LogWriter::write(LogWriterLevel::verbose, "", "SSL version: " + QSslSocket::sslLibraryBuildVersionString());
-    LogWriter::write(LogWriterLevel::verbose, "", "SSL support: " + QString((QSslSocket::supportsSsl() ? "YES" : "NO")));
-    QString certFileName = fConfigPath + "cert.pem";
-    QString keyFileName = fConfigPath + "key.pem";
-    for (const QString &p: ports) {
-        auto *s = new SslServer();
-        s->setMaxPendingConnections(10000);
-        if (!s->setSslLocalCertificate(certFileName)) {
-            LogWriter::write(LogWriterLevel::errors, "", QString("%1 certificate is not instaled").arg(certFileName));
-        }
-        if (!s->setSslPrivateKey(keyFileName)) {
-            LogWriter::write(LogWriterLevel::errors, "", QString("%1 private key is not instaled").arg(keyFileName));
-        }
-        fSslChain = QSslCertificate::fromPath(fConfigPath + "fullchain.pem", QSsl::Pem);
-
-
-        s->setSslProtocol(QSsl::TlsV1_2OrLater);
-        fSslLocalCertificate = s->fSslLocalCertificate;
-        fSslPrivateKey = s->fSslPrivateKey;
-        fSslProtocol = s->fSslProtocol;
-        if (!s->startListen(p.toInt())) {
-            LogWriter::write(LogWriterLevel::errors, "", "Cannot listen port: " + QString::number(ConfigIni::value("server/port").toInt()));
-            exit(1);
-            return;
-        }
-        LogWriter::write(LogWriterLevel::errors, "", "Listen port: " + p);
-        connect(s, &SslServer::connectionRequest, this, &ServerThread::newConnection);
-        fSslServer.append(s);
+    int port = ConfigIni::value("server/port").toInt();
+    fServer = new QWebSocketServer("BreezeServer", QWebSocketServer::NonSecureMode, this);
+    // fServer->setMaxPendingConnections(10000);
+    if (!fServer->listen(QHostAddress::Any, port)) {
+        LogWriter::write(LogWriterLevel::errors, "",
+                         "Cannot listen port: " + QString::number(ConfigIni::value("server/port").toInt()));
+        exit(1);
+        return;
     }
+    connect(fServer, SIGNAL(newConnection()), this, SLOT(onNewConnection()));
+    LogWriter::write(LogWriterLevel::verbose, "", QString("Listen port: %1").arg(port));
 }
 
-void ServerThread::newConnection(int socketDescriptor)
+void ServerThread::onNewConnection()
 {
-    auto *thread = new Thread("SocketThread");
-    auto *socketThread = new SocketThread(socketDescriptor, fSslLocalCertificate, fSslPrivateKey, fSslProtocol, fSslChain);
-    connect(thread, &QThread::started, socketThread, &SocketThread::run);
-    connect(thread, &QThread::finished, thread, &QThread::deleteLater);
-    connect(socketThread, &SocketThread::finished, thread, &Thread::quit);
-    socketThread->moveToThread(thread);
-    thread->start();
+    QWebSocket *ws = fServer->nextPendingConnection();
+    LogWriter::write(LogWriterLevel::verbose, "", "new connection" + ws->peerName() + " " + ws->origin());
+    connect(ws, &QWebSocket::textMessageReceived, this, &ServerThread::onTextMessage);
+    connect(ws, &QWebSocket::disconnected, this, [ws]() {
+        LogWriter::write(LogWriterLevel::verbose, "", "disconnected" + ws->peerName() + " " + ws->origin());
+    });
 }
 
+void ServerThread::onTextMessage(const QString &msg)
+{
+    LogWriter::write(LogWriterLevel::verbose, "", msg);
+    auto *ws = static_cast<QWebSocket *>(sender());
+    QJsonObject jdoc = QJsonDocument::fromJson(msg.toUtf8()).object();
+    QJsonObject jrep;
+    jrep["errorCode"] = 0;
+    jrep["requestId"] = jdoc["requestId"].toInt();
+    QString repMsg;
+    if (!jdoc.contains("command")) {
+        jrep["errorCode"] = 1;
+        jrep["errorMessage"] = "Invalid json";
+        repMsg = QJsonDocument(jrep).toJson(QJsonDocument::Compact);
+        LogWriter::write(LogWriterLevel::errors, "", repMsg);
+        ws->sendTextMessage(repMsg);
+        return;
+    }
+    QString command = jdoc["command"].toString();
+    QLibrary l(QString("%1/handlers/%2.dll").arg(qApp->applicationDirPath(), command));
+    if (!l.load()) {
+        jrep["errorCode"] = 2;
+        jrep["errorMessage"] = "Library not found";
+        repMsg = QJsonDocument(jrep).toJson(QJsonDocument::Compact);
+        LogWriter::write(LogWriterLevel::errors, "", repMsg);
+        ws->sendTextMessage(repMsg);
+        return;
+    }
+    handler h = reinterpret_cast<handler>(l.resolve(jdoc["handler"].toString().toLatin1().data()));
+    if (!h) {
+        jrep["errorCode"] = 3;
+        jrep["errorMessage"] = "Handler not found";
+        repMsg = QJsonDocument(jrep).toJson(QJsonDocument::Compact);
+        LogWriter::write(LogWriterLevel::errors, "", repMsg);
+        ws->sendTextMessage(repMsg);
+        return;
+    }
+    QJsonObject jresponse = jrep;
+    QString err;
+    if (!h(jdoc, jresponse, err)) {
+        if (jresponse.contains("errorCode")) {
+            jrep["errorCode"] = jresponse["errorCode"];
+        } else {
+            jrep["errorCode"] = 4;
+        }
+        jrep["errorMessage"] = err;
+        repMsg = QJsonDocument(jrep).toJson(QJsonDocument::Compact);
+        LogWriter::write(LogWriterLevel::errors, "", repMsg);
+        ws->sendTextMessage(repMsg);
+        return;
+    }
+    jresponse["requestId"] = jdoc["requestId"].toInt();
+    repMsg = QJsonDocument(jresponse).toJson(QJsonDocument::Compact);
+    LogWriter::write(LogWriterLevel::verbose, "", repMsg);
+    ws->sendTextMessage(repMsg);
+}

@@ -31,7 +31,7 @@
      <item row="1" column="1">
       <widget class="C5TableWidget" name="tblDoc">
        <property name="contextMenuPolicy">
-        <enum>Qt::ContextMenuPolicy::CustomContextMenu</enum>
+        <enum>Qt::CustomContextMenu</enum>
        </property>
        <column>
         <property name="text">
@@ -175,7 +175,7 @@
         <item>
          <spacer name="horizontalSpacer">
           <property name="orientation">
-           <enum>Qt::Orientation::Horizontal</enum>
+           <enum>Qt::Horizontal</enum>
           </property>
           <property name="sizeHint" stdset="0">
            <size>
@@ -226,14 +226,14 @@
         </size>
        </property>
        <property name="contextMenuPolicy">
-        <enum>Qt::ContextMenuPolicy::CustomContextMenu</enum>
+        <enum>Qt::CustomContextMenu</enum>
        </property>
       </widget>
      </item>
      <item row="1" column="2">
       <widget class="C5TableWidget" name="tblGoods">
        <property name="contextMenuPolicy">
-        <enum>Qt::ContextMenuPolicy::CustomContextMenu</enum>
+        <enum>Qt::CustomContextMenu</enum>
        </property>
        <column>
         <property name="text">
@@ -248,6 +248,16 @@
        <column>
         <property name="text">
          <string>Barcode</string>
+        </property>
+       </column>
+       <column>
+        <property name="text">
+         <string>Retail price</string>
+        </property>
+       </column>
+       <column>
+        <property name="text">
+         <string>Whosale price</string>
         </property>
        </column>
        <column>
@@ -273,7 +283,7 @@
     <string>Remove</string>
    </property>
    <property name="menuRole">
-    <enum>QAction::MenuRole::NoRole</enum>
+    <enum>QAction::NoRole</enum>
    </property>
   </action>
   <action name="actionChangeGoodsPrice">
@@ -281,7 +291,7 @@
     <string>Set retail price of selected goods</string>
    </property>
    <property name="menuRole">
-    <enum>QAction::MenuRole::NoRole</enum>
+    <enum>QAction::NoRole</enum>
    </property>
   </action>
   <action name="actionSet_whosale_price_of_selected_goods">
@@ -289,7 +299,7 @@
     <string>Set whosale price of selected goods</string>
    </property>
    <property name="menuRole">
-    <enum>QAction::MenuRole::NoRole</enum>
+    <enum>QAction::NoRole</enum>
    </property>
   </action>
   <action name="actionEdit_name">
@@ -297,7 +307,7 @@
     <string>Edit name</string>
    </property>
    <property name="menuRole">
-    <enum>QAction::MenuRole::NoRole</enum>
+    <enum>QAction::NoRole</enum>
    </property>
   </action>
   <action name="actionRemovelwName">
@@ -305,7 +315,7 @@
     <string>Remove</string>
    </property>
    <property name="menuRole">
-    <enum>QAction::MenuRole::NoRole</enum>
+    <enum>QAction::NoRole</enum>
    </property>
   </action>
  </widget>

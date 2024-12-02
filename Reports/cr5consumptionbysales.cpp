@@ -484,10 +484,20 @@ bool CR5ConsumptionBySales::tblDoubleClicked(int row, int column, const QList<QV
             break;
         }
         case col_qtysale: {
-            //if (pr(fDBParams, cp_t3_consuption_reason)) {
-            CR5ConsuptionReason *s = __mainWindow->createTab<CR5ConsuptionReason>(fDBParams);
-            s->setFilterParams(fFilter->date1(), fFilter->date2(), fFilter->store(), values.at(0).toInt());
-            //}
+            __mainWindow->createNTab("/engine/reports/consuption-reason.php",
+            QJsonObject{
+                {"date1", fFilter->date1().toString(FORMAT_DATE_TO_STR_MYSQL)},
+                {"date2", fFilter->date2().toString(FORMAT_DATE_TO_STR_MYSQL)},
+                {"store", fFilter->store()},
+                {"goods", values.at(0).toInt()},
+                {"date1", fFilter->date1().toString(FORMAT_DATE_TO_STR_MYSQL)},
+                {"date2", fFilter->date2().toString(FORMAT_DATE_TO_STR_MYSQL)},
+                {"store", fFilter->store()},
+                {"goods", values.at(0).toInt()}
+            });
+            //OLD VERSION
+            // CR5ConsuptionReason *s = __mainWindow->createTab<CR5ConsuptionReason>(fDBParams);
+            // s->setFilterParams(fFilter->date1(), fFilter->date2(), fFilter->store(), values.at(0).toInt());
             break;
         }
         case col_qtyinv: {

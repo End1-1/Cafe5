@@ -11,6 +11,7 @@
 #include "c5systempreference.h"
 #include "c5message.h"
 #include "dlgsplashscreen.h"
+#include "logwriter.h"
 #include <QApplication>
 #include <QMessageBox>
 #include <QLockFile>
@@ -35,18 +36,20 @@ int main(int argc, char *argv[])
     libPath << "./printsupport";
     QCoreApplication::setLibraryPaths(libPath);
 #endif
+    QApplication a(argc, argv);
     QDir d;
     QLockFile lockFile(d.homePath() + "/" + _APPLICATION_ + "/lock.pid");
     if (!lockFile.tryLock()) {
         C5Message::error(QObject::tr("An instance of application already running"));
         return -1;
     }
-    QApplication a(argc, argv);
+    LogWriter::write(LogWriterLevel::verbose, "", "starting...");
     QTranslator t;
     t.load(":/lang/Shop.qm");
     a.installTranslator( &t);
     auto *dlgsplash = new DlgSplashScreen();
     dlgsplash->show();
+    LogWriter::write(LogWriterLevel::verbose, "", "get server names");
     dlgsplash->messageSignal("Get server name");
     QString serverName, settingsName = "shop", rewriteConfig;
     bool noconfig = true;
@@ -61,7 +64,7 @@ int main(int argc, char *argv[])
             if (sn.length() == 2) {
                 settingsName = sn.at(1);
             }
-        } else if (arg.contains("rewriteconfig")) {
+        } else if (arg.contains("/rewriteconfig")) {
             QStringList sn = arg.split("=");
             if (sn.length() == 2) {
                 rewriteConfig = sn.at(1);

@@ -4,27 +4,27 @@
 <context>
     <name>C5Message</name>
     <message>
-        <location filename="../Cafe5/c5message.ui" line="182"/>
+        <location filename="../Cafe5/c5message.ui" line="185"/>
         <source>&lt;html&gt;msg&lt;/html&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Cafe5/c5message.ui" line="245"/>
+        <location filename="../Cafe5/c5message.ui" line="248"/>
         <source>A1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Cafe5/c5message.ui" line="258"/>
+        <location filename="../Cafe5/c5message.ui" line="261"/>
         <source>A3</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Cafe5/c5message.ui" line="271"/>
+        <location filename="../Cafe5/c5message.ui" line="274"/>
         <source>A2</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Cafe5/c5message.ui" line="284"/>
+        <location filename="../Cafe5/c5message.ui" line="287"/>
         <source>Copy</source>
         <translation type="unfinished"></translation>
     </message>
@@ -334,40 +334,6 @@
         <location filename="monitor.cpp" line="364"/>
         <location filename="monitor.cpp" line="395"/>
         <source>The server was started</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>QObject</name>
-    <message>
-        <location filename="../Service5Working/utils/storemovement.cpp" line="26"/>
-        <source>Invalid document id</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../Service5Working/utils/storemovement.cpp" line="143"/>
-        <source>Not enough materials in the store</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>RawBalanceHistory</name>
-    <message>
-        <location filename="../Service5Working/raw/rawbalancehistory.cpp" line="84"/>
-        <source>Starting balance</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../Service5Working/raw/rawbalancehistory.cpp" line="99"/>
-        <source>Ending balance</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>SocketThread</name>
-    <message>
-        <location filename="socketthread.cpp" line="358"/>
-        <source>Connection timeout</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

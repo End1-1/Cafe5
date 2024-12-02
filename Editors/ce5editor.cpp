@@ -166,7 +166,7 @@ bool CE5Editor::save(QString &err, QList<QMap<QString, QVariant> > &data)
             case 0:
                 value = leField->text();
                 if (value.toString().isEmpty()) {
-                    value = QVariant(QVariant::String);
+                    value = QVariant();
                 }
                 break;
             case 1:
@@ -325,6 +325,15 @@ void CE5Editor::clear()
         }
     }
     focusFirst();
+}
+
+bool CE5Editor::canCopy()
+{
+    return false;
+}
+
+void CE5Editor::copyObject()
+{
 }
 
 QPushButton *CE5Editor::b1()

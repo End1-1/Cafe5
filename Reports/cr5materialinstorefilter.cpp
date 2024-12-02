@@ -41,6 +41,9 @@ QString CR5MaterialInStoreFilter::condition()
     if (!ui->leUnit->isEmpty()) {
         cond += " and g.f_unit in (" + ui->leUnit->text() + ") ";
     }
+    if (!ui->leClass->isEmpty()) {
+        cond += " and gg.f_class='" + ui->leClass->text() + "' ";
+    }
     in(cond, "h.f_currency", ui->leCurrency);
     in(cond, "gpr.f_currency", ui->leCurrency);
     in(cond, "h.f_partner", ui->lePartner);

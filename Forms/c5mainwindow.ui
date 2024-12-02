@@ -281,7 +281,6 @@
    </attribute>
    <addaction name="actionChange_password"/>
    <addaction name="actionLogout"/>
-   <addaction name="actionHome"/>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
   <action name="actionClose_application">
@@ -290,23 +289,6 @@
    </property>
    <property name="toolTip">
     <string>Close application</string>
-   </property>
-  </action>
-  <action name="actionHome">
-   <property name="icon">
-    <iconset resource="../resources/res.qrc">
-     <normaloff>:/storehouse.png</normaloff>:/storehouse.png</iconset>
-   </property>
-   <property name="text">
-    <string>Home</string>
-   </property>
-  </action>
-  <action name="actionGo_to_home">
-   <property name="text">
-    <string>Go to home</string>
-   </property>
-   <property name="shortcut">
-    <string>Ctrl+Home</string>
    </property>
   </action>
   <action name="actionLogout">

@@ -7,7 +7,6 @@
 #include "c5utils.h"
 #include "c5message.h"
 #include "printtaxn.h"
-#include "sslsocket.h"
 #include "datadriver.h"
 #include "vieworder.h"
 #include "cashcollection.h"
@@ -15,7 +14,6 @@
 #include "c5user.h"
 #include "c5printing.h"
 #include "dlgreturnitem.h"
-#include "c5printtaxanywhere.h"
 #include "dlgdate.h"
 
 #define VM_TOTAL 0
@@ -77,28 +75,6 @@ bool Sales::printCheckWithTax(C5Database &db, const QString &id)
             C5Message::error(tr("Cannot print tax twice"));
             return resultb;
         }
-    }
-    if (__c5config.taxIP().toLower() == "http") {
-        QString url = QString("GET /printtax?auth=up&a=get&user=%1&pass=%2&order=%3 HTTP/1.1\r\n\r\n")
-                      .arg(__c5config.httpServerUsername(), __c5config.httpServerPassword(), id);
-        auto *s = new QSslSocket(0);
-        //connect(s, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(err(QAbstractSocket::SocketError)));
-        s->setPeerVerifyMode(QSslSocket::VerifyNone);
-        s->connectToHostEncrypted(__c5config.httpServerIP(), __c5config.httpServerPort());
-        if (s->waitForEncrypted(5000)) {
-            s->write(url.toUtf8());
-            if (s->waitForBytesWritten()) {
-                s->waitForReadyRead();
-                QByteArray d = s->readAll();
-                C5Message::info(d);
-            } else {
-                resultb = false;
-                C5Message::error(s->errorString());
-            }
-            s->close();
-        }
-        s->deleteLater();
-        return resultb;
     }
     db[":f_id"] = id;
     db.exec("select * from o_header where f_id=:f_id");
@@ -233,13 +209,13 @@ void Sales::refreshTotal()
     h.append(tr("Address"));
     ui->tbl->setColumnCount(h.count());
     ui->tbl->setHorizontalHeaderLabels(h);
-    ui->tbl->setColumnWidths(ui->tbl->columnCount(), 40, 0, 0, 80, 120, 120, 100, 120, 120, 150, 100, 100, 300);
+    ui->tbl->setColumnWidths(ui->tbl->columnCount(), 40, 0, 0, 0, 120, 0, 100, 120, 120, 150, 100, 100, 300);
     C5Database db(__c5config.dbParams());
     db[":f_hall"] = ui->cbHall->currentData();
     db[":f_start"] = ui->deStart->date();
     db[":f_end"] = ui->deEnd->date();
     db[":f_state"] = ORDER_STATE_CLOSE;
-    QString sqlCond = userCond();
+    QString sqlCond = "";
     if (!fUser->check(cp_t5_view_tax_and_no_sales)) {
         sqlCond += " and length(ot.f_receiptnumber)>0 ";
     }
@@ -308,13 +284,13 @@ void Sales::refreshItems()
     h.append(tr("Total"));
     ui->tbl->setColumnCount(h.count());
     ui->tbl->setHorizontalHeaderLabels(h);
-    ui->tbl->setColumnWidths(ui->tbl->columnCount(), 0, 0, 80, 120, 120, 100, 120, 100, 150, 250, 80, 80, 80);
+    ui->tbl->setColumnWidths(ui->tbl->columnCount(), 0, 0, 0, 120, 0, 100, 120, 100, 150, 250, 80, 80, 80);
     C5Database db(__c5config.dbParams());
     db[":f_hall"] = __c5config.defaultHall();
     db[":f_start"] = ui->deStart->date();
     db[":f_end"] = ui->deEnd->date();
     db[":f_state"] = ORDER_STATE_CLOSE;
-    QString sqlCond = userCond();
+    QString sqlCond = "";
     if (!fUser->check(cp_t5_view_tax_and_no_sales)) {
         sqlCond += " and length(ot.f_receiptnumber)>0 ";
     }
@@ -372,7 +348,7 @@ void Sales::refreshTotalItems()
     db[":f_start"] = ui->deStart->date();
     db[":f_end"] = ui->deEnd->date();
     db[":f_state"] = ORDER_STATE_CLOSE;
-    QString sqlCond = userCond();
+    QString sqlCond = "";
     if (!fUser->check(cp_t5_view_tax_and_no_sales)) {
         sqlCond += " and length(ot.f_receiptnumber)>0 ";
     }
@@ -421,7 +397,7 @@ void Sales::refreshGroups()
     db[":f_start"] = ui->deStart->date();
     db[":f_end"] = ui->deEnd->date();
     db[":f_state"] = ORDER_STATE_CLOSE;
-    QString sqlCond = userCond();
+    QString sqlCond = "";
     if (!fUser->check(cp_t5_view_tax_and_no_sales)) {
         sqlCond += " and length(ot.f_receiptnumber)>0 ";
     }
@@ -473,7 +449,7 @@ void Sales::refreshGroups()
     db.exec("select count(oh.f_id) as f_total "
             "from o_header oh "
             "inner join o_tax ot on ot.f_id=oh.f_id "
-            "where ot.f_receiptnumber>0 and oh.f_datecash between :f_start and :f_end and oh.f_state=:f_state " + userCond() +
+            "where ot.f_receiptnumber>0 and oh.f_datecash between :f_start and :f_end and oh.f_state=:f_state "
             "and oh.f_hall=:f_hall " + sqlCond);
     db.nextRow();
     ui->tbl->addEmptyRow();
@@ -487,7 +463,7 @@ void Sales::refreshGroups()
     db.exec("select sum(oh.f_amounttotal) as f_total "
             "from o_header oh "
             "inner join o_tax ot on ot.f_id=oh.f_id "
-            "where ot.f_receiptnumber>0 and oh.f_datecash between :f_start and :f_end and oh.f_state=:f_state " + userCond() +
+            "where ot.f_receiptnumber>0 and oh.f_datecash between :f_start and :f_end and oh.f_state=:f_state "
             "and oh.f_hall=:f_hall ");
     db.nextRow();
     ui->tbl->addEmptyRow();
@@ -496,14 +472,6 @@ void Sales::refreshGroups()
     row++;
     ui->leRetail->setDouble(0);
     ui->leWhosale->setDouble(0);
-}
-
-QString Sales::userCond() const
-{
-    if (!ui->leLogin->isEmpty()) {
-        return " and u.f_login='" + ui->leLogin->text() + "' ";
-    }
-    return "";
 }
 
 void Sales::printpreview()
@@ -828,5 +796,21 @@ void Sales::on_btnChangeDate_clicked()
         refresh();
     } else {
         C5Message::info(tr("Nothing was selected"));
+    }
+}
+
+void Sales::on_deStart_textChanged(const QString &arg1)
+{
+    Q_UNUSED(arg1);
+    if (ui->deStart->date() < QDate::currentDate().addDays(-31)) {
+        ui->deStart->setDate(QDate::currentDate().addDays(-31));
+    }
+}
+
+void Sales::on_deEnd_textChanged(const QString &arg1)
+{
+    Q_UNUSED(arg1);
+    if (ui->deEnd->date() < QDate::currentDate().addDays(-31)) {
+        ui->deEnd->setDate(QDate::currentDate().addDays(-31));
     }
 }

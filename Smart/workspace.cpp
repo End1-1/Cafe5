@@ -450,7 +450,7 @@ void Workspace::createHttpRequest(const QString &route, QJsonObject params, cons
                                   const char *responseErrorSlot)
 {
     params["sessionkey"] = __c5config.getRegValue("sessionkey").toString();
-    params["host"] = "t2";//hostinfo;
+    params["host"] = hostinfo;
     params["config_id"] = __c5config.fSettingsName;
     params["user_session"] = __c5config.getRegValue("session").toString();
     params["sessionid"] = __c5config.getRegValue("cashsession").toInt();
@@ -522,6 +522,13 @@ void Workspace::on_btnCheckout_clicked()
         otherAmount = ui->leTotal->getDouble();
     }
     cardAmount = ui->leCard->getDouble();
+    for (int i = 0; i < ui->tblOrder->rowCount(); i++) {
+        Dish d = ui->tblOrder->item(i, 0)->data(Qt::UserRole).value<Dish>();
+        if (d.f_emarks.isEmpty() == false) {
+            ui->btnFiscal->setChecked(true);
+            break;
+        }
+    }
     if (ui->btnFiscal->isChecked() && !ui->btnSetOther->isChecked()) {
         int result;
         do {
@@ -706,17 +713,40 @@ void Workspace::on_leReadCode_returnPressed()
             ui->leCard->setDouble(cardvalue);
         }
     }
-    QString code = newcode; //.replace("?", "").replace(";", "");
+    QString code = newcode;
+    if (!code.isEmpty()) {
+        if(code.startsWith("?")) {
+            code.remove(0, 1);
+            if (code.endsWith(";")) {
+                code.remove(code.length() - 1, 1);
+            }
+        }
+    }
     code = code.replace("\'", "\\\'");
     QString emarks;
-    if (code.length() > 20) {
-        if (code.length() > 29) {
-            code = code.left(29);
+    if (code.length() >= 29) {
+        QString barcode;
+        if (code.mid(0, 6) == "000000") {
+            barcode = code.mid(6, 8);
+        } else if (code.mid(0, 3) == "010") {
+            barcode = code.mid(3, 13);
+        } else {
+            barcode = code.mid(1, 8);
+            if (!fDishesBarcode.contains(barcode)) {
+                barcode.clear();
+            }
+            if (barcode.isEmpty()) {
+                barcode = code.mid(1, 13);
+            }
+            if (!fDishesBarcode.contains(barcode)) {
+                barcode = "";
+            }
         }
         emarks = code;
-        code = code.left(14);
-        while (code.at(0) == "0") {
-            code.remove(0, 1);
+        code = barcode;
+        if (barcode.isEmpty()) {
+            C5Message::error(tr("Invalid emarks"));
+            return;
         }
     }
     if (fDishesBarcode.contains(code)) {
@@ -1018,7 +1048,7 @@ bool Workspace::saveOrder(int state, bool printService)
         jo["timeorder"] = 0;
         jo["package"] = 0;
         jo["row"] = i;
-        jo["emarks"] = d.f_emarks;
+        jo["emarks"] = d.f_emarks.isEmpty() ? QJsonValue::Null : QJsonValue(d.f_emarks);
         dishes.append(jo);
     }
     QJsonObject marks;
@@ -2247,7 +2277,7 @@ void Workspace::createAddDishRequest(Dish *d)
     QJsonObject dish;
     dish["header"] = fOrderUuid;
     dish["menuid"] = d->menuid;
-    dish["f_emarks"] = d->f_emarks;
+    dish["f_emarks"] = d->f_emarks.isEmpty() ? QJsonValue::Null : QJsonValue(d->f_emarks);
     dish["table"] = fTable;
     dish["row"] = ui->tblOrder->rowCount() + 1;
     dish["mark"] = "addgoods";

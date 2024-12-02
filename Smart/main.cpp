@@ -39,10 +39,7 @@ int main(int argc, char *argv[])
     }
     auto *dlgsplash = new DlgSplashScreen();
     dlgsplash->show();
-    dlgsplash->messageSignal("Please, wait...");
-    LogWriter::write(LogWriterLevel::verbose, "",
-                     "OpenSSL version " + QSslSocket::sslLibraryBuildVersionString() + " " + QSslSocket::sslLibraryVersionString());
-    LogWriter::write(LogWriterLevel::verbose, "", "OpenSSL support " + QString((QSslSocket::supportsSsl() ? "YES" : "NO")));
+    emit dlgsplash->messageSignal("Please, wait...");
     QTranslator t;
     t.load(":/Smart.qm");
     a.installTranslator( &t);
@@ -78,7 +75,7 @@ int main(int argc, char *argv[])
         }
     }
     if (serverName.isEmpty()) {
-        C5Message::error("Connection server name not found");
+        C5Message::error("Server name not found");
         return 1;
     }
     if (connection.isEmpty()) {

@@ -25,10 +25,12 @@ public:
     void query();
     virtual QToolBar *toolBar() override;
     virtual void hotKey(const QString &key) override;
+    void initParams(const QJsonObject &o);
 
 private:
     Ui::NTableWidget *ui;
     int fFilterColumn;
+    QJsonObject fInitParams;
     QString mRoute;
     NLoadingDlg *mLoadingDlg;
     NFilterDlg *fFilter;

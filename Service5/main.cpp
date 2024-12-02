@@ -1,13 +1,7 @@
 #include "logwriter.h"
 #include "serverthread.h"
-#include "databaseconnectionmanager.h"
 #include "configini.h"
-#include "requestmanager.h"
-#include "pluginmanager.h"
-#include "raw.h"
 #include "monitor.h"
-#include "sqlqueries.h"
-#include "thread.h"
 #include <QFileInfo>
 #include <QDir>
 #include <windows.h>
@@ -53,7 +47,6 @@ DWORD WINAPI ThreadProc(CONST LPVOID lpParam)
     t.load(":/Service5.qm");
     app.installTranslator( &t);
     QString configFile;
-    DatabaseConnectionManager dcm;
     for (const QString &a : app.arguments()) {
         if (a.contains("--config")) {
             QStringList ac = a.split("=");
@@ -63,28 +56,8 @@ DWORD WINAPI ThreadProc(CONST LPVOID lpParam)
             }
         }
     }
-    do {
-        LogWriter::write(LogWriterLevel::verbose, "", "Try to initialize database manager");
-    } while (!dcm.init(configFile));
-    LogWriter::write(LogWriterLevel::verbose, "", "Init request manager");
-    RequestManager::init();
-    LogWriter::write(LogWriterLevel::verbose, "", "Init plugin manager");
-    PluginManager::init(APPDIR + "config.ini");
-    Raw::init();
-    if (!dcm.nodb) {
-        Database db;
-        DatabaseConnectionManager::openSystemDatabase(db);
-        SqlQueries::init(db);
-        db.close();
-    }
-    auto *server = new ServerThread(APPDIR);
-    auto *thread = new Thread("ServerThread");
-    thread->connect(thread, &QThread::started, server, &ServerThread::run);
-    thread->connect(thread, &QThread::finished, thread, &QThread::deleteLater);
-    server->connect(server, &ServerThread::endOfWork, &app, &QApplication::quit);
-    server->connect(server, &ServerThread::endOfWork, thread, &Thread::quit);
-    server->moveToThread(thread);
-    thread->start();
+    ServerThread server(APPDIR);
+    server.run();
     app.exec();
     LogWriter::write(LogWriterLevel::verbose, "", "Exit service thread");
     return 0;

@@ -69,7 +69,7 @@ CR5Goods::CR5Goods(const QStringList &dbParams, QWidget *parent) :
     fColumnsFields << "gg.f_id"
                    << "cp.f_taxname"
                    << "g.f_name as f_groupname"
-                   << "cm.f_name as f_modelname"
+                   << "g.f_class as f_class"
                    << "u.f_name as f_unitname"
                    << "gg.f_name"
                    << "gg.f_scancode"
@@ -90,7 +90,7 @@ CR5Goods::CR5Goods(const QStringList &dbParams, QWidget *parent) :
     fColumnsVisible["gg.f_id"] = true;
     fColumnsVisible["cp.f_taxname"] = true;
     fColumnsVisible["g.f_name as f_groupname"] = true;
-    fColumnsVisible["cm.f_name as f_modelname"] = true;
+    fColumnsVisible["g.f_class as f_class"] = true;
     fColumnsVisible["u.f_name as f_unitname"] = true;
     fColumnsVisible["gg.f_name"] = true;
     fColumnsVisible["gpr.f_price1"] = true;
@@ -110,7 +110,7 @@ CR5Goods::CR5Goods(const QStringList &dbParams, QWidget *parent) :
     fTranslation["f_id"] = tr("Code");
     fTranslation["f_taxname"] = tr("Supplier");
     fTranslation["f_groupname"] = tr("Group");
-    fTranslation["f_modelname"] = tr("Model");
+    fTranslation["f_class"] = tr("Class");
     fTranslation["f_unitname"] = tr("Unit");
     fTranslation["f_name"] = tr("Name");
     fTranslation["f_price1"] = tr("Retail price");

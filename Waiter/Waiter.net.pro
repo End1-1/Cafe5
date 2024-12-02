@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core gui network printsupport sql multimedia axcontainer
+QT       += core gui network printsupport sql multimedia axcontainer websockets
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -93,9 +93,7 @@ SOURCES += \
     ../Classes/outputofheader.cpp \
     ../Classes/proxytablewidgetdatabase.cpp \
     ../Classes/serverconnection.cpp \
-    ../Classes/socketconnection.cpp \
     ../Classes/thread.cpp \
-    ../Classes/threadsendmessage.cpp \
     ../Configs/breezeconfig.cpp \
     ../Configs/cashboxconfig.cpp \
     ../Configs/configs.cpp \
@@ -153,7 +151,6 @@ SOURCES += \
     ../Editors/ce5goodsgroup.cpp \
     ../Editors/ce5goodsmodel.cpp \
     ../Editors/ce5goodsunit.cpp \
-    ../Editors/ce5goodswaste.cpp \
     ../Editors/ce5halls.cpp \
     ../Editors/ce5menuname.cpp \
     ../Editors/ce5mfprocess.cpp \
@@ -194,7 +191,6 @@ SOURCES += \
     ../Forms/c5login.cpp \
     ../Forms/c5mainwindow.cpp \
     ../Forms/c5passwords.cpp \
-    ../Forms/c5printtaxanywhere.cpp \
     ../Forms/c5progressdialog.cpp \
     ../Forms/c5reportwidget.cpp \
     ../Forms/c5route.cpp \
@@ -272,9 +268,7 @@ SOURCES += \
     ../Reports/cr5commonsalesfilter.cpp \
     ../Reports/cr5complectations.cpp \
     ../Reports/cr5consumptionbysales.cpp \
-    ../Reports/cr5consumptionbysalesdraft.cpp \
     ../Reports/cr5consumptionbysalesfilter.cpp \
-    ../Reports/cr5consumptionbysalesfilterdraft.cpp \
     ../Reports/cr5consuptionbysalesqty.cpp \
     ../Reports/cr5consuptionreason.cpp \
     ../Reports/cr5consuptionreasonfilter.cpp \
@@ -318,7 +312,6 @@ SOURCES += \
     ../Reports/cr5goodsreservationsfilter.cpp \
     ../Reports/cr5goodsstorages.cpp \
     ../Reports/cr5goodsunit.cpp \
-    ../Reports/cr5goodswaste.cpp \
     ../Reports/cr5hall.cpp \
     ../Reports/cr5materialinstorefilter.cpp \
     ../Reports/cr5materialinstoreuncomplect.cpp \
@@ -369,9 +362,6 @@ SOURCES += \
     ../Reports/cr5usersfilter.cpp \
     ../Reports/cr5usersgroups.cpp \
     ../Service5/utils/logwriter.cpp \
-    ../Service5Working/raw/rawmessage.cpp \
-    ../Service5Working/socket/sslserver.cpp \
-    ../Service5Working/socket/sslsocket.cpp \
     ../Service5Working/utils/configini.cpp \
     ../TableRecord/aheader.cpp \
     ../TableRecord/bclientdebts.cpp \
@@ -527,9 +517,7 @@ HEADERS += \
     ../Classes/outputofheader.h \
     ../Classes/proxytablewidgetdatabase.h \
     ../Classes/serverconnection.h \
-    ../Classes/socketconnection.h \
     ../Classes/thread.h \
-    ../Classes/threadsendmessage.h \
     ../Configs/breezeconfig.h \
     ../Configs/cashboxconfig.h \
     ../Configs/configs.h \
@@ -587,7 +575,6 @@ HEADERS += \
     ../Editors/ce5goodsgroup.h \
     ../Editors/ce5goodsmodel.h \
     ../Editors/ce5goodsunit.h \
-    ../Editors/ce5goodswaste.h \
     ../Editors/ce5halls.h \
     ../Editors/ce5menuname.h \
     ../Editors/ce5mfprocess.h \
@@ -628,7 +615,6 @@ HEADERS += \
     ../Forms/c5login.h \
     ../Forms/c5mainwindow.h \
     ../Forms/c5passwords.h \
-    ../Forms/c5printtaxanywhere.h \
     ../Forms/c5progressdialog.h \
     ../Forms/c5reportwidget.h \
     ../Forms/c5route.h \
@@ -706,9 +692,7 @@ HEADERS += \
     ../Reports/cr5commonsalesfilter.h \
     ../Reports/cr5complectations.h \
     ../Reports/cr5consumptionbysales.h \
-    ../Reports/cr5consumptionbysalesdraft.h \
     ../Reports/cr5consumptionbysalesfilter.h \
-    ../Reports/cr5consumptionbysalesfilterdraft.h \
     ../Reports/cr5consuptionbysalesqty.h \
     ../Reports/cr5consuptionreason.h \
     ../Reports/cr5consuptionreasonfilter.h \
@@ -736,15 +720,9 @@ HEADERS += \
     ../Reports/cr5dishremovereason.h \
     ../Reports/cr5documents.h \
     ../Reports/cr5documentsfilter.h \
-    ../Reports/cr5draftoutputbyrecipe.cpp~RFf1daf29.TMP \
-    ../Reports/cr5draftoutputbyrecipe.cpp~RFf316443.TMP \
     ../Reports/cr5draftoutputbyrecipe.h \
     ../Reports/cr5draftoutputbyrecipefilter.h \
     ../Reports/cr5generalreportonlydate.h \
-    ../Reports/cr5goods.cpp~RF27725e9.TMP \
-    ../Reports/cr5goods.cpp~RF2783df1.TMP \
-    ../Reports/cr5goods.cpp~RF370d2a9.TMP \
-    ../Reports/cr5goods.cpp~RF8ee5758.TMP \
     ../Reports/cr5goods.h \
     ../Reports/cr5goodsfilter.h \
     ../Reports/cr5goodsgroup.h \
@@ -758,7 +736,6 @@ HEADERS += \
     ../Reports/cr5goodsreservationsfilter.h \
     ../Reports/cr5goodsstorages.h \
     ../Reports/cr5goodsunit.h \
-    ../Reports/cr5goodswaste.h \
     ../Reports/cr5hall.h \
     ../Reports/cr5materialinstorefilter.h \
     ../Reports/cr5materialinstoreuncomplect.h \
@@ -809,9 +786,6 @@ HEADERS += \
     ../Reports/cr5usersfilter.h \
     ../Reports/cr5usersgroups.h \
     ../Service5/utils/logwriter.h \
-    ../Service5Working/raw/rawmessage.h \
-    ../Service5Working/socket/sslserver.h \
-    ../Service5Working/socket/sslsocket.h \
     ../Service5Working/utils/configini.h \
     ../Service5Working/utils/servicecommands.h \
     ../TableRecord/aheader.h \
@@ -936,7 +910,6 @@ FORMS += \
     ../Editors/ce5goodsgroup.ui \
     ../Editors/ce5goodsmodel.ui \
     ../Editors/ce5goodsunit.ui \
-    ../Editors/ce5goodswaste.ui \
     ../Editors/ce5halls.ui \
     ../Editors/ce5menuname.ui \
     ../Editors/ce5mfprocess.ui \
@@ -976,7 +949,6 @@ FORMS += \
     ../Forms/c5login.ui \
     ../Forms/c5mainwindow.ui \
     ../Forms/c5passwords.ui \
-    ../Forms/c5printtaxanywhere.ui \
     ../Forms/c5progressdialog.ui \
     ../Forms/c5route.ui \
     ../Forms/c5salarydoc.ui \
@@ -1041,7 +1013,6 @@ FORMS += \
     ../Reports/cr5cashmovementfilter.ui \
     ../Reports/cr5commonsalesfilter.ui \
     ../Reports/cr5consumptionbysalesfilter.ui \
-    ../Reports/cr5consumptionbysalesfilterdraft.ui \
     ../Reports/cr5consuptionbysalesqty.ui \
     ../Reports/cr5consuptionreasonfilter.ui \
     ../Reports/cr5costumerdebtsfilter.ui \

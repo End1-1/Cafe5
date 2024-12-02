@@ -19,6 +19,7 @@ DlgPaymentChoose::DlgPaymentChoose(const QStringList &dbParams) :
     ui->leCashIn->setValidator(new QDoubleValidator(0, 1000000000, 2));
     ui->leChange->setValidator(new QDoubleValidator(0, 1000000000, 2));
     ui->lePrepaid->setValidator(new QDoubleValidator(0, 1000000000, 2));
+    fMaxPrepaid = 0;
 #ifdef QT_DEBUG
     QShortcut *s = new QShortcut(QKeySequence(Qt::Key_F11), this, SLOT(checkFiscal()));
 #else
@@ -36,7 +37,7 @@ DlgPaymentChoose::~DlgPaymentChoose()
 bool DlgPaymentChoose::getValues(double total, double &cash, double &card, double &idram, double &telcell, double &bank,
                                  double &credit,
                                  double &prepaid, double &debt, double &cashin, double &change, bool &fiscal,
-                                 bool readOnlyPrepaid)
+                                 bool readOnlyPrepaid, double maxPrepaid)
 {
     DlgPaymentChoose d(__c5config.dbParams());
     d.ui->leTotal->setDouble(total);
@@ -53,6 +54,11 @@ bool DlgPaymentChoose::getValues(double total, double &cash, double &card, doubl
     d.fFiscal = fiscal;
     d.setFiscalStyle();
     d.fFiscal = fiscal;
+    d.fMaxPrepaid = maxPrepaid;
+    if (maxPrepaid < 1) {
+        d.ui->lePrepaid->setEnabled(false);
+        d.ui->btnPrepaid->setEnabled(false);
+    }
     if (d.exec() == QDialog::Accepted) {
         cash = d.ui->leCash->getDouble();
         card = d.ui->leCard->getDouble();
@@ -114,6 +120,11 @@ void DlgPaymentChoose::clearAll(QLineEdit *le)
     ui->leDebt->clear();
     ui->leCredit->clear();
     le->setText(ui->leTotal->text());
+    if (ui->lePrepaid == le) {
+        if (ui->lePrepaid->getDouble() > fMaxPrepaid && fMaxPrepaid > 1) {
+            ui->lePrepaid->setDouble(fMaxPrepaid);
+        }
+    }
 }
 
 void DlgPaymentChoose::countChange()
@@ -241,6 +252,9 @@ void DlgPaymentChoose::on_leTelcell_textChanged(const QString &arg1)
 void DlgPaymentChoose::on_lePrepaid_textChanged(const QString &arg1)
 {
     Q_UNUSED(arg1);
+    if (arg1.toDouble() > fMaxPrepaid && fMaxPrepaid > 1) {
+        ui->lePrepaid->setDouble(fMaxPrepaid);
+    }
     countChange();
 }
 

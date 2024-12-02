@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core gui network printsupport sql multimedia
+QT       += core gui network printsupport sql multimedia websockets
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 

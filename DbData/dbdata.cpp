@@ -20,9 +20,16 @@ DbData::DbData(int id)
 
 QVariant DbData::get(int id, const QString &key)
 {
-#ifdef QT_DEBUG
-    Q_ASSERT(fData[id].contains(key));
-#endif
+    if (!fData.contains(id)) {
+        C5Database db;
+        db[":f_id"] = id;
+        db.exec("select * from " + fTable + " where f_id=:f_id");
+        if (db.nextRow()) {
+            QMap<QString, QVariant> m;
+            db.rowToMap(m);
+            fData[id] = m;
+        }
+    }
     return fData[id][key];
 }
 

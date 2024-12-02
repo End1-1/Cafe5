@@ -7,6 +7,7 @@
 #include <QJsonDocument>
 #include <QJsonParseError>
 #include <QThread>
+#include <QWebSocket>
 
 QJsonArray C5ServerName::mServers;
 
@@ -22,29 +23,30 @@ bool C5ServerName::getServers(const QString &name)
     if (!name.isEmpty()) {
         mParams["name"] = name;
     }
-    QNetworkAccessManager m;
-    QString host = QString("https://%1:10002/%2").arg(mServer, mRoute);
-    QNetworkRequest rq(host);
-    m.setTransferTimeout(60000);
-    rq.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
-    QSslConfiguration sslConf = rq.sslConfiguration();
-    sslConf.setPeerVerifyMode(QSslSocket::VerifyNone);
-    sslConf.setProtocol(QSsl::AnyProtocol);
-    rq.setSslConfiguration(sslConf);
+    QWebSocket *s = new QWebSocket();
+    QUrl url(QString("%1/ws").arg(mServer));
+    QEventLoop l1;
+    connect(s, &QWebSocket::connected, &l1, &QEventLoop::quit);
+    connect(s, &QWebSocket::disconnected, &l1, &QEventLoop::quit);
+    connect(this, &C5ServerName::messageReceived, &l1, &QEventLoop::quit);
+    s->open(url);
+    l1.exec();
+    QEventLoop l2;
+    connect(s, &QWebSocket::textMessageReceived, this, [this](const QString &s) {
+        fLastTextMessage = s;
+        QJsonObject jrep = QJsonDocument::fromJson(s.toUtf8()).object();
+        mServers = jrep["result"].toArray();
+        emit messageReceived();
+    });
+    connect(this, &C5ServerName::messageReceived, &l2, &QEventLoop::quit);
+    connect(s, &QWebSocket::disconnected, &l2, &QEventLoop::quit);
     QJsonObject jo;
+    jo["command"] = "ServerNamesAll";
+    jo["handler"] = "office";
     jo["key"] = "asdf7fa8kk49888d!!jjdjmskkak98983mj???m";
     jo["params"] = mParams;
-    auto *r = m.post(rq, QJsonDocument(jo).toJson(QJsonDocument::Compact));
-    while (!r->isFinished()) {
-        qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
-        QThread::msleep(10);
-    }
-    if (r->error() != QNetworkReply::NoError) {
-        C5Message::error(r->errorString() + "<br>" + r->readAll());
-        return false;
-    }
-    QByteArray ba = r->readAll();
-    mServers = QJsonDocument::fromJson(ba).array();
+    s->sendTextMessage(QJsonDocument(jo).toJson(QJsonDocument::Compact));
+    l2.exec();
     qDebug() << mServers;
     return true;
 }

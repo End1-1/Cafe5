@@ -89,7 +89,7 @@
             <string/>
            </property>
            <property name="icon">
-            <iconset resource="../resources/res.qrc">
+            <iconset>
              <normaloff>:/new.png</normaloff>:/new.png</iconset>
            </property>
            <property name="iconSize">
@@ -124,7 +124,7 @@
             <string/>
            </property>
            <property name="icon">
-            <iconset resource="../resources/res.qrc">
+            <iconset>
              <normaloff>:/whosale.png</normaloff>:/whosale.png</iconset>
            </property>
            <property name="iconSize">
@@ -159,7 +159,7 @@
             <string/>
            </property>
            <property name="icon">
-            <iconset resource="../resources/res.qrc">
+            <iconset>
              <normaloff>:/goodslist.png</normaloff>:/goodslist.png</iconset>
            </property>
            <property name="iconSize">
@@ -194,7 +194,7 @@
             <string/>
            </property>
            <property name="icon">
-            <iconset resource="../resources/res.qrc">
+            <iconset>
              <normaloff>:/draft.png</normaloff>:/draft.png</iconset>
            </property>
            <property name="iconSize">
@@ -229,43 +229,8 @@
             <string/>
            </property>
            <property name="icon">
-            <iconset resource="../resources/res.qrc">
+            <iconset>
              <normaloff>:/save.png</normaloff>:/save.png</iconset>
-           </property>
-           <property name="iconSize">
-            <size>
-             <width>30</width>
-             <height>30</height>
-            </size>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QPushButton" name="btnManualTax">
-           <property name="minimumSize">
-            <size>
-             <width>36</width>
-             <height>36</height>
-            </size>
-           </property>
-           <property name="maximumSize">
-            <size>
-             <width>36</width>
-             <height>36</height>
-            </size>
-           </property>
-           <property name="focusPolicy">
-            <enum>Qt::NoFocus</enum>
-           </property>
-           <property name="toolTip">
-            <string>Manual tax receipt</string>
-           </property>
-           <property name="text">
-            <string/>
-           </property>
-           <property name="icon">
-            <iconset resource="../resources/res.qrc">
-             <normaloff>:/print.png</normaloff>:/print.png</iconset>
            </property>
            <property name="iconSize">
             <size>
@@ -312,7 +277,7 @@
             <string/>
            </property>
            <property name="icon">
-            <iconset resource="../resources/res.qrc">
+            <iconset>
              <normaloff>:/help.png</normaloff>:/help.png</iconset>
            </property>
            <property name="iconSize">
@@ -347,7 +312,7 @@
             <string/>
            </property>
            <property name="icon">
-            <iconset resource="../resources/res.qrc">
+            <iconset>
              <normaloff>:/monitor.png</normaloff>:/monitor.png</iconset>
            </property>
            <property name="iconSize">
@@ -385,7 +350,7 @@
             <string/>
            </property>
            <property name="icon">
-            <iconset resource="../resources/res.qrc">
+            <iconset>
              <normaloff>:/present.png</normaloff>:/present.png</iconset>
            </property>
            <property name="iconSize">
@@ -420,7 +385,7 @@
             <string/>
            </property>
            <property name="icon">
-            <iconset resource="../resources/res.qrc">
+            <iconset>
              <normaloff>:/star-active.png</normaloff>:/star-active.png</iconset>
            </property>
            <property name="iconSize">
@@ -455,7 +420,7 @@
             <string/>
            </property>
            <property name="icon">
-            <iconset resource="../resources/res.qrc">
+            <iconset>
              <normaloff>:/calendar.png</normaloff>:/calendar.png</iconset>
            </property>
            <property name="iconSize">
@@ -490,8 +455,43 @@
             <string/>
            </property>
            <property name="icon">
-            <iconset resource="../resources/res.qrc">
+            <iconset>
              <normaloff>:/contract.png</normaloff>:/contract.png</iconset>
+           </property>
+           <property name="iconSize">
+            <size>
+             <width>30</width>
+             <height>30</height>
+            </size>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="btnCashout">
+           <property name="minimumSize">
+            <size>
+             <width>36</width>
+             <height>36</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>36</width>
+             <height>36</height>
+            </size>
+           </property>
+           <property name="focusPolicy">
+            <enum>Qt::NoFocus</enum>
+           </property>
+           <property name="toolTip">
+            <string>Gift card</string>
+           </property>
+           <property name="text">
+            <string/>
+           </property>
+           <property name="icon">
+            <iconset>
+             <normaloff>:/tax.png</normaloff>:/tax.png</iconset>
            </property>
            <property name="iconSize">
             <size>
@@ -525,7 +525,7 @@
             <string/>
            </property>
            <property name="icon">
-            <iconset resource="../resources/res.qrc">
+            <iconset>
              <normaloff>:/checkall.png</normaloff>:/checkall.png</iconset>
            </property>
            <property name="iconSize">
@@ -560,7 +560,7 @@
             <string/>
            </property>
            <property name="icon">
-            <iconset resource="../resources/res.qrc">
+            <iconset>
              <normaloff>:/qr_code.png</normaloff>:/qr_code.png</iconset>
            </property>
            <property name="iconSize">
@@ -595,7 +595,7 @@
             <string/>
            </property>
            <property name="icon">
-            <iconset resource="../resources/res.qrc">
+            <iconset>
              <normaloff>:/minimize.png</normaloff>:/minimize.png</iconset>
            </property>
            <property name="iconSize">
@@ -630,7 +630,7 @@
             <string/>
            </property>
            <property name="icon">
-            <iconset resource="../resources/res.qrc">
+            <iconset>
              <normaloff>:/logout.png</normaloff>:/logout.png</iconset>
            </property>
            <property name="iconSize">
@@ -642,6 +642,22 @@
           </widget>
          </item>
         </layout>
+        <zorder>btnSalesReport</zorder>
+        <zorder>btnNewRetail</zorder>
+        <zorder>btnNewWhosale</zorder>
+        <zorder>btnGoodsList</zorder>
+        <zorder>btnOpenDraft</zorder>
+        <zorder>btnWriteOrder</zorder>
+        <zorder>btnHelp</zorder>
+        <zorder>btnCostumerDisplay</zorder>
+        <zorder>btnGiftCard</zorder>
+        <zorder>chRegisterCard</zorder>
+        <zorder>btnGoodsMovement</zorder>
+        <zorder>btnCashout</zorder>
+        <zorder>btnColumns</zorder>
+        <zorder>btnClientConfigQR</zorder>
+        <zorder>btnMinimize</zorder>
+        <zorder>btnCloseApplication</zorder>
        </widget>
       </item>
      </layout>
@@ -766,7 +782,7 @@
          <string/>
         </property>
         <property name="pixmap">
-         <pixmap resource="../resources/res.qrc">:/checked.png</pixmap>
+         <pixmap>:/checked.png</pixmap>
         </property>
         <property name="scaledContents">
          <bool>true</bool>
@@ -790,9 +806,6 @@
  <tabstops>
   <tabstop>tab</tabstop>
  </tabstops>
- <resources>
-  <include location="../resources/res.qrc"/>
-  <include location="../resources/res.qrc"/>
- </resources>
+ <resources/>
  <connections/>
 </ui>

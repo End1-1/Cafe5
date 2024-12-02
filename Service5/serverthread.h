@@ -1,13 +1,11 @@
 #ifndef SERVERTHREAD_H
 #define SERVERTHREAD_H
 
-#include "threadworker.h"
-#include <QSslCertificate>
-#include <QSslKey>
+#include <QObject>
 
-class SslServer;
+class QWebSocketServer;
 
-class ServerThread : public ThreadWorker
+class ServerThread : public QObject
 {
     Q_OBJECT
 public:
@@ -18,15 +16,12 @@ public slots:
     void run();
 
 private:
-    QList<SslServer*> fSslServer;
+    QWebSocketServer *fServer;
     const QString fConfigPath;
-    QSslCertificate fSslLocalCertificate;
-    QSslKey fSslPrivateKey;
-    QSsl::SslProtocol fSslProtocol;
-    QList<QSslCertificate> fSslChain;
 
 private slots:
-    void newConnection(int socketDescriptor);
+    void onNewConnection();
+    void onTextMessage(const QString &msg);
 
 };
 

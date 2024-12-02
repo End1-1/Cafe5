@@ -67,7 +67,7 @@ void CR5MaterialsInStore::prepareDrafts()
                    << "g.f_name as f_goods"
                    << "g.f_scancode"
                    << "p.f_taxname"
-                   << "sum(s.f_qty*s.f_type) as f_qty"
+                   << "round(sum(s.f_qty*s.f_type),3) as f_qty"
                    << "u.f_name as f_unit"
                    << "g.f_lastinputprice"
                    << "sum(g.f_lastinputprice*s.f_type*s.f_qty) as f_total"
@@ -133,7 +133,7 @@ void CR5MaterialsInStore::prepareDrafts()
     fColumnsVisible["gg.f_name as f_group"] = true;
     fColumnsVisible["g.f_name as f_goods"] = true;
     fColumnsVisible["g.f_scancode"] = true;
-    fColumnsVisible["sum(s.f_qty*s.f_type) as f_qty"] = true;
+    fColumnsVisible["round(sum(s.f_qty*s.f_type),3) as f_qty"] = true;
     fColumnsVisible["u.f_name as f_unit"] = true;
     fColumnsVisible["g.f_lastinputprice"] = true;
     fColumnsVisible["sum(g.f_lastinputprice*s.f_type*s.f_qty) as f_total"] = true;
@@ -178,7 +178,7 @@ void CR5MaterialsInStore::prepareNoDrafts()
                    << "g.f_name as f_goods"
                    << "g.f_scancode"
                    << "v.f_date as f_validdate"
-                   << "sum(s.f_qty*s.f_type) as f_qty"
+                   << "round(sum(s.f_qty*s.f_type),3) as f_qty"
                    << "u.f_name as f_unit"
                    << "s.f_price"
                    << "sum(s.f_total*s.f_type) as f_total"
@@ -215,7 +215,7 @@ void CR5MaterialsInStore::prepareNoDrafts()
     if (fFilter->showZero()) {
         fHavindCondition = "";
     } else {
-        fHavindCondition = " having sum(s.f_qty*s.f_type) <> 0 ";
+        fHavindCondition = " having sum(s.f_qty*s.f_type) > 0.01 ";
     }
     fTranslation["f_code"] = tr("Code");
     fTranslation["f_storage"] = tr("Storage");
@@ -242,7 +242,7 @@ void CR5MaterialsInStore::prepareNoDrafts()
     fColumnsVisible["gg.f_name as f_group"] = true;
     fColumnsVisible["g.f_name as f_goods"] = true;
     fColumnsVisible["g.f_scancode"] = true;
-    fColumnsVisible["sum(s.f_qty*s.f_type) as f_qty"] = true;
+    fColumnsVisible["round(sum(s.f_qty*s.f_type),3) as f_qty"] = true;
     fColumnsVisible["u.f_name as f_unit"] = true;
     fColumnsVisible["s.f_price"] = true;
     fColumnsVisible["sum(s.f_total*s.f_type) as f_total"] = true;

@@ -45,6 +45,7 @@ void DlgGiftCardSale::on_leCode_returnPressed()
         }
     }
     ui->lbCard->setText(ui->leCode->text().right(4));
+    fGiftScancode = ui->lbCard->text();
 }
 
 void DlgGiftCardSale::on_btnRegister_clicked()
@@ -65,7 +66,6 @@ void DlgGiftCardSale::on_btnRegister_clicked()
         C5Message::error(tr("This card already has been sold"));
         return;
     }
-    fGiftScancode = ui->lbCard->text();
     fGiftPrice = str_float(ui->lstPrices->currentItem()->text());
     accept();
 }

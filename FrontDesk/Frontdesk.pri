@@ -43,7 +43,6 @@ FORMS += \
     ../Forms/c5login.ui \
     ../Forms/c5mainwindow.ui \
     ../Forms/c5passwords.ui \
-    ../Forms/c5printtaxanywhere.ui \
     ../Forms/c5progressdialog.ui \
     ../Forms/c5route.ui \
     ../Forms/c5salarydoc.ui \
@@ -97,7 +96,6 @@ FORMS += \
     ../Reports/cr5carvisitsfilter.ui \
     ../Reports/cr5cashdetailedfilter.ui \
     ../Reports/cr5cashmovementfilter.ui \
-    ../Reports/cr5consumptionbysalesfilterdraft.ui \
     ../Reports/cr5consuptionreasonfilter.ui \
     ../Reports/cr5costumerdebtsfilter.ui \
     ../Reports/cr5currencycrossratehistoryfilter.ui \
@@ -143,7 +141,6 @@ FORMS += \
     ../Editors/c5dishwidget.ui \
     ../Editors/ce5menuname.ui \
     ../Editors/ce5goodsgroup.ui \
-    ../Editors/ce5goodswaste.ui \
     ../Editors/ce5usergroup.ui \
     ../Editors/ce5user.ui \
     ../Editors/ce5creditcard.ui \
@@ -200,7 +197,6 @@ HEADERS += \
         ../Classes/notificationwidget.h \
         ../Classes/outputofheader.h \
         ../Classes/proxytablewidgetdatabase.h \
-        ../Classes/threadsendmessage.h \
         ../Configs/breezeconfig.h \
         ../Configs/configs.h \
         ../Controls/c5cleartablewidget.h \
@@ -248,7 +244,6 @@ HEADERS += \
         ../Forms/c5login.h \
         ../Forms/c5mainwindow.h \
         ../Forms/c5passwords.h \
-        ../Forms/c5printtaxanywhere.h \
         ../Forms/c5progressdialog.h \
         ../Forms/c5reportwidget.h \
         ../Forms/c5route.h \
@@ -310,8 +305,6 @@ HEADERS += \
         ../Reports/cr5cashmovementfilter.h \
         ../Reports/cr5cashnames.h \
         ../Reports/cr5complectations.h \
-        ../Reports/cr5consumptionbysalesdraft.h \
-        ../Reports/cr5consumptionbysalesfilterdraft.h \
         ../Reports/cr5consuptionreason.h \
         ../Reports/cr5consuptionreasonfilter.h \
         ../Reports/cr5costumerdebts.h \
@@ -412,7 +405,6 @@ HEADERS += \
         ../Reports/cr5goodsunit.h \
         ../Reports/cr5goodsgroup.h \
         ../Reports/cr5goods.h \
-        ../Reports/cr5goodswaste.h \
         ../Controls/c5lineeditwithselector.h \
         ../Reports/cr5goodsstorages.h \
         ../Reports/cr5goodspartners.h \
@@ -445,7 +437,6 @@ HEADERS += \
         ../Editors/c5dishwidget.h \
         ../Editors/ce5menuname.h \
         ../Editors/ce5goodsgroup.h \
-        ../Editors/ce5goodswaste.h \
         ../Editors/ce5usergroup.h \
         ../Editors/ce5user.h \
         ../Reports/cr5creditcards.h \
@@ -525,7 +516,6 @@ SOURCES += \
         ../Classes/notificationwidget.cpp \
         ../Classes/outputofheader.cpp \
         ../Classes/proxytablewidgetdatabase.cpp \
-        ../Classes/threadsendmessage.cpp \
         ../Configs/breezeconfig.cpp \
         ../Configs/configs.cpp \
         ../Controls/c5cleartablewidget.cpp \
@@ -573,7 +563,6 @@ SOURCES += \
         ../Forms/c5login.cpp \
         ../Forms/c5mainwindow.cpp \
         ../Forms/c5passwords.cpp \
-        ../Forms/c5printtaxanywhere.cpp \
         ../Forms/c5progressdialog.cpp \
         ../Forms/c5reportwidget.cpp \
         ../Forms/c5route.cpp \
@@ -633,8 +622,6 @@ SOURCES += \
         ../Reports/cr5cashmovementfilter.cpp \
         ../Reports/cr5cashnames.cpp \
         ../Reports/cr5complectations.cpp \
-        ../Reports/cr5consumptionbysalesdraft.cpp \
-        ../Reports/cr5consumptionbysalesfilterdraft.cpp \
         ../Reports/cr5consuptionreason.cpp \
         ../Reports/cr5consuptionreasonfilter.cpp \
         ../Reports/cr5costumerdebts.cpp \
@@ -735,7 +722,6 @@ SOURCES += \
         ../Reports/cr5goodsunit.cpp \
         ../Reports/cr5goodsgroup.cpp \
         ../Reports/cr5goods.cpp \
-        ../Reports/cr5goodswaste.cpp \
         ../Controls/c5lineeditwithselector.cpp \
         ../Reports/cr5goodsstorages.cpp \
         ../Reports/cr5goodspartners.cpp \
@@ -766,7 +752,6 @@ SOURCES += \
         ../Editors/c5dishwidget.cpp \
         ../Editors/ce5menuname.cpp \
         ../Editors/ce5goodsgroup.cpp \
-        ../Editors/ce5goodswaste.cpp \
         ../Editors/ce5usergroup.cpp \
         ../Editors/ce5user.cpp \
         ../Reports/cr5creditcards.cpp \

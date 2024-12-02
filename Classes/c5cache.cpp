@@ -29,6 +29,7 @@ C5Cache::C5Cache(const QStringList &dbParams) :
                                            left join c_groups gg on gg.f_id=g.f_group \
                                            left join c_units as u on u.f_id=g.f_unit \
                                            left join c_goods_prices gpr on gpr.f_goods=g.f_id and gpr.f_currency=1 \
+                                        where 1=1 %idcond% \
                                            order by 3 ")
                                    .arg(tr("Code").toLower())
                                    .arg(tr("Group").toLower())
@@ -89,7 +90,6 @@ C5Cache::C5Cache(const QStringList &dbParams) :
         fCacheQuery[cache_order_state] = QString("select f_id as `%1`, f_name as `%2` from o_state")
                                          .arg(tr("Code"))
                                          .arg(tr("Name"));
-        fCacheQuery[cache_goods_waste] = "";
         fCacheQuery[cache_cash_names] = QString("select f_id as `%1`, f_name as `%2`, f_currency as `%3` from e_cash_names")
                                         .arg(tr("Code"))
                                         .arg(tr("Name"))
@@ -166,7 +166,6 @@ C5Cache::C5Cache(const QStringList &dbParams) :
         fTableCache["d_part2"] = cache_dish_part2;
         fTableCache["d_dish"] = cache_dish;
         fTableCache["c_storages"] = cache_goods_store;
-        fTableCache["c_goods_waste"] = cache_goods_waste;
         fTableCache["s_user"] = cache_users;
         fTableCache["s_user_group"] = cache_users_groups;
         fTableCache["o_credit_card"] = cache_credit_card;
@@ -242,6 +241,24 @@ void C5Cache::refresh()
     loadFromDatabase(fCacheQuery[fId]);
 }
 
+void C5Cache::refreshId(const QString &whereField, int id)
+{
+    if (fCacheIdRow.contains(id)) {
+        int row = fCacheIdRow[id];
+        fCacheIdRow.remove(id);
+        fCacheData.removeAt(row);
+    }
+    C5Database db(fDBParams);
+    QList<QList<QVariant>> cacheData;
+    db.exec(fCacheQuery[fId].replace("%idcond%", QString(" and %1=%2 ")
+                                     .arg(whereField, QString::number(id))), cacheData,
+            fCacheColumns[fId]);
+    if (cacheData.empty() == false) {
+        fCacheData.append(cacheData.at(0));
+        fCacheIdRow[id] = fCacheData.count() - 1;
+    }
+}
+
 C5Cache *C5Cache::cache(const QStringList &dbParams, int cacheId)
 {
     QString name = cacheName(dbParams, cacheId);
@@ -285,7 +302,9 @@ void C5Cache::loadFromDatabase(const QString &query)
 {
     fCacheIdRow.clear();
     C5Database db(fDBParams);
-    db.exec(query, fCacheData, fCacheColumns[fId]);
+    QString q = query;
+    q.replace("%idcond%", "");
+    db.exec(q, fCacheData, fCacheColumns[fId]);
     for (int i = 0; i < fCacheData.count(); i++) {
         fCacheIdRow[fCacheData[i][0].toInt()] = i;
     }
