@@ -199,19 +199,6 @@
        </widget>
       </item>
       <item>
-       <widget class="QPushButton" name="btnChart">
-        <property name="minimumSize">
-         <size>
-          <width>140</width>
-          <height>60</height>
-         </size>
-        </property>
-        <property name="text">
-         <string>Chart</string>
-        </property>
-       </widget>
-      </item>
-      <item>
        <spacer name="horizontalSpacer_2">
         <property name="orientation">
          <enum>Qt::Horizontal</enum>
@@ -256,7 +243,7 @@
          </size>
         </property>
         <property name="text">
-         <string>Tools</string>
+         <string>Lock</string>
         </property>
         <property name="icon">
          <iconset resource="../resources/res.qrc">

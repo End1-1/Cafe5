@@ -1,6 +1,5 @@
 #include "c5printreceiptthread.h"
 #include "c5printing.h"
-#include "c5logsystem.h"
 #include "c5translator.h"
 #include "QRCodeGenerator.h"
 #include "c5utils.h"
@@ -8,7 +7,6 @@
 #include "logwriter.h"
 #include "c5utils.h"
 #include "c5config.h"
-#include "c5logsystem.h"
 #include <QApplication>
 #include <QSettings>
 
@@ -351,7 +349,6 @@ bool C5PrintReceiptThread::print(const QStringList &dbParams)
     p.br();
     p.line();
     if (fIdram[param_idram_id].length() > 0 && fBill) {
-        C5LogSystem::writeEvent("Idram QR");
         p.br();
         p.br();
         p.br();

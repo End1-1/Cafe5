@@ -14,7 +14,6 @@
 #include "notificationwidget.h"
 #include "c5jsondb.h"
 #include "cashboxconfig.h"
-#include "c5logsystem.h"
 #include <QDebug>
 #include <QJsonArray>
 #include <QMutex>
@@ -56,12 +55,12 @@ void C5WaiterServer::reply(QJsonObject &o)
                                  .arg(hallFilter.isEmpty() ? "" : " where f_id in (" + hallFilter + ")"), jHall);
             QJsonArray jTables;
             srh.getJsonFromQuery(QString("select t.f_id, t.f_hall, t.f_name, t.f_lock, t.f_lockSrc, \
-         h.f_id as f_header, concat(u.f_last, ' ', left(u.f_first, 1), '.') as f_staffName, \
-                  h.f_amounttotal as f_amount, h.f_print, bc.f_govnumber, \
-                  date_format(h.f_dateopen, '%d.%m.%Y') as f_dateopen, h.f_timeOpen, \
-                  t.f_special_config \
-                  from h_tables t \
-                  left join o_header h on h.f_table=t.f_id and h.f_state=1 \
+h.f_id as f_header, concat(u.f_last, ' ', left(u.f_first, 1), '.') as f_staffName, \
+        h.f_amounttotal as f_amount, h.f_print, bc.f_govnumber, \
+        date_format(h.f_dateopen, '%d.%m.%Y') as f_dateopen, h.f_timeOpen, \
+        t.f_special_config \
+        from h_tables t \
+        left join o_header h on h.f_table=t.f_id and h.f_state=1 \
 left join o_header_options o on o.f_id=h.f_id \
 left join b_car bc on bc.f_id=o.f_car \
 left join s_user u on u.f_id=h.f_staff  %1 \
@@ -809,20 +808,18 @@ void C5WaiterServer::processCloseOrder(QJsonObject &o, C5Database &db)
 }
 
 int C5WaiterServer::printTax(const QMap<QString, QVariant> &header, const QList<QMap<QString, QVariant> > &body,
-                             QString &err)
+                             const QStringList emarks, QString &err)
 {
     QElapsedTimer et;
     et.start();
     C5Database db(__c5config.dbParams());
     PrintTaxN pt(C5Config::taxIP(), C5Config::taxPort(), C5Config::taxPassword(), C5Config::taxUseExtPos(),
                  C5Config::taxCashier(), C5Config::taxPin(),  this);
+    pt.fEmarks.append(emarks);
     for (int i = 0; i < body.count(); i++) {
         const QMap<QString, QVariant> &m = body.at(i);
         if (m["f_state"].toInt() != DISH_STATE_OK) {
             continue;
-        }
-        if (!m["f_emarks"].toString().isEmpty()) {
-            pt.fEmarks.append(m["f_emarks"].toString());
         }
         pt.addGoods(C5Config::taxDept().toInt(),
                     dbdishpart2->adgcode(dbdish->part2(m["f_dish"].toInt())),
@@ -845,515 +842,550 @@ int C5WaiterServer::printTax(const QMap<QString, QVariant> &header, const QList<
                         + header["f_amountidram"].toDouble()
                         + header["f_amountpayx"].toDouble();
     result = pt.makeJsonAndPrint(cardamount, header["f_amountprepaid"].toDouble(), jsonIn, jsonOut, err);
-    QJsonObject jtax;
-    QJsonParseError jsonErr;
-    jtax["f_order"] = header["f_id"].toString();
-    jtax["f_elapsed"] = et.elapsed();
-    jtax["f_in"] = QJsonDocument::fromJson(jsonIn.toUtf8(), &jsonErr).object();
-    jtax["f_out"] = QJsonDocument::fromJson(jsonOut.toUtf8()).object();;
-    jtax["f_err"] = err;
-    jtax["f_result"] = result;
-    jtax["f_state"] = result == pt_err_ok ? 1 : 0;
-    if (jsonErr.error != QJsonParseError::NoError) {
+#ifdef QT_DEBUG
+    //#define return_5
+    if (result != 0) {
+#ifdef return_5
+        result = -5;
+        jsonOut = "{\"address\": \"ԿԵՆՏՐՈՆ ԹԱՂԱՄԱՍ Հյուսիսային պողոտա 1/1 \", "
+                  "\"change\": 0, \"crn\": \"53241359\", \"fiscal\": \"81326142\", "
+                  "\"lottery\": \"\", \"prize\": 0, \"rseq\": 7174, \"sn\": \"00022164315\", "
+                  "\"taxpayer\": \"«ՍՄԱՐՏ ՊԱՐԿԻՆԳ»\", \"time\": 1733052744891, \"tin\": \"02853428\", \"total\": 1}";
+#else
+        result = 0;
+        jsonOut = "{\"address\": \"ԿԵՆՏՐՈՆ ԹԱՂԱՄԱՍ Հյուսիսային պողոտա 1/1 \", "
+                  "\"change\": 0, \"crn\": \"53241359\", \"fiscal\": \"81326142\", "
+                  "\"lottery\": \"\", \"prize\": 0, \"rseq\": 7174, \"sn\": \"00022164315\", "
+                  "\"taxpayer\": \"«ՍՄԱՐՏ ՊԱՐԿԻՆԳ»\", \"time\": 1733052744891, \"tin\": \"02853428\", \"total\": 1}";
     }
-    QString jtaxstr = QString(QJsonDocument(jtax).toJson(
-                                  QJsonDocument::Compact));
-    jtaxstr.replace("\\\"", "\\\\\"");
-    jtaxstr.replace("'", "\\'");
-    if (!db.exec(QString("call sf_create_shop_tax('%1')").arg(jtaxstr))) {
+#endif
+#endif
+        QJsonObject jtax;
+        QJsonParseError jsonErr;
+        jtax["f_order"] = header["f_id"].toString();
+        jtax["f_elapsed"] = et.elapsed();
+        jtax["f_in"] = QJsonDocument::fromJson(jsonIn.toUtf8(), &jsonErr).object();
+        jtax["f_out"] = QJsonDocument::fromJson(jsonOut.toUtf8()).object();;
+        jtax["f_err"] = err;
+        jtax["f_result"] = result;
+        jtax["f_state"] = result == pt_err_ok ? 1 : 0;
+        if (jsonErr.error != QJsonParseError::NoError) {
+        }
+        QString jtaxstr = QString(QJsonDocument(jtax).toJson(
+                                      QJsonDocument::Compact));
+        jtaxstr.replace("\\\"", "\\\\\"");
+        jtaxstr.replace("'", "\\'");
+        if (!db.exec(QString("call sf_create_shop_tax('%1')").arg(jtaxstr))) {
+        }
+        return result;
     }
-    return result;
-}
 
-bool C5WaiterServer::printReceipt(QString &err, C5Database &db, bool isBill, bool alias)
-{
-    if (fIn["close"].toInt() > 0) {
-        db[":f_id"] = fIn["order"].toString();
-        db.exec("select f_otherid from o_header where f_id=:f_id");
-        if (db.nextRow()) {
-            if (db.getInt("f_otherid") == PAYOTHER_PRIMECOST) {
-                C5WaiterOrderDoc w(fIn["order"].toString(), db);
-                w.calculateSelfCost(db);
+    bool C5WaiterServer::printReceipt(QString &err, C5Database &db, bool isBill, bool alias)
+    {
+        if (fIn["close"].toInt() > 0) {
+            db[":f_id"] = fIn["order"].toString();
+            db.exec("select f_otherid from o_header where f_id=:f_id");
+            if (db.nextRow()) {
+                if (db.getInt("f_otherid") == PAYOTHER_PRIMECOST) {
+                    C5WaiterOrderDoc w(fIn["order"].toString(), db);
+                    w.calculateSelfCost(db);
+                }
             }
         }
-    }
-    QMap<QString, QVariant> headerInfo;
-    db[":f_id"] = fIn["order"].toString();
-    if (!db.exec("select o.*, concat_ws(' ', u.f_last, u.f_first) as f_currentstaffname,"
-                 "t.f_name as f_tablename, h.f_name as f_hallname "
-                 "from o_header o "
-                 "left join h_tables t on t.f_id=o.f_table "
-                 "left join h_halls h on h.f_id=o.f_hall "
-                 "left join s_user u on u.f_id=o.f_currentstaff "
-                 "where o.f_id=:f_id")) {
-        err = db.fLastError;
-        return false;
-    }
-    if (!db.nextRow()) {
-        err = tr("No order with this id");
-        return false;
-    }
-    db.rowToMap(headerInfo);
-    QList<QMap<QString, QVariant> > bodyInfo;
-    db[":f_header"] = fIn["order"].toString();
-    if (!db.exec("select f_state, f_dish, f_price, f_canservice, f_candiscount, ob.f_discount, "
-                 "d.f_name as f_dishname, d.f_adgt, d.f_hourlypayment, d.f_extra, "
-                 "sum(f_qty1) as f_qty1, sum(f_qty2) as f_qty2, "
-                 "sum(f_total) as f_total, f_adgcode, ob.f_comment, ob.f_emarks "
-                 "from o_body ob "
-                 "left join d_dish d on d.f_id=ob.f_dish "
-                 "where f_header=:f_header "
-                 "group by f_dish, f_state, f_price, ob.f_discount "
-                 "order by ob.f_row ")) {
-        err = db.fLastError;
-        return false;
-    }
-    while (db.nextRow()) {
-        QMap<QString, QVariant> m;
-        db.rowToMap(m);
-        bodyInfo.append(m);
-    }
-    if (fIn["printtax"].toInt() == 1 ) {
-        bool printtax = false;
+        QMap<QString, QVariant> headerInfo;
         db[":f_id"] = fIn["order"].toString();
-        db.exec("select f_receiptnumber from o_tax where f_id=:f_id");
-        if (db.nextRow()) {
-            if (db.getInt(0) == 0) {
+        if (!db.exec("select o.*, concat_ws(' ', u.f_last, u.f_first) as f_currentstaffname,"
+                     "t.f_name as f_tablename, h.f_name as f_hallname "
+                     "from o_header o "
+                     "left join h_tables t on t.f_id=o.f_table "
+                     "left join h_halls h on h.f_id=o.f_hall "
+                     "left join s_user u on u.f_id=o.f_currentstaff "
+                     "where o.f_id=:f_id")) {
+            err = db.fLastError;
+            return false;
+        }
+        if (!db.nextRow()) {
+            err = tr("No order with this id");
+            return false;
+        }
+        db.rowToMap(headerInfo);
+        QList<QMap<QString, QVariant> > bodyInfo;
+        db[":f_header"] = fIn["order"].toString();
+        if (!db.exec("select f_state, f_dish, f_price, f_canservice, f_candiscount, ob.f_discount, "
+                     "d.f_name as f_dishname, d.f_adgt, d.f_hourlypayment, d.f_extra, "
+                     "sum(f_qty1) as f_qty1, sum(f_qty2) as f_qty2, "
+                     "sum(f_total) as f_total, f_adgcode, ob.f_comment, ob.f_emarks "
+                     "from o_body ob "
+                     "left join d_dish d on d.f_id=ob.f_dish "
+                     "where f_header=:f_header "
+                     "group by f_dish, f_state, f_price, ob.f_discount "
+                     "order by ob.f_row ")) {
+            err = db.fLastError;
+            return false;
+        }
+        while (db.nextRow()) {
+            QMap<QString, QVariant> m;
+            db.rowToMap(m);
+            bodyInfo.append(m);
+        }
+        QStringList emarks;
+        db[":f_header"] = fIn["order"].toString();
+        if (!db.exec("select f_emarks from o_body where f_state=1 and f_header=:f_header")) {
+            err = db.fLastError;
+            return false;
+        }
+        while (db.nextRow()) {
+            if (db.getString("f_emarks").length() > 0) {
+                emarks.append(db.getString("f_emarks"));
+            }
+        }
+        if (fIn["printtax"].toInt() == 1 ) {
+            bool printtax = false;
+            db[":f_id"] = fIn["order"].toString();
+            db.exec("select f_receiptnumber from o_tax where f_id=:f_id");
+            if (db.nextRow()) {
+                if (db.getInt(0) == 0) {
+                    printtax = true;
+                }
+            } else {
                 printtax = true;
             }
-        } else {
-            printtax = true;
-        }
-        if (printtax) {
-            if (printTax(headerInfo, bodyInfo, err) != pt_err_ok) {
-                return false;
+            if (printtax) {
+                QStringList emarks;
+                db[":f_header"] = fIn["order"].toString();
+                db.exec("select f_emarks from o_body where f_state=1 and f_header=:f_header");
+                while (db.nextRow()) {
+                    if (db.getString("f_emarks").length() > 0) {
+                        emarks.append(db.getString("f_emarks"));
+                    }
+                }
+                if (printTax(headerInfo, bodyInfo, emarks, err) != pt_err_ok) {
+                    return false;
+                }
             }
         }
-    }
 #ifdef QT_DEBUG
-    qDebug() << "Error after printtax" << err;
-    err.clear();
+        qDebug() << "Error after printtax" << err;
+        err.clear();
 #endif
-    // CHECKING FOR RECEIPT PRINT COUNT
-    //    if (jh["f_print"].toString().toInt() > 0) {
-    //        if (!checkPermission(jh["f_currentstaff"].toString().toInt(), cp_t5_multiple_receipt, srh.fDb)) {
-    //            err = tr("You cannot print more then 1 copies of receipt");
-    //            return false;
-    //        }
-    //    }
-    // CHECKING ALL ITEMS THAT WAS PRINTED
-    //    for (int i = 0; i < jb.count(); i++) {
-    //        QJsonObject jo = jb[i].toObject();
-    //        if (jo["f_state"].toString().toInt() != DISH_STATE_OK) {
-    //            continue;
-    //        }
-    //        if (jo["f_qty1"].toString() != jo["f_qty2"].toString()) {
-    //            err += tr("All service must be complited");
-    //            break;
-    //        }
-    //    }
-    //CHECK SELFCOST
-    // CHECKING FOR TAX CASH/CARD
-    // PRINT RECEIPT
-    // TODO: CHECK FOR DESTINATION PRINTER AND REDIRECT QUERY//        jh["f_idramid"] = C5Config::idramID();
-    //        jh["f_idramphone"] = C5Config::idramPhone();
-    QString printerName = "local";
-    int paperWidth = 500;
-    C5LogSystem::writeEvent("Settings name: " + fIn["receipt_printer"].toString());
-    db[":f_name"] = fIn["receipt_printer"].toString();
-    db.exec("select f_id from s_settings_names where f_name=:f_name");
-    if (db.nextRow()) {
-        int s = db.getInt("f_id");
-        db[":f_settings"] = s;
-        db[":f_key"] = param_local_receipt_printer;
-        db.exec("select f_value from s_settings_values where f_settings=:f_settings and f_key=:f_key");
+        // CHECKING FOR RECEIPT PRINT COUNT
+        //    if (jh["f_print"].toString().toInt() > 0) {
+        //        if (!checkPermission(jh["f_currentstaff"].toString().toInt(), cp_t5_multiple_receipt, srh.fDb)) {
+        //            err = tr("You cannot print more then 1 copies of receipt");
+        //            return false;
+        //        }
+        //    }
+        // CHECKING ALL ITEMS THAT WAS PRINTED
+        //    for (int i = 0; i < jb.count(); i++) {
+        //        QJsonObject jo = jb[i].toObject();
+        //        if (jo["f_state"].toString().toInt() != DISH_STATE_OK) {
+        //            continue;
+        //        }
+        //        if (jo["f_qty1"].toString() != jo["f_qty2"].toString()) {
+        //            err += tr("All service must be complited");
+        //            break;
+        //        }
+        //    }
+        //CHECK SELFCOST
+        // CHECKING FOR TAX CASH/CARD
+        // PRINT RECEIPT
+        // TODO: CHECK FOR DESTINATION PRINTER AND REDIRECT QUERY//        jh["f_idramid"] = C5Config::idramID();
+        //        jh["f_idramphone"] = C5Config::idramPhone();
+        QString printerName = "local";
+        int paperWidth = 500;
+        db[":f_name"] = fIn["receipt_printer"].toString();
+        db.exec("select f_id from s_settings_names where f_name=:f_name");
         if (db.nextRow()) {
-            printerName = db.getString(0);
+            int s = db.getInt("f_id");
+            db[":f_settings"] = s;
+            db[":f_key"] = param_local_receipt_printer;
+            db.exec("select f_value from s_settings_values where f_settings=:f_settings and f_key=:f_key");
+            if (db.nextRow()) {
+                printerName = db.getString(0);
+            }
+            db[":f_settings"] = s;
+            db[":f_key"] = param_print_paper_width;
+            db.exec("select f_value from s_settings_values where f_settings=:f_settings and f_key=:f_key");
+            if (db.nextRow()) {
+                paperWidth = db.getString(0).toInt() == 0 ? 650 : db.getString(0).toInt();
+            }
         }
-        db[":f_settings"] = s;
-        db[":f_key"] = param_print_paper_width;
-        db.exec("select f_value from s_settings_values where f_settings=:f_settings and f_key=:f_key");
-        if (db.nextRow()) {
-            paperWidth = db.getString(0).toInt() == 0 ? 650 : db.getString(0).toInt();
-            C5LogSystem::writeEvent(QString("Paper width was changed: %1").arg(paperWidth));
+        if (alias) {
+            db[":f_alias"] = printerName;
+            db.exec("select * from d_print_aliases where f_alias=:f_alias");
+            if (db.nextRow()) {
+                printerName = db.getString("f_printer");
+            }
         }
+        if (fIn["withoutprint"].toInt() == 0 && fIn["nofinalreceipt"].toInt() == 0) {
+            C5PrintReceiptThread pr(fIn["order"].toString(), headerInfo, bodyInfo,
+                                    printerName, fIn["language"].toInt(), paperWidth);
+            pr.fBill = isBill;
+            pr.fIdram[param_idram_name] = C5Config::getValue(param_idram_name);
+            pr.fIdram[param_idram_id] = C5Config::getValue(param_idram_id);
+            pr.fIdram[param_idram_phone] = C5Config::getValue(param_idram_phone);
+            pr.fIdram[param_idram_tips] = C5Config::getValue(param_idram_tips);
+            pr.fIdram[param_idram_tips_wallet] = C5Config::getValue(param_idram_tips_wallet);
+            if (!pr.print(__c5config.dbParams())) {
+                err = pr.fError;
+            }
+        }
+        if (err.isEmpty()) {
+            if (isBill) {
+                db[":f_id"] = fIn["order"].toString();
+                db[":f_precheck"] = abs(headerInfo["f_precheck"].toInt()) + 1;
+                db.exec("update o_header set f_precheck=:f_precheck where f_id=:f_id");
+            } else {
+                db[":f_id"] = fIn["order"].toString();
+                db[":f_print"] = abs(headerInfo["f_print"].toInt()) + 1;
+                db.exec("update o_header set f_print=:f_print where f_id=:f_id");
+            }
+        }
+        return err.isEmpty();
     }
-    if (alias) {
-        db[":f_alias"] = printerName;
-        db.exec("select * from d_print_aliases where f_alias=:f_alias");
-        if (db.nextRow()) {
-            printerName = db.getString("f_printer");
-        }
-    }
-    if (fIn["withoutprint"].toInt() == 0 && fIn["nofinalreceipt"].toInt() == 0) {
-        C5PrintReceiptThread pr(fIn["order"].toString(), headerInfo, bodyInfo,
-                                printerName, fIn["language"].toInt(), paperWidth);
-        pr.fBill = isBill;
-        pr.fIdram[param_idram_name] = C5Config::getValue(param_idram_name);
-        pr.fIdram[param_idram_id] = C5Config::getValue(param_idram_id);
-        pr.fIdram[param_idram_phone] = C5Config::getValue(param_idram_phone);
-        pr.fIdram[param_idram_tips] = C5Config::getValue(param_idram_tips);
-        pr.fIdram[param_idram_tips_wallet] = C5Config::getValue(param_idram_tips_wallet);
-        if (!pr.print(__c5config.dbParams())) {
-            err = pr.fError;
-        }
-    }
-    if (err.isEmpty()) {
-        if (isBill) {
-            db[":f_id"] = fIn["order"].toString();
-            db[":f_precheck"] = abs(headerInfo["f_precheck"].toInt()) + 1;
-            db.exec("update o_header set f_precheck=:f_precheck where f_id=:f_id");
-        } else {
-            db[":f_id"] = fIn["order"].toString();
-            db[":f_print"] = abs(headerInfo["f_print"].toInt()) + 1;
-            db.exec("update o_header set f_print=:f_print where f_id=:f_id");
-        }
-    }
-    return err.isEmpty();
-}
 
-void C5WaiterServer::remember(const QJsonObject &h)
-{
-    C5Database db(C5Config::dbParams().at(0), C5Config::logDatabase(), C5Config::dbParams().at(2),
-                  C5Config::dbParams().at(3));
-    db[":f_comp"] = h["comp"].toString();
-    db[":f_date"] = QDate::fromString(h["date"].toString(), FORMAT_DATE_TO_STR_MYSQL);
-    db[":f_time"] = QTime::fromString(h["time"].toString(), FORMAT_TIME_TO_STR);
-    db[":f_user"] = h["user"].toString();
-    db[":f_type"] = h["type"].toInt();
-    db[":f_rec"] = h["rec"].toString();
-    db[":f_invoice"] = h["invoice"].toString();
-    db[":f_reservation"] = h["reservation"].toString();
-    db[":f_action"] = h["action"].toString();
-    db[":f_value1"] = h["value1"].toString();
-    db[":f_value2"] = h["value2"].toString();
-    db.insert("airlog.log", false);
-}
+    void C5WaiterServer::remember(const QJsonObject &h)
+    {
+        C5Database db(C5Config::dbParams().at(0), C5Config::logDatabase(), C5Config::dbParams().at(2),
+                      C5Config::dbParams().at(3));
+        db[":f_comp"] = h["comp"].toString();
+        db[":f_date"] = QDate::fromString(h["date"].toString(), FORMAT_DATE_TO_STR_MYSQL);
+        db[":f_time"] = QTime::fromString(h["time"].toString(), FORMAT_TIME_TO_STR);
+        db[":f_user"] = h["user"].toString();
+        db[":f_type"] = h["type"].toInt();
+        db[":f_rec"] = h["rec"].toString();
+        db[":f_invoice"] = h["invoice"].toString();
+        db[":f_reservation"] = h["reservation"].toString();
+        db[":f_action"] = h["action"].toString();
+        db[":f_value1"] = h["value1"].toString();
+        db[":f_value2"] = h["value2"].toString();
+        db.insert("airlog.log", false);
+    }
 
-void C5WaiterServer::processAppOrder(QJsonObject &o)
-{
-    QString orderinfo;
-    C5Database db(C5Config::dbParams());
-    QString id = fIn["header"].toString();
-    if (id.isEmpty()) {
-        id = db.uuid();
-        db[":f_id"] = fIn["hallid"].toString().toInt();
-        db.exec("select f_counter + 1, f_prefix as f_counter from h_halls where f_id=:f_id for update");
-        if (db.nextRow()) {
-            o["f_hallid"] = db.getInt(0);
-            o["f_prefix"] = db.getString(1);
-            db[":f_counter"] = db.getInt(0);
-            db.update("h_halls", where_id(fIn["hallid"].toString()));
-        } else {
-            o["f_hallid"] = 0;
-            o["f_prefix"] = "";
+    void C5WaiterServer::processAppOrder(QJsonObject &o)
+    {
+        QString orderinfo;
+        C5Database db(C5Config::dbParams());
+        QString id = fIn["header"].toString();
+        if (id.isEmpty()) {
+            id = db.uuid();
+            db[":f_id"] = fIn["hallid"].toString().toInt();
+            db.exec("select f_counter + 1, f_prefix as f_counter from h_halls where f_id=:f_id for update");
+            if (db.nextRow()) {
+                o["f_hallid"] = db.getInt(0);
+                o["f_prefix"] = db.getString(1);
+                db[":f_counter"] = db.getInt(0);
+                db.update("h_halls", where_id(fIn["hallid"].toString()));
+            } else {
+                o["f_hallid"] = 0;
+                o["f_prefix"] = "";
+            }
+            db[":f_id"] = id;
+            db[":f_hallid"] = o["f_hallid"].toInt();
+            db[":f_prefix"] = o["f_prefix"].toString();
+            db[":f_state"] = ORDER_STATE_OPEN;
+            db[":f_hall"] = fIn["hallid"].toString();
+            db[":f_table"] = fIn["tableid"].toString();
+            db[":f_dateopen"] = QDate::currentDate();
+            db[":f_timeopen"] = QTime::currentTime();
+            db[":f_staff"] = fIn["staffid"].toString();
+            db[":f_comment"] = "";
+            db[":f_print"] = 0;
+            db[":f_amounttotal"] = 0;
+            db[":f_amountcash"] = 0;
+            db[":f_amountcard"] = 0;
+            db[":f_amountbank"] = 0;
+            db[":f_amountother"] = 0;
+            db[":f_amountservice"] = 0;
+            db[":f_amountservice"] = 0;
+            db[":f_amountdiscount"] = 0;
+            db[":f_servicefactor"] = fIn["servicevalue"].toString().toDouble();
+            db[":f_discountfactor"] = 0;
+            db[":f_creditcardid"] = 0;
+            db[":f_otherid"] = 0;
+            db.insert("o_header", false);
+        }
+        orderinfo += QString("%1 %2, %3<br>").arg(tr("Order")).arg(fIn["tablename"].toString()).arg(
+                         o["f_hallprefix"].toString() + QString::number(o["f_hallid"].toInt()));
+        QJsonArray jd = fIn["dishes"].toArray();
+        QJsonArray jout;
+        QJsonArray jprint;
+        for (int i = 0; i < jd.count(); i++) {
+            QJsonObject d = jd.at(i).toObject();
+            if (d["remoteid"].toString().isEmpty()) {
+                d["remoteid"] = C5Database::uuid();
+                db[":f_id"] = d["remoteid"].toString();
+                db.insert("o_body", false);
+            }
+            if (d["qty2"].toString().toDouble() < d["qty1"].toString().toDouble()) {
+                QJsonObject jdp;
+                jdp["f_qtyprint"] = QString::number(d["qty1"].toString().toDouble() - d["qty2"].toString().toDouble(), 'f', 1);
+                jdp["f_name"] = d["dishname"].toString();
+                jdp["f_storename"] = d["store"].toString();
+                jdp["f_print1"] = d["print1"].toString();
+                jdp["f_print2"] = d["print2"].toString();
+                jprint.append(jdp);
+                d["qty2"] = d["qty1"].toString();
+                orderinfo += QString("%1: %2<br>").arg(jdp["f_name"].toString()).arg(jdp["f_qtyprint"].toString());
+            }
+            db[":f_header"] = id;
+            db[":f_state"] = d["state"].toString();
+            db[":f_dish"] = d["dishcode"].toString().toInt();
+            db[":f_qty1"] = d["qty1"].toString().toDouble();
+            db[":f_qty2"] = d["qty2"].toString().toDouble();
+            db[":f_price"] = d["price"].toString().toDouble();
+            db[":f_service"] = fIn["servicevalue"].toString().toDouble();
+            db[":f_discount"] = 0;
+            db[":f_total"] = (d["qty2"].toString().toDouble() * d["price"].toString().toDouble()) +
+                             (d["qty2"].toString().toDouble() * d["price"].toString().toDouble() * fIn["servicevalue"].toString().toDouble());
+            db[":f_store"] = d["store"].toString().toInt();
+            db[":f_print1"] = d["print1"].toString();
+            db[":f_print2"] = d["print2"].toString();
+            db[":f_comment"] = "";
+            db[":f_remind"] = d["remind"].toString().toInt();
+            db[":f_adgcode"] = d["adgcode"].toString();
+            db[":f_removereason"] = "";
+            db.update("o_body", where_id(d["remoteid"].toString()));
+            jout.append(d);
         }
         db[":f_id"] = id;
-        db[":f_hallid"] = o["f_hallid"].toInt();
-        db[":f_prefix"] = o["f_prefix"].toString();
-        db[":f_state"] = ORDER_STATE_OPEN;
-        db[":f_hall"] = fIn["hallid"].toString();
-        db[":f_table"] = fIn["tableid"].toString();
-        db[":f_dateopen"] = QDate::currentDate();
-        db[":f_timeopen"] = QTime::currentTime();
-        db[":f_staff"] = fIn["staffid"].toString();
-        db[":f_comment"] = "";
-        db[":f_print"] = 0;
-        db[":f_amounttotal"] = 0;
-        db[":f_amountcash"] = 0;
-        db[":f_amountcard"] = 0;
-        db[":f_amountbank"] = 0;
-        db[":f_amountother"] = 0;
-        db[":f_amountservice"] = 0;
-        db[":f_amountservice"] = 0;
-        db[":f_amountdiscount"] = 0;
-        db[":f_servicefactor"] = fIn["servicevalue"].toString().toDouble();
-        db[":f_discountfactor"] = 0;
-        db[":f_creditcardid"] = 0;
-        db[":f_otherid"] = 0;
-        db.insert("o_header", false);
-    }
-    orderinfo += QString("%1 %2, %3<br>").arg(tr("Order")).arg(fIn["tablename"].toString()).arg(
-                     o["f_hallprefix"].toString() + QString::number(o["f_hallid"].toInt()));
-    QJsonArray jd = fIn["dishes"].toArray();
-    QJsonArray jout;
-    QJsonArray jprint;
-    for (int i = 0; i < jd.count(); i++) {
-        QJsonObject d = jd.at(i).toObject();
-        if (d["remoteid"].toString().isEmpty()) {
-            d["remoteid"] = C5Database::uuid();
-            db[":f_id"] = d["remoteid"].toString();
-            db.insert("o_body", false);
-        }
-        if (d["qty2"].toString().toDouble() < d["qty1"].toString().toDouble()) {
-            QJsonObject jdp;
-            jdp["f_qtyprint"] = QString::number(d["qty1"].toString().toDouble() - d["qty2"].toString().toDouble(), 'f', 1);
-            jdp["f_name"] = d["dishname"].toString();
-            jdp["f_storename"] = d["store"].toString();
-            jdp["f_print1"] = d["print1"].toString();
-            jdp["f_print2"] = d["print2"].toString();
-            jprint.append(jdp);
-            d["qty2"] = d["qty1"].toString();
-            orderinfo += QString("%1: %2<br>").arg(jdp["f_name"].toString()).arg(jdp["f_qtyprint"].toString());
-        }
-        db[":f_header"] = id;
-        db[":f_state"] = d["state"].toString();
-        db[":f_dish"] = d["dishcode"].toString().toInt();
-        db[":f_qty1"] = d["qty1"].toString().toDouble();
-        db[":f_qty2"] = d["qty2"].toString().toDouble();
-        db[":f_price"] = d["price"].toString().toDouble();
-        db[":f_service"] = fIn["servicevalue"].toString().toDouble();
-        db[":f_discount"] = 0;
-        db[":f_total"] = (d["qty2"].toString().toDouble() * d["price"].toString().toDouble()) +
-                         (d["qty2"].toString().toDouble() * d["price"].toString().toDouble() * fIn["servicevalue"].toString().toDouble());
-        db[":f_store"] = d["store"].toString().toInt();
-        db[":f_print1"] = d["print1"].toString();
-        db[":f_print2"] = d["print2"].toString();
-        db[":f_comment"] = "";
-        db[":f_remind"] = d["remind"].toString().toInt();
-        db[":f_adgcode"] = d["adgcode"].toString();
-        db[":f_removereason"] = "";
-        db.update("o_body", where_id(d["remoteid"].toString()));
-        jout.append(d);
-    }
-    db[":f_id"] = id;
-    db.exec("select * from o_header where f_id=:f_id");
-    o["header"] = C5JsonDb::convertRowToJsonObject(db);
-    o["body"] = jout;
-    o["reply"] = 1;
-    if (jprint.count() > 0) {
-        o["msg"] = tr("Your order was accepted");
-        QJsonObject jhprint;
-        jhprint["f_tablename"] = fIn["tablename"].toString();
-        jhprint["f_prefix"] = o["header"].toObject()["f_prefix"].toString();
-        jhprint["f_hallid"] = o["header"].toObject()["f_hallid"].toInt();
-        jhprint["f_currentstaffname"] = fIn["staffname"].toString();
-        C5PrintServiceThread ps(id);
-        ps.run();
-        NotificationWidget::showMessage(orderinfo);
-    } else {
-        o["msg"] = tr("Your order is empty or already was accepted");
-        NotificationWidget::showMessage(tr("The customer was make an empty order, can you help him?"));
-    }
-}
-
-void C5WaiterServer::processCallStaff(QJsonObject &o)
-{
-    QFont font(qApp->font());
-    font.setPointSize(30);
-    C5Printing p;
-    p.setSceneParams(650, 28000, QPrinter::Portrait);
-    p.setFont(font);
-    p.ltext(tr("Table"), 0);
-    p.rtext(fIn["table"].toString());
-    p.br();
-    p.ltext(tr("Call staff"), 0);
-    p.br();
-    p.ltext(tr("Date"), 0);
-    p.rtext(QDate::currentDate().toString(FORMAT_DATE_TO_STR));
-    p.br();
-    p.ltext(tr("Time"), 0);
-    p.rtext(QTime::currentTime().toString(FORMAT_TIME_TO_STR));
-    p.br();
-    p.br(p.fLineHeight + 2);
-    p.line(0, p.fTop, p.fNormalWidth, p.fTop);
-    p.print(C5Config::localReceiptPrinter(), QPrinter::Custom);
-    o["reply"] = 1;
-    NotificationWidget::showMessage(QString("%1 %2: %3").arg(tr("Table")).arg(fIn["table"].toString()).arg(
-                                        tr("Call staff")));
-}
-
-void C5WaiterServer::processMessageList(QJsonObject &o)
-{
-    C5Database db(C5Config::dbParams());
-    db[":f_id"] = fIn["lastmessage"].toInt();
-    db.exec("select f_id, msg from droid_message where f_id>:f_id");
-    o["list"] = C5JsonDb::convertRowsToJsonArray(db);
-    o["reply"] = 1;
-}
-
-void C5WaiterServer::processCallReceipt(QJsonObject &o)
-{
-    QFont font(qApp->font());
-    font.setPointSize(30);
-    C5Printing p;
-    p.setSceneParams(650, 28000, QPrinter::Portrait);
-    p.setFont(font);
-    p.ltext(tr("Table"), 0);
-    p.rtext(fIn["tablename"].toString());
-    p.br();
-    p.ltext(tr("Call receipt"), 0);
-    p.br();
-    p.ltext(tr("Date"), 0);
-    p.rtext(QDate::currentDate().toString(FORMAT_DATE_TO_STR));
-    p.br();
-    p.ltext(tr("Time"), 0);
-    p.rtext(QTime::currentTime().toString(FORMAT_TIME_TO_STR));
-    p.br();
-    p.br(p.fLineHeight + 2);
-    p.line(0, p.fTop, p.fNormalWidth, p.fTop);
-    p.print(C5Config::localReceiptPrinter(), QPrinter::Custom);
-    o["reply"] = 1;
-    NotificationWidget::showMessage(QString("%1 %2: %3").arg(tr("Table")).arg(fIn["tablename"].toString()).arg(
-                                        tr("Call receipt")));
-}
-
-void C5WaiterServer::processGetCostumerByCar(QJsonObject &o)
-{
-    C5Database db(C5Config::dbParams());
-    db[":f_id"] = fIn["car"].toString().toInt();
-    db.exec("select bc.f_id, concat(c.f_name, ', ', bc.f_govnumber, ', ', trim(cl.f_contact)) as f_name "
-            "from b_car bc "
-            "left join c_partners cl on cl.f_id=bc.f_costumer "
-            "left join s_car c on c.f_id=bc.f_car "
-            "where bc.f_id=:f_id");
-    if (db.nextRow()) {
-        o["name"] = db.getString(1);
-        o["id"] = db.getString(0);
+        db.exec("select * from o_header where f_id=:f_id");
+        o["header"] = C5JsonDb::convertRowToJsonObject(db);
+        o["body"] = jout;
         o["reply"] = 1;
-    } else {
-        o["reply"] = 0;
+        if (jprint.count() > 0) {
+            o["msg"] = tr("Your order was accepted");
+            QJsonObject jhprint;
+            jhprint["f_tablename"] = fIn["tablename"].toString();
+            jhprint["f_prefix"] = o["header"].toObject()["f_prefix"].toString();
+            jhprint["f_hallid"] = o["header"].toObject()["f_hallid"].toInt();
+            jhprint["f_currentstaffname"] = fIn["staffname"].toString();
+            C5PrintServiceThread ps(id);
+            ps.run();
+            NotificationWidget::showMessage(orderinfo);
+        } else {
+            o["msg"] = tr("Your order is empty or already was accepted");
+            NotificationWidget::showMessage(tr("The customer was make an empty order, can you help him?"));
+        }
     }
-}
 
-void C5WaiterServer::processRotateShift(QJsonObject &o)
-{
-    C5Database db(C5Config::dbParams());
-    db[":f_value"] = fIn["date"].toString();
-    db[":f_key"] = param_date_cash;
-    db.exec("update s_settings_values set f_value=:f_value where f_key=:f_key");
-    db[":f_value"] = fIn["shift"].toString();
-    db[":f_key"] = param_date_cash_shift;
-    db.exec("update s_settings_values set f_value=:f_value where f_key=:f_key");
-    o["reply"] = 1;
-}
-
-void C5WaiterServer::processCheckDiscountByVisit(QJsonObject &o)
-{
-    C5Database db(C5Config::dbParams());
-    db[":f_govnumber"] = fIn["code"].toString();
-    db.exec("select count(f_order), f_costumer from o_header_options bco "
-            "inner join b_car bc on bc.f_id=bco.f_car "
-            "where bc.f_govnumber=:f_govnumber");
-    if (db.nextRow()) {
-        o["visit"] = db.getInt(0);
-        o["client"] = db.getInt(1);
-    } else {
-        o["reply"] = 0;
-        o["msg"] = tr("Invalide card code");
-        return;
+    void C5WaiterServer::processCallStaff(QJsonObject &o)
+    {
+        QFont font(qApp->font());
+        font.setPointSize(30);
+        C5Printing p;
+        p.setSceneParams(650, 28000, QPrinter::Portrait);
+        p.setFont(font);
+        p.ltext(tr("Table"), 0);
+        p.rtext(fIn["table"].toString());
+        p.br();
+        p.ltext(tr("Call staff"), 0);
+        p.br();
+        p.ltext(tr("Date"), 0);
+        p.rtext(QDate::currentDate().toString(FORMAT_DATE_TO_STR));
+        p.br();
+        p.ltext(tr("Time"), 0);
+        p.rtext(QTime::currentTime().toString(FORMAT_TIME_TO_STR));
+        p.br();
+        p.br(p.fLineHeight + 2);
+        p.line(0, p.fTop, p.fNormalWidth, p.fTop);
+        p.print(C5Config::localReceiptPrinter(), QPrinter::Custom);
+        o["reply"] = 1;
+        NotificationWidget::showMessage(QString("%1 %2: %3").arg(tr("Table")).arg(fIn["table"].toString()).arg(
+                                            tr("Call staff")));
     }
-    db[":f_code"] = "auto_" + fIn["code"].toString();
-    db[":f_mode"] = CARD_TYPE_AUTO_DISCOUNT;
-    db.exec("select * from b_cards_discount where f_code=:f_code");
-    if (db.nextRow()) {
-        o["card_code"] = db.getString("f_code");
-    } else {
-        o["card_code"] = "auto_" + fIn["code"].toString();
-        db[":f_mode"] = CARD_TYPE_AUTO_DISCOUNT;
+
+    void C5WaiterServer::processMessageList(QJsonObject &o)
+    {
+        C5Database db(C5Config::dbParams());
+        db[":f_id"] = fIn["lastmessage"].toInt();
+        db.exec("select f_id, msg from droid_message where f_id>:f_id");
+        o["list"] = C5JsonDb::convertRowsToJsonArray(db);
+        o["reply"] = 1;
+    }
+
+    void C5WaiterServer::processCallReceipt(QJsonObject &o)
+    {
+        QFont font(qApp->font());
+        font.setPointSize(30);
+        C5Printing p;
+        p.setSceneParams(650, 28000, QPrinter::Portrait);
+        p.setFont(font);
+        p.ltext(tr("Table"), 0);
+        p.rtext(fIn["tablename"].toString());
+        p.br();
+        p.ltext(tr("Call receipt"), 0);
+        p.br();
+        p.ltext(tr("Date"), 0);
+        p.rtext(QDate::currentDate().toString(FORMAT_DATE_TO_STR));
+        p.br();
+        p.ltext(tr("Time"), 0);
+        p.rtext(QTime::currentTime().toString(FORMAT_TIME_TO_STR));
+        p.br();
+        p.br(p.fLineHeight + 2);
+        p.line(0, p.fTop, p.fNormalWidth, p.fTop);
+        p.print(C5Config::localReceiptPrinter(), QPrinter::Custom);
+        o["reply"] = 1;
+        NotificationWidget::showMessage(QString("%1 %2: %3").arg(tr("Table")).arg(fIn["tablename"].toString()).arg(
+                                            tr("Call receipt")));
+    }
+
+    void C5WaiterServer::processGetCostumerByCar(QJsonObject &o)
+    {
+        C5Database db(C5Config::dbParams());
+        db[":f_id"] = fIn["car"].toString().toInt();
+        db.exec("select bc.f_id, concat(c.f_name, ', ', bc.f_govnumber, ', ', trim(cl.f_contact)) as f_name "
+                "from b_car bc "
+                "left join c_partners cl on cl.f_id=bc.f_costumer "
+                "left join s_car c on c.f_id=bc.f_car "
+                "where bc.f_id=:f_id");
+        if (db.nextRow()) {
+            o["name"] = db.getString(1);
+            o["id"] = db.getString(0);
+            o["reply"] = 1;
+        } else {
+            o["reply"] = 0;
+        }
+    }
+
+    void C5WaiterServer::processRotateShift(QJsonObject &o)
+    {
+        C5Database db(C5Config::dbParams());
+        db[":f_value"] = fIn["date"].toString();
+        db[":f_key"] = param_date_cash;
+        db.exec("update s_settings_values set f_value=:f_value where f_key=:f_key");
+        db[":f_value"] = fIn["shift"].toString();
+        db[":f_key"] = param_date_cash_shift;
+        db.exec("update s_settings_values set f_value=:f_value where f_key=:f_key");
+        o["reply"] = 1;
+    }
+
+    void C5WaiterServer::processCheckDiscountByVisit(QJsonObject &o)
+    {
+        C5Database db(C5Config::dbParams());
+        db[":f_govnumber"] = fIn["code"].toString();
+        db.exec("select count(f_order), f_costumer from o_header_options bco "
+                "inner join b_car bc on bc.f_id=bco.f_car "
+                "where bc.f_govnumber=:f_govnumber");
+        if (db.nextRow()) {
+            o["visit"] = db.getInt(0);
+            o["client"] = db.getInt(1);
+        } else {
+            o["reply"] = 0;
+            o["msg"] = tr("Invalide card code");
+            return;
+        }
         db[":f_code"] = "auto_" + fIn["code"].toString();
-        db[":f_client"] = o["client"].toInt();
-        db[":f_value"] = 100;
-        db[":f_datestart"] = QDate::currentDate();
-        db[":f_dateend"] = QDate::currentDate().addDays(360 * 10);
-        db[":f_active"] = 1;
-        db.insert("b_cards_discount", false);
+        db[":f_mode"] = CARD_TYPE_AUTO_DISCOUNT;
+        db.exec("select * from b_cards_discount where f_code=:f_code");
+        if (db.nextRow()) {
+            o["card_code"] = db.getString("f_code");
+        } else {
+            o["card_code"] = "auto_" + fIn["code"].toString();
+            db[":f_mode"] = CARD_TYPE_AUTO_DISCOUNT;
+            db[":f_code"] = "auto_" + fIn["code"].toString();
+            db[":f_client"] = o["client"].toInt();
+            db[":f_value"] = 100;
+            db[":f_datestart"] = QDate::currentDate();
+            db[":f_dateend"] = QDate::currentDate().addDays(360 * 10);
+            db[":f_active"] = 1;
+            db.insert("b_cards_discount", false);
+        }
+        db[":f_code"] = "VISIT";
+        db.exec("select * from b_cards_discount where f_code=:f_code");
+        if (!db.nextRow()) {
+            o["noconfig"] = 1;
+        } else {
+            o["current"] = o["visit"].toInt() % db.getInt("f_value");
+        }
+        o["reply"] = 1;
     }
-    db[":f_code"] = "VISIT";
-    db.exec("select * from b_cards_discount where f_code=:f_code");
-    if (!db.nextRow()) {
-        o["noconfig"] = 1;
-    } else {
-        o["current"] = o["visit"].toInt() % db.getInt("f_value");
-    }
-    o["reply"] = 1;
-}
 
-void C5WaiterServer::processPrintRemovedService(QJsonObject &o)
-{
-    C5PrintRemovedServiceThread *pr = new C5PrintRemovedServiceThread(fIn["id"].toString());
-    pr->start();
-}
+    void C5WaiterServer::processPrintRemovedService(QJsonObject &o)
+    {
+        C5PrintRemovedServiceThread *pr = new C5PrintRemovedServiceThread(fIn["id"].toString());
+        pr->start();
+    }
 
-void C5WaiterServer::processReturnTaxReceipt(QJsonObject &o)
-{
-    C5Database db(C5Config::dbParams());
-    db[":f_id"] = fIn["order"].toString();
-    db.exec("select * from o_tax where f_id=:f_id");
-    QString crn, rseq;
-    if (db.nextRow()) {
-        crn = db.getString("f_devnum");
-        rseq = db.getString("f_receiptnumber");
-    } else {
-        o["reply"] = 0;
-        o["msg"] = tr("No tax receipt exists for this order");
-        return;
+    void C5WaiterServer::processReturnTaxReceipt(QJsonObject &o)
+    {
+        C5Database db(C5Config::dbParams());
+        db[":f_id"] = fIn["order"].toString();
+        db.exec("select * from o_tax where f_id=:f_id");
+        QString crn, rseq;
+        if (db.nextRow()) {
+            crn = db.getString("f_devnum");
+            rseq = db.getString("f_receiptnumber");
+        } else {
+            o["reply"] = 0;
+            o["msg"] = tr("No tax receipt exists for this order");
+            return;
+        }
+        PrintTaxN pt(C5Config::taxIP(), C5Config::taxPort(), C5Config::taxPassword(), C5Config::taxUseExtPos(),
+                     C5Config::taxCashier(), C5Config::taxPin(), this);
+        QString jsnin, jsnout, err;
+        int result;
+        result = pt.printTaxback(rseq, crn, jsnin, jsnout, err);
+        o["reply"] = result == pt_err_ok ? 1 : 0;
+        o["msg"] = result == pt_err_ok ? tr("Success") : err;
+        db[":f_id"] = db.uuid();
+        db[":f_order"] = fIn["order"].toString();
+        db[":f_date"] = QDate::currentDate();
+        db[":f_time"] = QTime::currentTime();
+        db[":f_in"] = jsnin;
+        db[":f_out"] = jsnout;
+        db[":f_err"] = err;
+        db[":f_result"] = result;
+        db.insert("o_tax_log", false);
+        if (result != pt_err_ok) {
+        } else {
+            db[":f_fiscal"] = QVariant();
+            db[":f_receiptnumber"] = QVariant();
+            db[":f_time"] = QVariant();
+            db.update("o_tax", "f_id", fIn["order"].toString());
+        }
     }
-    PrintTaxN pt(C5Config::taxIP(), C5Config::taxPort(), C5Config::taxPassword(), C5Config::taxUseExtPos(),
-                 C5Config::taxCashier(), C5Config::taxPin(), this);
-    QString jsnin, jsnout, err;
-    int result;
-    result = pt.printTaxback(rseq, crn, jsnin, jsnout, err);
-    o["reply"] = result == pt_err_ok ? 1 : 0;
-    o["msg"] = result == pt_err_ok ? tr("Success") : err;
-    db[":f_id"] = db.uuid();
-    db[":f_order"] = fIn["order"].toString();
-    db[":f_date"] = QDate::currentDate();
-    db[":f_time"] = QTime::currentTime();
-    db[":f_in"] = jsnin;
-    db[":f_out"] = jsnout;
-    db[":f_err"] = err;
-    db[":f_result"] = result;
-    db.insert("o_tax_log", false);
-    if (result != pt_err_ok) {
-    } else {
-        db[":f_fiscal"] = QVariant();
-        db[":f_receiptnumber"] = QVariant();
-        db[":f_time"] = QVariant();
-        db.update("o_tax", "f_id", fIn["order"].toString());
-    }
-}
 
-void C5WaiterServer::processTaxReport(QJsonObject &o)
-{
-    Q_UNUSED(o);
-    PrintTaxN pt(C5Config::taxIP(), C5Config::taxPort(), C5Config::taxPassword(), C5Config::taxUseExtPos(),
-                 C5Config::taxCashier(), C5Config::taxPin(), this);
-    QString jsnin, jsnout, err;
-    int result;
-    result = pt.printReport(QDate::fromString(fIn["d1"].toString(), FORMAT_DATE_TO_STR_MYSQL),
-                            QDate::fromString(fIn["d2"].toString(), FORMAT_DATE_TO_STR_MYSQL),
-                            fIn["type"].toInt(), jsnin, jsnout, err);
-    C5Database db(C5Config::dbParams());
-    db[":f_id"] = db.uuid();
-    db[":f_order"] = QString("Report %1").arg(fIn["type"].toInt() == report_x ? "X" : "Z");
-    db[":f_date"] = QDate::currentDate();
-    db[":f_time"] = QTime::currentTime();
-    db[":f_in"] = jsnin;
-    db[":f_out"] = jsnout;
-    db[":f_err"] = err;
-    db[":f_result"] = result;
-    db.insert("o_tax_log", false);
-}
+    void C5WaiterServer::processTaxReport(QJsonObject &o)
+    {
+        Q_UNUSED(o);
+        PrintTaxN pt(C5Config::taxIP(), C5Config::taxPort(), C5Config::taxPassword(), C5Config::taxUseExtPos(),
+                     C5Config::taxCashier(), C5Config::taxPin(), this);
+        QString jsnin, jsnout, err;
+        int result;
+        result = pt.printReport(QDate::fromString(fIn["d1"].toString(), FORMAT_DATE_TO_STR_MYSQL),
+                                QDate::fromString(fIn["d2"].toString(), FORMAT_DATE_TO_STR_MYSQL),
+                                fIn["type"].toInt(), jsnin, jsnout, err);
+        C5Database db(C5Config::dbParams());
+        db[":f_id"] = db.uuid();
+        db[":f_order"] = QString("Report %1").arg(fIn["type"].toInt() == report_x ? "X" : "Z");
+        db[":f_date"] = QDate::currentDate();
+        db[":f_time"] = QTime::currentTime();
+        db[":f_in"] = jsnin;
+        db[":f_out"] = jsnout;
+        db[":f_err"] = err;
+        db[":f_result"] = result;
+        db.insert("o_tax_log", false);
+    }
 
-void C5WaiterServer::writeCashDoc(C5StoreDraftWriter &dw, const QString &uuid, const QString id, QString &err,
-                                  double amount, int staff, int cashboxid, QDate dateCash)
-{
-    QString cashdocid;
-    if (!dw.writeAHeader(cashdocid, id, DOC_STATE_SAVED, DOC_TYPE_CASH,
-                         staff, dateCash, QDate::currentDate(),
-                         QTime::currentTime(), 0, amount,
-                         id, 1, 1)) {
-        err = dw.fErrorMsg;
+    void C5WaiterServer::writeCashDoc(C5StoreDraftWriter &dw, const QString &uuid, const QString id, QString &err,
+                                      double amount, int staff, int cashboxid, QDate dateCash)
+    {
+        QString cashdocid;
+        if (!dw.writeAHeader(cashdocid, id, DOC_STATE_SAVED, DOC_TYPE_CASH,
+                             staff, dateCash, QDate::currentDate(),
+                             QTime::currentTime(), 0, amount,
+                             id, 1, 1)) {
+            err = dw.fErrorMsg;
+        }
+        if (!dw.writeAHeaderCash(cashdocid, cashboxid,
+                                 0, 1, "", uuid)) {
+            err = dw.fErrorMsg;
+        }
+        QString cashUUID;
+        if (!dw.writeECash(cashUUID, cashdocid, cashboxid, 1,
+                           id,
+                           amount, cashUUID, 1)) {
+            err = dw.fErrorMsg;
+        }
     }
-    if (!dw.writeAHeaderCash(cashdocid, cashboxid,
-                             0, 1, "", uuid)) {
-        err = dw.fErrorMsg;
-    }
-    QString cashUUID;
-    if (!dw.writeECash(cashUUID, cashdocid, cashboxid, 1,
-                       id,
-                       amount, cashUUID, 1)) {
-        err = dw.fErrorMsg;
-    }
-}

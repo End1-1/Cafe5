@@ -73,7 +73,7 @@
          <bool>false</bool>
         </property>
         <property name="focusPolicy">
-         <enum>Qt::FocusPolicy::NoFocus</enum>
+         <enum>Qt::NoFocus</enum>
         </property>
        </widget>
       </item>
@@ -116,7 +116,7 @@
       <item row="0" column="4" colspan="3">
        <spacer name="horizontalSpacer">
         <property name="orientation">
-         <enum>Qt::Orientation::Horizontal</enum>
+         <enum>Qt::Horizontal</enum>
         </property>
         <property name="sizeHint" stdset="0">
          <size>
@@ -169,7 +169,7 @@
          </size>
         </property>
         <property name="focusPolicy">
-         <enum>Qt::FocusPolicy::NoFocus</enum>
+         <enum>Qt::NoFocus</enum>
         </property>
         <property name="text">
          <string/>
@@ -202,7 +202,7 @@
          <bool>false</bool>
         </property>
         <property name="focusPolicy">
-         <enum>Qt::FocusPolicy::NoFocus</enum>
+         <enum>Qt::NoFocus</enum>
         </property>
        </widget>
       </item>
@@ -249,7 +249,7 @@
          <bool>false</bool>
         </property>
         <property name="focusPolicy">
-         <enum>Qt::FocusPolicy::NoFocus</enum>
+         <enum>Qt::NoFocus</enum>
         </property>
        </widget>
       </item>
@@ -291,7 +291,7 @@
          <bool>false</bool>
         </property>
         <property name="focusPolicy">
-         <enum>Qt::FocusPolicy::NoFocus</enum>
+         <enum>Qt::NoFocus</enum>
         </property>
        </widget>
       </item>
@@ -373,7 +373,7 @@
       <item row="0" column="4">
        <spacer name="horizontalSpacer_4">
         <property name="orientation">
-         <enum>Qt::Orientation::Horizontal</enum>
+         <enum>Qt::Horizontal</enum>
         </property>
         <property name="sizeHint" stdset="0">
          <size>
@@ -468,7 +468,7 @@
       </size>
      </property>
      <property name="focusPolicy">
-      <enum>Qt::FocusPolicy::NoFocus</enum>
+      <enum>Qt::NoFocus</enum>
      </property>
      <property name="currentIndex">
       <number>0</number>
@@ -511,7 +511,7 @@
           <item>
            <widget class="QPushButton" name="btnAddGoods">
             <property name="focusPolicy">
-             <enum>Qt::FocusPolicy::NoFocus</enum>
+             <enum>Qt::NoFocus</enum>
             </property>
             <property name="toolTip">
              <string>New row</string>
@@ -528,7 +528,7 @@
           <item>
            <widget class="QPushButton" name="btnRemoveGoods">
             <property name="focusPolicy">
-             <enum>Qt::FocusPolicy::NoFocus</enum>
+             <enum>Qt::NoFocus</enum>
             </property>
             <property name="toolTip">
              <string>Remove row</string>
@@ -545,7 +545,7 @@
           <item>
            <widget class="QPushButton" name="btnEditGoods">
             <property name="focusPolicy">
-             <enum>Qt::FocusPolicy::NoFocus</enum>
+             <enum>Qt::NoFocus</enum>
             </property>
             <property name="toolTip">
              <string>Edit goods on selected row</string>
@@ -562,7 +562,7 @@
           <item>
            <widget class="QPushButton" name="btnNewGoods">
             <property name="focusPolicy">
-             <enum>Qt::FocusPolicy::NoFocus</enum>
+             <enum>Qt::NoFocus</enum>
             </property>
             <property name="toolTip">
              <string>New goods</string>
@@ -579,7 +579,7 @@
           <item>
            <widget class="QPushButton" name="btnCalculator">
             <property name="focusPolicy">
-             <enum>Qt::FocusPolicy::NoFocus</enum>
+             <enum>Qt::NoFocus</enum>
             </property>
             <property name="toolTip">
              <string>New goods</string>
@@ -596,7 +596,7 @@
           <item>
            <widget class="QPushButton" name="btnCompressRow">
             <property name="focusPolicy">
-             <enum>Qt::FocusPolicy::NoFocus</enum>
+             <enum>Qt::NoFocus</enum>
             </property>
             <property name="toolTip">
              <string>Compresse rows</string>
@@ -616,7 +616,7 @@
           <item>
            <widget class="QPushButton" name="btnAutoDecrease">
             <property name="focusPolicy">
-             <enum>Qt::FocusPolicy::NoFocus</enum>
+             <enum>Qt::NoFocus</enum>
             </property>
             <property name="toolTip">
              <string>Automatically decrease quantities in message</string>
@@ -636,7 +636,7 @@
           <item>
            <widget class="QPushButton" name="btnFillRemote">
             <property name="focusPolicy">
-             <enum>Qt::FocusPolicy::NoFocus</enum>
+             <enum>Qt::NoFocus</enum>
             </property>
             <property name="toolTip">
              <string>New goods</string>
@@ -656,7 +656,7 @@
           <item>
            <spacer name="horizontalSpacer_2">
             <property name="orientation">
-             <enum>Qt::Orientation::Horizontal</enum>
+             <enum>Qt::Horizontal</enum>
             </property>
             <property name="sizeHint" stdset="0">
              <size>
@@ -714,7 +714,7 @@
           <item>
            <spacer name="horizontalSpacer_7">
             <property name="orientation">
-             <enum>Qt::Orientation::Horizontal</enum>
+             <enum>Qt::Horizontal</enum>
             </property>
             <property name="sizeHint" stdset="0">
              <size>
@@ -737,13 +737,13 @@
        <item>
         <widget class="C5TableWidget" name="tblGoods">
          <property name="focusPolicy">
-          <enum>Qt::FocusPolicy::NoFocus</enum>
+          <enum>Qt::NoFocus</enum>
          </property>
          <property name="editTriggers">
-          <set>QAbstractItemView::EditTrigger::NoEditTriggers</set>
+          <set>QAbstractItemView::NoEditTriggers</set>
          </property>
          <property name="selectionMode">
-          <enum>QAbstractItemView::SelectionMode::SingleSelection</enum>
+          <enum>QAbstractItemView::SingleSelection</enum>
          </property>
          <column>
           <property name="text">
@@ -830,7 +830,7 @@
           <item>
            <widget class="QPushButton" name="btnAddAdd">
             <property name="focusPolicy">
-             <enum>Qt::FocusPolicy::NoFocus</enum>
+             <enum>Qt::NoFocus</enum>
             </property>
             <property name="text">
              <string/>
@@ -844,7 +844,7 @@
           <item>
            <widget class="QPushButton" name="btnCopyLastAdd">
             <property name="focusPolicy">
-             <enum>Qt::FocusPolicy::NoFocus</enum>
+             <enum>Qt::NoFocus</enum>
             </property>
             <property name="text">
              <string/>
@@ -858,7 +858,7 @@
           <item>
            <widget class="QPushButton" name="btnRemoveAdd">
             <property name="focusPolicy">
-             <enum>Qt::FocusPolicy::NoFocus</enum>
+             <enum>Qt::NoFocus</enum>
             </property>
             <property name="text">
              <string/>
@@ -872,7 +872,7 @@
           <item>
            <spacer name="horizontalSpacer_5">
             <property name="orientation">
-             <enum>Qt::Orientation::Horizontal</enum>
+             <enum>Qt::Horizontal</enum>
             </property>
             <property name="sizeHint" stdset="0">
              <size>
@@ -947,7 +947,7 @@
           </size>
          </property>
          <property name="focusPolicy">
-          <enum>Qt::FocusPolicy::NoFocus</enum>
+          <enum>Qt::NoFocus</enum>
          </property>
         </widget>
        </item>
@@ -964,7 +964,7 @@
        <item row="2" column="2">
         <spacer name="verticalSpacer">
          <property name="orientation">
-          <enum>Qt::Orientation::Vertical</enum>
+          <enum>Qt::Vertical</enum>
          </property>
          <property name="sizeHint" stdset="0">
           <size>
@@ -986,7 +986,7 @@
           </size>
          </property>
          <property name="focusPolicy">
-          <enum>Qt::FocusPolicy::NoFocus</enum>
+          <enum>Qt::NoFocus</enum>
          </property>
         </widget>
        </item>
@@ -1016,7 +1016,7 @@
           <bool>true</bool>
          </property>
          <property name="focusPolicy">
-          <enum>Qt::FocusPolicy::NoFocus</enum>
+          <enum>Qt::NoFocus</enum>
          </property>
          <property name="readOnly">
           <bool>true</bool>
@@ -1046,7 +1046,7 @@
        <item row="4" column="5" colspan="2">
         <spacer name="verticalSpacer_2">
          <property name="orientation">
-          <enum>Qt::Orientation::Vertical</enum>
+          <enum>Qt::Vertical</enum>
          </property>
          <property name="sizeHint" stdset="0">
           <size>
@@ -1117,7 +1117,7 @@
           <item>
            <widget class="QPushButton" name="btnAddDish">
             <property name="focusPolicy">
-             <enum>Qt::FocusPolicy::NoFocus</enum>
+             <enum>Qt::NoFocus</enum>
             </property>
             <property name="toolTip">
              <string>New row</string>
@@ -1134,7 +1134,7 @@
           <item>
            <widget class="QPushButton" name="btnAddPackages">
             <property name="focusPolicy">
-             <enum>Qt::FocusPolicy::NoFocus</enum>
+             <enum>Qt::NoFocus</enum>
             </property>
             <property name="toolTip">
              <string>New row</string>
@@ -1151,7 +1151,7 @@
           <item>
            <widget class="QPushButton" name="btnRemoveRows">
             <property name="focusPolicy">
-             <enum>Qt::FocusPolicy::NoFocus</enum>
+             <enum>Qt::NoFocus</enum>
             </property>
             <property name="toolTip">
              <string>Remove row</string>
@@ -1168,7 +1168,7 @@
           <item>
            <spacer name="horizontalSpacer_6">
             <property name="orientation">
-             <enum>Qt::Orientation::Horizontal</enum>
+             <enum>Qt::Horizontal</enum>
             </property>
             <property name="sizeHint" stdset="0">
              <size>
@@ -1191,13 +1191,13 @@
        <item>
         <widget class="C5TableWidget" name="tblDishes">
          <property name="focusPolicy">
-          <enum>Qt::FocusPolicy::NoFocus</enum>
+          <enum>Qt::NoFocus</enum>
          </property>
          <property name="editTriggers">
-          <set>QAbstractItemView::EditTrigger::NoEditTriggers</set>
+          <set>QAbstractItemView::NoEditTriggers</set>
          </property>
          <property name="selectionMode">
-          <enum>QAbstractItemView::SelectionMode::SingleSelection</enum>
+          <enum>QAbstractItemView::SingleSelection</enum>
          </property>
          <property name="wordWrap">
           <bool>false</bool>
@@ -1305,10 +1305,10 @@
             <item>
              <spacer name="horizontalSpacer_3">
               <property name="orientation">
-               <enum>Qt::Orientation::Horizontal</enum>
+               <enum>Qt::Horizontal</enum>
               </property>
               <property name="sizeType">
-               <enum>QSizePolicy::Policy::Preferred</enum>
+               <enum>QSizePolicy::Preferred</enum>
               </property>
               <property name="sizeHint" stdset="0">
                <size>
@@ -1351,7 +1351,7 @@
              </widget>
             </item>
             <item>
-             <widget class="QLabel" name="label_3">
+             <widget class="QLabel" name="lbTotal">
               <property name="text">
                <string>Total</string>
               </property>
@@ -1378,7 +1378,7 @@
                </size>
               </property>
               <property name="focusPolicy">
-               <enum>Qt::FocusPolicy::NoFocus</enum>
+               <enum>Qt::NoFocus</enum>
               </property>
               <property name="readOnly">
                <bool>true</bool>
@@ -1427,31 +1427,31 @@
          </size>
         </property>
         <property name="focusPolicy">
-         <enum>Qt::FocusPolicy::NoFocus</enum>
+         <enum>Qt::NoFocus</enum>
         </property>
         <property name="contextMenuPolicy">
-         <enum>Qt::ContextMenuPolicy::CustomContextMenu</enum>
+         <enum>Qt::CustomContextMenu</enum>
         </property>
         <property name="styleSheet">
          <string notr="true">QTableWidget::item{ selection-background-color:rgb(50,150,200);}</string>
         </property>
         <property name="horizontalScrollBarPolicy">
-         <enum>Qt::ScrollBarPolicy::ScrollBarAlwaysOff</enum>
+         <enum>Qt::ScrollBarAlwaysOff</enum>
         </property>
         <property name="editTriggers">
-         <set>QAbstractItemView::EditTrigger::NoEditTriggers</set>
+         <set>QAbstractItemView::NoEditTriggers</set>
         </property>
         <property name="dragEnabled">
          <bool>true</bool>
         </property>
         <property name="dragDropMode">
-         <enum>QAbstractItemView::DragDropMode::DragDrop</enum>
+         <enum>QAbstractItemView::DragDrop</enum>
         </property>
         <property name="defaultDropAction">
-         <enum>Qt::DropAction::TargetMoveAction</enum>
+         <enum>Qt::TargetMoveAction</enum>
         </property>
         <property name="selectionMode">
-         <enum>QAbstractItemView::SelectionMode::SingleSelection</enum>
+         <enum>QAbstractItemView::SingleSelection</enum>
         </property>
         <attribute name="horizontalHeaderVisible">
          <bool>false</bool>
@@ -1485,16 +1485,16 @@
       <item>
        <widget class="C5TableWidget" name="tblGoodsStore">
         <property name="focusPolicy">
-         <enum>Qt::FocusPolicy::NoFocus</enum>
+         <enum>Qt::NoFocus</enum>
         </property>
         <property name="styleSheet">
          <string notr="true">QTableWidget::item{ selection-background-color: red}</string>
         </property>
         <property name="selectionMode">
-         <enum>QAbstractItemView::SelectionMode::SingleSelection</enum>
+         <enum>QAbstractItemView::SingleSelection</enum>
         </property>
         <property name="selectionBehavior">
-         <enum>QAbstractItemView::SelectionBehavior::SelectRows</enum>
+         <enum>QAbstractItemView::SelectRows</enum>
         </property>
         <property name="sortingEnabled">
          <bool>true</bool>

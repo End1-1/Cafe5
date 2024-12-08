@@ -2,7 +2,6 @@
 #include "c5config.h"
 #include "dlgpin.h"
 #include "ndataprovider.h"
-#include "c5logsystem.h"
 #include "datadriver.h"
 #include "c5user.h"
 #include "c5servername.h"
@@ -94,7 +93,6 @@ int main(int argc, char *argv[])
     if (!d.exists(d.homePath() + "/" + _APPLICATION_ + "/logs")) {
         d.mkpath(d.homePath() + "/" + _APPLICATION_ + "/logs");
     }
-    ls(QObject::tr("Application start"));
     a.setStyle(QStyleFactory::create("fusion"));
     QFile styleSheet("./styles.qss");
     if (styleSheet.exists()) {

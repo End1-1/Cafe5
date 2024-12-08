@@ -128,13 +128,6 @@ void StoreInput::on_btnAccept_clicked()
     foreach (int r, rows) {
         QString id = ui->tbl->getString(r, 0);
         ids.insert(QString("'%1'").arg(id));
-        // db[":f_id"] = id;
-        // db[":f_datetime"] = QDateTime::currentDateTime();
-        // if (!db.insert("a_header_shop2partneraccept", false)) {
-        //     C5Message::error(db.fLastError);
-        //     getList();
-        //     return;
-        // }
     }
     QString idlist = QList<QString>(ids.begin(), ids.end()).join(",");
     db.exec(QString("select f_document from a_store_draft where f_id in (%1)").arg(idlist));

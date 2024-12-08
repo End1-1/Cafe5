@@ -18,7 +18,6 @@ SOURCES += \
     ../../XLSX/src/xlsxwriter.cpp \
     ../Cafe5/c5cafecommon.cpp \
     ../Cafe5/c5double.cpp \
-    ../Cafe5/c5logsystem.cpp \
     ../Cafe5/c5serverhandler.cpp \
     ../Cafe5/c5systempreference.cpp \
     ../Cafe5/calendar.cpp \
@@ -124,7 +123,6 @@ HEADERS += \
     ../../XLSX/src/zip.h \
     ../Cafe5/c5cafecommon.h \
     ../Cafe5/c5double.h \
-    ../Cafe5/c5logsystem.h \
     ../Cafe5/c5serverhandler.h \
     ../Cafe5/c5systempreference.h \
     ../Cafe5/calendar.h \

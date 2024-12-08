@@ -25,12 +25,13 @@ private slots:
     void on_btnExit_clicked();
     void on_leFilter_textChanged(const QString &arg1);
     void on_btnSaveAndAccept_clicked();
-
     void on_btnMinimize_clicked();
 
 private:
     Ui::DlgMovement *ui;
     QString fUuid;
+    QString fPendingDoc;
+    bool mSetupComplete;
     int fState;
     int fStoreOut;
     int newRow();

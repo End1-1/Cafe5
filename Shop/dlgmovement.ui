@@ -47,6 +47,9 @@
       </item>
       <item row="0" column="9">
        <widget class="QToolButton" name="btnSaveAndAccept">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
         <property name="focusPolicy">
          <enum>Qt::NoFocus</enum>
         </property>

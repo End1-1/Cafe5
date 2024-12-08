@@ -3,7 +3,6 @@
 #include "c5config.h"
 #include "c5utils.h"
 #include "c5database.h"
-#include "c5logsystem.h"
 #include "c5tabledata.h"
 #include <QApplication>
 #include <QJsonDocument>
@@ -171,12 +170,7 @@ void C5PrintServiceThread::print(QString printer, const QString &side, bool repr
     QSet<QString> storages;
     for (int i = 0; i < fBodyData.count(); i++) {
         const QMap<QString, QVariant> &o = fBodyData.at(i);
-        C5LogSystem::writeEvent(QString("try to print %1 %2 %3 %4")
-                                .arg(C5TableData::instance()->string("d_dish", "f_name", o["f_dish"].toInt()), printer, side, o[side].toString()));
         if (o[side].toString() != printer) {
-            C5LogSystem::writeEvent(QString("not print case 3 %1 %2 %3 %4").arg(C5TableData::instance()->string("d_dish", "f_name",
-                                    o["f_dish"].toInt()), printer, side,
-                                    o[side].toString()));
             continue;
         }
         storages << C5TableData::instance()->string("c_storages", "f_name", o["f_store"].toInt());

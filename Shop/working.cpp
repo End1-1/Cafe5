@@ -8,7 +8,6 @@
 #include "c5config.h"
 #include "ndataprovider.h"
 #include "c5user.h"
-#include "loghistory.h"
 #include "dlggoodslist.h"
 #include "dlgpin.h"
 #include "dlgsplashscreen.h"
@@ -16,7 +15,6 @@
 #include "searchitems.h"
 #include "wcustomerdisplay.h"
 #include "goodsreserve.h"
-#include "c5logsystem.h"
 #include "storeinput.h"
 #include "chatmessage.h"
 #include "selectprinters.h"
@@ -226,40 +224,6 @@ bool Working::eventFilter(QObject *watched, QEvent *event)
                     }
                 }
                 break;
-            // case Qt::Key_T:
-            //     if (ke->modifiers() &Qt::ControlModifier) {
-            //         C5Database db(__c5config.dbParams());
-            //         db[":f_hall"] = __c5config.defaultHall();
-            //         db[":f_datecash"] = QDate::currentDate();
-            //         db[":f_state"] = ORDER_STATE_CLOSE;
-            //         db.exec("select concat(w.f_last, ' ', w.f_first) as f_staff, if(f_amounttotal<0,-1,1) as f_sign,"
-            //                 "sum(oh.f_amounttotal) as f_amounttotal "
-            //                 "from o_header oh "
-            //                 "left join s_user w on w.f_id=oh.f_staff  "
-            //                 "where oh.f_hall=:f_hall and oh.f_datecash=:f_datecash  and oh.f_state=:f_state and oh.f_amounttotal>0 "
-            //                 "group by 1, 2 "
-            //                 "union "
-            //                 "select '-' as f_staff, if(f_amounttotal<0,-1,1) as f_sign,"
-            //                 "sum(oh.f_amounttotal) as f_amounttotal "
-            //                 "from o_header oh "
-            //                 "left join s_user w on w.f_id=oh.f_staff  "
-            //                 "where oh.f_hall=:f_hall and oh.f_datecash=:f_datecash  and oh.f_state=:f_state and oh.f_amounttotal<0 "
-            //                 "group by 1, 2 ");
-            //         QString info = tr("Total today") + "<br>";
-            //         while (db.nextRow()) {
-            //             info += QString("%1: %2<br>").arg(db.getString("f_staff"), float_str(db.getDouble("f_amounttotal"), 2));
-            //         }
-            //         C5Message::info(info);
-            //         event->accept();
-            //     }
-            //     break;
-            case Qt::Key_H:
-                if (ke->modifiers() &Qt::ControlModifier) {
-                    auto *l = new LogHistory(this);
-                    l->exec();
-                    delete l;
-                }
-                break;
         }
     }
     return QWidget::eventFilter(watched, event);
@@ -386,7 +350,6 @@ WOrder *Working::newSale(int type)
     }
     ui->tab->addTab(w, QString("%1 #%2").arg(title).arg(ordersCount()));
     ui->tab->setCurrentIndex(ui->tab->count() - 1);
-    C5LogSystem::writeEvent(QString("%1 %2, #%3").arg(tr("New"), title).arg(ui->tab->count()));
     return w;
 }
 
@@ -734,11 +697,11 @@ void Working::on_btnItemBack_clicked()
 
 void Working::on_tab_currentChanged(int index)
 {
+    Q_UNUSED(index)
     auto *wo = worder();
     if (wo) {
         wo->updateCustomerDisplay(fCustomerDisplay);
     }
-    C5LogSystem::writeEvent(QString("%1 #%2").arg(tr("Current window")).arg(index + 1));
 }
 
 void Working::on_btnCloseApplication_clicked()
@@ -754,7 +717,6 @@ void Working::on_btnWriteOrder_clicked()
     if (!w) {
         return;
     }
-    C5LogSystem::writeEvent(QString("F12"));
     if (!w->writeOrder()) {
         return;
     }

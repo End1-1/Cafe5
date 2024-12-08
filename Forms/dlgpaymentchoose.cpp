@@ -96,6 +96,9 @@ void DlgPaymentChoose::setFiscalStyle()
 void DlgPaymentChoose::checkFiscal()
 {
     fFiscal = !fFiscal;
+    if (ui->leCard->getDouble() > 0.01) {
+        fFiscal = true;
+    }
     setFiscalStyle();
 }
 

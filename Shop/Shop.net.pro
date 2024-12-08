@@ -19,7 +19,7 @@ RC_FILE = res.rc
 # deprecated API in order to know how to port your code away from it.
 DEFINES += QT_DEPRECATED_WARNINGS
 DEFINES += NETWORKDB
-DEFINES += BF10
+#DEFINES += BF10
 
 # You can also make your code fail to compile if you use deprecated APIs.
 # In order to do so, uncomment the following line.
@@ -45,7 +45,6 @@ SOURCES += \
     ../../XLSX/src/xlsxwriter.cpp \
     ../Cafe5/c5cafecommon.cpp \
     ../Cafe5/c5double.cpp \
-    ../Cafe5/c5logsystem.cpp \
     ../Cafe5/c5sockethandler.cpp \
     ../Cafe5/c5systempreference.cpp \
     ../Cafe5/calendar.cpp \
@@ -173,7 +172,6 @@ SOURCES += \
     dlgshowcolumns.cpp \
     goodsreturnreason.cpp \
     imageloader.cpp \
-    loghistory.cpp \
         main.cpp \
     sales.cpp \
     searchitems.cpp \
@@ -220,7 +218,6 @@ HEADERS += \
     ../../XLSX/src/zip.h \
     ../Cafe5/c5cafecommon.h \
     ../Cafe5/c5double.h \
-    ../Cafe5/c5logsystem.h \
     ../Cafe5/c5sockethandler.h \
     ../Cafe5/c5systempreference.h \
     ../Cafe5/calendar.h \
@@ -351,7 +348,6 @@ HEADERS += \
     dlgshowcolumns.h \
     goodsreturnreason.h \
     imageloader.h \
-    loghistory.h \
     sales.h \
     searchitems.h \
     selectstaff.h \
@@ -407,7 +403,6 @@ FORMS += \
     dlgsearchpartner.ui \
     dlgshowcolumns.ui \
     goodsreturnreason.ui \
-    loghistory.ui \
     sales.ui \
     searchitems.ui \
     selectstaff.ui \

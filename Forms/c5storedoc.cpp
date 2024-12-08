@@ -115,6 +115,8 @@ C5StoreDoc::C5StoreDoc(const QStringList &dbParams, QWidget *parent) :
     ui->cbCurrency->setCurrentIndex(ui->cbCurrency->findData(__c5config.getValue(param_default_currency).toInt()));
     ui->tblGoods->setColumnHidden(col_price, __user->check(cp_t11_do_now_show_input_prices));
     ui->tblGoods->setColumnHidden(col_total, __user->check(cp_t11_do_now_show_input_prices));
+    ui->lbTotal->setVisible(!__user->check(cp_t11_do_now_show_input_prices));
+    ui->leTotal->setVisible(!__user->check(cp_t11_do_now_show_input_prices));
 }
 
 C5StoreDoc::~C5StoreDoc()
@@ -1483,11 +1485,16 @@ void C5StoreDoc::printV1()
             val[3] = ui->tblGoods->lineEdit(i, 5)->text();
         }
         val[4] = ui->tblGoods->getString(i, 6);
-        val[5] = ui->tblGoods->lineEdit(i, 7)->text();
-        if (ui->chLeaveFocusOnBarcode->isChecked()) {
-            val[6] = float_str(str_float(val[6]) + ui->tblGoods->lineEdit(i, 8)->getDouble(), 2);
+        if (!__user->check(cp_t11_do_now_show_input_prices)) {
+            val[5] = ui->tblGoods->lineEdit(i, 7)->text();
+            if (ui->chLeaveFocusOnBarcode->isChecked()) {
+                val[6] = float_str(str_float(val[6]) + ui->tblGoods->lineEdit(i, 8)->getDouble(), 2);
+            } else {
+                val[6] = ui->tblGoods->lineEdit(i, 8)->text();
+            }
         } else {
-            val[6] = ui->tblGoods->lineEdit(i, 8)->text();
+            val[5] = "0";
+            val[6] = "0";
         }
         val[5] = float_str(str_float(val[6]) / str_float(val[3]), 2);
         if (ui->chLeaveFocusOnBarcode->isChecked()) {
@@ -1883,8 +1890,13 @@ void C5StoreDoc::printV2()
         vals << ui->tblGoods->getString(i, 4);
         vals << ui->tblGoods->lineEdit(i, 5)->text();
         vals << ui->tblGoods->getString(i, 6);
-        vals << ui->tblGoods->lineEdit(i, 7)->text();
-        vals << ui->tblGoods->lineEdit(i, 8)->text();
+        if (!__user->check(cp_t11_do_now_show_input_prices)) {
+            vals << ui->tblGoods->lineEdit(i, 7)->text();
+            vals << ui->tblGoods->lineEdit(i, 8)->text();
+        } else {
+            vals << "0";
+            vals << "0";
+        }
         p.tableText(points, vals, p.fLineHeight + 20);
         //PART 10 - 2
         points.clear();
@@ -1895,8 +1907,13 @@ void C5StoreDoc::printV2()
         vals << ui->tblGoods->getString(i, 4);
         vals << ui->tblGoods->lineEdit(i, 5)->text();
         vals << ui->tblGoods->getString(i, 6);
-        vals << ui->tblGoods->lineEdit(i, 7)->text();
-        vals << ui->tblGoods->lineEdit(i, 8)->text();
+        if (!__user->check(cp_t11_do_now_show_input_prices)) {
+            vals << ui->tblGoods->lineEdit(i, 7)->text();
+            vals << ui->tblGoods->lineEdit(i, 8)->text();
+        } else {
+            vals << "0";
+            vals << "0";
+        }
         p.tableText(points, vals, p.fLineHeight + 20);
         if (p.checkBr(p.fLineHeight + 20)) {
             p.br(p.fLineHeight + 20);
@@ -2288,8 +2305,10 @@ void C5StoreDoc::getOutput()
         C5Message::error(err);
         return;
     }
+    QString showAmount = __user->check(cp_t11_do_now_show_input_prices) ? "0 as f_amount," :
+                         "sum(s.f_total*s.f_type) as f_amount,";
     QString query = QString("select s.f_goods, gg.f_name as f_groupname, g.f_name as f_goodsname, u.f_name as f_unitname, "
-                            "sum(s.f_qty*s.f_type) as f_qty, sum(s.f_total*s.f_type) as f_amount, g.f_scancode "
+                            "sum(s.f_qty*s.f_type) as f_qty, %3 g.f_scancode "
                             "from a_store s "
                             "inner join a_header d on d.f_id=s.f_document "
                             "inner join c_goods g on g.f_id=s.f_goods "
@@ -2299,7 +2318,8 @@ void C5StoreDoc::getOutput()
                             "group by 1, 2, 3, 4 "
                             "having sum(s.f_qty*s.f_type) > 0.00001 ")
                     .arg(ui->leStoreOutput->getInteger())
-                    .arg(ui->deDate->toMySQLDate());
+                    .arg(ui->deDate->toMySQLDate())
+                    .arg(showAmount);
     QList<QVariant> vals;
     QHash<QString, QString> trans;
     trans["f_goods"] = tr("Code");

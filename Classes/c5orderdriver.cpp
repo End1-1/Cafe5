@@ -38,7 +38,7 @@ bool C5OrderDriver::closeOrder()
             }
         }
         C5StoreDraftWriter dw(db);
-        auto *cbc = Configs::construct<CashboxConfig>(db.dbParams(), 2);
+        auto *cbc = Configs::construct<CashboxConfig>(__c5config.dbParams(), 2);
         QString headerPrefix;
         int headerId;
         QDate dateCash = headerValue("f_datecash").toDate();
@@ -206,9 +206,6 @@ bool C5OrderDriver::isEmpty()
     if (preorder("f_prepaidcash").toDouble()
             + preorder("f_prepaidcard").toDouble()
             + preorder("f_prepaidpayx").toDouble() > 0.01) {
-        if (dbhall->booking(headerValue("f_hall").toInt())) {
-            setHeader("f_state", ORDER_STATE_PREORDER_EMPTY);
-        }
         return false;
     }
     if (headerValue("f_state").toInt() == ORDER_STATE_PREORDER_EMPTY ||
@@ -217,9 +214,6 @@ bool C5OrderDriver::isEmpty()
     }
     for (int i = 0; i < fDishes.count(); i++) {
         if (dishesValue("f_state", i).toInt() == DISH_STATE_OK) {
-            if (dbhall->booking(headerValue("f_hall").toInt())) {
-                //setHeader("f_state", ORDER_STATE_PREORDER_WITH_ORDER);
-            }
             return false;
         }
     }

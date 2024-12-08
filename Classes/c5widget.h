@@ -4,11 +4,10 @@
 #include "c5database.h"
 #include "c5permissions.h"
 #include "c5config.h"
+#include "ninterface.h"
 #include <QWidget>
 #include <QIcon>
 #include <QToolBar>
-
-class NInterface;
 
 class C5Widget : public QWidget
 {

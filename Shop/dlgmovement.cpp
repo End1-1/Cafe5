@@ -7,7 +7,8 @@
 
 DlgMovement::DlgMovement()
     : C5Dialog(__c5config.dbParams(), true)
-    , ui(new Ui::DlgMovement)
+    , ui(new Ui::DlgMovement),
+      mSetupComplete(false)
 {
     ui->setupUi(this);
     fState = DOC_STATE_DRAFT;
@@ -25,6 +26,10 @@ DlgMovement::~DlgMovement()
 
 bool DlgMovement::openDoc(const QString &doc)
 {
+    if (!mSetupComplete) {
+        fPendingDoc = doc;
+        return true;
+    }
     fUuid = doc;
     C5Database db(__c5config.dbParams());
     db.exec(QString("select sf_open_store_document('{\"f_id\":\"%1\"}')").arg(doc));
@@ -69,6 +74,7 @@ bool DlgMovement::openDoc(const QString &doc)
         ui->tbl->setString(r, 0, jo["f_id"].toString());
         ui->tbl->setString(r, 1, jo["f_goodsname"].toString());
         ui->tbl->setString(r, 2, jo["f_scancode"].toString());
+        ui->tbl->setDouble(r, 5, jo["f_price"].toDouble());
         auto *l = ui->tbl->lineEdit(r, 4);
         l->setDouble(jo["f_qty"].toDouble());
         l->setEnabled(ui->btnSave->isEnabled());
@@ -81,11 +87,19 @@ bool DlgMovement::openDoc(const QString &doc)
 void DlgMovement::setupResponse(const QJsonObject &jdoc)
 {
     QJsonArray jstores = jdoc["availableoutstore"].toArray();
+    if (jstores.isEmpty()) {
+        C5Message::error(tr("Missing available stores"));
+        return;
+    }
+    mSetupComplete = true;
     for (int i = 0; i < jstores.size(); i++) {
         QJsonObject jt = jstores.at(i).toObject();
         ui->cbDstStore->addItem(jt["f_name"].toString(), jt["f_id"].toInt());
     }
     fHttp->httpQueryFinished(sender());
+    if (!fPendingDoc.isEmpty()) {
+        openDoc(fPendingDoc);
+    }
     showMaximized();
 }
 

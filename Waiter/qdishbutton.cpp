@@ -19,6 +19,7 @@ void QDishButton::paintEvent(QPaintEvent *pe)
     int id = property("id").toInt();
     bool stop = C5TableData::instance()->mStopList.contains(id);
     bool stopreached = false;
+    bool emarkrequired = property("emarkrequired").toBool();
     QString name = property("name").toString();
     if (stop) {
         double qty = C5TableData::instance()->mStopList[id];
@@ -55,5 +56,12 @@ void QDishButton::paintEvent(QPaintEvent *pe)
                         28 - (stopRect.height() / 2));
         QPixmap px(":/stop.png");
         p.drawPixmap(stopRect, px);
+    }
+    if (emarkrequired) {
+        qDebug() << fm.height();
+        QRect emarkRect = pe->rect();
+        emarkRect.adjust(emarkRect.width() - 2 - emarkRect.height() + fm.height(), 2,  - 2,  - (fm.height() + 5));
+        QPixmap px(":/qrcode.png");
+        p.drawPixmap(emarkRect, px.scaled(emarkRect.width(), emarkRect.height()));
     }
 }

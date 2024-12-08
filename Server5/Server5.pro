@@ -29,6 +29,7 @@ CONFIG += c++11
 
 SOURCES += \
         ../Cafe5/c5utils.cpp \
+        ../Classes/appwebsocket.cpp \
         ../Classes/c5filelogwriter.cpp \
         ../Classes/c5networkdb.cpp \
         ../Classes/c5printing.cpp \
@@ -36,18 +37,15 @@ SOURCES += \
         ../Classes/c5threadobject.cpp \
         ../Classes/notificationwidget.cpp \
         ../Service5Working/utils/logwriter.cpp \
-        c5reportsupload.cpp \
         c5scheduler.cpp \
-        dbconnection.cpp \
         main.cpp \
         c5server5.cpp \
         server5settings.cpp \
-        serversocket.cpp \
-        socketthread.cpp \
         widgetcontainer.cpp
 
 HEADERS += \
         ../Cafe5/c5utils.h \
+        ../Classes/appwebsocket.h \
         ../Classes/c5filelogwriter.h \
         ../Classes/c5networkdb.h \
         ../Classes/c5printing.h \
@@ -55,22 +53,16 @@ HEADERS += \
         ../Classes/c5threadobject.h \
         ../Classes/notificationwidget.h \
         ../Service5Working/utils/logwriter.h \
-        c5reportsupload.h \
         c5scheduler.h \
         c5server5.h \
-        dbconnection.h \
         rc.h \
         res.rc \
         server5settings.h \
-        serversocket.h \
-        socketthread.h \
         widgetcontainer.h
 
 FORMS += \
         ../Classes/notificationwidget.ui \
-        c5reportsupload.ui \
-        c5server5.ui \
-        dbconnection.ui
+        c5server5.ui
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

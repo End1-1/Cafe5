@@ -12,9 +12,6 @@ public:
 
     int settings(int id);
 
-    int booking(int id);
-
-
 };
 
 #endif // DBHALLS_H

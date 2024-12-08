@@ -162,7 +162,6 @@ bool C5SettingsWidget::save(QString &err, QList<QMap<QString, QVariant> > &data)
     fTags[ui->chDontCloseEmtpyOrder->getTag()] = ui->chDontCloseEmtpyOrder->isChecked() ? "1" : "0";
     fTags[ui->chDontPrintFinalReceipt->getTag()] = ui->chDontPrintFinalReceipt->isChecked() ? "1" : "0";
     fTags[ui->leAutochargeDishAfterSessionClose->getTag()] = ui->leAutochargeDishAfterSessionClose->text();
-    fTags[ui->chViewOnChart->getTag()] = ui->chViewOnChart->isChecked() ? "1" : "0";
     fTags[ui->chChoosePos->getTag()] = ui->chChoosePos->isChecked() ? "1" : "0";
     fTags[ui->leMobileAppConStr->getTag()] = ui->leMobileAppConStr->text();
     fTags[ui->cbDefaultCurrency->getTag()] = ui->cbDefaultCurrency->currentData().toString();

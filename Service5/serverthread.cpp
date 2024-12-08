@@ -41,7 +41,15 @@ void ServerThread::run()
 void ServerThread::onNewConnection()
 {
     QWebSocket *ws = fServer->nextPendingConnection();
-    LogWriter::write(LogWriterLevel::verbose, "", "new connection" + ws->peerName() + " " + ws->origin());
+    QString realIp = ws->request().rawHeader("X-Forwarded-For");
+    if (realIp.isEmpty()) {
+        realIp = ws->peerAddress().toString();
+    }
+    LogWriter::write(LogWriterLevel::verbose, "",
+                     QString("New connection from %1, peer name: %2, origin: %3")
+                     .arg(realIp)  // Используем реальный IP
+                     .arg(ws->peerName())  // Peer name, может быть пустым
+                     .arg(ws->origin()));  // Origin header
     connect(ws, &QWebSocket::textMessageReceived, this, &ServerThread::onTextMessage);
     connect(ws, &QWebSocket::disconnected, this, [ws]() {
         LogWriter::write(LogWriterLevel::verbose, "", "disconnected" + ws->peerName() + " " + ws->origin());
@@ -54,6 +62,10 @@ void ServerThread::onTextMessage(const QString &msg)
     auto *ws = static_cast<QWebSocket *>(sender());
     QJsonObject jdoc = QJsonDocument::fromJson(msg.toUtf8()).object();
     QJsonObject jrep;
+    if (msg.toLower() == "ping") {
+        ws->sendTextMessage("pong");
+        return;
+    }
     jrep["errorCode"] = 0;
     jrep["requestId"] = jdoc["requestId"].toInt();
     QString repMsg;

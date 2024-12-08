@@ -1,5 +1,4 @@
 #include "c5widget.h"
-#include "ninterface.h"
 #include <QEvent>
 #include <QKeyEvent>
 #include <QUuid>

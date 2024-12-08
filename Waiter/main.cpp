@@ -72,6 +72,7 @@ int main(int argc, char *argv[])
     C5ServerName sn(servername, "shop");
     sn.mParams["workstation"] = hostinfo;
     if (!sn.getServers(params)) {
+        C5Message::error(sn.mErrorString);
         return 1;
     }
     if (sn.mServers.size() == 0) {

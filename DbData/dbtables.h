@@ -14,8 +14,6 @@ public:
 
     int specialConfig(int id);
 
-    bool bookingOnly(int id);
-
     bool closeTable(int id, QString &err);
 
     int hourlyId(int id);

@@ -21,12 +21,9 @@ public:
 
     explicit DlgPreorder(const QJsonObject &jdoc);
 
-    DlgPreorder &setHotelMode(bool v);
-
     ~DlgPreorder();
 
 private slots:
-    void paymentComboboxIndexChanged(int index);
 
     void openReservationResponse(const QJsonObject &jdoc);
 
@@ -46,17 +43,9 @@ private slots:
 
     void on_btnSelectTable_clicked();
 
-    void on_leDateCheckout_dateChanged(const QDate &date);
-
-    void on_leDate_dateChanged(const QDate &date);
-
-    void on_leDays_valueChanged(int arg1);
-
     void on_btnCheckin_clicked();
 
     void on_btnPrintReservation_clicked();
-
-    void on_tblPayment_cellClicked(int row, int column);
 
     void on_btnCopyID_clicked();
 
@@ -65,17 +54,9 @@ private:
 
     QJsonObject fDoc;
 
-    bool fHotelMode;
-
     void openDoc();
 
     void save(bool withcheckin);
-
-    int fPrevRow;
-
-    int fPrevColumn;
-
-    void setVerticalHeaders();
 
     void setState();
 };

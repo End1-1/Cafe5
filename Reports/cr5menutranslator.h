@@ -2,8 +2,10 @@
 #define CR5MENUTRANSLATOR_H
 
 #include "c5widget.h"
+#include <QJsonObject>
 
-namespace Ui {
+namespace Ui
+{
 class CR5MenuTranslator;
 }
 
@@ -24,6 +26,8 @@ private slots:
     void on_btnClearSearch_clicked();
 
     void saveDataChanges();
+
+    void saveResponse(const QJsonObject &jo);
 
 private:
     Ui::CR5MenuTranslator *ui;

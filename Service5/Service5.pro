@@ -26,7 +26,6 @@ SOURCES += \
     main.cpp \
     monitor.cpp \
     serverthread.cpp \
-    threadworker.cpp \
     utils/logwriter.cpp \
     utils/sqlqueries.cpp
 
@@ -50,7 +49,6 @@ HEADERS += \
     monitor.h \
     rc.h \
     serverthread.h \
-    threadworker.h \
     utils/logwriter.h \
     utils/sqlqueries.h
 

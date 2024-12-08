@@ -290,10 +290,10 @@ private slots:
 
     void on_leCmd_returnPressed();
 
+    void on_btnSetQr_clicked();
+
 signals:
     void allDone();
-
-    void openNewReserve();
 };
 
 #endif // DLGORDER_H

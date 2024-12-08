@@ -53,7 +53,6 @@ SOURCES += \
     ../../XLSX/src/xlsxwriter.cpp \
     ../Cafe5/c5cafecommon.cpp \
     ../Cafe5/c5double.cpp \
-    ../Cafe5/c5logsystem.cpp \
     ../Cafe5/c5serverhandler.cpp \
     ../Cafe5/c5systempreference.cpp \
     ../Cafe5/calendar.cpp \
@@ -384,12 +383,10 @@ SOURCES += \
     dlglist.cpp \
     dlglistdishspecial.cpp \
     dlglistofpackages.cpp \
-    dlglistofreservation.cpp \
     dlgmanagertools.cpp \
     dlgmenuset.cpp \
     dlgprecheckoptions.cpp \
     dlgpreorderw.cpp \
-    dlgreservation.cpp \
     dlgscreen.cpp \
     dlgsearchinmenu.cpp \
     dlgshiftrotation.cpp \
@@ -432,7 +429,6 @@ SOURCES += \
     qdishpart2button.cpp \
     tablewidget.cpp \
     tablewidgetv1.cpp \
-    tablewidgetv2.cpp \
     wguestorder.cpp \
     worderw.cpp \
     wpaymentoptions.cpp \
@@ -474,7 +470,6 @@ HEADERS += \
     ../../XLSX/src/zip.h \
     ../Cafe5/c5cafecommon.h \
     ../Cafe5/c5double.h \
-    ../Cafe5/c5logsystem.h \
     ../Cafe5/c5serverhandler.h \
     ../Cafe5/c5systempreference.h \
     ../Cafe5/calendar.h \
@@ -817,7 +812,6 @@ HEADERS += \
     dlglist.h \
     dlglistdishspecial.h \
     dlglistofpackages.h \
-    dlglistofreservation.h \
     dlgmanagertools.h \
     dlgmenuset.h \
     dlgorder.h \
@@ -834,7 +828,6 @@ HEADERS += \
     ../Classes/c5printremovedservicethread.h \
     dlgprecheckoptions.h \
     dlgpreorderw.h \
-    dlgreservation.h \
     dlgscreen.h \
     dlgsearchinmenu.h \
     dlgshiftrotation.h \
@@ -859,7 +852,6 @@ HEADERS += \
     ../Classes/c5cache.h \
     tablewidget.h \
     tablewidgetv1.h \
-    tablewidgetv2.h \
     wguestorder.h \
     worderw.h \
     wpaymentoptions.h \
@@ -1057,14 +1049,12 @@ FORMS += \
     dlglist.ui \
     dlglistdishspecial.ui \
     dlglistofpackages.ui \
-    dlglistofreservation.ui \
     dlgmanagertools.ui \
     dlgmenuset.ui \
     dlgorder.ui \
     ../Classes/c5printpreview.ui \
     dlgprecheckoptions.ui \
     dlgpreorderw.ui \
-    dlgreservation.ui \
     dlgscreen.ui \
     dlgsearchinmenu.ui \
     dlgshiftrotation.ui \
@@ -1075,7 +1065,6 @@ FORMS += \
     dlgtimeorder.ui \
     dlgviewstoplist.ui \
     tablewidgetv1.ui \
-    tablewidgetv2.ui \
     wguestorder.ui \
     worderw.ui \
     wpaymentoptions.ui \

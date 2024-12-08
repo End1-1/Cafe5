@@ -5,7 +5,8 @@
 #include <QMenu>
 #include <QSystemTrayIcon>
 
-namespace Ui {
+namespace Ui
+{
 class C5Server5;
 }
 
@@ -37,13 +38,9 @@ private slots:
     void appTerminate();
     void iconClicked(QSystemTrayIcon::ActivationReason reason);
     void on_btnApply_clicked();
-    void clientSocketDataRead(const QString &uuid, QByteArray &d);
-    void on_btnReportsToUpload_clicked();
-    void on_btnDatabase_clicked();
-    void on_btnDatabaseSync_clicked();
-
-signals:
-    void sendData(const QString &);
+    void socketConnecting();
+    void socketConnected();
+    void socketDisconnected();
 };
 
 #endif // C5SERVER5_H

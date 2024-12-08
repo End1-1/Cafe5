@@ -176,5 +176,5 @@ insert into s_settings_values (f_settings, f_key, f_value) values (2, 97, 'Arial
 insert into e_cash_names (f_id, f_name) values (1, 'Կանխիկ'), (2, 'Անկանխիկ');
 insert into d_menu_names (f_id, f_name, f_datestart, f_dateend, f_comment, f_enabled) values (1, 'Ճաշացանկ', current_date(), date_add(current_date(), interval 10 YEAR), '', 1);
 insert into d_part1 (f_id, f_name) values (1, 'Բար'), (2, 'Խոհ․'), (3, 'Այլ');
-insert into h_halls (f_id, f_counter, f_name, f_prefix, f_settings, f_counterhall, f_booking) values (1, 1, 'Սրահ', 'Ս', 2, 1, 0);
+insert into h_halls (f_id, f_counter, f_name, f_prefix, f_settings, f_counterhall) values (1, 1, 'Սրահ', 'Ս', 2, 1);
 insert into c_storages (f_id, f_name) values (1, 'Պահեստ');

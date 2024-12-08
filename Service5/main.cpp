@@ -29,16 +29,6 @@ VOID ReportSvcStatus( DWORD, DWORD, DWORD );
 VOID SvcInit( DWORD, LPTSTR * );
 VOID SvcReportEvent( LPTSTR );
 
-DWORD WINAPI ThreadProcSocketClient(CONST LPVOID lpParam)
-{
-    //    SslSocket *clientSocket = (SslSocket*)lpParam;
-    //    SocketRW *srw = new SocketRW(clientSocket);
-    //    srw->go();
-    //    delete srw;
-    //    ExitThread(0);
-    return 0;
-}
-
 DWORD WINAPI ThreadProc(CONST LPVOID lpParam)
 {
     LogWriter::write(LogWriterLevel::verbose, "", "Start service thread");

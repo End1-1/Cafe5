@@ -166,8 +166,7 @@ void DlgOrder::accept()
 			if (wo->fOrderDriver->isEmpty()
 			        && __c5config.getValue(param_waiter_donotclose_empty_order).toInt() == 0
 			        && wo->fOrderDriver->headerValue("f_state").toInt() != ORDER_STATE_PREORDER_EMPTY
-			        && wo->fOrderDriver->headerValue("f_state").toInt() != ORDER_STATE_PREORDER_WITH_ORDER
-			        && dbhall->booking(wo->fOrderDriver->headerValue("f_hall").toInt()) == 0) {
+                    && wo->fOrderDriver->headerValue("f_state").toInt() != ORDER_STATE_PREORDER_WITH_ORDER) {
 				wo->fOrderDriver->setCloseHeader();
 			}
 			for (int i = 0; i < wo->fOrderDriver->dishesCount(); i++) {
@@ -368,7 +367,7 @@ void DlgOrder::addDishToOrder(int menuid, const QString &emark)
 	wo->fOrderDriver->amountTotal();
 	ui->scrollArea->verticalScrollBar()->setValue(ui->scrollArea->verticalScrollBar()->maximum() + 100);
 	setButtonsState();
-	if (__c5config.getValue(param_rest_qty_before_add_dish).toInt() == 1) {
+    if (__c5config.getValue(param_rest_qty_before_add_dish).toInt() == 1 && emark.isEmpty()) {
 		on_btnAnyqty_clicked();
 	}
 }
@@ -637,6 +636,7 @@ void DlgOrder::restoreStoplistQty(int dish, double qty)
 
 void DlgOrder::timeout()
 {
+    ui->leCmd->setFocus();
 	ui->lbTime->setText(QTime::currentTime().toString(FORMAT_TIME_TO_SHORT_STR));
 	fTimerCounter++;
 	if ((fTimerCounter % 60) == 0) {
@@ -852,6 +852,10 @@ void DlgOrder::dishClicked()
 	if (!worder()) {
 	}
 	QDishButton *btn = static_cast<QDishButton *>(sender());
+    if (btn->property("emarkrequired").toInt() > 0) {
+        C5Message::info(tr("Append by QR only"));
+        return;
+    }
     processMenuID(btn->property("id").toInt(), "");
 }
 
@@ -1083,8 +1087,7 @@ void DlgOrder::on_btnPrintService_clicked()
 		ui->btnPrintService->setEnabled(false);
 		C5SocketHandler *sh = createSocketHandler(SLOT(handlePrintService(QJsonObject)));
 		sh->bind("cmd", sm_printservice);
-		sh->bind("order", o->fOrderDriver->currentOrderId());
-		sh->bind("booking", dbhall->booking(o->fOrderDriver->headerValue("f_hall").toInt()));
+        sh->bind("order", o->fOrderDriver->currentOrderId());
 		sh->bind("alias", __c5config.getValue(param_force_use_print_alias).toInt());
 		sh->send();
 		logRecord(fUser->fullName(), o->fOrderDriver->headerValue("f_id").toString(), "", "Send to cooking", "", "");
@@ -1546,24 +1549,13 @@ bool DlgOrder::buildDishes(int menuid, int part2)
 	QJsonArray jmenu = C5TableData::instance()->dishes(menuid, part2);
 	for (int i = 0; i < jmenu.size(); i++) {
 		const QJsonObject &j = jmenu.at(i).toObject();
-		// C5Message::info(QString("%1-%2").arg(part2).arg(d2.fId));
-		// for (int i = 0; i < d2.data1.count(); i++) {
-		//     QDishPart2Button *btn = new QDishPart2Button();
-		//     btn->setProperty("bgcolor", dbdishpart2->color(d2.fId));
-		//     btn->setProperty("id", d2.data1.at(i).fId);
-		//     btn->setText(dbdishpart2->name(d2.data1.at(i).fId));
-		//     connect(btn, &QDishPart2Button::clicked, this, &DlgOrder::dishPartClicked);
-		//     ui->grDish->addWidget(btn, drow, dcol++, 1, 1);
-		//     if (dcol == dcolCount) {
-		//         dcol = 0;
-		//         drow ++;
-		//     }}
 		int w = (ui->wdishes->width() - 10)  / (scr.width() > 1024 ? 3 : 2 );
 		QDishButton *btn = new QDishButton(w);
 		btn->setProperty("id", j["f_id"].toInt());
 		btn->setProperty("price", j["f_price"].toDouble());
 		btn->setProperty("name", j["f_name"].toString());
 		btn->setProperty("color", j["f_color"].toInt());
+        btn->setProperty("emarkrequired", j["f_addbyqr"].toInt() > 0);
 		connect(btn, &QDishButton::clicked, this, &DlgOrder::dishClicked);
 		ui->grDish->addWidget(btn, drow, dcol++, 1, 1);
 		if (dcol == dcolCount) {
@@ -1627,7 +1619,6 @@ void DlgOrder::openReserveError(const QString &err)
     fHttp->httpQueryFinished(sender());
     if (err.contains("open reservation")) {
         emit allDone();
-        emit openNewReserve();
         reject();
         deleteLater();
     } else {
@@ -1676,10 +1667,6 @@ void DlgOrder::openTableResponse(const QJsonObject &jdoc)
     }
     ui->vs->addStretch();
     itemsToTable();
-    bool isbooking = dbhall->booking(dbtable->hall(wo->fOrderDriver->headerValue("f_table").toInt()));
-    if (isbooking) {
-        ui->wPreorder->setVisible(isbooking);
-    }
     fHttp->httpQueryFinished(sender());
     if (ex) {
         exec();
@@ -1705,7 +1692,7 @@ void DlgOrder::checkQrResponse(const QJsonObject &jdoc)
                 for (int i = 0; i < jmenu.size(); i++) {
                     const QJsonObject &jo = jmenu.at(i).toObject();
                     if (jd["f_id"].toInt() == jo["f_id"].toInt() && jd["f_menu"].toInt() == fMenuID) {
-                        processMenuID(jd["f_id"].toInt(), jdoc["qr"].toString());
+                        processMenuID(jd["f_id"].toInt(), jdoc["qr"].toString().length() >= 29 ? jdoc["qr"].toString() : "");
                         done = true;
                         break;
                     }
@@ -1716,6 +1703,11 @@ void DlgOrder::checkQrResponse(const QJsonObject &jdoc)
             }
             break;
         }
+        default:
+            if (!jdoc["msg"].toString().isEmpty()) {
+                C5Message::error(jdoc["msg"].toString());
+            }
+            break;
     }
     ui->leCmd->setFocus();
     fHttp->httpQueryFinished(sender());
@@ -2102,7 +2094,7 @@ void DlgOrder::on_btnPlus1_clicked()
 		C5Message::error(tr("Cannot add comment to hourly payment"));
 		return;
     }
-    if (dbdish->emarks(wo->fOrderDriver->dishesValue("f_dish", index).toInt()).isEmpty() == false) {
+    if (wo->fOrderDriver->dishesValue("f_emarks", index).toString().isEmpty() == false) {
         C5Message::error(tr("Cannot change qty of dishes thats contains emarks"));
         return;
     }
@@ -2202,6 +2194,10 @@ void DlgOrder::on_btnAnyqty_clicked()
 		C5Message::error(tr("Use removal tool"));
 		return;
 	}
+    if (wo->fOrderDriver->dishesValue("f_emarks", index).toString().isEmpty() == false) {
+        C5Message::error(tr("Cannot change qty of dishes thats contains emarks"));
+        return;
+    }
     if (dbdish->emarks(wo->fOrderDriver->dishesValue("f_dish", index).toInt()).isEmpty() == false) {
         C5Message::error(tr("Cannot change qty of dishes thats contains emarks"));
         return;
@@ -2515,7 +2511,6 @@ void DlgOrder::on_btnReprintSelected_clicked()
 	sh->bind("cmd", sm_printservice);
 	sh->bind("order", wo->fOrderDriver->currentOrderId());
 	sh->bind("reprint", reprintList.join(","));
-	sh->bind("booking", dbhall->booking(wo->fOrderDriver->headerValue("f_hall").toInt()));
 	sh->send();
 	logRecord(fUser->fullName(), wo->fOrderDriver->headerValue("f_id").toString(), "", "Duplicate ---Send to cooking", "",
 	          "");
@@ -2819,4 +2814,50 @@ void DlgOrder::on_leCmd_returnPressed()
     //Check qr exists
     fHttp->createHttpQuery("/engine/waiter/check-qr.php", QJsonObject{{"action", "checkQr"},
         {"qr", code}}, SLOT(checkQrResponse(QJsonObject)));
+}
+
+void DlgOrder::on_btnSetQr_clicked()
+{
+    int index = 0;
+    WOrder *wo = worder();
+    if (!wo) {
+        return;
+    }
+    if (!wo->currentRow(index)) {
+        return;
+    }
+    if (wo->fOrderDriver->dishesValue("f_state", index).toInt() != DISH_STATE_OK) {
+        return;
+    }
+    if (dbdish->isHourlyPayment(wo->fOrderDriver->dishesValue("f_dish", index).toInt())) {
+        C5Message::error(tr("Cannot add comment to hourly payment"));
+        return;
+    }
+    if (wo->fOrderDriver->dishesValue("f_emarks", index).toString().isEmpty() == false) {
+        C5Message::error(tr("Emarks already set"));
+        return;
+    }
+    bool ok;
+    QString emarks = QInputDialog::getText(this, tr("Emarks"), "", QLineEdit::Normal, "", &ok);
+    if (!ok) {
+        return;
+    }
+    if (emarks < 29) {
+        C5Message::error(tr("Invalid Emarks"));
+        return;
+    }
+    C5Database db(__c5config.dbParams());
+    db[":f_emarks"] = emarks;
+    db.exec("select * from o_body where f_state=1 and f_emarks=:f_emarks");
+    if (db.nextRow()) {
+        C5Message::error(tr("Used Emarks"));
+        return;
+    }
+    wo->fOrderDriver->setDishesValue("f_emarks", emarks, index);
+    wo->updateItem(index);
+    logRecord(fUser->fullName(), wo->fOrderDriver->headerValue("f_id").toString(),
+              wo->fOrderDriver->dishesValue("f_id", index).toString(),
+              "Emarks for dish",
+              dbdish->name(wo->fOrderDriver->dishesValue("f_emarks", index).toInt()), emarks);
+    wo->fOrderDriver->save();
 }

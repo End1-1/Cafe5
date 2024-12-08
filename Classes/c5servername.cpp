@@ -31,6 +31,12 @@ bool C5ServerName::getServers(const QString &name)
     connect(this, &C5ServerName::messageReceived, &l1, &QEventLoop::quit);
     s->open(url);
     l1.exec();
+    if (s->state() != QAbstractSocket::ConnectedState) {
+        qDebug() << s->error() << s->errorString();
+        mErrorString = s->errorString();
+        s->deleteLater();
+        return false;
+    }
     QEventLoop l2;
     connect(s, &QWebSocket::textMessageReceived, this, [this](const QString &s) {
         fLastTextMessage = s;
@@ -47,6 +53,6 @@ bool C5ServerName::getServers(const QString &name)
     jo["params"] = mParams;
     s->sendTextMessage(QJsonDocument(jo).toJson(QJsonDocument::Compact));
     l2.exec();
-    qDebug() << mServers;
+    s->deleteLater();
     return true;
 }

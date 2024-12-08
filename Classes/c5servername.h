@@ -13,6 +13,7 @@ public:
     bool getServers(const QString &name = "");
     static QJsonArray mServers;
     QJsonObject mParams;
+    QString mErrorString;
 
 private:
     QString mServer;

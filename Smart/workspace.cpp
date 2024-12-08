@@ -1129,6 +1129,15 @@ int Workspace::printTax(double cardAmount, double idramAmount)
     QString jsonIn, jsonOut, err;
     int result = 0;
     result = pt.makeJsonAndPrint(cardAmount, 0, jsonIn, jsonOut, err);
+#ifdef QT_DEBUG
+    if (result != 0) {
+        result = 0;
+        jsonOut = "{\"address\": \"ԿԵՆՏՐՈՆ ԹԱՂԱՄԱՍ Հյուսիսային պողոտա 1/1 \", "
+                  "\"change\": 0, \"crn\": \"53241359\", \"fiscal\": \"81326142\", "
+                  "\"lottery\": \"\", \"prize\": 0, \"rseq\": 7174, \"sn\": \"00022164315\", "
+                  "\"taxpayer\": \"«ՍՄԱՐՏ ՊԱՐԿԻՆԳ»\", \"time\": 1733052744891, \"tin\": \"02853428\", \"total\": 1}";
+    }
+#endif
     QJsonObject jtax;
     QJsonParseError jsonErr;
     jtax["f_order"] = fOrderUuid;

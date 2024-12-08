@@ -105,7 +105,6 @@
 #define param_waiter_donotclose_empty_order 109
 #define param_waiter_dontprint_final_receipt 110
 #define param_waiter_dish_after_day_change 111
-#define param_waiter_hall_chart 112
 #define param_choose_external_pos 113
 #define param_mobile_app_connection 114
 #define param_shop_scalecode 115

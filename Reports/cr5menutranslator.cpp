@@ -3,6 +3,7 @@
 #include "c5lineedit.h"
 #include "c5utils.h"
 #include "c5message.h"
+#include <QJsonArray>
 
 CR5MenuTranslator::CR5MenuTranslator(const QStringList &dbParams, QWidget *parent) :
     C5Widget(dbParams, parent),
@@ -37,11 +38,11 @@ CR5MenuTranslator::~CR5MenuTranslator()
 QToolBar *CR5MenuTranslator::toolBar()
 {
     if (!fToolBar) {
-            QList<ToolBarButtons> btn;
-            btn << ToolBarButtons::tbSave;
-                createStandartToolbar(btn);
-        }
-        return fToolBar;
+        QList<ToolBarButtons> btn;
+        btn << ToolBarButtons::tbSave;
+        createStandartToolbar(btn);
+    }
+    return fToolBar;
 }
 
 void CR5MenuTranslator::on_leSearch_textChanged(const QString &arg1)
@@ -56,18 +57,25 @@ void CR5MenuTranslator::on_btnClearSearch_clicked()
 
 void CR5MenuTranslator::saveDataChanges()
 {
-    C5Database db(fDBParams);
+    QJsonArray jt;
     for (int i = 0; i < ui->tbl->rowCount(); i++) {
-        db[":f_id"] = ui->tbl->getInteger(i, 0);
-        db.exec("delete from d_translator where f_id=:f_id");
-        db[":f_id"] = ui->tbl->getInteger(i, 0);
-        db[":f_mode"] = TRANSLATOR_MENU_DISHES;
-        db[":f_en"] = ui->tbl->lineEdit(i, 3)->text();
-        db[":f_ru"] = ui->tbl->lineEdit(i, 4)->text();
-        if (!db.insert("d_translator", false)) {
-            C5Message::error(db.fLastError);
-            return;
-        }
+        QJsonObject jo;
+        jo["f_id"] = ui->tbl->getInteger(i, 0);
+        jo["f_mode"] = TRANSLATOR_MENU_DISHES;
+        jo["f_am"] = ui->tbl->getString(i, 2);
+        jo["f_en"] = ui->tbl->lineEdit(i, 3)->text();
+        jo["f_ru"] = ui->tbl->lineEdit(i, 4)->text();
+        jt.append(jo);
     }
+    fHttp->createHttpQuery("/engine/office/save-translator.php", QJsonObject{
+        {"translator", jt},
+        {"mode", 1}
+
+    }, SLOT(saveResponse(QJsonObject)));
+}
+
+void CR5MenuTranslator::saveResponse(const QJsonObject &jo)
+{
+    fHttp->httpQueryFinished(sender());
     C5Message::info(tr("Saved"));
 }

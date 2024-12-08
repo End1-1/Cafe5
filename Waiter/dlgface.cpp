@@ -9,7 +9,6 @@
 #include "dlgpreorderw.h"
 #include "c5tabledata.h"
 #include "tablewidgetv1.h"
-#include "tablewidgetv2.h"
 #include "dlgguest.h"
 #include "c5utils.h"
 #include "datadriver.h"
@@ -18,7 +17,6 @@
 #include "c5socketmessage.h"
 #include "fileversion.h"
 #include "c5cafecommon.h"
-#include "dlgreservation.h"
 #include "c5logtoserverthread.h"
 #include <QPushButton>
 #include <QCloseEvent>
@@ -145,10 +143,6 @@ void DlgFace::timeout()
             }
         }
     }
-    db[":f_key"] = param_waiter_hall_chart;
-    db[":f_value"] = "1";
-    db.exec("select * from s_settings_values where f_key=:f_key and f_value=:f_value");
-    ui->btnChart->setVisible(db.nextRow());
     refreshTables();
     fHttp->createHttpQuery("/engine/waiter/init.php", QJsonObject{{"version", C5TableData::instance()->version()}}, SLOT(
         initResponse(QJsonObject)), "", false);
@@ -186,63 +180,7 @@ void DlgFace::tableClicked(int id)
         refreshTables();
         fTimer.start(TIMER_TIMEOUT_INTERVAL);
     });
-    connect(d, &DlgOrder::openNewReserve, [id]() {
-        int hall = tds("h_tables", "f_hall", id).toInt();
-        DlgPreorder(QJsonObject{
-            {"f_table", id},
-            {"f_hall", hall}
-        })
-        .setHotelMode(true).exec();
-    });
 }
-
-//void DlgFace::handleMenu(const QJsonObject &obj)
-//{
-//    sender()->deleteLater();
-//    C5Menu::fMenu.clear();;
-//    C5Menu::fMenuNames.clear();
-//    C5Menu::fPart2Color.clear();
-//    C5Menu::fDishSpecial.clear();
-//    C5Menu::fPackages.clear();
-//    C5Menu::fPackagesList.clear();
-//    C5Menu::fStopList.clear();
-//    sender()->deleteLater();
-//    QJsonArray jMenu = obj["menu"].toArray();
-//    C5Menu::fMenuVersion = obj["version"].toString();
-//    for (int i = 0, count = jMenu.count(); i < count; i++) {
-//        QJsonObject o = jMenu.at(i).toObject();
-//        C5Menu::fMenu[o["menu_name"].toString()]
-//                [o["part1"].toString()]
-//                [o["part2"].toString()]
-//                .append(o);
-//        C5Menu::fPart2Color[o["part2"].toString()] = o["type_color"].toString().toInt();
-//    }
-//    C5Menu::fPart2Color[""] = -1;
-//    for (int i = 0; i < obj["menunames"].toArray().count(); i++) {
-//        C5Menu::fMenuNames[obj["menunames"].toArray().at(i).toObject()["f_id"].toString()] = obj["menunames"].toArray().at(i).toObject()["f_name"].toString();
-//    }
-//    QJsonArray ja = obj["dishspecial"].toArray();
-//    for (int i = 0; i < ja.count(); i++) {
-//        QJsonObject o = ja.at(i).toObject();
-//        C5Menu::fDishSpecial[o["f_dish"].toString()].append(o["f_comment"].toString());
-//    }
-//    ja = obj["packages"].toArray();
-//    for (int i = 0; i < ja.count(); i++) {
-//        QJsonObject o = ja.at(i).toObject();
-//        C5Menu::fPackages[o["f_name"].toString()] = o;
-//    }
-//    ja = obj["packageslist"].toArray();
-//    for (int i = 0; i < ja.count(); i++) {
-//        QJsonObject o = ja.at(i).toObject();
-//        C5Menu::fPackagesList[o["f_package"].toString().toInt()].append(o);
-//    }
-//    ja = obj["stoplist"].toArray();
-//    for (int i = 0; i < ja.count(); i++) {
-//        QJsonObject o = ja.at(i).toObject();
-//        C5Menu::fStopList[o["f_dish"].toString().toInt()] = o["f_qty"].toString().toDouble();
-//    }
-//    fTimerCheckVersion.start(2000);
-//}
 
 void DlgFace::handleCreditCards(const QJsonObject &obj)
 {
@@ -307,21 +245,13 @@ void DlgFace::filterHall(int hall, int staff)
                 continue;
             }
         }
-        if (dbhall->booking(hall)) {
-            TableWidgetV2 *t = new TableWidgetV2();
-            connect(t, &TableWidgetV2::clicked, this, &DlgFace::tableClicked);
-            t->config(id);
-            t->configOrder(to);
-            ui->sglHall->addWidget(t, row, col++, 1, 1);
-        } else {
-            TableWidgetV1 *t = new TableWidgetV1();
-            t->setMinimumWidth(minWidth);
-            t->setMaximumWidth(minWidth);
-            connect(t, &TableWidgetV1::clicked, this, &DlgFace::tableClicked);
-            t->config(id);
-            t->configOrder(to);
-            ui->sglHall->addWidget(t, row, col++, 1, 1);
-        }
+        TableWidgetV1 *t = new TableWidgetV1();
+        t->setMinimumWidth(minWidth);
+        t->setMaximumWidth(minWidth);
+        connect(t, &TableWidgetV1::clicked, this, &DlgFace::tableClicked);
+        t->config(id);
+        t->configOrder(to);
+        ui->sglHall->addWidget(t, row, col++, 1, 1);
         if (col > cc) {
             row++;
             col = 0;
@@ -400,11 +330,6 @@ void DlgFace::showEvent(QShowEvent *e)
         return;
     }
     for (int id : dbhall->list()) {
-        if (fModeJustSelectTable) {
-            if (dbhall->booking(id)) {
-                continue;
-            }
-        }
         QPushButton *btn = new QPushButton(dbhall->name(id));
         btn->setMinimumSize(QSize(140, 60));
         btn->setProperty("id", id);
@@ -428,13 +353,6 @@ void DlgFace::on_btnGuests_clicked()
 {
     QString res, inv, room, guest;
     DlgGuest::getGuest(res, inv, room, guest);
-}
-
-void DlgFace::on_btnChart_clicked()
-{
-    fTimer.stop();
-    DlgReservation(fUser).exec();
-    fTimer.start(TIMER_TIMEOUT_INTERVAL);
 }
 
 void DlgFace::on_btnTools_clicked()

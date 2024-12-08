@@ -9,7 +9,6 @@
 #include "c5message.h"
 #include "c5permissions.h"
 #include "c5printing.h"
-#include "c5logsystem.h"
 #include "printreceiptgroup.h"
 #include "printreceipt.h"
 #include "selectstaff.h"
@@ -424,8 +423,21 @@ bool WOrder::writeOrder()
                             g.qty, //qty
                             fBHistory.value); //discount
             }
-            result = pt.makeJsonAndPrint(fOHeader.amountCard + fOHeader.amountIdram + fOHeader.amountTelcell,
-                                         fOHeader.amountPrepaid, jsonIn, jsonOut, err);
+            do {
+                result = pt.makeJsonAndPrint(fOHeader.amountCard + fOHeader.amountIdram + fOHeader.amountTelcell,
+                                             fOHeader.amountPrepaid, jsonIn, jsonOut, err);
+                if (result != pt_err_ok) {
+                    switch (C5Message::question(err, tr("Try again"), tr("Do not print fiscal"), tr("Return to editing"))) {
+                        case QDialog::Rejected:
+                            break;
+                        case QDialog::Accepted:
+                            result = pt_err_ok;
+                            break;
+                        case 2:
+                            return false;
+                    }
+                }
+            } while (result != pt_err_ok);
         } else {
             result = pt.printAdvanceJson(fOHeader.amountCash, fOHeader.amountCard, jsonIn, jsonOut, err);
         }
@@ -495,12 +507,6 @@ bool WOrder::writeOrder()
                 break;
         }
     }
-    //    bool w = so.write();
-    //    if (w) {
-    //        w = so.writeFlags(ui->btnF1->isChecked(), ui->btnF2->isChecked(),
-    //                          ui->btnF3->isChecked(), ui->btnF4->isChecked(),
-    //                          ui->btnF5->isChecked());
-    //    }
     if (fOHeader.partner > 0) {
         OutputOfHeader ooh;
         ooh.make(db, fOHeader._id());
@@ -511,9 +517,6 @@ bool WOrder::writeOrder()
         db[":f_header"] = fDraftSale.id;
         db.exec("update o_draft_sale_body set f_state=3 where f_header=:f_header");
     }
-    C5LogSystem::writeEvent(QString("%1. %2:%3ms, %4:%5, %6")
-                            .arg(tr("Order saved"), tr("Elapsed"), QString::number(t.elapsed()), tr("Order number"), fOHeader.humanId(),
-                                 fOHeader._id()));
     return true;
 }
 
@@ -538,7 +541,6 @@ void WOrder::fixCostumer(const QString &code)
     if (!db.nextRow()) {
         return;
     }
-    C5LogSystem::writeEvent(QString("Try log %1 - %2").arg(__c5config.getValue(param_auto_discount), code));
     if (__c5config.getValue(param_auto_discount) != code) {
         if (!checkDiscountRight()) {
             return;
@@ -566,7 +568,6 @@ void WOrder::fixCostumer(const QString &code)
     }
     ui->leOrganization->setText(db.getString("f_taxinfo"));
     ui->leContact->setText(db.getString("f_contact"));
-    C5LogSystem::writeEvent(QString("%1: %2:%3").arg(tr("Fix costumer"), code, db.getString("f_contact")));
     countTotal();
 }
 
@@ -655,8 +656,6 @@ void WOrder::discountRow(const QString &code)
             C5Message::error(tr("This discount mode is not supported"));
             return;
     }
-    C5LogSystem::writeEvent(QString("%1: %2:%3, %4:%5").arg(tr("Discount")).arg(tr("Discount type")).arg(discType).arg(
-                                tr("Value")).arg(v));
     countTotal();
 }
 
@@ -720,14 +719,11 @@ void WOrder::removeRow()
         }
     }
     OGoods &g = fOGoods[row];
-    int code = g.goods;
     QString name = g._goodsName;
     C5Database db(__c5config.dbParams());
     db[":f_id"] = ui->tblData->item(row, 0)->data(Qt::UserRole + 101);
     db[":f_state"] = 2;
     db.exec("update o_draft_sale_body set f_state=:f_state where f_id=:f_id");
-    C5LogSystem::writeEvent(QString("%1 #%2 %3:%4 %5").arg(tr("Remove row")).arg(row).arg(code).arg(name).arg(float_str(
-                                g.qty, 2)));
     fOGoods.remove(row);
     ui->tblData->setRowCount(fOGoods.count());
     countTotal();
@@ -917,7 +913,6 @@ bool WOrder::setQtyOfRow(int row, double qty)
     db[":f_id"] = ui->tblData->item(row, 0)->data(Qt::UserRole + 101);
     db[":f_qty"] = og.qty / og._qtybox;
     db.exec("update o_draft_sale_body set f_qty=:f_qty where f_id=:f_id");
-    C5LogSystem::writeEvent(QString("%1 %2:%3 %4").arg(tr("Change qty"), g.scancode(), g.goodsName(), float_str(qty, 2)));
     countTotal();
     return true;
 }
@@ -985,11 +980,8 @@ void WOrder::reponseProcessCode(const QJsonObject &jdoc)
     switch (jdoc["barcode"].toInt()) {
         case 1: {
             //GIFT CARD
-            C5LogSystem::writeEvent(QString("response case 1: Try log %1 - %2").arg(__c5config.getValue(param_auto_discount)));
             QJsonObject card = jdoc["card"].toObject();
             if (card["f_mode"].toInt() == CARD_TYPE_DISCOUNT) {
-                C5LogSystem::writeEvent(QString("Try log %1 - %2").arg(__c5config.getValue(param_auto_discount),
-                                        card["f_code"].toString()));
                 if (__c5config.getValue(param_auto_discount) != card["f_code"].toString()) {
                     if (!checkDiscountRight()) {
                         fHttp->httpQueryFinished(sender());
@@ -1038,7 +1030,6 @@ void WOrder::reponseProcessCode(const QJsonObject &jdoc)
             break;
         }
         case 2: {
-            C5LogSystem::writeEvent(QString("response case 2: Try log %1 - %2").arg(__c5config.getValue(param_auto_discount)));
             if (fOHeader.saleType == -1) {
                 if (fOGoods.count() > 0) {
                     C5Message::error(tr("Cannot add goods in prepaid mode"));
@@ -1063,13 +1054,6 @@ void WOrder::reponseProcessCode(const QJsonObject &jdoc)
             if (!jm.isEmpty()) {
                 price = jm["price"].toDouble();
             }
-            ls(QString("%1: %2, %3: %4, %5: %6")
-               .arg(tr("New goods with code"))
-               .arg(goods["f_scancode"].toString())
-               .arg(tr("name"))
-               .arg(goods["f_name"].toString())
-               .arg(tr("Price"))
-               .arg(price));
             int row = ui->tblData->addEmptyRow();
             auto *ch = new C5CheckBox();
             ch->setCheckable(s.value("learnaccumulate").toBool());
@@ -1111,7 +1095,6 @@ void WOrder::reponseProcessCode(const QJsonObject &jdoc)
         break;
         //SALE GIFT CARD
         case 3: {
-            C5LogSystem::writeEvent(QString("response case 3: Try log %1 - %2").arg(__c5config.getValue(param_auto_discount)));
             if (fOHeader.saleType == -1) {
                 if (fOGoods.count() > 0) {
                     C5Message::error(tr("Cannot add goods in prepaid mode"));
@@ -1152,13 +1135,6 @@ void WOrder::reponseProcessCode(const QJsonObject &jdoc)
             if (!jm.isEmpty()) {
                 price = jm["price"].toDouble();
             }
-            ls(QString("%1: %2, %3: %4, %5: %6")
-               .arg(tr("New goods with code"))
-               .arg(goods["f_scancode"].toString())
-               .arg(tr("name"))
-               .arg(goods["f_name"].toString())
-               .arg(tr("Price"))
-               .arg(price));
             int row = ui->tblData->addEmptyRow();
             auto *ch = new C5CheckBox();
             ch->setCheckable(s.value("learnaccumulate").toBool());
@@ -1317,7 +1293,6 @@ void WOrder::on_leCode_returnPressed()
     if (code.isEmpty()) {
         return;
     }
-    C5LogSystem::writeEvent(QString("Code line: %1").arg(code));
     ui->leCode->clear();
     ui->leCode->setFocus();
     if (code.at(0).toLower() == '?' && code.length() > 2 ) {
