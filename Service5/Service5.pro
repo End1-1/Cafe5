@@ -7,39 +7,33 @@ CONFIG += c++11
 RC_FILE = res.rc
 
 SOURCES += \
-    ../Classes/c5crypt.cpp \
     ../Classes/thread.cpp \
-    ../Service5Working/utils/commandline.cpp \
     ../Service5Working/utils/configini.cpp \
     ../Service5Working/utils/database.cpp \
     ../Service5Working/utils/gtranslator.cpp \
     ../Service5Working/utils/logwriter.cpp \
     ../Service5Working/utils/tablerecord.cpp \
+    main_linux.cpp \
     os.cpp \
-    utils/commandline.cpp \
     utils/configini.cpp \
     utils/database.cpp \
     datadriver/datadriver.cpp \
     dlglicenses.cpp \
     firebase.cpp \
     handlers/httpheader.cpp \
-    main.cpp \
     monitor.cpp \
     serverthread.cpp \
     utils/logwriter.cpp \
     utils/sqlqueries.cpp
 
 HEADERS += \
-    ../Classes/c5crypt.h \
     ../Classes/thread.h \
-    ../Service5Working/utils/commandline.h \
     ../Service5Working/utils/configini.h \
     ../Service5Working/utils/database.h \
     ../Service5Working/utils/gtranslator.h \
     ../Service5Working/utils/logwriter.h \
     ../Service5Working/utils/tablerecord.h \
     os.h \
-    utils/commandline.h \
     utils/configini.h \
     utils/database.h \
     datadriver/datadriver.h \
@@ -57,6 +51,13 @@ FORMS += \
     dlglicenses.ui \
     monitor.ui
 
+win23 {
+    SOURCES += main.cpp
+}
+unix {
+    SOURCES += main_linux.cpp
+    }
+
 INCLUDEPATH += handlers
 INCLUDEPATH += headers
 INCLUDEPATH += store
@@ -64,9 +65,7 @@ INCLUDEPATH += datadriver
 INCLUDEPATH += ../Service5Working/raw
 INCLUDEPATH += ../Service5Working/socket
 INCLUDEPATH += ../Classes
-INCLUDEPATH += C:/projects/Cafe5/Service5Working/utils
-INCLUDEPATH += C:/Soft/OpenSSLWin64/include
-INCLUDEPATH += C:/Soft/OpenSSLWin64/include/openssl
+INCLUDEPATH += ../Service5Working/utils
 
 DEFINES += _DBDRIVER_=\\\"QMARIADB\\\"
 DEFINES += _ORGANIZATION_=\\\"BreezeDevs\\\"
@@ -76,7 +75,6 @@ DEFINES += QSSLSOCKET_DEBUG
 
 LIBS += -lVersion
 LIBS += -lwsock32
-LIBS += -LC:/soft/OpenSSLWin64/lib/VC/x64/MD
 LIBS += -lopenssl
 LIBS += advapi32.lib
 LIBS += -llibcrypto

@@ -2,6 +2,7 @@
 #include "logwriter.h"
 #include <QDateTime>
 #include <QSqlRecord>
+#include <QRegularExpression>
 #include <QSettings>
 #include <QUuid>
 
@@ -245,7 +246,7 @@ const QString Database::lastQuery()
         default:
             break;
         }
-        sql.replace(QRegExp(it.key() + "\\b"), value.toString());
+        sql.replace(QRegularExpression(it.key() + "\\b"), value.toString());
     }
     return sql;
 }
