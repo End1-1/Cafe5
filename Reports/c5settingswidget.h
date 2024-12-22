@@ -3,7 +3,8 @@
 
 #include "ce5editor.h"
 
-namespace Ui {
+namespace Ui
+{
 class C5SettingsWidget;
 }
 
@@ -16,15 +17,25 @@ public:
 
     ~C5SettingsWidget();
 
-    virtual QString title() {return tr("Settings");}
+    virtual QString title()
+    {
+        return tr("Settings");
+    }
 
-    virtual QString table() {return "s_settings_names";}
+    virtual QString table()
+    {
+        return "s_settings_names";
+    }
 
     virtual void setId(int id);
 
     virtual bool save(QString &err, QList<QMap<QString, QVariant> > &data);
 
     void clear(QWidget *parent);
+
+    virtual bool canCopy() override;
+
+    virtual void copyObject() override;
 
 private slots:
     void on_btnTestAsConnection_clicked();

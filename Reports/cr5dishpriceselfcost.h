@@ -24,6 +24,8 @@ private:
 
     void buildQueryV2();
 
+    void buildQueryV3();
+
     CR5DishPriceSelfCostFilter *fFilter;
 
 };

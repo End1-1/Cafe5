@@ -10,7 +10,7 @@ class CR5Custom : public C5ReportWidget
 public:
     CR5Custom(const QStringList &dbParams, QWidget *parent = nullptr);
 
-    virtual QToolBar *toolBar();
+    virtual QToolBar *toolBar() override;
 
 protected slots:
     virtual void setSearchParameters() override;

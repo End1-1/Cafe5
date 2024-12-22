@@ -68,7 +68,7 @@ void C5Login::on_cbDatabases_currentIndexChanged(int index)
     }
     const QJsonObject &js = fServers.at(index).toObject();
     NDataProvider::mHost = js["database"].toString();
-    C5Config::fDBHost = js["host"].toString();
+    C5Config::fDBHost = js["database"].toString();
     C5Config::fDBPath = js["database"].toString();
     C5Config::fDBUser = js["username"].toString();
     C5Config::fDBPassword = js["password"].toString();

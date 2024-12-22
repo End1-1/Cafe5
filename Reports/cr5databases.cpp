@@ -140,82 +140,14 @@ void CR5Databases::backupDatabase()
 
 void CR5Databases::resetDatabase()
 {
-    if (!fTableView->currentIndex().isValid()) {
-        C5Message::info(tr("Nothing was selected"));
-        return;
-    }
-    QList<QVariant> values = fModel->getRowValues(fTableView->currentIndex().row());
-    if (values.at(0).toString().isEmpty()) {
-        return;
-    }
-    QStringList p;
-    p.append(values.at(1).toString());
-    p.append(values.at(2).toString());
-    p.append(values.at(5).toString());
-    p.append(values.at(6).toString());
-    p.append(values.at(3).toString());
-    C5DbResetOption *dr = new C5DbResetOption(fDBParams);
+    auto *dr = new C5DbResetOption(fDBParams);
     if (dr->exec() == QDialog::Accepted) {
-        C5Database db(p);
         if (dr->saleAndBuy()) {
-            db.exec("delete from op_body where f_id='1'");
-            db.exec("delete from op_header");
-            db.exec("delete from a_complectation_additions");
-            db.exec("delete from a_header_shop2partner");
-            db.exec("delete from a_header_shop2partneraccept");
-            db.exec("delete from a_store");
-            db.exec("delete from a_store_draft");
-            db.exec("delete from o_draft_sale_body");
-            db.exec("delete from o_draft_sale");
-            db.exec("delete from o_draft_sound");
-            db.exec("delete from e_cash");
-            db.exec("delete from a_header_store");
-            db.exec("delete from a_header_cash");
-            db.exec("delete from a_header");
-            db.exec("delete from b_history");
-            db.exec("delete from b_clients_debts");
-            db.exec("delete from o_tax_log");
-            db.exec("delete from o_tax_debug");
-            db.exec("delete from o_tax");
-            db.exec("delete from o_payment");
-            db.exec("delete from o_package");
-            db.exec("delete from o_goods");
-            db.exec("delete from o_body");
-            db.exec("delete from o_preorder");
-            db.exec("delete from o_header_hotel");
-            db.exec("delete from o_header_hotel_date");
-            db.exec("delete from o_header_options");
-            db.exec("delete from o_header_flags");
-            db.exec("delete from o_header");
-            db.exec("delete from o_pay_cl");
-            db.exec("delete from o_pay_room");
-            db.exec("delete from o_additional");
+            fHttp->createHttpQuery("/engine/worker/cleardb.php", QJsonObject{{"mode", "storeandsale"}}, SLOT(done(QJsonObject)));
         }
         if (dr->fullReset()) {
-            QFile f(":/cleardb.sql");
-            if (f.open(QIODevice::ReadOnly)) {
-                QList<QByteArray> sqls = f.readAll().split(';');
-                QStringList errors;
-                foreach (const QString &s, sqls) {
-                    if (!db.exec(s)) {
-                        errors += db.fLastError + "\r\n";
-                    }
-                }
-                f.close();
-                if (!errors.isEmpty()) {
-                    QFile fe(QDir::tempPath() + "/clearerrors.txt");
-                    if (fe.open(QIODevice::WriteOnly)) {
-                        QString ba = errors.join("\r\n");
-                        fe.write(ba.toUtf8());
-                        fe.close();
-                        QDesktopServices::openUrl(QDir::tempPath() + "/clearerrors.txt");
-                    }
-                }
-            } else {
-                C5Message::error("Cannot open file <br>" + f.errorString());
-            }
+            fHttp->createHttpQuery("/engine/worker/cleardb.php", QJsonObject{{"mode", "all"}}, SLOT(done(QJsonObject)));
         }
-        C5Message::info(tr("Done"));
     }
     dr->deleteLater();
 }
@@ -254,4 +186,10 @@ void CR5Databases::uploadData()
     randomDB[1] = randomDBName;
     db.exec("drop database "  + randomDBName);
     C5Message::info(tr("Upload completed") + "<br>" + sqlMsg);
+}
+
+void CR5Databases::done(QJsonObject)
+{
+    fHttp->httpQueryFinished(sender());
+    C5Message::info(tr("Done"));
 }

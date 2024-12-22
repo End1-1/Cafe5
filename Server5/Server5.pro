@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core gui sql network printsupport websockets
+QT       += core gui sql network printsupport websockets multimedia
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -28,7 +28,11 @@ DEFINES += QT_DEPRECATED_WARNINGS
 CONFIG += c++11
 
 SOURCES += \
+        ../Cafe5/c5config.cpp \
+        ../Cafe5/c5database.cpp \
+        ../Cafe5/c5message.cpp \
         ../Cafe5/c5utils.cpp \
+        ../Classes/QProgressIndicator.cpp \
         ../Classes/appwebsocket.cpp \
         ../Classes/c5filelogwriter.cpp \
         ../Classes/c5networkdb.cpp \
@@ -36,15 +40,23 @@ SOURCES += \
         ../Classes/c5printjson.cpp \
         ../Classes/c5threadobject.cpp \
         ../Classes/notificationwidget.cpp \
+        ../NTable/ndataprovider.cpp \
+        ../NTable/ninterface.cpp \
+        ../NTable/nloadingdlg.cpp \
         ../Service5Working/utils/logwriter.cpp \
         c5scheduler.cpp \
+        c5serverprinter.cpp \
         main.cpp \
         c5server5.cpp \
         server5settings.cpp \
         widgetcontainer.cpp
 
 HEADERS += \
+        ../Cafe5/C5Database.h \
+        ../Cafe5/c5config.h \
+        ../Cafe5/c5message.h \
         ../Cafe5/c5utils.h \
+        ../Classes/QProgressIndicator.h \
         ../Classes/appwebsocket.h \
         ../Classes/c5filelogwriter.h \
         ../Classes/c5networkdb.h \
@@ -52,16 +64,22 @@ HEADERS += \
         ../Classes/c5printjson.h \
         ../Classes/c5threadobject.h \
         ../Classes/notificationwidget.h \
+        ../NTable/ndataprovider.h \
+        ../NTable/ninterface.h \
+        ../NTable/nloadingdlg.h \
         ../Service5Working/utils/logwriter.h \
         c5scheduler.h \
         c5server5.h \
+        c5serverprinter.h \
         rc.h \
         res.rc \
         server5settings.h \
         widgetcontainer.h
 
 FORMS += \
+        ../Cafe5/c5message.ui \
         ../Classes/notificationwidget.ui \
+        ../NTable/nloadingdlg.ui \
         c5server5.ui
 
 # Default rules for deployment.
@@ -80,5 +98,6 @@ DEFINES += _MODULE_=\\\"Server5\\\"
 
 INCLUDEPATH += ../Classes
 INCLUDEPATH += ../Cafe5
+INCLUDEPATH += ../NTable
 INCLUDEPATH += C:/Projects/Cafe5/Service5/utils
 

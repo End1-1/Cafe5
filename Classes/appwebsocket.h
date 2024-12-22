@@ -13,6 +13,8 @@ public:
 
     explicit AppWebSocket(QObject *parent = nullptr);
 
+    ~AppWebSocket();
+
     ConnectionState mConnectionState;
 
     static QString host;
@@ -48,6 +50,8 @@ signals:
     void socketConnected();
 
     void socketDisconnected();
+
+    void messageReceived(const QString &message);
 };
 
 #endif // APPWEBSOCKET_H

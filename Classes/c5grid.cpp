@@ -26,10 +26,13 @@ C5Grid::C5Grid(const QStringList &dbParams, QWidget *parent) :
     fTableView = ui->tblView;
     fTableTotal = ui->tblTotal;
     fTableView->horizontalHeader()->setContextMenuPolicy(Qt::CustomContextMenu);
-    connect(fTableView->horizontalHeader(), SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(tableViewHeaderContextMenuRequested(QPoint)));
+    connect(fTableView->horizontalHeader(), SIGNAL(customContextMenuRequested(QPoint)), this,
+            SLOT(tableViewHeaderContextMenuRequested(QPoint)));
     connect(fTableView->horizontalHeader(), SIGNAL(sectionClicked(int)), this, SLOT(tableViewHeaderClicked(int)));
-    connect(fTableView->horizontalHeader(), SIGNAL(sectionResized(int,int,int)), this, SLOT(tableViewHeaderResized(int,int,int)));
-    connect(fTableView->selectionModel(), SIGNAL(selectionChanged(QItemSelection,QItemSelection)), this, SLOT(selectionChanged(QItemSelection,QItemSelection)));
+    connect(fTableView->horizontalHeader(), SIGNAL(sectionResized(int, int, int)), this, SLOT(tableViewHeaderResized(int,
+            int, int)));
+    connect(fTableView->selectionModel(), SIGNAL(selectionChanged(QItemSelection, QItemSelection)), this,
+            SLOT(selectionChanged(QItemSelection, QItemSelection)));
     connect(fTableView, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(tableViewContextMenuRequested(QPoint)));
     connect(ui->tblTotal->horizontalScrollBar(), SIGNAL(valueChanged(int)), this, SLOT(tblValueChanged(int)));
     fFilterWidget = nullptr;
@@ -206,7 +209,7 @@ void C5Grid::setSimpleQuery(const QString &sql)
     fSqlQuery = sql;
     fOrderCondition.clear();
     refreshData();
-    for (auto *a: fToolBar->actions()){
+    for (auto *a : fToolBar->actions()) {
         if (a->property("filter").toBool()) {
             a->setVisible(false);
         }
@@ -298,7 +301,7 @@ void C5Grid::sumColumnsData()
     if (fColumnsSumIndex.count() > 0) {
         QMap<int, double> values;
         fModel->sumForColumnsIndexes(fColumnsSumIndex, values);
-        for (int idx: fColumnsSumIndex) {
+        for (int idx : fColumnsSumIndex) {
             ui->tblTotal->setData(0, idx, values[idx]);
         }
     }
@@ -327,7 +330,6 @@ void C5Grid::restoreColumnsWidths()
                 .arg(_APPLICATION_)
                 .arg(_MODULE_)
                 .arg(fLabel));
-
     ui->tblTotal->setColumnCount(fModel->columnCount());
     for (int i = 0; i < ui->tblTotal->columnCount(); i++) {
         ui->tblTotal->setItem(0, i, new C5TableWidgetItem());
@@ -391,7 +393,8 @@ QMenu *C5Grid::buildTableViewContextMenu(const QPoint &point)
     if (index.row() > -1 && index.column() > -1) {
         fFilterString = fModel->data(index, Qt::DisplayRole).toString();
         fFilterIndex = index;
-        m->addAction(QIcon(":/filter_set.png"), QString("%1 '%2'").arg(tr("Filter")).arg(fFilterString), this, SLOT(filterByStringAndIndex()));
+        m->addAction(QIcon(":/filter_set.png"), QString("%1 '%2'").arg(tr("Filter")).arg(fFilterString), this,
+                     SLOT(filterByStringAndIndex()));
     }
     m->addAction(QIcon(":/copy.png"), tr("Copy selection"), this, SLOT(copySelection()));
     m->addAction(QIcon(":/copy.png"), tr("Copy all"), this, SLOT(copyAll()));
@@ -406,7 +409,7 @@ bool C5Grid::tblDoubleClicked(int row, int column, const QList<QVariant> &values
 
 void C5Grid::executeSql(const QString &sql)
 {
-    fModel->execQuery(sql);
+    fModel->execQuery(sql, this);
     if (fSimpleQuery) {
         for (int i = 0; i < fModel->columnCount(); i++) {
             fColumnsVisible[fModel->fColumnIndexName[i]] = true;
@@ -425,7 +428,8 @@ void C5Grid::completeRefresh()
     fTableView->clearSpans();
 }
 
-void C5Grid::insertJoinTable(QStringList &joins, QMap<QString, QString> &joinsMap, const QString &table, const QString &mainTable)
+void C5Grid::insertJoinTable(QStringList &joins, QMap<QString, QString> &joinsMap, const QString &table,
+                             const QString &mainTable)
 {
     QString j;
     for (int i = 0; i < fLeftJoinTables.count(); i++) {
@@ -435,7 +439,8 @@ void C5Grid::insertJoinTable(QStringList &joins, QMap<QString, QString> &joinsMa
         tmpJoinTable.replace("[", "").replace("]", "");
         if (tmpJoinTable == table) {
             if (!joinsMap.contains(tmpJoinTable)) {
-                j = fLeftJoinTables.at(i).mid(0, fLeftJoinTables.at(i).length() - (fLeftJoinTables.at(i).length() - fLeftJoinTables.at(i).indexOf(" [")));
+                j = fLeftJoinTables.at(i).mid(0, fLeftJoinTables.at(i).length() - (fLeftJoinTables.at(i).length() - fLeftJoinTables.at(
+                                                  i).indexOf(" [")));
                 QRegExp rx("=.*$");
                 rx.indexIn(j, 0);
                 QString otherTable = rx.cap(0).trimmed();
@@ -650,14 +655,17 @@ void C5Grid::print()
                 continue;
             }
             if (c > 0) {
-                p.ltext(fModel->headerData(c, Qt::Horizontal, Qt::DisplayRole).toString(), (sumOfColumnsWidghtBefore(c) / scaleFactor) + 1);
-                p.line(sumOfColumnsWidghtBefore(c) / scaleFactor, p.fTop, sumOfColumnsWidghtBefore(c) / scaleFactor, p.fTop + (fTableView->verticalHeader()->defaultSectionSize() / rowScaleFactor));
+                p.ltext(fModel->headerData(c, Qt::Horizontal, Qt::DisplayRole).toString(),
+                        (sumOfColumnsWidghtBefore(c) / scaleFactor) + 1);
+                p.line(sumOfColumnsWidghtBefore(c) / scaleFactor, p.fTop, sumOfColumnsWidghtBefore(c) / scaleFactor,
+                       p.fTop + (fTableView->verticalHeader()->defaultSectionSize() / rowScaleFactor));
             } else {
                 p.ltext(fModel->headerData(c, Qt::Horizontal, Qt::DisplayRole).toString(), 1);
                 p.line(0, p.fTop, 0, p.fTop + (fTableView->verticalHeader()->defaultSectionSize() / rowScaleFactor));
             }
         }
-        p.line(columnsWidth, p.fTop, columnsWidth, p.fTop + (fTableView->verticalHeader()->defaultSectionSize() / rowScaleFactor));
+        p.line(columnsWidth, p.fTop, columnsWidth,
+               p.fTop + (fTableView->verticalHeader()->defaultSectionSize() / rowScaleFactor));
         p.br();
         p.line(0, p.fTop, columnsWidth, p.fTop);
         for (int r = startFrom; r < fModel->rowCount(); r++) {
@@ -670,7 +678,8 @@ void C5Grid::print()
                 p.setFontBold(fModel->data(r, c, Qt::FontRole).value<QFont>().bold());
                 if (c > 0) {
                     p.ltext(fModel->data(r, c, Qt::DisplayRole).toString(), (sumOfColumnsWidghtBefore(c) / scaleFactor) + 1);
-                    p.line(sumOfColumnsWidghtBefore(c + s) / scaleFactor, p.fTop, sumOfColumnsWidghtBefore(c + s) / scaleFactor, p.fTop + (fTableView->rowHeight(r) / rowScaleFactor));
+                    p.line(sumOfColumnsWidghtBefore(c + s) / scaleFactor, p.fTop, sumOfColumnsWidghtBefore(c + s) / scaleFactor,
+                           p.fTop + (fTableView->rowHeight(r) / rowScaleFactor));
                 } else {
                     p.ltext(fModel->data(r, c, Qt::DisplayRole).toString(), 1);
                     p.line(0, p.fTop, 0, p.fTop + (fTableView->rowHeight(r) / rowScaleFactor));
@@ -682,7 +691,9 @@ void C5Grid::print()
             if (ui->tblTotal->isVisible() && r == fModel->rowCount() - 1) {
                 p.setFontBold(true);
                 if (p.checkBr(ui->tblTotal->rowHeight(0))) {
-                    p.line(0, p.fTop + (ui->tblTotal->rowHeight(0) / rowScaleFactor), columnsWidth, p.fTop + (ui->tblTotal->rowHeight(0) / rowScaleFactor));\
+                    p.line(0, p.fTop + (ui->tblTotal->rowHeight(0) / rowScaleFactor), columnsWidth,
+                           p.fTop + (ui->tblTotal->rowHeight(0) / rowScaleFactor));
+                    \
                     p.br();
                     stopped = startFrom >= fModel->rowCount() - 1;
                     p.fTop = p.fNormalHeight - p.fLineHeight;
@@ -699,14 +710,17 @@ void C5Grid::print()
                     p.br();
                 }
                 p.line(0, p.fTop, columnsWidth, p.fTop);
-                p.line(0, p.fTop + (ui->tblTotal->rowHeight(0) / rowScaleFactor), columnsWidth, p.fTop + (ui->tblTotal->rowHeight(0) / rowScaleFactor));\
+                p.line(0, p.fTop + (ui->tblTotal->rowHeight(0) / rowScaleFactor), columnsWidth,
+                       p.fTop + (ui->tblTotal->rowHeight(0) / rowScaleFactor));
+                \
                 for (int c = 0; c < fModel->columnCount(); c++) {
                     if (fTableView->columnWidth(c) == 0) {
                         continue;
                     }
                     if (c > 0) {
                         p.ltext(ui->tblTotal->getString(0, c), (sumOfColumnsWidghtBefore(c) / scaleFactor) + 1);
-                        p.line(sumOfColumnsWidghtBefore(c) / scaleFactor, p.fTop, sumOfColumnsWidghtBefore(c) / scaleFactor, p.fTop + (fTableView->verticalHeader()->defaultSectionSize() / rowScaleFactor));
+                        p.line(sumOfColumnsWidghtBefore(c) / scaleFactor, p.fTop, sumOfColumnsWidghtBefore(c) / scaleFactor,
+                               p.fTop + (fTableView->verticalHeader()->defaultSectionSize() / rowScaleFactor));
                     } else {
                         p.ltext(ui->tblTotal->getString(0, c), 1);
                         p.line(0, p.fTop, 0, p.fTop + (fTableView->verticalHeader()->defaultSectionSize() / rowScaleFactor));
@@ -715,7 +729,9 @@ void C5Grid::print()
                 p.line(columnsWidth, p.fTop, columnsWidth, p.fTop + (ui->tblTotal->rowHeight(0) / rowScaleFactor));
             }
             if (p.checkBr(p.fLineHeight * 4) || r >= fModel->rowCount() - 1) {
-                p.line(0, p.fTop + (fTableView->rowHeight(r) / rowScaleFactor), columnsWidth, p.fTop + (fTableView->rowHeight(r) / rowScaleFactor));\
+                p.line(0, p.fTop + (fTableView->rowHeight(r) / rowScaleFactor), columnsWidth,
+                       p.fTop + (fTableView->rowHeight(r) / rowScaleFactor));
+                \
                 p.br();
                 startFrom = r + 1;
                 stopped = startFrom >= fModel->rowCount() - 1;
@@ -743,8 +759,7 @@ void C5Grid::print()
             stopped = true;
         }
     } while (!stopped);
-
-    C5PrintPreview pp(&p, fDBParams);
+    C5PrintPreview pp( &p, fDBParams);
     pp.exec();
 }
 
@@ -771,7 +786,6 @@ void C5Grid::exportToExcel()
         s->addCell(1, i + 1, fModel->headerData(i, Qt::Horizontal, Qt::DisplayRole).toString(), d.style()->styleNum("header"));
         s->setColumnWidth(i + 1, fTableView->columnWidth(i) / 7);
     }
-
     /* BODY */
     QMap<int, QString> bgFill;
     QMap<int, QString> bgFillb;
@@ -781,14 +795,12 @@ void C5Grid::exportToExcel()
     d.style()->addVAlignment("body", xls_alignment_center);
     d.style()->addBorder("body", XlsxBorder());
     bgFill[QColor(Qt::white).rgb()] = "body";
-
     bodyFont.setBold(true);
     d.style()->addFont("body_b", bodyFont);
     d.style()->addBackgrounFill("body_b", QColor(Qt::white));
     d.style()->addVAlignment("body_b", xls_alignment_center);
     d.style()->addBorder("body_b", XlsxBorder());
     bgFillb[QColor(Qt::white).rgb()] = "body_b";
-
     for (int j = 0; j < rowCount; j++) {
         for (int i = 0; i < colCount; i++) {
             int bgColor = fModel->data(j, i, Qt::BackgroundColorRole).value<QColor>().rgb();
@@ -811,7 +823,6 @@ void C5Grid::exportToExcel()
             s->addCell(j + 2, i + 1, fModel->data(j, i, Qt::EditRole), d.style()->styleNum(bgStyle));
         }
     }
-
     /* MERGE cells */
     QMap<int, QList<int> > skiprow, skipcol;
     for (int r = 0; r < rowCount; r++) {
@@ -839,7 +850,6 @@ void C5Grid::exportToExcel()
             }
         }
     }
-
     /* TOTALS ROWS */
     if (ui->tblTotal->isVisible()) {
         QFont totalFont(qApp->font());
@@ -899,8 +909,10 @@ void C5Grid::tableViewHeaderContextMenuRequested(const QPoint &point)
     fFilterColumn = fTableView->columnAt(point.x());
     QString colName = fModel->headerData(fFilterColumn, Qt::Horizontal, Qt::DisplayRole).toString();
     QMenu m;
-    m.addAction(QIcon(":/filter_set.png"), QString("%1 '%2'").arg(tr("Set filter")).arg(colName), this, SLOT(filterByColumn()));
-    m.addAction(QIcon(":/filter_clear.png"), QString("%1 '%2'").arg(tr("Remove filter")).arg(colName), this, SLOT(removeFilterForColumn()));
+    m.addAction(QIcon(":/filter_set.png"), QString("%1 '%2'").arg(tr("Set filter")).arg(colName), this,
+                SLOT(filterByColumn()));
+    m.addAction(QIcon(":/filter_clear.png"), QString("%1 '%2'").arg(tr("Remove filter")).arg(colName), this,
+                SLOT(removeFilterForColumn()));
     m.addAction(QIcon(":/expand.png"), tr("Autofit columns widths"), this, SLOT(autofitColumns()));
     m.exec(fTableView->mapToGlobal(point));
 }
@@ -979,4 +991,9 @@ void C5Grid::refreshData()
 void C5Grid::on_tblView_clicked(const QModelIndex &index)
 {
     cellClicked(index);
+}
+
+void C5Grid::sqlError(const QString &errorMessage)
+{
+    C5Message::error(errorMessage);
 }

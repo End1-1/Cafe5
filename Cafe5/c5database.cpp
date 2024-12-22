@@ -27,7 +27,6 @@
 
 int C5Database::fCounter = 0;
 bool C5Database::LOGGING = false;
-QStringList C5Database::fDbParamsForUuid;
 
 static QMutex fMutex;
 
@@ -70,7 +69,6 @@ C5Database::C5Database(const QString &dbdriver)
 C5Database::C5Database(const QStringList &dbParams) :
     C5Database()
 {
-    fDbParamsForUuid = dbParams;
     init();
     configureDatabase(fDb, dbParams[0], dbParams[1], dbParams[2], dbParams[3]);
 }
@@ -89,9 +87,6 @@ C5Database::C5Database(C5Database &db) :
 C5Database::C5Database(const QJsonObject &params) :
     C5Database()
 {
-    fDbParamsForUuid.clear();
-    fDbParamsForUuid.append(params["host"].toString());
-    fDbParamsForUuid.append(params["database"].toString());
     configureDatabase(fDb, params["host"].toString(), params["database"].toString(), params["username"].toString(),
                       params["password"].toString());
 }
@@ -99,11 +94,6 @@ C5Database::C5Database(const QJsonObject &params) :
 C5Database::C5Database(const QString &host, const QString &db, const QString &user, const QString &password) :
     C5Database()
 {
-    fDbParamsForUuid.clear();
-    fDbParamsForUuid.append(host);
-    fDbParamsForUuid.append(db);
-    fDbParamsForUuid.append(user);
-    fDbParamsForUuid.append(password);
     init();
     configureDatabase(fDb, host, db, user, password);
 }
@@ -392,14 +382,14 @@ bool C5Database::execDirect(const QString &sqlQuery)
 
 bool C5Database::execSqlList(const QStringList &sqlList)
 {
-    if (fDbParamsForUuid.isEmpty()) {
+    if (__c5config.dbParams().at(0).isEmpty()) {
         fLastError = "Database not configured";
         return false;
     }
     QElapsedTimer t;
     t.start();
     QNetworkAccessManager m;
-    QString host = "https://" + fDbParamsForUuid.at(0);
+    QString host = QString("%1/engine/info.php").arg(__c5config.dbParams().at(0));
     QNetworkRequest rq(host);
     m.setTransferTimeout(60000);
     rq.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
@@ -498,7 +488,7 @@ bool C5Database::execSqlList(const QStringList &sqlList)
     }
     fCursorPos = -1;
 #ifdef QT_DEBUG
-    logEvent(fDbParamsForUuid.at(0) + " (" + QString::number(elapsed) + "-" + QString::number(
+    logEvent(__c5config.dbParams().at(0) + " (" + QString::number(elapsed) + "-" + QString::number(
                  t.elapsed()) + " ms):" + " " + ba.left(5000));
 #else
     if (__c5config.getValue(param_debuge_mode).toInt() > 0) {
@@ -510,7 +500,7 @@ bool C5Database::execSqlList(const QStringList &sqlList)
 
 bool C5Database::execNetwork(const QString &sqlQuery)
 {
-    if (fDbParamsForUuid.isEmpty()) {
+    if (__c5config.dbParams().at(0).isEmpty()) {
         fLastError = "Database not configured";
         return false;
     }
@@ -518,8 +508,8 @@ bool C5Database::execNetwork(const QString &sqlQuery)
     t.start();
     QString sql = execDry(sqlQuery);
     QNetworkAccessManager m;
-    QString host = "https://" + fDbParamsForUuid.at(0);
-    QNetworkRequest rq(host);
+    QString netPath = QString("%1/engine/info.php").arg(__c5config.dbParams().at(0));
+    QNetworkRequest rq(netPath);
     m.setTransferTimeout(60000);
     rq.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
     QSslConfiguration sslConf = rq.sslConfiguration();
@@ -528,7 +518,7 @@ bool C5Database::execNetwork(const QString &sqlQuery)
     rq.setSslConfiguration(sslConf);
     QJsonObject jo;
     jo["query"] = 3;
-    jo["call"] = "sql";
+    jo["call"] = sql.contains(";;;") ? "sqllist" : "sql";
     jo["sql"] = sql;
     jo["sk"] = "5cfafe13-a886-11ee-ac3e-1078d2d2b808";
     auto *r = m.post(rq, QJsonDocument(jo).toJson());
@@ -543,16 +533,17 @@ bool C5Database::execNetwork(const QString &sqlQuery)
     QByteArray ba = r->readAll();
     quint64 elapsed = t.elapsed();
 #ifdef QT_DEBUG
-    logEvent(host + " " + QJsonDocument(jo).toJson());
+    logEvent(netPath + " " + QJsonDocument(jo).toJson());
 #else
     if (__c5config.getValue(param_debuge_mode).toInt() > 0) {
-        logEvent(host + " " + QJsonDocument(jo).toJson());
+        logEvent(netPath + " " + QJsonDocument(jo).toJson());
     }
 #endif
     jo = QJsonDocument::fromJson(ba).object();
     if (jo["status"].toInt() == 0) {
         fLastError = ba;
         logEvent(ba);
+        emit queryError(fLastError);
         return false;
     }
     if (sql.mid(0, 6).compare("insert", Qt::CaseInsensitive) == 0
@@ -562,7 +553,7 @@ bool C5Database::execNetwork(const QString &sqlQuery)
             fCursorPos = jo["data"].toString().toInt();
         }
 #ifdef QT_DEBUG
-        logEvent(host + " (" + QString::number(elapsed) + "-" + QString::number(
+        logEvent(netPath + " (" + QString::number(elapsed) + "-" + QString::number(
                      t.elapsed()) + " ms):" + " " + sql);
 #else
         if (__c5config.getValue(param_debuge_mode).toInt() > 0) {
@@ -618,7 +609,7 @@ bool C5Database::execNetwork(const QString &sqlQuery)
     }
     fCursorPos = -1;
 #ifdef QT_DEBUG
-    logEvent(fDbParamsForUuid.at(0) + " (" + QString::number(elapsed) + "-" + QString::number(
+    logEvent(__c5config.dbParams().at(0) + " (" + QString::number(elapsed) + "-" + QString::number(
                  t.elapsed()) + " ms):" + " " + ba.left(5000));
 #else
     if (__c5config.getValue(param_debuge_mode).toInt() > 0) {

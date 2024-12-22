@@ -83,7 +83,7 @@ int main(int argc, char *argv[])
     if (configname.isEmpty() == false) {
         js["settings"] = configname;
     }
-    C5Config::fDBHost = js["host"].toString();
+    C5Config::fDBHost = js["database"].toString();
     C5Config::fDBPath = js["database"].toString();
     C5Config::fDBUser = js["username"].toString();
     C5Config::fDBPassword = js["password"].toString();

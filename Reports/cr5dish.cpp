@@ -16,7 +16,8 @@ CR5Dish::CR5Dish(const QStringList &dbParams, QWidget *parent) :
                 f_remind, d.f_barcode, f_service, f_discount, d.f_queue, d.f_color, f_netweight, f_cost \
                 from d_dish d \
                 left join d_part2 p2 on p2.f_id=d.f_part \
-                left join d_part1 p1 on p1.f_id=p2.f_part ";
+                left join d_part1 p1 on p1.f_id=p2.f_part \
+                order by p1.f_name, p2.f_name, d.f_name ";
     fTranslation["f_id"] = tr("Code");
     fTranslation["f_part1"] = tr("Dept");
     fTranslation["f_part2"] = tr("Type");
@@ -43,7 +44,9 @@ QToolBar *CR5Dish::toolBar()
             << ToolBarButtons::tbPrint;
         createStandartToolbar(btn);
         fToolBar->addAction(QIcon(":/translate.png"), tr("Translator"), this, SLOT(translator()));
+        fToolBar->addAction(QIcon(":/translate.png"), tr("Description\ntranslator"), this, SLOT(descriptionTranslator()));
         fToolBar->addAction(QIcon(":/delete.png"), tr("Remove"), this, SLOT(deleteDish()));
+        fToolBar->addAction(QIcon(":/www.png"), tr("Build web"), this, SLOT(buildWeb()));
         auto *g = new QAction(QIcon(":/goodsback.png"), tr("Output to AS"), this);
         connect(g, SIGNAL(triggered(bool)), this, SLOT(asoutput(bool)));
         fToolBar->addAction(g);
@@ -85,7 +88,14 @@ void CR5Dish::setColors()
 
 void CR5Dish::translator()
 {
-    __mainWindow->createTab<CR5MenuTranslator>(fDBParams);
+    auto *mt = __mainWindow->createTab<CR5MenuTranslator>(fDBParams);
+    mt->setMode(1);
+}
+
+void CR5Dish::descriptionTranslator()
+{
+    auto *mt = __mainWindow->createTab<CR5MenuTranslator>(fDBParams);
+    mt->setMode(3);
 }
 
 void CR5Dish::deleteDish()
@@ -150,4 +160,16 @@ void CR5Dish::printRecipes(bool v)
         w->printPreview(p, showprice);
     }
     p.print(pd.printer()->printerName(), QPrinter::A4);
+}
+
+void CR5Dish::buildWeb()
+{
+    fHttp->createHttpQuery("/engine/office/build-web.php", QJsonObject{{"mode", "buildmenu"}}, SLOT(buildWebResponse(
+                QJsonObject)));
+}
+
+void CR5Dish::buildWebResponse(const QJsonObject &obj)
+{
+    fHttp->httpQueryFinished(sender());
+    C5Message::info(tr("Build complete"));
 }

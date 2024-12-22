@@ -226,25 +226,8 @@ void C5MainWindow::tabCloseRequested(int index)
 {
     auto *w = static_cast<C5Widget *>(fTab->widget(index));
     QString prevWindow, currWindow;
-    //    if (fPrevTabUuid.count() > 1) {
-    //        prevWindow = fPrevTabUuid.at(fPrevTabUuid.count() - 2);
-    //    }
-    //currWindow = w->fWindowUuid;
     fTab->removeTab(index);
     delete w;
-    //    if (!prevWindow.isEmpty() && index == fTab->currentIndex()) {
-    //        for (int i = 0; i < fTab->count(); i++) {
-    //            w = static_cast<C5Widget*>(fTab->widget(i));
-    //            if (w->fWindowUuid == prevWindow) {
-    //                fPrevTabUuid.append(w->fWindowUuid);
-    //                fTab->setCurrentIndex(i);
-    //                fPrevTabUuid.removeAll(w->fWindowUuid);
-    //                return;
-    //            }
-    //        }
-    //    } else {
-    //        fPrevTabUuid.removeAll(currWindow);
-    //    }
 }
 
 void C5MainWindow::currentTabChange(int index)

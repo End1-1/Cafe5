@@ -3,7 +3,8 @@
 
 #include "c5filterwidget.h"
 
-namespace Ui {
+namespace Ui
+{
 class CR5DishPriceSelfCostFilter;
 }
 
@@ -22,7 +23,7 @@ public:
 
     virtual void restoreFilter(QWidget *parent);
 
-    bool isSimpleView();
+    int viewMode();
 
     QString menuId();
 

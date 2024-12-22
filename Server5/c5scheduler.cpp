@@ -15,7 +15,7 @@
 
 c5scheduler::c5scheduler(QObject *parent) : QObject(parent)
 {
-    connect(&fTimer, SIGNAL(timeout()), this, SLOT(timeout()));
+    connect( &fTimer, SIGNAL(timeout()), this, SLOT(timeout()));
 #ifdef QT_DEBUG
     fTimer.setInterval(10000 * __s.value("updateinterval").toInt());
 #else
@@ -23,9 +23,7 @@ c5scheduler::c5scheduler(QObject *parent) : QObject(parent)
 #endif
     fTimer.start();
     fRun = false;
-
     timeout();
-
 }
 
 void c5scheduler::timeout()
@@ -60,7 +58,6 @@ void c5scheduler::runServicePrint()
     }
     QJsonObject jconfig = jo["config"].toObject();
     QString printField = __s.value("printerside").toString();
-
     int fontSize = jconfig["font_size"].toInt();
     QFont font(jconfig["font_family"].toString(), fontSize);
     font.setPointSize(20);
@@ -69,9 +66,9 @@ void c5scheduler::runServicePrint()
         C5Printing p;
         p.setSceneParams(600, 2800, QPrinter::Portrait);
         p.setFont(font);
-
         QJsonObject jfirst = jo["orders"].toArray().at(i).toObject();
-        if (jfirst["f_state"].toInt() == ORDER_STATE_PREORDER_EMPTY || jfirst["f_state"].toInt() == ORDER_STATE_PREORDER_WITH_ORDER) {
+        if (jfirst["f_state"].toInt() == ORDER_STATE_PREORDER_EMPTY
+                || jfirst["f_state"].toInt() == ORDER_STATE_PREORDER_WITH_ORDER) {
             p.setFontSize(32);
             p.setFontBold(true);
             p.ctext("Նախնական պատվեր");
@@ -86,7 +83,6 @@ void c5scheduler::runServicePrint()
             p.line();
             p.br();
         }
-
         // if (reprint) {
         //     p.setFontSize(34);
         //     p.setFontBold(true);
@@ -94,7 +90,6 @@ void c5scheduler::runServicePrint()
         //     p.br();
         //     p.br();
         // }
-
         p.setFontBold(false);
         p.setFontSize(fontSize);
         p.ctext("Նոր պատվեր");
@@ -118,7 +113,6 @@ void c5scheduler::runServicePrint()
         p.br(p.fLineHeight + 2);
         p.line(0, p.fTop, p.fNormalWidth, p.fTop);
         p.br(2);
-
         p.setFontSize(30);
         QSet<QString> storages;
         bool toprint = false;
@@ -129,7 +123,6 @@ void c5scheduler::runServicePrint()
             }
             toprint = true;
             jcomplete.append(jdish["f_id"].toString());
-
             // storages << dbstore->name(o["f_store"].toInt());
             // if (__c5config.getValue(param_print_dish_timeorder).toInt() == 1) {
             //     p.ltext(QString("[%1] %2").arg(o["f_timeorder"].toString(), dbdish->name(o["f_dish"].toInt())), 0);
@@ -140,7 +133,6 @@ void c5scheduler::runServicePrint()
             p.setFontBold(true);
             p.rtext(QString("%1").arg(float_str(jdish["f_qty1"].toDouble(), 2)));
             p.setFontBold(false);
-
             if (jdish["f_comment2"].toString().length() > 0) {
                 p.br();
                 p.setFontSize(25);
@@ -150,7 +142,6 @@ void c5scheduler::runServicePrint()
                 p.setFontSize(30);
                 p.setFontBold(false);
             }
-
             if (jdish["f_comment"].toString().length() > 0) {
                 p.br();
                 p.setFontSize(25);
@@ -158,7 +149,6 @@ void c5scheduler::runServicePrint()
                 p.br();
                 p.setFontSize(30);
             }
-
             p.br();
             p.line(0, p.fTop, p.fNormalWidth, p.fTop);
             p.br(1);
@@ -189,7 +179,6 @@ void c5scheduler::runServicePrint()
         p.rtext(printField == "f_print1" ? " [1]" : "[2]");
         p.br();
         //p.ltext(tr("Storage: ") + storages.toList().join(","), 0);
-
         // if (fPrinterAliases.contains(printer)) {
         //     printer = fPrinterAliases[printer];
         // }
@@ -201,16 +190,14 @@ void c5scheduler::runServicePrint()
             final = "FAIL";
         }
     }
-
     if (!jcomplete.isEmpty()) {
         jo = QJsonObject();
         jo["ids"] = jcomplete;
         jo["side"] = printField == "f_print1" ? 1 : 2;
         sql = QString("select sf_print_complete('%1')")
-                  .arg(QString(QJsonDocument(jo).toJson(QJsonDocument::Compact)));
+              .arg(QString(QJsonDocument(jo).toJson(QJsonDocument::Compact)));
         db.query(sql);
     }
-
 }
 
 void c5scheduler::runMessages()
@@ -231,16 +218,12 @@ void c5scheduler::runMessages()
         C5Printing p;
         p.setSceneParams(600, 2800, QPrinter::Portrait);
         p.setFont(QFont("Arial LatArm Unicode", 29));
-
-
-            p.setFontSize(32);
-            p.setFontBold(true);
-            p.ctext("Անհրաժեշտ է օգնություն");
-            p.br();
-            p.line();
-            p.br();
-
-
+        p.setFontSize(32);
+        p.setFontBold(true);
+        p.ctext("Անհրաժեշտ է օգնություն");
+        p.br();
+        p.line();
+        p.br();
         // if (reprint) {
         //     p.setFontSize(34);
         //     p.setFontBold(true);
@@ -248,7 +231,6 @@ void c5scheduler::runMessages()
         //     p.br();
         //     p.br();
         // }
-
         p.setFontBold(false);
         p.setFontSize(20);
         p.ltext("Սեղան", 0);
@@ -282,11 +264,9 @@ void c5scheduler::runMessages()
     }
     if (!jc.isEmpty()) {
         sql = QString("select sf_set_messages_complete('{\"ids\":\"%1\"}')").arg(
-            QString(QJsonDocument(jc).toJson(QJsonDocument::Compact)));
+                  QString(QJsonDocument(jc).toJson(QJsonDocument::Compact)));
         if (!db.query(sql)) {
             return;
         }
     }
 }
-
-

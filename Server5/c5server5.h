@@ -1,6 +1,7 @@
 #ifndef C5SERVER5_H
 #define C5SERVER5_H
 
+#include "ninterface.h"
 #include <QWidget>
 #include <QMenu>
 #include <QSystemTrayIcon>
@@ -31,16 +32,27 @@ private:
     QSystemTrayIcon fTrayIcon;
     WidgetContainer *wc;
     c5scheduler *scheduler;
-    void processJson(QByteArray &d);
-    bool checkDbPassword();
+    NInterface *fHttp;
+    void printOrder(const QJsonObject &jo, QJsonArray &jcomplete);
+    QDateTime fLastRunTime;
+    void started();
 
 private slots:
     void appTerminate();
+    void clearBasket();
     void iconClicked(QSystemTrayIcon::ActivationReason reason);
     void on_btnApply_clicked();
     void socketConnecting();
     void socketConnected();
     void socketDisconnected();
+    void timeout();
+    void ordersResponse(const QJsonObject &jdoc);
+    void ordersErrorResponse(const QString &err);
+    void applyResponse(const QJsonObject &jdoc);
+    void showNotificationWidget(const QJsonObject &jdoc);
+    void notificationClosed(const QVariant &v);
+    void messageReceived(const QString &message);
+
 };
 
 #endif // C5SERVER5_H

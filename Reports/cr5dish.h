@@ -30,9 +30,15 @@ private:
 private slots:
     void translator();
 
+    void descriptionTranslator();
+
     void deleteDish();
 
     void printRecipes(bool v);
+
+    void buildWeb();
+
+    void buildWebResponse(const QJsonObject &obj);
 };
 
 #endif // CR5DISH_H

@@ -21,6 +21,8 @@ public:
 
     static bool mDebug;
 
+    static QString mProtocol;
+
     static QString mHost;
 
     static QString sessionKey;

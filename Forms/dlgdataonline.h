@@ -4,7 +4,8 @@
 #include "c5dialog.h"
 #include <QItemSelection>
 
-namespace Ui {
+namespace Ui
+{
 class DlgDataOnline;
 }
 
@@ -16,11 +17,13 @@ class DlgDataOnline : public C5Dialog
 
 public:
 
-    class DataResult {
+    class DataResult
+    {
     public:
         QHash<QString, int> fColumns;
         QList<QList<QVariant> > fRows;
-        QVariant value(int row, const QString &column) {
+        QVariant value(int row, const QString &column)
+        {
             QVariant v = fRows[row][fColumns[column.toLower()] + 1];
             return v;
         }
@@ -30,7 +33,8 @@ public:
 
     ~DlgDataOnline();
 
-    static bool get(const QStringList &dbParams, const QString &table, DataResult &result, bool multiselect = false, int searchcolumn = -1);
+    static bool get(const QStringList &dbParams, const QString &table, DataResult &result, bool multiselect = false,
+                    int searchcolumn = -1);
 
 private slots:
     void on_leFilter_textChanged(const QString &arg1);
@@ -42,6 +46,8 @@ private slots:
     void on_btnRefreshCache_clicked();
 
     void on_btnCheck_clicked();
+
+    void sqlError(const QString &errorMessage);
 
 private:
     Ui::DlgDataOnline *ui;
@@ -60,7 +66,7 @@ private:
 
     bool fMultipleSelection;
 
-    static QHash<QString, DlgDataOnline*> fInstances;
+    static QHash<QString, DlgDataOnline *> fInstances;
 };
 
 #endif // DLGDATAONLINE_H

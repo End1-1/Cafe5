@@ -60,6 +60,9 @@
    </item>
    <item>
     <widget class="C5TableWidget" name="tbl">
+     <property name="editTriggers">
+      <set>QAbstractItemView::NoEditTriggers</set>
+     </property>
      <column>
       <property name="text">
        <string>Code</string>
@@ -96,7 +99,13 @@
    <header location="global">c5tablewidget.h</header>
   </customwidget>
  </customwidgets>
+ <tabstops>
+  <tabstop>leSearch</tabstop>
+  <tabstop>tbl</tabstop>
+  <tabstop>btnClearSearch</tabstop>
+ </tabstops>
  <resources>
+  <include location="../resources/res.qrc"/>
   <include location="../resources/res.qrc"/>
  </resources>
  <connections/>

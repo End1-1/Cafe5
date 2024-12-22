@@ -11,6 +11,7 @@
 
 bool  NDataProvider::mDebug = false;
 QString NDataProvider::sessionKey;
+QString NDataProvider::mProtocol;
 QString NDataProvider::mHost;
 
 NDataProvider::NDataProvider(QObject *parent)
@@ -31,12 +32,14 @@ void NDataProvider::getData(const QString &route, const QJsonObject &data)
 {
     mTimer->restart();
     emit started();
-    QNetworkRequest rq(mHost + route);
+    if (mHost.startsWith("http")) {
+        mProtocol.clear();
+    }
+    if (mProtocol.isEmpty() && !mHost.contains("https")) {
+        mProtocol = "https://";
+    }
+    QNetworkRequest rq(mProtocol + mHost + route);
     rq.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
-    QSslConfiguration sslConf = rq.sslConfiguration();
-    sslConf.setPeerVerifyMode(QSslSocket::VerifyNone);
-    sslConf.setProtocol(QSsl::AnyProtocol);
-    rq.setSslConfiguration(sslConf);
     QJsonObject jo;
     jo["sessionkey"] = sessionKey;
     jo["hostinfo"] = QHostInfo::localHostName().toLower();

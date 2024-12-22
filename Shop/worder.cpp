@@ -429,9 +429,9 @@ bool WOrder::writeOrder()
                 if (result != pt_err_ok) {
                     switch (C5Message::question(err, tr("Try again"), tr("Do not print fiscal"), tr("Return to editing"))) {
                         case QDialog::Rejected:
+                            result = pt_err_ok;
                             break;
                         case QDialog::Accepted:
-                            result = pt_err_ok;
                             break;
                         case 2:
                             return false;

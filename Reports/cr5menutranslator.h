@@ -20,6 +20,8 @@ public:
 
     QToolBar *toolBar();
 
+    void setMode(int mode);
+
 private slots:
     void on_leSearch_textChanged(const QString &arg1);
 
@@ -31,6 +33,8 @@ private slots:
 
 private:
     Ui::CR5MenuTranslator *ui;
+
+    int fMode;
 };
 
 #endif // CR5MENUTRANSLATOR_H

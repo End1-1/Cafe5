@@ -15,6 +15,7 @@ SOURCES += \
     ../Service5Working/utils/gtranslator.cpp \
     ../Service5Working/utils/logwriter.cpp \
     ../Service5Working/utils/tablerecord.cpp \
+    c5searchengine.cpp \
     os.cpp \
     utils/commandline.cpp \
     utils/configini.cpp \
@@ -38,6 +39,7 @@ HEADERS += \
     ../Service5Working/utils/gtranslator.h \
     ../Service5Working/utils/logwriter.h \
     ../Service5Working/utils/tablerecord.h \
+    c5searchengine.h \
     os.h \
     utils/commandline.h \
     utils/configini.h \

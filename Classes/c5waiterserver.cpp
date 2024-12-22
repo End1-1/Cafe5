@@ -56,11 +56,11 @@ void C5WaiterServer::reply(QJsonObject &o)
             QJsonArray jTables;
             srh.getJsonFromQuery(QString("select t.f_id, t.f_hall, t.f_name, t.f_lock, t.f_lockSrc, \
 h.f_id as f_header, concat(u.f_last, ' ', left(u.f_first, 1), '.') as f_staffName, \
-        h.f_amounttotal as f_amount, h.f_print, bc.f_govnumber, \
-        date_format(h.f_dateopen, '%d.%m.%Y') as f_dateopen, h.f_timeOpen, \
-        t.f_special_config \
-        from h_tables t \
-        left join o_header h on h.f_table=t.f_id and h.f_state=1 \
+     h.f_amounttotal as f_amount, h.f_print, bc.f_govnumber, \
+     date_format(h.f_dateopen, '%d.%m.%Y') as f_dateopen, h.f_timeOpen, \
+     t.f_special_config \
+     from h_tables t \
+     left join o_header h on h.f_table=t.f_id and h.f_state=1 \
 left join o_header_options o on o.f_id=h.f_id \
 left join b_car bc on bc.f_id=o.f_car \
 left join s_user u on u.f_id=h.f_staff  %1 \
@@ -1162,10 +1162,11 @@ int C5WaiterServer::printTax(const QMap<QString, QVariant> &header, const QList<
             jhprint["f_currentstaffname"] = fIn["staffname"].toString();
             C5PrintServiceThread ps(id);
             ps.run();
-            NotificationWidget::showMessage(orderinfo);
+            NotificationWidget::showMessage(orderinfo, QVariant(), nullptr, nullptr);
         } else {
             o["msg"] = tr("Your order is empty or already was accepted");
-            NotificationWidget::showMessage(tr("The customer was make an empty order, can you help him?"));
+            NotificationWidget::showMessage(tr("The customer was make an empty order, can you help him?"), QVariant(), nullptr,
+                                            nullptr);
         }
     }
 
@@ -1192,7 +1193,7 @@ int C5WaiterServer::printTax(const QMap<QString, QVariant> &header, const QList<
         p.print(C5Config::localReceiptPrinter(), QPrinter::Custom);
         o["reply"] = 1;
         NotificationWidget::showMessage(QString("%1 %2: %3").arg(tr("Table")).arg(fIn["table"].toString()).arg(
-                                            tr("Call staff")));
+                                            tr("Call staff")), QVariant(), nullptr, nullptr);
     }
 
     void C5WaiterServer::processMessageList(QJsonObject &o)
@@ -1227,7 +1228,7 @@ int C5WaiterServer::printTax(const QMap<QString, QVariant> &header, const QList<
         p.print(C5Config::localReceiptPrinter(), QPrinter::Custom);
         o["reply"] = 1;
         NotificationWidget::showMessage(QString("%1 %2: %3").arg(tr("Table")).arg(fIn["tablename"].toString()).arg(
-                                            tr("Call receipt")));
+                                            tr("Call receipt")), QVariant(), nullptr, nullptr);
     }
 
     void C5WaiterServer::processGetCostumerByCar(QJsonObject &o)

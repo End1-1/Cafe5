@@ -1,6 +1,7 @@
 #include "serverthread.h"
 #include "logwriter.h"
 #include "configini.h"
+#include "c5searchengine.h"
 #include <QWebSocketServer>
 #include <QWebSocket>
 #include <QJsonObject>
@@ -8,13 +9,16 @@
 #include <QJsonArray>
 #include <QApplication>
 #include <QLibrary>
+#include <QMutex>
+
+QMutex mSocketMutex;
 
 typedef bool ( *handler) (const QJsonObject &, QJsonObject &, QString &);
-
 ServerThread::ServerThread(const QString &configPath) :
     QObject(),
     fConfigPath(configPath)
 {
+    C5SearchEngine::init({"kinopark"});
 }
 
 ServerThread::~ServerThread()
@@ -38,6 +42,35 @@ void ServerThread::run()
     LogWriter::write(LogWriterLevel::verbose, "", QString("Listen port: %1").arg(port));
 }
 
+void ServerThread::registerSocket(const QJsonObject &jdoc, QWebSocket *ws)
+{
+    SocketStruct ss;
+    ss.socket = ws;
+    ss.socketType = jdoc["socket_type"].toInt();
+    ss.database = jdoc["database"].toString();
+    ss.userid = jdoc["userid"].toInt();
+    fSockets.append(ss);
+}
+
+void ServerThread::unregisterSocket(const QJsonObject &jdoc, QWebSocket *ws)
+{
+    qDebug() << "unregister_socket";
+}
+
+void ServerThread::updateHotelCache(const QJsonObject &jdoc, QWebSocket *ws)
+{
+    QMutexLocker ml( &mSocketMutex);
+    for (const SocketStruct &ss : qAsConst(fSockets)) {
+        if (ss.socketType != hotel) {
+            continue;
+        }
+        if (ss.database != jdoc["database"].toString()) {
+            continue;
+        }
+        ss.socket->sendTextMessage(QJsonDocument(jdoc).toJson(QJsonDocument::Compact));
+    }
+}
+
 void ServerThread::onNewConnection()
 {
     QWebSocket *ws = fServer->nextPendingConnection();
@@ -54,6 +87,24 @@ void ServerThread::onNewConnection()
     connect(ws, &QWebSocket::disconnected, this, [ws]() {
         LogWriter::write(LogWriterLevel::verbose, "", "disconnected" + ws->peerName() + " " + ws->origin());
     });
+    fSockets.append(SocketStruct{ws,  0,  0,  ""});
+}
+
+void ServerThread::onDisconnected()
+{
+    QMutexLocker ml( &mSocketMutex);
+    QWebSocket *ws = qobject_cast<QWebSocket *>(sender());
+    if (!ws) {
+        return;
+    }
+    LogWriter::write(LogWriterLevel::verbose, "", "disconnected: " + ws->peerName() + " " + ws->origin());
+    auto it = std::remove_if(fSockets.begin(), fSockets.end(), [ws](const SocketStruct &s) {
+        return s.socket == ws;
+    });
+    if (it != fSockets.end()) {
+        fSockets.erase(it, fSockets.end());
+    }
+    ws->deleteLater();
 }
 
 void ServerThread::onTextMessage(const QString &msg)
@@ -64,6 +115,22 @@ void ServerThread::onTextMessage(const QString &msg)
     QJsonObject jrep;
     if (msg.toLower() == "ping") {
         ws->sendTextMessage("pong");
+        return;
+    }
+    if (jdoc["command"].toString() == "register_socket") {
+        registerSocket(jdoc, ws);
+        return;
+    }
+    if (jdoc["command"].toString() == "unregister_socket") {
+        unregisterSocket(jdoc, ws);
+        return;
+    }
+    if (jdoc["command"].toString() == "hotel_cache_update") {
+        updateHotelCache(jdoc, ws);
+        return;
+    }
+    if (jdoc["command"].toString() == "search_text") {
+        C5SearchEngine::mInstance->search(jdoc, ws);
         return;
     }
     jrep["errorCode"] = 0;

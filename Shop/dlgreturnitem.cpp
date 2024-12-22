@@ -129,6 +129,18 @@ void DlgReturnItem::on_btnReturn_clicked()
         }
     }
     C5Database db(fDBParams);
+    QMap<QString, QVariant> oldAmountsMap;
+    db[":f_id"] = ui->tblOrder->getString(ui->tblOrder->currentRow(), 0);
+    db.exec("select * from o_header where f_id=:f_id");
+    db.nextRow();
+    db.rowToMap(oldAmountsMap);
+    int cashid = __c5config.cashId();
+    if (oldAmountsMap["f_amountcard"].toDouble() > 0.1
+            || oldAmountsMap["f_amountidram"].toDouble() > 0.1
+            || oldAmountsMap["f_amounttelcell"].toDouble() > 0.1
+            || oldAmountsMap["f_amountbank"].toDouble() > 0.1) {
+        cashid = __c5config.nocashId();
+    }
     C5StoreDraftWriter dw(db);
     db[":f_oheader"] = ui->tblOrder->getString(ui->tblOrder->currentRow(), 0);
     db.exec("SELECT sum(e.f_amount) "
@@ -148,7 +160,8 @@ void DlgReturnItem::on_btnReturn_clicked()
                     6) == 0 ? 1 : ui->tblOrder->getInteger(ui->tblOrder->currentRow(), 6);
     oheader.state = ORDER_STATE_CLOSE;
     oheader.amountTotal = returnAmount * -1;
-    oheader.amountCash = returnAmount * -1;
+    oheader.amountCash = cashid == __c5config.cashId() ? returnAmount * -1 : 0;
+    oheader.amountCard = cashid == __c5config.nocashId() ? returnAmount * -1 : 0;
     oheader.saleType = SALE_RETURN;
     oheader.hall = __c5config.defaultHall();
     if (!dw.hallId(oheader.prefix, oheader.hallId, __c5config.defaultHall())) {
@@ -254,7 +267,6 @@ void DlgReturnItem::on_btnReturn_clicked()
             return;
         }
     }
-    int cashid = ui->btnReturnCash->isChecked() ? __c5config.cashId() : __c5config.nocashId();
     QString cashdocid;
     double cashamount = returnAmount;
     int counter = dw.counterAType(DOC_TYPE_CASH);
@@ -301,16 +313,4 @@ void DlgReturnItem::on_btnReturn_clicked()
     }
     db.commit();
     C5Message::info(tr("Return completed"));
-}
-
-void DlgReturnItem::on_btnReturnCash_clicked()
-{
-    ui->btnReturnCash->setChecked(true);
-    ui->btnReturnCard->setChecked(false);
-}
-
-void DlgReturnItem::on_btnReturnCard_clicked()
-{
-    ui->btnReturnCash->setChecked(false);
-    ui->btnReturnCard->setChecked(true);
 }

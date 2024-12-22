@@ -301,7 +301,8 @@ private:
 
     bool exec(const QString &sqlQuery, bool &isSelect);
 
-    static QStringList fDbParamsForUuid;
+signals:
+    void queryError(const QString &);
 
 };
 

@@ -84,7 +84,6 @@
         <file>save-file.png</file>
         <file>reset.png</file>
         <file>restore.png</file>
-        <file>cleardb.sql</file>
         <file>print_description.png</file>
         <file>cashcollection.png</file>
         <file>effectiveness.png</file>
@@ -223,5 +222,6 @@
         <file>pentools.png</file>
         <file>clear.png</file>
         <file>pin.png</file>
+        <file>www.png</file>
     </qresource>
 </RCC>

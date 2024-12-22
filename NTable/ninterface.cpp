@@ -3,7 +3,7 @@
 #include "ndataprovider.h"
 #include "c5message.h"
 
-NInterface::NInterface(QWidget *parent)
+NInterface::NInterface(QObject *parent)
     : QObject{parent},
       fErrorSlot(nullptr),
       fErrorObject(nullptr),
@@ -38,17 +38,21 @@ void NInterface::createHttpQuery(const QString &route, const QJsonObject &params
 void NInterface::httpQueryStarted()
 {
     if (!fLoadingDlg) {
-        fLoadingDlg = new NLoadingDlg(static_cast<QWidget *>(this->parent()));
+        if (fProgress) {
+            fLoadingDlg = new NLoadingDlg(static_cast<QWidget *>(this->parent()));
+        }
     }
-    fLoadingDlg->resetSeconds();
     if (fProgress) {
+        fLoadingDlg->resetSeconds();
         fLoadingDlg->open();
     }
 }
 
 void NInterface::httpQueryFinished(QObject *sender)
 {
-    fLoadingDlg->hide();
+    if (fLoadingDlg) {
+        fLoadingDlg->hide();
+    }
     sender->deleteLater();
 }
 

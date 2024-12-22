@@ -1703,23 +1703,23 @@ MS Excel</source>
         <translation>Ապրանքի հետ վերադարձ</translation>
     </message>
     <message>
-        <location filename="dlgreturnitem.ui" line="143"/>
+        <location filename="dlgreturnitem.ui" line="130"/>
         <source>Receipt number</source>
         <translation>Կտրոնի համար</translation>
     </message>
     <message>
-        <location filename="dlgreturnitem.ui" line="190"/>
-        <location filename="dlgreturnitem.ui" line="273"/>
+        <location filename="dlgreturnitem.ui" line="160"/>
+        <location filename="dlgreturnitem.ui" line="243"/>
         <source>Tax receipt</source>
         <translation>ՀԴՄ կոտրոնի համար</translation>
     </message>
     <message>
-        <location filename="dlgreturnitem.ui" line="226"/>
+        <location filename="dlgreturnitem.ui" line="196"/>
         <source>...</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="dlgreturnitem.ui" line="133"/>
+        <location filename="dlgreturnitem.ui" line="120"/>
         <source>Order contents</source>
         <translation>Վաճառքի պարունակություն</translation>
     </message>
@@ -1734,52 +1734,37 @@ MS Excel</source>
         <translation>Նպատակ</translation>
     </message>
     <message>
-        <location filename="dlgreturnitem.ui" line="291"/>
+        <location filename="dlgreturnitem.ui" line="261"/>
         <source>Return</source>
         <translation>Հետ վերադարձ</translation>
     </message>
     <message>
-        <location filename="dlgreturnitem.ui" line="253"/>
+        <location filename="dlgreturnitem.ui" line="223"/>
         <source>Uuid</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="dlgreturnitem.ui" line="120"/>
-        <source>Կանխիկ</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="dlgreturnitem.ui" line="150"/>
-        <source>Դրամարկղ</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="dlgreturnitem.ui" line="157"/>
-        <source>Անկանխիկ</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="dlgreturnitem.ui" line="258"/>
+        <location filename="dlgreturnitem.ui" line="228"/>
         <source>Date</source>
         <translation>Ամսաթիվ</translation>
     </message>
     <message>
-        <location filename="dlgreturnitem.ui" line="263"/>
+        <location filename="dlgreturnitem.ui" line="233"/>
         <source>Receipt</source>
         <translation>Կտրոնի համար</translation>
     </message>
     <message>
-        <location filename="dlgreturnitem.ui" line="268"/>
+        <location filename="dlgreturnitem.ui" line="238"/>
         <source>Hall</source>
         <translation>Սրահ</translation>
     </message>
     <message>
-        <location filename="dlgreturnitem.ui" line="278"/>
+        <location filename="dlgreturnitem.ui" line="248"/>
         <source>Saler</source>
         <translation>Վաճառող</translation>
     </message>
     <message>
-        <location filename="dlgreturnitem.ui" line="283"/>
+        <location filename="dlgreturnitem.ui" line="253"/>
         <source>Saler id</source>
         <translation></translation>
     </message>
@@ -1844,28 +1829,28 @@ MS Excel</source>
         <translation>Նպատակը նշված չէ</translation>
     </message>
     <message>
-        <location filename="dlgreturnitem.cpp" line="143"/>
+        <location filename="dlgreturnitem.cpp" line="155"/>
         <source>Nothing to return</source>
         <translation>Ոչինչ նշված չէ</translation>
     </message>
     <message>
-        <location filename="dlgreturnitem.cpp" line="170"/>
-        <location filename="dlgreturnitem.cpp" line="244"/>
+        <location filename="dlgreturnitem.cpp" line="183"/>
+        <location filename="dlgreturnitem.cpp" line="257"/>
         <source>Return of sale</source>
         <translation>Հետվերադարձ</translation>
     </message>
     <message>
-        <location filename="dlgreturnitem.cpp" line="233"/>
+        <location filename="dlgreturnitem.cpp" line="246"/>
         <source>Return from</source>
         <translation>Վերադարձի կտրոն</translation>
     </message>
     <message>
-        <location filename="dlgreturnitem.cpp" line="268"/>
+        <location filename="dlgreturnitem.cpp" line="280"/>
         <source>Return of</source>
         <translation>Հետ վերադարձ</translation>
     </message>
     <message>
-        <location filename="dlgreturnitem.cpp" line="303"/>
+        <location filename="dlgreturnitem.cpp" line="315"/>
         <source>Return completed</source>
         <translation>Հետվերադարձը հաջողվեց</translation>
     </message>

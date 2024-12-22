@@ -8,7 +8,7 @@ C5TableModel::C5TableModel(const QStringList &dbParams, QObject *parent) :
     QAbstractTableModel(parent),
     fDBParams(dbParams)
 {
-    fTableView = dynamic_cast<QTableView*>(parent);
+    fTableView = dynamic_cast<QTableView *>(parent);
     fSortAsc = true;
     fLastSortedColumn = -1;
     fCheckboxes = false;
@@ -20,13 +20,14 @@ void C5TableModel::translate(const QHash<QString, QString> &t)
     fTranslateColumn = t;
 }
 
-void C5TableModel::execQuery(const QString &query)
+void C5TableModel::execQuery(const QString &query, QObject *echoError)
 {
     QElapsedTimer timer;
     timer.start();
     beginResetModel();
     clearModel();
     C5Database db(fDBParams);
+    connect( &db, SIGNAL(queryError(QString)), echoError, SLOT(sqlError(QString)));
     QStringList queries = query.split(";", Qt::SkipEmptyParts);
 #ifdef NETWORKDB
     db.exec(query, fRawData, fColumnNameIndex);
@@ -74,7 +75,6 @@ void C5TableModel::execQuery(const QString &query)
             fColumnIndexName[0] = "X";
         }
     } else {
-
     }
 #endif
     endResetModel();
@@ -111,7 +111,8 @@ void C5TableModel::sort(int column)
     endResetModel();
 }
 
-void C5TableModel::setExternalData(const QHash<QString, int> &columnNameIndex, const QHash<QString, QString> &translation)
+void C5TableModel::setExternalData(const QHash<QString, int> &columnNameIndex,
+                                   const QHash<QString, QString> &translation)
 {
     beginResetModel();
     fProxyData.clear();
@@ -147,18 +148,19 @@ int C5TableModel::columnCount(const QModelIndex &parent) const
 QVariant C5TableModel::headerData(int section, Qt::Orientation orientation, int role) const
 {
     switch (role) {
-    case Qt::DisplayRole:
-        if (orientation == Qt::Vertical) {
-            return section + 1;
-        } else {
-            return fTranslateColumn.contains(fColumnIndexName[section]) ? fTranslateColumn[fColumnIndexName[section]] : fColumnIndexName[section];
-        }
-    case Qt::DecorationRole:
-        if (orientation == Qt::Horizontal) {
-            if (fFilters.contains(section)) {
-                return QIcon(":/filter_set.png");
+        case Qt::DisplayRole:
+            if (orientation == Qt::Vertical) {
+                return section + 1;
+            } else {
+                return fTranslateColumn.contains(fColumnIndexName[section]) ? fTranslateColumn[fColumnIndexName[section]] :
+                       fColumnIndexName[section];
             }
-        }
+        case Qt::DecorationRole:
+            if (orientation == Qt::Horizontal) {
+                if (fFilters.contains(section)) {
+                    return QIcon(":/filter_set.png");
+                }
+            }
     }
     return QVariant();
 }
@@ -185,67 +187,67 @@ QVariant C5TableModel::data(const QModelIndex &index, int role) const
         return QVariant();
     }
     switch (role) {
-    case Qt::CheckStateRole: {
-        if (fCheckboxes) {
-            if (index.column() == 0) {
-                return fRawData.at(fProxyData.at(index.row())).at(index.column()).toInt() == 0 ? Qt::Unchecked : Qt::Checked;
+        case Qt::CheckStateRole: {
+            if (fCheckboxes) {
+                if (index.column() == 0) {
+                    return fRawData.at(fProxyData.at(index.row())).at(index.column()).toInt() == 0 ? Qt::Unchecked : Qt::Checked;
+                }
             }
+            return QVariant();
         }
-        return QVariant();
-    }
-    case Qt::DisplayRole:
-        if (fCheckboxes) {
-            if (index.column() == 0) {
-                return "";
+        case Qt::DisplayRole:
+            if (fCheckboxes) {
+                if (index.column() == 0) {
+                    return "";
+                }
             }
-        }
-        return dataDisplay(fProxyData.at(index.row()), index.column());
-    case Qt::EditRole:
-        return fRawData.at(fProxyData.at(index.row())).at(index.column());
-    case Qt::BackgroundColorRole:
-        if (fColorData.contains(fProxyData.at(index.row()))) {
-            return fColorData[fProxyData.at(index.row())][index.column()];
-        }
-        return QVariant(QColor(Qt::white));
-    case Qt::FontRole: {
-        QFont fo;
-        if (fTableView) {
-            if (fCellFont.contains(index)) {
-                fo = fCellFont[index];
-            } else {
-                fo = fTableView->font();
+            return dataDisplay(fProxyData.at(index.row()), index.column());
+        case Qt::EditRole:
+            return fRawData.at(fProxyData.at(index.row())).at(index.column());
+        case Qt::BackgroundColorRole:
+            if (fColorData.contains(fProxyData.at(index.row()))) {
+                return fColorData[fProxyData.at(index.row())][index.column()];
             }
+            return QVariant(QColor(Qt::white));
+        case Qt::FontRole: {
+            QFont fo;
+            if (fTableView) {
+                if (fCellFont.contains(index)) {
+                    fo = fCellFont[index];
+                } else {
+                    fo = fTableView->font();
+                }
+            }
+            return fo;
         }
-        return fo;
-    }
-    default:
-        return QVariant();
+        default:
+            return QVariant();
     }
 }
 
 bool C5TableModel::setData(const QModelIndex &index, const QVariant &value, int role)
 {
     switch (role) {
-    case Qt::EditRole:
-        fRawData[fProxyData.at(index.row())][index.column()] = value;
-        break;
-    case Qt::CheckStateRole:
-        if (fCheckboxes && fSingleCheckBoxSelection && value > 0) {
-            for (int i = 0; i < fRawData.count(); i++) {
-                fRawData[i][0] = 0;
+        case Qt::EditRole:
+            fRawData[fProxyData.at(index.row())][index.column()] = value;
+            break;
+        case Qt::CheckStateRole:
+            if (fCheckboxes && fSingleCheckBoxSelection && value > 0) {
+                for (int i = 0; i < fRawData.count(); i++) {
+                    fRawData[i][0] = 0;
+                }
             }
-        }
-        fRawData[fProxyData.at(index.row())][index.column()] = value;
-        if (fTableView != nullptr) {
-            fTableView->viewport()->update();
-        }
-        break;
-    case Qt::FontRole:
-        fCellFont[index] = value.value<QFont>();
-        break;
-    default:
-        QAbstractTableModel::setData(index, value, role);
-        break;
+            fRawData[fProxyData.at(index.row())][index.column()] = value;
+            if (fTableView != nullptr) {
+                fTableView->viewport()->update();
+            }
+            break;
+        case Qt::FontRole:
+            fCellFont[index] = value.value<QFont>();
+            break;
+        default:
+            QAbstractTableModel::setData(index, value, role);
+            break;
     }
     return true;
 }
@@ -283,9 +285,8 @@ Qt::ItemFlags C5TableModel::flags(const QModelIndex &index) const
 {
     Qt::ItemFlags f = QAbstractTableModel::flags(index);
     if (fEditableFlags.contains(index.column())) {
-        f = f ^ fEditableFlags[index.column()];
+        f = f ^fEditableFlags[index.column()];
     } else {
-
     }
     if (fCheckboxes) {
         f = f | Qt::ItemIsUserCheckable;
@@ -310,22 +311,20 @@ void C5TableModel::insertRow(int row)
     for (int i = 0, count = fRawData.count(); i < count; i++) {
         fProxyData << i;
     }
-
-//    QHash<QModelIndex, QFont> tmp;
-//    for (QHash<QModelIndex, QFont>::iterator it = fCellFont.begin(); it != fCellFont.end();) {
-//        if (it.key().row() >= row) {
-////            fCellFont[createIndex(it.key().row() + 1, it.key().column())] = it.value();
-////            fCellFont[createIndex(it.key().row() - 1, it.key().column())] = it.value();
-//            tmp[createIndex(it.key().row() - 1, it.key().column())] = it.value();
-//            it = fCellFont.erase(it);
-//        } else {
-//            it++;
-//        }
-//    }
-
-//    for (QHash<QModelIndex, QFont>::iterator it = tmp.begin(); it != tmp.end(); it++) {
-//        fCellFont[it.key()] = it.value();
-//    }
+    //    QHash<QModelIndex, QFont> tmp;
+    //    for (QHash<QModelIndex, QFont>::iterator it = fCellFont.begin(); it != fCellFont.end();) {
+    //        if (it.key().row() >= row) {
+    ////            fCellFont[createIndex(it.key().row() + 1, it.key().column())] = it.value();
+    ////            fCellFont[createIndex(it.key().row() - 1, it.key().column())] = it.value();
+    //            tmp[createIndex(it.key().row() - 1, it.key().column())] = it.value();
+    //            it = fCellFont.erase(it);
+    //        } else {
+    //            it++;
+    //        }
+    //    }
+    //    for (QHash<QModelIndex, QFont>::iterator it = tmp.begin(); it != tmp.end(); it++) {
+    //        fCellFont[it.key()] = it.value();
+    //    }
     endInsertRows();
 }
 
@@ -376,7 +375,8 @@ void C5TableModel::saveDataChanges()
             db[":" + fColumnIndexName[fColumnsForUpdate.at(j)]] = fRawData.at(row).at(fColumnsForUpdate.at(j));
         }
         if (fAddDataToUpdate.contains(row)) {
-            for (QMap<QString, QVariant>::const_iterator it = fAddDataToUpdate[row].begin(); it != fAddDataToUpdate[row].end(); it++) {
+            for (QMap<QString, QVariant>::const_iterator it = fAddDataToUpdate[row].begin(); it != fAddDataToUpdate[row].end();
+                    it++) {
                 db[":" + it.key()] = it.value();
             }
         }
@@ -444,7 +444,7 @@ void C5TableModel::sumForColumns(const QStringList &columns, QMap<QString, doubl
 
 void C5TableModel::sumForColumnsIndexes(const QList<int> &columns, QMap<int, double> &values)
 {
-    for (int idx: columns) {
+    for (int idx : columns) {
         double total = 0;
         for (int i = 0, count = fProxyData.count(); i < count; i++) {
             total += fRawData.at(fProxyData.at(i)).at(idx).toDouble();
@@ -521,7 +521,6 @@ void C5TableModel::insertSubTotals(QList<int> cols, const QList<int> &totalCols,
             //fCellFont[createIndex(r, c)] = f;
         }
     }
-
 }
 
 void C5TableModel::resetProxyData()
@@ -580,7 +579,7 @@ void C5TableModel::filterData()
                 goto FOUND;
             }
         }
-        FOUND:
+    FOUND:
         if (found) {
             fProxyData << row;
         }
@@ -609,7 +608,7 @@ bool C5TableModel::isRowDataEmpty(int row, const QList<int> &cols)
 QString C5TableModel::subtotalRowData(int row, const QList<int> &cols)
 {
     QString r;
-    for (int c: cols) {
+    for (int c : cols) {
         r += data(row, c, Qt::EditRole).toString();
     }
     return r;
@@ -632,17 +631,17 @@ QVariant C5TableModel::dataDisplay(int row, int column) const
 {
     QVariant v = fRawData.at(row).at(column);
     switch (v.type()) {
-    case QVariant::Int:
-        return v.toString();
-    case QVariant::Date:
-        return v.toDate().toString(FORMAT_DATE_TO_STR);
-    case QVariant::DateTime:
-        return v.toDateTime().toString(FORMAT_DATETIME_TO_STR);
-    case QVariant::Time:
-        return v.toTime().toString(FORMAT_TIME_TO_STR);
-    case QVariant::Double:
-        return float_str(v.toDouble(), 4);
-    default:
-        return v.toString();
+        case QVariant::Int:
+            return v.toString();
+        case QVariant::Date:
+            return v.toDate().toString(FORMAT_DATE_TO_STR);
+        case QVariant::DateTime:
+            return v.toDateTime().toString(FORMAT_DATETIME_TO_STR);
+        case QVariant::Time:
+            return v.toTime().toString(FORMAT_TIME_TO_STR);
+        case QVariant::Double:
+            return float_str(v.toDouble(), 4);
+        default:
+            return v.toString();
     }
 }

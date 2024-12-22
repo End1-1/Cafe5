@@ -20,7 +20,7 @@ public:
 
     void clearModel();
 
-    void execQuery(const QString &query);
+    void execQuery(const QString &query, QObject *echoError);
 
     void setCheckboxes(bool v);
 

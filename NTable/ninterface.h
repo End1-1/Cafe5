@@ -10,7 +10,7 @@ class NInterface : public QObject
 {
     Q_OBJECT
 public:
-    explicit NInterface(QWidget *parent = nullptr);
+    explicit NInterface(QObject *parent = nullptr);
 
     ~NInterface();
 

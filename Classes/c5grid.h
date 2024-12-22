@@ -13,7 +13,8 @@
 #include <QTableView>
 #include <QSettings>
 
-namespace Ui {
+namespace Ui
+{
 class C5Grid;
 }
 
@@ -57,8 +58,9 @@ public:
     virtual void setSimpleQuery(const QString &sql);
 
     template<class T>
-    T *filter() {
-        return static_cast<T*>(fFilterWidget);
+    T *filter()
+    {
+        return static_cast<T *>(fFilterWidget);
     }
 
 public slots:
@@ -147,7 +149,8 @@ private:
 
     int fFilterColumn;
 
-    void insertJoinTable(QStringList &joins, QMap<QString, QString> &joinsMap, const QString &table, const QString &mainTable);
+    void insertJoinTable(QStringList &joins, QMap<QString, QString> &joinsMap, const QString &table,
+                         const QString &mainTable);
 
     int sumOfColumnsWidghtBefore(int column);
 
@@ -186,7 +189,7 @@ protected slots:
 
     virtual void tableViewHeaderResized(int column, int oldSize, int newSize);
 
-private slots:    
+private slots:
     void ctrlEnter();
 
     void autofitColumns();
@@ -201,13 +204,14 @@ private slots:
 
     void on_tblView_clicked(const QModelIndex &index);
 
+    void sqlError(const QString &errorMessage);
+
 signals:
     void tblSingleClick(const QModelIndex &);
 
     void tblDoubleClick(int row, int column, const QList<QVariant> &values);
 
     void refreshed();
-
 
 };
 

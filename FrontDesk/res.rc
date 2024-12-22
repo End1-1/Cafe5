@@ -1,4 +1,4 @@
-IDI_ICON1 ICON DISCARDABLE "app.ico"
+IDI_ICON1 ICON DISCARDABLE "app1.ico"
 
 #include "rc.h"
 #include <windows.h>
@@ -17,7 +17,7 @@ VALUE "CompanyName", "Kudryashov Vasili\0"
 VALUE "FileDescription", "OfficeN\0"
 VALUE "FileVersion", _FILE_VERSION_STR
 VALUE "InternalName", "OfficeN\0"
-VALUE "LegalCopyright", "(C)2017-2024, Kudryashov Vasili\0"
+VALUE "LegalCopyright", "(C)2017-2025, Kudryashov Vasili\0"
 VALUE "OriginalFilename", "OfficeN.exe\0"
 VALUE "Email", "end1_1@yahoo.com\0"
 VALUE "ProductName", "Picasso\0"

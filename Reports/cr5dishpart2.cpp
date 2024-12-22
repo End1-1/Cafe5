@@ -1,6 +1,8 @@
 #include "cr5dishpart2.h"
 #include "ce5dishpart2.h"
 #include "c5tablemodel.h"
+#include "cr5menutranslator.h"
+#include "c5mainwindow.h"
 #include <QHeaderView>
 
 CR5DishPart2::CR5DishPart2(const QStringList &dbParams, QWidget *parent) :
@@ -35,8 +37,9 @@ QToolBar *CR5DishPart2::toolBar()
             << ToolBarButtons::tbRefresh
             << ToolBarButtons::tbExcel
             << ToolBarButtons::tbPrint;
-            createStandartToolbar(btn);
-            fToolBar->addAction(QIcon(":/delete.png"), tr("Remove"), this, SLOT(deletePart2()));
+        createStandartToolbar(btn);
+        fToolBar->addAction(QIcon(":/delete.png"), tr("Remove"), this, SLOT(deletePart2()));
+        fToolBar->addAction(QIcon(":/translate.png"), tr("Translator"), this, SLOT(translator()));
     }
     return fToolBar;
 }
@@ -44,7 +47,8 @@ QToolBar *CR5DishPart2::toolBar()
 bool CR5DishPart2::on_tblView_doubleClicked(const QModelIndex &index)
 {
     if (C5ReportWidget::on_tblView_doubleClicked(index)) {
-        fModel->setRowColor(index.row(), QColor::fromRgb(fModel->data(index.row(), fModel->indexForColumnName("f_color"), Qt::EditRole).toInt()));
+        fModel->setRowColor(index.row(), QColor::fromRgb(fModel->data(index.row(), fModel->indexForColumnName("f_color"),
+                            Qt::EditRole).toInt()));
     }
     return true;
 }
@@ -91,7 +95,8 @@ void CR5DishPart2::deletePart2()
             return;
         }
     }
-    if (C5Message::question(tr("Confirm to remove the selected dish part and all dishes that includes this part")) != QDialog::Accepted) {
+    if (C5Message::question(tr("Confirm to remove the selected dish part and all dishes that includes this part")) !=
+            QDialog::Accepted) {
         return;
     }
     foreach (int dishid, ids) {
@@ -108,4 +113,10 @@ void CR5DishPart2::deletePart2()
     db.exec("delete from d_part2 where f_id=:f_id");
     fModel->removeRow(row);
     C5Message::info(tr("Deleted"));
+}
+
+void CR5DishPart2::translator()
+{
+    auto *mt = __mainWindow->createTab<CR5MenuTranslator>(fDBParams);
+    mt->setMode(2);
 }

@@ -4,7 +4,7 @@
 #include "c5tablemodel.h"
 #include "dataonline.h"
 
-QHash<QString, DlgDataOnline*> DlgDataOnline::fInstances;
+QHash<QString, DlgDataOnline *> DlgDataOnline::fInstances;
 
 DlgDataOnline::DlgDataOnline(const QStringList &dbParams, const QString &table) :
     C5Dialog(dbParams),
@@ -14,9 +14,11 @@ DlgDataOnline::DlgDataOnline(const QStringList &dbParams, const QString &table) 
     fTableModel = new C5TableModel(dbParams, this);
     ui->tableView->setModel(fTableModel);
     ui->tableView->setSelectionBehavior(QAbstractItemView::SelectRows);
-    connect(ui->tableView, SIGNAL(tblDoubleClick(int,int,QList<QVariant>)), this, SLOT(tblDoubleClicked(int,int,QList<QVariant>)));
+    connect(ui->tableView, SIGNAL(tblDoubleClick(int, int, QList<QVariant>)), this, SLOT(tblDoubleClicked(int, int,
+            QList<QVariant>)));
     //connect(fGrid, SIGNAL(tblSingleClick(QModelIndex)), this, SLOT(tblSingleClick(QModelIndex)));
-    connect(ui->tableView->selectionModel(), SIGNAL(selectionChanged(QItemSelection,QItemSelection)), this, SLOT(selectionChanged(QItemSelection,QItemSelection)));
+    connect(ui->tableView->selectionModel(), SIGNAL(selectionChanged(QItemSelection, QItemSelection)), this,
+            SLOT(selectionChanged(QItemSelection, QItemSelection)));
     fReset = true;
     fSearchColumn = -1;
     DataOnline d(dbParams);
@@ -29,7 +31,8 @@ DlgDataOnline::~DlgDataOnline()
     delete ui;
 }
 
-bool DlgDataOnline::get(const QStringList &dbParams, const QString &table, DataResult &result, bool multiselect, int searchcolumn)
+bool DlgDataOnline::get(const QStringList &dbParams, const QString &table, DataResult &result, bool multiselect,
+                        int searchcolumn)
 {
     QString hash = dbParams.join(',') + table;
     if (!fInstances.contains(hash)) {
@@ -64,13 +67,17 @@ void DlgDataOnline::on_btnCheck_clicked()
     }
 }
 
+void DlgDataOnline::sqlError(const QString &errorMessage)
+{
+    C5Message::error(errorMessage);
+}
+
 void DlgDataOnline::selectionChanged(const QItemSelection &selected, const QItemSelection &deselected)
 {
-    for (QModelIndex i: deselected.indexes()) {
+    for (QModelIndex i : deselected.indexes()) {
         fTableModel->setData(i.row(), 0, 0, Qt::CheckStateRole);
     }
-
-    for (QModelIndex i: selected.indexes()) {
+    for (QModelIndex i : selected.indexes()) {
         fTableModel->setData(i.row(), 0, 1, Qt::CheckStateRole);
     }
 }
@@ -91,7 +98,7 @@ void DlgDataOnline::refresh()
 {
     fTableModel->setCheckboxes(true);
     fTableModel->setSingleCheckBoxSelection(!fMultipleSelection);
-    fTableModel->execQuery(fQuery);
+    fTableModel->execQuery(fQuery, this);
     ui->tableView->resizeColumnsToContents();
     ui->tableView->setColumnWidth(0, 25);
 }

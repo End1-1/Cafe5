@@ -1,5 +1,6 @@
 #include "c5settingswidget.h"
 #include "ui_c5settingswidget.h"
+#include "jsons.h"
 #include <QFileDialog>
 
 C5SettingsWidget::C5SettingsWidget(const QStringList &dbParams, QWidget *parent) :
@@ -53,10 +54,21 @@ void C5SettingsWidget::setId(int id)
                 break;
         }
     }
+    db[":f_id"] = id;
+    db.exec("select * from sys_json_config where f_id=:f_id");
+    if (db.nextRow()) {
+        QJsonObject jo = __strjson(db.getString("f_config"));
+        ui->leChatOperatorUserId->setInteger(jo["chatoperatoruserid"].toInt());
+        ui->chDenyLogout->setChecked(jo["denylogout"].toBool());
+    }
 }
 
 bool C5SettingsWidget::save(QString &err, QList<QMap<QString, QVariant> > &data)
 {
+    bool isNew = false;
+    if (ui->leCode->getInteger() == 0) {
+        isNew = true;
+    }
     if (!CE5Editor::save(err, data)) {
         return false;
     }
@@ -171,6 +183,11 @@ bool C5SettingsWidget::save(QString &err, QList<QMap<QString, QVariant> > &data)
     fTags[ui->leDeliveryCostumerId->getTag()] = ui->leDeliveryCostumerId->text();
     fTags[ui->leDebtholderFilterId->getTag()] = ui->leDebtholderFilterId->text();
     C5Database db(fDBParams);
+    if (isNew) {
+        db[":f_id"] = ui->leCode->getInteger();
+        db[":f_name"] = ui->leSettingsName->text();
+        db.insert("sys_json_config", false);
+    }
     db[":f_settings"] = ui->leCode->getInteger();
     db.exec("delete from s_settings_values where f_settings=:f_settings");
     QString sql = "insert into s_settings_values (f_settings, f_key, f_value) values ";
@@ -195,10 +212,20 @@ bool C5SettingsWidget::save(QString &err, QList<QMap<QString, QVariant> > &data)
     jc["store_name"] = ui->cbDefaultStore->currentText();
     jc["first_page_title"] = ui->leSettingsName->text();
     jc["hall"] = ui->leHall->getInteger();
+    jc["table"] = ui->leTable->getInteger();
     jc["menu"] = ui->cbMenu->currentData().toInt();
     jc["dashboard"] = ui->cbMobileDashboard->currentText();
     jc["companydata"] = ui->leCompanyInfo->text();
     jc["companyname"] = ui->leCompanyname->text();
+    jc["receiptprinter"] = ui->leLocalReceiptPrinter->text();
+    jc["chatoperatoruserid"] = ui->leChatOperatorUserId->text().toInt();
+    jc["servicefactor"] = ui->leServiceFactor->getDouble();
+    jc["debugmode"] = ui->chDebugMode->isChecked();
+    jc["denylogout"] = ui->chDenyLogout->isChecked();
+    db[":f_id"] = ui->leCode->getInteger();
+    db[":f_name"] = ui->leSettingsName->text();
+    db[":f_config"] = __jsonstr(jc);
+    db.update("sys_json_config", "where f_id=:f_id");
     __c5config.initParamsFromDb();
     return true;
 }
@@ -262,6 +289,17 @@ void C5SettingsWidget::clear(QWidget *parent)
     ui->leInputDocCounter->clear();
     ui->leOutDocCounter->clear();
     ui->leMoveDocCounter->clear();
+    ui->leChatOperatorUserId->clear();
+}
+
+bool C5SettingsWidget::canCopy()
+{
+    return true;
+}
+
+void C5SettingsWidget::copyObject()
+{
+    ui->leCode->clear();
 }
 
 QWidget *C5SettingsWidget::widget(QWidget *parent, int tag)

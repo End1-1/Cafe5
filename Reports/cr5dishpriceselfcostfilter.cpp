@@ -11,9 +11,9 @@ CR5DishPriceSelfCostFilter::CR5DishPriceSelfCostFilter(const QStringList &dbPara
     ui->leMenu->setSelector(dbParams, ui->leMenuName, cache_menu_names);
     ui->leGoods->setSelector(dbParams, ui->leGoodsName, cache_goods, 1, 3).setMultiselection(true);
     QSettings s(_ORGANIZATION_, QString("%1\\%2\\reportfilter\\%3")
-                        .arg(_APPLICATION_)
-                        .arg(_MODULE_)
-                        .arg(metaObject()->className()));
+                .arg(_APPLICATION_)
+                .arg(_MODULE_)
+                .arg(metaObject()->className()));
     ui->rbSimpleView->setChecked(s.value("ViewMode").toBool());
     ui->rbExtendedView->setChecked(!s.value("ViewMode").toBool());
 }
@@ -36,9 +36,9 @@ void CR5DishPriceSelfCostFilter::saveFilter(QWidget *parent)
 {
     C5FilterWidget::saveFilter(parent);
     QSettings s(_ORGANIZATION_, QString("%1\\%2\\reportfilter\\%3")
-                    .arg(_APPLICATION_)
-                    .arg(_MODULE_)
-                    .arg(metaObject()->className()));
+                .arg(_APPLICATION_)
+                .arg(_MODULE_)
+                .arg(metaObject()->className()));
     s.setValue("ViewMode", ui->rbSimpleView->isChecked());
 }
 
@@ -46,15 +46,24 @@ void CR5DishPriceSelfCostFilter::restoreFilter(QWidget *parent)
 {
     C5FilterWidget::restoreFilter(parent);
     QSettings s(_ORGANIZATION_, QString("%1\\%2\\reportfilter\\%3")
-                        .arg(_APPLICATION_)
-                        .arg(_MODULE_)
-                        .arg(metaObject()->className()));
+                .arg(_APPLICATION_)
+                .arg(_MODULE_)
+                .arg(metaObject()->className()));
     ui->rbSimpleView->setChecked(s.value("ViewMode").toBool());
 }
 
-bool CR5DishPriceSelfCostFilter::isSimpleView()
+int CR5DishPriceSelfCostFilter::viewMode()
 {
-    return ui->rbSimpleView->isChecked();
+    if (ui->rbSimpleView->isChecked()) {
+        return 1;
+    }
+    if (ui->rbExtendedView->isChecked()) {
+        return 2;
+    }
+    if (ui->rbExtendedView_2->isChecked()) {
+        return 3;
+    }
+    return 0;
 }
 
 QString CR5DishPriceSelfCostFilter::menuId()

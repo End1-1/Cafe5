@@ -25,6 +25,8 @@ private:
 
 private slots:
     void deletePart2();
+
+    void translator();
 };
 
 #endif // CR5DISHPART2_H

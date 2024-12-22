@@ -26,6 +26,8 @@ private slots:
     void resetDatabase();
 
     void uploadData();
+
+    void done(QJsonObject);
 };
 
 #endif // CR5DATABASES_H
