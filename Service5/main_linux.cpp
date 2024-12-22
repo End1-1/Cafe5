@@ -84,7 +84,7 @@ int main(int argc, char *argv[]) {
     ServerThread server(APPDIR);
     QObject::connect(&server, &ServerThread::finished, &app, &QCoreApplication::quit);
 
-    server.start();
+    server.run();
 
     // Запуск основного цикла приложения
     return app.exec();
