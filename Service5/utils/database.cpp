@@ -2,6 +2,7 @@
 #include "logwriter.h"
 #include <QDateTime>
 #include <QSqlRecord>
+#include <QRegularExpression>
 #include <QSettings>
 #include <QUuid>
 
@@ -92,13 +93,14 @@ bool Database::exec(const QString &query)
     for (const QString &key: qAsConst(keys)) {
         fQuery->bindValue(key, fBindValues[key]);
     }
-    fBindValues.clear();
     if (!fQuery->exec()) {
         LogWriter::write(LogWriterLevel::errors, fSqlDatabase.databaseName(), fQuery->lastError().databaseText());
         LogWriter::write(LogWriterLevel::errors, fSqlDatabase.databaseName(), lastQuery());
+        fBindValues.clear();
         return false;
     }
     LogWriter::write(LogWriterLevel::verbose, fSqlDatabase.databaseName(), lastQuery());
+    fBindValues.clear();
     bool isSelect = fQuery->isSelect() || query.contains("call", Qt::CaseInsensitive);
     if (isSelect) {
         fColumnsNames.clear();
@@ -216,7 +218,7 @@ QVariant &Database::operator[](const QString &name)
 const QString Database::lastQuery()
 {
     QString sql = fQuery->lastQuery();
-    QMapIterator<QString, QVariant> it(fQuery->boundValues());
+    QMapIterator<QString, QVariant> it(fBindValues);
     while (it.hasNext()) {
         it.next();
         QVariant value = it.value();
@@ -245,7 +247,7 @@ const QString Database::lastQuery()
         default:
             break;
         }
-        sql.replace(QRegExp(it.key() + "\\b"), value.toString());
+        sql.replace(QRegularExpression(it.key() + "\\b"), value.toString());
     }
     return sql;
 }

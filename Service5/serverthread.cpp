@@ -30,11 +30,14 @@ ServerThread::~ServerThread()
 void ServerThread::run()
 {
     int port = ConfigIni::value("server/port").toInt();
+    if (!port) {
+        port = 10002;
+    }
     fServer = new QWebSocketServer("BreezeServer", QWebSocketServer::NonSecureMode, this);
     // fServer->setMaxPendingConnections(10000);
     if (!fServer->listen(QHostAddress::Any, port)) {
         LogWriter::write(LogWriterLevel::errors, "",
-                         "Cannot listen port: " + QString::number(ConfigIni::value("server/port").toInt()));
+                         "Cannot listen port: " + QString::number(port) + " " +fServer->errorString());
         exit(1);
         return;
     }

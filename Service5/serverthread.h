@@ -49,6 +49,9 @@ private slots:
     void onDisconnected();
     void onTextMessage(const QString &msg);
 
+signals:
+    void finished();
+
 };
 
 #endif // SERVERTHREAD_H

@@ -2,8 +2,8 @@
 #include <QDir>
 #include <QDebug>
 
-ConfigIni *ConfigIni::fInstance = nullptr;
 QString ConfigIni::fAppPath;
+ConfigIni *ConfigIni::fInstance = nullptr;
 
 ConfigIni::ConfigIni()
 {
