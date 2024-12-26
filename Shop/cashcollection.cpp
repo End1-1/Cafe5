@@ -2,6 +2,7 @@
 #include "ui_cashcollection.h"
 #include "c5storedraftwriter.h"
 #include "c5user.h"
+#include "jsons.h"
 
 CashCollection::CashCollection() :
     C5Dialog(__c5config.dbParams()),
@@ -9,6 +10,7 @@ CashCollection::CashCollection() :
 {
     ui->setupUi(this);
     fMax = 0;
+    fCoinCashId = 0;
     ui->lePurpose->setText(tr("Cash collection") + " " + QDateTime::currentDateTime().toString(FORMAT_DATETIME_TO_STR));
     C5Database db(__c5config.dbParams());
     db[":f_cash"] = __c5config.cashId();
@@ -40,6 +42,15 @@ CashCollection::CashCollection() :
     if (db.nextRow()) {
         ui->leAmountPrepaid->setDouble(db.getDouble("f_amountprepaid"));
     }
+    db[":f_id"] = __c5config.fSettingsId;
+    db.exec("select f_config from sys_json_config where f_id=:f_id");
+    if (db.nextRow()) {
+        QJsonObject jo = __strjson(db.getString(0));
+        fCoinCashId = jo["coincash_id"].toInt();
+    }
+    ui->lbAmountCoin->setVisible(fCoinCashId > 0);
+    ui->leAmountCoin->setVisible(fCoinCashId > 0);
+    adjustSize();
 }
 
 CashCollection::~CashCollection()

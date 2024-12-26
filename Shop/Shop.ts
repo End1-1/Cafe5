@@ -1982,7 +1982,7 @@ MS Excel</source>
 <context>
     <name>NInterface</name>
     <message>
-        <location filename="../NTable/ninterface.cpp" line="60"/>
+        <location filename="../NTable/ninterface.cpp" line="64"/>
         <source>Unauthorized</source>
         <translation type="unfinished"></translation>
     </message>

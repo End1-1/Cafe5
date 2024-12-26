@@ -178,9 +178,7 @@ HEADERS += \
         ../Classes/QRCodeGenerator.h \
         ../Classes/barcode5.h \
         ../Classes/c5airlog.h \
-        ../Classes/c5crypt.h \
         ../Classes/c5document.h \
-        ../Classes/c5filelogwriter.h \
         ../Classes/c5filterwidget.h \
         ../Classes/c5logtoserverthread.h \
         ../Classes/c5printrecipta4.h \
@@ -499,9 +497,7 @@ SOURCES += \
         ../Cafe5/c5systempreference.cpp \
         ../Classes/QRCodeGenerator.cpp \
         ../Classes/c5airlog.cpp \
-        ../Classes/c5crypt.cpp \
         ../Classes/c5document.cpp \
-        ../Classes/c5filelogwriter.cpp \
         ../Classes/c5filterwidget.cpp \
         ../Classes/c5logtoserverthread.cpp \
         ../Classes/c5printrecipta4.cpp \

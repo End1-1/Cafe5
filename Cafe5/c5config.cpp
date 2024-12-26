@@ -11,8 +11,10 @@
 QString C5Config::fAppHomePath;
 QString C5Config::fAppLogFile;
 QString C5Config::fSettingsName;
+int C5Config::fSettingsId;
 QString C5Config::fLastUsername;
 QWidget *C5Config::fParentWidget = nullptr;
+QString C5Config::fDBName;
 QString C5Config::fDBHost;
 QString C5Config::fDBPath;
 QString C5Config::fDBUser;
@@ -205,6 +207,7 @@ void C5Config::initParamsFromDb()
     db[":f_name"] = fSettingsName;
     db.exec("select f_id from s_settings_names where f_name=:f_name");
     if (db.nextRow()) {
+        fSettingsId = db.getInt(0);
         db[":f_settings"] = db.getInt(0);
         db.exec("select f_key, f_value from s_settings_values where f_settings=:f_settings");
         while (db.nextRow()) {

@@ -53,10 +53,8 @@ SOURCES += \
     ../Classes/QRCodeGenerator.cpp \
     ../Classes/c5airlog.cpp \
     ../Classes/c5combodelegate.cpp \
-    ../Classes/c5crypt.cpp \
     ../Classes/c5datedelegate.cpp \
     ../Classes/c5document.cpp \
-    ../Classes/c5filelogwriter.cpp \
     ../Classes/c5gridgilter.cpp \
     ../Classes/c5jsondb.cpp \
     ../Classes/c5logtoserverthread.cpp \
@@ -89,10 +87,10 @@ SOURCES += \
     ../Classes/dlgpassword.cpp \
     ../Classes/fileversion.cpp \
     ../Classes/idram.cpp \
+    ../Classes/logwriter.cpp \
     ../Classes/notificationwidget.cpp \
     ../Classes/outputofheader.cpp \
     ../Classes/proxytablewidgetdatabase.cpp \
-    ../Classes/thread.cpp \
     ../Configs/breezeconfig.cpp \
     ../Configs/cashboxconfig.cpp \
     ../Configs/configs.cpp \
@@ -134,18 +132,6 @@ SOURCES += \
     ../Printing/printreceipt.cpp \
     ../Printing/printreceiptgroup.cpp \
     ../Printing/selectprinters.cpp \
-    ../Service5/utils/commandline.cpp \
-    ../Service5/utils/configini.cpp \
-    ../Service5/utils/database.cpp \
-    ../Service5/utils/gtranslator.cpp \
-    ../Service5/utils/logwriter.cpp \
-    ../Service5/utils/tablerecord.cpp \
-    ../Service5Working/utils/commandline.cpp \
-    ../Service5Working/utils/configini.cpp \
-    ../Service5Working/utils/database.cpp \
-    ../Service5Working/utils/gtranslator.cpp \
-    ../Service5Working/utils/logwriter.cpp \
-    ../Service5Working/utils/tablerecord.cpp \
     ../TableRecord/aheader.cpp \
     ../TableRecord/bclientdebts.cpp \
     ../TableRecord/bhistory.cpp \
@@ -227,10 +213,8 @@ HEADERS += \
     ../Classes/barcode5.h \
     ../Classes/c5airlog.h \
     ../Classes/c5combodelegate.h \
-    ../Classes/c5crypt.h \
     ../Classes/c5datedelegate.h \
     ../Classes/c5document.h \
-    ../Classes/c5filelogwriter.h \
     ../Classes/c5gridgilter.h \
     ../Classes/c5jsondb.h \
     ../Classes/c5logtoserverthread.h \
@@ -265,10 +249,10 @@ HEADERS += \
     ../Classes/fileversion.h \
     ../Classes/goodsreserve.h \
     ../Classes/idram.h \
+    ../Classes/logwriter.h \
     ../Classes/notificationwidget.h \
     ../Classes/outputofheader.h \
     ../Classes/proxytablewidgetdatabase.h \
-    ../Classes/thread.h \
     ../Configs/breezeconfig.h \
     ../Configs/cashboxconfig.h \
     ../Configs/configs.h \
@@ -310,18 +294,6 @@ HEADERS += \
     ../Printing/printreceipt.h \
     ../Printing/printreceiptgroup.h \
     ../Printing/selectprinters.h \
-    ../Service5/utils/commandline.h \
-    ../Service5/utils/configini.h \
-    ../Service5/utils/database.h \
-    ../Service5/utils/gtranslator.h \
-    ../Service5/utils/logwriter.h \
-    ../Service5/utils/tablerecord.h \
-    ../Service5Working/utils/commandline.h \
-    ../Service5Working/utils/configini.h \
-    ../Service5Working/utils/database.h \
-    ../Service5Working/utils/gtranslator.h \
-    ../Service5Working/utils/logwriter.h \
-    ../Service5Working/utils/tablerecord.h \
     ../TableRecord/aheader.h \
     ../TableRecord/bclientdebts.h \
     ../TableRecord/bhistory.h \
@@ -434,10 +406,6 @@ INCLUDEPATH += ../Forms
 INCLUDEPATH += ../Configs
 INCLUDEPATH += ../Service
 INCLUDEPATH += ../Printing
-INCLUDEPATH += ../Service5
-INCLUDEPATH += ../Service5/socket
-INCLUDEPATH += ../Service5/utils
-INCLUDEPATH += ../Service5/handlers
 INCLUDEPATH += ../RESOURCES
 INCLUDEPATH += ../../XLSX/Src
 INCLUDEPATH += C:/Projects/NewTax/Src

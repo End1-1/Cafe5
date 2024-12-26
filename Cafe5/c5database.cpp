@@ -509,13 +509,19 @@ bool C5Database::execNetwork(const QString &sqlQuery)
     QString sql = execDry(sqlQuery);
     QNetworkAccessManager m;
     QString netPath = QString("%1/engine/info.php").arg(__c5config.dbParams().at(0));
+    if (!netPath.contains("http")) {
+        netPath = "https://" + netPath;
+    }
+    logEvent(netPath);
     QNetworkRequest rq(netPath);
     m.setTransferTimeout(60000);
     rq.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
-    QSslConfiguration sslConf = rq.sslConfiguration();
-    sslConf.setPeerVerifyMode(QSslSocket::VerifyNone);
-    sslConf.setProtocol(QSsl::AnyProtocol);
-    rq.setSslConfiguration(sslConf);
+    if (netPath.contains("https://")) {
+        QSslConfiguration sslConf = rq.sslConfiguration();
+        sslConf.setPeerVerifyMode(QSslSocket::VerifyNone);
+        sslConf.setProtocol(QSsl::AnyProtocol);
+        rq.setSslConfiguration(sslConf);
+    }
     QJsonObject jo;
     jo["query"] = 3;
     jo["call"] = sql.contains(";;;") ? "sqllist" : "sql";

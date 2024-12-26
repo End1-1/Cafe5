@@ -93,6 +93,8 @@ private:
 
     QLabel *fStatusLabel;
 
+    QLabel *fConnectionLabel;
+
     QStringList fPrevTabUuid;
 
     QTabWidget *fTab;

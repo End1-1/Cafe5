@@ -24,6 +24,8 @@ CR5SaleFromStore::CR5SaleFromStore(const QStringList &dbParams, QWidget *parent)
                     << "left join c_partners cpb on cpb.f_id=oh.f_partner [cpb]"
                     << "left join a_store_draft asd on asd.f_id=og.f_storerec [asd]"
                     << "left join h_halls hl on hl.f_id=oh.f_hall [hl]"
+                    << "left join o_goods og2 on og2.f_id=og.f_returnfrom [og2]"
+                    << "left join o_goods_return_reason grr on grr.f_id=og2.f_return [grr]"
                     << "left join e_currency_cross_rate cr on cr.f_currency1=ah.f_currency and cr.f_currency2=1 [cr]"
                     ;
     fColumnsFields << "oh.f_id as f_header"
@@ -36,6 +38,7 @@ CR5SaleFromStore::CR5SaleFromStore(const QStringList &dbParams, QWidget *parent)
                    << "gr.f_class as f_goodsclass"
                    << "gg.f_name as f_goodsname"
                    << "gg.f_scancode"
+                   << "grr.f_name as f_returnreason"
                    << "gu.f_name as f_goodsunit"
                    << "concat_ws(', ', cpb.f_name, cpb.f_taxname, cpb.f_address) as f_buyer"
                    << "cpb.f_taxcode as f_buyertaxcode"
@@ -57,6 +60,7 @@ CR5SaleFromStore::CR5SaleFromStore(const QStringList &dbParams, QWidget *parent)
                   << "oh.f_datecash"
                   << "hl.f_name as f_hallname"
                   << "gr.f_class"
+                  << "grr.f_name as f_returnreason"
                   << "s.f_name as f_storename"
                   << "gg.f_name as f_goodsname"
                   << "gg.f_scancode"
@@ -86,6 +90,7 @@ CR5SaleFromStore::CR5SaleFromStore(const QStringList &dbParams, QWidget *parent)
     fTranslation["f_goodsclass"] = tr("Class");
     fTranslation["f_scancode"] = tr("Scancode");
     fTranslation["f_goodsgroup"] = tr("Group");
+    fTranslation["f_returnreason"] = tr("Return reason");
     fTranslation["f_goodsunit"] = tr("Unit");
     fTranslation["f_qty"] = tr("Qty");
     fTranslation["f_total"] = tr("Total");
@@ -112,6 +117,7 @@ CR5SaleFromStore::CR5SaleFromStore(const QStringList &dbParams, QWidget *parent)
     fColumnsVisible["gg.f_scancode"] = false;
     fColumnsVisible["gr.f_name as f_goodsgroup"] = true;
     fColumnsVisible["gu.f_name as f_goodsunit"] = true;
+    fColumnsVisible["grr.f_name as f_returnreason"] = false;
     fColumnsVisible["sum(og.f_qty*og.f_sign) as f_qty"] = true;
     fColumnsVisible["sum(og.f_total*og.f_sign) as f_total"] = true;
     fColumnsVisible["hl.f_name as f_hallname"] = true;

@@ -132,6 +132,8 @@ public:
 
     static QString fAppLogFile;
 
+    static int fSettingsId;
+
     static QString fSettingsName;
 
     static QWidget *fParentWidget;
@@ -139,6 +141,8 @@ public:
     static QString fLastUsername;
 
     static bool fFullScreen;
+
+    static QString fDBName;
 
     static QString fDBHost;
 

@@ -1017,7 +1017,7 @@
     <message>
         <location filename="../Forms/c5dishselfcostgenprice.ui" line="37"/>
         <source>Search price in past, if not exists</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../Forms/c5dishselfcostgenprice.ui" line="63"/>
@@ -1177,12 +1177,12 @@
     <message>
         <location filename="../Editors/c5dishwidget.ui" line="211"/>
         <source>Emark required</source>
-        <translation type="unfinished"></translation>
+        <translation>Emarks պարտադիր է</translation>
     </message>
     <message>
         <location filename="../Editors/c5dishwidget.ui" line="214"/>
         <source>f_addbyqr</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../Editors/c5dishwidget.ui" line="230"/>
@@ -1620,7 +1620,7 @@
     <message>
         <location filename="../Editors/c5editor.ui" line="95"/>
         <source>Copy</source>
-        <translation type="unfinished">Պատճենել</translation>
+        <translation>Պատճենել</translation>
     </message>
     <message>
         <location filename="../Editors/c5editor.ui" line="102"/>
@@ -1763,12 +1763,12 @@
     <message>
         <location filename="../Forms/c5goodsprice.ui" line="255"/>
         <source>Retail price</source>
-        <translation type="unfinished"></translation>
+        <translation>Մանրածախ գին</translation>
     </message>
     <message>
         <location filename="../Forms/c5goodsprice.ui" line="260"/>
         <source>Whosale price</source>
-        <translation type="unfinished"></translation>
+        <translation>Մեծածախ գին</translation>
     </message>
     <message>
         <location filename="../Forms/c5goodsprice.ui" line="265"/>
@@ -1972,50 +1972,50 @@
         <translation>Նոր տող</translation>
     </message>
     <message>
-        <location filename="../Classes/c5grid.cpp" line="251"/>
-        <location filename="../Classes/c5grid.cpp" line="261"/>
-        <location filename="../Classes/c5grid.cpp" line="583"/>
+        <location filename="../Classes/c5grid.cpp" line="254"/>
+        <location filename="../Classes/c5grid.cpp" line="264"/>
+        <location filename="../Classes/c5grid.cpp" line="588"/>
         <source>Nothing was selected</source>
         <translation>Ոչինչ նշված չէ</translation>
     </message>
     <message>
-        <location filename="../Classes/c5grid.cpp" line="692"/>
-        <location filename="../Classes/c5grid.cpp" line="726"/>
+        <location filename="../Classes/c5grid.cpp" line="703"/>
+        <location filename="../Classes/c5grid.cpp" line="742"/>
         <source>Printed</source>
         <translation>Տպված</translation>
     </message>
     <message>
-        <location filename="../Classes/c5grid.cpp" line="756"/>
+        <location filename="../Classes/c5grid.cpp" line="771"/>
         <source>Empty report!</source>
         <translation>Հաշվետվությունը դատարկ է</translation>
     </message>
     <message>
-        <location filename="../Classes/c5grid.cpp" line="394"/>
+        <location filename="../Classes/c5grid.cpp" line="396"/>
         <source>Filter</source>
         <translation>Ֆիլտր</translation>
     </message>
     <message>
-        <location filename="../Classes/c5grid.cpp" line="396"/>
+        <location filename="../Classes/c5grid.cpp" line="399"/>
         <source>Copy selection</source>
         <translation>Պատճենել նշված տվյալները</translation>
     </message>
     <message>
-        <location filename="../Classes/c5grid.cpp" line="397"/>
+        <location filename="../Classes/c5grid.cpp" line="400"/>
         <source>Copy all</source>
         <translation>Պատճենել բոլորը</translation>
     </message>
     <message>
-        <location filename="../Classes/c5grid.cpp" line="902"/>
+        <location filename="../Classes/c5grid.cpp" line="912"/>
         <source>Set filter</source>
         <translation>Ֆիլտր</translation>
     </message>
     <message>
-        <location filename="../Classes/c5grid.cpp" line="903"/>
+        <location filename="../Classes/c5grid.cpp" line="914"/>
         <source>Remove filter</source>
         <translation>Հեռացնել ֆիլտրը</translation>
     </message>
     <message>
-        <location filename="../Classes/c5grid.cpp" line="904"/>
+        <location filename="../Classes/c5grid.cpp" line="916"/>
         <source>Autofit columns widths</source>
         <translation>Ուղղել սյուների լայնությունը</translation>
     </message>
@@ -4799,27 +4799,27 @@ Excel</translation>
         <translation>Փակել պատուհանը նախահաշիվը տպելուց հետո</translation>
     </message>
     <message>
-        <location filename="../Reports/c5settingswidget.ui" line="1057"/>
+        <location filename="../Reports/c5settingswidget.ui" line="1017"/>
         <source>Deny change qty</source>
         <translation>Արքելել փոխել քանակը</translation>
     </message>
     <message>
-        <location filename="../Reports/c5settingswidget.ui" line="1230"/>
+        <location filename="../Reports/c5settingswidget.ui" line="1250"/>
         <source>Disable grouping when printing</source>
         <translation>Չխմբավորել ապրանքները կտրոնում</translation>
     </message>
     <message>
-        <location filename="../Reports/c5settingswidget.ui" line="2089"/>
+        <location filename="../Reports/c5settingswidget.ui" line="2109"/>
         <source>CAS program path</source>
         <translation>CAS կշեռքի ծրագրի ճանապարհ</translation>
     </message>
     <message>
-        <location filename="../Reports/c5settingswidget.ui" line="2110"/>
+        <location filename="../Reports/c5settingswidget.ui" line="2130"/>
         <source>BM-15 mdb odbcs</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Reports/c5settingswidget.ui" line="1126"/>
+        <location filename="../Reports/c5settingswidget.ui" line="1090"/>
         <source>Dont check qty of store</source>
         <translation>Չստուգել պահեստի քանակը</translation>
     </message>
@@ -4874,137 +4874,137 @@ Excel</translation>
         <translation>Օրը փոխելուց հետո նստացնել բաց հաշիվների մեջ</translation>
     </message>
     <message>
-        <location filename="../Reports/c5settingswidget.ui" line="1206"/>
+        <location filename="../Reports/c5settingswidget.ui" line="1083"/>
         <source>Hide quantity column</source>
         <translation>Թաքցնել քանակի սյունը ապրանքների ցանկում</translation>
     </message>
     <message>
-        <location filename="../Reports/c5settingswidget.ui" line="1254"/>
+        <location filename="../Reports/c5settingswidget.ui" line="1143"/>
         <source>Mobile client config text</source>
         <translation>Շարժական կլիենտի կոնֆիգուրացիա QR կոդով</translation>
     </message>
     <message>
-        <location filename="../Reports/c5settingswidget.ui" line="1338"/>
+        <location filename="../Reports/c5settingswidget.ui" line="1358"/>
         <source>External tax</source>
         <translation>Տպել ՀԴՄ առանձին</translation>
     </message>
     <message>
-        <location filename="../Reports/c5settingswidget.ui" line="1449"/>
+        <location filename="../Reports/c5settingswidget.ui" line="1469"/>
         <source>Never offer tax</source>
         <translation>Երբեք չառաջարկել տպել ՀԴՄ</translation>
     </message>
     <message>
-        <location filename="../Reports/c5settingswidget.ui" line="1331"/>
+        <location filename="../Reports/c5settingswidget.ui" line="1351"/>
         <source>Always print if amount less then</source>
         <translation>Միշտ տպելՀԴՄ եթե պատվերի գումարը քիչ է քան</translation>
     </message>
     <message>
-        <location filename="../Reports/c5settingswidget.ui" line="1515"/>
+        <location filename="../Reports/c5settingswidget.ui" line="1535"/>
         <source>Service print font size</source>
         <translation>Խոհանոցի կտրոնոնի տարատեսակի չափս</translation>
     </message>
     <message>
-        <location filename="../Reports/c5settingswidget.ui" line="1789"/>
+        <location filename="../Reports/c5settingswidget.ui" line="1809"/>
         <source>Service print font family</source>
         <translation>Խոհանոցի կտրոնոնի տարատեսակ</translation>
     </message>
     <message>
-        <location filename="../Reports/c5settingswidget.ui" line="1736"/>
+        <location filename="../Reports/c5settingswidget.ui" line="1756"/>
         <source>Dont print</source>
         <translation>Չտպել</translation>
     </message>
     <message>
-        <location filename="../Reports/c5settingswidget.ui" line="1769"/>
+        <location filename="../Reports/c5settingswidget.ui" line="1789"/>
         <source>V3</source>
         <translation>Տարբերակ 3</translation>
     </message>
     <message>
-        <location filename="../Reports/c5settingswidget.ui" line="1704"/>
+        <location filename="../Reports/c5settingswidget.ui" line="1724"/>
         <source>Receipt print font family</source>
         <translation>Հաշվի կտրոնոնի տարատեսակ</translation>
     </message>
     <message>
-        <location filename="../Reports/c5settingswidget.ui" line="1690"/>
+        <location filename="../Reports/c5settingswidget.ui" line="1710"/>
         <source>Force use print alias</source>
         <translation>Օգտագործել տպիչի մականունները</translation>
     </message>
     <message>
-        <location filename="../Reports/c5settingswidget.ui" line="1813"/>
+        <location filename="../Reports/c5settingswidget.ui" line="1833"/>
         <source>Receipt print font size</source>
         <translation>Հաշվի կտրոնոնի տարատեսակի չափս</translation>
     </message>
     <message>
-        <location filename="../Reports/c5settingswidget.ui" line="1598"/>
+        <location filename="../Reports/c5settingswidget.ui" line="1618"/>
         <source>Print modicators on receipt</source>
         <translation>Տպել ուտեստի մեկնաբանությունը հաշվի մեջ</translation>
     </message>
     <message>
-        <location filename="../Reports/c5settingswidget.ui" line="1914"/>
+        <location filename="../Reports/c5settingswidget.ui" line="1934"/>
         <source>External integration</source>
         <translation>Արտաքին համակարգերի ինտեգրացում</translation>
     </message>
     <message>
-        <location filename="../Reports/c5settingswidget.ui" line="1926"/>
+        <location filename="../Reports/c5settingswidget.ui" line="1946"/>
         <source>Idram server</source>
         <translation>Idram սերվերի հասցե</translation>
     </message>
     <message>
-        <location filename="../Reports/c5settingswidget.ui" line="1937"/>
+        <location filename="../Reports/c5settingswidget.ui" line="1957"/>
         <source>https://money.idram.am/api/History/Search</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Reports/c5settingswidget.ui" line="1942"/>
+        <location filename="../Reports/c5settingswidget.ui" line="1962"/>
         <source>https://cashback.idram.am/api/history/searchbyorder</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Reports/c5settingswidget.ui" line="2053"/>
+        <location filename="../Reports/c5settingswidget.ui" line="2073"/>
         <source>Armenian Soft</source>
         <translation>ՀԾ</translation>
     </message>
     <message>
-        <location filename="../Reports/c5settingswidget.ui" line="2083"/>
+        <location filename="../Reports/c5settingswidget.ui" line="2103"/>
         <source>External scale</source>
         <translation>Արտաքին կշեռք</translation>
     </message>
     <message>
-        <location filename="../Reports/c5settingswidget.ui" line="2103"/>
+        <location filename="../Reports/c5settingswidget.ui" line="2123"/>
         <source>Find</source>
         <translation>Փնտրել</translation>
     </message>
     <message>
-        <location filename="../Reports/c5settingswidget.ui" line="1920"/>
+        <location filename="../Reports/c5settingswidget.ui" line="1940"/>
         <source>Idram</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Reports/c5settingswidget.ui" line="1964"/>
+        <location filename="../Reports/c5settingswidget.ui" line="1984"/>
         <source>Idram ID</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Reports/c5settingswidget.ui" line="1992"/>
+        <location filename="../Reports/c5settingswidget.ui" line="2012"/>
         <source>Idram phone</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Reports/c5settingswidget.ui" line="2006"/>
+        <location filename="../Reports/c5settingswidget.ui" line="2026"/>
         <source>Idram tips</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Reports/c5settingswidget.ui" line="2023"/>
+        <location filename="../Reports/c5settingswidget.ui" line="2043"/>
         <source>Idram wallet</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Reports/c5settingswidget.ui" line="1950"/>
+        <location filename="../Reports/c5settingswidget.ui" line="1970"/>
         <source>Idram name</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Reports/c5settingswidget.ui" line="1978"/>
+        <location filename="../Reports/c5settingswidget.ui" line="1998"/>
         <source>Idram session ID</source>
         <translation></translation>
     </message>
@@ -5085,85 +5085,110 @@ Excel</translation>
         <translation>Պարտքատերերի խմբի կոդ</translation>
     </message>
     <message>
-        <location filename="../Reports/c5settingswidget.ui" line="1421"/>
+        <location filename="../Reports/c5settingswidget.ui" line="1024"/>
+        <source>Available stores</source>
+        <translation>Հասանելի պահեստներ</translation>
+    </message>
+    <message>
+        <location filename="../Reports/c5settingswidget.ui" line="1290"/>
+        <source>Coin cashdesk</source>
+        <translation>Մանրի դրամարկղ</translation>
+    </message>
+    <message>
+        <location filename="../Reports/c5settingswidget.ui" line="1441"/>
         <source>VAT included</source>
         <translation>ԱԱՀ-ն այդ թվում</translation>
     </message>
     <message>
-        <location filename="../Reports/c5settingswidget.ui" line="1477"/>
+        <location filename="../Reports/c5settingswidget.ui" line="1497"/>
         <source>Choose pos</source>
         <translation>POS ընտրություն</translation>
     </message>
     <message>
-        <location filename="../Reports/c5settingswidget.ui" line="1711"/>
+        <location filename="../Reports/c5settingswidget.ui" line="1731"/>
         <source>Static QR code text</source>
         <translation>Հիմնական QR տեքստ</translation>
     </message>
     <message>
-        <location filename="../Reports/c5settingswidget.ui" line="1820"/>
+        <location filename="../Reports/c5settingswidget.ui" line="1840"/>
         <source>Dont print final receipt</source>
         <translation>Չտպել վերջնահաշիվը</translation>
     </message>
     <message>
-        <location filename="../Reports/c5settingswidget.ui" line="1838"/>
+        <location filename="../Reports/c5settingswidget.ui" line="1858"/>
         <source>Http server</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Reports/c5settingswidget.ui" line="1844"/>
+        <location filename="../Reports/c5settingswidget.ui" line="1864"/>
         <source>HTTP server ip</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Reports/c5settingswidget.ui" line="1858"/>
+        <location filename="../Reports/c5settingswidget.ui" line="1878"/>
         <source>HTTP server port</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Reports/c5settingswidget.ui" line="1872"/>
+        <location filename="../Reports/c5settingswidget.ui" line="1892"/>
         <source>HTTP server username</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Reports/c5settingswidget.ui" line="1886"/>
+        <location filename="../Reports/c5settingswidget.ui" line="1906"/>
         <source>HTTP server password</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Reports/c5settingswidget.ui" line="2059"/>
+        <location filename="../Reports/c5settingswidget.ui" line="2079"/>
         <source>Connection string</source>
         <translation>Կապ</translation>
     </message>
     <message>
-        <location filename="../Reports/c5settingswidget.ui" line="2073"/>
-        <location filename="../Reports/c5settingswidget.ui" line="2124"/>
+        <location filename="../Reports/c5settingswidget.ui" line="2093"/>
+        <location filename="../Reports/c5settingswidget.ui" line="2144"/>
         <source>Test</source>
         <translation>Ստուգել</translation>
     </message>
     <message>
-        <location filename="../Reports/c5settingswidget.ui" line="2135"/>
+        <location filename="../Reports/c5settingswidget.ui" line="2155"/>
         <source>Mobile</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Reports/c5settingswidget.ui" line="2141"/>
+        <location filename="../Reports/c5settingswidget.ui" line="2161"/>
         <source>Dashboard type</source>
         <translation>Առաջի էջի տեսք</translation>
     </message>
     <message>
-        <location filename="../Reports/c5settingswidget.ui" line="2149"/>
+        <location filename="../Reports/c5settingswidget.ui" line="2169"/>
         <source>reports</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Reports/c5settingswidget.ui" line="2154"/>
+        <location filename="../Reports/c5settingswidget.ui" line="2174"/>
         <source>store</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Reports/c5settingswidget.ui" line="2159"/>
+        <location filename="../Reports/c5settingswidget.ui" line="2179"/>
         <source>hotel</source>
         <translation></translation>
+    </message>
+    <message>
+        <location filename="../Reports/c5settingswidget.ui" line="2184"/>
+        <source>elinarep</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../Reports/c5settingswidget.ui" line="2192"/>
+        <source>Chat operator user id</source>
+        <translation>Չատի օպերատորի կոդ</translation>
+    </message>
+    <message>
+        <location filename="../Reports/c5settingswidget.ui" line="2222"/>
+        <source>Deny logout</source>
+        <translation>Արգելել ելքը ծրագրից</translation>
     </message>
     <message>
         <location filename="../Reports/c5settingswidget.ui" line="624"/>
@@ -5176,27 +5201,27 @@ Excel</translation>
         <translation>Հերթ</translation>
     </message>
     <message>
-        <location filename="../Reports/c5settingswidget.ui" line="1659"/>
+        <location filename="../Reports/c5settingswidget.ui" line="1679"/>
         <source>Print dish timeorder</source>
         <translation>Տպել պատրաստման հերթը</translation>
     </message>
     <message>
-        <location filename="../Reports/c5settingswidget.ui" line="1806"/>
+        <location filename="../Reports/c5settingswidget.ui" line="1826"/>
         <source>Print scancode with name</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Reports/c5settingswidget.ui" line="1566"/>
+        <location filename="../Reports/c5settingswidget.ui" line="1586"/>
         <source>Widthe of printer</source>
         <translation>Տպիչի լայնք</translation>
     </message>
     <message>
-        <location filename="../Reports/c5settingswidget.ui" line="1572"/>
+        <location filename="../Reports/c5settingswidget.ui" line="1592"/>
         <source>50mm</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Reports/c5settingswidget.ui" line="1582"/>
+        <location filename="../Reports/c5settingswidget.ui" line="1602"/>
         <source>80mm</source>
         <translation></translation>
     </message>
@@ -5236,32 +5261,32 @@ Excel</translation>
         <translation>Մեքենաների ռեժիմ</translation>
     </message>
     <message>
-        <location filename="../Reports/c5settingswidget.ui" line="1140"/>
+        <location filename="../Reports/c5settingswidget.ui" line="1150"/>
         <source>Autologin pin</source>
         <translation>Ավտոմատ մուտքի պին և կոդ</translation>
     </message>
     <message>
-        <location filename="../Reports/c5settingswidget.ui" line="1247"/>
+        <location filename="../Reports/c5settingswidget.ui" line="1257"/>
         <source>Deny retail</source>
         <translation>Արգելել մանրածախ վաճառք</translation>
     </message>
     <message>
-        <location filename="../Reports/c5settingswidget.ui" line="1133"/>
+        <location filename="../Reports/c5settingswidget.ui" line="1243"/>
         <source>Deny whosale</source>
         <translation>Արգելել մեծածախ վաճառք</translation>
     </message>
     <message>
-        <location filename="../Reports/c5settingswidget.ui" line="1040"/>
+        <location filename="../Reports/c5settingswidget.ui" line="1126"/>
         <source>Deny price changing</source>
         <translation>Արգելել գնի փոփոխություն</translation>
     </message>
     <message>
-        <location filename="../Reports/c5settingswidget.ui" line="1414"/>
+        <location filename="../Reports/c5settingswidget.ui" line="1434"/>
         <source>Cashier login</source>
         <translation>Օպերատոր</translation>
     </message>
     <message>
-        <location filename="../Reports/c5settingswidget.ui" line="1324"/>
+        <location filename="../Reports/c5settingswidget.ui" line="1344"/>
         <source>Cashier pin</source>
         <translation>Պին</translation>
     </message>
@@ -5281,53 +5306,53 @@ Excel</translation>
         <translation>Մուտքի պինով</translation>
     </message>
     <message>
-        <location filename="../Reports/c5settingswidget.ui" line="1213"/>
+        <location filename="../Reports/c5settingswidget.ui" line="1283"/>
         <source>Fix staff</source>
         <translation>Նշանակել աշխատողին</translation>
     </message>
     <message>
-        <location filename="../Reports/c5settingswidget.ui" line="1495"/>
-        <location filename="../Reports/c5settingswidget.ui" line="1724"/>
+        <location filename="../Reports/c5settingswidget.ui" line="1515"/>
+        <location filename="../Reports/c5settingswidget.ui" line="1744"/>
         <source>Printing</source>
         <translation>Տպել կտրոնը</translation>
     </message>
     <message>
-        <location filename="../Reports/c5settingswidget.ui" line="1652"/>
+        <location filename="../Reports/c5settingswidget.ui" line="1672"/>
         <source>Receipt paper width</source>
         <translation>Կտրոնի թղթի լայնք</translation>
     </message>
     <message>
-        <location filename="../Reports/c5settingswidget.ui" line="1749"/>
+        <location filename="../Reports/c5settingswidget.ui" line="1769"/>
         <source>V1</source>
         <translation>Տարբերակ 1</translation>
     </message>
     <message>
-        <location filename="../Reports/c5settingswidget.ui" line="1759"/>
+        <location filename="../Reports/c5settingswidget.ui" line="1779"/>
         <source>V2</source>
         <translation>Տարբերակ 2</translation>
     </message>
     <message>
-        <location filename="../Reports/c5settingswidget.ui" line="1528"/>
+        <location filename="../Reports/c5settingswidget.ui" line="1548"/>
         <source>Printing goods qty side</source>
         <translation>Ապրանքի քանակի տեղը</translation>
     </message>
     <message>
-        <location filename="../Reports/c5settingswidget.ui" line="1534"/>
+        <location filename="../Reports/c5settingswidget.ui" line="1554"/>
         <source>Left of name</source>
         <translation>Անունից ձախ</translation>
     </message>
     <message>
-        <location filename="../Reports/c5settingswidget.ui" line="1544"/>
+        <location filename="../Reports/c5settingswidget.ui" line="1564"/>
         <source>Down of name</source>
         <translation>Անունինց ներքև</translation>
     </message>
     <message>
-        <location filename="../Reports/c5settingswidget.ui" line="1281"/>
+        <location filename="../Reports/c5settingswidget.ui" line="1301"/>
         <source>Tax options</source>
         <translation>ՀԴՄ կարգավորումներ</translation>
     </message>
     <message>
-        <location filename="../Reports/c5settingswidget.ui" line="1317"/>
+        <location filename="../Reports/c5settingswidget.ui" line="1337"/>
         <source>Always offer tax</source>
         <translation>Միշտ առաջարկել ՀԴՄ</translation>
     </message>
@@ -5402,7 +5427,7 @@ Excel</translation>
         <translation>Հիմնական ճաշացանկ</translation>
     </message>
     <message>
-        <location filename="../Reports/c5settingswidget.ui" line="1345"/>
+        <location filename="../Reports/c5settingswidget.ui" line="1365"/>
         <source>Tax use external POS</source>
         <translation>Արտաքին POS</translation>
     </message>
@@ -5427,27 +5452,27 @@ Excel</translation>
         <translation>Հիմնական սեղան</translation>
     </message>
     <message>
-        <location filename="../Reports/c5settingswidget.ui" line="1673"/>
+        <location filename="../Reports/c5settingswidget.ui" line="1693"/>
         <source>Receipt printer</source>
         <translation>Հաշիվը տպելու տպիչ</translation>
     </message>
     <message>
-        <location filename="../Reports/c5settingswidget.ui" line="1400"/>
+        <location filename="../Reports/c5settingswidget.ui" line="1420"/>
         <source>Tax department</source>
         <translation>ՀԴՄ, բաժին</translation>
     </message>
     <message>
-        <location filename="../Reports/c5settingswidget.ui" line="1393"/>
+        <location filename="../Reports/c5settingswidget.ui" line="1413"/>
         <source>Tax IP</source>
         <translation>ՀԴՄ, IP հասցե</translation>
     </message>
     <message>
-        <location filename="../Reports/c5settingswidget.ui" line="1407"/>
+        <location filename="../Reports/c5settingswidget.ui" line="1427"/>
         <source>Tax port</source>
         <translation>ՀԴՄ, պորտ</translation>
     </message>
     <message>
-        <location filename="../Reports/c5settingswidget.ui" line="1365"/>
+        <location filename="../Reports/c5settingswidget.ui" line="1385"/>
         <source>Tax password</source>
         <translation>ՀԴՄ, գաղտնաբառ</translation>
     </message>
@@ -5472,8 +5497,8 @@ Excel</translation>
         <translation>Խանութ</translation>
     </message>
     <message>
-        <location filename="../Reports/c5settingswidget.cpp" line="343"/>
-        <location filename="../Reports/c5settingswidget.cpp" line="362"/>
+        <location filename="../Reports/c5settingswidget.cpp" line="374"/>
+        <location filename="../Reports/c5settingswidget.cpp" line="393"/>
         <source>Connection successfull</source>
         <translation>Կապը հաստատված է</translation>
     </message>
@@ -12529,109 +12554,116 @@ data</source>
         <translation>Ուտեստներ</translation>
     </message>
     <message>
-        <location filename="../Reports/cr5dish.cpp" line="20"/>
-        <location filename="../Reports/cr5dish.cpp" line="150"/>
+        <location filename="../Reports/cr5dish.cpp" line="21"/>
+        <location filename="../Reports/cr5dish.cpp" line="159"/>
         <source>Code</source>
         <translation>Համար</translation>
     </message>
     <message>
-        <location filename="../Reports/cr5dish.cpp" line="21"/>
+        <location filename="../Reports/cr5dish.cpp" line="22"/>
         <source>Dept</source>
         <translation>Բաժին</translation>
     </message>
     <message>
-        <location filename="../Reports/cr5dish.cpp" line="22"/>
+        <location filename="../Reports/cr5dish.cpp" line="23"/>
         <source>Type</source>
         <translation>Տեսակ</translation>
     </message>
     <message>
-        <location filename="../Reports/cr5dish.cpp" line="23"/>
+        <location filename="../Reports/cr5dish.cpp" line="24"/>
         <source>Name</source>
         <translation>Անվանում</translation>
     </message>
     <message>
-        <location filename="../Reports/cr5dish.cpp" line="24"/>
+        <location filename="../Reports/cr5dish.cpp" line="25"/>
         <source>Remind</source>
         <translation>Հիշեցում</translation>
     </message>
     <message>
-        <location filename="../Reports/cr5dish.cpp" line="25"/>
+        <location filename="../Reports/cr5dish.cpp" line="26"/>
         <source>Barcode</source>
         <translation>Բարկոդ</translation>
     </message>
     <message>
-        <location filename="../Reports/cr5dish.cpp" line="26"/>
+        <location filename="../Reports/cr5dish.cpp" line="27"/>
         <source>Service</source>
         <translation>Սպասարկման
 տոկոս</translation>
     </message>
     <message>
-        <location filename="../Reports/cr5dish.cpp" line="27"/>
+        <location filename="../Reports/cr5dish.cpp" line="28"/>
         <source>Discount</source>
         <translation>Զեղչ</translation>
     </message>
     <message>
-        <location filename="../Reports/cr5dish.cpp" line="28"/>
+        <location filename="../Reports/cr5dish.cpp" line="29"/>
         <source>Queue</source>
         <translation>Հերթ</translation>
     </message>
     <message>
-        <location filename="../Reports/cr5dish.cpp" line="29"/>
+        <location filename="../Reports/cr5dish.cpp" line="30"/>
         <source>Color</source>
         <translation>Գույն</translation>
     </message>
     <message>
-        <location filename="../Reports/cr5dish.cpp" line="30"/>
+        <location filename="../Reports/cr5dish.cpp" line="31"/>
         <source>Weight</source>
         <translation>Քաշ</translation>
     </message>
     <message>
-        <location filename="../Reports/cr5dish.cpp" line="31"/>
+        <location filename="../Reports/cr5dish.cpp" line="32"/>
         <source>Cost</source>
         <translation>Արժեք</translation>
     </message>
     <message>
-        <location filename="../Reports/cr5dish.cpp" line="45"/>
+        <location filename="../Reports/cr5dish.cpp" line="46"/>
         <source>Translator</source>
         <translation>Թարկմանիչ</translation>
     </message>
     <message>
-        <location filename="../Reports/cr5dish.cpp" line="46"/>
+        <location filename="../Reports/cr5dish.cpp" line="47"/>
+        <source>Description
+translator</source>
+        <translation>Նկարագրության
+թարկմանիչ</translation>
+    </message>
+    <message>
+        <location filename="../Reports/cr5dish.cpp" line="48"/>
         <source>Remove</source>
         <translation>Հեռացնել</translation>
     </message>
     <message>
-        <location filename="../Reports/cr5dish.cpp" line="47"/>
+        <location filename="../Reports/cr5dish.cpp" line="49"/>
         <source>Build web</source>
         <translation>Կառուցել վեբ էջը</translation>
     </message>
     <message>
-        <location filename="../Reports/cr5dish.cpp" line="48"/>
+        <location filename="../Reports/cr5dish.cpp" line="50"/>
         <source>Output to AS</source>
         <translation>Արտահանել ՀԾ</translation>
     </message>
     <message>
-        <location filename="../Reports/cr5dish.cpp" line="51"/>
+        <location filename="../Reports/cr5dish.cpp" line="53"/>
         <source>Print recipes</source>
         <translation>Տպել բաղադրատոմսերը</translation>
     </message>
     <message>
-        <location filename="../Reports/cr5dish.cpp" line="103"/>
+        <location filename="../Reports/cr5dish.cpp" line="112"/>
         <source>This name in use and cannot be removed</source>
         <translation>Այս անվանումը օգտագործվում է</translation>
     </message>
     <message>
-        <location filename="../Reports/cr5dish.cpp" line="106"/>
+        <location filename="../Reports/cr5dish.cpp" line="115"/>
         <source>Confirm to remove the selected dish</source>
         <translation>Հաստատեք հեռացումը</translation>
     </message>
     <message>
-        <location filename="../Reports/cr5dish.cpp" line="118"/>
+        <location filename="../Reports/cr5dish.cpp" line="127"/>
         <source>Deleted</source>
         <translation>Հեռացված է</translation>
     </message>
     <message>
-        <location filename="../Reports/cr5dish.cpp" line="165"/>
+        <location filename="../Reports/cr5dish.cpp" line="174"/>
         <source>Build complete</source>
         <translation>Պատրաստ է</translation>
     </message>
@@ -12713,73 +12745,78 @@ data</source>
 <context>
     <name>CR5DishPart2</name>
     <message>
-        <location filename="../Reports/cr5dishpart2.cpp" line="10"/>
+        <location filename="../Reports/cr5dishpart2.cpp" line="12"/>
         <source>Types of dishes</source>
         <translation>Ուտեստի տեսակներ</translation>
     </message>
     <message>
-        <location filename="../Reports/cr5dishpart2.cpp" line="17"/>
+        <location filename="../Reports/cr5dishpart2.cpp" line="19"/>
         <source>Code</source>
         <translation>Համար</translation>
     </message>
     <message>
-        <location filename="../Reports/cr5dishpart2.cpp" line="18"/>
+        <location filename="../Reports/cr5dishpart2.cpp" line="20"/>
         <source>Dept name</source>
         <translation>Բաժին</translation>
     </message>
     <message>
-        <location filename="../Reports/cr5dishpart2.cpp" line="19"/>
+        <location filename="../Reports/cr5dishpart2.cpp" line="21"/>
         <source>Name</source>
         <translation>Անվանում</translation>
     </message>
     <message>
-        <location filename="../Reports/cr5dishpart2.cpp" line="20"/>
+        <location filename="../Reports/cr5dishpart2.cpp" line="22"/>
         <source>ADG code</source>
         <translation>ԱԴԳՏ
 դասակարգիչ</translation>
     </message>
     <message>
-        <location filename="../Reports/cr5dishpart2.cpp" line="21"/>
+        <location filename="../Reports/cr5dishpart2.cpp" line="23"/>
         <source>Queue</source>
         <translation>Հերթ</translation>
     </message>
     <message>
-        <location filename="../Reports/cr5dishpart2.cpp" line="22"/>
+        <location filename="../Reports/cr5dishpart2.cpp" line="24"/>
         <source>Color</source>
         <translation>Գույն</translation>
     </message>
     <message>
-        <location filename="../Reports/cr5dishpart2.cpp" line="23"/>
+        <location filename="../Reports/cr5dishpart2.cpp" line="25"/>
         <source>Parent</source>
         <translation>Ծնող</translation>
     </message>
     <message>
-        <location filename="../Reports/cr5dishpart2.cpp" line="24"/>
+        <location filename="../Reports/cr5dishpart2.cpp" line="26"/>
         <source>Salary</source>
         <translation>Աշխատավարձ</translation>
     </message>
     <message>
-        <location filename="../Reports/cr5dishpart2.cpp" line="25"/>
+        <location filename="../Reports/cr5dishpart2.cpp" line="27"/>
         <source>Position</source>
         <translation>Հաստիկ</translation>
     </message>
     <message>
-        <location filename="../Reports/cr5dishpart2.cpp" line="39"/>
+        <location filename="../Reports/cr5dishpart2.cpp" line="41"/>
         <source>Remove</source>
         <translation>Հեռացնել</translation>
     </message>
     <message>
-        <location filename="../Reports/cr5dishpart2.cpp" line="90"/>
+        <location filename="../Reports/cr5dishpart2.cpp" line="42"/>
+        <source>Translator</source>
+        <translation>Թարկմանիչ</translation>
+    </message>
+    <message>
+        <location filename="../Reports/cr5dishpart2.cpp" line="94"/>
         <source>This name in use and cannot be removed</source>
         <translation>Այս անվանումը օգտագործվում է</translation>
     </message>
     <message>
-        <location filename="../Reports/cr5dishpart2.cpp" line="94"/>
+        <location filename="../Reports/cr5dishpart2.cpp" line="98"/>
         <source>Confirm to remove the selected dish part and all dishes that includes this part</source>
         <translation>Հաստատեք ուտեստի տեսակի հեռացումը իրեն պատկանող ուտեստների հետ միասին</translation>
     </message>
     <message>
-        <location filename="../Reports/cr5dishpart2.cpp" line="110"/>
+        <location filename="../Reports/cr5dishpart2.cpp" line="115"/>
         <source>Deleted</source>
         <translation>Հեռացված է</translation>
     </message>
@@ -15593,37 +15630,37 @@ action</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Reports/cr5menutranslator.ui" line="65"/>
+        <location filename="../Reports/cr5menutranslator.ui" line="68"/>
         <source>Code</source>
         <translation>Համար</translation>
     </message>
     <message>
-        <location filename="../Reports/cr5menutranslator.ui" line="70"/>
+        <location filename="../Reports/cr5menutranslator.ui" line="73"/>
         <source>Type</source>
         <translation>Տեսակ</translation>
     </message>
     <message>
-        <location filename="../Reports/cr5menutranslator.ui" line="75"/>
+        <location filename="../Reports/cr5menutranslator.ui" line="78"/>
         <source>Armenian</source>
         <translation>Հայերեն</translation>
     </message>
     <message>
-        <location filename="../Reports/cr5menutranslator.ui" line="80"/>
+        <location filename="../Reports/cr5menutranslator.ui" line="83"/>
         <source>English</source>
         <translation>Անգլերեն</translation>
     </message>
     <message>
-        <location filename="../Reports/cr5menutranslator.ui" line="85"/>
+        <location filename="../Reports/cr5menutranslator.ui" line="88"/>
         <source>Russian</source>
         <translation>Ռուսերեն</translation>
     </message>
     <message>
-        <location filename="../Reports/cr5menutranslator.cpp" line="27"/>
+        <location filename="../Reports/cr5menutranslator.cpp" line="13"/>
         <source>Translator</source>
         <translation>Թարկմանիչ</translation>
     </message>
     <message>
-        <location filename="../Reports/cr5menutranslator.cpp" line="80"/>
+        <location filename="../Reports/cr5menutranslator.cpp" line="102"/>
         <source>Saved</source>
         <translation>Պահպանված է</translation>
     </message>
@@ -16301,131 +16338,136 @@ user</source>
         <translation>Վաճառք ըստ տեսականի</translation>
     </message>
     <message>
-        <location filename="../Reports/cr5salefromstore.cpp" line="80"/>
+        <location filename="../Reports/cr5salefromstore.cpp" line="83"/>
         <source>UUID</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Reports/cr5salefromstore.cpp" line="81"/>
+        <location filename="../Reports/cr5salefromstore.cpp" line="84"/>
         <source>Tax receipt</source>
         <translation>ՀԴՄ</translation>
     </message>
     <message>
-        <location filename="../Reports/cr5salefromstore.cpp" line="82"/>
+        <location filename="../Reports/cr5salefromstore.cpp" line="85"/>
         <source>Number</source>
         <translation>Համար</translation>
     </message>
     <message>
-        <location filename="../Reports/cr5salefromstore.cpp" line="83"/>
+        <location filename="../Reports/cr5salefromstore.cpp" line="86"/>
         <source>Date, cash</source>
         <translation>Մուտք
 դրամարկղ</translation>
     </message>
     <message>
-        <location filename="../Reports/cr5salefromstore.cpp" line="84"/>
+        <location filename="../Reports/cr5salefromstore.cpp" line="87"/>
         <source>Store</source>
         <translation>Պահեստ</translation>
     </message>
     <message>
-        <location filename="../Reports/cr5salefromstore.cpp" line="85"/>
+        <location filename="../Reports/cr5salefromstore.cpp" line="88"/>
         <source>Goods</source>
         <translation>Ապրանքներ</translation>
     </message>
     <message>
-        <location filename="../Reports/cr5salefromstore.cpp" line="86"/>
+        <location filename="../Reports/cr5salefromstore.cpp" line="89"/>
         <source>Class</source>
         <translation>Դաս</translation>
     </message>
     <message>
-        <location filename="../Reports/cr5salefromstore.cpp" line="87"/>
+        <location filename="../Reports/cr5salefromstore.cpp" line="90"/>
         <source>Scancode</source>
         <translation>Շտրիխ կոդ</translation>
     </message>
     <message>
-        <location filename="../Reports/cr5salefromstore.cpp" line="88"/>
-        <location filename="../Reports/cr5salefromstore.cpp" line="92"/>
+        <location filename="../Reports/cr5salefromstore.cpp" line="91"/>
+        <location filename="../Reports/cr5salefromstore.cpp" line="96"/>
         <source>Group</source>
         <translation>Խումբ</translation>
     </message>
     <message>
-        <location filename="../Reports/cr5salefromstore.cpp" line="89"/>
+        <location filename="../Reports/cr5salefromstore.cpp" line="92"/>
+        <source>Return reason</source>
+        <translation>Վերադարձի պատճառ</translation>
+    </message>
+    <message>
+        <location filename="../Reports/cr5salefromstore.cpp" line="93"/>
         <source>Unit</source>
         <translation>ՉՄ</translation>
     </message>
     <message>
-        <location filename="../Reports/cr5salefromstore.cpp" line="90"/>
+        <location filename="../Reports/cr5salefromstore.cpp" line="94"/>
         <source>Qty</source>
         <translation>Քնկ</translation>
     </message>
     <message>
-        <location filename="../Reports/cr5salefromstore.cpp" line="91"/>
+        <location filename="../Reports/cr5salefromstore.cpp" line="95"/>
         <source>Total</source>
         <translation>Ընդամենը</translation>
     </message>
     <message>
-        <location filename="../Reports/cr5salefromstore.cpp" line="93"/>
+        <location filename="../Reports/cr5salefromstore.cpp" line="97"/>
         <source>Hall</source>
         <translation>Սրահ</translation>
     </message>
     <message>
-        <location filename="../Reports/cr5salefromstore.cpp" line="94"/>
+        <location filename="../Reports/cr5salefromstore.cpp" line="98"/>
         <source>Buyer</source>
         <translation>Գնորդ</translation>
     </message>
     <message>
-        <location filename="../Reports/cr5salefromstore.cpp" line="95"/>
+        <location filename="../Reports/cr5salefromstore.cpp" line="99"/>
         <source>Buyer taxcode</source>
         <translation>Գնորդի ՀՎՀՀ</translation>
     </message>
     <message>
-        <location filename="../Reports/cr5salefromstore.cpp" line="96"/>
+        <location filename="../Reports/cr5salefromstore.cpp" line="100"/>
         <source>Discount factor</source>
         <translation>Զեղչի տոկոս</translation>
     </message>
     <message>
-        <location filename="../Reports/cr5salefromstore.cpp" line="97"/>
+        <location filename="../Reports/cr5salefromstore.cpp" line="101"/>
         <source>Discount amount</source>
         <translation>Զեղչի գումար</translation>
     </message>
     <message>
-        <location filename="../Reports/cr5salefromstore.cpp" line="98"/>
+        <location filename="../Reports/cr5salefromstore.cpp" line="102"/>
         <source>Price</source>
         <translation>Գին</translation>
     </message>
     <message>
-        <location filename="../Reports/cr5salefromstore.cpp" line="99"/>
+        <location filename="../Reports/cr5salefromstore.cpp" line="103"/>
         <source>Sale price</source>
         <translation>Մանրածախ վաճառքի գին</translation>
     </message>
     <message>
-        <location filename="../Reports/cr5salefromstore.cpp" line="100"/>
+        <location filename="../Reports/cr5salefromstore.cpp" line="104"/>
         <source>Whosale price</source>
         <translation>Մեծածախ վաճառքի գին</translation>
     </message>
     <message>
-        <location filename="../Reports/cr5salefromstore.cpp" line="101"/>
+        <location filename="../Reports/cr5salefromstore.cpp" line="105"/>
         <source>Total of retail price</source>
         <translation>Ընդամենը,
 մանրածախ գին</translation>
     </message>
     <message>
-        <location filename="../Reports/cr5salefromstore.cpp" line="102"/>
+        <location filename="../Reports/cr5salefromstore.cpp" line="106"/>
         <source>Total of whosale price</source>
         <translation>Ընդամենը,
 մեծածախ գին</translation>
     </message>
     <message>
-        <location filename="../Reports/cr5salefromstore.cpp" line="103"/>
+        <location filename="../Reports/cr5salefromstore.cpp" line="107"/>
         <source>Selfcost</source>
         <translation>Ինքնառժեք</translation>
     </message>
     <message>
-        <location filename="../Reports/cr5salefromstore.cpp" line="104"/>
+        <location filename="../Reports/cr5salefromstore.cpp" line="108"/>
         <source>Selfcost total</source>
         <translation>Ընդհանուր ինքնառժեք</translation>
     </message>
     <message>
-        <location filename="../Reports/cr5salefromstore.cpp" line="161"/>
+        <location filename="../Reports/cr5salefromstore.cpp" line="166"/>
         <source>Column &apos;Header&apos; must be checked in filter</source>
         <translation>&quot;Կտրոնի համար&quot; դաշտը պետք է ընդգրկված լինի հաշվետվության մեջ</translation>
     </message>
@@ -16816,98 +16858,108 @@ user</source>
         <translation>Վաճառք, ըստ ուտեստների</translation>
     </message>
     <message>
-        <location filename="../Reports/cr5salesbydishes.cpp" line="66"/>
+        <location filename="../Reports/cr5salesbydishes.cpp" line="69"/>
         <source>Header</source>
         <translation>Ունիկալ համար</translation>
     </message>
     <message>
-        <location filename="../Reports/cr5salesbydishes.cpp" line="67"/>
+        <location filename="../Reports/cr5salesbydishes.cpp" line="70"/>
         <source>Order</source>
         <translation>Պատվեր</translation>
     </message>
     <message>
-        <location filename="../Reports/cr5salesbydishes.cpp" line="68"/>
+        <location filename="../Reports/cr5salesbydishes.cpp" line="71"/>
         <source>Hall</source>
         <translation>Սրահ</translation>
     </message>
     <message>
-        <location filename="../Reports/cr5salesbydishes.cpp" line="69"/>
+        <location filename="../Reports/cr5salesbydishes.cpp" line="72"/>
         <source>Table</source>
         <translation>Սեղան</translation>
     </message>
     <message>
-        <location filename="../Reports/cr5salesbydishes.cpp" line="70"/>
+        <location filename="../Reports/cr5salesbydishes.cpp" line="73"/>
         <source>Order state</source>
         <translation>Պատվերի վիճակ</translation>
     </message>
     <message>
-        <location filename="../Reports/cr5salesbydishes.cpp" line="71"/>
+        <location filename="../Reports/cr5salesbydishes.cpp" line="74"/>
         <source>Date, cash</source>
         <translation>Մուտք դրամարկղ</translation>
     </message>
     <message>
-        <location filename="../Reports/cr5salesbydishes.cpp" line="72"/>
+        <location filename="../Reports/cr5salesbydishes.cpp" line="75"/>
         <source>Time, close</source>
         <translation>Փակման ժամ</translation>
     </message>
     <message>
-        <location filename="../Reports/cr5salesbydishes.cpp" line="73"/>
+        <location filename="../Reports/cr5salesbydishes.cpp" line="76"/>
         <source>Dept</source>
         <translation>Բաժին</translation>
     </message>
     <message>
-        <location filename="../Reports/cr5salesbydishes.cpp" line="74"/>
+        <location filename="../Reports/cr5salesbydishes.cpp" line="77"/>
         <source>Type of dish</source>
         <translation>Ոտեստի տեսակ</translation>
     </message>
     <message>
-        <location filename="../Reports/cr5salesbydishes.cpp" line="75"/>
+        <location filename="../Reports/cr5salesbydishes.cpp" line="78"/>
         <source>Dish code</source>
         <translation>Ուտեստի կոդ</translation>
     </message>
     <message>
-        <location filename="../Reports/cr5salesbydishes.cpp" line="76"/>
-        <location filename="../Reports/cr5salesbydishes.cpp" line="114"/>
+        <location filename="../Reports/cr5salesbydishes.cpp" line="79"/>
+        <location filename="../Reports/cr5salesbydishes.cpp" line="119"/>
         <source>Dish</source>
         <translation>Ուտեստ</translation>
     </message>
     <message>
-        <location filename="../Reports/cr5salesbydishes.cpp" line="77"/>
+        <location filename="../Reports/cr5salesbydishes.cpp" line="80"/>
         <source>Dish state</source>
         <translation>Ուտեստի վիճակ</translation>
     </message>
     <message>
-        <location filename="../Reports/cr5salesbydishes.cpp" line="78"/>
+        <location filename="../Reports/cr5salesbydishes.cpp" line="81"/>
         <source>Remove reason</source>
         <translation>Հեռացման պատճառ</translation>
     </message>
     <message>
-        <location filename="../Reports/cr5salesbydishes.cpp" line="79"/>
+        <location filename="../Reports/cr5salesbydishes.cpp" line="82"/>
         <source>Store</source>
         <translation>Պահեստ</translation>
     </message>
     <message>
-        <location filename="../Reports/cr5salesbydishes.cpp" line="80"/>
+        <location filename="../Reports/cr5salesbydishes.cpp" line="83"/>
         <source>Qty</source>
         <translation>Քնկ</translation>
     </message>
     <message>
-        <location filename="../Reports/cr5salesbydishes.cpp" line="81"/>
+        <location filename="../Reports/cr5salesbydishes.cpp" line="84"/>
+        <source>Fiscal</source>
+        <translation>ՀԴՄ</translation>
+    </message>
+    <message>
+        <location filename="../Reports/cr5salesbydishes.cpp" line="85"/>
+        <source>ADG code</source>
+        <translation>ԱԴԳ կոդ</translation>
+    </message>
+    <message>
+        <location filename="../Reports/cr5salesbydishes.cpp" line="86"/>
         <source>Total</source>
         <translation>Ընդամենը</translation>
     </message>
     <message>
-        <location filename="../Reports/cr5salesbydishes.cpp" line="82"/>
+        <location filename="../Reports/cr5salesbydishes.cpp" line="87"/>
         <source>Comment</source>
         <translation>Մեկնաբանություն</translation>
     </message>
     <message>
-        <location filename="../Reports/cr5salesbydishes.cpp" line="132"/>
+        <location filename="../Reports/cr5salesbydishes.cpp" line="137"/>
         <source>Column &apos;Header&apos; must be checked in filter</source>
         <translation>&quot;Ունիկալ համար&quot; դաշտը պետք է ընդգրկված լինի հաշվետվության մեջ</translation>
     </message>
     <message>
-        <location filename="../Reports/cr5salesbydishes.cpp" line="146"/>
+        <location filename="../Reports/cr5salesbydishes.cpp" line="151"/>
         <source>Column &apos;Dish code&apos; must be checked in filter</source>
         <translation>&quot;Ուտեստի&quot; դաշտը պետք է ընդգրկված լինի հաշվետվության մեջ</translation>
     </message>
@@ -16920,113 +16972,129 @@ user</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Reports/cr5salesbydishesfilter.ui" line="33"/>
+        <location filename="../Reports/cr5salesbydishesfilter.ui" line="88"/>
         <source>Use closing
 datetime</source>
         <translation>Կիրարել փակման
  օր և ժամ</translation>
     </message>
     <message>
-        <location filename="../Reports/cr5salesbydishesfilter.ui" line="241"/>
+        <location filename="../Reports/cr5salesbydishesfilter.ui" line="237"/>
         <source>typeofdish</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Reports/cr5salesbydishesfilter.ui" line="44"/>
-        <location filename="../Reports/cr5salesbydishesfilter.ui" line="134"/>
+        <location filename="../Reports/cr5salesbydishesfilter.ui" line="99"/>
+        <location filename="../Reports/cr5salesbydishesfilter.ui" line="112"/>
         <source>dd.MM.yyyy HH:mm</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Reports/cr5salesbydishesfilter.ui" line="228"/>
+        <location filename="../Reports/cr5salesbydishesfilter.ui" line="78"/>
         <source>date2</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Reports/cr5salesbydishesfilter.ui" line="254"/>
+        <location filename="../Reports/cr5salesbydishesfilter.ui" line="207"/>
         <source>department</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Reports/cr5salesbydishesfilter.ui" line="107"/>
+        <location filename="../Reports/cr5salesbydishesfilter.ui" line="158"/>
         <source>State</source>
         <translation>Վիճակ</translation>
     </message>
     <message>
-        <location filename="../Reports/cr5salesbydishesfilter.ui" line="67"/>
+        <location filename="../Reports/cr5salesbydishesfilter.ui" line="267"/>
         <source>store</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Reports/cr5salesbydishesfilter.ui" line="169"/>
+        <location filename="../Reports/cr5salesbydishesfilter.ui" line="39"/>
         <source>date1</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Reports/cr5salesbydishesfilter.ui" line="93"/>
+        <location filename="../Reports/cr5salesbydishesfilter.ui" line="177"/>
         <source>state</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Reports/cr5salesbydishesfilter.ui" line="179"/>
+        <location filename="../Reports/cr5salesbydishesfilter.ui" line="294"/>
+        <location filename="../Reports/cr5salesbydishesfilter.ui" line="337"/>
         <source>All</source>
         <translation>Բոլորը</translation>
     </message>
     <message>
-        <location filename="../Reports/cr5salesbydishesfilter.ui" line="189"/>
-        <location filename="../Reports/cr5salesbydishesfilter.cpp" line="72"/>
+        <location filename="../Reports/cr5salesbydishesfilter.ui" line="304"/>
+        <location filename="../Reports/cr5salesbydishesfilter.cpp" line="78"/>
         <source>No recipe</source>
         <translation>Առանձ բաղադրատոմս</translation>
     </message>
     <message>
-        <location filename="../Reports/cr5salesbydishesfilter.ui" line="196"/>
-        <location filename="../Reports/cr5salesbydishesfilter.cpp" line="74"/>
+        <location filename="../Reports/cr5salesbydishesfilter.ui" line="311"/>
+        <location filename="../Reports/cr5salesbydishesfilter.cpp" line="80"/>
         <source>With recipe</source>
         <translation>Բաղադրատոմսերով</translation>
     </message>
     <message>
-        <location filename="../Reports/cr5salesbydishesfilter.ui" line="298"/>
+        <location filename="../Reports/cr5salesbydishesfilter.ui" line="321"/>
+        <source>Tax</source>
+        <translation>ՀԴՄ</translation>
+    </message>
+    <message>
+        <location filename="../Reports/cr5salesbydishesfilter.ui" line="347"/>
+        <source>Yes</source>
+        <translation>Այո</translation>
+    </message>
+    <message>
+        <location filename="../Reports/cr5salesbydishesfilter.ui" line="354"/>
+        <source>No</source>
+        <translation>Ոչ</translation>
+    </message>
+    <message>
+        <location filename="../Reports/cr5salesbydishesfilter.ui" line="122"/>
         <source>Order state</source>
         <translation>Պատվերի վիճակ</translation>
     </message>
     <message>
-        <location filename="../Reports/cr5salesbydishesfilter.ui" line="317"/>
+        <location filename="../Reports/cr5salesbydishesfilter.ui" line="141"/>
         <source>stateorder</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Reports/cr5salesbydishesfilter.ui" line="114"/>
+        <location filename="../Reports/cr5salesbydishesfilter.ui" line="284"/>
         <source>Recipe</source>
         <translation>Բաղադրատոմս</translation>
     </message>
     <message>
-        <location filename="../Reports/cr5salesbydishesfilter.ui" line="100"/>
+        <location filename="../Reports/cr5salesbydishesfilter.ui" line="20"/>
         <source>Start</source>
         <translation>Սկիզբ</translation>
     </message>
     <message>
-        <location filename="../Reports/cr5salesbydishesfilter.ui" line="54"/>
+        <location filename="../Reports/cr5salesbydishesfilter.ui" line="59"/>
         <source>End</source>
         <translation>Ավարտ</translation>
     </message>
     <message>
-        <location filename="../Reports/cr5salesbydishesfilter.ui" line="74"/>
+        <location filename="../Reports/cr5salesbydishesfilter.ui" line="194"/>
         <source>Department</source>
         <translation>Բաժին</translation>
     </message>
     <message>
-        <location filename="../Reports/cr5salesbydishesfilter.ui" line="281"/>
+        <location filename="../Reports/cr5salesbydishesfilter.ui" line="224"/>
         <source>Type of dish</source>
         <translation>Ոտեստի տեսակ</translation>
     </message>
     <message>
-        <location filename="../Reports/cr5salesbydishesfilter.ui" line="261"/>
+        <location filename="../Reports/cr5salesbydishesfilter.ui" line="254"/>
         <source>Store</source>
         <translation>Պահեստ</translation>
     </message>
     <message>
-        <location filename="../Reports/cr5salesbydishesfilter.cpp" line="63"/>
-        <location filename="../Reports/cr5salesbydishesfilter.cpp" line="65"/>
+        <location filename="../Reports/cr5salesbydishesfilter.cpp" line="69"/>
+        <location filename="../Reports/cr5salesbydishesfilter.cpp" line="71"/>
         <source>Date range</source>
         <translation>Ժամանակաշրջան</translation>
     </message>
@@ -18870,7 +18938,7 @@ permissions</source>
     <message>
         <location filename="../Forms/dlgsemireadyinout.ui" line="56"/>
         <source>kb</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../Forms/dlgsemireadyinout.ui" line="80"/>
@@ -19004,17 +19072,17 @@ permissions</source>
     <message>
         <location filename="../NTable/nfilterdlg.ui" line="20"/>
         <source>Search parameters</source>
-        <translation type="unfinished"></translation>
+        <translation>Փնտրելու պարամետրերը</translation>
     </message>
     <message>
         <location filename="../NTable/nfilterdlg.ui" line="51"/>
         <source>Apply</source>
-        <translation type="unfinished">Կիռարել</translation>
+        <translation>Կիռարել</translation>
     </message>
     <message>
         <location filename="../NTable/nfilterdlg.ui" line="58"/>
         <source>Cancel</source>
-        <translation type="unfinished">Հրաժարվել</translation>
+        <translation>Հրաժարվել</translation>
     </message>
 </context>
 <context>
@@ -19034,7 +19102,7 @@ permissions</source>
 <context>
     <name>NInterface</name>
     <message>
-        <location filename="../NTable/ninterface.cpp" line="60"/>
+        <location filename="../NTable/ninterface.cpp" line="64"/>
         <source>Unauthorized</source>
         <translation>Գործողությունը արգելված է</translation>
     </message>

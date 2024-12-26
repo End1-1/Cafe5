@@ -43,6 +43,7 @@ void C5SearchEngine::init(QStringList databases)
                 "WHERE LENGTH(f_word)>0 "
                 "ORDER BY f_mode desc, f_word");
         while (db.next()) {
+            //LogWriter::write(LogWriterLevel::special, "", db.string("f_word"));
             words.append(db.string("f_word"));
             objects[totalitems++] = {db.integer("f_mode"), db.integer("f_id"),  db.string("f_orig")};
         }
@@ -67,13 +68,14 @@ void C5SearchEngine::search(const QJsonObject &jo, QWebSocket *socket)
     int maxCount = 10;
     QString databaseName = jo["database"].toString();
     const QStringList &words = mSearchStrings[databaseName];
-    QStringList templateWords = jo["template"].toString().split(QRegExp("\\s+"));
+    QStringList templateWords = jo["template"].toString().split(QRegularExpression("\\s+"), Qt::SkipEmptyParts);
     templateWords.append(jo["template"].toString());
     QList<int> foundedIndexes;
     bool stopflag = false;
-    for (const QString &searchString : qAsConst(templateWords)) {
+    for (const QString &searchString : std::as_const(templateWords)) {
         for (int i = 0; i < words.count(); i++) {
-            if (words.at(i).contains(QRegExp("\\b" + QRegExp::escape(searchString)))) {
+            if (words.at(i).contains(QRegularExpression("\\b" + QRegularExpression::escape(searchString),
+                                     QRegularExpression::UseUnicodePropertiesOption))) {
                 if (!foundedIndexes.contains(i)) {
                     foundedIndexes.append(i);
                 }
@@ -103,5 +105,4 @@ void C5SearchEngine::search(const QJsonObject &jo, QWebSocket *socket)
     repMsg = QJsonDocument(jrep).toJson(QJsonDocument::Compact);
     LogWriter::write(LogWriterLevel::errors, "", repMsg);
     socket->sendTextMessage(repMsg);
-    return;
 }

@@ -5,7 +5,7 @@
 #include "nloadingdlg.h"
 #include "nsearchdlg.h"
 #include "c5message.h"
-#include "c5filelogwriter.h"
+#include "logwriter.h"
 #include "c5config.h"
 #include "ndataprovider.h"
 #include <QCheckBox>
@@ -213,7 +213,7 @@ void NFilterDlg::queryStarted()
 void NFilterDlg::queryError(const QString &error)
 {
     sender()->deleteLater();
-    c5loge(error);
+    LogWriterError(error);
     C5Message::error(error);
     mLoadingDlg->deleteLater();
 }

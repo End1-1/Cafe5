@@ -60,6 +60,16 @@ void C5SettingsWidget::setId(int id)
         QJsonObject jo = __strjson(db.getString("f_config"));
         ui->leChatOperatorUserId->setInteger(jo["chatoperatoruserid"].toInt());
         ui->chDenyLogout->setChecked(jo["denylogout"].toBool());
+        ui->leCoinCashdesk->setText(jo["coincash_id"].toString());
+        QJsonArray ja = jo["availableoutstore"].toArray();
+        QString s;
+        for (int i = 0; i < ja.count(); i++) {
+            if (!s.isEmpty()) {
+                s += ",";
+            }
+            s += QString::number(ja.at(i).toInt());
+        }
+        ui->leAvailableStore->setText(s);
     }
 }
 
@@ -222,6 +232,14 @@ bool C5SettingsWidget::save(QString &err, QList<QMap<QString, QVariant> > &data)
     jc["servicefactor"] = ui->leServiceFactor->getDouble();
     jc["debugmode"] = ui->chDebugMode->isChecked();
     jc["denylogout"] = ui->chDenyLogout->isChecked();
+    jc["cashbox_id"] = ui->leCashId->getInteger();
+    jc["coincash_id"] = ui->leCoinCashdesk->getInteger();
+    QJsonArray ja;
+    QStringList a = ui->leAvailableStore->text().split(",", Qt::SkipEmptyParts);
+    for  (const QString &s : a) {
+        ja.append(s.toInt());
+    }
+    jc["availableoutstore"] = ja;
     db[":f_id"] = ui->leCode->getInteger();
     db[":f_name"] = ui->leSettingsName->text();
     db[":f_config"] = __jsonstr(jc);

@@ -4,11 +4,15 @@
 #include <QMutex>
 #include <QMap>
 
-namespace LogWriterLevel {
-    const QString verbose = "verbose";
-    const QString warning = "warning";
-    const QString errors = "errors";
-    const QString special = "special";
+#define LogWriterVerbose(y) LogWriter::write(LogWriterLevel::verbose, y)
+#define LogWriterError(y) LogWriter::write(LogWriterLevel::errors, "", y)
+
+namespace LogWriterLevel
+{
+const QString verbose = "verbose";
+const QString warning = "warning";
+const QString errors = "errors";
+const QString special = "special";
 }
 
 class LogWriter

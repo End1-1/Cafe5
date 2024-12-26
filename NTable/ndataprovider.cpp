@@ -32,13 +32,13 @@ void NDataProvider::getData(const QString &route, const QJsonObject &data)
 {
     mTimer->restart();
     emit started();
-    if (mHost.startsWith("http")) {
-        mProtocol.clear();
-    }
-    if (mProtocol.isEmpty() && !mHost.contains("https")) {
-        mProtocol = "https://";
-    }
-    QNetworkRequest rq(mProtocol + mHost + route);
+    // if (mHost.startsWith("http")) {
+    //     mProtocol.clear();
+    // }
+    // if (mProtocol.isEmpty() && !mHost.contains("https")) {
+    //     mProtocol = "https://";
+    // }
+    QNetworkRequest rq(mHost + route);
     rq.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
     QJsonObject jo;
     jo["sessionkey"] = sessionKey;

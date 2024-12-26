@@ -4,7 +4,7 @@
 #include "ndataprovider.h"
 #include "nloadingdlg.h"
 #include "c5mainwindow.h"
-#include "c5filelogwriter.h"
+#include "logwriter.h"
 #include "c5filtervalues.h"
 #include "xlsxall.h"
 #include "c5utils.h"
@@ -140,7 +140,7 @@ void NTableWidget::filterByColumn()
 void NTableWidget::queryError(const QString &error)
 {
     sender()->deleteLater();
-    c5loge(error);
+    LogWriterError(error);
     C5Message::error(error);
     mLoadingDlg->deleteLater();
 }

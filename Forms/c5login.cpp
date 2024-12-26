@@ -44,6 +44,7 @@ void C5Login::loginResponse(const QJsonObject &jdoc)
     QSettings s(_ORGANIZATION_, _APPLICATION_ + QString("\\") + _MODULE_);
     s.setValue("lastdb", ui->cbDatabases->currentText());
     s.setValue("lastusername", ui->leUsername->currentText());
+    __c5config.fDBName = ui->cbDatabases->currentText();
     fHttp->httpQueryFinished(sender());
     accept();
 }

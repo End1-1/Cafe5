@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>695</width>
-    <height>307</height>
+    <height>388</height>
    </rect>
   </property>
   <property name="font">
@@ -142,6 +142,20 @@
      </property>
      <property name="readOnly">
       <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="0">
+    <widget class="QLabel" name="lbAmountCoin">
+     <property name="text">
+      <string>Amount, coin</string>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="1">
+    <widget class="C5LineEdit" name="leAmountCoin">
+     <property name="text">
+      <string>0</string>
      </property>
     </widget>
    </item>

@@ -37,7 +37,7 @@ void ServerThread::run()
     // fServer->setMaxPendingConnections(10000);
     if (!fServer->listen(QHostAddress::Any, port)) {
         LogWriter::write(LogWriterLevel::errors, "",
-                         "Cannot listen port: " + QString::number(port) + " " +fServer->errorString());
+                         "Cannot listen port: " + QString::number(port) + " " + fServer->errorString());
         exit(1);
         return;
     }
@@ -148,7 +148,8 @@ void ServerThread::onTextMessage(const QString &msg)
         return;
     }
     QString command = jdoc["command"].toString();
-    QLibrary l(QString("%1/handlers/%2.dll").arg(qApp->applicationDirPath(), command));
+    QString libraryPath = QString("%1/handlers/%2.dll").arg(qApp->applicationDirPath(), command);
+    QLibrary l(libraryPath);
     if (!l.load()) {
         jrep["errorCode"] = 2;
         jrep["errorMessage"] = "Library not found";
@@ -178,8 +179,10 @@ void ServerThread::onTextMessage(const QString &msg)
         repMsg = QJsonDocument(jrep).toJson(QJsonDocument::Compact);
         LogWriter::write(LogWriterLevel::errors, "", repMsg);
         ws->sendTextMessage(repMsg);
+        l.unload();
         return;
     }
+    l.unload();
     jresponse["requestId"] = jdoc["requestId"].toInt();
     repMsg = QJsonDocument(jresponse).toJson(QJsonDocument::Compact);
     LogWriter::write(LogWriterLevel::verbose, "", repMsg);

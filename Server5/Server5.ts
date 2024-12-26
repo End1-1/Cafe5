@@ -2,6 +2,34 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="hy_AM">
 <context>
+    <name>C5Message</name>
+    <message>
+        <location filename="../Cafe5/c5message.ui" line="185"/>
+        <source>&lt;html&gt;msg&lt;/html&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Cafe5/c5message.ui" line="248"/>
+        <source>A1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Cafe5/c5message.ui" line="261"/>
+        <source>A3</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Cafe5/c5message.ui" line="274"/>
+        <source>A2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Cafe5/c5message.ui" line="287"/>
+        <source>Copy</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>C5Server5</name>
     <message>
         <location filename="c5server5.ui" line="26"/>
@@ -9,89 +37,153 @@
         <translation></translation>
     </message>
     <message>
-        <location filename="c5server5.ui" line="35"/>
-        <source>Server port</source>
-        <translation>Սերվերի պորտ</translation>
-    </message>
-    <message>
-        <location filename="c5server5.ui" line="42"/>
-        <source>serverport</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="c5server5.ui" line="49"/>
+        <location filename="c5server5.ui" line="87"/>
         <source>Secret</source>
         <translation>Սերվերի գախտնաբառ</translation>
     </message>
     <message>
-        <location filename="c5server5.ui" line="56"/>
+        <location filename="c5server5.ui" line="94"/>
         <source>serversecret</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="c5server5.ui" line="63"/>
+        <location filename="c5server5.ui" line="35"/>
         <source>Status</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="c5server5.ui" line="70"/>
-        <location filename="c5server5.cpp" line="137"/>
+        <location filename="c5server5.ui" line="42"/>
+        <location filename="c5server5.cpp" line="179"/>
         <source>Disconnected</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="c5server5.ui" line="102"/>
+        <location filename="c5server5.ui" line="49"/>
+        <source>Protocol</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="c5server5.ui" line="56"/>
+        <source>protocol</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="c5server5.ui" line="60"/>
+        <source>HTTP</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="c5server5.ui" line="65"/>
+        <source>HTTPS</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="c5server5.ui" line="73"/>
+        <source>Server</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="c5server5.ui" line="80"/>
+        <source>server</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="c5server5.ui" line="101"/>
+        <source>receipprinter</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="c5server5.ui" line="108"/>
+        <source>Printer</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="c5server5.ui" line="115"/>
+        <source>Printer side</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="c5server5.ui" line="122"/>
+        <source>printerside</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="c5server5.ui" line="154"/>
         <source>Apply</source>
         <translation>Լավ</translation>
     </message>
     <message>
-        <location filename="c5server5.cpp" line="23"/>
+        <location filename="c5server5.cpp" line="32"/>
         <source>Quit</source>
         <translation>Ելք</translation>
     </message>
     <message>
-        <location filename="c5server5.cpp" line="77"/>
-        <source>New order received</source>
-        <translation>Նոր պատրվեր</translation>
+        <location filename="c5server5.cpp" line="33"/>
+        <source>Clear basket</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="c5server5.cpp" line="100"/>
+        <location filename="c5server5.cpp" line="124"/>
         <source>Confirmation</source>
         <translation>Հարց</translation>
     </message>
     <message>
-        <location filename="c5server5.cpp" line="100"/>
+        <location filename="c5server5.cpp" line="124"/>
         <source>Are you sure to close application?</source>
         <translation>Դուրս գալ՞ ծրագրից</translation>
     </message>
     <message>
-        <location filename="c5server5.cpp" line="86"/>
-        <source>Database password</source>
-        <translation>Տվյալների պահոցի գախտնավար</translation>
-    </message>
-    <message>
-        <location filename="c5server5.cpp" line="86"/>
-        <source>Password</source>
-        <translation>Գախտնաբար</translation>
-    </message>
-    <message>
-        <location filename="c5server5.cpp" line="91"/>
-        <source>Error</source>
-        <translation>Սխալ</translation>
-    </message>
-    <message>
-        <location filename="c5server5.cpp" line="91"/>
-        <source>Invalid database password</source>
-        <translation>Տվյալների պահոցի գախտնավարը սխալ է</translation>
-    </message>
-    <message>
-        <location filename="c5server5.cpp" line="127"/>
+        <location filename="c5server5.cpp" line="163"/>
         <source>Connecting</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="c5server5.cpp" line="132"/>
+        <location filename="c5server5.cpp" line="168"/>
         <source>Connected</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>C5ServerPrinter</name>
+    <message>
+        <location filename="c5serverprinter.cpp" line="47"/>
+        <source>Պատվեր</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="c5serverprinter.cpp" line="50"/>
+        <source>Ամսաթիվ</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="c5serverprinter.cpp" line="53"/>
+        <source>Ժամ</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="c5serverprinter.cpp" line="155"/>
+        <source>Տպիչ: </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="c5serverprinter.cpp" line="215"/>
+        <source>Printer: </source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>NInterface</name>
+    <message>
+        <location filename="../NTable/ninterface.cpp" line="64"/>
+        <source>Unauthorized</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>NLoadingDlg</name>
+    <message>
+        <location filename="../NTable/nloadingdlg.ui" line="44"/>
+        <source>1 sec</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -114,39 +206,62 @@
     </message>
 </context>
 <context>
+    <name>QObject</name>
+    <message>
+        <location filename="../Cafe5/c5message.h" line="19"/>
+        <source>Close</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Cafe5/c5message.h" line="21"/>
+        <source>OK</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Cafe5/c5message.h" line="23"/>
+        <source>Yes</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Cafe5/c5message.h" line="23"/>
+        <source>No</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>c5scheduler</name>
     <message>
-        <location filename="c5scheduler.cpp" line="107"/>
+        <location filename="c5scheduler.cpp" line="102"/>
         <source>Պատվեր</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="c5scheduler.cpp" line="110"/>
+        <location filename="c5scheduler.cpp" line="105"/>
         <source>Ամսաթիվ</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="c5scheduler.cpp" line="113"/>
+        <location filename="c5scheduler.cpp" line="108"/>
         <source>Ժամ</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="c5scheduler.cpp" line="116"/>
+        <location filename="c5scheduler.cpp" line="111"/>
         <source>Սպասարկող</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="c5scheduler.cpp" line="259"/>
+        <location filename="c5scheduler.cpp" line="241"/>
         <source>Date</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="c5scheduler.cpp" line="262"/>
+        <location filename="c5scheduler.cpp" line="244"/>
         <source>Time</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="c5scheduler.cpp" line="187"/>
+        <location filename="c5scheduler.cpp" line="177"/>
         <source>Printer: </source>
         <translation type="unfinished"></translation>
     </message>

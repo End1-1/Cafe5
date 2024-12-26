@@ -7,19 +7,7 @@ CONFIG += c++20
 RC_FILE = res.rc
 
 SOURCES += \
-    ../Classes/thread.cpp \
-<<<<<<< HEAD
-    ../Service5Working/utils/commandline.cpp \
-    ../Service5Working/utils/configini.cpp \
-    ../Service5Working/utils/database.cpp \
-    ../Service5Working/utils/gtranslator.cpp \
-    ../Service5Working/utils/logwriter.cpp \
-    ../Service5Working/utils/tablerecord.cpp \
     c5searchengine.cpp \
-    os.cpp \
-    utils/commandline.cpp \
-=======
->>>>>>> a5f0642f445e100497692fe1d1f4bb7435002fa5
     utils/configini.cpp \
     utils/database.cpp \
     datadriver/datadriver.cpp \
@@ -31,19 +19,8 @@ SOURCES += \
     utils/sqlqueries.cpp
 
 HEADERS += \
-    ../Classes/thread.h \
-<<<<<<< HEAD
-    ../Service5Working/utils/commandline.h \
-    ../Service5Working/utils/configini.h \
-    ../Service5Working/utils/database.h \
-    ../Service5Working/utils/gtranslator.h \
-    ../Service5Working/utils/logwriter.h \
-    ../Service5Working/utils/tablerecord.h \
+    .. / Classes / thread.h \
     c5searchengine.h \
-    os.h \
-    utils/commandline.h \
-=======
->>>>>>> a5f0642f445e100497692fe1d1f4bb7435002fa5
     utils/configini.h \
     utils/database.h \
     datadriver/datadriver.h \
@@ -56,26 +33,25 @@ HEADERS += \
     utils/sqlqueries.h
 
 FORMS += \
-    ../Cafe5/c5message.ui \
     dlglicenses.ui
 
-win23 {
+win32 {
     SOURCES += main.cpp
 }
 unix {
     SOURCES += main_linux.cpp
-    }
+}
 
 INCLUDEPATH += handlers
 INCLUDEPATH += headers
 INCLUDEPATH += store
 INCLUDEPATH += datadriver
 INCLUDEPATH += utils
-INCLUDEPATH += ../Service5Working/raw
-INCLUDEPATH += ../Service5Working/socket
-INCLUDEPATH += ../Classes
+INCLUDEPATH += .. /Service5Working/raw
+INCLUDEPATH += .. /Service5Working/socket
+INCLUDEPATH += .. /Classes
 
-DEFINES += _DBDRIVER_=\\\"QMARIADB\\\"
+DEFINES += _DBDRIVER_=\\\"QMYSQL\\\"
 DEFINES += _ORGANIZATION_=\\\"BreezeDevs\\\"
 DEFINES += _APPLICATION_=\\\"Cafe5\\\"
 DEFINES += _MODULE_=\\\"Service5\\\"
@@ -83,18 +59,17 @@ DEFINES += QSSLSOCKET_DEBUG
 
 win32 {
 
-LIBS += -lVersion
-LIBS += -lwsock32
-LIBS += -lopenssl
-LIBS += advapi32.lib
-LIBS += -llibcrypto
+        LIBS += -lVersion
+        LIBS += -lwsock32
+        LIBS += advapi32.lib
 }
 
+win32 {
 QMAKE_LFLAGS_WINDOWS += /MANIFESTUAC:"level='requireAdministrator'"
+}
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
-
 

@@ -55,6 +55,12 @@ QString CR5SalesByDishesFilter::condition()
     if (ui->rbWithRecipe->isChecked()) {
         result += QString(" and d.f_netweight>0.0001 ");
     }
+    if (ui->rbTaxNo->isChecked()) {
+        result += " and (ot.f_receiptnumber=0 or ot.f_receiptnumber is null) ";
+    }
+    if (ui->rbTaxYes->isChecked()) {
+        result += " and ot.f_receiptnumber>0 ";
+    }
     return result;
 }
 

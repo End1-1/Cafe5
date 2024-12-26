@@ -67,15 +67,15 @@ win32: QMAKE_CXXFLAGS -= -Zc:strictStrings
 
 HEADERS += \
     ../Classes/amkbd.h \
+    ../Classes/logwriter.h \
     ../Forms/c5goodsprice.h \
-    ../NTable/ninterface.h \
-    ../Service5/utils/logwriter.h
+    ../NTable/ninterface.h
 
 SOURCES += \
     ../Classes/amkbd.cpp \
+    ../Classes/logwriter.cpp \
     ../Forms/c5goodsprice.cpp \
-    ../NTable/ninterface.cpp \
-    ../Service5/utils/logwriter.cpp
+    ../NTable/ninterface.cpp
 
 FORMS += \
     ../Forms/c5goodsprice.ui

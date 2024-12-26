@@ -1,7 +1,6 @@
 #include "logwriter.h"
 #include "serverthread.h"
 #include "configini.h"
-#include "monitor.h"
 #include <QFileInfo>
 #include <QDir>
 #include <windows.h>
@@ -9,8 +8,6 @@
 #include <strsafe.h>
 #include <QApplication>
 #include <QTranslator>
-#include <QTextCodec>
-
 #define SVCNAME TEXT("Breeze")
 
 int ARGC;
@@ -61,14 +58,6 @@ int __cdecl main(int argc, char *argv[])
     ConfigIni::init(APPDIR + "config.ini");
     LogWriter::fCurrentLevel = 100;
     LogWriter::write(LogWriterLevel::verbose, "", "Service started");
-    QTextCodec::setCodecForLocale(QTextCodec::codecForName("utf8") );
-    if (QString(argv[1]).toLocal8Bit() == "--gui") {
-        QApplication a(argc, argv);
-        Monitor w;
-        w.show();
-        a.exec();
-        return 0;
-    }
     if (QString(argv[1]).toLocal8Bit() == "--install") {
         SvcInstall();
         return 0;

@@ -23,9 +23,11 @@ CR5SalesByDishes::CR5SalesByDishes(const QStringList &dbParams, QWidget *parent)
                     << "left join d_part2 dp on dp.f_id=d.f_part [dp]"
                     << "left join d_part1 dpd on dpd.f_id=dp.f_part [dpd]"
                     << "left join c_storages cst on cst.f_id=ob.f_store [cst]"
+                    << "left join o_tax ot on ot.f_id=oh.f_id [ot]"
                     ;
     fColumnsFields << "oh.f_id as f_header"
                    << "concat(oh.f_prefix, oh.f_hallid) as f_order"
+                   << "ot.f_receiptnumber as f_fiscal"
                    << "os.f_name as f_statename"
                    << "h.f_name as f_hallname"
                    << "t.f_name as f_tablename"
@@ -33,6 +35,7 @@ CR5SalesByDishes::CR5SalesByDishes(const QStringList &dbParams, QWidget *parent)
                    << "oh.f_timeclose"
                    << "bs.f_name as f_dishstate"
                    << "dpd.f_name as f_dishdept"
+                   << "ob.f_adgcode"
                    << "dp.f_name as f_dishpart"
                    << "d.f_id as f_dishid"
                    << "d.f_name as f_dishname"
@@ -78,6 +81,8 @@ CR5SalesByDishes::CR5SalesByDishes(const QStringList &dbParams, QWidget *parent)
     fTranslation["f_removereason"] = tr("Remove reason");
     fTranslation["f_storename"] = tr("Store");
     fTranslation["f_qty"] = tr("Qty");
+    fTranslation["f_fiscal"] = tr("Fiscal");
+    fTranslation["f_adgcode"] = tr("ADG code");
     fTranslation["f_grandtotal"] = tr("Total");
     fTranslation["f_comment"] = tr("Comment");
     fColumnsVisible["oh.f_id as f_header"] = true;

@@ -61,7 +61,6 @@ SOURCES += \
     ../Classes/axreporting.cpp \
     ../Classes/c5airlog.cpp \
     ../Classes/c5combodelegate.cpp \
-    ../Classes/c5crypt.cpp \
     ../Classes/c5datedelegate.cpp \
     ../Classes/c5document.cpp \
     ../Classes/c5filelogwriter.cpp \
@@ -91,8 +90,6 @@ SOURCES += \
     ../Classes/notificationwidget.cpp \
     ../Classes/outputofheader.cpp \
     ../Classes/proxytablewidgetdatabase.cpp \
-    ../Classes/serverconnection.cpp \
-    ../Classes/thread.cpp \
     ../Configs/breezeconfig.cpp \
     ../Configs/cashboxconfig.cpp \
     ../Configs/configs.cpp \
@@ -479,7 +476,6 @@ HEADERS += \
     ../Classes/barcode5.h \
     ../Classes/c5airlog.h \
     ../Classes/c5combodelegate.h \
-    ../Classes/c5crypt.h \
     ../Classes/c5datedelegate.h \
     ../Classes/c5document.h \
     ../Classes/c5filelogwriter.h \
@@ -511,8 +507,6 @@ HEADERS += \
     ../Classes/notificationwidget.h \
     ../Classes/outputofheader.h \
     ../Classes/proxytablewidgetdatabase.h \
-    ../Classes/serverconnection.h \
-    ../Classes/thread.h \
     ../Configs/breezeconfig.h \
     ../Configs/cashboxconfig.h \
     ../Configs/configs.h \

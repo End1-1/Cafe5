@@ -120,7 +120,12 @@ C5MainWindow::C5MainWindow(QWidget *parent) :
     ui->splitter->setStretchFactor(1, 1);
     __c5config.fParentWidget = this;
     fStatusLabel = new QLabel(tr("Disconnected"));
+    fConnectionLabel = new QLabel("");
+    QWidget *spacer = new QWidget(this);
+    spacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
     ui->statusBar->addWidget(fStatusLabel);
+    ui->statusBar->addWidget(spacer, 1);
+    ui->statusBar->addWidget(fConnectionLabel);
     fTab = ui->tabWidget;
     enableMenu(false);
     connect(ui->tabWidget, SIGNAL(tabCloseRequested(int)), this, SLOT(tabCloseRequested(int)));
@@ -262,6 +267,7 @@ void C5MainWindow::on_actionLogin_triggered()
     ui->actionChange_password->setVisible(true);
     C5ReportTemplateDriver::init(__user->group());
     fStatusLabel->setText(__user->fullName());
+    fConnectionLabel->setText(__c5config.fDBName);
     C5Database db(C5Config::fDBHost, C5Config::fDBPath, C5Config::fDBUser, C5Config::fDBPassword);
     db[":f_user"] = __user->id();
     db.exec("select f_name, f_description, f_host, f_db, f_user, f_password, f_main from s_db "

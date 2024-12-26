@@ -2,7 +2,7 @@
 #include "ui_c5datasynchronize.h"
 #include "nloadingdlg.h"
 #include "ndataprovider.h"
-#include "c5filelogwriter.h"
+#include "logwriter.h"
 #include <QScrollBar>
 #include <QMenu>
 
