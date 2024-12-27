@@ -33,15 +33,45 @@ void C5SearchEngine::init(QStringList databases)
         mSearchObjects[dbname] = QMap<int, SearchObject>();
         QStringList &words = mSearchStrings[dbname];
         QMap<int, SearchObject> &objects = mSearchObjects[dbname];
-        db.exec("SELECT f_id, f_mode, f_word as f_orig, lower(f_word) as f_word FROM ( "
-                "SELECT f_id, f_mode, f_en AS f_word FROM d_translator "
-                "UNION "
-                "SELECT f_id, f_mode, f_ru AS f_word FROM d_translator "
-                "union "
-                "SELECT f_id, f_mode, f_am AS f_word FROM d_translator "
-                ") AS tr "
-                "WHERE LENGTH(f_word)>0 "
-                "ORDER BY f_mode desc, f_word");
+        QString sql = QString::fromStdString(R"sql(
+        SELECT f_id, f_mode, f_word as f_orig, lower(f_word) as f_word FROM (
+        SELECT d.f_id, d.f_mode, d.f_en AS f_word FROM d_part2 p2
+            left join d_translator d on d.f_id=p2.f_id
+            WHERE d.f_mode = 2 and p2.f_id not in (select distinct(f_parent) from d_part2 where f_parent>0)
+        UNION
+        SELECT d.f_id, d.f_mode, d.f_ru AS f_word FROM d_part2 p2
+            left join d_translator d on d.f_id=p2.f_id
+            WHERE d.f_mode = 2 and p2.f_id not in (select distinct(f_parent) from d_part2 where f_parent>0)
+        union
+        SELECT d.f_id, d.f_mode, d.f_am AS f_word FROM d_part2 p2
+            left join d_translator d on d.f_id=p2.f_id
+            WHERE d.f_mode = 2 and p2.f_id not in (select distinct(f_parent) from d_part2 where f_parent>0)
+        UNION
+        SELECT d1.f_id, d1.f_mode, CONCAT_WS(' ',d1.f_en, d2.f_en) AS f_word
+        FROM d_menu m
+        left join d_dish d on d.f_id=m.f_dish
+        LEFT JOIN d_translator d1 ON d1.f_id=d.f_id AND d1.f_mode=1
+        LEFT JOIN d_translator d2 ON d2.f_id=d.f_id AND d2.f_mode=3
+        where m.f_state=1
+        UNION
+        SELECT d1.f_id, d1.f_mode, CONCAT_WS(' ',d1.f_ru, d2.f_ru) AS f_word
+        FROM d_menu m
+        left join d_dish d on d.f_id=m.f_dish
+        LEFT JOIN d_translator d1 ON d1.f_id=d.f_id AND d1.f_mode=1
+        LEFT JOIN d_translator d2 ON d2.f_id=d.f_id AND d2.f_mode=3
+        where m.f_state=1
+        UNION
+        SELECT d1.f_id, d1.f_mode, CONCAT_WS(' ',d1.f_am, d2.f_am) AS f_word
+        FROM d_menu m
+        left join d_dish d on d.f_id=m.f_dish
+        LEFT JOIN d_translator d1 ON d1.f_id=d.f_id AND d1.f_mode=1
+        LEFT JOIN d_translator d2 ON d2.f_id=d.f_id AND d2.f_mode=3
+        where m.f_state=1
+        ) AS tr
+        WHERE LENGTH(f_word)>0
+        ORDER BY f_mode desc, f_word
+        )sql");
+        db.exec(sql);
         while (db.next()) {
             //LogWriter::write(LogWriterLevel::special, "", db.string("f_word"));
             words.append(db.string("f_word"));
@@ -65,7 +95,7 @@ void C5SearchEngine::search(const QJsonObject &jo, QWebSocket *socket)
         socket->sendTextMessage(repMsg);
         return;
     }
-    int maxCount = 10;
+    int maxCount = jo["max_count"].toInt() == 0 ? 10 :  jo["max_count"].toInt();
     QString databaseName = jo["database"].toString();
     const QStringList &words = mSearchStrings[databaseName];
     QStringList templateWords = jo["template"].toString().split(QRegularExpression("\\s+"), Qt::SkipEmptyParts);

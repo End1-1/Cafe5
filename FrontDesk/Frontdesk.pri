@@ -50,7 +50,6 @@ FORMS += \
     ../Forms/c5saledoc.ui \
     ../Forms/c5salefromstoreorder.ui \
     ../Forms/c5selector.ui \
-    ../Forms/c5serviceconfig.ui \
     ../Forms/c5srofinventory.ui \
     ../Forms/c5storebarcode.ui \
     ../Forms/c5storebarcodelist.ui \
@@ -250,7 +249,6 @@ HEADERS += \
         ../Forms/c5saledoc.h \
         ../Forms/c5salefromstoreorder.h \
         ../Forms/c5selector.h \
-        ../Forms/c5serviceconfig.h \
         ../Forms/c5srofinventory.h \
         ../NTable/ndataprovider.h \
         ../NTable/ntablewidget.h \
@@ -567,7 +565,6 @@ SOURCES += \
         ../Forms/c5saledoc.cpp \
         ../Forms/c5salefromstoreorder.cpp \
         ../Forms/c5selector.cpp \
-        ../Forms/c5serviceconfig.cpp \
         ../Forms/c5srofinventory.cpp \
         ../Forms/c5storebarcode.cpp \
         ../Forms/c5storebarcodelist.cpp \

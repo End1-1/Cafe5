@@ -63,7 +63,6 @@ SOURCES += \
     ../Classes/c5combodelegate.cpp \
     ../Classes/c5datedelegate.cpp \
     ../Classes/c5document.cpp \
-    ../Classes/c5filelogwriter.cpp \
     ../Classes/c5filterwidget.cpp \
     ../Classes/c5grid.cpp \
     ../Classes/c5gridgilter.cpp \
@@ -87,6 +86,7 @@ SOURCES += \
     ../Classes/dataonline.cpp \
     ../Classes/dlgpassword.cpp \
     ../Classes/idram.cpp \
+    ../Classes/logwriter.cpp \
     ../Classes/notificationwidget.cpp \
     ../Classes/outputofheader.cpp \
     ../Classes/proxytablewidgetdatabase.cpp \
@@ -195,7 +195,6 @@ SOURCES += \
     ../Forms/c5saledoc.cpp \
     ../Forms/c5salefromstoreorder.cpp \
     ../Forms/c5selector.cpp \
-    ../Forms/c5serviceconfig.cpp \
     ../Forms/c5srofinventory.cpp \
     ../Forms/c5storebarcode.cpp \
     ../Forms/c5storebarcodelist.cpp \
@@ -357,7 +356,6 @@ SOURCES += \
     ../Reports/cr5users.cpp \
     ../Reports/cr5usersfilter.cpp \
     ../Reports/cr5usersgroups.cpp \
-    ../Service5/utils/logwriter.cpp \
     ../Service5Working/utils/configini.cpp \
     ../TableRecord/aheader.cpp \
     ../TableRecord/bclientdebts.cpp \
@@ -504,6 +502,7 @@ HEADERS += \
     ../Classes/dlgpassword.h \
     ../Classes/goodsreserve.h \
     ../Classes/idram.h \
+    ../Classes/logwriter.h \
     ../Classes/notificationwidget.h \
     ../Classes/outputofheader.h \
     ../Classes/proxytablewidgetdatabase.h \
@@ -612,7 +611,6 @@ HEADERS += \
     ../Forms/c5saledoc.h \
     ../Forms/c5salefromstoreorder.h \
     ../Forms/c5selector.h \
-    ../Forms/c5serviceconfig.h \
     ../Forms/c5srofinventory.h \
     ../Forms/c5storebarcode.h \
     ../Forms/c5storebarcodelist.h \
@@ -774,7 +772,6 @@ HEADERS += \
     ../Reports/cr5users.h \
     ../Reports/cr5usersfilter.h \
     ../Reports/cr5usersgroups.h \
-    ../Service5/utils/logwriter.h \
     ../Service5Working/utils/configini.h \
     ../Service5Working/utils/servicecommands.h \
     ../TableRecord/aheader.h \
@@ -942,7 +939,6 @@ FORMS += \
     ../Forms/c5saledoc.ui \
     ../Forms/c5salefromstoreorder.ui \
     ../Forms/c5selector.ui \
-    ../Forms/c5serviceconfig.ui \
     ../Forms/c5srofinventory.ui \
     ../Forms/c5storebarcode.ui \
     ../Forms/c5storebarcodelist.ui \
@@ -1088,7 +1084,6 @@ FORMS += \
     INCLUDEPATH += ../NTable
     INCLUDEPATH += ../Service5Working/raw
     INCLUDEPATH += ../Service5Working/socket
-    INCLUDEPATH += ../Service5Working/utils
     INCLUDEPATH += ../DbData
     INCLUDEPATH += ../Configs
     INCLUDEPATH += ../TableRecord

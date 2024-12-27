@@ -34,7 +34,6 @@ SOURCES += \
         ../Cafe5/c5utils.cpp \
         ../Classes/QProgressIndicator.cpp \
         ../Classes/appwebsocket.cpp \
-        ../Classes/c5filelogwriter.cpp \
         ../Classes/c5networkdb.cpp \
         ../Classes/c5printing.cpp \
         ../Classes/c5printjson.cpp \
@@ -58,7 +57,6 @@ HEADERS += \
         ../Cafe5/c5utils.h \
         ../Classes/QProgressIndicator.h \
         ../Classes/appwebsocket.h \
-        ../Classes/c5filelogwriter.h \
         ../Classes/c5networkdb.h \
         ../Classes/c5printing.h \
         ../Classes/c5printjson.h \

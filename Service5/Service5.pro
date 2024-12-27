@@ -7,6 +7,7 @@ CONFIG += c++20
 RC_FILE = res.rc
 
 SOURCES += \
+    ../Classes/logwriter.cpp \
     c5searchengine.cpp \
     utils/configini.cpp \
     utils/database.cpp \
@@ -15,11 +16,10 @@ SOURCES += \
     firebase.cpp \
     handlers/httpheader.cpp \
     serverthread.cpp \
-    utils/logwriter.cpp \
     utils/sqlqueries.cpp
 
 HEADERS += \
-    .. / Classes / thread.h \
+    ../Classes/logwriter.h \
     c5searchengine.h \
     utils/configini.h \
     utils/database.h \
@@ -29,7 +29,6 @@ HEADERS += \
     handlers/httpheader.h \
     rc.h \
     serverthread.h \
-    utils/logwriter.h \
     utils/sqlqueries.h
 
 FORMS += \
@@ -47,9 +46,9 @@ INCLUDEPATH += headers
 INCLUDEPATH += store
 INCLUDEPATH += datadriver
 INCLUDEPATH += utils
-INCLUDEPATH += .. /Service5Working/raw
-INCLUDEPATH += .. /Service5Working/socket
-INCLUDEPATH += .. /Classes
+INCLUDEPATH += ../Service5Working/raw
+INCLUDEPATH += ../Service5Working/socket
+INCLUDEPATH += ../Classes
 
 DEFINES += _DBDRIVER_=\\\"QMYSQL\\\"
 DEFINES += _ORGANIZATION_=\\\"BreezeDevs\\\"

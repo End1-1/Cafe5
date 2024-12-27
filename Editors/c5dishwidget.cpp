@@ -108,7 +108,8 @@ void C5DishWidget::setDish(int id)
 {
     C5Database db(fDBParams);
     db[":f_dish"] = id;
-    db.exec("select m.f_id, m.f_menu, m.f_price, m.f_store, m.f_print1, m.f_print2, m.f_state, m.f_recent from d_menu m where f_dish=:f_dish");
+    db.exec("select m.f_id, m.f_menu, m.f_price, m.f_store, m.f_print1, m.f_print2, "
+            "m.f_state, m.f_recent from d_menu m where f_dish=:f_dish");
     while (db.nextRow()) {
         for (int i = 0; i < ui->tblPricing->rowCount(); i++) {
             if (ui->tblPricing->getInteger(i, 1) == db.getInt("f_menu")) {
@@ -127,7 +128,8 @@ void C5DishWidget::setDish(int id)
     ui->tblRecipe->setRowCount(0);
     int row = 0;
     db[":f_dish"] = id;
-    db.exec("select r.f_id, r.f_goods, g.f_name, r.f_qty, u.f_name as f_unit, g.f_lastinputprice as f_price, "
+    db.exec("select r.f_id, r.f_goods, g.f_name, r.f_qty, "
+            "u.f_name as f_unit, g.f_lastinputprice as f_price, "
             "r.f_qty*g.f_lastinputprice as f_total "
             "from d_recipes r "
             "left join c_goods g on g.f_id=r.f_goods "
@@ -421,6 +423,9 @@ void C5DishWidget::uploadImage()
         } else {
             return;
         }
+    }
+    if (ui->leImageUUID->isEmpty()) {
+        ui->leImageUUID->setText(C5Database::uuid());
     }
     QString fn = QFileDialog::getOpenFileName(this, tr("Image"), "", "*.jpg;*.png;*.bmp");
     if (fn.isEmpty()) {

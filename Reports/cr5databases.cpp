@@ -4,7 +4,6 @@
 #include "c5mainwindow.h"
 #include "c5datasynchronize.h"
 #include "c5tablemodel.h"
-#include "c5serviceconfig.h"
 #include "c5checkdatabase.h"
 #include "c5dbresetoption.h"
 #include "c5random.h"
@@ -47,7 +46,6 @@ QToolBar *CR5Databases::toolBar()
         createStandartToolbar(btn);
         fToolBar->addAction(QIcon(":/access.png"), tr("Access"), this, SLOT(actionAccess()));
         fToolBar->addAction(QIcon(":data-transfer.png"), tr("Synchronization"), this, SLOT(actionSync()));
-        fToolBar->addAction(QIcon(":/service.png"), tr("Service"), this, SLOT(actionService()));
         fToolBar->addAction(QIcon(":/maintenance.png"), tr("Check\ndatabase"), this, SLOT(checkDatabase()));
         fToolBar->addAction(QIcon(":/save-file.png"), tr("Backup\ndatabase"), this, SLOT(backupDatabase()));
         fToolBar->addAction(QIcon(":/reset.png"), tr("Reset\ndatabase"), this, SLOT(resetDatabase()));
@@ -76,17 +74,6 @@ void CR5Databases::actionSync()
     C5DataSynchronize *ds = new C5DataSynchronize(p);
     ds->exec();
     delete ds;
-}
-
-void CR5Databases::actionService()
-{
-    QList<QVariant> values = fModel->getRowValues(fTableView->currentIndex().row());
-    if (values.at(0).toString().isEmpty()) {
-        return;
-    }
-    C5ServiceConfig *sc = new C5ServiceConfig(values.at(1).toString(), this);
-    sc->exec();
-    delete sc;
 }
 
 void CR5Databases::checkDatabase()

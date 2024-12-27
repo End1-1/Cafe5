@@ -74,44 +74,19 @@ void CashCollection::on_btnSave_clicked()
         C5Message::error(db.fLastError);
         return;
     }
-    db.startTransaction();
-    C5StoreDraftWriter dw(db);
-    int counter = dw.counterAType(DOC_TYPE_CASH);
-    if (counter == 0) {
-        db.rollback();
-        C5Message::error(dw.fErrorMsg);
-        return;
+    if (ui->leAmountCoin->getDouble() > 0.001) {
+        fHttp->createHttpQuery("/engine/cashdesk/create.php",
+        QJsonObject{
+            {"date", QDate::currentDate().toString(FORMAT_DATE_TO_STR_MYSQL)},
+            {"operator", __user->id() },
+            {"cashin", 0},
+            {"cashout", __c5config.cashId()},
+            {"remarks", tr("Amount coin")},
+            {"amount", ui->leAmountCoin->text()}
+        }, SLOT(responseOfCreate(QJsonObject)));
+    } else {
+        collectCash();
     }
-    QString headerPrefix;
-    int headerId;
-    if (!dw.hallId(headerPrefix, headerId, __c5config.defaultHall())) {
-        db.rollback();
-        C5Message::error(dw.fErrorMsg);
-        return;
-    }
-    QString cashdocid;
-    if (!dw.writeAHeader(cashdocid, QString::number(counter), DOC_STATE_SAVED, DOC_TYPE_CASH, __user->id(),
-                         QDate::currentDate(), QDate::currentDate(), QTime::currentTime(), 0, ui->leAmount->getDouble(),
-                         ui->lePurpose->text(), 1, __c5config.getValue(param_default_currency).toInt())) {
-        db.rollback();
-        C5Message::error(dw.fErrorMsg);
-        return;
-    }
-    if (!dw.writeAHeaderCash(cashdocid, 0, __c5config.cashId(), 0, "", "")) {
-        db.rollback();
-        C5Message::error(dw.fErrorMsg);
-        return;
-    }
-    QString cashUUID;
-    if (!dw.writeECash(cashUUID, cashdocid, __c5config.cashId(), -1, ui->lePurpose->text(), ui->leAmount->getDouble(),
-                       cashUUID, 1)) {
-        db.rollback();
-        C5Message::error(dw.fErrorMsg);
-        return;
-    }
-    db.commit();
-    C5Message::info(tr("Saved"));
-    accept();
 }
 
 void CashCollection::on_leAmount_textChanged(const QString &arg1)
@@ -120,4 +95,68 @@ void CashCollection::on_leAmount_textChanged(const QString &arg1)
     if (ui->leAmount->getDouble() > fMax) {
         ui->leAmount->setDouble(fMax);
     }
+}
+
+void CashCollection::responseOfCreate(const QJsonObject &jdoc)
+{
+    Q_UNUSED(jdoc);
+    fHttp->httpQueryFinished(sender());
+    collectCash();
+    fHttp->createHttpQuery("/engine/cashdesk/create.php",
+    QJsonObject{
+        {"date", QDate::currentDate().toString(FORMAT_DATE_TO_STR_MYSQL)},
+        {"operator", __user->id() },
+        {"cashin", fCoinCashId},
+        {"cashout", 0},
+        {"remarks", tr("Amount coin")},
+        {"amount", ui->leAmountCoin->text()}
+    }, SLOT(responseOfCreateIn(QJsonObject)));
+}
+
+void CashCollection::responseOfCreateIn(const QJsonObject &jdoc)
+{
+    Q_UNUSED(jdoc);
+    fHttp->httpQueryFinished(sender());
+}
+
+void CashCollection::collectCash()
+{
+    C5Database db(__c5config.dbParams());
+    if (!db.open()) {
+        C5Message::error(db.fLastError);
+        return;
+    }
+    C5StoreDraftWriter dw(db);
+    int counter = dw.counterAType(DOC_TYPE_CASH);
+    if (counter == 0) {
+        C5Message::error(dw.fErrorMsg);
+        return;
+    }
+    QString headerPrefix;
+    int headerId;
+    if (!dw.hallId(headerPrefix, headerId, __c5config.defaultHall())) {
+        C5Message::error(dw.fErrorMsg);
+        return;
+    }
+    QString cashdocid;
+    if (!dw.writeAHeader(cashdocid, QString::number(counter), DOC_STATE_SAVED, DOC_TYPE_CASH, __user->id(),
+                         QDate::currentDate(), QDate::currentDate(), QTime::currentTime(), 0,
+                         ui->leAmount->getDouble() - ui->leAmountCoin->getDouble(),
+                         ui->lePurpose->text(), 1, __c5config.getValue(param_default_currency).toInt())) {
+        C5Message::error(dw.fErrorMsg);
+        return;
+    }
+    if (!dw.writeAHeaderCash(cashdocid, 0, __c5config.cashId(), 0, "", "")) {
+        C5Message::error(dw.fErrorMsg);
+        return;
+    }
+    QString cashUUID;
+    if (!dw.writeECash(cashUUID, cashdocid, __c5config.cashId(), -1, ui->lePurpose->text(),
+                       ui->leAmount->getDouble() - ui->leAmountCoin->getDouble(),
+                       cashUUID, 1)) {
+        C5Message::error(dw.fErrorMsg);
+        return;
+    }
+    C5Message::info(tr("Saved"));
+    accept();
 }

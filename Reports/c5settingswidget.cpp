@@ -60,7 +60,8 @@ void C5SettingsWidget::setId(int id)
         QJsonObject jo = __strjson(db.getString("f_config"));
         ui->leChatOperatorUserId->setInteger(jo["chatoperatoruserid"].toInt());
         ui->chDenyLogout->setChecked(jo["denylogout"].toBool());
-        ui->leCoinCashdesk->setText(jo["coincash_id"].toString());
+        ui->leCoinCashdesk->setInteger(jo["coincash_id"].toInt());
+        ui->cbMobileDashboard->setCurrentIndex(ui->cbMobileDashboard->findText(jo["dashboard"].toString()));
         QJsonArray ja = jo["availableoutstore"].toArray();
         QString s;
         for (int i = 0; i < ja.count(); i++) {

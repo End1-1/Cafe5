@@ -17,8 +17,6 @@ private slots:
 
     void actionSync();
 
-    void actionService();
-
     void checkDatabase();
 
     void backupDatabase();

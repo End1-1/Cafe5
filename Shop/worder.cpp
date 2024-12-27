@@ -427,14 +427,15 @@ bool WOrder::writeOrder()
                 result = pt.makeJsonAndPrint(fOHeader.amountCard + fOHeader.amountIdram + fOHeader.amountTelcell,
                                              fOHeader.amountPrepaid, jsonIn, jsonOut, err);
                 if (result != pt_err_ok) {
-                    switch (C5Message::question(err, tr("Try again"), tr("Do not print fiscal"), tr("Return to editing"))) {
+                    if (err.contains("-5")) {
+                        err = tr("Connection with fiscal machine lost");
+                    }
+                    switch (C5Message::question(err, tr("Try again"), tr("Do not print fiscal"))) {
                         case QDialog::Rejected:
                             result = pt_err_ok;
                             break;
                         case QDialog::Accepted:
                             break;
-                        case 2:
-                            return false;
                     }
                 }
             } while (result != pt_err_ok);
