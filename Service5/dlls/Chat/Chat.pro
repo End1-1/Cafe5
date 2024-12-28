@@ -30,11 +30,11 @@ HEADERS += \
     ../../utils/database.h \
 
 
-INCLUDEPATH += C:/Projects/Cafe5/Cafe5
-INCLUDEPATH += C:/Projects/Cafe5/Classes
-INCLUDEPATH += C:/Projects/Cafe5/Service5/handlers
-INCLUDEPATH += C:/Projects/Cafe5/Service5/utils
-INCLUDEPATH += c:/projects/cafe5/service5working/utils
+INCLUDEPATH += ../../../Cafe5
+INCLUDEPATH += ../../../Cafe5/Classes
+INCLUDEPATH += ../../../Service5/handlers
+INCLUDEPATH += ../../../Service5/utils
+INCLUDEPATH += ../../../service5working/utils
 
 LIBS += -lVersion
 
