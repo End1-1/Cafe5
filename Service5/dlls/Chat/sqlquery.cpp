@@ -12,7 +12,6 @@
 
 bool newmessage(const QJsonObject &jreq, QJsonObject &jret, QString &err)
 {
-    CommandLine cl;
     QString path;
     Database db;
     if (!db.open("127.0.0.1", jreq["database"].toString(), "root", "root5")) {

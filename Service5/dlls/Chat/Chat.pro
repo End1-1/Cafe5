@@ -16,7 +16,6 @@ SOURCES += \
     ../../../Classes/logwriter.cpp \
     sqlquery.cpp \
     ../../handlers/httpheader.cpp \
-    ../../utils/commandline.cpp \
     ../../utils/configini.cpp \
     ../../utils/database.cpp \
 
@@ -25,18 +24,15 @@ HEADERS += \
     ../../../Classes/logwriter.h \
     sqlquery.h \
     ../../handlers/httpheader.h \
-    ../../utils/commandline.h \
     ../../utils/configini.h \
     ../../utils/database.h \
 
 
 INCLUDEPATH += ../../../Cafe5
-INCLUDEPATH += ../../../Cafe5/Classes
+INCLUDEPATH += ../../../Classes
 INCLUDEPATH += ../../../Service5/handlers
 INCLUDEPATH += ../../../Service5/utils
 INCLUDEPATH += ../../../service5working/utils
-
-LIBS += -lVersion
 
 DEFINES += _APPLICATION_=\\\"Picasso\\\"
 DEFINES += _MODULE_=\\\"Service5_chat_dll\\\"
