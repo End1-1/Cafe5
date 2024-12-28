@@ -3,7 +3,7 @@ QT       += core gui network sql websockets
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 CONFIG += c++20
-
+TARGET = service5
 RC_FILE = res.rc
 
 SOURCES += \
