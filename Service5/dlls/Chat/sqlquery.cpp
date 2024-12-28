@@ -1,6 +1,4 @@
 #include "sqlquery.h"
-#include "logwriter.h"
-#include "commandline.h"
 #include "jsons.h"
 #include "database.h"
 #include <QDebug>
@@ -39,7 +37,6 @@ bool newmessage(const QJsonObject &jreq, QJsonObject &jret, QString &err)
 
 bool getunread(const QJsonObject &jreq, QJsonObject &jret, QString &err)
 {
-    CommandLine cl;
     QString path;
     Database db;
     if (!db.open("127.0.0.1", jreq["database"].toString(), "root", "root5")) {
@@ -86,7 +83,6 @@ bool getunread(const QJsonObject &jreq, QJsonObject &jret, QString &err)
 
 bool clearbasket(const QJsonObject &jreq, QJsonObject &jret, QString &err)
 {
-    CommandLine cl;
     QString path;
     Database db;
     if (!db.open("127.0.0.1", jreq["database"].toString(), "root", "root5")) {
