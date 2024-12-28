@@ -4,13 +4,12 @@
 #include <QObject>
 #include <QWebSocket>
 
-class C5SearchEngine
+class C5SearchEngine : public QObject
 {
 public:
     C5SearchEngine();
     static C5SearchEngine *mInstance;
     static void init(QStringList databases);
-
     void search(const QJsonObject &jo, QWebSocket *socket);
 };
 

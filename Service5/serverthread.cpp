@@ -148,7 +148,11 @@ void ServerThread::onTextMessage(const QString &msg)
         return;
     }
     QString command = jdoc["command"].toString();
+#ifdef Q_OS_WIN
     QString libraryPath = QString("%1/handlers/%2.dll").arg(qApp->applicationDirPath(), command);
+#else
+    QString libraryPath = QString("/opt/service5/%1.so").arg(command);
+#endif
     QLibrary l(libraryPath);
     if (!l.load()) {
         jrep["errorCode"] = 2;

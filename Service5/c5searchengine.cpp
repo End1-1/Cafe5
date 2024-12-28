@@ -4,6 +4,7 @@
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QJsonArray>
+#include <QTimer>
 
 struct SearchObject {
     int mode;
@@ -17,7 +18,9 @@ QMap<QString, QStringList> mSearchStrings;
 QMap<QString, QMap<int, SearchObject> > mSearchObjects;
 
 C5SearchEngine *C5SearchEngine::mInstance = nullptr;
-C5SearchEngine::C5SearchEngine()
+
+C5SearchEngine::C5SearchEngine() :
+    QObject()
 {
 }
 
@@ -25,6 +28,8 @@ void C5SearchEngine::init(QStringList databases)
 {
     Database db;
     int totalitems = 0;
+    mSearchObjects.clear();
+    mSearchStrings.clear();
     for (const QString &dbname : databases) {
         if (!db.open("127.0.0.1", dbname, "root", "root5")) {
             continue;
@@ -135,9 +140,4 @@ void C5SearchEngine::search(const QJsonObject &jo, QWebSocket *socket)
     repMsg = QJsonDocument(jrep).toJson(QJsonDocument::Compact);
     LogWriter::write(LogWriterLevel::errors, "", repMsg);
     socket->sendTextMessage(repMsg);
-}
-
-void C5SearchEngine::timeout()
-{
-
 }
