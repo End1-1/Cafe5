@@ -136,3 +136,8 @@ void C5SearchEngine::search(const QJsonObject &jo, QWebSocket *socket)
     LogWriter::write(LogWriterLevel::errors, "", repMsg);
     socket->sendTextMessage(repMsg);
 }
+
+void C5SearchEngine::timeout()
+{
+
+}

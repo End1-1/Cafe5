@@ -274,9 +274,7 @@ bool C5DishWidget::save(QString &err, QList<QMap<QString, QVariant> > &data)
     db[":f_app"] = "menu";
     db.exec("select f_version from s_app where f_app=:f_app");
     if (db.nextRow()) {
-        db[":f_app"] = "menu";
-        db[":f_version"] = db.getString("f_version").toInt() + 1;
-        db.exec("update s_app set f_version=:f_version where f_app=:f_app");
+        db.exec("update s_app set f_version=cast(cast(f_version as unsigned) + 1 as CHAR(32)) where LOWER(f_app)='menu'");
     } else {
         db[":f_app"] = "menu";
         db[":f_version"] = "1";

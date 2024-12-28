@@ -13,21 +13,21 @@ CONFIG += c++11
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
+    ../../../Classes/logwriter.cpp \
     sqlquery.cpp \
     ../../handlers/httpheader.cpp \
     ../../utils/commandline.cpp \
     ../../utils/configini.cpp \
     ../../utils/database.cpp \
-    ../../utils/logwriter.cpp
 
 
 HEADERS += \
+    ../../../Classes/logwriter.h \
     sqlquery.h \
     ../../handlers/httpheader.h \
     ../../utils/commandline.h \
     ../../utils/configini.h \
     ../../utils/database.h \
-    ../../utils/logwriter.h
 
 
 INCLUDEPATH += C:/Projects/Cafe5/Cafe5

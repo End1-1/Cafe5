@@ -476,7 +476,6 @@ HEADERS += \
     ../Classes/c5combodelegate.h \
     ../Classes/c5datedelegate.h \
     ../Classes/c5document.h \
-    ../Classes/c5filelogwriter.h \
     ../Classes/c5filterwidget.h \
     ../Classes/c5grid.h \
     ../Classes/c5gridgilter.h \
