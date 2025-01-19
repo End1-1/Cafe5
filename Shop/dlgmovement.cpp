@@ -76,6 +76,9 @@ bool DlgMovement::openDoc(const QString &doc)
         ui->tbl->setString(r, 2, jo["f_scancode"].toString());
         ui->tbl->setDouble(r, 5, jo["f_price"].toDouble());
         auto *l = ui->tbl->lineEdit(r, 4);
+        connect(l, &C5LineEdit::textChanged, this, [this](QString s) {
+            countTotals();
+        });
         l->setDouble(jo["f_qty"].toDouble());
         l->setEnabled(ui->btnSave->isEnabled());
         ui->tbl->setInteger(r, 5, jo["f_goods"].toInt());
@@ -106,13 +109,17 @@ void DlgMovement::setupResponse(const QJsonObject &jdoc)
 void DlgMovement::searchResponse(const QJsonObject &jdoc)
 {
     QJsonObject jgoods = jdoc["goods"].toObject();
+    QJsonObject jprice = jdoc["price"].toObject();
     int r = newRow();
     ui->tbl->setString(r, 1, jgoods["f_name"].toString());
     ui->tbl->setString(r, 2, jgoods["f_scancode"].toString());
     ui->tbl->setDouble(r, 3, jdoc["qty"].toDouble());
-    ui->tbl->setInteger(r, 5, jgoods["f_id"].toInt());
+    ui->tbl->setInteger(r, 5, jprice["f_price1"].toInt());
     ui->tbl->verticalScrollBar()->setValue(999999999);
     ui->tbl->lineEdit(r, 4)->setFocus();
+    connect(ui->tbl->lineEdit(r, 4), &C5LineEdit::textChanged, [this](QString s) {
+        countTotals();
+    });
     fHttp->httpQueryFinished(sender());
 }
 
@@ -223,6 +230,17 @@ bool DlgMovement::saveDoc(int state)
         }
     }
     return true;
+}
+
+void DlgMovement::countTotals()
+{
+    double q = 0, a = 0;
+    for (int i = 0; i < ui->tbl->rowCount(); i++) {
+        q += ui->tbl->lineEdit(i, 4)->getDouble();
+        a += ui->tbl->lineEdit(i, 4)->getDouble() * ui->tbl->getDouble(i, 5);
+    }
+    ui->leTotalQty->setDouble(q);
+    ui->leTotalAmount->setDouble(a);
 }
 
 void DlgMovement::on_leSearch_returnPressed()

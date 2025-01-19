@@ -88,7 +88,7 @@ void MenuDialog::on_btnReturnFiscalReceipt_clicked()
         PrintTaxN pt(C5Config::taxIP(), C5Config::taxPort(), C5Config::taxPassword(), C5Config::taxUseExtPos(),
                      C5Config::taxCashier(), C5Config::taxPin(), this);
         int result;
-        result = pt.printTaxback(number, crn, jsnin, jsnout, err);
+        result = pt.printTaxback(number.toInt(), crn, jsnin, jsnout, err);
         //        db[":f_id"] = db.uuid();
         //        db[":f_order"] = uuid;
         //        db[":f_date"] = QDate::currentDate();

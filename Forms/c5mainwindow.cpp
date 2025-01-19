@@ -94,6 +94,7 @@
 #include "c5user.h"
 #include "cr5users.h"
 #include "cr5goodsstorages.h"
+#include "c5aboutdlg.h"
 #include "c5storedoc.h"
 #include <QCloseEvent>
 #include <QShortcut>
@@ -120,7 +121,10 @@ C5MainWindow::C5MainWindow(QWidget *parent) :
     ui->splitter->setStretchFactor(1, 1);
     __c5config.fParentWidget = this;
     fStatusLabel = new QLabel(tr("Disconnected"));
-    fConnectionLabel = new QLabel("");
+    fConnectionLabel = new QPushButton("");
+    connect(fConnectionLabel, &QPushButton::clicked, this, [this]() {
+        c5aboutdlg(this).exec();
+    });
     QWidget *spacer = new QWidget(this);
     spacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
     ui->statusBar->addWidget(fStatusLabel);
@@ -320,7 +324,7 @@ void C5MainWindow::updateTimeout()
             C5Database db2(db);
             db2[":f_header"] = db.getString("f_id");
             db2[":f_timeconfirmed"] = QDateTime::currentDateTime();
-            db2.insert("O_draft_sound", false);
+            db2.insert("o_draft_sound", false);
         }
         //player->deleteLater();
     }

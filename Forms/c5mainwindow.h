@@ -18,6 +18,7 @@ class QListWidget;
 class C5Widget;
 class NTableWidget;
 class NInterface;
+class QPushButton;
 
 class C5MainWindow : public QMainWindow
 {
@@ -93,7 +94,7 @@ private:
 
     QLabel *fStatusLabel;
 
-    QLabel *fConnectionLabel;
+    QPushButton *fConnectionLabel;
 
     QStringList fPrevTabUuid;
 

@@ -12,6 +12,7 @@ CR5StoreDocumentsFilter::CR5StoreDocumentsFilter(const QStringList &dbParams, QW
     ui->lePayment->setSelector(dbParams, ui->lePaymentName, cache_header_payment).setMultiselection(true);
     ui->lePartner->setSelector(dbParams, ui->lePartnerName, cache_goods_partners).setMultiselection(true);
     ui->leState->setSelector(dbParams, ui->leStateName, cache_doc_state);
+    ui->leReason->setSelector(dbParams, ui->leReasonName, cache_store_reason);
 }
 
 CR5StoreDocumentsFilter::~CR5StoreDocumentsFilter()
@@ -24,6 +25,8 @@ QString CR5StoreDocumentsFilter::condition()
     QString result = "where h.f_date between " + ui->deStart->toMySQLDate() + " and " + ui->deEnd->toMySQLDate();
     if (!ui->leType->isEmpty()) {
         result += " and h.f_type in (" + ui->leType->text() + ") ";
+    } else {
+        result += " and h.f_type in (1,2,3,6)";
     }
     if (!ui->lePayment->isEmpty()) {
         result += " and h.f_payment in (" + ui->lePayment->text() + ") ";
@@ -44,6 +47,7 @@ QString CR5StoreDocumentsFilter::condition()
         result += QString (" and (hs.f_storein in (%1) or hs.f_storeout in (%1)) ").arg(ui->leStore->text());
     }
     in(result, "h.f_state", ui->leState);
+    in(result, "hs.f_reason", ui->leReason);
     return result;
 }
 

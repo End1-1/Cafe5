@@ -52,6 +52,7 @@ C5Server5::C5Server5(QWidget *parent) :
     }
     scheduler = new c5scheduler(this);
     fLastRunTime = QDateTime::currentDateTime();
+    NDataProvider::mProtocol = __s.value("protocol").toString() + "://";
     NDataProvider::mHost = ___s.value("server").toString();
     NDataProvider::sessionKey = __s.value("sessionkey").toString();
     fHttp = new NInterface(this);
@@ -152,6 +153,7 @@ void C5Server5::on_btnApply_clicked()
     if (ui->wc->hasChanges()) {
         ui->wc->saveChanges();
     }
+    __s.setValue("protocol", ui->cbProtocol->currentText());
     NDataProvider::mProtocol = ui->cbProtocol->currentText() + "://";
     NDataProvider::mHost = ui->leServer->text();
     fHttp->createHttpQuery("/engine/login.php", QJsonObject{{"method", 2}, {"pin", ui->leSecret->text()}}, SLOT(

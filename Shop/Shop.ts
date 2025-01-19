@@ -33,7 +33,7 @@
         <location filename="../Classes/c5cache.cpp" line="139"/>
         <location filename="../Classes/c5cache.cpp" line="145"/>
         <location filename="../Classes/c5cache.cpp" line="153"/>
-        <location filename="../Classes/c5cache.cpp" line="316"/>
+        <location filename="../Classes/c5cache.cpp" line="317"/>
         <source>Code</source>
         <translation></translation>
     </message>
@@ -69,7 +69,7 @@
         <location filename="../Classes/c5cache.cpp" line="115"/>
         <location filename="../Classes/c5cache.cpp" line="118"/>
         <location filename="../Classes/c5cache.cpp" line="139"/>
-        <location filename="../Classes/c5cache.cpp" line="316"/>
+        <location filename="../Classes/c5cache.cpp" line="317"/>
         <source>Name</source>
         <translation></translation>
     </message>
@@ -1244,23 +1244,23 @@ MS Excel</source>
         <translation>Փասթաթուղթը գոյություն չունի</translation>
     </message>
     <message>
-        <location filename="dlgmovement.cpp" line="91"/>
+        <location filename="dlgmovement.cpp" line="94"/>
         <source>Missing available stores</source>
         <translation>Պահեստների ցանկը բացակայում է</translation>
     </message>
     <message>
-        <location filename="dlgmovement.cpp" line="152"/>
+        <location filename="dlgmovement.cpp" line="159"/>
         <source>Check quantities</source>
         <translation>Ստուգեք քանակները</translation>
     </message>
     <message>
-        <location filename="dlgmovement.cpp" line="241"/>
-        <location filename="dlgmovement.cpp" line="266"/>
+        <location filename="dlgmovement.cpp" line="259"/>
+        <location filename="dlgmovement.cpp" line="284"/>
         <source>Saved</source>
         <translation>Պահպանված է</translation>
     </message>
     <message>
-        <location filename="dlgmovement.cpp" line="248"/>
+        <location filename="dlgmovement.cpp" line="266"/>
         <source>Confirm to exit</source>
         <translation>Դուրս գալ՞</translation>
     </message>
@@ -2374,8 +2374,8 @@ MS Excel</source>
         <location filename="../../NewTax/Src/printtaxn.cpp" line="27"/>
         <location filename="../../NewTax/Src/printtaxn.cpp" line="84"/>
         <location filename="../../NewTax/Src/printtaxn.cpp" line="92"/>
-        <location filename="../../NewTax/Src/printtaxn.cpp" line="351"/>
-        <location filename="../../NewTax/Src/printtaxn.cpp" line="383"/>
+        <location filename="../../NewTax/Src/printtaxn.cpp" line="355"/>
+        <location filename="../../NewTax/Src/printtaxn.cpp" line="387"/>
         <source>Connection error</source>
         <translation>Կապի սխալ</translation>
     </message>
@@ -2390,8 +2390,8 @@ MS Excel</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../NewTax/Src/printtaxn.cpp" line="349"/>
-        <location filename="../../NewTax/Src/printtaxn.cpp" line="381"/>
+        <location filename="../../NewTax/Src/printtaxn.cpp" line="353"/>
+        <location filename="../../NewTax/Src/printtaxn.cpp" line="385"/>
         <source>Tax error code</source>
         <translation>ՀԴՄ սխալի կոդ</translation>
     </message>

@@ -31,6 +31,7 @@ void C5SearchEngine::init(QStringList databases)
     mSearchObjects.clear();
     mSearchStrings.clear();
     for (const QString &dbname : databases) {
+        int dbitemscount = 0;
         if (!db.open("127.0.0.1", dbname, "root", "root5")) {
             continue;
         }
@@ -73,15 +74,16 @@ void C5SearchEngine::init(QStringList databases)
         LEFT JOIN d_translator d2 ON d2.f_id=d.f_id AND d2.f_mode=3
         where m.f_state=1
         ) AS tr
-        WHERE LENGTH(f_word)>0
+        WHERE LENGTH(trim(f_word))>0
         ORDER BY f_mode desc, f_word
         )sql");
         db.exec(sql);
         while (db.next()) {
             //LogWriter::write(LogWriterLevel::special, "", db.string("f_word"));
             words.append(db.string("f_word"));
-            objects[totalitems++] = {db.integer("f_mode"), db.integer("f_id"),  db.string("f_orig")};
+            objects[dbitemscount++] = {db.integer("f_mode"), db.integer("f_id"),  db.string("f_orig")};
         }
+        totalitems += dbitemscount;
     }
     qDebug() << "serch engine of dishes initialized ";
     qDebug() << "total items" << totalitems;

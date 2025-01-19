@@ -750,6 +750,7 @@ bool C5StoreDoc::writeDocument(int state, QString &err)
     jbody["f_passed"] = ui->lePassed->getInteger();
     jbody["f_invoice"] = ui->leInvoiceNumber->text();
     jbody["f_invoicedate"] = ui->deInvoiceDate->date().toString(FORMAT_DATE_TO_STR_MYSQL);
+    jbody["f_reason"] = ui->leReason->getInteger();
     jbody["f_storein"] = ui->leStoreInput->getInteger();
     jbody["f_storeout"] = ui->leStoreOutput->getInteger();
     jbody["f_complectationcode"] = ui->leComplectationCode->getInteger();
@@ -2413,7 +2414,8 @@ void C5StoreDoc::printBarcode()
         db[":f_id"] = ui->tblGoods->getInteger(i, 3);
         db.exec("select f_name, f_scancode from c_goods where f_id=:f_id");
         if (db.nextRow()) {
-            b->addRow(db.getString("f_name"), db.getString("f_scancode"), ui->tblGoods->lineEdit(i, 5)->getInteger(),
+            b->addRow(db.getString("f_name"), db.getString("f_scancode"),
+                      ui->tblGoods->lineEdit(i, 5)->getInteger() < 1 ? 1 : ui->tblGoods->lineEdit(i, 5)->getInteger(),
                       ui->cbCurrency->currentData().toInt(), "");
         }
     }

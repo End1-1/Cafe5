@@ -11,6 +11,7 @@
 #include "c5printing.h"
 #include "c5utils.h"
 #include "datadriver.h"
+#include "jsons.h"
 #include "notificationwidget.h"
 #include "c5jsondb.h"
 #include "cashboxconfig.h"
@@ -56,11 +57,11 @@ void C5WaiterServer::reply(QJsonObject &o)
             QJsonArray jTables;
             srh.getJsonFromQuery(QString("select t.f_id, t.f_hall, t.f_name, t.f_lock, t.f_lockSrc, \
 h.f_id as f_header, concat(u.f_last, ' ', left(u.f_first, 1), '.') as f_staffName, \
-     h.f_amounttotal as f_amount, h.f_print, bc.f_govnumber, \
-     date_format(h.f_dateopen, '%d.%m.%Y') as f_dateopen, h.f_timeOpen, \
-     t.f_special_config \
-     from h_tables t \
-     left join o_header h on h.f_table=t.f_id and h.f_state=1 \
+    h.f_amounttotal as f_amount, h.f_print, bc.f_govnumber, \
+    date_format(h.f_dateopen, '%d.%m.%Y') as f_dateopen, h.f_timeOpen, \
+    t.f_special_config \
+    from h_tables t \
+    left join o_header h on h.f_table=t.f_id and h.f_state=1 \
 left join o_header_options o on o.f_id=h.f_id \
 left join b_car bc on bc.f_id=o.f_car \
 left join s_user u on u.f_id=h.f_staff  %1 \
@@ -1312,11 +1313,10 @@ int C5WaiterServer::printTax(const QMap<QString, QVariant> &header, const QList<
     {
         C5Database db(C5Config::dbParams());
         db[":f_id"] = fIn["order"].toString();
-        db.exec("select * from o_tax where f_id=:f_id");
-        QString crn, rseq;
+        db.exec("select * from o_tax_log where f_order=:f_id and f_state=1");
+        QJsonObject jo;
         if (db.nextRow()) {
-            crn = db.getString("f_devnum");
-            rseq = db.getString("f_receiptnumber");
+            jo = __strjson(db.getString("f_out"));
         } else {
             o["reply"] = 0;
             o["msg"] = tr("No tax receipt exists for this order");
@@ -1326,7 +1326,7 @@ int C5WaiterServer::printTax(const QMap<QString, QVariant> &header, const QList<
                      C5Config::taxCashier(), C5Config::taxPin(), this);
         QString jsnin, jsnout, err;
         int result;
-        result = pt.printTaxback(rseq, crn, jsnin, jsnout, err);
+        result = pt.printTaxback(jo["rseq"].toInt(), jo["crn"].toString(), jsnin, jsnout, err);
         o["reply"] = result == pt_err_ok ? 1 : 0;
         o["msg"] = result == pt_err_ok ? tr("Success") : err;
         db[":f_id"] = db.uuid();

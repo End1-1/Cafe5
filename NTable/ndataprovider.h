@@ -27,6 +27,10 @@ public:
 
     static QString sessionKey;
 
+    static QString mAppName;
+
+    static QString mFileVersion;
+
 private:
     QElapsedTimer *mTimer;
 

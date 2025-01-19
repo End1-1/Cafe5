@@ -204,8 +204,6 @@ public:
 
     static QString hotelDatabase();
 
-    static QString logDatabase();
-
     static QString serverIP();
 
     static bool noCashDocStore();

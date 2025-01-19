@@ -717,12 +717,13 @@ void CE5Goods::on_btnNewGoods_clicked()
 {
     CE5Goods *ep = new CE5Goods(fDBParams);
     C5Editor *e = C5Editor::createEditor(fDBParams, ep, 0);
-    QList<QMap<QString, QVariant> > data;
-    if(e->getResult(data)) {
+    QJsonObject data;
+    if(e->getJsonObject(data)) {
         int row = addGoodsRow();
-        ui->tblGoods->setData(row, 1, data.at(0)["f_id"]);
-        ui->tblGoods->setData(row, 2, data.at(0)["f_name"]);
-        ui->tblGoods->setData(row, 4, data.at(0)["f_unitname"]);
+        data = data["goods"].toObject();
+        ui->tblGoods->setData(row, 1, data["f_id"].toInt());
+        ui->tblGoods->setData(row, 2, data["f_name"].toString());
+        ui->tblGoods->setData(row, 4, data["f_unitname"].toString());
         ui->tblGoods->lineEdit(row, 3)->setFocus();
     }
     delete e;

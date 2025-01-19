@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1079</width>
-    <height>602</height>
+    <height>607</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -306,38 +306,6 @@
           <string>Additional</string>
          </property>
          <layout class="QGridLayout" name="gridLayout_3">
-          <item row="4" column="0" colspan="2">
-           <widget class="C5CheckBox" name="chServiceFee">
-            <property name="focusPolicy">
-             <enum>Qt::ClickFocus</enum>
-            </property>
-            <property name="text">
-             <string>Append service fee</string>
-            </property>
-            <property name="Field" stdset="0">
-             <string>f_service</string>
-            </property>
-           </widget>
-          </item>
-          <item row="2" column="1">
-           <widget class="C5LineEditWithSelector" name="leHourlyPayment">
-            <property name="maximumSize">
-             <size>
-              <width>50</width>
-              <height>16777215</height>
-             </size>
-            </property>
-            <property name="focusPolicy">
-             <enum>Qt::ClickFocus</enum>
-            </property>
-            <property name="Field" stdset="0">
-             <string>f_hourlypayment</string>
-            </property>
-            <property name="Type" stdset="0">
-             <number>1</number>
-            </property>
-           </widget>
-          </item>
           <item row="6" column="0">
            <widget class="C5CheckBox" name="chRemind">
             <property name="focusPolicy">
@@ -348,66 +316,6 @@
             </property>
             <property name="Field" stdset="0">
              <string>f_remind</string>
-            </property>
-           </widget>
-          </item>
-          <item row="3" column="1">
-           <widget class="C5LineEditWithSelector" name="leQueue_2">
-            <property name="maximumSize">
-             <size>
-              <width>50</width>
-              <height>16777215</height>
-             </size>
-            </property>
-            <property name="focusPolicy">
-             <enum>Qt::ClickFocus</enum>
-            </property>
-            <property name="Field" stdset="0">
-             <string>f_specialdiscount</string>
-            </property>
-            <property name="Type" stdset="0">
-             <string>1</string>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="0">
-           <widget class="QLabel" name="label_5">
-            <property name="text">
-             <string>Queue</string>
-            </property>
-           </widget>
-          </item>
-          <item row="2" column="0">
-           <widget class="QLabel" name="label_10">
-            <property name="text">
-             <string>Hourly payment</string>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="0">
-           <widget class="QLabel" name="label_7">
-            <property name="text">
-             <string>Color</string>
-            </property>
-           </widget>
-          </item>
-          <item row="5" column="0" colspan="2">
-           <widget class="C5CheckBox" name="chDiscount">
-            <property name="focusPolicy">
-             <enum>Qt::ClickFocus</enum>
-            </property>
-            <property name="text">
-             <string>Can discount</string>
-            </property>
-            <property name="Field" stdset="0">
-             <string>f_discount</string>
-            </property>
-           </widget>
-          </item>
-          <item row="3" column="0">
-           <widget class="QLabel" name="label_11">
-            <property name="text">
-             <string>Special dicount</string>
             </property>
            </widget>
           </item>
@@ -430,6 +338,65 @@
             </property>
            </widget>
           </item>
+          <item row="3" column="0">
+           <widget class="QLabel" name="label_11">
+            <property name="text">
+             <string>Special dicount</string>
+            </property>
+           </widget>
+          </item>
+          <item row="4" column="0" colspan="2">
+           <widget class="C5CheckBox" name="chServiceFee">
+            <property name="focusPolicy">
+             <enum>Qt::ClickFocus</enum>
+            </property>
+            <property name="text">
+             <string>Append service fee</string>
+            </property>
+            <property name="Field" stdset="0">
+             <string>f_service</string>
+            </property>
+           </widget>
+          </item>
+          <item row="5" column="0" colspan="2">
+           <widget class="C5CheckBox" name="chDiscount">
+            <property name="focusPolicy">
+             <enum>Qt::ClickFocus</enum>
+            </property>
+            <property name="text">
+             <string>Can discount</string>
+            </property>
+            <property name="Field" stdset="0">
+             <string>f_discount</string>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="1">
+           <widget class="C5LineEditWithSelector" name="leQueue_2">
+            <property name="maximumSize">
+             <size>
+              <width>50</width>
+              <height>16777215</height>
+             </size>
+            </property>
+            <property name="focusPolicy">
+             <enum>Qt::ClickFocus</enum>
+            </property>
+            <property name="Field" stdset="0">
+             <string>f_specialdiscount</string>
+            </property>
+            <property name="Type" stdset="0">
+             <string>1</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="0">
+           <widget class="QLabel" name="label_7">
+            <property name="text">
+             <string>Color</string>
+            </property>
+           </widget>
+          </item>
           <item row="7" column="0">
            <widget class="C5CheckBox" name="checkBox_4">
             <property name="focusPolicy">
@@ -440,6 +407,32 @@
             </property>
             <property name="Field" stdset="0">
              <string>f_extra</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="1">
+           <widget class="C5LineEditWithSelector" name="leHourlyPayment">
+            <property name="maximumSize">
+             <size>
+              <width>50</width>
+              <height>16777215</height>
+             </size>
+            </property>
+            <property name="focusPolicy">
+             <enum>Qt::ClickFocus</enum>
+            </property>
+            <property name="Field" stdset="0">
+             <string>f_hourlypayment</string>
+            </property>
+            <property name="Type" stdset="0">
+             <number>1</number>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="0">
+           <widget class="QLabel" name="label_5">
+            <property name="text">
+             <string>Queue</string>
             </property>
            </widget>
           </item>
@@ -465,6 +458,26 @@
             </property>
             <property name="SetColor" stdset="0">
              <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="0">
+           <widget class="QLabel" name="label_10">
+            <property name="text">
+             <string>Hourly payment</string>
+            </property>
+           </widget>
+          </item>
+          <item row="8" column="0">
+           <widget class="C5CheckBox" name="checkBox_5">
+            <property name="focusPolicy">
+             <enum>Qt::ClickFocus</enum>
+            </property>
+            <property name="text">
+             <string>Show online</string>
+            </property>
+            <property name="Field" stdset="0">
+             <string>f_showonline</string>
             </property>
            </widget>
           </item>
@@ -1313,14 +1326,14 @@
    <header location="global">c5lineeditwithselector.h</header>
   </customwidget>
   <customwidget>
-   <class>C5TableWidget</class>
-   <extends>QTableWidget</extends>
-   <header location="global">c5tablewidget.h</header>
-  </customwidget>
-  <customwidget>
    <class>C5CheckBox</class>
    <extends>QCheckBox</extends>
    <header location="global">c5checkbox.h</header>
+  </customwidget>
+  <customwidget>
+   <class>C5TableWidget</class>
+   <extends>QTableWidget</extends>
+   <header location="global">c5tablewidget.h</header>
   </customwidget>
  </customwidgets>
  <tabstops>

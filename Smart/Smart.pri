@@ -26,10 +26,7 @@ SOURCES += \
     ../Classes/c5airlog.cpp \
     ../Classes/c5cache.cpp \
     ../Classes/c5combodelegate.cpp \
-    ../Classes/c5crypt.cpp \
     ../Classes/c5datedelegate.cpp \
-    ../Classes/c5filelogwriter.cpp \
-    ../Classes/c5gridgilter.cpp \
     ../Classes/c5jsondb.cpp \
     ../Classes/c5logtoserverthread.cpp \
     ../Classes/c5menu.cpp \
@@ -56,7 +53,6 @@ SOURCES += \
     ../Classes/idram.cpp \
     ../Classes/notificationwidget.cpp \
     ../Classes/rkeyboard.cpp \
-    ../Classes/thread.cpp \
     ../Controls/c5checkbox.cpp \
     ../Controls/c5combobox.cpp \
     ../Controls/c5dateedit.cpp \
@@ -132,12 +128,8 @@ HEADERS += \
     ../Classes/c5airlog.h \
     ../Classes/c5cache.h \
     ../Classes/c5combodelegate.h \
-    ../Classes/c5crypt.h \
     ../Classes/c5datedelegate.h \
-    ../Classes/c5filelogwriter.h \
-    ../Classes/c5gridgilter.h \
     ../Classes/c5jsondb.h \
-    ../Classes/c5logtoserverthread.h \
     ../Classes/c5menu.h \
     ../Classes/c5permissions.h \
     ../Classes/c5printing.h \
@@ -162,7 +154,6 @@ HEADERS += \
     ../Classes/idram.h \
     ../Classes/notificationwidget.h \
     ../Classes/rkeyboard.h \
-    ../Classes/thread.h \
     ../Controls/c5checkbox.h \
     ../Controls/c5combobox.h \
     ../Controls/c5dateedit.h \
@@ -213,7 +204,6 @@ FORMS += \
     $$PWD/../Forms/dlgsplashscreen.ui \
     ../Cafe5/calendar.ui \
     ../Cafe5/dlgexitbyversion.ui \
-    ../Classes/c5gridgilter.ui \
     ../Classes/c5printpreview.ui \
     ../Classes/calculator.ui \
     ../Classes/dlgpassword.ui \

@@ -32,8 +32,7 @@ void C5Airlog::write(const QString &host, const QString &user, int type,
 
 void C5Airlog::writeToDatabase()
 {
-    C5Database db(C5Config::dbParams().at(0), C5Config::logDatabase(), C5Config::dbParams().at(2),
-                  C5Config::dbParams().at(3));
+    C5Database db(__c5config.dbParams());
     db[":f_comp"] = fHost;
     db[":f_date"] = QDate::currentDate();
     db[":f_time"] = QTime::currentTime();
@@ -45,6 +44,6 @@ void C5Airlog::writeToDatabase()
     db[":f_action"] = fAction;
     db[":f_value1"] = fV1;
     db[":f_value2"] = fV2;
-    db.insert("airlog.log", false);
+    db.insert("log", false);
     emit finished();
 }

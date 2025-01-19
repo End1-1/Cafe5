@@ -2,10 +2,10 @@
 #include "c5config.h"
 #include "c5systempreference.h"
 #include "ndataprovider.h"
-#include "logwriter.h"
 #include "c5servername.h"
 #include "ndataprovider.h"
 #include "dlgsplashscreen.h"
+#include "fileversion.h"
 #include <QFile>
 #include <QLockFile>
 #include <QSslSocket>
@@ -93,6 +93,8 @@ int main(int argc, char *argv[])
     C5Config::fSettingsName = js["settings"].toString();
     C5Config::fFullScreen = true;
     NDataProvider::mHost = C5Config::fDBPath;
+    NDataProvider::mAppName = "smart";
+    NDataProvider::mFileVersion = FileVersion::getVersionString(a.applicationFilePath());
     if (settingsName.length() > 0) {
         C5Config::fSettingsName = settingsName;
     }

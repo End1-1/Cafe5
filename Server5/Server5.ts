@@ -53,7 +53,7 @@
     </message>
     <message>
         <location filename="c5server5.ui" line="42"/>
-        <location filename="c5server5.cpp" line="179"/>
+        <location filename="c5server5.cpp" line="181"/>
         <source>Disconnected</source>
         <translation type="unfinished"></translation>
     </message>
@@ -123,22 +123,22 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="c5server5.cpp" line="124"/>
+        <location filename="c5server5.cpp" line="125"/>
         <source>Confirmation</source>
         <translation>Հարց</translation>
     </message>
     <message>
-        <location filename="c5server5.cpp" line="124"/>
+        <location filename="c5server5.cpp" line="125"/>
         <source>Are you sure to close application?</source>
         <translation>Դուրս գալ՞ ծրագրից</translation>
     </message>
     <message>
-        <location filename="c5server5.cpp" line="163"/>
+        <location filename="c5server5.cpp" line="165"/>
         <source>Connecting</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="c5server5.cpp" line="168"/>
+        <location filename="c5server5.cpp" line="170"/>
         <source>Connected</source>
         <translation type="unfinished"></translation>
     </message>

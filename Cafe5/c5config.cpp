@@ -145,11 +145,6 @@ QString C5Config::hotelDatabase()
     return getValue(param_hotel_database);
 }
 
-QString C5Config::logDatabase()
-{
-    return "airlog";
-}
-
 QString C5Config::serverIP()
 {
     return getRegValue("server_ip").toString();

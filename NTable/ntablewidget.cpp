@@ -235,6 +235,7 @@ void NTableWidget::exportToExcel()
     bgFillb[QColor(Qt::white).rgb()] = "body_b";
     for (int j = 0; j < rowCount; j++) {
         for (int i = 0; i < colCount; i++) {
+            QVariant v = fModel->data(j, i, Qt::EditRole);
             int bgColor = fModel->data(j, i, Qt::BackgroundColorRole).value<QColor>().rgb();
             if (!bgFill.contains(bgColor)) {
                 bodyFont.setBold(false);
@@ -252,13 +253,12 @@ void NTableWidget::exportToExcel()
             if (fModel->data(j, i, Qt::FontRole).value<QFont>().bold()) {
                 bgStyle = bgFillb[bgColor];
             }
-            QVariant v = fModel->data(j, i, Qt::EditRole);
             switch (v.type()) {
                 case QVariant::LongLong:
                 case QVariant::Double:
                 case QVariant::Int:
                     if (v.toDouble() < 0.01) {
-                        v = "";
+                        continue;
                     }
                     break;
                 default:

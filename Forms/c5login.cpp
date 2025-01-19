@@ -3,6 +3,7 @@
 #include "ndataprovider.h"
 #include "c5user.h"
 #include "c5servername.h"
+#include "fileversion.h"
 #include <QSettings>
 
 C5Login::C5Login() :
@@ -10,6 +11,7 @@ C5Login::C5Login() :
     ui(new Ui::C5Login)
 {
     ui->setupUi(this);
+    //ui->lbVersion->setText(FileVersion::getVersionString(qApp->applicationFilePath()));
     readServers();
 }
 
@@ -69,6 +71,8 @@ void C5Login::on_cbDatabases_currentIndexChanged(int index)
     }
     const QJsonObject &js = fServers.at(index).toObject();
     NDataProvider::mHost = js["database"].toString();
+    NDataProvider::mAppName = "officen";
+    NDataProvider::mFileVersion = FileVersion::getVersionString(qApp->applicationFilePath());
     C5Config::fDBHost = js["database"].toString();
     C5Config::fDBPath = js["database"].toString();
     C5Config::fDBUser = js["username"].toString();

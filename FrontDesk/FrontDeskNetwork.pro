@@ -69,13 +69,16 @@ HEADERS += \
     ../Classes/amkbd.h \
     ../Classes/logwriter.h \
     ../Forms/c5goodsprice.h \
-    ../NTable/ninterface.h
+    ../NTable/ninterface.h \
+    c5aboutdlg.h
 
 SOURCES += \
     ../Classes/amkbd.cpp \
     ../Classes/logwriter.cpp \
     ../Forms/c5goodsprice.cpp \
-    ../NTable/ninterface.cpp
+    ../NTable/ninterface.cpp \
+    c5aboutdlg.cpp
 
 FORMS += \
-    ../Forms/c5goodsprice.ui
+    ../Forms/c5goodsprice.ui \
+    c5aboutdlg.ui

@@ -29,7 +29,7 @@ void CR5StoreDocuments::buildQuery()
     fSqlQuery = "SELECT h.f_id as f_document, t.f_name as f_typename,"
                 "h.f_date, h.f_userid, ds.f_name as f_docstatename, "
                 "p.f_taxname as f_partnername, "
-                "coalesce(concat(so.f_name, '->', si.f_name)) as f_storename,  "
+                "concat(coalesce(so.f_name, ''), '->', coalesce(si.f_name, '')) as f_storename,  "
                 "h.f_amount, h.f_comment  "
                 "from a_header h "
                 "LEFT JOIN a_header_store hs ON hs.f_id=h.f_id  "

@@ -62,6 +62,7 @@ private slots:
     void on_leCash_textChanged(const QString &arg1);
     void on_btnDeliveryMan_clicked();
     void on_btnQr_clicked();
+    void on_btnCalculator_clicked();
 
 private:
     Ui::C5SaleDoc *ui;

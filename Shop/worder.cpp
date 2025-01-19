@@ -245,7 +245,7 @@ bool WOrder::writeOrder()
                                      fOHeader.amountTelcell, fOHeader.amountBank, fOHeader.amountCredit,
                                      fOHeader.amountPrepaid, fOHeader.amountDebt,
                                      fOHeader.amountCashIn, fOHeader.amountChange, fOHeader._printFiscal, prepaidReadonly,
-                                     ui->leGiftCardAmount->getDouble())) {
+                                     ui->leGiftCardAmount->getDouble() + 1000000000)) {
         return false;
     }
     QElapsedTimer t;

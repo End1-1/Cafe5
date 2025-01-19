@@ -123,10 +123,10 @@ void C5CostumerDebtPayment::on_btnOK_clicked()
             doc->setDate(ui->deDate->date());
             switch (fBClientDebt.source) {
                 case BCLIENTDEBTS_SOURCE_INPUT:
-                    doc->setComment(tr("Partner dept payment"));
+                    doc->setComment(ui->leComment->text());
                     break;
                 case BCLIENTDEBTS_SOURCE_SALE:
-                    doc->setComment(tr("Customer dept payment"));
+                    doc->setComment(ui->leComment->text());
                     break;
             }
             doc->updateRow(0, ui->leCostumerName->text(), ui->leAmount->getDouble());

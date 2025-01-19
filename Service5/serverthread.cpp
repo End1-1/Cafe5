@@ -18,7 +18,7 @@ ServerThread::ServerThread(const QString &configPath) :
     QObject(),
     fConfigPath(configPath)
 {
-    C5SearchEngine::init({"kinopark"});
+    C5SearchEngine::init({"kinopark", "cafe5"});
 }
 
 ServerThread::~ServerThread()

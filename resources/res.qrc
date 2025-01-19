@@ -223,5 +223,7 @@
         <file>clear.png</file>
         <file>pin.png</file>
         <file>www.png</file>
+        <file>icon.png</file>
+        <file>officen.png</file>
     </qresource>
 </RCC>

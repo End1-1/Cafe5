@@ -1485,3 +1485,7 @@ void C5SaleDoc::on_btnQr_clicked()
     }
     fEmarks.append(s);
 }
+
+void C5SaleDoc::on_btnCalculator_clicked()
+{
+}

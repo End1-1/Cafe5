@@ -250,8 +250,9 @@ void C5Cache::refreshId(const QString &whereField, int id)
     }
     C5Database db(fDBParams);
     QList<QList<QVariant>> cacheData;
-    db.exec(fCacheQuery[fId].replace("%idcond%", QString(" and %1=%2 ")
-                                     .arg(whereField, QString::number(id))), cacheData,
+    QString sql = fCacheQuery[fId];
+    db.exec(sql.replace("%idcond%", QString(" and %1=%2 ")
+                        .arg(whereField, QString::number(id))), cacheData,
             fCacheColumns[fId]);
     if (cacheData.empty() == false) {
         fCacheData.append(cacheData.at(0));

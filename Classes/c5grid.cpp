@@ -803,6 +803,11 @@ void C5Grid::exportToExcel()
     bgFillb[QColor(Qt::white).rgb()] = "body_b";
     for (int j = 0; j < rowCount; j++) {
         for (int i = 0; i < colCount; i++) {
+            if (fModel->data(j, i, Qt::EditRole).type() == QVariant::Double) {
+                if (fModel->data(j, i, Qt::EditRole).toDouble() == 0) {
+                    continue;
+                }
+            }
             int bgColor = fModel->data(j, i, Qt::BackgroundColorRole).value<QColor>().rgb();
             if (!bgFill.contains(bgColor)) {
                 bodyFont.setBold(false);

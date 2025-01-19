@@ -353,6 +353,7 @@ bool C5CashDoc::save(bool writedebt, bool fromrelation)
         bcd.cash = fUuid;
         bcd.flag = fDebtFlag;
         bcd.currency = ui->cbCurrency->currentData().toInt();
+        bcd.comment = ui->cbComment->currentText();
         if (ui->leOutput->getInteger() > 0) {
             bcd.source = BCLIENTDEBTS_SOURCE_INPUT;
         }

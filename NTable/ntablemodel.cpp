@@ -144,7 +144,8 @@ void NTableModel::setSumColumns(const QJsonArray &jcolsum)
     fColSum.clear();
     fColumnsOfDouble.clear();
     for (int i = 0; i < jcolsum.size(); i++) {
-        fColSum[jcolsum.at(i).toInt()] = 0;
+        qDebug() << jcolsum.at(i);
+        fColSum[jcolsum.at(i).toObject().keys().first().toInt()] = 0;
         fColumnsOfDouble.append(jcolsum.at(i).toInt());
     }
     countSum();

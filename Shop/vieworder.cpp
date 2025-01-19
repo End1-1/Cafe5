@@ -175,7 +175,7 @@ void ViewOrder::on_btnTaxReturn_clicked()
                  C5Config::taxCashier(), C5Config::taxPin(), this);
     QString jsnin, jsnout, err;
     int result;
-    result = pt.printTaxback(rseq, crn, jsnin, jsnout, err);
+    result = pt.printTaxback(rseq.toInt(), crn, jsnin, jsnout, err);
     db[":f_id"] = db.uuid();
     db[":f_order"] = fUuid;
     db[":f_date"] = QDate::currentDate();

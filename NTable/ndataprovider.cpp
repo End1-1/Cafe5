@@ -13,6 +13,8 @@ bool  NDataProvider::mDebug = false;
 QString NDataProvider::sessionKey;
 QString NDataProvider::mProtocol;
 QString NDataProvider::mHost;
+QString NDataProvider::mAppName;
+QString NDataProvider::mFileVersion;
 
 NDataProvider::NDataProvider(QObject *parent)
     : QObject(parent)
@@ -30,19 +32,20 @@ NDataProvider::~NDataProvider()
 
 void NDataProvider::getData(const QString &route, const QJsonObject &data)
 {
+    Q_ASSERT(mAppName.isEmpty() == false);
+    Q_ASSERT(mFileVersion.isEmpty() == false);
     mTimer->restart();
     emit started();
-    // if (mHost.startsWith("http")) {
-    //     mProtocol.clear();
-    // }
-    // if (mProtocol.isEmpty() && !mHost.contains("https")) {
-    //     mProtocol = "https://";
-    // }
-    QNetworkRequest rq(mHost + route);
+    if (mHost.startsWith("http")) {
+        mProtocol.clear();
+    }
+    QNetworkRequest rq(mProtocol + mHost + route);
     rq.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
     QJsonObject jo;
     jo["sessionkey"] = sessionKey;
     jo["hostinfo"] = QHostInfo::localHostName().toLower();
+    jo["app"] = mAppName;
+    jo["appversion"] = mFileVersion;
     QStringList keys = data.keys();
     for (const auto &s : qAsConst(keys)) {
         jo[s] = data[s];

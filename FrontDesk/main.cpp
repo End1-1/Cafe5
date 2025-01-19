@@ -54,6 +54,7 @@ int main(int argc, char *argv[])
             }
         }
     }
+#define LOGGING
     if (configName.isEmpty()) {
         configName = "Main";
     }

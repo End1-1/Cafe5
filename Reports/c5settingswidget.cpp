@@ -235,6 +235,7 @@ bool C5SettingsWidget::save(QString &err, QList<QMap<QString, QVariant> > &data)
     jc["denylogout"] = ui->chDenyLogout->isChecked();
     jc["cashbox_id"] = ui->leCashId->getInteger();
     jc["coincash_id"] = ui->leCoinCashdesk->getInteger();
+    jc["storage"] = ui->cbDefaultStore->currentData().toInt();
     QJsonArray ja;
     QStringList a = ui->leAvailableStore->text().split(",", Qt::SkipEmptyParts);
     for  (const QString &s : a) {

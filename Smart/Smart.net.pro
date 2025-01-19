@@ -72,6 +72,7 @@ FORMS += \
 HEADERS += \
     ../Classes/QProgressIndicator.h \
     ../Classes/amkbd.h \
+    ../Classes/c5logtoserverthread.h \
     ../NTable/ndataprovider.h \
     ../NTable/ninterface.h \
     ../NTable/nloadingdlg.h \

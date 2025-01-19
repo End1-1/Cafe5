@@ -37,6 +37,7 @@ private:
     int newRow();
     void countQty();
     bool saveDoc(int state);
+    void countTotals();
 };
 
 #endif // DLGMOVEMENT_H
