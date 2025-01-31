@@ -405,7 +405,7 @@ void CR5ConsumptionBySales::writeInvQty(C5Database &db, double qty, int row, int
     db.exec(QString("delete from a_store_inventory where f_document in (%1) and f_goods=:f_goods").arg(docid));
     QString id;
     if (qty > 0.0001) {
-        QString d = docid.split(",", QString::SkipEmptyParts).at(0);
+        QString d = docid.split(",", Qt::SkipEmptyParts).at(0);
         dw.writeAStoreInventory(id, d.replace("'", ""), fFilter->store(), goods, qty, 0, 0);
     }
     fModel->setData(row, column, qty);

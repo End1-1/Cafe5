@@ -93,19 +93,19 @@ bool C5StoreInventory::allowChangeDatabase()
 
 void C5StoreInventory::keyShortcut()
 {
-    QString s = static_cast<QShortcut*>(sender())->key().toString();
+    QString s = static_cast<QShortcut *>(sender())->key().toString();
     keyPressed(s.at(s.length() - 1));
 }
 
 void C5StoreInventory::keyPressed(const QChar &c)
 {
     switch (c.toLatin1()) {
-    case '+':
-        on_btnAddGoods_clicked();
-        break;
-    case '-':
-        on_btnRemoveGoods_clicked();
-        break;
+        case '+':
+            on_btnAddGoods_clicked();
+            break;
+        case '-':
+            on_btnRemoveGoods_clicked();
+            break;
     }
 }
 
@@ -117,7 +117,6 @@ void C5StoreInventory::saveDoc()
         C5Message::error(err);
         return;
     }
-
     C5StoreDraftWriter dw(db);
     if (ui->leDocNum->isEmpty()) {
         ui->leDocNum->setInteger(dw.counterAType(DOC_TYPE_STORE_INVENTORY));
@@ -125,8 +124,7 @@ void C5StoreInventory::saveDoc()
     dw.writeAHeader(fInternalID, ui->leDocNum->text(), DOC_STATE_SAVED, DOC_TYPE_STORE_INVENTORY, __user->id(),
                     ui->deDate->date(), QDate::currentDate(), QTime::currentTime(), 0,
                     ui->leTotal->getDouble(), ui->leComment->text(),
-                    0,__c5config.getValue(param_default_currency).toInt());
-
+                    0, __c5config.getValue(param_default_currency).toInt());
     db[":f_document"] = fInternalID;
     db.exec("delete from a_store_inventory where f_document=:f_document");
     QString longsql = "insert into a_store_inventory (f_id, f_document, f_store, f_goods, f_qty, f_price, f_total) values ";
@@ -146,17 +144,16 @@ void C5StoreInventory::saveDoc()
                        .arg(ui->tblGoods->lineEdit(i, 3)->getDouble())
                        .arg(ui->tblGoods->lineEdit(i, 5)->getDouble())
                        .arg(ui->tblGoods->lineEdit(i, 6)->getDouble()));
-//        QString id = ui->tblGoods->getString(i, 0);
-//        dw.writeAStoreInventory(id, fInternalID, ui->leStore->getInteger(), ui->tblGoods->getInteger(i, 1),
-//                                ui->tblGoods->lineEdit(i, 3)->getDouble(),  ui->tblGoods->lineEdit(i, 5)->getDouble(),
-//                                ui->tblGoods->lineEdit(i, 6)->getDouble());
+        //        QString id = ui->tblGoods->getString(i, 0);
+        //        dw.writeAStoreInventory(id, fInternalID, ui->leStore->getInteger(), ui->tblGoods->getInteger(i, 1),
+        //                                ui->tblGoods->lineEdit(i, 3)->getDouble(),  ui->tblGoods->lineEdit(i, 5)->getDouble(),
+        //                                ui->tblGoods->lineEdit(i, 6)->getDouble());
         ui->tblGoods->setString(i, 0, id);
     }
     if (!db.exec(longsql)) {
         C5Message::error(db.fLastError);
         return;
     }
-
     C5Message::info(tr("Saved"));
 }
 
@@ -169,12 +166,10 @@ void C5StoreInventory::printDoc()
     C5Printing p;
     QList<qreal> points;
     QStringList vals;
-    p.setSceneParams(2000, 2700, QPrinter::Portrait);
-
+    p.setSceneParams(2000, 2700, QPageLayout::Portrait);
     p.setFontSize(25);
     p.setFontBold(true);
     QString docTypeText = tr("Store inventorization");
-
     p.ctext(QString("%1 N%2").arg(docTypeText).arg(ui->leDocNum->text()));
     p.br();
     p.br();
@@ -194,7 +189,6 @@ void C5StoreInventory::printDoc()
         vals << tr("Comment");
         points << 600;
     }
-
     p.tableText(points, vals, p.fLineHeight + 20);
     p.br(p.fLineHeight + 20);
     p.setFontBold(false);
@@ -206,18 +200,15 @@ void C5StoreInventory::printDoc()
     if (!ui->leComment->isEmpty()) {
         vals << ui->leComment->text();
     }
-
     p.tableText(points, vals, p.fLineHeight + 20);
     p.br(p.fLineHeight + 20);
     p.br(p.fLineHeight + 20);
-
     points.clear();
     vals.clear();
     p.setFontBold(true);
     points << 50;
     p.tableText(points, vals, p.fLineHeight + 20);
     p.br(p.fLineHeight + 20);
-
     p.setFontBold(false);
     points.clear();
     vals.clear();
@@ -226,7 +217,6 @@ void C5StoreInventory::printDoc()
     p.br();
     p.br();
     p.br();
-
     points.clear();
     points << 50 << 100 << 200 << 600 << 250 << 250 << 250 << 270;
     vals.clear();
@@ -272,8 +262,7 @@ void C5StoreInventory::printDoc()
     p.br(p.fLineHeight + 20);
     p.line(50, p.fTop, 700, p.fTop);
     p.line(1000, p.fTop, 1650, p.fTop);
-
-    C5PrintPreview pp(&p, fDBParams);
+    C5PrintPreview pp( &p, fDBParams);
     pp.exec();
 }
 
@@ -356,13 +345,13 @@ void C5StoreInventory::tblQtyChanged(const QString &arg1)
 {
     Q_UNUSED(arg1);
     int row, col;
-    if (!ui->tblGoods->findWidget(static_cast<QWidget*>(sender()), row, col)) {
+    if (!ui->tblGoods->findWidget(static_cast<QWidget * >(sender()), row, col)) {
         return;
     }
     C5LineEdit *lqty = ui->tblGoods->lineEdit(row, col);
     C5LineEdit *lprice = ui->tblGoods->lineEdit(row, col + 2);
     C5LineEdit *ltotal = ui->tblGoods->lineEdit(row, col + 3);
-    ltotal->setDouble(lqty->getDouble() * lprice->getDouble());
+    ltotal->setDouble(lqty->getDouble() *lprice->getDouble());
     countTotal();
 }
 
@@ -370,13 +359,13 @@ void C5StoreInventory::tblPriceChanged(const QString &arg1)
 {
     Q_UNUSED(arg1);
     int row, col;
-    if (!ui->tblGoods->findWidget(static_cast<QWidget*>(sender()), row, col)) {
+    if (!ui->tblGoods->findWidget(static_cast<QWidget * >(sender()), row, col)) {
         return;
     }
     C5LineEdit *lqty = ui->tblGoods->lineEdit(row, col - 2);
     C5LineEdit *lprice = ui->tblGoods->lineEdit(row, col);
     C5LineEdit *ltotal = ui->tblGoods->lineEdit(row, col + 1);
-    ltotal->setDouble(lqty->getDouble() * lprice->getDouble());
+    ltotal->setDouble(lqty->getDouble() *lprice->getDouble());
     countTotal();
 }
 
@@ -384,7 +373,7 @@ void C5StoreInventory::tblTotalChanged(const QString &arg1)
 {
     Q_UNUSED(arg1);
     int row, col;
-    if (!ui->tblGoods->findWidget(static_cast<QWidget*>(sender()), row, col)) {
+    if (!ui->tblGoods->findWidget(static_cast<QWidget * >(sender()), row, col)) {
         return;
     }
     C5LineEdit *lqty = ui->tblGoods->lineEdit(row, col - 3);
@@ -444,4 +433,3 @@ void C5StoreInventory::on_btnBroadcast_clicked(bool checked)
         ui->btnBroadcast->setIcon(QIcon(":/wifib.png"));
     }
 }
-

@@ -7,7 +7,6 @@
 #include "c5widget.h"
 #include "cr5commonsales.h"
 #include "storeinputdocument.h"
-#include "checkforupdatethread.h"
 #include "cr5usersgroups.h"
 #include "nloadingdlg.h"
 #include "cr5materialinstoreuncomplect.h"
@@ -104,7 +103,7 @@
 #include <QSpacerItem>
 #include <QListWidget>
 #include <QPropertyAnimation>
-#include <QSound>
+#include <QMediaPlayer>
 #include <QToolButton>
 #include <QParallelAnimationGroup>
 
@@ -149,18 +148,18 @@ C5MainWindow::C5MainWindow(QWidget *parent) :
     C5Dialog::setMainWindow(this);
     __mainWindow = this;
     QVariant menuPanelIsVisible = C5Config::getRegValue("menupanel");
-    if (menuPanelIsVisible == QVariant::Invalid) {
+    if (!menuPanelIsVisible.isValid()) {
         menuPanelIsVisible = true;
     }
     ui->wshowmenu->setVisible(!menuPanelIsVisible.toBool());
     ui->wMenu->setVisible(menuPanelIsVisible.toBool());
     ui->actionLogout->setVisible(false);
     ui->actionChange_password->setVisible(false);
-    connect( &fUpdateTimer, SIGNAL(timeout()), this, SLOT(updateTimeout()));
+    connect( &fTimer, SIGNAL(timeout()), this, SLOT(updateTimeout()));
 #ifdef QT_DEBUG
-    fUpdateTimer.start(2000);
+    fTimer.start(2000);
 #else
-    fUpdateTimer.start(10000);
+    fTimer.start(10000);
 #endif
     ui->wMenu->resize(C5Config::getRegValue("twdbsize", 300).toInt(), 0);
     http = new NInterface(this);
@@ -169,7 +168,7 @@ C5MainWindow::C5MainWindow(QWidget *parent) :
 C5MainWindow::~C5MainWindow()
 {
     fBroadcastListeners.clear();
-    fUpdateTimer.stop();
+    fTimer.stop();
     delete ui;
 }
 
@@ -315,7 +314,7 @@ void C5MainWindow::menuListReponse(const QJsonObject &jdoc)
 
 void C5MainWindow::updateTimeout()
 {
-    fUpdateTimer.stop();
+    fTimer.stop();
     if (__user && (__user->id() == 77 || __user->id() == 81)) {
         C5Database db(C5Config::dbParams());
         db.exec("select f_id from o_draft_sale where f_id not in (select f_header from o_draft_sound) and f_saletype<3 ");
@@ -328,35 +327,7 @@ void C5MainWindow::updateTimeout()
         }
         //player->deleteLater();
     }
-    fUpdateTimer.start(10000);
-}
-
-void C5MainWindow::updateChecked(bool needUpdate, int source, const QString &path)
-{
-    if (!needUpdate) {
-        fUpdateTimer.start(60000);
-        return;
-    }
-    if (path.isEmpty()) {
-        fToolbarWidget->setUpdateButtonVisible(true);
-        C5Message::info(tr("Update exists, but you will update manually"));
-        fUpdateTimer.start(60000);
-        return;
-    }
-    fToolbarWidget->setUpdateButtonVisible(true);
-    switch (source) {
-        case usNone:
-            fUpdateTimer.start(60000);
-            break;
-        case usLocalnet: {
-            QStringList args;
-            args << "-lhttp://" + C5Config::fDBHost;
-            args << "-s0";
-            QProcess p;
-            p.start(qApp->applicationDirPath() + "/updater.exe", args);
-            break;
-        }
-    }
+    fTimer.start(10000);
 }
 
 void C5MainWindow::hotKey()
@@ -392,15 +363,14 @@ addTreeL3Item(QListWidget *l, int permission, const QString &text, const QString
     QListWidgetItem *item = new QListWidgetItem(l);
     item->setData(Qt::UserRole, permission);
     item->setData(Qt::UserRole + 1, icon);
-    int h = (qApp->font().pointSize() * 2) + 2;
-    item->setSizeHint(QSize(l->width(), h));
+    int h = (qApp->font().pointSize() * 2) + 8;
+    //item->setSizeHint(QSize(l->width(), h));
     QWidget *w = new QWidget();
     QHBoxLayout *hl = new QHBoxLayout();
     hl->setSpacing(1);
-    hl->setMargin(0);
+    hl->setContentsMargins(2, 2, 2, 2);
     QLabel *image = new QLabel();
-    image->setMaximumSize(QSize(h - 2, h - 2));
-    image->setMinimumSize(QSize(h - 2, h - 2));
+    image->setFixedSize(QSize(h - 2, h - 2));
     QPixmap p(icon);
     image->setPixmap(p.scaled(image->width() - 1, image->height() - 1, Qt::KeepAspectRatio));
     hl->addWidget(image);
@@ -408,8 +378,7 @@ addTreeL3Item(QListWidget *l, int permission, const QString &text, const QString
     bool active = __c5config.getRegValue(QString("favorite-active-%1").arg(permission)).toBool();
     QToolButton *favorite = new QToolButton();
     favorite->setIcon(active ? QIcon(":/star-active.png") : QIcon(":/star-passive.png"));
-    favorite->setMaximumSize(QSize(h - 2, h - 2));
-    favorite->setMinimumSize(QSize(h - 2, h - 2));
+    favorite->setFixedSize(QSize(h - 2, h - 2));
     favorite->setProperty("cp", permission);
     favorite->setProperty("name", text);
     favorite->setProperty("active", active);
@@ -420,6 +389,7 @@ addTreeL3Item(QListWidget *l, int permission, const QString &text, const QString
     w->setLayout(hl);
     l->addItem(item);
     l->setItemWidget(item, w);
+    item->setSizeHint(w->sizeHint());
     return item;
 }
 
@@ -793,7 +763,9 @@ void C5MainWindow::on_actionLogout_triggered()
     }
     QLayoutItem *li;
     while ((li = ui->lMenu->takeAt(0)) != nullptr) {
-        li->widget()->deleteLater();
+        if (li->widget()) {
+            li->widget()->deleteLater();
+        }
         delete li;
     }
     fMenuLists.clear();

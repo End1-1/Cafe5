@@ -8,16 +8,16 @@ C5DlgSelectReportTemplate::C5DlgSelectReportTemplate(int reportGroup, const QStr
     ui->setupUi(this);
     QList<TemplateDriver::Template> templates;
     C5ReportTemplateDriver::getTemplatesList(reportGroup, templates);
-    for (TemplateDriver::Template &t: templates) {
+    for (TemplateDriver::Template &t : templates) {
         QListWidgetItem *item = new QListWidgetItem(ui->lst);
-        item->setData(Qt::UserRole, qVariantFromValue(t));
+        item->setData(Qt::UserRole, QVariant::fromValue(t));
         item->setText(t.name);
         ui->lst->addItem(item);
     }
     TemplateDriver::Template t;
     t.id = 0;
     QListWidgetItem *item = new QListWidgetItem(ui->lst);
-    item->setData(Qt::UserRole, qVariantFromValue(t));
+    item->setData(Qt::UserRole, QVariant::fromValue(t));
     item->setText(tr("Cancel"));
     ui->lst->addItem(item);
 }
@@ -26,7 +26,6 @@ C5DlgSelectReportTemplate::~C5DlgSelectReportTemplate()
 {
     delete ui;
 }
-
 
 void C5DlgSelectReportTemplate::on_lst_itemClicked(QListWidgetItem *item)
 {

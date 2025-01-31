@@ -3,6 +3,7 @@ QT += sql
 
 TEMPLATE = lib
 DEFINES += JZSTORE_LIBRARY
+TARGET = jzstore
 
 CONFIG += c++11
 
@@ -11,25 +12,13 @@ CONFIG += c++11
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
-    ../../handlers/httpheader.cpp \
-    ../../handlers/requesthandler.cpp \
-    ../../handlers/socketdata.cpp \
-    ../../utils/configini.cpp \
+    ../../../Classes/logwriter.cpp \
     ../../utils/database.cpp \
-    ../../utils/databaseconnectionmanager.cpp \
-    ../../utils/jsonhandler.cpp \
-    ../../utils/logwriter.cpp \
     jzstore.cpp
 
 HEADERS += \
-    ../../handlers/httpheader.h \
-    ../../handlers/requesthandler.h \
-    ../../handlers/socketdata.h \
-    ../../utils/configini.h \
+    ../../../Classes/logwriter.h \
     ../../utils/database.h \
-    ../../utils/databaseconnectionmanager.h \
-    ../../utils/jsonhandler.h \
-    ../../utils/logwriter.h \
     jzstore.h
 
 DEFINES += _APPLICATION_=\\\"Breeze\\\"
@@ -39,6 +28,7 @@ DEFINES += _DBDRIVER_=\\\"QMARIADB\\\"
 TRANSLATIONS += \
     JZStore_hy_AM.ts
 
+INCLUDEPATH += C:/Projects/Cafe5/Classes
 INCLUDEPATH += C:/Projects/Cafe5/Service5/handlers
 INCLUDEPATH += C:/Projects/Cafe5/Service5/utils
 

@@ -97,6 +97,8 @@ private:
 
     QMovie *mMovie;
 
+    void openSearch();
+
 private slots:
     void timeout();
 
@@ -182,6 +184,7 @@ private slots:
 
     void on_chRegisterCard_clicked();
     void on_btnCashout_clicked();
+    void on_btnBooking_clicked();
 };
 
 #endif // WORKING_H

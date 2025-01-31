@@ -14,9 +14,14 @@ class DlgReturnItem : public C5Dialog
 
 public:
     explicit DlgReturnItem();
+
     ~DlgReturnItem();
 
+    void setMode(int mode);
+
 private slots:
+    void checkQtyResponse(const QJsonObject &jdoc);
+
     void on_btnSearchReceiptNumber_clicked();
 
     void on_tblOrder_cellClicked(int row, int column);
@@ -25,8 +30,12 @@ private slots:
 
     void on_btnReturn_clicked();
 
+    void on_leExchange_returnPressed();
+
 private:
     Ui::DlgReturnItem *ui;
+
+    int fMode;
 };
 
 #endif // DLGRETURNITEM_H

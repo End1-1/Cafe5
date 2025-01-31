@@ -59,8 +59,6 @@ private slots:
 
     void updateTimeout();
 
-    void updateChecked(bool needUpdate, int source, const QString &path);
-
     void hotKey();
 
     void tabCloseRequested(int index);
@@ -108,7 +106,7 @@ private:
 
     C5ToolBarWidget *fToolbarWidget;
 
-    QTimer fUpdateTimer;
+    QTimer fTimer;
 
     bool fLogin;
 

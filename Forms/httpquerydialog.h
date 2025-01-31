@@ -3,6 +3,7 @@
 
 #include "c5dialog.h"
 #include <QJsonObject>
+#include <QTimer>
 
 namespace Ui
 {
@@ -26,6 +27,7 @@ private:
     QString fUrl;
     QJsonObject jRequest;
     void connectError(QAbstractSocket::SocketError error);
+    QTimer fTimer;
 
 signals:
     void messageReceived();

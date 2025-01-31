@@ -1,5 +1,4 @@
 #include "configini.h"
-#include <QDir>
 #include <QDebug>
 
 QString ConfigIni::fAppPath;
@@ -7,7 +6,6 @@ ConfigIni *ConfigIni::fInstance = nullptr;
 
 ConfigIni::ConfigIni()
 {
-
 }
 
 ConfigIni::~ConfigIni()

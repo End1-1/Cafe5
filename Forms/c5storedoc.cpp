@@ -658,8 +658,8 @@ bool C5StoreDoc::openDraft(const QString &id, QString &err)
             "where b.f_header=:f_header");
     while (db.nextRow()) {
         ui->leStoreInput->setValue(db.getInt("f_store"));
-        int row = addGoods(db.getInt("f_goods"), db.getString("f_goodsname"), db.getDouble("f_qty"), db.getString("f_unitname"),
-                           0, 0, "");
+        addGoods(db.getInt("f_goods"), db.getString("f_goodsname"), db.getDouble("f_qty"), db.getString("f_unitname"),
+                 0, 0, "");
     }
     return true;
 }
@@ -1327,7 +1327,7 @@ void C5StoreDoc::printV1()
     p.setFont(f);
     QList<qreal> points;
     QStringList vals;
-    p.setSceneParams(2000, 2700, QPrinter::Portrait);
+    p.setSceneParams(2000, 2700, QPageLayout::Portrait);
     p.setFontSize(25);
     p.setFontBold(true);
     QString docTypeText;
@@ -1589,7 +1589,7 @@ void C5StoreDoc::printV2()
     p.setFont(f);
     QList<qreal> points;
     QStringList vals;
-    p.setSceneParams(2700, 2000, QPrinter::Landscape);
+    p.setSceneParams(2700, 2000, QPageLayout::Landscape);
     int c1 = (2700 / 2) / 2;
     int c2 = (2700 / 2) + (c1);
     int c0 = (2700 / 2) + 10;
@@ -2488,6 +2488,7 @@ void C5StoreDoc::cancelGoodsGroupOrder()
 
 void C5StoreDoc::tblAddChanged(const QString &arg1)
 {
+    Q_UNUSED(arg1);
     countTotal();
 }
 
@@ -3107,6 +3108,7 @@ void C5StoreDoc::on_btnCompressRow_clicked()
 
 void C5StoreDoc::on_cbCurrency_currentIndexChanged(int index)
 {
+    Q_UNUSED(index);
     if (fDocState == DOC_STATE_SAVED && fDocType == DOC_TYPE_STORE_INPUT) {
         if (C5Message::question("Փոխել պահպանված և բոլոր կապակցված փասթաթղթերի տարադրամը՞")
                 == QDialog::Accepted) {

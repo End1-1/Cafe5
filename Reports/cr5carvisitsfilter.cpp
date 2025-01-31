@@ -17,13 +17,14 @@ CR5CarVisitsFilter::~CR5CarVisitsFilter()
 
 QString CR5CarVisitsFilter::condition()
 {
-    QString where = QString(" oh.f_state=2 and oh.f_datecash between %1 and %2").arg(ui->deStart->toMySQLDate()).arg(ui->deEnd->toMySQLDate());
+    QString where = QString(" oh.f_state=2 and oh.f_datecash between %1 and %2").arg(ui->deStart->toMySQLDate()).arg(
+                        ui->deEnd->toMySQLDate());
     if (!ui->leCostumer->isEmpty()) {
         where += " and car.f_costumer in (" + ui->leCostumer->text() + ") ";
     }
     if (!ui->leGovNumber->isEmpty()) {
         QString gov;
-        QStringList l = ui->leGovNumber->text().split(",", QString::SkipEmptyParts);
+        QStringList l = ui->leGovNumber->text().split(",", Qt::SkipEmptyParts);
         for (int i = 0; i < l.count(); i++) {
             QString t = l[i].trimmed();
             if (!t.isEmpty()) {

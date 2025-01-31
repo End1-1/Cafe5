@@ -193,6 +193,7 @@ bool C5SettingsWidget::save(QString &err, QList<QMap<QString, QVariant> > &data)
     fTags[ui->leAutoDiscount->getTag()] = ui->leAutoDiscount->text();
     fTags[ui->leDeliveryCostumerId->getTag()] = ui->leDeliveryCostumerId->text();
     fTags[ui->leDebtholderFilterId->getTag()] = ui->leDebtholderFilterId->text();
+    fTags[ui->chSimpleFiscal->getTag()] = ui->chSimpleFiscal->isChecked() ? "1" : "0";
     C5Database db(fDBParams);
     if (isNew) {
         db[":f_id"] = ui->leCode->getInteger();
@@ -218,11 +219,15 @@ bool C5SettingsWidget::save(QString &err, QList<QMap<QString, QVariant> > &data)
     db.update("a_type", where_id(DOC_TYPE_STORE_OUTPUT));
     db[":f_counter"] = ui->leMoveDocCounter->getInteger();
     db.update("a_type", where_id(DOC_TYPE_STORE_MOVE));
+    QStringList halls = ui->leHall->text().split(",", Qt::SkipEmptyParts);
+    if (halls.isEmpty()) {
+        halls.append("0");
+    }
     QJsonObject jc;
     jc["store"] = ui->cbDefaultStore->currentData().toInt();
     jc["store_name"] = ui->cbDefaultStore->currentText();
     jc["first_page_title"] = ui->leSettingsName->text();
-    jc["hall"] = ui->leHall->getInteger();
+    jc["hall"] = halls.first().toInt();
     jc["table"] = ui->leTable->getInteger();
     jc["menu"] = ui->cbMenu->currentData().toInt();
     jc["dashboard"] = ui->cbMobileDashboard->currentText();
@@ -236,6 +241,9 @@ bool C5SettingsWidget::save(QString &err, QList<QMap<QString, QVariant> > &data)
     jc["cashbox_id"] = ui->leCashId->getInteger();
     jc["coincash_id"] = ui->leCoinCashdesk->getInteger();
     jc["storage"] = ui->cbDefaultStore->currentData().toInt();
+    jc["cash_cash_id"] = ui->leCashId->getInteger();
+    jc["cash_card_id"] = ui->leCardId->getInteger();
+    jc["addhall"] = ui->leHall->text();
     QJsonArray ja;
     QStringList a = ui->leAvailableStore->text().split(",", Qt::SkipEmptyParts);
     for  (const QString &s : a) {

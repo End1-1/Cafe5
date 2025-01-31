@@ -89,7 +89,7 @@
             <string/>
            </property>
            <property name="icon">
-            <iconset>
+            <iconset resource="../resources/res.qrc">
              <normaloff>:/new.png</normaloff>:/new.png</iconset>
            </property>
            <property name="iconSize">
@@ -124,7 +124,7 @@
             <string/>
            </property>
            <property name="icon">
-            <iconset>
+            <iconset resource="../resources/res.qrc">
              <normaloff>:/whosale.png</normaloff>:/whosale.png</iconset>
            </property>
            <property name="iconSize">
@@ -159,7 +159,7 @@
             <string/>
            </property>
            <property name="icon">
-            <iconset>
+            <iconset resource="../resources/res.qrc">
              <normaloff>:/goodslist.png</normaloff>:/goodslist.png</iconset>
            </property>
            <property name="iconSize">
@@ -194,7 +194,7 @@
             <string/>
            </property>
            <property name="icon">
-            <iconset>
+            <iconset resource="../resources/res.qrc">
              <normaloff>:/draft.png</normaloff>:/draft.png</iconset>
            </property>
            <property name="iconSize">
@@ -229,7 +229,7 @@
             <string/>
            </property>
            <property name="icon">
-            <iconset>
+            <iconset resource="../resources/res.qrc">
              <normaloff>:/save.png</normaloff>:/save.png</iconset>
            </property>
            <property name="iconSize">
@@ -277,7 +277,7 @@
             <string/>
            </property>
            <property name="icon">
-            <iconset>
+            <iconset resource="../resources/res.qrc">
              <normaloff>:/help.png</normaloff>:/help.png</iconset>
            </property>
            <property name="iconSize">
@@ -312,7 +312,7 @@
             <string/>
            </property>
            <property name="icon">
-            <iconset>
+            <iconset resource="../resources/res.qrc">
              <normaloff>:/monitor.png</normaloff>:/monitor.png</iconset>
            </property>
            <property name="iconSize">
@@ -350,7 +350,7 @@
             <string/>
            </property>
            <property name="icon">
-            <iconset>
+            <iconset resource="../resources/res.qrc">
              <normaloff>:/present.png</normaloff>:/present.png</iconset>
            </property>
            <property name="iconSize">
@@ -385,8 +385,43 @@
             <string/>
            </property>
            <property name="icon">
-            <iconset>
+            <iconset resource="../resources/res.qrc">
              <normaloff>:/star-active.png</normaloff>:/star-active.png</iconset>
+           </property>
+           <property name="iconSize">
+            <size>
+             <width>30</width>
+             <height>30</height>
+            </size>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="btnBooking">
+           <property name="minimumSize">
+            <size>
+             <width>36</width>
+             <height>36</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>36</width>
+             <height>36</height>
+            </size>
+           </property>
+           <property name="focusPolicy">
+            <enum>Qt::NoFocus</enum>
+           </property>
+           <property name="toolTip">
+            <string>Booking</string>
+           </property>
+           <property name="text">
+            <string/>
+           </property>
+           <property name="icon">
+            <iconset resource="../resources/res.qrc">
+             <normaloff>:/booking.png</normaloff>:/booking.png</iconset>
            </property>
            <property name="iconSize">
             <size>
@@ -420,7 +455,7 @@
             <string/>
            </property>
            <property name="icon">
-            <iconset>
+            <iconset resource="../resources/res.qrc">
              <normaloff>:/calendar.png</normaloff>:/calendar.png</iconset>
            </property>
            <property name="iconSize">
@@ -455,7 +490,7 @@
             <string/>
            </property>
            <property name="icon">
-            <iconset>
+            <iconset resource="../resources/res.qrc">
              <normaloff>:/contract.png</normaloff>:/contract.png</iconset>
            </property>
            <property name="iconSize">
@@ -490,7 +525,7 @@
             <string/>
            </property>
            <property name="icon">
-            <iconset>
+            <iconset resource="../resources/res.qrc">
              <normaloff>:/tax.png</normaloff>:/tax.png</iconset>
            </property>
            <property name="iconSize">
@@ -525,7 +560,7 @@
             <string/>
            </property>
            <property name="icon">
-            <iconset>
+            <iconset resource="../resources/res.qrc">
              <normaloff>:/checkall.png</normaloff>:/checkall.png</iconset>
            </property>
            <property name="iconSize">
@@ -560,7 +595,7 @@
             <string/>
            </property>
            <property name="icon">
-            <iconset>
+            <iconset resource="../resources/res.qrc">
              <normaloff>:/qr_code.png</normaloff>:/qr_code.png</iconset>
            </property>
            <property name="iconSize">
@@ -595,7 +630,7 @@
             <string/>
            </property>
            <property name="icon">
-            <iconset>
+            <iconset resource="../resources/res.qrc">
              <normaloff>:/minimize.png</normaloff>:/minimize.png</iconset>
            </property>
            <property name="iconSize">
@@ -630,7 +665,7 @@
             <string/>
            </property>
            <property name="icon">
-            <iconset>
+            <iconset resource="../resources/res.qrc">
              <normaloff>:/logout.png</normaloff>:/logout.png</iconset>
            </property>
            <property name="iconSize">
@@ -658,6 +693,7 @@
         <zorder>btnClientConfigQR</zorder>
         <zorder>btnMinimize</zorder>
         <zorder>btnCloseApplication</zorder>
+        <zorder>btnBooking</zorder>
        </widget>
       </item>
      </layout>
@@ -782,7 +818,7 @@
          <string/>
         </property>
         <property name="pixmap">
-         <pixmap>:/checked.png</pixmap>
+         <pixmap resource="../resources/res.qrc">:/checked.png</pixmap>
         </property>
         <property name="scaledContents">
          <bool>true</bool>
@@ -806,6 +842,9 @@
  <tabstops>
   <tabstop>tab</tabstop>
  </tabstops>
- <resources/>
+ <resources>
+  <include location="../resources/res.qrc"/>
+  <include location="../resources/res.qrc"/>
+ </resources>
  <connections/>
 </ui>

@@ -1,6 +1,7 @@
 #include "c5mainwindow.h"
 #include "c5systempreference.h"
 #include "c5login.h"
+#include "logwriter.h"
 #include "c5servername.h"
 #include <QMessageBox>
 #include <QApplication>
@@ -8,8 +9,16 @@
 #include <QStyleFactory>
 #include <QFontDatabase>
 #include <QFile>
+#include <QSslSocket>
 #include <ctime>
-#include <QTextCodec>
+#include <QSettings>
+
+bool isDarkModeEnabled()
+{
+    QSettings settings("HKEY_CURRENT_USER\\Software\\Microsoft\\Windows\\CurrentVersion\\Themes\\Personalize",
+                       QSettings::NativeFormat);
+    return settings.value("AppsUseLightTheme", 1).toInt() == 0; // 0 — темная, 1 — светлая
+}
 
 int main(int argc, char *argv[])
 {
@@ -23,7 +32,9 @@ int main(int argc, char *argv[])
     QCoreApplication::setLibraryPaths(libPath);
 #endif
     QApplication a(argc, argv);
-    QTextCodec::setCodecForLocale(QTextCodec::codecForName("utf8") );
+    qputenv("QT_ASSUME_UTF8", "1");
+    LogWriter::write(LogWriterLevel::verbose, "Support SSL", QSslSocket::supportsSsl() ? "true" : "false");
+    LogWriter::write(LogWriterLevel::verbose, "Support SSL version", QSslSocket::sslLibraryBuildVersionString());
     QString serverName, configName, showName;
     QJsonObject jdirectConnection;
     for (const QString &sn : a.arguments()) {
@@ -32,7 +43,10 @@ int main(int argc, char *argv[])
             if (snconf.length() == 2) {
                 serverName = snconf.at(1);
                 C5ServerName c5sn(serverName, "office");
-                c5sn.getServers("office");
+                if (!c5sn.getServers("office")) {
+                    C5Message::error(c5sn.mErrorString);
+                    return -1;
+                }
             }
         } else if (sn.contains("/config")) {
             QStringList snconf = sn.split("=", Qt::SkipEmptyParts);
@@ -67,15 +81,17 @@ int main(int argc, char *argv[])
         C5Message::error("Servername parameter must be pass as argument");
         return 1;
     }
-    QFile style(a.applicationDirPath() + "/officestyle.css");
     QString css;
-    if (style.exists()) {
-        if (style.open(QIODevice::ReadOnly)) {
-            css = style.readAll();
-            QString css2(css);
-            css2.replace("%font-size%", "12");
-            css2.replace("%font-family%", "Tahoma");
-            a.setStyleSheet(css2);
+    if (!isDarkModeEnabled()) {
+        QFile style(a.applicationDirPath() + "/officestyle.css");
+        if (style.exists()) {
+            if (style.open(QIODevice::ReadOnly)) {
+                css = style.readAll();
+                QString css2(css);
+                css2.replace("%font-size%", "12");
+                css2.replace("%font-family%", "Tahoma");
+                a.setStyleSheet(css2);
+            }
         }
     }
     C5Login l;
@@ -87,9 +103,11 @@ int main(int argc, char *argv[])
     } else {
         return 0;
     }
-    css.replace("%font-size%", __c5config.getValue(param_fd_font_size));
-    css.replace("%font-family%", __c5config.getValue(param_app_font_family));
-    a.setStyleSheet(css);
+    if (!isDarkModeEnabled()) {
+        css.replace("%font-size%", __c5config.getValue(param_fd_font_size));
+        css.replace("%font-family%", __c5config.getValue(param_app_font_family));
+        a.setStyleSheet(css);
+    }
     if (!C5SystemPreference::checkDecimalPointAndSeparator()) {
         return 0;
     }

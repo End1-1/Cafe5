@@ -113,6 +113,7 @@
 #define param_auto_discount 118
 #define param_waiter_delivery_costumer_category 119
 #define param_waiter_debt_costumer_category 120
+#define param_simple_fiscal 121
 
 #define FRONTDESK_WAITER 0
 #define FRONTDESK_SHOP 1

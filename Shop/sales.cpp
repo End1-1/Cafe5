@@ -794,3 +794,10 @@ void Sales::on_deEnd_textChanged(const QString &arg1)
         ui->deEnd->setDate(QDate::currentDate().addDays(-31));
     }
 }
+
+void Sales::on_btnItemChange_clicked()
+{
+    DlgReturnItem i;
+    i.setMode(2);
+    i.exec();
+}

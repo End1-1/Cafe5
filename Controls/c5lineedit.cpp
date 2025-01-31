@@ -50,13 +50,13 @@ double C5LineEdit::getDouble()
 
 void C5LineEdit::setData(const QVariant &data)
 {
-    switch (data.type()) {
-    case QVariant::Double:
-        setDouble(data.toDouble());
-        break;
-    default:
-        setText(data.toString());
-        break;
+    switch (data.typeId()) {
+        case QMetaType::Double:
+            setDouble(data.toDouble());
+            break;
+        default:
+            setText(data.toString());
+            break;
     }
 }
 
@@ -112,32 +112,32 @@ void C5LineEdit::keyPressEvent(QKeyEvent *e)
     const QValidator *v = validator();
     if (v) {
         if (!strcmp(v->metaObject()->className(), "QDoubleValidator")) {
-            const QDoubleValidator *dv = static_cast<const QDoubleValidator*>(v);
+            const QDoubleValidator *dv = static_cast<const QDoubleValidator *>(v);
             switch (e->key()) {
-            case 43:
-                //e->accept();
-                //e->ignore();
-                //break;
-                return;
-            case 45:
-                if (dv->bottom() > 0.0000001) {
+                case 43:
+                    //e->accept();
+                    //e->ignore();
+                    //break;
                     return;
-                }
-                break;
-            case 46:
-            case 44:
-            case 8228:
-                e = new QKeyEvent (QEvent::KeyRelease,Qt::Key_A,Qt::NoModifier, QLocale().decimalPoint());
-                break;
-            case 16777219:
-                //backspace ;)
-                break;
-            case 16777220:
-            case 16777221:
-                if (isEmpty()) {
-                    emit returnPressed();
-                }
-                break;
+                case 45:
+                    if (dv->bottom() > 0.0000001) {
+                        return;
+                    }
+                    break;
+                case 46:
+                case 44:
+                case 8228:
+                    e = new QKeyEvent (QEvent::KeyRelease, Qt::Key_A, Qt::NoModifier, QLocale().decimalPoint());
+                    break;
+                case 16777219:
+                    //backspace ;)
+                    break;
+                case 16777220:
+                case 16777221:
+                    if (isEmpty()) {
+                        emit returnPressed();
+                    }
+                    break;
             }
         }
     }
@@ -190,6 +190,6 @@ void C5LineEdit::editText(const QString &arg)
 
 C5LineEdit *isLineEdit(QObject *o)
 {
-    C5LineEdit *le = dynamic_cast<C5LineEdit*>(o);
+    C5LineEdit *le = dynamic_cast<C5LineEdit *>(o);
     return le;
 }

@@ -61,6 +61,8 @@ private slots:
 
     void on_deEnd_textChanged(const QString &arg1);
 
+    void on_btnItemChange_clicked();
+
 private:
     Ui::Sales *ui;
 

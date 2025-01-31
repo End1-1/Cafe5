@@ -6,6 +6,7 @@
 #include <QDateTime>
 #include <QCryptographicHash>
 #include <QJsonDocument>
+#include <QRegularExpression>
 
 #define FORMAT_DATETIME_TO_STR "dd/MM/yyyy HH:mm:ss"
 #define FORMAT_DATETIME_TO_STR_MYSQL "yyyy-MM-dd HH:mm:ss"
@@ -18,7 +19,7 @@
 #define current_date QDate::currentDate().toString(FORMAT_DATE_TO_STR)
 #define current_time QTime::currentTime().toString(FORMAT_TIME_TO_STR)
 #define hostinfo QHostInfo::localHostName().toLower()
-#define float_str(value, f) QLocale().toString(value, 'f', f).remove(QRegExp("(?!\\d[\\.\\,][1-9]+)0+$")).remove(QRegExp("[\\.\\,]$"))
+#define float_str(value, f) QLocale().toString(value, 'f', f).remove(QRegularExpression("(?!\\d[\\.\\,][1-9]+)0+$")).remove(QRegularExpression("[\\.\\,]$"))
 #define str_float(value) QLocale().toDouble(value)
 #define json_str(value) QString(QJsonDocument(value).toJson(QJsonDocument::Compact))
 #define str_json(value) QJsonDocument::fromJson(value.toUtf8()).object()

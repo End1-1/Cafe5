@@ -6,14 +6,12 @@
 #ifndef BARCODE5_H
 #define BARCODE5_H
 
-
 class Barcode39;
 class Barcode93;
 class BarcodeI2of5;
 class Barcode128;
 
-const int ga2_Code128[2][207]=
-{
+const int ga2_Code128[2][207] = {
 	{
 		64,  65,  66,  67,  68,  69,  70,  71,  72,  73,  74,  75,  76,  77,  78,  79,
 		80,  81,  82,  83,  84,  85,  86,  87,  88,  89,  90,  91,  92,  93,  94,  95,
@@ -46,46 +44,44 @@ const int ga2_Code128[2][207]=
 	},
 };
 
-
 class BarcodeBase
 {
 public:
 	BarcodeBase()
 	{
 		Clear();
-		i_Ratio=3;
+        i_Ratio = 3;
 	}
 
-	void operator=(const BarcodeBase&bc)
+    void operator=(const BarcodeBase &bc)
 	{
-		i_LenBuf=bc.i_LenBuf;
-		i_Ratio	=bc.i_Ratio;
-		memcpy(ia_Buf,bc.ia_Buf,sizeof(ia_Buf));
+        i_LenBuf = bc.i_LenBuf;
+        i_Ratio	= bc.i_Ratio;
+        memcpy(ia_Buf, bc.ia_Buf, sizeof(ia_Buf));
 	}
 
 	void Clear()
 	{
-		memset(ia_Buf,0,sizeof(ia_Buf));
-		i_LenBuf=0;
+        memset(ia_Buf, 0, sizeof(ia_Buf));
+        i_LenBuf = 0;
 	}
 
 	int GetEncodeLength()	const
 	{
-		BYTE*pb=(BYTE*)ia_Buf;
-		int i,iLen=0;
-		for(i=0;i<i_LenBuf;i++)
-		{
+        BYTE *pb = (BYTE *)ia_Buf;
+        int i, iLen = 0;
+        for(i = 0; i < i_LenBuf; i++) {
 			//wide is 3
-			if(*pb&2)	iLen+=(i_Ratio-1);
+            if( *pb & 2)	iLen += (i_Ratio - 1);
 			pb++;
 		}
-		return iLen+i_LenBuf;
+        return iLen + i_LenBuf;
 	}
 	int GetBufferLength()	const
 	{
 		return i_LenBuf;
 	}
-	const BYTE&GetAt(int i)	const 
+    const BYTE &GetAt(int i)	const
 	{
 		return ia_Buf[i];
 	}
@@ -95,31 +91,27 @@ public:
 	}
 	int SetRatio(int iRatio)
 	{
-		i_Ratio=iRatio;
-		if(i_Ratio<=0)	i_Ratio=1;
+        i_Ratio = iRatio;
+        if(i_Ratio <= 0)	i_Ratio = 1;
         return i_Ratio;
 	}
 
-    void DrawBarcode(QPainter &pr, qreal iX, qreal iY0, qreal iY10, qreal iY11, qreal iPenW) {
+    void DrawBarcode(QPainter &pr, qreal iX, qreal iY0, qreal iY10, qreal iY11, qreal iPenW)
+    {
         QPen pBar(Qt::black);
         pBar.setWidthF(iPenW);
         QPen pSpace(Qt::white);
         pSpace.setWidthF(iPenW);
-
-        BYTE*pb=ia_Buf;
-        int i0,iNum0=i_LenBuf;
-
+        BYTE *pb = ia_Buf;
+        int i0, iNum0 = i_LenBuf;
         BYTE bBar;
-        int i1,iNum1;
+        int i1, iNum1;
         qreal iY;
-
-        for(i0 = 0; i0 < iNum0; i0++)
-        {
+        for(i0 = 0; i0 < iNum0; i0++) {
             bBar	= *pb & 0x01;
-            iNum1	= (*pb & 0x02) ? i_Ratio : 1;
-            iY		= (*pb & 0x04) ? iY11 : iY10;
-            for(i1 = 0; i1 < iNum1; i1++)
-            {
+            iNum1	= ( *pb & 0x02) ? i_Ratio : 1;
+            iY		= ( *pb & 0x04) ? iY11 : iY10;
+            for(i1 = 0; i1 < iNum1; i1++) {
                 if(bBar) {
                     pr.setPen(pBar);
                     pr.fillRect(QRectF(iX, iY0, iPenW, iY), Qt::black);
@@ -134,21 +126,18 @@ public:
         }
     }
 
-    qreal DrawBarcodeGSLength(qreal iX, qreal iY11, qreal iPenW) {
-        BYTE*pb=ia_Buf;
-        int i0,iNum0=i_LenBuf;
-
+    qreal DrawBarcodeGSLength(qreal iX, qreal iY11, qreal iPenW)
+    {
+        BYTE *pb = ia_Buf;
+        int i0, iNum0 = i_LenBuf;
         BYTE bBar;
-        int i1,iNum1;
+        int i1, iNum1;
         qreal iY;
-
-        for(i0 = 0; i0 < iNum0; i0++)
-        {
+        for(i0 = 0; i0 < iNum0; i0++) {
             bBar	= *pb & 0x01;
-            iNum1	= (*pb & 0x02) ? i_Ratio : 1;
-            iY		= (*pb & 0x04) ? iY11 : iY11;
-            for(i1 = 0; i1 < iNum1; i1++)
-            {
+            iNum1	= ( *pb & 0x02) ? i_Ratio : 1;
+            iY		= ( *pb & 0x04) ? iY11 : iY11;
+            for(i1 = 0; i1 < iNum1; i1++) {
                 if(bBar) {
                     //pr.addRect(QRectF(iX, iY0, iPenW, iY), pBar);
                 } else {
@@ -161,26 +150,22 @@ public:
         return iX;
     }
 
-    void DrawBarcodeGS(QGraphicsScene &pr, qreal iX, qreal iY0, qreal iY10, qreal iY11, qreal iPenW) {
+    void DrawBarcodeGS(QGraphicsScene &pr, qreal iX, qreal iY0, qreal iY10, qreal iY11, qreal iPenW)
+    {
         QPen pBar(Qt::black);
         pBar.setWidthF(iPenW);
         QPen pSpace(Qt::white);
         pSpace.setWidthF(iPenW);
-
-        BYTE*pb=ia_Buf;
-        int i0,iNum0=i_LenBuf;
-
+        BYTE *pb = ia_Buf;
+        int i0, iNum0 = i_LenBuf;
         BYTE bBar;
-        int i1,iNum1;
+        int i1, iNum1;
         qreal iY;
-
-        for(i0 = 0; i0 < iNum0; i0++)
-        {
+        for(i0 = 0; i0 < iNum0; i0++) {
             bBar	= *pb & 0x01;
-            iNum1	= (*pb & 0x02) ? i_Ratio : 1;
-            iY		= (*pb & 0x04) ? iY11 : iY10;
-            for(i1 = 0; i1 < iNum1; i1++)
-            {
+            iNum1	= ( *pb & 0x02) ? i_Ratio : 1;
+            iY		= ( *pb & 0x04) ? iY11 : iY10;
+            for(i1 = 0; i1 < iNum1; i1++) {
                 if(bBar) {
                     pr.addRect(QRectF(iX, iY0, iPenW, iY), pBar);
                 } else {
@@ -192,26 +177,22 @@ public:
         }
     }
 
-    void DrawBarcodeVert(QPainter &pr, qreal iX, qreal iY0, qreal iY10, qreal iPenW) {
+    void DrawBarcodeVert(QPainter &pr, qreal iX, qreal iY0, qreal iY10, qreal iPenW)
+    {
         QPen pBar(Qt::black);
         pBar.setWidthF(iPenW);
         QPen pSpace(Qt::white);
         pSpace.setWidthF(iPenW);
-
-        BYTE*pb=ia_Buf;
-        int i0,iNum0=i_LenBuf;
-
+        BYTE *pb = ia_Buf;
+        int i0, iNum0 = i_LenBuf;
         BYTE bBar;
-        int i1,iNum1;
+        int i1, iNum1;
         int iY;
-
-        for(i0 = 0; i0 < iNum0; i0++)
-        {
+        for(i0 = 0; i0 < iNum0; i0++) {
             bBar	= *pb & 0x01;
-            iNum1	= (*pb & 0x02) ? i_Ratio : 1;
-            iY		= (*pb & 0x04) ? iY10 : iY10;
-            for(i1 = 0; i1 < iNum1; i1++)
-            {
+            iNum1	= ( *pb & 0x02) ? i_Ratio : 1;
+            iY		= ( *pb & 0x04) ? iY10 : iY10;
+            for(i1 = 0; i1 < iNum1; i1++) {
                 if(bBar) {
                     pr.setPen(pBar);
                 } else {
@@ -225,105 +206,89 @@ public:
         }
     }
 
-
-    void DrawBarcode(C5Printing &pr, qreal iX, qreal iY0, qreal iY10, qreal iY11) {
+    void DrawBarcode(C5Printing &pr, qreal iX, qreal iY0, qreal iY10, qreal iY11)
+    {
         qreal iPenW = 4;
         QPen pBar(Qt::black);
         pBar.setWidthF(iPenW);
         QPen pSpace(Qt::white);
         pSpace.setWidthF(iPenW);
-
-        BYTE*pb=ia_Buf;
-        int i0,iNum0=i_LenBuf;
-
+        BYTE *pb = ia_Buf;
+        int i0, iNum0 = i_LenBuf;
         BYTE bBar;
-        int i1,iNum1;
+        int i1, iNum1;
         int iY;
-        for(i0 = 0; i0 < iNum0; i0++)
-        {
+        for(i0 = 0; i0 < iNum0; i0++) {
             bBar	= *pb & 0x01;
-            iNum1	= (*pb & 0x02) ? i_Ratio : 1;
-            iY		= (*pb & 0x04) ? iY11 : iY10;
-            for(i1 = 0; i1 < iNum1; i1++)
-            {
+            iNum1	= ( *pb & 0x02) ? i_Ratio : 1;
+            iY		= ( *pb & 0x04) ? iY11 : iY10;
+            for(i1 = 0; i1 < iNum1; i1++) {
                 if(bBar) {
                     pr.setPen(pBar);
                 } else {
                     pr.setPen(pSpace);
                 }
                 pr.line(iX, iY0, iX, iY);
-//				::MoveToEx(hDC,iX,iY0,0);
-//				::LineTo(hDC,iX,iY);
+                //				::MoveToEx(hDC,iX,iY0,0);
+                //				::LineTo(hDC,iX,iY);
                 iX += (iPenW * 1);
             }
             pb++;
         }
     }
 
-    void DrawBarcode_v1(QPainter *p,int iX,int iY0,int iY10,int iY11, const int iPenW)
+    void DrawBarcode_v1(QPainter *p, int iX, int iY0, int iY10, int iY11, const int iPenW)
     {
         QPen penBar(Qt::black, iPenW);
         QPen penSpace(Qt::white, iPenW);
         QPen pen;
-
-        BYTE*pb=ia_Buf;
-        int i0,iNum0=i_LenBuf;
-
+        BYTE *pb = ia_Buf;
+        int i0, iNum0 = i_LenBuf;
         BYTE bBar;
-        int i1,iNum1;
+        int i1, iNum1;
         int iY;
-        for(i0=0;i0<iNum0;i0++)
-        {
-            bBar	=*pb&0x01;
-            iNum1	=(*pb&0x02)?i_Ratio:1;
-            iY		=(*pb&0x04)?iY11:iY10;
-            for(i1=0;i1<iNum1;i1++)
-            {
-                if(bBar){
+        for(i0 = 0; i0 < iNum0; i0++) {
+            bBar	= *pb & 0x01;
+            iNum1	= ( *pb & 0x02) ? i_Ratio : 1;
+            iY		= ( *pb & 0x04) ? iY11 : iY10;
+            for(i1 = 0; i1 < iNum1; i1++) {
+                if(bBar) {
                     pen = penBar;
                 } else {
                     pen = penSpace;
                 }
-
                 p->drawLine(QPointF(iX, iY0), QPointF(iX, iY));
-                iX+=iPenW;
+                iX += iPenW;
             }
             pb++;
         }
     }
 
-	void DrawBarcode(HDC hDC,int iX,int iY0,int iY10,int iY11,const COLORREF clrBar,const COLORREF clrSpace,const int iPenW)
+    void DrawBarcode(HDC hDC, int iX, int iY0, int iY10, int iY11, const COLORREF clrBar, const COLORREF clrSpace,
+                     const int iPenW)
 	{
-		HPEN hPenBar	=::CreatePen(PS_SOLID,iPenW,clrBar);
-		HPEN hPenSpace	=::CreatePen(PS_SOLID,iPenW,clrSpace);
-
-		HPEN hPenOld=(HPEN)::SelectObject(hDC,hPenBar);
-
-		BYTE*pb=ia_Buf;
-		int i0,iNum0=i_LenBuf;
-		
+        HPEN hPenBar	=::CreatePen(PS_SOLID, iPenW, clrBar);
+        HPEN hPenSpace	=::CreatePen(PS_SOLID, iPenW, clrSpace);
+        HPEN hPenOld = (HPEN)::SelectObject(hDC, hPenBar);
+        BYTE *pb = ia_Buf;
+        int i0, iNum0 = i_LenBuf;
 		BYTE bBar;
-		int i1,iNum1;
+        int i1, iNum1;
 		int iY;
-		for(i0=0;i0<iNum0;i0++)
-		{
-			bBar	=*pb&0x01;
-			iNum1	=(*pb&0x02)?i_Ratio:1;
-			iY		=(*pb&0x04)?iY11:iY10;
-			for(i1=0;i1<iNum1;i1++)
-			{
-				if(bBar)	::SelectObject(hDC,hPenBar);
-				else		::SelectObject(hDC,hPenSpace);
-				
-				::MoveToEx(hDC,iX,iY0,0);
-				::LineTo(hDC,iX,iY);
-				iX+=iPenW;
+        for(i0 = 0; i0 < iNum0; i0++) {
+            bBar	= *pb & 0x01;
+            iNum1	= ( *pb & 0x02) ? i_Ratio : 1;
+            iY		= ( *pb & 0x04) ? iY11 : iY10;
+            for(i1 = 0; i1 < iNum1; i1++) {
+                if(bBar)	::SelectObject(hDC, hPenBar);
+                else		::SelectObject(hDC, hPenSpace);
+                ::MoveToEx(hDC, iX, iY0, 0);
+                ::LineTo(hDC, iX, iY);
+                iX += iPenW;
 			}
 			pb++;
 		}
-
-		::SelectObject(hDC,hPenOld);
-
+        ::SelectObject(hDC, hPenOld);
 		::DeleteObject(hPenBar);
 		::DeleteObject(hPenSpace);
 	}
@@ -334,15 +299,14 @@ protected:
 
 	int		i_Ratio;
 
-	struct IntString
-	{
+    struct IntString {
 		int ch;
-		char*psz;
+        const char *psz;
 	};
 
 };
 
-class Barcode39:public BarcodeBase
+class Barcode39: public BarcodeBase
 {
 	//[n/a][n/a][n/a][n/a][n/a][n/a][w-n][b-s]
 public:
@@ -353,40 +317,35 @@ public:
 	{
 	}
 
-	BOOL Encode39(const char*pszCodeIn)
+    BOOL Encode39(const char *pszCodeIn)
 	{
-		int iLen=strlen(pszCodeIn);
-
-		char*pszCode=new char[iLen+3];
-		sprintf(pszCode,"*%s*",pszCodeIn);
+        int iLen = strlen(pszCodeIn);
+        char *pszCode = new char[iLen + 3];
+        sprintf(pszCode, "*%s*", pszCodeIn);
 		strupr(pszCode);
-
-		BYTE*pFst=ia_Buf;
-		BYTE*p0=pFst,*p1;
-
-		iLen+=2;
+        BYTE *pFst = ia_Buf;
+        BYTE *p0 = pFst, *p1;
+        iLen += 2;
 		int i;
-		for(i=0;i<iLen;i++)
-		{
-			p1=P_GetNarrowWideBarSpace39(pszCode[i],p0);
-			if(p1==0)	return 0;
-			p0=p1;
+        for(i = 0; i < iLen; i++) {
+            p1 = P_GetNarrowWideBarSpace39(pszCode[i], p0);
+            if(p1 == 0)	return 0;
+            p0 = p1;
 		}
-		i_LenBuf=p1-pFst;
+        i_LenBuf = p1 - pFst;
 		delete []pszCode;
 		return 1;
 	}
 
-	void Draw39(HDC hDC,int iX,int iY0,int iY1,const COLORREF clrBar,const COLORREF clrSpace,const int iPenW)
+    void Draw39(HDC hDC, int iX, int iY0, int iY1, const COLORREF clrBar, const COLORREF clrSpace, const int iPenW)
 	{
-		DrawBarcode(hDC,iX,iY0,iY1,iY1,clrBar,clrSpace,iPenW);
+        DrawBarcode(hDC, iX, iY0, iY1, iY1, clrBar, clrSpace, iPenW);
 	}
 
 private:
-	BYTE*P_GetNarrowWideBarSpace39(char ch,BYTE*pb)
+    BYTE *P_GetNarrowWideBarSpace39(char ch, BYTE *pb)
 	{
-		IntString infs[]=
-		{
+        IntString infs[] = {
 			{'1',	"wnnwnnnnwn"},
 			{'2',	"nnwwnnnnwn"},
 			{'3',	"wnwwnnnnnn"},
@@ -432,18 +391,14 @@ private:
 			{'+',	"nwnnnwnwnn"},
 			{'%',	"nnnwnwnwnn"},
 		};
-		
-		int i0,iNum0=sizeof(infs)/sizeof(infs[0]);
+        int i0, iNum0 = sizeof(infs) / sizeof(infs[0]);
 		int i1;
-		for(i0=0;i0<iNum0;i0++)
-		{
-			IntString&inf=infs[i0];
-			if(inf.ch==ch)
-			{
-				for(i1=0;i1<10;i1++)
-				{
-					if(inf.psz[i1]=='w')	*pb+=2;
-					if(i1%2==0)			*pb+=1;
+        for(i0 = 0; i0 < iNum0; i0++) {
+            IntString &inf = infs[i0];
+            if(inf.ch == ch) {
+                for(i1 = 0; i1 < 10; i1++) {
+                    if(inf.psz[i1] == 'w')	*pb += 2;
+                    if(i1 % 2 == 0)			*pb += 1;
 					pb++;
 				}
 				return pb;
@@ -453,7 +408,7 @@ private:
 	}
 };
 
-class BarcodeI2of5:public BarcodeBase
+class BarcodeI2of5: public BarcodeBase
 {
 	//[n/a][n/a][n/a][n/a][n/a][n/a][w-n][b-s]
 public:
@@ -464,54 +419,48 @@ public:
 	{
 	}
 
-	BOOL EncodeI2of5(const char*pszCode)
+    BOOL EncodeI2of5(const char *pszCode)
 	{
 		Clear();
-		BYTE*pFst=ia_Buf;
-		BYTE*pb=pFst;
-
-		const int iNum=strlen(pszCode);
-		
+        BYTE *pFst = ia_Buf;
+        BYTE *pb = pFst;
+        const int iNum = strlen(pszCode);
 		int i;
 		//"nnnn"
-		for(i=0;i<4;i++)
-		{
-			if(i%2==0)	*pb+=1;
+        for(i = 0; i < 4; i++) {
+            if(i % 2 == 0)	*pb += 1;
 			pb++;
 		}
-
 		int iV;
-		for(i=0;i<iNum;i+=2)
-		{
-			iV=pszCode[i]-'0';
-			iV=iV*10;
-			iV+=pszCode[i+1]-'0';
-			pb=P_GetNarrorWideBarSpaceI2of5(pb,iV);
-			if(pb==0)	return 0;
+        for(i = 0; i < iNum; i += 2) {
+            iV = pszCode[i] - '0';
+            iV = iV * 10;
+            iV += pszCode[i + 1] - '0';
+            pb = P_GetNarrorWideBarSpaceI2of5(pb, iV);
+            if(pb == 0)	return 0;
 		}
-
 		//"wnn"
-		*pb+=3;	pb++;
-		*pb+=0;	pb++;
-		*pb+=1;	pb++;
-
-		i_LenBuf=pb-pFst;
+        *pb += 3;
+        pb++;
+        *pb += 0;
+        pb++;
+        *pb += 1;
+        pb++;
+        i_LenBuf = pb - pFst;
 		return 1;
 	}
 
-	void DrawI2of5(HDC hDC,int iX,int iY0,int iY1,const COLORREF clrBar,const COLORREF clrSpace,const int iPenW)
+    void DrawI2of5(HDC hDC, int iX, int iY0, int iY1, const COLORREF clrBar, const COLORREF clrSpace, const int iPenW)
 	{
-		DrawBarcode(hDC,iX,iY0,iY1,iY1,clrBar,clrSpace,iPenW);
+        DrawBarcode(hDC, iX, iY0, iY1, iY1, clrBar, clrSpace, iPenW);
 	}
 
 private:
-	BYTE*P_GetNarrorWideBarSpaceI2of5(BYTE*pb,int ch)
+    BYTE *P_GetNarrorWideBarSpaceI2of5(BYTE *pb, int ch)
 	{
-		if(ch<0)	return 0;
-		if(ch>99)	return 0;
-
-		IntString infs[]=
-		{
+        if(ch < 0)	return 0;
+        if(ch > 99)	return 0;
+        IntString infs[] = {
 			{0,		"nnnnwwwwnn"},
 			{1,		"nwnnwnwnnw"},
 			{2,		"nnnwwnwnnw"},
@@ -613,21 +562,18 @@ private:
 			{98,	"nwwnnnwwnn"},
 			{99,	"nnwwnnwwnn"},
 		};
-		
-		IntString&inf=infs[ch];
-
+        IntString &inf = infs[ch];
 		int i;
-		for(i=0;i<10;i++)
-		{
-			if(inf.psz[i]=='w')	*pb+=2;
-			if(i%2==0)			*pb+=1;
+        for(i = 0; i < 10; i++) {
+            if(inf.psz[i] == 'w')	*pb += 2;
+            if(i % 2 == 0)			*pb += 1;
 			pb++;
 		}
 		return pb;
 	}
 };
 
-class Barcode93:public BarcodeBase
+class Barcode93: public BarcodeBase
 {
 	//[n/a][n/a][n/a][n/a][n/a][n/a][n/a][b-s]
 public:
@@ -638,57 +584,45 @@ public:
 	{
 	}
 
-	BOOL Encode93(const char* pszCode)
+    BOOL Encode93(const char *pszCode)
 	{
 		Clear();
-		const int iNum=strlen(pszCode);
-
-		BYTE*pFst=ia_Buf;
-		BYTE*pb=pFst;
-
-		pb=P_GetBarSpace93(pb,47);
-		if(pb==0)	return 0;
-
+        const int iNum = strlen(pszCode);
+        BYTE *pFst = ia_Buf;
+        BYTE *pb = pFst;
+        pb = P_GetBarSpace93(pb, 47);
+        if(pb == 0)	return 0;
 		BOOL b;
-		int i,iFirst,iSecond;
-		for(i=0;i<iNum;i++)
-		{
-			b=P_AscIItoCode93Sequence((int)pszCode[i],iFirst,iSecond);
-			if(b==0)	return 0;
-			
-			pb=P_GetBarSpace93(pb,iFirst);
-			if(pb==0)	return 0;
-
-			if(iSecond!=-1)
-			{
-				pb=P_GetBarSpace93(pb,iSecond);
-				if(pb==0)	return 0;
+        int i, iFirst, iSecond;
+        for(i = 0; i < iNum; i++) {
+            b = P_AscIItoCode93Sequence((int)pszCode[i], iFirst, iSecond);
+            if(b == 0)	return 0;
+            pb = P_GetBarSpace93(pb, iFirst);
+            if(pb == 0)	return 0;
+            if(iSecond != -1) {
+                pb = P_GetBarSpace93(pb, iSecond);
+                if(pb == 0)	return 0;
 			}
 		}
-
-		pb=P_GetCheckDigits(pb,pszCode);
-		if(pb==0)	return 0;
-
-		pb=P_GetBarSpace93(pb,48);
-		if(pb==0)	return 0;
-
-		i_LenBuf=pb-pFst;
+        pb = P_GetCheckDigits(pb, pszCode);
+        if(pb == 0)	return 0;
+        pb = P_GetBarSpace93(pb, 48);
+        if(pb == 0)	return 0;
+        i_LenBuf = pb - pFst;
 		return 1;
 	}
 
-	void Draw93(HDC hDC,int iX,int iY0,int iY1,const COLORREF clrBar,const COLORREF clrSpace,const int iPenW)
+    void Draw93(HDC hDC, int iX, int iY0, int iY1, const COLORREF clrBar, const COLORREF clrSpace, const int iPenW)
 	{
-		DrawBarcode(hDC,iX,iY0,iY1,iY1,clrBar,clrSpace,iPenW);
+        DrawBarcode(hDC, iX, iY0, iY1, iY1, clrBar, clrSpace, iPenW);
 	}
 
 private:
-	BYTE*P_GetBarSpace93(BYTE*pb,int ch)
+    BYTE *P_GetBarSpace93(BYTE *pb, int ch)
 	{
-		if(ch<0)	return 0;
-		if(ch>48)	return 0;
-
-		IntString infs[]=
-		{
+        if(ch < 0)	return 0;
+        if(ch > 48)	return 0;
+        IntString infs[] = {
 			{0,		"bsssbsbss"},
 			{1,		"bsbssbsss"},
 			{2,		"bsbsssbss"},
@@ -739,86 +673,66 @@ private:
 			{47,	"bsbsbbbbs"},
 			{48,	"bsbsbbbbsb"},
 		};
-		
-		IntString&inf=infs[ch];
+        IntString &inf = infs[ch];
 		int i;
-		for(i=0;i<9;i++)
-		{
-			if(inf.psz[i]=='b')	*pb+=1;
+        for(i = 0; i < 9; i++) {
+            if(inf.psz[i] == 'b')	*pb += 1;
 			pb++;
 		}
-
-		if(ch==48)
-		{
-			*pb+=1;
+        if(ch == 48) {
+            *pb += 1;
 			pb++;
 		}
 		return pb;
 	}
 
 private:
-	BYTE*P_GetCheckDigits(BYTE*pb,const char*&pszCode)
+    BYTE *P_GetCheckDigits(BYTE *pb, const char *&pszCode)
 	{
-		int i,iSum,iWeight,iFirst,iSecond;
-		
+        int i, iSum, iWeight, iFirst, iSecond;
 		// "C" check digit character
-		iWeight=1;
-		iSum=0;
-
-		const int iNum=strlen(pszCode);
-
-		for(i=iNum-1;i>-1;i--)
-		{
-			P_AscIItoCode93Sequence((int)pszCode[i],iFirst,iSecond);
-
-			iSum+=(iWeight*iFirst);
+        iWeight = 1;
+        iSum = 0;
+        const int iNum = strlen(pszCode);
+        for(i = iNum - 1; i > -1; i--) {
+            P_AscIItoCode93Sequence((int)pszCode[i], iFirst, iSecond);
+            iSum += (iWeight *iFirst);
 			iWeight++;
-			if(iWeight>20)	iWeight=1;
-
-			if(iSecond!=-1)
-			{
-				iSum+=(iWeight*iSecond);
+            if(iWeight > 20)	iWeight = 1;
+            if(iSecond != -1) {
+                iSum += (iWeight *iSecond);
 				iWeight++;
-				if(iWeight>20)	iWeight=1;
+                if(iWeight > 20)	iWeight = 1;
 			}
 		}
-
-		pb=P_GetBarSpace93(pb,iSum%47);
-		if(pb==0)	return 0;
-
-		iWeight=2;
-		iSum=iSum%47;
-		for(i=iNum-1;i>-1;i--)
-		{
-			P_AscIItoCode93Sequence((int)pszCode[i],iFirst,iSecond);
-
-			iSum +=(iWeight * iFirst);
+        pb = P_GetBarSpace93(pb, iSum % 47);
+        if(pb == 0)	return 0;
+        iWeight = 2;
+        iSum = iSum % 47;
+        for(i = iNum - 1; i > -1; i--) {
+            P_AscIItoCode93Sequence((int)pszCode[i], iFirst, iSecond);
+            iSum += (iWeight *iFirst);
 			iWeight++;
-			if(iWeight>15)	iWeight=1;
-
-			if(iSecond!=-1)
-			{
-				iSum +=(iWeight * iSecond);
+            if(iWeight > 15)	iWeight = 1;
+            if(iSecond != -1) {
+                iSum += (iWeight *iSecond);
 				iWeight++;
-				if(iWeight>15)	iWeight=1;
+                if(iWeight > 15)	iWeight = 1;
 			}
 		}
-
-		pb=P_GetBarSpace93(pb,iSum%47);
-		if(pb==0)	return 0;
-
+        pb = P_GetBarSpace93(pb, iSum % 47);
+        if(pb == 0)	return 0;
 		return pb;
 	}
 
-	BOOL P_AscIItoCode93Sequence(int iValue,int&iFirst,int&iSecond)
+    BOOL P_AscIItoCode93Sequence(int iValue, int &iFirst, int &iSecond)
 	{
-		if(iValue<0)	return 0;
-		if(iValue>127)	return 0;
-
-		struct	I3{int iV,iFirst,iSecond;};
-		
-		I3 i3s[]=
-		{
+        if(iValue < 0)	return 0;
+        if(iValue > 127)	return 0;
+        struct	I3 {
+            int iV, iFirst, iSecond;
+        };
+        I3 i3s[] = {
 			{0,	44,	30},
 			{1,	43,	10},
 			{2,	43,	11},
@@ -829,135 +743,133 @@ private:
 			{7,	43,	16},
 			{8,	43,	17},
 			{9,	43,	18},
-			{10,43,	19},
-			{11,43,	20},
-			{12,43,	21},
-			{13,43,	22},
-			{14,43,	23},
-			{15,43,	24},
-			{16,43,	25},
-			{17,43,	26},
-			{18,43,	27},
-			{19,43,	28},
-			{20,43,	29},
-			{21,43,	30},
-			{22,43,	31},
-			{23,43,	32},
-			{24,43,	33},
-			{25,43,	34},
-			{26,43,	35},
-			{27,44,	10},
-			{28,44,	11},
-			{29,44,	12},
-			{30,44,	13},
-			{31,44,	14},
-			{32,38,	-1},
-			{33,45,	10},
-			{34,45,	11},
-			{35,45,	12},
-			{36,39,	-1},
-			{37,42,	-1},
-			{38,45,	15},
-			{39,45,	16},
-			{40,45,	17},
-			{41,45,	18},
-			{42,45,	19},
-			{43,41,	-1},
-			{44,45,	21},
-			{45,36,	-1},
-			{46,37,	-1},
-			{47,40,	-1},
-			{48,0,	-1},
-			{49,1,	-1},
-			{50,2,	-1},
-			{51,3,	-1},
-			{52,4,	-1},
-			{53,5,	-1},
-			{54,6,	-1},
-			{55,7,	-1},
-			{56,8,	-1},
-			{57,9,	-1},
-			{58,45,	35},
-			{59,44,	15},
-			{60,44,	16},
-			{61,44,	17},
-			{62,44,	18},
-			{63,44,	19},
-			{64,44,	31},
-			{65,10,	-1},
-			{66,11,	-1},
-			{67,12,	-1},
-			{68,13,	-1},
-			{69,14,	-1},
-			{70,15,	-1},
-			{71,16,	-1},
-			{72,17,	-1},
-			{73,18,	-1},
-			{74,19,	-1},
-			{75,20,	-1},
-			{76,21,	-1},
-			{77,22,	-1},
-			{78,23,	-1},
-			{79,24,	-1},
-			{80,25,	-1},
-			{81,26,	-1},
-			{82,27,	-1},
-			{83,28,	-1},
-			{84,29,	-1},
-			{85,30,	-1},
-			{86,31,	-1},
-			{87,32,	-1},
-			{88,33,	-1},
-			{89,34,	-1},
-			{90,35,	-1},
-			{91,44,	20},
-			{92,44,	21},
-			{93,44,	22},
-			{94,44,	23},
-			{95,44,	24},
-			{96,44,	32},
-			{97,46,	10},
-			{98,46,	11},
-			{99,46,	12},
-			{100,46,13},
-			{101,46,14},
-			{102,46,15},
-			{103,46,16},
-			{104,46,17},
-			{105,46,18},
-			{106,46,19},
-			{107,46,20},
-			{108,46,21},
-			{109,46,22},
-			{110,46,23},
-			{111,46,24},
-			{112,46,25},
-			{113,46,26},
-			{114,46,27},
-			{115,46,28},
-			{116,46,29},
-			{117,46,30},
-			{118,46,31},
-			{119,46,32},
-			{120,46,33},
-			{121,46,34},
-			{122,46,35},
-			{123,44,25},
-			{124,44,26},
-			{125,44,27},
-			{126,44,28},
-			{127,44,29},
+            {10, 43,	19},
+            {11, 43,	20},
+            {12, 43,	21},
+            {13, 43,	22},
+            {14, 43,	23},
+            {15, 43,	24},
+            {16, 43,	25},
+            {17, 43,	26},
+            {18, 43,	27},
+            {19, 43,	28},
+            {20, 43,	29},
+            {21, 43,	30},
+            {22, 43,	31},
+            {23, 43,	32},
+            {24, 43,	33},
+            {25, 43,	34},
+            {26, 43,	35},
+            {27, 44,	10},
+            {28, 44,	11},
+            {29, 44,	12},
+            {30, 44,	13},
+            {31, 44,	14},
+            {32, 38,	-1},
+            {33, 45,	10},
+            {34, 45,	11},
+            {35, 45,	12},
+            {36, 39,	-1},
+            {37, 42,	-1},
+            {38, 45,	15},
+            {39, 45,	16},
+            {40, 45,	17},
+            {41, 45,	18},
+            {42, 45,	19},
+            {43, 41,	-1},
+            {44, 45,	21},
+            {45, 36,	-1},
+            {46, 37,	-1},
+            {47, 40,	-1},
+            {48, 0,	-1},
+            {49, 1,	-1},
+            {50, 2,	-1},
+            {51, 3,	-1},
+            {52, 4,	-1},
+            {53, 5,	-1},
+            {54, 6,	-1},
+            {55, 7,	-1},
+            {56, 8,	-1},
+            {57, 9,	-1},
+            {58, 45,	35},
+            {59, 44,	15},
+            {60, 44,	16},
+            {61, 44,	17},
+            {62, 44,	18},
+            {63, 44,	19},
+            {64, 44,	31},
+            {65, 10,	-1},
+            {66, 11,	-1},
+            {67, 12,	-1},
+            {68, 13,	-1},
+            {69, 14,	-1},
+            {70, 15,	-1},
+            {71, 16,	-1},
+            {72, 17,	-1},
+            {73, 18,	-1},
+            {74, 19,	-1},
+            {75, 20,	-1},
+            {76, 21,	-1},
+            {77, 22,	-1},
+            {78, 23,	-1},
+            {79, 24,	-1},
+            {80, 25,	-1},
+            {81, 26,	-1},
+            {82, 27,	-1},
+            {83, 28,	-1},
+            {84, 29,	-1},
+            {85, 30,	-1},
+            {86, 31,	-1},
+            {87, 32,	-1},
+            {88, 33,	-1},
+            {89, 34,	-1},
+            {90, 35,	-1},
+            {91, 44,	20},
+            {92, 44,	21},
+            {93, 44,	22},
+            {94, 44,	23},
+            {95, 44,	24},
+            {96, 44,	32},
+            {97, 46,	10},
+            {98, 46,	11},
+            {99, 46,	12},
+            {100, 46, 13},
+            {101, 46, 14},
+            {102, 46, 15},
+            {103, 46, 16},
+            {104, 46, 17},
+            {105, 46, 18},
+            {106, 46, 19},
+            {107, 46, 20},
+            {108, 46, 21},
+            {109, 46, 22},
+            {110, 46, 23},
+            {111, 46, 24},
+            {112, 46, 25},
+            {113, 46, 26},
+            {114, 46, 27},
+            {115, 46, 28},
+            {116, 46, 29},
+            {117, 46, 30},
+            {118, 46, 31},
+            {119, 46, 32},
+            {120, 46, 33},
+            {121, 46, 34},
+            {122, 46, 35},
+            {123, 44, 25},
+            {124, 44, 26},
+            {125, 44, 27},
+            {126, 44, 28},
+            {127, 44, 29},
 		};
-
-		I3&i3=i3s[iValue];
-		iFirst	=i3.iFirst;
-		iSecond	=i3.iSecond;
+        I3 &i3 = i3s[iValue];
+        iFirst	= i3.iFirst;
+        iSecond	= i3.iSecond;
 		return 1;
 	}
 };
 
-
-class Barcode128:public BarcodeBase
+class Barcode128: public BarcodeBase
 {
 public:
 	Barcode128()
@@ -967,131 +879,105 @@ public:
 	{
 	}
 
-	BOOL Encode128A(const char* pszCode)	{return P_Encode128((char*)pszCode,SUB::SETA);}
-	BOOL Encode128B(const char* pszCode)	{return P_Encode128((char*)pszCode,SUB::SETB);}
-	BOOL Encode128C(const char* pszCode)	{return P_Encode128((char*)pszCode,SUB::SETC);}
+    BOOL Encode128A(const char *pszCode)
+    {
+        return P_Encode128((char *)pszCode, SUB::SETA);
+    }
+    BOOL Encode128B(const char *pszCode)
+    {
+        return P_Encode128((char *)pszCode, SUB::SETB);
+    }
+    BOOL Encode128C(const char *pszCode)
+    {
+        return P_Encode128((char *)pszCode, SUB::SETC);
+    }
 
-	void Draw128(HDC hDC,int iX,int iY0,int iY1,const COLORREF clrBar,const COLORREF clrSpace,const int iPenW)
+    void Draw128(HDC hDC, int iX, int iY0, int iY1, const COLORREF clrBar, const COLORREF clrSpace, const int iPenW)
 	{
-		DrawBarcode(hDC,iX,iY0,iY1,iY1,clrBar,clrSpace,iPenW);
+        DrawBarcode(hDC, iX, iY0, iY1, iY1, clrBar, clrSpace, iPenW);
 	}
 
 private:
-	struct SUB
-	{
-		enum
-		{
-			SETA=0,
-			SETB=1,
-			SETC=2,
+    struct SUB {
+        enum {
+            SETA = 0,
+            SETB = 1,
+            SETC = 2,
 		};
 	};
 
-	BOOL P_Encode128(char*pszCode,const int iSetIn)
+    BOOL P_Encode128(char *pszCode, const int iSetIn)
 	{
 		Clear();
-		BYTE*pFst=ia_Buf;
-		BYTE*pb=pFst;
-
-
-		if(iSetIn==SUB::SETA)	pb=P_GetBarSpace128(pb,103);
-		else
-		if(iSetIn==SUB::SETB)	pb=P_GetBarSpace128(pb,104);
-		else					pb=P_GetBarSpace128(pb,105);
-		if(pb==0)	return 0;
-
-		const int iCheckDigit=GetCheckDigit(iSetIn,pszCode);
-		const int iNum=strlen(pszCode);
-
-		int iChar,iCharNext;
-		int iPosition=0;
-		int iSet=iSetIn;
-
-		while(iPosition<iNum)
-		{
-			if(iSet==SUB::SETC)
-			{
-				if(ga2_Code128[SUB::SETA][pszCode[iPosition]]==101)
-				{
-					pb=P_GetBarSpace128(pb,101);
+        BYTE *pFst = ia_Buf;
+        BYTE *pb = pFst;
+        if(iSetIn == SUB::SETA)	pb = P_GetBarSpace128(pb, 103);
+        else if(iSetIn == SUB::SETB)	pb = P_GetBarSpace128(pb, 104);
+        else					pb = P_GetBarSpace128(pb, 105);
+        if(pb == 0)	return 0;
+        const int iCheckDigit = GetCheckDigit(iSetIn, pszCode);
+        const int iNum = strlen(pszCode);
+        int iChar, iCharNext;
+        int iPosition = 0;
+        int iSet = iSetIn;
+        while(iPosition < iNum) {
+            if(iSet == SUB::SETC) {
+                if(ga2_Code128[SUB::SETA][pszCode[iPosition]] == 101) {
+                    pb = P_GetBarSpace128(pb, 101);
 					iPosition++;
-					iSet=SUB::SETA;
-				}
-				else 
-				if(ga2_Code128[SUB::SETA][pszCode[iPosition]]==100)
-				{
-					pb=P_GetBarSpace128(pb,100);
+                    iSet = SUB::SETA;
+                } else if(ga2_Code128[SUB::SETA][pszCode[iPosition]] == 100) {
+                    pb = P_GetBarSpace128(pb, 100);
 					iPosition++;
-					iSet=SUB::SETB;
-				}
-				else if(ga2_Code128[SUB::SETA][pszCode[iPosition]]==102)
-				{
-					pb=P_GetBarSpace128(pb,100);
+                    iSet = SUB::SETB;
+                } else if(ga2_Code128[SUB::SETA][pszCode[iPosition]] == 102) {
+                    pb = P_GetBarSpace128(pb, 100);
 					iPosition++;
-				}
-				else
-				{
-					char chT=pszCode[iPosition+2];
-					pszCode[iPosition+2]=0;
-					iChar=atoi(&pszCode[iPosition]);
-					pszCode[iPosition+2]=chT;
-
-					pb=P_GetBarSpace128(pb,iChar);
-					if(pb==0)	return 0;
-					iPosition +=2;
-				}
-			}
-			else
-			{
-				int iTemp2=pszCode[iPosition];
-				if(iTemp2<-1)	iTemp2=iTemp2&255;
-				
-				iChar=ga2_Code128[iSet][iTemp2];
-				
-				pb=P_GetBarSpace128(pb,iChar);
-				if(pb==0)	return 0;
+                } else {
+                    char chT = pszCode[iPosition + 2];
+                    pszCode[iPosition + 2] = 0;
+                    iChar = atoi( &pszCode[iPosition]);
+                    pszCode[iPosition + 2] = chT;
+                    pb = P_GetBarSpace128(pb, iChar);
+                    if(pb == 0)	return 0;
+                    iPosition += 2;
+                }
+            } else {
+                int iTemp2 = pszCode[iPosition];
+                if(iTemp2 < -1)	iTemp2 = iTemp2 & 255;
+                iChar = ga2_Code128[iSet][iTemp2];
+                pb = P_GetBarSpace128(pb, iChar);
+                if(pb == 0)	return 0;
 				iPosition++;
-				if(iSet==SUB::SETA)
-				{
-					if(iChar==100)	iSet=SUB::SETB;
-					else 
-					if(iChar==99)	iSet=SUB::SETC;
-				}
-				else if(iSet==SUB::SETB)
-				{
-					if(iChar==101)	iSet=SUB::SETA;
-					else 
-					if(iChar==99)	iSet=SUB::SETC;
-				}
-				else 
-				if(iChar==98)
-				{
-					if(iSet==SUB::SETA)
-						iCharNext=ga2_Code128[SUB::SETB][pszCode[iPosition]];
+                if(iSet == SUB::SETA) {
+                    if(iChar == 100)	iSet = SUB::SETB;
+                    else if(iChar == 99)	iSet = SUB::SETC;
+                } else if(iSet == SUB::SETB) {
+                    if(iChar == 101)	iSet = SUB::SETA;
+                    else if(iChar == 99)	iSet = SUB::SETC;
+                } else if(iChar == 98) {
+                    if(iSet == SUB::SETA)
+                        iCharNext = ga2_Code128[SUB::SETB][pszCode[iPosition]];
 					else
-						iCharNext=ga2_Code128[SUB::SETA][pszCode[iPosition]];
-
-					pb=P_GetBarSpace128(pb,iChar);
-					if(pb==0)	return 0;
+                        iCharNext = ga2_Code128[SUB::SETA][pszCode[iPosition]];
+                    pb = P_GetBarSpace128(pb, iChar);
+                    if(pb == 0)	return 0;
 					iPosition++;
 				}
 			}
 		}
-
-		pb=P_GetBarSpace128(pb,iCheckDigit);
-		if(pb==0)	return 0;
-		pb=P_GetBarSpace128(pb,106);
-		i_LenBuf=pb-pFst;
-
+        pb = P_GetBarSpace128(pb, iCheckDigit);
+        if(pb == 0)	return 0;
+        pb = P_GetBarSpace128(pb, 106);
+        i_LenBuf = pb - pFst;
 		return 1;
 	}
 
-	BYTE*P_GetBarSpace128(BYTE*pb,int iV)
+    BYTE *P_GetBarSpace128(BYTE *pb, int iV)
 	{
-		if(iV<0)	return 0;
-		if(iV>106)	return 0;
-		IntString infs[]=
-		{
+        if(iV < 0)	return 0;
+        if(iV > 106)	return 0;
+        IntString infs[] = {
 			{0,		"bbsbbssbbss"},
 			{1,		"bbssbbsbbss"},
 			{2,		"bbssbbssbbs"},
@@ -1195,139 +1081,102 @@ private:
 			{100,	"bsbbbbsbbbs"},
 			{101,	"bbbsbsbbbbs"},
 			{102,	"bbbbsbsbbbs"},
-//			{103,	"bbsbsbbbbss"},
+            //			{103,	"bbsbsbbbbss"},
 			{103,	"bbsbssssbss"},
 			{104,	"bbsbssbssss"},
 			{105,	"bbsbssbbbss"},
 			{106,	"bbsssbbbsbsbb"},
-		};	
-		
+        };
 		int i;
-		IntString&inf=infs[iV];
-		for(i=0;i<11;i++)
-		{
-			if(inf.psz[i]=='b')	*pb+=1;
+        IntString &inf = infs[iV];
+        for(i = 0; i < 11; i++) {
+            if(inf.psz[i] == 'b')	*pb += 1;
 			pb++;
 		}
-		if(iV==106)	
-		{
-			*pb+=1;	pb++;
-			*pb+=1;	pb++;
+        if(iV == 106) {
+            *pb += 1;
+            pb++;
+            *pb += 1;
+            pb++;
 		}
 		return pb;
 	}
 
 private:
-	int GetCheckDigit(const int iSet,char*pszCode)
+    int GetCheckDigit(const int iSet, char *pszCode)
 	{
-		int	iSum=0,iCurSet=0,iChar128,iCharNext,iWeight,iPosition;
-
-		iCurSet=iSet;
-		if(iSet==SUB::SETA)
-		{
-			iSum=103;
+        int	iSum = 0, iCurSet = 0, iChar128, iCharNext, iWeight, iPosition;
+        iCurSet = iSet;
+        if(iSet == SUB::SETA) {
+            iSum = 103;
+        } else if(iSet == SUB::SETB) {
+            iSum = 104;
+        } else if(iSet == SUB::SETC) {
+            iSum = 105;
 		}
-		else 
-		if(iSet==SUB::SETB)
-		{
-			iSum=104;
-		}
-		else 
-		if(iSet==SUB::SETC)
-		{
-			iSum=105;
-		}
-
-		iPosition=0;
-		iWeight=1;
-
-		const int iNum=strlen(pszCode);
-		while(iPosition<iNum)
-		{
-			if(iCurSet==SUB::SETC)
-			{
-				if(ga2_Code128[SUB::SETA][pszCode[iPosition]]==101)
-				{
-					iChar128=101;
-					iSum+=(iWeight*iChar128);
-					
+        iPosition = 0;
+        iWeight = 1;
+        const int iNum = strlen(pszCode);
+        while(iPosition < iNum) {
+            if(iCurSet == SUB::SETC) {
+                if(ga2_Code128[SUB::SETA][pszCode[iPosition]] == 101) {
+                    iChar128 = 101;
+                    iSum += (iWeight *iChar128);
 					iPosition++;
 					iWeight++;
-					iCurSet=SUB::SETA;
-				}
-				else if(ga2_Code128[SUB::SETA][pszCode[iPosition]]==100)
-				{
-					iChar128=100;
-					iSum+=(iWeight*iChar128);
+                    iCurSet = SUB::SETA;
+                } else if(ga2_Code128[SUB::SETA][pszCode[iPosition]] == 100) {
+                    iChar128 = 100;
+                    iSum += (iWeight *iChar128);
 					iPosition++;
 					iWeight++;
-					iCurSet=SUB::SETB;
-				}
-				else 
-				if(ga2_Code128[SUB::SETA][pszCode[iPosition]]==102)
-				{
-					iChar128=102;
-					iSum+=(iWeight*iChar128);
+                    iCurSet = SUB::SETB;
+                } else if(ga2_Code128[SUB::SETA][pszCode[iPosition]] == 102) {
+                    iChar128 = 102;
+                    iSum += (iWeight *iChar128);
 					iPosition++;
 					iWeight++;
-				}
-				else
-				{
-					char chT=pszCode[iPosition+2];
-					pszCode[iPosition+2]=0;
-					iChar128=atol(&pszCode[iPosition]);
-					pszCode[iPosition+2]=chT;
-
-					iSum +=(iWeight*iChar128);
-					iPosition +=2;
+                } else {
+                    char chT = pszCode[iPosition + 2];
+                    pszCode[iPosition + 2] = 0;
+                    iChar128 = atol( &pszCode[iPosition]);
+                    pszCode[iPosition + 2] = chT;
+                    iSum += (iWeight *iChar128);
+                    iPosition += 2;
 					iWeight++;
 				}
-			}
-			else 
-			{
-				int iTemp2=pszCode[iPosition];
-				if(iTemp2<-1)	iTemp2=iTemp2&255;
-				
-				iChar128=ga2_Code128[iCurSet][iTemp2];
-
-				iSum+=(iWeight*iChar128);
-
+            } else {
+                int iTemp2 = pszCode[iPosition];
+                if(iTemp2 < -1)	iTemp2 = iTemp2 & 255;
+                iChar128 = ga2_Code128[iCurSet][iTemp2];
+                iSum += (iWeight *iChar128);
 				iPosition++;
 				iWeight++;
-
-				if(iCurSet==SUB::SETA)
-				{
-					if(iChar128==100)
-						iCurSet=SUB::SETB;
-					else if(iChar128==99)
-						iCurSet=SUB::SETC;
-				}
-				else 
-				if(iCurSet==SUB::SETB)
-				{
-					if(iChar128==101)		iCurSet=SUB::SETA;
-					else if(iChar128==99)	iCurSet=SUB::SETC;
-				}
-				else 
-				if(iChar128==98)
-				{
-					if(iCurSet==SUB::SETA)
-						iCharNext=ga2_Code128[SUB::SETB][pszCode[iPosition]];
+                if(iCurSet == SUB::SETA) {
+                    if(iChar128 == 100)
+                        iCurSet = SUB::SETB;
+                    else if(iChar128 == 99)
+                        iCurSet = SUB::SETC;
+                } else if(iCurSet == SUB::SETB) {
+                    if(iChar128 == 101)		iCurSet = SUB::SETA;
+                    else if(iChar128 == 99)	iCurSet = SUB::SETC;
+                } else if(iChar128 == 98) {
+                    if(iCurSet == SUB::SETA)
+                        iCharNext = ga2_Code128[SUB::SETB][pszCode[iPosition]];
 					else
-						iCharNext=ga2_Code128[SUB::SETA][pszCode[iPosition]];
-
-					iSum+=(iWeight*iCharNext);
+                        iCharNext = ga2_Code128[SUB::SETA][pszCode[iPosition]];
+                    iSum += (iWeight *iCharNext);
 					iPosition++;
 					iWeight++;
 				}
 			}
 		}
-		return iSum%103;
+        return iSum % 103;
 	}
 };
 
 //=============================================
-class BarcodeEan13:public BarcodeBase
+class BarcodeEan13: public BarcodeBase
 {
 public:
 	BarcodeEan13()
@@ -1337,89 +1186,79 @@ public:
 	{
 	}
 
-	BOOL EncodeEan13(const char*pszCodeIn)
+    BOOL EncodeEan13(const char *pszCodeIn)
 	{
 		Clear();
-		
 		//only allow 12 characters as input
 		char szCode[14];
-		const int iLen=strlen(pszCodeIn);
-		if(iLen>12)
-		{
-			strncpy(szCode,pszCodeIn,12);
+        const int iLen = strlen(pszCodeIn);
+        if(iLen > 12) {
+            strncpy(szCode, pszCodeIn, 12);
+        } else {
+            strcpy(szCode, pszCodeIn);
+            while(strlen(szCode) < 12)	strcat(szCode, "0");
 		}
-		else
-		{
-			strcpy(szCode,pszCodeIn);
-			while(strlen(szCode)<12)	strcat(szCode,"0");
-		}
-
-		BYTE*pFst=ia_Buf;
-		BYTE*pb=pFst;
-
+        BYTE *pFst = ia_Buf;
+        BYTE *pb = pFst;
 		//"bsb"-long
-		*pb+=5;	pb++;
-		*pb+=4;	pb++;
-		*pb+=5;	pb++;
-
+        *pb += 5;
+        pb++;
+        *pb += 4;
+        pb++;
+        *pb += 5;
+        pb++;
 		BYTE iaCountryCode[6];
-		BOOL b=P_GetCountryCode(szCode[0],iaCountryCode);
-		if(b==0)	return 0;
-
-		pb=P_GetLeftOddParity(pb,szCode[1]);
-		
+        BOOL b = P_GetCountryCode(szCode[0], iaCountryCode);
+        if(b == 0)	return 0;
+        pb = P_GetLeftOddParity(pb, szCode[1]);
 		int i;
-		for(i=2;i<7;i++)
-		{
-			if(iaCountryCode[i-2]=='O')
-			{
-				pb=P_GetLeftOddParity(pb,szCode[i]);
-			}
-			else
-			if(iaCountryCode[i-2]=='E')
-			{
-				pb=P_GetLeftEvenParity(pb,szCode[i]);
+        for(i = 2; i < 7; i++) {
+            if(iaCountryCode[i - 2] == 'O') {
+                pb = P_GetLeftOddParity(pb, szCode[i]);
+            } else if(iaCountryCode[i - 2] == 'E') {
+                pb = P_GetLeftEvenParity(pb, szCode[i]);
 			}
 		}
-
 		//"sbsbs"-long
-		*pb+=4;	pb++;
-		*pb+=5;	pb++;
-		*pb+=4;	pb++;
-		*pb+=5;	pb++;
-		*pb+=4;	pb++;
-
-		for(i=7;i<12;i++)
-		{
-			pb=P_GetRightPattern(pb,szCode[i]);
+        *pb += 4;
+        pb++;
+        *pb += 5;
+        pb++;
+        *pb += 4;
+        pb++;
+        *pb += 5;
+        pb++;
+        *pb += 4;
+        pb++;
+        for(i = 7; i < 12; i++) {
+            pb = P_GetRightPattern(pb, szCode[i]);
 		}
-
-		i=P_GetCheckSumDigit(szCode);
-		pb=P_GetRightPattern(pb,(char)i);
-
+        i = P_GetCheckSumDigit(szCode);
+        pb = P_GetRightPattern(pb, (char)i);
 		//"bsb"-long
-		*pb+=5;	pb++;
-		*pb+=4;	pb++;
-		*pb+=5;	pb++;
-
-		i_LenBuf=pb-pFst;
+        *pb += 5;
+        pb++;
+        *pb += 4;
+        pb++;
+        *pb += 5;
+        pb++;
+        i_LenBuf = pb - pFst;
 		return 1;
 	}
 
-	void DrawEan13(HDC hDC,int iX,int iY0,int iY10,int iY11,const COLORREF clrBar,const COLORREF clrSpace,const int iPenW)
+    void DrawEan13(HDC hDC, int iX, int iY0, int iY10, int iY11, const COLORREF clrBar, const COLORREF clrSpace,
+                   const int iPenW)
 	{
-		DrawBarcode(hDC,iX,iY0,iY10,iY11,clrBar,clrSpace,iPenW);
+        DrawBarcode(hDC, iX, iY0, iY10, iY11, clrBar, clrSpace, iPenW);
 	}
 
 private:
-	BOOL P_GetCountryCode(char ch,BYTE*pbCountryCode)
+    BOOL P_GetCountryCode(char ch, BYTE *pbCountryCode)
 	{
-		const int iV=ch-'0';
-		if(iV<0)	return 0;
-		if(iV>9)	return 0;
-
-		IntString infs[]=
-		{
+        const int iV = ch - '0';
+        if(iV < 0)	return 0;
+        if(iV > 9)	return 0;
+        IntString infs[] = {
 			{0,	"OOOOO"},
 			{1,	"OEOEE"},
 			{2,	"OEEOE"},
@@ -1431,19 +1270,16 @@ private:
 			{8,	"EOEEO"},
 			{9,	"EEOEO"},
 		};
-		memcpy(pbCountryCode,infs[iV].psz,5);
+        memcpy(pbCountryCode, infs[iV].psz, 5);
 		return 1;
 	}
 
-	BYTE*P_GetLeftOddParity(BYTE*pb,char ch)
+    BYTE *P_GetLeftOddParity(BYTE *pb, char ch)
 	{
-		const int iV=ch-'0';
-		if(iV<0)	return 0;
-		if(iV>9)	return 0;
-
-
-		IntString infs[]=
-		{
+        const int iV = ch - '0';
+        if(iV < 0)	return 0;
+        if(iV > 9)	return 0;
+        IntString infs[] = {
 			{0,	"sssbbsb"},
 			{1,	"ssbbssb"},
 			{2,	"ssbssbb"},
@@ -1455,25 +1291,21 @@ private:
 			{8,	"sbbsbbb"},
 			{9,	"sssbsbb"},
 		};
-
-		IntString&inf=infs[iV];
+        IntString &inf = infs[iV];
 		int i;
-		for(i=0;i<7;i++)
-		{
-			if(inf.psz[i]=='b')	*pb+=1;
+        for(i = 0; i < 7; i++) {
+            if(inf.psz[i] == 'b')	*pb += 1;
 			pb++;
 		}
 		return pb;
 	}
 
-	BYTE*P_GetLeftEvenParity(BYTE*pb,char ch)
+    BYTE *P_GetLeftEvenParity(BYTE *pb, char ch)
 	{
-		const int iV=ch-'0';
-		if(iV<0)	return 0;
-		if(iV>9)	return 0;
-
-		IntString infs[]=
-		{
+        const int iV = ch - '0';
+        if(iV < 0)	return 0;
+        if(iV > 9)	return 0;
+        IntString infs[] = {
 			{0,	"sbssbbb"},
 			{1,	"sbbssbb"},
 			{2,	"ssbbsbb"},
@@ -1485,24 +1317,21 @@ private:
 			{8,	"sssbssb"},
 			{9,	"ssbsbbb"},
 		};
-		char*psz=infs[iV].psz;
+        const char *psz = infs[iV].psz;
 		int i;
-		for(i=0;i<7;i++)
-		{
-			if(psz[i]=='b')	*pb+=1;
+        for(i = 0; i < 7; i++) {
+            if(psz[i] == 'b')	*pb += 1;
 			pb++;
 		}
 		return pb;
 	}
 
-	BYTE*P_GetRightPattern(BYTE*pb,char ch)
+    BYTE *P_GetRightPattern(BYTE *pb, char ch)
 	{
-		const int iV=ch-'0';
-		if(iV<0)	return 0;
-		if(iV>9)	return 0;
-
-		IntString infs[]=
-		{
+        const int iV = ch - '0';
+        if(iV < 0)	return 0;
+        if(iV > 9)	return 0;
+        IntString infs[] = {
 			{0,	"bbbssbs"},
 			{1,	"bbssbbs"},
 			{2,	"bbsbbss"},
@@ -1514,32 +1343,27 @@ private:
 			{8,	"bssbsss"},
 			{9,	"bbbsbss"},
 		};
-		char*psz=infs[iV].psz;
+        const char *psz = infs[iV].psz;
 		int i;
-		for(i=0;i<7;i++)
-		{
-			if(psz[i]=='b')	*pb+=1;
+        for(i = 0; i < 7; i++) {
+            if(psz[i] == 'b')	*pb += 1;
 			pb++;
 		}
 		return pb;
 	}
 
-	char P_GetCheckSumDigit(const char*pszCode)
+    char P_GetCheckSumDigit(const char *pszCode)
 	{
-		const int iLen=strlen(pszCode);
-		int i,iSum=0,iItem;
-
-        for(i=iLen;i >=1; i--)
-		{
-			iItem=i%2?(pszCode[i-1]-'0')*1:(pszCode[i-1]-'0')*3;
-			iSum+=iItem;
+        const int iLen = strlen(pszCode);
+        int i, iSum = 0, iItem;
+        for(i = iLen; i >= 1; i--) {
+            iItem = i % 2 ? (pszCode[i - 1] - '0') * 1 : (pszCode[i - 1] - '0') * 3;
+            iSum += iItem;
 		}
-
-		iSum%=10;
-		return '0'+(10-iSum)%10;
+        iSum %= 10;
+        return '0' + (10 - iSum) % 10;
 	}
 
 };
-
 
 #endif

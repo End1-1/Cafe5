@@ -135,10 +135,9 @@ bool Workspace::login()
     if (!DlgPassword::getPassword(tr("ENTER"), pin)) {
         accept();
         return false;
-    } else {
-        qApp->quit();
     }
-    createHttpRequest("/engine/login.php", QJsonObject{{"method", 2}, {"pin", pin}}, SLOT(loginResponse(QJsonObject)),
+    createHttpRequest("/engine/login.php", QJsonObject{{"method", 2}, {"pin", pin}},
+    SLOT(loginResponse(QJsonObject)),
     "login");
     return true;
 }
@@ -1099,6 +1098,9 @@ int Workspace::printTax(double cardAmount, double idramAmount)
         if (!db.getString("f_emarks").isEmpty()) {
             pt.fEmarks.append(db.getString("f_emarks"));
         }
+        if (__c5config.getValue(param_simple_fiscal).toInt() > 0) {
+            continue;
+        }
         switch (fDiscountMode) {
             case CARD_TYPE_DISCOUNT:
                 pt.addGoods(db.getInt("f_taxdept") == 0
@@ -1128,7 +1130,11 @@ int Workspace::printTax(double cardAmount, double idramAmount)
     }
     QString jsonIn, jsonOut, err;
     int result = 0;
-    result = pt.makeJsonAndPrint(cardAmount, 0, jsonIn, jsonOut, err);
+    if (__c5config.getValue(param_simple_fiscal).toInt() == 0) {
+        result = pt.makeJsonAndPrint(cardAmount, 0, jsonIn, jsonOut, err);
+    } else {
+        result = pt.makeJsonAndPrintSimple(cardAmount, 0, jsonIn, jsonOut, err);
+    }
 #ifdef QT_DEBUG
     if (result != 0) {
         result = 0;

@@ -562,7 +562,7 @@ void C5DishWidget::on_btnPrintRecipe_clicked()
     QFont font(qApp->font());
     font.setPointSize(20);
     QSize paperSize(2000, 2800);
-    p.setSceneParams(paperSize.width(), paperSize.height(), QPrinter::Portrait);
+    p.setSceneParams(paperSize.width(), paperSize.height(), QPageLayout::Portrait);
     p.setFont(font);
     printPreview(p, true);
     C5PrintPreview pp( &p, fDBParams);
@@ -629,9 +629,9 @@ void C5DishWidget::on_btnCopy_clicked()
 
 void C5DishWidget::on_btnPasteRecipt_clicked()
 {
-    QStringList s = qApp->clipboard()->text().split("\r\n", QString::SkipEmptyParts);
+    QStringList s = qApp->clipboard()->text().split("\r\n", Qt::SkipEmptyParts);
     for (const QString &l : s) {
-        QStringList c = l.split("\t", QString::SkipEmptyParts);
+        QStringList c = l.split("\t", Qt::SkipEmptyParts);
         if (c.count() < 6) {
             C5Message::error(tr("No recipe in clipboard"));
             return;

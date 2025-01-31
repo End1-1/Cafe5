@@ -5,6 +5,8 @@
 #include "oheader.h"
 #include "ogoods.h"
 #include "printreceipt.h"
+#include "printtaxn.h"
+#include "jsons.h"
 
 DlgReturnItem::DlgReturnItem() :
     C5Dialog(__c5config.dbParams()),
@@ -13,12 +15,7 @@ DlgReturnItem::DlgReturnItem() :
     ui->setupUi(this);
     ui->tblOrder->setColumnWidths(ui->tblOrder->columnCount(), 0, 140, 100, 120, 100, 230, 0);
     ui->tblBody->setColumnWidths(ui->tblBody->columnCount(), 0, 30, 120, 200, 80, 80, 80, 80, 0, 0);
-    C5Database db(fDBParams);
-    db.exec("select f_id, f_name from o_goods_return_reason");
-    ui->cbReason->addItem("", 0);
-    while (db.nextRow()) {
-        ui->cbReason->addItem(db.getString("f_name"), db.getInt("f_id"));
-    }
+    ui->wexchange->setVisible(false);
 }
 
 DlgReturnItem::~DlgReturnItem()
@@ -26,8 +23,30 @@ DlgReturnItem::~DlgReturnItem()
     delete ui;
 }
 
+void DlgReturnItem::setMode(int mode)
+{
+    fMode = mode;
+    if (mode == 2) {
+        ui->btnReturn->setText(tr("Exchange"));
+        ui->wexchange->setVisible(true);
+    }
+}
+
+void DlgReturnItem::checkQtyResponse(const QJsonObject &jdoc)
+{
+    Q_UNUSED(jdoc);
+    fHttp->httpQueryFinished(sender());
+}
+
 void DlgReturnItem::on_btnSearchReceiptNumber_clicked()
 {
+    ui->leBarcode->setText(ui->leBarcode->text().trimmed());
+    if (fMode == 2) {
+        if (ui->leBarcode->text().isEmpty()) {
+            C5Message::error(tr("Enter barcode"));
+            return;
+        }
+    }
     ui->tblOrder->clearContents();
     ui->tblOrder->setRowCount(0);
     C5Database db(fDBParams);
@@ -71,16 +90,22 @@ void DlgReturnItem::on_tblOrder_cellClicked(int row, int column)
             "from o_goods b "
             "inner join c_goods g on g.f_id=b.f_goods "
             "inner join c_units u on u.f_id=g.f_unit "
-            "where b.f_header=:f_header");
+            "where b.f_header=:f_header "
+            "order by b.f_row ");
     while (db.nextRow()) {
         int r = ui->tblBody->addEmptyRow();
         for (int c = 0; c < ui->tblBody->columnCount(); c++) {
             ui->tblBody->setData(r, c, db.getValue(c));
         }
-        ui->tblBody->createCheckbox(r, 1);
+        auto *cb = ui->tblBody->createCheckbox(r, 1);
         if (db.getInt("f_return") > 0) {
             ui->tblBody->checkBox(r, 1)->setChecked(true);
             ui->tblBody->checkBox(r, 1)->setEnabled(false);
+        }
+        if (ui->leBarcode->text().isEmpty() == false) {
+            if (ui->leBarcode->text() != db.getString("f_scancode")) {
+                cb->setEnabled(false);
+            }
         }
     }
 }
@@ -108,11 +133,7 @@ void DlgReturnItem::on_btnSearchTax_clicked()
 
 void DlgReturnItem::on_btnReturn_clicked()
 {
-    int reason = ui->cbReason->currentData().toInt();
-    if (reason == 0) {
-        C5Message::error(tr("Reason not selected"));
-        return;
-    }
+    int reason = 1;
     bool ret = false;
     double returnAmount = 0;
     QList<int> rows;
@@ -128,7 +149,42 @@ void DlgReturnItem::on_btnReturn_clicked()
             rows.append(i);
         }
     }
-    C5Database db(fDBParams);
+    if (rows.isEmpty()) {
+        return;
+    }
+    //FISCAL RETURN
+    C5Database db(__c5config.dbParams());
+    db[":f_id"] = ui->tblOrder->getString(0, 0);
+    db.exec("select * from o_tax_log where f_order=:f_id and f_state=1");
+    if (db.nextRow()) {
+        QJsonObject jout = __strjson(db.getString("f_out"));
+        QString crn = jout["crn"].toString();
+        int rseq = jout["rseq"].toInt();
+        PrintTaxN pt(C5Config::taxIP(), C5Config::taxPort(), C5Config::taxPassword(), C5Config::taxUseExtPos(),
+                     C5Config::taxCashier(), C5Config::taxPin(), this);
+        QString jsnin, jsnout, err;
+        int result;
+        result = pt.printTaxback(rseq, crn, jsnin, jsnout, err);
+        db[":f_id"] = db.uuid();
+        db[":f_order"] = ui->tblOrder->getString(0, 0);
+        db[":f_date"] = QDate::currentDate();
+        db[":f_time"] = QTime::currentTime();
+        db[":f_in"] = jsnin;
+        db[":f_out"] = jsnout;
+        db[":f_err"] = err;
+        db[":f_result"] = result;
+        db.insert("o_tax_log", false);
+        if (result != pt_err_ok) {
+            C5Message::error(err);
+            return;
+        } else {
+            db[":f_fiscal"] = QVariant();
+            db[":f_receiptnumber"] = QVariant();
+            db[":f_time"] = QVariant();
+            db.update("o_tax", "f_id", ui->tblOrder->getString(0, 0));
+        }
+    }
+    //END OF FISCAL RETURN
     QMap<QString, QVariant> oldAmountsMap;
     db[":f_id"] = ui->tblOrder->getString(ui->tblOrder->currentRow(), 0);
     db.exec("select * from o_header where f_id=:f_id");
@@ -313,4 +369,12 @@ void DlgReturnItem::on_btnReturn_clicked()
     }
     db.commit();
     C5Message::info(tr("Return completed"));
+}
+
+void DlgReturnItem::on_leExchange_returnPressed()
+{
+    fHttp->createHttpQuery("/shop/check-qty.php", QJsonObject{
+        {"store", __c5config.defaultStore()},
+        {"barcode", ui->leExchange->text()}},
+    SLOT(checkQtyResponse(QJsonObject)));
 }

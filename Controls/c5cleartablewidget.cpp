@@ -23,7 +23,7 @@ C5ClearTableWidget::C5ClearTableWidget(QWidget *parent) :
 {
     setEditTriggers(NoEditTriggers);
     if (!property("columns").toString().isEmpty()) {
-        QStringList cols = property("columns").toString().split(",", QString::SkipEmptyParts);
+        QStringList cols = property("columns").toString().split(",", Qt::SkipEmptyParts);
         for (int i = 0; i < cols.count(); i++) {
             setColumnWidth(i, cols.at(i).toInt());
         }
@@ -289,6 +289,7 @@ C5LineEdit *C5ClearTableWidget::createLineEdit(int row, int column)
     l->setProperty("row", row);
     l->setProperty("column", column);
     l->setFrame(false);
+    l->setStyleSheet("border: none;outline: none;");
     setCellWidget(row, column, l);
     connect(l, SIGNAL(textChanged(QString)), this, SLOT(lineEditTextChanged(QString)));
     connect(l, &C5LineEdit::focusIn, [this, l, column]() {
@@ -311,16 +312,16 @@ QVariant C5TableWidgetItem::data(int role) const
 {
     QVariant v = QTableWidgetItem::data(role);
     if (role == Qt::DisplayRole) {
-        switch (v.type()) {
-            case QVariant::Int:
+        switch (v.typeId()) {
+            case QMetaType::Int:
                 return v.toString();
-            case QVariant::Date:
+            case QMetaType::QDate:
                 return v.toDate().toString(FORMAT_DATE_TO_STR);
-            case QVariant::DateTime:
+            case QMetaType::QDateTime:
                 return v.toDateTime().toString(FORMAT_DATETIME_TO_STR);
-            case QVariant::Time:
+            case QMetaType::QTime:
                 return v.toTime().toString(FORMAT_TIME_TO_STR);
-            case QVariant::Double:
+            case QMetaType::Double:
                 return float_str(v.toDouble(), fDecimals);
             default:
                 return v.toString();

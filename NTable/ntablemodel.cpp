@@ -31,16 +31,19 @@ QVariant NTableModel::headerData(int section, Qt::Orientation orientation, int r
 
 int NTableModel::rowCount(const QModelIndex &index) const
 {
+    Q_UNUSED(index);
     return mProxyRows.size();
 }
 
 int NTableModel::columnCount(const QModelIndex &index) const
 {
+    Q_UNUSED(index);
     return mColumnsNames.size();
 }
 
 bool NTableModel::setData(const QModelIndex &index, const QVariant &value, int role)
 {
+    Q_UNUSED(role);
     int row = mProxyRows[index.row()];
     QJsonArray ja = mRawData[row].toArray();
     ja.replace(0, value.toString());
@@ -85,7 +88,7 @@ QVariant NTableModel::data(const QModelIndex &index, int role) const
             }
             break;
         }
-        case Qt::BackgroundColorRole: {
+        case Qt::BackgroundRole: {
             if (mRowColors.contains(row)) {
                 return QColor::fromRgb(mRowColors[row]);
             }
@@ -103,12 +106,31 @@ void NTableModel::sort(int column, Qt::SortOrder order)
         order = mSortOrder == Qt::AscendingOrder ? Qt::DescendingOrder : Qt::AscendingOrder;
     }
     mSortOrder = order;
-    QMap<QVariant, int> data;
+    QMap<QString, int> data_s;
+    QMap<double, int> data_d;
+    QMap<int, int> data_i;
     foreach (int i, mProxyRows) {
-        data.insertMulti(mRawData.at(i).toArray().at(column).toVariant(), i);
+        QVariant v = mRawData.at(i).toArray().at(column).toVariant();
+        switch (v.typeId()) {
+            case QMetaType::Int:
+                data_i.insert(v.toInt(), i);
+                break;
+            case QMetaType::Double:
+                data_d.insert(v.toDouble(), i);
+                break;
+            default:
+                data_s.insert(v.toString(), i);
+                break;
+        }
     }
     beginResetModel();
-    mProxyRows = data.values();
+    if (!data_s.isEmpty()) {
+        mProxyRows = data_s.values();
+    } else  if (!data_i.isEmpty()) {
+        mProxyRows = data_i.values();
+    } else if (!data_d.isEmpty()) {
+        mProxyRows = data_d.values();
+    }
     if (mSortOrder == Qt::DescendingOrder) {
         std::reverse(mProxyRows.begin(), mProxyRows.end());
     }
@@ -145,7 +167,8 @@ void NTableModel::setSumColumns(const QJsonArray &jcolsum)
     fColumnsOfDouble.clear();
     for (int i = 0; i < jcolsum.size(); i++) {
         qDebug() << jcolsum.at(i);
-        fColSum[jcolsum.at(i).toObject().keys().first().toInt()] = 0;
+        QJsonObject jo = jcolsum.at(i).toObject();
+        fColSum[jo.keys().first().toInt()] = 0;
         fColumnsOfDouble.append(jcolsum.at(i).toInt());
     }
     countSum();

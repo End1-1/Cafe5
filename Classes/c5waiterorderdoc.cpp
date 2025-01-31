@@ -245,7 +245,7 @@ bool C5WaiterOrderDoc::transferToHotel(C5Database &db, QString &err)
     db[":f_user"] = staffid;
     db[":f_room"] = hInt("f_otherid") == PAYOTHER_TRANSFER_TO_ROOM ? room : clcode;
     db[":f_guest"] = hInt("f_otherid") == PAYOTHER_TRANSFER_TO_ROOM ? guest : clname + ", " + hString("f_prefix") +
-                     hInt("f_hallid");
+                     QString::number(hInt("f_hallid"));
     db[":f_itemCode"] = item;
     db[":f_finalName"] = itemName + " " + result;
     db[":f_amountAmd"] = hDouble("f_amounttotal");

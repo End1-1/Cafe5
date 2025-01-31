@@ -32,7 +32,7 @@ void CE5Editor::setId(int id)
     }
     le->setEnabled(false);
     if (id == 0) {
-        if (le->property("Manual") != QVariant::Invalid) {
+        if (le->property("Manual").isValid()) {
             le->setEnabled(true);
         }
         return;
@@ -66,7 +66,7 @@ void CE5Editor::setId(int id)
                     } else {
                         le->setValue(db.getString(i));
                     }
-                    if (le->property("SetColor") != QVariant::Invalid) {
+                    if (le->property("SetColor").isValid()) {
                         if (le->isEmpty()) {
                             le->setInteger(-1);
                         }
@@ -142,17 +142,17 @@ bool CE5Editor::save(QString &err, QList<QMap<QString, QVariant> > &data)
     }
     QMap<QString, QVariant> row;
     foreach (C5LineEditWithSelector *leField, fLines) {
-        if (leField->property("FieldRef") != QVariant::Invalid) {
+        if (leField->property("FieldRef").isValid()) {
             row[leField->property("FieldRef").toString()] = leField->text();
             continue;
         }
-        if (leField->property("Field") == QVariant::Invalid) {
+        if (!leField->property("Field").isValid()) {
             continue;
         }
-        if (leField->property("Primary") != QVariant::Invalid) {
+        if (leField->property("Primary").isValid()) {
             continue;
         }
-        if (leField->property("SetColor") != QVariant::Invalid) {
+        if (leField->property("SetColor").isValid()) {
             if (leField->isEmpty()) {
                 leField->setInteger(-1);
             }
@@ -182,21 +182,21 @@ bool CE5Editor::save(QString &err, QList<QMap<QString, QVariant> > &data)
         row[fieldName] = value;
     }
     foreach (C5CheckBox *chField, fChecks) {
-        if (chField->property("Field") == QVariant::Invalid) {
+        if (!chField->property("Field").isValid()) {
             continue;
         }
         db[":" + chField->property("Field").toString()] = (chField->isChecked() ? 1 : 0);
         row[chField->property("Field").toString()] = (chField->isChecked() ? 1 : 0);
     }
     foreach (C5DateEdit *deField, fDates) {
-        if (deField->property("Field") == QVariant::Invalid) {
+        if (!deField->property("Field").isValid()) {
             continue;
         }
         db[":" + deField->property("Field").toString()] = deField->date();
         row[deField->property("Field").toString()] = deField->date();
     }
     foreach (C5ComboBox *cb, fCombos) {
-        if (cb->property("Field") == QVariant::Invalid) {
+        if (!cb->property("Field").isValid()) {
             continue;
         }
         if (cb->currentData().toInt() == 0) {
@@ -218,7 +218,7 @@ bool CE5Editor::save(QString &err, QList<QMap<QString, QVariant> > &data)
             err = dbError(db.fLastError);
         }
     } else {
-        if (leId->property("Manual") != QVariant::Invalid) {
+        if (leId->property("Manual").isValid()) {
             if (leId->isEnabled()) {
                 C5Database dbcheck(fDBParams);
                 dbcheck[":f_id"] = leId->getInteger();
@@ -267,8 +267,8 @@ bool CE5Editor::save(QString &err, QList<QMap<QString, QVariant> > &data)
 bool CE5Editor::checkData(QString &err)
 {
     foreach (C5LineEdit *le, fLines) {
-        if (le->property("Check") != QVariant::Invalid) {
-            QStringList rules = le->property("Check").toString().split(";", QString::SkipEmptyParts);
+        if (le->property("Check").isValid()) {
+            QStringList rules = le->property("Check").toString().split(";", Qt::SkipEmptyParts);
             foreach (QString rule, rules) {
                 if (rule.mid(0, 5) == "empty") {
                     le->setText(le->text().trimmed());
@@ -303,7 +303,7 @@ void CE5Editor::clear()
             le->clear();
         } else {
             le->setValue("");
-            if (le->property("SetColor") != QVariant::Invalid) {
+            if (le->property("SetColor").isValid()) {
                 le->setColor(-1);
                 le->setInteger(-1);
             }
@@ -344,7 +344,7 @@ QPushButton *CE5Editor::b1()
 C5LineEditWithSelector *CE5Editor::findLineEditWithId()
 {
     foreach (C5LineEditWithSelector *le, fLines) {
-        if (le->property("Primary") != QVariant::Invalid) {
+        if (le->property("Primary").isValid()) {
             return le;
         }
     }
@@ -373,7 +373,7 @@ void CE5Editor::getLineEdit(QObject *parent)
             if (le->property("DecimalPlaces").isValid()) {
                 decimalPlaces = le->property("DecimalPlaces").toInt();
             }
-            if (dataType != QVariant::Invalid) {
+            if (dataType.isValid()) {
                 switch (dataType.toInt()) {
                     case 0:
                         break;
@@ -411,7 +411,7 @@ void CE5Editor::getLineEdit(QObject *parent)
 void CE5Editor::focusFirst()
 {
     foreach (C5LineEditWithSelector *l, fLines) {
-        if (l->property("First") != QVariant::Invalid) {
+        if (l->property("First").isValid()) {
             if (l->property("First").toBool()) {
                 l->setFocus();
             }
@@ -419,7 +419,7 @@ void CE5Editor::focusFirst()
         }
     }
     foreach (C5CheckBox *c, fChecks) {
-        if (c->property("First") != QVariant::Invalid) {
+        if (c->property("First").isValid()) {
             if (c->property("First").toBool()) {
                 c->setFocus();
             }
@@ -427,7 +427,7 @@ void CE5Editor::focusFirst()
         }
     }
     foreach (C5DateEdit *d, fDates) {
-        if (d->property("First") != QVariant::Invalid) {
+        if (d->property("First").isValid()) {
             if (d->property("First").toBool()) {
                 d->setFocus();
             }
@@ -435,7 +435,7 @@ void CE5Editor::focusFirst()
         }
     }
     foreach (C5ComboBox *c, fCombos) {
-        if (c->property("First") != QVariant::Invalid) {
+        if (c->property("First").isValid()) {
             if (c->property("First").toBool()) {
                 c->setFocus();
             }

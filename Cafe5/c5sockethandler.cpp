@@ -54,11 +54,11 @@ void C5SocketHandler::send()
     }
     QJsonObject jObj;
     for (QMap<QString, QVariant>::const_iterator it = fBindValues.constBegin(); it != fBindValues.constEnd(); it++) {
-        switch (it.value().type()) {
-            case QVariant::Int:
+        switch (it.value().typeId()) {
+            case QMetaType::Int:
                 jObj[it.key()] = it.value().toInt();
                 break;
-            case QVariant::Double:
+            case QMetaType::Double:
                 jObj[it.key()] = it.value().toDouble();
                 break;
             default:
@@ -92,8 +92,8 @@ void C5SocketHandler::send(int errorCode)
 void C5SocketHandler::send(QJsonObject &obj)
 {
     for (QMap<QString, QVariant>::const_iterator it = fBindValues.begin(); it != fBindValues.end(); it++) {
-        switch (it.value().type()) {
-            case QVariant::Int:
+        switch (it.value().typeId()) {
+            case QMetaType::Int:
                 obj[it.key()] = it.value().toInt();
                 break;
             default:

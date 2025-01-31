@@ -52,7 +52,7 @@ void C5LineEditWithSelector::setValue(const QString &id)
     C5Cache *c = C5Cache::cache(fDBParams, fCache);
     QString text;
     int row = -1;
-    QStringList ids = id.split(",", QString::SkipEmptyParts);
+    QStringList ids = id.split(",", Qt::SkipEmptyParts);
     foreach (const QString &s, ids) {
         row = c->find(s.toInt());
         if (row > -1) {

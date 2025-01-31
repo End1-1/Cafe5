@@ -10,6 +10,7 @@
 #include "c5systempreference.h"
 #include "c5message.h"
 #include "dlgsplashscreen.h"
+#include "fileversion.h"
 #include "logwriter.h"
 #include <QApplication>
 #include <QMessageBox>
@@ -27,6 +28,8 @@
 
 int main(int argc, char *argv[])
 {
+    QGuiApplication::setAttribute(Qt::AA_EnableHighDpiScaling); // Включить масштабирование DPI
+    QCoreApplication::setAttribute(Qt::AA_UseHighDpiPixmaps);
 #ifndef QT_DEBUG
     QStringList libPath;
     libPath << "./";
@@ -43,6 +46,12 @@ int main(int argc, char *argv[])
         return -1;
     }
     LogWriter::write(LogWriterLevel::verbose, "", "starting...");
+    a.setStyle(QStyleFactory::create("fusion"));
+    QFile styleSheet(a.applicationDirPath() + "/shop.css");
+    if (styleSheet.exists()) {
+        styleSheet.open(QIODevice::ReadOnly);
+        a.setStyleSheet(styleSheet.readAll());
+    }
     QTranslator t;
     t.load(":/lang/Shop.qm");
     a.installTranslator( &t);
@@ -93,12 +102,6 @@ int main(int argc, char *argv[])
     if (!d.exists(d.homePath() + "/" + _APPLICATION_ + "/logs")) {
         d.mkpath(d.homePath() + "/" + _APPLICATION_ + "/logs");
     }
-    a.setStyle(QStyleFactory::create("fusion"));
-    QFile styleSheet("./styles.qss");
-    if (styleSheet.exists()) {
-        styleSheet.open(QIODevice::ReadOnly);
-        a.setStyleSheet(styleSheet.readAll());
-    }
     QFontDatabase::addApplicationFont(":/barcode.ttf");
     //    int id = QFontDatabase::addApplicationFont(":/ahuni.ttf");
     //    QString family = QFontDatabase::applicationFontFamilies(id).at(0);
@@ -108,7 +111,8 @@ int main(int argc, char *argv[])
             a.setStyleSheet(shopstyle.readAll());
         }
     }
-    //FIRST, LOGIN, AUTOLOGIN DISABLED SINCE MAY, 24, 2024
+    NDataProvider::mAppName = "shop";
+    NDataProvider::mFileVersion = FileVersion::getVersionString(a.applicationFilePath());
     QString user, pin;
     __user = new C5User(0);
     while (!__user->isValid() || !__user->isActive()) {

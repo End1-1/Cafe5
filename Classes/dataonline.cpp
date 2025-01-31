@@ -16,7 +16,10 @@ DataOnline::DataOnline(const QStringList &dbParams) :
         }
         for (const QString &table : fColumnNames.keys()) {
             db.exec(fTableQueries[table] + " where t.f_id=-1");
-            fColumnNames[table] = db.fNameColumnMap;
+            for (QHash<QString, int>::const_iterator it = db.fNameColumnMap.constBegin(); it != db.fNameColumnMap.constEnd();
+                    it++) {
+                fColumnNames[table][it.key().toLower()] = it.value();
+            }
         }
     }
 }

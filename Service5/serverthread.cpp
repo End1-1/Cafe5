@@ -2,6 +2,8 @@
 #include "logwriter.h"
 #include "configini.h"
 #include "c5searchengine.h"
+#include "database.h"
+#include "armsoft.h"
 #include <QWebSocketServer>
 #include <QWebSocket>
 #include <QJsonObject>
@@ -18,7 +20,18 @@ ServerThread::ServerThread(const QString &configPath) :
     QObject(),
     fConfigPath(configPath)
 {
-    C5SearchEngine::init({"kinopark", "cafe5"});
+    Database db;
+    if (db.open("127.0.0.1", "service5", "root", "root5")) {
+        db.exec("select fname from dblist");
+        QStringList dbList;
+        while (db.next()) {
+            dbList.append(db.string("fname"));
+        }
+        C5SearchEngine::init(dbList);
+        LogWriter::write(LogWriterLevel::verbose, "Initialized databases", dbList.join(","));
+    } else {
+        LogWriter::write(LogWriterLevel::errors, "Failed initialization of service5 database", db.lastDbError());
+    }
 }
 
 ServerThread::~ServerThread()
@@ -72,6 +85,17 @@ void ServerThread::updateHotelCache(const QJsonObject &jdoc, QWebSocket *ws)
         }
         ss.socket->sendTextMessage(QJsonDocument(jdoc).toJson(QJsonDocument::Compact));
     }
+}
+
+void ServerThread::armsoft(const QJsonObject &jdoc, QWebSocket *ws)
+{
+    ArmSoft as(jdoc["params"].toObject());
+    QJsonObject jret;
+    QString err;
+    jret["idontknowe"] = as.exportToAS(err);
+    jret["errorCode"] = err.isEmpty() ? 0 : 1;
+    jret["errorMessage"] = err;
+    ws->sendTextMessage(QJsonDocument(jret).toJson(QJsonDocument::Compact));
 }
 
 void ServerThread::onNewConnection()
@@ -134,6 +158,10 @@ void ServerThread::onTextMessage(const QString &msg)
     }
     if (jdoc["command"].toString() == "search_text") {
         C5SearchEngine::mInstance->search(jdoc, ws);
+        return;
+    }
+    if (jdoc["command"].toString() == "armsoft") {
+        armsoft(jdoc, ws);
         return;
     }
     jrep["errorCode"] = 0;

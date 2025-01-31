@@ -16,7 +16,8 @@ C5TableWithTotal::C5TableWithTotal(QWidget *parent) :
     QStringList vl;
     vl.append("");
     ui->tblTotal->setVerticalHeaderLabels(vl);
-    connect(ui->tblMain->horizontalHeader(), SIGNAL(sectionResized(int,int,int)), this, SLOT(mainHeaderResized(int,int,int)));
+    connect(ui->tblMain->horizontalHeader(), SIGNAL(sectionResized(int, int, int)), this, SLOT(mainHeaderResized(int, int,
+            int)));
     connect(ui->tblTotal->horizontalScrollBar(), SIGNAL(valueChanged(int)), this, SLOT(totalScroll(int)));
 }
 
@@ -70,7 +71,6 @@ void C5TableWithTotal::exportToExcel()
         s->addCell(1, i + 1, columnTitle(i), d.style()->styleNum("header"));
         s->setColumnWidth(i + 1, columnWidth(i) / 7);
     }
-
     /* BODY */
     QMap<int, QString> bgFill;
     QFont bodyFont(qApp->font());
@@ -79,7 +79,7 @@ void C5TableWithTotal::exportToExcel()
     bgFill[QColor(Qt::white).rgb()] = "body";
     for (int j = 0; j < rowCount(); j++) {
         for (int i = 0; i < columnCount(); i++) {
-            int bgColor = getData(j, i, Qt::BackgroundColorRole).value<QColor>().rgb();
+            int bgColor = getData(j, i, Qt::BackgroundRole).value<QColor>().rgb();
             bgColor = QColor::fromRgb(255, 255, 255).rgb();
             if (!bgFill.contains(bgColor)) {
                 d.style()->addFont(QString::number(bgColor), bodyFont);
@@ -90,7 +90,6 @@ void C5TableWithTotal::exportToExcel()
             s->addCell(j + 2, i + 1, getData(j, i, Qt::EditRole), d.style()->styleNum(bgStyle));
         }
     }
-
     /* TOTALS ROWS */
     QFont totalFont(qApp->font());
     totalFont.setBold(true);
@@ -100,7 +99,6 @@ void C5TableWithTotal::exportToExcel()
     for (int i = 0; i < columnCount(); i++) {
         s->addCell(1 + rowCount() + 1, i + 1, totalStr(i), d.style()->styleNum("footer"));
     }
-
     QString err;
     if (!d.save(err, true)) {
         if (!err.isEmpty()) {
@@ -112,7 +110,7 @@ void C5TableWithTotal::exportToExcel()
 void C5TableWithTotal::setRowColor(int row, const QColor &c)
 {
     for (int i = 0; i < ui->tblMain->columnCount(); i++) {
-        ui->tblMain->item(row, i)->setBackgroundColor(c);
+        ui->tblMain->item(row, i)->setBackground(c);
     }
 }
 
@@ -204,7 +202,8 @@ C5TableWithTotal &C5TableWithTotal::setData(int &row, int column, const QVariant
     return *this;
 }
 
-C5TableWithTotal &C5TableWithTotal::createLineEdit(int &row, int column, const QVariant &data, QObject *obj, const char *slot, bool newrow)
+C5TableWithTotal &C5TableWithTotal::createLineEdit(int &row, int column, const QVariant &data, QObject *obj,
+        const char *slot, bool newrow)
 {
     if (newrow) {
         ui->tblMain->addEmptyRow();
@@ -216,7 +215,8 @@ C5TableWithTotal &C5TableWithTotal::createLineEdit(int &row, int column, const Q
     return *this;
 }
 
-C5TableWithTotal &C5TableWithTotal::createLineEditDblClick(int &row, int column, QObject *obj, const char *slot, bool newrow)
+C5TableWithTotal &C5TableWithTotal::createLineEditDblClick(int &row, int column, QObject *obj, const char *slot,
+        bool newrow)
 {
     setData(row, column, QVariant(), newrow);
     ui->tblMain->createLineEditWithSelector(row, column, nullptr, nullptr)->setData("");
@@ -294,7 +294,7 @@ void C5TableWithTotal::replaceRows(int row1, int row2)
     for (int i = 0; i < ui->tblMain->columnCount(); i++) {
         QVariant t;
         if (ui->tblMain->cellWidget(row1, i)) {
-            if (dynamic_cast<C5LineEdit*>(ui->tblMain->cellWidget(row1, i))) {
+            if (dynamic_cast<C5LineEdit * >(ui->tblMain->cellWidget(row1, i))) {
                 t = ui->tblMain->lineEdit(row1, i)->text();
                 ui->tblMain->lineEdit(row1, i)->setText(ui->tblMain->lineEdit(row2, i)->text());
                 ui->tblMain->lineEdit(row2, i)->setText(t.toString());

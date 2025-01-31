@@ -1,11 +1,10 @@
 #include "logwriter.h"
-#include <QFile>
 #include <QDateTime>
 #include <QDebug>
-#include <QDir>
 #include <QStandardPaths>
+#include <QDir>
+#include <QFile>
 
-QMutex LogWriter::fMutex;
 int LogWriter::fCurrentLevel = 0;
 
 LogWriter::LogWriter()
@@ -21,7 +20,6 @@ void LogWriter::write(const QString &file, const QString &session, const QString
         return;
     }
 #endif
-    QMutexLocker ml( &fMutex);
     writeToFile(file, session, message);
     if (file != LogWriterLevel::verbose) {
         writeToFile(LogWriterLevel::verbose, session, message);

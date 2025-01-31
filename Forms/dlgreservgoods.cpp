@@ -78,6 +78,9 @@ DlgReservGoods::~DlgReservGoods()
 void DlgReservGoods::createReserveResponse(const QJsonObject &jdoc)
 {
     Q_UNUSED(jdoc);
+    ui->leCode->setInteger(jdoc["f_id"].toInt());
+    ui->leFiscal->setInteger(jdoc["f_fiscal"].toInt());
+    ui->btnPrintFiscal->setEnabled(jdoc["f_fiscal"].toInt() == 0);
     fHttp->httpQueryFinished(sender());
 }
 
@@ -101,11 +104,13 @@ void DlgReservGoods::on_btnSave_clicked()
     if (ui->leEndDay->date() > QDate::currentDate().addDays(1)) {
         err += tr("The end date can be tomorrow");
     }
+    if (ui->leReservedQty->getDouble() < 1) {
+        err += tr("Incorrect quantity");
+    }
     if (!err.isEmpty()) {
         C5Message::error(err);
         return;
     }
-    insertReserve(__c5config.dbParams());
     ui->btnSave->setVisible(false);
     ui->btnCancelReserve->setVisible(true);
     ui->btnCompleteReserve->setVisible(true);
@@ -120,6 +125,14 @@ void DlgReservGoods::on_btnSave_clicked()
     jo["unit"] = dbo_str("c_goods", tr("Unit"), fGoods);
     jo["usermessage"] = ui->leMessage->text();
     jo["enddate"] = ui->leEndDay->text();
+    jo["f_id"] = ui->leCode->getInteger();
+    jo["f_enddate"] = ui->leEndDay->date().toString(FORMAT_DATE_TO_STR_MYSQL);
+    jo["f_goods"] = fGoods;
+    jo["f_qty"] = ui->leReservedQty->getDouble();
+    jo["f_message"] = ui->leMessage->text();
+    jo["f_prepaid"] = ui->lePrepaid->getDouble();
+    jo["f_prepaidcard"] = ui->lePrepaidCard->getDouble();
+    jo["f_fiscal"] = ui->leFiscal->getInteger();
     fHttp->createHttpQuery("/engine/shop/create-reserve.php", jo, SLOT(createReserveResponse(QJsonObject)));
 }
 
@@ -167,33 +180,6 @@ void DlgReservGoods::updateState(const QStringList &dbparams, int state)
     db[":f_goods"] = fGoods;
     db[":f_store"] = fStore;
     db.exec("update a_store_sale set f_qtyreserve=f_qtyreserve-:f_qty where f_store=:f_store and f_goods=:f_goods");
-}
-
-void DlgReservGoods::insertReserve(const QStringList &dbparams)
-{
-    C5Database db(dbparams);
-    db[":f_store"] = fStore;
-    db[":f_goods"] = fGoods;
-    db[":f_qty"] = ui->leReservedQty->getDouble();
-    db[":f_message"] = ui->leMessage->text();
-    db[":f_source"] = __c5config.defaultStore();
-    db[":f_enddate"] = ui->leEndDay->date();
-    db[":f_prepaid"] = ui->lePrepaid->getDouble();
-    db[":f_prepaidcard"] = ui->lePrepaidCard->getDouble();
-    db[":f_fiscal"] = ui->leFiscal->getInteger();
-    if (ui->leCode->isEmpty()) {
-        db[":f_date"] = QDate::currentDate();
-        db[":f_time"] = QTime::currentTime();
-        db[":f_state"] = GR_RESERVED;
-        ui->leCode->setInteger(db.insert("a_store_reserve", true));
-        db[":f_qty"] = ui->leReservedQty->getDouble();
-        db[":f_goods"] = fGoods;
-        db[":f_store"] = fStore;
-        db.exec("update a_store_sale set f_qtyreserve=f_qtyreserve+:f_qty where f_store=:f_store and f_goods=:f_goods");
-    } else {
-        db.update("a_store_reserve", "f_id", ui->leCode->getInteger());
-    }
-    ui->btnPrintFiscal->setEnabled(ui->leFiscal->getInteger() == 0);
 }
 
 void DlgReservGoods::on_btnCompleteReserve_clicked()
@@ -267,7 +253,8 @@ void DlgReservGoods::on_btnPrintFiscal_clicked()
         C5Message::error(err);
     } else {
         QJsonObject jdoc = QJsonDocument::fromJson(jsonOut.toUtf8()).object();
-        ui->leFiscal->setText(jdoc["rseq"].toString());
+        ui->leFiscal->setInteger(jdoc["rseq"].toInt());
         on_btnSave_clicked();
+        ui->btnPrintFiscal->setEnabled(false);
     }
 }

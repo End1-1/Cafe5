@@ -45,13 +45,13 @@ void C5CustomFilter::on_btnOK_clicked()
         C5Message::error(tr("Nothing was selected"));
         return;
     }
-    for (QWidget *w: fWidgets) {
+    for (QWidget *w : fWidgets) {
         QString r = w->property("replace").toString();
         if (w->property("t").toString() == "date") {
-            C5DateEdit *d = static_cast<C5DateEdit*>(w);
+            C5DateEdit *d = static_cast<C5DateEdit *>(w);
             fSql.replace("%" + r + "%", d->toMySQLDate());
         } else if (w->property("t").toString() == "cache") {
-            C5LineEditWithSelector *l = static_cast<C5LineEditWithSelector*>(w);
+            C5LineEditWithSelector *l = static_cast<C5LineEditWithSelector *>(w);
             if (l->isNotEmpty()) {
                 QString cond = r.mid(0, r.indexOf(";"));
                 cond.replace("~list", l->text());
@@ -92,7 +92,7 @@ void C5CustomFilter::on_lw_itemClicked(QListWidgetItem *item)
     QStringList availableWidgets;
     availableWidgets.append("date");
     availableWidgets.append("cache");
-    for (QString &s: fParams) {
+    for (QString &s : fParams) {
         if (duplicate.contains(s)) {
             continue;
         } else {
@@ -114,7 +114,7 @@ void C5CustomFilter::on_lw_itemClicked(QListWidgetItem *item)
         } else if (type.contains("cache")) {
             C5LineEditWithSelector *l1 = new C5LineEditWithSelector();
             C5LineEditWithSelector *l2 = new C5LineEditWithSelector();
-            l1->setSelector(fDBParams, l2, type.midRef(5, type.length() - 5).toInt());
+            l1->setSelector(fDBParams, l2, type.mid(5, type.length() - 5).toInt());
             l1->setProperty("FilterName", s);
             ui->gl->addWidget(l1, row, 1, 1, 1);
             ui->gl->addWidget(l2, row, 2, 1, 1);

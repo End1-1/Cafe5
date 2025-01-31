@@ -81,6 +81,7 @@ private:
     int addGoods(const QString &uuid, int store, int goodsId, const QString &barcode, const QString &name,
                  const QString &unitname, double qty, double price, double discount, int isService, const QString &returnFrom);
     void countGrandTotal();
+    void countTotalQty();
     bool openDraft(const QString &id);
     void setPartner();
     void setPartner(const CPartners &p);

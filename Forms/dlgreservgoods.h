@@ -53,8 +53,6 @@ private:
     void setState(int state);
 
     void updateState(const QStringList &dbparams, int state);
-
-    void insertReserve(const QStringList &dbparams);
 };
 
 #endif // DLGRESERVGOODS_H

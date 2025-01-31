@@ -225,5 +225,8 @@
         <file>www.png</file>
         <file>icon.png</file>
         <file>officen.png</file>
+        <file>booking.png</file>
+        <file>icon_1024x1024_transparent.png</file>
+        <file>drop-down.png</file>
     </qresource>
 </RCC>

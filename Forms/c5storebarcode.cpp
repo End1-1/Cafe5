@@ -84,15 +84,15 @@ bool C5StoreBarcode::printOneBarcode(const QString &code, const QString &price, 
 {
     QPrinter printer(QPrinter::HighResolution);
     printer.setPrinterName(pd.printer()->printerName());
-    printer.setOrientation(pd.printer()->orientation());
-    QSizeF szf = printer.pageSizeMM();
-    szf = pd.printer()->pageSizeMM();
+    printer.setPageOrientation(pd.printer()->pageLayout().orientation());
+    QSizeF szf = printer.pageLayout().pageSize().size(QPageSize::Millimeter);
+    // szf = pd.printer()->pageSizeMM();
     //szf.setWidth(400);
     //    szf.setHeight(20);
-    printer.setPageSizeMM(szf);
+    //printer.pageLayout().setPageSize(szf);
     //    printer.setResolution(pd.printer()->resolution());
-    QPrinter::PageSize ps = printer.pageSize();
-    ps = pd.printer()->pageSize();
+    QPageSize ps = printer.pageLayout().pageSize();
+    ps = pd.printer()->pageLayout().pageSize();
     printer.setPageSize(ps);
     QPainter p( &printer);
     Barcode93 b;
@@ -171,12 +171,12 @@ bool C5StoreBarcode::printOneBarcode2(const QString &code, const QString &price,
     pix = pix.scaled(150, 150);
     QPrinter printer(QPrinter::HighResolution);
     printer.setPrinterName(pd.printer()->printerName());
-    printer.setOrientation(QPrinter::Landscape);
-    QSizeF szf = printer.pageSizeMM();
-    szf = pd.printer()->pageSizeMM();
-    printer.setPageSizeMM(szf);
-    QPrinter::PageSize ps = printer.pageSize();
-    ps = pd.printer()->pageSize();
+    printer.setPageOrientation(QPageLayout::Landscape);
+    QSizeF szf = printer.pageLayout().pageSize().size(QPageSize::Millimeter);
+    szf = pd.printer()->pageLayout().pageSize().size(QPageSize::Millimeter);
+    printer.setPageSize(QPageSize(szf, QPageSize::Millimeter));
+    QPageSize ps = printer.pageLayout().pageSize();
+    ps = pd.printer()->pageLayout().pageSize();
     printer.setPageSize(ps);
     QPixmap px(400, 550);
     px.fill(Qt::white);
@@ -193,11 +193,11 @@ bool C5StoreBarcode::printOneBarcode2(const QString &code, const QString &price,
     painter.drawImage(QRectF(80, 0, 150, 150), encodeImage);
     QSet<QString> sizes;
     QStringList t = sizeList.split(" ");
-    for (const QString &s : qAsConst(t)) {
+    for (const QString &s : std::as_const(t)) {
         sizes.insert(s);
     }
-    QStringList sizess = sizes.toList();
-    qSort(sizess.begin(), sizess.end());
+    QStringList sizess = sizes.values();
+    std::sort(sizess.begin(), sizess.end());
     int shift = 170 - ((sizess.length() * 65) / 2);
     for (int i = 0; i < sizess.length(); i++) {
         painter.fillRect((i * 50) + 15 + shift, 150, 40, 40, code.mid(0, 2) == sizess.at(i) ? Qt::black : Qt::white);
@@ -221,10 +221,10 @@ bool C5StoreBarcode::printOneBarcode2(const QString &code, const QString &price,
     QFontMetrics mf(painter.font());
     QString code2 = QString("%1x%2x%3x%4").arg(code.mid(0, 2), code.mid(2, 3),
                     code.mid(5, 2), code.mid(7, code.length() - 7));
-    qDebug() << mf.width(code2) << mf.width(price);
-    qDebug() << QPointF(140 - (mf.width(code2)), 380);
-    painter.drawText(QPointF(140 - (mf.width(code2) / 2), 380), code2);
-    painter.drawText(QPointF(140 - (mf.width(price) / 2), 420), price);
+    qDebug() << mf.horizontalAdvance(code2) << mf.horizontalAdvance(price);
+    qDebug() << QPointF(140 - (mf.horizontalAdvance(code2)), 380);
+    painter.drawText(QPointF(140 - (mf.horizontalAdvance(code2) / 2), 380), code2);
+    painter.drawText(QPointF(140 - (mf.horizontalAdvance(price) / 2), 420), price);
     QPainter pp( &printer);
     pp.drawImage(0, 0, px.toImage());
     gs.render( &pp);
@@ -264,12 +264,12 @@ bool C5StoreBarcode::printOneBarcode(const QString &code, QPrintDialog &pd)
 {
     QPrinter printer(QPrinter::HighResolution);
     printer.setPrinterName(pd.printer()->printerName());
-    printer.setOrientation(pd.printer()->orientation());
-    QSizeF szf = printer.pageSizeMM();
-    szf = pd.printer()->pageSizeMM();
-    printer.setPageSizeMM(szf);
-    QPrinter::PageSize ps = printer.pageSize();
-    ps = pd.printer()->pageSize();
+    printer.setPageOrientation(pd.printer()->pageLayout().orientation());
+    QSizeF szf = printer.pageLayout().pageSize().size(QPageSize::Millimeter);
+    szf = pd.printer()->pageLayout().pageSize().size(QPageSize::Millimeter);
+    printer.pageLayout().setPageSize(QPageSize(szf, QPageSize::Millimeter));
+    QPageSize ps = printer.pageLayout().pageSize();
+    ps = pd.printer()->pageLayout().pageSize();
     printer.setPageSize(ps);
     QPainter p( &printer);
     Barcode93 b;
@@ -315,7 +315,7 @@ bool C5StoreBarcode::printOneBarcode(const QString &code, QPrintDialog &pd)
         s["10"] = "40 42 44 46";
         s["11"] = "42 44 46";
         s["12"] = "46 48 50";
-        QStringList sizes = s[code.left(2)].split(" ", QString::SkipEmptyParts);
+        QStringList sizes = s[code.left(2)].split(" ", Qt::SkipEmptyParts);
         for (int i = 0; i < sizes.count(); i++) {
             p.drawText(QPoint(((i + 1) * 35) - 15, 150), sizes.at(i));
             p.drawText(QPoint(((i + 1) * 35) - 15, 190), "1");
@@ -439,14 +439,14 @@ void C5StoreBarcode::printDescriptions()
         for (int j = 0; j < ui->tbl->lineEdit(i, 2)->getInteger(); j++) {
             QPrinter printer(QPrinter::HighResolution);
             printer.setPrinterName(pd.printer()->printerName());
-            printer.setOrientation(pd.printer()->orientation());
-            QSizeF szf = printer.pageSizeMM();
-            szf = pd.printer()->pageSizeMM();
+            printer.setPageOrientation(pd.printer()->pageLayout().orientation());
+            QSizeF szf = printer.pageLayout().pageSize().size(QPageSize::Millimeter);
+            szf = pd.printer()->pageLayout().pageSize().size(QPageSize::Millimeter);
             szf.setWidth(250);
             //    szf.setHeight(20);
-            printer.setPageSizeMM(szf);
-            QPrinter::PageSize ps = printer.pageSize();
-            ps = pd.printer()->pageSize();
+            printer.pageLayout().setPageSize(QPageSize(szf, QPageSize::Millimeter));
+            QPageSize ps = printer.pageLayout().pageSize();
+            ps = pd.printer()->pageLayout().pageSize();
             printer.setPageSize(ps);
             QPainter p( &printer);
             QFont f("Arial", 6, QFont::Normal);

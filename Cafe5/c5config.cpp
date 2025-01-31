@@ -177,7 +177,7 @@ QString C5Config::defaultMenuName()
 
 int C5Config::defaultHall()
 {
-    QStringList halls = getValue(param_default_hall).split(",", QString::SkipEmptyParts);
+    QStringList halls = getValue(param_default_hall).split(",", Qt::SkipEmptyParts);
     if (halls.count() > 0) {
         return halls.at(0).toInt();
     } else {

@@ -75,6 +75,7 @@ bool DlgMovement::openDoc(const QString &doc)
         ui->tbl->setString(r, 1, jo["f_goodsname"].toString());
         ui->tbl->setString(r, 2, jo["f_scancode"].toString());
         ui->tbl->setDouble(r, 5, jo["f_price"].toDouble());
+        ui->tbl->setInteger(r, 6, jo["f_goods"].toInt());
         auto *l = ui->tbl->lineEdit(r, 4);
         connect(l, &C5LineEdit::textChanged, this, [this](QString s) {
             countTotals();
@@ -91,6 +92,7 @@ void DlgMovement::setupResponse(const QJsonObject &jdoc)
 {
     QJsonArray jstores = jdoc["availableoutstore"].toArray();
     if (jstores.isEmpty()) {
+        fHttp->httpQueryFinished(sender());
         C5Message::error(tr("Missing available stores"));
         return;
     }
@@ -115,6 +117,7 @@ void DlgMovement::searchResponse(const QJsonObject &jdoc)
     ui->tbl->setString(r, 2, jgoods["f_scancode"].toString());
     ui->tbl->setDouble(r, 3, jdoc["qty"].toDouble());
     ui->tbl->setInteger(r, 5, jprice["f_price1"].toInt());
+    ui->tbl->setInteger(r, 6, jgoods["f_id"].toInt());
     ui->tbl->verticalScrollBar()->setValue(999999999);
     ui->tbl->lineEdit(r, 4)->setFocus();
     connect(ui->tbl->lineEdit(r, 4), &C5LineEdit::textChanged, [this](QString s) {
@@ -201,7 +204,7 @@ bool DlgMovement::saveDoc(int state)
     QJsonArray jgoods;
     for (int i = 0; i < ui->tbl->rowCount(); i++) {
         QJsonObject jitem;
-        jitem["f_goods"] = ui->tbl->getInteger(i, 5);
+        jitem["f_goods"] = ui->tbl->getInteger(i, 6);
         jitem["f_qty"] = ui->tbl->lineEdit(i, 4)->getDouble();
         jitem["f_price"] = 0;
         jitem["f_row"] = i;

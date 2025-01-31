@@ -16,7 +16,8 @@ C5GridGilter::~C5GridGilter()
     delete ui;
 }
 
-bool C5GridGilter::filter(C5FilterWidget *filterWidget, QString &condition, QMap<QString, bool> &showColumns, QHash<QString, QString> &colTranslation)
+bool C5GridGilter::filter(C5FilterWidget *filterWidget, QString &condition, QMap<QString, bool> &showColumns,
+                          QHash<QString, QString> &colTranslation)
 {
     C5GridGilter *gf = new C5GridGilter();
     filterWidget->restoreFilter(filterWidget);
@@ -24,7 +25,7 @@ bool C5GridGilter::filter(C5FilterWidget *filterWidget, QString &condition, QMap
     if (filterWidget->children().count() > 0) {
         QObjectList ol = filterWidget->children();
         foreach (QObject *o, ol) {
-            QWidget *w = dynamic_cast<QWidget*>(o);
+            QWidget *w = dynamic_cast<QWidget *>(o);
             if (w) {
                 if (w->focusPolicy() == Qt::StrongFocus) {
                     w->setFocus();
@@ -48,15 +49,13 @@ bool C5GridGilter::filter(C5FilterWidget *filterWidget, QString &condition, QMap
         keys.append(s);
         keyvalue[s] = it.key();
     }
-    qSort(keys.begin(), keys.end());
-
+    std::sort(keys.begin(), keys.end());
     QStringList trans = colTranslation.values();
-    qSort(trans.begin(), trans.end());
-    for (const QString &tt: trans) {
+    std::sort(trans.begin(), trans.end());
+    for (const QString &tt : trans) {
         auto s = colTranslation.key(tt);
         QListWidgetItem *item = new QListWidgetItem(lv);
         item->setData(Qt::UserRole, keyvalue[s]);
-
         QCheckBox *c = new QCheckBox(colTranslation[s].replace("\n", " ").replace("\r", " "));
         c->setChecked(showColumns[keyvalue[s]]);
         lv->setItemWidget(item, c);
@@ -67,7 +66,7 @@ bool C5GridGilter::filter(C5FilterWidget *filterWidget, QString &condition, QMap
         filterWidget->saveFilter(filterWidget);
         condition = filterWidget->condition();
         for (int i = 0; i < lv->count(); i++) {
-            QCheckBox *c = static_cast<QCheckBox*>(lv->itemWidget(lv->item(i)));
+            QCheckBox *c = static_cast<QCheckBox *>(lv->itemWidget(lv->item(i)));
             showColumns[lv->item(i)->data(Qt::UserRole).toString()] = c->isChecked();
         }
     }
@@ -82,7 +81,6 @@ void C5GridGilter::keyControlPlusEnter()
 
 void C5GridGilter::keyAlterPlusEnter()
 {
-
 }
 
 void C5GridGilter::on_btnCancel_clicked()

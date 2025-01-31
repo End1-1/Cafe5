@@ -1,5 +1,4 @@
 #include "c5dialog.h"
-#include <QDesktopWidget>
 #include <QKeyEvent>
 #include <QApplication>
 

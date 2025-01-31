@@ -36,7 +36,7 @@ C5Printing::~C5Printing()
 void C5Printing::newPage()
 {
     fTop = 0;
-    QPrinter::Orientation o = fCanvasOrientation[fCanvas];
+    QPageLayout::Orientation o = fCanvasOrientation[fCanvas];
     fCanvas = new QGraphicsScene();
     fCanvasList.append(fCanvas);
     setSceneParams(fNormalWidth, fNormalHeight, o);
@@ -46,7 +46,7 @@ void C5Printing::newPage()
     fJsonData.append(ob);
 }
 
-void C5Printing::setSceneParams(qreal width, qreal height, QPrinter::Orientation orientation)
+void C5Printing::setSceneParams(qreal width, qreal height, QPageLayout::Orientation orientation)
 {
     fNormalHeight = height;
     fNormalWidth = width;
@@ -293,7 +293,7 @@ bool C5Printing::br(qreal height)
             fCanvas->setSceneRect(rf);
         } else {
             fTop = 0;
-            QPrinter::Orientation o = fCanvasOrientation[fCanvas];
+            QPageLayout::Orientation o = fCanvasOrientation[fCanvas];
             fCanvas = new QGraphicsScene();
             fCanvasList.append(fCanvas);
             setSceneParams(fNormalWidth, fNormalHeight, o);
@@ -324,12 +324,12 @@ int C5Printing::pageCount()
     return fCanvasList.count();
 }
 
-QPrinter::Orientation C5Printing::orientation(int index)
+QPageLayout::Orientation C5Printing::orientation(int index)
 {
     return fCanvasOrientation[fCanvasList.at(index)];
 }
 
-bool C5Printing::print(const QString &printername, QPrinter::PageSize pageSize, bool rotate90)
+bool C5Printing::print(const QString &printername, QPageSize pageSize, bool rotate90)
 {
     if (printername.contains("print://", Qt::CaseInsensitive)) {
         //        QRegExp re("(print:\\/\\/)(.*):(\\d*)\\/(.*)", Qt::CaseInsensitive);
@@ -371,8 +371,8 @@ bool C5Printing::print(const QString &printername, QPrinter::PageSize pageSize, 
     if (fCanvasList.count() > 0) {
         QPrinter printer(QPrinter::PrinterResolution);
         printer.setPrinterName(printername);
-        QPrinter::Orientation o = fCanvasOrientation[fCanvasList.at(0)];
-        printer.setOrientation(o);
+        QPageLayout::Orientation o = fCanvasOrientation[fCanvasList.at(0)];
+        printer.setPageOrientation(o);
         printer.setPageSize(pageSize);
         QPainter painter( &printer);
         if (rotate90) {
@@ -382,7 +382,7 @@ bool C5Printing::print(const QString &printername, QPrinter::PageSize pageSize, 
         for (int i = 0; i < fCanvasList.count(); i++) {
             if (i > 0) {
                 o = fCanvasOrientation[fCanvasList.at(i)];
-                printer.setOrientation(o);
+                printer.setPageOrientation(o);
                 printer.newPage();
             }
             fCanvasList.at(i)->render( &painter);

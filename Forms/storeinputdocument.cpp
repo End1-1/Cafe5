@@ -73,6 +73,7 @@ void StoreInputDocument::qtyChanged(const QString &arg1)
 
 void StoreInputDocument::qtyBoxChanged(const QString &arg1)
 {
+    Q_UNUSED(arg1);
     int row, col;
     if (!ui->tbl->findWidget(static_cast<QWidget * >(sender()), row, col)) {
         return;
@@ -88,6 +89,7 @@ void StoreInputDocument::qtyBoxChanged(const QString &arg1)
 
 void StoreInputDocument::priceChanged(const QString &arg1)
 {
+    Q_UNUSED(arg1);
     int row, col;
     if (!ui->tbl->findWidget(static_cast<QWidget * >(sender()), row, col)) {
         return;
@@ -101,6 +103,7 @@ void StoreInputDocument::priceChanged(const QString &arg1)
 
 void StoreInputDocument::totalChanged(const QString &arg1)
 {
+    Q_UNUSED(arg1);
     int row, col;
     if (!ui->tbl->findWidget(static_cast<QWidget * >(sender()), row, col)) {
         return;
@@ -337,6 +340,7 @@ bool StoreInputDocument::openDoc(const QString &id)
         db.nextRow();
         ui->lePartner->setText(db.getString("f_name"));
     }
+    return true;
 }
 
 void StoreInputDocument::setLastInputPrices()

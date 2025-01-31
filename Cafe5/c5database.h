@@ -297,7 +297,7 @@ private:
     void configureDatabase(QSqlDatabase &cn, const QString &host, const QString &db, const QString &user,
                            const QString &password);
 
-    QString lastQuery(QSqlQuery *q);
+    //QString lastQuery(QSqlQuery *q);
 
     bool exec(const QString &sqlQuery, bool &isSelect);
 

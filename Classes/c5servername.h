@@ -4,6 +4,7 @@
 #include <QObject>
 #include <QJsonArray>
 #include <QJsonObject>
+#include <QTimer>
 
 class C5ServerName : public QObject
 {
@@ -19,6 +20,7 @@ private:
     QString mServer;
     QString mRoute;
     QString fLastTextMessage;
+    QTimer mTimer;
 
 signals:
     void messageReceived();

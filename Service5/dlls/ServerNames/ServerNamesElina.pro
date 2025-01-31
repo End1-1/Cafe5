@@ -4,6 +4,7 @@ QT += sql
 
 TEMPLATE = lib
 DEFINES += SQLQUERY_LIBRARY
+TARGET = jzstore
 
 CONFIG += c++11
 

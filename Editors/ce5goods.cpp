@@ -419,7 +419,7 @@ void CE5Goods::printCard()
     C5Printing p;
     QList<qreal> points;
     QStringList vals;
-    p.setSceneParams(2000, 2700, QPrinter::Portrait);
+    p.setSceneParams(2000, 2700, QPageLayout::Portrait);
     p.setFontSize(16);
     p.setFontBold(true);
     p.ltext(QString("%1: %2").arg(tr("Printed")).arg(QDateTime::currentDateTime().toString(FORMAT_DATETIME_TO_STR)), 0);

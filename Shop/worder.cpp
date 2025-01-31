@@ -36,6 +36,7 @@ WOrder::WOrder(C5User *user, int saleType, WCustomerDisplay *customerDisplay, QW
     ui(new Ui::WOrder)
 {
     ui->setupUi(this);
+    ui->lbCardDateEnd->setVisible(false);
     fDraftSale.saleType = saleType;
     fDraftSale.state = 1;
     fDraftSale.date = QDate::currentDate();
@@ -245,7 +246,7 @@ bool WOrder::writeOrder()
                                      fOHeader.amountTelcell, fOHeader.amountBank, fOHeader.amountCredit,
                                      fOHeader.amountPrepaid, fOHeader.amountDebt,
                                      fOHeader.amountCashIn, fOHeader.amountChange, fOHeader._printFiscal, prepaidReadonly,
-                                     ui->leGiftCardAmount->getDouble() + 1000000000)) {
+                                     ui->leGiftCardAmount->getDouble())) {
         return false;
     }
     QElapsedTimer t;
@@ -1096,6 +1097,16 @@ void WOrder::reponseProcessCode(const QJsonObject &jdoc)
         break;
         //SALE GIFT CARD
         case 3: {
+            QDate validDate = QDate::fromString(jdoc["card"].toObject()["f_datesaled"].toString(), FORMAT_DATE_TO_STR_MYSQL);
+            if (validDate.isValid()) {
+                if (validDate.addDays(31 * 6) < QDate::currentDate()) {
+                    fHttp->httpQueryFinished(sender());
+                    C5Message::error(tr("Card not valid"));
+                    return;
+                }
+            }
+            ui->lbCardDateEnd->setVisible(true);
+            ui->lbCardDateEnd->setText(validDate.addDays(31 * 6).toString(FORMAT_DATE_TO_STR));
             if (fOHeader.saleType == -1) {
                 if (fOGoods.count() > 0) {
                     C5Message::error(tr("Cannot add goods in prepaid mode"));

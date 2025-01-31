@@ -43,6 +43,7 @@ private:
     void registerSocket(const QJsonObject &jdoc, QWebSocket *ws);
     void unregisterSocket(const QJsonObject &jdoc, QWebSocket *ws);
     void updateHotelCache(const QJsonObject &jdoc, QWebSocket *ws);
+    void armsoft(const QJsonObject &jdoc, QWebSocket *ws);
 
 private slots:
     void onNewConnection();

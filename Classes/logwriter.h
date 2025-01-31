@@ -1,7 +1,6 @@
 #ifndef LOGWRITER_H
 #define LOGWRITER_H
 
-#include <QMutex>
 #include <QMap>
 
 #define LogWriterVerbose(y) LogWriter::write(LogWriterLevel::verbose, y)
@@ -25,7 +24,6 @@ public:
 
 private:
     static void writeToFile(const QString &fileName, const QString &session, const QString &message);
-    static QMutex fMutex;
 
 };
 

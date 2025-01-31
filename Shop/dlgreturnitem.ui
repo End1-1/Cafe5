@@ -14,6 +14,97 @@
    <string>Return item</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
+   <item row="2" column="1">
+    <widget class="QLineEdit" name="leBarcode"/>
+   </item>
+   <item row="2" column="0">
+    <widget class="QLabel" name="label_5">
+     <property name="text">
+      <string>Barcode</string>
+     </property>
+    </widget>
+   </item>
+   <item row="4" column="0" colspan="6">
+    <widget class="C5ClearTableWidget" name="tblOrder">
+     <property name="maximumSize">
+      <size>
+       <width>16777215</width>
+       <height>120</height>
+      </size>
+     </property>
+     <property name="editTriggers">
+      <set>QAbstractItemView::NoEditTriggers</set>
+     </property>
+     <property name="selectionMode">
+      <enum>QAbstractItemView::SingleSelection</enum>
+     </property>
+     <property name="selectionBehavior">
+      <enum>QAbstractItemView::SelectRows</enum>
+     </property>
+     <column>
+      <property name="text">
+       <string>Uuid</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>Date</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>Receipt</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>Hall</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>Tax receipt</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>Saler</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>Saler id</string>
+      </property>
+     </column>
+    </widget>
+   </item>
+   <item row="0" column="2">
+    <widget class="QToolButton" name="btnSearchReceiptNumber">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="focusPolicy">
+      <enum>Qt::NoFocus</enum>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+     <property name="icon">
+      <iconset resource="../resources/res.qrc">
+       <normaloff>:/zoom-in.png</normaloff>:/zoom-in.png</iconset>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="0">
+    <widget class="QLabel" name="label_2">
+     <property name="text">
+      <string>Tax receipt</string>
+     </property>
+    </widget>
+   </item>
    <item row="3" column="1">
     <widget class="QLabel" name="label_6">
      <property name="text">
@@ -21,7 +112,48 @@
      </property>
     </widget>
    </item>
-   <item row="6" column="0" colspan="6">
+   <item row="10" column="0" colspan="4">
+    <widget class="QPushButton" name="btnReturn">
+     <property name="text">
+      <string>Return</string>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="0">
+    <widget class="QLabel" name="label">
+     <property name="text">
+      <string>Receipt number</string>
+     </property>
+    </widget>
+   </item>
+   <item row="5" column="0">
+    <widget class="QLabel" name="label_3">
+     <property name="text">
+      <string>Order contents</string>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="2">
+    <widget class="QToolButton" name="btnSearchTax">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="focusPolicy">
+      <enum>Qt::NoFocus</enum>
+     </property>
+     <property name="text">
+      <string>...</string>
+     </property>
+     <property name="icon">
+      <iconset resource="../resources/res.qrc">
+       <normaloff>:/zoom-in.png</normaloff>:/zoom-in.png</iconset>
+     </property>
+    </widget>
+   </item>
+   <item row="8" column="0" colspan="6">
     <widget class="C5ClearTableWidget" name="tblBody">
      <property name="editTriggers">
       <set>QAbstractItemView::NoEditTriggers</set>
@@ -84,60 +216,16 @@
      </column>
     </widget>
    </item>
-   <item row="1" column="3">
-    <spacer name="horizontalSpacer_2">
-     <property name="orientation">
-      <enum>Qt::Horizontal</enum>
-     </property>
-     <property name="sizeHint" stdset="0">
-      <size>
-       <width>40</width>
-       <height>20</height>
-      </size>
-     </property>
-    </spacer>
+   <item row="1" column="1">
+    <widget class="QLineEdit" name="leTaxReceipt"/>
+   </item>
+   <item row="0" column="1">
+    <widget class="QLineEdit" name="leReceiptNumber"/>
    </item>
    <item row="3" column="0">
     <widget class="QLabel" name="label_4">
      <property name="text">
       <string>Matching orders</string>
-     </property>
-    </widget>
-   </item>
-   <item row="1" column="1">
-    <widget class="QLineEdit" name="leTaxReceipt"/>
-   </item>
-   <item row="0" column="4">
-    <widget class="QLabel" name="label_5">
-     <property name="text">
-      <string>Reason</string>
-     </property>
-    </widget>
-   </item>
-   <item row="5" column="0">
-    <widget class="QLabel" name="label_3">
-     <property name="text">
-      <string>Order contents</string>
-     </property>
-    </widget>
-   </item>
-   <item row="0" column="1">
-    <widget class="QLineEdit" name="leReceiptNumber"/>
-   </item>
-   <item row="0" column="0">
-    <widget class="QLabel" name="label">
-     <property name="text">
-      <string>Receipt number</string>
-     </property>
-    </widget>
-   </item>
-   <item row="0" column="5" colspan="2">
-    <widget class="QComboBox" name="cbReason">
-     <property name="minimumSize">
-      <size>
-       <width>150</width>
-       <height>0</height>
-      </size>
      </property>
     </widget>
    </item>
@@ -154,112 +242,33 @@
      </property>
     </spacer>
    </item>
-   <item row="1" column="0">
-    <widget class="QLabel" name="label_2">
-     <property name="text">
-      <string>Tax receipt</string>
+   <item row="1" column="3">
+    <spacer name="horizontalSpacer_2">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
      </property>
-    </widget>
-   </item>
-   <item row="0" column="2">
-    <widget class="QToolButton" name="btnSearchReceiptNumber">
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
-     </property>
-     <property name="focusPolicy">
-      <enum>Qt::NoFocus</enum>
-     </property>
-     <property name="text">
-      <string/>
-     </property>
-     <property name="icon">
-      <iconset resource="../resources/res.qrc">
-       <normaloff>:/zoom-in.png</normaloff>:/zoom-in.png</iconset>
-     </property>
-    </widget>
-   </item>
-   <item row="1" column="2">
-    <widget class="QToolButton" name="btnSearchTax">
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
-     </property>
-     <property name="focusPolicy">
-      <enum>Qt::NoFocus</enum>
-     </property>
-     <property name="text">
-      <string>...</string>
-     </property>
-     <property name="icon">
-      <iconset resource="../resources/res.qrc">
-       <normaloff>:/zoom-in.png</normaloff>:/zoom-in.png</iconset>
-     </property>
-    </widget>
-   </item>
-   <item row="4" column="0" colspan="6">
-    <widget class="C5ClearTableWidget" name="tblOrder">
-     <property name="maximumSize">
+     <property name="sizeHint" stdset="0">
       <size>
-       <width>16777215</width>
-       <height>120</height>
+       <width>40</width>
+       <height>20</height>
       </size>
      </property>
-     <property name="editTriggers">
-      <set>QAbstractItemView::NoEditTriggers</set>
-     </property>
-     <property name="selectionMode">
-      <enum>QAbstractItemView::SingleSelection</enum>
-     </property>
-     <property name="selectionBehavior">
-      <enum>QAbstractItemView::SelectRows</enum>
-     </property>
-     <column>
-      <property name="text">
-       <string>Uuid</string>
-      </property>
-     </column>
-     <column>
-      <property name="text">
-       <string>Date</string>
-      </property>
-     </column>
-     <column>
-      <property name="text">
-       <string>Receipt</string>
-      </property>
-     </column>
-     <column>
-      <property name="text">
-       <string>Hall</string>
-      </property>
-     </column>
-     <column>
-      <property name="text">
-       <string>Tax receipt</string>
-      </property>
-     </column>
-     <column>
-      <property name="text">
-       <string>Saler</string>
-      </property>
-     </column>
-     <column>
-      <property name="text">
-       <string>Saler id</string>
-      </property>
-     </column>
-    </widget>
+    </spacer>
    </item>
-   <item row="1" column="4" colspan="3">
-    <widget class="QPushButton" name="btnReturn">
-     <property name="text">
-      <string>Return</string>
-     </property>
+   <item row="9" column="0" colspan="4">
+    <widget class="QWidget" name="wexchange" native="true">
+     <layout class="QHBoxLayout" name="horizontalLayout">
+      <item>
+       <widget class="QLabel" name="label_7">
+        <property name="text">
+         <string>Exchange with</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLineEdit" name="leExchange"/>
+      </item>
+     </layout>
     </widget>
    </item>
   </layout>
@@ -273,9 +282,11 @@
  </customwidgets>
  <tabstops>
   <tabstop>leReceiptNumber</tabstop>
+  <tabstop>leTaxReceipt</tabstop>
+  <tabstop>leBarcode</tabstop>
   <tabstop>tblOrder</tabstop>
   <tabstop>tblBody</tabstop>
-  <tabstop>btnSearchReceiptNumber</tabstop>
+  <tabstop>btnReturn</tabstop>
  </tabstops>
  <resources>
   <include location="../resources/res.qrc"/>

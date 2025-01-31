@@ -456,7 +456,6 @@ HEADERS += \
         ../Reports/cr5dishpriceselfcostfilter.h \
         ../Reports/cr5storedocuments.h \
         ../Reports/cr5storedocumentsfilter.h \
-        ../Classes/checkforupdatethread.h \
         ../Classes/fileversion.h \
         ../Classes/c5waiterorderdoc.h \
         ../../XLSX/src/crs32.h \
@@ -768,7 +767,6 @@ SOURCES += \
         ../Reports/cr5dishpriceselfcostfilter.cpp \
         ../Reports/cr5storedocuments.cpp \
         ../Reports/cr5storedocumentsfilter.cpp \
-        ../Classes/checkforupdatethread.cpp \
         ../Classes/fileversion.cpp \
         ../Classes/c5waiterorderdoc.cpp \
         ../../XLSX/src/xlsx.cpp \

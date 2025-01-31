@@ -23,12 +23,17 @@ bool C5ServerName::getServers(const QString &name)
     if (!name.isEmpty()) {
         mParams["name"] = name;
     }
+    connect( &mTimer, &QTimer::timeout, this, []() {
+        qDebug() << "Websocket timeout";
+    });
     QWebSocket *s = new QWebSocket();
     QUrl url(QString("%1/ws").arg(mServer));
     QEventLoop l1;
     connect(s, &QWebSocket::connected, &l1, &QEventLoop::quit);
     connect(s, &QWebSocket::disconnected, &l1, &QEventLoop::quit);
     connect(this, &C5ServerName::messageReceived, &l1, &QEventLoop::quit);
+    connect( &mTimer, &QTimer::timeout, &l1, &QEventLoop::quit);
+    mTimer.start(10000);
     s->open(url);
     l1.exec();
     if (s->state() != QAbstractSocket::ConnectedState) {
@@ -46,6 +51,7 @@ bool C5ServerName::getServers(const QString &name)
     });
     connect(this, &C5ServerName::messageReceived, &l2, &QEventLoop::quit);
     connect(s, &QWebSocket::disconnected, &l2, &QEventLoop::quit);
+    connect( &mTimer, &QTimer::timeout, &l2, &QEventLoop::quit);
     QJsonObject jo;
     jo["command"] = "ServerNamesAll";
     jo["handler"] = "office";

@@ -533,7 +533,7 @@ void CR5CommonSales::exportToAS()
         dbas[":fDOCTYPE"] = 20;
         dbas[":fDOCSTATE"] = 1;
         dbas[":fORDERNUM"] = "";
-        dbas[":fDOCNUM"] = oh["f_prefix"].toString() + QString(oh["f_hallid"].toInt());
+        dbas[":fDOCNUM"] = oh["f_prefix"].toString() + QString::number(oh["f_hallid"].toInt());
         dbas[":fCUR"] = "AMD";
         dbas[":fSUMM"] = oh["f_amounttotal"];
         dbas[":fCOMMENT"] = "";

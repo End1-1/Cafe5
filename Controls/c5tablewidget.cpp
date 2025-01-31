@@ -12,7 +12,6 @@
 C5TableWidget::C5TableWidget(QWidget *parent) :
     C5ClearTableWidget(parent)
 {
-
 }
 
 C5ComboBox *C5TableWidget::createComboBox(int row, int column)
@@ -28,15 +27,13 @@ C5ComboBox *C5TableWidget::createComboBox(int row, int column)
 
 C5ComboBox *C5TableWidget::comboBox(int row, int column)
 {
-    return static_cast<C5ComboBox*>(cellWidget(row, column));
+    return static_cast<C5ComboBox *>(cellWidget(row, column));
 }
 
 void C5TableWidget::comboTextChanged(const QString &text)
 {
-    C5ComboBox *c = static_cast<C5ComboBox*>(sender());
+    C5ComboBox *c = static_cast<C5ComboBox *>(sender());
     int row, col;
     findWidget(c, row, col);
     setString(row, col, text);
 }
-
-

@@ -2,6 +2,7 @@
 #define CONFIGINI_H
 
 #include <QSettings>
+#include <QString>
 
 class ConfigIni
 {

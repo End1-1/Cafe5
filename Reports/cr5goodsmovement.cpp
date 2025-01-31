@@ -218,8 +218,9 @@ void CR5GoodsMovement::changePrice()
         C5Message::error(tr("Nothing was selected"));
         return;
     }
-    C5ChangeDocInputPrice::changePrice(fDBParams, fModel->data(rows.toList().at(0),
-                                       fModel->indexForColumnName("f_storerec"), Qt::EditRole).toString());
+    C5ChangeDocInputPrice::changePrice(fDBParams, fModel->data(rows.values().at(0),
+                                       fModel->indexForColumnName("f_storerec"),
+                                       Qt::EditRole).toString());
 }
 
 void CR5GoodsMovement::templates()

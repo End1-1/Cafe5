@@ -47,7 +47,7 @@ void NDataProvider::getData(const QString &route, const QJsonObject &data)
     jo["app"] = mAppName;
     jo["appversion"] = mFileVersion;
     QStringList keys = data.keys();
-    for (const auto &s : qAsConst(keys)) {
+    for (const auto &s : std::as_const(keys)) {
         jo[s] = data[s];
     }
     if (mDebug) {

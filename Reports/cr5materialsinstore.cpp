@@ -285,7 +285,7 @@ void CR5MaterialsInStore::setColors()
 void CR5MaterialsInStore::printBarcode()
 {
     C5Database db(fDBParams);
-    db[":f_id"] = fFilter->currency() == 0 ? __c5config.getValue(param_default_currency) : fFilter->currency();
+    db[":f_id"] = fFilter->currency().isEmpty() ? __c5config.getValue(param_default_currency) : fFilter->currency();
     db.exec("select f_symbol from e_currency where f_id=:f_id");
     db.nextRow();
     QString s = db.getString("f_symbol");

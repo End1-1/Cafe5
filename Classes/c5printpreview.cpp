@@ -2,7 +2,6 @@
 #include "ui_c5printpreview.h"
 #include "c5printing.h"
 #include <QPrinterInfo>
-#include <QMatrix>
 #include <QGraphicsScene>
 
 C5PrintPreview::C5PrintPreview(C5Printing *printData, const QStringList &dbParams) :
@@ -46,7 +45,7 @@ void C5PrintPreview::renderPage()
     ui->btnFirst->setEnabled(fPageNumber > 1);
     ui->btnBack->setEnabled(fPageNumber > 1);
     ui->btnLast->setEnabled(fPageNumber < fPrintData->pageCount());
-    ui->btnNext->setEnabled(fPageNumber <fPrintData->pageCount());
+    ui->btnNext->setEnabled(fPageNumber < fPrintData->pageCount());
 }
 
 void C5PrintPreview::zoom()
@@ -58,8 +57,8 @@ void C5PrintPreview::zoom()
     z /= 2.5;
     fScaleFactor = z;
     QRectF r(fPrintData->page(fPageNumber - 1)->sceneRect());
-    r.setWidth(r.width() * z);
-    r.setHeight(r.height() * z);
+    r.setWidth(r.width() *z);
+    r.setHeight(r.height() *z);
     ui->gv->setMinimumSize(r.size().toSize());
     ui->gv->setMaximumSize(r.size().toSize());
     ui->gv->scale(fScaleFactor, fScaleFactor);
@@ -78,7 +77,7 @@ void C5PrintPreview::on_cbZoom_currentIndexChanged(int index)
 
 void C5PrintPreview::on_btnPrint_clicked()
 {
-    fPrintData->print(ui->cbPrinters->currentText(), QPrinter::A4);
+    fPrintData->print(ui->cbPrinters->currentText(), QPageSize::A4);
 }
 
 void C5PrintPreview::on_cbPrinters_currentIndexChanged(const QString &arg1)

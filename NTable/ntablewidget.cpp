@@ -236,7 +236,7 @@ void NTableWidget::exportToExcel()
     for (int j = 0; j < rowCount; j++) {
         for (int i = 0; i < colCount; i++) {
             QVariant v = fModel->data(j, i, Qt::EditRole);
-            int bgColor = fModel->data(j, i, Qt::BackgroundColorRole).value<QColor>().rgb();
+            int bgColor = fModel->data(j, i, Qt::BackgroundRole).value<QColor>().rgb();
             if (!bgFill.contains(bgColor)) {
                 bodyFont.setBold(false);
                 d.style()->addFont(QString::number(bgColor), bodyFont);
@@ -253,10 +253,10 @@ void NTableWidget::exportToExcel()
             if (fModel->data(j, i, Qt::FontRole).value<QFont>().bold()) {
                 bgStyle = bgFillb[bgColor];
             }
-            switch (v.type()) {
-                case QVariant::LongLong:
-                case QVariant::Double:
-                case QVariant::Int:
+            switch (v.typeId()) {
+                case QMetaType::LongLong:
+                case QMetaType::Double:
+                case QMetaType::Int:
                     if (v.toDouble() < 0.01) {
                         continue;
                     }

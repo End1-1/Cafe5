@@ -158,10 +158,8 @@ bool CE5MFProduct::save(QString &err, QList<QMap<QString, QVariant> > &data)
     QByteArray bimage;
     QBuffer buff( &bimage);
     buff.open(QIODevice::WriteOnly);
-    const QPixmap *p = ui->lbImage->pixmap();
-    if (p) {
-        p->save( &buff, "JPG");
-    }
+    QPixmap p = ui->lbImage->pixmap();
+    p.save( &buff, "JPG");
     body["image"] = QString(bimage.toBase64());
     j = QJsonObject();
     j["chwash"] = ui->chWashTemp->isChecked();
@@ -394,7 +392,7 @@ void CE5MFProduct::on_btnPrint_clicked()
     C5Printing p;
     QList<qreal> points;
     QStringList vals;
-    p.setSceneParams(2000, 2700, QPrinter::Portrait);
+    p.setSceneParams(2000, 2700, QPageLayout::Portrait);
     p.setFontSize(25);
     p.setFontBold(true);
     p.ctext(QString("%1: %2").arg(tr("Product"), ui->leName->text()));
@@ -494,10 +492,10 @@ void CE5MFProduct::on_btnCopy_clicked()
 void CE5MFProduct::on_btnPaste_clicked()
 {
     QString clipdata = qApp->clipboard()->text();
-    QStringList rows = clipdata.split("\r", QString::SkipEmptyParts);
+    QStringList rows = clipdata.split("\r", Qt::SkipEmptyParts);
     C5Database db(fDBParams);
     for (int i = 0; i < rows.count(); i++) {
-        QStringList cols = rows.at(i).split("\t", QString::SkipEmptyParts);
+        QStringList cols = rows.at(i).split("\t", Qt::SkipEmptyParts);
         if (cols.count() < 8) {
             return;
         }

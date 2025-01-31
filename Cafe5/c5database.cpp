@@ -212,45 +212,45 @@ QString C5Database::execDry(const QString &sqlQuery)
         if(!it.value().isValid()) {
             value = "null";
         } else {
-            switch (it.value().type()) {
-                case QVariant::String:
+            switch (it.value().typeId()) {
+                case QMetaType::QString:
                     value = QString("'%1'").arg(value.toString().replace("'", "''"));
                     break;
-                case QVariant::Date:
+                case QMetaType::QDate:
                     if (value.toDate().isValid()) {
                         value = QString("'%1'").arg(value.toDate().toString("yyyy-MM-dd"));
                     } else {
                         value = "null";
                     }
                     break;
-                case QVariant::DateTime:
+                case QMetaType::QDateTime:
                     if (value.toDateTime().isValid()) {
                         value = QString("'%1'").arg(value.toDateTime().toString("yyyy-MM-dd HH:mm:ss"));
                     } else {
                         value = "null";
                     }
                     break;
-                case QVariant::Double:
+                case QMetaType::Double:
                     value = QString("%1").arg(QString::number(value.toDouble(), 'f', 4));
                     break;
-                case QVariant::Int:
+                case QMetaType::Int:
                     value = QString("%1").arg(value.toInt());
                     break;
-                case QVariant::Time:
+                case QMetaType::QTime:
                     if (value.toTime().isValid()) {
                         value = QString("'%1'").arg(value.toTime().toString("HH:mm:ss"));
                     } else {
                         value = "null";
                     }
                     break;
-                case QVariant::ByteArray:
+                case QMetaType::QByteArray:
                     value = QString("'%1'").arg(QString(value.toByteArray().toHex()));
                     break;
                 default:
                     break;
             }
         }
-        sql.replace(QRegExp(it.key() + "\\b"), value.toString());
+        sql.replace(QRegularExpression(it.key() + "\\b"), value.toString());
     }
     fBindValues.clear();
     return sql;
@@ -330,9 +330,9 @@ bool C5Database::exec(const QString &sqlQuery, QMap<QString, QList<QVariant> > &
     }
     if (LOGGING) {
 #ifdef QT_DEBUG
-        logEvent(fDb.hostName() + ":" + fDb.databaseName() + " " + lastQuery(fQuery));
+        //logEvent(fDb.hostName() + ":" + fDb.databaseName() + " " + lastQuery(fQuery));
 #else
-        logEvent(lastQuery(fQuery));
+        //logEvent(lastQuery(fQuery));
 #endif
     }
     fBindValues.clear();
@@ -371,10 +371,10 @@ bool C5Database::execDirect(const QString &sqlQuery)
         return false;
     }
 #ifdef QT_DEBUG
-    logEvent(fDb.hostName() + ":" + fDb.databaseName() + " " + lastQuery(fQuery));
+    //logEvent(fDb.hostName() + ":" + fDb.databaseName() + " " + lastQuery(fQuery));
 #else
     if (LOGGING) {
-        logEvent(fDb.hostName() + ":" + fDb.databaseName() + " " + lastQuery(fQuery));
+        //logEvent(fDb.hostName() + ":" + fDb.databaseName() + " " + lastQuery(fQuery));
     }
 #endif
     return true;
@@ -952,46 +952,46 @@ void C5Database::logEvent(const QString &event)
     f.close();
 }
 
-QString C5Database::lastQuery(QSqlQuery *q)
-{
-    QString sql = q->lastQuery();
-    QMapIterator<QString, QVariant> it(q->boundValues());
-    while (it.hasNext()) {
-        it.next();
-        QVariant value = it.value();
-        if(!it.value().isValid()) {
-            value = "null";
-        } else {
-            switch (it.value().type()) {
-                case QVariant::String:
-                    value = QString("'%1'").arg(value.toString().replace("'", "''"));
-                    break;
-                case QVariant::Date:
-                    value = QString("'%1'").arg(value.toDate().toString("yyyy-MM-dd"));
-                    break;
-                case QVariant::DateTime:
-                    value = QString("'%1'").arg(value.toDateTime().toString("yyyy-MM-dd HH:mm:ss"));
-                    break;
-                case QVariant::Double:
-                    value = QString("%1").arg(value.toDouble());
-                    break;
-                case QVariant::Int:
-                    value = QString("%1").arg(value.toInt());
-                    break;
-                case QVariant::Time:
-                    value = QString("'%1'").arg(value.toTime().toString("HH:mm:ss"));
-                    break;
-                case QVariant::ByteArray:
-                    value = QString("'%1'").arg(QString(value.toByteArray().toHex()));
-                    break;
-                default:
-                    break;
-            }
-        }
-        sql.replace(QRegExp(it.key() + "\\b"), value.toString());
-    }
-    return sql;
-}
+// QString C5Database::lastQuery(QSqlQuery *q)
+// {
+//     QString sql = q->lastQuery();
+//     QMapIterator<QString, QVariant> it(q->boundValues());
+//     while (it.hasNext()) {
+//         it.next();
+//         QVariant value = it.value();
+//         if(!it.value().isValid()) {
+//             value = "null";
+//         } else {
+//             switch (it.value().type()) {
+//                 case QVariant::String:
+//                     value = QString("'%1'").arg(value.toString().replace("'", "''"));
+//                     break;
+//                 case QVariant::Date:
+//                     value = QString("'%1'").arg(value.toDate().toString("yyyy-MM-dd"));
+//                     break;
+//                 case QVariant::DateTime:
+//                     value = QString("'%1'").arg(value.toDateTime().toString("yyyy-MM-dd HH:mm:ss"));
+//                     break;
+//                 case QVariant::Double:
+//                     value = QString("%1").arg(value.toDouble());
+//                     break;
+//                 case QVariant::Int:
+//                     value = QString("%1").arg(value.toInt());
+//                     break;
+//                 case QVariant::Time:
+//                     value = QString("'%1'").arg(value.toTime().toString("HH:mm:ss"));
+//                     break;
+//                 case QVariant::ByteArray:
+//                     value = QString("'%1'").arg(QString(value.toByteArray().toHex()));
+//                     break;
+//                 default:
+//                     break;
+//             }
+//         }
+//         sql.replace(QRegularExpression(it.key() + "\\b"), value.toString());
+//     }
+//     return sql;
+// }
 
 bool C5Database::exec(const QString &sqlQuery, bool &isSelect)
 {
@@ -1024,22 +1024,22 @@ bool C5Database::exec(const QString &sqlQuery, bool &isSelect)
     if (!fQuery->exec()) {
         fLastError = fQuery->lastError().databaseText();
         logEvent(fLastError);
-        logEvent(lastQuery(fQuery));
+        //logEvent(lastQuery(fQuery));
         throw SqlException(fLastError);
         return false;
     }
     fTimerCount = fTimer.elapsed();
 #ifdef QT_DEBUG
-    logEvent(fDb.hostName() + " (" + QString::number(fTimerCount) + " ms):" + fDb.databaseName() + " " + lastQuery(fQuery));
+    //logEvent(fDb.hostName() + " (" + QString::number(fTimerCount) + " ms):" + fDb.databaseName() + " " + lastQuery(fQuery));
 #else
     if (__c5config.getValue(param_debuge_mode).toInt() > 0) {
-        logEvent(" (" + QString::number(fTimerCount) + " ms):" + " " + lastQuery(fQuery));
+        //logEvent(" (" + QString::number(fTimerCount) + " ms):" + " " + lastQuery(fQuery));
     }
 #endif
     isSelect = fQuery->isSelect();
     QString call = "call";
     if (!isSelect) {
-        isSelect = sql.midRef(0, 4).compare(QStringRef( &call), Qt::CaseInsensitive) == 0;
+        isSelect = sql.mid(0, 4).compare(call, Qt::CaseInsensitive) == 0;
     }
     return true;
 }

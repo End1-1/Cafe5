@@ -7,6 +7,7 @@
 #include <tchar.h>
 #include <strsafe.h>
 #include <QApplication>
+#include <QSqlDatabase>
 #include <QTranslator>
 #define SVCNAME TEXT("Breeze")
 
@@ -28,8 +29,9 @@ VOID SvcReportEvent( LPTSTR );
 
 DWORD WINAPI ThreadProc(CONST LPVOID lpParam)
 {
-    LogWriter::write(LogWriterLevel::verbose, "", "Start service thread");
     QApplication app(ARGC, ARGV);
+    LogWriter::write(LogWriterLevel::verbose, "", "Start service thread");
+    LogWriter::write(LogWriterLevel::verbose, "Database drivers", QSqlDatabase::drivers().join(","));
     QTranslator t;
     t.load(":/Service5.qm");
     app.installTranslator( &t);

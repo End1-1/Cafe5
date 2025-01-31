@@ -225,25 +225,25 @@ const QString Database::lastQuery()
         it.next();
         QVariant value = it.value();
         switch (it.value().typeId()) {
-            case QVariant::String:
+            case QMetaType::QString:
                 value = QString("'%1'").arg(value.toString().replace("'", "''"));
                 break;
-            case QVariant::Date:
+            case QMetaType::QDate:
                 value = QString("'%1'").arg(value.toDate().toString("yyyy-MM-dd"));
                 break;
-            case QVariant::DateTime:
+            case QMetaType::QDateTime:
                 value = QString("'%1'").arg(value.toDateTime().toString("yyyy-MM-dd HH:mm:ss"));
                 break;
-            case QVariant::Double:
+            case QMetaType::Double:
                 value = QString("%1").arg(value.toDouble());
                 break;
-            case QVariant::Int:
+            case QMetaType::Int:
                 value = QString("%1").arg(value.toInt());
                 break;
-            case QVariant::Time:
+            case QMetaType::QTime:
                 value = QString("'%1'").arg(value.toTime().toString("HH:mm:ss"));
                 break;
-            case QVariant::ByteArray:
+            case QMetaType::QByteArray:
                 value = QString("'%1'").arg(QString(value.toByteArray().toHex()));
                 break;
             default:

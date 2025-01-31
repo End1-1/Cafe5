@@ -72,7 +72,7 @@ void C5Grid::postProcess()
 
 void C5Grid::buildQuery()
 {
-    QString mainTable = fMainTable.mid(fMainTable.indexOf(QRegExp("\\b[a-z,A-Z]*$")), fMainTable.length() - 1);
+    QString mainTable = fMainTable.mid(fMainTable.indexOf(QRegularExpression("\\b[a-z,A-Z]*$")), fMainTable.length() - 1);
     QStringList leftJoinTables;
     QMap<QString, QString> leftJoinTablesMap;
     QStringList groupFields;
@@ -93,7 +93,7 @@ void C5Grid::buildQuery()
                 fSqlQuery += s;
                 int pos = -1;
                 do {
-                    pos = s.indexOf(QRegExp("\\b[a-z,A-Z]*\\."), pos + 1);
+                    pos = s.indexOf(QRegularExpression("\\b[a-z,A-Z]*\\."), pos + 1);
                     QString tableOfField = s.mid(pos, s.indexOf(".", pos) - pos);
                     if (tableOfField != mainTable) {
                         insertJoinTable(leftJoinTables, leftJoinTablesMap, tableOfField, mainTable);
@@ -112,11 +112,16 @@ void C5Grid::buildQuery()
             fWhereCondition = fFilterWidget->condition();
         }
         int p = 0;
-        QRegExp re("\\b[a-z]*\\.");
-        re.setMinimal(true);
-        while ((p = re.indexIn(fWhereCondition, p)) != -1) {
-            QString table = re.cap(0);
-            p += re.matchedLength();
+        QRegularExpression re("\\b[a-z]*\\.");
+        re.setPatternOptions(QRegularExpression::PatternOption::DotMatchesEverythingOption);
+        while (true) {
+            QRegularExpressionMatch match = re.match(fWhereCondition, p);
+            if (!match.hasMatch()) {
+                break;  // Нет совпадений, выходим из цикла
+            }
+            QString table = match.captured(0);  // Получаем полное совпадение
+            p += match.capturedLength();  // Обновляем позицию
+            // Убираем точку в конце
             table = table.remove(table.length() - 1, 1);
             if (table != mainTable) {
                 insertJoinTable(leftJoinTables, leftJoinTablesMap, table, mainTable);
@@ -434,16 +439,16 @@ void C5Grid::insertJoinTable(QStringList &joins, QMap<QString, QString> &joinsMa
     QString j;
     for (int i = 0; i < fLeftJoinTables.count(); i++) {
         QString tmpJoinTable = fLeftJoinTables.at(i);
-        int pos = tmpJoinTable.indexOf(QRegExp("\\[.*\\]"));
+        int pos = tmpJoinTable.indexOf(QRegularExpression("\\[.*\\]"));
         tmpJoinTable = tmpJoinTable.mid(pos, tmpJoinTable.length() - pos);
         tmpJoinTable.replace("[", "").replace("]", "");
         if (tmpJoinTable == table) {
             if (!joinsMap.contains(tmpJoinTable)) {
                 j = fLeftJoinTables.at(i).mid(0, fLeftJoinTables.at(i).length() - (fLeftJoinTables.at(i).length() - fLeftJoinTables.at(
                                                   i).indexOf(" [")));
-                QRegExp rx("=.*$");
-                rx.indexIn(j, 0);
-                QString otherTable = rx.cap(0).trimmed();
+                QRegularExpression rx("=.*$");
+                QRegularExpressionMatch match = rx.match(j, 0);
+                QString otherTable = match.captured(0).trimmed();
                 otherTable.remove(0, 1);
                 otherTable = otherTable.mid(0, otherTable.indexOf(".", 0));
                 if (otherTable != mainTable && !otherTable.isEmpty()) {
@@ -628,9 +633,9 @@ void C5Grid::print()
     }
     columnsWidth /= scaleFactor;
     if (columnsWidth > 1950) {
-        p.setSceneParams(paperSize.height(), paperSize.width(), QPrinter::Landscape);
+        p.setSceneParams(paperSize.height(), paperSize.width(), QPageLayout::Landscape);
     } else {
-        p.setSceneParams(paperSize.width(), paperSize.height(), QPrinter::Portrait);
+        p.setSceneParams(paperSize.width(), paperSize.height(), QPageLayout::Portrait);
     }
     do {
         p.setFontBold(true);
@@ -803,12 +808,12 @@ void C5Grid::exportToExcel()
     bgFillb[QColor(Qt::white).rgb()] = "body_b";
     for (int j = 0; j < rowCount; j++) {
         for (int i = 0; i < colCount; i++) {
-            if (fModel->data(j, i, Qt::EditRole).type() == QVariant::Double) {
+            if (fModel->data(j, i, Qt::EditRole).typeId() == QMetaType::Double) {
                 if (fModel->data(j, i, Qt::EditRole).toDouble() == 0) {
                     continue;
                 }
             }
-            int bgColor = fModel->data(j, i, Qt::BackgroundColorRole).value<QColor>().rgb();
+            int bgColor = fModel->data(j, i, Qt::BackgroundRole).value<QColor>().rgb();
             if (!bgFill.contains(bgColor)) {
                 bodyFont.setBold(false);
                 d.style()->addFont(QString::number(bgColor), bodyFont);

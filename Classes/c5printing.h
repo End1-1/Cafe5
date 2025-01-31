@@ -17,7 +17,7 @@ public:
 
     void newPage();
 
-    void setSceneParams(qreal width, qreal height, QPrinter::Orientation orientation);
+    void setSceneParams(qreal width, qreal height, QPageLayout::Orientation orientation);
 
     void setFont(const QFont &font);
 
@@ -63,9 +63,9 @@ public:
 
     int pageCount();
 
-    QPrinter::Orientation orientation(int index);
+    QPageLayout::Orientation orientation(int index);
 
-    bool print(const QString &printername, QPagedPaintDevice::PageSize pageSize, bool rotate90 = false);
+    bool print(const QString &printername, QPageSize pageSize, bool rotate90 = false);
 
     void print(QPainter *p);
 
@@ -96,7 +96,7 @@ private:
 
     int fCurrentPageIndex;
 
-    QMap<QGraphicsScene *, QPrinter::Orientation> fCanvasOrientation;
+    QMap<QGraphicsScene *, QPageLayout::Orientation> fCanvasOrientation;
 
     void setLineHeight();
 

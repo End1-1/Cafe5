@@ -20,7 +20,7 @@ bool C5PrintReciptA4::print(QString &err)
     p.setFont(f);
     QList<qreal> points;
     QStringList vals;
-    p.setSceneParams(2000, 2700, QPrinter::Portrait);
+    p.setSceneParams(2000, 2700, QPageLayout::Portrait);
     db[":f_id"] = fOrderUUID;
     db.exec("select concat(o.f_prefix, o.f_hallid) as f_ordernumber, ost.f_name as f_saletypename, "
             "o.f_amounttotal, o.f_amountcash, o.f_amountcard, o.f_amountother, o.f_datecash, "

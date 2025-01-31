@@ -191,6 +191,7 @@ bool C5SaleDoc::openDoc(const QString &uuid)
     }
     ui->wtoolbar->setEnabled(o.state != ORDER_STATE_CLOSE);
     ui->paymentFrame->setEnabled(o.state != ORDER_STATE_CLOSE);
+    countTotalQty();
     return true;
 }
 
@@ -948,6 +949,16 @@ void C5SaleDoc::countGrandTotal()
         grandTotal += total;
     }
     ui->leGrandTotal->setDouble(grandTotal);
+    countTotalQty();
+}
+
+void C5SaleDoc::countTotalQty()
+{
+    double totalqty = 0;
+    for (int i = 0; i < ui->tblGoods->rowCount(); i++) {
+        totalqty += ui->tblGoods->lineEdit(i, col_qty)->getDouble();
+    }
+    ui->leTotalQty->setDouble(totalqty);
 }
 
 bool C5SaleDoc::openDraft(const QString &id)
@@ -1185,7 +1196,7 @@ void C5SaleDoc::exportToAs(int doctype)
     }
     jo["body"] = ja;
     jo["params"] = jo;
-    jo["command"] = "magnit";
+    jo["command"] = "armsoft";
     jo["handler"] = "armsoft";
     jo["key"] = "asdf7fa8kk49888d!!jjdjmskkak98983mj???m";
     HttpQueryDialog *qd = new HttpQueryDialog(fDBParams, QString("ws://%1:%2").arg(b->ipAddress,

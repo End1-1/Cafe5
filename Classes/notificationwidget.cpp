@@ -2,7 +2,6 @@
 #include "ui_notificationwidget.h"
 #include <QDateTime>
 #include <QGraphicsDropShadowEffect>
-#include <QDesktopWidget>
 #include <QScreen>
 
 QList<NotificationWidget *> NotificationWidget::fWidgetList;

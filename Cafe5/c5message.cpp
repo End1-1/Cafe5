@@ -3,7 +3,8 @@
 #include "c5config.h"
 #include <QClipboard>
 #include <QTimer>
-#include <QSound>
+#include <QMediaPlayer>
+#include <QAudioOutput>
 
 C5Message::C5Message(QWidget *parent) :
 #ifdef WAITER
@@ -46,7 +47,12 @@ int C5Message::question(const QString &questionStr, const QString &yes, const QS
 void C5Message::timeout()
 {
     if (fPlaySound) {
-        QSound::play(":/icq.wav");
+        QMediaPlayer *mp = new QMediaPlayer();
+        auto *ao = new QAudioOutput();
+        mp->setAudioOutput(ao);
+        mp->setSource(QUrl(":/icq.wav"));
+        ao->setVolume(0.5);
+        mp->play();
     }
 }
 

@@ -3,18 +3,15 @@
 #include "worder.h"
 #include "c5database.h"
 #include "datadriver.h"
-#include "printtaxn.h"
 #include "sales.h"
 #include "c5config.h"
 #include "ndataprovider.h"
 #include "c5user.h"
 #include "dlggoodslist.h"
 #include "dlgpin.h"
-#include "dlgsplashscreen.h"
 #include "c5cleartablewidget.h"
 #include "searchitems.h"
 #include "wcustomerdisplay.h"
-#include "goodsreserve.h"
 #include "storeinput.h"
 #include "chatmessage.h"
 #include "selectprinters.h"
@@ -150,9 +147,7 @@ bool Working::eventFilter(QObject *watched, QEvent *event)
                 return true;
             case Qt::Key_S:
                 if (ke->modifiers() &Qt::ControlModifier) {
-                    SearchItems *si = new SearchItems();
-                    si->exec();
-                    si->deleteLater();
+                    openSearch();
                     event->accept();
                     return true;
                 }
@@ -365,6 +360,13 @@ int Working::ordersCount()
     } else {
         return ui->tab->count();
     }
+}
+
+void Working::openSearch()
+{
+    SearchItems *si = new SearchItems();
+    si->exec();
+    si->deleteLater();
 }
 
 void Working::timeout()
@@ -900,4 +902,9 @@ void Working::on_chRegisterCard_clicked()
 void Working::on_btnCashout_clicked()
 {
     DlgCashout().exec();
+}
+
+void Working::on_btnBooking_clicked()
+{
+    openSearch();
 }

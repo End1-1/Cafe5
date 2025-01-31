@@ -3,6 +3,7 @@
 #include "c5database.h"
 #include <QIcon>
 #include <QTableView>
+#include <QApplication>
 
 C5TableModel::C5TableModel(const QStringList &dbParams, QObject *parent) :
     QAbstractTableModel(parent),
@@ -99,12 +100,31 @@ void C5TableModel::sort(int column)
         fSortAsc = true;
     }
     fLastSortedColumn = column;
-    QMap<QVariant, int> data;
+    QMap<QString, int > data_s;
+    QMap<int, int> data_i;
+    QMap<double, int> data_d;
     foreach (int i, fProxyData) {
-        data.insertMulti(fRawData[i][column], i);
+        const QVariant &v = fRawData[i][column];
+        switch (v.typeId()) {
+            case QMetaType::QString:
+                data_s.insert(v.toString(), i);
+                break;
+            case QMetaType::Int:
+                data_i.insert(v.toInt(), i);
+                break;
+            case QMetaType::Double:
+                data_d.insert(v.toDouble(), i);
+                break;
+        }
     }
     beginResetModel();
-    fProxyData = data.values();
+    if (!data_s.isEmpty()) {
+        fProxyData = data_s.values();
+    } else  if (!data_i.isEmpty()) {
+        fProxyData = data_i.values();
+    } else if (!data_d.isEmpty()) {
+        fProxyData = data_d.values();
+    }
     if (!fSortAsc) {
         std::reverse(fProxyData.begin(), fProxyData.end());
     }
@@ -204,11 +224,11 @@ QVariant C5TableModel::data(const QModelIndex &index, int role) const
             return dataDisplay(fProxyData.at(index.row()), index.column());
         case Qt::EditRole:
             return fRawData.at(fProxyData.at(index.row())).at(index.column());
-        case Qt::BackgroundColorRole:
+        case Qt::BackgroundRole:
             if (fColorData.contains(fProxyData.at(index.row()))) {
                 return fColorData[fProxyData.at(index.row())][index.column()];
             }
-            return QVariant(QColor(Qt::white));
+            return QVariant(QApplication::palette().color(QPalette::Base));
         case Qt::FontRole: {
             QFont fo;
             if (fTableView) {
@@ -232,7 +252,7 @@ bool C5TableModel::setData(const QModelIndex &index, const QVariant &value, int 
             fRawData[fProxyData.at(index.row())][index.column()] = value;
             break;
         case Qt::CheckStateRole:
-            if (fCheckboxes && fSingleCheckBoxSelection && value > 0) {
+            if (fCheckboxes && fSingleCheckBoxSelection && value.toInt() > 0) {
                 for (int i = 0; i < fRawData.count(); i++) {
                     fRawData[i][0] = 0;
                 }
@@ -380,7 +400,7 @@ void C5TableModel::saveDataChanges()
                 db[":" + it.key()] = it.value();
             }
         }
-        if (fRawData.at(row).at(0).toString() == 0) {
+        if (fRawData.at(row).at(0).toString().toInt() == 0) {
             fRawData[row][0] = db.insert(fTableForUpdate, true);;
         } else {
             db.update(fTableForUpdate, where_id(fRawData.at(row).at(0).toInt()));
@@ -544,7 +564,7 @@ void C5TableModel::filterData()
     }
     QMap<int, QStringList> filter;
     for (QMap<int, QString>::const_iterator it = fFilters.constBegin(); it != fFilters.constEnd(); it++) {
-        filter[it.key()] = it.value().split("|", QString::SkipEmptyParts);
+        filter[it.key()] = it.value().split("|", Qt::SkipEmptyParts);
         if (filter[it.key()].count() == 0) {
             filter.remove(it.key());
         }
@@ -630,16 +650,16 @@ void C5TableModel::clearModel()
 QVariant C5TableModel::dataDisplay(int row, int column) const
 {
     QVariant v = fRawData.at(row).at(column);
-    switch (v.type()) {
-        case QVariant::Int:
+    switch (v.typeId()) {
+        case QMetaType::Int:
             return v.toString();
-        case QVariant::Date:
+        case QMetaType::QDate:
             return v.toDate().toString(FORMAT_DATE_TO_STR);
-        case QVariant::DateTime:
+        case QMetaType::QDateTime:
             return v.toDateTime().toString(FORMAT_DATETIME_TO_STR);
-        case QVariant::Time:
+        case QMetaType::QTime:
             return v.toTime().toString(FORMAT_TIME_TO_STR);
-        case QVariant::Double:
+        case QMetaType::Double:
             return float_str(v.toDouble(), 4);
         default:
             return v.toString();

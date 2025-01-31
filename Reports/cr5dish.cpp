@@ -150,7 +150,7 @@ void CR5Dish::printRecipes(bool v)
     QFont font(this->font());
     font.setPointSize(20);
     QSize paperSize(2000, 2800);
-    p.setSceneParams(paperSize.width(), paperSize.height(), QPrinter::Portrait);
+    p.setSceneParams(paperSize.width(), paperSize.height(), QPageLayout::Portrait);
     p.setFont(font);
     for (int i = 0; i < fModel->rowCount(); i++) {
         if (i > 0) {
@@ -159,7 +159,7 @@ void CR5Dish::printRecipes(bool v)
         w->setId(fModel->data(i, fModel->fColumnNameIndex[tr("Code")], Qt::EditRole).toInt());
         w->printPreview(p, showprice);
     }
-    p.print(pd.printer()->printerName(), QPrinter::A4);
+    p.print(pd.printer()->printerName(), QPageSize::A4);
 }
 
 void CR5Dish::buildWeb()
@@ -170,6 +170,7 @@ void CR5Dish::buildWeb()
 
 void CR5Dish::buildWebResponse(const QJsonObject &obj)
 {
+    Q_UNUSED(obj);
     fHttp->httpQueryFinished(sender());
     C5Message::info(tr("Build complete"));
 }

@@ -154,8 +154,8 @@ void CR5Reports::removeHandler(bool checked)
     for (const QModelIndex &ml : mil) {
         rowsSet.insert(ml.row());
     }
-    QList<int> rows = rowsSet.toList();
-    qSort(rows);
+    QList<int> rows = rowsSet.values();
+    std::sort(rows.begin(), rows.end());
     QStringList queries = fDeleteHandler.split(";", Qt::SkipEmptyParts);
     C5Database db(fDBParams);
     for (int r : rows) {

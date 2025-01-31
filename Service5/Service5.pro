@@ -8,6 +8,7 @@ RC_FILE = res.rc
 
 SOURCES += \
     ../Classes/logwriter.cpp \
+    armsoft.cpp \
     c5searchengine.cpp \
     utils/configini.cpp \
     utils/database.cpp \
@@ -20,6 +21,7 @@ SOURCES += \
 
 HEADERS += \
     ../Classes/logwriter.h \
+    armsoft.h \
     c5searchengine.h \
     utils/configini.h \
     utils/database.h \

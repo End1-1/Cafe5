@@ -603,7 +603,7 @@ void C5GoodsPriceOrder::on_btnPrint_clicked()
     C5Printing p;
     QFont f(qApp->font());
     p.setFont(f);
-    p.setSceneParams(2000, 2700, QPrinter::Portrait);
+    p.setSceneParams(2000, 2700, QPageLayout::Portrait);
     p.setFontSize(30);
     p.ctext(tr("Discount document"));
     p.br();
@@ -644,7 +644,7 @@ void C5GoodsPriceOrder::on_btnPrint_clicked()
     }
     QList<qreal> points;
     QStringList vals;
-    p.setSceneParams(2000, 2700, QPrinter::Portrait);
+    p.setSceneParams(2000, 2700, QPageLayout::Portrait);
     p.setFontSize(25);
     p.setFontBold(true);
     QString docTypeText;
