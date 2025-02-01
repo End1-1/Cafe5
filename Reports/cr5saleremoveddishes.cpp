@@ -92,7 +92,7 @@ void CR5SaleRemovedDishes::restoreColumnsWidths()
     }
 }
 
-bool CR5SaleRemovedDishes::tblDoubleClicked(int row, int column, const QList<QVariant> &v)
+bool CR5SaleRemovedDishes::tblDoubleClicked(int row, int column, const QVector<QJsonValue> &v)
 {
     Q_UNUSED(row);
     Q_UNUSED(column);

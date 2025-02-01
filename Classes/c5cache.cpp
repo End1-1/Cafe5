@@ -207,9 +207,9 @@ C5Cache::C5Cache(const QStringList &dbParams) :
     }
 }
 
-QList<QVariant> C5Cache::getJoinedColumn(const QString &columnName)
+QVector<QJsonValue> C5Cache::getJoinedColumn(const QString &columnName)
 {
-    QList<QVariant> result;
+    QVector<QJsonValue> result;
     int columnIndex = fCacheColumns[fId][columnName.toLower()];
     for (int i = 0; i < fCacheData.count(); i++) {
         result.append(fCacheData.at(i).at(columnIndex));
@@ -249,7 +249,7 @@ void C5Cache::refreshId(const QString &whereField, int id)
         fCacheData.removeAt(row);
     }
     C5Database db(fDBParams);
-    QList<QList<QVariant>> cacheData;
+    QVector<QVector<QJsonValue> > cacheData;
     QString sql = fCacheQuery[fId];
     db.exec(sql.replace("%idcond%", QString(" and %1=%2 ")
                         .arg(whereField, QString::number(id))), cacheData,

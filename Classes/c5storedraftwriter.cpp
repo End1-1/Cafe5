@@ -540,7 +540,7 @@ int C5StoreDraftWriter::rowCount(int container)
 
 QVariant C5StoreDraftWriter::value(int container, int row, const QString &key)
 {
-    QList<QList<QVariant> > *c = nullptr;
+    QVector<QVector<QJsonValue> > *c = nullptr;
     QHash<QString, int> *d = nullptr;
     switch (container) {
         case container_ecash:
@@ -573,7 +573,7 @@ QVariant C5StoreDraftWriter::value(int container, int row, const QString &key)
             break;
     }
     Q_ASSERT(c);
-    QList<QVariant> &datarow = ( *c)[row];
+    QVector<QJsonValue>  &datarow = ( *c)[row];
     int column = d->value(key);
     return datarow.at(column);
 }

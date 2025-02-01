@@ -14,36 +14,30 @@ DlgSmartReports::DlgSmartReports() :
     item->setData(Qt::UserRole, 1);
     item->setTextAlignment(Qt::AlignCenter);
     ui->list->addItem(item);
-
     item = new QListWidgetItem(ui->list);
     item->setText(tr("Sales by dishes with time"));
     item->setData(Qt::UserRole, 2);
     item->setTextAlignment(Qt::AlignCenter);
     ui->list->addItem(item);
-
     item = new QListWidgetItem(ui->list);
     item->setText(tr("Session orders"));
     item->setData(Qt::UserRole, 3);
     item->setTextAlignment(Qt::AlignCenter);
     ui->list->addItem(item);
-
     item = new QListWidgetItem(ui->list);
     item->setText(tr("Delivery"));
     item->setData(Qt::UserRole, 4);
     item->setTextAlignment(Qt::AlignCenter);
     ui->list->addItem(item);
-
     item = new QListWidgetItem(ui->list);
     item->setText(tr("Total sale"));
     item->setTextAlignment(Qt::AlignCenter);
     item->setData(Qt::UserRole, 5);
     ui->list->addItem(item);
-
     item = new QListWidgetItem(ui->list);
     item->setText(tr("Cancel"));
     item->setTextAlignment(Qt::AlignCenter);
     ui->list->addItem(item);
-
 }
 
 DlgSmartReports::~DlgSmartReports()
@@ -60,21 +54,21 @@ void DlgSmartReports::on_list_itemClicked(QListWidgetItem *item)
         return;
     }
     switch (item->data(Qt::UserRole).toInt()) {
-    case 1:
-        reportCommonDishes();
-        break;
-    case 2:
-        reportCommonDishesWithTime();
-        break;
-    case 3:
-        SessionOrders().exec();
-        break;
-    case 4:
-        printDeliveryReport();
-        break;
-    case 5:
-        printTotalReport();
-        break;
+        case 1:
+            reportCommonDishes();
+            break;
+        case 2:
+            reportCommonDishesWithTime();
+            break;
+        case 3:
+            SessionOrders().exec();
+            break;
+        case 4:
+            printDeliveryReport();
+            break;
+        case 5:
+            printTotalReport();
+            break;
     }
 }
 
@@ -84,9 +78,8 @@ void DlgSmartReports::reportCommonDishes()
     QFont font(qApp->font());
     font.setPointSize(28);
     C5Printing p;
-    p.setSceneParams(650, 2800, QPrinter::Portrait);
+    p.setSceneParams(650, 2800, QPageLayout::Portrait);
     p.setFont(font);
-
     if (QFile::exists("./logo_receipt.png")) {
         p.image("./logo_receipt.png", Qt::AlignHCenter);
         p.br();
@@ -101,7 +94,6 @@ void DlgSmartReports::reportCommonDishes()
     p.ctext(ui->leDateEnd->text());
     p.br();
     double total = 0;
-
     C5Database dd(fDBParams);
     dd[":f_datecash1"] = ui->leDateStart->date();
     dd[":f_datecash2"] = ui->leDateEnd->date();
@@ -131,7 +123,8 @@ void DlgSmartReports::reportCommonDishes()
         total += dd.getDouble("f_total");
         p.ltext(dd.getString("f_name"), 0);
         p.br();
-        p.ltext(QString("%1 X %2 = %3").arg(float_str(dd.getDouble("f_qty"), 2)).arg(dd.getDouble("f_price"), 2).arg(float_str(dd.getDouble("f_total"), 2)), 0);
+        p.ltext(QString("%1 X %2 = %3").arg(float_str(dd.getDouble("f_qty"), 2)).arg(dd.getDouble("f_price"),
+                2).arg(float_str(dd.getDouble("f_total"), 2)), 0);
         p.br();
         p.line();
         p.br(2);
@@ -150,15 +143,13 @@ void DlgSmartReports::reportCommonDishes()
     p.rtext(float_str(total, 2));
     p.br();
     p.br();
-
     p.line();
     p.br();
-
     p.setFontSize(18);
     p.ltext(tr("Printed"), 0);
     p.rtext(QDateTime::currentDateTime().toString(FORMAT_DATETIME_TO_STR));
     p.br();
-    p.print(C5Config::localReceiptPrinter(), QPrinter::Custom);
+    p.print(C5Config::localReceiptPrinter(), QPageSize::Custom);
 }
 
 void DlgSmartReports::reportCommonDishesWithTime()
@@ -167,9 +158,8 @@ void DlgSmartReports::reportCommonDishesWithTime()
     QFont font(qApp->font());
     font.setPointSize(28);
     C5Printing p;
-    p.setSceneParams(650, 2800, QPrinter::Portrait);
+    p.setSceneParams(650, 2800, QPageLayout::Portrait);
     p.setFont(font);
-
     if (QFile::exists("./logo_receipt.png")) {
         p.image("./logo_receipt.png", Qt::AlignHCenter);
         p.br();
@@ -184,7 +174,6 @@ void DlgSmartReports::reportCommonDishesWithTime()
     p.ctext(ui->leDateEnd->text() + " " + ui->leTimeEnd->text());
     p.br();
     double total = 0;
-
     C5Database dd(fDBParams);
     dd[":f_date1"] = QDateTime::fromString(ui->leDateStart->text() + " " + ui->leTimeStart->text(), "dd/MM/yyyy HH:mm");
     dd[":f_date2"] = QDateTime::fromString(ui->leDateEnd->text() + " " + ui->leTimeEnd->text(), "dd/MM/yyyy HH:mm");
@@ -213,7 +202,8 @@ void DlgSmartReports::reportCommonDishesWithTime()
         total += dd.getDouble("f_total");
         p.ltext(dd.getString("f_name"), 0);
         p.br();
-        p.ltext(QString("%1 X %2 = %3").arg(float_str(dd.getDouble("f_qty"), 2)).arg(dd.getDouble("f_price"), 2).arg(float_str(dd.getDouble("f_total"), 2)), 0);
+        p.ltext(QString("%1 X %2 = %3").arg(float_str(dd.getDouble("f_qty"), 2)).arg(dd.getDouble("f_price"),
+                2).arg(float_str(dd.getDouble("f_total"), 2)), 0);
         p.br();
         p.line();
         p.br(2);
@@ -232,15 +222,13 @@ void DlgSmartReports::reportCommonDishesWithTime()
     p.rtext(float_str(total, 2));
     p.br();
     p.br();
-
     p.line();
     p.br();
-
     p.setFontSize(18);
     p.ltext(tr("Printed"), 0);
     p.rtext(QDateTime::currentDateTime().toString(FORMAT_DATETIME_TO_STR));
     p.br();
-    p.print(C5Config::localReceiptPrinter(), QPrinter::Custom);
+    p.print(C5Config::localReceiptPrinter(), QPageSize::Custom);
 }
 
 void DlgSmartReports::printDeliveryReport()
@@ -249,9 +237,8 @@ void DlgSmartReports::printDeliveryReport()
     QFont font(qApp->font());
     font.setPointSize(28);
     C5Printing p;
-    p.setSceneParams(650, 2800, QPrinter::Portrait);
+    p.setSceneParams(650, 2800, QPageLayout::Portrait);
     p.setFont(font);
-
     if (QFile::exists("./logo_receipt.png")) {
         p.image("./logo_receipt.png", Qt::AlignHCenter);
         p.br();
@@ -265,12 +252,11 @@ void DlgSmartReports::printDeliveryReport()
     p.br();
     p.ctext(ui->leDateEnd->text() + " " + ui->leTimeEnd->text());
     p.br();
-
     QString sql ("SELECT h.f_id, concat(h.f_prefix, h.f_hallid) as f_hallid, "
-                    "date_format(cast(concat(f_dateclose, ' ', f_timeclose) as datetime),'%d/%m/%Y %H:%i' ) as f_date, h.f_amounttotal "
-                    "from o_header h "
-                    "left join o_header_flags f on f.f_id=h.f_id "
-                    "where f.f_1=1 and h.f_state=:f_state and cast(concat(h.f_dateclose, ' ', h.f_timeclose) as datetime) between :f_date1 and :f_date2 ");
+                 "date_format(cast(concat(f_dateclose, ' ', f_timeclose) as datetime),'%d/%m/%Y %H:%i' ) as f_date, h.f_amounttotal "
+                 "from o_header h "
+                 "left join o_header_flags f on f.f_id=h.f_id "
+                 "where f.f_1=1 and h.f_state=:f_state and cast(concat(h.f_dateclose, ' ', h.f_timeclose) as datetime) between :f_date1 and :f_date2 ");
     C5Database db(fDBParams);
     db[":f_date1"] = QDateTime::fromString(ui->leDateStart->text() + " " + ui->leTimeStart->text(), "dd/MM/yyyy HH:mm");
     db[":f_date2"] = QDateTime::fromString(ui->leDateEnd->text() + " " + ui->leTimeEnd->text(), "dd/MM/yyyy HH:mm");
@@ -290,15 +276,13 @@ void DlgSmartReports::printDeliveryReport()
     p.rtext(float_str(total, 2));
     p.br();
     p.br();
-
     p.line();
     p.br();
-
     p.setFontSize(18);
     p.ltext(tr("Printed"), 0);
     p.rtext(QDateTime::currentDateTime().toString(FORMAT_DATETIME_TO_STR));
     p.br();
-    p.print(C5Config::localReceiptPrinter(), QPrinter::Custom);
+    p.print(C5Config::localReceiptPrinter(), QPageSize::Custom);
 }
 
 void DlgSmartReports::printTotalReport()
@@ -307,9 +291,8 @@ void DlgSmartReports::printTotalReport()
     QFont font(qApp->font());
     font.setPointSize(28);
     C5Printing p;
-    p.setSceneParams(650, 2800, QPrinter::Portrait);
+    p.setSceneParams(650, 2800, QPageLayout::Portrait);
     p.setFont(font);
-
     if (QFile::exists("./logo_receipt.png")) {
         p.image("./logo_receipt.png", Qt::AlignHCenter);
         p.br();
@@ -323,12 +306,11 @@ void DlgSmartReports::printTotalReport()
     p.br();
     p.ctext(ui->leDateEnd->text() + " " + ui->leTimeEnd->text());
     p.br();
-
     QString sql ("SELECT date_format(f_datecash, '%d/%m/%Y' ) as f_datecash, sum(h.f_amounttotal) as f_amounttotal, "
-                "sum(f_amountcash) as f_amountcash, sum(f_amountcard) as f_amountcard "
-                "from o_header h "
-                "where h.f_state=:f_state and f_datecash between :f_date1 and :f_date2 "
-                "group by 1 ");
+                 "sum(f_amountcash) as f_amountcash, sum(f_amountcard) as f_amountcard "
+                 "from o_header h "
+                 "where h.f_state=:f_state and f_datecash between :f_date1 and :f_date2 "
+                 "group by 1 ");
     C5Database db(fDBParams);
     db[":f_date1"] = ui->leDateStart->date();
     db[":f_date2"] = ui->leDateEnd->date();
@@ -342,28 +324,23 @@ void DlgSmartReports::printTotalReport()
         p.ltext(tr("Total"), 0);
         p.rtext(float_str(db.getDouble("f_amounttotal"), 0));
         p.br();
-
         p.ltext(tr("Cash"), 0);
         p.rtext(float_str(db.getDouble("f_amountcash"), 0));
         p.br();
-
         p.ltext(tr("Card"), 0);
         p.rtext(float_str(db.getDouble("f_amountcard"), 0));
         p.br();
         p.line();
         p.br();
-
     }
     p.br();
-
     p.line();
     p.br();
-
     p.setFontSize(18);
     p.ltext(tr("Printed"), 0);
     p.rtext(QDateTime::currentDateTime().toString(FORMAT_DATETIME_TO_STR));
     p.br();
-    p.print(C5Config::localReceiptPrinter(), QPrinter::Custom);
+    p.print(C5Config::localReceiptPrinter(), QPageSize::Custom);
 }
 
 void DlgSmartReports::on_btnStartBack_clicked()

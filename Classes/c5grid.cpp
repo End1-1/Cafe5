@@ -226,7 +226,7 @@ bool C5Grid::on_tblView_doubleClicked(const QModelIndex &index)
     if (index.row() < 0 || index.column() < 0) {
         return false;
     }
-    QList<QVariant> values = fModel->getRowValues(index.row());
+    QVector<QJsonValue> values = fModel->getRowValues(index.row());
     if (tblDoubleClicked(index.row(), index.column(), values)) {
         return false;
     }
@@ -406,7 +406,7 @@ QMenu *C5Grid::buildTableViewContextMenu(const QPoint &point)
     return m;
 }
 
-bool C5Grid::tblDoubleClicked(int row, int column, const QList<QVariant> &values)
+bool C5Grid::tblDoubleClicked(int row, int column, const QVector<QJsonValue> &values)
 {
     emit tblDoubleClick(row, column, values);
     return false;

@@ -17,7 +17,7 @@ public:
 protected:
     virtual void refreshData() override;
 
-    virtual bool tblDoubleClicked(int row, int column, const QList<QVariant> &v) override;
+    virtual bool tblDoubleClicked(int row, int column, const QVector<QJsonValue> &v) override;
 
 private slots:
     void groupAction();

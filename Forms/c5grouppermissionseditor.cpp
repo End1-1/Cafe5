@@ -69,7 +69,7 @@ QToolBar *C5GroupPermissionsEditor::toolBar()
 
 void C5GroupPermissionsEditor::on_lbGroup_clicked()
 {
-    QList<QVariant> values;
+    QVector<QJsonValue> values;
     if (C5Selector::getValue(fDBParams, cache_users_groups, values)) {
         setPermissionsGroupId(values.at(0).toInt());
     }

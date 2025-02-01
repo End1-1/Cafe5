@@ -15,15 +15,9 @@ public:
 private slots:
     void actionAccess();
 
-    void actionSync();
-
-    void checkDatabase();
-
     void backupDatabase();
 
     void resetDatabase();
-
-    void uploadData();
 
     void done(QJsonObject);
 };

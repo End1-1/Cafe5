@@ -20,15 +20,15 @@ public:
 
     ~C5Selector();
 
-    static bool getValue(const QStringList &dbParams, int cache, QList<QVariant> &values);
+    static bool getValue(const QStringList &dbParams, int cache, QVector<QJsonValue> &values);
 
-    static bool getValue(const QStringList &dbParams, const QString &query, QList<QVariant> &values);
+    static bool getValue(const QStringList &dbParams, const QString &query, QVector<QJsonValue> &values);
 
-    static bool getValueOfColumn(const QStringList &dbParams, int cache, QList<QVariant> &values, int column);
+    static bool getValueOfColumn(const QStringList &dbParams, int cache, QVector<QJsonValue> &values, int column);
 
-    static bool getMultipleValues(const QStringList &dbParams, int cache, QList<QList<QVariant> > &values);
+    static bool getMultipleValues(const QStringList &dbParams, int cache, QList<QVector<QJsonValue> > &values);
 
-    static bool getValues(const QStringList &dbParams, const QString &sql, QList<QVariant> &values, const QHash<QString, QString> &translator);
+    static bool getValues(const QStringList &dbParams, const QString &sql, QVector<QJsonValue> &values, const QHash<QString, QString> &translator);
 
     void keyPressEvent(QKeyEvent *key) override;
 
@@ -37,7 +37,7 @@ public:
 private slots:
     void selectionChanged(const QItemSelection &selected, const QItemSelection &deselected);
 
-    virtual bool tblDoubleClicked(int row, int column, const QList<QVariant> &values);
+    virtual bool tblDoubleClicked(int row, int column, const QVector<QJsonValue> &values);
 
     void on_btnRefreshCache_clicked();
 
@@ -58,7 +58,7 @@ private:
 
     C5Grid *fGrid;
 
-    QList<QVariant> fValues;
+    QVector<QJsonValue> fValues;
 
     static QMap<QString, QMap<int, C5Selector*> > fSelectorList;
 

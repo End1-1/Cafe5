@@ -17,7 +17,7 @@ C5CostumerDebtPayment::C5CostumerDebtPayment(int type, const QStringList &dbPara
     ui->leCash->setSelector(dbParams, ui->leCashName, cache_cash_names);
     ui->leHall->setSelector(dbParams, ui->leHallName, cache_halls);
     ui->leCash->setCallbackDialog(this);
-    connect(ui->leCostumer, SIGNAL(done(QList<QVariant>)), this, SLOT(selectorDone(QList<QVariant>)));
+    connect(ui->leCostumer, SIGNAL(done(QVector<QJsonValue>)), this, SLOT(selectorDone(QVector<QJsonValue>)));
     fBClientDebt.source = type;
     ui->leType->setText(type == BCLIENTDEBTS_SOURCE_SALE ? tr("Customer payment") : tr("Partner payment"));
 }
@@ -58,7 +58,7 @@ void C5CostumerDebtPayment::setPartnerAndAmount(int partner, double amount, cons
     fClearFlag = clearFlag;
 }
 
-void C5CostumerDebtPayment::selectorCallback(int row, const QList<QVariant> &values)
+void C5CostumerDebtPayment::selectorCallback(int row, const QVector<QJsonValue> &values)
 {
     switch (row) {
         case cache_cash_names:

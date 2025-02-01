@@ -45,11 +45,8 @@ QToolBar *CR5Databases::toolBar()
             << ToolBarButtons::tbPrint;
         createStandartToolbar(btn);
         fToolBar->addAction(QIcon(":/access.png"), tr("Access"), this, SLOT(actionAccess()));
-        fToolBar->addAction(QIcon(":data-transfer.png"), tr("Synchronization"), this, SLOT(actionSync()));
-        fToolBar->addAction(QIcon(":/maintenance.png"), tr("Check\ndatabase"), this, SLOT(checkDatabase()));
         fToolBar->addAction(QIcon(":/save-file.png"), tr("Backup\ndatabase"), this, SLOT(backupDatabase()));
         fToolBar->addAction(QIcon(":/reset.png"), tr("Reset\ndatabase"), this, SLOT(resetDatabase()));
-        fToolBar->addAction(QIcon(":/restore.png"), tr("Upload\ndata"), this, SLOT(uploadData()));
     }
     return fToolBar;
 }
@@ -59,43 +56,9 @@ void CR5Databases::actionAccess()
     __mainWindow->createTab<C5DbUserAccess>(fDBParams);
 }
 
-void CR5Databases::actionSync()
-{
-    QList<QVariant> values = fModel->getRowValues(fTableView->currentIndex().row());
-    if (values.at(0).toString().isEmpty()) {
-        return;
-    }
-    QStringList p;
-    p.append(values.at(1).toString());
-    p.append(values.at(2).toString());
-    p.append(values.at(5).toString());
-    p.append(values.at(6).toString());
-    p.append(values.at(3).toString());
-    C5DataSynchronize *ds = new C5DataSynchronize(p);
-    ds->exec();
-    delete ds;
-}
-
-void CR5Databases::checkDatabase()
-{
-    QList<QVariant> values = fModel->getRowValues(fTableView->currentIndex().row());
-    if (values.at(0).toString().isEmpty()) {
-        return;
-    }
-    QStringList p;
-    p.append(values.at(1).toString());
-    p.append(values.at(2).toString());
-    p.append(values.at(5).toString());
-    p.append(values.at(6).toString());
-    p.append(values.at(3).toString());
-    C5CheckDatabase *ds = new C5CheckDatabase(p);
-    ds->exec();
-    delete ds;
-}
-
 void CR5Databases::backupDatabase()
 {
-    QList<QVariant> values = fModel->getRowValues(fTableView->currentIndex().row());
+    QVector<QJsonValue> values = fModel->getRowValues(fTableView->currentIndex().row());
     if (values.at(0).toString().isEmpty()) {
         return;
     }
@@ -137,42 +100,6 @@ void CR5Databases::resetDatabase()
         }
     }
     dr->deleteLater();
-}
-
-void CR5Databases::uploadData()
-{
-    QList<QVariant> values = fModel->getRowValues(fTableView->currentIndex().row());
-    if (values.at(0).toString().isEmpty()) {
-        return;
-    }
-    QString fileName = QFileDialog::getOpenFileName(this, tr("Select folder for dump"), "", "*.sql");
-    if (fileName.isEmpty()) {
-        return;
-    }
-    QString randomDBName = "db_" + C5Random::randomStr(10000, 99999);
-    C5Database db(values.at(1).toString(), values.at(2).toString(), values.at(5).toString(), values.at(6).toString());
-    db.exec("create database " + randomDBName + " default character set utf8 collate utf8_general_ci");
-    QProcess p;
-    p.setProcessChannelMode(QProcess::MergedChannels);
-    QStringList args;
-    args.append("-h");
-    args.append(values.at(1).toString());
-    args.append(randomDBName);
-    args.append("-u" + values.at(5).toString());
-    args.append("-p" + values.at(6).toString());
-    p.setStandardInputFile(fileName);
-    p.start(qApp->applicationDirPath() + "/mysql.exe", args);
-    p.waitForStarted(-1);
-    p.waitForFinished(-1);
-    if (p.exitCode() != 0) {
-        C5Message::error(tr("Upload with error") + "<br>" + p.readAll());
-        return;
-    }
-    QString sqlMsg = p.readAll();
-    QStringList randomDB = db.dbParams();
-    randomDB[1] = randomDBName;
-    db.exec("drop database "  + randomDBName);
-    C5Message::info(tr("Upload completed") + "<br>" + sqlMsg);
 }
 
 void CR5Databases::done(QJsonObject)

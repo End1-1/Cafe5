@@ -85,16 +85,16 @@ void CR5SaleFromStoreTotal::buildQuery()
     fColumnNameIndex["f_finalamount"] = nextCol++;
     fTranslation["f_final"] = tr("Final, qty");
     fTranslation["f_finalamount"] = tr("Final amount");
-    QList<QList<QVariant> > &rows = fModel->fRawData;
+    QVector<QVector<QJsonValue> > &rows = fModel->fRawData;
     rows.clear();
     //names
     db.exec("select g.f_id, g.f_name, gr.f_name as f_groupname from c_goods g inner join c_groups gr on gr.f_id=g.f_group order by f_name");
     int row = 0;
     QMap<int, int> goodsRowMap;
     while (db.nextRow()) {
-        QList<QVariant> emptyRow;
+        QVector<QJsonValue> emptyRow;
         for (int i = 0; i < 14; i++) {
-            emptyRow << QVariant();
+            emptyRow << QJsonValue();
         }
         emptyRow[0] = db.getString("f_groupname");
         emptyRow[1] = db.getInt("f_id");

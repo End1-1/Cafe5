@@ -16,7 +16,7 @@ public:
 protected:
     virtual int newRow() override;
 
-    virtual bool tblDoubleClicked(int row, int column, const QList<QVariant> &values) override;
+    virtual bool tblDoubleClicked(int row, int column, const QVector<QJsonValue> &values) override;
 };
 
 #endif // CR5GOODSRESERVATIONS_H

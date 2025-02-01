@@ -24,7 +24,7 @@ public:
 
     void setPartnerAndAmount(int partner, double amount, const QString &clearFlag);
 
-    virtual void selectorCallback(int row, const QList<QVariant> &values) override;
+    virtual void selectorCallback(int row, const QVector<QJsonValue> &values) override;
 
 private slots:
     void on_btnCancel_clicked();

@@ -19,7 +19,7 @@ protected:
 
     virtual void restoreColumnsWidths();
 
-    virtual bool tblDoubleClicked(int row, int column, const QList<QVariant> &values);
+    virtual bool tblDoubleClicked(int row, int column, const QVector<QJsonValue> &values);
 
 private slots:
     void transferToRoom();

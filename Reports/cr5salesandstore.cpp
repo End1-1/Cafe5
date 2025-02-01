@@ -71,7 +71,7 @@ void CR5SalesEffectiveness::rep1()
     fTranslation["f_finalqty"] = tr("Final qty");
     fTranslation["f_effectivity"] = tr("Effectivity");
     fTranslation["f_storedelta"] = tr("Store delta");
-    QList<QList<QVariant> > &rows = fModel->fRawData;
+    QVector<QVector<QJsonValue> > &rows = fModel->fRawData;
     fModel->clearModel();
     QHash<int, int> goodsRowMap;
     C5Database db(fDBParams);
@@ -97,7 +97,7 @@ void CR5SalesEffectiveness::rep1()
     db.exec(query);
     int storeIdx = db.columnCount();
     while (db.nextRow()) {
-        QList<QVariant> row;
+        QVector<QJsonValue> row;
         for (int i = 0, c = db.columnCount(); i < c; i++) {
             row.append(db.getValue(i));
         }
@@ -296,7 +296,7 @@ void CR5SalesEffectiveness::rep2()
     fTranslation["f_finalqty"] = tr("Final qty");
     fTranslation["f_effectivity"] = tr("Effectivity");
     fTranslation["f_storedelta"] = tr("Store delta");
-    QList<QList<QVariant> > &rows = fModel->fRawData;
+    QVector<QVector<QJsonValue> > &rows = fModel->fRawData;
     fModel->clearModel();
     QHash<int, int> goodsRowMap;
     C5Database db(fDBParams);
@@ -309,7 +309,7 @@ void CR5SalesEffectiveness::rep2()
     db.exec(query);
     int storeIdx = db.columnCount();
     while (db.nextRow()) {
-        QList<QVariant> row;
+        QVector<QJsonValue> row;
         for (int i = 0, c = db.columnCount(); i < c; i++) {
             row.append(db.getValue(i));
         }

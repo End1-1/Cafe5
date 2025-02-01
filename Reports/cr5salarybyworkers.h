@@ -19,7 +19,7 @@ public:
     virtual void buildQuery() override;
 
 protected:
-    virtual bool tblDoubleClicked(int row, int column, const QList<QVariant> &vals);
+    virtual bool tblDoubleClicked(int row, int column, const QVector<QJsonValue> &vals);
 
 private:
     QString fQuery;

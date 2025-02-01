@@ -51,7 +51,7 @@ void CR5SalaryByWorkers::buildQuery()
     C5ReportWidget::buildQuery();
 }
 
-bool CR5SalaryByWorkers::tblDoubleClicked(int row, int column, const QList<QVariant> &vals)
+bool CR5SalaryByWorkers::tblDoubleClicked(int row, int column, const QVector<QJsonValue> &vals)
 {
     Q_UNUSED(row);
     Q_UNUSED(column);

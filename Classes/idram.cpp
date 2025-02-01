@@ -6,18 +6,18 @@
 
 Idram::Idram(QObject *parent) : QObject(parent)
 {
-
 }
 
-bool Idram::check(const QString &server, const QString &sessionid, const QString &orderid, double &amount, QByteArray &out)
+bool Idram::check(const QString &server, const QString &sessionid, const QString &orderid, double &amount,
+                  QByteArray &out)
 {
     QString request = QString("{\"Detail\":\"%1\"}").arg(orderid);
     QString str;
     QString host, route, f = server;
     int hoststart = f.indexOf("//") + 2;
     int routestart = f.indexOf("/", hoststart + 1);
-    host = f.midRef(hoststart, routestart - hoststart).toString();
-    route = f.midRef(routestart, f.length() - routestart).toString();
+    host = f.mid(hoststart, routestart - hoststart);
+    route = f.mid(routestart, f.length() - routestart);
     str.append(QString("POST %1 HTTP/1.1\r\n").arg(route));
     str.append(QString("Host: %1\r\n").arg(host));
     str.append(QString("Content-Type: application/json;charset=UTF-8\r\n"));

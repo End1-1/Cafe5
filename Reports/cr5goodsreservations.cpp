@@ -60,7 +60,7 @@ int CR5GoodsReservations::newRow()
     return -1;
 }
 
-bool CR5GoodsReservations::tblDoubleClicked(int row, int column, const QList<QVariant> &values)
+bool CR5GoodsReservations::tblDoubleClicked(int row, int column, const QVector<QJsonValue> &values)
 {
     Q_UNUSED(column);
     if (row < 0 || values.count() == 0) {

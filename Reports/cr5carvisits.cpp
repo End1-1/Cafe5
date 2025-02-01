@@ -98,7 +98,7 @@ void CR5CarVisits::restoreColumnsWidths()
     }
 }
 
-bool CR5CarVisits::tblDoubleClicked(int row, int column, const QList<QVariant> &values)
+bool CR5CarVisits::tblDoubleClicked(int row, int column, const QVector<QJsonValue> &values)
 {
     Q_UNUSED(row);
     Q_UNUSED(column);

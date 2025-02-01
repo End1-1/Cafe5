@@ -131,7 +131,7 @@ protected:
 
     virtual QMenu *buildTableViewContextMenu(const QPoint &point);
 
-    virtual bool tblDoubleClicked(int row, int column, const QList<QVariant> &values);
+    virtual bool tblDoubleClicked(int row, int column, const QVector<QJsonValue> &values);
 
     virtual void executeSql(const QString &sql);
 
@@ -209,7 +209,7 @@ private slots:
 signals:
     void tblSingleClick(const QModelIndex &);
 
-    void tblDoubleClick(int row, int column, const QList<QVariant> &values);
+    void tblDoubleClick(int row, int column, const QVector<QJsonValue> &values);
 
     void refreshed();
 

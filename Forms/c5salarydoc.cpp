@@ -169,7 +169,7 @@ void C5SalaryDoc::getEmployesInOutList()
 
 void C5SalaryDoc::on_btnAddEmployee_clicked()
 {
-    QList<QVariant> vals;
+    QVector<QJsonValue> vals;
     if (!C5Selector::getValue(fDBParams, cache_users, vals)) {
         return;
     }

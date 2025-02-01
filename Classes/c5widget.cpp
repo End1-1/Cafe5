@@ -102,7 +102,7 @@ void C5Widget::hotKey(const QString &key)
     Q_UNUSED(key);
 }
 
-void C5Widget::selectorCallback(int row, const QList<QVariant> &values)
+void C5Widget::selectorCallback(int row, const QVector<QJsonValue> &values)
 {
     Q_UNUSED(values);
     Q_UNUSED(row);

@@ -629,7 +629,7 @@ void CE5Goods::on_btnNewUnit_clicked()
 
 void CE5Goods::on_btnAddGoods_clicked()
 {
-    QList<QVariant> vals;
+    QVector<QJsonValue> vals;
     if (!C5Selector::getValue(fDBParams, cache_goods, vals)) {
         return;
     }

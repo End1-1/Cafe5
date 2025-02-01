@@ -56,6 +56,7 @@ win32: QMAKE_CXXFLAGS -= -Zc:strictStrings
 
 HEADERS += \
     ../Classes/amkbd.h \
+    ../Classes/format_date.h \
     ../Classes/logwriter.h \
     ../Forms/c5goodsprice.h \
     ../NTable/ninterface.h \

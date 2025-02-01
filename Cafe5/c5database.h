@@ -1,6 +1,7 @@
 #ifndef C5Database_H
 #define C5Database_H
 
+#include "format_date.h"
 #include <QSqlDatabase>
 #include <QMap>
 #include <QVariant>
@@ -32,8 +33,6 @@ public:
 
     QStringList dbParams();
 
-    void init();
-
     bool isOpened();
 
     bool isReady();
@@ -60,13 +59,9 @@ public:
 
     bool exec(const QString &sqlQuery);
 
-    bool exec(const QString &sqlQuery, QList<QList<QVariant> > &dbrows);
+    bool exec(const QString &sqlQuery, QVector<QVector<QJsonValue> > &dbrows);
 
-    bool exec(const QString &sqlQuery, QList<QList<QVariant> > &dbrows, QHash<QString, int> &columns);
-
-    bool exec(const QString &sqlQuery, QMap<QString, QList<QVariant> > &dbrows, QMap<QString, int> &columns);
-
-    bool execDirect(const QString &sqlQuery);
+    bool exec(const QString &sqlQuery, QVector<QVector<QJsonValue> > &dbrows, QHash<QString, int> &columns);
 
     bool execSqlList(const QStringList &sqlList);
 
@@ -74,13 +69,11 @@ public:
 
     static QString uuid();
 
-    QByteArray uuid_bin();
-
     QByteArray uuid_getbin(QString u);
 
     QMap<QString, QVariant> fBindValues;
 
-    QList<QList<QVariant> > fDbRows;
+    QVector<QVector<QJsonValue> > fDbRows;
 
     QString fLastError;
 
@@ -92,7 +85,7 @@ public:
 
     bool first();
 
-    bool nextRow(QList<QVariant> &row);
+    bool nextRow(QVector<QJsonValue> &row);
 
     bool nextRow();
 
@@ -118,7 +111,7 @@ public:
 
     bool deleteTableEntry(const QString &table, const QVariant &id);
 
-    inline QVariant getValue(int column)
+    inline QJsonValue getValue(int column)
     {
         return fDbRows.at(fCursorPos).at(column);
     }
@@ -190,47 +183,45 @@ public:
 
     inline QDate getDate(int row, const QString &columnName)
     {
-        return fDbRows.at(row).at(fNameColumnMap[columnName.toLower()]).toDate();
+        return QDate::fromString(fDbRows.at(row).at(fNameColumnMap[columnName.toLower()]).toString(), FORMAT_DATE_TO_STR);
     }
 
     inline QDate getDate(const QString &columnName)
     {
-        return fDbRows.at(fCursorPos).at(fNameColumnMap[columnName.toLower()]).toDate();
+        return QDate::fromString(fDbRows.at(fCursorPos).at(fNameColumnMap[columnName.toLower()]).toString(),
+                                 FORMAT_DATE_TO_STR);
     }
 
     inline QDate getDate(int column)
     {
-        return fDbRows.at(fCursorPos).at(column).toDate();
+        return QDate::fromString(fDbRows.at(fCursorPos).at(column).toString(), FORMAT_DATE_TO_STR);
     }
 
     inline QTime getTime(int column)
     {
-        return fDbRows.at(fCursorPos).at(column).toTime();
+        return QTime::fromString(fDbRows.at(fCursorPos).at(column).toString());
     }
 
     inline QTime getTime(const QString &columnName)
     {
-        return fDbRows.at(fCursorPos).at(fNameColumnMap[columnName.toLower()]).toTime();
+        return QTime::fromString(fDbRows.at(fCursorPos).at(fNameColumnMap[columnName.toLower()]).toString());
     }
 
     inline QDateTime getDateTime(int row, const QString &columnName)
     {
-        return fDbRows.at(row).at(fNameColumnMap[columnName.toLower()]).toDateTime();
+        return QDateTime::fromString(fDbRows.at(row).at(fNameColumnMap[columnName.toLower()]).toString(),
+                                     FORMAT_DATETIME_TO_STR);
     }
 
     inline QDateTime getDateTime(const QString &columnName)
     {
-        return fDbRows.at(fCursorPos).at(fNameColumnMap[columnName.toLower()]).toDateTime();
+        return QDateTime::fromString(fDbRows.at(fCursorPos).at(fNameColumnMap[columnName.toLower()]).toString(),
+                                     FORMAT_DATETIME_TO_STR);
     }
 
     inline QDateTime getDateTime(int column)
     {
-        return fDbRows.at(fCursorPos).at(column).toDateTime();
-    }
-
-    inline QList<QVariant> &row()
-    {
-        return fDbRows[fCursorPos];
+        return QDateTime::fromString(fDbRows.at(fCursorPos).at(column).toString(), FORMAT_DATETIME_TO_STR);
     }
 
     QString columnName(int index);
@@ -247,9 +238,9 @@ public:
 
     void removeBindValue(const QString &key);
 
-    void setValue(int row, int column, const QVariant &value);
+    void setValue(int row, int column, const QJsonValue &value);
 
-    void setValue(int row, const QString &columnName, const QVariant &value);
+    void setValue(int row, const QString &columnName, const QJsonValue &value);
 
     void logEvent(const QString &event);
 

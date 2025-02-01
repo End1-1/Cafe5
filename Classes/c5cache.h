@@ -3,7 +3,7 @@
 
 #include <QObject>
 #include <QMap>
-#include <QVariant>
+#include <QJsonValue>
 
 #define cache_users_groups 1
 #define cache_users_states 2
@@ -70,17 +70,17 @@ public:
         return fCacheData.at(row).at(column).toString();
     }
 
-    inline QList<QVariant> getRow(int row)
+    inline QVector<QJsonValue> getRow(int row)
     {
         return fCacheData.at(row);
     }
 
-    inline QList<QVariant> getValuesForId(int id)
+    inline QVector<QJsonValue> getValuesForId(int id)
     {
-        return find(id) > -1 ? getRow(find(id)) : QList<QVariant>();
+        return find(id) > -1 ? getRow(find(id)) : QVector<QJsonValue>();
     }
 
-    QList<QVariant> getJoinedColumn(const QString &columnName);
+    QVector<QJsonValue> getJoinedColumn(const QString &columnName);
 
     QString getString(int id);
 
@@ -127,7 +127,7 @@ public:
     QString query(int cacheId);
 
 protected:
-    QList<QList<QVariant> > fCacheData;
+    QVector<QVector<QJsonValue> > fCacheData;
 
     QMap<int, int> fCacheIdRow;
 

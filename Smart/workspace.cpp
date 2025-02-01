@@ -33,7 +33,6 @@
 #include <QScrollBar>
 #include <QInputDialog>
 #include <QScreen>
-#include <QDesktopWidget>
 #include <QPropertyAnimation>
 #include <QParallelAnimationGroup>
 #include <QColor>
@@ -902,7 +901,7 @@ void Workspace::on_btnSetIdram_clicked()
     //        QFont font(qApp->font());
     //        font.setPointSize(24);
     //        C5Printing p;
-    //        p.setSceneParams(650, 2800, QPrinter::Portrait);
+    //        p.setSceneParams(650, 2800, QPageLayout::Portrait);
     //        p.setFont(font);
     //        p.setFontBold(true);
     //        p.ctext(fOrderUuid);
@@ -956,7 +955,7 @@ void Workspace::on_btnSetIdram_clicked()
     //        p.br();
     //        p.ltext("_", 0);
     //        p.br();
-    //        p.print(C5Config::localReceiptPrinter(), QPrinter::Custom);
+    //        p.print(C5Config::localReceiptPrinter(), QPageSize::Custom);
     //    }
 }
 
@@ -1185,7 +1184,7 @@ bool Workspace::printReceipt(const QString &id, bool printSecond, bool precheck)
     font.setPointSize(basefont);
     font.setBold(true);
     C5Printing p;
-    p.setSceneParams(650, 2800, QPrinter::Portrait);
+    p.setSceneParams(650, 2800, QPageLayout::Portrait);
     p.setFont(font);
     QMap<int, QMap<QString, QVariant> > packages;
     QJsonObject jtax, jin;
@@ -1423,7 +1422,7 @@ bool Workspace::printReceipt(const QString &id, bool printSecond, bool precheck)
     p.ltext(QString("%1: %2").arg(tr("Sample")).arg(db.getInt("f_print") + 1), 0);
     p.br();
     p.ltext(".", 0);
-    p.print(C5Config::localReceiptPrinter(), QPrinter::Custom);
+    p.print(C5Config::localReceiptPrinter(), QPageSize::Custom);
     db[":f_print"] = db.getInt("f_print") + 1;
     db.update("o_header", "f_id", id);
     if (printSecond) {
@@ -1441,7 +1440,7 @@ void Workspace::printService(const QString &printerName, const QJsonObject &h, c
     int basesize = __c5config.getValue(param_service_print_font_size).toInt();
     font.setPointSize(basesize);
     C5Printing p;
-    p.setSceneParams(650, 2800, QPrinter::Portrait);
+    p.setSceneParams(650, 2800, QPageLayout::Portrait);
     p.setFont(font);
     p.setFontBold(true);
     p.ctext(tr("Receipt #") + QString("%1%2").arg(h["f_prefix"].toString(), QString::number(h["f_hallid"].toInt())));
@@ -1499,7 +1498,7 @@ void Workspace::printService(const QString &printerName, const QJsonObject &h, c
     if (fPrinterAliases.contains(printerName)) {
         finalPrinter = fPrinterAliases[printerName];
     }
-    p.print(finalPrinter, QPrinter::Custom);
+    p.print(finalPrinter, QPageSize::Custom);
 }
 
 void Workspace::showCustomerDisplay()
@@ -1512,8 +1511,8 @@ void Workspace::showCustomerDisplay()
     } else {
         s.setValue("customerdisplay", true);
         fCustomerDisplay = new WCustomerDisplay();
-        if (qApp->desktop()->screenCount() > 1) {
-            fCustomerDisplay->move(qApp->desktop()->screenGeometry(1).x(), qApp->desktop()->screenGeometry(1).y());
+        if (qApp->screens().count() > 1) {
+            fCustomerDisplay->move(qApp->primaryScreen()->geometry().x(), qApp->primaryScreen()->geometry().y());
             fCustomerDisplay->showMaximized();
             fCustomerDisplay->showFullScreen();
         } else {
@@ -1597,7 +1596,7 @@ void Workspace::initResponse(const QJsonObject &jdoc)
     ui->tblPart2->setRowCount(1);
     QTableWidgetItem *itemAll = new QTableWidgetItem(tr("POPULAR"));
     itemAll->setData(Qt::UserRole, -1);
-    itemAll->setData(Qt::BackgroundColorRole, -1);
+    itemAll->setData(Qt::BackgroundRole, -1);
     ui->tblPart2->setItem(row, col, itemAll);
     col++;
     if (col == ui->tblPart2->columnCount()) {
@@ -1611,7 +1610,7 @@ void Workspace::initResponse(const QJsonObject &jdoc)
         }
         QTableWidgetItem *item = new QTableWidgetItem(j["f_name"].toString());
         item->setData(Qt::UserRole, j["f_id"].toInt());
-        item->setData(Qt::BackgroundColorRole, j["f_color"].toInt());
+        item->setData(Qt::BackgroundRole, j["f_color"].toInt());
         ui->tblPart2->setItem(row, col, item);
         col++;
         if (col == ui->tblPart2->columnCount()) {
@@ -1678,7 +1677,7 @@ void Workspace::initResponse(const QJsonObject &jdoc)
     stretchTableColumns(ui->tblPart2);
     on_btnShowDishes_clicked();
     QSettings s(_ORGANIZATION_, _APPLICATION_ + QString("\\") + _MODULE_);
-    if (s.value("customerdisplay").toBool() && qApp->desktop()->screenCount() > 1) {
+    if (s.value("customerdisplay").toBool() && qApp->screens().count() > 1) {
         showCustomerDisplay();
     }
     LogWriter::write(LogWriterLevel::verbose, "init", "tables");
@@ -1861,20 +1860,6 @@ void Workspace::voidResponse(const QJsonObject &jdoc)
 void Workspace::removeDishResponse(const QJsonObject &jdoc)
 {
     Q_UNUSED(jdoc);
-    // QJsonObject jo = jdoc["data"].toObject();
-    // for (int i = 0; i < ui->tblOrder->rowCount(); i++) {
-    //     Dish d = ui->tblOrder->item(i, 0)->data(Qt::UserRole).value<Dish>();
-    //     if (d.obodyId == jo["obodyid"].toString()) {
-    //         d.state = jo["state"].toInt();
-    //         ui->tblOrder->item(i, 0)->setData(Qt::UserRole, QVariant::fromValue(d));
-    //         updateInfo(i);
-    //     }
-    //     if (d.state == 1) {
-    //         d.qty2 = abs(d.qty2) * -1;
-    //     }
-    // }
-    // ui->tblOrder->viewport()->update();
-    // countTotal();
     httpStop(sender());
     createHttpRequest("/engine/smart/opentable.php", QJsonObject{{"table", fTable}}, SLOT(
         openTableResponse(QJsonObject)));

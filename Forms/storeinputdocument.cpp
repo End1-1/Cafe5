@@ -166,7 +166,7 @@ void StoreInputDocument::disconnectSlotSignal(int row)
 
 void StoreInputDocument::on_btnAddRow_clicked()
 {
-    QList<QVariant> vals;
+    QVector<QJsonValue> vals;
     if (!C5Selector::getValueOfColumn(fDBParams, cache_goods, vals, 3)) {
         return;
     }
@@ -180,7 +180,7 @@ void StoreInputDocument::on_btnAddRow_clicked()
 
 void StoreInputDocument::on_toolButton_clicked()
 {
-    QList<QVariant> vals;
+    QVector<QJsonValue> vals;
     if (!C5Selector::getValueOfColumn(fDBParams, cache_goods_store, vals, 2)) {
         return;
     }
@@ -407,7 +407,7 @@ void StoreInputDocument::removeDocument()
 
 void StoreInputDocument::on_btnSetPartner_clicked()
 {
-    QList<QVariant> vals;
+    QVector<QJsonValue> vals;
     if (!C5Selector::getValueOfColumn(fDBParams, cache_goods_partners, vals, -1)) {
         return;
     }

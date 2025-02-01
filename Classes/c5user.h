@@ -54,7 +54,7 @@ public:
 private:
     C5User();
 
-    QStringList fPermissions;
+    QVector<int> fPermissions;
 
     bool fValid;
 

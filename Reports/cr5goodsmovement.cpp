@@ -175,7 +175,7 @@ void CR5GoodsMovement::setInOut(int inout)
     fFilter->setInOut(inout);
 }
 
-bool CR5GoodsMovement::tblDoubleClicked(int row, int column, const QList<QVariant> &values)
+bool CR5GoodsMovement::tblDoubleClicked(int row, int column, const QVector<QJsonValue> &values)
 {
     Q_UNUSED(row);
     Q_UNUSED(column);

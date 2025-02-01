@@ -117,7 +117,7 @@ bool C5User::authByPinPass(const QString &pin, const QString &pass)
 
 bool C5User::check(int permission)
 {
-    if(fPermissions.contains(QString::number(permission))) {
+    if(fPermissions.contains(permission)) {
         return true;
     }
     fError = tr("You have not permission");
@@ -216,7 +216,7 @@ void C5User::getPermissions()
     db[":f_group"] = group();
     db.exec("select f_key, f_value from s_user_access where f_group=:f_group and f_value=1");
     while (db.nextRow()) {
-        fPermissions.append(db.getString("f_key"));
+        fPermissions.append(db.getInt("f_key"));
     }
 }
 

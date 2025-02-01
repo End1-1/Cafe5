@@ -792,7 +792,7 @@ bool C5StoreDoc::writeDocument(int state, QString &err)
     jdoc["session"] = session;
     QJsonDocument json(jdoc);
     C5Database db(fDBParams);
-    if (!db.execDirect(QString("call sf_create_store_document('%1')").arg(QString(json.toJson(QJsonDocument::Compact))))) {
+    if (!db.execNetwork(QString("call sf_create_store_document('%1')").arg(QString(json.toJson(QJsonDocument::Compact))))) {
         err = db.fLastError;
         return false;
     }
@@ -1287,7 +1287,7 @@ void C5StoreDoc::addGoodsByCalculation(int goods, const QString &name, double qt
     int r;
     auto *c = C5Cache::cache(fDBParams, cache_goods);
     while (db.nextRow()) {
-        QList<QVariant> vg = c->getValuesForId(db.getInt("f_goods"));
+        QVector<QJsonValue> vg = c->getValuesForId(db.getInt("f_goods"));
         r = -1;
         for (int i = 0; i < ui->tblGoods->rowCount(); i++) {
             if (ui->tblGoods->getInteger(i, 3) == db.getInt("f_goods")) {
@@ -2280,7 +2280,7 @@ void C5StoreDoc::newDoc()
 
 void C5StoreDoc::getInput()
 {
-    QList<QVariant> vals;
+    QVector<QJsonValue> vals;
     if (!C5Selector::getValueOfColumn(fDBParams, cache_goods, vals, 3)) {
         return;
     }
@@ -2321,7 +2321,7 @@ void C5StoreDoc::getOutput()
                     .arg(ui->leStoreOutput->getInteger())
                     .arg(ui->deDate->toMySQLDate())
                     .arg(showAmount);
-    QList<QVariant> vals;
+    QVector<QJsonValue> vals;
     QHash<QString, QString> trans;
     trans["f_goods"] = tr("Code");
     trans["f_groupname"] = tr("Group");
@@ -2939,7 +2939,7 @@ void C5StoreDoc::duplicateAsInput()
 
 void C5StoreDoc::on_btnAddDish_clicked()
 {
-    QList<QVariant> vals;
+    QVector<QJsonValue> vals;
     if (!C5Selector::getValue(fDBParams, cache_dish, vals)) {
         return;
     }
@@ -3018,7 +3018,7 @@ void C5StoreDoc::on_btnFillRemote_clicked(bool checked)
 
 void C5StoreDoc::on_btnAddPackages_clicked()
 {
-    QList<QVariant> vals;
+    QVector<QJsonValue> vals;
     if (!C5Selector::getValue(fDBParams, cache_dish_package, vals)) {
         return;
     }
@@ -3041,7 +3041,7 @@ void C5StoreDoc::on_btnAddPackages_clicked()
 
 void C5StoreDoc::on_btnChangePartner_clicked()
 {
-    QList<QVariant> values;
+    QVector<QJsonValue> values;
     if (!C5Selector::getValue(fDBParams, cache_goods_partners, values)) {
         return;
     }

@@ -47,7 +47,6 @@ SOURCES += \
     ../Classes/c5widget.cpp \
     ../Classes/c5witerconf.cpp \
     ../Classes/calculator.cpp \
-    ../Classes/checkforupdatethread.cpp \
     ../Classes/dlgpassword.cpp \
     ../Classes/fileversion.cpp \
     ../Classes/idram.cpp \
@@ -148,7 +147,6 @@ HEADERS += \
     ../Classes/c5widget.h \
     ../Classes/c5witerconf.h \
     ../Classes/calculator.h \
-    ../Classes/checkforupdatethread.h \
     ../Classes/dlgpassword.h \
     ../Classes/fileversion.h \
     ../Classes/idram.h \

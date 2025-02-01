@@ -42,13 +42,17 @@ public:
 
     virtual QVariant data(const QModelIndex &index, int role) const;
 
-    inline QVariant data(int row, int column, int role) const {return data(index(row, column), role); }
+    inline QVariant data(int row, int column, int role) const
+    {
+        return data(index(row, column), role);
+    }
 
     virtual bool setData(const QModelIndex &index, const QVariant &value, int role = Qt::EditRole);
 
     virtual bool setData(int row, int column, const QVariant &value, int role = Qt::EditRole);
 
-    void setRowToUpdate(int row, const QString &field = "", const QVariant &value = QVariant(), const QColor &rowColor = QColor::fromRgb(210, 150, 60));
+    void setRowToUpdate(int row, const QString &field = "", const QVariant &value = QVariant(),
+                        const QColor &rowColor = QColor::fromRgb(210, 150, 60));
 
     void setRowColor(int row, const QColor &color);
 
@@ -64,11 +68,14 @@ public:
 
     void removeRow(int row, const QModelIndex &parent = QModelIndex());
 
-    QList<QVariant> getRowValues(int row);
+    QVector<QJsonValue> getRowValues(int row);
 
     void saveDataChanges();
 
-    inline bool hasUpdates() {return fRowToUpdate.count() > 0;}
+    inline bool hasUpdates()
+    {
+        return fRowToUpdate.count() > 0;
+    }
 
     void setFilter(int column, const QString &filter);
 
@@ -94,7 +101,7 @@ public:
 
     QList<int> fColumnsForUpdate;
 
-    QList<QList<QVariant> > fRawData;
+    QVector<QVector<QJsonValue> > fRawData;
 
 private:
     QStringList fDBParams;
@@ -109,7 +116,7 @@ private:
 
     bool fSingleCheckBoxSelection;
 
-    QList<int> fProxyData;
+    QVector<int> fProxyData;
 
     QMap<int, QList<QColor> > fColorData;
 
@@ -121,11 +128,11 @@ private:
 
     QMap<int, QMap<QString, QVariant> > fAddDataToUpdate;
 
-    QMap<int, QString> fFilters;
+    QHash<int, QString> fFilters;
 
     QHash<QModelIndex, QFont> fCellFont;
 
-    inline QVariant dataDisplay(int row, int column) const;
+    inline QString dataDisplay(int row, int column) const;
 
     void filterData();
 

@@ -21,7 +21,7 @@ public:
     {
     public:
         QHash<QString, int> fColumns;
-        QList<QList<QVariant> > fRows;
+        QList<QVector<QJsonValue> > fRows;
         QVariant value(int row, const QString &column)
         {
             QVariant v = fRows[row][fColumns[column.toLower()] + 1];
@@ -41,7 +41,7 @@ private slots:
 
     void selectionChanged(const QItemSelection &selected, const QItemSelection &deselected);
 
-    virtual bool tblDoubleClicked(int row, int column, const QList<QVariant> &values);
+    virtual bool tblDoubleClicked(int row, int column, const QVector<QJsonValue> &values);
 
     void on_btnRefreshCache_clicked();
 
@@ -60,7 +60,7 @@ private:
 
     void refresh();
 
-    QList<QList<QVariant> > fValues;
+    QList<QVector<QJsonValue> > fValues;
 
     bool fReset;
 

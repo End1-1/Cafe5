@@ -57,7 +57,7 @@ bool CR5CashDetailed::on_tblView_doubleClicked(const QModelIndex &index)
     if (index.row() < 0 || index.column() < 0) {
         return false;
     }
-    QList<QVariant> values = fModel->getRowValues(index.row());
+    QVector<QJsonValue> values = fModel->getRowValues(index.row());
     if (values.at(0).toString().isEmpty()) {
         return false;
     }
@@ -79,9 +79,9 @@ void CR5CashDetailed::buildQuery()
             return;
         }
     }
-    QList<QVariant> er;
-    er << QVariant() << QVariant() << QVariant() << QVariant() << QVariant() << QVariant() << QVariant();
-    QList<QList<QVariant> > &rows = fModel->fRawData;
+    QVector<QJsonValue> er;
+    er << QJsonValue() << QJsonValue() << QJsonValue() << QJsonValue() << QJsonValue() << QJsonValue() << QJsonValue();
+    QVector<QVector<QJsonValue> > &rows = fModel->fRawData;
     rows.clear();
     QString where = "where 1=1 ";
     if (fFilter->shift() > 0) {
@@ -107,7 +107,7 @@ void CR5CashDetailed::buildQuery()
         rows.append(er);
         r = rows.count() - 1;
         rows[r][col_header] = db.getString("f_header");
-        rows[r][col_date] = db.getDate("f_date");
+        rows[r][col_date] = db.getString("f_date");
         rows[r][col_remark] = db.getString("f_remarks");
         rows[r][col_detail] = "";
         if (db.getDouble("f_amount") > 0.001) {
@@ -142,7 +142,7 @@ void CR5CashDetailed::buildQuery()
         rows.append(er);
         r = rows.count() - 1;
         rows[r][col_header] = db.getString("f_header");
-        rows[r][col_date] = db.getDate("f_date");
+        rows[r][col_date] = db.getString("f_date");
         rows[r][col_remark] = db.getString("f_comment");
         rows[r][col_detail] = db.getString("f_remarks");
         if (db.getInt("f_sign") == 1) {

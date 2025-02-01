@@ -133,7 +133,7 @@ void CR5ConsumptionBySales::buildQuery()
         C5Message::info(tr("Store must be defined"));
         return;
     }
-    QList<QList<QVariant> > &rows = fModel->fRawData;
+    QVector<QVector<QJsonValue>> &rows = fModel->fRawData;
     rows.clear();
     QMap<int, int> goodsMap;
     QString cond = " where c.f_id>0 ";
@@ -149,21 +149,21 @@ void CR5ConsumptionBySales::buildQuery()
                     "left join c_units u on u.f_id=c.f_unit %1 "
                     "order by 2, 3").arg(cond));
     while (db.nextRow()) {
-        QList<QVariant> row;
+        QVector<QJsonValue> row;
         row << db.getInt("f_id")
             << db.getString("f_groupname")
             << db.getString("f_name")
             << db.getString("f_scancode")
-            << QVariant()
-            << QVariant()
-            << QVariant()
-            << QVariant()
-            << QVariant()
-            << QVariant()
-            << QVariant()
-            << QVariant()
+            << QJsonValue()
+            << QJsonValue()
+            << QJsonValue()
+            << QJsonValue()
+            << QJsonValue()
+            << QJsonValue()
+            << QJsonValue()
+            << QJsonValue()
             << db.getString("f_unitname")
-            << QVariant();
+            << QJsonValue();
         rows.append(row);
         goodsMap[db.getInt("f_id")] = rows.count() - 1;
     }
@@ -453,7 +453,7 @@ void CR5ConsumptionBySales::storeoutResponse(const QJsonObject &jdoc)
     }
 }
 
-bool CR5ConsumptionBySales::tblDoubleClicked(int row, int column, const QList<QVariant> &values)
+bool CR5ConsumptionBySales::tblDoubleClicked(int row, int column, const QVector<QJsonValue> &values)
 {
     if (values.count() == 0) {
         return true;
@@ -547,7 +547,7 @@ void CR5ConsumptionBySales::makeOutput(bool v)
 {
     Q_UNUSED(v);
     QMap<int, double> goodsSale, goodsLost, goodsOver;
-    QList<QList<QVariant> > &rows = fModel->fRawData;
+    QVector<QVector<QJsonValue>> &rows = fModel->fRawData;
     for (int i = 0; i < rows.count(); i++) {
         // if (rows[i][col_qtyinv].toString().isEmpty()) {
         //     //continue;
@@ -612,7 +612,7 @@ void CR5ConsumptionBySales::salesOutput(bool v)
 {
     Q_UNUSED(v);
     QMap<int, double> goodsSale;
-    QList<QList<QVariant> > &rows = fModel->fRawData;
+    QVector<QVector<QJsonValue> > &rows = fModel->fRawData;
     for (int i = 0; i < rows.count(); i++) {
         double qty = rows[i][col_qtysale].toDouble();
         if (qty > 0.0001) {
@@ -742,7 +742,7 @@ void CR5ConsumptionBySales::semireadyInOut()
                         "left join c_units gu on gu.f_id=g.f_unit "
                         "where g.f_id=:f_id");
                 db.nextRow();
-                QList<QVariant> row;
+                QVector<QJsonValue> row;
                 row << db.getInt("f_id")
                     << db.getString("f_groupname")
                     << db.getString("f_name")

@@ -186,7 +186,7 @@ void CR5MfDaily::processTaskDbClick()
     if (ui->wt->findWidget(r, c, l) == false) {
         return;
     }
-    QList<QVariant> vals;
+    QVector<QJsonValue> vals;
     if (!C5Selector::getValueOfColumn(fDBParams, cache_mf_active_task, vals, 3)) {
         return;
     }
@@ -206,7 +206,7 @@ void CR5MfDaily::exportToExcel()
 
 void CR5MfDaily::addWorker()
 {
-    QList<QVariant> vals;
+    QVector<QJsonValue> vals;
     if (!C5Selector::getValue(fDBParams, cache_users, vals)) {
         return;
     }
@@ -270,7 +270,7 @@ void CR5MfDaily::addProcess()
                      tr("Process code"), tr("Process"), tr("Duration"), tr("Price"),
                      tr("Stage code"),
                      ui->cbTasks->itemData(ui->cbTasks->currentIndex(), Qt::UserRole + 1).toString());
-    QList<QVariant> vals;
+    QVector<QJsonValue> vals;
     if (!C5Selector::getValue(fDBParams, query, vals)) {
         return;
     }

@@ -35,7 +35,7 @@ bool C5PrintReceiptThread::print(const QStringList &dbParams)
     }
     font.setPointSize(bs);
     C5Printing p;
-    p.setSceneParams(fPaperWidth, 2600, QPrinter::Portrait);
+    p.setSceneParams(fPaperWidth, 2600, QPageLayout::Portrait);
     p.setFont(font);
     QMap<QString, QVariant> options;
     QJsonObject jtax;
@@ -496,6 +496,6 @@ bool C5PrintReceiptThread::print(const QStringList &dbParams)
     p.ltext(__translator.tt("Printed"), 0);
     p.rtext(QDateTime::currentDateTime().toString(FORMAT_DATETIME_TO_STR));
     p.br();
-    p.print(fPrinter, QPrinter::Custom);
+    p.print(fPrinter, QPageSize::Custom);
     return true;
 }

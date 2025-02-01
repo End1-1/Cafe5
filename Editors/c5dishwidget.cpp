@@ -179,7 +179,7 @@ void C5DishWidget::setDish(int id)
     }
 }
 
-void C5DishWidget::selectorCallback(int row, const QList<QVariant> &values)
+void C5DishWidget::selectorCallback(int row, const QVector<QJsonValue> &values)
 {
     Q_UNUSED(row);
     ui->lePart1Name->setText(values.at(2).toString());
@@ -379,7 +379,7 @@ void C5DishWidget::printPreview(C5Printing &p, bool showPrice)
 
 void C5DishWidget::on_btnAddRecipe_clicked()
 {
-    QList<QVariant> values;
+    QVector<QJsonValue> values;
     if (!C5Selector::getValueOfColumn(fDBParams, cache_goods, values, 3)) {
         return;
     }
@@ -725,7 +725,7 @@ void C5DishWidget::on_chSameAsInStore_clicked(bool checked)
 
 void C5DishWidget::on_btnAddDishRecipe_clicked()
 {
-    QList<QVariant> vals;
+    QVector<QJsonValue> vals;
     if (!C5Selector::getValueOfColumn(fDBParams, cache_dish, vals, 3)) {
         return;
     }
@@ -771,7 +771,7 @@ void C5DishWidget::on_btnAddDishRecipe_clicked()
 
 void C5DishWidget::on_btnAddToSet_clicked()
 {
-    QList<QVariant> vals;
+    QVector<QJsonValue> vals;
     if (!C5Selector::getValue(fDBParams, cache_dish, vals)) {
         return;
     }

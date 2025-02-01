@@ -124,7 +124,7 @@ bool CE5DishPackage::checkData(QString &err)
 
 void CE5DishPackage::newDish()
 {
-    QList<QVariant> vals;
+    QVector<QJsonValue> vals;
     if (!C5Selector::getValue(fDBParams, cache_dish, vals)) {
         return;
     }

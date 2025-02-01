@@ -15,7 +15,8 @@ public:
 
     ~C5LineEditWithSelector();
 
-    C5LineEditWithSelector &setSelector(const QStringList &dbParams, QLineEdit *selName, int cacheId, int colId = 1, int colName = 2);
+    C5LineEditWithSelector &setSelector(const QStringList &dbParams, QLineEdit *selName, int cacheId, int colId = 1,
+                                        int colName = 2);
 
     void setMultiselection(bool v);
 
@@ -54,9 +55,6 @@ private:
     bool fMultiselection;
 
 signals:
-    void done(const QList<QVariant> &values);
-
-    void multiDone(const QList<QList<QVariant> > &values);
 
 };
 

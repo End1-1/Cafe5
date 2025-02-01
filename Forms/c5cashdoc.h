@@ -40,7 +40,7 @@ public:
 
     void setStoreDoc(const QString &uuid);
 
-    virtual void selectorCallback(int row, const QList<QVariant> &values);
+    virtual void selectorCallback(int row, const QVector<QJsonValue> &values);
 
     QString uuid() const;
 

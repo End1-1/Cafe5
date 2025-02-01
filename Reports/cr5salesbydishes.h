@@ -15,7 +15,7 @@ public:
     virtual void restoreColumnsWidths();
 
 protected:
-    virtual bool tblDoubleClicked(int row, int column, const QList<QVariant> &v);
+    virtual bool tblDoubleClicked(int row, int column, const QVector<QJsonValue> &v);
 
 private slots:
     void actionShowDish();

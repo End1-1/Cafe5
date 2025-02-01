@@ -1,6 +1,7 @@
 #include "c5dialog.h"
 #include <QKeyEvent>
 #include <QApplication>
+#include <QScreen>
 
 static QWidget *__mainWindow = nullptr;
 
@@ -14,7 +15,8 @@ C5Dialog::C5Dialog(const QStringList &dbParams) :
 #endif
 {
 #ifdef WAITER
-    setMaximumSize(qApp->desktop()->geometry().size());
+    QScreen *screen = QGuiApplication::primaryScreen();
+    setMaximumSize(screen->geometry().size());
     //setWindowFlags(Qt::WindowStaysOnTopHint);
 #endif
     if (__mainWindow == nullptr) {
@@ -33,7 +35,8 @@ C5Dialog::C5Dialog(const QStringList &dbParams, bool noparent) :
 #endif
 {
 #ifdef WAITER
-    setMaximumSize(qApp->desktop()->geometry().size());
+    QScreen *screen = QGuiApplication::primaryScreen();
+    setMaximumSize(screen->geometry().size());
 #endif
     if (!noparent && __mainWindow == nullptr) {
         __mainWindow = this;
@@ -84,7 +87,7 @@ void C5Dialog::showFullScreen()
 #endif
 }
 
-void C5Dialog::selectorCallback(int row, const QList<QVariant> &values)
+void C5Dialog::selectorCallback(int row, const QVector<QJsonValue> &values)
 {
     Q_UNUSED(row);
     Q_UNUSED(values);

@@ -4,6 +4,7 @@
 #include <QIcon>
 #include <QTableView>
 #include <QApplication>
+#include <QElapsedTimer>
 
 C5TableModel::C5TableModel(const QStringList &dbParams, QObject *parent) :
     QAbstractTableModel(parent),
@@ -30,11 +31,10 @@ void C5TableModel::execQuery(const QString &query, QObject *echoError)
     C5Database db(fDBParams);
     connect( &db, SIGNAL(queryError(QString)), echoError, SLOT(sqlError(QString)));
     QStringList queries = query.split(";", Qt::SkipEmptyParts);
-#ifdef NETWORKDB
     db.exec(query, fRawData, fColumnNameIndex);
     for (int i = 0, count = fRawData.count(); i < count; i++) {
         if (fCheckboxes) {
-            fRawData[i].insert(0, QVariant());
+            fRawData[i].insert(0, QJsonValue());
         }
         fProxyData << i;
     }
@@ -51,33 +51,6 @@ void C5TableModel::execQuery(const QString &query, QObject *echoError)
         fColumnNameIndex["X"] = 0;
         fColumnIndexName[0] = "X";
     }
-#else
-    for (int i = 0; i < queries.count() - 1; i++) {
-        db.exec(queries.at(i));
-    }
-    if (db.exec(queries.last(), fRawData, fColumnNameIndex)) {
-        for (int i = 0, count = fRawData.count(); i < count; i++) {
-            if (fCheckboxes) {
-                fRawData[i].insert(0, QVariant());
-            }
-            fProxyData << i;
-        }
-        for (QHash<QString, int>::const_iterator it = fColumnNameIndex.constBegin(); it != fColumnNameIndex.constEnd(); it++) {
-            fColumnIndexName[it.value()] = it.key();
-        }
-        if (fCheckboxes) {
-            for (QHash<QString, int>::iterator it = fColumnNameIndex.begin(); it != fColumnNameIndex.end(); it++) {
-                QString k = it.key();
-                int v = it.value() + 1;
-                fColumnNameIndex[k] = v;
-                fColumnIndexName[v] = k;
-            }
-            fColumnNameIndex["X"] = 0;
-            fColumnIndexName[0] = "X";
-        }
-    } else {
-    }
-#endif
     endResetModel();
     qDebug() << "Data loaded in " << timer.elapsed() << "ms";
 }
@@ -249,7 +222,7 @@ bool C5TableModel::setData(const QModelIndex &index, const QVariant &value, int 
 {
     switch (role) {
         case Qt::EditRole:
-            fRawData[fProxyData.at(index.row())][index.column()] = value;
+            fRawData[fProxyData.at(index.row())][index.column()] = value.toJsonValue();
             break;
         case Qt::CheckStateRole:
             if (fCheckboxes && fSingleCheckBoxSelection && value.toInt() > 0) {
@@ -257,7 +230,7 @@ bool C5TableModel::setData(const QModelIndex &index, const QVariant &value, int 
                     fRawData[i][0] = 0;
                 }
             }
-            fRawData[fProxyData.at(index.row())][index.column()] = value;
+            fRawData[fProxyData.at(index.row())][index.column()] = value.toJsonValue();
             if (fTableView != nullptr) {
                 fTableView->viewport()->update();
             }
@@ -322,9 +295,9 @@ void C5TableModel::setEditableFlag(int column, Qt::ItemFlags flag)
 void C5TableModel::insertRow(int row)
 {
     beginInsertRows(QModelIndex(), row < 0 ? 0 : row, row < 0 ? 0 : row);
-    QList<QVariant> emptyRow;
+    QVector<QJsonValue> emptyRow;
     for (int i = 0; i < fColumnIndexName.count(); i++) {
-        emptyRow << QVariant();
+        emptyRow << QJsonValue();
     }
     fRawData.insert(row + 1, emptyRow);
     fProxyData.clear();
@@ -352,7 +325,7 @@ void C5TableModel::insertColumn(int column)
 {
     beginInsertColumns(QModelIndex(), column, column);
     for (int i = 0; i < fRawData.count(); i++) {
-        fRawData[i].insert(column, QVariant());
+        fRawData[i].insert(column, QJsonValue());
     }
     endInsertColumns();
 }
@@ -379,7 +352,7 @@ void C5TableModel::removeRow(int row, const QModelIndex &parent)
     endRemoveRows();
 }
 
-QList<QVariant> C5TableModel::getRowValues(int row)
+QVector<QJsonValue> C5TableModel::getRowValues(int row)
 {
     return fRawData.at(fProxyData.at(row));
 }
@@ -444,7 +417,7 @@ void C5TableModel::clearFilter()
 void C5TableModel::uniqueValuesForColumn(int column, QSet<QString> &values)
 {
     for (int i = 0; i < fProxyData.count(); i++) {
-        values << dataDisplay(fProxyData.at(i), column).toString();
+        values << dataDisplay(fProxyData.at(i), column);
     }
 }
 
@@ -480,9 +453,9 @@ void C5TableModel::insertSubTotals(QList<int> cols, const QList<int> &totalCols,
     if (totalCols.count() == 0) {
         return;
     }
-    QList<QVariant> emptyRow;
+    QVector<QJsonValue> emptyRow;
     for (int i = 0; i < columnCount(); i++) {
-        emptyRow << QVariant();
+        emptyRow << QJsonValue();
     }
     QList<double> totals;
     for (int i = 0; i < totalCols.count(); i++) {
@@ -500,7 +473,7 @@ void C5TableModel::insertSubTotals(QList<int> cols, const QList<int> &totalCols,
             }
             if (!isRowDataEmpty(r, cols)
                     && subtotalRowData(r, cols).compare(currName) != 0) {
-                QList<QVariant> newrow = emptyRow;
+                QVector<QJsonValue> newrow = emptyRow;
                 //newrow[0] = tr("SUBTOTAL") + " " + currName;
                 for (int c = 0; c < totalCols.count(); c++) {
                     newrow[totalCols.at(c)] = totals[c];
@@ -528,7 +501,7 @@ void C5TableModel::insertSubTotals(QList<int> cols, const QList<int> &totalCols,
         r++;
     }
     if (r > 0) {
-        QList<QVariant> newrow = emptyRow;
+        QVector<QJsonValue> newrow = emptyRow;
         if (title) {
             //newrow[0] = tr("Subtotal") + " " + currName;
         }
@@ -555,56 +528,32 @@ void C5TableModel::resetProxyData()
 
 void C5TableModel::filterData()
 {
+    QElapsedTimer et;
+    et.start();
     beginResetModel();
-    QList<int> ps = fProxyData;
+    QVector<int> ps = std::move(fProxyData);
     fProxyData.clear();
-    QList<int> columns = fFilters.keys();
+    fProxyData.reserve(ps.size());
+    QVector<int> columns = fFilters.keys();
     if (columns.contains(-1)) {
-        columns.removeFirst();
+        columns.removeOne(-1);
     }
-    QMap<int, QStringList> filter;
-    for (QMap<int, QString>::const_iterator it = fFilters.constBegin(); it != fFilters.constEnd(); it++) {
-        filter[it.key()] = it.value().split("|", Qt::SkipEmptyParts);
-        if (filter[it.key()].count() == 0) {
-            filter.remove(it.key());
-        }
-    }
-    for (int r = 0, count = ps.count(); r < count; r++) {
-        int row = ps.at(r);
-        bool found = filter.count() == 0;
-        if (found) {
-            goto FOUND;
-        }
-        if (fFilters.contains(-1)) {
-            for (int c = 0; c < fColumnIndexName.count(); c++) {
-                foreach (QString searchStr, filter[-1]) {
-                    if (dataDisplay(row, c).toString().contains(searchStr, Qt::CaseInsensitive)) {
-                        found = true;
-                        goto FOUND;
-                    }
-                }
-            }
-        }
-        found = columns.count() > 0;
-        foreach (int col, columns) {
-            bool found2 = false;
-            foreach (QString searchStr, filter[col]) {
-                found2 = found2 || dataDisplay(row, col).toString().contains(searchStr, Qt::CaseInsensitive);
-                if (found2) {
+    //SEARCH EVERYWHERE
+    if (fFilters.contains(-1)) {
+        QRegularExpression regex(".*" + QRegularExpression::escape(fFilters[-1]) + ".*",
+                                 QRegularExpression::CaseInsensitiveOption);
+        for (int r = 0; r < ps.count(); r++) {
+            for (int c = 0; c < columnCount(); c++) {
+                QString cellData = dataDisplay(r, c);
+                if (regex.match(cellData).hasMatch()) {
+                    fProxyData.append(r);
                     break;
                 }
             }
-            found = found && found2;
-            if (!found) {
-                goto FOUND;
-            }
-        }
-    FOUND:
-        if (found) {
-            fProxyData << row;
         }
     }
     endResetModel();
+    qDebug() << "Search completed with" << et.elapsed();
 }
 
 bool C5TableModel::isRowDataEmpty(int row, const QList<int> &cols)
@@ -647,18 +596,18 @@ void C5TableModel::clearModel()
     fCellFont.clear();
 }
 
-QVariant C5TableModel::dataDisplay(int row, int column) const
+QString C5TableModel::dataDisplay(int row, int column) const
 {
     QVariant v = fRawData.at(row).at(column);
     switch (v.typeId()) {
         case QMetaType::Int:
-            return v.toString();
+            return QString::number(v.toInt());
         case QMetaType::QDate:
-            return v.toDate().toString(FORMAT_DATE_TO_STR);
+            return v.value<QDate>().toString(FORMAT_DATE_TO_STR);
         case QMetaType::QDateTime:
-            return v.toDateTime().toString(FORMAT_DATETIME_TO_STR);
+            return v.value<QDateTime>().toString(FORMAT_DATETIME_TO_STR);
         case QMetaType::QTime:
-            return v.toTime().toString(FORMAT_TIME_TO_STR);
+            return v.value<QTime>().toString(FORMAT_TIME_TO_STR);
         case QMetaType::Double:
             return float_str(v.toDouble(), 4);
         default:

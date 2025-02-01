@@ -136,12 +136,12 @@ void C5LineEditWithSelector::mouseDoubleClickEvent(QMouseEvent *e)
         return;
     }
     if (fMultiselection) {
-        QList<QList<QVariant> > values;
+        QList<QVector<QJsonValue> > values;
         if (!C5Selector::getMultipleValues(fDBParams, fCache, values)) {
             return;
         }
         QString textId, textName;
-        foreach (const QList<QVariant> &c, values) {
+        foreach (const QVector<QJsonValue> &c, values) {
             if (!textId.isEmpty()) {
                 textId += ",";
                 textName += ",";
@@ -153,9 +153,8 @@ void C5LineEditWithSelector::mouseDoubleClickEvent(QMouseEvent *e)
         if (fNameLineEdit) {
             fNameLineEdit->setText(textName);
         }
-        emit multiDone(values);
     } else {
-        QList<QVariant> values;
+        QVector<QJsonValue> values;
         if (!C5Selector::getValue(fDBParams, fCache, values)) {
             return;
         }
@@ -172,7 +171,6 @@ void C5LineEditWithSelector::mouseDoubleClickEvent(QMouseEvent *e)
         if (fDialog && values.count() > 0) {
             fDialog->selectorCallback(0, values);
         }
-        emit done(values);
     }
 }
 

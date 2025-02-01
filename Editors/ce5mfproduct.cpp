@@ -317,7 +317,7 @@ void CE5MFProduct::on_btnAdd_clicked()
     if (ui->leCode->getInteger() == 0) {
         C5Message::error(tr("Save first"));
     }
-    QList<QVariant> vals;
+    QVector<QJsonValue> vals;
     if (!C5Selector::getValue(fDBParams, cache_mf_actions, vals)) {
         return;
     }

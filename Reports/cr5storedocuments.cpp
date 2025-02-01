@@ -59,7 +59,7 @@ QToolBar *CR5StoreDocuments::toolBar()
     return fToolBar;
 }
 
-bool CR5StoreDocuments::tblDoubleClicked(int row, int column, const QList<QVariant> &values)
+bool CR5StoreDocuments::tblDoubleClicked(int row, int column, const QVector<QJsonValue> &values)
 {
     Q_UNUSED(row);
     Q_UNUSED(column);

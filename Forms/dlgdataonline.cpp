@@ -14,8 +14,8 @@ DlgDataOnline::DlgDataOnline(const QStringList &dbParams, const QString &table) 
     fTableModel = new C5TableModel(dbParams, this);
     ui->tableView->setModel(fTableModel);
     ui->tableView->setSelectionBehavior(QAbstractItemView::SelectRows);
-    connect(ui->tableView, SIGNAL(tblDoubleClick(int, int, QList<QVariant>)), this, SLOT(tblDoubleClicked(int, int,
-            QList<QVariant>)));
+    connect(ui->tableView, SIGNAL(tblDoubleClick(int, int, QVector<QJsonValue>)), this, SLOT(tblDoubleClicked(int, int,
+            QVector<QJsonValue>)));
     //connect(fGrid, SIGNAL(tblSingleClick(QModelIndex)), this, SLOT(tblSingleClick(QModelIndex)));
     connect(ui->tableView->selectionModel(), SIGNAL(selectionChanged(QItemSelection, QItemSelection)), this,
             SLOT(selectionChanged(QItemSelection, QItemSelection)));
@@ -82,7 +82,7 @@ void DlgDataOnline::selectionChanged(const QItemSelection &selected, const QItem
     }
 }
 
-bool DlgDataOnline::tblDoubleClicked(int row, int column, const QList<QVariant> &values)
+bool DlgDataOnline::tblDoubleClicked(int row, int column, const QVector<QJsonValue> &values)
 {
     Q_UNUSED(column);
     Q_UNUSED(row);

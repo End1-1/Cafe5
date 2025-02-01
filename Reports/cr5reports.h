@@ -18,7 +18,7 @@ public:
     virtual void buildQuery() override;
 
 public slots:
-    virtual bool tblDoubleClicked(int row, int column, const QList<QVariant> &values) override;
+    virtual bool tblDoubleClicked(int row, int column, const QVector<QJsonValue> &values) override;
 
     virtual void setSearchParameters() override;
 

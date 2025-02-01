@@ -1,6 +1,5 @@
 #include "sqlquery.h"
 #include "logwriter.h"
-#include "commandline.h"
 #include "database.h"
 #include <QDebug>
 #include <QJsonDocument>
@@ -10,9 +9,6 @@
 
 bool office(const QJsonObject &jreq, QJsonObject &jret, QString &err)
 {
-    CommandLine cl;
-    QString path;
-    cl.value("dllpath", path);
     qDebug() << "office request" << jreq;
     if (jreq["key"].toString() != "asdf7fa8kk49888d!!jjdjmskkak98983mj???m") {
         err = "Unauthorized";
@@ -101,9 +97,6 @@ bool office(const QJsonObject &jreq, QJsonObject &jret, QString &err)
 
 bool shop(const QJsonObject &jreq, QJsonObject &jret, QString &err)
 {
-    CommandLine cl;
-    QString path;
-    cl.value("dllpath", path);
     qDebug() << "office request" << jreq;
     if (jreq["key"].toString() != "asdf7fa8kk49888d!!jjdjmskkak98983mj???m") {
         err = "Unauthorized";

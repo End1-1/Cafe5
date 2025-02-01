@@ -1,13 +1,12 @@
 #include "C5Database.h"
 #include "c5config.h"
 #include "c5utils.h"
+#include "logwriter.h"
 #include <QMutexLocker>
 #include <QSqlQuery>
 #include <QSqlError>
 #include <QSqlRecord>
-#include <QDir>
 #include <QHostInfo>
-#include <QFile>
 #include <QDate>
 #include <QDebug>
 #include <QUuid>
@@ -49,7 +48,6 @@ C5Database::C5Database() :
     QObject()
 {
     fQuery = nullptr;
-    init();
 }
 
 C5Database::C5Database(const QString &dbdriver)
@@ -69,14 +67,12 @@ C5Database::C5Database(const QString &dbdriver)
 C5Database::C5Database(const QStringList &dbParams) :
     C5Database()
 {
-    init();
     configureDatabase(fDb, dbParams[0], dbParams[1], dbParams[2], dbParams[3]);
 }
 
 C5Database::C5Database(C5Database &db) :
     C5Database()
 {
-    init();
     configureDatabase(fDb,
                       db.fDb.hostName(),
                       db.fDb.databaseName(),
@@ -94,7 +90,6 @@ C5Database::C5Database(const QJsonObject &params) :
 C5Database::C5Database(const QString &host, const QString &db, const QString &user, const QString &password) :
     C5Database()
 {
-    init();
     configureDatabase(fDb, host, db, user, password);
 }
 
@@ -268,17 +263,14 @@ bool C5Database::exec(const QString &sqlQuery)
     return exec(sqlQuery, fDbRows, fNameColumnMap);
 }
 
-bool C5Database::exec(const QString &sqlQuery, QList<QList<QVariant> > &dbrows)
+bool C5Database::exec(const QString &sqlQuery, QVector<QVector<QJsonValue> > &dbrows)
 {
     QHash<QString, int> cols;
     return exec(sqlQuery, dbrows, cols);
 }
 
-bool C5Database::exec(const QString &sqlQuery, QList<QList<QVariant> > &dbrows, QHash<QString, int> &columns)
+bool C5Database::exec(const QString &sqlQuery, QVector<QVector<QJsonValue> > &dbrows, QHash<QString, int> &columns)
 {
-    bool isSelect = true;
-    bool result = true;
-#ifdef NETWORKDB
     if(execNetwork(sqlQuery)) {
         dbrows = fDbRows;
         columns = fNameColumnMap;
@@ -291,93 +283,6 @@ bool C5Database::exec(const QString &sqlQuery, QList<QList<QVariant> > &dbrows, 
 #endif
         return false;
     }
-#endif
-    if (!exec(sqlQuery, isSelect)) {
-        fBindValues.clear();
-        return false;
-    }
-    fBindValues.clear();
-    if (isSelect) {
-        fCursorPos = -1;
-        columns.clear();
-        QSqlRecord r = fQuery->record();
-        for (int i = 0; i < r.count(); i++) {
-            columns[r.field(i).name().toLower()] = i;
-        }
-        int colCount = r.count();
-        dbrows.clear();
-        while (fQuery->next()) {
-            QList<QVariant> row;
-            for (int i = 0; i < colCount; i++) {
-                row << fQuery->value(i);
-            }
-            dbrows << row;
-        }
-    }
-    return result;
-}
-
-bool C5Database::exec(const QString &sqlQuery, QMap<QString, QList<QVariant> > &dbrows, QMap<QString, int> &columns)
-{
-    bool isSelect = true;
-    bool result = true;
-#ifdef NETWORKDB
-    return execNetwork(sqlQuery);
-#endif
-    if (!exec(sqlQuery, isSelect)) {
-        fBindValues.clear();
-        return false;
-    }
-    if (LOGGING) {
-#ifdef QT_DEBUG
-        //logEvent(fDb.hostName() + ":" + fDb.databaseName() + " " + lastQuery(fQuery));
-#else
-        //logEvent(lastQuery(fQuery));
-#endif
-    }
-    fBindValues.clear();
-    if (isSelect) {
-        fCursorPos = -1;
-        columns.clear();
-        QSqlRecord r = fQuery->record();
-        for (int i = 0; i < r.count(); i++) {
-            columns[r.field(i).name().toLower()] = i;
-        }
-        int colCount = r.count();
-        dbrows.clear();
-        while (fQuery->next()) {
-            QList<QVariant> row;
-            for (int i = 0; i < colCount; i++) {
-                row << fQuery->value(i);
-            }
-            dbrows[fQuery->value(0).toString()] << row;
-        }
-    }
-    return result;
-}
-
-bool C5Database::execDirect(const QString &sqlQuery)
-{
-#ifdef NETWORKDB
-    return execNetwork(sqlQuery);
-#endif
-    if (!open())  {
-        return false;
-    }
-    if (!fQuery->exec(sqlQuery)) {
-        fLastError = fQuery->lastError().databaseText();
-        logEvent(fLastError);
-        logEvent(sqlQuery);
-        return false;
-    }
-#ifdef QT_DEBUG
-    //logEvent(fDb.hostName() + ":" + fDb.databaseName() + " " + lastQuery(fQuery));
-#else
-    if (LOGGING) {
-        //logEvent(fDb.hostName() + ":" + fDb.databaseName() + " " + lastQuery(fQuery));
-    }
-#endif
-    return true;
 }
 
 bool C5Database::execSqlList(const QStringList &sqlList)
@@ -458,7 +363,7 @@ bool C5Database::execSqlList(const QStringList &sqlList)
     ja = jo["data"].toArray();
     fDbRows.clear();
     for (int i = 0; i < ja.size(); i++) {
-        QList<QVariant> r;
+        QVector<QJsonValue> r;
         QJsonArray jar = ja[i].toArray();
         for (int j = 0; j < jar.size(); j++) {
             switch (jtype[j].toInt()) {
@@ -471,13 +376,13 @@ bool C5Database::execSqlList(const QStringList &sqlList)
                     r.append(jar[j].toDouble());
                     break;
                 case 10:
-                    r.append(QDate::fromString(jar[j].toString(), FORMAT_DATE_TO_STR_MYSQL));
+                    r.append(jar[j].toString());
                     break;
                 case 11:
-                    r.append(QTime::fromString(jar[j].toString()));
+                    r.append(jar[j].toString());
                     break;
                 case 7:
-                    r.append(QDateTime::fromString(jar[j].toString(), FORMAT_DATETIME_TO_STR_MYSQL));
+                    r.append(jar[j].toString());
                     break;
                 default:
                     r.append(jar[j].toString());
@@ -585,7 +490,7 @@ bool C5Database::execNetwork(const QString &sqlQuery)
     ja = jo["data"].toArray();
     fDbRows.clear();
     for (int i = 0; i < ja.size(); i++) {
-        QList<QVariant> r;
+        QVector<QJsonValue> r;
         QJsonArray jar = ja[i].toArray();
         for (int j = 0; j < jar.size(); j++) {
             switch (jtype[j].toInt()) {
@@ -598,13 +503,13 @@ bool C5Database::execNetwork(const QString &sqlQuery)
                     r.append(jar[j].toDouble());
                     break;
                 case 10:
-                    r.append(QDate::fromString(jar[j].toString(), FORMAT_DATE_TO_STR_MYSQL));
+                    r.append(jar[j].toString());
                     break;
                 case 11:
-                    r.append(QTime::fromString(jar[j].toString()));
+                    r.append(jar[j].toString());
                     break;
                 case 7:
-                    r.append(QDateTime::fromString(jar[j].toString(), FORMAT_DATETIME_TO_STR_MYSQL));
+                    r.append(jar[j].toString());
                     break;
                 default:
                     r.append(jar[j].toString());
@@ -628,15 +533,6 @@ bool C5Database::execNetwork(const QString &sqlQuery)
 QString C5Database::uuid()
 {
     return QUuid::createUuid().toString().replace("{", "").replace("}", "");
-}
-
-QByteArray C5Database::uuid_bin()
-{
-    exec("select unhex(replace(uuid(),'-',''))") ;
-    if (nextRow()) {
-        return getValue(0).toByteArray();
-    }
-    return QByteArray();
 }
 
 QByteArray C5Database::uuid_getbin(QString u)
@@ -672,7 +568,7 @@ bool C5Database::first()
     return rowCount() > 0;
 }
 
-bool C5Database::nextRow(QList<QVariant> &row)
+bool C5Database::nextRow(QVector<QJsonValue> &row)
 {
     bool result = nextRow();
     if (result) {
@@ -875,31 +771,14 @@ void C5Database::removeBindValue(const QString &key)
     fBindValues.remove(key);
 }
 
-void C5Database::setValue(int row, int column, const QVariant &value)
+void C5Database::setValue(int row, int column, const QJsonValue &value)
 {
     fDbRows[row][column] = value;
 }
 
-void C5Database::setValue(int row, const QString &columnName, const QVariant &value)
+void C5Database::setValue(int row, const QString &columnName, const QJsonValue &value)
 {
     setValue(row, fNameColumnMap[columnName], value);
-}
-
-void C5Database::init()
-{
-#ifdef NETWORKDB
-    return;
-#endif
-    fIsReady = false;
-    if (QSqlDatabase::drivers().count() == 0) {
-        return;
-    }
-    fIsReady = true;
-    QMutexLocker ml( &fMutex);
-    ++fCounter;
-    fDbName = getDbNumber("DB1");
-    fDb = QSqlDatabase::addDatabase(_DBDRIVER_, fDbName);
-    fDb.setConnectOptions("MYSQL_OPT_CONNECT_TIMEOUT=5");
 }
 
 bool C5Database::isOpened()
@@ -939,59 +818,8 @@ void C5Database::configureDatabase(QSqlDatabase &cn, const QString &host, const 
 void C5Database::logEvent(const QString &event)
 {
     qDebug() << event.left(1000);
-    QDir d;
-    if (!d.exists(d.homePath() + "/" + _APPLICATION_)) {
-        d.mkpath(d.homePath() + "/" + _APPLICATION_);
-    }
-    QFile  f(d.homePath() + "/" + _APPLICATION_ + "/log.txt");
-    QString dt = QDateTime::currentDateTime().toString("dd.MM.yyyy HH:mm:ss") + " ";
-    f.open(QIODevice::Append);
-    f.write(dt.toUtf8());
-    f.write(event.toUtf8());
-    f.write("\r\n");
-    f.close();
+    LogWriter::write(LogWriterLevel::verbose, "", event);
 }
-
-// QString C5Database::lastQuery(QSqlQuery *q)
-// {
-//     QString sql = q->lastQuery();
-//     QMapIterator<QString, QVariant> it(q->boundValues());
-//     while (it.hasNext()) {
-//         it.next();
-//         QVariant value = it.value();
-//         if(!it.value().isValid()) {
-//             value = "null";
-//         } else {
-//             switch (it.value().type()) {
-//                 case QVariant::String:
-//                     value = QString("'%1'").arg(value.toString().replace("'", "''"));
-//                     break;
-//                 case QVariant::Date:
-//                     value = QString("'%1'").arg(value.toDate().toString("yyyy-MM-dd"));
-//                     break;
-//                 case QVariant::DateTime:
-//                     value = QString("'%1'").arg(value.toDateTime().toString("yyyy-MM-dd HH:mm:ss"));
-//                     break;
-//                 case QVariant::Double:
-//                     value = QString("%1").arg(value.toDouble());
-//                     break;
-//                 case QVariant::Int:
-//                     value = QString("%1").arg(value.toInt());
-//                     break;
-//                 case QVariant::Time:
-//                     value = QString("'%1'").arg(value.toTime().toString("HH:mm:ss"));
-//                     break;
-//                 case QVariant::ByteArray:
-//                     value = QString("'%1'").arg(QString(value.toByteArray().toHex()));
-//                     break;
-//                 default:
-//                     break;
-//             }
-//         }
-//         sql.replace(QRegularExpression(it.key() + "\\b"), value.toString());
-//     }
-//     return sql;
-// }
 
 bool C5Database::exec(const QString &sqlQuery, bool &isSelect)
 {

@@ -217,7 +217,7 @@ void C5GoodsPriceOrder::on_btnNewGroup_clicked()
     }
     auto *item = ui->lwNames->item(ci);
     int itemid = item->data(Qt::UserRole).toInt();
-    QList<QVariant> vals;
+    QVector<QJsonValue> vals;
     if (!C5Selector::getValueOfColumn(fDBParams, cache_goods_group, vals, 2)) {
         return;
     }

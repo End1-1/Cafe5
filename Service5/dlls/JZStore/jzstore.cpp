@@ -1,5 +1,6 @@
 #include "jzstore.h"
 #include "database.h"
+#include "logwriter.h"
 #include <QJsonDocument>
 
 QMap<int, QMap<QString, QString> > fConnections;
@@ -72,9 +73,9 @@ void init()
         fStorages[2] = QString::fromUtf8("Բար");
         fStorages[3] = QString::fromUtf8("Խոհանոց");
         fStorages[4] = QString::fromUtf8("Սառնարան");
-        fAsStorageMap[2][2] = "001";
-        fAsStorageMap[2][3] = "002";
-        fAsStorageMap[2][4] = "003";
+        fAsStorageMap[2][2] = "02";
+        fAsStorageMap[2][3] = "04";
+        fAsStorageMap[2][4] = "05";
         fAsStorageMap[3][2] = "031";
         fAsStorageMap[3][3] = "032";
         fAsStorageMap[3][4] = "033";
@@ -129,6 +130,7 @@ bool requestStore(const QJsonObject &jreq, QJsonObject &jret, QString &err)
     QMap<QString, QString> con = fConnections[cafe];
     Database db("QIBASE");
     if (!db.open(con["host"], con["schema"], con["username"], con["password"])) {
+        jret["errorCode"] = 1;
         err = "Connection to " + con["host"] + con["schema"] + " failed with " + db.lastDbError();
         return false;
     }
@@ -137,7 +139,6 @@ bool requestStore(const QJsonObject &jreq, QJsonObject &jret, QString &err)
     if (db.next()) {
         dbname = db.string("database");
         mssql_conn = QString("%1;DATABASE=%2").arg(db.string("conn_str"), db.string("database"));
-        qDebug() << "CONNECTION" << mssql_conn;
     }
     db.exec("select f.id, t.name as typename, f.name as foodname "
             "from food_names f "
@@ -174,9 +175,11 @@ bool requestStore(const QJsonObject &jreq, QJsonObject &jret, QString &err)
                  "and st.doc_date = :date and st.store_input=:store_id "
                  "and st.action_id=:action_id "
                  "group by 1")) {
+        jret["errorCode"] = 1;
         err = db.lastDbError();
         return false;
     }
+    LogWriter::write(LogWriterLevel::verbose, "Last inventory data", db.lastQuery());
     while (db.next()) {
         QJsonObject j = goods[db.integer("goods_id")];
         j["QTY_TILL"] = db.doubleValue("qty");
@@ -184,7 +187,9 @@ bool requestStore(const QJsonObject &jreq, QJsonObject &jret, QString &err)
         goods[db.integer("goods_id")] = j;
     }
     Database mssqldb("QODBC");
+    LogWriter::write(LogWriterLevel::verbose, "MSSQL", mssql_conn);
     if (!mssqldb.open("10.1.0.4,1433", mssql_conn, "sa", "SaSa111")) {
+        jret["errorCode"] = 1;
         err = "Connection to 10.1.0.4,1433 failed with " + mssqldb.lastDbError();
         return false;
     }
@@ -192,18 +197,22 @@ bool requestStore(const QJsonObject &jreq, QJsonObject &jret, QString &err)
     mssqldb[":date1"] = d1;
     mssqldb[":date2"] = d2;
     if (!mssqldb.exec(
-                QString("select cast(t.fMTCODE as integer) as food, m.fDBCR as sign, sum(m.fQTY) as qty, sum(m.fCOSTSUMM) as amount "
+                QString("select cast(t.fMTCODE as integer) as food, m.fDBCR as sign, "
+                        "sum(m.fQTY) as qty, sum(m.fCOSTSUMM) as amount "
                         "from %1.dbo.MTHI m, %1.dbo.MATERIALS t , %1.dbo.DOCUMENTS d "
                         "where m.fMTID=t.fMTID and d.fISN=m.fBASE and d.fDOCTYPE in (6, 7, 8, 17) "
-                        "and d.fDATE between :date1 and :date2 and m.fSTORAGE=:store "
+                        "and d.fDATE between :date1 and :date2 and cast(m.fSTORAGE as integer)=cast(:store as integer)"
                         "and (t.fMTCODE NOT LIKE '1-%' and t.fMTCODE NOT LIKE '2-%') "
                         "group by cast(t.fMTCODE as integer), m.fDBCR "
                         "order by 1").arg(dbname))) {
+        jret["errorCode"] = 1;
         err = mssqldb.lastDbError();
         return false;
     }
     QStringList foodNotInDb;
+    int mssqlrowcount = 0;
     while (mssqldb.next()) {
+        mssqlrowcount ++;
         if (!goods.contains(mssqldb.integer("food"))) {
             if (!foodNotInDb.contains(mssqldb.string("food"))) {
                 foodNotInDb.append(mssqldb.string("food"));
@@ -215,6 +224,7 @@ bool requestStore(const QJsonObject &jreq, QJsonObject &jret, QString &err)
         j["AMOUNT_IN"] = j["AMOUNT_IN"].toDouble() + (mssqldb.doubleValue("amount") * (mssqldb.integer("sign") == 0 ? -1 : 1));
         goods[mssqldb.integer("food")] = j;
     }
+    LogWriter::write(LogWriterLevel::verbose, QString("mssql records: %1").arg(mssqlrowcount), mssqldb.lastQuery());
     if (foodNotInDb.count() > 0) {
         err = QString("Goods not in database: %1").arg(foodNotInDb.join(","));
         return false;
@@ -231,6 +241,7 @@ bool requestStore(const QJsonObject &jreq, QJsonObject &jret, QString &err)
                  "and r.goods_id is not null "
                  "and d.store_id=:store "
                  "group by 1")) {
+        jret["errorCode"] = 1;
         err = db.lastDbError();
         return false;
     }
@@ -252,6 +263,7 @@ bool requestStore(const QJsonObject &jreq, QJsonObject &jret, QString &err)
                  "left join food_names fn on fn.id=sdd.goods_id "
                  "where sd.doc_date between :date1 and :date2 and sa.id in (2) and s2.id=:store "
                  "group by 1 ")) {
+        jret["errorCode"] = 1;
         err = db.lastDbError();
         return false;
     }

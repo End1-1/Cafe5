@@ -11,7 +11,7 @@ CE5PackageList::CE5PackageList(const QStringList &dbParams, int package) :
     ui->tbl->setColumnWidths(5, 0, 200, 0, 300, 80);
     ui->lePackage->setSelector(fDBParams, ui->lePackageName, cache_dish_package);
     setPackage(package);
-    connect(ui->lePackage, SIGNAL(done(QList<QVariant>)), this, SLOT(packageChanged(QList<QVariant>)));
+    connect(ui->lePackage, SIGNAL(done(QVector<QJsonValue>)), this, SLOT(packageChanged(QVector<QJsonValue>)));
 }
 
 CE5PackageList::~CE5PackageList()
@@ -69,7 +69,7 @@ void CE5PackageList::itemPriceChanged(const QString &str)
     countPrices();
 }
 
-void CE5PackageList::packageChanged(const QList<QVariant> &val)
+void CE5PackageList::packageChanged(const QVector<QJsonValue> &val)
 {
     if (val.count() > 0) {
         setPackage(val.at(0).toInt());
@@ -78,7 +78,7 @@ void CE5PackageList::packageChanged(const QList<QVariant> &val)
 
 void CE5PackageList::on_btnAdd_clicked()
 {
-    QList<QVariant> values;
+    QVector<QJsonValue> values;
     if (!C5Selector::getValue(fDBParams, cache_dish, values)) {
         return;
     }

@@ -5,6 +5,7 @@
 #include <QIcon>
 #include <QLayout>
 #include <QLabel>
+#include <QTimer>
 
 C5ReportWidget::C5ReportWidget(const QStringList &dbParams, QWidget *parent) :
     C5Grid(dbParams, parent)
@@ -15,14 +16,17 @@ C5ReportWidget::C5ReportWidget(const QStringList &dbParams, QWidget *parent) :
     fEditor = nullptr;
     QLabel *l = new QLabel(tr("Global search"), widget());
     fFilterLineEdit = new C5LineEdit(widget());
-    fFilterLineEdit->setPlaceholderText(tr("Use \"|\" for separator multiple values"));
+    //fFilterLineEdit->setPlaceholderText(tr("Use \"|\" for separator multiple values"));
     widget()->layout()->addWidget(l);
     widget()->layout()->addWidget(fFilterLineEdit);
     widget()->setVisible(false);
     connect(fFilterLineEdit, &C5LineEdit::textChanged, [this](const QString &arg1) {
-        fModel->setFilter(-1, arg1);
-        sumColumnsData();
+        fSearchTimer->start();
     });
+    fSearchTimer = new QTimer(this);
+    fSearchTimer->setSingleShot(true );
+    fSearchTimer->setInterval(600);
+    connect(fSearchTimer, &QTimer::timeout, this, &C5ReportWidget::searchText);
 }
 
 C5ReportWidget::~C5ReportWidget()
@@ -37,7 +41,7 @@ C5ReportWidget::~C5ReportWidget()
 
 bool C5ReportWidget::hasDataUpdates()
 {
-    return static_cast<C5TableModel*>(fTableView->model())->hasUpdates();
+    return static_cast<C5TableModel *>(fTableView->model())->hasUpdates();
 }
 
 void C5ReportWidget::hotKey(const QString &key)
@@ -66,7 +70,7 @@ bool C5ReportWidget::on_tblView_doubleClicked(const QModelIndex &index)
     if (index.row() < 0 || index.column() < 0) {
         return false;
     }
-    QList<QVariant> values = fModel->getRowValues(index.row());
+    QVector<QJsonValue> values = fModel->getRowValues(index.row());
     if (tblDoubleClicked(index.row(), index.column(), values)) {
         return false;
     }
@@ -151,4 +155,10 @@ int C5ReportWidget::newRow()
     }
     fTableView->setCurrentIndex(fModel->index(row + 1, 0));
     return row;
+}
+
+void C5ReportWidget::searchText()
+{
+    fModel->setFilter(-1, fFilterLineEdit->text());
+    sumColumnsData();
 }

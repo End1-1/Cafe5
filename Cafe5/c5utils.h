@@ -1,20 +1,13 @@
 #ifndef C5UTILS_H
 #define C5UTILS_H
 
+#include "format_date.h"
 #include <QString>
 #include <QHostInfo>
 #include <QDateTime>
 #include <QCryptographicHash>
 #include <QJsonDocument>
 #include <QRegularExpression>
-
-#define FORMAT_DATETIME_TO_STR "dd/MM/yyyy HH:mm:ss"
-#define FORMAT_DATETIME_TO_STR_MYSQL "yyyy-MM-dd HH:mm:ss"
-#define FORMAT_DATETIME_TO_STR2 "dd/MM/yyyy HH:mm"
-#define FORMAT_DATE_TO_STR "dd/MM/yyyy"
-#define FORMAT_TIME_TO_STR "HH:mm:ss"
-#define FORMAT_TIME_TO_SHORT_STR "HH:mm"
-#define FORMAT_DATE_TO_STR_MYSQL "yyyy-MM-dd"
 
 #define current_date QDate::currentDate().toString(FORMAT_DATE_TO_STR)
 #define current_time QTime::currentTime().toString(FORMAT_TIME_TO_STR)
@@ -85,8 +78,6 @@ class C5Utils
 {
 public:
     C5Utils();
-
-    void writeErrorLog(const QString &text);
 
     QString pwd(const QString &value);
 };

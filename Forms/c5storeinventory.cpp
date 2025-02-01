@@ -268,7 +268,7 @@ void C5StoreInventory::printDoc()
 
 void C5StoreInventory::on_btnAddGoods_clicked()
 {
-    QList<QVariant> vals;
+    QVector<QJsonValue> vals;
     if (!C5Selector::getValueOfColumn(fDBParams, cache_goods, vals, 3)) {
         return;
     }

@@ -41,8 +41,9 @@ int main(int argc, char *argv[])
     dlgsplash->show();
     emit dlgsplash->messageSignal("Please, wait...");
     QTranslator t;
-    t.load(":/Smart.qm");
-    a.installTranslator( &t);
+    if (t.load(":/Smart.qm")) {
+        a.installTranslator( &t);
+    }
     QStringList args;
     for (int i = 0; i < argc; i++) {
         args << argv[i];

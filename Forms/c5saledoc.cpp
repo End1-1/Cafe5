@@ -1207,7 +1207,7 @@ void C5SaleDoc::exportToAs(int doctype)
 
 void C5SaleDoc::on_btnAddGoods_clicked()
 {
-    QList<QVariant> vals;
+    QVector<QJsonValue> vals;
     if (!C5Selector::getValueOfColumn(fDBParams, cache_goods, vals, 3)) {
         return;
     }
@@ -1287,7 +1287,7 @@ void C5SaleDoc::on_cbHall_currentIndexChanged(int index)
 
 void C5SaleDoc::on_btnSearchTaxpayer_clicked()
 {
-    QList<QVariant> values;
+    QVector<QJsonValue> values;
     if (!C5Selector::getValue(fDBParams, cache_goods_partners, values)) {
         return;
     }
@@ -1349,7 +1349,7 @@ void C5SaleDoc::on_leCash_textChanged(const QString &arg1)
 
 void C5SaleDoc::on_btnDeliveryMan_clicked()
 {
-    QList<QVariant> vals;
+    QVector<QJsonValue> vals;
     C5Selector::getValue(fDBParams, cache_users, vals);
     if (vals.count() == 0) {
         return;

@@ -215,7 +215,7 @@ void C5CashDoc::setStoreDoc(const QString &uuid)
     }
 }
 
-void C5CashDoc::selectorCallback(int row, const QList<QVariant> &values)
+void C5CashDoc::selectorCallback(int row, const QVector<QJsonValue> &values)
 {
     C5LineEditWithSelector *l = static_cast<C5LineEditWithSelector *>(sender());
     if (row == cache_cash_names) {

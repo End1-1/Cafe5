@@ -54,7 +54,7 @@ void SessionsHistory::on_btnPrintReport_clicked()
     font.setPointSize(__c5config.getValue(param_receipt_print_font_size).toInt());
     font.setFamily(__c5config.getValue(param_receipt_print_font_family));
     C5Printing p;
-    p.setSceneParams(650, 2800, QPrinter::Portrait);
+    p.setSceneParams(650, 2800, QPageLayout::Portrait);
     p.setFont(font);
     if (QFile::exists("./logo_receipt.png")) {
         p.image("./logo_receipt.png", Qt::AlignHCenter);
@@ -128,7 +128,7 @@ void SessionsHistory::on_btnPrintReport_clicked()
     p.ltext(tr("Printed"), 0);
     p.rtext(QDateTime::currentDateTime().toString(FORMAT_DATETIME_TO_STR));
     p.br();
-    p.print(C5Config::localReceiptPrinter(), QPrinter::Custom);
+    p.print(C5Config::localReceiptPrinter(), QPageSize::Custom);
 }
 
 void SessionsHistory::on_btnCancel_clicked()
@@ -169,7 +169,7 @@ void SessionsHistory::on_btnPrintSession_clicked()
     font.setPointSize(__c5config.getValue(param_receipt_print_font_size).toInt());
     font.setFamily(__c5config.getValue(param_receipt_print_font_family));
     C5Printing p;
-    p.setSceneParams(650, 2800, QPrinter::Portrait);
+    p.setSceneParams(650, 2800, QPageLayout::Portrait);
     p.setFont(font);
     if (QFile::exists("./logo_receipt.png")) {
         p.image("./logo_receipt.png", Qt::AlignHCenter);
@@ -236,5 +236,5 @@ void SessionsHistory::on_btnPrintSession_clicked()
     p.ltext(tr("Printed"), 0);
     p.rtext(QDateTime::currentDateTime().toString(FORMAT_DATETIME_TO_STR));
     p.br();
-    p.print(C5Config::localReceiptPrinter(), QPrinter::Custom);
+    p.print(C5Config::localReceiptPrinter(), QPageSize::Custom);
 }

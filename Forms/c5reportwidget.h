@@ -8,6 +8,7 @@
 
 class C5Cache;
 class CE5Editor;
+class QTimer;
 
 class C5ReportWidget : public C5Grid
 {
@@ -39,6 +40,12 @@ protected slots:
     virtual void completeRefresh();
 
     virtual int newRow();
+
+private:
+    QTimer *fSearchTimer;
+
+private slots:
+    void searchText();
 };
 
 #endif // C5REPORTWIDGET_H

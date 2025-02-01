@@ -12,7 +12,7 @@
 #include "sessionshistory.h"
 #include "workspace.h"
 #include <QFile>
-#include <QDesktopWidget>
+#include <QScreen>
 
 MenuDialog::MenuDialog(Workspace *w, C5User *u) :
     C5Dialog(__c5config.dbParams()),
@@ -21,7 +21,7 @@ MenuDialog::MenuDialog(Workspace *w, C5User *u) :
 {
     ui->setupUi(this);
     fUser = u;
-    if (qApp->desktop()->screenCount() < 2) {
+    if (qApp->screens().count() < 2) {
         ui->btnCustomerDisplay->setEnabled(false);
     }
 }
@@ -141,7 +141,7 @@ void MenuDialog::on_btnReportByOrder_clicked()
     QFont font(qApp->font());
     font.setPointSize(28);
     C5Printing p;
-    p.setSceneParams(650, 2800, QPrinter::Portrait);
+    p.setSceneParams(650, 2800, QPageLayout::Portrait);
     p.setFont(font);
     if (QFile::exists("./logo_receipt.png")) {
         p.image("./logo_receipt.png", Qt::AlignHCenter);
@@ -225,7 +225,7 @@ void MenuDialog::on_btnReportByOrder_clicked()
     p.ltext(tr("Printed"), 0);
     p.rtext(QDateTime::currentDateTime().toString(FORMAT_DATETIME_TO_STR));
     p.br();
-    p.print(C5Config::localReceiptPrinter(), QPrinter::Custom);
+    p.print(C5Config::localReceiptPrinter(), QPageSize::Custom);
 }
 
 void MenuDialog::on_btnBack_clicked()

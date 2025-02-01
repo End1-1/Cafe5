@@ -47,7 +47,7 @@ void C5TranslatorForm::saveDataChanges()
                     ui->tbl->lineEdit(i, 1)->text(),
                     ui->tbl->lineEdit(i, 2)->text() );
     }
-    db.execDirect(sql);
+    db.execNetwork(sql);
     C5Message::info(tr("Saved"));
 }
 

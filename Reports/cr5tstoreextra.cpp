@@ -83,7 +83,7 @@ void CR5TStoreExtra::buildQuery()
         return;
     }
     QMap<int, double> goodsSalePrice;
-    QList<QList<QVariant> > &rows = fModel->fRawData;
+    QVector<QVector<QJsonValue>> &rows = fModel->fRawData;
     rows.clear();
     C5Database db(fDBParams);
     //names
@@ -92,9 +92,9 @@ void CR5TStoreExtra::buildQuery()
     QMap<int, int> goodsRowMap;
     while (db.nextRow()) {
         goodsSalePrice[db.getInt("f_id")] = db.getDouble("f_saleprice");
-        QList<QVariant> emptyRow;
+        QVector<QJsonValue> emptyRow;
         for (int i = 0; i < 14; i++) {
-            emptyRow << QVariant();
+            emptyRow << QJsonValue();
         }
         emptyRow[0] = db.getInt("f_id");
         emptyRow[1] = db.getString("f_name");
@@ -245,7 +245,7 @@ QString CR5TStoreExtra::documentForInventory()
     return result;
 }
 
-bool CR5TStoreExtra::tblDoubleClicked(int row, int column, const QList<QVariant> &values)
+bool CR5TStoreExtra::tblDoubleClicked(int row, int column, const QVector<QJsonValue> &values)
 {
     bool ok;
     double qty;

@@ -28,7 +28,7 @@ public:
 
     void setDish(int id);
 
-    virtual void selectorCallback(int row, const QList<QVariant> &values);
+    virtual void selectorCallback(int row, const QVector<QJsonValue> &values);
 
     virtual bool save(QString &err, QList<QMap<QString, QVariant> > &data);
 

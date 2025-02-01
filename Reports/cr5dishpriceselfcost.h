@@ -17,7 +17,7 @@ public:
     virtual void buildQuery();
 
 protected:
-    virtual bool tblDoubleClicked(int row, int column, const QList<QVariant> &values) override;
+    virtual bool tblDoubleClicked(int row, int column, const QVector<QJsonValue> &values) override;
 
 private:
     void buildQueryV1();

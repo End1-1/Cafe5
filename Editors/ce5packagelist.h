@@ -28,7 +28,7 @@ private:
 private slots:
     void itemPriceChanged(const QString &str);
 
-    void packageChanged(const QList<QVariant> &val);
+    void packageChanged(const QVector<QJsonValue> &val);
 
     void on_btnAdd_clicked();
 

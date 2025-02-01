@@ -49,7 +49,7 @@ double DlgSemireadyInOut::goodsQty(int r)
 
 void DlgSemireadyInOut::on_btnSelectGoods_clicked()
 {
-    QList<QVariant> vals;
+    QVector<QJsonValue> vals;
     QHash<QString, QString> trans;
     if (!C5Selector::getValues(fDBParams,
                                "select distinct(g.f_id), g.f_name, g.f_complectout, u.f_name as f_unitname "

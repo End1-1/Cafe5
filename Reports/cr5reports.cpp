@@ -86,7 +86,7 @@ void CR5Reports::buildQuery()
     }
 }
 
-bool CR5Reports::tblDoubleClicked(int row, int column, const QList<QVariant> &values)
+bool CR5Reports::tblDoubleClicked(int row, int column, const QVector<QJsonValue> &values)
 {
     Q_UNUSED(row);
     Q_UNUSED(column);

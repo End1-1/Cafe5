@@ -20,13 +20,11 @@ HEADERS += \
     sqlquery.h
 
 SOURCES += \
-    ../../utils/commandline.cpp \
     ../../utils/configini.cpp \
     ../../utils/database.cpp \
 
 
 HEADERS += \
-    ../../utils/commandline.h \
     ../../utils/configini.h \
     ../../utils/database.h \
 

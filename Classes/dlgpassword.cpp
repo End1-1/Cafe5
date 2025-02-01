@@ -212,7 +212,8 @@ void DlgPassword::on_lePassword_textChanged(const QString &arg1)
 {
     if (fMax > 0.01) {
         if (arg1.toDouble() > fMax) {
-            ui->lePassword->setText(QString::number(fMax, 'f', 2).remove(QRegExp("\\.0+$")).remove(QRegExp("\\.$")));
+            ui->lePassword->setText(QString::number(fMax, 'f',
+                                                    2).remove(QRegularExpression("\\.0+$")).remove(QRegularExpression("\\.$")));
         }
     }
 }
