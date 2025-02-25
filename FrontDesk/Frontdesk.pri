@@ -48,6 +48,8 @@ FORMS += \
     ../Forms/c5salarydoc.ui \
     ../Forms/c5salarypayment.ui \
     ../Forms/c5saledoc.ui \
+    ../Forms/c5goodsprice.ui \
+    c5aboutdlg.ui \
     ../Forms/c5salefromstoreorder.ui \
     ../Forms/c5selector.ui \
     ../Forms/c5srofinventory.ui \
@@ -147,7 +149,6 @@ FORMS += \
     ../Editors/ce5discountcard.ui \
     ../Editors/ce5dishcomment.ui \
     ../Reports/cr5salefromstorefilter.ui \
-    ../Editors/ce5databases.ui \
     ../Editors/ce5halls.ui \
     ../Editors/ce5table.ui \
     ../Editors/ce5createtablesforhall.ui \
@@ -214,6 +215,12 @@ HEADERS += \
         ../Editors/ce5mfproduct.h \
         ../Editors/ce5mftask.h \
         ../Editors/ce5mfworkshop.h \
+        ../Classes/amkbd.h \
+        ../Classes/format_date.h \
+        ../Classes/logwriter.h \
+        ../Forms/c5goodsprice.h \
+        ../NTable/ninterface.h \
+        c5aboutdlg.h \
         ../Editors/ce5ordermark.h \
         ../Editors/ce5packagelist.h \
         ../Editors/ce5storereason.h \
@@ -445,7 +452,6 @@ HEADERS += \
         ../Reports/cr5dishcomment.h \
         ../Reports/cr5salefromstore.h \
         ../Reports/cr5salefromstorefilter.h \
-        ../Editors/ce5databases.h \
         ../Reports/cr5hall.h \
         ../Editors/ce5halls.h \
         ../Reports/cr5tables.h \
@@ -458,22 +464,6 @@ HEADERS += \
         ../Reports/cr5storedocumentsfilter.h \
         ../Classes/fileversion.h \
         ../Classes/c5waiterorderdoc.h \
-        ../../XLSX/src/crs32.h \
-        ../../XLSX/src/xlsx.h \
-        ../../XLSX/src/xlsxall.h \
-        ../../XLSX/src/xlsxcell.h \
-        ../../XLSX/src/xlsxcontenttype.h \
-        ../../XLSX/src/xlsxdocpropsapp.h \
-        ../../XLSX/src/xlsxdocpropscore.h \
-        ../../XLSX/src/xlsxdocument.h \
-        ../../XLSX/src/xlsxrels.h \
-        ../../XLSX/src/xlsxsharedstring.h \
-        ../../XLSX/src/xlsxsheet.h \
-        ../../XLSX/src/xlsxstyles.h \
-        ../../XLSX/src/xlsxtheme.h \
-        ../../XLSX/src/xlsxworkbook.h \
-        ../../XLSX/src/xlsxwriter.h \
-        ../../XLSX/src/zip.h \
         ../NTable/nfilterdlg.h
 
 
@@ -625,6 +615,11 @@ SOURCES += \
         ../Reports/cr5currencyratehistory.cpp \
         ../Reports/cr5currencyratehistoryfilter.cpp \
         ../Reports/cr5custom.cpp \
+        ../Classes/amkbd.cpp \
+        ../Classes/logwriter.cpp \
+        ../Forms/c5goodsprice.cpp \
+        ../NTable/ninterface.cpp \
+        c5aboutdlg.cpp \
         ../Reports/cr5discountstatisics.cpp \
         ../Reports/cr5discountstatisticsfilter.cpp \
         ../Reports/cr5dishpackage.cpp \
@@ -756,7 +751,6 @@ SOURCES += \
         ../Reports/cr5dishcomment.cpp \
         ../Reports/cr5salefromstore.cpp \
         ../Reports/cr5salefromstorefilter.cpp \
-        ../Editors/ce5databases.cpp \
         ../Reports/cr5hall.cpp \
         ../Editors/ce5halls.cpp \
         ../Reports/cr5tables.cpp \
@@ -769,20 +763,9 @@ SOURCES += \
         ../Reports/cr5storedocumentsfilter.cpp \
         ../Classes/fileversion.cpp \
         ../Classes/c5waiterorderdoc.cpp \
-        ../../XLSX/src/xlsx.cpp \
-        ../../XLSX/src/xlsxcell.cpp \
-        ../../XLSX/src/xlsxcontenttype.cpp \
-        ../../XLSX/src/xlsxdocpropsapp.cpp \
-        ../../XLSX/src/xlsxdocpropscore.cpp \
-        ../../XLSX/src/xlsxdocument.cpp \
-        ../../XLSX/src/xlsxrels.cpp \
-        ../../XLSX/src/xlsxsharedstring.cpp \
-        ../../XLSX/src/xlsxsheet.cpp \
-        ../../XLSX/src/xlsxstyles.cpp \
-        ../../XLSX/src/xlsxtheme.cpp \
-        ../../XLSX/src/xlsxworkbook.cpp \
-        ../../XLSX/src/xlsxwriter.cpp \
         ../NTable/nfilterdlg.cpp
+
+include(C:/projects/QXlsx/QXlsx/QXlsx.pri)
 
 INCLUDEPATH += ../Cafe5
 INCLUDEPATH += ../Cache
@@ -798,7 +781,6 @@ INCLUDEPATH += ../Service
 INCLUDEPATH += ../Service5Working/utils
 INCLUDEPATH += ../Forms
 INCLUDEPATH += ../Configs
-INCLUDEPATH += ../../XLSX/src
 INCLUDEPATH += ../../NewTax/Src
 
 DEFINES += QT_DEPRECATED_WARNINGS

@@ -33,6 +33,10 @@ int main(int argc, char *argv[])
 #endif
     QApplication a(argc, argv);
     qputenv("QT_ASSUME_UTF8", "1");
+    QTranslator t;
+    if (t.load(":/lang/FrontDesk.qm")) {
+        a.installTranslator( &t);
+    }
     LogWriter::write(LogWriterLevel::verbose, "Support SSL", QSslSocket::supportsSsl() ? "true" : "false");
     LogWriter::write(LogWriterLevel::verbose, "Support SSL version", QSslSocket::sslLibraryBuildVersionString());
     QString serverName, configName, showName;
@@ -58,7 +62,11 @@ int main(int argc, char *argv[])
             if (h.length() == 2) {
                 QJsonObject jo;
                 jdirectConnection["host"] = QString("%1/engine/info.php").arg(h.at(1));
-                jdirectConnection["database"] = QString("https://%1").arg(h.at(1));
+                if (h.at(1).contains("127.0.0.1")) {
+                    jdirectConnection["database"] = QString("http://%1").arg(h.at(1));
+                } else {
+                    jdirectConnection["database"] = QString("https://%1").arg(h.at(1));
+                }
                 jdirectConnection["waiterserver"] = "";
             }
         } else if (sn.contains("/showname")) {
@@ -111,9 +119,6 @@ int main(int argc, char *argv[])
     if (!C5SystemPreference::checkDecimalPointAndSeparator()) {
         return 0;
     }
-    QTranslator t;
-    t.load(":/lang/FrontDesk.qm");
-    a.installTranslator( &t);
     a.setStyle(QStyleFactory::create("fusion"));
     QFontDatabase::addApplicationFont(":/barcode.ttf");
     //    int id = QFontDatabase::addApplicationFont(":/ahuni.ttf");

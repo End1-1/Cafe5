@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT += core gui network printsupport sql multimedia widgets websockets
+QT += core gui network printsupport sql multimedia widgets websockets concurrent
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -54,21 +54,4 @@ win32: QMAKE_CXXFLAGS -= -Zc:strictStrings
  #    QMAKE_CXXFLAGS += /WX
  # }
 
-HEADERS += \
-    ../Classes/amkbd.h \
-    ../Classes/format_date.h \
-    ../Classes/logwriter.h \
-    ../Forms/c5goodsprice.h \
-    ../NTable/ninterface.h \
-    c5aboutdlg.h
 
-SOURCES += \
-    ../Classes/amkbd.cpp \
-    ../Classes/logwriter.cpp \
-    ../Forms/c5goodsprice.cpp \
-    ../NTable/ninterface.cpp \
-    c5aboutdlg.cpp
-
-FORMS += \
-    ../Forms/c5goodsprice.ui \
-    c5aboutdlg.ui
