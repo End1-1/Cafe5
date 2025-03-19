@@ -49,7 +49,7 @@ OHeader::OHeader()
 
 void OHeader::bind(C5Database &db)
 {
-    db[":f_id"] = id;
+    db[":f_id"] = _id();
     db[":f_hallid"] = hallId;
     db[":f_prefix"] = prefix;
     db[":f_state"] = state;
@@ -157,14 +157,14 @@ bool OHeader::write(C5Database &db, QString &err)
     } else {
         bool b = insert(db, "o_header", err);
         if (b) {
-            db[":f_id"] = id;
+            db[":f_id"] = _id();
             db[":f_1"] = 0;
             db[":f_2"] = 0;
             db[":f_3"] = 0;
             db[":f_4"] = 0;
             db[":f_5"] = 0;
             b = b && getWriteResult(db, db.insert("o_header_flags", false), err);
-            db[":f_id"] = id;
+            db[":f_id"] = _id();
             b = b && getWriteResult(db, db.insert("o_header_options", false), err);
         }
         return b;
@@ -189,7 +189,8 @@ void OHeader::countAmount(QVector<OGoods> &goods, BHistory &bhistory)
     amountDiscount = 0;
     for (int i = 0; i < goods.count(); i++) {
         OGoods &g = goods[i];
-        g.total = (g.qty / g._qtybox)  * g.price;
+        g.row = i;
+        g.total = g.qty   *g.price;
         amountTotal += g.total;
         switch (g.discountMode) {
             case CARD_TYPE_DISCOUNT:

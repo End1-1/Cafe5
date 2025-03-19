@@ -3,7 +3,8 @@
 
 #include "c5dialog.h"
 
-namespace Ui {
+namespace Ui
+{
 class SearchItems;
 }
 
@@ -13,6 +14,7 @@ class SearchItems : public C5Dialog
 
 public:
     explicit SearchItems();
+
     ~SearchItems();
 
 private slots:

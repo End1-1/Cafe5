@@ -50,6 +50,16 @@ double C5LineEdit::getDouble()
 
 void C5LineEdit::setData(const QVariant &data)
 {
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+    switch (data.type()) {
+        case QVariant::Double:
+            setDouble(data.toDouble());
+            break;
+        default:
+            setText(data.toString());
+            break;
+    }
+#else
     switch (data.typeId()) {
         case QMetaType::Double:
             setDouble(data.toDouble());
@@ -58,6 +68,7 @@ void C5LineEdit::setData(const QVariant &data)
             setText(data.toString());
             break;
     }
+#endif
 }
 
 int C5LineEdit::getTag()
@@ -142,10 +153,14 @@ void C5LineEdit::keyPressEvent(QKeyEvent *e)
         }
     }
     if (!fEventKeys.isEmpty()) {
-        if (fEventKeys.contains(QChar(e->key()))) {
-            e->ignore();
-            keyPressed(QChar(e->key()));
-            return;
+        int key = e->key();
+        if (key >= 0x20 && key <= 0x10FFFF) {
+            QChar ch(static_cast<char32_t>(key));
+            if (fEventKeys.contains(ch)) {
+                emit keyPressed(ch);
+                e->ignore();
+                return;
+            }
         }
     }
     QLineEdit::keyPressEvent(e);
@@ -154,9 +169,12 @@ void C5LineEdit::keyPressEvent(QKeyEvent *e)
 void C5LineEdit::keyReleaseEvent(QKeyEvent *event)
 {
     if (!fEventKeys.isEmpty()) {
-        if (fEventKeys.contains(QChar(event->key()))) {
-            keyPressed(QChar(event->key()));
-            event->ignore();
+        int key = event->key();
+        if (key >= 0x20 && key <= 0x10FFFF) {
+            if (fEventKeys.contains(QChar(event->key()))) {
+                emit keyPressed(QChar(event->key()));
+                event->ignore();
+            }
         }
     }
     QLineEdit::keyReleaseEvent(event);

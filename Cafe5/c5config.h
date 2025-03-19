@@ -84,7 +84,6 @@
 #define param_shop_report_of_logged_staff 88
 #define param_shop_hide_store_qty 89
 #define param_shop_config_mobile_client 90
-#define param_fd_russian_scale1 91
 #define param_shop_print_v3 92
 #define param_shop_never_tax 93
 #define param_fd_update_a_temp_store 94

@@ -20,3 +20,14 @@ QString hostusername()
     }
     return name;
 }
+
+QString columnNumberToLetter(int n)
+{
+    QString letter = "";
+    while (n > 0) {
+        n--;  // Уменьшаем на 1, чтобы учитывать нумерацию с A
+        letter = char(n % 26 + 'A') + letter;
+        n /= 26;
+    }
+    return letter;
+}

@@ -229,16 +229,20 @@ bool C5StoreDraftWriter::hallId(QString &prefix, int &id, int hall)
 int C5StoreDraftWriter::counterAType(int type)
 {
     fDb[":f_id"] = DOC_TYPE_CASH;
-    if (!fDb.exec("select f_counter + 1 from a_type where f_id=:f_id for update")) {
+    if (!fDb.exec("select cast(f_counter + 1 as int) "
+                  "from a_type "
+                  "where f_id=:f_id")) {
         return returnResult(false);
     }
     if (!fDb.nextRow()) {
         return returnResult(false, "Invalid counter number");
     }
     int result = fDb.getInt(0);
+    Q_ASSERT(result > 0);
     fDb[":f_id"] = type;
     fDb[":f_counter"] = result;
-    if (!fDb.exec("update a_type set f_counter=:f_counter where f_id=:f_id and f_counter<:f_counter")) {
+    if (!fDb.exec("update a_type set f_counter=:f_counter "
+                  "where f_id=:f_id and f_counter<:f_counter")) {
         return returnResult(false);
     }
     return result > 0;
@@ -264,7 +268,7 @@ bool C5StoreDraftWriter::readAHeaderStore(const QString &id)
         fErrorMsg = fDb.fLastError;
         return false;
     }
-    if (fAHeaderStoreData.count() > 0) {
+    if (fAHeaderStoreData.size() > 0) {
         return true;
     } else {
         fErrorMsg = tr("Error in store document, partial data was lost");
@@ -315,7 +319,7 @@ bool C5StoreDraftWriter::readAHeaderCash(const QString &id)
         fErrorMsg = fDb.fLastError;
         return false;
     }
-    if (fAHeaderCashData.count() > 0) {
+    if (fAHeaderCashData.size() > 0) {
         return true;
     } else {
         fErrorMsg = tr("Error in cash document, partial data was lost");
@@ -327,7 +331,7 @@ bool C5StoreDraftWriter::readECash(const QString &id)
 {
     fDb[":f_header"] = id;
     if (fDb.exec("select * from e_cash where f_header=:f_header order by f_row", fECashData, fECashDataMap)) {
-        if (fECashData.count() == 0) {
+        if (fECashData.size() == 0) {
             fErrorMsg = tr("Empty cash document");
             return false;
         }
@@ -400,7 +404,7 @@ bool C5StoreDraftWriter::readAHeader(const QString &id)
     bool result = true;
     fDb[":f_id"] = id;
     fDb.exec("select * from a_header where f_id=:f_id", fAHeaderData, fAHeaderDataMap);
-    if (fAHeaderData.count() > 0) {
+    if (fAHeaderData.size() > 0) {
         switch (value(container_aheader, 0, "f_type").toInt()) {
             case DOC_TYPE_STORE_INPUT:
                 result = readAHeaderStore(id);
@@ -510,28 +514,28 @@ bool C5StoreDraftWriter::writeAHeader2ShopStore(const QString &id, int store, in
 
 int C5StoreDraftWriter::rowCount(int container)
 {
-    int rc = -1;
+    unsigned long long rc = -1;
     switch (container) {
         case container_ecash:
-            rc = fECashData.count();
+            rc =  fECashData.size();
             break;
         case container_aheader:
-            rc = fAHeaderData.count();
+            rc = fAHeaderData.size();
             break;
         case container_aheadercash:
-            rc = fAHeaderCashData.count();
+            rc = fAHeaderCashData.size();
             break;
         case container_aheaderstore:
-            rc = fAHeaderStoreData.count();
+            rc = fAHeaderStoreData.size();
             break;
         case container_astoredraft:
-            rc = fAStoreDraftData.count();
+            rc = fAStoreDraftData.size();
             break;
         case container_astoredishwaste:
-            rc = fAStoreDishWaste.count();
+            rc = fAStoreDishWaste.size();
             break;
         case container_bclient_debts:
-            rc = fBClientsDebtsData.count();
+            rc = fBClientsDebtsData.size();
             break;
     }
     Q_ASSERT(rc != -1);
@@ -540,7 +544,7 @@ int C5StoreDraftWriter::rowCount(int container)
 
 QVariant C5StoreDraftWriter::value(int container, int row, const QString &key)
 {
-    QVector<QVector<QJsonValue> > *c = nullptr;
+    std::vector<QJsonArray > *c = nullptr;
     QHash<QString, int> *d = nullptr;
     switch (container) {
         case container_ecash:
@@ -573,7 +577,7 @@ QVariant C5StoreDraftWriter::value(int container, int row, const QString &key)
             break;
     }
     Q_ASSERT(c);
-    QVector<QJsonValue>  &datarow = ( *c)[row];
+    QJsonArray  &datarow = ( *c)[row];
     int column = d->value(key);
     return datarow.at(column);
 }
@@ -742,9 +746,8 @@ bool C5StoreDraftWriter::writeOBodyToOGoods(const QString &id, const QString &he
              "where b.f_id=:f_id");
     int row = 0;
     OGoods g;
-    bool fetch = true;
     QString err;
-    while (fetch = g.getRecord(fDb)) {
+    while (g.getRecord(fDb)) {
         g.row = ++row;
         g.header = headerid;
         g.body = id;
@@ -798,7 +801,9 @@ bool C5StoreDraftWriter::writeInput(const QString &docId, QString &err)
     fDb[":f_document"] = docId;
     fDb.exec("select * from a_store_draft where f_document=:f_document");
     QString longsql =
-        "insert into a_store (f_id, f_document, f_store, f_type, f_goods, f_qty, f_price, f_total, f_base, f_basedoc, f_reason, f_draft) values ";
+        "insert into a_store (f_id, f_document, f_store, f_type, f_goods, "
+        "f_qty, f_price, f_total, "
+        "f_base, f_basedoc, f_reason, f_draft) values ";
     bool f = true;
     while (fDb.nextRow()) {
         if (f) {
@@ -878,7 +883,7 @@ bool C5StoreDraftWriter::writeOutput(const QString &docId, QString &err)
     while (fDb.nextRow()) {
         recID.append(fDb.getString("f_id"));
         baseID.append(fDb.getString("f_base"));
-        goodsID.append(fDb.getString("f_goods"));
+        goodsID.append(QString::number(fDb.getInt("f_goods")));
         goodsName.append(fDb.getString("f_name"));
         reason = fDb.getInt("f_reason");
         qtyList.append(fDb.getDouble("f_qty"));
@@ -891,24 +896,13 @@ bool C5StoreDraftWriter::writeOutput(const QString &docId, QString &err)
     }
     QList<QMap<QString, QVariant> > storeData;
     fDb[":f_store"] = storeOut;
-    //    fDb[":f_date"] = date;
-    //    if (!fDb.exec(QString("select s.f_id, s.f_goods, sum(s.f_qty*s.f_type) as f_qty, s.f_price, s.f_total*s.f_type, "
-    //                          "s.f_document, s.f_base, d.f_date "
-    //            "from a_store s "
-    //            "inner join a_header d on d.f_id=s.f_document "
-    //            "where s.f_goods in (%1) and s.f_store=:f_store "
-    //            "group by s.f_base "
-    //            "having sum(s.f_qty*s.f_type)>0 "
-    //            "order by d.f_date "
-    //            "for update ").arg(goodsID.join(",")))) {
-    //        err = fDb.fLastError + "<br>";
-    //        return false;
-    //    }
     if (!fDb.exec(
-                QString("select s.f_id, s.f_goods, sm.f_qty, sm.f_price, sm.f_total, s.f_document, s.f_base, s.f_basedoc, d.f_date "
+                QString("select s.f_id, s.f_goods, sm.f_qty, sm.f_price, sm.f_total, "
+                        "s.f_document, s.f_base, s.f_basedoc, d.f_date "
                         "from a_store s "
                         "left join ( "
-                        "select   sum(ss.f_qty*ss.f_type) as f_qty, ss.f_price, sum(ss.f_total*ss.f_type) as f_total, ss.f_base "
+                        "select   sum(ss.f_qty*ss.f_type) as f_qty, ss.f_price, "
+                        "sum(ss.f_total*ss.f_type) as f_total, ss.f_base "
                         "from a_store ss "
                         "where ss.f_goods in (%1) and ss.f_store=:f_store "
                         "group by ss.f_base  "

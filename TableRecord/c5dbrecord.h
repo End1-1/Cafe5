@@ -11,7 +11,7 @@ public:
     virtual bool write(C5Database &db, QString &err) = 0;
     virtual void bind(C5Database &db) = 0;
     virtual bool getRecord(C5Database &db);
-    virtual TableRecord &queryRecordOfId(C5Database &db, const QVariant &id);
+    virtual TableRecord &queryRecordOfId(C5Database &db, int id);
     bool getWriteResult(C5Database &db, bool result, QString &err);
     bool insert(C5Database &db, const QString &table, QString &err);
     bool insertWithId(C5Database &db, const QString &table, QString &err);

@@ -17,7 +17,7 @@ public:
     virtual void restoreColumnsWidths();
 
 protected:
-    virtual bool tblDoubleClicked(int row, int column, const QVector<QJsonValue> &values);
+    virtual bool tblDoubleClicked(int row, int column, const QJsonArray &values) override;
 
 private:
     CR5SaleFromStoreFilter *fFilter;

@@ -3,10 +3,12 @@
 #include "c5lineedit.h"
 #include "c5lineeditwithselector.h"
 #include "c5message.h"
-#include "xlsxall.h"
 #include <QScrollBar>
 #include <QDebug>
 #include <QElapsedTimer>
+#include <QFileDialog>
+#include <QDesktopServices>
+#include <QXlsx/header/xlsxdocument.h>
 
 C5TableWithTotal::C5TableWithTotal(QWidget *parent) :
     QWidget(parent),
@@ -59,52 +61,41 @@ void C5TableWithTotal::exportToExcel()
         C5Message::info(tr("Empty report!"));
         return;
     }
-    XlsxDocument d;
-    XlsxSheet *s = d.workbook()->addSheet("Sheet1");
+    QXlsx::Document d;
+    d.addSheet("Sheet1");
     /* HEADER */
     QColor color = QColor::fromRgb(200, 200, 250);
     QFont headerFont(qApp->font());
     headerFont.setBold(true);
-    d.style()->addFont("header", headerFont);
-    d.style()->addBackgrounFill("header", color);
+    QXlsx::Format hf;
+    hf.setFont(headerFont);
+    hf.setBorderStyle(QXlsx::Format::BorderThin);
+    hf.setPatternBackgroundColor(color);
     for (int i = 0; i < columnCount(); i++) {
-        s->addCell(1, i + 1, columnTitle(i), d.style()->styleNum("header"));
-        s->setColumnWidth(i + 1, columnWidth(i) / 7);
+        d.write(1, i + 1, columnTitle(i), hf);
+        d.setColumnWidth(i + 1, columnWidth(i) / 7);
     }
     /* BODY */
-    QMap<int, QString> bgFill;
     QFont bodyFont(qApp->font());
-    d.style()->addFont("body", bodyFont);
-    d.style()->addBackgrounFill("body", QColor(Qt::white));
-    bgFill[QColor(Qt::white).rgb()] = "body";
+    QXlsx::Format bf;
+    bf.setFont(bodyFont);
+    bf.setHorizontalAlignment(QXlsx::Format::AlignHCenter);
+    bf.setBorderStyle(QXlsx::Format::BorderThin);
     for (int j = 0; j < rowCount(); j++) {
         for (int i = 0; i < columnCount(); i++) {
-            int bgColor = getData(j, i, Qt::BackgroundRole).value<QColor>().rgb();
-            bgColor = QColor::fromRgb(255, 255, 255).rgb();
-            if (!bgFill.contains(bgColor)) {
-                d.style()->addFont(QString::number(bgColor), bodyFont);
-                d.style()->addBackgrounFill(QString::number(bgColor), QColor::fromRgb(bgColor));
-                bgFill[bgColor] = QString::number(bgColor);
-            }
-            QString bgStyle = bgFill[bgColor];
-            s->addCell(j + 2, i + 1, getData(j, i, Qt::EditRole), d.style()->styleNum(bgStyle));
+            d.write(j + 2, i + 1, getData(j, i, Qt::EditRole), bf);
         }
     }
     /* TOTALS ROWS */
-    QFont totalFont(qApp->font());
-    totalFont.setBold(true);
-    d.style()->addFont("footer", headerFont);
-    color = QColor::fromRgb(193, 206, 221);
-    d.style()->addBackgrounFill("footer", color);
     for (int i = 0; i < columnCount(); i++) {
-        s->addCell(1 + rowCount() + 1, i + 1, totalStr(i), d.style()->styleNum("footer"));
+        d.write(1 + rowCount() + 1, i + 1, totalStr(i), hf);
     }
-    QString err;
-    if (!d.save(err, true)) {
-        if (!err.isEmpty()) {
-            C5Message::error(err);
-        }
+    QString filename = QFileDialog::getSaveFileName(nullptr, "", "", "*.xlsx");
+    if (filename.isEmpty()) {
+        return;
     }
+    d.saveAs(filename);
+    QDesktopServices::openUrl(filename);
 }
 
 void C5TableWithTotal::setRowColor(int row, const QColor &c)

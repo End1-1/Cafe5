@@ -87,7 +87,7 @@ void C5Dialog::showFullScreen()
 #endif
 }
 
-void C5Dialog::selectorCallback(int row, const QVector<QJsonValue> &values)
+void C5Dialog::selectorCallback(int row, const QJsonArray &values)
 {
     Q_UNUSED(row);
     Q_UNUSED(values);

@@ -51,7 +51,6 @@ void C5Permissions::init(C5Database &db, int group)
               << cp_t3_debts_partner
               << cp_t3_consuption_reason
               << cp_t3_preorders
-              << cp_t3_sale_effectiveness
               << cp_t3_storage_uncomplected
               << cp_t3_move_uncomplected
               << cp_t3_custom_reports

@@ -2,7 +2,7 @@
 #include "ui_dlgstafflist.h"
 #include "datadriver.h"
 #include "dlgpassword.h"
-#include <QDesktopWidget>
+#include <QScreen>
 
 DlgStaffList::DlgStaffList() :
     C5Dialog(__c5config.dbParams()),
@@ -12,7 +12,7 @@ DlgStaffList::DlgStaffList() :
     setWindowState(Qt::WindowFullScreen);
     connect(ui->wkbd, &RKeyboard::textChanged, this, &DlgStaffList::searchStaff);
     connect(ui->wkbd, &RKeyboard::reject, this, &DlgStaffList::reject);
-    QRect scr = qApp->desktop()->screenGeometry();
+    QRect scr = qApp->screens().at(0)->geometry();
     setProperty("cols", (scr.width() - 20) / ui->tbl->horizontalHeader()->defaultSectionSize());
     searchStaff("");
 }
@@ -29,7 +29,7 @@ void DlgStaffList::searchStaff(const QString &txt)
     ui->tbl->setRowCount(0);
     int c = 0, r = 0;
     dbuser->refresh();
-    for (int id: dbuser->list()) {
+    for (int id : dbuser->list()) {
         if (!txt.isEmpty()) {
             if (!dbuser->fullName(id).contains(txt, Qt::CaseInsensitive)) {
                 continue;
@@ -54,11 +54,13 @@ void DlgStaffList::on_tbl_cellClicked(int row, int column)
     if (id == 0) {
         return;
     }
-    if (C5Message::question(tr("Are you sure to change password for ") + "\r\n" + ui->tbl->getString(row, column)) != QDialog::Accepted) {
+    if (C5Message::question(tr("Are you sure to change password for ") + "\r\n" + ui->tbl->getString(row,
+                            column)) != QDialog::Accepted) {
         return;
     }
     QString pass;
-    if (!DlgPassword::getPasswordString(tr("Enter the new password for ") + "\r\n" + ui->tbl->getString(row, column), pass)) {
+    if (!DlgPassword::getPasswordString(tr("Enter the new password for ") + "\r\n" + ui->tbl->getString(row, column),
+                                        pass)) {
         return;
     }
     C5Database db(__c5config.dbParams());

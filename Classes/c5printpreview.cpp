@@ -77,7 +77,7 @@ void C5PrintPreview::on_cbZoom_currentIndexChanged(int index)
 
 void C5PrintPreview::on_btnPrint_clicked()
 {
-    fPrintData->print(ui->cbPrinters->currentText(), QPageSize::A4);
+    fPrintData->print(ui->cbPrinters->currentText(), QPageSize(QPageSize::A4));
 }
 
 void C5PrintPreview::on_cbPrinters_currentIndexChanged(const QString &arg1)

@@ -148,7 +148,6 @@ void DlgReservGoods::on_btnCancelReserve_clicked()
 void DlgReservGoods::setState(int state)
 {
     updateState(__c5config.dbParams(), state);
-    updateState(__c5config.dbParams(), state);
     ui->btnCancelReserve->setVisible(false);
     ui->btnCompleteReserve->setVisible(false);
 #if(!defined FRONTDESK && !defined WAITER)
@@ -179,15 +178,12 @@ void DlgReservGoods::updateState(const QStringList &dbparams, int state)
     db[":f_qty"] = ui->leReservedQty->getDouble();
     db[":f_goods"] = fGoods;
     db[":f_store"] = fStore;
-    db.exec("update a_store_sale set f_qtyreserve=f_qtyreserve-:f_qty where f_store=:f_store and f_goods=:f_goods");
+    db.exec("update a_store_sale set f_qtyreserve=f_qtyreserve-:f_qty "
+            "where f_store=:f_store and f_goods=:f_goods");
 }
 
 void DlgReservGoods::on_btnCompleteReserve_clicked()
 {
-    //    if (fStore != 23) {
-    //        C5Message::error("No-no-no!");
-    //        return;
-    //    }
     setState(GR_COMPLETED);
 }
 

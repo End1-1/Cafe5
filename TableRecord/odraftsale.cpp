@@ -48,6 +48,6 @@ bool ODraftSale::write(C5Database &db, QString &err)
     if (n) {
         return insert(db, "o_draft_sale", err);
     } else {
-        return getWriteResult(db, db.update("o_draft_sale", "f_id", id), err);
+        return getWriteResult(db, db.update("o_draft_sale", "f_id", _id()), err);
     }
 }

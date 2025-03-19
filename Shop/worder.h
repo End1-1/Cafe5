@@ -157,6 +157,8 @@ private:
 
     bool checkDiscountRight();
 
+    void marti8();
+
 };
 
 #endif // WORDER_H

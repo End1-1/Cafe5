@@ -29,20 +29,6 @@ DEFINES += NETWORKDB
 
 
 SOURCES += \
-    ../../XLSX/src/xlsx.cpp \
-    ../../XLSX/src/xlsxborder.cpp \
-    ../../XLSX/src/xlsxcell.cpp \
-    ../../XLSX/src/xlsxcontenttype.cpp \
-    ../../XLSX/src/xlsxdocpropsapp.cpp \
-    ../../XLSX/src/xlsxdocpropscore.cpp \
-    ../../XLSX/src/xlsxdocument.cpp \
-    ../../XLSX/src/xlsxrels.cpp \
-    ../../XLSX/src/xlsxsharedstring.cpp \
-    ../../XLSX/src/xlsxsheet.cpp \
-    ../../XLSX/src/xlsxstyles.cpp \
-    ../../XLSX/src/xlsxtheme.cpp \
-    ../../XLSX/src/xlsxworkbook.cpp \
-    ../../XLSX/src/xlsxwriter.cpp \
     ../Cafe5/c5cafecommon.cpp \
     ../Cafe5/c5double.cpp \
     ../Cafe5/c5sockethandler.cpp \
@@ -82,7 +68,6 @@ SOURCES += \
     ../Classes/c5widget.cpp \
     ../Classes/c5witerconf.cpp \
     ../Classes/calculator.cpp \
-    ../Classes/checkforupdatethread.cpp \
     ../Classes/dataonline.cpp \
     ../Classes/dlgpassword.cpp \
     ../Classes/fileversion.cpp \
@@ -148,6 +133,7 @@ SOURCES += \
     dlgcashout.cpp \
     dlgdate.cpp \
     dlggetidname.cpp \
+    dlggetvalue.cpp \
     dlggiftcardsale.cpp \
     dlggoodslist.cpp \
     dlgmovement.cpp \
@@ -185,23 +171,6 @@ SOURCES += \
     ../Controls/c5checkbox.cpp
 
 HEADERS += \
-    ../../XLSX/src/crs32.h \
-    ../../XLSX/src/xlsx.h \
-    ../../XLSX/src/xlsxall.h \
-    ../../XLSX/src/xlsxborder.h \
-    ../../XLSX/src/xlsxcell.h \
-    ../../XLSX/src/xlsxcontenttype.h \
-    ../../XLSX/src/xlsxdocpropsapp.h \
-    ../../XLSX/src/xlsxdocpropscore.h \
-    ../../XLSX/src/xlsxdocument.h \
-    ../../XLSX/src/xlsxrels.h \
-    ../../XLSX/src/xlsxsharedstring.h \
-    ../../XLSX/src/xlsxsheet.h \
-    ../../XLSX/src/xlsxstyles.h \
-    ../../XLSX/src/xlsxtheme.h \
-    ../../XLSX/src/xlsxworkbook.h \
-    ../../XLSX/src/xlsxwriter.h \
-    ../../XLSX/src/zip.h \
     ../Cafe5/c5cafecommon.h \
     ../Cafe5/c5double.h \
     ../Cafe5/c5sockethandler.h \
@@ -243,7 +212,6 @@ HEADERS += \
     ../Classes/c5witerconf.h \
     ../Classes/calculator.h \
     ../Classes/chatmessage.h \
-    ../Classes/checkforupdatethread.h \
     ../Classes/dataonline.h \
     ../Classes/dlgpassword.h \
     ../Classes/fileversion.h \
@@ -310,6 +278,7 @@ HEADERS += \
     dlgcashout.h \
     dlgdate.h \
     dlggetidname.h \
+    dlggetvalue.h \
     dlggiftcardsale.h \
     dlggoodslist.h \
     dlgmovement.h \
@@ -366,6 +335,7 @@ FORMS += \
     dlgcashout.ui \
     dlgdate.ui \
     dlggetidname.ui \
+    dlggetvalue.ui \
     dlggiftcardsale.ui \
     dlggoodslist.ui \
     dlgmovement.ui \
@@ -407,16 +377,17 @@ INCLUDEPATH += ../Configs
 INCLUDEPATH += ../Service
 INCLUDEPATH += ../Printing
 INCLUDEPATH += ../RESOURCES
-INCLUDEPATH += ../../XLSX/Src
 INCLUDEPATH += C:/Projects/NewTax/Src
-INCLUDEPATH += C:/Soft/OpenSSLWin64/include
-INCLUDEPATH += C:/Soft/OpenSSLWin64/include/openssl
+INCLUDEPATH += c:/Soft/OpenSSLWin64/include
+INCLUDEPATH += c:/Soft/OpenSSLWin64/include/openssl
 
 ICON = bag.ico
 
 RESOURCES += \
     ../resources/res.qrc \
     local.qrc
+
+include(C:/projects/QXlsx/QXlsx/QXlsx.pri)
 
 LIBS += -lVersion
 LIBS += -lwsock32
@@ -427,14 +398,14 @@ LIBS += -llibcrypto
 DEFINES += _CRYPT_KEY_=\\\"shop2022!!!\\\"
 DEFINES += WAITER
 
-win32: QMAKE_CXXFLAGS_RELEASE -= -Zc:strictStrings
-win32: QMAKE_CFLAGS_RELEASE -= -Zc:strictStrings
-win32: QMAKE_CFLAGS -= -Zc:strictStrings
-win32: QMAKE_CXXFLAGS -= -Zc:strictStrings
+#win32: QMAKE_CXXFLAGS_RELEASE -= -Zc:strictStrings
+#win32: QMAKE_CFLAGS_RELEASE -= -Zc:strictStrings
+#win32: QMAKE_CFLAGS -= -Zc:strictStrings
+#win32: QMAKE_CXXFLAGS -= -Zc:strictStrings
 
-win32-g++ {
-   QMAKE_CXXFLAGS += -Werror
-}
-win32-msvc*{
-   QMAKE_CXXFLAGS += /WX
-}
+#win32-g++ {
+#   QMAKE_CXXFLAGS += -Werror
+#}
+##win32-msvc*{
+ #  QMAKE_CXXFLAGS += /WX
+#}

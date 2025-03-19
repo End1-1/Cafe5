@@ -23,7 +23,7 @@ bool OutputOfHeader::make(C5Database &db, const QString &id)
         return false;
     }
     QList<QMap<QString, QVariant> > goodsList;
-    db[":f_header"] = fOHeader.id;
+    db[":f_header"] = fOHeader.id.toString();
     db.exec("select og.f_goods, g.f_name, g.f_unit, og.f_isservice, og.f_qty  "
             "from o_goods og "
             "left join c_goods g on g.f_id=og.f_goods "

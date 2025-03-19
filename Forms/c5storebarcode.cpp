@@ -3,7 +3,6 @@
 #include "barcode.h"
 #include "barcode5.h"
 #include "c5storebarcodelist.h"
-#include "QRCodeGenerator.h"
 #include "c5lineedit.h"
 #include "c5checkbox.h"
 #include "dlgselectcurrency.h"
@@ -96,9 +95,9 @@ bool C5StoreBarcode::printOneBarcode(const QString &code, const QString &price, 
     printer.setPageSize(ps);
     QPainter p( &printer);
     Barcode93 b;
-    bool r = b.Encode93(code.toLatin1().data());
+    //bool r = b.Encode93(code.toLatin1().data());
     BarcodeEan13 e13;
-    bool r_e13 = e13.EncodeEan13(code.toLatin1().data());
+    //bool r_e13 = e13.EncodeEan13(code.toLatin1().data());
     QFont f(__c5config.getValue(param_app_font_family), 25, QFont::Normal);
     int levelIndex = 1;
     int versionIndex = 0;

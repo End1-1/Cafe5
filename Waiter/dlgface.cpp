@@ -20,7 +20,7 @@
 #include "c5logtoserverthread.h"
 #include <QPushButton>
 #include <QCloseEvent>
-#include <QDesktopWidget>
+#include <QScreen>
 
 #define HALL_COL_WIDTH 175
 #define HALL_ROW_HEIGHT 60
@@ -221,7 +221,7 @@ void DlgFace::filterHall(int hall, int staff)
         ui->sglHall->itemAt(0)->widget()->deleteLater();
         ui->sglHall->removeItem(ui->sglHall->itemAt(0));
     }
-    QRect f = qApp->desktop()->screen()->geometry();
+    QRect f = qApp->screens().at(0)->geometry();
     int sw = ui->shall->width() - 20;
     int cc = (sw / 204) - 1;
     int delta = sw - ((cc + 1) * 204);

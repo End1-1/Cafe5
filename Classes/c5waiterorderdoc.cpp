@@ -336,7 +336,6 @@ bool C5WaiterOrderDoc::transferToHotel(C5Database &db, QString &err)
         db[":f_canceluser"] = 0;
         if (!db.insert(QString("%1.o_dish").arg(__c5config.hotelDatabase()), false)) {
             err = "Cannot insert into o_dish<br>" + db.fLastError;
-            db.rollback();
             return false;
         }
     }
@@ -352,7 +351,6 @@ bool C5WaiterOrderDoc::transferToHotel(C5Database &db, QString &err)
     db[":f_value1"] = QString("%1%2").arg(hString("f_prefix"), QString::number(hInt("f_hallid")));
     db[":f_value2"] = hString("f_amounttotal");
     db.insert("airlog.log", false);
-    db.commit();
     return true;
 #endif
 }
@@ -380,7 +378,6 @@ bool C5WaiterOrderDoc::makeOutputOfStore(C5Database &db, QString &err, int store
     QList<tmpg> goods;
     while (db.nextRow()) {
         if (db.getInt("f_state") == DOC_STATE_SAVED) {
-            db.rollback();
             err += tr("Document saved") + "<br>";
             return false;
         }
@@ -721,7 +718,6 @@ QString C5WaiterOrderDoc::getHotelID(const QString &source, QString &err)
     QStringList dbparams = __c5config.dbParams();
     dbparams[1] = "airwick";
     C5Database dba(dbparams);
-    dba.open();
     int totaltrynum = 0;
     bool done = false;
     QString result;
@@ -828,10 +824,6 @@ void C5WaiterOrderDoc::calculateSelfCost(C5Database &db)
 void C5WaiterOrderDoc::run()
 {
     QString err;
-    if (fDb.open()) {
-        open(fDb);
-        makeOutputOfStore(fDb, err, DOC_STATE_SAVED);
-        fDb.close();
-    }
+    makeOutputOfStore(fDb, err, DOC_STATE_SAVED);
     emit finished();
 }

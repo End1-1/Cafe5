@@ -1,5 +1,4 @@
 #include "cr5generalreportonlydate.h"
-#include "xlsxsheet.h"
 #include "cr5mfgeneralreportfilter.h"
 #include "c5tablemodel.h"
 
@@ -9,30 +8,30 @@ CR5GeneralReportOnlyDate::CR5GeneralReportOnlyDate(const QStringList &dbParams) 
     fIcon = ":/manufacturing.png";
     fLabel = tr("Manufacture general report only date");
     fFilterWidget = new CR5MFGeneralReportFilter(dbParams);
-    fFilter = static_cast<CR5MFGeneralReportFilter*>(fFilterWidget);
+    fFilter = static_cast<CR5MFGeneralReportFilter *>(fFilterWidget);
     fTranslation["f_date"] = tr("Date");
     fTranslation["f_workername"] = tr("Worker");
     fTranslation["f_counted"] = tr("Counted");
     fTranslation["f_days"] = tr("Days");
     fTranslation["f_average"] = tr("Average");
-
     fSimpleQuery = true;
 }
 
 void CR5GeneralReportOnlyDate::buildQuery()
 {
-    fSqlQuery = "select concat(w.f_last, ' ', w.f_first) as f_workername, date_format(p.f_date, '%d/%m/%Y') as f_date, -1 as f_counted, -1 as f_days, -1 as f_average "
-                "from mf_daily_process p "
-                "inner join s_user w on w.f_id=p.f_worker "
-                "where p.f_product in (34)  and %where% "
-                "union "
-                "select concat(w.f_last, ' ', w.f_first), '', floor(sum(p.f_qty*p.f_price)), "
-                "count(distinct(p.f_date)), floor(sum(p.f_qty*p.f_price) / count(distinct(p.f_date))) "
-                "from mf_daily_process p "
-                "inner join s_user w on w.f_id=p.f_worker "
-                "where p.f_product not in (34) and %where% "
-                "group by 1 "
-                "order by 1, 2 desc ";
+    fSqlQuery =
+        "select concat(w.f_last, ' ', w.f_first) as f_workername, date_format(p.f_date, '%d/%m/%Y') as f_date, -1 as f_counted, -1 as f_days, -1 as f_average "
+        "from mf_daily_process p "
+        "inner join s_user w on w.f_id=p.f_worker "
+        "where p.f_product in (34)  and %where% "
+        "union "
+        "select concat(w.f_last, ' ', w.f_first), '', floor(sum(p.f_qty*p.f_price)), "
+        "count(distinct(p.f_date)), floor(sum(p.f_qty*p.f_price) / count(distinct(p.f_date))) "
+        "from mf_daily_process p "
+        "inner join s_user w on w.f_id=p.f_worker "
+        "where p.f_product not in (34) and %where% "
+        "group by 1 "
+        "order by 1, 2 desc ";
     C5ReportWidget::buildQuery();
 }
 
@@ -45,7 +44,7 @@ QToolBar *CR5GeneralReportOnlyDate::toolBar()
             << ToolBarButtons::tbRefresh
             << ToolBarButtons::tbExcel
             << ToolBarButtons::tbPrint;
-            createStandartToolbar(btn);
+        createStandartToolbar(btn);
     }
     return fToolBar;
 }

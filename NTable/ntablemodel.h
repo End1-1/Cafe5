@@ -48,6 +48,8 @@ public:
 
     bool checked(int &row);
 
+    bool checkedRows(std::vector<int> &rows);
+
     const QSet<QString> &uniqueValuesForColumn(int column);
 
     QMap<int, int> mRowColors;

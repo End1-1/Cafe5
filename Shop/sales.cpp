@@ -46,6 +46,14 @@ Sales::Sales(C5User *user) :
     ui->cbHall->setCurrentIndex(0);
     ui->lbTotalQty->setVisible(false);
     ui->leTotalQty->setVisible(false);
+    ui->leTotal->setVisible(__c5config.fMainJson["hide_revenue"].toBool() == false);
+    ui->lbTotalAmount->setVisible(ui->leTotal->isVisible());
+    ui->leTotalQty->setVisible(__c5config.fMainJson["hide_reenue"].toBool() == false);
+    ui->lbTotalQty->setVisible(ui->leTotalQty->isVisible());
+    ui->leRetail->setVisible(__c5config.fMainJson["hide_revenue"].toBool() == false);
+    ui->lbRetail->setVisible(ui->leRetail->isVisible());
+    ui->leWhosale->setVisible(__c5config.fMainJson["hide_revenue"].toBool() == false);
+    ui->lbWhosale->setVisible(ui->leWhosale->isVisible());
     refresh();
 }
 
@@ -200,7 +208,7 @@ void Sales::refreshTotal()
     h.append(tr("Seller"));
     h.append(tr("Sale type"));
     h.append(tr("Number"));
-    h.append(tr("Tax"));
+    h.append(tr("##"));
     h.append(tr("Date"));
     h.append(tr("Time"));
     h.append(tr("Amount"));
@@ -225,9 +233,11 @@ void Sales::refreshTotal()
         //}
     }
     QString sql =
-        QString("select '', oh.f_id, oh.f_saletype, u.f_login, os.f_name, concat(oh.f_prefix, oh.f_hallid) as f_number, "
+        QString("select '', oh.f_id, oh.f_saletype, u.f_login, os.f_name, "
+                "concat(oh.f_prefix, oh.f_hallid) as f_number, "
                 "ot.f_receiptnumber, "
-                "oh.f_datecash, oh.f_timeclose, oh.f_amounttotal, concat(c.f_taxname, ' ', c.f_contact) as f_client, "
+                "oh.f_datecash, oh.f_timeclose, oh.f_amounttotal, "
+                "concat(c.f_taxname, ' ', c.f_contact) as f_client, "
                 "concat_ws(' ', dm.f_last, dm.f_first) as f_deliverman, "
                 "oh.f_comment "
                 "from o_header oh "
@@ -239,7 +249,8 @@ void Sales::refreshTotal()
                 "left join o_sale_type os on os.f_id=oh.f_saletype "
                 "left join s_user u on u.f_id=oh.f_staff "
                 "left join s_user dm on dm.f_id=oo.f_deliveryman "
-                "where oh.f_datecash between :f_start and :f_end and oh.f_state=:f_state " + sqlCond +
+                "where oh.f_datecash between :f_start and :f_end "
+                "and oh.f_state=:f_state " + sqlCond +
                 "and oh.f_hall=:f_hall "
                 "order by oh.f_datecash, oh.f_timeclose ");
     db.exec(sql);
@@ -249,6 +260,10 @@ void Sales::refreshTotal()
         for (int i = 0; i < ui->tbl->columnCount(); i++) {
             ui->tbl->setData(row, i, db.getValue(i));
         }
+        qDebug() << db.getInt("f_saletype") << db.getDouble("f_amounttotal");
+        ui->tbl->setInteger(row, 2, db.getInt("f_saletype"));
+        ui->tbl->setDouble(row, 9, db.getDouble("f_amounttotal"));
+        qDebug() << ui->tbl->getDouble(row, 9) << ui->tbl->getData(row, 9);
         ui->tbl->item(row, 0)->setCheckState(Qt::Unchecked);
         row++;
     }
@@ -256,7 +271,7 @@ void Sales::refreshTotal()
     ui->leTotal->setDouble(ui->tbl->sumOfColumn(acol));
     double retail = 0, whosale = 0;
     for (int i = 0; i < ui->tbl->rowCount(); i++) {
-        if (ui->tbl->getInteger(i, 1) == SALE_RETAIL) {
+        if (ui->tbl->getInteger(i, 2) == SALE_RETAIL) {
             retail += ui->tbl->getDouble(i, acol);
         } else {
             whosale += ui->tbl->getDouble(i, acol);
@@ -274,7 +289,7 @@ void Sales::refreshItems()
     h.append(tr("Seller"));
     h.append(tr("Sale type"));
     h.append(tr("Number"));
-    h.append(tr("Tax"));
+    h.append(tr("##"));
     h.append(tr("Date"));
     h.append(tr("Time"));
     h.append(tr("Scancode"));
@@ -495,9 +510,9 @@ void Sales::printpreview()
     }
     columnsWidth /= scaleFactor;
     if (columnsWidth > 2000) {
-        p.setSceneParams(paperSize.height(), paperSize.width(), QPrinter::Landscape);
+        p.setSceneParams(paperSize.height(), paperSize.width(), QPageLayout::Landscape);
     } else {
-        p.setSceneParams(paperSize.width(), paperSize.height(), QPrinter::Portrait);
+        p.setSceneParams(paperSize.width(), paperSize.height(), QPageLayout::Portrait);
     }
     do {
         p.setFontBold(true);

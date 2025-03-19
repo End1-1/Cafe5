@@ -19,7 +19,7 @@ public:
 protected:
     virtual void restoreColumnsWidths() override;
 
-    virtual bool tblDoubleClicked(int row, int column, const QVector<QJsonValue> &vals) override;
+    virtual bool tblDoubleClicked(int row, int column, const QJsonArray &vals) override;
 
 private:
     CR5CostumerDebtsFilter *fFilter;

@@ -5,7 +5,6 @@
 #include "c5storedoc.h"
 #include "c5saledoc.h"
 #include "cr5reportsfilter.h"
-#include "c5salefromstoreorder.h"
 #include "ntablewidget.h"
 #include <QJsonObject>
 
@@ -86,7 +85,7 @@ void CR5Reports::buildQuery()
     }
 }
 
-bool CR5Reports::tblDoubleClicked(int row, int column, const QVector<QJsonValue> &values)
+bool CR5Reports::tblDoubleClicked(int row, int column, const QJsonArray &values)
 {
     Q_UNUSED(row);
     Q_UNUSED(column);
@@ -98,9 +97,12 @@ bool CR5Reports::tblDoubleClicked(int row, int column, const QVector<QJsonValue>
     }
     if (fHandlerUuid == REPORT_HANDLER_SALE_DOC_OPEN_DRAFT) {
         C5Database db(fDBParams);
-        db[":f_id"] = values.at(0);
+        db[":f_id"] = values.at(0).toString();
         db.exec("select * from o_draft_sale where f_id=:f_id");
-        db.nextRow();
+        if (!db.nextRow()) {
+            C5Message::error(tr("Program error"), "draft not found by id");
+            return false;
+        }
         int type = db.getInt("f_saletype");
         if (type == 3) {
             QString err;
@@ -118,7 +120,7 @@ bool CR5Reports::tblDoubleClicked(int row, int column, const QVector<QJsonValue>
             }
         }
     } else if (fHandlerUuid == REPORT_HANDLER_GIFT_CARD_TOTAL) {
-        __mainWindow->createNTab("/engine/reports/gifthistorydetails.php", QJsonObject{{"card", values.at(1).toString()}});
+        __mainWindow->createNTab("/engine/reports/gifthistorydetails.php", "", QJsonObject{{"card", values.at(1).toString()}});
     }
     return true;
 }

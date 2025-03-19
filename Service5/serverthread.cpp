@@ -185,6 +185,7 @@ void ServerThread::onTextMessage(const QString &msg)
     if (!l.load()) {
         jrep["errorCode"] = 2;
         jrep["errorMessage"] = "Library not found";
+        jrep["library"] = libraryPath;
         repMsg = QJsonDocument(jrep).toJson(QJsonDocument::Compact);
         LogWriter::write(LogWriterLevel::errors, "", repMsg);
         ws->sendTextMessage(repMsg);
@@ -194,6 +195,7 @@ void ServerThread::onTextMessage(const QString &msg)
     if (!h) {
         jrep["errorCode"] = 3;
         jrep["errorMessage"] = "Handler not found";
+        jrep["handler"] = jdoc["handler"].toString();
         repMsg = QJsonDocument(jrep).toJson(QJsonDocument::Compact);
         LogWriter::write(LogWriterLevel::errors, "", repMsg);
         ws->sendTextMessage(repMsg);

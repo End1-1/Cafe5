@@ -4,6 +4,7 @@
 #include <QObject>
 #include <QMap>
 #include <QJsonValue>
+#include <QJsonArray>
 
 #define cache_users_groups 1
 #define cache_users_states 2
@@ -70,17 +71,17 @@ public:
         return fCacheData.at(row).at(column).toString();
     }
 
-    inline QVector<QJsonValue> getRow(int row)
+    inline QJsonArray getRow(int row)
     {
         return fCacheData.at(row);
     }
 
-    inline QVector<QJsonValue> getValuesForId(int id)
+    inline QJsonArray getValuesForId(int id)
     {
-        return find(id) > -1 ? getRow(find(id)) : QVector<QJsonValue>();
+        return find(id) > -1 ? getRow(find(id)) : QJsonArray();
     }
 
-    QVector<QJsonValue> getJoinedColumn(const QString &columnName);
+    QJsonArray getJoinedColumn(const QString &columnName);
 
     QString getString(int id);
 
@@ -89,7 +90,9 @@ public:
     inline double getDouble(int row, const QString &columnName)
     {
         int col = fCacheColumns[fId][columnName.toLower()];
-        return fCacheData.at(row).at(col).toDouble();
+        const QJsonArray &a = fCacheData.at(row);
+        const QJsonValue &v = a.at(col);
+        return v.toDouble();
     }
 
     inline int getInt(int row, int column)
@@ -99,7 +102,7 @@ public:
 
     inline int rowCount()
     {
-        return fCacheData.count();
+        return static_cast<int> (fCacheData.size());
     }
 
     inline int find(int id)
@@ -127,7 +130,7 @@ public:
     QString query(int cacheId);
 
 protected:
-    QVector<QVector<QJsonValue> > fCacheData;
+    std::vector<QJsonArray > fCacheData;
 
     QMap<int, int> fCacheIdRow;
 

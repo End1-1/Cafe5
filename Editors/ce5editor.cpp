@@ -47,7 +47,9 @@ void CE5Editor::setId(int id)
             bool found = false;
             foreach (C5LineEditWithSelector *le, fLines) {
                 if (le->property("Field").toString() == colName) {
-                    if (le->cacheId() == 0) {
+                    if(le->property("Primary").isValid()) {
+                        le->setInteger(db.getInt(i));
+                    } else {
                         switch (le->property("Type").toInt()) {
                             case 0:
                                 le->setText(db.getString(i));
@@ -63,8 +65,6 @@ void CE5Editor::setId(int id)
                                 le->setText(db.getString(i));
                                 break;
                         }
-                    } else {
-                        le->setValue(db.getString(i));
                     }
                     if (le->property("SetColor").isValid()) {
                         if (le->isEmpty()) {
@@ -100,7 +100,7 @@ void CE5Editor::setId(int id)
                 foreach (C5ComboBox *cb, fCombos) {
                     if (cb->property("Field").toString() == colName) {
                         if (cb->property("ItemData").toBool()) {
-                            cb->setCurrentIndex(cb->findData(db.getString(i)));
+                            cb->setCurrentIndex(cb->findData(db.getInt(i)));
                         } else {
                             cb->setCurrentText(db.getString(i));
                         }
@@ -225,7 +225,6 @@ bool CE5Editor::save(QString &err, QList<QMap<QString, QVariant> > &data)
                 dbcheck.exec("select * from " + table() + " where f_id=:f_id");
                 if (dbcheck.nextRow()) {
                     err = tr("Duplicate id");
-                    db.rollback();
                     return false;
                 }
                 leId->setEnabled(false);
@@ -246,7 +245,6 @@ bool CE5Editor::save(QString &err, QList<QMap<QString, QVariant> > &data)
     }
     row[leId->property("Field").toString()] = leId->getInteger();
     data.append(row);
-    db.startTransaction();
     C5Cache *cache = C5Cache::cache(fDBParams, 0);
     int cacheid = cache->idForTable(table());
     if (cacheid == 0) {
@@ -258,7 +256,6 @@ bool CE5Editor::save(QString &err, QList<QMap<QString, QVariant> > &data)
         db[":f_version"] = db.getInt("f_version") + 1;
         db.update("s_cache", where_id(C5Cache::idForTable(table())));
     }
-    db.commit();
     C5Cache::resetCache(fDBParams, table());
     C5Selector::resetCache(fDBParams, cacheid);
     return err.isEmpty();

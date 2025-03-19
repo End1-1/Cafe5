@@ -1,6 +1,6 @@
 #include "cpartners.h"
 
-CPartners &CPartners::queryRecordOfId(C5Database &db, const QVariant &id)
+CPartners &CPartners::queryRecordOfId(C5Database &db, int id)
 {
     db[":f_id"] = id;
     db.exec("select p.*, pc.f_name as f_categoryname, ps.f_name as f_statename, pg.f_name as f_groupname "

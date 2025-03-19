@@ -55,7 +55,7 @@ bool DlgPaymentChoose::getValues(double total, double &cash, double &card, doubl
     d.setFiscalStyle();
     d.fFiscal = fiscal;
     d.fMaxPrepaid = maxPrepaid;
-    if (maxPrepaid < 1) {
+    if (maxPrepaid < 1 && __c5config.fMainJson["prepaid_only_by_gift"].toBool()) {
         d.ui->lePrepaid->setEnabled(false);
         d.ui->btnPrepaid->setEnabled(false);
     }

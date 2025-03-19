@@ -3,6 +3,7 @@
 #include "c5login.h"
 #include "logwriter.h"
 #include "c5servername.h"
+#include "dlgserverconnection.h"
 #include <QMessageBox>
 #include <QApplication>
 #include <QTranslator>
@@ -39,53 +40,16 @@ int main(int argc, char *argv[])
     }
     LogWriter::write(LogWriterLevel::verbose, "Support SSL", QSslSocket::supportsSsl() ? "true" : "false");
     LogWriter::write(LogWriterLevel::verbose, "Support SSL version", QSslSocket::sslLibraryBuildVersionString());
-    QString serverName, configName, showName;
-    QJsonObject jdirectConnection;
-    for (const QString &sn : a.arguments()) {
-        if (sn.contains("/servername")) {
-            QStringList snconf = sn.split("=");
-            if (snconf.length() == 2) {
-                serverName = snconf.at(1);
-                C5ServerName c5sn(serverName, "office");
-                if (!c5sn.getServers("office")) {
-                    C5Message::error(c5sn.mErrorString);
-                    return -1;
-                }
-            }
-        } else if (sn.contains("/config")) {
-            QStringList snconf = sn.split("=", Qt::SkipEmptyParts);
-            if (snconf.length() == 2) {
-                configName = snconf.at(1);
-            }
-        } else if (sn.contains("/host")) {
-            QStringList h = sn.split("=", Qt::SkipEmptyParts);
-            if (h.length() == 2) {
-                QJsonObject jo;
-                jdirectConnection["host"] = QString("%1/engine/info.php").arg(h.at(1));
-                if (h.at(1).contains("127.0.0.1")) {
-                    jdirectConnection["database"] = QString("http://%1").arg(h.at(1));
-                } else {
-                    jdirectConnection["database"] = QString("https://%1").arg(h.at(1));
-                }
-                jdirectConnection["waiterserver"] = "";
-            }
-        } else if (sn.contains("/showname")) {
-            QStringList s = sn.split("=");
-            if (s.length() == 2) {
-                showName = s.at(1);
-            }
-        }
+    while (__c5config.getRegValue("ss_server_address").toString().isEmpty()) {
+        DlgServerConnection::showSettings(nullptr);
+    }
+    C5ServerName c5sn(__c5config.getRegValue("ss_server_address").toString(), "office");
+    if (!c5sn.getServers("office")) {
+        C5Message::error(c5sn.mErrorString);
+        return -1;
     }
 #define LOGGING
-    if (configName.isEmpty()) {
-        configName = "Main";
-    }
-    if (!jdirectConnection.isEmpty()) {
-        jdirectConnection["settings"] = configName;
-        jdirectConnection["name"] = showName;
-        C5ServerName::mServers.append(jdirectConnection);
-    }
-    if (serverName.isEmpty() && C5ServerName::mServers.isEmpty()) {
+    if (__c5config.getRegValue("ss_server_address").toString().isEmpty() && C5ServerName::mServers.isEmpty()) {
         C5Message::error("Servername parameter must be pass as argument");
         return 1;
     }
@@ -104,9 +68,7 @@ int main(int argc, char *argv[])
     }
     C5Login l;
     if (l.exec() == QDialog::Accepted) {
-        if (configName.isEmpty() == false) {
-            C5Config::fSettingsName = configName;
-        }
+        C5Config::fSettingsName = __c5config.getRegValue("ss_settings").toString();
         C5Config::initParamsFromDb();
     } else {
         return 0;

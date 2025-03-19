@@ -85,21 +85,21 @@ void CR5SaleFromStoreTotal::buildQuery()
     fColumnNameIndex["f_finalamount"] = nextCol++;
     fTranslation["f_final"] = tr("Final, qty");
     fTranslation["f_finalamount"] = tr("Final amount");
-    QVector<QVector<QJsonValue> > &rows = fModel->fRawData;
+    std::vector<QJsonArray > &rows = fModel->fRawData;
     rows.clear();
     //names
     db.exec("select g.f_id, g.f_name, gr.f_name as f_groupname from c_goods g inner join c_groups gr on gr.f_id=g.f_group order by f_name");
     int row = 0;
     QMap<int, int> goodsRowMap;
     while (db.nextRow()) {
-        QVector<QJsonValue> emptyRow;
+        QJsonArray emptyRow;
         for (int i = 0; i < 14; i++) {
             emptyRow << QJsonValue();
         }
         emptyRow[0] = db.getString("f_groupname");
         emptyRow[1] = db.getInt("f_id");
         emptyRow[2] = db.getString("f_name");
-        rows << emptyRow;
+        rows.push_back(emptyRow);
         goodsRowMap[db.getInt(0)] = row++;
     }
     QString query = QString("select s.f_goods, gg.f_name as f_groupname, g.f_name as f_goodsname, u.f_name as f_unitname, "
@@ -144,9 +144,9 @@ void CR5SaleFromStoreTotal::buildQuery()
         rows[row][col] = db.getDouble("f_qty");
         rows[row][col + 1] = db.getDouble("f_amount");
     }
-    for (int i = 0; i < rows.count(); i++) {
+    for (int i = 0; i < rows.size(); i++) {
     }
-    for (int i = rows.count() - 1; i > -1; i--) {
+    for (int i = rows.size() - 1; i > -1; i--) {
         bool remove = true;
         for (int j = 3; j < nextCol - 3; j += 2) {
             rows[i][nextCol - 2] = rows[i][nextCol - 2].toDouble() + rows[i][j].toDouble();
@@ -156,7 +156,7 @@ void CR5SaleFromStoreTotal::buildQuery()
             }
         }
         if (remove) {
-            rows.removeAt(i);
+            rows.erase(rows.begin() + i);
         }
     }
     fModel->setExternalData(fColumnNameIndex, fTranslation);
@@ -165,12 +165,12 @@ void CR5SaleFromStoreTotal::buildQuery()
     }
     restoreColumnsWidths();
     QStringList totalList;
-    totalList.append(QString::number(rows.count()));
+    totalList.append(QString::number(rows.size()));
     fTableTotal->setVerticalHeaderLabels(totalList);
     fTableTotal->setVisible(true);
     for (int i = 3; i < nextCol; i++) {
         double total = 0;
-        for (int j = 0; j < rows.count(); j++) {
+        for (int j = 0; j < rows.size(); j++) {
             total += rows[j][i].toDouble();
         }
         fTableTotal->setData(0, i, total);

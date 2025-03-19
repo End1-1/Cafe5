@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>565</width>
-    <height>116</height>
+    <height>132</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -33,7 +33,7 @@
       </size>
      </property>
      <property name="focusPolicy">
-      <enum>Qt::NoFocus</enum>
+      <enum>Qt::FocusPolicy::NoFocus</enum>
      </property>
      <property name="readOnly">
       <bool>true</bool>
@@ -67,12 +67,15 @@
      <property name="First" stdset="0">
       <bool>true</bool>
      </property>
+     <property name="Type" stdset="0">
+      <number>1</number>
+     </property>
     </widget>
    </item>
    <item row="1" column="2">
     <widget class="C5LineEditWithSelector" name="leBaseCurrName">
      <property name="focusPolicy">
-      <enum>Qt::NoFocus</enum>
+      <enum>Qt::FocusPolicy::NoFocus</enum>
      </property>
      <property name="readOnly">
       <bool>true</bool>
@@ -100,12 +103,15 @@
      <property name="Field" stdset="0">
       <string>f_currency2</string>
      </property>
+     <property name="Type" stdset="0">
+      <number>1</number>
+     </property>
     </widget>
    </item>
    <item row="2" column="2">
     <widget class="C5LineEditWithSelector" name="leDepCurrName">
      <property name="focusPolicy">
-      <enum>Qt::NoFocus</enum>
+      <enum>Qt::FocusPolicy::NoFocus</enum>
      </property>
      <property name="readOnly">
       <bool>true</bool>
@@ -132,6 +138,9 @@
      </property>
      <property name="Field" stdset="0">
       <string>f_rate</string>
+     </property>
+     <property name="Type" stdset="0">
+      <number>2</number>
      </property>
     </widget>
    </item>

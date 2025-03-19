@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>400</width>
-    <height>194</height>
+    <height>222</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -148,6 +148,9 @@
     <widget class="C5ComboBox" name="cbState">
      <property name="Field" stdset="0">
       <string>f_state</string>
+     </property>
+     <property name="ItemData" stdset="0">
+      <bool>true</bool>
      </property>
     </widget>
    </item>

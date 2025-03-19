@@ -183,7 +183,9 @@ private slots:
     void on_btnColumns_clicked();
 
     void on_chRegisterCard_clicked();
+
     void on_btnCashout_clicked();
+
     void on_btnBooking_clicked();
 };
 

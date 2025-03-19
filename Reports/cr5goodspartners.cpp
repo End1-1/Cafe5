@@ -1,6 +1,4 @@
 #include "cr5goodspartners.h"
-#include "c5cache.h"
-#include "c5editor.h"
 #include "ce5partner.h"
 #include "partnersasmap.h"
 #include "c5mainwindow.h"
@@ -20,7 +18,6 @@ CR5GoodsPartners::CR5GoodsPartners(const QStringList &dbParams, QWidget *parent)
                 "left join c_partners_group g on g.f_id=p.f_group "
                 "left join o_sale_type st on st.f_id=p.f_price_politic "
                 "left join s_user u on u.f_id=p.f_manager ";
-
     fTranslation["f_id"] = tr("Code");
     fTranslation["f_category"] = tr("Category");
     fTranslation["f_state"] = tr("State");
@@ -37,7 +34,6 @@ CR5GoodsPartners::CR5GoodsPartners(const QStringList &dbParams, QWidget *parent)
     fTranslation["f_discount"] = tr("Discount");
     fTranslation["f_saletype"] = tr("Sale type");
     fTranslation["f_manager"] = tr("Manager");
-
     fEditor = new CE5Partner(fDBParams);
 }
 
@@ -50,8 +46,8 @@ QToolBar *CR5GoodsPartners::toolBar()
             << ToolBarButtons::tbRefresh
             << ToolBarButtons::tbExcel
             << ToolBarButtons::tbPrint;
-            createStandartToolbar(btn);
-             fToolBar->addAction(QIcon(":/AS.png"), tr("ArmSoft map"), this, SLOT(armSoftMap()));
+        createStandartToolbar(btn);
+        fToolBar->addAction(QIcon(":/AS.png"), tr("ArmSoft map"), this, SLOT(armSoftMap()));
     }
     return fToolBar;
 }

@@ -13,6 +13,7 @@ TEMPLATE = app
 
 RC_FILE = res.rc
 
+CONFIG += c++17
 
 # The following define makes your compiler emit warnings if you use
 # any feature of Qt which has been marked as deprecated (the exact warnings
@@ -53,7 +54,6 @@ INCLUDEPATH += c:/projects/cafe5/Forms
 INCLUDEPATH += c:/Projects/NewTax/Src
 INCLUDEPATH += C:/Soft/OpenSSLWin64/include
 INCLUDEPATH += C:/Soft/OpenSSLWin64/include/openssl
-INCLUDEPATH += /projects/xlsx/src
 
 LIBS += -lVersion
 LIBS += -lwsock32
@@ -79,6 +79,7 @@ HEADERS += \
     dlgservicevalues.h
 
 SOURCES += \
+    ../../NewTax/Src/printtaxn.cpp \
     ../Classes/QProgressIndicator.cpp \
     ../Classes/amkbd.cpp \
     ../NTable/ndataprovider.cpp \

@@ -360,7 +360,6 @@ HEADERS += \
         ../Reports/cr5salefromstoretotalfilter.h \
         ../Reports/cr5saleremoveddishes.h \
         ../Reports/cr5saleremoveddishesfilter.h \
-        ../Reports/cr5salesandstore.h \
         ../Reports/cr5salesbydishes.h \
         ../Reports/cr5salesbydishesfilter.h \
         ../Reports/cr5storereason.h \
@@ -661,7 +660,6 @@ SOURCES += \
         ../Reports/cr5salefromstoretotalfilter.cpp \
         ../Reports/cr5saleremoveddishes.cpp \
         ../Reports/cr5saleremoveddishesfilter.cpp \
-        ../Reports/cr5salesandstore.cpp \
         ../Reports/cr5salesbydishes.cpp \
         ../Reports/cr5salesbydishesfilter.cpp \
         ../Reports/cr5storereason.cpp \

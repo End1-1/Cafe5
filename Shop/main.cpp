@@ -24,21 +24,23 @@
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QSettings>
-#include <QTextCodec>
 
 int main(int argc, char *argv[])
 {
-    QGuiApplication::setAttribute(Qt::AA_EnableHighDpiScaling); // Включить масштабирование DPI
-    QCoreApplication::setAttribute(Qt::AA_UseHighDpiPixmaps);
 #ifndef QT_DEBUG
-    QStringList libPath;
-    libPath << "./";
-    libPath << "./platforms";
-    libPath << "./sqldrivers";
-    libPath << "./printsupport";
+    QStringList libPath = QCoreApplication::libraryPaths();
+    libPath << qApp->applicationDirPath();
+    libPath << qApp->applicationDirPath() + "/platforms";
+    libPath << qApp->applicationDirPath() + "/sqldrivers";
+    libPath << qApp->applicationDirPath() + "/printsupport";
+    libPath << qApp->applicationDirPath() + "/imageformats";
+    libPath << qApp->applicationDirPath() + "/plugins";
     QCoreApplication::setLibraryPaths(libPath);
 #endif
     QApplication a(argc, argv);
+    qputenv("QT_ASSUME_UTF8", "1");
+    LogWriter::write(LogWriterLevel::verbose, "Support SSL", QSslSocket::supportsSsl() ? "true" : "false");
+    LogWriter::write(LogWriterLevel::verbose, "Support SSL version", QSslSocket::sslLibraryBuildVersionString());
     QDir d;
     QLockFile lockFile(d.homePath() + "/" + _APPLICATION_ + "/lock.pid");
     if (!lockFile.tryLock()) {
@@ -53,15 +55,20 @@ int main(int argc, char *argv[])
         a.setStyleSheet(styleSheet.readAll());
     }
     QTranslator t;
-    t.load(":/lang/Shop.qm");
-    a.installTranslator( &t);
+    if (t.load(":/lang/Shop.qm")) {
+        a.installTranslator( &t);
+    }
     auto *dlgsplash = new DlgSplashScreen();
     dlgsplash->show();
     LogWriter::write(LogWriterLevel::verbose, "", "get server names");
-    dlgsplash->messageSignal("Get server name");
+    emit dlgsplash->messageSignal("Get server name");
     QString serverName, settingsName = "shop", rewriteConfig;
     bool noconfig = true;
     for (const QString &arg : a.arguments()) {
+        if (arg.contains("/debug")) {
+            __c5config.setValue(param_debuge_mode, "1");
+            continue;
+        }
         if (arg.contains("/servername=")) {
             QStringList sn = arg.split("=", Qt::SkipEmptyParts);
             if (sn.length() == 2) {
@@ -114,14 +121,20 @@ int main(int argc, char *argv[])
     NDataProvider::mAppName = "shop";
     NDataProvider::mFileVersion = FileVersion::getVersionString(a.applicationFilePath());
     QString user, pin;
+    LogWriter::write(LogWriterLevel::verbose, "", "Init params from db");
+    emit dlgsplash->messageSignal("Init params from db");
+    C5Config::initParamsFromDb();
     __user = new C5User(0);
     while (!__user->isValid() || !__user->isActive()) {
-        if (!DlgPin::getPin(user, pin)) {
+        if (!DlgPin::getPin(user, pin, false)) {
             return 0;
         }
+        LogWriter::write(LogWriterLevel::verbose, "", "try login to db");
+        emit dlgsplash->messageSignal("try login to db");
+        __c5config.setValue(param_debuge_mode, "1");
         if (__user->authByPinPass(user, pin)) {
         } else {
-            C5Message::error(__user->error());
+            C5Message::error(__user->error() + " 2");
         }
         pin.clear();
         user.clear();
@@ -132,7 +145,6 @@ int main(int argc, char *argv[])
         }
     }
     DataDriver::init(__c5config.dbParams(), dlgsplash);
-    C5Config::initParamsFromDb();
     if (!C5SystemPreference::checkDecimalPointAndSeparator()) {
         return 0;
     }

@@ -9,7 +9,7 @@ bool TableRecord::getRecord(C5Database &db)
     return true;
 }
 
-TableRecord &TableRecord::queryRecordOfId(C5Database &db, const QVariant &id)
+TableRecord &TableRecord::queryRecordOfId(C5Database &db, int id)
 {
     Q_UNUSED(db);
     Q_UNUSED(id);

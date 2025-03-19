@@ -11,7 +11,7 @@ CE5CurrencyCrossRate::CE5CurrencyCrossRate(const QStringList &dbParams, QWidget 
     ui->leBaseCurr->setSelector(dbParams, ui->leBaseCurrName, cache_currency);
     ui->leDepCurr->setSelector(dbParams, ui->leDepCurrName, cache_currency);
     ui->leRate->setValidator(new QDoubleValidator(0, 99999999, 7));
-
+    ui->leRate->fDecimalPlaces = 4;
 }
 
 CE5CurrencyCrossRate::~CE5CurrencyCrossRate()

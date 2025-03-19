@@ -4,7 +4,6 @@
 #include "c5mainwindow.h"
 #include "c5storebarcode.h"
 #include "ce5goods.h"
-#include "ce5editor.h"
 
 CR5MaterialsInStore::CR5MaterialsInStore(const QStringList &dbParams, QWidget *parent) :
     C5ReportWidget(dbParams, parent)

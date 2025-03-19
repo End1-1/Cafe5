@@ -34,7 +34,6 @@ C5CashDoc::C5CashDoc(const QStringList &dbParams, QWidget *parent) :
     fActionDraft = nullptr;
     fActionSave = nullptr;
     C5Database db(dbParams);
-    db.open();
     db.exec("select * from e_currency order by f_id");
     while (db.nextRow()) {
         ui->cbCurrency->addItem(db.getString("f_name"), db.getInt("f_id"));
@@ -215,15 +214,10 @@ void C5CashDoc::setStoreDoc(const QString &uuid)
     }
 }
 
-void C5CashDoc::selectorCallback(int row, const QVector<QJsonValue> &values)
+void C5CashDoc::selectorCallback(int row, const QJsonArray &values)
 {
-    C5LineEditWithSelector *l = static_cast<C5LineEditWithSelector *>(sender());
     if (row == cache_cash_names) {
-        if (l == ui->leInput) {
-            ui->cbCurrency->setCurrentIndex(ui->cbCurrency->findData(values.at(2)));
-        } else {
-            ui->cbCurrency->setCurrentIndex(ui->cbCurrency->findData(values.at(2)));
-        }
+        ui->cbCurrency->setCurrentIndex(ui->cbCurrency->findData(values.at(2).toInt()));
     }
 }
 

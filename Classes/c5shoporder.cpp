@@ -131,8 +131,7 @@ bool C5ShopOrder::writeFlags(int f1, int f2, int f3, int f4, int f5)
 
 bool C5ShopOrder::returnFalse(const QString &msg, C5Database &db)
 {
-    db.rollback();
-    db.close();
+    Q_UNUSED(db)
     C5Message::error(msg);
     return false;
 }
@@ -158,7 +157,7 @@ bool C5ShopOrder::writeCash(C5Database &db, double value, int cash)
     db[":f_id"] = aheader.id;
     db[":f_cashin"] = cash;
     db[":f_cashout"] = 0;
-    db[":f_oheader"] = fOHeader.id;
+    db[":f_oheader"] = fOHeader.id.toString();
     db[":f_related"] = 1;
     db.insert("a_header_cash", false);
     ECash ecash;

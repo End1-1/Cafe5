@@ -119,12 +119,10 @@ void DlgDirtyStoreDoc::on_btnRemove_clicked()
         return;
     }
     C5Database db(fDBParams);
-    db.startTransaction();
     db[":f_id"] = ui->tbl->getString(r, 0);
     db.exec("delete from a_store where f_id=:f_id");
     db[":f_id"] = ui->tbl->getString(r, 0);
     db.exec("delete from a_store_draft where f_id=:f_id");
-    db.commit();
     ui->tbl->removeRow(r);
     countTotal();
 }

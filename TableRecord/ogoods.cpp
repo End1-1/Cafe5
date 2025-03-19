@@ -2,7 +2,7 @@
 
 void OGoods::bind(C5Database &db)
 {
-    db[":f_id"] = id;
+    db[":f_id"] = _id();
     db[":f_header"] = header;
     db[":f_body"] = body;
     db[":f_store"] = store;

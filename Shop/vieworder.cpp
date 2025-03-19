@@ -83,10 +83,10 @@ ViewOrder::ViewOrder(Working *w, const QString &order) :
         ui->tbl->setString(r, 0, db.getString("f_id"));
         ui->tbl->createCheckbox(r, 1);
         ui->tbl->setString(r, 2, db.getString("f_name"));
-        ui->tbl->setString(r, 3, db.getString("f_qty"));
-        ui->tbl->setString(r, 4, db.getString("f_price"));
-        ui->tbl->setString(r, 5, db.getString("f_total"));
-        ui->tbl->setString(r, 6, db.getString("f_goodsid"));
+        ui->tbl->setDouble(r, 3, db.getDouble("f_qty"));
+        ui->tbl->setDouble(r, 4, db.getDouble("f_price"));
+        ui->tbl->setDouble(r, 5, db.getDouble("f_total"));
+        ui->tbl->setInteger(r, 6, db.getInt("f_goodsid"));
         ui->tbl->setString(r, 7, db.getString("f_scancode"));
         ui->tbl->setString(r, 8, db.getString("f_service"));
         ui->tbl->setInteger(r, 9, db.getInt("f_return"));
@@ -126,6 +126,8 @@ void ViewOrder::on_btnReturn_clicked()
     GoodsReturnReason r;
     r.exec();
     int reason = r.fReason;
+    ui->leReturnReason->setProperty("reason", r.fReason);
+    ui->leReturnReason->setText(r.fReasonName);
     if (reason == 0) {
         return;
     }
@@ -145,8 +147,6 @@ void ViewOrder::on_btnReturn_clicked()
 void ViewOrder::returnFalse(const QString &msg, C5Database *db)
 {
     C5Message::error(msg);
-    db->rollback();
-    db->close();
 }
 
 void ViewOrder::countOrder()
@@ -337,7 +337,8 @@ bool ViewOrder::printCheckWithTax(C5Database &db, const QString &id, QString &rs
         }
     }
     db[":f_id"] = id;
-    db.exec("select og.f_id, og.f_goods, g.f_name, og.f_qty, gu.f_name as f_unitname, og.f_price, og.f_total,"
+    db.exec("select og.f_id, og.f_goods, g.f_name, og.f_qty, "
+            "gu.f_name as f_unitname, og.f_price, og.f_total,"
             "t.f_taxdept, t.f_adgcode, "
             "og.f_store "
             "from o_goods og "
@@ -349,7 +350,7 @@ bool ViewOrder::printCheckWithTax(C5Database &db, const QString &id, QString &rs
                  C5Config::taxPin(), 0);
     pt.fPartnerTin = partnerHvhh;
     while (db.nextRow()) {
-        pt.addGoods(db.getString("f_taxdept").toInt(), //dep
+        pt.addGoods(db.getInt("f_taxdept"), //dep
                     db.getString("f_adgcode"), //adg
                     db.getString("f_goods"), //goods id
                     db.getString("f_name"), //name
@@ -407,10 +408,13 @@ void ViewOrder::on_btnMakeDraft_clicked()
 
 void ViewOrder::on_btnSaveReturn_clicked()
 {
+    if (ui->leReturnReason->property("reason").toInt() == 0) {
+        C5Message::error(tr("he return reason must be specified."));
+        return;
+    }
     int uid = 1;
     C5Database db(__c5config.dbParams());
     C5StoreDraftWriter dw(db);
-    db.startTransaction();
     bool ret = false;
     double returnAmount = 0;
     QList<int> rows;
@@ -444,7 +448,6 @@ void ViewOrder::on_btnSaveReturn_clicked()
     if (db.rowCount() > 1) {
         if (rows.count() != ui->tbl->rowCount()) {
             C5Message::info(tr("Mixed payment mode. Only full return available."));
-            db.rollback();
             return;
         }
     }
@@ -479,7 +482,7 @@ void ViewOrder::on_btnSaveReturn_clicked()
     QString storeDocId;
     QString storedocUserNum;
     if (haveStore) {
-        storeDocComment = QString("%1 %2").arg(tr("Return of sale")).arg(fSaleDoc);
+        storeDocComment = QString("%1 %2").arg(tr("Return of sale"), fSaleDoc);
         storedocUserNum = dw.storeDocNum(DOC_TYPE_STORE_INPUT, __c5config.defaultStore(), true, 0);
         if (!dw.writeAHeader(storeDocId, storedocUserNum, DOC_STATE_DRAFT, DOC_TYPE_STORE_INPUT,
                              uid, QDate::currentDate(), QDate::currentDate(), QTime::currentTime(), 0, 0,
@@ -489,7 +492,6 @@ void ViewOrder::on_btnSaveReturn_clicked()
     }
     for (int j = 0; j < rows.count(); j++) {
         int i = rows.at(j);
-        QString ogoodsid;
         QString adraftid;
         double price = 0;
         db[":f_id"] = ui->tbl->getString(i, 0);
@@ -530,15 +532,15 @@ void ViewOrder::on_btnSaveReturn_clicked()
         if (!g.write(db, err)) {
             return returnFalse(err, &db);
         }
-        if (!dw.updateField("o_goods", "f_return", ui->leReturnReason->property("reason").toInt(), "f_id", ui->tbl->getString(i,
-                            0))) {
+        if (!dw.updateField("o_goods", "f_return", ui->leReturnReason->property("reason").toInt(), "f_id",
+                            ui->tbl->getString(i, 0))) {
             return returnFalse(dw.fErrorMsg, &db);
         }
-        if (!dw.updateField("o_goods", "f_returnfrom", ogoodsid, "f_id", ui->tbl->getString(i, 0))) {
-            return returnFalse(dw.fErrorMsg, &db);
-        }
+        // if (!dw.updateField("o_goods", "f_returnfrom", ogoodsid, "f_id", ui->tbl->getString(i, 0) )) {
+        //     return returnFalse(dw.fErrorMsg, &db);
+        // }
         if (!dw.updateField("o_header", "f_comment", QString("%1 %2").arg(tr("Return from")).arg(ui->leOrderNum->text()),
-                            "f_id", oheader.id)) {
+                            "f_id", oheader.id.toString())) {
             return returnFalse(dw.fErrorMsg, &db);
         }
         ui->tbl->setInteger(i, 9, 1);
@@ -595,7 +597,6 @@ void ViewOrder::on_btnSaveReturn_clicked()
         PrintReceipt p;
         p.print(oheader._id(), db);
     }
-    db.commit();
     close();
     C5Message::info(tr("Return completed"));
 }
@@ -615,4 +616,8 @@ void ViewOrder::on_tbl_cellClicked(int row, int column)
     }
     ui->tbl->setDouble(row, 3, newqty);
     countOrder();
+}
+
+void ViewOrder::on_btnEditReason_clicked()
+{
 }

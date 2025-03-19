@@ -496,6 +496,11 @@ bool C5PrintReceiptThread::print(const QStringList &dbParams)
     p.ltext(__translator.tt("Printed"), 0);
     p.rtext(QDateTime::currentDateTime().toString(FORMAT_DATETIME_TO_STR));
     p.br();
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+    QPageSize ps(QPageSize::Custom);
+    p.print(fPrinter, ps);
+#else
     p.print(fPrinter, QPageSize::Custom);
+#endif
     return true;
 }

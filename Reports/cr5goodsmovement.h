@@ -12,7 +12,7 @@ class CR5GoodsMovement : public C5ReportWidget
 public:
     CR5GoodsMovement(const QStringList &dbParams, QWidget *parent = nullptr);
 
-    virtual QToolBar *toolBar();
+    virtual QToolBar *toolBar() override;
 
     void setDate(const QDate &d1, const QDate &d2);
 
@@ -27,9 +27,9 @@ public:
     void setInOut(int inout);
 
 protected:
-    void restoreColumnsWidths();
+    void restoreColumnsWidths() override;
 
-    virtual bool tblDoubleClicked(int row, int column, const QVector<QJsonValue> &values) override;
+    virtual bool tblDoubleClicked(int row, int column, const QJsonArray &values) override;
 
 private:
     CR5GoodsMovementFilter *fFilter;

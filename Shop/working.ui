@@ -80,7 +80,7 @@
             </size>
            </property>
            <property name="focusPolicy">
-            <enum>Qt::NoFocus</enum>
+            <enum>Qt::FocusPolicy::NoFocus</enum>
            </property>
            <property name="toolTip">
             <string>New retail</string>
@@ -115,7 +115,7 @@
             </size>
            </property>
            <property name="focusPolicy">
-            <enum>Qt::NoFocus</enum>
+            <enum>Qt::FocusPolicy::NoFocus</enum>
            </property>
            <property name="toolTip">
             <string>New whosale</string>
@@ -150,7 +150,7 @@
             </size>
            </property>
            <property name="focusPolicy">
-            <enum>Qt::NoFocus</enum>
+            <enum>Qt::FocusPolicy::NoFocus</enum>
            </property>
            <property name="toolTip">
             <string>Goods list</string>
@@ -185,7 +185,7 @@
             </size>
            </property>
            <property name="focusPolicy">
-            <enum>Qt::NoFocus</enum>
+            <enum>Qt::FocusPolicy::NoFocus</enum>
            </property>
            <property name="toolTip">
             <string>Open draft</string>
@@ -220,7 +220,7 @@
             </size>
            </property>
            <property name="focusPolicy">
-            <enum>Qt::NoFocus</enum>
+            <enum>Qt::FocusPolicy::NoFocus</enum>
            </property>
            <property name="toolTip">
             <string>Write order</string>
@@ -243,7 +243,7 @@
          <item>
           <spacer name="horizontalSpacer">
            <property name="orientation">
-            <enum>Qt::Horizontal</enum>
+            <enum>Qt::Orientation::Horizontal</enum>
            </property>
            <property name="sizeHint" stdset="0">
             <size>
@@ -268,7 +268,7 @@
             </size>
            </property>
            <property name="focusPolicy">
-            <enum>Qt::NoFocus</enum>
+            <enum>Qt::FocusPolicy::NoFocus</enum>
            </property>
            <property name="toolTip">
             <string>Help</string>
@@ -303,7 +303,7 @@
             </size>
            </property>
            <property name="focusPolicy">
-            <enum>Qt::NoFocus</enum>
+            <enum>Qt::FocusPolicy::NoFocus</enum>
            </property>
            <property name="toolTip">
             <string>Costumer display</string>
@@ -341,7 +341,7 @@
             </size>
            </property>
            <property name="focusPolicy">
-            <enum>Qt::NoFocus</enum>
+            <enum>Qt::FocusPolicy::NoFocus</enum>
            </property>
            <property name="toolTip">
             <string>Gift card</string>
@@ -376,7 +376,7 @@
             </size>
            </property>
            <property name="focusPolicy">
-            <enum>Qt::NoFocus</enum>
+            <enum>Qt::FocusPolicy::NoFocus</enum>
            </property>
            <property name="toolTip">
             <string>Manual tax receipt</string>
@@ -411,7 +411,7 @@
             </size>
            </property>
            <property name="focusPolicy">
-            <enum>Qt::NoFocus</enum>
+            <enum>Qt::FocusPolicy::NoFocus</enum>
            </property>
            <property name="toolTip">
             <string>Booking</string>
@@ -446,7 +446,7 @@
             </size>
            </property>
            <property name="focusPolicy">
-            <enum>Qt::NoFocus</enum>
+            <enum>Qt::FocusPolicy::NoFocus</enum>
            </property>
            <property name="toolTip">
             <string>Sales report</string>
@@ -481,7 +481,7 @@
             </size>
            </property>
            <property name="focusPolicy">
-            <enum>Qt::NoFocus</enum>
+            <enum>Qt::FocusPolicy::NoFocus</enum>
            </property>
            <property name="toolTip">
             <string>Goods movement</string>
@@ -516,7 +516,7 @@
             </size>
            </property>
            <property name="focusPolicy">
-            <enum>Qt::NoFocus</enum>
+            <enum>Qt::FocusPolicy::NoFocus</enum>
            </property>
            <property name="toolTip">
             <string>Gift card</string>
@@ -551,7 +551,7 @@
             </size>
            </property>
            <property name="focusPolicy">
-            <enum>Qt::NoFocus</enum>
+            <enum>Qt::FocusPolicy::NoFocus</enum>
            </property>
            <property name="toolTip">
             <string>Database connection</string>
@@ -586,7 +586,7 @@
             </size>
            </property>
            <property name="focusPolicy">
-            <enum>Qt::NoFocus</enum>
+            <enum>Qt::FocusPolicy::NoFocus</enum>
            </property>
            <property name="toolTip">
             <string>Database connection</string>
@@ -621,7 +621,7 @@
             </size>
            </property>
            <property name="focusPolicy">
-            <enum>Qt::NoFocus</enum>
+            <enum>Qt::FocusPolicy::NoFocus</enum>
            </property>
            <property name="toolTip">
             <string>Close application</string>
@@ -656,7 +656,7 @@
             </size>
            </property>
            <property name="focusPolicy">
-            <enum>Qt::NoFocus</enum>
+            <enum>Qt::FocusPolicy::NoFocus</enum>
            </property>
            <property name="toolTip">
             <string>Close application</string>
@@ -677,10 +677,10 @@
           </widget>
          </item>
         </layout>
+        <zorder>btnGoodsList</zorder>
         <zorder>btnSalesReport</zorder>
         <zorder>btnNewRetail</zorder>
         <zorder>btnNewWhosale</zorder>
-        <zorder>btnGoodsList</zorder>
         <zorder>btnOpenDraft</zorder>
         <zorder>btnWriteOrder</zorder>
         <zorder>btnHelp</zorder>
@@ -702,7 +702,7 @@
    <item>
     <widget class="QTabWidget" name="tab">
      <property name="focusPolicy">
-      <enum>Qt::NoFocus</enum>
+      <enum>Qt::FocusPolicy::NoFocus</enum>
      </property>
      <property name="tabsClosable">
       <bool>true</bool>
@@ -724,10 +724,10 @@
       </size>
      </property>
      <property name="frameShape">
-      <enum>QFrame::Box</enum>
+      <enum>QFrame::Shape::Box</enum>
      </property>
      <property name="frameShadow">
-      <enum>QFrame::Raised</enum>
+      <enum>QFrame::Shadow::Raised</enum>
      </property>
      <layout class="QHBoxLayout" name="horizontalLayout_2">
       <property name="spacing">
@@ -755,7 +755,7 @@
       <item>
        <widget class="Line" name="line">
         <property name="orientation">
-         <enum>Qt::Vertical</enum>
+         <enum>Qt::Orientation::Vertical</enum>
         </property>
        </widget>
       </item>
@@ -769,7 +769,7 @@
       <item>
        <widget class="Line" name="line_3">
         <property name="orientation">
-         <enum>Qt::Vertical</enum>
+         <enum>Qt::Orientation::Vertical</enum>
         </property>
        </widget>
       </item>
@@ -783,14 +783,14 @@
       <item>
        <widget class="Line" name="line_2">
         <property name="orientation">
-         <enum>Qt::Vertical</enum>
+         <enum>Qt::Orientation::Vertical</enum>
         </property>
        </widget>
       </item>
       <item>
        <spacer name="horizontalSpacer_2">
         <property name="orientation">
-         <enum>Qt::Horizontal</enum>
+         <enum>Qt::Orientation::Horizontal</enum>
         </property>
         <property name="sizeHint" stdset="0">
          <size>

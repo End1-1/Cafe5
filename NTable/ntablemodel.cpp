@@ -106,14 +106,16 @@ void NTableModel::sort(int column, Qt::SortOrder order)
         order = mSortOrder == Qt::AscendingOrder ? Qt::DescendingOrder : Qt::AscendingOrder;
     }
     mSortOrder = order;
-    QMap<QString, int> data_s;
-    QMap<double, int> data_d;
-    QMap<int, int> data_i;
+    QMultiMap<QString, int> data_s;
+    QMultiMap<double, int> data_d;
+    QMultiMap<quint64, int> data_i;
     foreach (int i, mProxyRows) {
         QVariant v = mRawData.at(i).toArray().at(column).toVariant();
         switch (v.typeId()) {
             case QMetaType::Int:
-                data_i.insert(v.toInt(), i);
+            case QMetaType::LongLong:
+            case QMetaType::Long:
+                data_i.insert(v.toLongLong(), i);
                 break;
             case QMetaType::Double:
                 data_d.insert(v.toDouble(), i);
@@ -256,6 +258,19 @@ bool NTableModel::checked(int &row)
         }
     }
     return false;
+}
+
+bool NTableModel::checkedRows(std::vector<int> &rows)
+{
+    if (!mCheckboxMode) {
+        return false;
+    }
+    for (int i = 0; i < mProxyRows.size(); i++) {
+        if (mCheckboxValues[mProxyRows[i]]) {
+            rows.push_back(i);
+        }
+    }
+    return !rows.empty();
 }
 
 const QSet<QString> &NTableModel::uniqueValuesForColumn(int column)

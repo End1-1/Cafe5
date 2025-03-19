@@ -29,7 +29,7 @@
 #include <QMessageBox>
 #include <QProcess>
 #include <QSettings>
-#include <QDesktopWidget>
+#include <QScreen>
 #include <QMovie>
 
 QHash<QString, int> Working::fGoodsRows;
@@ -155,7 +155,7 @@ bool Working::eventFilter(QObject *watched, QEvent *event)
             case Qt::Key_I:
                 if (ke->modifiers() &Qt::ControlModifier) {
                     QString pin, pass;
-                    if (DlgPin::getPin(pin, pass)) {
+                    if (DlgPin::getPin(pin, pass, true)) {
                         C5Database db(__c5config.dbParams());
                         C5User ua(0);
                         QString name;
@@ -196,7 +196,7 @@ bool Working::eventFilter(QObject *watched, QEvent *event)
             case Qt::Key_O:
                 if (ke->modifiers() &Qt::ControlModifier) {
                     QString pin, pass;
-                    if (DlgPin::getPin(pin, pass)) {
+                    if (DlgPin::getPin(pin, pass, true)) {
                         C5Database db(__c5config.dbParams());
                         C5User ua(0);
                         QString name;
@@ -247,7 +247,7 @@ WOrder *Working::findDraft(const QString &draftid)
 {
     for (int i = 0; i < ui->tab->count(); i++) {
         WOrder *wo = static_cast<WOrder *>(ui->tab->widget(i));
-        if (wo->fDraftSale.id == draftid) {
+        if (wo->fDraftSale._id() == draftid) {
             ui->tab->setCurrentIndex(i);
             return wo;
         }
@@ -394,7 +394,7 @@ void Working::checkMessageResponse(const QJsonObject &jdoc)
     QFont font(qApp->font());
     font.setPointSize(30);
     C5Printing p;
-    p.setSceneParams(650, 2800, QPrinter::Portrait);
+    p.setSceneParams(650, 2800, QPageLayout::Portrait);
     p.setFont(font);
     p.br(2);
     QPixmap img(":/atention.png");
@@ -495,7 +495,7 @@ void Working::checkMessageResponse(const QJsonObject &jdoc)
     p.br();
     p.ltext(tr("Printed"), 0);
     p.rtext(QDateTime::currentDateTime().toString(FORMAT_DATETIME_TO_STR2));
-    p.print(C5Config::localReceiptPrinter(), QPrinter::Custom);
+    p.print(C5Config::localReceiptPrinter(), QPageSize(QPageSize::Custom));
 }
 
 void Working::astoresaleResponse(const QJsonObject &jdoc)
@@ -634,7 +634,7 @@ void Working::qtyRemains(const QJsonObject &jdoc)
     C5Printing p;
     QFont font = qApp->font();
     font.setPointSize(28);
-    p.setSceneParams(650, 2800, QPrinter::Portrait);
+    p.setSceneParams(650, 2800, QPageLayout::Portrait);
     p.setFont(font);
     p.br(2);
     QPixmap img(":/atention.png");
@@ -659,7 +659,7 @@ void Working::qtyRemains(const QJsonObject &jdoc)
     if (print) {
         p.ltext(tr("Printed"), 0);
         p.rtext(QDateTime::currentDateTime().toString(FORMAT_DATETIME_TO_STR2));
-        //p.print(C5Config::localReceiptPrinter(), QPrinter::Custom);
+        //p.print(C5Config::localReceiptPrinter(), QPageSize::Custom);
     }
     sender()->deleteLater();
 }
@@ -857,8 +857,8 @@ void Working::on_btnCostumerDisplay_clicked(bool checked)
     } else {
         s.setValue("customerdisplay", true);
         fCustomerDisplay = new WCustomerDisplay();
-        if (qApp->desktop()->screenCount() > 1) {
-            fCustomerDisplay->move(qApp->desktop()->screenGeometry(1).x(), qApp->desktop()->screenGeometry(1).y());
+        if (qApp->screens().count() > 1) {
+            fCustomerDisplay->move(qApp->screens().at(1)->geometry().x(), qApp->screens().at(1)->geometry().y());
             fCustomerDisplay->showMaximized();
             fCustomerDisplay->showFullScreen();
         } else {

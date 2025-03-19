@@ -48,6 +48,9 @@
      <property name="Field" stdset="0">
       <string>f_counter</string>
      </property>
+     <property name="Type" stdset="0">
+      <number>1</number>
+     </property>
     </widget>
    </item>
    <item row="6" column="1">
@@ -78,7 +81,7 @@
       </size>
      </property>
      <property name="focusPolicy">
-      <enum>Qt::NoFocus</enum>
+      <enum>Qt::FocusPolicy::NoFocus</enum>
      </property>
      <property name="Field" stdset="0">
       <string>f_id</string>
@@ -122,7 +125,7 @@
       <bool>false</bool>
      </property>
      <property name="focusPolicy">
-      <enum>Qt::NoFocus</enum>
+      <enum>Qt::FocusPolicy::NoFocus</enum>
      </property>
      <property name="FieldRef" stdset="0">
       <string>f_settingsname</string>
@@ -139,6 +142,9 @@
      </property>
      <property name="Field" stdset="0">
       <string>f_counterhall</string>
+     </property>
+     <property name="Type" stdset="0">
+      <number>1</number>
      </property>
     </widget>
    </item>

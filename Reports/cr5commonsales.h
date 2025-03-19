@@ -12,21 +12,17 @@ class CR5CommonSales : public C5ReportWidget
 public:
     CR5CommonSales(const QStringList &dbParams, QWidget *parent = nullptr);
 
-    virtual QToolBar *toolBar();
+    virtual QToolBar *toolBar() override;
 
 protected:
-    virtual void editRow(int columnWidthId);
+    virtual void editRow(int columnWidthId) override;
 
-    virtual void restoreColumnsWidths();
+    virtual void restoreColumnsWidths() override;
 
-    virtual bool tblDoubleClicked(int row, int column, const QVector<QJsonValue> &values);
+    virtual bool tblDoubleClicked(int row, int column, const QJsonArray &values) override;
 
 private slots:
     void transferToRoom();
-
-    void exportToAS();
-
-    void createStoreOutputAS();
 
     void templates();
 

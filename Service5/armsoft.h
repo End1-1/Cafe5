@@ -14,11 +14,10 @@ public:
 
 private:
     QJsonObject fData;
-    QMap<int, QMap<QString, QVariant> > partnersMap;
+    QMap<QString, QMap<QString, QVariant> > partnersMap;
     QMap<QString, QMap<QString, QVariant> > servicesMap;
     QMap<QString, QMap<QString, QVariant> > goodsMap;
     QMap<QString, QMap<QString, QVariant> > unitsMap;
-
 
     bool getIndexes(QString &err, QSqlDatabase &dbas);
     void recordToMap(QMap<QString, QVariant> &m, QSqlQuery &q, QStringList &fields);

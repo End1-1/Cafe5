@@ -45,9 +45,15 @@ DlgGoodsList::DlgGoodsList(int currency) :
     int row = 0;
     double totalRetail = 0, totalWholesale = 0;
     while (db.nextRow()) {
-        for (int c = 0; c < db.columnCount(); c++) {
-            ui->tbl->setData(row, c, db.getValue(c));
-        }
+        ui->tbl->setData(row, 0, db.getInt("f_goods"));
+        ui->tbl->setData(row, 1, db.getString("f_groupname"));
+        ui->tbl->setData(row, 2, db.getString("f_scancode"));
+        ui->tbl->setData(row, 3, db.getString("f_name"));
+        ui->tbl->setData(row, 4, db.getDouble("f_qty"));
+        ui->tbl->setData(row, 5, db.getDouble("f_price1"));
+        ui->tbl->setData(row, 6, db.getDouble("f_price2"));
+        ui->tbl->setData(row, 7, db.getDouble("f_draftqty"));
+        ui->tbl->setData(row, 8, db.getDouble("f_reserve"));
         totalRetail += db.getDouble("f_price1") * db.getDouble("f_qty");
         totalWholesale += db.getDouble("f_price2") * db.getDouble("f_qty");
         row++;
@@ -55,7 +61,7 @@ DlgGoodsList::DlgGoodsList(int currency) :
     ui->leTotalRetail->setDouble(totalRetail);
     // ui->leTotalRetail->setVisible(__c5config.getValue(param_shop_hide_store_qty).toInt() == 1);
     // ui->lbTotalRetail->setVisible(ui->leTotalRetail->isVisible());
-    ui->tbl->setColumnHidden(6, __c5config.shopDenyF2());
+    ui->tbl->setColumnHidden(6, !__c5config.fMainJson["show_whosale_price"].toBool() );
     ui->leSearch->installEventFilter(this);
     ui->tbl->resizeColumnsToContents();
 }

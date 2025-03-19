@@ -27,7 +27,7 @@ DishItem::DishItem(C5OrderDriver *od, int index, QWidget *parent) :
     setChanges();
     adjustSize();
     QFont f(font());
-    f.setWeight(99);
+    f.setBold(true);
     ui->lbQty1->setFont(f);
     ui->lbComment->installEventFilter(this);
     ui->lbQty1->installEventFilter(this);

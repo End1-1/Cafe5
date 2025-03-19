@@ -209,7 +209,7 @@ void C5Config::initParamsFromDb()
             fSettings[db.getInt(0)] = db.getString(1);
         }
     }
-    db[":f_id"] = 1;
+    db[":f_id"] = __c5config.fSettingsId;
     db.exec("select * from sys_json_config where f_id=:f_id");
     if (db.nextRow()) {
         fMainJson = QJsonDocument::fromJson(db.getString("f_config").toUtf8()).object();

@@ -29,7 +29,7 @@ bool ArmSoft::exportToAS(QString &err)
     int partner = jh["f_partner"].toInt();
     //int doctype = db.integer("f_saletype") == 1 ? 20 : 5; //20 - retail, 5 - invoice
     int doctype = jh["f_saletype"].toInt();
-    int aspartner = jh["f_aspartnerid"].toInt();
+    QString aspartner = jh["f_aspartnerid"].toString();
     int pricepolitic = jh["f_price_politic"].toInt();
     QString partnerAddress = jh["f_address"].toString();
     QString partnerLegalAddress = jh["f_legaladdress"].toString();
@@ -70,14 +70,26 @@ bool ArmSoft::exportToAS(QString &err)
     dbas[":fCUR"] = "AMD";
     dbas[":fSUMM"] = total;
     dbas[":fCOMMENT"] = partnerAddress;
-    dbas[":fBODY"] = QString("\r\nPREPAYMENTACC:5231\r\nVATACC:5243\r\nSUMMVAT:%2\r\nBUYERACC:2211\r\n"
-                             "CUREXCHNG:1.0000\r\nCOURSECOUNT:1.0000\r\nBUYCHACCPOST:Գլխավոր հաշվապահ \r\nMAXROWID:%1\r\n"
-                             "BUYTAXCODE:%3\r\nBUYADDRESS:%4\r\nBUYBUSADDRESS:%5\r\nPOISN:00000000-0000-0000-0000-000000000000\r\nINVOICESTATES:0\r\n")
+    dbas[":fBODY"] = QString("\r\nPREPAYMENTACC:5231\r\n"
+                             "%6"
+                             "VATACC:5243\r\n"
+                             "SUMMVAT:%2\r\n"
+                             "BUYERACC:2211\r\n"
+                             "CUREXCHNG:1.0000\r\n"
+                             "COURSECOUNT:1.0000\r\n"
+                             "BUYCHACCPOST:Գլխավոր հաշվապահ \r\n"
+                             "MAXROWID:%1\r\n"
+                             "BUYTAXCODE:%3\r\n"
+                             "BUYADDRESS:%4\r\n"
+                             "BUYBUSADDRESS:%5\r\n"
+                             "POISN:00000000-0000-0000-0000-000000000000\r\n"
+                             "INVOICESTATES:0\r\n")
                      .arg(items.count())
                      .arg(vatamount)
                      .arg(partnersMap[aspartner]["ftaxcode"].toString())
                      .arg(partnersMap[aspartner]["faddress"].toString())
-                     .arg(partnerAddress);
+                     .arg(partnerAddress).arg(fData["dealtype"].toString().isEmpty() ? "" : QString("DEALTYPE:%1\r\n").arg(
+                             fData["dealtype"].toString()));
     dbas[":fPARTNAME"] = partnersMap[aspartner]["fcaption"].isValid() ? partnersMap[aspartner]["fcaption"] :
                          ""; // set to kamar
     dbas[":fUSERID"] = 0;
@@ -143,12 +155,16 @@ bool ArmSoft::exportToAS(QString &err)
                               fData["lemincomeacc"].toString();
         dbas[":fPARTYMETHOD"] = 0;
         dbas[":fROWID"] = rowid++;
+        //LogWriter::write(LogWriterLevel::errors, "EEEEEEEEEEEEEEEE", ( *bi));
+        dbas[":fDEALTYPE"] = ( *bi)["f_dealtype"].toString().isEmpty() ? "" : ( *bi)["f_dealtype"].toString();
         if (!dbas.exec("insert into MTINVOICELIST (fISN, fROWNUM, fITEMTYPE, fITEMID, fITEMNAME, "
                        "fUNITBRIEF, fSTORAGE, fQUANTITY, fINITPRICE, fDISCOUNT, fPRICE, fSUMMA, fSUMMA1, "
-                       "fENVFEEPERCENT, fENVFEESUMMA, fVAT, fEXPMETHOD, fACCEXPENSE, fACCINCOME, fPARTYMETHOD, fROWID) "
+                       "fENVFEEPERCENT, fENVFEESUMMA, fVAT, fEXPMETHOD, fACCEXPENSE, fACCINCOME, fPARTYMETHOD, fROWID, "
+                       "fDEALTYPE) "
                        "VALUES (:fISN, :fROWNUM, :fITEMTYPE, :fITEMID, :fITEMNAME, "
                        ":fUNITBRIEF, :fSTORAGE, :fQUANTITY, :fINITPRICE, :fDISCOUNT, :fPRICE, :fSUMMA, :fSUMMA1, "
-                       ":fENVFEEPERCENT, :fENVFEESUMMA, :fVAT, :fEXPMETHOD, :fACCEXPENSE, :fACCINCOME, :fPARTYMETHOD, :fROWID)")) {
+                       ":fENVFEEPERCENT, :fENVFEESUMMA, :fVAT, :fEXPMETHOD, :fACCEXPENSE, :fACCINCOME, :fPARTYMETHOD, :fROWID, "
+                       ":fDEALTYPE)")) {
             err = dbas.lastDbError();
             dbas.rollback();
             return false;
@@ -200,7 +216,7 @@ bool ArmSoft::getIndexes(QString &err, QSqlDatabase &dbas)
     while (q.next()) {
         QMap<QString, QVariant> temp;
         recordToMap(temp, q, fields);
-        partnersMap[q.value(1).toInt()] = temp;
+        partnersMap[q.value(1).toString()] = temp;
     }
     return true;
 }

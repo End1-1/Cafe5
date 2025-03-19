@@ -35,6 +35,7 @@ private slots:
     void amountDoubleClicked();
     void printSale();
     void fiscale();
+    void cancelFiscal();
     void createInvoiceAS();
     void createRetailAS();
     void makeStoreOutput();
@@ -75,6 +76,7 @@ private:
     QAction *fActionCopy;
     QAction *fRemoveAction;
     QAction *fPrintTax;
+    QAction *fPrintReturnTax;
     QAction *fActionReturn;
     void saveReturnItems();
     int addGoods(int goodsId, C5Database &db);
@@ -87,6 +89,7 @@ private:
     void setPartner(const CPartners &p);
     void setDeliveryMan();
     void exportToAs(int doctype);
+    void getFiscalNum();
     bool fOpenedFromDraft;
     QStringList fEmarks;
     QStringList fRowToDelete;

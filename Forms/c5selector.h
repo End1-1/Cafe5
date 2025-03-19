@@ -4,7 +4,8 @@
 #include "c5dialog.h"
 #include <QTableView>
 
-namespace Ui {
+namespace Ui
+{
 class C5Selector;
 }
 
@@ -20,15 +21,16 @@ public:
 
     ~C5Selector();
 
-    static bool getValue(const QStringList &dbParams, int cache, QVector<QJsonValue> &values);
+    static bool getValue(const QStringList &dbParams, int cache, QJsonArray &values);
 
-    static bool getValue(const QStringList &dbParams, const QString &query, QVector<QJsonValue> &values);
+    static bool getValue(const QStringList &dbParams, const QString &query, QJsonArray &values);
 
-    static bool getValueOfColumn(const QStringList &dbParams, int cache, QVector<QJsonValue> &values, int column);
+    static bool getValueOfColumn(const QStringList &dbParams, int cache, QJsonArray &values, int column);
 
-    static bool getMultipleValues(const QStringList &dbParams, int cache, QList<QVector<QJsonValue> > &values);
+    static bool getMultipleValues(const QStringList &dbParams, int cache, QVector<QJsonArray> &values);
 
-    static bool getValues(const QStringList &dbParams, const QString &sql, QVector<QJsonValue> &values, const QHash<QString, QString> &translator);
+    static bool getValues(const QStringList &dbParams, const QString &sql, QJsonArray &values,
+                          const QHash<QString, QString> &translator);
 
     void keyPressEvent(QKeyEvent *key) override;
 
@@ -37,7 +39,7 @@ public:
 private slots:
     void selectionChanged(const QItemSelection &selected, const QItemSelection &deselected);
 
-    virtual bool tblDoubleClicked(int row, int column, const QVector<QJsonValue> &values);
+    virtual bool tblDoubleClicked(int row, int column, const QJsonArray &values);
 
     void on_btnRefreshCache_clicked();
 
@@ -58,9 +60,9 @@ private:
 
     C5Grid *fGrid;
 
-    QVector<QJsonValue> fValues;
+    QJsonArray fValues;
 
-    static QMap<QString, QMap<int, C5Selector*> > fSelectorList;
+    static QMap<QString, QMap<int, C5Selector *> > fSelectorList;
 
     bool fReset;
 

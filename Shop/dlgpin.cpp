@@ -15,6 +15,7 @@ DlgPin::DlgPin(QWidget *parent) :
     fPinEmpty = true;
     fLastError = false;
     installEventFilter(this);
+    fDoNotAuth = false;
 }
 
 DlgPin::~DlgPin()
@@ -22,10 +23,11 @@ DlgPin::~DlgPin()
     delete ui;
 }
 
-bool DlgPin::getPin(QString &pin, QString &pass)
+bool DlgPin::getPin(QString &pin, QString &pass, bool donotauth)
 {
     bool result = false;
     DlgPin *d = new DlgPin();
+    d->fDoNotAuth = donotauth;
     if (!pin.isEmpty()) {
         d->ui->leUser->setText(pin);
         d->ui->lePin->setText(pass);
@@ -54,12 +56,18 @@ void DlgPin::btnNumPressed()
 
 void DlgPin::on_btnEnter_clicked()
 {
+    if (fDoNotAuth) {
+        accept();
+        return;
+    }
     fLastError = false;
     NDataProvider::mHost = __c5config.dbParams().at(1);
     fHttp->fErrorObject = this;
     fHttp->fErrorSlot = const_cast<char *>(SLOT(errorResponse(QString)));
     if (ui->lePin->text().length() == 4 && ui->leUser->text().length() == 4) {
-        fHttp->createHttpQuery("/engine/login.php", QJsonObject{{"method", 2}, {"pin", ui->lePin->text()}},
+        fHttp->createHttpQuery("/engine/login.php", QJsonObject{{"method", 1},
+            {"username", ui->leUser->text()},
+            {"password", ui->lePin->text()}},
         SLOT(loginResponse(QJsonObject)));
     }
 }

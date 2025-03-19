@@ -4,11 +4,12 @@
 #include "c5utils.h"
 #include "c5config.h"
 #include "c5printpreview.h"
+#include "QRCodeGenerator.h"
 
 C5PrintReciptA4::C5PrintReciptA4(const QStringList &dbParams, const QString &orderid, QObject *parent) :
     QObject(parent),
-    fDBParams(dbParams),
-    fOrderUUID(orderid)
+    fOrderUUID(orderid),
+    fDBParams(dbParams)
 {
 }
 
@@ -24,7 +25,9 @@ bool C5PrintReciptA4::print(QString &err)
     db[":f_id"] = fOrderUUID;
     db.exec("select concat(o.f_prefix, o.f_hallid) as f_ordernumber, ost.f_name as f_saletypename, "
             "o.f_amounttotal, o.f_amountcash, o.f_amountcard, o.f_amountother, o.f_datecash, "
-            "p.f_taxcode, p.f_taxname, p.f_address, ds.f_datefor, concat_ws(' ', u.f_last, u.f_first) as f_staff "
+            "p.f_taxcode, p.f_taxname, p.f_address, ds.f_datefor, "
+            "concat_ws(' ', u.f_last, u.f_first) as f_staff, "
+            "o.lu, o.f_id "
             "from o_header o "
             "left join o_draft_sale ds on ds.f_id=o.f_id "
             "left join o_sale_type ost on ost.f_id=o.f_saletype "
@@ -53,19 +56,42 @@ bool C5PrintReciptA4::print(QString &err)
         db.rowToMap(b);
         body.append(b);
     }
-    QString store = body.at(0)["f_storename"].toString();
+    int levelIndex = 1;
+    int versionIndex = 0;
+    bool bExtent = true;
+    int maskIndex = -1;
+    QString encodeString = QString("%1;%2;%3").arg(header["f_id"].toString(), header["f_ordernumber"].toString(),
+                           header["lu"].toString());
+    CQR_Encode qrEncode;
+    bool successfulEncoding = qrEncode.EncodeData( levelIndex, versionIndex, bExtent, maskIndex,
+                              encodeString.toUtf8().data() );
+    if (!successfulEncoding) {
+        //            fLog.append("Cannot encode qr image");
+    }
+    int qrImageSize = qrEncode.m_nSymbleSize;
+    int encodeImageSize = qrImageSize + ( QR_MARGIN * 2 );
+    QImage encodeImage(encodeImageSize, encodeImageSize, QImage::Format_Mono);
+    encodeImage.fill(1);
+    for ( int i = 0; i < qrImageSize; i++ ) {
+        for ( int j = 0; j < qrImageSize; j++ ) {
+            if ( qrEncode.m_byModuleData[i][j] ) {
+                encodeImage.setPixel(i + QR_MARGIN, j + QR_MARGIN, 0);
+            }
+        }
+    }
+    QPixmap pix = QPixmap::fromImage(encodeImage);
+    pix = pix.scaled(300, 300);
+    p.image(pix, Qt::AlignLeft);
     p.setFontSize(25);
     p.setFontBold(true);
-    QString docTypeText = QString("%1 %2").arg(header["f_saletypename"].toString()).arg(tr("sale"));
+    QString docTypeText = QString("%1 %2").arg(header["f_saletypename"].toString(), tr("sale"));
     p.ctext(QString("%1 N%2").arg(docTypeText, header["f_ordernumber"].toString()));
     p.br();
-    p.br();
+    p.fTop = p.fLineHeight + 10;
     p.setFontSize(20);
-    p.setFontBold(false);
-    p.br();
     p.setFontBold(true);
     points.clear();
-    points << 50 << 200 << 500 << 1200;
+    points << 300 << 200 << 500 << 950;
     vals << tr("Date");
     vals << tr("Delivery date");
     vals << tr("Buyer");
@@ -73,8 +99,8 @@ bool C5PrintReciptA4::print(QString &err)
     p.br(p.fLineHeight + 20);
     p.setFontBold(false);
     vals.clear();
-    vals << header["f_datecash"].toDate().toString("dd/MM/yyyy");
-    vals << header["f_datefor"].toDate().toString("dd/MM/yyyy");;
+    vals << QDate::fromString(header["f_datecash"].toString(), FORMAT_DATE_TO_STR_MYSQL).toString("dd/MM/yyyy");
+    vals << QDate::fromString(header["f_datefor"].toString(), FORMAT_DATE_TO_STR_MYSQL).toString("dd/MM/yyyy");
     vals << QString("%1, %2 %3, %4 %5").arg(header["f_taxname"].toString(), tr("Taxpayer code"),
                                             header["f_taxcode"].toString(),
                                             tr("Address"), header["f_address"].toString());
@@ -82,28 +108,24 @@ bool C5PrintReciptA4::print(QString &err)
     p.br(p.fLineHeight + 20);
     //SALER
     points.clear();
-    points << 50 << 200 << 1700;
+    points << 300 << 200 << 1450;
     vals.clear();
     vals << tr("Saler");
     vals << __c5config.fMainJson["firmfullinfo"].toString();
-    //vals << QString::fromUtf8("\"Հրաչ Աջեմյան\" ԱԶ, ՀՎՀՀ՝ 35136541");
-    //vals << QString::fromUtf8("");
     p.tableText(points, vals, p.fLineHeight + 20);
     p.br(p.fLineHeight + 20);
     p.br(p.fLineHeight + 20);
     points.clear();
     vals.clear();
     p.setFontBold(true);
-    points << 50;
+    points << 300;
     p.tableText(points, vals, p.fLineHeight + 20);
     p.br(p.fLineHeight + 20);
     p.setFontBold(false);
     points.clear();
     vals.clear();
-    points << 50;
+    points << 300;
     p.tableText(points, vals, p.fLineHeight + 20);
-    p.br();
-    p.br();
     p.br();
     QString goodsColName = tr("Goods");
     points.clear();

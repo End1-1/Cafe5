@@ -37,13 +37,13 @@ void CR5Complectations::buildQuery()
     fModel->insertColumn(col++, tr("Price"));
     fModel->insertColumn(col++, tr("Total"));
     C5Database db(fDBParams);
-    QVector<QVector<QJsonValue> > complectNames;
+    std::vector<QJsonArray > complectNames;
     db.exec("select distinct(g.f_name), c.f_base, g.f_complectout, u.f_name from "
             "c_goods_complectation c "
             "left join c_goods g on g.f_id=c.f_base "
             "left join c_units u on u.f_id=g.f_unit ", complectNames);
     QMap<int, int> complectIdRowMap;
-    for (int i = 0; i < complectNames.count(); i++) {
+    for (int i = 0; i < complectNames.size(); i++) {
         complectIdRowMap[complectNames.at(i).at(1).toInt()] = i;
     }
     db.exec("select c.f_base, c.f_goods, g.f_name, c.f_qty, u.f_name as f_unitname, g.f_lastinputprice "

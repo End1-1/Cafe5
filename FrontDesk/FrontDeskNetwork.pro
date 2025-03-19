@@ -54,4 +54,13 @@ win32: QMAKE_CXXFLAGS -= -Zc:strictStrings
  #    QMAKE_CXXFLAGS += /WX
  # }
 
+FORMS += \
+    ../Classes/dlgserverconnection.ui
+
+HEADERS += \
+    ../Classes/dlgserverconnection.h
+
+SOURCES += \
+    ../Classes/dlgserverconnection.cpp
+
 

@@ -84,7 +84,6 @@ void C5DbUserAccess::refreshData()
 void C5DbUserAccess::saveDataChanges()
 {
     C5Database db(fDBParams);
-    db.startTransaction();
     db.exec("delete from s_db_access");
     for (int c = 3; c < ui->tbl->columnCount(); c++) {
         for (int r = 0; r < ui->tbl->rowCount(); r++) {
@@ -96,7 +95,6 @@ void C5DbUserAccess::saveDataChanges()
             }
         }
     }
-    db.commit();
     C5Message::info(tr("Saved"));
 }
 

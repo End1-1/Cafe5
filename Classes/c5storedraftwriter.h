@@ -99,33 +99,33 @@ public:
 private:
     C5Database &fDb;
 
-    QVector<QVector<QJsonValue> > fAStoreDraftData;
+    std::vector<QJsonArray > fAStoreDraftData;
 
     QHash<QString, int> fAStoreDraftDataMap;
 
-    QVector<QVector<QJsonValue> > fAHeaderStoreData;
+    std::vector<QJsonArray > fAHeaderStoreData;
 
     QHash<QString, int> fAHeaderStoreDataMap;
 
-    QVector<QVector<QJsonValue> > fAStoreDishWaste;
+    std::vector<QJsonArray > fAStoreDishWaste;
 
     QHash<QString, int> fAStoreDishWasteDataMap;
 
-    QVector<QVector<QJsonValue> > fAHeaderData;
+    std::vector<QJsonArray > fAHeaderData;
 
     QHash<QString, int> fAHeaderDataMap;
 
-    QVector<QVector<QJsonValue> > fAHeaderCashData;
+    std::vector<QJsonArray > fAHeaderCashData;
 
     QHash<QString, int> fAHeaderCashDataMap;
 
-    QVector<QVector<QJsonValue> > fECashData;
+    std::vector<QJsonArray > fECashData;
 
     QHash<QString, int> fECashDataMap;
 
     QHash<QString, int> fBClientsDebtsDataMap;
 
-    QVector<QVector<QJsonValue> > fBClientsDebtsData;
+    std::vector<QJsonArray > fBClientsDebtsData;
 
     bool readAHeaderStore(const QString &id);
 

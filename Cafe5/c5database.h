@@ -8,6 +8,7 @@
 #include <QDate>
 #include <QElapsedTimer>
 #include <QJsonObject>
+#include <QJsonArray>
 
 #define where_id(id) QString("where f_id='%1'").arg(id)
 
@@ -45,23 +46,13 @@ public:
 
     void setDatabase(const QString &host, const QString &db, const QString &user, const QString &password);
 
-    bool open();
-
-    bool startTransaction();
-
-    bool commit();
-
-    void rollback();
-
-    void close(bool commit = true);
-
     QString execDry(const QString &sqlQuery);
 
     bool exec(const QString &sqlQuery);
 
-    bool exec(const QString &sqlQuery, QVector<QVector<QJsonValue> > &dbrows);
+    bool exec(const QString &sqlQuery, std::vector<QJsonArray > &dbrows);
 
-    bool exec(const QString &sqlQuery, QVector<QVector<QJsonValue> > &dbrows, QHash<QString, int> &columns);
+    bool exec(const QString &sqlQuery, std::vector<QJsonArray > &dbrows, QHash<QString, int> &columns);
 
     bool execSqlList(const QStringList &sqlList);
 
@@ -73,7 +64,9 @@ public:
 
     QMap<QString, QVariant> fBindValues;
 
-    QVector<QVector<QJsonValue> > fDbRows;
+    std::vector<QJsonArray> fDbRows;
+
+    QMap<int, QMetaType::Type> fColumnType;
 
     QString fLastError;
 
@@ -85,7 +78,7 @@ public:
 
     bool first();
 
-    bool nextRow(QVector<QJsonValue> &row);
+    bool nextRow(QJsonArray &row);
 
     bool nextRow();
 
@@ -111,9 +104,17 @@ public:
 
     bool deleteTableEntry(const QString &table, const QVariant &id);
 
-    inline QJsonValue getValue(int column)
+    inline QVariant getValue(int column)
     {
-        return fDbRows.at(fCursorPos).at(column);
+        QJsonValue v = fDbRows.at(fCursorPos).at(column);
+        switch (fColumnType[column]) {
+            case QMetaType::Int:
+                return v.toInt();
+            case QMetaType::Double:
+                return v.toDouble();
+            default:
+                return v.toVariant();
+        }
     }
 
     inline QVariant getValue(const QString &columnName)
@@ -183,18 +184,18 @@ public:
 
     inline QDate getDate(int row, const QString &columnName)
     {
-        return QDate::fromString(fDbRows.at(row).at(fNameColumnMap[columnName.toLower()]).toString(), FORMAT_DATE_TO_STR);
+        return QDate::fromString(fDbRows.at(row).at(fNameColumnMap[columnName.toLower()]).toString(), FORMAT_DATE_TO_STR_MYSQL);
     }
 
     inline QDate getDate(const QString &columnName)
     {
         return QDate::fromString(fDbRows.at(fCursorPos).at(fNameColumnMap[columnName.toLower()]).toString(),
-                                 FORMAT_DATE_TO_STR);
+                                 FORMAT_DATE_TO_STR_MYSQL);
     }
 
     inline QDate getDate(int column)
     {
-        return QDate::fromString(fDbRows.at(fCursorPos).at(column).toString(), FORMAT_DATE_TO_STR);
+        return QDate::fromString(fDbRows.at(fCursorPos).at(column).toString(), FORMAT_DATE_TO_STR_MYSQL);
     }
 
     inline QTime getTime(int column)
@@ -210,18 +211,18 @@ public:
     inline QDateTime getDateTime(int row, const QString &columnName)
     {
         return QDateTime::fromString(fDbRows.at(row).at(fNameColumnMap[columnName.toLower()]).toString(),
-                                     FORMAT_DATETIME_TO_STR);
+                                     FORMAT_DATETIME_TO_STR_MYSQL);
     }
 
     inline QDateTime getDateTime(const QString &columnName)
     {
         return QDateTime::fromString(fDbRows.at(fCursorPos).at(fNameColumnMap[columnName.toLower()]).toString(),
-                                     FORMAT_DATETIME_TO_STR);
+                                     FORMAT_DATETIME_TO_STR_MYSQL);
     }
 
     inline QDateTime getDateTime(int column)
     {
-        return QDateTime::fromString(fDbRows.at(fCursorPos).at(column).toString(), FORMAT_DATETIME_TO_STR);
+        return QDateTime::fromString(fDbRows.at(fCursorPos).at(column).toString(), FORMAT_DATETIME_TO_STR_MYSQL);
     }
 
     QString columnName(int index);

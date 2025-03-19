@@ -39,11 +39,11 @@ QVariant DataOnline::value(const QString &table, const QString &field, int id)
     if (needupdate) {
         C5Database db(fDBParams);
         db[":f_id"] = id;
-        QVector<QVector<QJsonValue> > values;
+        std::vector<QJsonArray > values;
         QString sql = fTableQueries[table] + " where t.f_id=:f_id";
         db.exec(sql, values);
-        QVector<QVector<QJsonValue> > &data = fValues[table];
-        if (values.count() == 0) {
+        QVector<QJsonArray > &data = fValues[table];
+        if (values.size() == 0) {
             return "INVALID ID";
         }
         data.append(values.at(0));

@@ -43,7 +43,7 @@
 #include "dlgtext.h"
 #include <QToolButton>
 #include <QCloseEvent>
-#include <QDesktopWidget>
+#include <QScreen>
 #include <QScrollBar>
 #include <QInputDialog>
 #include <QPaintEvent>
@@ -1123,7 +1123,7 @@ void DlgOrder::on_btnRecent_clicked()
 		ui->grDish->itemAt(0)->widget()->deleteLater();
 		ui->grDish->removeItem(ui->grDish->itemAt(0));
 	}
-	QRect scr = qApp->desktop()->screenGeometry();
+    QRect scr = qApp->screens().at(0)->geometry();
 	int dcolCount = scr.width() > 1024 ? 3 : 2;
 	int dcol = 0;
 	int drow = 0;
@@ -1542,7 +1542,7 @@ bool DlgOrder::buildDishes(int menuid, int part2)
 		ui->grDish->itemAt(0)->widget()->deleteLater();
 		ui->grDish->removeItem(ui->grDish->itemAt(0));
 	}
-	QRect scr = qApp->desktop()->screenGeometry();
+    QRect scr = qApp->screens().at(0)->geometry();
 	int dcolCount = scr.width() > 1024 ? 3 : 2;
 	int dcol = 0;
 	int drow = 0;
@@ -2601,7 +2601,7 @@ void DlgOrder::on_btnSetPrecent_clicked()
 		if (wo->fOrderDriver->dishesValue("f_state", i).toInt() != DISH_STATE_OK) {
 			continue;
 		}
-		if (wo->fOrderDriver->dishesValue("f_price", i) < 0.01) {
+        if (wo->fOrderDriver->dishesValue("f_price", i).toDouble() < 0.01) {
 			continue;
 		}
 		if (wo->dishWidget(i)->isChecked()) {
@@ -2624,7 +2624,7 @@ void DlgOrder::on_btnSetPrecent_clicked()
 		if (wo->fOrderDriver->dishesValue("f_state", i).toInt() != DISH_STATE_OK) {
 			continue;
 		}
-		if (wo->fOrderDriver->dishesValue("f_price", i) < 0.01) {
+        if (wo->fOrderDriver->dishesValue("f_price", i).toDouble() < 0.01) {
 			continue;
 		}
 		if (wo->dishWidget(i)->isChecked()) {
@@ -2842,7 +2842,7 @@ void DlgOrder::on_btnSetQr_clicked()
     if (!ok) {
         return;
     }
-    if (emarks < 29) {
+    if (emarks.length() < 29) {
         C5Message::error(tr("Invalid Emarks"));
         return;
     }

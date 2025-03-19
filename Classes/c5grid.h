@@ -21,6 +21,7 @@ class C5Grid;
 class C5FilterWidget;
 class C5TableWidget;
 class C5TableModel;
+class NLoadingDlg;
 
 class C5Grid : public C5Widget
 {
@@ -69,6 +70,8 @@ public slots:
 protected:
     bool fSimpleQuery;
 
+    NLoadingDlg *fLoadingDlg;
+
     QString fSqlQuery;
 
     QString fMainTable;
@@ -96,12 +99,6 @@ protected:
     QString fOrderCondition;
 
     C5FilterWidget *fFilterWidget;
-
-    int fXlsxPageSize;
-
-    QString fXlsxPageOrientation;
-
-    int fXlsxFitToPage;
 
     QWidget *widget();
 
@@ -131,7 +128,7 @@ protected:
 
     virtual QMenu *buildTableViewContextMenu(const QPoint &point);
 
-    virtual bool tblDoubleClicked(int row, int column, const QVector<QJsonValue> &values);
+    virtual bool tblDoubleClicked(int row, int column, const QJsonArray &values);
 
     virtual void executeSql(const QString &sql);
 
@@ -209,7 +206,7 @@ private slots:
 signals:
     void tblSingleClick(const QModelIndex &);
 
-    void tblDoubleClick(int row, int column, const QVector<QJsonValue> &values);
+    void tblDoubleClick(int row, int column, const QJsonArray &values);
 
     void refreshed();
 

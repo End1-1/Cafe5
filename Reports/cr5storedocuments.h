@@ -12,14 +12,14 @@ class CR5StoreDocuments : public C5ReportWidget
 public:
     CR5StoreDocuments(const QStringList &dbParams, QWidget *parent = nullptr);
 
-    virtual void buildQuery();
+    virtual void buildQuery() override;
 
-    QToolBar *toolBar();
+    QToolBar *toolBar() override;
 
     CR5StoreDocumentsFilter *fFilter;
 
 protected:
-    virtual bool tblDoubleClicked(int row, int column, const QVector<QJsonValue> &values);
+    virtual bool tblDoubleClicked(int row, int column, const QJsonArray &values) override;
 
 };
 

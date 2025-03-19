@@ -2,6 +2,14 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="hy_AM">
 <context>
+    <name>ArmSoft</name>
+    <message>
+        <location filename="armsoft.cpp" line="61"/>
+        <source>Empty invoice</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>DlgLicenses</name>
     <message>
         <location filename="dlglicenses.ui" line="14"/>

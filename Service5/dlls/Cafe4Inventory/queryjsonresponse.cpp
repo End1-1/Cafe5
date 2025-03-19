@@ -17,86 +17,86 @@
 #define rGetAllTogether 14
 
 QueryJsonResponse::QueryJsonResponse(QSettings &s, const QJsonObject &ji, QJsonObject &jo) :
-    fSettings(s),
     fJsonIn(ji),
-    fJsonOut(jo)
+    fJsonOut(jo),
+    fSettings(s)
 {
-
 }
 
 void QueryJsonResponse::getResponse()
 {
     fJsonOut["kStatus"] = 1;
     fJsonOut["kData"] = "";
-
     switch (fJsonIn["request"].toInt()) {
-    case rCafeList:
-        getCafeList();
-        break;
-    case rStoreList:
-        getStoreList();
-        break;
-    case rGetBaseItems:
-        getBaseItems();
-        break;
-    case rAmtStorageList:
-        getAmtStorageList();
-        break;
-    case rAsStorageList:
-        getAsStorageList();
-        break;
-    case rGetStorageItem:
-        getStorageItems();
-        break;
-    case rOpenInventoryDoc:
-        openInventoryDoc();
-        break;
-    case rUpdateInventoryDocItem:
-        updateInventoryDocItem();
-        break;
-    case rGetGoodsQrAndWeight:
-        getGoodsQrAndWeight();
-        break;
-    case rGetGoodsNames:
-        getGoodsNames();
-        break;
-    case rSaveGoodsQrName:
-        saveGoodsQrName();
-        break;
-    case rGetConfig:
-        getConfig();
-        break;
-    case rGetAragamash:
-        getAragamash();
-        break;
-    case rGetAllTogether:
-        getAllTogether();
-        break;
-    default:        
-        fJsonOut["kData"] = "Unknown query";
-        fJsonOut["kStatus"] = 4;
-        break;
+        case rCafeList:
+            getCafeList();
+            break;
+        case rStoreList:
+            getStoreList();
+            break;
+        case rGetBaseItems:
+            getBaseItems();
+            break;
+        case rAmtStorageList:
+            getAmtStorageList();
+            break;
+        case rAsStorageList:
+            getAsStorageList();
+            break;
+        case rGetStorageItem:
+            getStorageItems();
+            break;
+        case rOpenInventoryDoc:
+            openInventoryDoc();
+            break;
+        case rUpdateInventoryDocItem:
+            updateInventoryDocItem();
+            break;
+        case rGetGoodsQrAndWeight:
+            getGoodsQrAndWeight();
+            break;
+        case rGetGoodsNames:
+            getGoodsNames();
+            break;
+        case rSaveGoodsQrName:
+            saveGoodsQrName();
+            break;
+        case rGetConfig:
+            getConfig();
+            break;
+        case rGetAragamash:
+            getAragamash();
+            break;
+        case rGetAllTogether:
+            getAllTogether();
+            break;
+        default:
+            fJsonOut["kData"] = "Unknown query";
+            fJsonOut["kStatus"] = 4;
+            break;
     }
+    fJsonOut["errorCode"] = fJsonOut["kStatus"].toInt() == 1 ? 0 : fJsonOut["kStatus"].toInt();
+    fJsonOut["errorMessage"] = fJsonOut["errorCode"].toInt() > 0 ? fJsonOut["kData"].toString() : "";
 }
 
 void QueryJsonResponse::dbToArray(QJsonArray &ja, Database  &db)
 {
     while (db.next()) {
         QJsonObject jo;
-        for (int i = 0; i < db.columnCount(); i++){
-            switch (db.value(i).type()) {
-            case QVariant::Int:
-            case QVariant::Char:
-            case QVariant::LongLong:
-            case QVariant::ULongLong:
-                jo[db.columnName(i)] = db.integer(i);
-                break;
-            case QVariant::Double:
-                jo[db.columnName(i)] = db.doubleValue(i);
-                break;
-            default:
-                jo[db.columnName(i)] = db.string(i);
-                break;
+        for (int i = 0; i < db.columnCount(); i++) {
+            switch (db.value(i).typeId()) {
+                case QMetaType::Int:
+                case QMetaType::Char:
+                case QMetaType::LongLong:
+                case QMetaType::ULongLong:
+                    jo[db.columnName(i)] = db.integer(i);
+                    break;
+                case QMetaType::Double:
+                    jo[db.columnName(i)] = db.doubleValue(i);
+                    break;
+                default:
+                    jo[db.columnName(i)] = db.string(i);
+                    break;
             }
         }
         ja.append(jo);
@@ -137,7 +137,7 @@ void QueryJsonResponse::getCafeList()
     fSettings.beginGroup("cafelist");
     QStringList keys = fSettings.allKeys();
     QJsonArray ja;
-    for (const QString &s: qAsConst(keys)) {
+    for (const QString &s : qAsConst(keys)) {
         QJsonObject jo;
         jo["id"] = s;
         jo["name"] = fSettings.value(s).toString();
@@ -152,7 +152,7 @@ void QueryJsonResponse::getStoreList()
     fSettings.beginGroup("storelist");
     QStringList keys = fSettings.allKeys();
     QJsonArray ja;
-    for (const QString &s: qAsConst(keys)) {
+    for (const QString &s : qAsConst(keys)) {
         QJsonObject jo;
         jo["id"] = s;
         jo["name"] = fSettings.value(s).toString();
@@ -180,8 +180,8 @@ void QueryJsonResponse::getBaseItems()
         where += QString("AND OPER.fDEPARTIN = '%1' ").arg(fJsonIn["store"].toString());
     }
     QString query = fSettings.value("query/baseitem").toString()
-            .replace("%date%", QDate::currentDate().toString("yyyy-MM-dd"))
-            .replace("%where%", where);
+                    .replace("%date%", QDate::currentDate().toString("yyyy-MM-dd"))
+                    .replace("%where%", where);
     db.exec(query);
     QJsonArray ja;
     dbToArray(ja, db);
@@ -252,12 +252,12 @@ void QueryJsonResponse::getStorageItems()
     }
     fSettings.endGroup();
     QString where;
-    if (fJsonIn["store"].toString().isEmpty() == false){
+    if (fJsonIn["store"].toString().isEmpty() == false) {
         where += QString("AND H.fSTORAGE ='%1'").arg(fJsonIn["store"].toString());
     }
     QString query = fSettings.value("query/storageitem").toString()
-            .replace("%date%", QDate::currentDate().toString("yyyy-MM-dd"))
-            .replace("%where%", where);
+                    .replace("%date%", QDate::currentDate().toString("yyyy-MM-dd"))
+                    .replace("%where%", where);
     db.exec(query);
     QJsonArray ja;
     dbToArray(ja, db);
@@ -304,6 +304,7 @@ void QueryJsonResponse::updateInventoryDocItem()
                  fSettings.value("db").toString(),
                  fSettings.value("user").toString(),
                  fSettings.value("password").toString())) {
+        fJsonOut["group"] = fbDb();
         fJsonOut["kData"] = db.lastDbError();
         fJsonOut["kStatus"] = 4;
         return;
@@ -395,7 +396,7 @@ void QueryJsonResponse::saveGoodsQrName()
         return;
     }
     QString qr = fJsonIn["qr"].toString();
-    if (qr.isEmpty()){
+    if (qr.isEmpty()) {
         fJsonOut["kData"] = "QR code is empty";
         fJsonOut["kStatus"] = 4;
         return;
@@ -420,7 +421,7 @@ void QueryJsonResponse::saveGoodsQrName()
         db[":scancode"] = qr;
         db.exec("select * from food_scancode where scancode=:scancode");
         if (db.next()) {
-           id = db.integer("id");
+            id = db.integer("id");
         }
     }
     fJsonOut["id"] = id;
@@ -433,10 +434,15 @@ void QueryJsonResponse::saveGoodsQrName()
 
 void QueryJsonResponse::getConfig()
 {
+    if (fJsonIn["config"].toString().isEmpty()) {
+        fJsonOut["kStatus"] = 2;
+        fJsonOut["kData"] = "No config key";
+        return;
+    }
     fSettings.beginGroup(QString("config_%1").arg(fJsonIn["config"].toString()));
     QStringList keys = fSettings.allKeys();
     QJsonArray ja;
-    for (const QString &s: qAsConst(keys)) {
+    for (const QString &s : qAsConst(keys)) {
         QJsonObject jo;
         jo[s] = fSettings.value(s).toString();
         ja.append(jo);
@@ -463,7 +469,7 @@ void QueryJsonResponse::getAragamash()
     if (fJsonIn["item"].toString().isEmpty() == false) {
         where += QString(" and M.fMTCODE='%1'").arg(fJsonIn["item"].toString());
     }
-    if (fJsonIn["store"].toString().isEmpty() == false){
+    if (fJsonIn["store"].toString().isEmpty() == false) {
         where += QString(" and H.fFADEPARTMENT='%1'").arg(fJsonIn["store"].toString());
     }
     query.replace("%where%", where);
@@ -475,7 +481,4 @@ void QueryJsonResponse::getAragamash()
 
 void QueryJsonResponse::getAllTogether()
 {
-
 }
-
-

@@ -67,7 +67,6 @@ QToolBar *PartnersAsMap::toolBar()
 void PartnersAsMap::saveDataChanges()
 {
     C5Database db(fDBParams);
-    db.startTransaction();
     db.exec("delete from as_convert where f_table='c_partners'");
     for (int i = 0; i < ui->tbl->rowCount(); i++) {
         for (int c = ui->tbl->columnCount() - asList.count(); c < ui->tbl->columnCount(); c++) {
@@ -80,6 +79,5 @@ void PartnersAsMap::saveDataChanges()
             }
         }
     }
-    db.commit();
     C5Message::info(tr("Saved"));
 }

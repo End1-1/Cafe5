@@ -34,7 +34,7 @@ public:
 
     virtual void hotKey(const QString &key);
 
-    virtual void selectorCallback(int row, const QVector<QJsonValue> &values);
+    virtual void selectorCallback(int row, const QJsonArray &values);
 
     virtual bool event(QEvent *event);
 

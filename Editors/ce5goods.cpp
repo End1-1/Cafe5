@@ -93,7 +93,7 @@ CE5Goods::CE5Goods(const QStringList &dbParams, QWidget *parent) :
     fScancodeGenerated = false;
     db.exec("select * from e_currency_cross_rate");
     while (db.nextRow()) {
-        fCrossRate[QString("%1-%2").arg(db.getString("f_currency1"), db.getString("f_currency2"))] = db.getDouble("f_rate");
+        fCrossRate[QString("%1-%2").arg(db.getInt("f_currency1")).arg(db.getInt("f_currency2"))] = db.getDouble("f_rate");
     }
     db.exec("select f_id, f_name from as_list");
     while (db.nextRow()) {
@@ -161,6 +161,7 @@ bool CE5Goods::save(QString &err, QList<QMap<QString, QVariant> > &data)
 void CE5Goods::clear()
 {
     int scancode = ui->leScanCode->getInteger();
+    fImage.clear();
     ui->tblBarcodes->setRowCount(0);
     CE5Editor::clear();
     ui->tblGoods->clearContents();
@@ -173,7 +174,7 @@ void CE5Goods::clear()
     ui->leTotal->clear();
     ui->chOnlyWholeNumber->setChecked(false);
     ui->chSameStoreId->setChecked(true);
-    ui->chSameStoreId->clicked(true);
+    emit ui->chSameStoreId->clicked(true);
     if (__c5config.getRegValue("last_goods_editor").toBool()) {
         ui->leGroup->setValue(fLastGroup);
         ui->leUnit->setValue(fLastUnit);
@@ -316,7 +317,8 @@ void CE5Goods::saveResponse(const QJsonObject &jdoc)
 
 void CE5Goods::openResponse(const QJsonObject &jdoc)
 {
-    QByteArray ba = QByteArray::fromBase64(jdoc["image"].toString().toLatin1());
+    fImage = jdoc["image"].toString();
+    QByteArray ba = QByteArray::fromBase64(fImage.toLatin1());
     QPixmap p;
     p.loadFromData(ba);
     ui->lbImage->setPixmap(p);
@@ -339,10 +341,10 @@ void CE5Goods::openResponse(const QJsonObject &jdoc)
     ui->chSameStoreId->setChecked(ui->leStoreId->getInteger() == ui->leCode->getInteger());
     ui->chEnabled->setChecked(j["f_enabled"].toInt() > 0);
     ui->chOnlyWholeNumber->setChecked(j["f_wholenumber"].toInt() > 0);
-    ui->chService->setEnabled(j["f_service"].toInt() > 0);
-    ui->chNoSpecialPrice->setEnabled(j["f_nospecial_price"].toInt() > 0);
+    ui->chService->setChecked(j["f_service"].toInt() > 0);
+    ui->chNoSpecialPrice->setChecked(j["f_nospecial_price"].toInt() > 0);
     ui->leComplectOutputQty->setDouble(j["f_complectout"].toDouble());
-    ui->chComponentExit->setEnabled(j["f_component_exit"].toInt() > 0);
+    ui->chComponentExit->setChecked(j["f_component_exit"].toInt() > 0);
     ui->leWebLink->setText(j["f_weblink"].toString());
     ui->leQueue->setInteger(j["f_queue"].toInt());
     QJsonArray ja = jdoc["complect"].toArray();
@@ -422,7 +424,7 @@ void CE5Goods::printCard()
     p.setSceneParams(2000, 2700, QPageLayout::Portrait);
     p.setFontSize(16);
     p.setFontBold(true);
-    p.ltext(QString("%1: %2").arg(tr("Printed")).arg(QDateTime::currentDateTime().toString(FORMAT_DATETIME_TO_STR)), 0);
+    p.ltext(QString("%1: %2").arg(tr("Printed"), QDateTime::currentDateTime().toString(FORMAT_DATETIME_TO_STR)), 0);
     p.setFontSize(25);
     QString docTypeText = tr("Goods card") + " " + ui->leName->text() + " " + ui->leScanCode->text();
     p.ctext(QString("%1").arg(docTypeText));
@@ -468,7 +470,7 @@ void CE5Goods::printCard()
         }
         p.br(p.fLineHeight + 20);
         p.br(p.fLineHeight + 20);
-        p.rtext(QString("%1: %2").arg(tr("Complectation cost")).arg(ui->leTotal->text()));
+        p.rtext(QString("%1: %2").arg(tr("Complectation cost"), ui->leTotal->text()));
     }
     fEditor->close();
     C5PrintPreview pp( &p, fDBParams);
@@ -577,7 +579,7 @@ void CE5Goods::uploadImage()
         buff.open(QIODevice::WriteOnly);
         pm.save( &buff, "JPG");
     } while (ba.size() > 100000);
-    ui->lbImage->setPixmap(pm.scaled(ui->lbImage->size(), Qt::KeepAspectRatio));
+    ui->lbImage->setPixmap(pm);
     fImage = QString(ba.toBase64());
 }
 
@@ -629,12 +631,12 @@ void CE5Goods::on_btnNewUnit_clicked()
 
 void CE5Goods::on_btnAddGoods_clicked()
 {
-    QVector<QJsonValue> vals;
+    QJsonArray vals;
     if (!C5Selector::getValue(fDBParams, cache_goods, vals)) {
         return;
     }
     int row = addGoodsRow();
-    ui->tblGoods->setString(row, 1, vals.at(1).toString());
+    ui->tblGoods->setInteger(row, 1, vals.at(1).toInt());
     ui->tblGoods->setString(row, 2, vals.at(3).toString());
     ui->tblGoods->setString(row, 4, vals.at(4).toString());
     ui->tblGoods->lineEdit(row, 5)->setDouble(vals.at(6).toDouble());

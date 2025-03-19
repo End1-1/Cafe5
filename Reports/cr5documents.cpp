@@ -124,7 +124,7 @@ void CR5Documents::restoreColumnsWidths()
     }
 }
 
-bool CR5Documents::tblDoubleClicked(int row, int column, const QVector<QJsonValue> &values)
+bool CR5Documents::tblDoubleClicked(int row, int column, const QJsonArray &values)
 {
     Q_UNUSED(column);
     Q_UNUSED(row);

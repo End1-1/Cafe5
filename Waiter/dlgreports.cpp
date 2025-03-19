@@ -4,7 +4,6 @@
 #include "dlgreportslist.h"
 #include "c5printjson.h"
 #include "c5translator.h"
-#include "c5cafecommon.h"
 #include "c5user.h"
 #include "datadriver.h"
 #include "dlgreceiptlanguage.h"
@@ -12,7 +11,6 @@
 #include "printtaxn.h"
 #include "c5printing.h"
 #include "dlgcashbuttonopions.h"
-#include "c5cashdoc.h"
 #include "dlgviewcashreport.h"
 #include "qinputdialog.h"
 #include <QSettings>
@@ -365,7 +363,7 @@ void DlgReports::on_btnCashobx_clicked()
         QFont font(qApp->font());
         font.setPointSize(bs);
         C5Printing p;
-        p.setSceneParams(650, 2600, QPrinter::Portrait);
+        p.setSceneParams(650, 2600, QPageLayout::Portrait);
         p.setFont(font);
         p.image("./logo_receipt.png", Qt::AlignHCenter);
         p.br();
@@ -430,7 +428,7 @@ void DlgReports::on_btnCashobx_clicked()
         p.ltext(tr("Printed"), 0);
         p.rtext(QDateTime::currentDateTime().toString(FORMAT_DATETIME_TO_STR));
         p.br();
-        p.print(C5Config::localReceiptPrinter(), QPrinter::Custom);
+        p.print(C5Config::localReceiptPrinter(), QPageSize::Custom);
     }
     if (closecash) {
         db[":f_sessionid"] = QDateTime::currentDateTime().toString("dd/MM/yyyy HH:mm:ss");
@@ -464,7 +462,7 @@ void DlgReports::on_btnCashInput_clicked()
     QFont font(qApp->font());
     font.setPointSize(bs);
     C5Printing p;
-    p.setSceneParams(700, 2600, QPrinter::Portrait);
+    p.setSceneParams(700, 2600, QPageLayout::Portrait);
     p.setFont(font);
     p.image("./logo_receipt.png", Qt::AlignHCenter);
     p.br();
@@ -486,5 +484,5 @@ void DlgReports::on_btnCashInput_clicked()
     p.br();
     p.setFontSize(bs - 4);
     p.setFontBold(false);
-    p.print(C5Config::localReceiptPrinter(), QPrinter::Custom);
+    p.print(C5Config::localReceiptPrinter(), QPageSize::Custom);
 }

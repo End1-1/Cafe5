@@ -70,7 +70,7 @@ bool C5ReportWidget::on_tblView_doubleClicked(const QModelIndex &index)
     if (index.row() < 0 || index.column() < 0) {
         return false;
     }
-    QVector<QJsonValue> values = fModel->getRowValues(index.row());
+    QJsonArray values = fModel->getRowValues(index.row());
     if (tblDoubleClicked(index.row(), index.column(), values)) {
         return false;
     }

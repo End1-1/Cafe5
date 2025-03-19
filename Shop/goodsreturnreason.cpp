@@ -35,5 +35,6 @@ void GoodsReturnReason::on_lst_itemClicked(QListWidgetItem *item)
         return;
     }
     fReason = item->data(Qt::UserRole).toInt();
+    fReasonName = item->text();
     accept();
 }

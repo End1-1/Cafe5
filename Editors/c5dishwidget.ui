@@ -107,7 +107,7 @@
              </size>
             </property>
             <property name="focusPolicy">
-             <enum>Qt::NoFocus</enum>
+             <enum>Qt::FocusPolicy::NoFocus</enum>
             </property>
             <property name="FieldRef" stdset="0">
              <string>f_part1</string>
@@ -117,7 +117,7 @@
           <item row="1" column="5">
            <widget class="QPushButton" name="btnNewType">
             <property name="focusPolicy">
-             <enum>Qt::NoFocus</enum>
+             <enum>Qt::FocusPolicy::NoFocus</enum>
             </property>
             <property name="text">
              <string/>
@@ -134,7 +134,7 @@
              <bool>false</bool>
             </property>
             <property name="focusPolicy">
-             <enum>Qt::NoFocus</enum>
+             <enum>Qt::FocusPolicy::NoFocus</enum>
             </property>
             <property name="FieldRef" stdset="0">
              <string>f_part2</string>
@@ -309,7 +309,7 @@
           <item row="6" column="0">
            <widget class="C5CheckBox" name="chRemind">
             <property name="focusPolicy">
-             <enum>Qt::ClickFocus</enum>
+             <enum>Qt::FocusPolicy::ClickFocus</enum>
             </property>
             <property name="text">
              <string>Reminder</string>
@@ -328,7 +328,7 @@
              </size>
             </property>
             <property name="focusPolicy">
-             <enum>Qt::ClickFocus</enum>
+             <enum>Qt::FocusPolicy::ClickFocus</enum>
             </property>
             <property name="Field" stdset="0">
              <string>f_queue</string>
@@ -348,7 +348,7 @@
           <item row="4" column="0" colspan="2">
            <widget class="C5CheckBox" name="chServiceFee">
             <property name="focusPolicy">
-             <enum>Qt::ClickFocus</enum>
+             <enum>Qt::FocusPolicy::ClickFocus</enum>
             </property>
             <property name="text">
              <string>Append service fee</string>
@@ -361,7 +361,7 @@
           <item row="5" column="0" colspan="2">
            <widget class="C5CheckBox" name="chDiscount">
             <property name="focusPolicy">
-             <enum>Qt::ClickFocus</enum>
+             <enum>Qt::FocusPolicy::ClickFocus</enum>
             </property>
             <property name="text">
              <string>Can discount</string>
@@ -380,7 +380,7 @@
              </size>
             </property>
             <property name="focusPolicy">
-             <enum>Qt::ClickFocus</enum>
+             <enum>Qt::FocusPolicy::ClickFocus</enum>
             </property>
             <property name="Field" stdset="0">
              <string>f_specialdiscount</string>
@@ -400,7 +400,7 @@
           <item row="7" column="0">
            <widget class="C5CheckBox" name="checkBox_4">
             <property name="focusPolicy">
-             <enum>Qt::ClickFocus</enum>
+             <enum>Qt::FocusPolicy::ClickFocus</enum>
             </property>
             <property name="text">
              <string>Extra</string>
@@ -419,7 +419,7 @@
              </size>
             </property>
             <property name="focusPolicy">
-             <enum>Qt::ClickFocus</enum>
+             <enum>Qt::FocusPolicy::ClickFocus</enum>
             </property>
             <property name="Field" stdset="0">
              <string>f_hourlypayment</string>
@@ -445,7 +445,7 @@
              </size>
             </property>
             <property name="focusPolicy">
-             <enum>Qt::ClickFocus</enum>
+             <enum>Qt::FocusPolicy::ClickFocus</enum>
             </property>
             <property name="readOnly">
              <bool>true</bool>
@@ -471,7 +471,7 @@
           <item row="8" column="0">
            <widget class="C5CheckBox" name="checkBox_5">
             <property name="focusPolicy">
-             <enum>Qt::ClickFocus</enum>
+             <enum>Qt::FocusPolicy::ClickFocus</enum>
             </property>
             <property name="text">
              <string>Show online</string>
@@ -561,7 +561,7 @@
              <item>
               <spacer name="horizontalSpacer_2">
                <property name="orientation">
-                <enum>Qt::Horizontal</enum>
+                <enum>Qt::Orientation::Horizontal</enum>
                </property>
                <property name="sizeHint" stdset="0">
                 <size>
@@ -577,10 +577,10 @@
           <item row="1" column="0">
            <widget class="QFrame" name="frame">
             <property name="frameShape">
-             <enum>QFrame::Box</enum>
+             <enum>QFrame::Shape::Box</enum>
             </property>
             <property name="frameShadow">
-             <enum>QFrame::Sunken</enum>
+             <enum>QFrame::Shadow::Sunken</enum>
             </property>
             <layout class="QVBoxLayout" name="verticalLayout_2">
              <property name="spacing">
@@ -607,16 +607,16 @@
                 </sizepolicy>
                </property>
                <property name="frameShape">
-                <enum>QFrame::NoFrame</enum>
+                <enum>QFrame::Shape::NoFrame</enum>
                </property>
                <property name="verticalScrollBarPolicy">
-                <enum>Qt::ScrollBarAlwaysOn</enum>
+                <enum>Qt::ScrollBarPolicy::ScrollBarAlwaysOn</enum>
                </property>
                <property name="horizontalScrollBarPolicy">
-                <enum>Qt::ScrollBarAlwaysOff</enum>
+                <enum>Qt::ScrollBarPolicy::ScrollBarAlwaysOff</enum>
                </property>
                <property name="editTriggers">
-                <set>QAbstractItemView::NoEditTriggers</set>
+                <set>QAbstractItemView::EditTrigger::NoEditTriggers</set>
                </property>
                <column>
                 <property name="text">
@@ -664,16 +664,16 @@
                 </size>
                </property>
                <property name="frameShape">
-                <enum>QFrame::NoFrame</enum>
+                <enum>QFrame::Shape::NoFrame</enum>
                </property>
                <property name="verticalScrollBarPolicy">
-                <enum>Qt::ScrollBarAlwaysOn</enum>
+                <enum>Qt::ScrollBarPolicy::ScrollBarAlwaysOn</enum>
                </property>
                <property name="horizontalScrollBarPolicy">
-                <enum>Qt::ScrollBarAlwaysOn</enum>
+                <enum>Qt::ScrollBarPolicy::ScrollBarAlwaysOn</enum>
                </property>
                <property name="editTriggers">
-                <set>QAbstractItemView::NoEditTriggers</set>
+                <set>QAbstractItemView::EditTrigger::NoEditTriggers</set>
                </property>
                <attribute name="horizontalHeaderVisible">
                 <bool>false</bool>
@@ -751,7 +751,7 @@
              <item>
               <widget class="QPushButton" name="btnAddRecipe">
                <property name="focusPolicy">
-                <enum>Qt::NoFocus</enum>
+                <enum>Qt::FocusPolicy::NoFocus</enum>
                </property>
                <property name="toolTip">
                 <string>Add goods (+)</string>
@@ -768,7 +768,7 @@
              <item>
               <widget class="QPushButton" name="btnAddDishRecipe">
                <property name="focusPolicy">
-                <enum>Qt::NoFocus</enum>
+                <enum>Qt::FocusPolicy::NoFocus</enum>
                </property>
                <property name="toolTip">
                 <string>Add goods (+)</string>
@@ -785,7 +785,7 @@
              <item>
               <widget class="QPushButton" name="btnNewGoods">
                <property name="focusPolicy">
-                <enum>Qt::NoFocus</enum>
+                <enum>Qt::FocusPolicy::NoFocus</enum>
                </property>
                <property name="toolTip">
                 <string>New goods (Control + N)</string>
@@ -802,7 +802,7 @@
              <item>
               <widget class="QPushButton" name="btnRemoveRecipe">
                <property name="focusPolicy">
-                <enum>Qt::NoFocus</enum>
+                <enum>Qt::FocusPolicy::NoFocus</enum>
                </property>
                <property name="toolTip">
                 <string>Remove selected row (-)</string>
@@ -819,7 +819,7 @@
              <item>
               <widget class="QPushButton" name="btnCopy">
                <property name="focusPolicy">
-                <enum>Qt::NoFocus</enum>
+                <enum>Qt::FocusPolicy::NoFocus</enum>
                </property>
                <property name="toolTip">
                 <string>Copy recipe (Control + C)</string>
@@ -836,7 +836,7 @@
              <item>
               <widget class="QPushButton" name="btnPasteRecipt">
                <property name="focusPolicy">
-                <enum>Qt::NoFocus</enum>
+                <enum>Qt::FocusPolicy::NoFocus</enum>
                </property>
                <property name="toolTip">
                 <string>Paste recipe (Control + P)</string>
@@ -853,7 +853,7 @@
              <item>
               <widget class="QPushButton" name="btnPrintRecipe">
                <property name="focusPolicy">
-                <enum>Qt::NoFocus</enum>
+                <enum>Qt::FocusPolicy::NoFocus</enum>
                </property>
                <property name="toolTip">
                 <string>Print receipe (Control + P)</string>
@@ -870,7 +870,7 @@
              <item>
               <spacer name="horizontalSpacer">
                <property name="orientation">
-                <enum>Qt::Horizontal</enum>
+                <enum>Qt::Orientation::Horizontal</enum>
                </property>
                <property name="sizeHint" stdset="0">
                 <size>
@@ -965,7 +965,7 @@
           <item>
            <spacer name="horizontalSpacer_4">
             <property name="orientation">
-             <enum>Qt::Horizontal</enum>
+             <enum>Qt::Orientation::Horizontal</enum>
             </property>
             <property name="sizeHint" stdset="0">
              <size>
@@ -996,7 +996,7 @@
           <item>
            <widget class="QListWidget" name="lwComment">
             <property name="editTriggers">
-             <set>QAbstractItemView::NoEditTriggers</set>
+             <set>QAbstractItemView::EditTrigger::NoEditTriggers</set>
             </property>
            </widget>
           </item>
@@ -1023,13 +1023,13 @@
        <item>
         <widget class="QLabel" name="lbImage">
          <property name="contextMenuPolicy">
-          <enum>Qt::CustomContextMenu</enum>
+          <enum>Qt::ContextMenuPolicy::CustomContextMenu</enum>
          </property>
          <property name="text">
           <string>Image</string>
          </property>
          <property name="alignment">
-          <set>Qt::AlignCenter</set>
+          <set>Qt::AlignmentFlag::AlignCenter</set>
          </property>
         </widget>
        </item>
@@ -1049,10 +1049,10 @@
           <item row="1" column="0">
            <widget class="QFrame" name="frame_2">
             <property name="frameShape">
-             <enum>QFrame::Box</enum>
+             <enum>QFrame::Shape::Box</enum>
             </property>
             <property name="frameShadow">
-             <enum>QFrame::Sunken</enum>
+             <enum>QFrame::Shadow::Sunken</enum>
             </property>
             <layout class="QVBoxLayout" name="verticalLayout_5">
              <property name="spacing">
@@ -1079,22 +1079,22 @@
                 </sizepolicy>
                </property>
                <property name="frameShape">
-                <enum>QFrame::NoFrame</enum>
+                <enum>QFrame::Shape::NoFrame</enum>
                </property>
                <property name="verticalScrollBarPolicy">
-                <enum>Qt::ScrollBarAlwaysOn</enum>
+                <enum>Qt::ScrollBarPolicy::ScrollBarAlwaysOn</enum>
                </property>
                <property name="horizontalScrollBarPolicy">
-                <enum>Qt::ScrollBarAlwaysOff</enum>
+                <enum>Qt::ScrollBarPolicy::ScrollBarAlwaysOff</enum>
                </property>
                <property name="editTriggers">
-                <set>QAbstractItemView::NoEditTriggers</set>
+                <set>QAbstractItemView::EditTrigger::NoEditTriggers</set>
                </property>
                <property name="selectionMode">
-                <enum>QAbstractItemView::SingleSelection</enum>
+                <enum>QAbstractItemView::SelectionMode::SingleSelection</enum>
                </property>
                <property name="selectionBehavior">
-                <enum>QAbstractItemView::SelectRows</enum>
+                <enum>QAbstractItemView::SelectionBehavior::SelectRows</enum>
                </property>
                <column>
                 <property name="text">
@@ -1122,16 +1122,16 @@
                 </size>
                </property>
                <property name="frameShape">
-                <enum>QFrame::NoFrame</enum>
+                <enum>QFrame::Shape::NoFrame</enum>
                </property>
                <property name="verticalScrollBarPolicy">
-                <enum>Qt::ScrollBarAlwaysOn</enum>
+                <enum>Qt::ScrollBarPolicy::ScrollBarAlwaysOn</enum>
                </property>
                <property name="horizontalScrollBarPolicy">
-                <enum>Qt::ScrollBarAlwaysOn</enum>
+                <enum>Qt::ScrollBarPolicy::ScrollBarAlwaysOn</enum>
                </property>
                <property name="editTriggers">
-                <set>QAbstractItemView::NoEditTriggers</set>
+                <set>QAbstractItemView::EditTrigger::NoEditTriggers</set>
                </property>
                <attribute name="horizontalHeaderVisible">
                 <bool>false</bool>
@@ -1209,7 +1209,7 @@
              <item>
               <spacer name="horizontalSpacer_3">
                <property name="orientation">
-                <enum>Qt::Horizontal</enum>
+                <enum>Qt::Orientation::Horizontal</enum>
                </property>
                <property name="sizeHint" stdset="0">
                 <size>
@@ -1263,7 +1263,7 @@
              <item>
               <widget class="QPushButton" name="btnAddToSet">
                <property name="focusPolicy">
-                <enum>Qt::NoFocus</enum>
+                <enum>Qt::FocusPolicy::NoFocus</enum>
                </property>
                <property name="toolTip">
                 <string>Add goods (+)</string>
@@ -1280,7 +1280,7 @@
              <item>
               <widget class="QPushButton" name="btnRemoveFromSet">
                <property name="focusPolicy">
-                <enum>Qt::NoFocus</enum>
+                <enum>Qt::FocusPolicy::NoFocus</enum>
                </property>
                <property name="toolTip">
                 <string>Remove selected row (-)</string>
@@ -1297,7 +1297,7 @@
              <item>
               <spacer name="horizontalSpacer_5">
                <property name="orientation">
-                <enum>Qt::Horizontal</enum>
+                <enum>Qt::Orientation::Horizontal</enum>
                </property>
                <property name="sizeHint" stdset="0">
                 <size>
@@ -1326,14 +1326,14 @@
    <header location="global">c5lineeditwithselector.h</header>
   </customwidget>
   <customwidget>
-   <class>C5CheckBox</class>
-   <extends>QCheckBox</extends>
-   <header location="global">c5checkbox.h</header>
-  </customwidget>
-  <customwidget>
    <class>C5TableWidget</class>
    <extends>QTableWidget</extends>
    <header location="global">c5tablewidget.h</header>
+  </customwidget>
+  <customwidget>
+   <class>C5CheckBox</class>
+   <extends>QCheckBox</extends>
+   <header location="global">c5checkbox.h</header>
   </customwidget>
  </customwidgets>
  <tabstops>

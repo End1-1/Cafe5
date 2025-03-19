@@ -12,14 +12,14 @@ class CR5TStoreExtra : public C5ReportWidget
 public:
     CR5TStoreExtra(const QStringList &dbParams, QWidget *parent = nullptr);
 
-    virtual QToolBar *toolBar();
+    virtual QToolBar *toolBar() override;
 
 protected:
-    virtual void buildQuery();
+    virtual void buildQuery() override;
 
-    virtual void refreshData();
+    virtual void refreshData() override;
 
-    virtual bool tblDoubleClicked(int row, int column, const QVector<QJsonValue> &values);
+    virtual bool tblDoubleClicked(int row, int column, const QJsonArray &values) override;
 
 private:
     QHash<QString, int> fColumnNameIndex;

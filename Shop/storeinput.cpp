@@ -123,7 +123,6 @@ void StoreInput::on_btnAccept_clicked()
         return;
     }
     C5Database db(__c5config.dbParams());
-    db.startTransaction();
     QSet<QString> ids;
     foreach (int r, rows) {
         QString id = ui->tbl->getString(r, 0);
@@ -150,13 +149,11 @@ void StoreInput::on_btnAccept_clicked()
                 dw.updateField("a_header", "f_state", DOC_STATE_SAVED, "f_id", s);
                 if (!dw.writeInput(s, err)) {
                     C5Message::error(err);
-                    db.rollback();
                     return;
                 }
             }
         }
     }
-    db.commit();
     getList();
 }
 
@@ -167,7 +164,8 @@ void StoreInput::getList()
     ui->tbl->clearContents();
     ui->tbl->setRowCount(0);
     QStringList header;
-    header << tr("UUID") << tr("X") << tr("Date") << tr("Store") << tr("Goods") << tr("Scancode") << tr("Qty") <<
+    header << tr("UUID") << tr("X") << tr("Date") << tr("Store")
+           << tr("Goods") << tr("Scancode") << tr("Qty") <<
            tr("Retail");
     ui->tbl->setColumnCount(header.count());
     ui->tbl->setHorizontalHeaderLabels(header);
@@ -199,8 +197,8 @@ void StoreInput::getList()
         ui->tbl->setString(r, 3, "Store");
         ui->tbl->setString(r, 4, db.getString("f_name"));
         ui->tbl->setString(r, 5, db.getString("f_scancode"));
-        ui->tbl->setString(r, 6, db.getString("f_qty"));
-        ui->tbl->setString(r, 7, db.getString("f_price1"));
+        ui->tbl->setDouble(r, 6, db.getDouble("f_qty"));
+        ui->tbl->setDouble(r, 7, db.getDouble("f_price1"));
         ui->leTotal->setDouble(ui->leTotal->getDouble() + (db.getDouble("f_qty") *db.getDouble("f_price1")));
     }
     ui->tbl->fitColumnsToWidth();
@@ -213,7 +211,8 @@ void StoreInput::history()
     ui->tbl->clearContents();
     ui->tbl->setRowCount(0);
     QStringList header;
-    header << tr("UUID") << tr("X") << tr("Date") << tr("Store") << tr("Goods") << tr("Scancode") << tr("Qty") <<
+    header << tr("UUID") << tr("X") << tr("Date") << tr("Store")
+           << tr("Goods") << tr("Scancode") << tr("Qty") <<
            tr("Retail");
     ui->tbl->setColumnCount(header.count());
     ui->tbl->setHorizontalHeaderLabels(header);
@@ -224,7 +223,8 @@ void StoreInput::history()
     db[":f_date2"] = ui->deEnd->date();
     db[":f_type"] = 1;
     db[":f_state"] = DOC_STATE_SAVED;
-    if (!db.exec("select ad.f_id, '', ah.f_date, g.f_name, g.f_scancode, ad.f_qty, if(gpr.f_price1disc>0, gpr.f_price1disc, gpr.f_price1) as f_price1, "
+    if (!db.exec("select ad.f_id, '', ah.f_date, g.f_name, g.f_scancode, "
+                 "ad.f_qty, if(gpr.f_price1disc>0, gpr.f_price1disc, gpr.f_price1) as f_price1, "
                  "spa.f_id as f_spa "
                  "from a_store_draft ad "
                  "inner join c_goods g on g.f_id=ad.f_goods "
@@ -232,7 +232,8 @@ void StoreInput::history()
                  "inner join a_header ah on ah.f_id=ad.f_document "
                  "left join a_header_shop2partneraccept spa on spa.f_id=ad.f_id "
                  "where ad.f_store=:f_store and ah.f_date between :f_date1 and :f_date2 and ad.f_type=1 "
-                 "and ad.f_type=:f_type and ah.f_state=:f_state ")) {
+                 "and ad.f_type=:f_type and ah.f_state=:f_state "
+                 "order by ad.f_document , ad.f_row ")) {
         C5Message::error(db.fLastError);
         return;
     }
@@ -246,12 +247,12 @@ void StoreInput::history()
         ui->tbl->setString(r, 3, "Store");
         ui->tbl->setString(r, 4, db.getString("f_name"));
         ui->tbl->setString(r, 5, db.getString("f_scancode"));
-        ui->tbl->setString(r, 6, db.getString("f_qty"));
-        ui->tbl->setString(r, 7, db.getString("f_price1"));
+        ui->tbl->setDouble(r, 6, db.getDouble("f_qty"));
+        ui->tbl->setDouble(r, 7, db.getDouble("f_price1"));
         ui->leTotal->setDouble(ui->leTotal->getDouble() + (db.getDouble("f_qty") *db.getDouble("f_price1")));
         if (db.getString("f_id") == db.getString("f_spa")) {
             for (int i = 0; i < ui->tbl->columnCount(); i++) {
-                ui->tbl->item(r, i)->setData(Qt::BackgroundColorRole, QColor(Qt::magenta));
+                ui->tbl->item(r, i)->setData(Qt::BackgroundRole, QColor(Qt::magenta));
             }
         }
     }
@@ -275,7 +276,8 @@ void StoreInput::storeByGroup()
     db[":f_store"] = __c5config.defaultStore();
     db[":f_date"] = QDate::currentDate();
     if (!db.exec("select gg.f_name as f_group,sum(s.f_qty*s.f_type) as f_qty, "
-                 "sum(s.f_qty*s.f_type)*if(gpr.f_price1disc>0, gpr.f_price1disc, gpr.f_price1) as f_totalsale "
+                 "sum(s.f_qty*s.f_type)*if(gpr.f_price1disc>0, "
+                 "gpr.f_price1disc, gpr.f_price1) as f_totalsale "
                  "from a_store s "
                  "inner join c_goods g on g.f_id=s.f_goods "
                  "left join c_goods_prices gpr on gpr.f_goods=g.f_id "
@@ -297,7 +299,7 @@ void StoreInput::storeByGroup()
         ui->tbl->setDouble(r, 3, db.getDouble("f_totalsale"));
         ui->leTotal->setDouble(ui->leTotal->getDouble() + db.getDouble("f_totalsale"));
     }
-    ui->chAll->clicked(true);
+    emit(ui->chAll->clicked(true));
 }
 
 void StoreInput::storeByItems()
@@ -315,7 +317,8 @@ void StoreInput::storeByItems()
     C5Database db(__c5config.dbParams());
     db[":f_store"] = __c5config.defaultStore();
     db[":f_date"] = QDate::currentDate();
-    if (!db.exec("select gg.f_name as f_group, g.f_name, g.f_scancode, sum(s.f_qty*s.f_type) as f_qty, "
+    if (!db.exec("select gg.f_name as f_group, g.f_name, g.f_scancode, "
+                 "sum(s.f_qty*s.f_type) as f_qty, "
                  "sum(s.f_qty*s.f_type)*if(gpr.f_price1disc>0, gpr.f_price1disc, gpr.f_price1) as f_totalsale "
                  "from a_store s "
                  "inner join c_goods g on g.f_id=s.f_goods "
@@ -340,7 +343,7 @@ void StoreInput::storeByItems()
         ui->tbl->setDouble(r, 5, db.getDouble("f_totalsale"));
         ui->leTotal->setDouble(ui->leTotal->getDouble() + db.getDouble("f_totalsale"));
     }
-    ui->chAll->clicked(true);
+    emit(ui->chAll->clicked(true));
     ui->tbl->fitColumnsToWidth();
 }
 

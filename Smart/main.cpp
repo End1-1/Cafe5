@@ -6,6 +6,7 @@
 #include "ndataprovider.h"
 #include "dlgsplashscreen.h"
 #include "fileversion.h"
+#include "logwriter.h"
 #include <QFile>
 #include <QLockFile>
 #include <QSslSocket>
@@ -16,6 +17,7 @@
 
 int main(int argc, char *argv[])
 {
+    qputenv("QT_OPENGL", "angle");
     QApplication a(argc, argv);
 #ifndef QT_DEBUG
     QStringList libPath = QCoreApplication::libraryPaths();
@@ -37,6 +39,8 @@ int main(int argc, char *argv[])
         C5Message::error(QObject::tr("An instance of application already running"));
         return -1;
     }
+    LogWriter::write(LogWriterLevel::verbose, "Support SSL", QSslSocket::supportsSsl() ? "true" : "false");
+    LogWriter::write(LogWriterLevel::verbose, "Support SSL version", QSslSocket::sslLibraryBuildVersionString());
     auto *dlgsplash = new DlgSplashScreen();
     dlgsplash->show();
     emit dlgsplash->messageSignal("Please, wait...");

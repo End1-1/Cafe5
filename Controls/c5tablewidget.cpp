@@ -1,10 +1,5 @@
 #include "c5tablewidget.h"
-#include "c5lineedit.h"
 #include "c5combobox.h"
-#include "c5message.h"
-#include "c5utils.h"
-#include "c5checkbox.h"
-#include "xlsxall.h"
 #include <QHeaderView>
 #include <QApplication>
 #include <C5LineEditWithSelector.h>

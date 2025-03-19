@@ -220,7 +220,7 @@ bool DlgMovement::saveDoc(int state)
     jdoc["session"] = session;
     QJsonDocument json(jdoc);
     C5Database db(fDBParams);
-    if (!db.execDirect(QString("call sf_create_store_document('%1')").arg(QString(json.toJson(QJsonDocument::Compact))))) {
+    if (!db.execNetwork(QString("call sf_create_store_document('%1')").arg(QString(json.toJson(QJsonDocument::Compact))))) {
         C5Message::error(db.fLastError);
     }
     db[":f_session"] = session;

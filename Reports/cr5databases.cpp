@@ -1,12 +1,8 @@
 #include "cr5databases.h"
 #include "c5dbuseraccess.h"
-#include "ce5databases.h"
 #include "c5mainwindow.h"
-#include "c5datasynchronize.h"
 #include "c5tablemodel.h"
-#include "c5checkdatabase.h"
 #include "c5dbresetoption.h"
-#include "c5random.h"
 #include <QFileDialog>
 #include <QProcess>
 #include <QDesktopServices>
@@ -31,7 +27,6 @@ CR5Databases::CR5Databases(const QStringList &dbParams, QWidget *parent) :
     fTableView->setItemDelegateForColumn(4, new C5TextDelegate(fTableView));
     fTableView->setItemDelegateForColumn(5, new C5TextDelegate(fTableView));
     fTableView->setItemDelegateForColumn(6, new C5TextDelegate(fTableView));
-    fEditor = new CE5Databases(dbParams);
 }
 
 QToolBar *CR5Databases::toolBar()
@@ -58,7 +53,7 @@ void CR5Databases::actionAccess()
 
 void CR5Databases::backupDatabase()
 {
-    QVector<QJsonValue> values = fModel->getRowValues(fTableView->currentIndex().row());
+    QJsonArray values = fModel->getRowValues(fTableView->currentIndex().row());
     if (values.at(0).toString().isEmpty()) {
         return;
     }

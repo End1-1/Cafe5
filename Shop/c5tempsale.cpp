@@ -72,11 +72,12 @@ void C5TempSale::on_btnTrash_clicked()
 void C5TempSale::refreshData()
 {
     C5Database db(__c5config.dbParams());
+    db[":f_hall"] = __c5config.defaultHall();
     db.exec("select d.f_id, d.f_date, d.f_time, concat_ws(' ', u.f_last, u.f_first), "
             "d.f_amount "
             "from o_draft_sale d "
             "left join s_user u on u.f_id=d.f_staff "
-            "where d.f_state=1");
+            "where d.f_state=1 ");
     ui->tbl->setRowCount(0);
     while (db.nextRow()) {
         int r = ui->tbl->rowCount();

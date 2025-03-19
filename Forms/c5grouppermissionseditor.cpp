@@ -6,28 +6,31 @@
 #include <QProxyStyle>
 #include <QStyleOptionTab>
 
-class CustomTabStyle : public QProxyStyle {
+class CustomTabStyle : public QProxyStyle
+{
 public:
-  QSize sizeFromContents(ContentsType type, const QStyleOption* option,
-                         const QSize& size, const QWidget* widget) const {
-    QSize s = QProxyStyle::sizeFromContents(type, option, size, widget);
-    if (type == QStyle::CT_TabBarTab) {
-      s.transpose();
+    QSize sizeFromContents(ContentsType type, const QStyleOption *option,
+                           const QSize &size, const QWidget *widget) const
+    {
+        QSize s = QProxyStyle::sizeFromContents(type, option, size, widget);
+        if (type == QStyle::CT_TabBarTab) {
+            s.transpose();
+        }
+        return s;
     }
-    return s;
-  }
 
-  void drawControl(ControlElement element, const QStyleOption* option, QPainter* painter, const QWidget* widget) const {
-    if (element == CE_TabBarTabLabel) {
-      if (const QStyleOptionTab* tab = qstyleoption_cast<const QStyleOptionTab*>(option)) {
-        QStyleOptionTab opt(*tab);
-        opt.shape = QTabBar::RoundedNorth;
-        QProxyStyle::drawControl(element, &opt, painter, widget);
-        return;
-      }
+    void drawControl(ControlElement element, const QStyleOption *option, QPainter *painter, const QWidget *widget) const
+    {
+        if (element == CE_TabBarTabLabel) {
+            if (const QStyleOptionTab * tab = qstyleoption_cast<const QStyleOptionTab * >(option)) {
+                QStyleOptionTab opt( *tab);
+                opt.shape = QTabBar::RoundedNorth;
+                QProxyStyle::drawControl(element, &opt, painter, widget);
+                return;
+            }
+        }
+        QProxyStyle::drawControl(element, option, painter, widget);
     }
-    QProxyStyle::drawControl(element, option, painter, widget);
-  }
 };
 
 C5GroupPermissionsEditor::C5GroupPermissionsEditor(const QStringList &dbParams, QWidget *parent) :
@@ -69,7 +72,7 @@ QToolBar *C5GroupPermissionsEditor::toolBar()
 
 void C5GroupPermissionsEditor::on_lbGroup_clicked()
 {
-    QVector<QJsonValue> values;
+    QJsonArray values;
     if (C5Selector::getValue(fDBParams, cache_users_groups, values)) {
         setPermissionsGroupId(values.at(0).toInt());
     }
@@ -80,7 +83,7 @@ void C5GroupPermissionsEditor::savePemissions()
     C5Database db(fDBParams);
     db[":f_group"] = fGroupId;
     db.exec("delete from s_user_access where f_group=:f_group");
-    for (QMap<int, C5CheckBox*>::const_iterator it = fCheckBoxes.constBegin(); it != fCheckBoxes.constEnd(); it++) {
+    for (QMap<int, C5CheckBox * >::const_iterator it = fCheckBoxes.constBegin(); it != fCheckBoxes.constEnd(); it++) {
         if (it.value()->isChecked()) {
             db[":f_group"] = fGroupId;
             db[":f_key"] = it.key();
@@ -93,7 +96,7 @@ void C5GroupPermissionsEditor::savePemissions()
 
 void C5GroupPermissionsEditor::getPermissions()
 {
-    QList<C5CheckBox*> l = fCheckBoxes.values();
+    QList<C5CheckBox *> l = fCheckBoxes.values();
     foreach (C5CheckBox *c, l) {
         c->setChecked(false);
     }
@@ -124,10 +127,10 @@ void C5GroupPermissionsEditor::getCheckBoxes(QWidget *parent)
     QObjectList ol = parent->children();
     foreach (QObject *o, ol) {
         if (o->children().count() > 0) {
-            getCheckBoxes(static_cast<QWidget*>(o));
+            getCheckBoxes(static_cast<QWidget *>(o));
         }
         if (strcmp(o->metaObject()->className(), "C5CheckBox") == 0) {
-            C5CheckBox *cb = static_cast<C5CheckBox*>(o);
+            C5CheckBox *cb = static_cast<C5CheckBox *>(o);
             fCheckBoxes[cb->getTag()] = cb;
         }
     }
@@ -135,7 +138,7 @@ void C5GroupPermissionsEditor::getCheckBoxes(QWidget *parent)
 
 void C5GroupPermissionsEditor::setChecked(int start, int end, bool v)
 {
-    for (QMap<int, C5CheckBox*>::const_iterator it = fCheckBoxes.constBegin(); it != fCheckBoxes.constEnd(); it++) {
+    for (QMap<int, C5CheckBox * >::const_iterator it = fCheckBoxes.constBegin(); it != fCheckBoxes.constEnd(); it++) {
         if (it.key() >= start && it.key() <= end) {
             it.value()->setChecked(v);
         }

@@ -100,7 +100,7 @@ void CustomerInfo::on_pushButton_clicked()
     db[":f_name"] = ui->leCustomer->text();
     db[":f_phone"] = ui->lePhone->text();
     db[":f_address"] = ui->leAddress->text();
-    db[":f_category"] = __c5config.getValue(param_waiter_delivery_costumer_category).toInt();
+    db[":f_category"] = 1;//__c5config.getValue(param_waiter_delivery_costumer_category).toInt();
     if (fCustomerId == 0) {
         fCustomerId = db.insert("c_partners");
     } else {

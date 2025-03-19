@@ -12,7 +12,6 @@
 #include <QLockFile>
 #include <QMessageBox>
 #include <QSettings>
-#include <QTextCodec>
 
 int main(int argc, char *argv[])
 {
@@ -26,6 +25,7 @@ int main(int argc, char *argv[])
     libPath << qApp->applicationDirPath() + "/imageformats";
     QCoreApplication::setLibraryPaths(libPath);
 #endif
+    qputenv("QT_ASSUME_UTF8", "1");
     QFile styleSheet(a.applicationDirPath() + "/waiter.css");
     if (styleSheet.open(QIODevice::ReadOnly)) {
         a.setStyleSheet(styleSheet.readAll());
@@ -96,21 +96,18 @@ int main(int argc, char *argv[])
         return 0;
     }
     QTranslator t;
-    t.load(":/Waiter.qm");
-    a.installTranslator( &t);
+    if (t.load(":/Waiter.qm")) {
+        a.installTranslator( &t);
+    }
     QFont font(a.font());
     font.setFamily("Arial LatArm Unicode");
     font.setPointSize(11);
     a.setFont(font);
     C5Database db(__c5config.dbParams());
-    if (db.open()) {
-        DbData::setDBParams(__c5config.dbParams());
-        DataDriver::fInstance = new DataDriver();
-        DataDriver::norefresh.append("goods");
-        DataDriver::init(__c5config.dbParams(), dlgsplash);
-    } else {
-        C5Message::error(db.fLastError);
-    }
+    DbData::setDBParams(__c5config.dbParams());
+    DataDriver::fInstance = new DataDriver();
+    DataDriver::norefresh.append("goods");
+    DataDriver::init(__c5config.dbParams(), dlgsplash);
     NDataProvider::mHost = C5Config::fDBPath;
     NDataProvider::mDebug = C5Config::getValue(param_debuge_mode).toInt() > 0;
     dlgsplash->deleteLater();

@@ -98,7 +98,6 @@ void DlgCashinOut::on_btnCloseSession_clicked()
     db[":f_close"] = QDateTime::currentDateTime();
     db.exec("update s_working_sessions "
             "set f_close=:f_close where f_id=:f_working_session ");
-    db.commit();
     db[":f_working_session"] = __c5config.getRegValue("sessionid");
     QString sql = "SELECT SUM(oh.f_amountcash) AS f_cash, SUM(oh.f_amountcard) AS f_card, "
                   "SUM(oh.f_amountidram) AS f_idram, sum(oh.f_amountother) as f_amountother "
@@ -119,8 +118,8 @@ void DlgCashinOut::on_btnCloseSession_clicked()
         C5Message::error(QString("No session with %1").arg(__c5config.getRegValue("sessionid").toInt()));
         return;
     }
-    QDateTime open = db.getDateTime("f_open");
-    QDateTime close = db.getDateTime("f_close");
+    QDateTime open = QDateTime::fromString(db.getString("f_open"), FORMAT_DATETIME_TO_STR_MYSQL);
+    QDateTime close = QDateTime::fromString(db.getString("f_close"), FORMAT_DATETIME_TO_STR_MYSQL);
     QString staff = db.getString("f_fullname");
     QFont font(qApp->font());
     font.setPointSize(__c5config.getValue(param_receipt_print_font_size).toInt());

@@ -207,11 +207,11 @@ C5Cache::C5Cache(const QStringList &dbParams) :
     }
 }
 
-QVector<QJsonValue> C5Cache::getJoinedColumn(const QString &columnName)
+QJsonArray C5Cache::getJoinedColumn(const QString &columnName)
 {
-    QVector<QJsonValue> result;
+    QJsonArray result;
     int columnIndex = fCacheColumns[fId][columnName.toLower()];
-    for (int i = 0; i < fCacheData.count(); i++) {
+    for (int i = 0; i < fCacheData.size(); i++) {
         result.append(fCacheData.at(i).at(columnIndex));
     }
     return result;
@@ -246,17 +246,17 @@ void C5Cache::refreshId(const QString &whereField, int id)
     if (fCacheIdRow.contains(id)) {
         int row = fCacheIdRow[id];
         fCacheIdRow.remove(id);
-        fCacheData.removeAt(row);
+        fCacheData.erase(fCacheData.begin() + row);
     }
     C5Database db(fDBParams);
-    QVector<QVector<QJsonValue> > cacheData;
+    std::vector<QJsonArray > cacheData;
     QString sql = fCacheQuery[fId];
     db.exec(sql.replace("%idcond%", QString(" and %1=%2 ")
                         .arg(whereField, QString::number(id))), cacheData,
             fCacheColumns[fId]);
     if (cacheData.empty() == false) {
-        fCacheData.append(cacheData.at(0));
-        fCacheIdRow[id] = fCacheData.count() - 1;
+        fCacheData.push_back(cacheData.at(0));
+        fCacheIdRow[id] = static_cast<int>(fCacheData.size()) - 1;
     }
 }
 
@@ -271,7 +271,7 @@ C5Cache *C5Cache::cache(const QStringList &dbParams, int cacheId)
     } else {
         cache = fCacheList[name];
     }
-    if (cache->fCacheData.count() == 0) {
+    if (cache->fCacheData.size() == 0) {
         QString query = fCacheQuery[cacheId];
         if (query.isEmpty()) {
             query = "select 0";
@@ -306,7 +306,7 @@ void C5Cache::loadFromDatabase(const QString &query)
     QString q = query;
     q.replace("%idcond%", "");
     db.exec(q, fCacheData, fCacheColumns[fId]);
-    for (int i = 0; i < fCacheData.count(); i++) {
+    for (int i = 0; i < fCacheData.size(); i++) {
         fCacheIdRow[fCacheData[i][0].toInt()] = i;
     }
 }

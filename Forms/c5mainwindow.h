@@ -7,6 +7,7 @@
 #include <QTimer>
 #include <QListWidgetItem>
 #include <QUdpSocket>
+#include <QJsonObject>
 
 namespace Ui
 {
@@ -41,7 +42,7 @@ public:
         return t;
     }
 
-    NTableWidget *createNTab(const QString &route, const QJsonObject &initParams);
+    NTableWidget *createNTab(const QString &route, const QString &image, const QJsonObject &initParams = QJsonObject{});
 
     void nTabDesign(const QIcon &icon, const QString &label, NTableWidget *widget);
 

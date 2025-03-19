@@ -62,6 +62,9 @@ void C5SettingsWidget::setId(int id)
         ui->chDenyLogout->setChecked(jo["denylogout"].toBool());
         ui->leCoinCashdesk->setInteger(jo["coincash_id"].toInt());
         ui->cbMobileDashboard->setCurrentIndex(ui->cbMobileDashboard->findText(jo["dashboard"].toString()));
+        ui->chPrepaidOnlyByGift->setChecked(jo["prepaid_only_by_gift"].toBool());
+        ui->chHideRevenue->setChecked(jo["hide_revenue"].toBool());
+        ui->chShowWhosalePrice->setChecked(jo["show_whosale_price"].toBool());
         QJsonArray ja = jo["availableoutstore"].toArray();
         QString s;
         for (int i = 0; i < ja.count(); i++) {
@@ -166,7 +169,6 @@ bool C5SettingsWidget::save(QString &err, QList<QMap<QString, QVariant> > &data)
     //fTags[ui->chReportOfOnlyLogged->getTag()] = ui->chReportOfOnlyLogged->isChecked() ? "1" : "0";
     fTags[ui->chHideShopQuantity->getTag()] = ui->chHideShopQuantity->isChecked() ? "1" : "0";
     fTags[ui->leShopMobileClentConfig->getTag()] = ui->leShopMobileClentConfig->text();
-    fTags[ui->leScaleRusBMODBC->getTag()] = ui->leScaleRusBMODBC->text();
     fTags[ui->chNeverOfferTax->getTag()] = ui->chNeverOfferTax->isChecked() ? "1" : "0";
     fTags[ui->chAutomaticallyStoreOutWaiter->getTag()] = ui->chAutomaticallyStoreOutWaiter->isChecked() ? "1" : "0";
     fTags[ui->rbPrintVNoPrint->property("tag").toInt()] = ui->rbPrintVNoPrint->isChecked() ? "1" : "0";
@@ -244,6 +246,9 @@ bool C5SettingsWidget::save(QString &err, QList<QMap<QString, QVariant> > &data)
     jc["cash_cash_id"] = ui->leCashId->getInteger();
     jc["cash_card_id"] = ui->leCardId->getInteger();
     jc["addhall"] = ui->leHall->text();
+    jc["prepaid_only_by_gift"] = ui->chPrepaidOnlyByGift->isChecked();
+    jc["hide_revenue"] = ui->chHideRevenue->isChecked();
+    jc["show_whosale_price"] = ui->chShowWhosalePrice->isChecked();
     QJsonArray ja;
     QStringList a = ui->leAvailableStore->text().split(",", Qt::SkipEmptyParts);
     for  (const QString &s : a) {
@@ -376,32 +381,10 @@ QWidget *C5SettingsWidget::widget(QWidget *parent, int tag)
     return nullptr;
 }
 
-void C5SettingsWidget::on_btnTestAsConnection_clicked()
-{
-    C5Database dbas("QODBC3");
-    dbas.setDatabase("", ui->leASConnectionString->text(), "", "");
-    if (dbas.open()) {
-        C5Message::error(tr("Connection successfull"));
-    } else {
-        C5Message::error(dbas.fLastError);
-    }
-}
-
 void C5SettingsWidget::on_btnScalePath_clicked()
 {
     QString path = QFileDialog::getExistingDirectory(this, "", "");
     if (!path.isEmpty()) {
         ui->leScalePath->setText(path);
-    }
-}
-
-void C5SettingsWidget::on_btnTestScaleODBCString_clicked()
-{
-    C5Database db("QODBC3");
-    db.setDatabase("", ui->leScaleRusBMODBC->text(), "", "");
-    if (db.open()) {
-        C5Message::error(tr("Connection successfull"));
-    } else {
-        C5Message::error(db.fLastError);
     }
 }

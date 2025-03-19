@@ -53,6 +53,21 @@ void C5SocketHandler::send()
         return;
     }
     QJsonObject jObj;
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+    for (QMap<QString, QVariant>::const_iterator it = fBindValues.constBegin(); it != fBindValues.constEnd(); it++) {
+        switch (it.value().type()) {
+            case QVariant::Int:
+                jObj[it.key()] = it.value().toInt();
+                break;
+            case QVariant::Double:
+                jObj[it.key()] = it.value().toDouble();
+                break;
+            default:
+                jObj[it.key()] = it.value().toString();
+                break;
+        }
+    }
+#else
     for (QMap<QString, QVariant>::const_iterator it = fBindValues.constBegin(); it != fBindValues.constEnd(); it++) {
         switch (it.value().typeId()) {
             case QMetaType::Int:
@@ -66,6 +81,7 @@ void C5SocketHandler::send()
                 break;
         }
     }
+#endif
     QJsonDocument jDoc(jObj);
     QByteArray data = jDoc.toJson();
     int docSize = data.size();
@@ -91,6 +107,18 @@ void C5SocketHandler::send(int errorCode)
 
 void C5SocketHandler::send(QJsonObject &obj)
 {
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+    for (QMap<QString, QVariant>::const_iterator it = fBindValues.begin(); it != fBindValues.end(); it++) {
+        switch (it.value().type()) {
+            case QVariant::Int:
+                obj[it.key()] = it.value().toInt();
+                break;
+            default:
+                obj[it.key()] = it.value().toString();
+                break;
+        }
+    }
+#else
     for (QMap<QString, QVariant>::const_iterator it = fBindValues.begin(); it != fBindValues.end(); it++) {
         switch (it.value().typeId()) {
             case QMetaType::Int:
@@ -101,6 +129,7 @@ void C5SocketHandler::send(QJsonObject &obj)
                 break;
         }
     }
+#endif
     QJsonDocument doc(obj);
     QByteArray data = doc.toJson();
     int docSize = data.length();

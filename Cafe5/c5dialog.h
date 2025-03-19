@@ -43,7 +43,7 @@ public:
 
     void showFullScreen();
 
-    virtual void selectorCallback(int row, const QVector<QJsonValue> &values);
+    virtual void selectorCallback(int row, const QJsonArray &values);
 
 protected:
     QStringList fDBParams;

@@ -23,7 +23,7 @@ public:
     int pricePolitic = 0;
     double permanentDiscount = 0.0;
 
-    virtual CPartners &queryRecordOfId(C5Database &db, const QVariant &id) override;
+    virtual CPartners &queryRecordOfId(C5Database &db, int id) override;
     virtual bool getRecord(C5Database &db) override;
     virtual void bind(C5Database &db) override;
     virtual bool write(C5Database &db, QString &err) override;

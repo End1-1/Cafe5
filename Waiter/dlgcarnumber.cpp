@@ -1,7 +1,7 @@
 #include "dlgcarnumber.h"
 #include "ui_dlgcarnumber.h"
 #include <QListWidgetItem>
-#include <QDesktopWidget>
+#include <QScreen>
 
 QMap<int, QString> DlgCarNumber::fCarList;
 QMap<int, QString> DlgCarNumber::fCostumerNames;
@@ -55,7 +55,7 @@ bool DlgCarNumber::getNumber(int &id)
 {
     id = 0;
     DlgCarNumber *d = new DlgCarNumber();
-    d->move((qApp->desktop()->screenGeometry().width() / 2) - (d->width() / 2), 50);
+    d->move((qApp->screens().at(0)->geometry().width() / 2) - (d->width() / 2), 50);
     if (d->exec() == QDialog::Accepted) {
         id = d->fRecordId;
     }
@@ -77,10 +77,9 @@ void DlgCarNumber::kbdAccept()
     if (fCarNumber) {
         ui->leCarNumber->setText(ui->wKbd->text().toUpper());
         if (!ui->wKbd->text().isEmpty()) {
-            QList<QListWidgetItem*> l = ui->lst->findItems(ui->wKbd->text(), Qt::MatchStartsWith);
+            QList<QListWidgetItem *> l = ui->lst->findItems(ui->wKbd->text(), Qt::MatchStartsWith);
             if (l.count() > 0) {
                 if (l.count() == 1) {
-
                 }
             }
         }
@@ -199,7 +198,7 @@ void DlgCarNumber::on_btnAccept_clicked()
             db[":f_info"] = ui->leAdditional->text();
             ui->leCostumer->setProperty("id", db.insert("c_partners"));
         }
-        if (fRecordId == 0){
+        if (fRecordId == 0) {
             db[":f_govnumber"] = ui->leCarNumber->text();
             db[":f_car"] = ui->leCarModel->property("id").toInt();
             db[":f_costumer"] = ui->leCostumer->property("id").toInt();

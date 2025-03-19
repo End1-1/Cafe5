@@ -69,6 +69,10 @@ void C5LineEditWithSelector::setValue(const QString &id)
         fNameLineEdit->clear();
     }
     if (!fMultiselection) {
+        if (row > -1) {
+            const QJsonArray &j = c->getRow(row);
+            emit singleSelect(j.at(fColumnId).toInt(), j.at(fColumnName).toString());
+        }
         if (fWidget && row > -1) {
             fWidget->selectorCallback(fCache, c->getRow(row));
         }
@@ -136,17 +140,17 @@ void C5LineEditWithSelector::mouseDoubleClickEvent(QMouseEvent *e)
         return;
     }
     if (fMultiselection) {
-        QList<QVector<QJsonValue> > values;
+        QVector<QJsonArray > values;
         if (!C5Selector::getMultipleValues(fDBParams, fCache, values)) {
             return;
         }
         QString textId, textName;
-        foreach (const QVector<QJsonValue> &c, values) {
+        foreach (const QJsonArray &c, values) {
             if (!textId.isEmpty()) {
                 textId += ",";
                 textName += ",";
             }
-            textId += c.at(fColumnId).toString();
+            textId += QString::number(c.at(fColumnId).toInt());
             textName += c.at(fColumnName).toString();
         }
         setText(textId);
@@ -154,14 +158,14 @@ void C5LineEditWithSelector::mouseDoubleClickEvent(QMouseEvent *e)
             fNameLineEdit->setText(textName);
         }
     } else {
-        QVector<QJsonValue> values;
+        QJsonArray values;
         if (!C5Selector::getValue(fDBParams, fCache, values)) {
             return;
         }
         if (values.count() == 0) {
             return;
         }
-        setText(values.at(fColumnId).toString());
+        setText(QString::number(values.at(fColumnId).toInt()));
         if (fNameLineEdit) {
             fNameLineEdit->setText(values.at(fColumnName).toString());
         }

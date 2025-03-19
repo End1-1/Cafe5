@@ -24,7 +24,7 @@ bool ODraftSaleBody::getRecord(C5Database &db)
 
 void ODraftSaleBody::bind(C5Database &db)
 {
-    db[":f_id"] = id;
+    db[":f_id"] = _id();
     db[":f_header"] = header;
     db[":f_state"] = state;
     db[":f_store"] = store;
@@ -38,7 +38,7 @@ void ODraftSaleBody::bind(C5Database &db)
     db[":f_timeRemoved"] = timeRemoved;
     db[":f_userAppend"] = userAppend;
     db[":f_userRemove"] = userRemove;
-    db[":f_discount"]= discount;
+    db[":f_discount"] = discount;
 }
 
 bool ODraftSaleBody::write(C5Database &db, QString &err)
@@ -51,7 +51,7 @@ bool ODraftSaleBody::write(C5Database &db, QString &err)
     if (n) {
         return getWriteResult(db, db.insert("o_draft_sale_body", false), err);
     } else {
-        return getWriteResult(db, db.update("o_draft_sale_body", "f_id", id), err);
+        return getWriteResult(db, db.update("o_draft_sale_body", "f_id", _id()), err);
     }
     return true;
 }

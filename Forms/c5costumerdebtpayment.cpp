@@ -58,7 +58,7 @@ void C5CostumerDebtPayment::setPartnerAndAmount(int partner, double amount, cons
     fClearFlag = clearFlag;
 }
 
-void C5CostumerDebtPayment::selectorCallback(int row, const QVector<QJsonValue> &values)
+void C5CostumerDebtPayment::selectorCallback(int row, const QJsonArray &values)
 {
     switch (row) {
         case cache_cash_names:
@@ -88,7 +88,6 @@ void C5CostumerDebtPayment::on_btnOK_clicked()
         C5Message::error(tr("Cash must be defined"));
         return;
     }
-    QString err;
     C5Database db(fDBParams);
     fBClientDebt.date = ui->deDate->date();
     fBClientDebt.costumer = ui->leCostumer->getInteger();
@@ -123,9 +122,11 @@ void C5CostumerDebtPayment::on_btnOK_clicked()
             doc->setDate(ui->deDate->date());
             switch (fBClientDebt.source) {
                 case BCLIENTDEBTS_SOURCE_INPUT:
+                    doc->setCashOutput(ui->leCash->getInteger());
                     doc->setComment(ui->leComment->text());
                     break;
                 case BCLIENTDEBTS_SOURCE_SALE:
+                    doc->setCashInput(ui->leCash->getInteger());
                     doc->setComment(ui->leComment->text());
                     break;
             }
@@ -152,7 +153,6 @@ void C5CostumerDebtPayment::on_btnRemove_clicked()
         return;
     }
     C5Database db(fDBParams);
-    db.startTransaction();
     db[":f_id"] = ui->leCode->getInteger();
     db.exec("select f_cash from b_clients_debts where f_id=:f_id");
     QString fcash = db.nextRow() ? db.getString(0) : "";
@@ -160,9 +160,7 @@ void C5CostumerDebtPayment::on_btnRemove_clicked()
     db.exec("delete from b_clients_debts where f_id=:f_id");
     C5CashDoc *doc = new C5CashDoc(fDBParams);
     if (doc->removeDoc(db, fcash)) {
-        db.commit();
     } else {
-        db.rollback();
         C5Message::error(tr("Could not remove record"));
         return;
     }

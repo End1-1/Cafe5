@@ -26,28 +26,28 @@ public:
 
     void setSingleCheckBoxSelection(bool v);
 
-    void sort(int column) ;
+    void sort(int column, Qt::SortOrder order = Qt::AscendingOrder) override;
 
     void setExternalData(const QHash<QString, int> &columnNameIndex, const QHash<QString, QString> &translation);
 
-    virtual int rowCount(const QModelIndex &parent = QModelIndex()) const;
+    virtual int rowCount(const QModelIndex &parent = QModelIndex()) const override;
 
-    virtual int columnCount(const QModelIndex &parent = QModelIndex()) const;
+    virtual int columnCount(const QModelIndex &parent = QModelIndex()) const override;
 
-    virtual QVariant headerData(int section, Qt::Orientation orientation, int role) const;
+    virtual QVariant headerData(int section, Qt::Orientation orientation, int role) const override;
 
     int indexForColumnName(const QString &column);
 
     QString nameForColumnIndex(int index);
 
-    virtual QVariant data(const QModelIndex &index, int role) const;
+    virtual QVariant data(const QModelIndex &index, int role) const override;
 
     inline QVariant data(int row, int column, int role) const
     {
         return data(index(row, column), role);
     }
 
-    virtual bool setData(const QModelIndex &index, const QVariant &value, int role = Qt::EditRole);
+    virtual bool setData(const QModelIndex &index, const QVariant &value, int role = Qt::EditRole) override;
 
     virtual bool setData(int row, int column, const QVariant &value, int role = Qt::EditRole);
 
@@ -56,7 +56,7 @@ public:
 
     void setRowColor(int row, const QColor &color);
 
-    virtual Qt::ItemFlags flags(const QModelIndex &index) const;
+    virtual Qt::ItemFlags flags(const QModelIndex &index) const override;
 
     void setEditableFlag(int column, Qt::ItemFlags flag);
 
@@ -68,7 +68,7 @@ public:
 
     void removeRow(int row, const QModelIndex &parent = QModelIndex());
 
-    QVector<QJsonValue> getRowValues(int row);
+    QJsonArray getRowValues(int row);
 
     void saveDataChanges();
 
@@ -101,7 +101,9 @@ public:
 
     QList<int> fColumnsForUpdate;
 
-    QVector<QVector<QJsonValue> > fRawData;
+    QMap<int, QMetaType::Type> fColumnType;
+
+    std::vector<QJsonArray > fRawData;
 
 private:
     QStringList fDBParams;

@@ -38,11 +38,8 @@ public:
     virtual void copyObject() override;
 
 private slots:
-    void on_btnTestAsConnection_clicked();
 
     void on_btnScalePath_clicked();
-
-    void on_btnTestScaleODBCString_clicked();
 
 private:
     Ui::C5SettingsWidget *ui;

@@ -7,7 +7,6 @@ DlgSelectCurrency::DlgSelectCurrency(const QStringList &dbParams, QWidget *paren
 {
     ui->setupUi(this);
     C5Database db(dbParams);
-    db.open();
     db.exec("select * from e_currency order by f_id");
     while (db.nextRow()) {
         ui->cbCurrency->addItem(db.getString("f_name"), db.getInt("f_id"));

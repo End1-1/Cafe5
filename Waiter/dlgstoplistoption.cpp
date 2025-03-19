@@ -50,7 +50,7 @@ void DlgStopListOption::printStopListResponse(const QJsonObject &jdoc)
         QFont font(qApp->font());
         font.setPointSize(20);
         C5Printing p;
-        p.setSceneParams(__c5config.getValue(param_print_paper_width).toInt(), 2800, QPrinter::Portrait);
+        p.setSceneParams(__c5config.getValue(param_print_paper_width).toInt(), 2800, QPageLayout::Portrait);
         p.setFont(font);
         p.ctext(tr("STOPLIST"));
         p.br();
@@ -76,7 +76,7 @@ void DlgStopListOption::printStopListResponse(const QJsonObject &jdoc)
         p.br();
         p.ltext(".", 0);
         p.br();
-        p.print(__c5config.localReceiptPrinter(),  QPrinter::Custom);
+        p.print(__c5config.localReceiptPrinter(),  QPageSize::Custom);
     }
 }
 

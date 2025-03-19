@@ -231,7 +231,6 @@ void C5WaiterOrder::removeOrder()
     }
     C5Database db(fDBParams);
     C5StoreDraftWriter dw(db);
-    db.startTransaction();
     db[":f_header"] = ui->leUuid->text();
     db.exec("select f_id from o_goods where f_header=:f_header");
     QStringList idList;
@@ -240,7 +239,6 @@ void C5WaiterOrder::removeOrder()
     }
     for (const QString &id : idList) {
         if (!dw.rollbackOutput(db, id)) {
-            db.rollback();
             C5Message::error(dw.fErrorMsg);
             return;
         }
@@ -249,7 +247,6 @@ void C5WaiterOrder::removeOrder()
     db[":f_id"] = ui->leUuid->text();
     db.exec("update o_header set f_state=:f_state where f_id=:f_id");
     C5WaiterOrderDoc::removeDocument(db, ui->leUuid->text());
-    db.commit();
     C5Airlog::write(hostinfo, __user->fullName(), LOG_WAITER, "", ui->leUuid->text(), "", tr("Order removed from cash"),
                     ui->leTax->text(), "");
     __mainWindow->removeTab(this);

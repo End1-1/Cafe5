@@ -55,7 +55,7 @@ private:
     bool fMultiselection;
 
 signals:
-
+    void singleSelect(int, const QString &);
 };
 
 C5LineEditWithSelector *isLineEditWithSelector(QObject *o);

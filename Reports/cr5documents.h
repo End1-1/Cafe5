@@ -12,17 +12,17 @@ class CR5Documents : public C5ReportWidget
 public:
     CR5Documents(const QStringList &dbParams, QWidget *parent = nullptr);
 
-    virtual QToolBar *toolBar();
+    virtual QToolBar *toolBar() override;
 
 protected:
-    virtual QMenu *buildTableViewContextMenu(const QPoint &point);
+    virtual QMenu *buildTableViewContextMenu(const QPoint &point) override;
 
-    virtual void restoreColumnsWidths();
+    virtual void restoreColumnsWidths() override;
 
-    virtual bool tblDoubleClicked(int row, int column, const QVector<QJsonValue> &values) override;
+    virtual bool tblDoubleClicked(int row, int column, const QJsonArray &values) override;
 
 protected slots:
-    virtual void callEditor(const QString &id);
+    virtual void callEditor(const QString &id) override;
 
 private:
     CR5DocumentsFilter *fFilter;

@@ -15,8 +15,8 @@ C5Selector::C5Selector(const QStringList &dbParams) :
     fGrid = new C5Grid(dbParams, nullptr);
     fGrid->fTableView->setSelectionBehavior(QAbstractItemView::SelectRows);
     ui->hl->addWidget(fGrid);
-    connect(fGrid, SIGNAL(tblDoubleClick(int, int, QVector<QJsonValue>)), this, SLOT(tblDoubleClicked(int, int,
-            QVector<QJsonValue>)));
+    connect(fGrid, SIGNAL(tblDoubleClick(int, int, QJsonArray)), this, SLOT(tblDoubleClicked(int, int,
+            QJsonArray)));
     //connect(fGrid, SIGNAL(tblSingleClick(QModelIndex)), this, SLOT(tblSingleClick(QModelIndex)));
     connect(fGrid->fTableView->selectionModel(), SIGNAL(selectionChanged(QItemSelection, QItemSelection)), this,
             SLOT(selectionChanged(QItemSelection, QItemSelection)));
@@ -30,7 +30,7 @@ C5Selector::~C5Selector()
     delete ui;
 }
 
-bool C5Selector::getValue(const QStringList &dbParams, int cache, QVector<QJsonValue> &values)
+bool C5Selector::getValue(const QStringList &dbParams, int cache, QJsonArray &values)
 {
     QString cacheName = C5Cache::cacheName(dbParams, cache);
     C5Selector *c = nullptr;
@@ -57,7 +57,7 @@ bool C5Selector::getValue(const QStringList &dbParams, int cache, QVector<QJsonV
     return result;
 }
 
-bool C5Selector::getValue(const QStringList &dbParams, const QString &query, QVector<QJsonValue> &values)
+bool C5Selector::getValue(const QStringList &dbParams, const QString &query, QJsonArray &values)
 {
     C5Selector *c = new C5Selector(dbParams);
     c->fQuery = query;
@@ -73,7 +73,7 @@ bool C5Selector::getValue(const QStringList &dbParams, const QString &query, QVe
     return result;
 }
 
-bool C5Selector::getValueOfColumn(const QStringList &dbParams, int cache, QVector<QJsonValue> &values, int column)
+bool C5Selector::getValueOfColumn(const QStringList &dbParams, int cache, QJsonArray &values, int column)
 {
     QString cacheName = C5Cache::cacheName(dbParams, cache);
     C5Selector *c = nullptr;
@@ -98,7 +98,7 @@ bool C5Selector::getValueOfColumn(const QStringList &dbParams, int cache, QVecto
     return result;
 }
 
-bool C5Selector::getMultipleValues(const QStringList &dbParams, int cache, QList<QVector<QJsonValue> > &values)
+bool C5Selector::getMultipleValues(const QStringList &dbParams, int cache, QVector<QJsonArray > &values)
 {
     QString cacheName = C5Cache::cacheName(dbParams, cache);
     C5Selector *c = nullptr;
@@ -128,7 +128,7 @@ bool C5Selector::getMultipleValues(const QStringList &dbParams, int cache, QList
     return result;
 }
 
-bool C5Selector::getValues(const QStringList &dbParams, const QString &sql, QVector<QJsonValue> &values,
+bool C5Selector::getValues(const QStringList &dbParams, const QString &sql, QJsonArray &values,
                            const QHash<QString, QString> &translator)
 {
     C5Selector *c = new C5Selector(dbParams);
@@ -190,7 +190,7 @@ void C5Selector::selectionChanged(const QItemSelection &selected, const QItemSel
     }
 }
 
-bool C5Selector::tblDoubleClicked(int row, int column, const QVector<QJsonValue> &values)
+bool C5Selector::tblDoubleClicked(int row, int column, const QJsonArray &values)
 {
     Q_UNUSED(column);
     Q_UNUSED(row);

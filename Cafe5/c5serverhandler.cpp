@@ -5,7 +5,6 @@
 C5ServerHandler::C5ServerHandler() :
     fDb(C5Config::dbParams())
 {
-    fDb.open();
 }
 
 void C5ServerHandler::getJsonFromQuery(const QString &query, QJsonArray &arr, const QMap<QString, QVariant> &bind)

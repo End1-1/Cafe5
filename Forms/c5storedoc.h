@@ -68,7 +68,6 @@ public slots:
     void saveDoc();
 
 protected:
-    virtual bool eventFilter(QObject *o, QEvent *e) override;
 
     virtual void nextChild() override;
 
@@ -85,15 +84,11 @@ private:
 
     QString fCashDocUuid;
 
-    TableCell *fGroupTableCell;
-
     QMap<QString, QVariant> fFlags;
 
     QMap<int, double> fBaseQtyOfComplectation;
 
     double fBaseComplectOutput;
-
-    bool fGroupTableCellMove;
 
     QString fComplectationId;
 
@@ -120,18 +115,6 @@ private:
 
     void setDocEnabled(bool v);
 
-    void loadGroupsInput();
-
-    void loadGoodsInput();
-
-    void loadGoodsOutput();
-
-    void loadGoods(int store);
-
-    void setGoodsPanelHidden(bool v);
-
-    void markGoodsComplited();
-
     void addGoodsByCalculation(int goods, const QString &name, double qty);
 
     void printV1();
@@ -148,6 +131,8 @@ private slots:
     void focusNextChildren();
 
     void changeCurrencyResponse(const QJsonObject &jdoc);
+
+    void slotCheckQtyResponse(const QJsonObject &jdoc);
 
     void exportToExcel();
 
@@ -171,16 +156,6 @@ private slots:
 
     void checkInvoiceDuplicate();
 
-    void filterGoodsPanel(int group);
-
-    void showHideGoodsList();
-
-    void changeGoodsGroupOrder();
-
-    void saveGoodsGroupOrder();
-
-    void cancelGoodsGroupOrder();
-
     void tblAddChanged(const QString &arg1);
 
     void tblDishQtyChanged(const QString &arg1);
@@ -199,17 +174,11 @@ private slots:
 
     void on_leStoreOutput_textChanged(const QString &arg1);
 
-    void on_tblGoodsGroup_itemClicked(QTableWidgetItem *item);
-
-    void on_tblGoodsStore_itemDoubleClicked(QTableWidgetItem *item);
-
     void on_btnNewPartner_clicked();
 
     void on_btnNewGoods_clicked();
 
     void on_leScancode_returnPressed();
-
-    void on_tblGoodsGroup_customContextMenuRequested(const QPoint &pos);
 
     void on_leComplectationName_textChanged(const QString &arg1);
 
@@ -258,6 +227,12 @@ private slots:
     void on_btnCompressRow_clicked();
 
     void on_cbCurrency_currentIndexChanged(int index);
+
+    void on_btnEditPassed_clicked();
+
+    void on_btnEditAccept_clicked();
+
+    void on_btnSaveComment_clicked();
 };
 
 #endif // C5STOREDOC_H

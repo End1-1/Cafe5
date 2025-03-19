@@ -48,15 +48,12 @@ void CE5DishPackage::setId(int id)
         connect(ui->tblDishes->lineEdit(r, 3), SIGNAL(textChanged(QString)), this, SLOT(setQty(QString)));
         ui->tblDishes->createLineEdit(r, 4)->setDouble(db.getDouble(4));
         connect(ui->tblDishes->lineEdit(r, 4), SIGNAL(textChanged(QString)), this, SLOT(setPrice(QString)));
-
         C5ComboBox *cb = ui->tblDishes->createComboBox(r, 5);
         cb->setCache(fDBParams, cache_goods_store);
         cb->setIndexForValue(db.getInt(5));
-
         cb = ui->tblDishes->createComboBox(r, 6);
         cb->setCache(fDBParams, cache_waiter_printers);
         cb->setCurrentIndex(cb->findText(db.getString(6)));
-
         ui->tblDishes->setData(r, 7, db.getDouble("f_cost"));
     }
     double p = 0, sc = 0;
@@ -82,7 +79,7 @@ bool CE5DishPackage::save(QString &err, QList<QMap<QString, QVariant> > &data)
         return false;
     }
     C5Database db(fDBParams);
-    for (int id: fRemovedDish) {
+    for (int id : fRemovedDish) {
         db[":f_id"] = id;
         db.exec("delete from d_package_list where f_id=:f_id");
     }
@@ -124,7 +121,7 @@ bool CE5DishPackage::checkData(QString &err)
 
 void CE5DishPackage::newDish()
 {
-    QVector<QJsonValue> vals;
+    QJsonArray vals;
     if (!C5Selector::getValue(fDBParams, cache_dish, vals)) {
         return;
     }

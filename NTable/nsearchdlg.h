@@ -4,7 +4,8 @@
 #include <QDialog>
 #include <QJsonArray>
 
-namespace Ui {
+namespace Ui
+{
 class NSearchDlg;
 }
 
@@ -16,8 +17,8 @@ public:
     explicit NSearchDlg(QWidget *parent = nullptr);
     ~NSearchDlg();
     void setData(const QJsonArray &jcols, const QJsonArray &jdata);
-    QString mId;
-    QString mName;
+    QStringList mId;
+    QStringList mName;
 
 private slots:
     void on_btnCancel_clicked();

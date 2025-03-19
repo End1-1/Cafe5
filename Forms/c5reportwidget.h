@@ -20,24 +20,24 @@ public:
 
     virtual bool hasDataUpdates();
 
-    virtual void hotKey(const QString &key);
+    virtual void hotKey(const QString &key) override;
 
     virtual void changeDatabase(const QStringList &dbParams) override;
 
 public slots:
-    virtual bool on_tblView_doubleClicked(const QModelIndex &index);
+    virtual bool on_tblView_doubleClicked(const QModelIndex &index) override;
 
 protected:
     C5Cache *createCache(int cacheId);
 
-    virtual void clearFilter();
+    virtual void clearFilter() override;
 
     C5LineEdit *fFilterLineEdit;
 
     CE5Editor *fEditor;
 
 protected slots:
-    virtual void completeRefresh();
+    virtual void completeRefresh() override;
 
     virtual int newRow();
 

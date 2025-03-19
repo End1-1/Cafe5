@@ -3,7 +3,6 @@
 C5Document::C5Document(const QStringList &dbParams, QWidget *parent) :
     C5Widget(dbParams, parent)
 {
-
 }
 
 int C5Document::genNumber(int docType) const
@@ -16,7 +15,6 @@ int C5Document::genNumber(int docType) const
         db[":f_counter"] = 1;
         db[":f_name"] = tr("Cash doc");
         db.insert("a_type", false);
-        db.commit();
         db[":f_id"] = docType;
         db.exec("select f_counter from a_type where f_id=:f_id for update");
         db.nextRow();

@@ -69,7 +69,6 @@ void C5GoodsSpecialPrices::saveDataChanges()
         return;
     }
     C5Database db(fDBParams);
-    db.startTransaction();
     db[":f_partner"] = fPartner;
     db.exec("delete from c_goods_special_prices where f_partner=:f_partner");
     for (int i = 0; i < ui->tbl->rowCount(); i++) {
@@ -80,7 +79,6 @@ void C5GoodsSpecialPrices::saveDataChanges()
             db.insert("c_goods_special_prices", false);
         }
     }
-    db.commit();
     C5Message::info(tr("Saved"));
 }
 

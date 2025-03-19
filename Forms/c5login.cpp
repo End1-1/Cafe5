@@ -4,6 +4,7 @@
 #include "c5user.h"
 #include "c5servername.h"
 #include "fileversion.h"
+#include "dlgserverconnection.h"
 #include <QSettings>
 
 C5Login::C5Login() :
@@ -108,4 +109,9 @@ void C5Login::readServers()
         ui->leUsername->setCurrentText(s.value("lastusername").toString());
         ui->lePassword->setFocus();
     }
+}
+
+void C5Login::on_btnConfig_clicked()
+{
+    DlgServerConnection::showSettings(this);
 }

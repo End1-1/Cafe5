@@ -9,10 +9,13 @@
 #include <QJsonDocument>
 #include <QRegularExpression>
 
+const QRegularExpression float_expr1("(?!\\d[\\.\\,][1-9]+)0+$");
+const QRegularExpression float_expr2("[\\.\\,]$");
+
 #define current_date QDate::currentDate().toString(FORMAT_DATE_TO_STR)
 #define current_time QTime::currentTime().toString(FORMAT_TIME_TO_STR)
 #define hostinfo QHostInfo::localHostName().toLower()
-#define float_str(value, f) QLocale().toString(value, 'f', f).remove(QRegularExpression("(?!\\d[\\.\\,][1-9]+)0+$")).remove(QRegularExpression("[\\.\\,]$"))
+#define float_str(value, f) QLocale().toString(value, 'f', f).remove(float_expr1).remove(float_expr2)
 #define str_float(value) QLocale().toDouble(value)
 #define json_str(value) QString(QJsonDocument(value).toJson(QJsonDocument::Compact))
 #define str_json(value) QJsonDocument::fromJson(value.toUtf8()).object()
@@ -85,6 +88,8 @@ public:
 QString hostusername();
 
 QString password(const QString &value);
+
+QString columnNumberToLetter(int n);
 
 extern C5Utils __c5utils;
 

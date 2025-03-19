@@ -64,7 +64,7 @@ bool C5StoreInventory::openDoc(QString id)
             where d.f_document=:f_document ");
     while (db.nextRow()) {
         int row = addGoodsRow();
-        ui->leStore->setValue(db.getString("f_store"));
+        ui->leStore->setValue(db.getInt("f_store"));
         ui->tblGoods->setString(row, 0, db.getString(0));
         ui->tblGoods->setInteger(row, 1, db.getInt(1));
         ui->tblGoods->setString(row, 2, db.getString(2));
@@ -268,7 +268,7 @@ void C5StoreInventory::printDoc()
 
 void C5StoreInventory::on_btnAddGoods_clicked()
 {
-    QVector<QJsonValue> vals;
+    QJsonArray vals;
     if (!C5Selector::getValueOfColumn(fDBParams, cache_goods, vals, 3)) {
         return;
     }

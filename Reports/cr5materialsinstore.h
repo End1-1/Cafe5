@@ -12,11 +12,11 @@ class CR5MaterialsInStore : public C5ReportWidget
 public:
     CR5MaterialsInStore(const QStringList &dbParams, QWidget *parent = nullptr);
 
-    virtual QToolBar *toolBar();
+    virtual QToolBar *toolBar() override;
 
     virtual void buildQuery() override;
 
-    virtual bool on_tblView_doubleClicked(const QModelIndex &index);
+    virtual bool on_tblView_doubleClicked(const QModelIndex &index) override;
 
 protected slots:
     virtual void refreshData() override;

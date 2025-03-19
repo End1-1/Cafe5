@@ -54,6 +54,8 @@ private slots:
 
     void on_tbl_cellClicked(int row, int column);
 
+    void on_btnEditReason_clicked();
+
 private:
     Ui::ViewOrder *ui;
 

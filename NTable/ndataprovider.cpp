@@ -20,7 +20,7 @@ NDataProvider::NDataProvider(QObject *parent)
     : QObject(parent)
 {
     mNetworkAccessManager = new QNetworkAccessManager(this);
-    mNetworkAccessManager->setTransferTimeout(30000);
+    mNetworkAccessManager->setTransferTimeout(60000);
     connect(mNetworkAccessManager, &QNetworkAccessManager::finished, this, &NDataProvider::queryFinished);
     mTimer = new QElapsedTimer();
 }
@@ -46,6 +46,9 @@ void NDataProvider::getData(const QString &route, const QJsonObject &data)
     jo["hostinfo"] = QHostInfo::localHostName().toLower();
     jo["app"] = mAppName;
     jo["appversion"] = mFileVersion;
+#ifdef QT_DEBUG
+    jo["debug"] = true;
+#endif
     QStringList keys = data.keys();
     for (const auto &s : std::as_const(keys)) {
         jo[s] = data[s];
@@ -71,10 +74,21 @@ void NDataProvider::queryFinished(QNetworkReply *r)
 {
     if (r->error() != QNetworkReply::NoError) {
         QString err = r->errorString() + r->readAll();
-        if (err.contains("<html>")) {
+        if (err.contains("access denied", Qt::CaseInsensitive)) {
+            err = tr("Access denied");
+        } else if (err.contains("Application version must be", Qt::CaseInsensitive)) {
+            LogWriter::write(LogWriterLevel::errors, "", err);
+            err = tr("You must upgrade the application to continue using it");
+        } else if (err.contains("<html>")) {
             err = err.mid(err.indexOf("<html>"), err.length());
         } else {
-            err = err.mid(err.indexOf("Server error") + 12, err.length());
+            int index = err.indexOf("Server error");
+            if (index > -1) {
+                index += 12;
+            } else {
+                index = 0;
+            }
+            err = err.mid(index, err.length());
         }
         LogWriter::write(LogWriterLevel::errors, "Error", err);
         emit error(err);

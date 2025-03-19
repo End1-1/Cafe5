@@ -57,11 +57,11 @@ void C5WaiterServer::reply(QJsonObject &o)
             QJsonArray jTables;
             srh.getJsonFromQuery(QString("select t.f_id, t.f_hall, t.f_name, t.f_lock, t.f_lockSrc, \
 h.f_id as f_header, concat(u.f_last, ' ', left(u.f_first, 1), '.') as f_staffName, \
-    h.f_amounttotal as f_amount, h.f_print, bc.f_govnumber, \
-    date_format(h.f_dateopen, '%d.%m.%Y') as f_dateopen, h.f_timeOpen, \
-    t.f_special_config \
-    from h_tables t \
-    left join o_header h on h.f_table=t.f_id and h.f_state=1 \
+  h.f_amounttotal as f_amount, h.f_print, bc.f_govnumber, \
+  date_format(h.f_dateopen, '%d.%m.%Y') as f_dateopen, h.f_timeOpen, \
+  t.f_special_config \
+  from h_tables t \
+  left join o_header h on h.f_table=t.f_id and h.f_state=1 \
 left join o_header_options o on o.f_id=h.f_id \
 left join b_car bc on bc.f_id=o.f_car \
 left join s_user u on u.f_id=h.f_staff  %1 \
@@ -467,7 +467,6 @@ void C5WaiterServer::openActiveOrder(QJsonObject &jh, QJsonArray &jb, QJsonArray
 
 void C5WaiterServer::saveOrder(QJsonObject &o, QJsonObject &jh, QJsonArray &ja, C5Database &db)
 {
-    db.startTransaction();
     if (jh.contains("unlocktable")) {
         if (jh["unlocktable"].toString().toInt() > 0) {
             db[":f_lock"] = 0;
@@ -606,7 +605,6 @@ void C5WaiterServer::saveOrder(QJsonObject &o, QJsonObject &jh, QJsonArray &ja, 
         db[":f_state"] = ja.count() == 0 ? ORDER_STATE_PREORDER_EMPTY : ORDER_STATE_PREORDER_WITH_ORDER;
         db.update("o_header", "f_id", jh["f_id"].toString());
     }
-    db.commit();
 }
 
 void C5WaiterServer::saveDish(const QJsonObject &h, QJsonObject &o, C5Database &db)
@@ -1047,8 +1045,7 @@ int C5WaiterServer::printTax(const QMap<QString, QVariant> &header, const QList<
 
     void C5WaiterServer::remember(const QJsonObject &h)
     {
-        C5Database db(C5Config::dbParams().at(0), C5Config::logDatabase(), C5Config::dbParams().at(2),
-                      C5Config::dbParams().at(3));
+        C5Database db(__c5config.dbParams());
         db[":f_comp"] = h["comp"].toString();
         db[":f_date"] = QDate::fromString(h["date"].toString(), FORMAT_DATE_TO_STR_MYSQL);
         db[":f_time"] = QTime::fromString(h["time"].toString(), FORMAT_TIME_TO_STR);
@@ -1176,7 +1173,7 @@ int C5WaiterServer::printTax(const QMap<QString, QVariant> &header, const QList<
         QFont font(qApp->font());
         font.setPointSize(30);
         C5Printing p;
-        p.setSceneParams(650, 28000, QPrinter::Portrait);
+        p.setSceneParams(650, 28000, QPageLayout::Portrait);
         p.setFont(font);
         p.ltext(tr("Table"), 0);
         p.rtext(fIn["table"].toString());
@@ -1191,7 +1188,7 @@ int C5WaiterServer::printTax(const QMap<QString, QVariant> &header, const QList<
         p.br();
         p.br(p.fLineHeight + 2);
         p.line(0, p.fTop, p.fNormalWidth, p.fTop);
-        p.print(C5Config::localReceiptPrinter(), QPrinter::Custom);
+        p.print(C5Config::localReceiptPrinter(), QPageSize::Custom);
         o["reply"] = 1;
         NotificationWidget::showMessage(QString("%1 %2: %3").arg(tr("Table")).arg(fIn["table"].toString()).arg(
                                             tr("Call staff")), QVariant(), nullptr, nullptr);
@@ -1211,7 +1208,7 @@ int C5WaiterServer::printTax(const QMap<QString, QVariant> &header, const QList<
         QFont font(qApp->font());
         font.setPointSize(30);
         C5Printing p;
-        p.setSceneParams(650, 28000, QPrinter::Portrait);
+        p.setSceneParams(650, 28000, QPageLayout::Portrait);
         p.setFont(font);
         p.ltext(tr("Table"), 0);
         p.rtext(fIn["tablename"].toString());
@@ -1226,7 +1223,7 @@ int C5WaiterServer::printTax(const QMap<QString, QVariant> &header, const QList<
         p.br();
         p.br(p.fLineHeight + 2);
         p.line(0, p.fTop, p.fNormalWidth, p.fTop);
-        p.print(C5Config::localReceiptPrinter(), QPrinter::Custom);
+        p.print(C5Config::localReceiptPrinter(), QPageSize::Custom);
         o["reply"] = 1;
         NotificationWidget::showMessage(QString("%1 %2: %3").arg(tr("Table")).arg(fIn["tablename"].toString()).arg(
                                             tr("Call receipt")), QVariant(), nullptr, nullptr);

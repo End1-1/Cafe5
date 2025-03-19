@@ -225,7 +225,7 @@ void CR5DishPriceSelfCost::buildQueryV3()
     fTableView->resizeColumnsToContents();
 }
 
-bool CR5DishPriceSelfCost::tblDoubleClicked(int row, int column, const QVector<QJsonValue> &values)
+bool CR5DishPriceSelfCost::tblDoubleClicked(int row, int column, const QJsonArray &values)
 {
     Q_UNUSED(row);
     Q_UNUSED(column);

@@ -1,11 +1,13 @@
 #include "c5cleartablewidget.h"
 #include "c5message.h"
 #include "c5utils.h"
-#include "xlsxall.h"
 #include "c5checkbox.h"
 #include "c5lineedit.h"
 #include <QHeaderView>
+#include <QFileDialog>
+#include <QDesktopServices>
 #include <QApplication>
+#include <QXlsx/header/xlsxdocument.h>
 
 C5TableWidgetItem::C5TableWidgetItem(int type) :
     QTableWidgetItem (type)
@@ -144,7 +146,7 @@ void C5ClearTableWidget::setString(int row, int column, const QString &str)
 
 double C5ClearTableWidget::getDouble(int row, int column)
 {
-    return str_float(getData(row, column).toString());
+    return getData(row, column, Qt::EditRole).toDouble();
 }
 
 double C5ClearTableWidget::getDouble(int row, const QString &columnName)
@@ -186,33 +188,35 @@ void C5ClearTableWidget::exportToExcel()
         C5Message::info(tr("Empty report"));
         return;
     }
-    XlsxDocument d;
-    XlsxSheet *s = d.workbook()->addSheet("Sheet1");
+    QXlsx::Document d;
+    d.addSheet("Sheet1");
     /* HEADER */
     QColor color = QColor::fromRgb(200, 200, 250);
     QFont headerFont(qApp->font());
-    headerFont.setBold(true);
-    d.style()->addFont("header", headerFont);
-    d.style()->addBackgrounFill("header", color);
+    QXlsx::Format  hf;
+    hf.setFont(headerFont);
+    hf.setFontBold(true);
+    hf.setPatternBackgroundColor(color);
     for (int i = 0; i < columnCount(); i++) {
-        s->addCell(1, i + 1, horizontalHeaderItem(i)->data(Qt::DisplayRole).toString(), d.style()->styleNum("header"));
-        s->setColumnWidth(i + 1, columnWidth(i) / 7);
+        d.write(1, i + 1, horizontalHeaderItem(i)->data(Qt::DisplayRole).toString(), hf);
+        d.setColumnWidth(i + 1, columnWidth(i) / 7);
     }
     //e.setHorizontalAlignment(e.address(0, 0), e.address(0, colCount - 1), Excel::hCenter);
     /* BODY */
     QFont bodyFont(qApp->font());
-    d.style()->addFont("body", bodyFont);
+    QXlsx::Format bf;
+    bf.setFont(bodyFont);
     for (int j = 0; j < rowCount(); j++) {
         for (int i = 0; i < columnCount(); i++) {
-            s->addCell(j + 2, i + 1,  item(j, i)->data(Qt::EditRole), d.style()->styleNum("body"));
+            d.write(j + 2, i + 1,  item(j, i)->data(Qt::EditRole), bf);
         }
     }
-    QString err;
-    if (!d.save(err, true)) {
-        if (!err.isEmpty()) {
-            C5Message::error(err);
-        }
+    QString filename = QFileDialog::getSaveFileName(nullptr, "", "", "*.xlsx");
+    if (filename.isEmpty()) {
+        return;
     }
+    d.saveAs(filename);
+    QDesktopServices::openUrl(filename);
 }
 
 void C5ClearTableWidget::search(const QString &txt)
@@ -311,6 +315,27 @@ C5LineEdit *C5ClearTableWidget::lineEdit(int row, int column)
 QVariant C5TableWidgetItem::data(int role) const
 {
     QVariant v = QTableWidgetItem::data(role);
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+    if (role == Qt::DisplayRole) {
+        if (v.userType() == QMetaType::QJsonValue) {
+            v = v.toJsonValue().toVariant();
+        }
+        switch (v.type()) {
+            case QVariant::Int:
+                return v.toString();
+            case QVariant::Date:
+                return v.toDate().toString(FORMAT_DATE_TO_STR);
+            case QVariant::DateTime:
+                return v.toDateTime().toString(FORMAT_DATETIME_TO_STR);
+            case QVariant::Time:
+                return v.toTime().toString(FORMAT_TIME_TO_STR);
+            case QVariant::Double:
+                return float_str(v.toDouble(), fDecimals);
+            default:
+                return v.toString();
+        }
+    }
+#else
     if (role == Qt::DisplayRole) {
         switch (v.typeId()) {
             case QMetaType::Int:
@@ -327,6 +352,7 @@ QVariant C5TableWidgetItem::data(int role) const
                 return v.toString();
         }
     }
+#endif
     return v;
 }
 

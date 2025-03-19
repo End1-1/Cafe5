@@ -42,7 +42,7 @@ void C5PrintJson::run()
             font.setBold(jo["bold"].toBool());
             p.setFont(font);
         } else if (jo["cmd"].toString() == "print") {
-            p.print(jo["printer"].toString(), static_cast<QPageSize::PageSizeId>(jo["pagesize"].toInt()));
+            p.print(jo["printer"].toString(), QPageSize(static_cast<QPageSize::PageSizeId>(jo["pagesize"].toInt())));
         } else if (jo["cmd"].toString() == "line1") {
             p.line(jo["x1"].toDouble(), jo["y1"].toDouble(), jo["x2"].toDouble(), jo["y2"].toDouble(), jo["width"].toInt());
         } else if (jo["cmd"].toString() == "line2") {

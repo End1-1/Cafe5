@@ -15,7 +15,7 @@ public:
     virtual void restoreColumnsWidths() override;
 
 protected:
-    virtual bool tblDoubleClicked(int row, int column, const QVector<QJsonValue> &values);
+    virtual bool tblDoubleClicked(int row, int column, const QJsonArray &values) override;
 };
 
 #endif // CR5DISCOUNTSTATISICS_H

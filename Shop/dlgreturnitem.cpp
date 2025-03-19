@@ -50,14 +50,16 @@ void DlgReturnItem::on_btnSearchReceiptNumber_clicked()
     ui->tblOrder->clearContents();
     ui->tblOrder->setRowCount(0);
     C5Database db(fDBParams);
-    db.exec(QString("select o.f_id, o.f_datecash, concat(o.f_prefix, o.f_hallid) as f_receipt, h.f_name as f_hallname,  "
-                    "t.f_receiptnumber, concat(u.f_last, ' ', u.f_first) as f_saler, o.f_staff "
-                    "from o_header o "
-                    "inner join h_halls h on h.f_id=o.f_hall "
-                    "left join o_tax t on t.f_id=o.f_id "
-                    "left join s_user u on u.f_id=o.f_staff "
-                    "where concat(o.f_prefix, o.f_hallid)='%1' and o.f_hall in (%2, 10,2,3,4,5,6,7,8,9) "
-                    "order by 2 ").arg(ui->leReceiptNumber->text())
+    db.exec(QString(R"(select o.f_id, o.f_datecash, concat(o.f_prefix, o.f_hallid) as f_receipt,
+                    h.f_name as f_hallname,
+                    t.f_receiptnumber, concat(u.f_last, ' ', u.f_first) as f_saler, o.f_staff
+                    from o_header o
+                    inner join h_halls h on h.f_id=o.f_hall
+                    left join o_tax t on t.f_id=o.f_id
+                    left join s_user u on u.f_id=o.f_staff
+                    where concat(o.f_prefix, o.f_hallid)='%1' and o.f_hall in (%2, 10,2,3,4,5,6,7,8,9)
+                    and DATEDIFF(CURRENT_DATE, f_datecash)<15
+                    order by 2 )").arg(ui->leReceiptNumber->text())
             .arg(__c5config.defaultHall())
            ) ;
     while (db.nextRow()) {
@@ -65,9 +67,10 @@ void DlgReturnItem::on_btnSearchReceiptNumber_clicked()
         for (int i = 0; i < db.columnCount(); i++) {
             ui->tblOrder->setData(r, i, db.getValue(i));
             if (db.getDate("f_datecash").daysTo(QDate::currentDate()) > 14) {
-                ui->tblOrder->item(r, 0)->setData(Qt::BackgroundColorRole, QVariant::fromValue(Qt::red));
+                ui->tblOrder->item(r, 0)->setData(Qt::BackgroundRole, QVariant::fromValue(Qt::red));
             }
         }
+        //ui->tblOrder->setData(r, )
         if (db.getDate("f_datecash").daysTo(QDate::currentDate()) > 14) {
             ui->tblOrder->item(r, 0)->setData(Qt::UserRole, 14);
         }
@@ -86,7 +89,8 @@ void DlgReturnItem::on_tblOrder_cellClicked(int row, int column)
         return;
     }
     db[":f_header"] = ui->tblOrder->getString(row, 0);
-    db.exec("select b.f_id, 0, g.f_scancode, g.f_name, b.f_qty, u.f_name, b.f_price, b.f_total, b.f_goods, b.f_return "
+    db.exec("select b.f_id, 0, g.f_scancode, g.f_name, b.f_qty, "
+            "u.f_name, b.f_price, b.f_total, b.f_goods, b.f_return "
             "from o_goods b "
             "inner join c_goods g on g.f_id=b.f_goods "
             "inner join c_units u on u.f_id=g.f_unit "
@@ -95,8 +99,13 @@ void DlgReturnItem::on_tblOrder_cellClicked(int row, int column)
     while (db.nextRow()) {
         int r = ui->tblBody->addEmptyRow();
         for (int c = 0; c < ui->tblBody->columnCount(); c++) {
-            ui->tblBody->setData(r, c, db.getValue(c));
+            ui->tblBody->setData(r, c, db.getValue(c).toString());
         }
+        ui->tblBody->setData(r, 4, db.getDouble("f_qty"));
+        ui->tblBody->setData(r, 6, db.getDouble("f_price"));
+        ui->tblBody->setData(r, 7, db.getDouble("f_total"));
+        ui->tblBody->setData(r, 8, db.getInt("f_goods"));
+        ui->tblBody->setData(r, 9, db.getInt("f_return"));
         auto *cb = ui->tblBody->createCheckbox(r, 1);
         if (db.getInt("f_return") > 0) {
             ui->tblBody->checkBox(r, 1)->setChecked(true);
@@ -137,6 +146,8 @@ void DlgReturnItem::on_btnReturn_clicked()
     bool ret = false;
     double returnAmount = 0;
     QList<int> rows;
+    QList<double> qty;
+    QList<double> prices;
     bool haveStore = false;
     for (int i = 0; i < ui->tblBody->rowCount(); i++) {
         if (ui->tblBody->checkBox(i, 1)->isChecked()) {
@@ -147,13 +158,21 @@ void DlgReturnItem::on_btnReturn_clicked()
             haveStore = true;
             returnAmount += ui->tblBody->getDouble(i, 7);
             rows.append(i);
+            qty.append(ui->tblBody->getDouble(i, 4));
+            prices.append(ui->tblBody->getDouble(i, 7));
         }
     }
     if (rows.isEmpty()) {
         return;
     }
-    //FISCAL RETURN
+    ui->btnReturn->setEnabled(false);
+    QMap<QString, QVariant> oldAmountsMap;
     C5Database db(__c5config.dbParams());
+    db[":f_id"] = ui->tblOrder->getString(ui->tblOrder->currentRow(), 0);
+    db.exec("select * from o_header where f_id=:f_id");
+    db.nextRow();
+    db.rowToMap(oldAmountsMap);
+    //FISCAL RETURN
     db[":f_id"] = ui->tblOrder->getString(0, 0);
     db.exec("select * from o_tax_log where f_order=:f_id and f_state=1");
     if (db.nextRow()) {
@@ -162,8 +181,21 @@ void DlgReturnItem::on_btnReturn_clicked()
         int rseq = jout["rseq"].toInt();
         PrintTaxN pt(C5Config::taxIP(), C5Config::taxPort(), C5Config::taxPassword(), C5Config::taxUseExtPos(),
                      C5Config::taxCashier(), C5Config::taxPin(), this);
+        for (int i = 0; i < rows.count(); i++) {
+            if (prices.at(i) < 1) {
+                continue;
+            }
+            pt.addReturnItem(rows.at(i), qty.at(i));
+        }
         QString jsnin, jsnout, err;
         int result;
+        if (oldAmountsMap["f_amountcash"].toDouble() > 0) {
+            pt.fCashAmountForReturn = returnAmount;
+        } else if (oldAmountsMap["f_amountcard"].toDouble() > 0) {
+            pt.fCardAmountForReturn = returnAmount;
+        } else if (oldAmountsMap["f_amountprepaid"].toDouble() > 0) {
+            pt.fPrepaymentAmountForReturn = returnAmount;
+        }
         result = pt.printTaxback(rseq, crn, jsnin, jsnout, err);
         db[":f_id"] = db.uuid();
         db[":f_order"] = ui->tblOrder->getString(0, 0);
@@ -176,6 +208,7 @@ void DlgReturnItem::on_btnReturn_clicked()
         db.insert("o_tax_log", false);
         if (result != pt_err_ok) {
             C5Message::error(err);
+            ui->btnReturn->setEnabled(true);
             return;
         } else {
             db[":f_fiscal"] = QVariant();
@@ -185,11 +218,6 @@ void DlgReturnItem::on_btnReturn_clicked()
         }
     }
     //END OF FISCAL RETURN
-    QMap<QString, QVariant> oldAmountsMap;
-    db[":f_id"] = ui->tblOrder->getString(ui->tblOrder->currentRow(), 0);
-    db.exec("select * from o_header where f_id=:f_id");
-    db.nextRow();
-    db.rowToMap(oldAmountsMap);
     int cashid = __c5config.cashId();
     if (oldAmountsMap["f_amountcard"].toDouble() > 0.1
             || oldAmountsMap["f_amountidram"].toDouble() > 0.1
@@ -209,6 +237,7 @@ void DlgReturnItem::on_btnReturn_clicked()
     }
     if (!ret) {
         C5Message::error(tr("Nothing to return"));
+        ui->btnReturn->setEnabled(true);
         return;
     }
     OHeader oheader;
@@ -222,13 +251,13 @@ void DlgReturnItem::on_btnReturn_clicked()
     oheader.hall = __c5config.defaultHall();
     if (!dw.hallId(oheader.prefix, oheader.hallId, __c5config.defaultHall())) {
         C5Message::error(dw.fErrorMsg);
-        db.rollback();
+        ui->btnReturn->setEnabled(true);
         return;
     }
     QString err;
     if (!oheader.write(db, err)) {
         C5Message::error(err);
-        db.rollback();
+        ui->btnReturn->setEnabled(true);
         return;
     }
     QString storeDocComment;
@@ -242,7 +271,7 @@ void DlgReturnItem::on_btnReturn_clicked()
                              oheader.staff, QDate::currentDate(), QDate::currentDate(), QTime::currentTime(), 0, 0,
                              storeDocComment, 1, __c5config.getValue(param_default_currency).toInt())) {
             C5Message::error(dw.fErrorMsg);
-            db.rollback();
+            ui->btnReturn->setEnabled(true);
             return;
         }
     }
@@ -269,7 +298,7 @@ void DlgReturnItem::on_btnReturn_clicked()
                                      price, price *ui->tblBody->getDouble(i, 4),
                                      DOC_REASON_SALE_RETURN, adraftid, i + 1, "")) {
                 C5Message::error(dw.fErrorMsg);
-                db.rollback();
+                ui->btnReturn->setEnabled(true);
                 return;
             }
         }
@@ -286,22 +315,22 @@ void DlgReturnItem::on_btnReturn_clicked()
         g.tax = ui->tblOrder->getInteger(ui->tblOrder->currentRow(), 4);
         if (!g.write(db, err)) {
             C5Message::error(err);
-            db.rollback();
+            ui->btnReturn->setEnabled(true);
             return;
         }
         if (!dw.updateField("o_goods", "f_return", reason, "f_id", ui->tblBody->getString(i, 0))) {
             C5Message::error(dw.fErrorMsg);
-            db.rollback();
+            ui->btnReturn->setEnabled(true);
             return;
         }
         if (!dw.updateField("o_goods", "f_returnfrom", g.id, "f_id", ui->tblBody->getString(i, 0))) {
             C5Message::error(dw.fErrorMsg);
-            db.rollback();
+            ui->btnReturn->setEnabled(true);
             return;
         }
         if (!dw.updateField("o_header", "f_comment", QString("%1 %2").arg(tr("Return from"), saledoc), "f_id", oheader.id)) {
             C5Message::error(dw.fErrorMsg);
-            db.rollback();
+            ui->btnReturn->setEnabled(true);
             return;
         }
         on_tblOrder_cellClicked(ui->tblOrder->currentRow(), 0);
@@ -319,7 +348,7 @@ void DlgReturnItem::on_btnReturn_clicked()
         if (!dw.writeAHeaderStore(storeDocId, oheader.staff, oheader.staff, "", QDate::currentDate(), __c5config.defaultStore(),
                                   0, 1, fCashUuid, 0, 0, oheader._id())) {
             C5Message::error(dw.fErrorMsg);
-            db.rollback();
+            ui->btnReturn->setEnabled(true);
             return;
         }
     }
@@ -328,7 +357,7 @@ void DlgReturnItem::on_btnReturn_clicked()
     int counter = dw.counterAType(DOC_TYPE_CASH);
     if (counter == 0) {
         C5Message::error(dw.fErrorMsg);
-        db.rollback();
+        ui->btnReturn->setEnabled(true);
         return;
     }
     if (!dw.writeAHeader(cashdocid, QString::number(counter), DOC_STATE_SAVED, DOC_TYPE_CASH, oheader.staff,
@@ -336,18 +365,18 @@ void DlgReturnItem::on_btnReturn_clicked()
                          QDate::currentDate(), QTime::currentTime(), 0, cashamount, tr("Return of") + " " + saledoc,
                          1, __c5config.getValue(param_default_currency).toInt())) {
         C5Message::error(dw.fErrorMsg);
-        db.rollback();
+        ui->btnReturn->setEnabled(true);
         return;
     }
     if (!dw.writeAHeaderCash(cashdocid, 0, cashid, 1, "", oheader._id())) {
         C5Message::error(dw.fErrorMsg);
-        db.rollback();
+        ui->btnReturn->setEnabled(true);
         return;
     }
     QString cashUUID;
     if (!dw.writeECash(cashUUID, cashdocid, cashid, -1, saledoc, cashamount, cashUUID, 1)) {
         C5Message::error(dw.fErrorMsg);
-        db.rollback();
+        ui->btnReturn->setEnabled(true);
         return;
     }
     if (haveStore) {
@@ -357,7 +386,7 @@ void DlgReturnItem::on_btnReturn_clicked()
                                  QDate::currentDate(), QTime::currentTime(), 0, 0, storeDocComment,
                                  1, __c5config.getValue(param_default_currency).toInt())) {
                 C5Message::error(dw.fErrorMsg);
-                db.rollback();
+                ui->btnReturn->setEnabled(true);
                 return;
             }
             dw.writeTotalStoreAmount(storeDocId);
@@ -367,8 +396,8 @@ void DlgReturnItem::on_btnReturn_clicked()
         PrintReceipt p;
         p.print(oheader._id(), db);
     }
-    db.commit();
     C5Message::info(tr("Return completed"));
+    accept();
 }
 
 void DlgReturnItem::on_leExchange_returnPressed()

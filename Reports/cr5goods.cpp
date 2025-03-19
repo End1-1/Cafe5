@@ -65,6 +65,7 @@ CR5Goods::CR5Goods(const QStringList &dbParams, QWidget *parent) :
                     << "left join c_units u on u.f_id=gg.f_unit [u]"
                     << "left join e_currency cr on cr.f_id=gpr.f_currency [cr]"
                     << "left join c_goods_model cm on cm.f_id=gg.f_model [cm]"
+                    << "left join c_goods_images gi on gi.f_id=gg.f_id [gi]"
                     ;
     fColumnsFields << "gg.f_id"
                    << "cp.f_taxname"
@@ -79,6 +80,7 @@ CR5Goods::CR5Goods(const QStringList &dbParams, QWidget *parent) :
                    << "gpr.f_price2disc"
                    << "cr.f_symbol as f_currencyname"
                    << "gg.f_lowlevel"
+                   << "gi.f_size"
                    << "gg.f_lastinputprice"
                    << "g.f_chargevalue"
                    << "(ggpr.f_price1/gg.f_lastinputprice*100)-100 as f_realchargevalue"
@@ -107,6 +109,7 @@ CR5Goods::CR5Goods(const QStringList &dbParams, QWidget *parent) :
     fColumnsVisible["gg.f_description"] = false;
     fColumnsVisible["gg.f_weight"] = true;
     fColumnsVisible["gg.f_fiscalname"] = true;
+    fColumnsVisible["gi.f_size"] = false;
     fTranslation["f_id"] = tr("Code");
     fTranslation["f_taxname"] = tr("Supplier");
     fTranslation["f_groupname"] = tr("Group");
@@ -119,6 +122,7 @@ CR5Goods::CR5Goods(const QStringList &dbParams, QWidget *parent) :
     fTranslation["f_price2disc"] = tr("Whosale discounted");
     fTranslation["f_currencyname"] = tr("Currency");
     fTranslation["f_lowlevel"] = tr("Low level");
+    fTranslation["f_size"] = tr("Image size");
     fTranslation["f_lastinputprice"] = tr("Last input price");
     fTranslation["f_chargevalue"] = tr("Charge value");
     fTranslation["f_acc"] = tr("Account");
@@ -224,7 +228,7 @@ void CR5Goods::groupPrice()
             if (codes.length() > 0) {
                 codes += ",";
             }
-            codes += fModel->data(i, fModel->indexForColumnName("f_id"), Qt::EditRole).toString();
+            codes += QString::number(fModel->data(i, fModel->indexForColumnName("f_id"), Qt::EditRole).toInt());
         }
         C5Database db(dbParams());
         QString query ;
@@ -298,35 +302,6 @@ void CR5Goods::exportToScales()
         f.close();
         C5Message::info(tr("Done"));
     }
-    if (__c5config.getValue(param_fd_russian_scale1).isEmpty() == false) {
-        C5Database dbo("QODBC3");
-        dbo.setDatabase("", __c5config.getValue(param_fd_russian_scale1), "", "");
-        if (dbo.open()) {
-            while (db.nextRow()) {
-                QString name = db.getString("f_name").toLower();
-                name.replace("ու", "u");
-                for (QMap<QString, QString>::const_iterator it = l.constBegin(); it != l.constEnd(); it++) {
-                    name.replace(it.key(), it.value());
-                }
-                dbo[":PLU"] = db.getString("f_scancode").toInt();
-                dbo.exec("delete from Products where PLU=:PLU");
-                QString sql = QString("insert into Products (ID, PLU, Status, LabelNo, BarcodeNo, "
-                                      "Prefix, Price, Tare, Code, DuringDate, "
-                                      "[Group], Barcode, RVTName, "
-                                      "Type, LiteDuringDate) "
-                                      "values (%1, %2, %3, %4, %5, '%6', %7, %8, %9, %10, %11, %12, '%13', '%14', %15)")
-                              .arg(db.getString("f_scancode"), db.getString("f_scancode"), QString("0"), QString("0"), QString("0"),
-                                   QString("0"), QString::number(db.getDouble("f_saleprice") / 100, 'f', 2))
-                              .arg(QString("0"), QString("0"), QString("0"),
-                                   QString("0"), db.getString("f_scancode"), name,
-                                   QString::fromUtf8("вес."), QString("0"));
-                dbo.exec(sql);
-            }
-            C5Message::info(tr("Done"));
-        } else {
-            C5Message::error(dbo.fLastError);
-        }
-    }
 }
 
 void CR5Goods::deleteGoods()
@@ -381,7 +356,12 @@ void CR5Goods::deleteGoods()
 void CR5Goods::printBarCodes()
 {
     C5Database db(fDBParams);
-    db[":f_id"] = fFilter->currency();
+    int curr = fFilter->currency();
+    if (curr == 0) {
+        C5Message::info(tr("Select currency"));
+        return;
+    }
+    db[":f_id"] = curr;
     db.exec("select f_symbol from e_currency where f_id=:f_id");
     db.nextRow();
     QString s = db.getString("f_symbol");

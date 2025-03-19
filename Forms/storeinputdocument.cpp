@@ -166,7 +166,7 @@ void StoreInputDocument::disconnectSlotSignal(int row)
 
 void StoreInputDocument::on_btnAddRow_clicked()
 {
-    QVector<QJsonValue> vals;
+    QJsonArray vals;
     if (!C5Selector::getValueOfColumn(fDBParams, cache_goods, vals, 3)) {
         return;
     }
@@ -180,7 +180,7 @@ void StoreInputDocument::on_btnAddRow_clicked()
 
 void StoreInputDocument::on_toolButton_clicked()
 {
-    QVector<QJsonValue> vals;
+    QJsonArray vals;
     if (!C5Selector::getValueOfColumn(fDBParams, cache_goods_store, vals, 2)) {
         return;
     }
@@ -222,7 +222,6 @@ void StoreInputDocument::saveDoc()
     }
     C5Database db(fDBParams);
     C5StoreDraftWriter dw(db);
-    db.startTransaction();
     if (ui->leDocnum->text().isEmpty()) {
         ui->leDocnum->setText(dw.storeDocNum(DOC_TYPE_STORE_INPUT, ui->leStore->property("f_id").toInt(), true, 0));
     }
@@ -282,7 +281,6 @@ void StoreInputDocument::saveDoc()
         db[":f_lastinputprice"] = ui->tbl->getDouble(i, col_price);
         db.update("c_goods", "f_id", ui->tbl->getInteger(i, col_goodsid));
     }
-    db.commit();
     fSave->setEnabled(false);
     C5Cache::cache(fDBParams, cache_goods)->refresh();
 }
@@ -384,12 +382,10 @@ bool StoreInputDocument::draftDoc()
         C5Message::error(err);
         return false;
     }
-    db.startTransaction();
     db[":f_document"] = ui->leDocnum->property("f_id");
     db.exec("delete from a_store where f_document=:f_document");
     db[":f_state"] = DOC_STATE_DRAFT;
     db.update("a_header", "f_id",  ui->leDocnum->property("f_id"));
-    db.commit();
     fSave->setEnabled(true);
     fDraft->setEnabled(false);
     return true;
@@ -407,7 +403,7 @@ void StoreInputDocument::removeDocument()
 
 void StoreInputDocument::on_btnSetPartner_clicked()
 {
-    QVector<QJsonValue> vals;
+    QJsonArray vals;
     if (!C5Selector::getValueOfColumn(fDBParams, cache_goods_partners, vals, -1)) {
         return;
     }

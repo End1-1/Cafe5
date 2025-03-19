@@ -7,9 +7,10 @@
 #include "c5printing.h"
 #include "c5printpreview.h"
 #include "mfprocessproductpriceupdate.h"
-#include "xlsxall.h"
 #include "ninterface.h"
 #include <QFileDialog>
+#include <QDesktopServices>
+#include <QXlsx/header/xlsxdocument.h>
 #include <QClipboard>
 #include <QMimeData>
 #include <QBuffer>
@@ -317,7 +318,7 @@ void CE5MFProduct::on_btnAdd_clicked()
     if (ui->leCode->getInteger() == 0) {
         C5Message::error(tr("Save first"));
     }
-    QVector<QJsonValue> vals;
+    QJsonArray vals;
     if (!C5Selector::getValue(fDBParams, cache_mf_actions, vals)) {
         return;
     }
@@ -530,80 +531,46 @@ void CE5MFProduct::on_btnExportExcel_clicked()
         C5Message::info(tr("Empty report!"));
         return;
     }
-    XlsxDocument d;
-    XlsxSheet *s = d.workbook()->addSheet("Sheet1");
-    int fXlsxPageSize = xls_page_size_a4;
-    int fXlsxFitToPage = 0;
-    QString fXlsxPageOrientation = xls_page_orientation_portrait;
-    s->setupPage(fXlsxPageSize, fXlsxFitToPage, fXlsxPageOrientation);
+    QXlsx::Document d;
+    d.addSheet("Sheet1");
     /* HEADER */
     QColor color = QColor::fromRgb(200, 200, 250);
     QFont headerFont(qApp->font());
     headerFont.setBold(true);
-    d.style()->addFont("header", headerFont);
-    d.style()->addBackgrounFill("header", color);
-    d.style()->addHAlignment("header", xls_alignment_center);
-    d.style()->addBorder("header", XlsxBorder());
+    QXlsx::Format hf;
+    hf.setFont(headerFont);
+    hf.setBorderStyle(QXlsx::Format::BorderThin);
+    hf.setPatternBackgroundColor(color);
     for (int i = 0; i < colCount; i++) {
-        s->addCell(1, i + 1, ui->wt->columnTitle(i), d.style()->styleNum("header"));
-        s->setColumnWidth(i + 1, ui->wt->columnWidth(i) / 7);
+        d.write(1, i + 1, ui->wt->columnTitle(i), hf);
+        d.setColumnWidth(i + 1, ui->wt->columnWidth(i) / 7);
     }
     /* BODY */
-    QMap<int, QString> bgFill;
-    QMap<int, QString> bgFillb;
     QFont bodyFont(qApp->font());
-    d.style()->addFont("body", bodyFont);
-    d.style()->addBackgrounFill("body", QColor(Qt::white));
-    d.style()->addVAlignment("body", xls_alignment_center);
-    d.style()->addBorder("body", XlsxBorder());
-    bgFill[QColor(Qt::white).rgb()] = "body";
-    bodyFont.setBold(true);
-    d.style()->addFont("body_b", bodyFont);
-    d.style()->addBackgrounFill("body_b", QColor(Qt::white));
-    d.style()->addVAlignment("body_b", xls_alignment_center);
-    d.style()->addBorder("body_b", XlsxBorder());
-    bgFillb[QColor(Qt::white).rgb()] = "body_b";
+    QXlsx::Format bf;
+    bf.setFont(bodyFont);
+    bf.setHorizontalAlignment(QXlsx::Format::AlignHCenter);
+    bf.setBorderStyle(QXlsx::Format::BorderThin);
     for (int j = 0; j < rowCount; j++) {
         for (int i = 0; i < colCount; i++) {
-            int bgColor = QColor(Qt::white).rgb();
-            if (!bgFill.contains(bgColor)) {
-                bodyFont.setBold(false);
-                d.style()->addFont(QString::number(bgColor), bodyFont);
-                d.style()->addBackgrounFill(QString::number(bgColor), QColor::fromRgb(bgColor));
-                bgFill[bgColor] = QString::number(bgColor);
-            }
-            if (!bgFill.contains(bgColor)) {
-                bodyFont.setBold(true);
-                d.style()->addFont(QString::number(bgColor), bodyFont);
-                d.style()->addBackgrounFill(QString::number(bgColor), QColor::fromRgb(bgColor));
-                bgFillb[bgColor] = QString::number(bgColor);
-            }
-            QString bgStyle = bgFill[bgColor];
             if (ui->wt->lineEdit(j, i) == nullptr) {
-                s->addCell(j + 2, i + 1, ui->wt->getData(j, i, Qt::EditRole), d.style()->styleNum(bgStyle));
+                d.write(j + 2, i + 1, ui->wt->getData(j, i, Qt::EditRole), bf);
             } else {
-                s->addCell(j + 2, i + 1, ui->wt->lineEdit(j, i)->text(), d.style()->styleNum(bgStyle));
+                d.write(j + 2, i + 1, ui->wt->lineEdit(j, i)->text(), bf);
             }
         }
     }
     /* TOTALS ROWS */
-    QFont totalFont(qApp->font());
-    totalFont.setBold(true);
-    d.style()->addFont("footer", headerFont);
-    d.style()->addBorder("footer", XlsxBorder());
-    color = QColor::fromRgb(193, 206, 221);
-    d.style()->addBackgrounFill("footer", color);
-    //d.style()->addHAlignment("footer", xls_alignment_right);
-    s->addCell(1 + ui->wt->rowCount() + 1, 4 + 1, ui->wt->total(4), d.style()->styleNum("footer"));
-    s->addCell(1 + ui->wt->rowCount() + 1, 5 + 1, ui->wt->total(5), d.style()->styleNum("footer"));
-    s->addCell(1 + ui->wt->rowCount() + 1, 6 + 1, ui->wt->total(6), d.style()->styleNum("footer"));
-    s->addCell(1 + ui->wt->rowCount() + 1, 7 + 1, ui->wt->total(7), d.style()->styleNum("footer"));
-    QString err;
-    if (!d.save(err, true)) {
-        if (!err.isEmpty()) {
-            C5Message::error(err);
-        }
+    d.write(1 + ui->wt->rowCount() + 1, 4 + 1, ui->wt->total(4), hf);
+    d.write(1 + ui->wt->rowCount() + 1, 5 + 1, ui->wt->total(5), hf);
+    d.write(1 + ui->wt->rowCount() + 1, 6 + 1, ui->wt->total(6), hf);
+    d.write(1 + ui->wt->rowCount() + 1, 7 + 1, ui->wt->total(7), hf);
+    QString filename = QFileDialog::getSaveFileName(nullptr, "", "", "*.xlsx");
+    if (filename.isEmpty()) {
+        return;
     }
+    d.saveAs(filename);
+    QDesktopServices::openUrl(filename);
 }
 
 void CE5MFProduct::on_btnAdd_2_clicked()

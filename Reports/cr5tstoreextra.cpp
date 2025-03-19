@@ -83,7 +83,7 @@ void CR5TStoreExtra::buildQuery()
         return;
     }
     QMap<int, double> goodsSalePrice;
-    QVector<QVector<QJsonValue>> &rows = fModel->fRawData;
+    std::vector<QJsonArray> &rows = fModel->fRawData;
     rows.clear();
     C5Database db(fDBParams);
     //names
@@ -92,13 +92,13 @@ void CR5TStoreExtra::buildQuery()
     QMap<int, int> goodsRowMap;
     while (db.nextRow()) {
         goodsSalePrice[db.getInt("f_id")] = db.getDouble("f_saleprice");
-        QVector<QJsonValue> emptyRow;
+        QJsonArray emptyRow;
         for (int i = 0; i < 14; i++) {
             emptyRow << QJsonValue();
         }
         emptyRow[0] = db.getInt("f_id");
         emptyRow[1] = db.getString("f_name");
-        rows << emptyRow;
+        rows.push_back(emptyRow);
         goodsRowMap[db.getInt(0)] = row++;
     }
     //begin
@@ -187,7 +187,7 @@ void CR5TStoreExtra::buildQuery()
         }
     }
     //finaly, count
-    for (int i = 0; i < rows.count(); i++) {
+    for (int i = 0; i < rows.size(); i++) {
         rows[i][8] = rows[i][2].toDouble() + rows[i][4].toDouble() - rows[i][6].toDouble();
         rows[i][9] = rows[i][3].toDouble() + rows[i][5].toDouble() - rows[i][7].toDouble();
         double qty = rows[i][2].toDouble() + rows[i][4].toDouble();
@@ -198,12 +198,12 @@ void CR5TStoreExtra::buildQuery()
         rows[i][13] = rows[i][11].toDouble() - rows[i][9].toDouble();
     }
     //clear unused
-    for (int i = rows.count() - 1; i > -1; i--) {
+    for (int i = rows.size() - 1; i > -1; i--) {
         if (rows[i][2].toDouble() < 0.001
                 && rows[i][4].toDouble() < 0.001
                 && rows[i][6].toDouble() < 0.001
                 && rows[i][10].toDouble() < 0.001) {
-            rows.removeAt(i);
+            rows.erase(rows.begin() + i);
         }
     }
     fModel->setExternalData(fColumnNameIndex, fTranslation);
@@ -245,7 +245,7 @@ QString CR5TStoreExtra::documentForInventory()
     return result;
 }
 
-bool CR5TStoreExtra::tblDoubleClicked(int row, int column, const QVector<QJsonValue> &values)
+bool CR5TStoreExtra::tblDoubleClicked(int row, int column, const QJsonArray &values)
 {
     bool ok;
     double qty;

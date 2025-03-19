@@ -191,8 +191,8 @@ void NFilterDlg::openSuggestions()
         f.move(mapToGlobal(btnPos));
         f.setData(mCols[btn->property("filter").toString()], mData[btn->property("filter").toString()]);
         if (f.exec()) {
-            c->setText(f.mId);
-            l->setText(f.mName);
+            c->setText(f.mId.join(","));
+            l->setText(f.mName.join(","));
         }
     } else {
         auto *nd = new NDataProvider(this);

@@ -1,17 +1,17 @@
 #include "c5salefromstoreorder.h"
 #include "ui_c5salefromstoreorder.h"
 #include "c5mainwindow.h"
-#include "c5storedraftwriter.h"
 #include "../../NewTax/Src/printtaxn.h"
 #include "breezeconfig.h"
 #include "../Forms/dlglist2.h"
 #include "httpquerydialog.h"
-#include "ce5partner.h"
-#include "../../Xlsx/src/xlsxall.h"
 #include "c5cache.h"
 #include "c5printrecipta4.h"
 #include <QMenu>
 #include <QClipboard>
+#include <QFileDialog>
+#include <QDesktopServices>
+#include <QXlsx/header/xlsxdocument.h>
 
 C5SaleFromStoreOrder::C5SaleFromStoreOrder(const QStringList &dbParams) :
     C5Dialog(dbParams),
@@ -256,32 +256,27 @@ void C5SaleFromStoreOrder::on_btnPrintA4_clicked()
 
 void C5SaleFromStoreOrder::on_btnExportToExcel_clicked()
 {
-    int fXlsxFitToPage = 0;
-    QString fXlsxPageOrientation = xls_page_orientation_portrait;
-    int fXlsxPageSize = xls_page_size_a4;
-    XlsxDocument d;
-    XlsxSheet *s = d.workbook()->addSheet("Sheet1");
-    s->setupPage(fXlsxPageSize, fXlsxFitToPage, fXlsxPageOrientation);
+    QXlsx::Document d;
+    d.addSheet("Sheet1");
     /* HEADER */
     QColor color = Qt::white;
     QFont headerFont(qApp->font());
-    d.style()->addFont("header", headerFont);
-    d.style()->addBackgrounFill("header", color);
-    d.style()->addHAlignment("header", xls_alignment_center);
-    d.style()->addBorder("header", XlsxBorder());
-    s->setColumnWidth(1, 10);
-    s->setColumnWidth(2, 15);
-    s->setColumnWidth(3, 50);
-    s->setColumnWidth(4, 20);
-    s->setColumnWidth(5, 20);
-    s->setColumnWidth(6, 20);
-    s->setColumnWidth(7, 20);
+    QXlsx::Format hf;
+    hf.setFont(headerFont);
+    hf.setBorderStyle(QXlsx::Format::BorderThin);
+    hf.setPatternBackgroundColor(color);
+    d.setColumnWidth(1, 10);
+    d.setColumnWidth(2, 15);
+    d.setColumnWidth(3, 50);
+    d.setColumnWidth(4, 20);
+    d.setColumnWidth(5, 20);
+    d.setColumnWidth(6, 20);
+    d.setColumnWidth(7, 20);
     int col = 1, row = 1;
-    s->addCell(row, col, QString("%1 N%2").arg(tr("Order"), ui->leUserId->text()),
-               d.style()->styleNum("header"));
+    d.write(row, col, QString("%1 N%2").arg(tr("Order"), ui->leUserId->text()), hf);
     row++;
     if (!ui->lePartnerName->isEmpty()) {
-        s->addCell(row, col, tr("Buyer") + " " + ui->lePartnerName->text(), d.style()->styleNum("header"));
+        d.write(row, col, tr("Buyer") + " " + ui->lePartnerName->text(), hf);
         row++;
     }
     QList<int> cols;
@@ -290,13 +285,13 @@ void C5SaleFromStoreOrder::on_btnExportToExcel_clicked()
     cols << col++;
     vals << tr("Date");
     for (int i = 0; i < cols.count(); i++) {
-        s->addCell(row, cols.at(i), vals.at(i), d.style()->styleNum("header"));
+        d.write(row, cols.at(i), vals.at(i), hf);
     }
     row++;
     vals.clear();
     vals << ui->deDate->text() + " " + ui->teTime->text();
     for (int i = 0; i < cols.count(); i++) {
-        s->addCell(row, cols.at(i), vals.at(i), d.style()->styleNum("header"));
+        d.write(row, cols.at(i), vals.at(i), hf);
     }
     row += 2;
     cols.clear();
@@ -312,17 +307,14 @@ void C5SaleFromStoreOrder::on_btnExportToExcel_clicked()
          << tr("Price")
          << tr("Total");
     for (int i = 0; i < cols.count(); i++) {
-        s->addCell(row, cols.at(i), vals.at(i), d.style()->styleNum("header"));
+        d.write(row, cols.at(i), vals.at(i), hf);
     }
     row++;
-    QMap<int, QString> bgFill;
-    QMap<int, QString> bgFillb;
     QFont bodyFont(qApp->font());
-    d.style()->addFont("body", bodyFont);
-    d.style()->addBackgrounFill("body", QColor(Qt::white));
-    d.style()->addVAlignment("body", xls_alignment_center);
-    d.style()->addBorder("body", XlsxBorder());
-    bgFill[QColor(Qt::white).rgb()] = "body";
+    QXlsx::Format bf;
+    bf.setFont(bodyFont);
+    bf.setHorizontalAlignment(QXlsx::Format::AlignHCenter);
+    bf.setBorderStyle(QXlsx::Format::BorderThin);
     for (int i = 0; i < ui->tblData->rowCount(); i++) {
         vals.clear();
         vals << QString::number(i + 1);
@@ -333,7 +325,7 @@ void C5SaleFromStoreOrder::on_btnExportToExcel_clicked()
         vals << ui->tblData->getString(i, 5);
         vals << ui->tblData->getString(i, 6);
         for (int i = 0; i < cols.count(); i++) {
-            s->addCell(row, cols.at(i), vals.at(i), d.style()->styleNum("body"));
+            d.write(row, cols.at(i), vals.at(i), bf);
         }
         row++;
     }
@@ -343,20 +335,20 @@ void C5SaleFromStoreOrder::on_btnExportToExcel_clicked()
     vals << tr("Total amount");
     vals << QString::number(str_float(ui->leTotal->text()));
     for (int i = 0; i < cols.count(); i++) {
-        s->addCell(row, cols.at(i), vals.at(i), d.style()->styleNum("header"));
+        d.write(row, cols.at(i), vals.at(i), hf);
     }
     row++;
     col = 1;
-    s->setSpan(1, col, 1, col + 5);
-    s->setSpan(2, col, 2, col + 5);
-    s->setSpan(3, col, 3, col + 5);
-    s->setSpan(4, col, 4, col + 5);
-    QString err;
-    if (!d.save(err, true)) {
-        if (!err.isEmpty()) {
-            C5Message::error(err);
-        }
+    d.mergeCells("A1:E1");
+    d.mergeCells("A2:E2");
+    d.mergeCells("A3:E3");
+    d.mergeCells("A4:E4");
+    QString filename = QFileDialog::getSaveFileName(nullptr, "", "", "*.xlsx");
+    if (filename.isEmpty()) {
+        return;
     }
+    d.saveAs(filename);
+    QDesktopServices::openUrl(filename);
 }
 
 void C5SaleFromStoreOrder::on_btnPrintA4_3_clicked()

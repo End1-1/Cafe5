@@ -1,7 +1,5 @@
-#include "jsonhandler.h"
+
 #include "logwriter.h"
-#include "commandline.h"
-#include "database.h"
 #include "queryjsonresponse.h"
 #include <QDebug>
 #include <QJsonDocument>
@@ -9,33 +7,23 @@
 #include <QJsonArray>
 #include <QFile>
 #include <QSettings>
+#include <QDir>
 
-void routes(QStringList &r)
+extern "C" Q_DECL_EXPORT bool inventory(const QJsonObject &jreq, QJsonObject &jret, QString &err)
 {
-    r.append("Cafe4Inventory");
-}
-
-bool Cafe4Inventory(const QByteArray &indata, QByteArray &outdata, const QHash<QString, DataAddress> &dataMap,
-                    const ContentType &contentType)
-{
-    CommandLine cl;
-    QString path;
-    cl.value("dllpath", path);
-    JsonHandler jh;
-    RequestHandler rh(outdata);
-    QString configFile = path + "/Cafe4Inventory.ini";
+    QDir d;
+    QString dr = d.homePath() + "/Cafe4Inventory";
+    if (!d.exists(dr)) {
+        d.mkpath(dr);
+    }
+    QString configFile = dr + "/Cafe4Inventory.ini";
     if (!QFile::exists(configFile)) {
         LogWriter::write(LogWriterLevel::errors, "", QString("Cafe4Inventory config file not exists: %1").arg(configFile));
-        jh["message"] = QString("Cafe4Inventory config file not exists: %1").arg(configFile);
-        return rh.setInternalServerError(jh.toString());
+        jret["errorCode"] = 1;
+        jret["errorMessage"] = QString("Cafe4Inventory config file not exists: %1").arg(configFile);
+        return false;
     }
     QSettings s(configFile, QSettings::IniFormat);
-    s.setIniCodec("UTF-8");
-    if (contentType != ContentType::ApplilcationJson) {
-        return rh.setDataValidationError("Accept content type: Applilcation/Json");
-    }
-    QJsonObject jo = QJsonDocument::fromJson(getData(indata, dataMap["json"])).object();
-    QJsonObject jresponse;
-    QueryJsonResponse(s, jo, jresponse).getResponse();
-    return rh.setResponse(HTTP_OK, QJsonDocument(jresponse).toJson(QJsonDocument::Compact));
+    QueryJsonResponse(s, jreq, jret).getResponse();
+    return true;
 }

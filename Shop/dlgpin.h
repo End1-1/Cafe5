@@ -20,7 +20,7 @@ public:
 
     ~DlgPin();
 
-    static bool getPin(QString &pin, QString &pass);
+    static bool getPin(QString &pin, QString &pass, bool donotauth);
 
 protected:
     virtual void keyReleaseEvent(QKeyEvent *event) override;
@@ -74,6 +74,8 @@ private:
     NLoadingDlg *fLoadingDlg;
 
     bool fLastError;
+
+    bool fDoNotAuth;
 
 };
 

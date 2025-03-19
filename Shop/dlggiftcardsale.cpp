@@ -55,7 +55,6 @@ void DlgGiftCardSale::on_btnRegister_clicked()
         return;
     }
     C5Database db(__c5config.dbParams());
-    db.startTransaction();
     db[":f_code"] = ui->leCode->text();
     db.exec("select * from b_gift_card where f_code=:f_code for update");
     if (db.nextRow() == false) {

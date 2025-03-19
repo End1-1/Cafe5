@@ -58,7 +58,7 @@ bool C5PrintServiceThread::run()
             fPrint1 << fBodyData.at(i)["f_print1"].toString();
         }
         if (fBodyData.at(i)["f_print1"].toString() != fBodyData.at(i)["f_print2"].toString()) {
-            if (fBodyData.at(i)["f_print2"].toString() > 0) {
+            if (fBodyData.at(i)["f_print2"].toString().length() > 0) {
                 fPrint2 << fBodyData.at(i)["f_print2"].toString();
             }
         }
@@ -95,7 +95,7 @@ bool C5PrintServiceThread::run()
                 fPrint1 << fBodyData.at(i)["f_print1"].toString();
             }
             if (fBodyData.at(i)["f_print1"].toString() != fBodyData.at(i)["f_print2"].toString()) {
-                if (fBodyData.at(i)["f_print2"].toString() > 0) {
+                if (fBodyData.at(i)["f_print2"].toString().length() > 0) {
                     fPrint2 << fBodyData.at(i)["f_print2"].toString();
                 }
             }
@@ -117,7 +117,7 @@ void C5PrintServiceThread::print(QString printer, const QString &side, bool repr
     QFont font(qApp->font());
     font.setPointSize(20);
     C5Printing p;
-    p.setSceneParams(__c5config.receiptParepWidth(), 2800, QPrinter::Portrait);
+    p.setSceneParams(__c5config.receiptParepWidth(), 2800, QPageLayout::Portrait);
     p.setFont(font);
     if (fHeaderData["f_state"].toInt() == ORDER_STATE_PREORDER_EMPTY
             || fHeaderData["f_state"].toInt() == ORDER_STATE_PREORDER_WITH_ORDER || fBooking) {
@@ -217,12 +217,12 @@ void C5PrintServiceThread::print(QString printer, const QString &side, bool repr
     p.setFontBold(true);
     p.rtext(side == "f_print1" ? " [1]" : "[2]");
     p.br();
-    p.ltext(tr("Storage: ") + storages.toList().join(","), 0);
+    p.ltext(tr("Storage: ") + storages.values().join(","), 0);
     if (fPrinterAliases.contains(printer)) {
         printer = fPrinterAliases[printer];
     }
     QString final = "OK";
-    if (!p.print(printer, QPrinter::Custom)) {
+    if (!p.print(printer, QPageSize::Custom)) {
         final = "FAIL";
     }
     QDir dir;

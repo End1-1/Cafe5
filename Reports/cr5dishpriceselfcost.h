@@ -12,12 +12,12 @@ class CR5DishPriceSelfCost : public C5ReportWidget
 public:
     CR5DishPriceSelfCost(const QStringList &dbParams, QWidget *parent = nullptr);
 
-    virtual QToolBar *toolBar();
+    virtual QToolBar *toolBar() override;
 
-    virtual void buildQuery();
+    virtual void buildQuery() override;
 
 protected:
-    virtual bool tblDoubleClicked(int row, int column, const QVector<QJsonValue> &values) override;
+    virtual bool tblDoubleClicked(int row, int column, const QJsonArray &values) override;
 
 private:
     void buildQueryV1();

@@ -17,14 +17,14 @@ class CR5ConsumptionBySales : public C5ReportWidget
 public:
     CR5ConsumptionBySales(const QStringList &dbParams, QWidget *parent = nullptr);
 
-    virtual QToolBar *toolBar();
+    virtual QToolBar *toolBar() override;
 
-    virtual void buildQuery();
+    virtual void buildQuery() override;
 
-    virtual void refreshData();
+    virtual void refreshData() override;
 
 protected:
-    virtual bool tblDoubleClicked(int row, int column, const QVector<QJsonValue> &values);
+    virtual bool tblDoubleClicked(int row, int column, const QJsonArray &values) override;
 
 private:
     CR5ConsumptionBySalesFilter *fFilter;

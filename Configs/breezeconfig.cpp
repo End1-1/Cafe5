@@ -1,5 +1,4 @@
 #include "breezeconfig.h"
-#include "c5database.h"
 
 BreezeConfig::BreezeConfig(const QStringList &dbParams, int id) :
     Configs(dbParams, id)
@@ -13,4 +12,5 @@ void BreezeConfig::readValues()
     apiKey = jo["apikey"].toString();
     username = jo["user"].toString();
     password = jo["password"].toString();
+    dealtype = jo["dealtype"].toString();
 }

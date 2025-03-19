@@ -48,7 +48,7 @@ void QDishButton::paintEvent(QPaintEvent *pe)
     QRect rectPrice = option.rect;
     QFontMetrics fm(p.font());
     QString price = float_str(property("price").toDouble(), 2);
-    rectPrice.adjust(rectPrice.width() - (fm.width(price) + 5), rectPrice.height() - (fm.height() + 5), -2, -2);
+    rectPrice.adjust(rectPrice.width() - (fm.horizontalAdvance(price) + 5), rectPrice.height() - (fm.height() + 5), -2, -2);
     p.drawText(rectPrice, price);
     if (stopreached) {
         QRect stopRect = pe->rect();

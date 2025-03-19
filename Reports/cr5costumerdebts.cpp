@@ -216,7 +216,7 @@ void CR5CostumerDebts::restoreColumnsWidths()
     }
 }
 
-bool CR5CostumerDebts::tblDoubleClicked(int row, int column, const QVector<QJsonValue> &vals)
+bool CR5CostumerDebts::tblDoubleClicked(int row, int column, const QJsonArray &vals)
 {
     Q_UNUSED(row);
     Q_UNUSED(column);

@@ -152,7 +152,7 @@ void PrintReceiptGroup::print(const QString &id, C5Database &db, int rw)
     QFont font(qApp->font());
     font.setPointSize(20);
     C5Printing p;
-    p.setSceneParams(600, 2800, QPrinter::Portrait);
+    p.setSceneParams(600, 2800, QPageLayout::Portrait);
     p.setFont(font);
     p.br(2);
     if (!saletype.isEmpty()) {
@@ -312,7 +312,7 @@ void PrintReceiptGroup::print(const QString &id, C5Database &db, int rw)
     p.ltext(tr("Printed"), 0);
     p.rtext(QDateTime::currentDateTime().toString(FORMAT_DATETIME_TO_STR));
     p.br();
-    p.print(C5Config::localReceiptPrinter(), QPrinter::Custom);
+    p.print(C5Config::localReceiptPrinter(), QPageSize(QPageSize::Custom));
 }
 
 void PrintReceiptGroup::print2(const QString &id, C5Database &db)
@@ -453,7 +453,7 @@ void PrintReceiptGroup::print2(const QString &id, C5Database &db)
     QFont font(qApp->font());
     font.setPointSize(20);
     C5Printing p;
-    p.setSceneParams(600, 2800, QPrinter::Portrait);
+    p.setSceneParams(600, 2800, QPageLayout::Portrait);
     p.image("./logo_receipt.png", Qt::AlignHCenter);
     p.br();
     p.br();
@@ -638,7 +638,7 @@ void PrintReceiptGroup::print2(const QString &id, C5Database &db)
     p.ltext(tr("Printed"), 0);
     p.rtext(QDateTime::currentDateTime().toString(FORMAT_DATETIME_TO_STR));
     p.br();
-    p.print(C5Config::localReceiptPrinter(), QPrinter::Custom);
+    p.print(C5Config::localReceiptPrinter(), QPageSize(QPageSize::Custom));
 }
 
 void PrintReceiptGroup::print3(const QString &id, C5Database &db)
@@ -699,7 +699,7 @@ void PrintReceiptGroup::print3(const QString &id, C5Database &db)
     QFont font(qApp->font());
     font.setPointSize(20);
     C5Printing p;
-    p.setSceneParams(2000, 2700, QPrinter::Portrait);
+    p.setSceneParams(2000, 2700, QPageLayout::Portrait);
     p.setFont(font);
     p.br(2);
     if (!saletype.isEmpty()) {
@@ -853,5 +853,5 @@ void PrintReceiptGroup::print3(const QString &id, C5Database &db)
     p.ltext(tr("Printed"), 0);
     p.rtext(QDateTime::currentDateTime().toString(FORMAT_DATETIME_TO_STR));
     p.br();
-    p.print(C5Config::localReceiptPrinter(), QPrinter::A4);
+    p.print(C5Config::localReceiptPrinter(), QPageSize(QPageSize::A4));
 }

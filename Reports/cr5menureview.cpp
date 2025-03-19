@@ -71,7 +71,7 @@ void CR5MenuReview::refreshData()
     }
 }
 
-bool CR5MenuReview::tblDoubleClicked(int row, int column, const QVector<QJsonValue> &v)
+bool CR5MenuReview::tblDoubleClicked(int row, int column, const QJsonArray &v)
 {
     Q_UNUSED(row);
     Q_UNUSED(column);

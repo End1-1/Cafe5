@@ -33,7 +33,6 @@ public:
     QString _goodsFiscalName;
     QString _barcode;
     QString _unitName;
-    double _qtybox = 0.0;
     QString emarks;
 
     virtual void bind(C5Database &db) override;

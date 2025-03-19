@@ -172,6 +172,19 @@
     </message>
 </context>
 <context>
+    <name>NDataProvider</name>
+    <message>
+        <location filename="../NTable/ndataprovider.cpp" line="78"/>
+        <source>Access denied</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../NTable/ndataprovider.cpp" line="80"/>
+        <source>You must upgrade the application to continue using it</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>NInterface</name>
     <message>
         <location filename="../NTable/ninterface.cpp" line="64"/>

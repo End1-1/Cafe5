@@ -82,7 +82,7 @@ void DlgDataOnline::selectionChanged(const QItemSelection &selected, const QItem
     }
 }
 
-bool DlgDataOnline::tblDoubleClicked(int row, int column, const QVector<QJsonValue> &values)
+bool DlgDataOnline::tblDoubleClicked(int row, int column, const QJsonArray &values)
 {
     Q_UNUSED(column);
     Q_UNUSED(row);

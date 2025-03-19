@@ -3,7 +3,8 @@
 
 #include "c5dialog.h"
 
-namespace Ui {
+namespace Ui
+{
 class GoodsReturnReason;
 }
 
@@ -19,6 +20,8 @@ public:
     ~GoodsReturnReason();
 
     int fReason;
+
+    QString fReasonName;
 
 private slots:
     void on_lst_itemClicked(QListWidgetItem *item);

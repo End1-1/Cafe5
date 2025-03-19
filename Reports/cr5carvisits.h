@@ -9,12 +9,12 @@ class CR5CarVisits : public C5ReportWidget
 public:
     CR5CarVisits(const QStringList &dbParams, QWidget *parent = nullptr);
 
-    virtual QToolBar *toolBar();
+    virtual QToolBar *toolBar() override;
 
 protected:
-    virtual void restoreColumnsWidths();
+    virtual void restoreColumnsWidths() override;
 
-    virtual bool tblDoubleClicked(int row, int column, const QVector<QJsonValue> &values) override;
+    virtual bool tblDoubleClicked(int row, int column, const QJsonArray &values) override;
 };
 
 #endif // CR5CARVISITS_H

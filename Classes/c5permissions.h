@@ -46,7 +46,6 @@
 #define cp_t3_debts_partner 312
 #define cp_t3_consuption_reason 313
 #define cp_t3_preorders 315
-#define cp_t3_sale_effectiveness 316
 #define cp_t3_storage_uncomplected 317
 #define cp_t3_move_uncomplected 318
 #define cp_t3_custom_reports 320

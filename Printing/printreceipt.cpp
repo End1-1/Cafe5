@@ -103,7 +103,7 @@ void PrintReceipt::print(const QString &id, C5Database &db)
         QFont font(qApp->font());
         font.setPointSize(20);
         C5Printing p;
-        p.setSceneParams(650, 2800, QPrinter::Portrait);
+        p.setSceneParams(650, 2800, QPageLayout::Portrait);
         p.setFont(font);
         if (tax) {
             p.ltext(firm, 0);
@@ -229,6 +229,11 @@ void PrintReceipt::print(const QString &id, C5Database &db)
         p.ltext(tr("Printed"), 0);
         p.rtext(QDateTime::currentDateTime().toString(FORMAT_DATETIME_TO_STR));
         p.br();
-        p.print(C5Config::localReceiptPrinter(), QPrinter::Custom);
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+        QPageSize ps(QPageSize::Custom);
+        p.print(C5Config::localReceiptPrinter(), ps);
+#else
+        p.print(C5Config::localReceiptPrinter(), QPageSize::Custom);
+#endif
     }
 }

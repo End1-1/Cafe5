@@ -43,7 +43,7 @@ void C5PrintRemovedServiceThread::print(QString printName)
     QFont font(qApp->font());
     font.setPointSize(18);
     C5Printing p;
-    p.setSceneParams(650, 2800, QPrinter::Portrait);
+    p.setSceneParams(650, 2800, QPageLayout::Portrait);
     p.setFont(font);
     p.image(":/cancel.png", Qt::AlignHCenter);
     p.br();
@@ -89,5 +89,10 @@ void C5PrintRemovedServiceThread::print(QString printName)
     if (fPrinterAliases.contains(printName)) {
         printName = fPrinterAliases[printName];
     }
-    p.print(printName, QPrinter::Custom);
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+    QPageSize ps(QPageSize::Custom);
+    p.print(printName, ps);
+#else
+    p.print(printName, QPageSize::Custom);
+#endif
 }

@@ -24,6 +24,8 @@ private slots:
     void on_btnOk_clicked();
     void on_cbDatabases_currentIndexChanged(int index);
 
+    void on_btnConfig_clicked();
+
 private:
     Ui::C5Login *ui;
     QJsonArray fServers;

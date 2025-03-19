@@ -78,7 +78,7 @@ void CE5PackageList::packageChanged(const QVector<QJsonValue> &val)
 
 void CE5PackageList::on_btnAdd_clicked()
 {
-    QVector<QJsonValue> values;
+    QJsonArray values;
     if (!C5Selector::getValue(fDBParams, cache_dish, values)) {
         return;
     }

@@ -43,13 +43,12 @@ void CR5RouteReport::newRow()
         if (!sql.isEmpty()) {
             sql += ",";
         }
-        sql += QString("(%1,'%2',%3,%4)").arg(db.getString("f_partner"), d.toString(FORMAT_DATE_TO_STR_MYSQL), "0",  QString::number(driver));
+        sql += QString("(%1,'%2',%3,%4)").arg(db.getString("f_partner"), d.toString(FORMAT_DATE_TO_STR_MYSQL), "0",
+                                              QString::number(driver));
     }
-    db.startTransaction();
     db[":f_date"] = d;
     db[":f_driver"] = driver;
     db.exec("delete from o_route_exec where f_date=:f_date and f_action=0 and f_driver=:f_driver");
     sql = QString("insert into o_route_exec (f_partner, f_date, f_action, f_driver) values %1").arg(sql);
     db.exec(sql);
-    db.commit();
 }

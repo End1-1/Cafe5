@@ -523,7 +523,9 @@ void Workspace::on_btnCheckout_clicked()
     for (int i = 0; i < ui->tblOrder->rowCount(); i++) {
         Dish d = ui->tblOrder->item(i, 0)->data(Qt::UserRole).value<Dish>();
         if (d.f_emarks.isEmpty() == false) {
-            ui->btnFiscal->setChecked(true);
+            if (__c5config.getValue(param_simple_fiscal).toInt() == 0) {
+                ui->btnFiscal->setChecked(true);
+            }
             break;
         }
     }
@@ -802,7 +804,9 @@ void Workspace::on_btnCostumer_clicked()
         ui->lbCostumerPhone->setVisible(true);
     }
     if (!fOrderUuid.isEmpty()) {
-        createHttpRequest("/engine/smart/set-customer.php", QJsonObject{{"header", fOrderUuid}, {"customer", fCustomer}}, SLOT(
+        createHttpRequest("/engine/smart/set-customer.php", QJsonObject{
+            {"header", fOrderUuid},
+            {"customer", fCustomer}}, SLOT(
             voidResponse(QJsonObject)));
     }
 }
@@ -1056,7 +1060,11 @@ bool Workspace::saveOrder(int state, bool printService)
         marks["printreceipt"] = true;
         marks["header"] = fOrderUuid;
     }
-    createHttpRequest("/engine/smart/save.php", QJsonObject{{"header", header}, {"bhistory", bhistory}, {"dishes", dishes}, {"flags", flags}},
+    createHttpRequest("/engine/smart/save.php", QJsonObject{
+        {"header", header},
+        {"bhistory", bhistory},
+        {"dishes", dishes},
+        {"flags", flags}},
     SLOT(saveResponse(QJsonObject)), marks);
     return true;
 }
@@ -1105,7 +1113,7 @@ int Workspace::printTax(double cardAmount, double idramAmount)
                 pt.addGoods(db.getInt("f_taxdept") == 0
                             ? C5Config::taxDept().toInt()
                             : db.getInt("f_taxdept"),
-                            db.getString("f_adgcode"), db.getString("f_dish"),
+                            db.getString("f_adgcode"), QString::number(db.getInt("f_dish")),
                             db.getString("f_name"), db.getDouble("f_price"),
                             db.getDouble("f_qty1"), fDiscountValue * 100);
                 break;
@@ -1132,6 +1140,7 @@ int Workspace::printTax(double cardAmount, double idramAmount)
     if (__c5config.getValue(param_simple_fiscal).toInt() == 0) {
         result = pt.makeJsonAndPrint(cardAmount, 0, jsonIn, jsonOut, err);
     } else {
+        pt.fJsonHeader["paidAmount"] = ui->leTotal->getDouble();
         result = pt.makeJsonAndPrintSimple(cardAmount, 0, jsonIn, jsonOut, err);
     }
 #ifdef QT_DEBUG
@@ -1231,7 +1240,7 @@ bool Workspace::printReceipt(const QString &id, bool printSecond, bool precheck)
         return false;
     }
     p.setFontBold(true);
-    p.ctext(tr("Receipt #") + QString("%1%2").arg(db.getString("f_prefix"), db.getString("f_hallid")));
+    p.ctext(tr("Receipt #") + QString("%1%2").arg(db.getString("f_prefix"), QString::number(db.getInt("f_hallid"))));
     p.br();
     //p.setFontBold(false);
     if (!jtax.isEmpty()) {
@@ -1360,7 +1369,7 @@ bool Workspace::printReceipt(const QString &id, bool printSecond, bool precheck)
     p.line(4);
     p.br(3);
     p.setFontBold(true);
-    if (bh.card > 0) {
+    if (bh.type > 0) {
         p.ltext(QString("%1").arg(tr("Total")), 0);
         p.rtext(float_str(clearTotal, 2));
         p.br();
@@ -1523,15 +1532,18 @@ void Workspace::showCustomerDisplay()
 
 void Workspace::httpQueryLoading()
 {
-    fLoadingDlg = new NLoadingDlg(this);
+    if (!fLoadingDlg) {
+        fLoadingDlg = new NLoadingDlg(this);
+    }
+    fLoadingDlg->resetSeconds();
     fLoadingDlg->open();
 }
 
 void Workspace::httpStop(QObject *sender)
 {
-    fLoadingDlg->hide();
-    fLoadingDlg->deleteLater();
-    fLoadingDlg = nullptr;
+    if (fLoadingDlg) {
+        fLoadingDlg->hide();
+    }
     sender->deleteLater();
 }
 

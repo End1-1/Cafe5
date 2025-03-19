@@ -350,7 +350,7 @@ double C5OrderDriver::prepayment()
         if (dishesValue("f_state", i).toInt() != DISH_STATE_OK) {
             continue;
         }
-        if (dishesValue("f_hourlypayment", i) > 0) {
+        if (dishesValue("f_hourlypayment", i).toInt() > 0) {
             total += dishesValue("f_total", i).toDouble();
             continue;
         }

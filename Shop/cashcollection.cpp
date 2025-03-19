@@ -42,12 +42,8 @@ CashCollection::CashCollection() :
     if (db.nextRow()) {
         ui->leAmountPrepaid->setDouble(db.getDouble("f_amountprepaid"));
     }
-    db[":f_id"] = __c5config.fSettingsId;
-    db.exec("select f_config from sys_json_config where f_id=:f_id");
-    if (db.nextRow()) {
-        QJsonObject jo = __strjson(db.getString(0));
-        fCoinCashId = jo["coincash_id"].toInt();
-    }
+    QJsonObject jo = __strjson(db.getString(0));
+    fCoinCashId = __c5config.fMainJson["coincash_id"].toInt();
     ui->lbAmountCoin->setVisible(fCoinCashId > 0);
     ui->leAmountCoin->setVisible(fCoinCashId > 0);
     adjustSize();
@@ -70,10 +66,6 @@ void CashCollection::on_btnSave_clicked()
         return;
     }
     C5Database db(__c5config.dbParams());
-    if (!db.open()) {
-        C5Message::error(db.fLastError);
-        return;
-    }
     if (ui->leAmountCoin->getDouble() > 0.001) {
         fHttp->createHttpQuery("/engine/cashdesk/create.php",
         QJsonObject{
@@ -122,10 +114,6 @@ void CashCollection::responseOfCreateIn(const QJsonObject &jdoc)
 void CashCollection::collectCash()
 {
     C5Database db(__c5config.dbParams());
-    if (!db.open()) {
-        C5Message::error(db.fLastError);
-        return;
-    }
     C5StoreDraftWriter dw(db);
     int counter = dw.counterAType(DOC_TYPE_CASH);
     if (counter == 0) {

@@ -3,7 +3,8 @@
 
 #include "c5document.h"
 
-namespace Ui {
+namespace Ui
+{
 class C5CashDoc;
 }
 
@@ -40,7 +41,7 @@ public:
 
     void setStoreDoc(const QString &uuid);
 
-    virtual void selectorCallback(int row, const QVector<QJsonValue> &values);
+    virtual void selectorCallback(int row, const QJsonArray &values) override;
 
     QString uuid() const;
 
@@ -84,7 +85,7 @@ private slots:
 
 private:
     Ui::C5CashDoc *ui;
-    
+
     QString fStoreUuid;
 
     bool fRelation;

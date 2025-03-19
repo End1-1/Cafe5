@@ -28,7 +28,7 @@ private:
 
     QHash<QString, QHash<int, int> > fIdRow;
 
-    QHash<QString, QVector<QVector<QJsonValue> > > fValues;
+    QHash<QString, QVector<QJsonArray > > fValues;
 
     static QHash<QString, DataOnline *> fInstances;
 

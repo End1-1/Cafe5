@@ -8,6 +8,7 @@
 #include "dqty.h"
 #include "c5message.h"
 #include "c5permissions.h"
+#include "dlggetvalue.h"
 #include "c5printing.h"
 #include "printreceiptgroup.h"
 #include "printreceipt.h"
@@ -325,8 +326,6 @@ bool WOrder::writeOrder()
     QJsonArray jg;
     for (int i = 0; i < fOGoods.count(); i++) {
         OGoods &g = fOGoods[i];
-        g.price = g.total / (g.qty / g._qtybox);
-        g.qty /= g._qtybox;
         QJsonObject jt;
         jt["f_id"] = C5Database::uuid();
         jt["f_header"] = jh["f_id"];
@@ -339,13 +338,13 @@ bool WOrder::writeOrder()
         jt["f_sign"] = g.sign;
         jt["f_taxdebt"] = g.taxDept;
         jt["f_adgcode"] = g.adgCode;
-        jt["f_row"] = g.row;
+        jt["f_row"] = i;
         jt["f_storerec"] = g.storeRec;
         jt["f_discountfactor"] = g.discountFactor;
         jt["f_discountmode"] = g.discountMode;
         jt["f_discountamount"] = g.discountAmount;
         jt["f_return"] = g.return_;
-        jt["f_returnfrom"] = g.returnFrom;
+        jt["f_returnfrom"] = g.returnFrom.isEmpty() ? QJsonValue() : g.returnFrom;
         jt["f_isservice"] = g.isService;
         jt["f_amountaccumulate"] = g.accumulateAmount;
         jt["f_emarks"] = QString(g.emarks).replace("\"", "\\\"");
@@ -412,17 +411,16 @@ bool WOrder::writeOrder()
                 if (g.emarks.isEmpty() == false) {
                     pt.fEmarks.append(g.emarks);
                 }
-                double price = g.price / g._qtybox;
-                if (fBHistory.value > 0.01) {
-                    price = price / (100 - (fBHistory.value )) * 100;
+                if (g.discountFactor > 0.999) {
+                    continue;
                 }
                 pt.addGoods(g.taxDept, //dep
                             g.adgCode, //adg
                             QString::number(g.goods), //goods id
                             g._goodsFiscalName.isEmpty() ? g._goodsName : g._goodsFiscalName, //name
-                            price, //price
+                            g.price, //price
                             g.qty, //qty
-                            fBHistory.value); //discount
+                            g.discountFactor * 100); //discount
             }
             do {
                 result = pt.makeJsonAndPrint(fOHeader.amountCard + fOHeader.amountIdram + fOHeader.amountTelcell,
@@ -463,6 +461,8 @@ bool WOrder::writeOrder()
             file.write(jsonOut.toUtf8());
             file.write("\r\n");
             file.write("\r\n ERROR JSON");
+            file.write("\r\n");
+            file.write(err.toUtf8());
             jerr.errorString();
             file.write("\r\n");
             file.close();
@@ -514,7 +514,7 @@ bool WOrder::writeOrder()
         ooh.make(db, fOHeader._id());
     }
     if (!fDraftSale.id.toString().isEmpty()) {
-        db[":f_id"] = fDraftSale.id;
+        db[":f_id"] = fDraftSale._id();
         db.exec("update o_draft_sale set f_state=3 where f_id=:f_id");
         db[":f_header"] = fDraftSale.id;
         db.exec("update o_draft_sale_body set f_state=3 where f_header=:f_header");
@@ -768,7 +768,7 @@ void WOrder::comma()
         if (qty < 0.001) {
             return;
         }
-        setQtyOfRow(row, qty *fOGoods.at(row)._qtybox);
+        setQtyOfRow(row, qty);
     }
 }
 
@@ -788,6 +788,29 @@ void WOrder::setDiscount(const QString &label, const QString &value)
 
 void WOrder::countTotal()
 {
+    for (int i = 0; i < fOGoods.count(); i++) {
+        //MARTI8
+        int a = -1;
+        if (i > 0) {
+            QStringList codes;
+            codes.append("1");
+            codes.append("100");
+            codes.append("101");
+            codes.append("102");
+            codes.append("103");
+            codes.append("104");
+            if (codes.contains(fOGoods.at(i)._barcode)) {
+                a = i;
+                fOGoods[i].discountFactor = 1;
+                fOGoods[i].discountMode = 1;
+            }
+        }
+        if (a > -1) {
+            OGoods gt = fOGoods[fOGoods.count() - 1];
+            fOGoods[fOGoods.count() - 1] = fOGoods[a];
+            fOGoods[a] = gt;
+        }
+    }
     double accAmount = 0;
     fOHeader.countAmount(fOGoods, fBHistory);
     ui->leTotal->setDouble(fOHeader.amountTotal);
@@ -795,12 +818,26 @@ void WOrder::countTotal()
         ui->leDisc->setDouble(fOHeader.amountDiscount);
     }
     for (int i = 0; i < fOGoods.count(); i++) {
+        //MARTI8
+        if (i > 0) {
+            QStringList codes;
+            codes.append("1");
+            codes.append("100");
+            codes.append("101");
+            codes.append("102");
+            codes.append("103");
+            codes.append("104");
+            if (codes.contains(fOGoods.at(i)._barcode)) {
+                fOGoods[i].discountFactor = 1;
+                fOGoods[i].discountMode = 1;
+            }
+        }
         const OGoods &og = fOGoods.at(i);
         ui->tblData->setData(i, col_bacode, og._barcode);
         ui->tblData->setData(i, col_group, og._groupName);
         ui->tblData->setData(i, col_name, og._goodsName);
         ui->tblData->setData(i, col_qty, og.qty);
-        ui->tblData->setData(i, col_qtybox, og.qty / og._qtybox);
+        ui->tblData->setData(i, col_qtybox, og.qty);
         ui->tblData->setData(i, col_price, og.price);
         ui->tblData->setData(i, col_unit, og._unitName);
         ui->tblData->setData(i, col_total, og.total);
@@ -832,12 +869,11 @@ void WOrder::countTotal()
     fDraftSale.amount = fOHeader.amountTotal;
     fDraftSale.write(db, err);
     updateCustomerDisplay(fCustomerDisplay);
+    marti8();
 }
 
 bool WOrder::returnFalse(const QString &msg, C5Database &db)
 {
-    db.rollback();
-    db.close();
     C5Message::error(msg);
     return false;
 }
@@ -895,6 +931,52 @@ bool WOrder::checkDiscountRight()
     return true;
 }
 
+void WOrder::marti8()
+{
+    return;
+    if (ui->leTotal->getDouble() < 25000) {
+        QStringList codes;
+        codes.append("100");
+        codes.append("101");
+        codes.append("102");
+        codes.append("103");
+        codes.append("104");
+        for (int i = 1; i < ui->tblData->rowCount(); i++) {
+            if (codes.contains(ui->tblData->getString(i, 0))) {
+                return;
+            }
+        }
+        DlgGetValue gv(codes, this);
+        if (gv.exec() == QDialog::Accepted) {
+            ui->leCode->setText(gv.value());
+            on_leCode_returnPressed();
+        }
+    } else {
+        QStringList codes;
+        codes.append("100");
+        codes.append("101");
+        codes.append("102");
+        codes.append("103");
+        codes.append("104");
+        for (int i = 1; i < ui->tblData->rowCount(); i++) {
+            if (codes.contains(ui->tblData->getString(i, 0))) {
+                ui->tblData->setCurrentCell(i, 0);
+                removeRow();
+                return;
+            }
+        }
+        for (int i = 1; i < ui->tblData->rowCount(); i++) {
+            QStringList codes2;
+            codes2.append("1");
+            if (codes2.contains(ui->tblData->getString(i, 0))) {
+                return;
+            }
+        }
+        ui->leCode->setText("1");
+        on_leCode_returnPressed();
+    }
+}
+
 bool WOrder::setQtyOfRow(int row, double qty)
 {
     OGoods &og = fOGoods[row];
@@ -902,7 +984,7 @@ bool WOrder::setQtyOfRow(int row, double qty)
     if (g.acceptIntegerQty()) {
         qty = trunc(qty);
     }
-    double diffqty = (qty / og._qtybox);
+    double diffqty = qty ;
     if (og.isService == 0  && __c5config.getValue(param_shop_dont_check_qty).toInt() == 0) {
         QString err;
         if (!checkQty(g.id(), diffqty, err, og.qty)) {
@@ -913,7 +995,7 @@ bool WOrder::setQtyOfRow(int row, double qty)
     og.qty = qty;
     C5Database db(__c5config.dbParams());
     db[":f_id"] = ui->tblData->item(row, 0)->data(Qt::UserRole + 101);
-    db[":f_qty"] = og.qty / og._qtybox;
+    db[":f_qty"] = og.qty ;
     db.exec("update o_draft_sale_body set f_qty=:f_qty where f_id=:f_id");
     countTotal();
     return true;
@@ -979,6 +1061,7 @@ void WOrder::addGoods2(const QString &barcode, double price)
 
 void WOrder::reponseProcessCode(const QJsonObject &jdoc)
 {
+    QJsonObject j23 = sender()->property("marks").toJsonObject();
     switch (jdoc["barcode"].toInt()) {
         case 1: {
             //GIFT CARD
@@ -1041,7 +1124,6 @@ void WOrder::reponseProcessCode(const QJsonObject &jdoc)
             QJsonObject goods = jdoc["goods"].toObject();
             QJsonObject store = jdoc["store"].toObject();
             double price = 0;
-            QJsonObject jm = sender()->property("marks").toJsonObject();
             switch (fOHeader.saleType) {
                 case SALE_RETAIL:
                     price = goods["f_price1"].toDouble();
@@ -1053,7 +1135,8 @@ void WOrder::reponseProcessCode(const QJsonObject &jdoc)
                     price = goods["f_price1"].toDouble();
                     break;
             }
-            if (!jm.isEmpty()) {
+            QJsonObject jm = sender()->property("marks").toJsonObject();
+            if (jm.contains("price")) {
                 price = jm["price"].toDouble();
             }
             int row = ui->tblData->addEmptyRow();
@@ -1063,18 +1146,22 @@ void WOrder::reponseProcessCode(const QJsonObject &jdoc)
             connect(ch, &C5CheckBox::clicked, this, &WOrder::checkCardClicked);
             ui->tblData->setCellWidget(row, col_check_discount, ch);
             OGoods og;
+            double qty = goods["f_defaultqty"].toDouble();
+            if (j23.contains("23")) {
+                auto qtyStr = j23["23"].toString().right(5);
+                qty = qtyStr.toDouble() / 10000;
+            }
             og._groupName = goods["f_groupname"].toString();
             og._goodsName = goods["f_name"].toString();
             og._goodsFiscalName = goods["f_fiscalname"].toString();
             og._unitName = goods["f_unitname"].toString();
             og._barcode = goods["f_scancode"].toString();
-            og._qtybox = goods["f_qtybox"].toDouble();
             og.header = fOHeader._id();
             og.goods = goods["f_id"].toInt();
             og.taxDept = goods["f_taxdept"].toInt();
             og.adgCode = goods["f_adgcode"].toString();
             og.isService = goods["f_service"].toInt();
-            og.qty = goods["f_defaultqty"].toDouble();
+            og.qty = qty;
             og.price = price;
             og.store = __c5config.defaultStore();
             og.total = og.qty *og.price;
@@ -1086,9 +1173,9 @@ void WOrder::reponseProcessCode(const QJsonObject &jdoc)
             fOGoods.append(og);
             ui->tblData->setCurrentCell(row, 0);
             //ui->tblData->setDouble(row, col_stock, (g.unit()->defaultQty()/og._qtybox) + (qtyStore / og._qtybox));
-            ui->tblData->setDouble(row, col_stock, (store["f_qty"].toDouble() / og._qtybox));
-            countTotal();
+            ui->tblData->setDouble(row, col_stock, store["f_qty"].toDouble());
             ui->tblData->item(row, 0)->setData(Qt::UserRole + 101, jdoc["draftid"].toString());
+            countTotal();
             ImageLoader *il = new ImageLoader(goods["f_id"].toInt(), this);
             connect(il, SIGNAL(imageLoaded(QPixmap)), this, SLOT(imageLoaded(QPixmap)));
             connect(il, SIGNAL(noImage()), this, SLOT(noImage()));
@@ -1159,7 +1246,6 @@ void WOrder::reponseProcessCode(const QJsonObject &jdoc)
             og._goodsFiscalName = goods["f_fiscalname"].toString();
             og._unitName = goods["f_unitname"].toString();
             og._barcode = goods["f_scancode"].toString();
-            og._qtybox = goods["f_qtybox"].toDouble();
             og.header = fOHeader._id();
             og.goods = goods["f_id"].toInt();
             og.taxDept = goods["f_taxdept"].toInt();
@@ -1177,7 +1263,7 @@ void WOrder::reponseProcessCode(const QJsonObject &jdoc)
             fOGoods.append(og);
             ui->tblData->setCurrentCell(row, 0);
             //ui->tblData->setDouble(row, col_stock, (g.unit()->defaultQty()/og._qtybox) + (qtyStore / og._qtybox));
-            ui->tblData->setDouble(row, col_stock, (store["f_qty"].toDouble() / og._qtybox));
+            ui->tblData->setDouble(row, col_stock, store["f_qty"].toDouble());
             countTotal();
             ui->tblData->item(row, 0)->setData(Qt::UserRole + 101, jdoc["draftid"].toString());
             ImageLoader *il = new ImageLoader(goods["f_id"].toInt(), this);
@@ -1214,7 +1300,6 @@ void WOrder::openDraftResponse(const QJsonObject &jdoc)
         og._goodsFiscalName = g.goodsFiscalName();
         og._unitName = g.unit()->unitName();
         og._barcode = g.scancode();
-        og._qtybox = g.qtyBox();
         og.header = fOHeader._id();
         og.goods = jo["f_goods"].toInt();
         og.taxDept = g.group()->taxDept();
@@ -1353,6 +1438,16 @@ void WOrder::on_leCode_returnPressed()
         return;
     }
     //code.replace(";", "").replace("?", "");
+    if(code.left(3) == "230") {
+        QString code2 = code.mid(3, code.size() - 9);
+        fHttp->createHttpQuery("/engine/shop/process-barcode.php",
+        QJsonObject{{"code", code2},
+            {"store", __c5config.defaultStore()},
+            {"draft_header", fDraftSale._id()},
+            {"retail", fOHeader.saleType == SALE_RETAIL}},
+        SLOT(reponseProcessCode(QJsonObject)), QJsonObject{{"23", code}});
+        return;
+    }
     addGoods(code);
 }
 

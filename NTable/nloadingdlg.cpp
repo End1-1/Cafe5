@@ -4,8 +4,8 @@
 
 NLoadingDlg::NLoadingDlg(QWidget *parent) :
     QDialog(parent, Qt::FramelessWindowHint),
-    mSecond(0),
-    ui(new Ui::NLoadingDlg)
+    ui(new Ui::NLoadingDlg),
+    mSecond(0)
 {
     ui->setupUi(this);
     auto *t = new QTimer(this);

@@ -2,7 +2,6 @@
 #include "ui_c5salarydoc.h"
 #include "c5selector.h"
 #include "c5cache.h"
-#include "c5daterange.h"
 #include "c5cashdoc.h"
 #include "c5storedraftwriter.h"
 #include "c5mainwindow.h"
@@ -169,7 +168,7 @@ void C5SalaryDoc::getEmployesInOutList()
 
 void C5SalaryDoc::on_btnAddEmployee_clicked()
 {
-    QVector<QJsonValue> vals;
+    QJsonArray vals;
     if (!C5Selector::getValue(fDBParams, cache_users, vals)) {
         return;
     }
@@ -240,7 +239,9 @@ void C5SalaryDoc::getSessions()
     QDate date2 = date1.addDays(date1.daysInMonth() - 1);
     db[":date1"] = date1;
     db[":date2"] = date2;
-    db.exec("select * from s_working_sessions where cast(f_close as date) between :date1 and :date2 order by f_id desc");
+    db.exec("select * from s_working_sessions "
+            "where cast(f_close as date) between :date1 and :date2 "
+            "order by f_id desc");
     QSet<QDate> dates;
     while (db.nextRow()) {
         ui->cbShift->addItem(
@@ -251,7 +252,7 @@ void C5SalaryDoc::getSessions()
         int i = ui->cbShift->count() - 1;
         ui->cbShift->setItemData(i, db.getDateTime("f_open"), Qt::UserRole + 1);
         ui->cbShift->setItemData(i, db.getDateTime("f_close").date(), Qt::UserRole + 2);
-        dates.insert(db.getDate("f_close"));
+        dates.insert(db.getDateTime("f_close").date());
     }
     bool getagain = false;
     for (QDate d1 = date1; d1 < date2; d1 = d1.addDays(1)) {

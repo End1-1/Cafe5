@@ -6,9 +6,8 @@
 #include "c5permissions.h"
 #include "c5widget.h"
 #include "cr5commonsales.h"
-#include "storeinputdocument.h"
+#include "c5changepassword.h"
 #include "cr5usersgroups.h"
-#include "nloadingdlg.h"
 #include "cr5materialinstoreuncomplect.h"
 #include "cr5consumptionbysales.h"
 #include "cr5storereason.h"
@@ -30,12 +29,10 @@
 #include "cr5currencies.h"
 #include "cr5currencycrossrate.h"
 #include "cr5currencycrossratehistory.h"
-#include "c5costumerdebtpayment.h"
 #include "cr5cashnames.h"
 #include "cr5dish.h"
 #include "cr5settings.h"
 #include "cr5complectations.h"
-#include "c5selector.h"
 #include "cr5goodsmovement.h"
 #include "c5salarydoc.h"
 #include "c5reporttemplatedriver.h"
@@ -55,7 +52,6 @@
 #include "cr5dishcomment.h"
 #include "cr5salesbydishes.h"
 #include "cr5tstoreextra.h"
-#include "cr5costumerdebts.h"
 #include "cr5goodsimages.h"
 #include "cr5storedocuments.h"
 #include "cr5dishpart2.h"
@@ -65,7 +61,6 @@
 #include "c5storeinventory.h"
 #include "cr5discountsystem.h"
 #include "cr5dishpackage.h"
-#include "cr5salesandstore.h"
 #include "cr5goodsgroup.h"
 #include "cr5menureview.h"
 #include "cr5mfproduct.h"
@@ -78,7 +73,6 @@
 #include "cr5discountstatisics.h"
 #include "cr5salefromstore.h"
 #include "cr5goodsunit.h"
-#include "c5datasynchronize.h"
 #include "cr5menunames.h"
 #include "cr5mfactionstage.h"
 #include "cr5mfactivetasks.h"
@@ -86,7 +80,6 @@
 #include "cr5tables.h"
 #include "cr5hall.h"
 #include "cr5materialsinstore.h"
-#include "c5changepassword.h"
 #include "c5route.h"
 #include "cr5dishremovereason.h"
 #include "cr5goods.h"
@@ -109,6 +102,8 @@
 
 C5MainWindow *__mainWindow;
 QStringList mainDbParams;
+
+#define MENU_HEIGHT  (qApp->font().pointSize() * 3) + 8 + 4
 
 C5MainWindow::C5MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -181,7 +176,8 @@ void C5MainWindow::closeEvent(QCloseEvent *event)
     QMainWindow::closeEvent(event);
 }
 
-NTableWidget *C5MainWindow::createNTab(const QString &route, const QJsonObject &initParams = QJsonObject{})
+NTableWidget *C5MainWindow::createNTab(const QString &route, const QString &image,
+                                       const QJsonObject &initParams)
 {
     auto *t = new NTableWidget(route);
     t->mMainWindow = this;
@@ -293,13 +289,14 @@ void C5MainWindow::menuListReponse(const QJsonObject &jdoc)
     }
     if (lw) {
         QJsonObject jo = jdoc["data"].toObject();
-        QJsonArray ja = jo["reports"].toArray();
+        QJsonArray ja = jdoc["reports"].toArray();
         for (int i = 0; i < ja.size(); i++) {
             const QJsonObject &j = ja.at(i).toObject();
             // QPixmap p;
             // p.loadFromData(QByteArray::fromBase64(j["image"].toString().toLatin1()));
             auto *l = addTreeL3Item(lw, 0, j["title"].toString(), QString(":/%1").arg(j["image"].toString()));
             l->setData(Qt::UserRole + 105, j["route"].toString());
+            l->setData(Qt::UserRole + 110, QString(":/%1").arg(j["image"].toString()));
         }
         for (QListWidget *ll : fMenuLists) {
             int size = ll->count() == 0 ? 0 : (ll->count() * (ll->item(0)->sizeHint().height() + 1));
@@ -404,9 +401,9 @@ void C5MainWindow::animateMenu(QListWidget *l, bool hide)
         p2->setEndValue(0);
     } else {
         p1->setStartValue(0);
-        p1->setEndValue(l->count() * ((qApp->font().pointSize() * 2) + 3));
+        p1->setEndValue(l->count() *MENU_HEIGHT);
         p2->setStartValue(0);
-        p2->setEndValue(l->count() * ((qApp->font().pointSize() * 2) + 3));
+        p2->setEndValue(l->count() *MENU_HEIGHT);
     }
     p1->setDuration(200);
     p2->setDuration(200);
@@ -460,7 +457,7 @@ void C5MainWindow::on_listWidgetItemClicked(const QModelIndex &index)
     int permission = item->data(Qt::UserRole).toInt();
     QString route = item->data(Qt::UserRole + 105).toString();
     if (!route.isEmpty()) {
-        createNTab(route);
+        createNTab(route, item->data(Qt::UserRole + 110).toString());
         return;
     }
     switch (permission) {
@@ -553,10 +550,10 @@ void C5MainWindow::on_listWidgetItemClicked(const QModelIndex &index)
             createTab<CR5SaleFromStore>(dbParams);
             break;
         case cp_t3_debts_partner:
-            createNTab("/engine/reports/customer-debts.php");
+            createNTab("/engine/reports/customer-debts.php", ":/cash.png");
             break;
         case cp_t3_debts_customer:
-            createNTab("/engine/reports/customer-debts.php");
+            createNTab("/engine/reports/customer-debts.php", ":/cash.png");
             break;
         case cp_t3_sale_removed_dishes:
             createTab<CR5SaleRemovedDishes>(dbParams);
@@ -575,9 +572,6 @@ void C5MainWindow::on_listWidgetItemClicked(const QModelIndex &index)
             break;
         case cp_t3_preorders:
             createTab<CR5Preorders>(dbParams);
-            break;
-        case cp_t3_sale_effectiveness:
-            createTab<CR5SalesEffectiveness>(dbParams);
             break;
         case cp_t3_storage_uncomplected:
             createTab<CR5MaterialInStoreUncomplect>(dbParams);
@@ -688,7 +682,7 @@ void C5MainWindow::on_listWidgetItemClicked(const QModelIndex &index)
             createTab<CR5CashMovement>(dbParams);
             break;
         case cp_t8_shifts:
-            createNTab("/engine/cash/shifts.php");
+            createNTab("/engine/cash/shifts.php", ":/cash.png");
             break;
         case cp_t8_currency:
             createTab<CR5Currencies>(dbParams);
@@ -806,9 +800,11 @@ bool C5MainWindow::addMainLevel(const QString &db, int permission, const QString
         connect(b, SIGNAL(clicked()), this, SLOT(on_btnMenuClick()));
         l = new QListWidget();
         l->setProperty("menu", "1");
+        l->setProperty("me", title);
         connect(l, SIGNAL(clicked(QModelIndex)), this, SLOT(on_listWidgetItemClicked(QModelIndex)));
         l->setProperty("db", db);
         l->setProperty("cp", permission);
+        l->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed));
         l->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
         fMenuLists.append(l);
         b->setProperty("list", fMenuLists.count() - 1);
@@ -829,10 +825,20 @@ void C5MainWindow::setDB()
         li->widget()->deleteLater();
         delete li;
     }
+    //FOVORITES LIST
+    QPushButton *b = new QPushButton(QIcon(icon), tr("Favorites"));
+    b->setProperty("menu", "0");
+    b->setProperty("cp", -1);
+    b->setProperty("list", 0);
+    connect(b, SIGNAL(clicked()), this, SLOT(on_btnMenuClick()));
     QListWidget *l = new QListWidget();
+    l->setProperty("me", "favorite");
+    l->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed));
     connect(l, SIGNAL(clicked(QModelIndex)), this, SLOT(on_listWidgetItemClicked(QModelIndex)));
     fMenuLists.append(l);
+    ui->lMenu->addWidget(b);
     ui->lMenu->addWidget(l);
+    //MAIN MENU
     QStringList db = __c5config.dbParams();
     if (addMainLevel(db.at(1), cp_t2_action, tr("Actions"), ":/edit.png", l)) {
         l->setProperty("reportlevel", 1);
@@ -865,7 +871,6 @@ void C5MainWindow::setDB()
         addTreeL3Item(l, cp_t3_draft_output_recipes, tr("Draft output by recipes"), ":/goods.png");
         addTreeL3Item(l, cp_t3_consuption_reason, tr("Reason for consuption"), ":/goods.png");
         addTreeL3Item(l, cp_t3_sales_common, tr("Sales by tickets"), ":/graph.png");
-        addTreeL3Item(l, cp_t3_sale_effectiveness, tr("Effectiveness of sales"), ":/effectiveness.png");
         if (__c5config.frontDeskMode() == FRONTDESK_WAITER) {
             addTreeL3Item(l, cp_t3_sale_dishes, tr("Sales, dishes"), ":/graph.png");
             addTreeL3Item(l, cp_t3_sale_removed_dishes, tr("Sales, removed dishes"), ":/delete.png");
@@ -955,7 +960,7 @@ void C5MainWindow::setDB()
         addTreeL3Item(l, cp_t7_translator, tr("Translator"), ":/translate.png");
         addTreeL3Item(l, cp_t1_breeze, tr("Breeze service"), ":/configure.png");
     }
-    C5Database dbb(db.at(0),  db.at(1),  db.at(2),  db.at(3));
+    C5Database dbb(__c5config.dbParams());
     dbb[":f_group"] = __user->group();
     dbb.exec("select r.f_id, rg.f_level, r.f_name as f_reportname "
              "from reports r "
@@ -972,10 +977,10 @@ void C5MainWindow::setDB()
     }
     readFavoriteMenu();
     for (QListWidget *ll : fMenuLists) {
-        int size = ll->count() == 0 ? 0 : (ll->count() * (ll->item(0)->sizeHint().height() + 1));
-        ll->setMinimumHeight(size);
-        ll->setMaximumHeight(ll->minimumHeight());
+        qDebug() << ll->property("me");
+        ll->setFixedHeight(MENU_HEIGHT *ll->count() * 2);
         ll->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+        ll->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
         animateMenu(ll, __c5config.getRegValue(QString("btnmenushow-%1").arg(ll->property("cp").toInt()), false).toBool());
     }
     ui->lMenu->addStretch(1);
@@ -1045,9 +1050,6 @@ void C5MainWindow::readFavoriteMenu()
             ss.remove(s + "-name");
         }
     }
-    int size = l->count() == 0 ? 0 : (l->count() * (l->item(0)->sizeHint().height() + 1));
-    l->setMinimumHeight(size);
-    l->setMaximumHeight(l->minimumHeight());
 }
 
 void C5MainWindow::on_btnShowMenu_clicked()

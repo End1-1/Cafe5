@@ -1,21 +1,6 @@
 SOURCES += \
     $$PWD/../Classes/c5servername.cpp \
     $$PWD/../Forms/dlgsplashscreen.cpp \
-    ../../NewTax/Src/printtaxn.cpp \
-    ../../XLSX/src/xlsx.cpp \
-    ../../XLSX/src/xlsxborder.cpp \
-    ../../XLSX/src/xlsxcell.cpp \
-    ../../XLSX/src/xlsxcontenttype.cpp \
-    ../../XLSX/src/xlsxdocpropsapp.cpp \
-    ../../XLSX/src/xlsxdocpropscore.cpp \
-    ../../XLSX/src/xlsxdocument.cpp \
-    ../../XLSX/src/xlsxrels.cpp \
-    ../../XLSX/src/xlsxsharedstring.cpp \
-    ../../XLSX/src/xlsxsheet.cpp \
-    ../../XLSX/src/xlsxstyles.cpp \
-    ../../XLSX/src/xlsxtheme.cpp \
-    ../../XLSX/src/xlsxworkbook.cpp \
-    ../../XLSX/src/xlsxwriter.cpp \
     ../Cafe5/c5cafecommon.cpp \
     ../Cafe5/c5double.cpp \
     ../Cafe5/c5serverhandler.cpp \
@@ -99,23 +84,6 @@ HEADERS += \
     $$PWD/../Classes/c5servername.h \
     $$PWD/../Forms/dlgsplashscreen.h \
     ../../NewTax/Src/printtaxn.h \
-    ../../XLSX/src/crs32.h \
-    ../../XLSX/src/xlsx.h \
-    ../../XLSX/src/xlsxall.h \
-    ../../XLSX/src/xlsxborder.h \
-    ../../XLSX/src/xlsxcell.h \
-    ../../XLSX/src/xlsxcontenttype.h \
-    ../../XLSX/src/xlsxdocpropsapp.h \
-    ../../XLSX/src/xlsxdocpropscore.h \
-    ../../XLSX/src/xlsxdocument.h \
-    ../../XLSX/src/xlsxrels.h \
-    ../../XLSX/src/xlsxsharedstring.h \
-    ../../XLSX/src/xlsxsheet.h \
-    ../../XLSX/src/xlsxstyles.h \
-    ../../XLSX/src/xlsxtheme.h \
-    ../../XLSX/src/xlsxworkbook.h \
-    ../../XLSX/src/xlsxwriter.h \
-    ../../XLSX/src/zip.h \
     ../Cafe5/c5cafecommon.h \
     ../Cafe5/c5double.h \
     ../Cafe5/c5serverhandler.h \
