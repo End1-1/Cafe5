@@ -23,12 +23,11 @@ ServerThread::ServerThread(const QString &configPath) :
     Database db;
     if (db.open("127.0.0.1", "service5", "root", "root5")) {
         db.exec("select fname from dblist");
-        QStringList dbList;
         while (db.next()) {
-            dbList.append(db.string("fname"));
+            fDbList.append(db.string("fname"));
         }
-        C5SearchEngine::init(dbList);
-        LogWriter::write(LogWriterLevel::verbose, "Initialized databases", dbList.join(","));
+        C5SearchEngine::init(fDbList);
+        LogWriter::write(LogWriterLevel::verbose, "Initialized databases", fDbList.join(","));
     } else {
         LogWriter::write(LogWriterLevel::errors, "Failed initialization of service5 database", db.lastDbError());
     }
@@ -156,8 +155,33 @@ void ServerThread::onTextMessage(const QString &msg)
         updateHotelCache(jdoc, ws);
         return;
     }
+    if (jdoc["command"].toString() == "search_engine_reload") {
+        C5SearchEngine::init(fDbList);
+        LogWriter::write(LogWriterLevel::verbose, "Initialized databases", fDbList.join(","));
+        return;
+    }
     if (jdoc["command"].toString() == "search_text") {
         C5SearchEngine::mInstance->search(jdoc, ws);
+        return;
+    }
+    if (jdoc["command"].toString() == "search_partner") {
+        C5SearchEngine::mInstance->searchPartner(jdoc, ws);
+        return;
+    }
+    if (jdoc["command"].toString() == "search_goods_groups") {
+        C5SearchEngine::mInstance->searchGoodsGroups(jdoc, ws);
+        return;
+    }
+    if (jdoc["command"].toString() == "search_goods") {
+        C5SearchEngine::mInstance->searchGoods(jdoc, ws);
+        return;
+    }
+    if (jdoc["command"].toString() == "search_store") {
+        C5SearchEngine::mInstance->searchStore(jdoc, ws);
+        return;
+    }
+    if (jdoc["command"].toString() == "search_update_partner_cache") {
+        C5SearchEngine::mInstance->searchUpdatePartnerCache(jdoc, ws);
         return;
     }
     if (jdoc["command"].toString() == "armsoft") {
