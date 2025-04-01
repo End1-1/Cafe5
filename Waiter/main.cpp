@@ -2,6 +2,7 @@
 #include "datadriver.h"
 #include "dlgscreen.h"
 #include "c5systempreference.h"
+#include "fileversion.h"
 #include "c5servername.h"
 #include "ndataprovider.h"
 #include <QApplication>
@@ -108,6 +109,8 @@ int main(int argc, char *argv[])
     DataDriver::fInstance = new DataDriver();
     DataDriver::norefresh.append("goods");
     DataDriver::init(__c5config.dbParams(), dlgsplash);
+    NDataProvider::mAppName = "waiter";
+    NDataProvider::mFileVersion = FileVersion::getVersionString(qApp->applicationFilePath());
     NDataProvider::mHost = C5Config::fDBPath;
     NDataProvider::mDebug = C5Config::getValue(param_debuge_mode).toInt() > 0;
     dlgsplash->deleteLater();

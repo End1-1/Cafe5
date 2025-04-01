@@ -61,10 +61,19 @@ void C5SettingsWidget::setId(int id)
         ui->leChatOperatorUserId->setInteger(jo["chatoperatoruserid"].toInt());
         ui->chDenyLogout->setChecked(jo["denylogout"].toBool());
         ui->leCoinCashdesk->setInteger(jo["coincash_id"].toInt());
-        ui->cbMobileDashboard->setCurrentIndex(ui->cbMobileDashboard->findText(jo["dashboard"].toString()));
         ui->chPrepaidOnlyByGift->setChecked(jo["prepaid_only_by_gift"].toBool());
         ui->chHideRevenue->setChecked(jo["hide_revenue"].toBool());
         ui->chShowWhosalePrice->setChecked(jo["show_whosale_price"].toBool());
+        //buttons config
+        ui->chmNewOrder->setChecked(jo["chm_neworder"].toBool());
+        ui->chmOrders->setChecked(jo["chm_orders"].toBool());
+        ui->chmCompletedOrders->setChecked(jo["chm_completedorders"].isBool());
+        ui->chmDebts->setChecked(jo["chm_debts"].toBool());
+        ui->chmCheckQuantity->setChecked(jo["chm_checkqty"].toBool());
+        ui->chmDraftSale->setChecked(jo["chm_draftsale"].toBool());
+        ui->chmStoreInputCheck->setChecked(jo["chm_storeinputcheck"].toBool());
+        ui->chmSaleOutputConfirmation->setChecked(jo["chm_saleoutconfirmation"].toBool());
+        ui->chmReturnGoods->setChecked(jo["chm_returngoods"].toBool());
         QJsonArray ja = jo["availableoutstore"].toArray();
         QString s;
         for (int i = 0; i < ja.count(); i++) {
@@ -232,7 +241,6 @@ bool C5SettingsWidget::save(QString &err, QList<QMap<QString, QVariant> > &data)
     jc["hall"] = halls.first().toInt();
     jc["table"] = ui->leTable->getInteger();
     jc["menu"] = ui->cbMenu->currentData().toInt();
-    jc["dashboard"] = ui->cbMobileDashboard->currentText();
     jc["companydata"] = ui->leCompanyInfo->text();
     jc["companyname"] = ui->leCompanyname->text();
     jc["receiptprinter"] = ui->leLocalReceiptPrinter->text();
@@ -249,6 +257,15 @@ bool C5SettingsWidget::save(QString &err, QList<QMap<QString, QVariant> > &data)
     jc["prepaid_only_by_gift"] = ui->chPrepaidOnlyByGift->isChecked();
     jc["hide_revenue"] = ui->chHideRevenue->isChecked();
     jc["show_whosale_price"] = ui->chShowWhosalePrice->isChecked();
+    jc["chm_neworder"] = ui->chmNewOrder->isChecked();
+    jc["chm_orders"] = ui->chmOrders->isChecked();
+    jc["chm_completedorders"] = ui->chmCompletedOrders->isChecked();
+    jc["chm_debts"] = ui->chmDebts->isChecked();
+    jc["chm_checkqty"] = ui->chmCheckQuantity->isChecked();
+    jc["chm_draftsale"] = ui->chmDraftSale->isChecked();
+    jc["chm_storeinputcheck"] = ui->chmStoreInputCheck->isChecked();
+    jc["chm_saleoutconfirmation"] = ui->chmSaleOutputConfirmation->isChecked();
+    jc["chm_returngoods"] = ui->chmReturnGoods->isChecked();
     QJsonArray ja;
     QStringList a = ui->leAvailableStore->text().split(",", Qt::SkipEmptyParts);
     for  (const QString &s : a) {

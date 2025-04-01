@@ -3,7 +3,8 @@
 
 #include "c5filterwidget.h"
 
-namespace Ui {
+namespace Ui
+{
 class CR5ReportsFilter;
 }
 
@@ -28,7 +29,7 @@ public:
 private:
     Ui::CR5ReportsFilter *ui;
 
-    QMap<int, C5LineEditWithSelector*> fCache;
+    QMap<int, C5LineEditWithSelector *> fCache;
 
     void addFilterField(const QString &title, const QString &data, int row);
 };

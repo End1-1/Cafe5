@@ -28,6 +28,7 @@ public:
     virtual bool reportHandler(const QString &handleId, const QVariant &data) override;
     virtual QToolBar *toolBar() override;
     bool openDoc(const QString &uuid);
+    bool openDraft(const QString &id);
 
 private slots:
     void makeDraftResponse(const QJsonObject &jdoc);
@@ -64,6 +65,7 @@ private slots:
     void on_btnDeliveryMan_clicked();
     void on_btnQr_clicked();
     void on_btnCalculator_clicked();
+    void on_cbStorage_currentIndexChanged(int index);
 
 private:
     Ui::C5SaleDoc *ui;
@@ -84,7 +86,6 @@ private:
                  const QString &unitname, double qty, double price, double discount, int isService, const QString &returnFrom);
     void countGrandTotal();
     void countTotalQty();
-    bool openDraft(const QString &id);
     void setPartner();
     void setPartner(const CPartners &p);
     void setDeliveryMan();

@@ -23,17 +23,37 @@ bool C5PrintReciptA4::print(QString &err)
     QStringList vals;
     p.setSceneParams(2000, 2700, QPageLayout::Portrait);
     db[":f_id"] = fOrderUUID;
-    db.exec("select concat(o.f_prefix, o.f_hallid) as f_ordernumber, ost.f_name as f_saletypename, "
-            "o.f_amounttotal, o.f_amountcash, o.f_amountcard, o.f_amountother, o.f_datecash, "
-            "p.f_taxcode, p.f_taxname, p.f_address, ds.f_datefor, "
-            "concat_ws(' ', u.f_last, u.f_first) as f_staff, "
-            "o.lu, o.f_id "
-            "from o_header o "
-            "left join o_draft_sale ds on ds.f_id=o.f_id "
-            "left join o_sale_type ost on ost.f_id=o.f_saletype "
-            "left join s_user u on u.f_id=o.f_staff "
-            "left join c_partners p on p.f_id=o.f_partner "
-            "where o.f_id=:f_id ");
+    db.exec("select * from o_draft_sale where f_id=:f_id");
+    if (db.nextRow() == false) {
+        err = "Order not exists";
+        return false;
+    }
+    bool isDraft = db.getInt("f_state") == 1;
+    db[":f_id"] = fOrderUUID;
+    if (isDraft) {
+        db.exec("select '--' as f_ordernumber, ost.f_name as f_saletypename, "
+                "o.f_amount as f_amounttotal, 0 as f_amountcash, 0 as f_amountcard, 0 as f_amountother, o.f_date, "
+                "p.f_taxcode, p.f_taxname, p.f_address, o.f_datefor, "
+                "concat_ws(' ', u.f_last, u.f_first) as f_staff, "
+                "CONCAT(DATE(o.f_date), ' ', TIME(o.f_time)) AS lu, o.f_id "
+                "from  o_draft_sale o "
+                "left join o_sale_type ost on ost.f_id=o.f_saletype "
+                "left join s_user u on u.f_id=o.f_staff "
+                "left join c_partners p on p.f_id=o.f_partner "
+                "where o.f_id=:f_id ");
+    } else {
+        db.exec("select concat(o.f_prefix, o.f_hallid) as f_ordernumber, ost.f_name as f_saletypename, "
+                "o.f_amounttotal, o.f_amountcash, o.f_amountcard, o.f_amountother, o.f_datecash, "
+                "p.f_taxcode, p.f_taxname, p.f_address, ds.f_datefor, "
+                "concat_ws(' ', u.f_last, u.f_first) as f_staff, "
+                "o.lu, o.f_id "
+                "from o_header o "
+                "left join o_draft_sale ds on ds.f_id=o.f_id "
+                "left join o_sale_type ost on ost.f_id=o.f_saletype "
+                "left join s_user u on u.f_id=o.f_staff "
+                "left join c_partners p on p.f_id=o.f_partner "
+                "where o.f_id=:f_id ");
+    }
     QMap<QString, QVariant> header;
     if (db.nextRow()) {
         db.rowToMap(header);
@@ -41,16 +61,41 @@ bool C5PrintReciptA4::print(QString &err)
         err = "Order not exists";
         return false;
     }
+    QMap<QString, QVariant> debt;
+    if (header["f_partner"].toInt() > 0) {
+        db[":f_costumer"] = header["f_partner"];
+        db[":f_order"] = fOrderUUID;
+        db.exec("select 0 as a, sum(f_amount) from b_clients_debts "
+                "where f_custumer=:f_customer and f_order<>:f_order"
+                "union "
+                "select 1 as a, sum(f_amount) from b_clients_debts "
+                "where f_custumer=:f_customer and f_order=:f_order "
+                "order by 1");
+        db.nextRow();
+        db.rowToMap(debt);
+    }
     QList<QMap<QString, QVariant> > body;
     db[":f_header"] = fOrderUUID;
-    db.exec("select g.f_scancode, g.f_name as f_goodsname, ob.f_qty, ob.f_price, ob.f_total, "
-            "s.f_name as f_storename, gu.f_name as f_unitname, ob.f_discountfactor * 100 as f_discountfactor "
-            "from o_goods ob "
-            "left join c_goods g on g.f_id=ob.f_goods "
-            "left join c_storages s on s.f_id=ob.f_store "
-            "left join c_units gu on gu.f_id=g.f_unit "
-            "where ob.f_header=:f_header "
-            "order by ob.f_row ");
+    if (isDraft) {
+        db.exec("select g.f_scancode, g.f_name as f_goodsname, "
+                "ob.f_qty, ob.f_price, ob.f_qty*ob.f_price as f_total, "
+                "s.f_name as f_storename, gu.f_name as f_unitname, ob.f_discount as f_discountfactor "
+                "from o_draft_sale_body ob "
+                "left join c_goods g on g.f_id=ob.f_goods "
+                "left join c_storages s on s.f_id=ob.f_store "
+                "left join c_units gu on gu.f_id=g.f_unit "
+                "where ob.f_header=:f_header "
+                "order by ob.f_row ");
+    } else {
+        db.exec("select g.f_scancode, g.f_name as f_goodsname, ob.f_qty, ob.f_price, ob.f_total, "
+                "s.f_name as f_storename, gu.f_name as f_unitname, ob.f_discountfactor * 100 as f_discountfactor "
+                "from o_goods ob "
+                "left join c_goods g on g.f_id=ob.f_goods "
+                "left join c_storages s on s.f_id=ob.f_store "
+                "left join c_units gu on gu.f_id=g.f_unit "
+                "where ob.f_header=:f_header "
+                "order by ob.f_row ");
+    }
     while (db.nextRow()) {
         QMap<QString, QVariant> b;
         db.rowToMap(b);
@@ -60,7 +105,8 @@ bool C5PrintReciptA4::print(QString &err)
     int versionIndex = 0;
     bool bExtent = true;
     int maskIndex = -1;
-    QString encodeString = QString("%1;%2;%3").arg(header["f_id"].toString(), header["f_ordernumber"].toString(),
+    QString encodeString = QString("%1;%2;%3").arg(header["f_id"].toString(),
+                           isDraft ? tr("Draft") : header["f_ordernumber"].toString(),
                            header["lu"].toString());
     CQR_Encode qrEncode;
     bool successfulEncoding = qrEncode.EncodeData( levelIndex, versionIndex, bExtent, maskIndex,
@@ -129,7 +175,7 @@ bool C5PrintReciptA4::print(QString &err)
     p.br();
     QString goodsColName = tr("Goods");
     points.clear();
-    points << 50 << 100 << 250 << 850 << 100 << 100 << 200 << 100 << 200;
+    points << 50 << 100 << 250 << 850 << 100 << 100 << 150 << 100 << 150 << 150;
     vals.clear();
     vals << tr("NN")
          << tr("Material code")
@@ -138,6 +184,7 @@ bool C5PrintReciptA4::print(QString &err)
          << tr("Unit")
          << tr("Price")
          << tr("Discount")
+         << tr("Discounted\r\nprice")
          << tr("Total");
     p.setFontBold(true);
     p.tableText(points, vals, p.fLineHeight + 20);
@@ -157,6 +204,7 @@ bool C5PrintReciptA4::print(QString &err)
         vals << m["f_unitname"].toString();
         vals << float_str(m["f_price"].toDouble(), 2);
         vals << float_str(m["f_discountfactor"].toDouble(), 2) + "%";
+        vals << float_str(m["f_price"].toDouble() - (m["f_price"].toDouble() * (m["f_discountfactor"].toDouble() / 100)), 1);
         vals << float_str(m["f_total"].toDouble(), 2);
         p.tableText(points, vals, p.fLineHeight + 20);
         if (p.checkBr(p.fLineHeight + 20)) {

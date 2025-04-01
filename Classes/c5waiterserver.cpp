@@ -57,11 +57,11 @@ void C5WaiterServer::reply(QJsonObject &o)
             QJsonArray jTables;
             srh.getJsonFromQuery(QString("select t.f_id, t.f_hall, t.f_name, t.f_lock, t.f_lockSrc, \
 h.f_id as f_header, concat(u.f_last, ' ', left(u.f_first, 1), '.') as f_staffName, \
-  h.f_amounttotal as f_amount, h.f_print, bc.f_govnumber, \
-  date_format(h.f_dateopen, '%d.%m.%Y') as f_dateopen, h.f_timeOpen, \
-  t.f_special_config \
-  from h_tables t \
-  left join o_header h on h.f_table=t.f_id and h.f_state=1 \
+ h.f_amounttotal as f_amount, h.f_print, bc.f_govnumber, \
+ date_format(h.f_dateopen, '%d.%m.%Y') as f_dateopen, h.f_timeOpen, \
+ t.f_special_config \
+ from h_tables t \
+ left join o_header h on h.f_table=t.f_id and h.f_state=1 \
 left join o_header_options o on o.f_id=h.f_id \
 left join b_car bc on bc.f_id=o.f_car \
 left join s_user u on u.f_id=h.f_staff  %1 \
@@ -754,12 +754,11 @@ void C5WaiterServer::processCloseOrder(QJsonObject &o, C5Database &db)
                 }
                 db.exec("update b_history set f_data=:f_data where f_id=:f_id");
             }
-            C5WaiterOrderDoc w(db, jh, jb);
-            w.transferToHotel(db, err);
-            if (settings[param_waiter_automatially_storeout].toInt() > 0) {
-                w.makeOutputOfStore(db, err, DOC_STATE_SAVED);
-            }
             C5StoreDraftWriter dw(db);
+            dw.transferToHotel(db, jh["f_id"].toString(), err);
+            if (settings[param_waiter_automatially_storeout].toInt() > 0) {
+                dw.writeStoreOfSale(jh["f_id"].toString(), err, DOC_STATE_SAVED);
+            }
             auto *cbc = Configs::construct<CashboxConfig>(db.dbParams(), 2);
             if (settings[param_autoinput_salecash].toInt() == 1) {
                 QString headerPrefix;

@@ -7,12 +7,14 @@
 #include "c5costumerdebtpayment.h"
 #include "c5storedoc.h"
 #include "ntablemodel.h"
+#include "c5saledoc.h"
 #include <QToolButton>
 #include <QGridLayout>
 #include <QTableView>
 
 static const QString hDebt = "90dd520c-f072-11ee-b90b-7c10c9bcac82";
 static const QString hShortDebt = "ec26fd1c-2391-11ef-a99a-7c10c9bcac82";
+static const QString hDraftSale  = "39617ca7-8fa4-11ed-8ad3-1078d2d2b808";
 
 NHandler::NHandler(QObject *parent)
     : QObject{parent}
@@ -70,6 +72,9 @@ void NHandler::handle(const QJsonArray &ja)
         C5CostumerDebtPayment d(0, __c5config.dbParams());
         d.setId(ja.at(0).toString());
         d.exec();
+    } else if (mHandlers.at(1).toString() == hDraftSale) {
+        auto *retaildoc = __mainWindow->createTab<C5SaleDoc>(__c5config.dbParams());
+        retaildoc->openDraft(ja.at(0).toString());
     }
 }
 
@@ -115,6 +120,7 @@ void NHandler::toolWidget(QWidget *w)
                 cb.exec();
             });
             gl->addWidget(b, 0, 0, Qt::AlignLeft);
+        } else if (mHandlers.contains(hDraftSale)) {
         }
     }
 }

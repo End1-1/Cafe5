@@ -72,6 +72,38 @@ void DlgReports::setLangIcon()
     }
 }
 
+void DlgReports::cashDocResponse(const QJsonObject &jdoc)
+{
+    int bs = 22;
+    QFont font(qApp->font());
+    font.setPointSize(bs);
+    C5Printing p;
+    p.setSceneParams(700, 2600, QPageLayout::Portrait);
+    p.setFont(font);
+    p.image("./logo_receipt.png", Qt::AlignHCenter);
+    p.br();
+    p.setFontSize(bs + 2);
+    p.setFontBold(true);
+    p.ctext(QDate::currentDate().toString(FORMAT_DATE_TO_STR));
+    p.br();
+    p.setFontSize(bs + 4);
+    p.setFontBold(true);
+    p.ctext(jdoc["purpose"].toString());
+    p.br();
+    p.setFontSize(bs);
+    p.setFontBold(false);
+    p.ctext(float_str(jdoc["cash_in"].toDouble(), 2));
+    p.br();
+    p.setFontSize(bs - 4);
+    p.ltext(tr("Printed"), 0);
+    p.rtext(QDateTime::currentDateTime().toString(FORMAT_DATETIME_TO_STR));
+    p.br();
+    p.setFontSize(bs - 4);
+    p.setFontBold(false);
+    p.print(C5Config::localReceiptPrinter(), QPageSize::Custom);
+    fHttp->httpQueryFinished(sender());
+}
+
 void DlgReports::handleDailyCommon(const QJsonObject &obj)
 {
     sender()->deleteLater();
@@ -443,46 +475,12 @@ void DlgReports::on_btnCashInput_clicked()
     if (!ok || cash < 0.001) {
         return;
     }
-    C5Database db(__c5config.dbParams());
-    C5CashDoc *doc = new C5CashDoc(__c5config.dbParams());
-    doc->setRelation(true);
-    doc->setCashOutput(__c5config.cashId());
-    doc->setDate(QDate::currentDate());
-    doc->addRow(tr("Change output"), cash);
-    doc->save(true);
-    db[":f_id"] = doc->uuid();
-    db.exec("update a_header set f_sessionid=uuid() where f_Id=:f_id");
-    C5CashDoc *d2 = new C5CashDoc(__c5config.dbParams());
-    d2->setRelation(true);
-    d2->setCashInput(__c5config.cashId());
-    d2->setDate(QDate::currentDate());
-    d2->addRow(tr("Change input"), cash);
-    d2->save(true);
-    int bs = 22;
-    QFont font(qApp->font());
-    font.setPointSize(bs);
-    C5Printing p;
-    p.setSceneParams(700, 2600, QPageLayout::Portrait);
-    p.setFont(font);
-    p.image("./logo_receipt.png", Qt::AlignHCenter);
-    p.br();
-    p.setFontSize(bs + 2);
-    p.setFontBold(true);
-    p.ctext(QDate::currentDate().toString(FORMAT_DATE_TO_STR));
-    p.br();
-    p.setFontSize(bs + 4);
-    p.setFontBold(true);
-    p.ctext(tr("Change input"));
-    p.br();
-    p.setFontSize(bs);
-    p.setFontBold(false);
-    p.ctext(float_str(cash, 2));
-    p.br();
-    p.setFontSize(bs - 4);
-    p.ltext(tr("Printed"), 0);
-    p.rtext(QDateTime::currentDateTime().toString(FORMAT_DATETIME_TO_STR));
-    p.br();
-    p.setFontSize(bs - 4);
-    p.setFontBold(false);
-    p.print(C5Config::localReceiptPrinter(), QPageSize::Custom);
+    QJsonObject jo;
+    jo["cash_in"] = __c5config.cashId();
+    jo["cash_out"] = 0;
+    jo["purpose"] = tr("Change input");
+    jo["date"] = QDate::currentDate().toString(FORMAT_DATE_TO_STR_MYSQL);
+    jo["amount_in"] = cash;
+    jo["amount_out"] = 0;
+    fHttp->createHttpQuery("/engine/worker/cashdoc.php", jo, SLOT(cashDocResponse(QJsonObject)));
 }

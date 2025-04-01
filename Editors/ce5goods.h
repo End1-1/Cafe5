@@ -104,6 +104,8 @@ private slots:
 
     void on_leBarcode_returnPressed();
 
+    void on_leTotal_textChanged(const QString &arg1);
+
 private:
     Ui::CE5Goods *ui;
 
@@ -112,6 +114,8 @@ private:
     void countTotal();
 
     QSet<QString> fStrings;
+
+    QString fBigImage;
 
     QString fImage;
 

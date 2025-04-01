@@ -1468,6 +1468,7 @@ void WOrder::on_leCustomerTaxpayerId_returnPressed()
         db[":f_taxcode"] = ui->leCustomerTaxpayerId->text();
         fOHeader.partner = db.insert("c_partners");
     }
+    fOHeader.taxpayerTin = ui->leCustomerTaxpayerId->text();
 }
 
 void WOrder::on_btnSearchPartner_clicked()

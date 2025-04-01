@@ -1852,6 +1852,7 @@ void C5StoreDoc::exportToExcel()
     QFont headerFont(qApp->font());
     QXlsx::Format hf;
     hf.setFont(headerFont);
+    hf.setFontColor(Qt::black);
     hf.setBorderStyle(QXlsx::Format::BorderThin);
     hf.setPatternBackgroundColor(color);
     d.setColumnWidth(1, 10);
@@ -1867,7 +1868,7 @@ void C5StoreDoc::exportToExcel()
     d.write(row, col, QString("%1 %2").arg(tr("Reason"), ui->leReasonName->text()), hf);
     row++;
     if (!ui->leComment->isEmpty()) {
-        d.write(row, col, ui->leComment->text(), hf);
+        d.write(row, col, tr("Comment") + " " + ui->leComment->text(), hf);
         row++;
     }
     QList<int> cols;
@@ -1917,6 +1918,7 @@ void C5StoreDoc::exportToExcel()
     row++;
     QFont bodyFont(qApp->font());
     QXlsx::Format bf;
+    bf.setFontColor(Qt::black);
     bf.setFont(bodyFont);
     bf.setHorizontalAlignment(QXlsx::Format::AlignHCenter);
     bf.setBorderStyle(QXlsx::Format::BorderThin);
@@ -1944,10 +1946,9 @@ void C5StoreDoc::exportToExcel()
         d.write(row, cols.at(i), vals.at(i), hf);
     }
     row++;
-    d.mergeCells("A1:E1");
-    d.mergeCells("A2:E2");
-    d.mergeCells("A3:E3");
-    d.mergeCells("A4:E4");
+    d.mergeCells("A1:G1");
+    d.mergeCells("A2:G2");
+    d.mergeCells("A3:G3");
     QString filename = QFileDialog::getSaveFileName(nullptr, "", "", "*.xlsx");
     if (filename.isEmpty()) {
         return;

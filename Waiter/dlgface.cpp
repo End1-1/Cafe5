@@ -105,9 +105,11 @@ void DlgFace::refreshResponse(const QJsonObject &jdoc)
             tw->configOrder(to);
         }
     }
-    while (ui->vlStaff->itemAt(0)) {
-        ui->vlStaff->itemAt(0)->widget()->deleteLater();
-        ui->vlStaff->removeItem(ui->vlStaff->itemAt(0));
+    while (QLayoutItem *item = ui->vlStaff->takeAt(0)) {
+        if (QWidget *widget = item->widget()) {
+            widget->deleteLater();
+        }
+        delete item;
     }
     // for (QMap<int, int>::const_iterator it = dboheader->fStaffTable.constBegin(); it != dboheader->fStaffTable.constEnd();
     //      it++) {

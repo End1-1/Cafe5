@@ -64,7 +64,7 @@ void DlgSemireadyInOut::on_btnSelectGoods_clicked()
     ui->lbMeas->setText(vals.at(4).toString());
     ui->leGoods->setText(vals.at(2).toString());
     C5Database db(fDBParams);
-    db[":f_base"] = vals.at(1);
+    db[":f_base"] = vals.at(1).toInt();
     db.exec("select g.f_name, gc.f_goods, gc.f_qty "
             "from c_goods_complectation gc "
             "left join c_goods g on g.f_id=gc.f_goods "

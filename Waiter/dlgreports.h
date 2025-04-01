@@ -37,6 +37,8 @@ private:
     void setLangIcon();
 
 private slots:
+    void cashDocResponse(const QJsonObject &jdoc);
+
     void handleDailyCommon(const QJsonObject &obj);
 
     void reportListResponse(const QJsonObject &obj);

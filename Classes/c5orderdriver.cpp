@@ -27,17 +27,16 @@ bool C5OrderDriver::closeOrder()
     if (headerValue("f_state").toInt() == ORDER_STATE_CLOSE) {
         QString err;
         C5Database db(__c5config.dbParams());
-        C5WaiterOrderDoc doc(currentOrderId(), db);
+        C5StoreDraftWriter dw(db);
         if (__c5config.getValue(param_waiter_automatially_storeout).toInt() > 0) {
-            doc.makeOutputOfStore(db, err, DOC_STATE_SAVED);
+            dw.writeStoreOfSale(currentOrderId(), err, DOC_STATE_SAVED);
         }
         if (__c5config.hotelDatabase().length() > 0) {
-            if (!doc.transferToHotel(db, err)) {
+            if (!dw.transferToHotel(db, currentOrderId(), err)) {
                 fLastError = err;
                 return false;
             }
         }
-        C5StoreDraftWriter dw(db);
         auto *cbc = Configs::construct<CashboxConfig>(__c5config.dbParams(), 2);
         QString headerPrefix;
         int headerId;

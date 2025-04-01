@@ -138,7 +138,7 @@ void C5SearchEngine::init(QStringList databases)
         //FILL GOODS MAP
         sql = QString::fromStdString(R"sql(
         select g.f_id, gr.f_id as f_groupid, g.f_name, gr.f_name as f_groupname, u.f_name as f_unitname,
-        gpr.f_price1, gpr.f_price1disc, gpr.f_price2, gpr.f_price2disc, 0 as f_qty
+        gpr.f_price1, gpr.f_price1disc, gpr.f_price2, gpr.f_price2disc, 0 as f_qty, g.f_scancode
         from c_goods g
         left join c_groups gr on gr.f_id=g.f_group
         left join c_units u on u.f_id=g.f_unit
@@ -159,6 +159,7 @@ void C5SearchEngine::init(QStringList databases)
             jt["p1d"] = db.doubleValue("f_price1disc");
             jt["p2"] = db.doubleValue("f_price2");
             jt["p2d"] = db.doubleValue("f_price2disc");
+            jt["sku"] = db.string("f_scancode");
             jt["qty"] = 0;
             jgoods.append(jt);
         }
@@ -310,7 +311,7 @@ void C5SearchEngine::searchGoods(const QJsonObject &jo, QWebSocket *socket)
     bool noResult = true;
     for (int i = 0; i < jsrc.size(); i++) {
         const QJsonObject &jt = jsrc.at(i).toObject();
-        if (jt["name"].toString().contains(searchString, Qt::CaseInsensitive)) {
+        if (jt["name"].toString().contains(searchString, Qt::CaseInsensitive) || jt["sku"].toString().contains(searchString)) {
             noResult = false;
             if (skip > 0) {
                 skip--;

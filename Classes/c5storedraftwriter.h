@@ -2,7 +2,6 @@
 #define C5STOREDRAFTWRITER_H
 
 #include "c5database.h"
-#include "c5dbrecord.h"
 
 #define container_ecash 1
 #define container_aheader 2
@@ -95,6 +94,12 @@ public:
     int rowCount(int container);
 
     QVariant value(int container, int row, const QString &key);
+
+    bool writeStoreOfSale(const QString &uuid,  QString &err, int storedocstate);
+
+    bool transferToHotel(C5Database &db, const QString &uuid, QString &err);
+
+    QString getHotelID(const QString &source, QString &err);
 
 private:
     C5Database &fDb;

@@ -2,9 +2,9 @@
 #define C5WAITERORDER_H
 
 #include "c5widget.h"
-#include "c5waiterorderdoc.h"
 
-namespace Ui {
+namespace Ui
+{
 class C5WaiterOrder;
 }
 
@@ -25,8 +25,6 @@ public:
 
 private:
     Ui::C5WaiterOrder *ui;
-
-    void jsonToDoc(C5WaiterOrderDoc &doc);
 
     void showLog();
 
@@ -62,7 +60,9 @@ private slots:
     void on_btnSetCL_clicked();
 
     void on_btnClearCL_clicked();
+
     void on_rbDraft_clicked(bool checked);
+
     void on_rbWrited_clicked(bool checked);
 };
 

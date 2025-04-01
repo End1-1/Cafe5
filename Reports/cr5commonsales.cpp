@@ -4,6 +4,7 @@
 #include "c5waiterorder.h"
 #include "c5mainwindow.h"
 #include "c5saledoc.h"
+#include "c5storedraftwriter.h"
 #include "c5waiterorderdoc.h"
 #include "dlgexportsaletoasoptions.h"
 #include "c5dlgselectreporttemplate.h"
@@ -271,8 +272,8 @@ void CR5CommonSales::transferToRoom()
     C5Database db1(fDBParams);;
     foreach (int r, rows) {
         QString err;
-        C5WaiterOrderDoc w(fModel->data(r, fModel->fColumnNameIndex["f_id"], Qt::EditRole).toString(), db1);
-        w.transferToHotel(db1, err);
+        C5StoreDraftWriter w(db1);
+        w.transferToHotel(db1, fModel->data(r, fModel->fColumnNameIndex["f_id"], Qt::EditRole).toString(), err);
         if (!err.isEmpty()) {
             C5Message::error(err + "<br>" + fModel->data(r, 0, Qt::EditRole).toString());
             return;

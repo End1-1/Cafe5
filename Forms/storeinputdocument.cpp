@@ -50,7 +50,7 @@ QToolBar *StoreInputDocument::toolBar()
         fToolBar->addAction(QIcon(":/recycle.png"), tr("Remove"), this, SLOT(removeDocument()));
         fToolBar->addAction(QIcon(":/print.png"), tr("Print"), this, SLOT(printDoc()));
         fToolBar->addAction(QIcon(":/excel.png"), tr("Export\nto Excel"),  this, SLOT(exportToExcel()));
-        fDraft->setEnabled(false);
+        fDraft->setEnabled(true);
     }
     return fToolBar;
 }

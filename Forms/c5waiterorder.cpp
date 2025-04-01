@@ -150,11 +150,6 @@ QToolBar *C5WaiterOrder::toolBar()
     return fToolBar;
 }
 
-void C5WaiterOrder::jsonToDoc(C5WaiterOrderDoc &doc)
-{
-    ui->leTotal->setDouble(doc.hDouble("f_amounttotal"));
-}
-
 void C5WaiterOrder::showLog()
 {
     ui->tblLog->clearContents();
@@ -272,9 +267,9 @@ void C5WaiterOrder::hideRemoved()
 void C5WaiterOrder::transferToHotel()
 {
     C5Database db(fDBParams);
-    C5WaiterOrderDoc d(ui->leUuid->text(), db);
+    C5StoreDraftWriter d(db);
     QString err;
-    d.transferToHotel(db, err);
+    d.transferToHotel(db, ui->leUuid->text(), err);
     if (err.isEmpty()) {
         C5Message::info(tr("Done"));
     } else {
@@ -287,7 +282,7 @@ void C5WaiterOrder::recountSelfCost()
     C5Database db(fDBParams);
     C5WaiterOrderDoc d(ui->leUuid->text(), db);
     d.calculateSelfCost(db);
-    jsonToDoc(d);
+    ui->leTotal->setDouble(d.hDouble("f_amounttotal"));
     C5Message::info(tr("Done"));
 }
 
@@ -295,7 +290,8 @@ void C5WaiterOrder::storeOutput()
 {
     C5Database db(fDBParams);
     QString err;
-    C5WaiterOrderDoc(ui->leUuid->text(), db).makeOutputOfStore(db, err, DOC_STATE_SAVED);
+    C5StoreDraftWriter d(db);
+    d.writeStoreOfSale(ui->leUuid->text(),  err, DOC_STATE_SAVED);
     if (err.isEmpty()) {
         C5Message::info(tr("Done"));
     } else {

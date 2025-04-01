@@ -31,7 +31,7 @@
 #define col_uuid 0
 #define col_checkbox 1
 #define col_goods_code 2
-#define col_store 3
+#define col_none 3
 #define col_barcode 4
 #define col_name 5
 #define col_qty 6
@@ -60,6 +60,7 @@ C5SaleDoc::C5SaleDoc(const QStringList &dbParams, QWidget *parent) :
     ui->cbHall->setCurrentIndex(ui->cbHall->findData(__c5config.getValue(param_default_hall).toInt()));
     ui->cbStorage->setCurrentIndex(ui->cbStorage->findData(__c5config.getValue(param_default_store).toInt()));
     ui->cbCashDesk->setCurrentIndex(ui->cbCashDesk->findData(__c5config.getValue(param_default_table).toInt()));
+    ui->tblGoods->setColumnHidden(col_none, true);
     fOpenedFromDraft = false;
     connect(ui->leUuid, &C5LineEdit::doubleClicked, this, &C5SaleDoc::uuidDoubleClicked);
     connect(ui->leBankTransfer, &C5LineEdit::doubleClicked, this, &C5SaleDoc::amountDoubleClicked);
@@ -130,7 +131,8 @@ bool C5SaleDoc::openDoc(const QString &uuid)
     C5Database db(fDBParams);
     //GOODS
     db[":f_header"] = uuid;
-    db.exec(QString("select dsb.f_id as ogoodsid, dsb.f_store, dsb.f_qty, g.*, gu.f_name as f_unitname, dsb.f_price, dsb.f_discountfactor,  "
+    db.exec(QString("select dsb.f_id as ogoodsid, dsb.f_store, dsb.f_qty, g.*, "
+                    "gu.f_name as f_unitname, dsb.f_price, dsb.f_discountfactor,  "
                     "dsb.f_returnfrom "
                     "from o_goods dsb "
                     "left join c_goods g on g.f_id=dsb.f_goods "
@@ -163,6 +165,8 @@ bool C5SaleDoc::openDoc(const QString &uuid)
         fToolBar->actions().at(0)->setEnabled(false);
     }
     ui->leDocnumber->setText(QString("%1%2").arg(db.getString("f_prefix")).arg(db.getInt("f_hallid")));
+    ui->leDocnumber->setProperty("f_hallid", db.getInt("f_hallid") );
+    ui->leDocnumber->setProperty("f_prefix", db.getString("f_prefix"));
     ui->leCash->setDouble(db.getDouble("f_amountcash"));
     ui->leCard->setDouble(db.getDouble("f_amountcard"));
     ui->leBankTransfer->setDouble(db.getDouble("f_amountbank"));
@@ -188,7 +192,7 @@ bool C5SaleDoc::openDoc(const QString &uuid)
         }
     }
     fActionSave->setEnabled(o.state != ORDER_STATE_CLOSE);
-    fActionDraft->setEnabled(o.state == ORDER_STATE_CLOSE);
+    //fActionDraft->setEnabled(o.state == ORDER_STATE_CLOSE);
     fActionCopy->setEnabled(true);
     for (int r = 0; r < ui->tblGoods->rowCount(); r++) {
         for (int c = 0; c < ui->tblGoods->columnCount(); c++) {
@@ -503,7 +507,7 @@ void C5SaleDoc::returnItems()
         OGoods g;
         g.header = oh._id();
         g.goods = ui->tblGoods->getInteger(i, col_goods_code);
-        g.store = ui->tblGoods->comboBox(i, col_store)->currentData().toInt();
+        g.store = ui->cbStorage->currentData().toInt();
         g.qty = ui->tblGoods->lineEdit(i, col_qty)->getDouble();
         g.price = ui->tblGoods->lineEdit(i, col_grandtotal)->getDouble() / ui->tblGoods->lineEdit(i, col_qty)->getDouble();
         g.total = ui->tblGoods->lineEdit(i, col_grandtotal)->getDouble();
@@ -539,9 +543,6 @@ void C5SaleDoc::saveDataChanges()
         err += tr("Storage is not defined");
     }
     for (int i = 0; i < ui->tblGoods->rowCount(); i++) {
-        if (ui->tblGoods->comboBox(i, col_store)->currentData().isValid() == false) {
-            err += tr("Store not defined on row: ") + QString::number(i + 1) + "<br>";
-        }
         if (ui->tblGoods->lineEdit(i, col_qty)->getDouble() < 0.001) {
             err += tr("Quantity not defined on row: ") + QString::number(i + 1) + "<br>";
         }
@@ -587,8 +588,8 @@ void C5SaleDoc::saveDataChanges()
     jdoc["contact"] = ui->leTaxpayerId->text();
     QJsonObject jh;
     jh["f_id"] = uuid;
-    jh["f_hallid"] = 0;
-    jh["f_prefix"] = "";
+    jh["f_hallid"] = ui->leDocnumber->property("f_hallid").toInt();
+    jh["f_prefix"] = ui->leDocnumber->property("f_prefix").toString();
     jh["f_state"] = ORDER_STATE_CLOSE;
     jh["f_hall"] = ui->cbHall->currentData().toInt();
     jh["f_table"] = ui->cbCashDesk->currentData().toInt();
@@ -616,7 +617,7 @@ void C5SaleDoc::saveDataChanges()
     jh["f_amountdiscount"] = ui->leDiscount->getDouble();
     jh["f_servicefactor"] = 0;
     jh["f_discountfactor"] = 0;
-    jh["f_source"] = 1;
+    jh["f_source"] = 2;
     jh["f_saletype"] = fMode;
     jh["f_partner"] = fPartner.id.toInt();
     jh["f_currency"] = ui->cbCurrency->currentData().toInt();
@@ -685,6 +686,9 @@ void C5SaleDoc::saveDataChanges()
         C5Message::error(jr["message"].toString());
         return ;
     }
+    ui->leDocnumber->setText(QString("%1%2").arg(jr["f_prefix"].toString()).arg(jr["f_hallid"].toInt()));
+    ui->leDocnumber->setProperty("f_hallid", jr["f_hallid"].toInt() );
+    ui->leDocnumber->setProperty("f_prefix", jr["f_prefix"].toString());
     if (isNew && !__c5config.httpServerIP().isEmpty()) {
         for (int i = 0; i < ui->tblGoods->rowCount(); i++) {
             QJsonObject jo;
@@ -697,7 +701,7 @@ void C5SaleDoc::saveDataChanges()
             jo["usermessage"] = tr("Online shop") + " " + ui->leDocnumber->text();
             jo["enddate"] = ui->leDate->date().addDays(7).toString(FORMAT_DATE_TO_STR);
             jo["userfrom"] = __c5config.defaultStore();
-            jo["userto"] = ui->tblGoods->comboBox(i, col_store)->currentData().toInt();
+            jo["userto"] = ui->cbStorage->currentData().toInt();
             fHttp->createHttpQuery("/engine/shop/create-reserve.php", jo, SLOT(createReserveResponse(QJsonObject)), QVariant(),
                                    false);
         }
@@ -713,7 +717,7 @@ void C5SaleDoc::saveDataChanges()
     ui->wtoolbar->setEnabled(false);
     ui->paymentFrame->setEnabled(false);
     fActionSave->setEnabled(false);
-    fActionDraft->setEnabled(true);
+    //fActionDraft->setEnabled(true);
     fActionCopy->setEnabled(true);
     C5Message::info(tr("Saved"));
 }
@@ -795,7 +799,6 @@ int C5SaleDoc::addGoods(const QString &uuid, int store, int goodsId, const QStri
     ui->tblGoods->setString(r, col_uuid, uuid);
     ui->tblGoods->createCheckbox(r, col_checkbox);
     ui->tblGoods->setInteger(r, col_goods_code, goodsId);
-    C5ComboBox *cs = ui->tblGoods->createComboBox(r, col_store);
     ui->tblGoods->setString(r, col_barcode, barcode);
     ui->tblGoods->setString(r, col_name, name);
     C5LineEdit *l = ui->tblGoods->createLineEdit(r, col_qty);
@@ -818,10 +821,6 @@ int C5SaleDoc::addGoods(const QString &uuid, int store, int goodsId, const QStri
     connect(ui->tblGoods->lineEdit(r, col_price), &C5LineEdit::textEdited, this, &C5SaleDoc::on_PriceTextChanged);
     connect(ui->tblGoods->lineEdit(r, col_discount_value), &C5LineEdit::textEdited, this,
             &C5SaleDoc::on_discountValueChanged);
-    for (int i = 0; i < ui->cbStorage->count(); i++) {
-        cs->addItem(ui->cbStorage->itemText(i), ui->cbStorage->itemData(i));
-    }
-    cs->setCurrentIndex(cs->findData(store));
     if (fSpecialPrices.contains(goodsId)) {
         ui->tblGoods->lineEdit(r, col_price)->setDouble(fSpecialPrices[goodsId]);
         ui->tblGoods->lineEdit(r, col_discount_value)->setDouble(0);
@@ -900,6 +899,7 @@ bool C5SaleDoc::openDraft(const QString &id)
                     "and dsb.f_state=:f_state and dsb.f_qty>0 ").arg(priceField));
     ui->tblGoods->setRowCount(0);
     while (db.nextRow()) {
+        ui->cbStorage->setCurrentIndex(ui->cbStorage->findData(db.getInt("f_store")));
         addGoods("", db.getInt("f_store"), db.getInt("f_id"), db.getString("f_scancode"), db.getString("f_name"),
                  db.getString("f_unitname"), db.getDouble("f_qty"), db.getDouble("f_price"), db.getDouble("f_discount"), 0, "");
     }
@@ -923,7 +923,7 @@ bool C5SaleDoc::openDraft(const QString &id)
     }
     fActionSave->setEnabled(true);
     fActionCopy->setEnabled(false);
-    fActionDraft->setEnabled(false);
+    //fActionDraft->setEnabled(false);
     for (int r = 0; r < ui->tblGoods->rowCount(); r++) {
         for (int c = 0; c < ui->tblGoods->columnCount(); c++) {
             QWidget *w = ui->tblGoods->cellWidget(r, c);
@@ -1298,7 +1298,7 @@ void C5SaleDoc::saveReturnItems()
         OGoods g;
         g.header = oheader._id();
         g.id = ui->tblGoods->getString(i, col_uuid);
-        g.store = ui->tblGoods->comboBox(i, col_store)->currentData().toInt();
+        g.store = ui->cbStorage->currentData().toInt();
         g.goods = ui->tblGoods->getInteger(i, col_goods_code);
         g.qty = ui->tblGoods->lineEdit(i, col_qty)->getDouble();
         g.price = ui->tblGoods->lineEdit(i, col_price)->getDouble();
@@ -1321,7 +1321,7 @@ void C5SaleDoc::saveReturnItems()
     js["partner"] = fPartner.id.toInt();
     db.exec(QString("call sf_create_return_of_sale('%1')").arg(json_str(js)));
     fActionSave->setEnabled(false);
-    fActionDraft->setEnabled(false);
+    //fActionDraft->setEnabled(false);
     C5Message::info(tr("Saved"));
 }
 
@@ -1330,8 +1330,96 @@ void C5SaleDoc::saveAsDraft()
     if (C5Message::question(tr("Confirm to make a draft")) != QDialog::Accepted) {
         return;
     }
-    fHttp->createHttpQuery("/engine/shop/make-draft.php", QJsonObject{{"id", ui->leUuid->text()}}, SLOT(makeDraftResponse(
-                QJsonObject)));
+    QString uuid = ui->leUuid->text();
+    QJsonObject jdoc;
+    jdoc["class"] = "saledoc";
+    jdoc["method"] = "createDraft";
+    jdoc["session"] = C5Database::uuid();
+    jdoc["giftcard"] = 0;
+    jdoc["settings"] = __c5config.fSettingsName;
+    jdoc["organization"] = ui->leTaxpayerName->text();
+    jdoc["contact"] = ui->leTaxpayerId->text();
+    QJsonObject jh;
+    jh["f_id"] = uuid;
+    jh["f_hallid"] = 0;
+    jh["f_prefix"] = "";
+    jh["f_state"] = ORDER_STATE_CLOSE;
+    jh["f_hall"] = ui->cbHall->currentData().toInt();
+    jh["f_table"] = ui->cbCashDesk->currentData().toInt();
+    jh["f_dateopen"] = QDate::currentDate().toString(FORMAT_DATE_TO_STR_MYSQL);
+    jh["f_dateclose"] = QDate::currentDate().toString(FORMAT_DATE_TO_STR_MYSQL);
+    jh["f_datecash"] = QDate::currentDate().toString(FORMAT_DATE_TO_STR_MYSQL);
+    jh["f_timeopen"] = QTime::currentTime().toString(FORMAT_TIME_TO_STR);
+    jh["f_timeclose"] = QTime::currentTime().toString(FORMAT_TIME_TO_STR);
+    jh["f_cashier"] = __user->id();
+    jh["f_staff"] = fDraftSale.staff;
+    jh["f_comment"] = ui->leComment->text();
+    jh["f_print"] = 0;
+    jh["f_amounttotal"] = ui->leGrandTotal->getDouble();
+    jh["f_amountcash"] = ui->leCash->getDouble();
+    jh["f_amountcard"] = ui->leCard->getDouble();
+    jh["f_amountprepaid"] = ui->lePrepaid->getDouble();
+    jh["f_amountbank"] = ui->leBankTransfer->getDouble();
+    jh["f_amountcredit"] = 0;
+    jh["f_amountidram"] = 0;
+    jh["f_amounttelcell"] = 0;
+    jh["f_amountdebt"] = ui->leDebt->getDouble();
+    jh["f_amountpayx"] = 0;
+    jh["f_amountother"] = 0;
+    jh["f_amountservice"] = 0;
+    jh["f_amountdiscount"] = ui->leDiscount->getDouble();
+    jh["f_servicefactor"] = 0;
+    jh["f_discountfactor"] = 0;
+    jh["f_source"] = 2;
+    jh["f_saletype"] = fMode;
+    jh["f_partner"] = fPartner.id.toInt();
+    jh["f_currency"] = ui->cbCurrency->currentData().toInt();
+    jh["f_taxpayertin"] = fPartner.taxCode;
+    jh["f_cash"] = ui->leCountCash->getDouble();
+    jh["f_change"] = ui->leChange->getDouble();
+    jh["f_deliverydate"] = QDate::fromString(ui->leDelivery->text(), "dd/MM/yyyy").toString(FORMAT_DATE_TO_STR_MYSQL);
+    jdoc["header"] = jh;
+    QJsonArray jg;
+    for (int i = 0; i < ui->tblGoods->rowCount(); i++) {
+        QJsonObject jt;
+        jt["f_id"] = C5Database::uuid();
+        jt["f_header"] = jh["f_id"];
+        jt["f_store"] = ui->cbStorage->currentData().toInt();
+        jt["f_goods"] = ui->tblGoods->getInteger(i, col_goods_code);
+        jt["f_qty"] = ui->tblGoods->lineEdit(i, col_qty)->getDouble();
+        jt["f_price"] = ui->tblGoods->lineEdit(i, col_price)->getDouble();
+        jt["f_total"] = ui->tblGoods->lineEdit(i, col_grandtotal)->getDouble();
+        jt["f_tax"] = 0;
+        jt["f_sign"] = 1;
+        jt["f_taxdebt"] = 0;
+        jt["f_adgcode"] = "";
+        jt["f_row"] = i;
+        jt["f_storerec"] = "";
+        jt["f_discountfactor"] = ui->tblGoods->lineEdit(i, col_discount_value)->getDouble();
+        jt["f_discountmode"] = 1;
+        jt["f_discountamount"] = ui->tblGoods->lineEdit(i, col_discount_amount)->getDouble();
+        jt["f_return"] = 0;
+        jt["f_returnfrom"] =  QJsonValue();
+        jt["f_isservice"] = ui->tblGoods->getInteger(i, col_isservice);
+        jt["f_amountaccumulate"] = 0;
+        jt["f_emarks"] = ui->tblGoods->getString(i, col_emarks).replace("\"", "\\\"");
+        jt["f_row"] = i;
+        jg.append(jt);
+    }
+    jdoc["goods"] = jg;
+    QJsonObject jhistory;
+    jhistory["f_card"] = 0;
+    jhistory["f_data"] = 0;
+    jhistory["f_type"] = 0;
+    jdoc["history"] = jhistory;
+    QJsonObject jflags;
+    jflags["f_1"] =  0;
+    jflags["f_2"] =  0;
+    jflags["f_3"] =  0;
+    jflags["f_4"] =  0;
+    jflags["f_5"] =  0;
+    jdoc["flags"] = jflags;
+    fHttp->createHttpQuery("/engine/office/", jdoc, SLOT(makeDraftResponse(QJsonObject)));
 }
 
 void C5SaleDoc::saveCopy()
@@ -1360,7 +1448,7 @@ void C5SaleDoc::saveCopy()
         fDraftSaleBody.id = "";
         fDraftSaleBody.header = fDraftSale.id.toString();
         fDraftSaleBody.state = 1;
-        fDraftSaleBody.store = ui->tblGoods->comboBox(i, col_store)->currentData().toInt();
+        fDraftSaleBody.store = ui->cbStorage->currentData().toInt();
         fDraftSaleBody.dateAppend = QDate::currentDate();
         fDraftSaleBody.timeAppend = QTime::currentTime();
         fDraftSaleBody.goods = ui->tblGoods->getInteger(i, col_goods_code);
@@ -1396,5 +1484,9 @@ void C5SaleDoc::on_btnQr_clicked()
 }
 
 void C5SaleDoc::on_btnCalculator_clicked()
+{
+}
+
+void C5SaleDoc::on_cbStorage_currentIndexChanged(int index)
 {
 }

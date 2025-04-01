@@ -110,40 +110,6 @@ SOURCES += \
     ../DbData/dbtables.cpp \
     ../DbData/dbunit.cpp \
     ../DbData/dbusers.cpp \
-    ../Editors/c5cashname.cpp \
-    ../Editors/c5editor.cpp \
-    ../Editors/ce5createtablesforhall.cpp \
-    ../Editors/ce5creditcard.cpp \
-    ../Editors/ce5currency.cpp \
-    ../Editors/ce5currencycrossrate.cpp \
-    ../Editors/ce5currencycrossraterecord.cpp \
-    ../Editors/ce5currencyrate.cpp \
-    ../Editors/ce5discountcard.cpp \
-    ../Editors/ce5dishcomment.cpp \
-    ../Editors/ce5dishpackage.cpp \
-    ../Editors/ce5dishpart1.cpp \
-    ../Editors/ce5dishpart2.cpp \
-    ../Editors/ce5dishremovereason.cpp \
-    ../Editors/ce5editor.cpp \
-    ../Editors/ce5goodsbarcodelabelview.cpp \
-    ../Editors/ce5goodsgroup.cpp \
-    ../Editors/ce5goodsmodel.cpp \
-    ../Editors/ce5goodsunit.cpp \
-    ../Editors/ce5halls.cpp \
-    ../Editors/ce5menuname.cpp \
-    ../Editors/ce5mfprocess.cpp \
-    ../Editors/ce5mfprocessstage.cpp \
-    ../Editors/ce5mfproduct.cpp \
-    ../Editors/ce5mftask.cpp \
-    ../Editors/ce5mfworkshop.cpp \
-    ../Editors/ce5ordermark.cpp \
-    ../Editors/ce5packagelist.cpp \
-    ../Editors/ce5partner.cpp \
-    ../Editors/ce5storage.cpp \
-    ../Editors/ce5storereason.cpp \
-    ../Editors/ce5table.cpp \
-    ../Editors/ce5user.cpp \
-    ../Editors/ce5usergroup.cpp \
     ../Forms/armsoftexportoptions.cpp \
     ../Forms/barcode.cpp \
     ../Forms/c5changedocinputprice.cpp \
@@ -158,7 +124,6 @@ SOURCES += \
     ../Forms/c5dishselfcostgenprice.cpp \
     ../Forms/c5dlgselectreporttemplate.cpp \
     ../Forms/c5filtervalues.cpp \
-    ../Forms/c5goodsimage.cpp \
     ../Forms/c5goodsprice.cpp \
     ../Forms/c5goodspricing.cpp \
     ../Forms/c5goodsspecialprices.cpp \
@@ -166,17 +131,13 @@ SOURCES += \
     ../Forms/c5inputdate.cpp \
     ../Forms/c5passwords.cpp \
     ../Forms/c5progressdialog.cpp \
-    ../Forms/c5reportwidget.cpp \
-    ../Forms/c5route.cpp \
     ../Forms/c5salefromstoreorder.cpp \
     ../Forms/c5selector.cpp \
     ../Forms/c5srofinventory.cpp \
     ../Forms/c5storedocselectprinttemplate.cpp \
-    ../Forms/c5storeinventory.cpp \
     ../Forms/c5tablewidgetwithselector.cpp \
     ../Forms/c5toolbarwidget.cpp \
     ../Forms/c5translatorform.cpp \
-    ../Forms/c5waiterorder.cpp \
     ../Forms/change.cpp \
     ../Forms/cr5routereport.cpp \
     ../Forms/customerinfo.cpp \
@@ -206,18 +167,15 @@ SOURCES += \
     ../Forms/httpquerydialog.cpp \
     ../Forms/mfprocessproductpriceupdate.cpp \
     ../Forms/partnersasmap.cpp \
-    ../Forms/storeinputdocument.cpp \
     ../Forms/touchdlgphonenumber.cpp \
     ../Forms/touchentertaxreceiptnumber.cpp \
     ../Forms/touchselecttaxreport.cpp \
     ../NTable/ndataprovider.cpp \
     ../NTable/nfilterdlg.cpp \
-    ../NTable/nhandler.cpp \
     ../NTable/ninterface.cpp \
     ../NTable/nloadingdlg.cpp \
     ../NTable/nsearchdlg.cpp \
     ../NTable/ntablemodel.cpp \
-    ../NTable/ntablewidget.cpp \
     ../Printing/printreceipt.cpp \
     ../Printing/printreceiptgroup.cpp \
     ../Printing/selectprinters.cpp \
@@ -387,40 +345,6 @@ HEADERS += \
     ../DbData/dbtables.h \
     ../DbData/dbunit.h \
     ../DbData/dbusers.h \
-    ../Editors/c5cashname.h \
-    ../Editors/c5editor.h \
-    ../Editors/ce5createtablesforhall.h \
-    ../Editors/ce5creditcard.h \
-    ../Editors/ce5currency.h \
-    ../Editors/ce5currencycrossrate.h \
-    ../Editors/ce5currencycrossraterecord.h \
-    ../Editors/ce5currencyrate.h \
-    ../Editors/ce5discountcard.h \
-    ../Editors/ce5dishcomment.h \
-    ../Editors/ce5dishpackage.h \
-    ../Editors/ce5dishpart1.h \
-    ../Editors/ce5dishpart2.h \
-    ../Editors/ce5dishremovereason.h \
-    ../Editors/ce5editor.h \
-    ../Editors/ce5goodsbarcodelabelview.h \
-    ../Editors/ce5goodsgroup.h \
-    ../Editors/ce5goodsmodel.h \
-    ../Editors/ce5goodsunit.h \
-    ../Editors/ce5halls.h \
-    ../Editors/ce5menuname.h \
-    ../Editors/ce5mfprocess.h \
-    ../Editors/ce5mfprocessstage.h \
-    ../Editors/ce5mfproduct.h \
-    ../Editors/ce5mftask.h \
-    ../Editors/ce5mfworkshop.h \
-    ../Editors/ce5ordermark.h \
-    ../Editors/ce5packagelist.h \
-    ../Editors/ce5partner.h \
-    ../Editors/ce5storage.h \
-    ../Editors/ce5storereason.h \
-    ../Editors/ce5table.h \
-    ../Editors/ce5user.h \
-    ../Editors/ce5usergroup.h \
     ../Forms/armsoftexportoptions.h \
     ../Forms/barcode.h \
     ../Forms/c5changedocinputprice.h \
@@ -435,7 +359,6 @@ HEADERS += \
     ../Forms/c5dishselfcostgenprice.h \
     ../Forms/c5dlgselectreporttemplate.h \
     ../Forms/c5filtervalues.h \
-    ../Forms/c5goodsimage.h \
     ../Forms/c5goodsprice.h \
     ../Forms/c5goodspricing.h \
     ../Forms/c5goodsspecialprices.h \
@@ -443,17 +366,13 @@ HEADERS += \
     ../Forms/c5inputdate.h \
     ../Forms/c5passwords.h \
     ../Forms/c5progressdialog.h \
-    ../Forms/c5reportwidget.h \
-    ../Forms/c5route.h \
     ../Forms/c5salefromstoreorder.h \
     ../Forms/c5selector.h \
     ../Forms/c5srofinventory.h \
     ../Forms/c5storedocselectprinttemplate.h \
-    ../Forms/c5storeinventory.h \
     ../Forms/c5tablewidgetwithselector.h \
     ../Forms/c5toolbarwidget.h \
     ../Forms/c5translatorform.h \
-    ../Forms/c5waiterorder.h \
     ../Forms/change.h \
     ../Forms/cr5routereport.h \
     ../Forms/customerinfo.h \
@@ -483,18 +402,15 @@ HEADERS += \
     ../Forms/httpquerydialog.h \
     ../Forms/mfprocessproductpriceupdate.h \
     ../Forms/partnersasmap.h \
-    ../Forms/storeinputdocument.h \
     ../Forms/touchdlgphonenumber.h \
     ../Forms/touchentertaxreceiptnumber.h \
     ../Forms/touchselecttaxreport.h \
     ../NTable/ndataprovider.h \
     ../NTable/nfilterdlg.h \
-    ../NTable/nhandler.h \
     ../NTable/ninterface.h \
     ../NTable/nloadingdlg.h \
     ../NTable/nsearchdlg.h \
     ../NTable/ntablemodel.h \
-    ../NTable/ntablewidget.h \
     ../Printing/printreceipt.h \
     ../Printing/printreceiptgroup.h \
     ../Printing/selectprinters.h \
@@ -599,38 +515,6 @@ FORMS += \
     ../Classes/notificationwidget.ui \
     ../Controls/c5tablewithtotal.ui \
     ../Controls/combosearchview.ui \
-    ../Editors/c5cashname.ui \
-    ../Editors/c5editor.ui \
-    ../Editors/ce5createtablesforhall.ui \
-    ../Editors/ce5creditcard.ui \
-    ../Editors/ce5currency.ui \
-    ../Editors/ce5currencycrossrate.ui \
-    ../Editors/ce5currencycrossraterecord.ui \
-    ../Editors/ce5currencyrate.ui \
-    ../Editors/ce5discountcard.ui \
-    ../Editors/ce5dishcomment.ui \
-    ../Editors/ce5dishpackage.ui \
-    ../Editors/ce5dishpart1.ui \
-    ../Editors/ce5dishpart2.ui \
-    ../Editors/ce5dishremovereason.ui \
-    ../Editors/ce5goodsgroup.ui \
-    ../Editors/ce5goodsmodel.ui \
-    ../Editors/ce5goodsunit.ui \
-    ../Editors/ce5halls.ui \
-    ../Editors/ce5menuname.ui \
-    ../Editors/ce5mfprocess.ui \
-    ../Editors/ce5mfprocessstage.ui \
-    ../Editors/ce5mfproduct.ui \
-    ../Editors/ce5mftask.ui \
-    ../Editors/ce5mfworkshop.ui \
-    ../Editors/ce5ordermark.ui \
-    ../Editors/ce5packagelist.ui \
-    ../Editors/ce5partner.ui \
-    ../Editors/ce5storage.ui \
-    ../Editors/ce5storereason.ui \
-    ../Editors/ce5table.ui \
-    ../Editors/ce5user.ui \
-    ../Editors/ce5usergroup.ui \
     ../Forms/armsoftexportoptions.ui \
     ../Forms/c5changedocinputprice.ui \
     ../Forms/c5changepassword.ui \
@@ -644,7 +528,6 @@ FORMS += \
     ../Forms/c5dishselfcostgenprice.ui \
     ../Forms/c5dlgselectreporttemplate.ui \
     ../Forms/c5filtervalues.ui \
-    ../Forms/c5goodsimage.ui \
     ../Forms/c5goodsprice.ui \
     ../Forms/c5goodspricing.ui \
     ../Forms/c5goodsspecialprices.ui \
@@ -652,15 +535,12 @@ FORMS += \
     ../Forms/c5inputdate.ui \
     ../Forms/c5passwords.ui \
     ../Forms/c5progressdialog.ui \
-    ../Forms/c5route.ui \
     ../Forms/c5salefromstoreorder.ui \
     ../Forms/c5selector.ui \
     ../Forms/c5srofinventory.ui \
     ../Forms/c5storedocselectprinttemplate.ui \
-    ../Forms/c5storeinventory.ui \
     ../Forms/c5toolbarwidget.ui \
     ../Forms/c5translatorform.ui \
-    ../Forms/c5waiterorder.ui \
     ../Forms/change.ui \
     ../Forms/cr5routereport.ui \
     ../Forms/customerinfo.ui \
@@ -690,14 +570,12 @@ FORMS += \
     ../Forms/httpquerydialog.ui \
     ../Forms/mfprocessproductpriceupdate.ui \
     ../Forms/partnersasmap.ui \
-    ../Forms/storeinputdocument.ui \
     ../Forms/touchdlgphonenumber.ui \
     ../Forms/touchentertaxreceiptnumber.ui \
     ../Forms/touchselecttaxreport.ui \
     ../NTable/nfilterdlg.ui \
     ../NTable/nloadingdlg.ui \
     ../NTable/nsearchdlg.ui \
-    ../NTable/ntablewidget.ui \
     ../Printing/preorders.ui \
     ../Printing/selectprinters.ui \
     dishitem.ui \

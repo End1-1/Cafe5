@@ -573,8 +573,19 @@ void C5TableModel::filterData()
             QJsonArray &rowArray = fRawData[r];
             QStringList rowTextList;
             rowTextList.reserve(rowArray.size());
-            for (const QJsonValue &val : rowArray) {
-                rowTextList.append(val.toString());
+            for (const QJsonValue &jv : rowArray) {
+                if (jv.isString()) {
+                    rowTextList.append(jv.toString());
+                } else if (jv.isDouble()) {
+                    rowTextList.append(QString::number(jv.toDouble()));
+                } else if (jv.isBool()) {
+                    rowTextList.append(jv.toBool() ? "true" : "false");
+                } else if (jv.isNull()) {
+                    rowTextList.append("null");
+                } else {
+                    rowTextList.append("[object]");
+                }
+                rowTextList.append(jv.toString());
             }
             if (regex.match(rowTextList.join("🍆")).hasMatch()) {
                 fProxyData.append(r);

@@ -2,11 +2,30 @@
 #include "c5utils.h"
 #include "c5config.h"
 #include "chatmessage.h"
+#include "c5cafecommon.h"
+#include "jsons.h"
 #include "ogoods.h"
 #include <QVariant>
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QMap>
+
+struct tmpg {
+    QString recId;
+    int goodsId;
+    double qtyDraft;
+    double qtyGoods;
+    int store;
+    double price;
+    tmpg() {}
+    tmpg(const QString &n, double dr, double goods, double pr)
+    {
+        recId = n;
+        qtyDraft = dr;
+        qtyGoods = goods;
+        price = pr;
+    }
+};
 
 C5StoreDraftWriter::C5StoreDraftWriter(C5Database &db) :
     QObject(),
@@ -580,6 +599,478 @@ QVariant C5StoreDraftWriter::value(int container, int row, const QString &key)
     QJsonArray  &datarow = ( *c)[row];
     int column = d->value(key);
     return datarow.at(column);
+}
+
+bool C5StoreDraftWriter::writeStoreOfSale(const QString &uuid,  QString &err, int storedocstate)
+{
+    //Remove old docs
+    C5Database db(__c5config.dbParams());
+    db[":f_id"] = uuid;
+    db.exec("select distinct(ad.f_document) from o_goods g "
+            "left join a_store_draft ad on ad.f_id=g.f_storerec "
+            "where g.f_header=:f_id");
+    while (db.nextRow()) {
+        removeStoreDocument(fDb, db.getString(0), err);
+    }
+    //Check for store doc
+    db[":f_header"] = uuid;;
+    db.exec("select h.f_state, d.f_id, d.f_qty as f_dqty, g.f_qty as f_gqty, "
+            "gg.f_lastinputprice as f_gprice "
+            "from o_goods g "
+            "inner join a_store_draft d on d.f_id=g.f_storerec "
+            "inner join a_header h on h.f_id=d.f_document "
+            "inner join c_goods gg on g.f_id=g.f_goods "
+            "where g.f_header=:f_header");
+    QList<tmpg> goods;
+    while (db.nextRow()) {
+        if (db.getInt("f_state") == DOC_STATE_SAVED) {
+            err += tr("Document saved") + "<br>";
+            return false;
+        }
+        goods.append(tmpg(db.getString("f_id"), db.getDouble("f_dqty"), db.getDouble("f_gqty"), db.getDouble("f_gprice")));
+    }
+    foreach (const tmpg &t, goods) {
+        db[":f_id"] = t.recId;
+        db[":f_qty"] = t.qtyGoods;
+        db.exec("update a_store_draft set f_qty=f_qty-:f_qty where f_id=:f_id");
+    }
+    db[":f_header"] = uuid;
+    db.exec("delete from o_goods where f_header=:f_header");
+    //NONE COMPONNENTS EXIT (W/O COMPLECTATION)
+    db[":f_header"] = uuid;
+    db[":f_state1"] = DISH_STATE_OK;
+    db[":f_state2"] = DISH_STATE_VOID;
+    db.exec("select b.f_id, r.f_goods, r.f_qty*b.f_qty1 as f_totalqty, r.f_qty, "
+            "g.f_lastinputprice, b.f_store "
+            "from o_body b "
+            "inner join d_recipes r on r.f_dish=b.f_dish "
+            "inner join c_goods g on g.f_id=r.f_goods and f_component_exit=0 "
+            "where b.f_header=:f_header and (b.f_state=:f_state1 or b.f_state=:f_state2) ");
+    goods.clear();
+    while (db.nextRow()) {
+        tmpg t;
+        t.recId = db.getString("f_id");
+        t.goodsId = db.getInt("f_goods");
+        t.qtyGoods = db.getDouble("f_totalqty");
+        t.store = db.getInt("f_store");
+        t.price = db.getDouble("f_lastinputprice");
+        goods.append(t);
+    }
+    //COMPONENT EXIT WITH COMPLECTATON
+    db[":f_header"] = uuid;
+    db[":f_state1"] = DISH_STATE_OK;
+    db[":f_state2"] = DISH_STATE_VOID;
+    db.exec("select b.f_id, gc.f_goods, ((gc.f_qty/g.f_complectout) * r.f_qty)*b.f_qty1 as f_totalqty, gc.f_qty, "
+            "g.f_lastinputprice, b.f_store "
+            "from o_body b "
+            "inner join d_recipes r on r.f_dish=b.f_dish "
+            "inner join c_goods_complectation gc on gc.f_base=r.f_goods "
+            "inner join c_goods g on g.f_id=r.f_goods and f_component_exit=1 "
+            "where b.f_header=:f_header and (b.f_state=:f_state1 or b.f_state=:f_state2) ");
+    while (db.nextRow()) {
+        tmpg t;
+        t.recId = db.getString("f_id");
+        t.goodsId = db.getInt("f_goods");
+        t.qtyGoods = db.getDouble("f_totalqty");
+        t.store = db.getInt("f_store");
+        t.price = db.getDouble("f_lastinputprice");
+        goods.append(t);
+    }
+    //DISHES SET
+    db[":f_header"] = uuid;
+    db[":f_state1"] = DISH_STATE_OK;
+    db[":f_state2"] = DISH_STATE_VOID;
+    db.exec("select b.f_id, r.f_goods, r.f_qty*b.f_qty1*ds.f_qty as f_totalqty, r.f_qty, "
+            "g.f_lastinputprice, b.f_store "
+            "from o_body b "
+            "inner join d_dish_set ds on ds.f_dish=b.f_dish "
+            "inner join d_recipes r on r.f_dish=ds.f_part "
+            "inner join c_goods g on g.f_id=r.f_goods and f_component_exit=0 "
+            "where b.f_header=:f_header and (b.f_state=:f_state1 or b.f_state=:f_state2) ");
+    while (db.nextRow()) {
+        tmpg t;
+        t.recId = db.getString("f_id");
+        t.goodsId = db.getInt("f_goods");
+        t.qtyGoods = db.getDouble("f_totalqty");
+        t.store = db.getInt("f_store");
+        t.price = db.getDouble("f_lastinputprice");
+        goods.append(t);
+    }
+    //WRITE RESULT OF RECIPE
+    int row = 1;
+    foreach (const tmpg &t, goods) {
+        db[":f_id"] = db.uuid();
+        db[":f_header"] = uuid;
+        db[":f_body"] = t.recId;
+        db[":f_goods"] = t.goodsId;
+        db[":f_qty"] = t.qtyGoods;
+        db[":f_store"] = t.store;
+        db[":f_price"] = t.price;
+        db[":f_total"] = t.price *t.qtyGoods;
+        db[":f_row"] = row++;
+        db[":f_tax"] = 0;
+        db[":f_taxdept"] = 0;
+        db.insert("o_goods", false);
+    }
+    if (!writeFromShopOutput(uuid, storedocstate, err)) {
+        err += fErrorMsg + "<br>";
+        return false;
+    }
+    return true;
+}
+
+bool C5StoreDraftWriter::transferToHotel(C5Database &db, const QString &uuid, QString &err)
+{
+#ifdef SMART
+    Q_UNUSED(db);
+    err = "";
+    return true;
+#else
+    fDb["f_id"] = uuid;
+    fDb.exec("select * from o_header where f_id=:f_id");
+    if (!fDb.nextRow()) {
+        err = "o_header record not exists";
+        return false;
+    }
+    QMap<QString, QVariant> fHeader;
+    fDb.rowToMap(fHeader);
+    if (fHeader["f_state"].toInt() != ORDER_STATE_CLOSE) {
+        err = tr("Order state is not closed");
+        return false;
+    }
+    fDb[":f_order"] = uuid;
+    QJsonObject fTax;
+    fDb.exec("select * from o_tax_log where f_order=:f_order and f_state=1");
+    if (fDb.nextRow()) {
+        fTax = __strjson(fDb.getString("f_out"));
+    }
+    int settings = 0;
+    int item = 0;
+    QString itemName;
+    db[":f_id"] = fHeader["f_table"].toInt();
+    db.exec("select f_special_config from h_tables where f_id=:f_id");
+    if (db.nextRow()) {
+        if (db.getInt(0) > 0) {
+            settings = db.getInt(0);
+        }
+    }
+    if (settings == 0) {
+        db[":f_id"] = fHeader["f_hall"].toInt();
+        db.exec("select f_settings from h_halls where f_id=:f_id");
+        if (db.nextRow()) {
+            settings = db.getInt(0);
+        }
+    }
+    if (settings == 0) {
+        err = "Cannot get settings for hall";
+        return false;
+    }
+    db[":f_settings"] = settings;
+    db[":f_key"] = param_item_code_for_hotel;
+    db.exec("select f_value from s_settings_values where f_settings=:f_settings and f_key=:f_key");
+    if (db.nextRow()) {
+        item = db.getString("f_value").toInt();
+    }
+    if (item == 0) {
+        err = "Cannot retrieve invoice item for hotel #1";
+        return false;
+    }
+    bool no_hotel_invoice = false;
+    db[":f_settings"] = settings;
+    db[":f_key"] = param_hotel_noinvoice;
+    db.exec("select f_value from s_settings_values where f_settings=:f_settings and f_key=:f_key");
+    if (db.nextRow()) {
+        no_hotel_invoice = db.getString("f_value").toInt() > 0;
+    }
+    int hallid = 0;
+    db[":f_settings"] = settings;
+    db[":f_key"] = param_hotel_hall_id;
+    db.exec("select f_value from s_settings_values where f_settings=:f_settings and f_key=:f_key");
+    if (db.nextRow()) {
+        hallid = db.getString("f_value").toInt();
+    }
+    if (hallid == 0) {
+        err = "Hall id undefined";
+        return true;
+    }
+    int staffid = 0;
+    db[":f_settings"] = settings;
+    db[":f_key"] = param_hotel_user_Id;
+    db.exec("select f_value from s_settings_values where f_settings=:f_settings and f_key=:f_key");
+    if (db.nextRow()) {
+        staffid = db.getString("f_value").toInt();
+    }
+    if (staffid == 0) {
+        err = "Staff id undefined";
+        return true;
+    }
+    if (!err.isEmpty()) {
+        return false;
+    }
+    int paymentMode = 1;
+    QString dc = "DEBET";
+    int sign = -1;
+    QString paymentModeComment;
+    QString room, res, inv, clcode, clname, guest;
+    db[":f_id"] = fHeader["f_id"].toString();
+    db.exec("select * from o_pay_room where f_id=:f_id");
+    if (db.nextRow()) {
+        if (!db.getString("f_inv").isEmpty()) {
+            room = db.getString("f_room");
+            inv = db.getString("f_inv");
+            res = db.getString("f_res");
+            guest = db.getString("f_guest");
+            paymentModeComment = QString("%1, %2").arg(room, guest);
+            paymentMode = 5;
+            dc = "CREDIT";
+            sign = 1;
+        }
+    }
+    if (fHeader["f_otherid"].toInt() == PAYOTHER_COMPLIMENTARY) {
+        paymentMode = 6;
+    } else if (fHeader["f_otherid"].toInt() == PAYOTHER_PRIMECOST) {
+        paymentMode = 14;
+    }
+    if (fHeader["f_otherid"].toInt() == PAYOTHER_CL) {
+        clcode = fHeader["f_other_clcode"].toString();
+        clname = fHeader["f_other_clname"].toString();
+        paymentMode = 4;
+        dc = "DEBIT";
+        sign = -1;
+    }
+    db[":f_id"] = fHeader["f_id"].toString();
+    db.exec("select * from o_pay_cl where f_id=:f_id");
+    if (db.nextRow()) {
+        if (db.getInt("f_code") > 0) {
+            clcode = db.getString("f_code");
+            clname = db.getString("f_name");
+            paymentMode = 4;
+            dc = "DEBIT";
+            sign = -1;
+        }
+    }
+    if (fHeader["f_amountcard"].toDouble() > 0.001) {
+        paymentMode = 2;
+    }
+    if (fHeader["f_amountbank"].toDouble() > 0.001) {
+        paymentMode = 3;
+    }
+    QString result = QString("%1%2").arg(fHeader["f_prefix"].toString(), QString::number(fHeader["f_hallid"].toInt()));
+    //Remove old
+    db[":f_header"] = result;
+    db.exec(QString("delete from %1.o_dish where f_header=:f_header").arg(__c5config.hotelDatabase()));
+    db[":f_id"] = result;
+    db.exec(QString("delete from %1.o_header where f_id=:f_id").arg(__c5config.hotelDatabase()));
+    db[":f_id"] = result;
+    db.exec(QString("delete from %1.m_register where f_id=:f_id").arg(__c5config.hotelDatabase()));
+    db[":f_id"] = item;
+    db.exec(QString("select f_en from %1.f_invoice_item where f_id=:f_id").arg(__c5config.hotelDatabase()));
+    if (db.nextRow()) {
+        itemName = db.getString(0);
+    } else {
+        err = QString("Cannot retrieve invoice item for hotel #2 %1").arg(item);
+        return false;
+    }
+    QString payComment = "CASH";
+    if (fHeader["f_amountcard"].toDouble() > 0.001) {
+        payComment = C5CafeCommon::creditCardName(fHeader["f_creditcardid"].toInt());
+    }
+    if (!clcode.isEmpty()) {
+        payComment = clname;
+    }
+    db[":f_id"] = result;
+    db[":f_source"] = "PS";
+    db[":f_res"] = no_hotel_invoice ? "" : res;
+    db[":f_wdate"] = QDate::fromString(fHeader["f_datecash"].toString(), ("yyyy-MM-dd"));
+    db[":f_rdate"] = QDate::currentDate();
+    db[":f_time"] = QTime::currentTime();
+    db[":f_user"] = staffid;
+    db[":f_room"] = fHeader["f_otherid"].toInt() == PAYOTHER_TRANSFER_TO_ROOM ? room : clcode;
+    db[":f_guest"] = fHeader["f_otherid"].toInt() == PAYOTHER_TRANSFER_TO_ROOM ? guest : clname + ", " +
+                     fHeader["f_prefix"].toString() +
+                     QString::number(fHeader["f_hallid"].toInt());
+    db[":f_itemCode"] = item;
+    db[":f_finalName"] = itemName + " " + result;
+    db[":f_amountAmd"] = fHeader["f_amounttotal"].toDouble();
+    db[":f_usedPrepaid"] = 0;
+    db[":f_amountVat"] = fHeader["f_amounttotal"].toDouble() - (fHeader["f_amounttotal"].toDouble() / 1.2);
+    db[":f_amountUsd"] = 0;
+    db[":f_fiscal"] = fTax["rseq"].toInt();
+    db[":f_fiscaldate"] = QDate::fromString(fHeader["f_dateclose"].toString(), "yyyy-MM-dd");
+    db[":f_fiscaltime"] = QTime::fromString(fHeader["f_timeclose"].toString(), "HH:mm:ss");
+    db[":f_paymentMode"] = paymentMode;
+    db[":f_creditCard"] = fHeader["f_creditcardid"].toInt();
+    db[":f_cityLedger"] = clcode.toInt();
+    db[":f_paymentComment"] = payComment;
+    db[":f_dc"] = dc;
+    db[":f_sign"] = sign;
+    db[":f_doc"] = "";
+    db[":f_rec"] = "";
+    db[":f_inv"] = no_hotel_invoice ? "" : inv;
+    db[":f_vatmode"] = 1;
+    db[":f_finance"] = 1;
+    db[":f_remarks"] = "";
+    db[":f_canceled"] = 0;
+    db[":f_cancelReason"] = "";
+    db[":f_cancelDate"] = 0;
+    db[":f_cancelUser"] = 0;
+    db[":f_side"] = 0;
+    if (!db.insert(QString("%1.m_register").arg(__c5config.hotelDatabase()), false)) {
+        err = "Cannot insert into m_register<br>" + db.fLastError;
+        return false;
+    }
+    db[":f_id"] = result;
+    db[":f_state"] = 2;
+    db[":f_hall"] = hallid;
+    db[":f_table"] = 1;
+    db[":f_staff"] = staffid;
+    db[":f_dateopen"] = QDateTime::fromString(fHeader["f_dateopen"].toString() + " " + fHeader["f_timeopen"].toString(),
+                        "yyyy-MM-dd HH:mm:ss");
+    db[":f_dateclose"] = QDateTime::fromString(fHeader["f_dateclose"].toString() + " " + fHeader["f_timeclose"].toString(),
+                         "yyyy-MM-dd HH:mm:ss");
+    db[":f_datecash"] = QDate::fromString(fHeader["f_datecash"].toString(), ("yyyy-MM-dd"));
+    db[":f_comment"] = "";
+    db[":f_paymentModeComment"] = paymentModeComment;
+    db[":f_paymentMode"] = paymentMode;
+    db[":f_cityLedger"] = clcode.toInt();
+    db[":f_reservation"] = no_hotel_invoice ? "" : res;
+    db[":f_complex"] = 0;
+    db[":f_print"] = fHeader["f_print"].toInt();
+    db[":f_tax"] = fTax["rseq"].toInt();
+    db[":f_roomComment"] = "";
+    db[":f_total"] = fHeader["f_total"].toDouble();
+    if (!db.insert(QString("%1.o_header").arg(__c5config.hotelDatabase()), false)) {
+        err = "Cannot insert into o_header<br>" + db.fLastError;
+        return false;
+    }
+    QJsonArray fItems;
+    db[":f_header"] = fHeader["f_id"].toString();
+    db.exec("select ob.f_id, ob.f_header, ob.f_state, dp1.f_name as part1, dp2.f_name as part2, ob.f_adgcode, d.f_name as f_name, \
+            ob.f_qty1, ob.f_qty2, ob.f_price, ob.f_service, ob.f_discount, ob.f_total, \
+                        ob.f_store, ob.f_print1, ob.f_print2, ob.f_comment, ob.f_remind, ob.f_dish, \
+                       s.f_name as f_storename, ob.f_removereason, ob.f_timeorder, ob.f_package, d.f_hourlypayment, \
+                               ob.f_canservice, ob.f_candiscount, ob.f_guest \
+            from o_body ob \
+            left join d_dish d on d.f_id=ob.f_dish \
+              left join d_part2 dp2 on dp2.f_id=d.f_part \
+              left join d_part1 dp1 on dp1.f_id=dp2.f_part \
+              left join c_storages s on s.f_id=ob.f_store \
+              where ob.f_header=:f_header");
+    while (db.nextRow()) {
+        QMap<QString, QVariant> h;
+        db.rowToMap(h);
+        fItems.append(QJsonObject::fromVariantMap(h));
+    }
+    for (int i = 0; i < fItems.count(); i++) {
+        QJsonObject o = fItems.at(i).toObject();
+        if (o["f_state"].toInt() != DISH_STATE_OK) {
+            continue;
+        }
+        double price = o["f_price"].toDouble();
+        if (o["f_service"].toDouble() > 0.001) {
+            price += price *o["f_service"].toDouble();
+        }
+        if (o["f_discount"].toDouble() > 0.001) {
+            price -= price *o["f_discount"].toDouble();
+        }
+        db[":f_id"] = getHotelID("DR", err);
+        db[":f_state"] = 1;
+        db[":f_header"] = result;
+        db[":f_dish"] = o["f_dish"].toInt();
+        db[":f_qty"] = o["f_qty1"].toDouble();
+        db[":f_qtyprint"] = o["f_qty2"].toDouble();
+        db[":f_price"] = price;
+        db[":f_svcvalue"] = o["f_service"].toDouble();
+        db[":f_svcamount"] = 0;
+        db[":f_dctvalue"] = 0;
+        db[":f_dctamount"] = 0;
+        db[":f_total"] = o["f_qty1"].toDouble() * price;
+        db[":f_totalusd"] = 0;
+        db[":f_print1"] = "";
+        db[":f_print2"] = "";
+        db[":f_store"] = o["f_store"].toInt();
+        db[":f_comment"] = "";
+        db[":f_staff"] = 1;
+        db[":f_complex"] = 0;
+        db[":f_complexid"] = 0;
+        db[":f_adgt"] = o["f_adgcode"].toString();
+        db[":f_complexRec"] = 0;
+        db[":f_canceluser"] = 0;
+        if (!db.insert(QString("%1.o_dish").arg(__c5config.hotelDatabase()), false)) {
+            err = "Cannot insert into o_dish<br>" + db.fLastError;
+            return false;
+        }
+    }
+    db[":f_comp"] = QHostInfo::localHostName().toUpper();
+    db[":f_date"] = QDate::currentDate();
+    db[":f_time"] = QTime::currentTime();
+    db[":f_user"] = 1;
+    db[":f_type"] = 23;
+    db[":f_rec"] = QString("%1%2").arg(fHeader["f_prefix"].toString(),
+                                       QString::number(fHeader["f_hallid"].toInt()));
+    db[":f_invoice"] = inv;
+    db[":f_reservation"] = res;
+    db[":f_action"] = "IMPORT FROM WAITER";
+    db[":f_value1"] = QString("%1%2").arg(fHeader["f_prefix"].toString(), QString::number(fHeader["f_hallid"].toInt()));
+    db[":f_value2"] = fHeader["f_amounttotal"].toDouble();
+    db.insert("airlog.log", false);
+    return true;
+#endif
+}
+
+QString C5StoreDraftWriter::getHotelID(const QString &source, QString &err)
+{
+#ifdef SMART
+    Q_UNUSED(source);
+    err = "";
+    return "";
+#else
+    QStringList dbparams = __c5config.dbParams();
+    dbparams[1] = "airwick";
+    C5Database dba(dbparams);
+    int totaltrynum = 0;
+    bool done = false;
+    QString result;
+    do {
+        QString query = QString ("select f_max, f_zero from airwick.serv_id_counter where f_id='%1' for update").arg(source);
+        if (!dba.exec(query)) {
+            err = "<H1><font color=\"red\">ID ERROR. COUNTER ID GENERATOR FAIL</font></h1><br>" + dba.fLastError;
+            exit(0);
+        }
+        if (dba.nextRow()) {
+            int max = dba.getInt(0) + 1;
+            int zero = dba.getInt(1);
+            dba[":f_max"] = max;
+            dba[":f_id"] = source;
+            query = "update airwick.serv_id_counter set f_max=:f_max where f_id=:f_id";
+            dba.exec(query);
+            result = QString("%1").arg(max, zero, 10, QChar('0'));
+        } else {
+            query = "insert into airwick.serv_id_counter (f_id, f_max, f_zero) values ('" + source + "', 0, 6)";
+            dba.exec(query);
+            totaltrynum++;
+            continue;
+        }
+        dba.exec(QString("insert into airwick.f_id (f_value, f_try, f_comp, f_user, f_date, f_time, f_db) values ('%1-%2', %3, '%4', '%5', '%6', '%7', database())")
+                 .arg(source)
+                 .arg(result).arg(totaltrynum)
+                 .arg(QHostInfo::localHostName().toUpper())
+                 .arg(1) //user id
+                 .arg(QDate::currentDate().toString("yyyy-MM-dd"))
+                 .arg(QTime::currentTime().toString("HH:mm:ss")));
+        if (dba.fLastError.toLower().contains("duplicate entry")) {
+            totaltrynum++;
+        } else {
+            done = true;
+        }
+        if (totaltrynum > 20) {
+            err = "<H1><font color=\"red\">ID ERROR, TRYNUM>20. COUNTER ID GENERATOR FAIL, GIVE UP</font></h1>";
+            exit(0);
+        }
+    } while (!done);
+    result = source + result;
+    return result;
+#endif
 }
 
 bool C5StoreDraftWriter::writeAStoreDraft(QString &id, const QString &docId, int store, int type, int goods,

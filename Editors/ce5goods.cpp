@@ -240,6 +240,7 @@ QJsonObject CE5Goods::makeJsonObject()
     fJsonData["scangenerated"] = fScancodeGenerated;
     fJsonData["scancounter"] = ui->leScanCode->text().left(7).toInt();
     fJsonData["image"] = fImage.isEmpty() ? QJsonValue() : fImage;
+    fJsonData["bigimage"] = fBigImage.isEmpty() ? QJsonValue() : fBigImage;
     QJsonArray ja;
     for (int i = 0; i < ui->tblGoods->rowCount(); i++) {
         j = QJsonObject();
@@ -321,7 +322,8 @@ void CE5Goods::openResponse(const QJsonObject &jdoc)
     QByteArray ba = QByteArray::fromBase64(fImage.toLatin1());
     QPixmap p;
     p.loadFromData(ba);
-    ui->lbImage->setPixmap(p);
+    QPixmap scaledPixmap = p.scaled(ui->lbImage->size(), Qt::KeepAspectRatio, Qt::SmoothTransformation);
+    ui->lbImage->setPixmap(scaledPixmap);
     QJsonObject j = jdoc["goods"].toObject();
     ui->leCode->setInteger(j["f_id"].toInt());
     ui->leName->setText(j["f_name"].toString());
@@ -572,14 +574,19 @@ void CE5Goods::uploadImage()
         return;
     }
     QByteArray ba;
+    QBuffer bigBuff( &ba);
+    pm.save( &bigBuff, "JPG");
+    fBigImage = ba.toBase64();
     do {
+        if (fBigImage.isEmpty()) {
+        }
         pm = pm.scaled(pm.width() * 0.8,  pm.height() * 0.8);
         ba.clear();
         QBuffer buff( &ba);
         buff.open(QIODevice::WriteOnly);
         pm.save( &buff, "JPG");
     } while (ba.size() > 100000);
-    ui->lbImage->setPixmap(pm);
+    ui->lbImage->setPixmap(pm.scaled(ui->lbImage->size(), Qt::KeepAspectRatio, Qt::SmoothTransformation));
     fImage = QString(ba.toBase64());
 }
 
@@ -903,4 +910,9 @@ void CE5Goods::on_leBarcode_returnPressed()
     ui->leBarcode->clear();
     ui->tblBarcodes->resizeColumnsToContents();
     ui->leBarcode->setFocus();
+}
+
+void CE5Goods::on_leTotal_textChanged(const QString &arg1)
+{
+    ui->leCostPrice->setText(arg1);
 }

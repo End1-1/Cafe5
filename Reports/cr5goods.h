@@ -2,6 +2,7 @@
 #define CR5GOODS_H
 
 #include "c5reportwidget.h"
+#include <QTimer>
 
 class CR5GoodsFilter;
 
@@ -20,6 +21,8 @@ public slots:
 private:
     CR5GoodsFilter *fFilter;
 
+    QTimer mTimer;
+
 private slots:
     void pricing();
 
@@ -32,6 +35,17 @@ private slots:
     void printBarCodes();
 
     void armSoftMap();
+
+    void buildWeb();
+
+    void buildWebResponse(const QJsonObject &obj);
+
+    void semiReadyPriceUpdate();
+
+    void semiReadyPriceUpdateResponse(const QJsonObject jdoc);
+
+signals:
+    void messageReceived();
 };
 
 #endif // CR5GOODS_H

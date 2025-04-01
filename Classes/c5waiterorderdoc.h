@@ -32,10 +32,6 @@ public:
 
     void sendToServer(C5SocketHandler *sh);
 
-    bool transferToHotel(C5Database &db, QString &err);
-
-    bool makeOutputOfStore(C5Database &db, QString &err, int storedocstate);
-
     static bool clearStoreOutput(C5Database &db, const QDate &d1, const QDate &d2);
 
     static void removeDocument(C5Database &db, const QString &id);
@@ -84,8 +80,6 @@ private:
     void open(C5Database &db);
 
     void getTaxInfo(C5Database &db);
-
-    QString getHotelID(const QString &source, QString &err);
 
 signals:
     void finished();

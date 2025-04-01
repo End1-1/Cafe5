@@ -9,8 +9,11 @@
 #include "c5goodspricing.h"
 #include "goodsasmap.h"
 #include "c5storebarcode.h"
+#include "ndataprovider.h"
 #include <math.h>
 #include <QFile>
+#include <QWebSocket>
+#include <QEventLoop>
 
 QMap <QString, QString> l;
 
@@ -151,11 +154,13 @@ QToolBar *CR5Goods::toolBar()
         if (__user->check(cp_t1_goods_pricing)) {
             fToolBar->addAction(QIcon(":/pricing.png"), tr("Pricing"), this, SLOT(pricing()));
         }
+        fToolBar->addAction(QIcon(":/www.png"), tr("Build web"), this, SLOT(buildWeb()));
         fToolBar->addAction(QIcon(":/dress.png"), tr("Group price"), this, SLOT(groupPrice()));
         fToolBar->addAction(QIcon(":/scales.png"), tr("Scales"), this, SLOT(exportToScales()));
         fToolBar->addAction(QIcon(":/delete.png"), tr("Remove"), this, SLOT(deleteGoods()));
         fToolBar->addAction(QIcon(":/barcode.png"), tr("Print\nbarcode"), this, SLOT(printBarCodes()));
         fToolBar->addAction(QIcon(":/AS.png"), tr("ArmSoft map"), this, SLOT(armSoftMap()));
+        fToolBar->addAction(QIcon(":/dress.png"), tr("S/R price update"), this, SLOT(semiReadyPriceUpdate()));
     }
     return fToolBar;
 }
@@ -377,4 +382,74 @@ void CR5Goods::printBarCodes()
 void CR5Goods::armSoftMap()
 {
     __mainWindow->createTab<GoodsAsMap>(fDBParams);
+}
+
+void CR5Goods::buildWeb()
+{
+    fHttp->createHttpQuery("/engine/office/build-web.php", QJsonObject{{"mode", "buildGoods"}}, SLOT(buildWebResponse(
+                QJsonObject)));
+}
+
+void CR5Goods::buildWebResponse(const QJsonObject &obj)
+{
+    Q_UNUSED(obj);
+    fHttp->httpQueryFinished(sender());
+    connect( &mTimer, &QTimer::timeout, this, []() {
+        qDebug() << "Websocket timeout";
+    });
+    QWebSocket *s = new QWebSocket();
+    QString host = NDataProvider::mHost;
+    if (host.contains("https://")) {
+        host.remove(0, 8);
+        host = "wss://" + host;
+    } else if(host.contains("http://")) {
+        host.remove(0, 7);
+        host = "ws://" + host;
+    }
+    QUrl url(QString("%1/ws").arg(host));
+    QEventLoop l1;
+    connect(s, &QWebSocket::connected, &l1, &QEventLoop::quit);
+    connect(s, &QWebSocket::disconnected, &l1, &QEventLoop::quit);
+    connect(this, &CR5Goods::messageReceived, &l1, &QEventLoop::quit);
+    connect( &mTimer, &QTimer::timeout, &l1, &QEventLoop::quit);
+    mTimer.start(10000);
+    s->open(url);
+    l1.exec();
+    if (s->state() != QAbstractSocket::ConnectedState) {
+        qDebug() << s->error() << s->errorString();
+        C5Message::error(s->errorString());
+        s->deleteLater();
+        return;
+    }
+    QEventLoop l2;
+    connect(s, &QWebSocket::textMessageReceived, this, [this](const QString &s) {
+        QJsonObject jrep = QJsonDocument::fromJson(s.toUtf8()).object();
+        emit messageReceived();
+    });
+    connect(this, &CR5Goods::messageReceived, &l2, &QEventLoop::quit);
+    connect(s, &QWebSocket::disconnected, &l2, &QEventLoop::quit);
+    connect( &mTimer, &QTimer::timeout, &l2, &QEventLoop::quit);
+    QJsonObject jo;
+    jo["command"] = "search_engine_reload";
+    jo["handler"] = "office";
+    jo["key"] = "asdf7fa8kk49888d!!jjdjmskkak98983mj???m";
+    jo["params"] = QJsonObject();
+    s->sendTextMessage(QJsonDocument(jo).toJson(QJsonDocument::Compact));
+    l2.exec();
+    s->deleteLater();
+    C5Message::info(tr("Build complete"));
+}
+
+void CR5Goods::semiReadyPriceUpdate()
+{
+    QJsonObject jo;
+    jo["class"] = "goods";
+    jo["method"] = "semireadyPriceUpdate";
+    fHttp->createHttpQuery("/engine/office/", jo, SLOT(semiReadyPriceUpdateResponse(QJsonObject)));
+}
+
+void CR5Goods::semiReadyPriceUpdateResponse(const QJsonObject jdoc)
+{
+    fHttp->httpQueryFinished(sender());
+    C5Message::info(tr("Done"));
 }
