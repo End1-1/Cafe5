@@ -5,12 +5,57 @@
 #include <QApplication>
 
 #ifdef Q_OS_WIN
-    #include <windows.h>
+#include <windows.h>
 #elif defined(Q_OS_LINUX)
-    #include <elf.h>
-    #include <fcntl.h>
-    #include <unistd.h>
-    #include <sys/mman.h>
+#include <fcntl.h>
+#include <unistd.h>
+#include <sys/mman.h>
+#include <string.h>
+#include <stdio.h>
+
+typedef struct {
+    unsigned char e_ident[16];
+    uint16_t      e_type;
+    uint16_t      e_machine;
+    uint32_t      e_version;
+    uint64_t      e_entry;
+    uint64_t      e_phoff;
+    uint64_t      e_shoff;
+    uint32_t      e_flags;
+    uint16_t      e_ehsize;
+    uint16_t      e_phentsize;
+    uint16_t      e_phnum;
+    uint16_t      e_shentsize;
+    uint16_t      e_shnum;
+    uint16_t      e_shstrndx;
+} Elf64_Ehdr;
+
+typedef struct {
+    uint32_t   sh_name;
+    uint32_t   sh_type;
+    uint64_t   sh_flags;
+    uint64_t   sh_addr;
+    uint64_t   sh_offset;
+    uint64_t   sh_size;
+    uint32_t   sh_link;
+    uint32_t   sh_info;
+    uint64_t   sh_addralign;
+    uint64_t   sh_entsize;
+} Elf64_Shdr;
+
+typedef struct {
+    uint32_t      st_name;
+    unsigned char st_info;
+    unsigned char st_other;
+    uint16_t      st_shndx;
+    uint64_t      st_value;
+    uint64_t      st_size;
+} Elf64_Sym;
+
+#define ELFMAG0 0x7F
+#define ELFMAG1 'E'
+#define ELFMAG2 'L'
+#define ELFMAG3 'F'
 #endif
 
 QString FileVersion::getVersionString(QString fName)
@@ -60,54 +105,45 @@ QString FileVersion::getVersionString(QString fName)
 QString FileVersion::getElfVersion(const QString &fName)
 {
     int fd = open(fName.toUtf8().constData(), O_RDONLY);
-    if (fd == -1)
+    if (fd == -1) {
         return "";
+    }
     struct stat st;
-    if (fstat(fd, &st) {
-    close(fd);
+    if (fstat(fd, &st) == -1) {
+        close(fd);
         return "";
     }
     void *map = mmap(NULL, st.st_size, PROT_READ, MAP_PRIVATE, fd, 0);
     if (map == MAP_FAILED) {
-    close(fd);
+        close(fd);
         return "";
     }
     QString version;
-    ElfW(Ehdr) *ehdr = (ElfW(Ehdr) *)map;
-    if (memcmp(ehdr->e_ident, ELFMAG, SELFMAG) == 0) {
-    // This is ELF file, search for version string
-    char *strtab = nullptr;
-    size_t strtabsz = 0;
-    ElfW(Shdr) *shdr = (ElfW(Shdr) *)((char *)map + ehdr->e_shoff);
-        for (int i = 0; i < ehdr->e_shnum; ++i) {
-            if (shdr[i].sh_type == SHT_STRTAB) {
-                strtab = (char *)map + shdr[i].sh_offset;
-                strtabsz = shdr[i].sh_size;
-                break;
-            }
-        }
-        if (strtab) {
-            ElfW(Shdr) *dynsym = nullptr;
-            for (int i = 0; i < ehdr->e_shnum; ++i) {
-                if (shdr[i].sh_type == SHT_DYNSYM) {
-                    dynsym = &shdr[i];
+    Elf64_Ehdr *ehdr = (Elf64_Ehdr *)map;
+    // Проверка ELF magic
+    if (ehdr->e_ident[0] != ELFMAG0 ||
+            ehdr->e_ident[1] != ELFMAG1 ||
+            ehdr->e_ident[2] != ELFMAG2 ||
+            ehdr->e_ident[3] != ELFMAG3) {
+        munmap(map, st.st_size);
+        close(fd);
+        return "";
+    }
+    // Поиск секции .dynstr (динамические строки)
+    Elf64_Shdr *shdr = (Elf64_Shdr *)((char *)map + ehdr->e_shoff);
+    char *shstrtab = (char *)map + shdr[ehdr->e_shstrndx].sh_offset;
+    for (int i = 0; i < ehdr->e_shnum; ++i) {
+        if (strcmp(shstrtab + shdr[i].sh_name, ".dynstr") == 0) {
+            char *dynstr = (char *)map + shdr[i].sh_offset;
+            size_t dynstr_size = shdr[i].sh_size;
+            // Ищем строки, содержащие "version"
+            for (size_t j = 0; j < dynstr_size; ++j) {
+                if (strncmp(dynstr + j, "version", 7) == 0) {
+                    version = QString(dynstr + j);
                     break;
                 }
             }
-            if (dynsym) {
-                ElfW(Sym) *sym = (ElfW(Sym) *)((char *)map + dynsym->sh_offset);
-                size_t count = dynsym->sh_size / sizeof(ElfW(Sym));
-                for (size_t i = 0; i < count; ++i) {
-                    if (sym[i].st_name < strtabsz) {
-                        const char *name = strtab + sym[i].st_name;
-                        if (strstr(name, "version") || strstr(name, "Version")) {
-                            // Found version-related symbol
-                            version = QString(name);
-                            break;
-                        }
-                    }
-                }
-            }
+            break;
         }
     }
     munmap(map, st.st_size);
