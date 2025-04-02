@@ -24,18 +24,30 @@ bool C5PrintReciptA4::print(QString &err)
     p.setSceneParams(2000, 2700, QPageLayout::Portrait);
     db[":f_id"] = fOrderUUID;
     db.exec("select * from o_draft_sale where f_id=:f_id");
+    bool oops = false;
+    bool isDraft;
     if (db.nextRow() == false) {
-        err = "Order not exists";
-        return false;
+        oops = true;
     }
-    bool isDraft = db.getInt("f_state") == 1;
+    if (oops) {
+        db[":f_id"] = fOrderUUID;
+        db.exec("select * from o_header where f_id=:f_id");
+        if (db.nextRow() == false) {
+            err = "Order not exists";
+            return false;
+        }
+        isDraft = db.getInt("f_state") != 2;
+    } else {
+        isDraft = db.getInt("f_state") == 1;
+    }
     db[":f_id"] = fOrderUUID;
     if (isDraft) {
         db.exec("select '--' as f_ordernumber, ost.f_name as f_saletypename, "
                 "o.f_amount as f_amounttotal, 0 as f_amountcash, 0 as f_amountcard, 0 as f_amountother, o.f_date, "
                 "p.f_taxcode, p.f_taxname, p.f_address, o.f_datefor, "
                 "concat_ws(' ', u.f_last, u.f_first) as f_staff, "
-                "CONCAT(DATE(o.f_date), ' ', TIME(o.f_time)) AS lu, o.f_id "
+                "CONCAT(DATE(o.f_date), ' ', TIME(o.f_time)) AS lu, o.f_id, "
+                "o.f_partner "
                 "from  o_draft_sale o "
                 "left join o_sale_type ost on ost.f_id=o.f_saletype "
                 "left join s_user u on u.f_id=o.f_staff "
@@ -46,7 +58,7 @@ bool C5PrintReciptA4::print(QString &err)
                 "o.f_amounttotal, o.f_amountcash, o.f_amountcard, o.f_amountother, o.f_datecash, "
                 "p.f_taxcode, p.f_taxname, p.f_address, ds.f_datefor, "
                 "concat_ws(' ', u.f_last, u.f_first) as f_staff, "
-                "o.lu, o.f_id "
+                "o.lu, o.f_id, o.f_partner  "
                 "from o_header o "
                 "left join o_draft_sale ds on ds.f_id=o.f_id "
                 "left join o_sale_type ost on ost.f_id=o.f_saletype "
@@ -61,18 +73,20 @@ bool C5PrintReciptA4::print(QString &err)
         err = "Order not exists";
         return false;
     }
-    QMap<QString, QVariant> debt;
+    QMap<QString, QVariant> debt1, debt2;
     if (header["f_partner"].toInt() > 0) {
         db[":f_costumer"] = header["f_partner"];
         db[":f_order"] = fOrderUUID;
-        db.exec("select 0 as a, sum(f_amount) from b_clients_debts "
-                "where f_custumer=:f_customer and f_order<>:f_order"
+        db.exec("select 0 as a, sum(f_amount) as dd from b_clients_debts "
+                "where f_costumer=:f_costumer and f_order<>:f_order "
                 "union "
-                "select 1 as a, sum(f_amount) from b_clients_debts "
-                "where f_custumer=:f_customer and f_order=:f_order "
+                "select 1 as a, sum(f_amount) as dd from b_clients_debts "
+                "where f_costumer=:f_costumer and f_order=:f_order "
                 "order by 1");
         db.nextRow();
-        db.rowToMap(debt);
+        db.rowToMap(debt1);
+        db.nextRow();
+        db.rowToMap(debt2);
     }
     QList<QMap<QString, QVariant> > body;
     db[":f_header"] = fOrderUUID;
@@ -175,7 +189,7 @@ bool C5PrintReciptA4::print(QString &err)
     p.br();
     QString goodsColName = tr("Goods");
     points.clear();
-    points << 50 << 100 << 250 << 850 << 100 << 100 << 150 << 100 << 150 << 150;
+    points << 50 << 100 << 250 << 800 << 100 << 100 << 150 << 100 << 150 << 150;
     vals.clear();
     vals << tr("NN")
          << tr("Material code")
@@ -202,10 +216,12 @@ bool C5PrintReciptA4::print(QString &err)
         vals << m["f_goodsname"].toString();
         vals << float_str(m["f_qty"].toDouble(), 2);
         vals << m["f_unitname"].toString();
-        vals << float_str(m["f_price"].toDouble(), 2);
+        double price = m["f_price"].toDouble();
+        vals << float_str(price, 2);
         vals << float_str(m["f_discountfactor"].toDouble(), 2) + "%";
-        vals << float_str(m["f_price"].toDouble() - (m["f_price"].toDouble() * (m["f_discountfactor"].toDouble() / 100)), 1);
-        vals << float_str(m["f_total"].toDouble(), 2);
+        price -= price *(m["f_discountfactor"].toDouble() / 100);
+        vals << float_str(price, 1);
+        vals << float_str(m["f_qty"].toDouble() *price, 2);
         p.tableText(points, vals, p.fLineHeight + 20);
         if (p.checkBr(p.fLineHeight + 20)) {
             p.br(p.fLineHeight + 20);
@@ -214,9 +230,9 @@ bool C5PrintReciptA4::print(QString &err)
     }
     p.setFontBold(true);
     points.clear();
-    points << 1250
-           << 500
-           << 200;
+    points << 1200
+           << 450
+           << 300;
     vals.clear();
     vals << tr("Total amount");
     vals << float_str(header["f_amounttotal"].toDouble(), 2);
@@ -224,6 +240,19 @@ bool C5PrintReciptA4::print(QString &err)
     p.br(p.fLineHeight + 20);
     p.br(p.fLineHeight + 20);
     p.br(p.fLineHeight + 20);
+    if (abs(debt1["dd"].toDouble()) > 0 || abs(debt2["dd"].toDouble()) > 0) {
+        p.ltext(tr("Debt before"), 50);
+        p.ltext(float_str(debt1["dd"].toDouble(), 1), 400);
+        p.br();
+        p.ltext(tr("Debt changed"), 50);
+        p.ltext(float_str(debt2["dd"].toDouble(), 1), 400);
+        p.br();
+        p.ltext(tr("Total debt"), 50);
+        p.ltext(float_str(debt2["dd"].toDouble() + debt1["dd"].toDouble(), 1), 400);
+        p.br(p.fLineHeight + 20);
+        p.br(p.fLineHeight + 20);
+        p.br(p.fLineHeight + 20);
+    }
     p.ltext(tr("Passed"), 50);
     p.ltext(tr("Accepted"), 1000);
     p.br(p.fLineHeight + 20);

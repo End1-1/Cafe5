@@ -67,7 +67,7 @@ void C5SettingsWidget::setId(int id)
         //buttons config
         ui->chmNewOrder->setChecked(jo["chm_neworder"].toBool());
         ui->chmOrders->setChecked(jo["chm_orders"].toBool());
-        ui->chmCompletedOrders->setChecked(jo["chm_completedorders"].isBool());
+        ui->chmCompletedOrders->setChecked(jo["chm_completedorders"].toBool());
         ui->chmDebts->setChecked(jo["chm_debts"].toBool());
         ui->chmCheckQuantity->setChecked(jo["chm_checkqty"].toBool());
         ui->chmDraftSale->setChecked(jo["chm_draftsale"].toBool());
@@ -75,6 +75,7 @@ void C5SettingsWidget::setId(int id)
         ui->chmSaleOutputConfirmation->setChecked(jo["chm_saleoutconfirmation"].toBool());
         ui->chmReturnGoods->setChecked(jo["chm_returngoods"].toBool());
         QJsonArray ja = jo["availableoutstore"].toArray();
+        ui->chUseWebsocket->setChecked(jo["use_websocket"].toBool());
         QString s;
         for (int i = 0; i < ja.count(); i++) {
             if (!s.isEmpty()) {
@@ -266,6 +267,7 @@ bool C5SettingsWidget::save(QString &err, QList<QMap<QString, QVariant> > &data)
     jc["chm_storeinputcheck"] = ui->chmStoreInputCheck->isChecked();
     jc["chm_saleoutconfirmation"] = ui->chmSaleOutputConfirmation->isChecked();
     jc["chm_returngoods"] = ui->chmReturnGoods->isChecked();
+    jc["use_websocket"] = ui->chUseWebsocket->isChecked();
     QJsonArray ja;
     QStringList a = ui->leAvailableStore->text().split(",", Qt::SkipEmptyParts);
     for  (const QString &s : a) {

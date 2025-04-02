@@ -914,5 +914,5 @@ void CE5Goods::on_leBarcode_returnPressed()
 
 void CE5Goods::on_leTotal_textChanged(const QString &arg1)
 {
-    ui->leCostPrice->setText(arg1);
+    //ui->leCostPrice->setText(arg1);
 }

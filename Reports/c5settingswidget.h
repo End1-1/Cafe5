@@ -17,21 +17,21 @@ public:
 
     ~C5SettingsWidget();
 
-    virtual QString title()
+    virtual QString title() override
     {
         return tr("Settings");
     }
 
-    virtual QString table()
+    virtual QString table() override
     {
         return "s_settings_names";
     }
 
-    virtual void setId(int id);
+    virtual void setId(int id) override;
 
     virtual bool save(QString &err, QList<QMap<QString, QVariant> > &data);
 
-    void clear(QWidget *parent);
+    void clear(QWidget *parent) ;
 
     virtual bool canCopy() override;
 

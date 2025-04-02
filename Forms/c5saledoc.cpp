@@ -360,11 +360,10 @@ void C5SaleDoc::exportToExcel()
     QXlsx::Document d;
     d.addSheet("Sheet1");
     /* HEADER */
-    QColor color = Qt::white;
     QFont headerFont(qApp->font());
     QXlsx::Format headerFormat;
     headerFormat.setFont(headerFont);
-    headerFormat.setFontColor(color);
+    headerFormat.setFontColor(Qt::black);
     headerFormat.setHorizontalAlignment(QXlsx::Format::AlignHCenter);
     headerFormat.setBorderStyle(QXlsx::Format::BorderThin);
     d.setColumnWidth(1, 10);
@@ -374,12 +373,17 @@ void C5SaleDoc::exportToExcel()
     d.setColumnWidth(5, 20);
     d.setColumnWidth(6, 20);
     d.setColumnWidth(7, 20);
+    d.setColumnWidth(8, 20);
+    d.setColumnWidth(9, 20);
     int col = 1, row = 1;
     d.write(row, col, QString("%1 N%2").arg(tr("Order"), ui->leDocnumber->text()),
             headerFormat);
     row++;
     if (!ui->leTaxpayerName->isEmpty()) {
-        d.write(row, col, tr("Buyer") + " " + ui->leTaxpayerName->text(), headerFormat);
+        auto t = QString("%4 %1: %2, %3, %5").arg(tr("Taxpayer number"),
+                 ui->leTaxpayerId->text(), ui->leTaxpayerName->text(),
+                 tr("Buyer"), fPartner.phone);
+        d.write(row, col, t, headerFormat);
         row++;
     }
     QList<int> cols;
@@ -398,7 +402,7 @@ void C5SaleDoc::exportToExcel()
     }
     row += 2;
     cols.clear();
-    for (int i = 0; i < 7; i++) {
+    for (int i = 0; i < 9; i++) {
         cols << i + 1;
     }
     vals.clear();
@@ -408,6 +412,8 @@ void C5SaleDoc::exportToExcel()
          << tr("Qty")
          << tr("Unit")
          << tr("Price")
+         << tr("Discount")
+         << tr("Discounted price")
          << tr("Total");
     for (int i = 0; i < cols.count(); i++) {
         d.write(row, cols.at(i), vals.at(i), headerFormat);
@@ -416,6 +422,7 @@ void C5SaleDoc::exportToExcel()
     QFont bodyFont(qApp->font());
     QXlsx::Format bodyFormat;
     bodyFormat.setFont(bodyFont);
+    bodyFormat.setFontColor(Qt::black);
     bodyFormat.setHorizontalAlignment(QXlsx::Format::AlignHCenter);
     bodyFormat.setBorderStyle(QXlsx::Format::BorderThin);
     for (int i = 0; i < ui->tblGoods->rowCount(); i++) {
@@ -426,14 +433,17 @@ void C5SaleDoc::exportToExcel()
         vals << ui->tblGoods->lineEdit(i, 6)->text();
         vals << ui->tblGoods->getString(i, 7);
         vals << ui->tblGoods->lineEdit(i, 8)->text();
-        vals << ui->tblGoods->lineEdit(i, 9)->text();
+        vals << ui->tblGoods->lineEdit(i, col_discount_value)->text();
+        vals << float_str(ui->tblGoods->lineEdit(i, col_price)->getDouble() - (ui->tblGoods->lineEdit(i,
+                          col_price)->getDouble() * (ui->tblGoods->lineEdit(i, col_discount_value)->getDouble() / 100)), 1);
+        vals << ui->tblGoods->lineEdit(i, col_grandtotal)->text();
         for (int j = 0; j < cols.count(); j++) {
             d.write(row, cols.at(j), vals.at(j), bodyFormat);
         }
         row++;
     }
     cols.clear();
-    cols << 6 << 7;
+    cols << 8 << 9;
     vals.clear();
     vals << tr("Total amount");
     vals << QString::number(str_float(ui->leGrandTotal->text()));
@@ -1330,6 +1340,10 @@ void C5SaleDoc::saveAsDraft()
     if (C5Message::question(tr("Confirm to make a draft")) != QDialog::Accepted) {
         return;
     }
+    QDate deliveryDate = QDate::fromString(ui->leDelivery->text(), "dd/MM/yyyy");
+    if (!deliveryDate.isValid()) {
+        deliveryDate = QDate::currentDate();
+    }
     QString uuid = ui->leUuid->text();
     QJsonObject jdoc;
     jdoc["class"] = "saledoc";
@@ -1377,7 +1391,7 @@ void C5SaleDoc::saveAsDraft()
     jh["f_taxpayertin"] = fPartner.taxCode;
     jh["f_cash"] = ui->leCountCash->getDouble();
     jh["f_change"] = ui->leChange->getDouble();
-    jh["f_deliverydate"] = QDate::fromString(ui->leDelivery->text(), "dd/MM/yyyy").toString(FORMAT_DATE_TO_STR_MYSQL);
+    jh["f_deliverydate"] = deliveryDate.toString(FORMAT_DATE_TO_STR_MYSQL);
     jdoc["header"] = jh;
     QJsonArray jg;
     for (int i = 0; i < ui->tblGoods->rowCount(); i++) {

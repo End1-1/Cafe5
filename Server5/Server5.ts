@@ -179,7 +179,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../NTable/ndataprovider.cpp" line="80"/>
+        <location filename="../NTable/ndataprovider.cpp" line="81"/>
         <source>You must upgrade the application to continue using it</source>
         <translation type="unfinished"></translation>
     </message>
