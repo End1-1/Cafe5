@@ -71,6 +71,12 @@ win32 {
 QMAKE_LFLAGS_WINDOWS += /MANIFESTUAC:"level='requireAdministrator'"
 }
 
+linux {
+    VERSION = 1.3.4.49
+    QMAKE_LFLAGS += -Wl,--build-id
+    DEFINES += APP_VERSION=\\\"$$VERSION\\\"
+}
+
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
