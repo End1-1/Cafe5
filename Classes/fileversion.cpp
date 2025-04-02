@@ -7,6 +7,7 @@
 #ifdef Q_OS_WIN
 #include <windows.h>
 #elif defined(Q_OS_LINUX)
+#include <sys/stat.h>
 #include <fcntl.h>
 #include <unistd.h>
 #include <sys/mman.h>
