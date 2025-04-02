@@ -7,6 +7,7 @@ TARGET = service5
 RC_FILE = res.rc
 
 SOURCES += \
+    ../Classes/fileversion.cpp \
     ../Classes/logwriter.cpp \
     armsoft.cpp \
     c5searchengine.cpp \
@@ -20,6 +21,7 @@ SOURCES += \
     utils/sqlqueries.cpp
 
 HEADERS += \
+    ../Classes/fileversion.h \
     ../Classes/logwriter.h \
     armsoft.h \
     c5searchengine.h \

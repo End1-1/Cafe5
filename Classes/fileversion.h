@@ -7,6 +7,7 @@ class FileVersion
 {
 public:
     static QString getVersionString(QString fName);
+    static QString getVersionString();
 
 private:
     FileVersion();

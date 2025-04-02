@@ -4,6 +4,7 @@
 #include "c5searchengine.h"
 #include "database.h"
 #include "armsoft.h"
+#include "fileversion.h"
 #include <QWebSocketServer>
 #include <QWebSocket>
 #include <QJsonObject>
@@ -106,9 +107,9 @@ void ServerThread::onNewConnection()
     }
     LogWriter::write(LogWriterLevel::verbose, "",
                      QString("New connection from %1, peer name: %2, origin: %3")
-                     .arg(realIp)  // Используем реальный IP
-                     .arg(ws->peerName())  // Peer name, может быть пустым
-                     .arg(ws->origin()));  // Origin header
+                     .arg(realIp)
+                     .arg(ws->peerName())
+                     .arg(ws->origin()));
     connect(ws, &QWebSocket::textMessageReceived, this, &ServerThread::onTextMessage);
     connect(ws, &QWebSocket::disconnected, this, [ws]() {
         LogWriter::write(LogWriterLevel::verbose, "", "disconnected" + ws->peerName() + " " + ws->origin());
@@ -141,6 +142,12 @@ void ServerThread::onTextMessage(const QString &msg)
     QJsonObject jrep;
     if (msg.toLower() == "ping") {
         ws->sendTextMessage("pong");
+        return;
+    }
+    if (msg.toLower() == "who?") {
+        jrep["me"] = "Service5";
+        jrep["version"] = FileVersion::getVersionString();
+        ws->sendTextMessage( QJsonDocument(jrep).toJson(QJsonDocument::Compact));
         return;
     }
     if (jdoc["command"].toString() == "register_socket") {
