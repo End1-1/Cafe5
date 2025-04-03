@@ -119,7 +119,7 @@ bool C5PrintReciptA4::print(QString &err)
     int versionIndex = 0;
     bool bExtent = true;
     int maskIndex = -1;
-    QString encodeString = QString("%1;%2;%3").arg(header["f_id"].toString(),
+    QString encodeString = QString("doc;%1;%2;%3").arg(header["f_id"].toString(),
                            isDraft ? tr("Draft") : header["f_ordernumber"].toString(),
                            header["lu"].toString());
     CQR_Encode qrEncode;

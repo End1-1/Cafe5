@@ -1,5 +1,5 @@
 #include "c5servername.h"
-#include "c5message.h"
+#include "c5config.h"
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
 #include <QNetworkRequest>
@@ -53,7 +53,8 @@ bool C5ServerName::getServers(const QString &name)
     connect(s, &QWebSocket::disconnected, &l2, &QEventLoop::quit);
     connect( &mTimer, &QTimer::timeout, &l2, &QEventLoop::quit);
     QJsonObject jo;
-    jo["command"] = "ServerNamesAll";
+    jo["command"] = "get_db_list";
+    jo["server_key"] = __c5config.getRegValue("ss_server_key").toString();
     jo["handler"] = "office";
     jo["key"] = "asdf7fa8kk49888d!!jjdjmskkak98983mj???m";
     jo["params"] = mParams;

@@ -58,6 +58,36 @@ void ServerThread::run()
     LogWriter::write(LogWriterLevel::verbose, "", QString("Listen port: %1").arg(port));
 }
 
+void ServerThread::getDbList(const QJsonObject &jdoc, QWebSocket *ws)
+{
+    Database db;
+    QString repMsg;
+    QJsonObject jrep;
+    if (!db.open("127.0.0.1", "service5", "root", "root5")) {
+        jrep["errorCode"] = 1;
+        jrep["errorMessage"] = db.lastDbError();
+        repMsg = QJsonDocument(jrep).toJson(QJsonDocument::Compact);
+        LogWriter::write(LogWriterLevel::errors, "", db.lastDbError());
+        ws->sendTextMessage(repMsg);
+        return;
+    }
+    db[":fkey"] = jdoc["server_key"].toString();
+    db.exec("select * from dblist where fkey=:fkey");
+    QJsonArray ja;
+    while (db.next()) {
+        QJsonObject jt;
+        jt["name"] = db.string("fcomment");
+        jt["database"] = db.string("fpath");
+        jt["settings"] = db.string("fsettings");
+        ja.append(jt);
+    }
+    jrep["result"] = ja;
+    jrep["errorCode"] = 0;
+    repMsg = QJsonDocument(jrep).toJson(QJsonDocument::Compact);
+    LogWriter::write(LogWriterLevel::errors, "", repMsg);
+    ws->sendTextMessage(repMsg);
+}
+
 void ServerThread::registerSocket(const QJsonObject &jdoc, QWebSocket *ws)
 {
     SocketStruct ss;
@@ -148,6 +178,10 @@ void ServerThread::onTextMessage(const QString &msg)
         jrep["me"] = "Service5";
         jrep["version"] = FileVersion::getVersionString();
         ws->sendTextMessage( QJsonDocument(jrep).toJson(QJsonDocument::Compact));
+        return;
+    }
+    if (jdoc["command"].toString() == "get_db_list") {
+        getDbList(jdoc, ws);
         return;
     }
     if (jdoc["command"].toString() == "register_socket") {

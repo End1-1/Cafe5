@@ -7,38 +7,57 @@
     <x>0</x>
     <y>0</y>
     <width>424</width>
-    <height>180</height>
+    <height>210</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Config</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
-   <item row="0" column="0">
-    <widget class="QLabel" name="label">
+   <item row="3" column="2">
+    <widget class="QPushButton" name="btnGetDatabases">
      <property name="text">
-      <string>Server address</string>
+      <string/>
+     </property>
+     <property name="icon">
+      <iconset resource="../resources/res.qrc">
+       <normaloff>:/refresh.png</normaloff>:/refresh.png</iconset>
      </property>
     </widget>
    </item>
-   <item row="2" column="0">
-    <widget class="QLabel" name="label_3">
-     <property name="text">
-      <string>Database</string>
+   <item row="4" column="1">
+    <widget class="QComboBox" name="cbSettings">
+     <property name="editable">
+      <bool>true</bool>
      </property>
     </widget>
    </item>
-   <item row="0" column="1">
-    <widget class="QLineEdit" name="leAddress"/>
-   </item>
-   <item row="3" column="0">
-    <widget class="QLabel" name="label_2">
-     <property name="text">
-      <string>Settings name</string>
+   <item row="5" column="1">
+    <widget class="QLineEdit" name="leSettingsPassword">
+     <property name="echoMode">
+      <enum>QLineEdit::EchoMode::Password</enum>
      </property>
     </widget>
    </item>
-   <item row="5" column="0" colspan="3">
+   <item row="5" column="0">
+    <widget class="QLabel" name="label_4">
+     <property name="text">
+      <string>Settings password</string>
+     </property>
+    </widget>
+   </item>
+   <item row="4" column="2">
+    <widget class="QPushButton" name="btnGetSettings">
+     <property name="text">
+      <string/>
+     </property>
+     <property name="icon">
+      <iconset resource="../resources/res.qrc">
+       <normaloff>:/refresh.png</normaloff>:/refresh.png</iconset>
+     </property>
+    </widget>
+   </item>
+   <item row="6" column="0" colspan="3">
     <widget class="QWidget" name="widget" native="true">
      <layout class="QHBoxLayout" name="horizontalLayout">
       <item>
@@ -84,57 +103,7 @@
      </layout>
     </widget>
    </item>
-   <item row="3" column="1">
-    <widget class="QComboBox" name="cbSettings">
-     <property name="editable">
-      <bool>true</bool>
-     </property>
-    </widget>
-   </item>
-   <item row="2" column="2">
-    <widget class="QPushButton" name="btnGetDatabases">
-     <property name="text">
-      <string/>
-     </property>
-     <property name="icon">
-      <iconset resource="../resources/res.qrc">
-       <normaloff>:/refresh.png</normaloff>:/refresh.png</iconset>
-     </property>
-    </widget>
-   </item>
-   <item row="2" column="1">
-    <widget class="QComboBox" name="cbDatabases">
-     <property name="editable">
-      <bool>true</bool>
-     </property>
-    </widget>
-   </item>
-   <item row="3" column="2">
-    <widget class="QPushButton" name="btnGetSettings">
-     <property name="text">
-      <string/>
-     </property>
-     <property name="icon">
-      <iconset resource="../resources/res.qrc">
-       <normaloff>:/refresh.png</normaloff>:/refresh.png</iconset>
-     </property>
-    </widget>
-   </item>
-   <item row="4" column="0">
-    <widget class="QLabel" name="label_4">
-     <property name="text">
-      <string>Settings password</string>
-     </property>
-    </widget>
-   </item>
-   <item row="4" column="1">
-    <widget class="QLineEdit" name="leSettingsPassword">
-     <property name="echoMode">
-      <enum>QLineEdit::EchoMode::Password</enum>
-     </property>
-    </widget>
-   </item>
-   <item row="4" column="2">
+   <item row="5" column="2">
     <widget class="QPushButton" name="btnShowPassword">
      <property name="text">
       <string/>
@@ -148,8 +117,61 @@
      </property>
     </widget>
    </item>
+   <item row="3" column="1">
+    <widget class="QComboBox" name="cbDatabases">
+     <property name="editable">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="0">
+    <widget class="QLabel" name="label_3">
+     <property name="text">
+      <string>Database</string>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="1">
+    <widget class="QLineEdit" name="leAddress"/>
+   </item>
+   <item row="4" column="0">
+    <widget class="QLabel" name="label_2">
+     <property name="text">
+      <string>Settings name</string>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="0">
+    <widget class="QLabel" name="label">
+     <property name="text">
+      <string>Server address</string>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="0">
+    <widget class="QLabel" name="label_5">
+     <property name="text">
+      <string>Server key</string>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="1">
+    <widget class="QLineEdit" name="leServerKey"/>
+   </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>leAddress</tabstop>
+  <tabstop>leServerKey</tabstop>
+  <tabstop>cbDatabases</tabstop>
+  <tabstop>cbSettings</tabstop>
+  <tabstop>leSettingsPassword</tabstop>
+  <tabstop>btnGetDatabases</tabstop>
+  <tabstop>btnGetSettings</tabstop>
+  <tabstop>btnShowPassword</tabstop>
+  <tabstop>btnSave</tabstop>
+  <tabstop>btnCancel</tabstop>
+ </tabstops>
  <resources>
   <include location="../resources/res.qrc"/>
   <include location="../resources/res.qrc"/>

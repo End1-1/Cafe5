@@ -41,6 +41,7 @@ private:
     const QString fConfigPath;
     QList<SocketStruct> fSockets;
     QStringList fDbList;
+    void getDbList(const QJsonObject &jdoc, QWebSocket *ws);
     void registerSocket(const QJsonObject &jdoc, QWebSocket *ws);
     void unregisterSocket(const QJsonObject &jdoc, QWebSocket *ws);
     void updateHotelCache(const QJsonObject &jdoc, QWebSocket *ws);

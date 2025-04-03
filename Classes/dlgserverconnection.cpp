@@ -10,6 +10,7 @@ DlgServerConnection::DlgServerConnection(QWidget *parent)
 {
     ui->setupUi(this);
     ui->leAddress->setText(__c5config.getRegValue("ss_server_address").toString());
+    ui->leServerKey->setText(__c5config.getRegValue("ss_server_key").toString());
     ui->leSettingsPassword->setText(__c5config.getRegValue("ss_settings_password").toString());
     ui->cbDatabases->setCurrentText(__c5config.getRegValue("ss_database").toString());
     ui->cbSettings->setCurrentText(__c5config.getRegValue("ss_settings").toString());
@@ -56,6 +57,7 @@ void DlgServerConnection::on_btnShowPassword_clicked(bool checked)
 void DlgServerConnection::on_btnSave_clicked()
 {
     __c5config.setRegValue("ss_server_address", ui->leAddress->text());
+    __c5config.setRegValue("ss_server_key", ui->leServerKey->text());
     __c5config.setRegValue("ss_settings_password", ui->leSettingsPassword->text());
     __c5config.setRegValue("ss_database", ui->cbDatabases->currentText());
     __c5config.setRegValue("ss_settings", ui->cbSettings->currentText());
