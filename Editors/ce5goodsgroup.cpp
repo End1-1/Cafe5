@@ -1,6 +1,7 @@
 #include "ce5goodsgroup.h"
 #include "ui_ce5goodsgroup.h"
 #include "c5database.h"
+#include "c5message.h"
 
 CE5GoodsGroup::CE5GoodsGroup(const QStringList &dbParams, QWidget *parent) :
     CE5Editor(dbParams, parent),

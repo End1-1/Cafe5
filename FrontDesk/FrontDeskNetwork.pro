@@ -55,12 +55,15 @@ win32: QMAKE_CXXFLAGS -= -Zc:strictStrings
  # }
 
 FORMS += \
-    ../Classes/dlgserverconnection.ui
+    ../Classes/dlgserverconnection.ui \
+    dlgemarks.ui
 
 HEADERS += \
-    ../Classes/dlgserverconnection.h
+    ../Classes/dlgserverconnection.h \
+    dlgemarks.h
 
 SOURCES += \
-    ../Classes/dlgserverconnection.cpp
+    ../Classes/dlgserverconnection.cpp \
+    dlgemarks.cpp
 
 

@@ -1,5 +1,6 @@
 #include "armsoftexportoptions.h"
 #include "ui_armsoftexportoptions.h"
+#include "c5config.h"
 
 ArmSoftExportOptions::ArmSoftExportOptions(const QStringList &dbParams, QWidget *parent) :
     C5Dialog(dbParams, parent),

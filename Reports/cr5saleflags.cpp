@@ -1,5 +1,6 @@
 #include "cr5saleflags.h"
 #include "ui_cr5saleflags.h"
+#include "c5database.h"
 
 CR5SaleFlags::CR5SaleFlags(const QStringList &dbParams) :
     C5Dialog(dbParams),
@@ -12,26 +13,26 @@ CR5SaleFlags::CR5SaleFlags(const QStringList &dbParams) :
         QLabel *l;
         QWidget *w;
         switch (db.getInt("f_id")) {
-        case 1:
-            l = ui->lbName1;
-            w = ui->w1;
-            break;
-        case 2:
-            l = ui->lbName2;
-            w = ui->w2;
-            break;
-        case 3:
-            l = ui->lbName3;
-            w = ui->w3;
-            break;
-        case 4:
-            l = ui->lbName4;
-            w = ui->w4;
-            break;
-        case 5:
-            l = ui->lbName5;
-            w = ui->w5;
-            break;
+            case 1:
+                l = ui->lbName1;
+                w = ui->w1;
+                break;
+            case 2:
+                l = ui->lbName2;
+                w = ui->w2;
+                break;
+            case 3:
+                l = ui->lbName3;
+                w = ui->w3;
+                break;
+            case 4:
+                l = ui->lbName4;
+                w = ui->w4;
+                break;
+            case 5:
+                l = ui->lbName5;
+                w = ui->w5;
+                break;
         }
         l->setText(db.getString("f_name"));
         w->setEnabled(db.getInt("f_enabled") > 0);

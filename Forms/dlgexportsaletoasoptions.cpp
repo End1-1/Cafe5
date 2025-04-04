@@ -1,5 +1,6 @@
 #include "dlgexportsaletoasoptions.h"
 #include "ui_dlgexportsaletoasoptions.h"
+#include "c5config.h"
 #include <QDoubleValidator>
 
 DlgExportSaleToAsOptions::DlgExportSaleToAsOptions(const QStringList &dbParams) :
@@ -26,7 +27,8 @@ DlgExportSaleToAsOptions::~DlgExportSaleToAsOptions()
     delete ui;
 }
 
-int DlgExportSaleToAsOptions::getOption(const QStringList &dbParams, QString &partner, QString &store, QString &service, QString &srvinacc,
+int DlgExportSaleToAsOptions::getOption(const QStringList &dbParams, QString &partner, QString &store, QString &service,
+                                        QString &srvinacc,
                                         QString &srvoutacc, QString &iteminacc, QString &itemoutacc, QString &bankacc, QString &vat,
                                         bool &exportSimple, QString &simpleItem)
 {

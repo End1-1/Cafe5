@@ -8,6 +8,8 @@
 #include "c5replacecharacter.h"
 #include "c5mainwindow.h"
 #include "c5storedoc.h"
+#include "c5utils.h"
+#include "c5message.h"
 #include "ce5goods.h"
 
 #define col_checkbox 0

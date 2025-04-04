@@ -6,8 +6,10 @@
 #include "c5cache.h"
 #include "c5printing.h"
 #include "c5printpreview.h"
+#include "c5message.h"
 #include "mfprocessproductpriceupdate.h"
 #include "ninterface.h"
+#include "c5utils.h"
 #include <QFileDialog>
 #include <QDesktopServices>
 #include <QXlsx/header/xlsxdocument.h>

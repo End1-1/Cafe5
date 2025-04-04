@@ -2,7 +2,7 @@
 #include "ui_ce5createtablesforhall.h"
 #include "c5cache.h"
 #include "ce5halls.h"
-#include "c5mainwindow.h"
+#include "c5message.h"
 
 CE5CreateTablesForHall::CE5CreateTablesForHall(const QStringList &dbParams) :
     C5Dialog(dbParams),

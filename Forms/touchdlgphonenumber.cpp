@@ -1,5 +1,6 @@
 #include "touchdlgphonenumber.h"
 #include "ui_touchdlgphonenumber.h"
+#include "c5config.h"
 
 TouchDlgPhoneNumber::TouchDlgPhoneNumber() :
     C5Dialog(__c5config.dbParams()),
@@ -38,69 +39,68 @@ void TouchDlgPhoneNumber::buttonClicked(QPushButton *b)
     }
     QString t = b->text();
     switch (p.length()) {
-    case 0:
-        p += "(";
-        break;
-    case 4:
-        p += ")";
-        break;
-    case 7:
-    case 10:
-        p += "-";
-        break;
+        case 0:
+            p += "(";
+            break;
+        case 4:
+            p += ")";
+            break;
+        case 7:
+        case 10:
+            p += "-";
+            break;
     }
-
     ui->lePhone->setText(p + t);
 }
 
 void TouchDlgPhoneNumber::on_btn0_clicked()
 {
-    buttonClicked(static_cast<QPushButton*>(sender()));
+    buttonClicked(static_cast<QPushButton *>(sender()));
 }
 
 void TouchDlgPhoneNumber::on_btn1_clicked()
 {
-    buttonClicked(static_cast<QPushButton*>(sender()));
+    buttonClicked(static_cast<QPushButton *>(sender()));
 }
 
 void TouchDlgPhoneNumber::on_btn2_clicked()
 {
-    buttonClicked(static_cast<QPushButton*>(sender()));
+    buttonClicked(static_cast<QPushButton *>(sender()));
 }
 
 void TouchDlgPhoneNumber::on_btn3_clicked()
 {
-    buttonClicked(static_cast<QPushButton*>(sender()));
+    buttonClicked(static_cast<QPushButton *>(sender()));
 }
 
 void TouchDlgPhoneNumber::on_btn4_clicked()
 {
-    buttonClicked(static_cast<QPushButton*>(sender()));
+    buttonClicked(static_cast<QPushButton *>(sender()));
 }
 
 void TouchDlgPhoneNumber::on_btn5_clicked()
 {
-    buttonClicked(static_cast<QPushButton*>(sender()));
+    buttonClicked(static_cast<QPushButton *>(sender()));
 }
 
 void TouchDlgPhoneNumber::on_btn6_clicked()
 {
-    buttonClicked(static_cast<QPushButton*>(sender()));
+    buttonClicked(static_cast<QPushButton *>(sender()));
 }
 
 void TouchDlgPhoneNumber::on_btn7_clicked()
 {
-    buttonClicked(static_cast<QPushButton*>(sender()));
+    buttonClicked(static_cast<QPushButton *>(sender()));
 }
 
 void TouchDlgPhoneNumber::on_btn8_clicked()
 {
-    buttonClicked(static_cast<QPushButton*>(sender()));
+    buttonClicked(static_cast<QPushButton *>(sender()));
 }
 
 void TouchDlgPhoneNumber::on_btn9_clicked()
 {
-    buttonClicked(static_cast<QPushButton*>(sender()));
+    buttonClicked(static_cast<QPushButton *>(sender()));
 }
 
 void TouchDlgPhoneNumber::on_btnCancel_clicked()
@@ -114,11 +114,11 @@ void TouchDlgPhoneNumber::on_btnBackspace_clicked()
     t.remove(t.length() - 1, 1);
     QChar c = t.at(t.length() - 1);
     switch (c.toLatin1()) {
-    case '(':
-    case ')':
-    case '-':
-        t.remove(t.length() - 1, 1);
-        break;
+        case '(':
+        case ')':
+        case '-':
+            t.remove(t.length() - 1, 1);
+            break;
     }
     ui->lePhone->setText(t);
 }

@@ -1,5 +1,6 @@
 #include "c5printpreview.h"
 #include "ui_c5printpreview.h"
+#include "c5config.h"
 #include "c5printing.h"
 #include <QPrinterInfo>
 #include <QGraphicsScene>

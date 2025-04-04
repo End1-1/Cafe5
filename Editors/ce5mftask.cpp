@@ -1,6 +1,7 @@
 #include "ce5mftask.h"
 #include "ui_ce5mftask.h"
 #include "c5cache.h"
+#include "c5message.h"
 
 CE5MFTask::CE5MFTask(const QStringList &dbParams) :
     CE5Editor(dbParams),
@@ -48,7 +49,7 @@ void CE5MFTask::setId(int id)
         ui->tbl->setRowCount(0);
         QJsonDocument doc = QJsonDocument::fromJson(db.getString("f_notes").toUtf8());
         QJsonObject jo = doc.object();
-        for (const QString &k: jo.keys()) {
+        for (const QString &k : jo.keys()) {
             int r = ui->tbl->addEmptyRow();
             ui->tbl->setString(r, 0, k);
             ui->tbl->createLineEdit(r, 1)->setText(jo[k].toString());

@@ -2,6 +2,8 @@
 #include "ui_ce5packagelist.h"
 #include "c5cache.h"
 #include "c5selector.h"
+#include "c5database.h"
+#include "c5message.h"
 
 CE5PackageList::CE5PackageList(const QStringList &dbParams, int package) :
     C5Dialog(dbParams),

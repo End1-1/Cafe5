@@ -1,5 +1,6 @@
 #include "dlgqty.h"
 #include "ui_dlgqty.h"
+#include "c5config.h"
 
 DlgQty::DlgQty() :
     C5Dialog(__c5config.dbParams()),

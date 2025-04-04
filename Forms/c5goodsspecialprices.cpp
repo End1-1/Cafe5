@@ -3,6 +3,7 @@
 #include "c5selector.h"
 #include "c5cache.h"
 #include "c5lineedit.h"
+#include "c5message.h"
 #include <QTableWidgetItem>
 
 C5GoodsSpecialPrices::C5GoodsSpecialPrices(const QStringList &dbParams, QWidget *parent) :

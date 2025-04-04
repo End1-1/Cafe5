@@ -1,6 +1,7 @@
 #include "dlgdriverroutedate.h"
 #include "ui_dlgdriverroutedate.h"
 #include "c5cache.h"
+#include "c5message.h"
 
 DlgDriverRouteDate::DlgDriverRouteDate(const QStringList &dbParams, QWidget *parent) :
     C5Dialog(dbParams, parent),

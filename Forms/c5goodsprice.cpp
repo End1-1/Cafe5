@@ -6,6 +6,7 @@
 #include "c5cache.h"
 #include "c5lineedit.h"
 #include "c5printing.h"
+#include "c5message.h"
 #include "c5printpreview.h"
 #include <QInputDialog>
 #include <QMenu>

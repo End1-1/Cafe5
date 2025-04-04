@@ -23,49 +23,93 @@ class C5SaleDoc : public C5Widget
 
 public:
     explicit C5SaleDoc(const QStringList &dbParams, QWidget *parent = nullptr);
+
     ~C5SaleDoc();
+
     void setMode(int mode);
+
     virtual bool reportHandler(const QString &handleId, const QVariant &data) override;
+
     virtual QToolBar *toolBar() override;
+
     bool openDoc(const QString &uuid);
+
     bool openDraft(const QString &id);
 
 private slots:
     void makeDraftResponse(const QJsonObject &jdoc);
+
     void removeDocResponse(const QJsonObject &jdoc);
+
     void amountDoubleClicked();
+
+    void createStoreDocument();
+
     void printSale();
+
     void fiscale();
+
     void cancelFiscal();
+
     void createInvoiceAS();
+
     void createRetailAS();
+
     void makeStoreOutput();
+
     void exportToExcel();
+
     void returnItems();
+
     void saveDataChanges();
+
     void saveAsDraft();
+
     void saveCopy();
+
     void removeDoc();
+
     void uuidDoubleClicked();
+
     void on_PriceTextChanged(const QString &arg1);
+
     void on_QtyTextChanged(const QString &arg1);
+
     void on_discountValueChanged(const QString &arg1);
+
     void on_leCmd_returnPressed();
+
     void on_btnAddGoods_clicked();
+
     void on_btnRemoveGoods_clicked();
+
     void on_btnEditGoods_clicked();
+
     void on_btnNewGoods_clicked();
+
     void on_cbHall_currentIndexChanged(int index);
+
     void on_btnSearchTaxpayer_clicked();
+
     void on_btnRemoveDelivery_clicked();
+
     void on_btnDelivery_clicked();
+
     void on_btnEditPartner_clicked();
+
     void on_btnEditAccounts_clicked();
+
     void on_leCash_textChanged(const QString &arg1);
+
     void on_btnDeliveryMan_clicked();
+
     void on_btnQr_clicked();
+
     void on_btnCalculator_clicked();
+
     void on_cbStorage_currentIndexChanged(int index);
+
+    void on_btnCashier_clicked();
 
 private:
     Ui::C5SaleDoc *ui;

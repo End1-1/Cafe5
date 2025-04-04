@@ -1,5 +1,8 @@
 #include "c5passwords.h"
 #include "ui_c5passwords.h"
+#include "c5database.h"
+#include "c5utils.h"
+#include "c5message.h"
 
 C5Passwords::C5Passwords(const QStringList &dbParams) :
     C5Dialog(dbParams),

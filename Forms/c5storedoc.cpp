@@ -13,8 +13,10 @@
 #include "ce5goods.h"
 #include "c5storebarcode.h"
 #include "c5user.h"
+#include "c5message.h"
 #include "c5storedraftwriter.h"
 #include "calculator.h"
+#include "c5utils.h"
 #include "c5storedocselectprinttemplate.h"
 #include <QMenu>
 #include <QHash>

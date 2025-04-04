@@ -6,7 +6,9 @@
 #include "c5printpreview.h"
 #include "c5user.h"
 #include "ce5goods.h"
+#include "c5message.h"
 #include "ce5editor.h"
+#include "c5utils.h"
 #include "c5storedraftwriter.h"
 #include <QShortcut>
 #include <QUuid>

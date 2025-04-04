@@ -1,5 +1,7 @@
 #include "change.h"
 #include "ui_change.h"
+#include "c5config.h"
+#include "c5utils.h"
 #include <QDoubleValidator>
 
 Change::Change() :
@@ -18,7 +20,6 @@ Change::Change() :
     fButtons.append(ui->btn8);
     fButtons.append(ui->btn9);
     fButtons.append(ui->btn0);
-
     fButtons2.append(ui->btn1000);
     fButtons2.append(ui->btn2000);
     fButtons2.append(ui->btn5000);
@@ -40,7 +41,7 @@ bool Change::getReceived(double &v)
         QPushButton *b = c.fButtons.at(i);
         connect(b, &QPushButton::clicked, &c, &Change::buttonClicked);
     }
-    for (int i = 0; i , i < c.fButtons2.count(); i++) {
+    for (int i = 0; i, i < c.fButtons2.count(); i++) {
         QPushButton *b = c.fButtons2.at(i);
         connect(b, &QPushButton::clicked, &c, &Change::buttonClicked2);
     }
@@ -54,13 +55,13 @@ bool Change::getReceived(double &v)
 
 void Change::buttonClicked()
 {
-    QPushButton *b = static_cast<QPushButton*>(sender());
+    QPushButton *b = static_cast<QPushButton *>(sender());
     ui->leReceived->setText(ui->leReceived->text() + b->text());
 }
 
 void Change::buttonClicked2()
 {
-    ui->leReceived->setText(static_cast<QPushButton*>(sender())->text());
+    ui->leReceived->setText(static_cast<QPushButton *>(sender())->text());
 }
 
 void Change::on_leReceived_textChanged(const QString &arg1)

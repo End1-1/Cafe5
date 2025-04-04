@@ -1,6 +1,8 @@
 #include "dlgdirtystoredoc.h"
 #include "ui_dlgdirtystoredoc.h"
 #include "c5lineedit.h"
+#include "c5message.h"
+#include "c5database.h"
 
 DlgDirtyStoreDoc::DlgDirtyStoreDoc(const QString &uuid, const QStringList &dbParams) :
     C5Dialog(dbParams),

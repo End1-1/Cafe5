@@ -1,5 +1,8 @@
 #include "dlgguestinfo.h"
 #include "ui_dlgguestinfo.h"
+#include "c5config.h"
+#include "c5database.h"
+#include "c5message.h"
 
 DlgGuestInfo::DlgGuestInfo() :
     C5Dialog(__c5config.dbParams()),

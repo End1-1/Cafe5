@@ -1,6 +1,9 @@
 #include "customerinfo.h"
 #include "ui_customerinfo.h"
 #include "amkbd.h"
+#include "c5database.h"
+#include "c5message.h"
+#include "c5config.h"
 #include <QEvent>
 #include <QKeyEvent>
 

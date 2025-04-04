@@ -5,6 +5,9 @@
 #include "c5servername.h"
 #include "fileversion.h"
 #include "dlgserverconnection.h"
+#include "c5config.h"
+#include "c5database.h"
+#include "c5message.h"
 #include <QSettings>
 
 C5Login::C5Login() :

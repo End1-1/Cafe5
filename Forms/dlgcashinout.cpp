@@ -2,6 +2,10 @@
 #include "ui_dlgcashinout.h"
 #include "c5printing.h"
 #include "c5user.h"
+#include "c5utils.h"
+#include "c5message.h"
+#include "c5config.h"
+#include "c5database.h"
 #include <QFile>
 
 DlgCashinOut::DlgCashinOut(C5User *u) :

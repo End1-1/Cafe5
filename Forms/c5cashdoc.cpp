@@ -9,6 +9,7 @@
 #include "bclientdebts.h"
 #include "c5user.h"
 #include "c5storedraftwriter.h"
+#include "c5message.h"
 
 C5CashDoc::C5CashDoc(const QStringList &dbParams, QWidget *parent) :
     C5Document(dbParams, parent),

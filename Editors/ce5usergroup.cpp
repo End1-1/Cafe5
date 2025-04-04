@@ -1,5 +1,6 @@
 #include "ce5usergroup.h"
 #include "ui_ce5usergroup.h"
+#include "c5message.h"
 
 CE5UserGroup::CE5UserGroup(const QStringList &dbParams, QWidget *parent) :
     CE5Editor(dbParams, parent),

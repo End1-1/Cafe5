@@ -1,5 +1,7 @@
 #include "c5srofinventory.h"
 #include "ui_c5srofinventory.h"
+#include "c5database.h"
+#include "c5message.h"
 
 C5SrOfInventory::C5SrOfInventory(const QStringList &dbParams, QWidget *parent) :
     C5Dialog(dbParams, parent),

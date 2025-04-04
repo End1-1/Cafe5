@@ -1,6 +1,7 @@
 #include "dlgconfigtable.h"
 #include "ui_dlgconfigtable.h"
 #include "QRCodeGenerator.h"
+#include "c5config.h"
 
 DlgConfigTable::DlgConfigTable(const QStringList &dbParams) :
     C5Dialog(dbParams),
@@ -14,7 +15,8 @@ DlgConfigTable::DlgConfigTable(const QStringList &dbParams) :
     //Storage name, IP, port, login, password, store, only read
     QString encodeString = __c5config.getValue(param_shop_config_mobile_client);
     CQR_Encode qrEncode;
-    bool successfulEncoding = qrEncode.EncodeData(levelIndex, versionIndex, bExtent, maskIndex, encodeString.toUtf8().data() );
+    bool successfulEncoding = qrEncode.EncodeData(levelIndex, versionIndex, bExtent, maskIndex,
+                              encodeString.toUtf8().data() );
     if (!successfulEncoding) {
         //fLog.append("Cannot encode qr image");
     }
@@ -22,7 +24,6 @@ DlgConfigTable::DlgConfigTable(const QStringList &dbParams) :
     int encodeImageSize = qrImageSize + ( QR_MARGIN * 2 );
     QImage encodeImage(encodeImageSize, encodeImageSize, QImage::Format_Mono);
     encodeImage.fill(1);
-
     for ( int i = 0; i < qrImageSize; i++ ) {
         for ( int j = 0; j < qrImageSize; j++ ) {
             if ( qrEncode.m_byModuleData[i][j] ) {
@@ -30,7 +31,6 @@ DlgConfigTable::DlgConfigTable(const QStringList &dbParams) :
             }
         }
     }
-
     QPixmap pix = QPixmap::fromImage(encodeImage).scaled(180, 180);
     ui->lbQR->setPixmap(pix);
 }

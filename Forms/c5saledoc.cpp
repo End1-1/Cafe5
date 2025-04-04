@@ -21,6 +21,7 @@
 #include "outputofheader.h"
 #include "../../NewTax/Src/printtaxn.h"
 #include "oheader.h"
+#include "c5storedoc.h"
 #include <QXlsx/header/xlsxdocument.h>
 #include <QClipboard>
 #include <QSqlQuery>
@@ -121,6 +122,7 @@ QToolBar *C5SaleDoc::toolBar()
         fPrintTax = fToolBar->addAction(QIcon(":/fiscal.png"), tr("Fiscal"), this, SLOT(fiscale()));
         fPrintReturnTax = fToolBar->addAction(QIcon(":/fiscal.png"), tr("Return fiscal"), this, SLOT(cancelFiscal()));
         fToolBar->addAction(QIcon(":/excel.png"), tr("Export to Excel"), this, SLOT(exportToExcel()));
+        fToolBar->addAction(QIcon(":/whosale.png"), tr("Create store\r\ndocument"), this, SLOT(createStoreDocument()));
         fActionReturn = fToolBar->addAction(QIcon(":/trading.png"), tr("Return"), this, SLOT(returnItems()));
     }
     return fToolBar;
@@ -160,6 +162,7 @@ bool C5SaleDoc::openDoc(const QString &uuid)
     }
     ui->cbHall->setCurrentIndex(ui->cbHall->findData(o.hall));
     ui->cbCashDesk->setCurrentIndex(ui->cbCashDesk->findData(o.table));
+    ui->leCashier->setProperty("f_cashier", db.getInt("f_cashier"));
     setMode(db.getInt("f_saletype"));
     if (db.getInt("f_state") > 1) {
         fToolBar->actions().at(0)->setEnabled(false);
@@ -173,6 +176,11 @@ bool C5SaleDoc::openDoc(const QString &uuid)
     ui->leDebt->setDouble(db.getDouble("f_amountdebt"));
     ui->lePrepaid->setDouble(db.getDouble("f_amountprepaid"));
     ui->leGrandTotal->setDouble(db.getDouble("f_amounttotal"));
+    //CASHIER
+    db[":f_id"] = ui->leCashier->property("f_cashier");
+    db.exec("select * from s_user where f_id=:f_id");
+    db.nextRow();
+    ui->leCashier->setText(QString("%1 %2").arg(db.getString("f_last"), db.getString("f_first")));
     fPartner.queryRecordOfId(db, o.partner);
     setPartner(fPartner);
     ui->leDate->setDate(o.dateCash);
@@ -231,6 +239,28 @@ void C5SaleDoc::amountDoubleClicked()
     ui->leDebt->clear();
     ui->lePrepaid->clear();
     static_cast<C5LineEdit *>(sender())->setDouble(ui->leGrandTotal->getDouble());
+}
+
+void C5SaleDoc::createStoreDocument()
+{
+    C5Database db(fDBParams);
+    QHash<int, double> prices1;
+    db.exec("select f_id, f_lastinputprice from c_goods");
+    while (db.nextRow()) {
+        prices1[db.getInt(0)] = db.getDouble(1);
+    }
+    auto *sd = __mainWindow->createTab<C5StoreDoc>(fDBParams);
+    sd->setMode(C5StoreDoc::sdInput);
+    sd->setStore(0, 0);
+    sd->setReason(DOC_REASON_INPUT);
+    sd->setComment(ui->leComment->text());
+    for (int i = 0; i < ui->tblGoods->rowCount(); i++) {
+        sd->addGoods(ui->tblGoods->getInteger(i, col_goods_code),
+                     ui->tblGoods->getString(i, col_name),
+                     ui->tblGoods->lineEdit(i, col_qty)->getDouble(),
+                     ui->tblGoods->getString(i, col_unit),
+                     0, 0, "");
+    }
 }
 
 void C5SaleDoc::printSale()
@@ -605,10 +635,11 @@ void C5SaleDoc::saveDataChanges()
     jh["f_table"] = ui->cbCashDesk->currentData().toInt();
     jh["f_dateopen"] = QDate::currentDate().toString(FORMAT_DATE_TO_STR_MYSQL);
     jh["f_dateclose"] = QDate::currentDate().toString(FORMAT_DATE_TO_STR_MYSQL);
-    jh["f_datecash"] = QDate::currentDate().toString(FORMAT_DATE_TO_STR_MYSQL);
+    jh["f_datecash"] = ui->leDate->date().toString(FORMAT_DATE_TO_STR_MYSQL);
     jh["f_timeopen"] = QTime::currentTime().toString(FORMAT_TIME_TO_STR);
     jh["f_timeclose"] = QTime::currentTime().toString(FORMAT_TIME_TO_STR);
-    jh["f_cashier"] = __user->id();
+    jh["f_cashier"] = ui->leCashier->property("f_cachier").toInt()  == 0 ? __user->id() :
+                      ui->leCashier->property("f_cashier").toInt();
     jh["f_staff"] = __user->id();
     jh["f_comment"] = ui->leComment->text();
     jh["f_print"] = 0;
@@ -877,6 +908,7 @@ bool C5SaleDoc::openDraft(const QString &id)
     if (fDraftSale.state != 1) {
         return openDoc(id);
     }
+    ui->leCashier->setProperty("f_cashier", db.getInt("f_cashier"));
     switch (db.getInt("f_saletype")) {
         case 1:
             ui->leSaleType->setText(tr("Retail"));
@@ -896,11 +928,16 @@ bool C5SaleDoc::openDraft(const QString &id)
     ui->leUuid->setText(fDraftSale.id.toString());
     ui->leDelivery->setText(fDraftSale.deliveryDate.toString(FORMAT_DATE_TO_STR));
     setDeliveryMan();
+    db[":f_id"] = ui->leCashier->property("f_cashier");
+    db.exec("select * from s_user where f_id=:f_id");
+    db.nextRow();
+    ui->leCashier->setText(QString("%1 %2").arg(db.getString("f_last"), db.getString("f_first")));
     QString priceField = "f_price1";
     db[":f_header"] = id;
     db[":f_state"] = 1;
     db[":f_currency"] = ui->cbCurrency->currentData();
-    db.exec(QString("select dsb.f_store, dsb.f_qty, g.*, gu.f_name as f_unitname, dsb.f_price, dsb.f_discount "
+    db.exec(QString("select dsb.f_store, dsb.f_qty, g.*, "
+                    "gu.f_name as f_unitname, dsb.f_price, dsb.f_discount "
                     "from o_draft_sale_body dsb "
                     "left join c_goods g on g.f_id=dsb.f_goods "
                     "left join c_goods_prices gpr on gpr.f_goods=g.f_id "
@@ -930,6 +967,11 @@ bool C5SaleDoc::openDraft(const QString &id)
         case 7:
             ui->leDebt->setDouble(ui->leGrandTotal->getDouble());
             break;
+    }
+    db[":f_header"] = id;
+    db.exec("select * from o_qr where f_header = :f_header");
+    while (db.nextRow()) {
+        fEmarks.append(QByteArray::fromBase64(db.getString( "f_qr").toUtf8()));
     }
     fActionSave->setEnabled(true);
     fActionCopy->setEnabled(false);
@@ -982,12 +1024,17 @@ void C5SaleDoc::setPartner(const CPartners &p)
 void C5SaleDoc::setDeliveryMan()
 {
     ui->leDeluveryMan->clear();
+    C5Database db(fDBParams);
     if (fDraftSale.staff > 0) {
-        C5Database db(fDBParams);
         db[":f_id"] = fDraftSale.staff;
         db.exec("select concat_ws(' ', f_last, f_first) as f_fullname from s_user where f_id=:f_id");
         db.nextRow();
         ui->leDeluveryMan->setText(db.getString("f_fullname"));
+    }
+    if (!fActionSave->isEnabled()) {
+        db["f_id"] = ui->leUuid->text();
+        db["f_staff"] = fDraftSale.staff;
+        db.exec("update o_header set f_staff=:f_staff where f_id=:f_id");
     }
 }
 
@@ -1079,9 +1126,10 @@ void C5SaleDoc::exportToAs(int doctype)
     QJsonArray ja;
     db[":f_header"] = ui->leUuid->text();
     db[":f_asdbid"] = jo["asdbid"].toInt();
+    db[":f_dealtype"] = dealtype;
     db.exec("SELECT ds.f_goods, a.f_ascode, g.f_name, ds.f_price - (ds.f_price * ds.f_discountfactor) as f_price, ds.f_qty, "
             "ds.f_price as f_initprice, ds.f_discountfactor as f_discount, "
-            "g.f_service, a2.f_ascode as f_asstore, '' as f_dealtype "
+            "g.f_service, a2.f_ascode as f_asstore, :f_dealtype as f_dealtype "
             "FROM o_goods ds "
             "LEFT JOIN c_goods g ON g.f_id=ds.f_goods "
             "left join as_convert a on a.f_tableid=g.f_id and a.f_table='c_goods' and a.f_asdbid=:f_asdbid "
@@ -1490,11 +1538,6 @@ void C5SaleDoc::removeDoc()
 
 void C5SaleDoc::on_btnQr_clicked()
 {
-    QString s = QInputDialog::getText(this, tr("Emarks"), "");
-    if (s.isEmpty()) {
-        return;
-    }
-    fEmarks.append(s);
 }
 
 void C5SaleDoc::on_btnCalculator_clicked()
@@ -1503,4 +1546,22 @@ void C5SaleDoc::on_btnCalculator_clicked()
 
 void C5SaleDoc::on_cbStorage_currentIndexChanged(int index)
 {
+}
+
+void C5SaleDoc::on_btnCashier_clicked()
+{
+    QJsonArray vals;
+    C5Selector::getValue(fDBParams, cache_users, vals);
+    if (vals.count() == 0) {
+        return;
+    }
+    fDraftSale.cashier = vals.at(1).toInt();
+    ui->leCashier->setProperty("f_cashier", vals.at(1).toInt());
+    ui->leCashier->setText(QString("%1 %2").arg(vals.at(2).toString(), vals.at(3).toString()));
+    if (!fActionSave->isEnabled()) {
+        C5Database db(__c5config.dbParams());
+        db[":f_id"] = ui->leUuid->text();
+        db[":f_cashier"] = vals.at(1).toInt();
+        db.exec("update o_header set f_cashier=:f_cashier where f_id=:f_id");
+    }
 }

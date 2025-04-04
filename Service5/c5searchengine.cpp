@@ -95,7 +95,7 @@ void C5SearchEngine::init(QStringList databases)
         sql = QString::fromStdString(R"sql(
         select f_id, f_taxname, coalesce(f_taxcode, '') as f_taxcode, f_price_politic,
         f_address, f_permanent_discount,
-        f_phone, f_contact
+        f_phone, f_contact, f_name
         from c_partners where f_state>0
         order by 2
         )sql");
@@ -111,6 +111,7 @@ void C5SearchEngine::init(QStringList databases)
             jt["address"] = db.string("f_address");
             jt["discount"] = db.doubleValue("f_permanent_discount");
             jt["mode"] = db.integer("f_price_politic");
+            jt["name"] = db.string("f_name");
             ja.append(jt);
         }
         mSearchPartners[dbname] = ja;
@@ -241,7 +242,9 @@ void C5SearchEngine::searchPartner(const QJsonObject &jo, QWebSocket *socket)
         if (jt["taxname"].toString().contains(searchString, Qt::CaseInsensitive)
                 || jt["tin"].toString().contains(searchString, Qt::CaseInsensitive)
                 || jt["phone"].toString().contains(searchString, Qt::CaseInsensitive)
-                || jt["contact"].toString().contains(searchString, Qt::CaseInsensitive)) {
+                || jt["contact"].toString().contains(searchString, Qt::CaseInsensitive)
+                || jt["address"].toString().contains(searchString, Qt::CaseInsensitive)
+                || jt["name"].toString().contains(searchString, Qt::CaseInsensitive)) {
             noResult = false;
             if (skip > 0) {
                 skip--;

@@ -1,5 +1,7 @@
 #include "dlgselectcurrency.h"
 #include "ui_dlgselectcurrency.h"
+#include "c5database.h"
+#include "c5config.h"
 
 DlgSelectCurrency::DlgSelectCurrency(const QStringList &dbParams, QWidget *parent) :
     C5Dialog(dbParams, parent),

@@ -1,6 +1,8 @@
 #include "dlgsetwaiterordercl.h"
 #include "ui_dlgsetwaiterordercl.h"
 #include "dlgnewcl.h"
+#include "c5config.h"
+#include "c5database.h"
 
 DlgSetWaiterOrderCL::DlgSetWaiterOrderCL(const QStringList &dbParams) :
     C5Dialog(dbParams),

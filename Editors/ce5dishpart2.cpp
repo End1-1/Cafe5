@@ -1,6 +1,7 @@
 #include "ce5dishpart2.h"
 #include "ui_ce5dishpart2.h"
 #include "c5cache.h"
+#include "c5message.h"
 #include "ce5dishpart1.h"
 #include <QColorDialog>
 #include <QMenu>
@@ -119,18 +120,16 @@ void CE5DishPart2::uploadImage()
         return;
     }
     ui->lbImg->setPixmap(pm.scaled(ui->lbImg->size(), Qt::KeepAspectRatio));
-
     QByteArray ba;
     do {
         if (!ui->chDonNotResize->isChecked()) {
             pm = pm.scaled(pm.width() * 0.8,  pm.height() * 0.8);
         }
         ba.clear();
-        QBuffer buff(&ba);
+        QBuffer buff( &ba);
         buff.open(QIODevice::WriteOnly);
-        pm.save(&buff, "JPG");
+        pm.save( &buff, "JPG");
     } while (ba.size() > 100000 && !ui->chDonNotResize->isChecked());
-
     C5Database db(fDBParams);
     db[":f_id"] = ui->leImageUUID->text();
     db.exec("delete from s_images where f_id=:f_id");

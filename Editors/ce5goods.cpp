@@ -12,6 +12,7 @@
 #include "ce5goodsmodel.h"
 #include "c5user.h"
 #include "c5storebarcode.h"
+#include "c5utils.h"
 #include "c5replacecharacter.h"
 #include <QClipboard>
 #include <QFontDatabase>

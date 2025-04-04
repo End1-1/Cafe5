@@ -4,6 +4,8 @@
 #include "logwriter.h"
 #include "c5servername.h"
 #include "dlgserverconnection.h"
+#include "c5config.h"
+#include "c5message.h"
 #include <QMessageBox>
 #include <QApplication>
 #include <QTranslator>

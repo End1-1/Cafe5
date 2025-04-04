@@ -7,7 +7,9 @@
 #include "c5mainwindow.h"
 #include "c5dateedit.h"
 #include "c5cashdoc.h"
+#include "c5utils.h"
 #include "c5user.h"
+#include "c5message.h"
 #include "c5lineeditwithselector.h"
 
 C5SalaryDoc::C5SalaryDoc(const QStringList &dbParams, QWidget *parent) :

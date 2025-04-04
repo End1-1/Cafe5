@@ -3,6 +3,9 @@
 #include "c5lineedit.h"
 #include "c5checkbox.h"
 #include "c5cache.h"
+#include "c5database.h"
+#include "c5message.h"
+#include "c5utils.h"
 
 DlgChangeOutputStore::DlgChangeOutputStore(const QStringList &dbParams) :
     C5Dialog(dbParams),
@@ -10,7 +13,7 @@ DlgChangeOutputStore::DlgChangeOutputStore(const QStringList &dbParams) :
 {
     ui->setupUi(this);
     ui->tbl->setRowCount(1);
-    for (int i = 0; i < ui->tbl->columnCount(); i++){
+    for (int i = 0; i < ui->tbl->columnCount(); i++) {
         C5LineEdit *l = ui->tbl->createLineEdit(0, i);
         connect(l, SIGNAL(textChanged(QString)), this, SLOT(search(QString)));
     }
@@ -60,7 +63,7 @@ void DlgChangeOutputStore::refresh(const QDate &d1, const QDate &d2)
 
 void DlgChangeOutputStore::searchInTable(int col, const QString &str)
 {
-    for (int i = 1; i < ui->tbl->rowCount(); i++){
+    for (int i = 1; i < ui->tbl->rowCount(); i++) {
         bool rh = true;
         rh = ui->tbl->getString(i, col).contains(str, Qt::CaseInsensitive);
         ui->tbl->setRowHidden(i, !rh);
@@ -69,7 +72,7 @@ void DlgChangeOutputStore::searchInTable(int col, const QString &str)
 
 void DlgChangeOutputStore::search(const QString &arg1)
 {
-    C5LineEdit *l = static_cast<C5LineEdit*>(sender());
+    C5LineEdit *l = static_cast<C5LineEdit *>(sender());
     int r, c;
     if (!ui->tbl->findWidget(l, r, c)) {
         return;

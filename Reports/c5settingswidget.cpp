@@ -1,6 +1,7 @@
 #include "c5settingswidget.h"
 #include "ui_c5settingswidget.h"
 #include "jsons.h"
+#include "c5utils.h"
 #include <QFileDialog>
 
 C5SettingsWidget::C5SettingsWidget(const QStringList &dbParams, QWidget *parent) :
@@ -74,6 +75,7 @@ void C5SettingsWidget::setId(int id)
         ui->chmStoreInputCheck->setChecked(jo["chm_storeinputcheck"].toBool());
         ui->chmSaleOutputConfirmation->setChecked(jo["chm_saleoutconfirmation"].toBool());
         ui->chmReturnGoods->setChecked(jo["chm_returngoods"].toBool());
+        ui->chDebugMode->setChecked(jo["debug_mode"].toBool());
         QJsonArray ja = jo["availableoutstore"].toArray();
         ui->chUseWebsocket->setChecked(jo["use_websocket"].toBool());
         QString s;
@@ -268,6 +270,7 @@ bool C5SettingsWidget::save(QString &err, QList<QMap<QString, QVariant> > &data)
     jc["chm_saleoutconfirmation"] = ui->chmSaleOutputConfirmation->isChecked();
     jc["chm_returngoods"] = ui->chmReturnGoods->isChecked();
     jc["use_websocket"] = ui->chUseWebsocket->isChecked();
+    jc["debug_mode"] = ui->chDebugMode->isChecked();
     QJsonArray ja;
     QStringList a = ui->leAvailableStore->text().split(",", Qt::SkipEmptyParts);
     for  (const QString &s : a) {

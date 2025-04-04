@@ -3,6 +3,7 @@
 #include "c5selector.h"
 #include "c5combobox.h"
 #include "c5cache.h"
+#include "c5message.h"
 #include <QMenu>
 
 CE5DishPackage::CE5DishPackage(const QStringList &dbParams, QWidget *parent) :

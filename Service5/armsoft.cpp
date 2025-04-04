@@ -48,6 +48,7 @@ bool ArmSoft::exportToAS(QString &err)
         tmp["f_discount"] = jt["f_discount"].toDouble() * 100;
         tmp["f_service"] = jt["f_service"].toInt();
         tmp["f_store"] = jt["f_asstore"].toString();
+        tmp["f_dealtype"] =  QString::number(jt["f_dealtype"].toString().toInt() - 1);
         items.append(tmp);
         double ltotal = tmp["f_qty"].toDouble() * tmp["f_price"].toDouble();
         total += ltotal + (ltotal *fData["withvat"].toDouble());

@@ -8,6 +8,7 @@
 #include "c5storedoc.h"
 #include "ntablemodel.h"
 #include "c5saledoc.h"
+#include "c5message.h"
 #include <QToolButton>
 #include <QGridLayout>
 #include <QTableView>

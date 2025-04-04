@@ -3,6 +3,7 @@
 #include "c5permissions.h"
 #include "c5selector.h"
 #include "c5cache.h"
+#include "c5message.h"
 #include <QProxyStyle>
 #include <QStyleOptionTab>
 
@@ -22,7 +23,7 @@ public:
     void drawControl(ControlElement element, const QStyleOption *option, QPainter *painter, const QWidget *widget) const
     {
         if (element == CE_TabBarTabLabel) {
-            if (const QStyleOptionTab * tab = qstyleoption_cast<const QStyleOptionTab * >(option)) {
+            if (const QStyleOptionTab *tab = qstyleoption_cast<const QStyleOptionTab * >(option)) {
                 QStyleOptionTab opt( *tab);
                 opt.shape = QTabBar::RoundedNorth;
                 QProxyStyle::drawControl(element, &opt, painter, widget);

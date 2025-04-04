@@ -1,6 +1,8 @@
 #include "dlgsemireadyinout.h"
 #include "ui_dlgsemireadyinout.h"
 #include "c5selector.h"
+#include "c5database.h"
+#include "c5utils.h"
 
 DlgSemireadyInOut::DlgSemireadyInOut(const QStringList &dbParams, QWidget *parent) :
     C5Dialog(dbParams, parent),

@@ -1,5 +1,8 @@
 #include "dlgnewcl.h"
 #include "ui_dlgnewcl.h"
+#include "c5message.h"
+#include "c5database.h"
+#include "c5config.h"
 
 DlgNewCL::DlgNewCL(const QStringList &dbParams) :
     C5Dialog(dbParams),

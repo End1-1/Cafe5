@@ -1,6 +1,7 @@
 #include "touchselecttaxreport.h"
 #include "ui_touchselecttaxreport.h"
 #include "printtaxn.h"
+#include "c5config.h"
 
 TouchSelectTaxReport::TouchSelectTaxReport() :
     C5Dialog(__c5config.dbParams()),

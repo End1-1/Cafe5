@@ -64,6 +64,9 @@ public:
 
     bool openDraft(const QString &id, QString &err);
 
+    int addGoods(int goods, const QString &name, double qty, const QString &unit, double price, double total,
+                 const QString &comment);
+
 public slots:
     void saveDoc();
 
@@ -109,9 +112,6 @@ private:
     void writeDocumentWithState(int state);
 
     int addGoodsRow();
-
-    int addGoods(int goods, const QString &name, double qty, const QString &unit, double price, double total,
-                 const QString &comment);
 
     void setDocEnabled(bool v);
 

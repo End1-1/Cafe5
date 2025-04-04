@@ -1,6 +1,9 @@
 #include "dlgcashop.h"
 #include "ui_dlgcashop.h"
 #include "c5storedraftwriter.h"
+#include "c5message.h"
+#include "c5config.h"
+#include "c5utils.h"
 #include "c5user.h"
 #include <QStyle>
 #include <QDoubleValidator>

@@ -6,6 +6,10 @@
 #include "../Forms/dlglist2.h"
 #include "httpquerydialog.h"
 #include "c5cache.h"
+#include "c5message.h"
+#include "c5database.h"
+#include "c5utils.h"
+#include "c5config.h"
 #include "c5printrecipta4.h"
 #include <QMenu>
 #include <QClipboard>

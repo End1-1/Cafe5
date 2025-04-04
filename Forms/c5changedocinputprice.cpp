@@ -1,6 +1,9 @@
 #include "c5changedocinputprice.h"
 #include "ui_c5changedocinputprice.h"
 #include "c5cache.h"
+#include "c5message.h"
+#include "c5database.h"
+#include "c5config.h"
 #include "c5user.h"
 
 C5ChangeDocInputPrice::C5ChangeDocInputPrice(const QStringList &dbParams, const QString &uuid) :
@@ -64,13 +67,13 @@ void C5ChangeDocInputPrice::on_btnChange_clicked()
         drafts.append(db.getString("f_draft"));
         docs.insert(db.getString("f_document"));
     }
-    for (const QString &s: drafts) {
+    for (const QString &s : drafts) {
         db[":f_id"] = s;
         db[":f_goods"] = ui->leGoods->getInteger();
         db[":f_price"] = ui->lePrice->text();
         db.exec("update a_store_draft set f_goods=:f_goods, f_price=:f_price, f_total=:f_price*f_qty where f_id=:f_id");
     }
-    for (const QString &s: docs) {
+    for (const QString &s : docs) {
         db[":f_id"] = s;
         db.exec("update a_header set f_amount=(select sum(f_total) from a_store_draft where f_document=:f_id) where f_id=:f_id");
     }

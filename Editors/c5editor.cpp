@@ -1,6 +1,7 @@
 #include "c5editor.h"
 #include "ui_c5editor.h"
 #include "ce5editor.h"
+#include "c5message.h"
 #include <QShortcut>
 #include <QKeyEvent>
 

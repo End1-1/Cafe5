@@ -1,6 +1,7 @@
 #include "c5inputdate.h"
 #include "ui_c5inputdate.h"
 #include "c5cache.h"
+#include "c5message.h"
 
 C5InputDate::C5InputDate(const QStringList &dbParams) :
     C5Dialog(dbParams),

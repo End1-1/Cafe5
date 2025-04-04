@@ -252,8 +252,7 @@ bool CR5CommonSales::tblDoubleClicked(int row, int column, const QJsonArray &val
             }
         }
     } else {
-        C5WaiterOrder *wo = __mainWindow->createTab<C5WaiterOrder>(fDBParams);
-        wo->setOrder(values.at(fModel->fColumnNameIndex["f_id"]).toString());
+        C5Message::error(tr("Order not exists"));
     }
     return true;
 }

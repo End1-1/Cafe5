@@ -8,6 +8,7 @@
 #include "c5dishwidget.h"
 #include "c5mainwindow.h"
 #include "proxytablewidgetdatabase.h"
+#include "c5message.h"
 #include "c5cashdoc.h"
 #include "c5airlog.h"
 #include "dlgsetwaiterordercl.h"

@@ -2,6 +2,7 @@
 #include "ui_ce5user.h"
 #include "c5cache.h"
 #include "ce5usergroup.h"
+#include "c5message.h"
 #include <QFileDialog>
 
 CE5User::CE5User(const QStringList &dbParams, QWidget *parent) :
@@ -74,7 +75,6 @@ void CE5User::on_btnLoadImage_clicked()
     }
 }
 
-
 void CE5User::setId(int id)
 {
     CE5Editor::setId(id);
@@ -84,7 +84,6 @@ void CE5User::setId(int id)
     QPixmap p;
     if (db.nextRow()) {
         if (p.loadFromData(db.getValue("f_data").toByteArray())) {
-
         } else {
             p = QPixmap(":/staff.png");
         }
@@ -96,5 +95,4 @@ void CE5User::setId(int id)
 
 void CE5User::on_btnPin_clicked(bool checked)
 {
-
 }

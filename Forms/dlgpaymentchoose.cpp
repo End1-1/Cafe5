@@ -1,5 +1,8 @@
 #include "dlgpaymentchoose.h"
 #include "ui_dlgpaymentchoose.h"
+#include "c5message.h"
+#include "c5config.h"
+#include "c5utils.h"
 #include <QDoubleValidator>
 #include <QShortcut>
 #include <QStyle>

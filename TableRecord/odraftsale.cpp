@@ -10,13 +10,13 @@ bool ODraftSale::getRecord(C5Database &db)
     saleType = db.getInt("f_saletype");
     date = db.getDate("f_date");
     time = db.getTime("f_time");
+    cashier = db.getInt("f_cashier");
     staff = db.getInt("f_staff");
     partner = db.getInt("f_partner");
     amount = db.getDouble("f_amount");
     comment = db.getString("f_comment");
     payment = db.getInt("f_payment");
     deliveryDate = db.getDate("f_datefor");
-    cashier = db.getInt("f_cashier");
     return true;
 }
 

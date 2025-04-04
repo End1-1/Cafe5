@@ -2,6 +2,7 @@
 #include "ui_c5customfilter.h"
 #include "c5dateedit.h"
 #include "c5lineeditwithselector.h"
+#include "c5message.h"
 #include <QListWidgetItem>
 #include <QRegularExpression>
 #include <QLabel>

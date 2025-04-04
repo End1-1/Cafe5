@@ -5,6 +5,7 @@
 #include "c5cache.h"
 #include "c5combobox.h"
 #include "c5selector.h"
+#include "c5message.h"
 #include <QValidator>
 #include <QPushButton>
 #include <QPlainTextEdit>

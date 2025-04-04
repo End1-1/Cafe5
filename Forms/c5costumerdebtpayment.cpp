@@ -4,6 +4,7 @@
 #include "c5cashdoc.h"
 #include "bclientdebts.h"
 #include "c5user.h"
+#include "c5message.h"
 #include <QDoubleValidator>
 
 C5CostumerDebtPayment::C5CostumerDebtPayment(int type, const QStringList &dbParams) :
