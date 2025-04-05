@@ -40,7 +40,7 @@ CR5CommonSales::CR5CommonSales(const QStringList &dbParams, QWidget *parent) :
                    << "dayofweek(oh.f_datecash) as f_dayofweek"
                    << "hl.f_name as f_hallname"
                    << "ht.f_name as f_tablename"
-                   << "concat_ws(' ', w.f_last, w.f_first) as f_cashier"
+                   << "concat_ws(' ', ww.f_last, ww.f_first) as f_cashier"
                    << "concat(w.f_last, ' ', w.f_first) as f_staff"
                    << "oh.f_dateopen"
                    << "oh.f_timeopen"
@@ -158,7 +158,7 @@ CR5CommonSales::CR5CommonSales(const QStringList &dbParams, QWidget *parent) :
     fColumnsVisible["sum(oh.f_amounttelcell) as f_amounttelcell"] = false;
     fColumnsVisible["concat_ws(', ', cpb.f_name, cpb.f_taxname, cpb.f_address) as f_buyer"] = false;
     fColumnsVisible["cpb.f_taxcode as f_buyertaxcode"] = false;
-    fColumnsVisible["concat_ws(' ', w.f_last, w.f_first) as f_cashier"] = false;
+    fColumnsVisible["concat_ws(' ', ww.f_last, ww.f_first) as f_cashier"] = false;
     fColumnsVisible["concat(w.f_last, ' ', w.f_first) as f_staff"] = false;
     fColumnsVisible["sum(oh.f_amounttotal) as f_amounttotal"] = true;
     fColumnsVisible["sum(oh.f_amountcash) as f_amountcash"] = true;
