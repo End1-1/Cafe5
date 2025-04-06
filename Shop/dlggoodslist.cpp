@@ -1,5 +1,7 @@
 #include "dlggoodslist.h"
 #include "ui_dlggoodslist.h"
+#include "c5database.h"
+#include "c5config.h"
 #include <QKeyEvent>
 
 DlgGoodsList::DlgGoodsList(int currency) :

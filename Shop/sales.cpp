@@ -11,6 +11,7 @@
 #include "vieworder.h"
 #include "cashcollection.h"
 #include "c5printpreview.h"
+#include "c5permissions.h"
 #include "c5user.h"
 #include "c5printing.h"
 #include "dlgreturnitem.h"

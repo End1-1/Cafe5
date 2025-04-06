@@ -1,6 +1,7 @@
 #include "dlgreceiptlanguage.h"
 #include "ui_dlgreceiptlanguage.h"
 #include "c5translator.h"
+#include "c5config.h"
 
 DlgReceiptLanguage::DlgReceiptLanguage(const QStringList &dbParams) :
     C5Dialog(dbParams),
@@ -50,18 +51,18 @@ void DlgReceiptLanguage::on_lst_clicked(const QModelIndex &index)
         return;
     }
     switch (index.row()) {
-    case 0:
-        fResult = LANG_AM;
-        break;
-    case 1:
-        fResult = LANG_EN;
-        break;
-    case 2:
-        fResult = LANG_RU;
-        break;
-    default:
-        reject();
-        return;
+        case 0:
+            fResult = LANG_AM;
+            break;
+        case 1:
+            fResult = LANG_EN;
+            break;
+        case 2:
+            fResult = LANG_RU;
+            break;
+        default:
+            reject();
+            return;
     }
     accept();
 }

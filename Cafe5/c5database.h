@@ -20,8 +20,6 @@ class C5Database : public QObject
 public:
     C5Database();
 
-    C5Database(const QString &dbdriver);
-
     C5Database(const QStringList &dbParams);
 
     C5Database(C5Database &db);

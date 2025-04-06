@@ -70,6 +70,7 @@ SOURCES += \
     ../Classes/calculator.cpp \
     ../Classes/dataonline.cpp \
     ../Classes/dlgpassword.cpp \
+    ../Classes/dlgserverconnection.cpp \
     ../Classes/idram.cpp \
     ../Classes/logwriter.cpp \
     ../Classes/notificationwidget.cpp \
@@ -304,6 +305,7 @@ HEADERS += \
     ../Classes/chatmessage.h \
     ../Classes/dataonline.h \
     ../Classes/dlgpassword.h \
+    ../Classes/dlgserverconnection.h \
     ../Classes/goodsreserve.h \
     ../Classes/idram.h \
     ../Classes/logwriter.h \
@@ -512,6 +514,7 @@ FORMS += \
     ../Classes/c5gridgilter.ui \
     ../Classes/calculator.ui \
     ../Classes/dlgpassword.ui \
+    ../Classes/dlgserverconnection.ui \
     ../Classes/notificationwidget.ui \
     ../Controls/c5tablewithtotal.ui \
     ../Controls/combosearchview.ui \

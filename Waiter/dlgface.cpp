@@ -1,6 +1,5 @@
 #include "dlgface.h"
 #include "dlgmanagertools.h"
-#include "jsons.h"
 #include "ui_dlgface.h"
 #include "dlgpassword.h"
 #include "c5user.h"
@@ -14,10 +13,12 @@
 #include "datadriver.h"
 #include "tablewidget.h"
 #include "dlgexitwithmessage.h"
-#include "c5socketmessage.h"
+#include "c5config.h"
+#include "c5permissions.h"
 #include "fileversion.h"
 #include "c5cafecommon.h"
 #include "c5logtoserverthread.h"
+#include "c5message.h"
 #include <QPushButton>
 #include <QCloseEvent>
 #include <QScreen>

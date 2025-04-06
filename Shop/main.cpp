@@ -1,6 +1,7 @@
 #include "working.h"
 #include "c5config.h"
 #include "dlgpin.h"
+#include "dlgserverconnection.h"
 #include "ndataprovider.h"
 #include "datadriver.h"
 #include "c5user.h"
@@ -8,6 +9,7 @@
 #include "settingsselection.h"
 #include "c5dialog.h"
 #include "c5systempreference.h"
+#include "c5database.h"
 #include "c5message.h"
 #include "dlgsplashscreen.h"
 #include "fileversion.h"
@@ -62,41 +64,21 @@ int main(int argc, char *argv[])
     dlgsplash->show();
     LogWriter::write(LogWriterLevel::verbose, "", "get server names");
     emit dlgsplash->messageSignal("Get server name");
-    QString serverName, settingsName = "shop", rewriteConfig;
     bool noconfig = true;
-    for (const QString &arg : a.arguments()) {
-        if (arg.contains("/debug")) {
-            __c5config.setValue(param_debuge_mode, "1");
-            continue;
-        }
-        if (arg.contains("/servername=")) {
-            QStringList sn = arg.split("=", Qt::SkipEmptyParts);
-            if (sn.length() == 2) {
-                serverName = sn.at(1);
-            }
-        } else if (arg.contains("/config")) {
-            QStringList sn = arg.split("=", Qt::SkipEmptyParts);
-            if (sn.length() == 2) {
-                settingsName = sn.at(1);
-            }
-        } else if (arg.contains("/rewriteconfig")) {
-            QStringList sn = arg.split("=");
-            if (sn.length() == 2) {
-                rewriteConfig = sn.at(1);
-            }
-        }
-    }
-    C5ServerName sng(serverName, "shop");
-    if (!sng.getServers(settingsName)) {
+    C5ServerName sng(__c5config.getRegValue("ss_server_address").toString());
+    if (!sng.getConnection(__c5config.getRegValue("ss_database").toString())) {
+        C5Message::error(sng.mErrorString);
+        DlgServerConnection::showSettings(0);
         return 1;
     }
     noconfig = false;
-    QJsonObject js = sng.mServers.at(0).toObject();
-    C5Config::fDBHost = js["host"].toString();
+    QJsonObject js = sng.mReply;
+    C5Config::fDBHost = js["settings"].toString();
     C5Config::fDBPath = js["database"].toString();
     C5Config::fDBUser = js["username"].toString();
+    NDataProvider::mProtocol = js["settings"].toString();
     C5Config::fDBPassword = js["password"].toString();
-    C5Config::fSettingsName = rewriteConfig.isEmpty() ? js["settings"].toString() : rewriteConfig;
+    C5Config::fSettingsName = __c5config.getRegValue("ss_settings").toString();
     QSettings ss(_ORGANIZATION_, _APPLICATION_ + QString("\\") + _MODULE_);
     ss.setValue("server", "");
     if (noconfig) {
@@ -131,7 +113,6 @@ int main(int argc, char *argv[])
         }
         LogWriter::write(LogWriterLevel::verbose, "", "try login to db");
         emit dlgsplash->messageSignal("try login to db");
-        __c5config.setValue(param_debuge_mode, "1");
         if (__user->authByPinPass(user, pin)) {
         } else {
             C5Message::error(__user->error() + " 2");

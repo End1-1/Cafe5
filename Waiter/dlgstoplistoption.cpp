@@ -2,7 +2,10 @@
 #include "ui_dlgstoplistoption.h"
 #include "dlgorder.h"
 #include "c5tabledata.h"
+#include "c5message.h"
 #include "c5printing.h"
+#include "c5config.h"
+#include "c5utils.h"
 #include "c5user.h"
 
 DlgStopListOption::DlgStopListOption(DlgOrder *o, C5User *u) :

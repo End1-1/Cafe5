@@ -1,6 +1,9 @@
 #include "dlgregistercard.h"
 #include "ui_dlgregistercard.h"
 #include "dlgsearchpartner.h"
+#include "c5config.h"
+#include "c5message.h"
+#include "c5database.h"
 
 DlgRegisterCard::DlgRegisterCard(QWidget *parent) :
     QDialog(parent),
@@ -25,12 +28,10 @@ void DlgRegisterCard::on_toolButton_clicked()
     }
 }
 
-
 void DlgRegisterCard::on_btnCancel_clicked()
 {
     reject();
 }
-
 
 void DlgRegisterCard::on_btnRegister_clicked()
 {
@@ -70,4 +71,3 @@ void DlgRegisterCard::on_btnRegister_clicked()
     accept();
     C5Message::info(tr("Card registered"));
 }
-

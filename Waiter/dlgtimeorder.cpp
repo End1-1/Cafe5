@@ -1,5 +1,6 @@
 #include "dlgtimeorder.h"
 #include "ui_dlgtimeorder.h"
+#include "c5config.h"
 
 DlgTimeorder::DlgTimeorder() :
     C5Dialog(__c5config.dbParams()),

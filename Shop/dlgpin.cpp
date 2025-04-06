@@ -1,8 +1,11 @@
 #include "dlgpin.h"
 #include "ui_dlgpin.h"
 #include "nloadingdlg.h"
+#include "c5servername.h"
 #include "c5message.h"
 #include "ndataprovider.h"
+#include "c5config.h"
+#include "dlgserverconnection.h"
 #include <QKeyEvent>
 #include <QJsonObject>
 
@@ -208,4 +211,13 @@ void DlgPin::queryError(const QString &err)
 {
     C5Message::error(err);
     queryStopped(sender());
+}
+
+void DlgPin::on_btnSettings_clicked()
+{
+    DlgServerConnection::showSettings(this);
+    C5ServerName sng(__c5config.getRegValue("ss_server_address").toString());
+    if (!sng.getServers()) {
+        C5Message::error(sng.mErrorString);
+    }
 }

@@ -1,5 +1,7 @@
 #include "dlgguest.h"
 #include "ui_dlgguest.h"
+#include "c5config.h"
+#include "c5database.h"
 
 DlgGuest::DlgGuest() :
     C5Dialog(C5Config::dbParams()),

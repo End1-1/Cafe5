@@ -1,5 +1,6 @@
 #include "calendar.h"
 #include "ui_calendar.h"
+#include "c5config.h"
 
 Calendar::Calendar() :
     C5Dialog(__c5config.dbParams()),

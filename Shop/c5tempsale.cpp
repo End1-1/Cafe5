@@ -1,9 +1,9 @@
 #include "c5tempsale.h"
 #include "ui_c5tempsale.h"
-#include "worder.h"
 #include "working.h"
-#include "odraftsale.h"
-#include "odraftsalebody.h"
+#include "c5config.h"
+#include "c5database.h"
+#include "c5message.h"
 #include <QTableWidgetItem>
 
 C5TempSale::C5TempSale() :

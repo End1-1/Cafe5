@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>424</width>
-    <height>210</height>
+    <height>248</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -25,13 +25,6 @@
      </property>
     </widget>
    </item>
-   <item row="4" column="1">
-    <widget class="QComboBox" name="cbSettings">
-     <property name="editable">
-      <bool>true</bool>
-     </property>
-    </widget>
-   </item>
    <item row="5" column="1">
     <widget class="QLineEdit" name="leSettingsPassword">
      <property name="echoMode">
@@ -43,17 +36,6 @@
     <widget class="QLabel" name="label_4">
      <property name="text">
       <string>Settings password</string>
-     </property>
-    </widget>
-   </item>
-   <item row="4" column="2">
-    <widget class="QPushButton" name="btnGetSettings">
-     <property name="text">
-      <string/>
-     </property>
-     <property name="icon">
-      <iconset resource="../resources/res.qrc">
-       <normaloff>:/refresh.png</normaloff>:/refresh.png</iconset>
      </property>
     </widget>
    </item>
@@ -158,16 +140,17 @@
    <item row="2" column="1">
     <widget class="QLineEdit" name="leServerKey"/>
    </item>
+   <item row="4" column="1">
+    <widget class="QLineEdit" name="leSettingsName"/>
+   </item>
   </layout>
  </widget>
  <tabstops>
   <tabstop>leAddress</tabstop>
   <tabstop>leServerKey</tabstop>
   <tabstop>cbDatabases</tabstop>
-  <tabstop>cbSettings</tabstop>
   <tabstop>leSettingsPassword</tabstop>
   <tabstop>btnGetDatabases</tabstop>
-  <tabstop>btnGetSettings</tabstop>
   <tabstop>btnShowPassword</tabstop>
   <tabstop>btnSave</tabstop>
   <tabstop>btnCancel</tabstop>

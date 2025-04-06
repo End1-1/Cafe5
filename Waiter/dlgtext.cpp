@@ -1,5 +1,6 @@
 #include "dlgtext.h"
 #include "ui_dlgtext.h"
+#include "c5config.h"
 
 DlgText::DlgText() :
     C5Dialog(__c5config.dbParams()),

@@ -1,6 +1,9 @@
 #include "dlgcashout.h"
 #include "ui_dlgcashout.h"
 #include "c5user.h"
+#include "c5config.h"
+#include "c5message.h"
+#include "c5utils.h"
 #include <QValidator>
 
 DlgCashout::DlgCashout()

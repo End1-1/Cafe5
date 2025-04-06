@@ -51,20 +51,6 @@ C5Database::C5Database() :
     fQuery = nullptr;
 }
 
-C5Database::C5Database(const QString &dbdriver)
-{
-    fIsReady = false;
-    if (QSqlDatabase::drivers().count() == 0) {
-        return;
-    }
-    fIsReady = true;
-    fQuery = nullptr;
-    QMutexLocker ml( &fMutex);
-    ++fCounter;
-    fDbName = getDbNumber("DB1");
-    fDb = QSqlDatabase::addDatabase(dbdriver, fDbName);
-}
-
 C5Database::C5Database(const QStringList &dbParams) :
     C5Database()
 {
@@ -148,45 +134,6 @@ QString C5Database::execDry(const QString &sqlQuery)
         if(!it.value().isValid()) {
             value = "null";
         } else {
-#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
-            switch (it.value().type()) {
-                case QVariant::String:
-                    value = QString("'%1'").arg(value.toString().replace("'", "''"));
-                    break;
-                case QVariant::Date:
-                    if (value.toDate().isValid()) {
-                        value = QString("'%1'").arg(value.toDate().toString("yyyy-MM-dd"));
-                    } else {
-                        value = "null";
-                    }
-                    break;
-                case QVariant::DateTime:
-                    if (value.toDateTime().isValid()) {
-                        value = QString("'%1'").arg(value.toDateTime().toString("yyyy-MM-dd HH:mm:ss"));
-                    } else {
-                        value = "null";
-                    }
-                    break;
-                case QVariant::Double:
-                    value = QString("%1").arg(QString::number(value.toDouble(), 'f', 4));
-                    break;
-                case QVariant::Int:
-                    value = QString("%1").arg(value.toInt());
-                    break;
-                case QVariant::Time:
-                    if (value.toTime().isValid()) {
-                        value = QString("'%1'").arg(value.toTime().toString("HH:mm:ss"));
-                    } else {
-                        value = "null";
-                    }
-                    break;
-                case QVariant::ByteArray:
-                    value = QString("'%1'").arg(QString(value.toByteArray().toHex()));
-                    break;
-                default:
-                    break;
-            }
-#else
             switch (it.value().typeId()) {
                 case QMetaType::QString:
                     value = QString("'%1'").arg(value.toString().replace("'", "''"));
@@ -224,7 +171,6 @@ QString C5Database::execDry(const QString &sqlQuery)
                 default:
                     break;
             }
-#endif
         }
         sql.replace(QRegularExpression(it.key() + "\\b"), value.toString());
     }
@@ -261,14 +207,14 @@ bool C5Database::exec(const QString &sqlQuery, std::vector<QJsonArray> &dbrows, 
 
 bool C5Database::execSqlList(const QStringList &sqlList)
 {
-    if (__c5config.dbParams().at(0).isEmpty()) {
+    if (C5Config::fDBPath.isEmpty()) {
         fLastError = "Database not configured";
         return false;
     }
     QElapsedTimer t;
     t.start();
     QNetworkAccessManager m;
-    QString host = QString("%1/engine/info.php").arg(__c5config.dbParams().at(0));
+    QString host = QString("%1://%2/engine/info.php").arg(C5Config::fDBHost, C5Config::fDBPath);
     QNetworkRequest rq(host);
     m.setTransferTimeout(60000);
     rq.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
@@ -336,7 +282,7 @@ bool C5Database::execSqlList(const QStringList &sqlList)
     }
     fCursorPos = -1;
 #ifdef QT_DEBUG
-    logEvent(__c5config.dbParams().at(0) + " (" + QString::number(elapsed) + "-" + QString::number(
+    logEvent(C5Config::fDBPath + " (" + QString::number(elapsed) + "-" + QString::number(
                  t.elapsed()) + " ms):" + " " + ba.left(5000));
 #else
     if (__c5config.getValue(param_debuge_mode).toInt() > 0) {
@@ -348,7 +294,7 @@ bool C5Database::execSqlList(const QStringList &sqlList)
 
 bool C5Database::execNetwork(const QString &sqlQuery)
 {
-    if (__c5config.dbParams().at(0).isEmpty()) {
+    if (C5Config::fDBPath.isEmpty()) {
         fLastError = "Database not configured";
         return false;
     }
@@ -356,11 +302,7 @@ bool C5Database::execNetwork(const QString &sqlQuery)
     t.start();
     QString sql = execDry(sqlQuery);
     QNetworkAccessManager m;
-    QString netPath = QString("%1/engine/info.php").arg(__c5config.dbParams().at(0));
-    if (!netPath.contains("http")) {
-        netPath = "https://" + netPath;
-    }
-    logEvent(netPath);
+    QString netPath = QString("%1://%2/engine/info.php").arg(C5Config::fDBHost, C5Config::fDBPath);
     QNetworkRequest rq(netPath);
     m.setTransferTimeout(60000);
     rq.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");

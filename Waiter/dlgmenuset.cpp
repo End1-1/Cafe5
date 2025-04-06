@@ -1,5 +1,8 @@
 #include "dlgmenuset.h"
 #include "ui_dlgmenuset.h"
+#include "c5config.h"
+#include "c5utils.h"
+#include "c5message.h"
 #include "c5database.h"
 #include <QPushButton>
 
@@ -47,7 +50,6 @@ DlgMenuSet::DlgMenuSet(const QString &bodyId) :
         fMax *= db.getDouble("f_qty1");
     }
     ui->lbMax->setText(QString("0/%1").arg(float_str(fMax, 1)));
-
     db[":f_set"] = bodyId;
     db[":f_state"] = DISH_STATE_SET;
     db.exec("select b.f_id, b.f_dish, d.f_name, b.f_qty1 "
@@ -130,7 +132,7 @@ void DlgMenuSet::addDish()
 
 void DlgMenuSet::removeDish()
 {
-    auto *b = static_cast<QPushButton*>(sender());
+    auto *b = static_cast<QPushButton *>(sender());
     int row = -1;
     for (int i = 0; i < ui->t2->rowCount(); i++) {
         if (b == ui->t2->cellWidget(i, 4)) {
@@ -145,4 +147,3 @@ void DlgMenuSet::removeDish()
         ui->t2->removeRow(row);
     }
 }
-

@@ -2,6 +2,7 @@
 #include "ui_dlgpassword.h"
 #include "c5config.h"
 #include "c5user.h"
+#include "c5message.h"
 #include <QCryptographicHash>
 #include <QDoubleValidator>
 

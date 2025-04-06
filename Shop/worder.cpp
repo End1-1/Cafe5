@@ -933,7 +933,6 @@ bool WOrder::checkDiscountRight()
 
 void WOrder::marti8()
 {
-    return;
     if (ui->leTotal->getDouble() < 25000) {
         QStringList codes;
         codes.append("100");

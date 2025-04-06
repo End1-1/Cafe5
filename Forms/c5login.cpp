@@ -77,7 +77,8 @@ void C5Login::on_cbDatabases_currentIndexChanged(int index)
     NDataProvider::mHost = js["database"].toString();
     NDataProvider::mAppName = "officen";
     NDataProvider::mFileVersion = FileVersion::getVersionString(qApp->applicationFilePath());
-    C5Config::fDBHost = js["database"].toString();
+    NDataProvider::mProtocol = js["settings"].toString();
+    C5Config::fDBHost = js["settings"].toString();
     C5Config::fDBPath = js["database"].toString();
     C5Config::fDBUser = js["username"].toString();
     C5Config::fDBPassword = js["password"].toString();

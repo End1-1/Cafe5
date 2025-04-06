@@ -1,9 +1,10 @@
 #include "dlgshowcolumns.h"
 #include "ui_dlgshowcolumns.h"
 #include "worder.h"
+#include "c5config.h"
 #include <QSettings>
 
-static QSettings s(_ORGANIZATION_, _APPLICATION_+ QString("\\") + _MODULE_);
+static QSettings s(_ORGANIZATION_, _APPLICATION_ + QString("\\") + _MODULE_);
 
 DlgShowColumns::DlgShowColumns() :
     C5Dialog(__c5config.dbParams()),
@@ -58,9 +59,7 @@ void DlgShowColumns::on_chCheckDiscount_clicked(bool checked)
     s.setValue("col" + QString::number(col_check_discount), checked);
 }
 
-
 void DlgShowColumns::on_chCheckDiscount_2_clicked(bool checked)
 {
     s.setValue("learnaccumulate", checked);
 }
-

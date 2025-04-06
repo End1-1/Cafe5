@@ -1,5 +1,6 @@
 #include "dlgdate.h"
 #include "ui_dlgdate.h"
+#include "c5config.h"
 
 DlgDate::DlgDate() :
     C5Dialog(__c5config.dbParams()),

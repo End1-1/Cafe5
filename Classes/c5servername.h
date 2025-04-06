@@ -10,15 +10,15 @@ class C5ServerName : public QObject
 {
     Q_OBJECT
 public:
-    explicit C5ServerName(const QString &server, const QString &route, QObject *parent = nullptr);
-    bool getServers(const QString &name = "");
+    explicit C5ServerName(const QString &server, QObject *parent = nullptr);
+    bool getServers();
+    bool getConnection(const QString &connectionName);
     static QJsonArray mServers;
-    QJsonObject mParams;
+    QJsonObject mReply;
     QString mErrorString;
 
 private:
     QString mServer;
-    QString mRoute;
     QString fLastTextMessage;
     QTimer mTimer;
 

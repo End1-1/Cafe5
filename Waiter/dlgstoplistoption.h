@@ -9,6 +9,7 @@ class DlgStopListOption;
 }
 
 class DlgOrder;
+class C5User;
 
 class DlgStopListOption : public C5Dialog
 {

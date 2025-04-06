@@ -2,6 +2,9 @@
 #include "ui_dlgmovement.h"
 #include "c5lineedit.h"
 #include "c5config.h"
+#include "c5database.h"
+#include "c5message.h"
+#include "c5utils.h"
 #include "c5user.h"
 #include <QScrollBar>
 

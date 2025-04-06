@@ -2,6 +2,7 @@
 #include "ui_dlgviewstoplist.h"
 #include "datadriver.h"
 #include "dlgpassword.h"
+#include "c5config.h"
 
 DlgViewStopList::DlgViewStopList() :
     C5Dialog(__c5config.dbParams()),

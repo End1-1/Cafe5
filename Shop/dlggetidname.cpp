@@ -1,8 +1,9 @@
 #include "dlggetidname.h"
+#include "c5database.h"
 #include "ui_dlggetidname.h"
 
 QHash<int, QString> DlgGetIDName::fQueries;
-QHash<int, DlgGetIDName*> DlgGetIDName::fDialogs;
+QHash<int, DlgGetIDName *> DlgGetIDName::fDialogs;
 
 DlgGetIDName::DlgGetIDName(const QStringList &dbParams, QWidget *parent) :
     C5Dialog(dbParams, parent),
@@ -13,7 +14,8 @@ DlgGetIDName::DlgGetIDName(const QStringList &dbParams, QWidget *parent) :
     ui->tbl->setColumnWidth(1, 400);
     if (fQueries.isEmpty()) {
         fQueries[idname_users_fullname] = "select f_id, concat_ws(' ', f_last, f_first) from s_user order by 2";
-        fQueries[idname_partners_full] = "select f_id, concat_ws(' ', f_taxcode, f_taxname, f_contact, f_phone) from c_partners order by 2";
+        fQueries[idname_partners_full] =
+            "select f_id, concat_ws(' ', f_taxcode, f_taxname, f_contact, f_phone) from c_partners order by 2";
     }
 }
 
@@ -24,7 +26,6 @@ DlgGetIDName::~DlgGetIDName()
 
 bool DlgGetIDName::get(const QStringList &dbParams, QString &id, QString &name, int table, QWidget *parent)
 {
-
     DlgGetIDName *d;
     if (fDialogs.contains(table)) {
         d = fDialogs[table];
@@ -40,7 +41,6 @@ bool DlgGetIDName::get(const QStringList &dbParams, QString &id, QString &name, 
     }
     return false;
 }
-
 
 void DlgGetIDName::on_btnCancel_clicked()
 {
@@ -79,7 +79,8 @@ void DlgGetIDName::on_btnRefresh_clicked()
 void DlgGetIDName::on_leFilter_textChanged(const QString &arg1)
 {
     for (int i = 0; i < ui->tbl->rowCount(); i++) {
-        ui->tbl->setRowHidden(i, !ui->tbl->item(i, 0)->text().contains(arg1, Qt::CaseInsensitive) && !ui->tbl->item(i, 1)->text().contains(arg1, Qt::CaseInsensitive));
+        ui->tbl->setRowHidden(i, !ui->tbl->item(i, 0)->text().contains(arg1, Qt::CaseInsensitive)
+                              && !ui->tbl->item(i, 1)->text().contains(arg1, Qt::CaseInsensitive));
     }
 }
 

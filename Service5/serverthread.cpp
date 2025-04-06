@@ -88,6 +88,38 @@ void ServerThread::getDbList(const QJsonObject &jdoc, QWebSocket *ws)
     ws->sendTextMessage(repMsg);
 }
 
+void ServerThread::getConnection(const QJsonObject &jdoc, QWebSocket *ws)
+{
+    Database db;
+    QString repMsg;
+    QJsonObject jrep;
+    if (!db.open("127.0.0.1", "service5", "root", "root5")) {
+        jrep["errorCode"] = 1;
+        jrep["errorMessage"] = db.lastDbError();
+        repMsg = QJsonDocument(jrep).toJson(QJsonDocument::Compact);
+        LogWriter::write(LogWriterLevel::errors, "", db.lastDbError());
+        ws->sendTextMessage(repMsg);
+        return;
+    }
+    db[":fkey"] = jdoc["server_key"].toString();
+    db[":fname"] = jdoc["connection_name"].toString();
+    db.exec("select * from dblist where fkey=:fkey and fcomment=:fname");
+    QJsonObject jt;
+    if (db.next()) {
+        jt["name"] = db.string("fcomment");
+        jt["database"] = db.string("fpath");
+        jt["settings"] = db.string("fsettings");
+        jrep["result"] = jt;
+        jrep["errorCode"] = 0;
+    } else {
+        jrep["errorMessage"] = "Connection name not found";
+        jrep["errorCode"] = 1;
+    }
+    repMsg = QJsonDocument(jrep).toJson(QJsonDocument::Compact);
+    LogWriter::write(LogWriterLevel::errors, "", repMsg);
+    ws->sendTextMessage(repMsg);
+}
+
 void ServerThread::registerSocket(const QJsonObject &jdoc, QWebSocket *ws)
 {
     SocketStruct ss;
@@ -182,6 +214,10 @@ void ServerThread::onTextMessage(const QString &msg)
     }
     if (jdoc["command"].toString() == "get_db_list") {
         getDbList(jdoc, ws);
+        return;
+    }
+    if (jdoc["command"].toString() == "get_connection") {
+        getConnection(jdoc, ws);
         return;
     }
     if (jdoc["command"].toString() == "register_socket") {

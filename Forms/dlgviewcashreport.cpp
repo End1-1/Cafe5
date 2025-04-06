@@ -1,5 +1,7 @@
 #include "dlgviewcashreport.h"
 #include "ui_dlgviewcashreport.h"
+#include "c5config.h"
+#include "c5utils.h"
 
 DlgViewCashReport::DlgViewCashReport() :
     C5Dialog(__c5config.dbParams()),

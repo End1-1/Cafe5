@@ -6,6 +6,7 @@
 #include "c5utils.h"
 #include "dishitem.h"
 #include "dlgorder.h"
+#include "c5config.h"
 #include "dlgguestinfo.h"
 #include "dlgqty.h"
 #include <QJsonObject>

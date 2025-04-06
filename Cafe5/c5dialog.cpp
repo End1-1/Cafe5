@@ -1,5 +1,6 @@
 #include "c5dialog.h"
 #include "c5message.h"
+#include "c5config.h"
 #include <QKeyEvent>
 #include <QApplication>
 #include <QScreen>

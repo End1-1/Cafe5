@@ -26,6 +26,8 @@ private slots:
 
     void on_btnCancel_clicked();
 
+    void on_btnGetDatabases_clicked();
+
 private:
     Ui::DlgServerConnection *ui;
 };

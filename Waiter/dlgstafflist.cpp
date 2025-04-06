@@ -2,6 +2,9 @@
 #include "ui_dlgstafflist.h"
 #include "datadriver.h"
 #include "dlgpassword.h"
+#include "c5config.h"
+#include "c5message.h"
+#include "c5database.h"
 #include <QScreen>
 
 DlgStaffList::DlgStaffList() :

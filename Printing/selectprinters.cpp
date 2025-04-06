@@ -1,5 +1,6 @@
 #include "selectprinters.h"
 #include "ui_selectprinters.h"
+#include "c5config.h"
 
 SelectPrinters::SelectPrinters() :
     C5Dialog(__c5config.dbParams()),

@@ -1,5 +1,6 @@
 #include "dlgsearchinmenu.h"
 #include "ui_dlgsearchinmenu.h"
+#include "c5config.h"
 #include "c5tabledata.h"
 
 DlgSearchInMenu::DlgSearchInMenu() :

@@ -2,6 +2,7 @@
 #define SALES_H
 
 #include "c5dialog.h"
+#include "c5database.h"
 
 namespace Ui
 {

@@ -1,5 +1,7 @@
 #include "dlgcl.h"
 #include "ui_dlgcl.h"
+#include "c5config.h"
+#include "c5database.h"
 #include <QSettings>
 
 DlgCL::DlgCL(const QStringList &dbParams) :

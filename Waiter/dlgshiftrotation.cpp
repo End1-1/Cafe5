@@ -2,8 +2,12 @@
 #include "ui_dlgshiftrotation.h"
 #include "datadriver.h"
 #include "c5storedraftwriter.h"
+#include "c5config.h"
+#include "c5message.h"
 #include "c5user.h"
 #include "dlgexitwithmessage.h"
+#include "c5message.h"
+#include "c5utils.h"
 
 DlgShiftRotation::DlgShiftRotation(C5User *user) :
     C5Dialog(__c5config.dbParams()),

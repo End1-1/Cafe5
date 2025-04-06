@@ -66,6 +66,8 @@ private slots:
 
     void on_btn0_clicked();
 
+    void on_btnSettings_clicked();
+
 private:
     Ui::DlgPin *ui;
 

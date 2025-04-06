@@ -1,4 +1,6 @@
 #include "dlgsearchpartner.h"
+#include "c5config.h"
+#include "c5database.h"
 #include "ui_dlgsearchpartner.h"
 
 DlgSearchPartner::DlgSearchPartner() :

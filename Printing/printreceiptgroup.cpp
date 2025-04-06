@@ -23,7 +23,16 @@ void PrintReceiptGroup::print(const QString &id, C5Database &db, int rw)
     if (db.nextRow()) {
         cash = db.getDouble("f_cash");
         change = db.getDouble("f_change");
+    } else {
     }
+    int hallid = db.getInt("f_hallid");
+    QString pref = db.getString("f_prefix");
+    int partner = db.getInt("f_partner");
+    double amountTotal = db.getDouble("f_amounttotal");
+    double amountCash = db.getDouble("f_amountcash");
+    double amountCard = db.getDouble("f_amountcard");
+    double amountPrepaid = db.getDouble("f_amountprepaid");
+    QString comment = db.getString("f_comment");
     QJsonObject jtax;
     db[":f_order"] = id;
     db.exec("select * from o_tax_log where f_order=:f_order and f_state=1");
@@ -52,14 +61,6 @@ void PrintReceiptGroup::print(const QString &id, C5Database &db, int rw)
             db.nextRow();
         }
     }
-    int hallid = db.getInt("f_hallid");
-    QString pref = db.getString("f_prefix");
-    int partner = db.getInt("f_partner");
-    double amountTotal = db.getDouble("f_amounttotal");
-    double amountCash = db.getDouble("f_amountcash");
-    double amountCard = db.getDouble("f_amountcard");
-    double amountPrepaid = db.getDouble("f_amountprepaid");
-    QString comment = db.getString("f_comment");
     QString partnerName, partnerTaxcode;
     if (partner > 0) {
         db[":f_id"] = partner;
@@ -199,7 +200,7 @@ void PrintReceiptGroup::print(const QString &id, C5Database &db, int rw)
         p.br();
     }
     p.setFontBold(true);
-    p.ctext(QString("#%1%2").arg(pref, hallid));
+    p.ctext(QString("#%1%2").arg(pref, QString::number(hallid)));
     p.br();
     if (returnFrom.count() > 0) {
         p.ctext(QString("(%1 %2%3)").arg(tr("Return from"), returnFrom["f_prefix"].toString()).arg(
@@ -221,8 +222,14 @@ void PrintReceiptGroup::print(const QString &id, C5Database &db, int rw)
                     .arg(data.at(i).at(2).toDouble(), 2)
                     .arg(float_str(data.at(i).at(3).toDouble(), 2)), 0);
             p.br();
-        }
-        if (__c5config.getValue(param_shop_print_goods_qty_side_left).toInt() == 1) {
+        } else if (__c5config.getValue(param_shop_print_goods_qty_side_left).toInt() == 1) {
+            p.ltext(QString("%1").arg(data.at(i).at(0).toString()), 0);
+            p.rtext(QString("%1 X %2 = %3")
+                    .arg(float_str(data.at(i).at(1).toDouble(), 3))
+                    .arg(data.at(i).at(2).toDouble(), 2)
+                    .arg(float_str(data.at(i).at(3).toDouble(), 2)));
+            p.br();
+        } else {
             p.ltext(QString("%1").arg(data.at(i).at(0).toString()), 0);
             p.rtext(QString("%1 X %2 = %3")
                     .arg(float_str(data.at(i).at(1).toDouble(), 3))

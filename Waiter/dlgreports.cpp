@@ -9,8 +9,11 @@
 #include "dlgreceiptlanguage.h"
 #include "dlglistofhall.h"
 #include "printtaxn.h"
+#include "c5message.h"
 #include "c5printing.h"
+#include "c5utils.h"
 #include "dlgcashbuttonopions.h"
+#include "c5config.h"
 #include "dlgviewcashreport.h"
 #include "qinputdialog.h"
 #include <QSettings>

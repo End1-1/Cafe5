@@ -5,6 +5,11 @@
 #include "dlgshiftrotation.h"
 #include "dlgpassword.h"
 #include "dlgstafflist.h"
+#include "c5message.h"
+#include "c5user.h"
+#include "c5permissions.h"
+#include "c5config.h"
+#include "c5database.h"
 #include <QSettings>
 #include <QProcess>
 

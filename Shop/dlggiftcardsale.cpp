@@ -1,5 +1,9 @@
 #include "dlggiftcardsale.h"
 #include "ui_dlggiftcardsale.h"
+#include "c5database.h"
+#include "c5message.h"
+#include "c5utils.h"
+#include "c5config.h"
 
 DlgGiftCardSale::DlgGiftCardSale(const QStringList &dbParams) :
     C5Dialog(dbParams),

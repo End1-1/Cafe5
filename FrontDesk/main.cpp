@@ -45,8 +45,12 @@ int main(int argc, char *argv[])
     while (__c5config.getRegValue("ss_server_address").toString().isEmpty()) {
         DlgServerConnection::showSettings(nullptr);
     }
-    C5ServerName c5sn(__c5config.getRegValue("ss_server_address").toString(), "office");
-    if (!c5sn.getServers("office")) {
+    C5ServerName c5sn(__c5config.getRegValue("ss_server_address").toString());
+    if (!c5sn.getServers()) {
+        C5Message::error(c5sn.mErrorString);
+        return -1;
+    }
+    if (!c5sn.getConnection(__c5config.getRegValue("ss_database").toString())) {
         C5Message::error(c5sn.mErrorString);
         return -1;
     }

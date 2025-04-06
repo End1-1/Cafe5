@@ -8,6 +8,9 @@
 #include "c5tabledata.h"
 #include "ndataprovider.h"
 #include "jsons.h"
+#include "c5config.h"
+#include "c5permissions.h"
+#include "c5message.h"
 #include "c5socketmessage.h"
 #include <QTimer>
 

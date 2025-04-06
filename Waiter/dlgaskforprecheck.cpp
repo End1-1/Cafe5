@@ -1,5 +1,6 @@
 #include "dlgaskforprecheck.h"
 #include "ui_dlgaskforprecheck.h"
+#include "c5config.h"
 
 DlgAskForPrecheck::DlgAskForPrecheck() :
     C5Dialog(__c5config.dbParams()),

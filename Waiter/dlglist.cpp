@@ -1,5 +1,6 @@
 #include "dlglist.h"
 #include "ui_dlglist.h"
+#include "c5config.h"
 
 DlgList::DlgList() :
     C5Dialog(__c5config.dbParams()),
@@ -48,4 +49,3 @@ void DlgList::on_lst_clicked(const QModelIndex &index)
         reject();
     }
 }
-

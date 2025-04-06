@@ -1,5 +1,7 @@
 #include "dlgcashbuttonopions.h"
 #include "ui_dlgcashbuttonopions.h"
+#include "c5config.h"
+#include "c5message.h"
 #include "c5user.h"
 #include <QSettings>
 
@@ -8,7 +10,6 @@ DlgCashButtonOpions::DlgCashButtonOpions(const QStringList &dbParams) :
     ui(new Ui::DlgCashButtonOpions)
 {
     ui->setupUi(this);
-
     QSettings _ls(qApp->applicationDirPath() + "/ls.inf", QSettings::IniFormat);
     if (_ls.value("cashoptions/view", 0).toInt() > 0) {
         ui->btnViewReport->setEnabled(_ls.value("cashoptions/view", -1).toInt() == __user->id());

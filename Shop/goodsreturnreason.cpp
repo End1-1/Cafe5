@@ -1,5 +1,7 @@
 #include "goodsreturnreason.h"
 #include "ui_goodsreturnreason.h"
+#include "c5config.h"
+#include "c5database.h"
 #include <QListWidgetItem>
 
 GoodsReturnReason::GoodsReturnReason() :

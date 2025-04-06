@@ -3,9 +3,12 @@
 #include "c5checkbox.h"
 #include "c5storedraftwriter.h"
 #include "oheader.h"
+#include "c5config.h"
+#include "c5utils.h"
 #include "ogoods.h"
 #include "printreceipt.h"
 #include "printtaxn.h"
+#include "c5message.h"
 #include "jsons.h"
 
 DlgReturnItem::DlgReturnItem() :
