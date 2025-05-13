@@ -1,6 +1,9 @@
 #include "sessionshistory.h"
 #include "ui_sessionshistory.h"
 #include "c5printing.h"
+#include "c5config.h"
+#include "c5database.h"
+#include "c5utils.h"
 #include <QFile>
 
 SessionsHistory::SessionsHistory(const QDate &d1, const QDate &d2) :

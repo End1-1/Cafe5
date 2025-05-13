@@ -1,6 +1,7 @@
 #include "cr5settings.h"
 #include "c5settingswidget.h"
 #include "c5tablemodel.h"
+#include "c5database.h"
 
 CR5Settings::CR5Settings(const QStringList &dbParams, QWidget *parent) :
     C5ReportWidget(dbParams, parent)
@@ -26,7 +27,7 @@ QToolBar *CR5Settings::toolBar()
             << ToolBarButtons::tbRefresh
             << ToolBarButtons::tbExcel
             << ToolBarButtons::tbPrint;
-            createStandartToolbar(btn);
+        createStandartToolbar(btn);
         fToolBar->addAction(QIcon(":/delete.png"), tr("Delete\nsettings"), this, SLOT(removeSettings()));
     }
     return fToolBar;

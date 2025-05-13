@@ -2,6 +2,7 @@
 #define C5SALARYDOC_H
 
 #include "c5document.h"
+#include "c5database.h"
 
 namespace Ui
 {
@@ -25,6 +26,7 @@ public slots:
     void save();
 
 private slots:
+    void countAmounts(const QString &arg1);
 
     void createCashDocument();
 

@@ -1,17 +1,14 @@
 #include "dlgscreen.h"
-#include "c5waiterserver.h"
 #include "ui_dlgscreen.h"
 #include "c5user.h"
 #include "dlgface.h"
-#include "c5waiterserver.h"
 #include "c5cafecommon.h"
 #include "c5tabledata.h"
 #include "ndataprovider.h"
-#include "jsons.h"
+#include "c5waiterserver.h"
 #include "c5config.h"
 #include "c5permissions.h"
 #include "c5message.h"
-#include "c5socketmessage.h"
 #include <QTimer>
 
 DlgScreen::DlgScreen() :
@@ -19,8 +16,6 @@ DlgScreen::DlgScreen() :
     ui(new Ui::DlgScreen)
 {
     ui->setupUi(this);
-    connect( &fTcpServer, SIGNAL(newConnection()), this, SLOT(newConnection()));
-    fTcpServer.listen(QHostAddress::Any, 1000);
     QTimer *t = new QTimer(this);
     connect(t, &QTimer::timeout, this, &DlgScreen::timerTimeout);
     t->start(1000);
@@ -36,11 +31,13 @@ DlgScreen::DlgScreen() :
     auto *t2 = new QTimer();
     connect(t2, &QTimer::timeout, this, &DlgScreen::serviceTimeout);
     t2->start(10000);
+    mWaiterServer = new C5WaiterServer();
 }
 
 DlgScreen::~DlgScreen()
 {
     delete ui;
+    mWaiterServer->deleteLater();
 }
 
 void DlgScreen::initResponse(const QJsonObject &jdoc)
@@ -56,34 +53,15 @@ void DlgScreen::serviceTimeout()
 {
     auto *timer = static_cast<QTimer *>(sender());
     timer->stop();
-    C5Database db;
-    db.exec("select * from sys_mobile where f_state=1");
-    QList<int> ids;
-    while (db.nextRow()) {
-        ids.append(db.getInt("f_id"));
-        QJsonObject jo = __strjson(db.getString("f_order"));
-        if (jo["action"].toString() == "printservice") {
-            C5SocketHandler *sh = createSocketHandler(SLOT(handlePrintService(QJsonObject)));
-            sh->bind("cmd", sm_printservice);
-            sh->bind("order", jo["id"].toString());
-            sh->bind("booking", 0);
-            sh->bind("alias", __c5config.getValue(param_force_use_print_alias).toInt());
-            sh->send();
-            //logRecord(fUser->fullName(), jo["id"].toString(), "", "Send to cooking", "", "");
-        }
-    }
-    for (int id : ids) {
-        db[":f_id"] = id;
-        db.exec("update sys_mobile set f_state=2 where f_id=:f_id");
-    }
-    timer->start(3000);
-}
-
-void DlgScreen::newConnection()
-{
-    QTcpSocket *s = fTcpServer.nextPendingConnection();
-    C5SocketHandler *sh = new C5SocketHandler(s, this);
-    connect(sh, SIGNAL(handleCommand(QJsonObject)), this, SLOT(handleSocket(QJsonObject)));
+    auto np = new NDataProvider(this);
+    np->overwriteHost("http", "127.0.0.1", 8080);
+    connect(np, &NDataProvider::done, this, [timer](const QJsonObject &jo) {
+        timer->start(3000);
+    });
+    connect(np, &NDataProvider::error, this, [timer](const QString &err) {
+        timer->start(3000);
+    });
+    np->getData("/mobile", {});
 }
 
 void DlgScreen::loginResponse(const QJsonObject &jdoc)
@@ -144,19 +122,6 @@ void DlgScreen::timerTimeout()
     ui->lbCurrentTime->setText(QString("%1: %2")
                                .arg(tr("System datetime"))
                                .arg(QDateTime::currentDateTime().toString(FORMAT_DATETIME_TO_STR)));
-}
-
-void DlgScreen::handleSocket(const QJsonObject &obj)
-{
-    QJsonObject no(obj);
-    C5SocketHandler *sh = static_cast<C5SocketHandler *>(sender());
-    C5WaiterServer ws(no, sh->fSocket);
-    QJsonObject o;
-    ws.reply(o);
-    o["cmd"] = ws.cmd();
-    sh->send(o);
-    sh->close();
-    sh->deleteLater();
 }
 
 void DlgScreen::on_btnClear_clicked()

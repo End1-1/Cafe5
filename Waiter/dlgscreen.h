@@ -2,12 +2,13 @@
 #define DLGSCREEN_H
 
 #include "c5dialog.h"
-#include <QTcpServer>
 
 namespace Ui
 {
 class DlgScreen;
 }
+
+class C5WaiterServer;
 
 class DlgScreen : public C5Dialog
 {
@@ -15,6 +16,7 @@ class DlgScreen : public C5Dialog
 
 public:
     explicit DlgScreen();
+
     ~DlgScreen();
 
 private slots:
@@ -22,13 +24,9 @@ private slots:
 
     void serviceTimeout();
 
-    void newConnection();
-
     void loginResponse(const QJsonObject &jdoc);
 
     void timerTimeout();
-
-    void handleSocket(const QJsonObject &obj);
 
     void on_btnClear_clicked();
 
@@ -63,7 +61,7 @@ private slots:
 private:
     Ui::DlgScreen *ui;
 
-    QTcpServer fTcpServer;
+    C5WaiterServer *mWaiterServer;
 
     void tryExit();
 };

@@ -1,6 +1,6 @@
 #include "cr5routereport.h"
 #include "ui_cr5routereport.h"
-#include "c5daterange.h"
+#include "c5database.h"
 #include "dlgdriverroutedate.h"
 
 CR5RouteReport::CR5RouteReport(const QStringList &dbParams, QWidget *parent) :

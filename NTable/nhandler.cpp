@@ -7,6 +7,7 @@
 #include "c5costumerdebtpayment.h"
 #include "c5storedoc.h"
 #include "ntablemodel.h"
+#include "c5config.h"
 #include "c5saledoc.h"
 #include "c5message.h"
 #include <QToolButton>

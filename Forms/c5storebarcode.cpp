@@ -6,6 +6,8 @@
 #include "c5lineedit.h"
 #include "c5checkbox.h"
 #include "dlgselectcurrency.h"
+#include "c5database.h"
+#include "c5config.h"
 #include "QRCodeGenerator.h"
 #include <QPainter>
 #include <QDebug>

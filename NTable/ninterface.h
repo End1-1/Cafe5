@@ -19,7 +19,11 @@ public:
     QObject *fErrorObject;
 
     void createHttpQuery(const QString &route, const QJsonObject &params, const char *slotResponse,
-                         const QVariant &marks = QVariant(), bool progress = true);
+                         const QVariant &marks = QVariant(), bool progress = true, int timeout = 60000);
+
+    void createHttpQueryLambda(const QString &route, const QJsonObject &params,
+                               std::function<void(const QJsonObject &)> callback, std::function<void (const QJsonObject &)> errCallback,
+                               const QVariant &marks = QVariant(), bool progress = true, int timeout = 60000);
 
 public slots:
     void httpQueryStarted();

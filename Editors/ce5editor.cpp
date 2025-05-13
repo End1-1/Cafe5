@@ -6,6 +6,7 @@
 #include "c5combobox.h"
 #include "c5selector.h"
 #include "c5message.h"
+#include "c5database.h"
 #include <QValidator>
 #include <QPushButton>
 #include <QPlainTextEdit>
@@ -285,6 +286,20 @@ bool CE5Editor::checkData(QString &err)
             }
         }
     }
+    foreach (C5ComboBox *cb, fCombos) {
+        if (cb->property("Check").isValid()) {
+            QStringList rules = cb->property("Check").toString().split(";", Qt::SkipEmptyParts);
+            foreach (QString rule, rules) {
+                if (rule.mid(0, 5) == "empty") {
+                    if (cb->currentData().toInt() == 0) {
+                        err += QString("%1 %2<br>")
+                               .arg(rule.mid(rule.indexOf("=") + 1, rule.length() - rule.indexOf("=")))
+                               .arg(tr("cannot be empty"));
+                    }
+                }
+            }
+        }
+    }
     return err.isEmpty();
 }
 
@@ -312,6 +327,9 @@ void CE5Editor::clear()
     }
     foreach (C5ComboBox *cb, fCombos) {
         cb->setCurrentIndex(-1);
+        if (cb->property("default").toInt() > 0) {
+            cb->setCurrentIndex(cb->findData(cb->property("default")));
+        }
     }
     foreach (QPlainTextEdit *pt, fPlainText) {
         pt->clear();
@@ -394,13 +412,13 @@ void CE5Editor::getLineEdit(QObject *parent)
                 le->setText(v.toString());
             }
             fLines << le;
-        } else if (ch = dynamic_cast<C5CheckBox * >(o)) {
+        } else if ((ch = dynamic_cast<C5CheckBox * >(o))) {
             fChecks << ch;
-        } else if (de = dynamic_cast<C5DateEdit * >(o)) {
+        } else if ((de = dynamic_cast<C5DateEdit * >(o))) {
             fDates << de;
-        } else if (cb = dynamic_cast<C5ComboBox * >(o)) {
+        } else if ((cb = dynamic_cast<C5ComboBox * >(o))) {
             fCombos << cb;
-        } else if (pt = dynamic_cast<QPlainTextEdit * >(o)) {
+        } else if ((pt = dynamic_cast<QPlainTextEdit * >(o))) {
             fPlainText << pt;
         }
     }

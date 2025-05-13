@@ -3,6 +3,7 @@
 #include "c5cache.h"
 #include "ce5usergroup.h"
 #include "c5message.h"
+#include "c5database.h"
 #include <QFileDialog>
 
 CE5User::CE5User(const QStringList &dbParams, QWidget *parent) :

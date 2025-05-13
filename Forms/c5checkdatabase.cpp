@@ -4,6 +4,7 @@
 #include "c5storedraftwriter.h"
 #include "dlgstoreutils.h"
 #include "c5message.h"
+#include "c5config.h"
 #include "c5utils.h"
 
 C5CheckDatabase::C5CheckDatabase(const QStringList &dbParams) :

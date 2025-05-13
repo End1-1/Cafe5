@@ -10,12 +10,12 @@ public:
     C5SearchEngine();
     static C5SearchEngine *mInstance;
     static void init(QStringList databases);
-    void search(const QJsonObject &jo, QWebSocket *socket);
-    void searchPartner(const QJsonObject &jo, QWebSocket *socket);
-    void searchGoodsGroups(const QJsonObject &jo, QWebSocket *socket);
-    void searchGoods(const QJsonObject &jo, QWebSocket *socket);
-    void searchStore(const QJsonObject &jo, QWebSocket *socket);
-    void searchUpdatePartnerCache(const QJsonObject &jo, QWebSocket *socket);
+    QString search(const QJsonObject &jo);
+    QString searchPartner(const QJsonObject &jo);
+    QString searchGoodsGroups(const QJsonObject &jo);
+    QString searchGoods(const QJsonObject &jo);
+    QString searchStore(const QJsonObject &jo);
+    QString searchUpdatePartnerCache(const QJsonObject &jo);
 
 };
 

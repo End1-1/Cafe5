@@ -1,6 +1,7 @@
 #include "cr5goodsimages.h"
 #include "ui_cr5goodsimages.h"
 #include "c5goodsimage.h"
+#include "c5database.h"
 
 CR5GoodsImages::CR5GoodsImages(const QStringList &dbParams, QWidget *parent) :
     C5Widget(dbParams, parent),
@@ -20,7 +21,7 @@ QToolBar *CR5GoodsImages::toolBar()
 {
     if (!fToolBar) {
         QList<ToolBarButtons> btn;
-            createStandartToolbar(btn);
+        createStandartToolbar(btn);
     }
     return fToolBar;
 }

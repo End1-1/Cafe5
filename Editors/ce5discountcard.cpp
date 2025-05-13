@@ -1,6 +1,7 @@
 #include "ce5discountcard.h"
 #include "ui_ce5discountcard.h"
 #include "c5cache.h"
+#include "c5database.h"
 #include "ce5partner.h"
 #include <QDoubleValidator>
 
@@ -10,7 +11,7 @@ CE5DiscountCard::CE5DiscountCard(const QStringList &dbParams, QWidget *parent) :
 {
     ui->setupUi(this);
     ui->deDateEnd->setDate(QDate::currentDate().addDays(365 * 10));
-   // ui->leValue->setValidator(new QDoubleValidator(-10, 100, 3));
+    // ui->leValue->setValidator(new QDoubleValidator(-10, 100, 3));
     ui->leClient->setSelector(dbParams, ui->leFirstName, cache_goods_partners);
     ui->leDiscount->setSelector(dbParams, ui->leDiscountName, cache_discount_type);
 }

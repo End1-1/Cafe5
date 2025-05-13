@@ -1,8 +1,5 @@
 #include "cr5salarybyworkers.h"
-#include "c5tablemodel.h"
 #include "cr5salarybyworkersfilter.h"
-#include "c5salarydoc.h"
-#include "c5mainwindow.h"
 
 CR5SalaryByWorkers::CR5SalaryByWorkers(const QStringList &dbParams, QWidget *parent) :
     C5ReportWidget(dbParams, parent)
@@ -18,7 +15,7 @@ CR5SalaryByWorkers::CR5SalaryByWorkers(const QStringList &dbParams, QWidget *par
              "LEFT JOIN s_user_group g ON g.f_id=u.f_group "
              " %filter "
              "ORDER BY 1, 3";
-    fColumnsSum.append("if (sp.f_cashdoc is NULL, sp.f_amount, sp.f_amount*-1) AS `Գումար`");
+    fColumnsSum.append("գումար");
     restoreColumnsVisibility();
     fFilterWidget = new CR5SalaryByWorkersFilter(fDBParams);
     fFilter = static_cast<CR5SalaryByWorkersFilter *>(fFilterWidget);

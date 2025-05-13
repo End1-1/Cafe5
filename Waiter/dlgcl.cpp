@@ -34,7 +34,7 @@ DlgCL::DlgCL(const QStringList &dbParams) :
     connect(ui->kbd, SIGNAL(textChanged(QString)), this, SLOT(searchCL(QString)));
     connect(ui->kbd, SIGNAL(accept()), this, SLOT(kbdAccept()));
     connect(ui->kbd, SIGNAL(reject()), this, SLOT(reject()));
-    ui->tblGuest->setColumnWidths(ui->tblGuest->columnCount(), 120, 400);
+    ui->tblGuest->configColumns({ 120, 400});
 }
 
 DlgCL::~DlgCL()

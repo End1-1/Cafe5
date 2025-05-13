@@ -228,5 +228,8 @@
         <file>booking.png</file>
         <file>icon_1024x1024_transparent.png</file>
         <file>drop-down.png</file>
+        <file>xml.png</file>
+        <file>apps.png</file>
+        <file>deletefolder.png</file>
     </qresource>
 </RCC>

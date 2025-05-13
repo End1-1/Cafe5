@@ -9,22 +9,22 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Cafe5/c5message.ui" line="248"/>
+        <location filename="../../Cafe5/c5message.ui" line="257"/>
         <source>A1</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../Cafe5/c5message.ui" line="261"/>
+        <location filename="../../Cafe5/c5message.ui" line="270"/>
         <source>A3</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../Cafe5/c5message.ui" line="274"/>
+        <location filename="../../Cafe5/c5message.ui" line="283"/>
         <source>A2</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../Cafe5/c5message.ui" line="287"/>
+        <location filename="../../Cafe5/c5message.ui" line="296"/>
         <source>Copy</source>
         <translation></translation>
     </message>
@@ -124,22 +124,22 @@
         <translation>Տպված</translation>
     </message>
     <message>
-        <location filename="../../Cafe5/c5message.h" line="19"/>
+        <location filename="../../Cafe5/c5message.h" line="20"/>
         <source>Close</source>
         <translation>Փակել</translation>
     </message>
     <message>
-        <location filename="../../Cafe5/c5message.h" line="21"/>
+        <location filename="../../Cafe5/c5message.h" line="22"/>
         <source>OK</source>
         <translation>ԱՅՈ</translation>
     </message>
     <message>
-        <location filename="../../Cafe5/c5message.h" line="23"/>
+        <location filename="../../Cafe5/c5message.h" line="25"/>
         <source>Yes</source>
         <translation>Այո</translation>
     </message>
     <message>
-        <location filename="../../Cafe5/c5message.h" line="23"/>
+        <location filename="../../Cafe5/c5message.h" line="26"/>
         <source>No</source>
         <translation>Աչ</translation>
     </message>

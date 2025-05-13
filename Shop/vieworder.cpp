@@ -77,7 +77,8 @@ ViewOrder::ViewOrder(Working *w, const QString &order) :
             "left join o_header h on h.f_id=b.f_header "
             "left join o_tax t on t.f_id=h.f_id "
             "inner join c_goods g on g.f_id=b.f_goods "
-            "where b.f_header=:f_header");
+            "where b.f_header=:f_header "
+            "order by b.f_row ");
     while (db.nextRow()) {
         int r = ui->tbl->addEmptyRow();
         ui->tbl->setString(r, 0, db.getString("f_id"));
@@ -345,7 +346,8 @@ bool ViewOrder::printCheckWithTax(C5Database &db, const QString &id, QString &rs
             "left join c_goods g on g.f_id=og.f_goods "
             "left join c_units gu on gu.f_id=g.f_unit "
             "left join c_groups t on t.f_id=g.f_group "
-            "where og.f_header=:f_id");
+            "where og.f_header=:f_id "
+            "order by og.f_row ");
     PrintTaxN pt(C5Config::taxIP(), C5Config::taxPort(), C5Config::taxPassword(), useExtPos, C5Config::taxCashier(),
                  C5Config::taxPin(), 0);
     pt.fPartnerTin = partnerHvhh;

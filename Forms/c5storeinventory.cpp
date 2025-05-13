@@ -4,6 +4,7 @@
 #include "c5cache.h"
 #include "c5printing.h"
 #include "c5printpreview.h"
+#include "c5config.h"
 #include "c5user.h"
 #include "ce5goods.h"
 #include "c5message.h"

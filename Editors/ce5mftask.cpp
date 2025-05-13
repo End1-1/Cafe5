@@ -1,7 +1,9 @@
 #include "ce5mftask.h"
 #include "ui_ce5mftask.h"
 #include "c5cache.h"
+#include "c5database.h"
 #include "c5message.h"
+#include <QJsonDocument>
 
 CE5MFTask::CE5MFTask(const QStringList &dbParams) :
     CE5Editor(dbParams),

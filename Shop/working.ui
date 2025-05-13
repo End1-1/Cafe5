@@ -206,6 +206,41 @@
           </widget>
          </item>
          <item>
+          <widget class="QPushButton" name="btnPrepaidFiscal">
+           <property name="minimumSize">
+            <size>
+             <width>36</width>
+             <height>36</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>36</width>
+             <height>36</height>
+            </size>
+           </property>
+           <property name="focusPolicy">
+            <enum>Qt::FocusPolicy::NoFocus</enum>
+           </property>
+           <property name="toolTip">
+            <string>Open draft</string>
+           </property>
+           <property name="text">
+            <string/>
+           </property>
+           <property name="icon">
+            <iconset resource="../resources/res.qrc">
+             <normaloff>:/return_receipt.png</normaloff>:/return_receipt.png</iconset>
+           </property>
+           <property name="iconSize">
+            <size>
+             <width>30</width>
+             <height>30</height>
+            </size>
+           </property>
+          </widget>
+         </item>
+         <item>
           <widget class="QPushButton" name="btnWriteOrder">
            <property name="minimumSize">
             <size>
@@ -694,6 +729,7 @@
         <zorder>btnMinimize</zorder>
         <zorder>btnCloseApplication</zorder>
         <zorder>btnBooking</zorder>
+        <zorder>btnPrepaidFiscal</zorder>
        </widget>
       </item>
      </layout>

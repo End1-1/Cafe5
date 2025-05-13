@@ -115,6 +115,7 @@ void C5CostumerDebtPayment::on_btnOK_clicked()
             doc->addRow(ui->leCostumerName->text(), ui->leAmount->getDouble());
             doc->save(true);
             fBClientDebt.cash = doc->uuid();
+            fBClientDebt.id = doc->fBClientDebtId;
             delete doc;
         }
     } else {
@@ -134,10 +135,12 @@ void C5CostumerDebtPayment::on_btnOK_clicked()
             doc->updateRow(0, ui->leCostumerName->text(), ui->leAmount->getDouble());
             doc->fDebtFlag = fBClientDebt.flag;
             doc->save(true);
+            fBClientDebt.id = doc->fBClientDebtId;
         }
         delete doc;
     }
-    //fBClientDebt.write(db, err);
+    QString err;
+    fBClientDebt.write(db, err);
     ui->leCode->setInteger(fBClientDebt.id);
     ui->btnRemove->setEnabled(true);
     if (!fClearFlag.isEmpty()) {

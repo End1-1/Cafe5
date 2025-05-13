@@ -10,9 +10,13 @@ C5PrintJson::C5PrintJson(const QJsonArray &obj, QObject *parent) :
     connect(this, SIGNAL(finished()), this, SLOT(deleteLater()));
 }
 
+C5PrintJson::~C5PrintJson()
+{
+    qDebug() << "C5PRINTJSON DESCTRUCTOR";
+}
+
 void C5PrintJson::run()
 {
-    qDebug() << fJson;
     C5Printing p;
     for (int i = 0; i < fJson.count(); i++) {
         QJsonObject jo = fJson.at(i).toObject();
@@ -21,7 +25,7 @@ void C5PrintJson::run()
         } else if (jo["cmd"].toString() == "simpleline") {
             p.line();
         } else if (jo["cmd"].toString() == "ltext") {
-            p.ltext(jo["text"].toString(), jo["x"].toDouble());
+            p.ltext(jo["text"].toString(), jo["x"].toDouble(), jo["textwidth"].toInt());
         } else if (jo["cmd"].toString() == "ctext") {
             p.ctext(jo["text"].toString());
         } else if (jo["cmd"].toString() == "rtext") {

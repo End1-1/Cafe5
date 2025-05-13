@@ -3,7 +3,8 @@
 
 #include <QDialog>
 
-namespace Ui {
+namespace Ui
+{
 class C5Message;
 }
 
@@ -18,9 +19,11 @@ public:
 
     static int error(const QString &errorStr, const QString &yes = QObject::tr("Close"), const QString &no = "");
 
-    static int info(const QString &infoStr, const QString &yes = QObject::tr("OK"), const QString &no = "", bool playSound = false);
+    static int info(const QString &infoStr, const QString &yes = QObject::tr("OK"), const QString &no = "",
+                    bool playSound = false);
 
-    static int question(const QString &questionStr, const QString &yes = QObject::tr("Yes"), const QString &no = QObject::tr("No"), const QString &a3 = "");
+    static int question(const QString &questionStr, const QString &yes = QObject::tr("Yes"),
+                        const QString &no = QObject::tr("No"), const QString &a3 = "");
 
 private slots:
     void timeout();
@@ -33,12 +36,15 @@ private slots:
 
     void on_btnCopy_clicked();
 
+    void on_label_linkActivated(const QString &link);
+
 private:
     Ui::C5Message *ui;
 
     bool fPlaySound;
 
-    static int showMessage(const QString &text, int tp, const QString &yes, const QString &no, const QString &a3, bool playsound = false);
+    static int showMessage(const QString &text, int tp, const QString &yes, const QString &no, const QString &a3,
+                           bool playsound = false);
 };
 
 #endif // C5MESSAGE_H

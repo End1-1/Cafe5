@@ -9,6 +9,8 @@
 #include "c5goodspricing.h"
 #include "goodsasmap.h"
 #include "c5storebarcode.h"
+#include "c5database.h"
+#include "c5permissions.h"
 #include "ndataprovider.h"
 #include <math.h>
 #include <QFile>
@@ -386,8 +388,9 @@ void CR5Goods::armSoftMap()
 
 void CR5Goods::buildWeb()
 {
-    fHttp->createHttpQuery("/engine/office/build-web.php", QJsonObject{{"mode", "buildGoods"}}, SLOT(buildWebResponse(
-                QJsonObject)));
+    fHttp->createHttpQuery("/engine/office/build-web.php",
+    QJsonObject{{"mode", "buildGoods"}},
+    SLOT(buildWebResponse(QJsonObject)), QVariant(), true, 180000);
 }
 
 void CR5Goods::buildWebResponse(const QJsonObject &obj)
@@ -399,10 +402,10 @@ void CR5Goods::buildWebResponse(const QJsonObject &obj)
     });
     QWebSocket *s = new QWebSocket();
     QString host = NDataProvider::mHost;
-    if (host.contains("https://")) {
+    if (NDataProvider::mProtocol == "https") {
         host.remove(0, 8);
         host = "wss://" + host;
-    } else if(host.contains("http://")) {
+    } else {
         host.remove(0, 7);
         host = "ws://" + host;
     }

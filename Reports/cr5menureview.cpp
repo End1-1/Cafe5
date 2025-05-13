@@ -1,5 +1,5 @@
 #include "cr5menureview.h"
-#include "ce5editor.h"
+#include "c5database.h"
 #include "c5tablemodel.h"
 #include "c5dishwidget.h"
 #include "cr5menureviewfilter.h"
@@ -10,15 +10,16 @@ CR5MenuReview::CR5MenuReview(const QStringList &dbParams, QWidget *parent) :
 {
     fIcon = ":/menu.png";
     fLabel = tr("Review menu");
-    fSqlQuery = "select  d.f_id, m.f_id as f_mid, md.f_name as f_statename, mn.f_name as f_menuname, dp1.f_name as f_part1, dp2.f_name as f_part2, "
-            "d.f_name as f_dishname, m.f_price, d.f_cost, d.f_recipeqty, s.f_name as f_storename, m.f_print1, m.f_print2, d.f_color "
-            "from d_menu m "
-            "left join d_dish_state md on md.f_id=m.f_state "
-            "left join d_dish d on d.f_id=m.f_dish "
-            "left join d_part2 dp2 on dp2.f_id=d.f_part "
-            "left join d_part1 dp1 on dp1.f_id=dp2.f_part "
-            "left join d_menu_names mn on mn.f_id=m.f_menu "
-            "left join c_storages s on s.f_id=m.f_store ";
+    fSqlQuery =
+        "select  d.f_id, m.f_id as f_mid, md.f_name as f_statename, mn.f_name as f_menuname, dp1.f_name as f_part1, dp2.f_name as f_part2, "
+        "d.f_name as f_dishname, m.f_price, d.f_cost, d.f_recipeqty, s.f_name as f_storename, m.f_print1, m.f_print2, d.f_color "
+        "from d_menu m "
+        "left join d_dish_state md on md.f_id=m.f_state "
+        "left join d_dish d on d.f_id=m.f_dish "
+        "left join d_part2 dp2 on dp2.f_id=d.f_part "
+        "left join d_part1 dp1 on dp1.f_id=dp2.f_part "
+        "left join d_menu_names mn on mn.f_id=m.f_menu "
+        "left join c_storages s on s.f_id=m.f_store ";
     fOrderCondition = "order by mn.f_name, dp1.f_name, dp2.f_name ";
     fTranslation["f_mid"] = tr("Id");
     fTranslation["f_id"] = tr("Code");
@@ -84,7 +85,6 @@ bool CR5MenuReview::tblDoubleClicked(int row, int column, const QJsonArray &v)
     ep->setId(v.at(col).toInt());
     QList<QMap<QString, QVariant> > data;
     if(e->getResult(data)) {
-
     }
     delete e;
     return true;

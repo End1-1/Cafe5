@@ -1,5 +1,6 @@
 #include "ce5partner.h"
 #include "ui_ce5partner.h"
+#include "c5database.h"
 #include <QCompleter>
 #include <stdexcept>
 

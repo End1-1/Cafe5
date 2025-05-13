@@ -1,6 +1,7 @@
 #include "ce5dishpart1.h"
 #include "ui_ce5dishpart1.h"
 #include "c5message.h"
+#include "c5database.h"
 #include <QMenu>
 #include <QFileDialog>
 #include <QBuffer>

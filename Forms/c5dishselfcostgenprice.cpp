@@ -1,6 +1,7 @@
 #include "c5dishselfcostgenprice.h"
 #include "ui_c5dishselfcostgenprice.h"
 #include "c5message.h"
+#include "c5database.h"
 #include "proxytablewidgetdatabase.h"
 
 C5DishSelfCostGenPrice::C5DishSelfCostGenPrice(const QStringList &dbParams, QWidget *parent) :
@@ -40,7 +41,7 @@ void C5DishSelfCostGenPrice::on_btnStart_clicked()
             "left join c_units u on u.f_id=g.f_unit "
             "order by 2, 3 ");
     ui->tbl->setRowCount(0);
-    ProxyTableWidgetDatabase::fillTableWidgetRowFromDatabase(&db, ui->tbl);
+    ProxyTableWidgetDatabase::fillTableWidgetRowFromDatabase( &db, ui->tbl);
     db.first();
     int row = 0;
     while (db.nextRow()) {
@@ -107,7 +108,6 @@ void C5DishSelfCostGenPrice::saveDataChanges()
         db[":f_goods"] = ui->tbl->getInteger(i, 0);
         db[":f_price"] = ui->tbl->lineEdit(i, 4)->getDouble();
         db.exec("update d_recipes set f_price=:f_price where f_goods=:f_goods");
-
         db[":f_id"] = ui->tbl->getInteger(i, 0);
         db[":f_price"] = ui->tbl->lineEdit(i, 4)->getDouble();
         db.exec("update c_goods set f_lastinputprice=:f_price where f_id=:f_id");

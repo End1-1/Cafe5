@@ -4,6 +4,7 @@
 #include "c5message.h"
 #include "c5utils.h"
 #include "c5cache.h"
+#include "c5config.h"
 #include "c5selector.h"
 #include "c5user.h"
 #include "jsons.h"
@@ -28,6 +29,7 @@
 #include <QInputDialog>
 #include <QFileDialog>
 #include <QDesktopServices>
+#include <QDomDocument>
 
 #define col_uuid 0
 #define col_checkbox 1
@@ -44,6 +46,8 @@
 #define col_isservice 12
 #define col_returnfrom 13
 #define col_emarks 14
+
+#define float_str_(value, f) QString::number(value, 'f', f)
 
 C5SaleDoc::C5SaleDoc(const QStringList &dbParams, QWidget *parent) :
     C5Widget(dbParams, parent),
@@ -124,6 +128,7 @@ QToolBar *C5SaleDoc::toolBar()
         fToolBar->addAction(QIcon(":/excel.png"), tr("Export to Excel"), this, SLOT(exportToExcel()));
         fToolBar->addAction(QIcon(":/whosale.png"), tr("Create store\r\ndocument"), this, SLOT(createStoreDocument()));
         fActionReturn = fToolBar->addAction(QIcon(":/trading.png"), tr("Return"), this, SLOT(returnItems()));
+        fToolBar->addAction(QIcon(":/xml.png"), tr("Export to XML"), this, SLOT(exportXML()));
     }
     return fToolBar;
 }
@@ -270,6 +275,168 @@ void C5SaleDoc::printSale()
     p.print(err);
     if (!err.isEmpty()) {
         C5Message::error(err);
+    }
+}
+
+void C5SaleDoc::exportXML()
+{
+    QString fileName = QFileDialog::getSaveFileName(this, tr("Export to XML"), "", "*.xml");
+    if (fileName.isEmpty()) {
+        return;
+    }
+    QDomDocument doc;
+    // Декларация
+    QDomProcessingInstruction decl = doc.createProcessingInstruction("xml", "version=\"1.0\"");
+    doc.appendChild(decl);
+    // Корневой элемент
+    QDomElement root = doc.createElement("ExportedData");
+    root.setAttribute("xmlns:xsi", "http://www.w3.org/2001/XMLSchema-instance");
+    root.setAttribute("xmlns:xsd", "http://www.w3.org/2001/XMLSchema");
+    root.setAttribute("xmlns", "http://www.taxservice.am/tp3/invoice/definitions");
+    doc.appendChild(root);
+    // Invoice
+    QDomElement invoice = doc.createElement("Invoice");
+    invoice.setAttribute("Version", "1.0");
+    root.appendChild(invoice);
+    // Type
+    invoice.appendChild(doc.createElement("Type")).appendChild(doc.createTextNode("1"));
+    invoice.appendChild(doc.createElement("Traceable")).appendChild(doc.createTextNode("false"));
+    // GeneralInfo
+    QDomElement generalInfo = doc.createElement("GeneralInfo");
+    invoice.appendChild(generalInfo);
+    generalInfo.appendChild(doc.createElement("ParentInvoiceNumber"));
+    generalInfo.appendChild(doc.createElement("EcrReceipt"));
+    generalInfo.appendChild(doc.createElement("SupplyDate"))
+               .appendChild(doc.createTextNode(ui->leDate->date().toString("yyyy-MM-dd") + "+04:00"));
+    generalInfo.appendChild(doc.createElement("Procedure")).appendChild(doc.createTextNode("2"));
+    QDomElement dealInfo = doc.createElement("DealInfo");
+    dealInfo.appendChild(doc.createElement("DealNumber"));
+    generalInfo.appendChild(dealInfo);
+    generalInfo.appendChild(doc.createElement("AdditionalData"));
+    generalInfo.appendChild(doc.createElement("AdjustmentAccount")).appendChild(doc.createTextNode("false"));
+    // SupplierInfo
+    QDomElement supplierInfo = doc.createElement("SupplierInfo");
+    invoice.appendChild(supplierInfo);
+    supplierInfo.appendChild(doc.createElement("VATNumber"));
+    QDomElement supplierTaxpayer = doc.createElement("Taxpayer");
+    supplierInfo.appendChild(supplierTaxpayer);
+    supplierTaxpayer.appendChild(doc.createElement("TIN"))
+                    .appendChild(doc.createTextNode(C5Config::fMainJson["companytin"].toString()));
+    supplierTaxpayer.appendChild(doc.createElement("Name"))
+                    .appendChild(doc.createTextNode(C5Config::fMainJson["companyname"].toString()));
+    supplierTaxpayer.appendChild(doc.createElement("Address"))
+                    .appendChild(doc.createTextNode(C5Config::fMainJson["companyaddress"].toString()));
+    QDomElement supplierBank = doc.createElement("BankAccount");
+    supplierBank.appendChild(doc.createElement("BankName"))
+                .appendChild(doc.createTextNode(C5Config::fMainJson["companybank"].toString()));
+    supplierBank.appendChild(doc.createElement("BankAccountNumber"))
+                .appendChild(doc.createTextNode(C5Config::fMainJson["companybankaccount"].toString()));
+    supplierTaxpayer.appendChild(supplierBank);
+    supplierTaxpayer.appendChild(doc.createElement("AdditionalData"));
+    supplierInfo.appendChild(doc.createElement("SupplyLocation"))
+                .appendChild(doc.createTextNode(C5Config::fMainJson["companyaddress"].toString()));
+    supplierInfo.appendChild(doc.createElement("FactualSupplierAddress"))
+                .appendChild(doc.createTextNode(C5Config::fMainJson["companyaddress"].toString()));
+    //BehalfOf SUpplier
+    QDomElement behalfSupplier = doc.createElement("OnBehalfOfSupplierInfo");
+    invoice.appendChild(behalfSupplier);
+    behalfSupplier.appendChild(doc.createElement("VATNumber"));
+    QDomElement behalfTaxpayer = doc.createElement("Taxpayer");
+    behalfSupplier.appendChild(behalfTaxpayer);
+    behalfTaxpayer.appendChild(doc.createElement("TIN"));
+    behalfTaxpayer.appendChild(doc.createElement("Name"));
+    behalfTaxpayer.appendChild(doc.createElement("Address"));
+    QDomElement behalfBank = doc.createElement("BankAccount");
+    behalfTaxpayer.appendChild(behalfBank);
+    behalfBank.appendChild(doc.createElement("BankName"));
+    behalfBank.appendChild(doc.createElement("BankAccountNumber"));
+    behalfTaxpayer.appendChild(doc.createElement("AdditionalData"));
+    behalfTaxpayer.appendChild(doc.createElement("PrincipalTinNotRequired"))
+                  .appendChild(doc.createTextNode("false"));
+    // BuyerInfo
+    QDomElement buyerInfo = doc.createElement("BuyerInfo");
+    invoice.appendChild(buyerInfo);
+    buyerInfo.appendChild(doc.createElement("VATNumber")); // Пустой
+    QDomElement buyerTaxpayer = doc.createElement("Taxpayer");
+    buyerTaxpayer.appendChild(doc.createElement("TIN"))
+                 .appendChild(doc.createTextNode(ui->leTaxpayerId->text()));
+    buyerTaxpayer.appendChild(doc.createElement("Passport"));
+    buyerTaxpayer.appendChild(doc.createElement("Name"))
+                 .appendChild(doc.createTextNode(fPartner.taxName));
+    buyerTaxpayer.appendChild(doc.createElement("Address"))
+                 .appendChild(doc.createTextNode(fPartner.address));
+    QDomElement buyerBank = doc.createElement("BankAccount");
+    buyerBank.appendChild(doc.createElement("BankName"));
+    buyerBank.appendChild(doc.createElement("BankAccountNumber"));
+    buyerTaxpayer.appendChild(buyerBank);
+    buyerTaxpayer.appendChild(doc.createElement("AdditionalData"));
+    buyerTaxpayer.appendChild(doc.createElement("TinNotRequired")).appendChild(doc.createTextNode("false"));
+    buyerTaxpayer.appendChild(doc.createElement("IsNatural")).appendChild(doc.createTextNode("false"));
+    buyerInfo.appendChild(buyerTaxpayer);
+    buyerInfo.appendChild(doc.createElement("BuyerEmail"));
+    QDomElement mediator = doc.createElement("Mediator");
+    mediator.appendChild(doc.createElement("Name"));
+    mediator.appendChild(doc.createElement("LicenseNumber"));
+    buyerInfo.appendChild(mediator);
+    buyerInfo.appendChild(doc.createElement("DeliveryMethod"));
+    buyerInfo.appendChild(doc.createElement("DeliveryLocation"))
+             .appendChild(doc.createTextNode(ui->leDeliveryAddress->text()));
+    buyerInfo.appendChild(doc.createElement("BuyerResidenceAddress"));
+    buyerInfo.appendChild(doc.createElement("FactualBuyerAddress"))
+             .appendChild(doc.createTextNode(ui->leDeliveryAddress->text()));
+    // GoodsInfo
+    QDomElement goodsInfo = doc.createElement("GoodsInfo");
+    invoice.appendChild(goodsInfo);
+    double totalVat = 0;
+    double totalWithoutVAT = 0;
+    for (int i = 0; i < ui->tblGoods->rowCount(); ++i) {
+        QDomElement good = doc.createElement("Good");
+        double qty = ui->tblGoods->lineEdit(i, col_qty)->getDouble() ;
+        double price = ui->tblGoods->lineEdit(i, col_price)->getDouble();
+        price -= (price *ui->tblGoods->lineEdit(i, col_discount_value)->getDouble() / 100.0);
+        double priceWithoutVAT = (price  / 1.2) ;
+        double vat = (priceWithoutVAT  * 0.2);
+        vat *= qty;
+        totalVat += vat  ;
+        totalWithoutVAT += priceWithoutVAT *qty ;
+        // good.appendChild(doc.createElement("GoodId"))
+        //     .appendChild(doc.createTextNode(QString::number(ui->tblGoods->getInteger(i, col_goods_code))));
+        good.appendChild(doc.createElement("Description"))
+            .appendChild(doc.createTextNode(ui->tblGoods->getString(i, col_name)));
+        good.appendChild(doc.createElement("Unit"))
+            .appendChild(doc.createTextNode(ui->tblGoods->getString(i, col_unit)));
+        good.appendChild(doc.createElement("Amount")).appendChild(doc.createTextNode(QString::number(qty )));
+        good.appendChild(doc.createElement("PricePerUnit"))
+            .appendChild(doc.createTextNode(float_str_(priceWithoutVAT, 4)));
+        good.appendChild(doc.createElement("Price"))
+            .appendChild(doc.createTextNode(float_str_(priceWithoutVAT *qty, 2)));
+        good.appendChild(doc.createElement("VATRate")).appendChild(doc.createTextNode("20"));
+        good.appendChild(doc.createElement("VAT")).appendChild(doc.createTextNode(float_str_(vat, 2)));
+        good.appendChild(doc.createElement("EnvironmentalFee")).appendChild(doc.createTextNode("0"));
+        good.appendChild(doc.createElement("TotalPrice"))
+            .appendChild(doc.createTextNode(float_str_(price *qty, 2)));
+        goodsInfo.appendChild(good);
+        if (i == ui->tblGoods->rowCount() - 1) {
+            QDomElement total = doc.createElement("Total");
+            total.appendChild(doc.createElement("Price"))
+                 .appendChild(doc.createTextNode(float_str_(totalWithoutVAT, 2)));
+            total.appendChild(doc.createElement("VAT"))
+                 .appendChild(doc.createTextNode(float_str_(totalVat, 2)));
+            total.appendChild(doc.createElement("TotalPrice"))
+                 .appendChild(doc.createTextNode(float_str_(ui->leGrandTotal->getDouble(), 2)));
+            total.appendChild(doc.createElement("TotalEnvironmentalFee")).appendChild(doc.createTextNode("0"));
+            goodsInfo.appendChild(total);
+        }
+    }
+    QFile f(fileName);
+    if (f.open(QIODevice::WriteOnly)) {
+        QTextStream stream( &f);
+        stream.setEncoding(QStringConverter::Utf8);
+        doc.save(stream, 2);
+        f.close();
+        C5Message::info(tr("Exported"));
+    } else {
+        C5Message::error(tr("Could not export to the file"));
     }
 }
 
@@ -626,6 +793,9 @@ void C5SaleDoc::saveDataChanges()
     jdoc["settings"] = __c5config.fSettingsName;
     jdoc["organization"] = ui->leTaxpayerName->text();
     jdoc["contact"] = ui->leTaxpayerId->text();
+    QJsonObject jd;
+    jd["f_delivery"] = QDate::fromString(ui->btnDelivery->text(), "dd/MM/yyyy").toString(FORMAT_DATE_TO_STR);
+    jdoc["draft"] = jd;
     QJsonObject jh;
     jh["f_id"] = uuid;
     jh["f_hallid"] = ui->leDocnumber->property("f_hallid").toInt();
@@ -638,7 +808,7 @@ void C5SaleDoc::saveDataChanges()
     jh["f_datecash"] = ui->leDate->date().toString(FORMAT_DATE_TO_STR_MYSQL);
     jh["f_timeopen"] = QTime::currentTime().toString(FORMAT_TIME_TO_STR);
     jh["f_timeclose"] = QTime::currentTime().toString(FORMAT_TIME_TO_STR);
-    jh["f_cashier"] = ui->leCashier->property("f_cachier").toInt()  == 0 ? __user->id() :
+    jh["f_cashier"] = ui->leCashier->property("f_cashier").toInt()  == 0 ? __user->id() :
                       ui->leCashier->property("f_cashier").toInt();
     jh["f_staff"] = __user->id();
     jh["f_comment"] = ui->leComment->text();
@@ -818,9 +988,12 @@ int C5SaleDoc::addGoods(int goodsId, C5Database &db)
     }
     db[":f_id"] = goodsId;
     db[":f_currency"] = ui->cbCurrency->currentData();
-    db.exec(QString("select g.*, gu.f_name as f_unitname, if(gpr.%1>0, gpr.%1, gpr.%2) as f_price "
+    db[":f_partner"] = fPartner.id;
+    db.exec(QString("select g.*, gu.f_name as f_unitname, "
+                    "if((coalesce(sp.f_price, 0)>0), sp.f_price, if (gpr.%1>0, gpr.%1, gpr.%2)) as f_price "
                     "from c_goods g "
                     "left join c_goods_prices gpr on gpr.f_goods=g.f_id "
+                    "left join c_goods_special_prices sp on sp.f_goods=g.f_id and sp.f_partner=:f_partner "
                     "left join c_units gu on gu.f_id=g.f_unit "
                     "where g.f_id=:f_id and gpr.f_currency=:f_currency").arg(priceDiscount, priceField));
     if (db.nextRow()) {
@@ -923,6 +1096,9 @@ bool C5SaleDoc::openDraft(const QString &id)
     fPartner.queryRecordOfId(db, fDraftSale.partner);
     setPartner();
     ui->leDate->setDate(fDraftSale.date);
+    if (C5Config::fMainJson["change_draft_date_to_current"].toBool()) {
+        ui->leDate->setDate(QDate::currentDate());
+    }
     ui->leTime->setText(fDraftSale.time.toString(FORMAT_TIME_TO_STR));
     ui->leComment->setText(fDraftSale.comment);
     ui->leUuid->setText(fDraftSale.id.toString());
@@ -1018,6 +1194,7 @@ void C5SaleDoc::setPartner(const CPartners &p)
     Q_UNUSED(p);
     ui->leTaxpayerName->setText(QString("%1, %2, %3").arg(fPartner.categoryName, fPartner.groupName, fPartner.taxName));
     ui->leTaxpayerId->setText(fPartner.taxCode);
+    ui->leDeliveryAddress->setText(p.address);
     //setMode(fPartner.pricePolitic);
 }
 

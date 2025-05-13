@@ -8,6 +8,7 @@
 #include "c5dateedit.h"
 #include "c5cashdoc.h"
 #include "c5utils.h"
+#include "c5config.h"
 #include "c5user.h"
 #include "c5message.h"
 #include "c5lineeditwithselector.h"
@@ -116,6 +117,15 @@ void C5SalaryDoc::save()
     db.exec("insert into s_salary_payment (f_worker, f_date, f_shift, f_amount)  "
             "select  distinct(f_worker), :f_date, :f_shift, sum(f_amount) from s_salary_attendance "
             "where f_shift=:f_shift group by 1 ");
+}
+
+void C5SalaryDoc::countAmounts(const QString &arg1)
+{
+    double total = 0;
+    for (int i = 0; i < ui->tbl->rowCount(); i++) {
+        total += ui->tbl->lineEdit(i, 5)->getDouble();
+    }
+    ui->leTotal->setDouble(total);
 }
 
 void C5SalaryDoc::createCashDocument()

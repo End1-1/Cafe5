@@ -7,6 +7,8 @@
 #include "c5mainwindow.h"
 #include "c5inputdate.h"
 #include "bclientdebts.h"
+#include "c5config.h"
+#include "c5permissions.h"
 #include "c5user.h"
 #include "c5storedraftwriter.h"
 #include "c5message.h"
@@ -142,16 +144,16 @@ bool C5CashDoc::openDoc(const QString &uuid)
     if (fActionDraft) {
         fActionDraft->setEnabled(dw.value(container_aheader, 0, "f_state").toInt() == DOC_STATE_SAVED);
     }
-    ui->deDate->setDate(dw.value(container_aheader, 0, "f_date").toDate());
+    ui->deDate->setDate(QDate::fromString(dw.value(container_aheader, 0, "f_date").toString(), FORMAT_DATE_TO_STR_MYSQL));
     ui->leDocNum->setText(dw.value(container_aheader, 0, "f_userid").toString());
-    ui->lePartner->setValue(dw.value(container_aheader, 0, "f_partner").toString());
+    ui->lePartner->setValue(dw.value(container_aheader, 0, "f_partner").toInt());
     fRelation = dw.value(container_aheadercash, 0, "f_related").toInt();
-    ui->leInput->setValue(dw.value(container_aheadercash, 0, "f_cashin").toString());
-    ui->leOutput->setValue(dw.value(container_aheadercash, 0, "f_cashout").toString());
+    ui->leInput->setValue(dw.value(container_aheadercash, 0, "f_cashin").toInt());
+    ui->leOutput->setValue(dw.value(container_aheadercash, 0, "f_cashout").toInt());
     ui->cbComment->setCurrentText(dw.value(container_aheader, 0, "f_comment").toString());
     fStoreUuid = dw.value(container_aheadercash, 0, "f_storedoc").toString();
-    ui->lePartner->setValue(dw.value(container_aheader, 0, "f_partner").toString());
-    ui->cbCurrency->setCurrentIndex(ui->cbCurrency->findData(dw.value(container_aheader, 0, "f_currency")));
+    ui->lePartner->setValue(dw.value(container_aheader, 0, "f_partner").toInt());
+    ui->cbCurrency->setCurrentIndex(ui->cbCurrency->findData(dw.value(container_aheader, 0, "f_currency").toInt()));
     for (int i = 0; i < dw.rowCount(container_ecash); i++) {
         int row = -1;
         for (int j = 0; j < ui->tbl->rowCount(); j++) {
@@ -356,6 +358,7 @@ bool C5CashDoc::save(bool writedebt, bool fromrelation)
             bcd.source = BCLIENTDEBTS_SOURCE_SALE;
         }
         bcd.write(db, err);
+        fBClientDebtId = bcd.id;
     }
     foreach (const QString &s, fRemovedRows) {
         db[":f_base"] = s;

@@ -15,12 +15,12 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
-    <widget class="C5TableWidget" name="tbl">
+    <widget class="WaiterTableWidget" name="tbl">
      <property name="editTriggers">
-      <set>QAbstractItemView::NoEditTriggers</set>
+      <set>QAbstractItemView::EditTrigger::NoEditTriggers</set>
      </property>
      <property name="selectionMode">
-      <enum>QAbstractItemView::NoSelection</enum>
+      <enum>QAbstractItemView::SelectionMode::NoSelection</enum>
      </property>
      <attribute name="verticalHeaderDefaultSectionSize">
       <number>60</number>
@@ -46,9 +46,9 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>C5TableWidget</class>
+   <class>WaiterTableWidget</class>
    <extends>QTableWidget</extends>
-   <header location="global">c5tablewidget.h</header>
+   <header location="global">waitertablewidget.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

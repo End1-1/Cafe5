@@ -24,7 +24,7 @@
      </property>
      <layout class="QHBoxLayout" name="horizontalLayout_2">
       <item>
-       <widget class="C5TableWidget" name="t1">
+       <widget class="WaiterTableWidget" name="t1">
         <attribute name="verticalHeaderDefaultSectionSize">
          <number>50</number>
         </attribute>
@@ -51,7 +51,7 @@
        </widget>
       </item>
       <item>
-       <widget class="C5TableWidget" name="t2">
+       <widget class="WaiterTableWidget" name="t2">
         <attribute name="verticalHeaderDefaultSectionSize">
          <number>50</number>
         </attribute>
@@ -116,7 +116,7 @@
       <item>
        <spacer name="horizontalSpacer">
         <property name="orientation">
-         <enum>Qt::Horizontal</enum>
+         <enum>Qt::Orientation::Horizontal</enum>
         </property>
         <property name="sizeHint" stdset="0">
          <size>
@@ -144,7 +144,7 @@
          <string>...</string>
         </property>
         <property name="icon">
-         <iconset resource="../resources/resources.qrc">
+         <iconset>
           <normaloff>:/exit.png</normaloff>:/exit.png</iconset>
         </property>
        </widget>
@@ -156,13 +156,11 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>C5TableWidget</class>
+   <class>WaiterTableWidget</class>
    <extends>QTableWidget</extends>
-   <header location="global">c5tablewidget.h</header>
+   <header location="global">waitertablewidget.h</header>
   </customwidget>
  </customwidgets>
- <resources>
-  <include location="../resources/resources.qrc"/>
- </resources>
+ <resources/>
  <connections/>
 </ui>

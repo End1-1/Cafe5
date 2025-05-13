@@ -1,7 +1,7 @@
 #include "cr5menutranslator.h"
 #include "ui_cr5menutranslator.h"
 #include "c5lineedit.h"
-#include "c5utils.h"
+#include "c5database.h"
 #include "c5message.h"
 #include <QJsonArray>
 

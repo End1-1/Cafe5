@@ -29,10 +29,10 @@ void DlgViewStopList::getStopListResponse(const QJsonObject &jdoc)
             ui->tbl->addEmptyRow();
         }
         QJsonObject o = ja.at(i).toObject();
-        C5TableWidgetItem *item = new C5TableWidgetItem(QString("[%1] %2")
-            .arg(o["f_qty"].toDouble())
-            .arg(dbdish->name(
-                     o["f_dish"].toInt())));
+        auto item = new QTableWidgetItem(QString("[%1] %2")
+                                         .arg(o["f_qty"].toDouble())
+                                         .arg(dbdish->name(
+                                                 o["f_dish"].toInt())));
         item->setData(Qt::UserRole, o["f_dish"].toInt());
         ui->tbl->setItem(r, c, item);
         if (++c > ui->tbl->columnCount() - 1) {
@@ -47,7 +47,7 @@ void DlgViewStopList::handleStopListQty(const QJsonObject &obj)
 {
     for (int r = 0; r < ui->tbl->rowCount(); r++) {
         for (int c = 0; c < ui->tbl->columnCount(); c++) {
-            C5TableWidgetItem *item = ui->tbl->item(r, c);
+            auto item = ui->tbl->item(r, c);
             if (item) {
                 if (item->data(Qt::UserRole).toInt() == obj["f_dish"].toString().toInt()) {
                     item->setText(QString("[%1] %2").arg(obj["f_qty"].toDouble()).arg(dbdish->name(obj["f_dish"].toString().toInt())));
@@ -65,7 +65,7 @@ void DlgViewStopList::handleStopListRemoveOne(const QJsonObject &obj)
     fHttp->httpQueryFinished(sender());
     for (int r = 0; r < ui->tbl->rowCount(); r++) {
         for (int c = 0; c < ui->tbl->columnCount(); c++) {
-            C5TableWidgetItem *item = ui->tbl->item(r, c);
+            auto item = ui->tbl->item(r, c);
             if (item) {
                 if (item->data(Qt::UserRole).toInt() == obj["f_dish"].toInt()) {
                     item->setText("");

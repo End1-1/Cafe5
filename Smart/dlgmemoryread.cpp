@@ -1,6 +1,10 @@
 #include "dlgmemoryread.h"
 #include "ui_dlgmemoryread.h"
 #include "workspace.h"
+#include "c5message.h"
+#include "c5database.h"
+#include "c5utils.h"
+#include "c5config.h"
 
 DlgMemoryRead::DlgMemoryRead() :
     C5Dialog(__c5config.dbParams()),

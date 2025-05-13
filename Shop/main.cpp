@@ -106,6 +106,7 @@ int main(int argc, char *argv[])
     LogWriter::write(LogWriterLevel::verbose, "", "Init params from db");
     emit dlgsplash->messageSignal("Init params from db");
     C5Config::initParamsFromDb();
+    C5Database db(C5Config::dbParams());
     __user = new C5User(0);
     while (!__user->isValid() || !__user->isActive()) {
         if (!DlgPin::getPin(user, pin, false)) {
@@ -120,6 +121,14 @@ int main(int argc, char *argv[])
         pin.clear();
         user.clear();
     }
+    if (C5Config::fMainJson["clear_sale_draft"].toBool()) {
+        emit dlgsplash->messageSignal("clear draft");
+        db[":f_hall"] = C5Config::defaultHall();
+        db.exec("update o_draft_sale_body set f_state=10 where f_state=1 "
+                "and f_header in (select f_id from o_draft_sale where f_hall=:f_hall and f_state=1)");
+        db[":f_hall"] = C5Config::defaultHall();
+        db.exec("update o_draft_sale set f_state=10 where f_hall=:f_hall and f_state=1");
+    }
     if (__user->value("f_settingsname").toString() != __c5config.fSettingsName) {
         if (__user->value("f_settingsname").toString().isEmpty() == false ) {
             __c5config.fSettingsName = __user->value("f_settingsname").toString();
@@ -130,7 +139,6 @@ int main(int argc, char *argv[])
         return 0;
     }
     NDataProvider::mDebug = __c5config.getValue(param_debuge_mode).toInt() > 0;
-    C5Database db(C5Config::dbParams());
     db[":f_user"] = __user->id();
     db.exec("select sn.f_id, sn.f_name from s_settings_names sn where sn.f_id in (select f_settings from s_user_config where f_user=:f_user)");
     auto *s = new SettingsSelection();

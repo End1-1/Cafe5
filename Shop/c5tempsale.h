@@ -3,7 +3,8 @@
 
 #include "c5dialog.h"
 
-namespace Ui {
+namespace Ui
+{
 class C5TempSale;
 }
 
@@ -16,7 +17,9 @@ class C5TempSale : public C5Dialog
 
 public:
     explicit C5TempSale();
+
     ~C5TempSale();
+
     QString openDraft();
 
 private slots:
@@ -30,6 +33,7 @@ private slots:
 
 private:
     Ui::C5TempSale *ui;
+
     void refreshData();
 };
 

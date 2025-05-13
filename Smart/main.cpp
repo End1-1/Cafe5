@@ -7,6 +7,9 @@
 #include "dlgsplashscreen.h"
 #include "fileversion.h"
 #include "logwriter.h"
+#include "c5message.h"
+#include "c5database.h"
+#include "dlgserverconnection.h"
 #include <QFile>
 #include <QLockFile>
 #include <QSslSocket>
@@ -59,50 +62,23 @@ int main(int argc, char *argv[])
     if (styleFile.open(QIODevice::ReadOnly)) {
         a.setStyleSheet(styleFile.readAll());
     }
-    QString settingsName, serverName, connection;
-    for (const QString &arg : a.arguments()) {
-        if (arg.contains("/servername=")) {
-            QStringList sn = arg.split("=");
-            if (sn.length() == 2) {
-                serverName = sn.at(1);
-            }
-        } else if (arg.contains("/config")) {
-            QStringList sn = arg.split("=", Qt::SkipEmptyParts);
-            if (sn.length() > 1) {
-                settingsName = sn.at(1);
-                C5Config::fSettingsName = settingsName;
-            }
-        } else if (arg.contains("/name")) {
-            QStringList sn = arg.split("=");
-            if (sn.length() == 2) {
-                connection = sn.at(1);
-            }
-        }
-    }
-    if (serverName.isEmpty()) {
-        C5Message::error("Server name not found");
+    C5ServerName sng(__c5config.getRegValue("ss_server_address").toString());
+    if (!sng.getConnection(__c5config.getRegValue("ss_database").toString())) {
+        C5Message::error(sng.mErrorString);
+        DlgServerConnection::showSettings(0);
         return 1;
     }
-    if (connection.isEmpty()) {
-        connection = "smart";
-    }
-    C5ServerName sng(serverName, "shop");
-    if (!sng.getServers(connection)) {
-        return 1;
-    }
-    QJsonObject js = sng.mServers.at(0).toObject();
-    C5Config::fDBHost = js["host"].toString();
+    QJsonObject js = sng.mReply;
+    C5Config::fDBHost = js["settings"].toString();
     C5Config::fDBPath = js["database"].toString();
     C5Config::fDBUser = js["username"].toString();
     C5Config::fDBPassword = js["password"].toString();
-    C5Config::fSettingsName = js["settings"].toString();
+    C5Config::fSettingsName = __c5config.getRegValue("ss_settings").toString();
     C5Config::fFullScreen = true;
+    NDataProvider::mProtocol = C5Config::fDBHost;
     NDataProvider::mHost = C5Config::fDBPath;
     NDataProvider::mAppName = "smart";
     NDataProvider::mFileVersion = FileVersion::getVersionString(a.applicationFilePath());
-    if (settingsName.length() > 0) {
-        C5Config::fSettingsName = settingsName;
-    }
     QSettings ss(_ORGANIZATION_, _APPLICATION_ + QString("\\") + _MODULE_);
     ss.setValue("server", "");
     C5Config::initParamsFromDb();

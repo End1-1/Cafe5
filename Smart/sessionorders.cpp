@@ -1,5 +1,8 @@
 #include "sessionorders.h"
 #include "ui_sessionorders.h"
+#include "c5config.h"
+#include "c5database.h"
+#include "c5utils.h"
 
 SessionOrders::SessionOrders() :
     C5Dialog(__c5config.dbParams()),

@@ -31,7 +31,7 @@ public:
 
     virtual bool save(QString &err, QList<QMap<QString, QVariant> > &data);
 
-    void clear(QWidget *parent)  ;
+    void clear(QWidget *parent);
 
     virtual bool canCopy() override;
 

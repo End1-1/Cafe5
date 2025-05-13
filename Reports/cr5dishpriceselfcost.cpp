@@ -1,6 +1,7 @@
 #include "cr5dishpriceselfcost.h"
 #include "cr5dishpriceselfcostfilter.h"
 #include "c5tablemodel.h"
+#include "c5database.h"
 #include "c5dishwidget.h"
 
 CR5DishPriceSelfCost::CR5DishPriceSelfCost(const QStringList &dbParams, QWidget *parent) :

@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core gui network printsupport sql multimedia axcontainer websockets
+QT       += core gui network printsupport sql multimedia axcontainer websockets httpserver
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -39,7 +39,6 @@ DEFINES += QT_DEPRECATED_WARNINGS
 SOURCES += \
     ../Cafe5/c5cafecommon.cpp \
     ../Cafe5/c5double.cpp \
-    ../Cafe5/c5serverhandler.cpp \
     ../Cafe5/c5systempreference.cpp \
     ../Cafe5/calendar.cpp \
     ../Classes/QProgressIndicator.cpp \
@@ -49,8 +48,6 @@ SOURCES += \
     ../Classes/c5combodelegate.cpp \
     ../Classes/c5datedelegate.cpp \
     ../Classes/c5document.cpp \
-    ../Classes/c5filterwidget.cpp \
-    ../Classes/c5grid.cpp \
     ../Classes/c5gridgilter.cpp \
     ../Classes/c5jsondb.cpp \
     ../Classes/c5orderdriver.cpp \
@@ -75,16 +72,11 @@ SOURCES += \
     ../Classes/logwriter.cpp \
     ../Classes/notificationwidget.cpp \
     ../Classes/outputofheader.cpp \
-    ../Classes/proxytablewidgetdatabase.cpp \
     ../Configs/breezeconfig.cpp \
     ../Configs/cashboxconfig.cpp \
     ../Configs/configs.cpp \
-    ../Controls/c5cleartablewidget.cpp \
     ../Controls/c5combotable.cpp \
     ../Controls/c5guicontrols.cpp \
-    ../Controls/c5lineeditwithselector.cpp \
-    ../Controls/c5tablewidget.cpp \
-    ../Controls/c5tablewithtotal.cpp \
     ../Controls/combosearchview.cpp \
     ../DbData/datadriver.cpp \
     ../DbData/dbbodystate.cpp \
@@ -113,61 +105,36 @@ SOURCES += \
     ../DbData/dbusers.cpp \
     ../Forms/armsoftexportoptions.cpp \
     ../Forms/barcode.cpp \
-    ../Forms/c5changedocinputprice.cpp \
     ../Forms/c5changepassword.cpp \
     ../Forms/c5changepriceofgroup.cpp \
     ../Forms/c5checkdatabase.cpp \
-    ../Forms/c5datasynchronize.cpp \
     ../Forms/c5daterange.cpp \
     ../Forms/c5dbresetoption.cpp \
-    ../Forms/c5dbuseraccess.cpp \
-    ../Forms/c5dishgroupaction.cpp \
-    ../Forms/c5dishselfcostgenprice.cpp \
     ../Forms/c5dlgselectreporttemplate.cpp \
     ../Forms/c5filtervalues.cpp \
-    ../Forms/c5goodsprice.cpp \
-    ../Forms/c5goodspricing.cpp \
-    ../Forms/c5goodsspecialprices.cpp \
-    ../Forms/c5grouppermissionseditor.cpp \
-    ../Forms/c5inputdate.cpp \
     ../Forms/c5passwords.cpp \
     ../Forms/c5progressdialog.cpp \
-    ../Forms/c5salefromstoreorder.cpp \
-    ../Forms/c5selector.cpp \
-    ../Forms/c5srofinventory.cpp \
     ../Forms/c5storedocselectprinttemplate.cpp \
-    ../Forms/c5tablewidgetwithselector.cpp \
     ../Forms/c5toolbarwidget.cpp \
-    ../Forms/c5translatorform.cpp \
     ../Forms/change.cpp \
-    ../Forms/cr5routereport.cpp \
     ../Forms/customerinfo.cpp \
     ../Forms/dlgcashinout.cpp \
     ../Forms/dlgcashop.cpp \
-    ../Forms/dlgchangeoutputstore.cpp \
     ../Forms/dlgconfigtable.cpp \
     ../Forms/dlgdataonline.cpp \
-    ../Forms/dlgdirtystoredoc.cpp \
-    ../Forms/dlgdriverroutedate.cpp \
-    ../Forms/dlgexportsaletoasoptions.cpp \
     ../Forms/dlgguestinfo.cpp \
     ../Forms/dlglist2.cpp \
     ../Forms/dlglistofdishcomments.cpp \
-    ../Forms/dlgnewcl.cpp \
     ../Forms/dlgpaymentchoose.cpp \
     ../Forms/dlgprintrecipesoptions.cpp \
     ../Forms/dlgqty.cpp \
     ../Forms/dlgreservgoods.cpp \
     ../Forms/dlgselectcurrency.cpp \
-    ../Forms/dlgsemireadyinout.cpp \
-    ../Forms/dlgsetwaiterordercl.cpp \
     ../Forms/dlgsplashscreen.cpp \
     ../Forms/dlgstoreutils.cpp \
     ../Forms/dlgviewcashreport.cpp \
-    ../Forms/goodsasmap.cpp \
     ../Forms/httpquerydialog.cpp \
     ../Forms/mfprocessproductpriceupdate.cpp \
-    ../Forms/partnersasmap.cpp \
     ../Forms/touchdlgphonenumber.cpp \
     ../Forms/touchentertaxreceiptnumber.cpp \
     ../Forms/touchselecttaxreport.cpp \
@@ -222,7 +189,6 @@ SOURCES += \
     ../Cafe5/c5dialog.cpp \
     ../Cafe5/c5utils.cpp \
     ../Cafe5/c5message.cpp \
-    ../Cafe5/c5sockethandler.cpp \
     dlgorder.cpp \
     ../Classes/c5user.cpp \
     ../Classes/c5menu.cpp \
@@ -248,6 +214,7 @@ SOURCES += \
     qdishpart2button.cpp \
     tablewidget.cpp \
     tablewidgetv1.cpp \
+    waitertablewidget.cpp \
     wguestorder.cpp \
     worderw.cpp \
     wpaymentoptions.cpp \
@@ -272,7 +239,6 @@ SOURCES += \
 HEADERS += \
     ../Cafe5/c5cafecommon.h \
     ../Cafe5/c5double.h \
-    ../Cafe5/c5serverhandler.h \
     ../Cafe5/c5systempreference.h \
     ../Cafe5/calendar.h \
     ../Classes/QProgressIndicator.h \
@@ -283,8 +249,6 @@ HEADERS += \
     ../Classes/c5combodelegate.h \
     ../Classes/c5datedelegate.h \
     ../Classes/c5document.h \
-    ../Classes/c5filterwidget.h \
-    ../Classes/c5grid.h \
     ../Classes/c5gridgilter.h \
     ../Classes/c5jsondb.h \
     ../Classes/c5orderdriver.h \
@@ -311,16 +275,11 @@ HEADERS += \
     ../Classes/logwriter.h \
     ../Classes/notificationwidget.h \
     ../Classes/outputofheader.h \
-    ../Classes/proxytablewidgetdatabase.h \
     ../Configs/breezeconfig.h \
     ../Configs/cashboxconfig.h \
     ../Configs/configs.h \
-    ../Controls/c5cleartablewidget.h \
     ../Controls/c5combotable.h \
     ../Controls/c5guicontrols.h \
-    ../Controls/c5lineeditwithselector.h \
-    ../Controls/c5tablewidget.h \
-    ../Controls/c5tablewithtotal.h \
     ../Controls/combosearchview.h \
     ../DbData/datadriver.h \
     ../DbData/dbbodystate.h \
@@ -349,61 +308,36 @@ HEADERS += \
     ../DbData/dbusers.h \
     ../Forms/armsoftexportoptions.h \
     ../Forms/barcode.h \
-    ../Forms/c5changedocinputprice.h \
     ../Forms/c5changepassword.h \
     ../Forms/c5changepriceofgroup.h \
     ../Forms/c5checkdatabase.h \
-    ../Forms/c5datasynchronize.h \
     ../Forms/c5daterange.h \
     ../Forms/c5dbresetoption.h \
-    ../Forms/c5dbuseraccess.h \
-    ../Forms/c5dishgroupaction.h \
-    ../Forms/c5dishselfcostgenprice.h \
     ../Forms/c5dlgselectreporttemplate.h \
     ../Forms/c5filtervalues.h \
-    ../Forms/c5goodsprice.h \
-    ../Forms/c5goodspricing.h \
-    ../Forms/c5goodsspecialprices.h \
-    ../Forms/c5grouppermissionseditor.h \
-    ../Forms/c5inputdate.h \
     ../Forms/c5passwords.h \
     ../Forms/c5progressdialog.h \
-    ../Forms/c5salefromstoreorder.h \
-    ../Forms/c5selector.h \
-    ../Forms/c5srofinventory.h \
     ../Forms/c5storedocselectprinttemplate.h \
-    ../Forms/c5tablewidgetwithselector.h \
     ../Forms/c5toolbarwidget.h \
-    ../Forms/c5translatorform.h \
     ../Forms/change.h \
-    ../Forms/cr5routereport.h \
     ../Forms/customerinfo.h \
     ../Forms/dlgcashinout.h \
     ../Forms/dlgcashop.h \
-    ../Forms/dlgchangeoutputstore.h \
     ../Forms/dlgconfigtable.h \
     ../Forms/dlgdataonline.h \
-    ../Forms/dlgdirtystoredoc.h \
-    ../Forms/dlgdriverroutedate.h \
-    ../Forms/dlgexportsaletoasoptions.h \
     ../Forms/dlgguestinfo.h \
     ../Forms/dlglist2.h \
     ../Forms/dlglistofdishcomments.h \
-    ../Forms/dlgnewcl.h \
     ../Forms/dlgpaymentchoose.h \
     ../Forms/dlgprintrecipesoptions.h \
     ../Forms/dlgqty.h \
     ../Forms/dlgreservgoods.h \
     ../Forms/dlgselectcurrency.h \
-    ../Forms/dlgsemireadyinout.h \
-    ../Forms/dlgsetwaiterordercl.h \
     ../Forms/dlgsplashscreen.h \
     ../Forms/dlgstoreutils.h \
     ../Forms/dlgviewcashreport.h \
-    ../Forms/goodsasmap.h \
     ../Forms/httpquerydialog.h \
     ../Forms/mfprocessproductpriceupdate.h \
-    ../Forms/partnersasmap.h \
     ../Forms/touchdlgphonenumber.h \
     ../Forms/touchentertaxreceiptnumber.h \
     ../Forms/touchselecttaxreport.h \
@@ -441,8 +375,6 @@ HEADERS += \
     ../Cafe5/c5dialog.h \
     ../Cafe5/c5utils.h \
     ../Cafe5/c5message.h \
-    ../Cafe5/c5sockethandler.h \
-    ../Cafe5/c5socketmessage.h \
     dlgguests.h \
     dlglist.h \
     dlglistdishspecial.h \
@@ -487,6 +419,7 @@ HEADERS += \
     ../Classes/c5cache.h \
     tablewidget.h \
     tablewidgetv1.h \
+    waitertablewidget.h \
     wguestorder.h \
     worderw.h \
     wpaymentoptions.h \
@@ -510,69 +443,43 @@ HEADERS += \
 
 FORMS += \
     ../Cafe5/calendar.ui \
-    ../Classes/c5grid.ui \
     ../Classes/c5gridgilter.ui \
     ../Classes/calculator.ui \
     ../Classes/dlgpassword.ui \
     ../Classes/dlgserverconnection.ui \
     ../Classes/notificationwidget.ui \
-    ../Controls/c5tablewithtotal.ui \
     ../Controls/combosearchview.ui \
     ../Forms/armsoftexportoptions.ui \
-    ../Forms/c5changedocinputprice.ui \
     ../Forms/c5changepassword.ui \
     ../Forms/c5changepriceofgroup.ui \
     ../Forms/c5checkdatabase.ui \
-    ../Forms/c5datasynchronize.ui \
     ../Forms/c5daterange.ui \
     ../Forms/c5dbresetoption.ui \
-    ../Forms/c5dbuseraccess.ui \
-    ../Forms/c5dishgroupaction.ui \
-    ../Forms/c5dishselfcostgenprice.ui \
     ../Forms/c5dlgselectreporttemplate.ui \
     ../Forms/c5filtervalues.ui \
-    ../Forms/c5goodsprice.ui \
-    ../Forms/c5goodspricing.ui \
-    ../Forms/c5goodsspecialprices.ui \
-    ../Forms/c5grouppermissionseditor.ui \
-    ../Forms/c5inputdate.ui \
     ../Forms/c5passwords.ui \
     ../Forms/c5progressdialog.ui \
-    ../Forms/c5salefromstoreorder.ui \
-    ../Forms/c5selector.ui \
-    ../Forms/c5srofinventory.ui \
     ../Forms/c5storedocselectprinttemplate.ui \
     ../Forms/c5toolbarwidget.ui \
-    ../Forms/c5translatorform.ui \
     ../Forms/change.ui \
-    ../Forms/cr5routereport.ui \
     ../Forms/customerinfo.ui \
     ../Forms/dlgcashinout.ui \
     ../Forms/dlgcashop.ui \
-    ../Forms/dlgchangeoutputstore.ui \
     ../Forms/dlgconfigtable.ui \
     ../Forms/dlgdataonline.ui \
-    ../Forms/dlgdirtystoredoc.ui \
-    ../Forms/dlgdriverroutedate.ui \
-    ../Forms/dlgexportsaletoasoptions.ui \
     ../Forms/dlgguestinfo.ui \
     ../Forms/dlglist2.ui \
     ../Forms/dlglistofdishcomments.ui \
-    ../Forms/dlgnewcl.ui \
     ../Forms/dlgpaymentchoose.ui \
     ../Forms/dlgprintrecipesoptions.ui \
     ../Forms/dlgqty.ui \
     ../Forms/dlgreservgoods.ui \
     ../Forms/dlgselectcurrency.ui \
-    ../Forms/dlgsemireadyinout.ui \
-    ../Forms/dlgsetwaiterordercl.ui \
     ../Forms/dlgsplashscreen.ui \
     ../Forms/dlgstoreutils.ui \
     ../Forms/dlgviewcashreport.ui \
-    ../Forms/goodsasmap.ui \
     ../Forms/httpquerydialog.ui \
     ../Forms/mfprocessproductpriceupdate.ui \
-    ../Forms/partnersasmap.ui \
     ../Forms/touchdlgphonenumber.ui \
     ../Forms/touchentertaxreceiptnumber.ui \
     ../Forms/touchselecttaxreport.ui \
@@ -644,9 +551,6 @@ FORMS += \
     INCLUDEPATH += C:/Projects/NewTax/Src
     INCLUDEPATH += C:/Soft/OpenSSLWin64/include
     INCLUDEPATH += C:/Soft/OpenSSLWin64/include/openssl
-
-
-include(C:/projects/QXlsx/QXlsx/QXlsx.pri)
 
 RESOURCES += \
     ../resources/res.qrc \

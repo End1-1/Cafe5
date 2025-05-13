@@ -78,7 +78,7 @@ bool C5PrintReciptA4::print(QString &err)
         db[":f_costumer"] = header["f_partner"];
         db[":f_order"] = fOrderUUID;
         db.exec("select 0 as a, sum(f_amount) as dd from b_clients_debts "
-                "where f_costumer=:f_costumer and f_order<>:f_order "
+                "where f_costumer=:f_costumer and (f_order<>:f_order or f_order is null) "
                 "union "
                 "select 1 as a, sum(f_amount) as dd from b_clients_debts "
                 "where f_costumer=:f_costumer and f_order=:f_order "

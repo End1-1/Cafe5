@@ -1,5 +1,6 @@
 #include "cr5complectations.h"
 #include "c5tablemodel.h"
+#include "c5database.h"
 
 CR5Complectations::CR5Complectations(const QStringList &dbparams, QWidget *parent) :
     C5ReportWidget(dbparams, parent)

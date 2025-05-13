@@ -1,6 +1,7 @@
 #include "cr5consumptionbysalesfilter.h"
 #include "ui_cr5consumptionbysalesfilter.h"
 #include "c5cache.h"
+#include "c5config.h"
 
 CR5ConsumptionBySalesFilter::CR5ConsumptionBySalesFilter(const QStringList &dbParams, QWidget *parent) :
     C5FilterWidget(dbParams, parent),

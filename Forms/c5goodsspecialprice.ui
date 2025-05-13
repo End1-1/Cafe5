@@ -1,0 +1,275 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>C5GoodsSpecialPrice</class>
+ <widget class="QDialog" name="C5GoodsSpecialPrice">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>677</width>
+    <height>563</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Dialog</string>
+  </property>
+  <layout class="QGridLayout" name="gridLayout">
+   <item row="13" column="0">
+    <widget class="QLabel" name="label_13">
+     <property name="text">
+      <string>Goods special whosale price</string>
+     </property>
+    </widget>
+   </item>
+   <item row="4" column="1">
+    <widget class="C5LineEdit" name="lePartnerAddress">
+     <property name="readOnly">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="8" column="0">
+    <widget class="QLabel" name="label_8">
+     <property name="text">
+      <string>Goods name</string>
+     </property>
+    </widget>
+   </item>
+   <item row="13" column="1">
+    <widget class="C5LineEdit" name="leWhosalePriceDiff">
+     <property name="readOnly">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="0">
+    <widget class="QLabel" name="label_3">
+     <property name="text">
+      <string>Partner Name</string>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="0">
+    <widget class="QLabel" name="label_2">
+     <property name="text">
+      <string>Parnert ID</string>
+     </property>
+    </widget>
+   </item>
+   <item row="14" column="0" colspan="3">
+    <widget class="QWidget" name="widget" native="true">
+     <layout class="QHBoxLayout" name="horizontalLayout">
+      <item>
+       <spacer name="horizontalSpacer">
+        <property name="orientation">
+         <enum>Qt::Orientation::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>223</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item>
+       <widget class="QPushButton" name="btnOK">
+        <property name="text">
+         <string>OK</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="btnCancel">
+        <property name="text">
+         <string>Cancel</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <spacer name="horizontalSpacer_2">
+        <property name="orientation">
+         <enum>Qt::Orientation::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>223</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item row="11" column="1">
+    <widget class="C5LineEdit" name="leWhosalePrice">
+     <property name="readOnly">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="5" column="1">
+    <widget class="C5LineEdit" name="leGoodsID"/>
+   </item>
+   <item row="12" column="0">
+    <widget class="QLabel" name="label_12">
+     <property name="text">
+      <string>Goods special whosale price</string>
+     </property>
+    </widget>
+   </item>
+   <item row="9" column="1">
+    <widget class="C5LineEdit" name="leSpecialPrice"/>
+   </item>
+   <item row="12" column="1">
+    <widget class="C5LineEdit" name="leRetailPriceDiff">
+     <property name="readOnly">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="1">
+    <widget class="C5LineEdit" name="lePartnerTIN">
+     <property name="readOnly">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="1">
+    <widget class="C5LineEdit" name="lePartnerID"/>
+   </item>
+   <item row="3" column="1">
+    <widget class="C5LineEdit" name="lePartnerName">
+     <property name="readOnly">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="7" column="0">
+    <widget class="QLabel" name="label_7">
+     <property name="text">
+      <string>Goods barcode</string>
+     </property>
+    </widget>
+   </item>
+   <item row="4" column="0">
+    <widget class="QLabel" name="label_5">
+     <property name="text">
+      <string>Partner addres</string>
+     </property>
+    </widget>
+   </item>
+   <item row="9" column="0">
+    <widget class="QLabel" name="label_9">
+     <property name="text">
+      <string>Goods special price</string>
+     </property>
+    </widget>
+   </item>
+   <item row="10" column="0">
+    <widget class="QLabel" name="label_10">
+     <property name="text">
+      <string>Goods special retail price</string>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="0">
+    <widget class="QLabel" name="label_4">
+     <property name="text">
+      <string>Partner TIN</string>
+     </property>
+    </widget>
+   </item>
+   <item row="7" column="1">
+    <widget class="C5LineEdit" name="leBarcode"/>
+   </item>
+   <item row="0" column="0">
+    <widget class="QLabel" name="label">
+     <property name="text">
+      <string>ID</string>
+     </property>
+    </widget>
+   </item>
+   <item row="5" column="0">
+    <widget class="QLabel" name="label_6">
+     <property name="text">
+      <string>Goods ID</string>
+     </property>
+    </widget>
+   </item>
+   <item row="11" column="0">
+    <widget class="QLabel" name="label_11">
+     <property name="text">
+      <string>Goods special whosale price</string>
+     </property>
+    </widget>
+   </item>
+   <item row="8" column="1">
+    <widget class="C5LineEdit" name="leGoodsName">
+     <property name="readOnly">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="1">
+    <widget class="C5LineEdit" name="leID">
+     <property name="readOnly">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="10" column="1">
+    <widget class="C5LineEdit" name="leRetailPrice">
+     <property name="readOnly">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="5" column="2">
+    <widget class="QPushButton" name="btnSelectGoods">
+     <property name="text">
+      <string/>
+     </property>
+     <property name="icon">
+      <iconset resource="../resources/res.qrc">
+       <normaloff>:/folder.png</normaloff>:/folder.png</iconset>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="2">
+    <widget class="QPushButton" name="btnSelectPartner">
+     <property name="text">
+      <string/>
+     </property>
+     <property name="icon">
+      <iconset resource="../resources/res.qrc">
+       <normaloff>:/folder.png</normaloff>:/folder.png</iconset>
+     </property>
+    </widget>
+   </item>
+   <item row="6" column="0">
+    <widget class="QLabel" name="label_14">
+     <property name="text">
+      <string>Goods group</string>
+     </property>
+    </widget>
+   </item>
+   <item row="6" column="1">
+    <widget class="C5LineEdit" name="leGoodsGroup"/>
+   </item>
+  </layout>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>C5LineEdit</class>
+   <extends>QLineEdit</extends>
+   <header location="global">c5lineedit.h</header>
+  </customwidget>
+ </customwidgets>
+ <resources>
+  <include location="../resources/res.qrc"/>
+  <include location="../resources/res.qrc"/>
+ </resources>
+ <connections/>
+</ui>

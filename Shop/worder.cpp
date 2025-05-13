@@ -43,6 +43,7 @@ WOrder::WOrder(C5User *user, int saleType, WCustomerDisplay *customerDisplay, QW
     fDraftSale.date = QDate::currentDate();
     fDraftSale.time = QTime::currentTime();
     fDraftSale.staff = user->id();
+    fDraftSale.hall = __c5config.defaultHall();
     fOHeader.id = C5Database::uuid();
     fOHeader.state = ORDER_STATE_CLOSE;
     fOHeader.hall = __c5config.defaultHall();
@@ -788,29 +789,6 @@ void WOrder::setDiscount(const QString &label, const QString &value)
 
 void WOrder::countTotal()
 {
-    for (int i = 0; i < fOGoods.count(); i++) {
-        //MARTI8
-        int a = -1;
-        if (i > 0) {
-            QStringList codes;
-            codes.append("1");
-            codes.append("100");
-            codes.append("101");
-            codes.append("102");
-            codes.append("103");
-            codes.append("104");
-            if (codes.contains(fOGoods.at(i)._barcode)) {
-                a = i;
-                fOGoods[i].discountFactor = 1;
-                fOGoods[i].discountMode = 1;
-            }
-        }
-        if (a > -1) {
-            OGoods gt = fOGoods[fOGoods.count() - 1];
-            fOGoods[fOGoods.count() - 1] = fOGoods[a];
-            fOGoods[a] = gt;
-        }
-    }
     double accAmount = 0;
     fOHeader.countAmount(fOGoods, fBHistory);
     ui->leTotal->setDouble(fOHeader.amountTotal);
@@ -818,20 +796,6 @@ void WOrder::countTotal()
         ui->leDisc->setDouble(fOHeader.amountDiscount);
     }
     for (int i = 0; i < fOGoods.count(); i++) {
-        //MARTI8
-        if (i > 0) {
-            QStringList codes;
-            codes.append("1");
-            codes.append("100");
-            codes.append("101");
-            codes.append("102");
-            codes.append("103");
-            codes.append("104");
-            if (codes.contains(fOGoods.at(i)._barcode)) {
-                fOGoods[i].discountFactor = 1;
-                fOGoods[i].discountMode = 1;
-            }
-        }
         const OGoods &og = fOGoods.at(i);
         ui->tblData->setData(i, col_bacode, og._barcode);
         ui->tblData->setData(i, col_group, og._groupName);
@@ -869,7 +833,6 @@ void WOrder::countTotal()
     fDraftSale.amount = fOHeader.amountTotal;
     fDraftSale.write(db, err);
     updateCustomerDisplay(fCustomerDisplay);
-    marti8();
 }
 
 bool WOrder::returnFalse(const QString &msg, C5Database &db)
@@ -929,51 +892,6 @@ bool WOrder::checkDiscountRight()
         }
     }
     return true;
-}
-
-void WOrder::marti8()
-{
-    if (ui->leTotal->getDouble() < 25000) {
-        QStringList codes;
-        codes.append("100");
-        codes.append("101");
-        codes.append("102");
-        codes.append("103");
-        codes.append("104");
-        for (int i = 1; i < ui->tblData->rowCount(); i++) {
-            if (codes.contains(ui->tblData->getString(i, 0))) {
-                return;
-            }
-        }
-        DlgGetValue gv(codes, this);
-        if (gv.exec() == QDialog::Accepted) {
-            ui->leCode->setText(gv.value());
-            on_leCode_returnPressed();
-        }
-    } else {
-        QStringList codes;
-        codes.append("100");
-        codes.append("101");
-        codes.append("102");
-        codes.append("103");
-        codes.append("104");
-        for (int i = 1; i < ui->tblData->rowCount(); i++) {
-            if (codes.contains(ui->tblData->getString(i, 0))) {
-                ui->tblData->setCurrentCell(i, 0);
-                removeRow();
-                return;
-            }
-        }
-        for (int i = 1; i < ui->tblData->rowCount(); i++) {
-            QStringList codes2;
-            codes2.append("1");
-            if (codes2.contains(ui->tblData->getString(i, 0))) {
-                return;
-            }
-        }
-        ui->leCode->setText("1");
-        on_leCode_returnPressed();
-    }
 }
 
 bool WOrder::setQtyOfRow(int row, double qty)

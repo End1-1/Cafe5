@@ -19,6 +19,8 @@ public:
 
     void changeTimeout(int value);
 
+    void overwriteHost(const QString &protocol, const QString &host, int port);
+
     static bool mDebug;
 
     static QString mProtocol;
@@ -35,6 +37,12 @@ private:
     QElapsedTimer *mTimer;
 
     QNetworkAccessManager *mNetworkAccessManager;
+
+    QString mConnectionProtocol;
+
+    QString mConnectionHost;
+
+    int mConnectionPort;
 
 private slots:
     void queryFinished(QNetworkReply *r);

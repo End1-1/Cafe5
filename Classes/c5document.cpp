@@ -1,4 +1,5 @@
 #include "c5document.h"
+#include "c5database.h"
 
 C5Document::C5Document(const QStringList &dbParams, QWidget *parent) :
     C5Widget(dbParams, parent)

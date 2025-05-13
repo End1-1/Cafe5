@@ -18,7 +18,8 @@ SOURCES += \
     firebase.cpp \
     handlers/httpheader.cpp \
     serverthread.cpp \
-    utils/sqlqueries.cpp
+    utils/sqlqueries.cpp \
+    waiter.cpp
 
 HEADERS += \
     ../Classes/fileversion.h \
@@ -33,7 +34,8 @@ HEADERS += \
     handlers/httpheader.h \
     rc.h \
     serverthread.h \
-    utils/sqlqueries.h
+    utils/sqlqueries.h \
+    waiter.h
 
 FORMS += \
     dlglicenses.ui

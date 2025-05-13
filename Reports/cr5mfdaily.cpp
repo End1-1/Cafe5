@@ -4,6 +4,7 @@
 #include "c5lineeditwithselector.h"
 #include "c5message.h"
 #include "c5utils.h"
+#include "c5database.h"
 #include "c5cache.h"
 
 CR5MfDaily::CR5MfDaily(const QStringList &dbParams, QWidget *parent) :

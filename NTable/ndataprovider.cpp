@@ -23,6 +23,9 @@ NDataProvider::NDataProvider(QObject *parent)
     mNetworkAccessManager->setTransferTimeout(60000);
     connect(mNetworkAccessManager, &QNetworkAccessManager::finished, this, &NDataProvider::queryFinished);
     mTimer = new QElapsedTimer();
+    mConnectionProtocol = mProtocol;
+    mConnectionHost = mHost;
+    mConnectionPort = mConnectionProtocol == "https" ? 443 : 80;
 }
 
 NDataProvider::~NDataProvider()
@@ -36,7 +39,9 @@ void NDataProvider::getData(const QString &route, const QJsonObject &data)
     Q_ASSERT(mFileVersion.isEmpty() == false);
     mTimer->restart();
     emit started();
-    QNetworkRequest rq(mProtocol + "://" + mHost + route);
+    QString url = QString("%1://%2:%3/%4").arg(mConnectionProtocol, mConnectionHost, QString::number(mConnectionPort),
+                  route);
+    QNetworkRequest rq(url);
     rq.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
     QJsonObject jo;
     jo["sessionkey"] = sessionKey;
@@ -45,17 +50,18 @@ void NDataProvider::getData(const QString &route, const QJsonObject &data)
     jo["appversion"] = mFileVersion;
 #ifdef QT_DEBUG
     jo["debug"] = true;
+    //jo["appversion"] = "2.5.32.771";
 #endif
     QStringList keys = data.keys();
     for (const auto &s : std::as_const(keys)) {
         jo[s] = data[s];
     }
     if (mDebug) {
-        LogWriter::write(LogWriterLevel::verbose, "", route);
+        LogWriter::write(LogWriterLevel::verbose, "", url);
         LogWriter::write(LogWriterLevel::verbose, "", QJsonDocument(data).toJson(QJsonDocument::Compact));
     } else {
 #ifdef QT_DEBUG
-        LogWriter::write(LogWriterLevel::verbose, "", mHost + route);
+        LogWriter::write(LogWriterLevel::verbose, "", url);
         LogWriter::write(LogWriterLevel::verbose, "", QJsonDocument(jo).toJson(QJsonDocument::Compact));
 #endif
     }
@@ -67,6 +73,13 @@ void NDataProvider::changeTimeout(int value)
     mNetworkAccessManager->setTransferTimeout(value);
 }
 
+void NDataProvider::overwriteHost(const QString &protocol, const QString &host, int port)
+{
+    mConnectionProtocol = protocol;
+    mConnectionHost = host;
+    mConnectionPort = port;
+}
+
 void NDataProvider::queryFinished(QNetworkReply *r)
 {
     if (r->error() != QNetworkReply::NoError) {
@@ -75,9 +88,18 @@ void NDataProvider::queryFinished(QNetworkReply *r)
             err = tr("Access denied");
         } else if (err.contains("Application version must be", Qt::CaseInsensitive)) {
             LogWriter::write(LogWriterLevel::errors, "", err);
-            err = tr("You must upgrade the application to continue using it");
+            QJsonObject  je = QJsonDocument::fromJson(err.toUtf8()).object();
+            err = QString("<p>%1</p><p><a href=\"launch-updater?version=%3\">%2</a></p>")
+                  .arg(tr("You must upgrade the application to continue using it"),
+                       tr("Click here to launch updater"),
+                       je["expected_version"].toString());
+        } else if (err.contains("server replied:")) {
+            int index = err.indexOf("server replied:") + 15;
+            err = err.mid(index, err.length());
         } else if (err.contains("<html>")) {
             err = err.mid(err.indexOf("<html>"), err.length());
+        } else  if (err.contains("Unauthorized", Qt::CaseInsensitive)) {
+            err = tr("Access denied");
         } else {
             int index = err.indexOf("Server error");
             if (index > -1) {

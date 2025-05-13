@@ -4,6 +4,7 @@
 #include <QNetworkReply>
 #include <QJsonObject>
 #include <QWebSocket>
+#include <QTcpSocket>
 #include <QJsonDocument>
 #include <QTimer>
 

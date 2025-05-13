@@ -8,7 +8,7 @@ DlgSearchInMenu::DlgSearchInMenu() :
     ui(new Ui::DlgSearchInMenu)
 {
     ui->setupUi(this);
-    ui->tbl->setColumnWidths(ui->tbl->columnCount(), 0, 100, 200, 350, 100);
+    ui->tbl->configColumns({ 0, 100, 200, 350, 100});
     connect(ui->kb, SIGNAL(textChanged(QString)), this, SLOT(searchDish(QString)));
     connect(ui->kb, SIGNAL(accept()), this, SLOT(kbdAccept()));
     connect(ui->kb, SIGNAL(reject()), this, SLOT(reject()));

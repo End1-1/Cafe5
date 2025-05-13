@@ -7,6 +7,7 @@
 #include "ce5goods.h"
 #include "c5printing.h"
 #include "ce5dishpart2.h"
+#include "c5database.h"
 #include "c5printpreview.h"
 #include <QColorDialog>
 #include <QKeyEvent>

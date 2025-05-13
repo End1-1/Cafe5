@@ -187,6 +187,7 @@ private slots:
     void on_btnCashout_clicked();
 
     void on_btnBooking_clicked();
+    void on_btnPrepaidFiscal_clicked();
 };
 
 #endif // WORKING_H

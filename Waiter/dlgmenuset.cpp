@@ -12,8 +12,8 @@ DlgMenuSet::DlgMenuSet(const QString &bodyId) :
 {
     ui->setupUi(this);
     setWindowState(Qt::WindowFullScreen);
-    ui->t1->setColumnWidths(4, 0, 300, 100, 50);
-    ui->t2->setColumnWidths(5, 0, 0, 300, 100, 50);
+    ui->t1->configColumns({4, 0, 300, 100, 50});
+    ui->t2->configColumns({5, 0, 0, 300, 100, 50});
     setProperty("bodyid", bodyId);
     C5Database db(fDBParams);
     db[":f_id"] = bodyId;

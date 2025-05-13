@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>510</width>
-    <height>535</height>
+    <height>643</height>
    </rect>
   </property>
   <property name="maximumSize">
@@ -57,7 +57,7 @@
        <item row="16" column="1">
         <spacer name="verticalSpacer">
          <property name="orientation">
-          <enum>Qt::Vertical</enum>
+          <enum>Qt::Orientation::Vertical</enum>
          </property>
          <property name="sizeHint" stdset="0">
           <size>
@@ -134,6 +134,9 @@
          </property>
          <property name="ItemData" stdset="0">
           <bool>true</bool>
+         </property>
+         <property name="default" stdset="0">
+          <number>1</number>
          </property>
         </widget>
        </item>
@@ -236,6 +239,9 @@
          <property name="Field" stdset="0">
           <string>f_manager</string>
          </property>
+         <property name="default" stdset="0">
+          <number>1</number>
+         </property>
         </widget>
        </item>
        <item row="1" column="1">
@@ -248,6 +254,9 @@
          </property>
          <property name="ItemData" stdset="0">
           <bool>true</bool>
+         </property>
+         <property name="default" stdset="0">
+          <number>1</number>
          </property>
         </widget>
        </item>
@@ -290,6 +299,9 @@
          <property name="Field" stdset="0">
           <string>f_price_politic</string>
          </property>
+         <property name="Check" stdset="0">
+          <string>empty=Type of sale</string>
+         </property>
         </widget>
        </item>
        <item row="7" column="1">
@@ -327,6 +339,9 @@
          <property name="ItemData" stdset="0">
           <bool>true</bool>
          </property>
+         <property name="default" stdset="0">
+          <number>1</number>
+         </property>
         </widget>
        </item>
        <item row="11" column="0">
@@ -357,10 +372,10 @@
        <item>
         <widget class="C5TableWidget" name="tblAs">
          <property name="editTriggers">
-          <set>QAbstractItemView::NoEditTriggers</set>
+          <set>QAbstractItemView::EditTrigger::NoEditTriggers</set>
          </property>
          <property name="selectionMode">
-          <enum>QAbstractItemView::NoSelection</enum>
+          <enum>QAbstractItemView::SelectionMode::NoSelection</enum>
          </property>
          <column>
           <property name="text">
@@ -392,14 +407,14 @@
    <header location="global">c5lineeditwithselector.h</header>
   </customwidget>
   <customwidget>
-   <class>C5TableWidget</class>
-   <extends>QTableWidget</extends>
-   <header location="global">c5tablewidget.h</header>
-  </customwidget>
-  <customwidget>
    <class>C5ComboBox</class>
    <extends>QComboBox</extends>
    <header location="global">c5combobox.h</header>
+  </customwidget>
+  <customwidget>
+   <class>C5TableWidget</class>
+   <extends>QTableWidget</extends>
+   <header location="global">c5tablewidget.h</header>
   </customwidget>
  </customwidgets>
  <tabstops>
@@ -415,10 +430,16 @@
   <tabstop>lineEdit_5</tabstop>
   <tabstop>lineEdit_6</tabstop>
   <tabstop>lineEdit_8</tabstop>
-  <tabstop>tblAs</tabstop>
+  <tabstop>lineEdit_11</tabstop>
+  <tabstop>cbSaleType</tabstop>
+  <tabstop>lineEdit_10</tabstop>
+  <tabstop>cbManager</tabstop>
+  <tabstop>btnClearManager</tabstop>
   <tabstop>tabWidget</tabstop>
+  <tabstop>tblAs</tabstop>
  </tabstops>
  <resources>
+  <include location="../resources/res.qrc"/>
   <include location="../resources/res.qrc"/>
  </resources>
  <connections/>

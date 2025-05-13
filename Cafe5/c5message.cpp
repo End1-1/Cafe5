@@ -4,6 +4,8 @@
 #include <QClipboard>
 #include <QTimer>
 #include <QMediaPlayer>
+#include <QProcess>
+#include <QUrlQuery>
 #include <QAudioOutput>
 
 C5Message::C5Message(QWidget *parent) :
@@ -116,4 +118,19 @@ void C5Message::on_btnA3_clicked()
 void C5Message::on_btnCopy_clicked()
 {
     qApp->clipboard()->setText(ui->label->text());
+}
+
+void C5Message::on_label_linkActivated(const QString &link)
+{
+    QUrl url(link);
+    if (url.path() == "launch-updater") {
+        QUrlQuery urlQuery(url);
+        QString updaterPath = QCoreApplication::applicationDirPath() + "/updater.exe";
+        QStringList params;
+        if (urlQuery.hasQueryItem("version")) {
+            params.append("--app=officen");
+            params.append("--version=" +  urlQuery.queryItemValue("version"));
+        }
+        QProcess::startDetached(updaterPath, params);
+    }
 }

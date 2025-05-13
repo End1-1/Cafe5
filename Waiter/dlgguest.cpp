@@ -20,14 +20,14 @@ DlgGuest::DlgGuest() :
         ui->tblGuest->setString(row, 1, db.getString(0));
         ui->tblGuest->setString(row, 2, db.getString(2));
         ui->tblGuest->setString(row, 3, db.getString(3));
-        ui->tblGuest->setData(row, 4, db.getDate(4));
-        ui->tblGuest->setData(row, 5, db.getDate(5));
+        ui->tblGuest->setString(row, 4, db.getDate(4).toString(FORMAT_DATE_TO_STR));
+        ui->tblGuest->setString(row, 5, db.getDate(5).toString(FORMAT_DATE_TO_STR));
         ui->tblGuest->setInteger(row, 6, db.getInt(6));
     }
     connect(ui->kbd, SIGNAL(textChanged(QString)), this, SLOT(searchGuest(QString)));
     connect(ui->kbd, SIGNAL(accept()), this, SLOT(kbdAccept()));
     connect(ui->kbd, SIGNAL(reject()), this, SLOT(reject()));
-    ui->tblGuest->setColumnWidths(ui->tblGuest->columnCount(), 0, 0, 140, 500, 100, 100, 100);
+    ui->tblGuest->configColumns({0, 0, 140, 500, 100, 100, 100});
 }
 
 DlgGuest::~DlgGuest()

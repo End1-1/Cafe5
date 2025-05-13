@@ -1,5 +1,4 @@
 #include "dlgreports.h"
-#include "c5socketmessage.h"
 #include "ui_dlgreports.h"
 #include "dlgreportslist.h"
 #include "c5printjson.h"
@@ -12,6 +11,7 @@
 #include "c5message.h"
 #include "c5printing.h"
 #include "c5utils.h"
+#include "ndataprovider.h"
 #include "dlgcashbuttonopions.h"
 #include "c5config.h"
 #include "dlgviewcashreport.h"
@@ -47,14 +47,16 @@ void DlgReports::openReports(C5User *user)
 
 void DlgReports::getDailyCommon(const QDate &date1, const QDate &date2)
 {
-    C5SocketHandler *sh = createSocketHandler(SLOT(handleDailyCommon(QJsonObject)));
-    sh->bind("cmd", sm_dailycommon);
-    sh->bind("date1", date1.toString(FORMAT_DATE_TO_STR_MYSQL));
-    sh->bind("date2", date2.toString(FORMAT_DATE_TO_STR_MYSQL));
-    sh->bind("hall", QString::number(fCurrentHall));
-    sh->bind("opened", QString::number(ui->btnOpened->isChecked()));
-    sh->bind("cash", QString::number(__c5config.cashId()));
-    sh->send();
+    //TODO: CHECK L1
+    fHttp->createHttpQueryLambda("/engine/reports/dailycommon.php", {
+        {"date1", date1.toString(FORMAT_DATE_TO_STR_MYSQL)},
+        {"date2", date2.toString(FORMAT_DATE_TO_STR_MYSQL)},
+        {"hall", fCurrentHall},
+        {"opened", ui->btnOpened->isChecked()}
+    }, [](const QJsonObject &jdoc) {
+    }, [](const QJsonObject &je) {
+        Q_UNUSED(je);
+    });
 }
 
 void DlgReports::setLangIcon()
@@ -128,9 +130,9 @@ void DlgReports::handleDailyCommon(const QJsonObject &obj)
         ui->tbl->setString(r, 4, o["f_hall"].toString());
         ui->tbl->setString(r, 5, o["f_table"].toString());
         ui->tbl->setString(r, 6, o["f_staff"].toString());
-        ui->tbl->setString(r, 7, float_str(o["f_amounttotal"].toString().toDouble(), 2));
+        ui->tbl->setString(r, 7, float_str(o["f_amounttotal"].toDouble(), 2));
         ui->tbl->setString(r, 8, o["f_receiptnumber"].toString());
-        total += o["f_amounttotal"].toString().toDouble();
+        total += o["f_amounttotal"].toDouble();
     }
     ui->tblTotal->setColumnCount(ui->tbl->columnCount());
     ui->tbl->resizeColumnsToContents();
@@ -259,15 +261,24 @@ void DlgReports::on_btnPrintOrderReceipt_clicked()
     } else if (db.getDouble("f_amountcard") > 0.001) {
         tax = 1;
     }
-    C5SocketHandler *sh = createSocketHandler(SLOT(handleReceipt(QJsonObject)));
-    sh->bind("cmd", sm_printreceipt);
-    sh->bind("staffid", QString::number(fUser->id()));
-    sh->bind("staffname", fUser->fullName());
-    sh->bind("f_receiptlanguage", QString::number(C5Config::getRegValue("receipt_language").toInt()));
-    sh->bind("order", orderid);
-    sh->bind("printtax", tax);
-    sh->bind("receipt_printer", C5Config::fSettingsName);
-    sh->send();
+    //TODO: CHECK L3
+    fHttp->createHttpQueryLambda("/engine/waiter/printreceipt.php", {
+        {"staffid", fUser->id()},
+        {"f_receiptlanguage", C5Config::getRegValue("receipt_language").toInt()},
+        {"order", orderid},
+        {"printtax", tax},
+        {"receipt_printer", C5Config::fSettingsName}
+    }, [this](const QJsonObject &jo) {
+        auto np = new NDataProvider(this);
+        np->overwriteHost("http", "127.0.0.1", 8080);
+        connect(np, &NDataProvider::done, this, [](const QJsonObject &jjo) {
+        });
+        connect(np, &NDataProvider::error, this, [](const QString &err) {
+        });
+        np->getData("/printjson", jo);
+    }, [](const QJsonObject &je) {
+        Q_UNUSED(je);
+    });
 }
 
 void DlgReports::on_btnReceiptLanguage_clicked()
@@ -295,31 +306,48 @@ void DlgReports::on_btnReturnTaxReceipt_clicked()
     if (l.count() == 0) {
         return;
     }
-    QString orderid = ui->tbl->getString(l.at(0).row(), 0);
-    C5SocketHandler *sh = createSocketHandler(SLOT(handleTaxback(QJsonObject)));
-    sh->bind("cmd", sm_retrun_tax_receipt);
-    sh->bind("order", orderid);
-    sh->send();
+    //TODO: CHECK L7
+    auto np = new NDataProvider(this);
+    np->overwriteHost("http", "127.0.0.1", 8080);
+    connect(np, &NDataProvider::done, this, [](const QJsonObject &jo) {
+    });
+    connect(np, &NDataProvider::error, this, [](const QString &err) {
+    });
+    np->getData("/taxreturn", {
+        {"order",  ui->tbl->getString(l.at(0).row(), 0)}
+    });
 }
 
 void DlgReports::on_btnPrintTaxX_clicked()
 {
-    C5SocketHandler *sh = createSocketHandler(SLOT(handleTaxReport(QJsonObject)));
-    sh->bind("cmd", sm_tax_report);
-    sh->bind("d1", ui->date1->date().toString(FORMAT_DATE_TO_STR_MYSQL));
-    sh->bind("d2", ui->date2->date().toString(FORMAT_DATE_TO_STR_MYSQL));
-    sh->bind("type", report_x);
-    sh->send();
+    //TODO: CHECK L6
+    auto np = new NDataProvider(this);
+    np->overwriteHost("http", "127.0.0.1", 8080);
+    connect(np, &NDataProvider::done, this, [](const QJsonObject &jo) {
+    });
+    connect(np, &NDataProvider::error, this, [](const QString &err) {
+    });
+    np->getData("/taxreport", {
+        {"d1", ui->date1->date().toString(FORMAT_DATE_TO_STR_MYSQL)},
+        {"d2", ui->date2->date().toString(FORMAT_DATE_TO_STR_MYSQL)},
+        {"type", report_x}
+    });
 }
 
 void DlgReports::on_btnPrintTaxZ_clicked()
 {
-    C5SocketHandler *sh = createSocketHandler(SLOT(handleTaxReport(QJsonObject)));
-    sh->bind("cmd", sm_tax_report);
-    sh->bind("d1", ui->date1->date().toString(FORMAT_DATE_TO_STR_MYSQL));
-    sh->bind("d2", ui->date2->date().toString(FORMAT_DATE_TO_STR_MYSQL));
-    sh->bind("type", report_z);
-    sh->send();
+    //TODO: CHECK L5
+    auto np = new NDataProvider(this);
+    np->overwriteHost("http", "127.0.0.1", 8080);
+    connect(np, &NDataProvider::done, this, [](const QJsonObject &jo) {
+    });
+    connect(np, &NDataProvider::error, this, [](const QString &err) {
+    });
+    np->getData("/taxreport", {
+        {"d1", ui->date1->date().toString(FORMAT_DATE_TO_STR_MYSQL)},
+        {"d2", ui->date2->date().toString(FORMAT_DATE_TO_STR_MYSQL)},
+        {"type", report_z}
+    });
 }
 
 void DlgReports::on_btnCashobx_clicked()

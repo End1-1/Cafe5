@@ -10,6 +10,10 @@
 #include "dlgcashop.h"
 #include "dlgsmartreports.h"
 #include "sessionshistory.h"
+#include "c5config.h"
+#include "c5database.h"
+#include "c5message.h"
+#include "c5utils.h"
 #include "workspace.h"
 #include <QFile>
 #include <QScreen>

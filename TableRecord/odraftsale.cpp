@@ -17,6 +17,7 @@ bool ODraftSale::getRecord(C5Database &db)
     comment = db.getString("f_comment");
     payment = db.getInt("f_payment");
     deliveryDate = db.getDate("f_datefor");
+    hall = db.getInt("f_hall");
     return true;
 }
 
@@ -36,6 +37,7 @@ void ODraftSale::bind(C5Database &db)
     db[":f_payment"] = payment;
     db[":f_datefor"] = deliveryDate.isValid() ? deliveryDate : QDate::currentDate();
     db[":f_cashier"] = cashier;
+    db[":f_hall"] = hall;
 }
 
 bool ODraftSale::write(C5Database &db, QString &err)

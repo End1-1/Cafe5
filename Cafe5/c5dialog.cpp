@@ -1,5 +1,6 @@
 #include "c5dialog.h"
 #include "c5message.h"
+#include "c5lineedit.h"
 #include "c5config.h"
 #include <QKeyEvent>
 #include <QApplication>
@@ -8,13 +9,8 @@
 static QWidget *__mainWindow = nullptr;
 
 C5Dialog::C5Dialog(const QStringList &dbParams) :
-#ifdef WAITER
-    QDialog(__mainWindow, Qt::FramelessWindowHint),
+    QDialog(__mainWindow, C5Config::isAppFullScreen() ? Qt::FramelessWindowHint : Qt::Window),
     fDBParams(dbParams)
-#else
-    QDialog(__mainWindow),
-    fDBParams(dbParams)
-#endif
 {
 #ifdef WAITER
     QScreen *screen = QGuiApplication::primaryScreen();
@@ -28,13 +24,8 @@ C5Dialog::C5Dialog(const QStringList &dbParams) :
 }
 
 C5Dialog::C5Dialog(const QStringList &dbParams, bool noparent) :
-#ifdef WAITER
-    QDialog(noparent ? nullptr : __mainWindow, Qt::FramelessWindowHint),
+    QDialog(noparent ? nullptr : __mainWindow,  C5Config::isAppFullScreen() ? Qt::FramelessWindowHint : Qt::Window),
     fDBParams(dbParams)
-#else
-    QDialog(__mainWindow),
-    fDBParams(dbParams)
-#endif
 {
 #ifdef WAITER
     QScreen *screen = QGuiApplication::primaryScreen();
@@ -63,14 +54,6 @@ bool C5Dialog::preambule()
     return true;
 }
 
-C5SocketHandler *C5Dialog::createSocketHandler(const char *slot)
-{
-    C5SocketHandler *s = new C5SocketHandler(nullptr, this);
-    connect(s, SIGNAL(handleCommand(QJsonObject)), this, slot);
-    connect(s, SIGNAL(handleError(int, QString)), this, SLOT(handleError(int, QString)));
-    return s;
-}
-
 QStringList C5Dialog::getDbParams()
 {
     return fDBParams;
@@ -93,6 +76,66 @@ void C5Dialog::selectorCallback(int row, const QJsonArray &values)
 {
     Q_UNUSED(row);
     Q_UNUSED(values);
+}
+
+void C5Dialog::setFieldValue(const QString &name, const QString &value)
+{
+    auto l  = this->findChild<C5LineEdit *>(name);
+    if (l) {
+        l->setText(value);
+        return;
+    }
+    Q_ASSERT(false);
+}
+
+void C5Dialog::setFieldValue(const QString &name, double value)
+{
+    auto l  = this->findChild<C5LineEdit *>(name);
+    if (l) {
+        l->setDouble(value);
+        return;
+    }
+    Q_ASSERT(false);
+}
+
+void C5Dialog::setFieldValue(const QString &name, int value)
+{
+    auto l  = this->findChild<C5LineEdit *>(name);
+    if (l) {
+        l->setInteger(value);
+        return;
+    }
+    Q_ASSERT(false);
+}
+
+int C5Dialog::getFieldIntValue(const QString &name)
+{
+    auto l  = this->findChild<C5LineEdit *>(name);
+    if (l) {
+        return l->getInteger();
+    }
+    Q_ASSERT(false);
+    return 0;
+}
+
+double C5Dialog::getFieldDoubleValue(const QString &name)
+{
+    auto l  = this->findChild<C5LineEdit *>(name);
+    if (l) {
+        return l->getDouble();
+    }
+    Q_ASSERT(false);
+    return 0;
+}
+
+QString C5Dialog::getFieldStringValue(const QString &name)
+{
+    auto l  = this->findChild<C5LineEdit *>(name);
+    if (l) {
+        return l->text();
+    }
+    Q_ASSERT(false);
+    return "";
 }
 
 void C5Dialog::keyPressEvent(QKeyEvent *e)

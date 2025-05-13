@@ -1,7 +1,6 @@
 #ifndef C5LOGTOSERVERTHREAD_H
 #define C5LOGTOSERVERTHREAD_H
 
-#include <QThread>
 #include <QDate>
 #include <QTime>
 
@@ -40,10 +39,8 @@ public:
 
     static void configureServer(const QString &ip, int port);
 
-    static void remember(int type, const QString &user, const QString &rec, const QString &invoice, const QString &reservation, const QString &action, const QString &value1, const QString &value2);
-
-public slots:
-    void run();
+    static void remember(int type, const QString &user, const QString &rec, const QString &invoice,
+                         const QString &reservation, const QString &action, const QString &value1, const QString &value2);
 
 protected:
 

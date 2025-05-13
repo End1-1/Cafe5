@@ -8,7 +8,7 @@ DlgListOfPackages::DlgListOfPackages(QWidget *parent) :
 {
     ui->setupUi(this);
     ui->tbl->setRowCount(dbmenupackage->list().count() + 1);
-    ui->tbl->setColumnWidths(3, 0, 300, 100);
+    ui->tbl->configColumns({3, 0, 300, 100});
     int row = 0;
     for (int id : dbmenupackage->list()) {
         DbMenuPackages p(id);

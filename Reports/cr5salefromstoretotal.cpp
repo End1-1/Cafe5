@@ -2,6 +2,7 @@
 #include "c5tablemodel.h"
 #include "cr5salefromstoretotalfilter.h"
 #include "c5tablewidget.h"
+#include "c5database.h"
 
 CR5SaleFromStoreTotal::CR5SaleFromStoreTotal(const QStringList &dbParams, QWidget *parent) :
     C5ReportWidget(dbParams, parent)

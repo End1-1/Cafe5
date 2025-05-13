@@ -44,8 +44,8 @@ C5Cache::C5Cache(const QStringList &dbParams) :
         fCacheQuery[cache_goods_store] = QString("select f_id as `%1`, f_name as `%2` from c_storages")
                                          .arg(tr("Code"), tr("Name"));
         fCacheQuery[cache_goods_partners] =
-            QString("select f_id as `%1`, f_name as ``, f_address as ``, f_taxname as `%2`, f_contact as `%3`, \
-                                                    f_info as `%4`, f_phone `%5`, f_email as `%6` from c_partners ")
+            QString("select f_id as `%1`, f_name as `%2`, f_address as `%3`, f_taxname as `%4`, f_contact as `%5`, \
+                                                    f_info as `%4`, f_phone `%5`, f_email as `%6`, f_taxcode as `%7` from c_partners ")
             .arg(tr("Code"))
             .arg(tr("Name"))
             .arg(tr("Address"))
@@ -53,7 +53,8 @@ C5Cache::C5Cache(const QStringList &dbParams) :
             .arg(tr("Contact"))
             .arg(tr("Info"))
             .arg(tr("Phone"))
-            .arg(tr("Email"));
+            .arg(tr("Email"))
+            .arg(tr("Taxcode"));
         fCacheQuery[cache_store_inout] = QString("select f_id as `%1`, f_name as `%2` from a_type_sign")
                                          .arg(tr("Code"), tr("Name"));
         fCacheQuery[cache_doc_state] = QString("select f_id as `%1`, f_name as `%2` from a_state")
@@ -283,7 +284,8 @@ C5Cache *C5Cache::cache(const QStringList &dbParams, int cacheId)
 
 QString C5Cache::cacheName(const QStringList &dbParams, int cacheId)
 {
-    return dbParams[0] + dbParams[1] + dbParams[2] + dbParams[3] + "-" + QString::number(cacheId);
+    Q_UNUSED(dbParams);
+    return QString::number(cacheId);
 }
 
 void C5Cache::resetCache(const QStringList &dbParams, const QString &table)

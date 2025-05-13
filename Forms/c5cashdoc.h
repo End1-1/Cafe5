@@ -2,6 +2,7 @@
 #define C5CASHDOC_H
 
 #include "c5document.h"
+#include "c5database.h"
 
 namespace Ui
 {
@@ -52,6 +53,8 @@ public:
     int outputCash();
 
     QString fUuid;
+
+    int fBClientDebtId;
 
     int fDebtSource;
 

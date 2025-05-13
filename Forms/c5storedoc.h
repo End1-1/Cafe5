@@ -126,6 +126,8 @@ private:
     double additionalCostForEveryGoods();
 
 private slots:
+    virtual void selectorCallback(int row, const QJsonArray &values) override;
+
     void lineEditKeyPressed(const QChar &key);
 
     void focusNextChildren();
@@ -233,6 +235,8 @@ private slots:
     void on_btnEditAccept_clicked();
 
     void on_btnSaveComment_clicked();
+
+    void on_btnSavePayment_clicked();
 };
 
 #endif // C5STOREDOC_H

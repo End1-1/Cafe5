@@ -134,8 +134,6 @@ private slots:
 
     void handlePrintService(const QJsonObject &obj);
 
-    void handleReceipt(const QJsonObject &obj);
-
     void handleStopList(const QJsonObject &obj);
 
     void restoreStoplistQtyResponse(const QJsonObject &jdoc);

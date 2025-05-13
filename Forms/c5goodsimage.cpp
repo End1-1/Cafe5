@@ -2,6 +2,7 @@
 #include "ui_c5goodsimage.h"
 #include "ce5goods.h"
 #include "c5editor.h"
+#include "c5database.h"
 #include <QBuffer>
 
 C5GoodsImage::C5GoodsImage(const QStringList &dbParams, QWidget *parent) :
@@ -62,11 +63,10 @@ void C5GoodsImage::on_btnCompress_clicked()
         do {
             pm = pm.scaled(pm.width() * 0.8,  pm.height() * 0.8);
             ba.clear();
-            QBuffer buff(&ba);
+            QBuffer buff( &ba);
             buff.open(QIODevice::WriteOnly);
-            pm.save(&buff, "JPG");
+            pm.save( &buff, "JPG");
         } while (ba.size() > 100000);
-
         C5Database db(fDBParams);
         db[":f_id"] =  property("goodsid");
         db.exec("delete from c_goods_images where f_id=:f_id");

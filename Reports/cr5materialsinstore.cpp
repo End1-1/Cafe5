@@ -2,6 +2,7 @@
 #include "cr5materialinstorefilter.h"
 #include "c5tablemodel.h"
 #include "c5mainwindow.h"
+#include "c5database.h"
 #include "c5storebarcode.h"
 #include "ce5goods.h"
 

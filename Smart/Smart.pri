@@ -3,7 +3,6 @@ SOURCES += \
     $$PWD/../Forms/dlgsplashscreen.cpp \
     ../Cafe5/c5cafecommon.cpp \
     ../Cafe5/c5double.cpp \
-    ../Cafe5/c5serverhandler.cpp \
     ../Cafe5/c5systempreference.cpp \
     ../Cafe5/calendar.cpp \
     ../Cafe5/dlgexitbyversion.cpp \
@@ -76,7 +75,6 @@ SOURCES += \
     ../Cafe5/c5dialog.cpp \
     ../Cafe5/c5message.cpp \
     ../Cafe5/c5utils.cpp \
-    ../Cafe5/c5sockethandler.cpp \
     ../Controls/c5lineedit.cpp \
     ../Classes/c5user.cpp
 
@@ -86,7 +84,6 @@ HEADERS += \
     ../../NewTax/Src/printtaxn.h \
     ../Cafe5/c5cafecommon.h \
     ../Cafe5/c5double.h \
-    ../Cafe5/c5serverhandler.h \
     ../Cafe5/c5systempreference.h \
     ../Cafe5/calendar.h \
     ../Cafe5/dlgexitbyversion.h \
@@ -161,7 +158,6 @@ HEADERS += \
     ../Cafe5/c5dialog.h \
     ../Cafe5/c5message.h \
     ../Cafe5/c5utils.h \
-    ../Cafe5/c5sockethandler.h \
     ../Cafe5/c5socketmessage.h \
     ../Controls/c5lineedit.h \
     ../Classes/c5user.h

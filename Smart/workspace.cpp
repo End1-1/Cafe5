@@ -1,34 +1,27 @@
 #include "workspace.h"
 #include "ui_workspace.h"
 #include "dlgpassword.h"
-#include "c5waiterorderdoc.h"
 #include "menudish.h"
-#include "c5storedraftwriter.h"
-#include "calendar.h"
 #include "c5user.h"
-#include "supplier.h"
 #include "dishpackage.h"
 #include "c5printing.h"
-#include "touchdlgphonenumber.h"
-#include "touchentertaxreceiptnumber.h"
 #include "logwriter.h"
-#include "touchselecttaxreport.h"
 #include "printtaxn.h"
+#include "bhistory.h"
+#include "c5utils.h"
 #include "c5airlog.h"
 #include "nloadingdlg.h"
 #include "dlgqty.h"
-#include "oheader.h"
 #include "dlgservicevalues.h"
-#include "idram.h"
 #include "change.h"
 #include "menudialog.h"
-#include "QRCodeGenerator.h"
 #include "dlglistofdishcomments.h"
+#include "c5config.h"
 #include "customerinfo.h"
 #include "dlgmemoryread.h"
 #include "ndataprovider.h"
 #include "wcustomerdisplay.h"
-#include "thread.h"
+#include "c5message.h"
 #include <QScreen>
 #include <QScrollBar>
 #include <QInputDialog>
@@ -121,6 +114,7 @@ Workspace::Workspace(const QStringList &dbParams) :
         d.endGroup();
     }
     ui->tblTables->setVisible(__c5config.getRegValue("tables").toBool());
+    mRejectEnabled = true;
 }
 
 Workspace::~Workspace()
@@ -135,6 +129,8 @@ bool Workspace::login()
         accept();
         return false;
     }
+    fHttp->fErrorObject = this;
+    fHttp->fErrorSlot =  (char *)    SLOT(slotHttpError(const QString &));
     createHttpRequest("/engine/login.php", QJsonObject{{"method", 2}, {"pin", pin}},
     SLOT(loginResponse(QJsonObject)),
     "login");
@@ -143,8 +139,12 @@ bool Workspace::login()
 
 void Workspace::reject()
 {
-    if (C5Message::question(tr("Confirm to close application"))) {
-        C5Dialog::reject();
+    if (mRejectEnabled) {
+        if (C5Message::question(tr("Confirm to close application")) == QDialog::Accepted) {
+            C5Dialog::reject();
+        } else {
+            return;
+        }
     }
     qApp->quit();
 }
@@ -160,6 +160,10 @@ void Workspace::setQty(double qty, int mode, int rownum, const QString &packageu
     }
     Dish d = ui->tblOrder->item(row, 0)->data(Qt::UserRole).value<Dish>();
     if (d.state != DISH_STATE_OK) {
+        return;
+    }
+    if (d.id == C5Config::fMainJson["service_item_code"].toInt()
+            || d.id == C5Config::fMainJson["discount_item_code"].toInt()) {
         return;
     }
     QString uuid = packageuuid;
@@ -186,7 +190,7 @@ void Workspace::setQty(double qty, int mode, int rownum, const QString &packageu
             }
             break;
     }
-    createHttpRequest("/engine/smart/change-qty.php", QJsonObject{{"row", row}, {"qty", d.qty}, {"obodyid", d.obodyId}},
+    createHttpRequest("/engine/smart/change-qty.php", QJsonObject{{"row", row}, {"qty", d.qty}, {"price", d.price}, {"obodyid", d.obodyId}},
     SLOT(changeQtyResponse(QJsonObject)));
 }
 
@@ -201,6 +205,10 @@ void Workspace::removeDish(int rownum, const QString &packageuuid)
         return;
     }
     Dish d = ui->tblOrder->item(row, 0)->data(Qt::UserRole).value<Dish>();
+    if (d.id == C5Config::fMainJson["service_item_code"].toInt()
+            || d.id == C5Config::fMainJson["discount_item_code"].toInt()) {
+        return;
+    }
     if (d.qty2 > 0.01) {
         if (C5Message::question(tr("Confirm to remove printed row")) != QDialog::Accepted) {
             return;
@@ -253,6 +261,8 @@ void Workspace::filter(const QString &name)
 void Workspace::countTotal()
 {
     double total = 0;
+    double service = 0;
+    double serviceValue = C5Config::serviceFactor().toDouble();
     if (fAutoDiscounts.count() > 0) {
         QMap<QString, QList<QString> > dishgroups;
         QMap<QString, double> dishamounts;
@@ -307,6 +317,10 @@ void Workspace::countTotal()
         if (d.state != DISH_STATE_OK) {
             continue;
         }
+        if (d.id == C5Config::fMainJson["service_item_code"].toInt()
+                || d.id == C5Config::fMainJson["discount_item_code"].toInt()) {
+            continue;
+        }
         switch (fDiscountMode) {
             case CARD_TYPE_DISCOUNT:
                 total += (d.price - (d.price *fDiscountValue)) * d.qty;
@@ -330,6 +344,28 @@ void Workspace::countTotal()
             case CARD_TYPE_SPECIAL_DISHES:
                 ui->leDiscount->setText(QString("%1").arg(fDiscountAmount));
                 break;
+        }
+    }
+    if (serviceValue > 0) {
+        service = total *serviceValue;
+        total += service;
+    }
+    ui->leServiceValue->setText("");
+    if (service > 0) {
+        ui->leServiceValue->setText(QString("%1 %2% - %3").arg(tr("Service"), float_str(serviceValue * 100, 2),
+                                    float_str(service,
+                                              2)));
+        for (int i = 0; i < ui->tblOrder->rowCount(); i++) {
+            Dish d = ui->tblOrder->item(i, 0)->data(Qt::UserRole).value<Dish>();
+            if (d.id == C5Config::fMainJson["service_item_code"].toInt()) {
+                d.price = service;
+                d.qty2 = 1;
+                ui->tblOrder->item(i, 0)->setData(Qt::UserRole, QVariant::fromValue(d));
+                updateInfo(i);
+                createHttpRequest("/engine/smart/change-qty.php", QJsonObject{{"row", 1000}, {"qty", d.qty}, {"price", d.price}, {"obodyid", d.obodyId}},
+                SLOT(changeQtyResponse(QJsonObject)), "donothing");
+                break;
+            }
         }
     }
     ui->leTotal->setDouble(total);
@@ -728,6 +764,8 @@ void Workspace::on_leReadCode_returnPressed()
         QString barcode;
         if (code.mid(0, 6) == "000000") {
             barcode = code.mid(6, 8);
+        } else if (code.mid(0, 8) == "01000000") {
+            barcode = code.mid(8, 8);
         } else if (code.mid(0, 3) == "010") {
             barcode = code.mid(3, 13);
         } else {
@@ -750,9 +788,9 @@ void Workspace::on_leReadCode_returnPressed()
         }
     }
     if (fDishesBarcode.contains(code)) {
-        Dish *d = fDishesBarcode[code];
-        d->f_emarks = emarks;
-        createAddDishRequest(d);
+        Dish dish(fDishesBarcode[code]);
+        dish.f_emarks = emarks;
+        createAddDishRequest(dish);
         return;
     }
     C5Database db(fDBParams);
@@ -831,7 +869,7 @@ void Workspace::on_tblDishes_cellClicked(int row, int column)
     if (!d) {
         return;
     }
-    createAddDishRequest(d);
+    createAddDishRequest(Dish(d));
 }
 
 void Workspace::on_btnP1_clicked()
@@ -1150,6 +1188,11 @@ int Workspace::printTax(double cardAmount, double idramAmount)
                   "\"change\": 0, \"crn\": \"53241359\", \"fiscal\": \"81326142\", "
                   "\"lottery\": \"\", \"prize\": 0, \"rseq\": 7174, \"sn\": \"00022164315\", "
                   "\"taxpayer\": \"«ՍՄԱՐՏ ՊԱՐԿԻՆԳ»\", \"time\": 1733052744891, \"tin\": \"02853428\", \"total\": 1}";
+    }
+#else
+    if (result != 0) {
+        LogWriter::write(LogWriterLevel::errors, "Fiscal request", jsonIn);
+        LogWriter::write(LogWriterLevel::errors, "Fiscal response", jsonOut);
     }
 #endif
     QJsonObject jtax;
@@ -1551,18 +1594,9 @@ void Workspace::slotHttpError(const QString &err)
 {
     QVariant marks = sender()->property("marks");
     httpStop(sender());
-    if (marks == "login") {
-        C5Message::error(tr("Access denied"));
-        login();
-        return;
-    }
-    if (err.contains("Unauthorized", Qt::CaseInsensitive)) {
-        C5Message::error(tr("Access denied"));
-        qApp->quit();
-    }
-    LogWriter::write(LogWriterLevel::errors, "", err);
     C5Message::error(err);
-    if (marks == "init") {
+    if (marks == "init" || marks == "login") {
+        mRejectEnabled = false;
         qApp->quit();
     }
 }
@@ -1634,6 +1668,10 @@ void Workspace::initResponse(const QJsonObject &jdoc)
     jta = jo["menu"].toArray();
     for (int i = 0; i < jta.size(); i++) {
         const QJsonObject &j = jta.at(i).toObject();
+        if (j["f_id"].toInt() == C5Config::fMainJson["service_item_code"].toInt()
+                || j["f_id"].toInt() == C5Config::fMainJson["discount_item_code"].toInt()) {
+            continue;
+        }
         Dish *d = new Dish();
         d->menuid = j["menuid"].toInt();
         d->id = j["f_id"].toInt();
@@ -1916,6 +1954,8 @@ void Workspace::openTableResponse(const QJsonObject &jdoc)
         jt = jo["flags"].toObject();
         ui->btnFlagTakeAway->setChecked(jt["f_3"].toInt() > 0);
         QJsonArray ja = jo["dishes"].toArray();
+        int serviceItemCode = C5Config::fMainJson["service_item_code"].toInt();
+        C5Config::fMainJson["service_item_code"] = 0;
         for (int i = 0; i < ja.size(); i++) {
             jt = ja.at(i).toObject();
             Dish d;
@@ -1934,6 +1974,7 @@ void Workspace::openTableResponse(const QJsonObject &jdoc)
             d.state = jt["f_state"].toInt();
             addDishToOrder( &d);
         }
+        C5Config::fMainJson["service_item_code"] = serviceItemCode;
         ui->tblTables->viewport()->update();
     }
     httpStop(sender());
@@ -1941,8 +1982,15 @@ void Workspace::openTableResponse(const QJsonObject &jdoc)
 
 void Workspace::changeQtyResponse(const QJsonObject &jdoc)
 {
+    if (sender()->property("marks") == "donothing") {
+        httpStop(sender());
+        return;
+    }
     QJsonObject jo = jdoc["data"].toObject();
     int row = jo["row"].toInt();
+    if (row == 1000) {
+        row = ui->tblOrder->rowCount() - 1;
+    }
     Dish d = ui->tblOrder->item(row, 0)->data(Qt::UserRole).value<Dish>();
     d.qty = jo["qty"].toDouble();
     ui->tblOrder->item(row, 0)->setData(Qt::UserRole, QVariant::fromValue(d));
@@ -2064,10 +2112,17 @@ void Workspace::addDishToOrder(Dish *d)
             dd->discount = dd->specialDiscount;
             break;
     }
-    ui->tblOrder->item(row, 0)->setData(Qt::UserRole, QVariant::fromValue( *dd));
-    updateInfo(row);
+    if (C5Config::fMainJson["service_item_code"].toInt() > 0 && ui->tblOrder->rowCount() > 2) {
+        Dish d =  ui->tblOrder->item(row - 1, 0)->data(Qt::UserRole).value<Dish>();
+        ui->tblOrder->item(row, 0)->setData(Qt::UserRole, QVariant::fromValue( d));
+        ui->tblOrder->item(row - 1, 0)->setData(Qt::UserRole, QVariant::fromValue( *dd));
+        updateInfo(row - 1);
+        updateInfo(row);
+    } else {
+        ui->tblOrder->item(row, 0)->setData(Qt::UserRole, QVariant::fromValue( *dd));
+        updateInfo(row);
+    }
     ui->tblOrder->setCurrentCell(row, 0);
-    countTotal();
     if (ui->btnSetCard->isChecked() || ui->btnSetCardExternal->isChecked()) {
         ui->leCard->setDouble(ui->leTotal->getDouble());
     }
@@ -2077,6 +2132,22 @@ void Workspace::addDishToOrder(Dish *d)
     if (d->f_emarks.isEmpty() == false) {
         //ui->btnFiscal->setChecked(true);
     }
+    if (C5Config::serviceFactor().toDouble() > 0 && C5Config::fMainJson["service_item_code"].toInt() > 0) {
+        bool servicefound = false;
+        for (int i = 0; i < ui->tblOrder->rowCount(); i++) {
+            auto ds = ui->tblOrder->item(i, 0)->data(Qt::UserRole).value<Dish>();
+            if (ds.id == C5Config::fMainJson["service_item_code"].toInt()) {
+                servicefound = true;
+            }
+        }
+        if (!servicefound) {
+            Dish d;
+            d.id = C5Config::fMainJson["service_item_code"].toInt();
+            createAddDishRequest(d);
+            return;
+        }
+    }
+    countTotal();
 }
 
 double Workspace::discountValue()
@@ -2284,15 +2355,23 @@ void Workspace::configFiscalButton()
     }
 }
 
-void Workspace::createAddDishRequest(Dish *d)
+void Workspace::createAddDishRequest(const Dish &dish)
 {
-    QJsonObject dish;
-    dish["header"] = fOrderUuid;
-    dish["menuid"] = d->menuid;
-    dish["f_emarks"] = d->f_emarks.isEmpty() ? QJsonValue::Null : QJsonValue(d->f_emarks);
-    dish["table"] = fTable;
-    dish["row"] = ui->tblOrder->rowCount() + 1;
-    dish["mark"] = "addgoods";
+    int row = ui->tblOrder->rowCount() + 1;
+    if (C5Config::fMainJson["service_item_code"].toInt() > 0) {
+        if (C5Config::fMainJson["service_item_code"].toInt() == dish.id) {
+            row = 1000;
+        }
+    }
+    QJsonObject jdish;
+    jdish["header"] = fOrderUuid;
+    jdish["menuid"] = dish.menuid;
+    jdish["dishid"] = dish.id;
+    jdish["menucode"] = C5Config::defaultMenu();
+    jdish["f_emarks"] = dish.f_emarks.isEmpty() ? QJsonValue::Null : QJsonValue(dish.f_emarks);
+    jdish["table"] = fTable;
+    jdish["row"] =  row;
+    jdish["mark"] = "addgoods";
     QJsonObject bhistory;
     bhistory["card"] = fDiscountCard;
     bhistory["type"] = fDiscountMode;
@@ -2304,11 +2383,11 @@ void Workspace::createAddDishRequest(Dish *d)
     flags["f3"] = ui->btnFlagTakeAway->isChecked() ? 1 : 0;
     flags["f4"] = 0;
     flags["f5"] = 0;
-    dish["flags"] = flags;
-    dish["bhistory"] = bhistory;
-    dish["customer"] = fCustomer;
-    dish["sessionid"] = __c5config.getRegValue("sessionid").toInt();
-    createHttpRequest("/engine/smart/adddish.php", dish, SLOT(addGoodsResponse(QJsonObject)), dish);
+    jdish["flags"] = flags;
+    jdish["bhistory"] = bhistory;
+    jdish["customer"] = fCustomer;
+    jdish["sessionid"] = __c5config.getRegValue("sessionid").toInt();
+    createHttpRequest("/engine/smart/adddish.php", jdish, SLOT(addGoodsResponse(QJsonObject)));
 }
 
 void Workspace::on_btnFlagTakeAway_clicked(bool checked)

@@ -42,7 +42,6 @@ DlgFace::DlgFace(C5User *user) :
     } else {
         setWindowState(Qt::WindowFullScreen);
     }
-    timeout();
     ui->lbStaff->setText(user->fullName());
     ui->btnCancel->setVisible(false);
     fModeJustSelectTable = false;
@@ -51,7 +50,6 @@ DlgFace::DlgFace(C5User *user) :
     //ui->wall->setVisible(false);
     ui->lbTime->setText(QTime::currentTime().toString(FORMAT_TIME_TO_SHORT_STR));
     connect( &fTimer, SIGNAL(timeout()), this, SLOT(timeout()));
-    fTimer.start(TIMER_TIMEOUT_INTERVAL);
     ui->btnGuests->setVisible(user->check(cp_t5_pay_transfer_to_room));
     ui->btnTools->setVisible(__user->check(cp_t1_login_to_manager));
 }
@@ -121,6 +119,9 @@ void DlgFace::refreshResponse(const QJsonObject &jdoc)
     //     ui->vlStaff->addWidget(btn);
     // }
     ui->vlStaff->addStretch(0);
+    fHttp->createHttpQuery("/engine/waiter/init.php",
+    QJsonObject{{"version", C5TableData::instance()->version()}},
+    SLOT(initResponse(QJsonObject)), "", false);
 }
 
 void DlgFace::openReservationResponse(const QJsonObject &jdoc)
@@ -147,8 +148,6 @@ void DlgFace::timeout()
         }
     }
     refreshTables();
-    fHttp->createHttpQuery("/engine/waiter/init.php", QJsonObject{{"version", C5TableData::instance()->version()}}, SLOT(
-        initResponse(QJsonObject)), "", false);
 }
 
 void DlgFace::hallClicked()
@@ -306,8 +305,9 @@ void DlgFace::setViewMode(int v)
 
 void DlgFace::refreshTables()
 {
-    fHttp->createHttpQuery("/engine/waiter/hall-state.php", QJsonObject{{"date", __c5config.dateCash()}}, SLOT(
-        refreshResponse(QJsonObject)), QVariant(),
+    fHttp->createHttpQuery("/engine/waiter/hall-state.php",
+    QJsonObject{{"date", __c5config.dateCash()}},
+    SLOT(refreshResponse(QJsonObject)), QVariant(),
     false);
 }
 

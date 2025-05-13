@@ -3,7 +3,6 @@
 
 #include <QDialog>
 #include <QJsonArray>
-#include "c5sockethandler.h"
 #include "ninterface.h"
 
 class C5Dialog : public QDialog
@@ -33,13 +32,23 @@ public:
         return result;
     }
 
-    C5SocketHandler *createSocketHandler(const char *slot);
-
     QStringList getDbParams();
 
     void showFullScreen();
 
     virtual void selectorCallback(int row, const QJsonArray &values);
+
+    void setFieldValue(const QString &name, const QString &value);
+
+    void setFieldValue(const QString &name, double value);
+
+    void setFieldValue(const QString &name, int value);
+
+    int getFieldIntValue(const QString &name);
+
+    double getFieldDoubleValue(const QString &name);
+
+    QString getFieldStringValue(const QString &name);
 
 protected:
     QStringList fDBParams;

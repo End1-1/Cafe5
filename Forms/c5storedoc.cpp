@@ -12,12 +12,15 @@
 #include "dlgdirtystoredoc.h"
 #include "ce5goods.h"
 #include "c5storebarcode.h"
+#include "c5config.h"
 #include "c5user.h"
 #include "c5message.h"
 #include "c5storedraftwriter.h"
 #include "calculator.h"
 #include "c5utils.h"
+#include "bclientdebts.h"
 #include "c5storedocselectprinttemplate.h"
+#include "c5permissions.h"
 #include <QMenu>
 #include <QHash>
 #include <QClipboard>
@@ -56,6 +59,7 @@ C5StoreDoc::C5StoreDoc(const QStringList &dbParams, QWidget *parent) :
     connect(ui->leStoreOutput, SIGNAL(keyPressed(QChar)), this, SLOT(lineEditKeyPressed(QChar)));
     ui->leReason->setSelector(fDBParams, ui->leReasonName, cache_store_reason);
     ui->lePartner->setSelector(fDBParams, ui->lePartnerName, cache_goods_partners, 1, 4);
+    ui->lePartner->setCallbackWidget(this);
     ui->leComplectationCode->setSelector(fDBParams, ui->leComplectationName, cache_goods, 1, 3);
     disconnect(ui->leComplectationName, SIGNAL(textChanged(QString)), this,
                SLOT(on_leComplectationName_textChanged(QString)));
@@ -232,7 +236,7 @@ bool C5StoreDoc::openDoc(QString id, QString &err)
     ui->leComplectationQty->setDouble(doc_header_store["f_complectationqty"].toDouble());
     ui->deInvoiceDate->setDate(QDate::fromString(doc_header_store["f_invoicedate"].toString(), FORMAT_DATE_TO_STR_MYSQL));
     ui->leInvoiceNumber->setText(doc_header_store["f_invoice"].toString());
-    fCashDocUuid = doc_header_store["f_cashuuid"].toString();
+    fCashDocUuid = doc_header["f_payment"].toString();
     ui->chPaid->setChecked(!fCashDocUuid.isEmpty());
     if (!fCashDocUuid.isEmpty()) {
         on_chPaid_clicked(true);
@@ -354,6 +358,7 @@ void C5StoreDoc::setMode(C5StoreDoc::STORE_DOC sd)
             ui->btnRememberStoreIn->setVisible(false);
             ui->lePartner->setVisible(true);
             ui->lePartnerName->setVisible(true);
+            ui->lePartnerDebt->setVisible(false);
             ui->leInvoiceNumber->setVisible(false);
             ui->deInvoiceDate->setVisible(false);
             ui->lbStoreInput->setVisible(false);
@@ -373,6 +378,7 @@ void C5StoreDoc::setMode(C5StoreDoc::STORE_DOC sd)
             ui->lbInvoiceDate->setVisible(false);
             ui->lbInvoiceNumber->setVisible(false);
             ui->lbPartner->setVisible(false);
+            ui->lePartnerDebt->setVisible(false);
             ui->btnNewPartner->setVisible(false);
             ui->btnFixPartner->setVisible(false);
             ui->leReason->setValue(DOC_REASON_MOVE);
@@ -386,6 +392,7 @@ void C5StoreDoc::setMode(C5StoreDoc::STORE_DOC sd)
             ui->lbInvoiceDate->setVisible(false);
             ui->lbInvoiceNumber->setVisible(false);
             ui->lbPartner->setVisible(false);
+            ui->lePartnerDebt->setVisible(false);
             ui->btnNewPartner->setVisible(false);
             ui->btnFixPartner->setVisible(false);
             ui->leReason->setValue(DOC_REASON_COMPLECTATION);
@@ -399,6 +406,7 @@ void C5StoreDoc::setMode(C5StoreDoc::STORE_DOC sd)
             ui->lbInvoiceDate->setVisible(false);
             ui->lbInvoiceNumber->setVisible(false);
             ui->lbPartner->setVisible(false);
+            ui->lePartnerDebt->setVisible(false);
             ui->btnNewPartner->setVisible(false);
             ui->btnFixPartner->setVisible(false);
             ui->leReason->setValue(DOC_REASON_DECOMPLECTATION);
@@ -717,6 +725,7 @@ bool C5StoreDoc::writeDocument(int state, QString &err)
     jheader["f_storeout"] = ui->leStoreOutput->getInteger();
     jheader["f_reason"] = ui->leReason->getInteger();
     jheader["f_comment"] = ui->leComment->text();
+    jheader["f_payment"] = state == DOC_STATE_SAVED ?  QJsonValue(fCashDocUuid) : QJsonValue::Null;
     jheader["f_paid"] = ui->chPaid->isChecked() ? 1 : 0;
     jdoc["header"] = jheader;
     QJsonObject jbody;
@@ -948,6 +957,11 @@ void C5StoreDoc::writeDocumentWithState(int state)
             db[":f_state"] = 6;
             db.exec("update o_draft_sale set f_state=:f_state where f_id=:f_id");
         }
+#pragma message( " DONT FORGET DO THIS FOR STORE UPDATE IN SHOP")
+#pragma message( " DONT FORGET DO THIS FOR STORE UPDATE IN SHOP")
+#pragma message( " DONT FORGET DO THIS FOR STORE UPDATE IN SHOP")
+#pragma message( " DONT FORGET DO THIS FOR STORE UPDATE IN SHOP")
+#pragma message( " DONT FORGET DO THIS FOR STORE UPDATE IN SHOP")
 #pragma message( " DONT FORGET DO THIS FOR STORE UPDATE IN SHOP")
         C5Message::info(tr("Saved"));
         if (fFlags.contains("outputservice")) {
@@ -1781,6 +1795,28 @@ double C5StoreDoc::additionalCostForEveryGoods()
         return additionalCost() / ui->leTotalQty->getDouble();
     }
     return 0;
+}
+
+void C5StoreDoc::selectorCallback(int row, const QJsonArray &values)
+{
+    switch (row) {
+        case cache_goods_partners:
+            C5Database db(__c5config.dbParams());
+            db[":f_costumer"] = values.at(0).toInt();
+            db.exec(R"(
+                    SELECT GROUP_CONCAT(round(f_amount, 0), ' ', f_short SEPARATOR ', ') as f_amounts
+                    FROM (
+                    SELECT  c.f_short, sum(f_amount*if(f_source=1, 1, -1)) AS f_amount
+                    from b_clients_debts b
+                    inner JOIN e_currency c ON c.f_id=b.f_currency
+                    where f_costumer=:f_costumer
+                    GROUP BY 1)
+                    AS sub
+                )");
+            db.nextRow();
+            ui->lePartnerDebt->setText(db.getString("f_amounts"));
+            break;
+    }
 }
 
 void C5StoreDoc::lineEditKeyPressed(const QChar &key)
@@ -2815,4 +2851,51 @@ void C5StoreDoc::on_btnSaveComment_clicked()
     db[":f_comment"] = ui->leComment->text();
     db[":f_id"] = fInternalId;
     db.exec("update a_header set f_comment=:f_comment where f_id=:f_id");
+}
+
+void C5StoreDoc::on_btnSavePayment_clicked()
+{
+    if (fDocState == DOC_STATE_DRAFT) {
+        C5Message::error(tr("Inpossible in draft mode"));
+        return;
+    }
+    QString err;
+    C5Database db(__c5config.dbParams());
+    if (ui->chPaid->isChecked()) {
+        if (ui->leCash->getInteger() == 0) {
+            C5Message::error(tr("Cash must be selected"));
+            return;
+        }
+        QJsonObject jo;
+        jo["f_cashout"] = ui->leCash->getInteger();
+        jo["f_currency"] = ui->cbCurrency->currentData().toInt();
+        jo["f_amount"] = ui->leTotal->getDouble();
+        jo["f_purpose"] = QString("%1 %2").arg(tr("Store input"), ui->leDocNum->text());
+        jo["f_comment"] = QString("%1 %2").arg(tr("Store input"), ui->leDocNum->text());
+        jo["f_operator"] = __user->id();
+        jo["f_date"] = ui->deCashDate->date().toString(FORMAT_DATE_TO_STR_MYSQL);
+        db[":params"] = QString(QJsonDocument(jo).toJson());
+        db.exec("select sf_create_cashdoc(:params)");
+        db.nextRow();
+        jo = QJsonDocument::fromJson(db.getString(0).toUtf8()).object();
+        fCashDocUuid = jo["cashdoc"].toString();
+        db[":f_id"] = fInternalId;
+        db[":f_payment"] = fCashDocUuid;
+        db.exec("update a_header set f_payment=:f_payment where f_id=:f_id");
+        db[":f_storedoc"] = fInternalId;
+        db.exec("delete from b_clients_debts where f_storedoc=:f_storedoc");
+    } else {
+        db[":cashdoc"] = fCashDocUuid;
+        db.exec("select sf_remove_cashdoc(:cashdoc) ");
+        BClientDebts b;
+        b.date = ui->deDate->date();
+        b.costumer = ui->lePartner->getInteger();
+        b.currency = ui->cbCurrency->currentData().toInt();
+        b.amount = -1 * ui->leTotal->getDouble();
+        b.source = 1;
+        b.store = fInternalId;
+        b.write(db, err);
+        b.comment = QString("%1 %2").arg(tr("Store input"), ui->leDocNum->text());
+    }
+    C5Message::info(tr("Payment saved"));
 }

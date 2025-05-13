@@ -30,8 +30,6 @@ public:
 
     void addItem(const QJsonObject &obj);
 
-    void sendToServer(C5SocketHandler *sh);
-
     static bool clearStoreOutput(C5Database &db, const QDate &d1, const QDate &d2);
 
     static void removeDocument(C5Database &db, const QString &id);

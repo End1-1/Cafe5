@@ -20,6 +20,7 @@
 #include "selectprinters.h"
 #include "c5printing.h"
 #include "dlggiftcardsale.h"
+#include "printtaxn.h"
 #include "dlgregistercard.h"
 #include "printreceiptgroup.h"
 #include "dlgshowcolumns.h"
@@ -662,7 +663,7 @@ void Working::qtyRemains(const QJsonObject &jdoc)
     if (print) {
         p.ltext(tr("Printed"), 0);
         p.rtext(QDateTime::currentDateTime().toString(FORMAT_DATETIME_TO_STR2));
-        //p.print(C5Config::localReceiptPrinter(), QPageSize::Custom);
+        p.print(C5Config::localReceiptPrinter(), QPageSize::Custom);
     }
     sender()->deleteLater();
 }
@@ -733,9 +734,11 @@ void Working::on_btnWriteOrder_clicked()
     }
     w->deleteLater();
     startStoreUpdate();
-    auto *dp = new NDataProvider(this);
-    connect(dp, &NDataProvider::done, this, &Working::qtyRemains);
-    dp->getData("/engine/shop/check-qty-remain.php", QJsonObject{{"header", id}});
+    if (C5Config::fMainJson["remind_out_of_stock"].toBool()) {
+        auto *dp = new NDataProvider(this);
+        connect(dp, &NDataProvider::done, this, &Working::qtyRemains);
+        dp->getData("/engine/shop/check-qty-remain.php", QJsonObject{{"header", id}});
+    }
 }
 
 void Working::on_btnGoodsMovement_clicked()
@@ -910,4 +913,56 @@ void Working::on_btnCashout_clicked()
 void Working::on_btnBooking_clicked()
 {
     openSearch();
+}
+
+void Working::on_btnPrepaidFiscal_clicked()
+{
+    bool ok;
+    double v = QInputDialog::getDouble(this, tr("Prepaid"), "", 0, 0, 99999999, 0, &ok);
+    if (v > 0 and ok) {
+        PrintTaxN pt(C5Config::taxIP(), C5Config::taxPort(), C5Config::taxPassword(),
+                     C5Config::taxUseExtPos(), C5Config::taxCashier(), C5Config::taxPin(), this);
+        QString in, out, err;
+        QElapsedTimer et;
+        et.start();
+        auto result = pt.printAdvanceJson(v, 0, in, out, err);
+        C5Database db(__c5config.dbParams());
+        db[":f_id"] = db.uuid();
+        db[":f_order"] = db[":f_id"];
+        db[":f_date"] = QDate::currentDate();
+        db[":f_time"] = QTime::currentTime();
+        db[":f_elapsed"] = et.elapsed();
+        db[":f_in"] = in.replace("'", "''");
+        db[":f_out"] = out;
+        db[":f_err"] = err;
+        db[":f_result"] = result;
+        db[":f_state"] = result == pt_err_ok ? 1 : 0;
+        db.insert("o_tax_log");
+        if (result != pt_err_ok) {
+            C5Message::error(err);
+        } else {
+            QJsonObject jo = QJsonDocument::fromJson(out.toUtf8()).object();
+            C5Printing p;
+            p.setSceneParams(650, 2800, QPageLayout::Portrait);
+            p.setFont(qApp->font());
+            p.br(2);
+            p.setFontSize(30);
+            p.ctext(tr("Prepaid fiscal"));
+            p.br();
+            p.ltext(tr("Fiscal number"), 0);
+            p.rtext(QString::number(jo["rseq"].toInt()));
+            p.br();
+            p.ltext(tr("Amount"), 0);
+            p.rtext(float_str(v, 1));
+            p.br();
+            p.br();
+            p.ltext(tr("Printed"), 0);
+            p.rtext(QDateTime::currentDateTime().toString(FORMAT_DATETIME_TO_STR));
+            p.br();
+            p.br();
+            p.ltext(".", 0);
+            p.print(__c5config.localReceiptPrinter(), QPageSize::Custom);
+            C5Message::info(tr("Done"));
+        }
+    }
 }

@@ -723,6 +723,7 @@ bool C5StoreDraftWriter::transferToHotel(C5Database &db, const QString &uuid, QS
 {
 #ifdef SMART
     Q_UNUSED(db);
+    Q_UNUSED(uuid);
     err = "";
     return true;
 #else

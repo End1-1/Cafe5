@@ -66,6 +66,7 @@ RESOURCES += \
     transres.qrc
 
 FORMS += \
+    ../Classes/dlgserverconnection.ui \
     ../NTable/nloadingdlg.ui \
     dlgservicevalues.ui
 
@@ -73,6 +74,7 @@ HEADERS += \
     ../Classes/QProgressIndicator.h \
     ../Classes/amkbd.h \
     ../Classes/c5logtoserverthread.h \
+    ../Classes/dlgserverconnection.h \
     ../NTable/ndataprovider.h \
     ../NTable/ninterface.h \
     ../NTable/nloadingdlg.h \
@@ -82,6 +84,7 @@ SOURCES += \
     ../../NewTax/Src/printtaxn.cpp \
     ../Classes/QProgressIndicator.cpp \
     ../Classes/amkbd.cpp \
+    ../Classes/dlgserverconnection.cpp \
     ../NTable/ndataprovider.cpp \
     ../NTable/ninterface.cpp \
     ../NTable/nloadingdlg.cpp \

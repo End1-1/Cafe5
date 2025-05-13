@@ -1,6 +1,7 @@
 #include "cr5custom.h"
 #include "c5customfilter.h"
 #include "c5user.h"
+#include "c5database.h"
 
 QStringList rnames;
 QStringList rsqls;

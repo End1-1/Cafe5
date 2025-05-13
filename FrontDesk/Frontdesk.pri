@@ -180,7 +180,6 @@ HEADERS += \
         ../Classes/c5airlog.h \
         ../Classes/c5document.h \
         ../Classes/c5filterwidget.h \
-        ../Classes/c5logtoserverthread.h \
         ../Classes/c5printrecipta4.h \
         ../Classes/c5random.h \
         ../Classes/c5replacecharacter.h \
@@ -380,7 +379,6 @@ HEADERS += \
         ../Cafe5/c5dialog.h \
         ../Cafe5/c5message.h \
         ../Cafe5/c5utils.h \
-        ../Cafe5/c5sockethandler.h \
         ../Classes/c5permissions.h \
         ../Classes/c5grid.h \
         ../Reports/cr5usersgroups.h \
@@ -485,7 +483,6 @@ SOURCES += \
         ../Classes/c5airlog.cpp \
         ../Classes/c5document.cpp \
         ../Classes/c5filterwidget.cpp \
-        ../Classes/c5logtoserverthread.cpp \
         ../Classes/c5printrecipta4.cpp \
         ../Classes/c5random.cpp \
         ../Classes/c5replacecharacter.cpp \
@@ -680,7 +677,6 @@ SOURCES += \
         ../Cafe5/c5dialog.cpp \
         ../Cafe5/c5message.cpp \
         ../Cafe5/c5utils.cpp \
-        ../Cafe5/c5sockethandler.cpp \
         ../Classes/c5permissions.cpp \
         ../Classes/c5grid.cpp \
         ../Reports/cr5usersgroups.cpp \

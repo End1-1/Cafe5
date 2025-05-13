@@ -170,18 +170,14 @@ void C5SearchEngine::init(QStringList databases)
     qDebug() << "total items" << totalitems;
 }
 
-void C5SearchEngine::search(const QJsonObject &jo, QWebSocket *socket)
+QString C5SearchEngine::search(const QJsonObject &jo)
 {
     QJsonObject jrep;
     jrep["errorCode"] = 0;
     jrep["requestId"] = jo["requestId"];
-    QString repMsg;
     if (jo["template"].toString().isEmpty()) {
         jrep["result_count"] = 0;
-        repMsg = QJsonDocument(jrep).toJson(QJsonDocument::Compact);
-        LogWriter::write(LogWriterLevel::errors, "", repMsg);
-        socket->sendTextMessage(repMsg);
-        return;
+        return QJsonDocument(jrep).toJson(QJsonDocument::Compact);
     }
     int maxCount = jo["max_count"].toInt() == 0 ? 10 :  jo["max_count"].toInt();
     QString databaseName = jo["database"].toString();
@@ -220,12 +216,10 @@ void C5SearchEngine::search(const QJsonObject &jo, QWebSocket *socket)
     }
     jrep["result_count"] = ja.count();
     jrep["result"] = ja;
-    repMsg = QJsonDocument(jrep).toJson(QJsonDocument::Compact);
-    LogWriter::write(LogWriterLevel::verbose, "", repMsg);
-    socket->sendTextMessage(repMsg);
+    return QJsonDocument(jrep).toJson(QJsonDocument::Compact);
 }
 
-void C5SearchEngine::searchPartner(const QJsonObject &jo, QWebSocket *socket)
+QString C5SearchEngine::searchPartner(const QJsonObject &jo)
 {
     QJsonObject jrep;
     jrep["errorCode"] = 0;
@@ -261,12 +255,10 @@ void C5SearchEngine::searchPartner(const QJsonObject &jo, QWebSocket *socket)
     jrep["page"] = jo["page"];
     jrep["limit"] = jo["limit"];
     jrep["noresult"] = noResult;
-    QString repMsg = QJsonDocument(jrep).toJson(QJsonDocument::Compact);
-    LogWriter::write(LogWriterLevel::verbose, "", repMsg);
-    socket->sendTextMessage(repMsg);
+    return QJsonDocument(jrep).toJson(QJsonDocument::Compact);
 }
 
-void C5SearchEngine::searchGoodsGroups(const QJsonObject &jo, QWebSocket *socket)
+QString C5SearchEngine::searchGoodsGroups(const QJsonObject &jo)
 {
     QJsonObject jrep;
     jrep["errorCode"] = 0;
@@ -284,12 +276,10 @@ void C5SearchEngine::searchGoodsGroups(const QJsonObject &jo, QWebSocket *socket
     jrep["result"] = result;
     jrep["page"] = jo["page"];
     jrep["limit"] = jo["limit"];
-    QString repMsg = QJsonDocument(jrep).toJson(QJsonDocument::Compact);
-    LogWriter::write(LogWriterLevel::verbose, "", repMsg);
-    socket->sendTextMessage(repMsg);
+    return QJsonDocument(jrep).toJson(QJsonDocument::Compact);
 }
 
-void C5SearchEngine::searchGoods(const QJsonObject &jo, QWebSocket *socket)
+QString C5SearchEngine::searchGoods(const QJsonObject &jo)
 {
     QJsonObject jrep;
     jrep["errorCode"] = 0;
@@ -331,12 +321,10 @@ void C5SearchEngine::searchGoods(const QJsonObject &jo, QWebSocket *socket)
     jrep["page"] = jo["page"];
     jrep["limit"] = jo["limit"];
     jrep["noresult"] = noResult;
-    QString repMsg = QJsonDocument(jrep).toJson(QJsonDocument::Compact);
-    LogWriter::write(LogWriterLevel::verbose, "", repMsg);
-    socket->sendTextMessage(repMsg);
+    return QJsonDocument(jrep).toJson(QJsonDocument::Compact);
 }
 
-void C5SearchEngine::searchStore(const QJsonObject &jo, QWebSocket *socket)
+QString C5SearchEngine::searchStore(const QJsonObject &jo)
 {
     QString repMsg;
     QJsonObject jrep;
@@ -347,16 +335,12 @@ void C5SearchEngine::searchStore(const QJsonObject &jo, QWebSocket *socket)
     if (!db.open("127.0.0.1", jo["database"].toString(), "root", "root5")) {
         jrep["errorCode"] = 1;
         jrep["errorMessage"] = db.lastDbError();
-        LogWriter::write(LogWriterLevel::errors, "", repMsg);
-        socket->sendTextMessage(repMsg);
-        return;
+        return QJsonDocument(jrep).toJson(QJsonDocument::Compact);
     }
-    repMsg = QJsonDocument(jrep).toJson(QJsonDocument::Compact);
-    LogWriter::write(LogWriterLevel::verbose, "", repMsg);
-    socket->sendTextMessage(repMsg);
+    return QJsonDocument(jrep).toJson(QJsonDocument::Compact);
 }
 
-void C5SearchEngine::searchUpdatePartnerCache(const QJsonObject &jo, QWebSocket *socket)
+QString C5SearchEngine::searchUpdatePartnerCache(const QJsonObject &jo)
 {
     QJsonObject jrep;
     jrep["errorCode"] = 0;
@@ -373,9 +357,7 @@ void C5SearchEngine::searchUpdatePartnerCache(const QJsonObject &jo, QWebSocket 
     if (!db.open("127.0.0.1", jo["database"].toString(), "root", "root5")) {
         jrep["errorCode"] = 1;
         jrep["errorMessage"] = db.lastDbError();
-        LogWriter::write(LogWriterLevel::errors, "", repMsg);
-        socket->sendTextMessage(repMsg);
-        return;
+        return QJsonDocument(jrep).toJson(QJsonDocument::Compact);
     }
     db[":f_id"] = jo["id"].toInt();
     db.exec(sql);
@@ -404,8 +386,6 @@ void C5SearchEngine::searchUpdatePartnerCache(const QJsonObject &jo, QWebSocket 
         }
         mSearchPartners[jo["database"].toString()] = ja;
         jrep["new"] = !updated;
-        QString repMsg = QJsonDocument(jrep).toJson(QJsonDocument::Compact);
-        LogWriter::write(LogWriterLevel::verbose, "", repMsg);
-        socket->sendTextMessage(repMsg);
     }
+    return QJsonDocument(jrep).toJson(QJsonDocument::Compact);
 }

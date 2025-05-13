@@ -45,15 +45,18 @@ int main(int argc, char *argv[])
     while (__c5config.getRegValue("ss_server_address").toString().isEmpty()) {
         DlgServerConnection::showSettings(nullptr);
     }
-    C5ServerName c5sn(__c5config.getRegValue("ss_server_address").toString());
-    if (!c5sn.getServers()) {
-        C5Message::error(c5sn.mErrorString);
+    auto c5sn  = new C5ServerName(__c5config.getRegValue("ss_server_address").toString());
+    if (!c5sn->getServers()) {
+        C5Message::error(c5sn->mErrorString);
+        DlgServerConnection::showSettings(0);
         return -1;
     }
-    if (!c5sn.getConnection(__c5config.getRegValue("ss_database").toString())) {
-        C5Message::error(c5sn.mErrorString);
+    if (!c5sn->getConnection(__c5config.getRegValue("ss_database").toString())) {
+        C5Message::error(c5sn->mErrorString);
+        DlgServerConnection::showSettings(0);
         return -1;
     }
+    c5sn->deleteLater();
 #define LOGGING
     if (__c5config.getRegValue("ss_server_address").toString().isEmpty() && C5ServerName::mServers.isEmpty()) {
         C5Message::error("Servername parameter must be pass as argument");

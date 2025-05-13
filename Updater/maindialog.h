@@ -3,7 +3,8 @@
 
 #include <QDialog>
 
-namespace Ui {
+namespace Ui
+{
 class MainDialog;
 }
 
@@ -20,8 +21,6 @@ public:
 
 private slots:
     void message(const QString &str);
-
-    void download(bool d);
 
     void downloadProgress(int p);
 

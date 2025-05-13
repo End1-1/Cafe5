@@ -1,5 +1,6 @@
 #include "ce5creditcard.h"
 #include "ui_ce5creditcard.h"
+#include "c5database.h"
 #include <QFileDialog>
 #include <QGraphicsItem>
 #include <QGraphicsPixmapItem>
@@ -50,12 +51,12 @@ bool CE5CreditCard::save(QString &err, QList<QMap<QString, QVariant> > &data)
     if (!CE5Editor::save(err, data)) {
         return false;
     }
-    QList<QGraphicsItem*> ol = ui->gv->scene()->items();
+    QList<QGraphicsItem *> ol = ui->gv->scene()->items();
     if (ol.count() > 0) {
-        QGraphicsPixmapItem *p = static_cast<QGraphicsPixmapItem*>(ol.at(0));
+        QGraphicsPixmapItem *p = static_cast<QGraphicsPixmapItem *>(ol.at(0));
         QByteArray ba;
-        QBuffer buff(&ba);
-        p->pixmap().toImage().save(&buff, "PNG");
+        QBuffer buff( &ba);
+        p->pixmap().toImage().save( &buff, "PNG");
         QString str = ba.toBase64().data();
         C5Database db(fDBParams);
         db[":f_image"] = str;

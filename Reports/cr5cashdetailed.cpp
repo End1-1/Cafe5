@@ -90,7 +90,7 @@ void CR5CashDetailed::buildQuery()
         where += QString(" and h.f_date<'%1' ").arg(fFilter->date1().toString(FORMAT_DATE_TO_STR_MYSQL));
     }
     QString query = QString("select '' as f_header, '%1' as f_date, '%2' as f_remarks, "
-                            "c.f_sign, sum(c.f_amount*c.f_sign) as f_amount "
+                            "c.f_sign, cast(sum(c.f_amount*c.f_sign) as float) as f_amount "
                             "from e_cash c "
                             "inner join a_header h on h.f_id=c.f_header and h.f_type=:f_type "
                             + where +
@@ -153,6 +153,7 @@ void CR5CashDetailed::buildQuery()
             rows[r][col_debit] = abs(db.getDouble("f_amount"));
         }
     }
+    fModel->fColumnType = {{4, QMetaType::Double}, {5, QMetaType::Double}, {6, QMetaType::Double}};
     fModel->setExternalData(fColumnNameIndex, fTranslation);
     restoreColumnsWidths();
     sum();

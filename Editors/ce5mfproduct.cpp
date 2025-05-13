@@ -6,6 +6,7 @@
 #include "c5cache.h"
 #include "c5printing.h"
 #include "c5printpreview.h"
+#include "c5database.h"
 #include "c5message.h"
 #include "mfprocessproductpriceupdate.h"
 #include "ninterface.h"

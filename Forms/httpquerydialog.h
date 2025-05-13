@@ -3,6 +3,7 @@
 
 #include "c5dialog.h"
 #include <QJsonObject>
+#include <QTcpSocket>
 #include <QTimer>
 
 namespace Ui

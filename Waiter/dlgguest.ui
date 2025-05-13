@@ -15,15 +15,15 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
-    <widget class="C5TableWidget" name="tblGuest">
+    <widget class="WaiterTableWidget" name="tblGuest">
      <property name="editTriggers">
-      <set>QAbstractItemView::NoEditTriggers</set>
+      <set>QAbstractItemView::EditTrigger::NoEditTriggers</set>
      </property>
      <property name="selectionMode">
-      <enum>QAbstractItemView::SingleSelection</enum>
+      <enum>QAbstractItemView::SelectionMode::SingleSelection</enum>
      </property>
      <property name="selectionBehavior">
-      <enum>QAbstractItemView::SelectRows</enum>
+      <enum>QAbstractItemView::SelectionBehavior::SelectRows</enum>
      </property>
      <column>
       <property name="text">
@@ -80,7 +80,7 @@
       <item>
        <spacer name="horizontalSpacer">
         <property name="orientation">
-         <enum>Qt::Horizontal</enum>
+         <enum>Qt::Orientation::Horizontal</enum>
         </property>
         <property name="sizeHint" stdset="0">
          <size>
@@ -103,7 +103,7 @@
       <item>
        <spacer name="horizontalSpacer_2">
         <property name="orientation">
-         <enum>Qt::Horizontal</enum>
+         <enum>Qt::Orientation::Horizontal</enum>
         </property>
         <property name="sizeHint" stdset="0">
          <size>
@@ -120,15 +120,15 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>C5TableWidget</class>
-   <extends>QTableWidget</extends>
-   <header location="global">c5tablewidget.h</header>
-  </customwidget>
-  <customwidget>
    <class>RKeyboard</class>
    <extends>QWidget</extends>
    <header location="global">rkeyboard.h</header>
    <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>WaiterTableWidget</class>
+   <extends>QTableWidget</extends>
+   <header location="global">waitertablewidget.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

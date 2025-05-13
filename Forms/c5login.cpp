@@ -15,8 +15,13 @@ C5Login::C5Login() :
     ui(new Ui::C5Login)
 {
     ui->setupUi(this);
-    //ui->lbVersion->setText(FileVersion::getVersionString(qApp->applicationFilePath()));
+    ui->leVersion->setText(FileVersion::getVersionString(qApp->applicationFilePath()));
+#ifndef QT_DEBUG
+    ui->leVersion->setText(FileVersion::getVersionString(qApp->applicationFilePath()));
+    ui->leVersion->setVisible(false);
+#endif
     readServers();
+    adjustSize();
 }
 
 C5Login::~C5Login()
@@ -50,6 +55,7 @@ void C5Login::loginResponse(const QJsonObject &jdoc)
     QSettings s(_ORGANIZATION_, _APPLICATION_ + QString("\\") + _MODULE_);
     s.setValue("lastdb", ui->cbDatabases->currentText());
     s.setValue("lastusername", ui->leUsername->currentText());
+    s.setValue("lastversion", ui->leVersion->text());
     __c5config.fDBName = ui->cbDatabases->currentText();
     fHttp->httpQueryFinished(sender());
     accept();
@@ -62,7 +68,11 @@ void C5Login::on_btnCancel_clicked()
 
 void C5Login::on_btnOk_clicked()
 {
-    fHttp->createHttpQuery("/engine/login.php", QJsonObject{{"method", 1}, {"username", ui->leUsername->currentText()}, {"password", ui->lePassword->text()}},
+    NDataProvider::mFileVersion = ui->leVersion->text();
+    fHttp->createHttpQuery("/engine/login.php",
+    QJsonObject{{"method", 1},
+        {"username", ui->leUsername->currentText()},
+        {"password", ui->lePassword->text()}},
     SLOT(loginResponse(QJsonObject)));
 }
 
@@ -76,7 +86,6 @@ void C5Login::on_cbDatabases_currentIndexChanged(int index)
     const QJsonObject &js = fServers.at(index).toObject();
     NDataProvider::mHost = js["database"].toString();
     NDataProvider::mAppName = "officen";
-    NDataProvider::mFileVersion = FileVersion::getVersionString(qApp->applicationFilePath());
     NDataProvider::mProtocol = js["settings"].toString();
     C5Config::fDBHost = js["settings"].toString();
     C5Config::fDBPath = js["database"].toString();
@@ -107,6 +116,11 @@ void C5Login::readServers()
         ui->cbDatabases->addItem(js["name"].toString());
     }
     QSettings s(_ORGANIZATION_, _APPLICATION_ + QString("\\") + _MODULE_);
+#ifdef QT_DEBUG
+    if (s.value("lastversion").toString().isEmpty() == false) {
+        ui->leVersion->setText(s.value("lastversion").toString());
+    }
+#endif
     int dbindex = ui->cbDatabases->findText(s.value("lastdb").toString());
     ui->cbDatabases->setCurrentIndex(dbindex);
     if (dbindex > -1) {

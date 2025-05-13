@@ -11,6 +11,8 @@ class C5PrintJson : public QThread
 public:
     C5PrintJson(const QJsonArray &obj, QObject *parent = 0);
 
+    ~C5PrintJson();
+
 protected:
     virtual void run();
 

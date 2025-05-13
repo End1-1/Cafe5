@@ -3,6 +3,7 @@
 #include "c5mainwindow.h"
 #include "c5tablemodel.h"
 #include "cr5menutranslator.h"
+#include "c5database.h"
 #include "dlgprintrecipesoptions.h"
 #include <QAbstractScrollArea>
 #include <QPrintDialog>

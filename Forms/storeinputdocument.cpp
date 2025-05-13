@@ -3,6 +3,7 @@
 #include "c5checkbox.h"
 #include "c5selector.h"
 #include "c5cache.h"
+#include "c5config.h"
 #include "c5user.h"
 #include "c5storedraftwriter.h"
 #include "c5replacecharacter.h"

@@ -1,9 +1,5 @@
 #include "c5waiterorderdoc.h"
-#include "c5socketmessage.h"
 #include "c5utils.h"
-#include "c5cafecommon.h"
-#include "c5config.h"
-#include "c5sockethandler.h"
 #include "c5storedraftwriter.h"
 #include <QHostInfo>
 
@@ -63,15 +59,6 @@ void C5WaiterOrderDoc::addItem(const QJsonObject &obj)
 {
     fItems.append(obj);
     fSaved = false;
-}
-
-void C5WaiterOrderDoc::sendToServer(C5SocketHandler *sh)
-{
-    sh->bind("cmd", sm_saveorder);
-    QJsonObject o;
-    o["header"] = fHeader;
-    o["body"] = fItems;
-    sh->send(o);
 }
 
 bool C5WaiterOrderDoc::clearStoreOutput(C5Database &db, const QDate &d1, const QDate &d2)

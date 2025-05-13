@@ -76,7 +76,9 @@ private slots:
     void on_btnPrintTaxX_clicked();
 
     void on_btnPrintTaxZ_clicked();
+
     void on_btnCashobx_clicked();
+
     void on_btnCashInput_clicked();
 };
 

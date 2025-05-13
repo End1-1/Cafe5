@@ -41,12 +41,14 @@ private:
     const QString fConfigPath;
     QList<SocketStruct> fSockets;
     QStringList fDbList;
-    void getDbList(const QJsonObject &jdoc, QWebSocket *ws);
-    void getConnection(const QJsonObject &jdoc, QWebSocket *ws);
+    QString getDbList(const QJsonObject &jdoc);
+    QString getConnection(const QJsonObject &jdoc);
+    QString handleDll(const QJsonObject &jdoc, const QString &command);
     void registerSocket(const QJsonObject &jdoc, QWebSocket *ws);
     void unregisterSocket(const QJsonObject &jdoc, QWebSocket *ws);
-    void updateHotelCache(const QJsonObject &jdoc, QWebSocket *ws);
-    void armsoft(const QJsonObject &jdoc, QWebSocket *ws);
+    QString updateHotelCache(const QJsonObject &jdoc);
+    QString armsoft(const QJsonObject &jdoc);
+    void handleCommand(const QJsonObject &jdoc, QString &repMsg);
 
 private slots:
     void onNewConnection();

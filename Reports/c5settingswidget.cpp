@@ -1,5 +1,7 @@
 #include "c5settingswidget.h"
 #include "ui_c5settingswidget.h"
+#include "c5database.h"
+#include "c5config.h"
 #include "jsons.h"
 #include "c5utils.h"
 #include <QFileDialog>
@@ -59,6 +61,14 @@ void C5SettingsWidget::setId(int id)
     db.exec("select * from sys_json_config where f_id=:f_id");
     if (db.nextRow()) {
         QJsonObject jo = __strjson(db.getString("f_config"));
+        //company data
+        ui->leCompanyInfo->setText(jo["companydata"].toString());
+        ui->leCompanyname->setText(jo["companyname"].toString());
+        ui->leCompanyTin->setText(jo["companytin"].toString());
+        ui->leCompanyBank->setText(jo["companybank"].toString());
+        ui->leCompanyBankAccount->setText(jo["companybankaccount"].toString());
+        ui->leCompanyAddress->setText(jo["companyaddress"].toString());
+        //other
         ui->leChatOperatorUserId->setInteger(jo["chatoperatoruserid"].toInt());
         ui->chDenyLogout->setChecked(jo["denylogout"].toBool());
         ui->leCoinCashdesk->setInteger(jo["coincash_id"].toInt());
@@ -76,8 +86,14 @@ void C5SettingsWidget::setId(int id)
         ui->chmSaleOutputConfirmation->setChecked(jo["chm_saleoutconfirmation"].toBool());
         ui->chmReturnGoods->setChecked(jo["chm_returngoods"].toBool());
         ui->chDebugMode->setChecked(jo["debug_mode"].toBool());
+        ui->chClearSaveDraft->setChecked(jo["clear_sale_draft"].toBool());
+        ui->chChangeDraftDateToCurrent->setChecked(jo["change_draft_date_to_current"].toBool());
         QJsonArray ja = jo["availableoutstore"].toArray();
+        ui->leWaiterServer->setText(jo["waiter_server"].toString());
         ui->chUseWebsocket->setChecked(jo["use_websocket"].toBool());
+        ui->chRemindOutOfStock->setChecked(jo["remind_out_of_stock"].toBool());
+        ui->leServiceItemCode->setInteger(jo["service_item_code"].toInt());
+        ui->leDiscountItemCode->setInteger(jo["discount_item_code"].toInt());
         QString s;
         for (int i = 0; i < ja.count(); i++) {
             if (!s.isEmpty()) {
@@ -246,6 +262,10 @@ bool C5SettingsWidget::save(QString &err, QList<QMap<QString, QVariant> > &data)
     jc["menu"] = ui->cbMenu->currentData().toInt();
     jc["companydata"] = ui->leCompanyInfo->text();
     jc["companyname"] = ui->leCompanyname->text();
+    jc["companytin"] = ui->leCompanyTin->text();
+    jc["companybank"] = ui->leCompanyBank->text();
+    jc["companybankaccount"] = ui->leCompanyBankAccount->text();
+    jc["companyaddress"] = ui->leCompanyAddress->text();
     jc["receiptprinter"] = ui->leLocalReceiptPrinter->text();
     jc["chatoperatoruserid"] = ui->leChatOperatorUserId->text().toInt();
     jc["servicefactor"] = ui->leServiceFactor->getDouble();
@@ -271,6 +291,12 @@ bool C5SettingsWidget::save(QString &err, QList<QMap<QString, QVariant> > &data)
     jc["chm_returngoods"] = ui->chmReturnGoods->isChecked();
     jc["use_websocket"] = ui->chUseWebsocket->isChecked();
     jc["debug_mode"] = ui->chDebugMode->isChecked();
+    jc["clear_sale_draft"] = ui->chClearSaveDraft->isChecked();
+    jc["change_draft_date_to_current"] = ui->chChangeDraftDateToCurrent->isChecked();
+    jc["waiter_server"] = ui->leWaiterServer->text();
+    jc["remind_out_of_stock"] = ui->chRemindOutOfStock->isChecked();
+    jc["service_item_code"] = ui->leServiceItemCode->getInteger();
+    jc["discount_item_code"] = ui->leDiscountItemCode->getInteger();
     QJsonArray ja;
     QStringList a = ui->leAvailableStore->text().split(",", Qt::SkipEmptyParts);
     for  (const QString &s : a) {

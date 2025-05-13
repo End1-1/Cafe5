@@ -8,6 +8,7 @@ class ODraftSale : public TableRecord
 public:
     int state = 0;
     int saleType = 0;
+    int hall = 0;
     QDate date;
     QTime time;
     int payment = 0;

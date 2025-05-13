@@ -6,14 +6,20 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>800</width>
-    <height>631</height>
+    <width>1042</width>
+    <height>747</height>
    </rect>
   </property>
   <property name="minimumSize">
    <size>
     <width>800</width>
     <height>500</height>
+   </size>
+  </property>
+  <property name="maximumSize">
+   <size>
+    <width>16777215</width>
+    <height>16777215</height>
    </size>
   </property>
   <property name="windowTitle">
@@ -25,7 +31,7 @@
      <property name="maximumSize">
       <size>
        <width>16777215</width>
-       <height>600</height>
+       <height>16777215</height>
       </size>
      </property>
      <property name="widgetResizable">
@@ -36,8 +42,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>759</width>
-        <height>773</height>
+        <width>1001</width>
+        <height>808</height>
        </rect>
       </property>
       <layout class="QHBoxLayout" name="horizontalLayout_2">
@@ -60,35 +66,24 @@
            <string>Main</string>
           </attribute>
           <layout class="QGridLayout" name="gridLayout_3">
-           <item row="1" column="0">
-            <widget class="QLabel" name="label_15">
-             <property name="text">
-              <string>Name</string>
+           <item row="9" column="1">
+            <widget class="C5LineEdit" name="leFDFontSize">
+             <property name="Tag" stdset="0">
+              <number>28</number>
              </property>
             </widget>
            </item>
-           <item row="11" column="1">
+           <item row="7" column="1">
+            <widget class="C5LineEditWithSelector" name="leCompanyInfo"/>
+           </item>
+           <item row="15" column="1">
             <widget class="C5ComboBox" name="cbDefaultCurrency">
              <property name="Tag" stdset="0">
               <string>116</string>
              </property>
             </widget>
            </item>
-           <item row="0" column="0">
-            <widget class="QLabel" name="label_14">
-             <property name="text">
-              <string>Code</string>
-             </property>
-            </widget>
-           </item>
-           <item row="8" column="0">
-            <widget class="QLabel" name="label_79">
-             <property name="text">
-              <string>Debug mode</string>
-             </property>
-            </widget>
-           </item>
-           <item row="9" column="1">
+           <item row="13" column="1">
             <widget class="C5LineEdit" name="leSystemThouthandSeparator">
              <property name="maxLength">
               <number>1</number>
@@ -97,6 +92,16 @@
               <number>106</number>
              </property>
             </widget>
+           </item>
+           <item row="11" column="1">
+            <widget class="C5ComboBox" name="cbFronDeskMode">
+             <property name="Tag" stdset="0">
+              <number>33</number>
+             </property>
+            </widget>
+           </item>
+           <item row="2" column="1">
+            <widget class="C5LineEditWithSelector" name="leCompanyTin"/>
            </item>
            <item row="0" column="1">
             <widget class="C5LineEditWithSelector" name="leCode">
@@ -108,20 +113,6 @@
              </property>
             </widget>
            </item>
-           <item row="7" column="1">
-            <widget class="C5ComboBox" name="cbFronDeskMode">
-             <property name="Tag" stdset="0">
-              <number>33</number>
-             </property>
-            </widget>
-           </item>
-           <item row="6" column="0">
-            <widget class="QLabel" name="label_90">
-             <property name="text">
-              <string>Application font family</string>
-             </property>
-            </widget>
-           </item>
            <item row="1" column="1">
             <widget class="C5LineEditWithSelector" name="leSettingsName">
              <property name="Field" stdset="0">
@@ -129,96 +120,7 @@
              </property>
             </widget>
            </item>
-           <item row="10" column="1">
-            <widget class="C5LineEdit" name="leMobileAppConStr">
-             <property name="maxLength">
-              <number>1</number>
-             </property>
-             <property name="Tag" stdset="0">
-              <number>114</number>
-             </property>
-            </widget>
-           </item>
-           <item row="3" column="1">
-            <widget class="C5LineEditWithSelector" name="leCompanyInfo"/>
-           </item>
-           <item row="10" column="0">
-            <widget class="QLabel" name="label_107">
-             <property name="text">
-              <string>Mobile application connection string</string>
-             </property>
-            </widget>
-           </item>
-           <item row="5" column="0">
-            <widget class="QLabel" name="label_32">
-             <property name="text">
-              <string>Applicatin font base size</string>
-             </property>
-            </widget>
-           </item>
-           <item row="2" column="1">
-            <widget class="C5LineEditWithSelector" name="leCompanyname"/>
-           </item>
-           <item row="11" column="0">
-            <widget class="QLabel" name="label_215">
-             <property name="text">
-              <string>Default currency</string>
-             </property>
-            </widget>
-           </item>
-           <item row="3" column="0">
-            <widget class="QLabel" name="label_114">
-             <property name="text">
-              <string>Company info for documents</string>
-             </property>
-            </widget>
-           </item>
-           <item row="8" column="1">
-            <widget class="C5CheckBox" name="chDebugMode">
-             <property name="text">
-              <string/>
-             </property>
-             <property name="Tag" stdset="0">
-              <number>83</number>
-             </property>
-            </widget>
-           </item>
-           <item row="9" column="0">
-            <widget class="QLabel" name="label_99">
-             <property name="text">
-              <string>System thouthand separator</string>
-             </property>
-            </widget>
-           </item>
-           <item row="7" column="0">
-            <widget class="QLabel" name="label_35">
-             <property name="text">
-              <string>Frontdesk mode</string>
-             </property>
-            </widget>
-           </item>
-           <item row="4" column="1">
-            <widget class="C5LineEditWithSelector" name="lineEdit_3">
-             <property name="Field" stdset="0">
-              <string>f_description</string>
-             </property>
-            </widget>
-           </item>
-           <item row="4" column="0">
-            <widget class="QLabel" name="label_16">
-             <property name="text">
-              <string>Description</string>
-             </property>
-            </widget>
-           </item>
-           <item row="5" column="1">
-            <widget class="C5LineEdit" name="leFDFontSize">
-             <property name="Tag" stdset="0">
-              <number>28</number>
-             </property>
-            </widget>
-           </item>
-           <item row="12" column="1">
+           <item row="16" column="1">
             <spacer name="verticalSpacer_3">
              <property name="orientation">
               <enum>Qt::Orientation::Vertical</enum>
@@ -231,19 +133,163 @@
              </property>
             </spacer>
            </item>
-           <item row="2" column="0">
+           <item row="12" column="1">
+            <widget class="C5CheckBox" name="chDebugMode">
+             <property name="text">
+              <string/>
+             </property>
+             <property name="Tag" stdset="0">
+              <number>83</number>
+             </property>
+            </widget>
+           </item>
+           <item row="15" column="0">
+            <widget class="QLabel" name="label_215">
+             <property name="text">
+              <string>Default currency</string>
+             </property>
+            </widget>
+           </item>
+           <item row="14" column="0">
+            <widget class="QLabel" name="label_107">
+             <property name="text">
+              <string>Mobile application connection string</string>
+             </property>
+            </widget>
+           </item>
+           <item row="6" column="0">
+            <widget class="QLabel" name="label_124">
+             <property name="text">
+              <string>Bank account number</string>
+             </property>
+            </widget>
+           </item>
+           <item row="11" column="0">
+            <widget class="QLabel" name="label_35">
+             <property name="text">
+              <string>Frontdesk mode</string>
+             </property>
+            </widget>
+           </item>
+           <item row="10" column="1">
+            <widget class="QFontComboBox" name="fnApp">
+             <property name="Tag" stdset="0">
+              <number>97</number>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="0">
+            <widget class="QLabel" name="label_14">
+             <property name="text">
+              <string>Code</string>
+             </property>
+            </widget>
+           </item>
+           <item row="9" column="0">
+            <widget class="QLabel" name="label_32">
+             <property name="text">
+              <string>Applicatin font base size</string>
+             </property>
+            </widget>
+           </item>
+           <item row="8" column="0">
+            <widget class="QLabel" name="label_16">
+             <property name="text">
+              <string>Description</string>
+             </property>
+            </widget>
+           </item>
+           <item row="5" column="1">
+            <widget class="C5LineEditWithSelector" name="leCompanyBank"/>
+           </item>
+           <item row="12" column="0">
+            <widget class="QLabel" name="label_79">
+             <property name="text">
+              <string>Debug mode</string>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="0">
+            <widget class="QLabel" name="label_15">
+             <property name="text">
+              <string>Name</string>
+             </property>
+            </widget>
+           </item>
+           <item row="14" column="1">
+            <widget class="C5LineEdit" name="leMobileAppConStr">
+             <property name="maxLength">
+              <number>1</number>
+             </property>
+             <property name="Tag" stdset="0">
+              <number>114</number>
+             </property>
+            </widget>
+           </item>
+           <item row="10" column="0">
+            <widget class="QLabel" name="label_90">
+             <property name="text">
+              <string>Application font family</string>
+             </property>
+            </widget>
+           </item>
+           <item row="5" column="0">
+            <widget class="QLabel" name="label_123">
+             <property name="text">
+              <string>Bank name</string>
+             </property>
+            </widget>
+           </item>
+           <item row="13" column="0">
+            <widget class="QLabel" name="label_99">
+             <property name="text">
+              <string>System thouthand separator</string>
+             </property>
+            </widget>
+           </item>
+           <item row="6" column="1">
+            <widget class="C5LineEditWithSelector" name="leCompanyBankAccount"/>
+           </item>
+           <item row="7" column="0">
+            <widget class="QLabel" name="label_114">
+             <property name="text">
+              <string>Company info for documents</string>
+             </property>
+            </widget>
+           </item>
+           <item row="3" column="1">
+            <widget class="C5LineEditWithSelector" name="leCompanyname"/>
+           </item>
+           <item row="8" column="1">
+            <widget class="C5LineEditWithSelector" name="lineEdit_3">
+             <property name="Field" stdset="0">
+              <string>f_description</string>
+             </property>
+            </widget>
+           </item>
+           <item row="3" column="0">
             <widget class="QLabel" name="label_113">
              <property name="text">
               <string>Company name</string>
              </property>
             </widget>
            </item>
-           <item row="6" column="1">
-            <widget class="QFontComboBox" name="fnApp">
-             <property name="Tag" stdset="0">
-              <number>97</number>
+           <item row="2" column="0">
+            <widget class="QLabel" name="label_122">
+             <property name="text">
+              <string>Company tin</string>
              </property>
             </widget>
+           </item>
+           <item row="4" column="0">
+            <widget class="QLabel" name="label_125">
+             <property name="text">
+              <string>Company address</string>
+             </property>
+            </widget>
+           </item>
+           <item row="4" column="1">
+            <widget class="C5LineEditWithSelector" name="leCompanyAddress"/>
            </item>
           </layout>
          </widget>
@@ -252,17 +298,31 @@
            <string>Store</string>
           </attribute>
           <layout class="QGridLayout" name="gridLayout_2">
-           <item row="9" column="0">
-            <widget class="QLabel" name="label_56">
-             <property name="text">
-              <string>Autoenter last input price for store document</string>
-             </property>
-            </widget>
-           </item>
            <item row="2" column="2">
             <widget class="C5LineEdit" name="leOutDocNumDigits">
              <property name="Tag" stdset="0">
               <number>23</number>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="0">
+            <widget class="QLabel" name="label_26">
+             <property name="text">
+              <string>Movement document number digits</string>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="2">
+            <widget class="C5LineEdit" name="leInputDocNumDigits">
+             <property name="Tag" stdset="0">
+              <number>13</number>
+             </property>
+            </widget>
+           </item>
+           <item row="3" column="0">
+            <widget class="QLabel" name="label_20">
+             <property name="text">
+              <string>Input documents counter*</string>
              </property>
             </widget>
            </item>
@@ -276,24 +336,10 @@
              </property>
             </widget>
            </item>
-           <item row="7" column="0">
-            <widget class="QLabel" name="label_28">
+           <item row="6" column="0">
+            <widget class="QLabel" name="label_17">
              <property name="text">
-              <string>No cash doc option in store doc</string>
-             </property>
-            </widget>
-           </item>
-           <item row="6" column="2">
-            <widget class="C5ComboBox" name="cbDefaultStore">
-             <property name="Tag" stdset="0">
-              <number>14</number>
-             </property>
-            </widget>
-           </item>
-           <item row="10" column="0">
-            <widget class="QLabel" name="label_88">
-             <property name="text">
-              <string>Update temp storage for shop</string>
+              <string>Default store</string>
              </property>
             </widget>
            </item>
@@ -307,52 +353,12 @@
              </property>
             </widget>
            </item>
-           <item row="1" column="2">
-            <widget class="C5LineEdit" name="leMoveDocNumDigits">
-             <property name="Tag" stdset="0">
-              <number>22</number>
-             </property>
-            </widget>
-           </item>
-           <item row="5" column="2">
-            <widget class="C5LineEdit" name="leOutDocCounter"/>
-           </item>
-           <item row="1" column="0">
-            <widget class="QLabel" name="label_26">
+           <item row="11" column="0">
+            <widget class="QLabel" name="label_89">
              <property name="text">
-              <string>Movement document number digits</string>
+              <string>Automatically store output after sale</string>
              </property>
             </widget>
-           </item>
-           <item row="10" column="2">
-            <widget class="C5CheckBox" name="chUpdateTempStorageForShop">
-             <property name="text">
-              <string/>
-             </property>
-             <property name="Tag" stdset="0">
-              <number>94</number>
-             </property>
-            </widget>
-           </item>
-           <item row="2" column="0">
-            <widget class="QLabel" name="label_27">
-             <property name="text">
-              <string>Output document number digits</string>
-             </property>
-            </widget>
-           </item>
-           <item row="12" column="2">
-            <spacer name="verticalSpacer">
-             <property name="orientation">
-              <enum>Qt::Orientation::Vertical</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>20</width>
-               <height>40</height>
-              </size>
-             </property>
-            </spacer>
            </item>
            <item row="8" column="0">
             <widget class="QLabel" name="label_29">
@@ -361,17 +367,10 @@
              </property>
             </widget>
            </item>
-           <item row="6" column="0">
-            <widget class="QLabel" name="label_17">
+           <item row="9" column="0">
+            <widget class="QLabel" name="label_56">
              <property name="text">
-              <string>Default store</string>
-             </property>
-            </widget>
-           </item>
-           <item row="3" column="0">
-            <widget class="QLabel" name="label_20">
-             <property name="text">
-              <string>Input documents counter*</string>
+              <string>Autoenter last input price for store document</string>
              </property>
             </widget>
            </item>
@@ -385,25 +384,18 @@
              </property>
             </widget>
            </item>
-           <item row="4" column="0">
-            <widget class="QLabel" name="label_21">
-             <property name="text">
-              <string>Movement document counter*</string>
+           <item row="13" column="2">
+            <spacer name="verticalSpacer">
+             <property name="orientation">
+              <enum>Qt::Orientation::Vertical</enum>
              </property>
-            </widget>
-           </item>
-           <item row="4" column="2">
-            <widget class="C5LineEdit" name="leMoveDocCounter"/>
-           </item>
-           <item row="5" column="0">
-            <widget class="QLabel" name="label_22">
-             <property name="text">
-              <string>Output document counter*</string>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>20</width>
+               <height>40</height>
+              </size>
              </property>
-            </widget>
-           </item>
-           <item row="3" column="2">
-            <widget class="C5LineEdit" name="leInputDocCounter"/>
+            </spacer>
            </item>
            <item row="0" column="0" colspan="2">
             <widget class="QLabel" name="label_13">
@@ -412,29 +404,100 @@
              </property>
             </widget>
            </item>
-           <item row="0" column="2">
-            <widget class="C5LineEdit" name="leInputDocNumDigits">
-             <property name="Tag" stdset="0">
-              <number>13</number>
+           <item row="5" column="2">
+            <widget class="C5LineEdit" name="leOutDocCounter"/>
+           </item>
+           <item row="4" column="2">
+            <widget class="C5LineEdit" name="leMoveDocCounter"/>
+           </item>
+           <item row="7" column="0">
+            <widget class="QLabel" name="label_28">
+             <property name="text">
+              <string>No cash doc option in store doc</string>
              </property>
             </widget>
            </item>
-           <item row="13" column="0" colspan="3">
+           <item row="3" column="2">
+            <widget class="C5LineEdit" name="leInputDocCounter"/>
+           </item>
+           <item row="4" column="0">
+            <widget class="QLabel" name="label_21">
+             <property name="text">
+              <string>Movement document counter*</string>
+             </property>
+            </widget>
+           </item>
+           <item row="6" column="2">
+            <widget class="C5ComboBox" name="cbDefaultStore">
+             <property name="Tag" stdset="0">
+              <number>14</number>
+             </property>
+            </widget>
+           </item>
+           <item row="10" column="2">
+            <widget class="C5CheckBox" name="chUpdateTempStorageForShop">
+             <property name="text">
+              <string/>
+             </property>
+             <property name="Tag" stdset="0">
+              <number>94</number>
+             </property>
+            </widget>
+           </item>
+           <item row="14" column="0" colspan="3">
             <widget class="QLabel" name="label_23">
              <property name="text">
               <string>*This settings common for all cases</string>
              </property>
             </widget>
            </item>
-           <item row="11" column="0">
-            <widget class="QLabel" name="label_89">
+           <item row="10" column="0">
+            <widget class="QLabel" name="label_88">
              <property name="text">
-              <string>Automatically store output after sale</string>
+              <string>Update temp storage for shop</string>
+             </property>
+            </widget>
+           </item>
+           <item row="2" column="0">
+            <widget class="QLabel" name="label_27">
+             <property name="text">
+              <string>Output document number digits</string>
              </property>
             </widget>
            </item>
            <item row="11" column="2">
             <widget class="C5CheckBox" name="chAutomaticallyStoreOutWaiter">
+             <property name="text">
+              <string/>
+             </property>
+             <property name="Tag" stdset="0">
+              <number>95</number>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="2">
+            <widget class="C5LineEdit" name="leMoveDocNumDigits">
+             <property name="Tag" stdset="0">
+              <number>22</number>
+             </property>
+            </widget>
+           </item>
+           <item row="5" column="0">
+            <widget class="QLabel" name="label_22">
+             <property name="text">
+              <string>Output document counter*</string>
+             </property>
+            </widget>
+           </item>
+           <item row="12" column="0">
+            <widget class="QLabel" name="label_112">
+             <property name="text">
+              <string>Remind about out of stock</string>
+             </property>
+            </widget>
+           </item>
+           <item row="12" column="2">
+            <widget class="C5CheckBox" name="chRemindOutOfStock">
              <property name="text">
               <string/>
              </property>
@@ -450,13 +513,6 @@
            <string>Sale, common</string>
           </attribute>
           <layout class="QGridLayout" name="gridLayout_8">
-           <item row="11" column="0">
-            <widget class="QLabel" name="label_61">
-             <property name="text">
-              <string>Shift</string>
-             </property>
-            </widget>
-           </item>
            <item row="4" column="0">
             <widget class="QLabel" name="label_39">
              <property name="text">
@@ -464,41 +520,73 @@
              </property>
             </widget>
            </item>
-           <item row="0" column="1">
-            <widget class="C5LineEdit" name="leOrderPrefix">
-             <property name="Tag" stdset="0">
-              <number>10</number>
-             </property>
-            </widget>
-           </item>
-           <item row="2" column="1">
-            <widget class="C5CheckBox" name="chAutoCash">
+           <item row="12" column="0">
+            <widget class="QLabel" name="label_30">
              <property name="text">
-              <string/>
-             </property>
-             <property name="Tag" stdset="0">
-              <number>38</number>
+              <string>Working date change time</string>
              </property>
             </widget>
            </item>
-           <item row="3" column="1">
+           <item row="11" column="2">
+            <widget class="C5LineEdit" name="leShift">
+             <property name="Tag" stdset="0">
+              <number>31</number>
+             </property>
+            </widget>
+           </item>
+           <item row="3" column="2">
             <widget class="C5LineEdit" name="leCashId">
              <property name="Tag" stdset="0">
               <number>32</number>
              </property>
             </widget>
            </item>
-           <item row="6" column="1">
-            <widget class="C5LineEdit" name="leCardIdPrefix">
-             <property name="Tag" stdset="0">
-              <number>37</number>
-             </property>
-            </widget>
-           </item>
-           <item row="4" column="1">
+           <item row="4" column="2">
             <widget class="C5LineEdit" name="leCashIdPrefix">
              <property name="Tag" stdset="0">
               <number>36</number>
+             </property>
+            </widget>
+           </item>
+           <item row="7" column="0">
+            <widget class="QLabel" name="label_55">
+             <property name="text">
+              <string>Receipt footer text</string>
+             </property>
+            </widget>
+           </item>
+           <item row="14" column="0">
+            <widget class="QLabel" name="label_373">
+             <property name="text">
+              <string>Service item code</string>
+             </property>
+            </widget>
+           </item>
+           <item row="13" column="0" colspan="3">
+            <widget class="Line" name="line_7">
+             <property name="orientation">
+              <enum>Qt::Orientation::Horizontal</enum>
+             </property>
+            </widget>
+           </item>
+           <item row="11" column="0">
+            <widget class="QLabel" name="label_61">
+             <property name="text">
+              <string>Shift</string>
+             </property>
+            </widget>
+           </item>
+           <item row="5" column="0">
+            <widget class="QLabel" name="label_38">
+             <property name="text">
+              <string>Card autoinput</string>
+             </property>
+            </widget>
+           </item>
+           <item row="2" column="0">
+            <widget class="QLabel" name="label_37">
+             <property name="text">
+              <string>Auto cash input</string>
              </property>
             </widget>
            </item>
@@ -509,27 +597,69 @@
              </property>
             </widget>
            </item>
-           <item row="13" column="2">
-            <spacer name="verticalSpacer_2">
-             <property name="orientation">
-              <enum>Qt::Orientation::Vertical</enum>
+           <item row="0" column="2">
+            <widget class="C5LineEdit" name="leOrderPrefix">
+             <property name="Tag" stdset="0">
+              <number>10</number>
              </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>20</width>
-               <height>40</height>
-              </size>
-             </property>
-            </spacer>
+            </widget>
            </item>
-           <item row="8" column="0" colspan="3">
+           <item row="14" column="2">
+            <widget class="C5LineEdit" name="leServiceItemCode">
+             <property name="Tag" stdset="0">
+              <number>32</number>
+             </property>
+            </widget>
+           </item>
+           <item row="3" column="0">
+            <widget class="QLabel" name="label_34">
+             <property name="text">
+              <string>Cash autoinput</string>
+             </property>
+            </widget>
+           </item>
+           <item row="8" column="0" colspan="4">
             <widget class="Line" name="line_2">
              <property name="orientation">
               <enum>Qt::Orientation::Horizontal</enum>
              </property>
             </widget>
            </item>
-           <item row="10" column="1">
+           <item row="7" column="2">
+            <widget class="C5LineEdit" name="leReceiptFooterText">
+             <property name="Tag" stdset="0">
+              <number>56</number>
+             </property>
+            </widget>
+           </item>
+           <item row="9" column="2">
+            <widget class="C5CheckBox" name="chAutoDateCash">
+             <property name="text">
+              <string/>
+             </property>
+             <property name="Tag" stdset="0">
+              <number>19</number>
+             </property>
+            </widget>
+           </item>
+           <item row="2" column="2">
+            <widget class="C5CheckBox" name="chAutoCash">
+             <property name="text">
+              <string/>
+             </property>
+             <property name="Tag" stdset="0">
+              <number>38</number>
+             </property>
+            </widget>
+           </item>
+           <item row="6" column="0">
+            <widget class="QLabel" name="label_40">
+             <property name="text">
+              <string>Card autoinput prefix</string>
+             </property>
+            </widget>
+           </item>
+           <item row="10" column="2">
             <widget class="C5LineEdit" name="leDateOfClose">
              <property name="readOnly">
               <bool>false</bool>
@@ -542,13 +672,6 @@
              </property>
             </widget>
            </item>
-           <item row="0" column="0">
-            <widget class="QLabel" name="label_10">
-             <property name="text">
-              <string>Order number prefix</string>
-             </property>
-            </widget>
-           </item>
            <item row="9" column="0">
             <widget class="QLabel" name="label_24">
              <property name="text">
@@ -556,45 +679,48 @@
              </property>
             </widget>
            </item>
-           <item row="7" column="0">
-            <widget class="QLabel" name="label_55">
+           <item row="0" column="0">
+            <widget class="QLabel" name="label_10">
              <property name="text">
-              <string>Receipt footer text</string>
+              <string>Order number prefix</string>
              </property>
             </widget>
            </item>
-           <item row="2" column="0">
-            <widget class="QLabel" name="label_37">
-             <property name="text">
-              <string>Auto cash input</string>
+           <item row="1" column="0" colspan="4">
+            <widget class="Line" name="line">
+             <property name="orientation">
+              <enum>Qt::Orientation::Horizontal</enum>
              </property>
             </widget>
            </item>
-           <item row="9" column="1">
-            <widget class="C5CheckBox" name="chAutoDateCash">
-             <property name="text">
-              <string/>
-             </property>
+           <item row="6" column="2">
+            <widget class="C5LineEdit" name="leCardIdPrefix">
              <property name="Tag" stdset="0">
-              <number>19</number>
+              <number>37</number>
              </property>
             </widget>
            </item>
-           <item row="5" column="1">
+           <item row="16" column="1">
+            <spacer name="verticalSpacer_2">
+             <property name="orientation">
+              <enum>Qt::Orientation::Vertical</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>20</width>
+               <height>40</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+           <item row="5" column="2">
             <widget class="C5LineEdit" name="leCardId">
              <property name="Tag" stdset="0">
               <number>35</number>
              </property>
             </widget>
            </item>
-           <item row="7" column="1">
-            <widget class="C5LineEdit" name="leReceiptFooterText">
-             <property name="Tag" stdset="0">
-              <number>56</number>
-             </property>
-            </widget>
-           </item>
-           <item row="12" column="1">
+           <item row="12" column="2">
             <widget class="C5LineEdit" name="leChangeWorkingDateTime">
              <property name="inputMask">
               <string>##:##:##</string>
@@ -604,45 +730,17 @@
              </property>
             </widget>
            </item>
-           <item row="12" column="0">
-            <widget class="QLabel" name="label_30">
+           <item row="15" column="0">
+            <widget class="QLabel" name="label_374">
              <property name="text">
-              <string>Working date change time</string>
+              <string>Discount item code</string>
              </property>
             </widget>
            </item>
-           <item row="11" column="1">
-            <widget class="C5LineEdit" name="leShift">
+           <item row="15" column="2">
+            <widget class="C5LineEdit" name="leDiscountItemCode">
              <property name="Tag" stdset="0">
-              <number>31</number>
-             </property>
-            </widget>
-           </item>
-           <item row="3" column="0">
-            <widget class="QLabel" name="label_34">
-             <property name="text">
-              <string>Cash autoinput</string>
-             </property>
-            </widget>
-           </item>
-           <item row="6" column="0">
-            <widget class="QLabel" name="label_40">
-             <property name="text">
-              <string>Card autoinput prefix</string>
-             </property>
-            </widget>
-           </item>
-           <item row="1" column="0" colspan="3">
-            <widget class="Line" name="line">
-             <property name="orientation">
-              <enum>Qt::Orientation::Horizontal</enum>
-             </property>
-            </widget>
-           </item>
-           <item row="5" column="0">
-            <widget class="QLabel" name="label_38">
-             <property name="text">
-              <string>Card autoinput</string>
+              <number>32</number>
              </property>
             </widget>
            </item>
@@ -653,51 +751,152 @@
            <string>Sale, waiter</string>
           </attribute>
           <layout class="QGridLayout" name="gridLayout_5">
-           <item row="14" column="0">
-            <widget class="QLabel" name="label_102">
-             <property name="text">
-              <string>Dont close empty order</string>
+           <item row="0" column="2">
+            <widget class="C5ComboBox" name="cbMenu">
+             <property name="Tag" stdset="0">
+              <number>9</number>
              </property>
             </widget>
            </item>
-           <item row="16" column="2">
-            <widget class="C5CheckBox" name="chCloseTablefterServicePrint">
+           <item row="4" column="0">
+            <widget class="QLabel" name="label_11">
+             <property name="text">
+              <string>Default hall</string>
+             </property>
+            </widget>
+           </item>
+           <item row="5" column="2">
+            <widget class="C5LineEdit" name="leTable">
+             <property name="Tag" stdset="0">
+              <number>12</number>
+             </property>
+            </widget>
+           </item>
+           <item row="14" column="2">
+            <widget class="C5CheckBox" name="chWaiterLoginAfterPayment">
              <property name="text">
               <string/>
              </property>
              <property name="Tag" stdset="0">
-              <number>79</number>
+              <number>51</number>
+             </property>
+            </widget>
+           </item>
+           <item row="21" column="0">
+            <widget class="QLabel" name="label_94">
+             <property name="text">
+              <string>Compact dishes in order</string>
+             </property>
+            </widget>
+           </item>
+           <item row="2" column="0">
+            <widget class="QLabel" name="label_2">
+             <property name="text">
+              <string>Service value</string>
+             </property>
+            </widget>
+           </item>
+           <item row="16" column="0">
+            <widget class="QLabel" name="label_33">
+             <property name="text">
+              <string>Car mode</string>
+             </property>
+            </widget>
+           </item>
+           <item row="3" column="0">
+            <widget class="QLabel" name="label_109">
+             <property name="text">
+              <string>Autodiscount</string>
+             </property>
+            </widget>
+           </item>
+           <item row="18" column="0">
+            <widget class="QLabel" name="label_92">
+             <property name="text">
+              <string>Ask for precheck</string>
+             </property>
+            </widget>
+           </item>
+           <item row="11" column="0">
+            <widget class="QLabel" name="label_67">
+             <property name="text">
+              <string>Hall id for hotel record</string>
              </property>
             </widget>
            </item>
            <item row="6" column="0">
-            <widget class="QLabel" name="label_111">
+            <widget class="QLabel" name="label_110">
              <property name="text">
-              <string>Debtholder filter id</string>
+              <string>Delivery costumer id</string>
              </property>
             </widget>
            </item>
-           <item row="12" column="0">
+           <item row="5" column="0">
+            <widget class="QLabel" name="label_12">
+             <property name="text">
+              <string>Default table</string>
+             </property>
+            </widget>
+           </item>
+           <item row="22" column="2">
+            <widget class="C5CheckBox" name="chAppendQuantityBefore">
+             <property name="text">
+              <string/>
+             </property>
+             <property name="Tag" stdset="0">
+              <number>117</number>
+             </property>
+            </widget>
+           </item>
+           <item row="10" column="2">
+            <widget class="C5LineEdit" name="leUserIdForHotelVoucher">
+             <property name="Tag" stdset="0">
+              <number>70</number>
+             </property>
+            </widget>
+           </item>
+           <item row="13" column="0">
             <widget class="QLabel" name="label_68">
              <property name="text">
               <string>No invoice record for hotel</string>
              </property>
             </widget>
            </item>
-           <item row="1" column="2">
-            <widget class="C5LineEdit" name="leServiceFactor">
-             <property name="Tag" stdset="0">
-              <number>2</number>
+           <item row="19" column="0">
+            <widget class="QLabel" name="label_91">
+             <property name="text">
+              <string>Final receipt quantity selection</string>
              </property>
             </widget>
            </item>
-           <item row="20" column="2">
-            <widget class="C5CheckBox" name="chCompactDishesInOrder">
+           <item row="16" column="2">
+            <widget class="C5CheckBox" name="chCarMode">
              <property name="text">
               <string/>
              </property>
              <property name="Tag" stdset="0">
-              <number>101</number>
+              <number>30</number>
+             </property>
+            </widget>
+           </item>
+           <item row="12" column="0">
+            <widget class="QLabel" name="label_104">
+             <property name="text">
+              <string>Autocharge item after close session</string>
+             </property>
+            </widget>
+           </item>
+           <item row="6" column="2">
+            <widget class="C5LineEdit" name="leDeliveryCostumerId">
+             <property name="Tag" stdset="0">
+              <number>119</number>
+             </property>
+            </widget>
+           </item>
+           <item row="11" column="2">
+            <widget class="C5LineEdit" name="leHallIdForHotel">
+             <property name="Tag" stdset="0">
+              <number>71</number>
              </property>
             </widget>
            </item>
@@ -708,14 +907,7 @@
              </property>
             </widget>
            </item>
-           <item row="2" column="0">
-            <widget class="QLabel" name="label_109">
-             <property name="text">
-              <string>Autodiscount</string>
-             </property>
-            </widget>
-           </item>
-           <item row="18" column="2">
+           <item row="19" column="2">
             <widget class="C5CheckBox" name="chFinalReceiptQtySelect">
              <property name="text">
               <string/>
@@ -725,142 +917,7 @@
              </property>
             </widget>
            </item>
-           <item row="4" column="0">
-            <widget class="QLabel" name="label_12">
-             <property name="text">
-              <string>Default table</string>
-             </property>
-            </widget>
-           </item>
-           <item row="18" column="0">
-            <widget class="QLabel" name="label_91">
-             <property name="text">
-              <string>Final receipt quantity selection</string>
-             </property>
-            </widget>
-           </item>
-           <item row="11" column="2">
-            <widget class="C5LineEdit" name="leAutochargeDishAfterSessionClose">
-             <property name="Tag" stdset="0">
-              <number>111</number>
-             </property>
-            </widget>
-           </item>
-           <item row="10" column="0">
-            <widget class="QLabel" name="label_67">
-             <property name="text">
-              <string>Hall id for hotel record</string>
-             </property>
-            </widget>
-           </item>
-           <item row="8" column="2">
-            <widget class="C5LineEdit" name="leItemCodeForHotel">
-             <property name="Tag" stdset="0">
-              <number>21</number>
-             </property>
-            </widget>
-           </item>
-           <item row="12" column="2">
-            <widget class="C5CheckBox" name="chNoInvoiceRecordForHotel">
-             <property name="text">
-              <string/>
-             </property>
-             <property name="Tag" stdset="0">
-              <number>72</number>
-             </property>
-            </widget>
-           </item>
-           <item row="1" column="0">
-            <widget class="QLabel" name="label_2">
-             <property name="text">
-              <string>Service value</string>
-             </property>
-            </widget>
-           </item>
-           <item row="21" column="2">
-            <widget class="C5CheckBox" name="chAppendQuantityBefore">
-             <property name="text">
-              <string/>
-             </property>
-             <property name="Tag" stdset="0">
-              <number>117</number>
-             </property>
-            </widget>
-           </item>
-           <item row="16" column="0">
-            <widget class="QLabel" name="label_75">
-             <property name="text">
-              <string>Close table after service print</string>
-             </property>
-            </widget>
-           </item>
-           <item row="5" column="2">
-            <widget class="C5LineEdit" name="leDeliveryCostumerId">
-             <property name="Tag" stdset="0">
-              <number>119</number>
-             </property>
-            </widget>
-           </item>
-           <item row="15" column="0">
-            <widget class="QLabel" name="label_33">
-             <property name="text">
-              <string>Car mode</string>
-             </property>
-            </widget>
-           </item>
-           <item row="21" column="0">
-            <widget class="QLabel" name="label_108">
-             <property name="text">
-              <string>Input quantity before append dish</string>
-             </property>
-            </widget>
-           </item>
-           <item row="10" column="2">
-            <widget class="C5LineEdit" name="leHallIdForHotel">
-             <property name="Tag" stdset="0">
-              <number>71</number>
-             </property>
-            </widget>
-           </item>
-           <item row="8" column="0">
-            <widget class="QLabel" name="label_25">
-             <property name="text">
-              <string>Item code for hotel voucher</string>
-             </property>
-            </widget>
-           </item>
-           <item row="20" column="0">
-            <widget class="QLabel" name="label_94">
-             <property name="text">
-              <string>Compact dishes in order</string>
-             </property>
-            </widget>
-           </item>
-           <item row="9" column="0">
-            <widget class="QLabel" name="label_43">
-             <property name="text">
-              <string>User id for hotel voucher</string>
-             </property>
-            </widget>
-           </item>
-           <item row="7" column="0">
-            <widget class="QLabel" name="label_19">
-             <property name="text">
-              <string>Hotel database</string>
-             </property>
-            </widget>
-           </item>
-           <item row="13" column="2">
-            <widget class="C5CheckBox" name="chWaiterLoginAfterPayment">
-             <property name="text">
-              <string/>
-             </property>
-             <property name="Tag" stdset="0">
-              <number>51</number>
-             </property>
-            </widget>
-           </item>
-           <item row="17" column="2">
+           <item row="18" column="2">
             <widget class="C5CheckBox" name="chAskForPrecheck">
              <property name="text">
               <string/>
@@ -870,14 +927,131 @@
              </property>
             </widget>
            </item>
-           <item row="6" column="2">
+           <item row="14" column="0">
+            <widget class="QLabel" name="label_53">
+             <property name="text">
+              <string>Login after payment</string>
+             </property>
+            </widget>
+           </item>
+           <item row="9" column="0">
+            <widget class="QLabel" name="label_25">
+             <property name="text">
+              <string>Item code for hotel voucher</string>
+             </property>
+            </widget>
+           </item>
+           <item row="17" column="0">
+            <widget class="QLabel" name="label_75">
+             <property name="text">
+              <string>Close table after service print</string>
+             </property>
+            </widget>
+           </item>
+           <item row="17" column="2">
+            <widget class="C5CheckBox" name="chCloseTablefterServicePrint">
+             <property name="text">
+              <string/>
+             </property>
+             <property name="Tag" stdset="0">
+              <number>79</number>
+             </property>
+            </widget>
+           </item>
+           <item row="7" column="2">
             <widget class="C5LineEdit" name="leDebtholderFilterId">
              <property name="Tag" stdset="0">
               <number>120</number>
              </property>
             </widget>
            </item>
-           <item row="22" column="2">
+           <item row="4" column="2">
+            <widget class="C5LineEdit" name="leHall">
+             <property name="Tag" stdset="0">
+              <number>11</number>
+             </property>
+            </widget>
+           </item>
+           <item row="15" column="0">
+            <widget class="QLabel" name="label_102">
+             <property name="text">
+              <string>Dont close empty order</string>
+             </property>
+            </widget>
+           </item>
+           <item row="9" column="2">
+            <widget class="C5LineEdit" name="leItemCodeForHotel">
+             <property name="Tag" stdset="0">
+              <number>21</number>
+             </property>
+            </widget>
+           </item>
+           <item row="20" column="2">
+            <widget class="C5CheckBox" name="chCloseTableAfterPrecheck">
+             <property name="text">
+              <string/>
+             </property>
+             <property name="Tag" stdset="0">
+              <number>85</number>
+             </property>
+            </widget>
+           </item>
+           <item row="8" column="0">
+            <widget class="QLabel" name="label_19">
+             <property name="text">
+              <string>Hotel database</string>
+             </property>
+            </widget>
+           </item>
+           <item row="12" column="2">
+            <widget class="C5LineEdit" name="leAutochargeDishAfterSessionClose">
+             <property name="Tag" stdset="0">
+              <number>111</number>
+             </property>
+            </widget>
+           </item>
+           <item row="20" column="0">
+            <widget class="QLabel" name="label_81">
+             <property name="text">
+              <string>Close table after precheck</string>
+             </property>
+            </widget>
+           </item>
+           <item row="21" column="2">
+            <widget class="C5CheckBox" name="chCompactDishesInOrder">
+             <property name="text">
+              <string/>
+             </property>
+             <property name="Tag" stdset="0">
+              <number>101</number>
+             </property>
+            </widget>
+           </item>
+           <item row="2" column="2">
+            <widget class="C5LineEdit" name="leServiceFactor">
+             <property name="Tag" stdset="0">
+              <number>2</number>
+             </property>
+            </widget>
+           </item>
+           <item row="15" column="2">
+            <widget class="C5CheckBox" name="chDontCloseEmtpyOrder">
+             <property name="text">
+              <string/>
+             </property>
+             <property name="Tag" stdset="0">
+              <number>109</number>
+             </property>
+            </widget>
+           </item>
+           <item row="10" column="0">
+            <widget class="QLabel" name="label_43">
+             <property name="text">
+              <string>User id for hotel voucher</string>
+             </property>
+            </widget>
+           </item>
+           <item row="23" column="2">
             <spacer name="verticalSpacer_5">
              <property name="orientation">
               <enum>Qt::Orientation::Vertical</enum>
@@ -890,117 +1064,55 @@
              </property>
             </spacer>
            </item>
-           <item row="17" column="0">
-            <widget class="QLabel" name="label_92">
+           <item row="22" column="0">
+            <widget class="QLabel" name="label_108">
              <property name="text">
-              <string>Ask for precheck</string>
+              <string>Input quantity before append dish</string>
              </property>
             </widget>
            </item>
-           <item row="4" column="2">
-            <widget class="C5LineEdit" name="leTable">
+           <item row="8" column="2">
+            <widget class="C5LineEdit" name="leHotelDatabase">
              <property name="Tag" stdset="0">
-              <number>12</number>
+              <number>17</number>
              </property>
             </widget>
            </item>
-           <item row="15" column="2">
-            <widget class="C5CheckBox" name="chCarMode">
+           <item row="7" column="0">
+            <widget class="QLabel" name="label_111">
+             <property name="text">
+              <string>Debtholder filter id</string>
+             </property>
+            </widget>
+           </item>
+           <item row="13" column="2">
+            <widget class="C5CheckBox" name="chNoInvoiceRecordForHotel">
              <property name="text">
               <string/>
              </property>
              <property name="Tag" stdset="0">
-              <number>30</number>
+              <number>72</number>
              </property>
             </widget>
            </item>
-           <item row="0" column="2">
-            <widget class="C5ComboBox" name="cbMenu">
-             <property name="Tag" stdset="0">
-              <number>9</number>
-             </property>
-            </widget>
-           </item>
-           <item row="5" column="0">
-            <widget class="QLabel" name="label_110">
-             <property name="text">
-              <string>Delivery costumer id</string>
-             </property>
-            </widget>
-           </item>
-           <item row="13" column="0">
-            <widget class="QLabel" name="label_53">
-             <property name="text">
-              <string>Login after payment</string>
-             </property>
-            </widget>
-           </item>
-           <item row="19" column="0">
-            <widget class="QLabel" name="label_81">
-             <property name="text">
-              <string>Close table after precheck</string>
-             </property>
-            </widget>
-           </item>
-           <item row="14" column="2">
-            <widget class="C5CheckBox" name="chDontCloseEmtpyOrder">
-             <property name="text">
-              <string/>
-             </property>
-             <property name="Tag" stdset="0">
-              <number>109</number>
-             </property>
-            </widget>
-           </item>
-           <item row="19" column="2">
-            <widget class="C5CheckBox" name="chCloseTableAfterPrecheck">
-             <property name="text">
-              <string/>
-             </property>
-             <property name="Tag" stdset="0">
-              <number>85</number>
-             </property>
-            </widget>
-           </item>
-           <item row="2" column="2">
+           <item row="3" column="2">
             <widget class="C5LineEdit" name="leAutoDiscount">
              <property name="Tag" stdset="0">
               <number>118</number>
              </property>
             </widget>
            </item>
-           <item row="11" column="0">
-            <widget class="QLabel" name="label_104">
+           <item row="1" column="0">
+            <widget class="QLabel" name="label_44">
              <property name="text">
-              <string>Autocharge item after close session</string>
+              <string>Waiter server</string>
              </property>
             </widget>
            </item>
-           <item row="9" column="2">
-            <widget class="C5LineEdit" name="leUserIdForHotelVoucher">
+           <item row="1" column="2">
+            <widget class="C5LineEdit" name="leWaiterServer">
              <property name="Tag" stdset="0">
-              <number>70</number>
-             </property>
-            </widget>
-           </item>
-           <item row="3" column="2">
-            <widget class="C5LineEdit" name="leHall">
-             <property name="Tag" stdset="0">
-              <number>11</number>
-             </property>
-            </widget>
-           </item>
-           <item row="3" column="0">
-            <widget class="QLabel" name="label_11">
-             <property name="text">
-              <string>Default hall</string>
-             </property>
-            </widget>
-           </item>
-           <item row="7" column="2">
-            <widget class="C5LineEdit" name="leHotelDatabase">
-             <property name="Tag" stdset="0">
-              <number>17</number>
+              <number>2</number>
              </property>
             </widget>
            </item>
@@ -1011,26 +1123,33 @@
            <string>Sale, shop</string>
           </attribute>
           <layout class="QGridLayout" name="gridLayout_6">
-           <item row="14" column="1">
-            <widget class="C5CheckBox" name="chPrepaidOnlyByGift">
+           <item row="1" column="4">
+            <spacer name="horizontalSpacer_2">
+             <property name="orientation">
+              <enum>Qt::Orientation::Horizontal</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>40</width>
+               <height>20</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+           <item row="8" column="1">
+            <widget class="C5CheckBox" name="chDenyReatail">
              <property name="text">
               <string/>
              </property>
              <property name="Tag" stdset="0">
-              <number>89</number>
+              <number>47</number>
              </property>
             </widget>
            </item>
-           <item row="3" column="1" colspan="3">
-            <widget class="QLineEdit" name="leAvailableStore"/>
-           </item>
-           <item row="13" column="1">
-            <widget class="C5CheckBox" name="chHideShopQuantity">
+           <item row="8" column="0">
+            <widget class="QLabel" name="label_49">
              <property name="text">
-              <string/>
-             </property>
-             <property name="Tag" stdset="0">
-              <number>89</number>
+              <string>Deny retail</string>
              </property>
             </widget>
            </item>
@@ -1048,125 +1167,10 @@
              </property>
             </widget>
            </item>
-           <item row="15" column="0">
-            <widget class="QLabel" name="label_118">
-             <property name="text">
-              <string>Hide revenue</string>
-             </property>
-            </widget>
-           </item>
-           <item row="0" column="0">
-            <widget class="QLabel" name="label_36">
-             <property name="text">
-              <string>Enter pin</string>
-             </property>
-            </widget>
-           </item>
-           <item row="1" column="4">
-            <spacer name="horizontalSpacer_2">
-             <property name="orientation">
-              <enum>Qt::Orientation::Horizontal</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>40</width>
-               <height>20</height>
-              </size>
-             </property>
-            </spacer>
-           </item>
-           <item row="5" column="0">
-            <widget class="QLabel" name="label_82">
-             <property name="text">
-              <string>Dont check qty of store</string>
-             </property>
-            </widget>
-           </item>
-           <item row="9" column="0">
-            <widget class="QLabel" name="label_50">
-             <property name="text">
-              <string>Deny whosale</string>
-             </property>
-            </widget>
-           </item>
-           <item row="1" column="0">
-            <widget class="QLabel" name="label_54">
-             <property name="text">
-              <string>Autologin pin</string>
-             </property>
-            </widget>
-           </item>
            <item row="13" column="0">
             <widget class="QLabel" name="label_85">
              <property name="text">
               <string>Hide quantity column</string>
-             </property>
-            </widget>
-           </item>
-           <item row="4" column="1">
-            <widget class="C5LineEdit" name="leCoinCashdesk"/>
-           </item>
-           <item row="11" column="1">
-            <widget class="C5CheckBox" name="chDenyPriceChange">
-             <property name="text">
-              <string/>
-             </property>
-             <property name="Tag" stdset="0">
-              <number>49</number>
-             </property>
-            </widget>
-           </item>
-           <item row="2" column="0">
-            <widget class="QLabel" name="label_84">
-             <property name="text">
-              <string>Mobile client config text</string>
-             </property>
-            </widget>
-           </item>
-           <item row="6" column="1">
-            <widget class="C5CheckBox" name="chDenyQtychange">
-             <property name="text">
-              <string/>
-             </property>
-             <property name="Tag" stdset="0">
-              <number>81</number>
-             </property>
-            </widget>
-           </item>
-           <item row="5" column="1">
-            <widget class="C5CheckBox" name="chDontCheckStoreQty">
-             <property name="text">
-              <string/>
-             </property>
-             <property name="Tag" stdset="0">
-              <number>86</number>
-             </property>
-            </widget>
-           </item>
-           <item row="7" column="0">
-            <widget class="QLabel" name="label_78">
-             <property name="text">
-              <string>Disable grouping when printing</string>
-             </property>
-            </widget>
-           </item>
-           <item row="8" column="1">
-            <widget class="C5CheckBox" name="chDenyReatail">
-             <property name="text">
-              <string/>
-             </property>
-             <property name="Tag" stdset="0">
-              <number>47</number>
-             </property>
-            </widget>
-           </item>
-           <item row="9" column="1">
-            <widget class="C5CheckBox" name="chDenyWhosale">
-             <property name="text">
-              <string/>
-             </property>
-             <property name="Tag" stdset="0">
-              <number>48</number>
              </property>
             </widget>
            </item>
@@ -1196,20 +1200,6 @@
              </property>
             </widget>
            </item>
-           <item row="3" column="0">
-            <widget class="QLabel" name="label_105">
-             <property name="text">
-              <string>Available stores</string>
-             </property>
-            </widget>
-           </item>
-           <item row="8" column="0">
-            <widget class="QLabel" name="label_49">
-             <property name="text">
-              <string>Deny retail</string>
-             </property>
-            </widget>
-           </item>
            <item row="2" column="1" colspan="4">
             <widget class="C5LineEdit" name="leShopMobileClentConfig">
              <property name="minimumSize">
@@ -1229,54 +1219,85 @@
              </property>
             </widget>
            </item>
-           <item row="0" column="2" colspan="3">
-            <spacer name="horizontalSpacer">
-             <property name="orientation">
-              <enum>Qt::Orientation::Horizontal</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>40</width>
-               <height>20</height>
-              </size>
-             </property>
-            </spacer>
-           </item>
-           <item row="14" column="0">
-            <widget class="QLabel" name="label_86">
+           <item row="9" column="0">
+            <widget class="QLabel" name="label_50">
              <property name="text">
-              <string>Prepaid only by gift</string>
+              <string>Deny whosale</string>
              </property>
             </widget>
            </item>
-           <item row="0" column="1">
-            <widget class="C5CheckBox" name="chEnterShopPin">
+           <item row="9" column="1">
+            <widget class="C5CheckBox" name="chDenyWhosale">
              <property name="text">
               <string/>
              </property>
              <property name="Tag" stdset="0">
-              <number>34</number>
+              <number>48</number>
              </property>
             </widget>
            </item>
-           <item row="7" column="1">
-            <widget class="C5CheckBox" name="chDontGroupPrint">
+           <item row="10" column="1">
+            <widget class="C5CheckBox" name="chShowWhosalePrice">
              <property name="text">
               <string/>
              </property>
              <property name="Tag" stdset="0">
-              <number>82</number>
+              <number>48</number>
              </property>
             </widget>
            </item>
-           <item row="12" column="0">
-            <widget class="QLabel" name="label_52">
+           <item row="13" column="1">
+            <widget class="C5CheckBox" name="chHideShopQuantity">
              <property name="text">
-              <string>Fix staff</string>
+              <string/>
+             </property>
+             <property name="Tag" stdset="0">
+              <number>89</number>
              </property>
             </widget>
            </item>
-           <item row="16" column="1">
+           <item row="15" column="0">
+            <widget class="QLabel" name="label_118">
+             <property name="text">
+              <string>Hide revenue</string>
+             </property>
+            </widget>
+           </item>
+           <item row="15" column="1">
+            <widget class="C5CheckBox" name="chHideRevenue">
+             <property name="text">
+              <string/>
+             </property>
+             <property name="Tag" stdset="0">
+              <number>89</number>
+             </property>
+            </widget>
+           </item>
+           <item row="14" column="1">
+            <widget class="C5CheckBox" name="chPrepaidOnlyByGift">
+             <property name="text">
+              <string/>
+             </property>
+             <property name="Tag" stdset="0">
+              <number>89</number>
+             </property>
+            </widget>
+           </item>
+           <item row="2" column="0">
+            <widget class="QLabel" name="label_84">
+             <property name="text">
+              <string>Mobile client config text</string>
+             </property>
+            </widget>
+           </item>
+           <item row="5" column="0">
+            <widget class="QLabel" name="label_82">
+             <property name="text">
+              <string>Dont check qty of store</string>
+             </property>
+            </widget>
+           </item>
+           <item row="18" column="1">
             <spacer name="verticalSpacer_6">
              <property name="orientation">
               <enum>Qt::Orientation::Vertical</enum>
@@ -1289,23 +1310,61 @@
              </property>
             </spacer>
            </item>
-           <item row="12" column="1">
-            <widget class="C5CheckBox" name="chFixShopStaff">
+           <item row="16" column="0">
+            <widget class="QLabel" name="label_121">
+             <property name="text">
+              <string>Clear sale draft</string>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="0">
+            <widget class="QLabel" name="label_54">
+             <property name="text">
+              <string>Autologin pin</string>
+             </property>
+            </widget>
+           </item>
+           <item row="6" column="1">
+            <widget class="C5CheckBox" name="chDenyQtychange">
              <property name="text">
               <string/>
              </property>
              <property name="Tag" stdset="0">
-              <number>50</number>
+              <number>81</number>
              </property>
             </widget>
            </item>
-           <item row="15" column="1">
-            <widget class="C5CheckBox" name="chHideRevenue">
+           <item row="11" column="1">
+            <widget class="C5CheckBox" name="chDenyPriceChange">
+             <property name="text">
+              <string/>
+             </property>
+             <property name="Tag" stdset="0">
+              <number>49</number>
+             </property>
+            </widget>
+           </item>
+           <item row="16" column="1">
+            <widget class="C5CheckBox" name="chClearSaveDraft">
              <property name="text">
               <string/>
              </property>
              <property name="Tag" stdset="0">
               <number>89</number>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="0">
+            <widget class="QLabel" name="label_36">
+             <property name="text">
+              <string>Enter pin</string>
+             </property>
+            </widget>
+           </item>
+           <item row="3" column="0">
+            <widget class="QLabel" name="label_105">
+             <property name="text">
+              <string>Available stores</string>
              </property>
             </widget>
            </item>
@@ -1328,6 +1387,46 @@
              </property>
             </widget>
            </item>
+           <item row="12" column="1">
+            <widget class="C5CheckBox" name="chFixShopStaff">
+             <property name="text">
+              <string/>
+             </property>
+             <property name="Tag" stdset="0">
+              <number>50</number>
+             </property>
+            </widget>
+           </item>
+           <item row="12" column="0">
+            <widget class="QLabel" name="label_52">
+             <property name="text">
+              <string>Fix staff</string>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="1">
+            <widget class="C5CheckBox" name="chEnterShopPin">
+             <property name="text">
+              <string/>
+             </property>
+             <property name="Tag" stdset="0">
+              <number>34</number>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="2" colspan="3">
+            <spacer name="horizontalSpacer">
+             <property name="orientation">
+              <enum>Qt::Orientation::Horizontal</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>40</width>
+               <height>20</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
            <item row="10" column="0">
             <widget class="QLabel" name="label_119">
              <property name="text">
@@ -1335,13 +1434,60 @@
              </property>
             </widget>
            </item>
-           <item row="10" column="1">
-            <widget class="C5CheckBox" name="chShowWhosalePrice">
+           <item row="5" column="1">
+            <widget class="C5CheckBox" name="chDontCheckStoreQty">
              <property name="text">
               <string/>
              </property>
              <property name="Tag" stdset="0">
-              <number>48</number>
+              <number>86</number>
+             </property>
+            </widget>
+           </item>
+           <item row="7" column="1">
+            <widget class="C5CheckBox" name="chDontGroupPrint">
+             <property name="text">
+              <string/>
+             </property>
+             <property name="Tag" stdset="0">
+              <number>82</number>
+             </property>
+            </widget>
+           </item>
+           <item row="4" column="1">
+            <widget class="C5LineEdit" name="leCoinCashdesk"/>
+           </item>
+           <item row="7" column="0">
+            <widget class="QLabel" name="label_78">
+             <property name="text">
+              <string>Disable grouping when printing</string>
+             </property>
+            </widget>
+           </item>
+           <item row="14" column="0">
+            <widget class="QLabel" name="label_86">
+             <property name="text">
+              <string>Prepaid only by gift</string>
+             </property>
+            </widget>
+           </item>
+           <item row="3" column="1" colspan="3">
+            <widget class="QLineEdit" name="leAvailableStore"/>
+           </item>
+           <item row="17" column="0">
+            <widget class="QLabel" name="label_126">
+             <property name="text">
+              <string>Change draft date to current</string>
+             </property>
+            </widget>
+           </item>
+           <item row="17" column="1">
+            <widget class="C5CheckBox" name="chChangeDraftDateToCurrent">
+             <property name="text">
+              <string/>
+             </property>
+             <property name="Tag" stdset="0">
+              <number>89</number>
              </property>
             </widget>
            </item>
@@ -2337,14 +2483,14 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>C5LineEditWithSelector</class>
-   <extends>QLineEdit</extends>
-   <header location="global">c5lineeditwithselector.h</header>
-  </customwidget>
-  <customwidget>
    <class>C5LineEdit</class>
    <extends>QLineEdit</extends>
    <header location="global">c5lineedit.h</header>
+  </customwidget>
+  <customwidget>
+   <class>C5LineEditWithSelector</class>
+   <extends>QLineEdit</extends>
+   <header location="global">c5lineeditwithselector.h</header>
   </customwidget>
   <customwidget>
    <class>C5ComboBox</class>
@@ -2358,38 +2504,38 @@
   </customwidget>
  </customwidgets>
  <tabstops>
-  <tabstop>leCode</tabstop>
-  <tabstop>leSettingsName</tabstop>
-  <tabstop>leCompanyname</tabstop>
-  <tabstop>leCompanyInfo</tabstop>
-  <tabstop>lineEdit_3</tabstop>
-  <tabstop>leFDFontSize</tabstop>
-  <tabstop>fnApp</tabstop>
-  <tabstop>cbFronDeskMode</tabstop>
-  <tabstop>chDebugMode</tabstop>
-  <tabstop>leSystemThouthandSeparator</tabstop>
-  <tabstop>leMobileAppConStr</tabstop>
-  <tabstop>cbDefaultCurrency</tabstop>
-  <tabstop>leAutoDiscount</tabstop>
-  <tabstop>leHall</tabstop>
-  <tabstop>leTable</tabstop>
-  <tabstop>leDeliveryCostumerId</tabstop>
-  <tabstop>leDebtholderFilterId</tabstop>
-  <tabstop>leHotelDatabase</tabstop>
-  <tabstop>leItemCodeForHotel</tabstop>
-  <tabstop>leUserIdForHotelVoucher</tabstop>
-  <tabstop>leHallIdForHotel</tabstop>
-  <tabstop>leAutochargeDishAfterSessionClose</tabstop>
+  <tabstop>leInputDocNumDigits</tabstop>
+  <tabstop>leMoveDocNumDigits</tabstop>
+  <tabstop>leOutDocNumDigits</tabstop>
+  <tabstop>leInputDocCounter</tabstop>
+  <tabstop>leMoveDocCounter</tabstop>
+  <tabstop>leOutDocCounter</tabstop>
+  <tabstop>cbDefaultStore</tabstop>
+  <tabstop>chNoCashDoc</tabstop>
+  <tabstop>chNoScanCode</tabstop>
+  <tabstop>chFixAutoenterInputDocPrice</tabstop>
+  <tabstop>chUpdateTempStorageForShop</tabstop>
+  <tabstop>chAutomaticallyStoreOutWaiter</tabstop>
+  <tabstop>chRemindOutOfStock</tabstop>
   <tabstop>chNoInvoiceRecordForHotel</tabstop>
   <tabstop>chWaiterLoginAfterPayment</tabstop>
   <tabstop>chDontCloseEmtpyOrder</tabstop>
-  <tabstop>leDateOfClose</tabstop>
-  <tabstop>chAutoDateCash</tabstop>
   <tabstop>chCarMode</tabstop>
   <tabstop>chCloseTablefterServicePrint</tabstop>
   <tabstop>chAskForPrecheck</tabstop>
   <tabstop>chFinalReceiptQtySelect</tabstop>
   <tabstop>chCloseTableAfterPrecheck</tabstop>
+  <tabstop>lineEdit_3</tabstop>
+  <tabstop>chCompactDishesInOrder</tabstop>
+  <tabstop>chAppendQuantityBefore</tabstop>
+  <tabstop>fnApp</tabstop>
+  <tabstop>leDateOfClose</tabstop>
+  <tabstop>chAutoDateCash</tabstop>
+  <tabstop>cbFronDeskMode</tabstop>
+  <tabstop>chDebugMode</tabstop>
+  <tabstop>leSystemThouthandSeparator</tabstop>
+  <tabstop>leMobileAppConStr</tabstop>
+  <tabstop>cbDefaultCurrency</tabstop>
   <tabstop>leLocalReceiptPrinter</tabstop>
   <tabstop>leReceipPaperWidth</tabstop>
   <tabstop>leStaticQRCode</tabstop>
@@ -2397,7 +2543,7 @@
   <tabstop>leServiceFontSize</tabstop>
   <tabstop>fbReceiptFont</tabstop>
   <tabstop>lereceiptFontSize</tabstop>
-  <tabstop>chCompactDishesInOrder</tabstop>
+  <tabstop>leCompanyInfo</tabstop>
   <tabstop>chPrintDishOrder</tabstop>
   <tabstop>chPrintScancodeWithName</tabstop>
   <tabstop>chForceUsePrintAlias</tabstop>
@@ -2436,23 +2582,23 @@
   <tabstop>chDenyWhosale</tabstop>
   <tabstop>chDenyPriceChange</tabstop>
   <tabstop>chHideShopQuantity</tabstop>
-  <tabstop>leOutDocNumDigits</tabstop>
+  <tabstop>leServiceFactor</tabstop>
   <tabstop>chFixShopStaff</tabstop>
-  <tabstop>chAppendQuantityBefore</tabstop>
+  <tabstop>leFDFontSize</tabstop>
   <tabstop>leReceiptFooterText</tabstop>
-  <tabstop>leInputDocCounter</tabstop>
-  <tabstop>leOutDocCounter</tabstop>
-  <tabstop>chNoScanCode</tabstop>
+  <tabstop>leAutoDiscount</tabstop>
+  <tabstop>leTable</tabstop>
+  <tabstop>leDebtholderFilterId</tabstop>
   <tabstop>leOrderPrefix</tabstop>
-  <tabstop>leMoveDocNumDigits</tabstop>
-  <tabstop>cbDefaultStore</tabstop>
-  <tabstop>leInputDocNumDigits</tabstop>
+  <tabstop>leWaiterServer</tabstop>
+  <tabstop>leDeliveryCostumerId</tabstop>
+  <tabstop>cbMenu</tabstop>
   <tabstop>leCardIdPrefix</tabstop>
   <tabstop>leCashIdPrefix</tabstop>
   <tabstop>leChangeWorkingDateTime</tabstop>
-  <tabstop>chFixAutoenterInputDocPrice</tabstop>
-  <tabstop>leMoveDocCounter</tabstop>
-  <tabstop>chUpdateTempStorageForShop</tabstop>
+  <tabstop>leAutochargeDishAfterSessionClose</tabstop>
+  <tabstop>leHall</tabstop>
+  <tabstop>leItemCodeForHotel</tabstop>
   <tabstop>leCashId</tabstop>
   <tabstop>leHttpIP</tabstop>
   <tabstop>leHttpPort</tabstop>
@@ -2470,12 +2616,38 @@
   <tabstop>leScalePath</tabstop>
   <tabstop>btnScalePath</tabstop>
   <tabstop>scrollArea</tabstop>
-  <tabstop>chNoCashDoc</tabstop>
+  <tabstop>leHotelDatabase</tabstop>
   <tabstop>leCardId</tabstop>
-  <tabstop>chAutomaticallyStoreOutWaiter</tabstop>
+  <tabstop>leUserIdForHotelVoucher</tabstop>
   <tabstop>chAutoCash</tabstop>
-  <tabstop>leServiceFactor</tabstop>
-  <tabstop>cbMenu</tabstop>
+  <tabstop>leCompanyname</tabstop>
+  <tabstop>leCode</tabstop>
+  <tabstop>leCompanyTin</tabstop>
+  <tabstop>leCompanyBank</tabstop>
+  <tabstop>leCompanyBankAccount</tabstop>
+  <tabstop>leCompanyAddress</tabstop>
+  <tabstop>chShowWhosalePrice</tabstop>
+  <tabstop>chHideRevenue</tabstop>
+  <tabstop>chPrepaidOnlyByGift</tabstop>
+  <tabstop>chClearSaveDraft</tabstop>
+  <tabstop>leCoinCashdesk</tabstop>
+  <tabstop>leAvailableStore</tabstop>
+  <tabstop>chChangeDraftDateToCurrent</tabstop>
+  <tabstop>chSimpleFiscal</tabstop>
+  <tabstop>leChatOperatorUserId</tabstop>
+  <tabstop>chDenyLogout</tabstop>
+  <tabstop>chmStoreInputCheck</tabstop>
+  <tabstop>chmSaleOutputConfirmation</tabstop>
+  <tabstop>chmNewOrder</tabstop>
+  <tabstop>chmDebts</tabstop>
+  <tabstop>chmReturnGoods</tabstop>
+  <tabstop>chmCompletedOrders</tabstop>
+  <tabstop>chmDraftSale</tabstop>
+  <tabstop>chmCheckQuantity</tabstop>
+  <tabstop>chmOrders</tabstop>
+  <tabstop>chUseWebsocket</tabstop>
+  <tabstop>leSettingsName</tabstop>
+  <tabstop>leHallIdForHotel</tabstop>
  </tabstops>
  <resources/>
  <connections/>

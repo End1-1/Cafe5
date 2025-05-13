@@ -3,6 +3,7 @@
 #include "partnersasmap.h"
 #include "c5lineedit.h"
 #include "c5message.h"
+#include "c5database.h"
 
 PartnersAsMap::PartnersAsMap(const QStringList &dbParams, QWidget *parent) :
     C5Widget(dbParams, parent),

@@ -1,5 +1,6 @@
 #include "ce5menuname.h"
 #include "ui_ce5menuname.h"
+#include "c5database.h"
 
 CE5MenuName::CE5MenuName(const QStringList &dbParams, QWidget *parent) :
     CE5Editor(dbParams, parent),

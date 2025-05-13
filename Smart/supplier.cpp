@@ -1,5 +1,6 @@
 #include "supplier.h"
 #include "ui_supplier.h"
+#include "c5database.h"
 
 supplier::supplier(const QStringList &dbParams) :
     C5Dialog(dbParams),

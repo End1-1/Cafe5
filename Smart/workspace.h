@@ -205,11 +205,13 @@ private:
 
     double fDiscountAmount;
 
+    bool mRejectEnabled;
+
     WCustomerDisplay *fCustomerDisplay;
 
     void configFiscalButton();
 
-    void createAddDishRequest(Dish *d);
+    void createAddDishRequest(const Dish &dish);
 
     void addDishToOrder(Dish *d);
 

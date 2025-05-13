@@ -4,6 +4,8 @@
 #include "c5waiterorder.h"
 #include "c5waiterorderdoc.h"
 #include "c5storedraftwriter.h"
+#include "c5config.h"
+#include "c5permissions.h"
 #include "c5user.h"
 #include "c5dishwidget.h"
 #include "c5mainwindow.h"

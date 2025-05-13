@@ -47,6 +47,8 @@ private slots:
 
     void printSale();
 
+    void exportXML();
+
     void fiscale();
 
     void cancelFiscal();

@@ -3,6 +3,7 @@
 #include "c5cache.h"
 #include "c5message.h"
 #include "ce5dishpart1.h"
+#include "c5database.h"
 #include <QColorDialog>
 #include <QMenu>
 #include <QFileDialog>

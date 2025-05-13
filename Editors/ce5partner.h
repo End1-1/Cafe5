@@ -17,9 +17,9 @@ public:
 
     ~CE5Partner();
 
-    virtual QString title();
+    virtual QString title() override;
 
-    virtual QString table();
+    virtual QString table() override;
 
     virtual void setId(int id) override;
 

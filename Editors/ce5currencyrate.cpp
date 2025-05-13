@@ -1,6 +1,7 @@
 #include "ce5currencyrate.h"
 #include "ui_ce5currencyrate.h"
 #include "c5cache.h"
+#include "c5database.h"
 #include "c5message.h"
 
 CE5CurrencyRate::CE5CurrencyRate(const QStringList &dbParams, QWidget *parent) :

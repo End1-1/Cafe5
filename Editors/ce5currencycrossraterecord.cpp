@@ -1,6 +1,7 @@
 #include "ce5currencycrossraterecord.h"
 #include "ui_ce5currencycrossraterecord.h"
 #include "c5cache.h"
+#include "c5database.h"
 #include "c5message.h"
 #include <QDoubleValidator>
 

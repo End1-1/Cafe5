@@ -1,9 +1,6 @@
 #ifndef C5WIDGET_H
 #define C5WIDGET_H
 
-#include "c5database.h"
-#include "c5permissions.h"
-#include "c5config.h"
 #include "ninterface.h"
 #include <QWidget>
 #include <QIcon>

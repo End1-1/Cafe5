@@ -1,6 +1,7 @@
 #include "cr5dishpart2.h"
 #include "ce5dishpart2.h"
 #include "c5tablemodel.h"
+#include "c5database.h"
 #include "cr5menutranslator.h"
 #include "c5mainwindow.h"
 #include <QHeaderView>

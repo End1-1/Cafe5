@@ -1,4 +1,3 @@
-#include "c5sockethandler.h"
 #include "datadriver.h"
 #include "dlgscreen.h"
 #include "c5systempreference.h"
@@ -7,7 +6,6 @@
 #include "c5database.h"
 #include "c5servername.h"
 #include "ndataprovider.h"
-#include "c5utils.h"
 #include "dlgserverconnection.h"
 #include "c5message.h"
 #include <QApplication>
@@ -48,18 +46,22 @@ int main(int argc, char *argv[])
     auto *dlgsplash = new DlgSplashScreen();
     dlgsplash->show();
     emit dlgsplash->messageSignal("Get server name");
-    C5ServerName sng(__c5config.getRegValue("ss_server_address").toString());
-    if (!sng.getConnection(__c5config.getRegValue("ss_database").toString())) {
-        C5Message::error(sng.mErrorString);
+    auto sng = new C5ServerName(__c5config.getRegValue("ss_server_address").toString());
+    if (!sng->getConnection(__c5config.getRegValue("ss_database").toString())) {
+        C5Message::error(sng->mErrorString);
         DlgServerConnection::showSettings(0);
         return 1;
     }
-    QJsonObject js = sng.mReply;
+    QJsonObject js = sng->mReply;
+    sng->deleteLater();
     C5Config::fDBHost = js["settings"].toString();
     C5Config::fDBPath = js["database"].toString();
     C5Config::fSettingsName = __c5config.getRegValue("ss_settings").toString();
+#ifdef QT_DEBUG
+    C5Config::fFullScreen = false;
+#else
     C5Config::fFullScreen = true;
-    C5SocketHandler::setServerAddress("127.0.0.1");
+#endif
     C5Config::initParamsFromDb();
     C5Database::LOGGING = C5Config::getValue(param_debuge_mode).toInt() == 1;
     NDataProvider::mProtocol = js["settings"].toString();

@@ -49,6 +49,7 @@ struct Dish {
     }
     Dish(Dish *d)
     {
+        menuid = d->menuid;
         id = d->id;
         state = d->state;
         typeId = d->typeId;
