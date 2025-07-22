@@ -14,7 +14,7 @@ class CR5MenuTranslator : public C5Widget
     Q_OBJECT
 
 public:
-    explicit CR5MenuTranslator(const QStringList &dbParams, QWidget *parent = nullptr);
+    explicit CR5MenuTranslator(QWidget *parent = nullptr);
 
     ~CR5MenuTranslator();
 

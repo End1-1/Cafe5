@@ -14,12 +14,11 @@
 #include "storeinputdocument.h"
 #include <QMenu>
 
-CR5Documents::CR5Documents(const QStringList &dbParams, QWidget *parent) :
-    C5ReportWidget(dbParams, parent)
+CR5Documents::CR5Documents(QWidget *parent) :
+    C5ReportWidget(parent)
 {
     fIcon = ":/documents.png";
     fLabel = tr("Documents");
-
     fSimpleQuery = false;
     fMainTable = "a_header h";
     fLeftJoinTables << "left join s_user u on u.f_id=h.f_operator [u]"
@@ -28,8 +27,7 @@ CR5Documents::CR5Documents(const QStringList &dbParams, QWidget *parent) :
                     << "left join a_type dt on dt.f_id=h.f_type [dt]"
                     << "left join a_store sa on sa.f_document=h.f_id [sa]"
                     << "left join a_header_store hs on hs.f_id=h.f_id [hs]"
-                       ;
-
+                    ;
     fColumnsFields << "distinct(h.f_id) as f_id"
                    << "h.f_userid as f_docnum"
                    << "ds.f_name as f_statename"
@@ -42,10 +40,8 @@ CR5Documents::CR5Documents(const QStringList &dbParams, QWidget *parent) :
                    << "u.f_login as f_operatorname"
                    << "h.f_createdate"
                    << "h.f_createtime"
-                      ;
-
+                   ;
     fColumnsSum << "f_amount";
-
     fTranslation["f_id"] = tr("Op.num.");
     fTranslation["f_docnum"] = tr("Code");
     fTranslation["f_statename"] = tr("State");
@@ -58,7 +54,6 @@ CR5Documents::CR5Documents(const QStringList &dbParams, QWidget *parent) :
     fTranslation["f_operatorname"] = tr("Operator");
     fTranslation["f_createdate"] = tr("Last change date");
     fTranslation["f_createtime"] = tr("Last change time");
-
     fColumnsVisible["distinct(h.f_id) as f_id"] = true;
     fColumnsVisible["h.f_userid as f_docnum"] = true;
     fColumnsVisible["ds.f_name as f_statename"] = true;
@@ -71,17 +66,15 @@ CR5Documents::CR5Documents(const QStringList &dbParams, QWidget *parent) :
     fColumnsVisible["u.f_login as f_operatorname"] = true;
     fColumnsVisible["h.f_createdate"] = true;
     fColumnsVisible["h.f_createtime"] = true;
-
     fOrderCondition = " order by h.f_date, h.f_userid ";
     restoreColumnsVisibility();
-
-    fFilterWidget = new CR5DocumentsFilter(dbParams);
+    fFilterWidget = new CR5DocumentsFilter();
     fFilter = static_cast<CR5DocumentsFilter*>(fFilterWidget);
 }
 
-QToolBar *CR5Documents::toolBar()
+QToolBar* CR5Documents::toolBar()
 {
-    if (!fToolBar) {
+    if(!fToolBar) {
         QList<ToolBarButtons> btn;
         btn << ToolBarButtons::tbEdit
             << ToolBarButtons::tbFilter
@@ -103,10 +96,11 @@ QToolBar *CR5Documents::toolBar()
         connect(a, SIGNAL(triggered()), this, SLOT(templates()));
         fToolBar->insertAction(fToolBar->actions().at(3), a);
     }
+
     return fToolBar;
 }
 
-QMenu *CR5Documents::buildTableViewContextMenu(const QPoint &point)
+QMenu* CR5Documents::buildTableViewContextMenu(const QPoint &point)
 {
     QMenu *m = C5Grid::buildTableViewContextMenu(point);
     m->addSeparator();
@@ -119,7 +113,8 @@ QMenu *CR5Documents::buildTableViewContextMenu(const QPoint &point)
 void CR5Documents::restoreColumnsWidths()
 {
     C5Grid::restoreColumnsWidths();
-    if (fColumnsVisible["distinct(h.f_id) as f_id"]) {
+
+    if(fColumnsVisible["distinct(h.f_id) as f_id"]) {
         fTableView->setColumnWidth(fModel->fColumnNameIndex["f_id"], 0);
     }
 }
@@ -128,10 +123,12 @@ bool CR5Documents::tblDoubleClicked(int row, int column, const QJsonArray &value
 {
     Q_UNUSED(column);
     Q_UNUSED(row);
-    if (!fColumnsVisible["distinct(h.f_id) as f_id"]) {
+
+    if(!fColumnsVisible["distinct(h.f_id) as f_id"]) {
         C5Message::error(tr("Op.num. column must be included in the report"));
         return true;
     }
+
     openDoc(values.at(fModel->indexForColumnName("f_id")).toString());
     return true;
 }
@@ -144,134 +141,165 @@ void CR5Documents::callEditor(const QString &id)
 void CR5Documents::openDoc(QString id)
 {
     QString err;
-    switch (docType(id)) {
+
+    switch(docType(id)) {
     case DOC_TYPE_STORE_INPUT: {
 #ifdef NEWVERSION
-        auto *si = __mainWindow->createTab<StoreInputDocument>(fDBParams);
-        if (!si->openDoc(id)) {
+        auto *si = __mainWindow->createTab<StoreInputDocument>();
+
+        if(!si->openDoc(id)) {
             __mainWindow->removeTab(si);
         }
+
 #else
-        auto *sa = __mainWindow->createTab<C5StoreDoc>(fDBParams);
-        if (!sa->openDoc(id, err)) {
+        auto *sa = __mainWindow->createTab<C5StoreDoc>();
+
+        if(!sa->openDoc(id, err)) {
             __mainWindow->removeTab(sa);
             C5Message::error(err);
         }
+
 #endif
         break;
     }
+
     case DOC_TYPE_STORE_OUTPUT:
     case DOC_TYPE_STORE_MOVE:
     case DOC_TYPE_COMPLECTATION: {
-        auto *sd = __mainWindow->createTab<C5StoreDoc>(fDBParams);
-        if (!sd->openDoc(id, err)) {
+        auto *sd = __mainWindow->createTab<C5StoreDoc>();
+
+        if(!sd->openDoc(id, err)) {
             __mainWindow->removeTab(sd);
             C5Message::error(err);
         }
+
         break;
     }
+
     case DOC_TYPE_STORE_INVENTORY: {
-        auto *si = __mainWindow->createTab<C5StoreInventory>(fDBParams);
-        if (!si->openDoc(id)) {
+        auto *si = __mainWindow->createTab<C5StoreInventory>();
+
+        if(!si->openDoc(id)) {
             __mainWindow->removeTab(si);
         }
+
         break;
     }
+
     case DOC_TYPE_CASH: {
-        auto *cd = __mainWindow->createTab<C5CashDoc>(fDBParams);
-        if (!cd->openDoc(id)) {
+        auto *cd = __mainWindow->createTab<C5CashDoc>();
+
+        if(!cd->openDoc(id)) {
             __mainWindow->removeTab(cd);
         }
+
         break;
     }
+
     case DOC_TYPE_SALE_INPUT:
-        C5Database db(fDBParams);
+        C5Database db;
         db[":f_id"] = id;
         db.exec("select f_source from o_header where f_id=:f_id");
-        if (db.nextRow()) {
-            switch (abs(db.getInt(0))) {
+
+        if(db.nextRow()) {
+            switch(abs(db.getInt(0))) {
             case 1: {
-                C5WaiterOrder *wo = __mainWindow->createTab<C5WaiterOrder>(fDBParams);
+                C5WaiterOrder *wo = __mainWindow->createTab<C5WaiterOrder>();
                 wo->setOrder(id);
                 break;
             }
+
             case 2: {
-                C5SaleFromStoreOrder::openOrder(fDBParams, id);
+                C5SaleFromStoreOrder::openOrder(id);
                 break;
             }
+
             default: {
-                C5WaiterOrder *wo = __mainWindow->createTab<C5WaiterOrder>(fDBParams);
+                C5WaiterOrder *wo = __mainWindow->createTab<C5WaiterOrder>();
                 wo->setOrder(id);
                 break;
             }
             }
         } else {
-            C5WaiterOrder *wo = __mainWindow->createTab<C5WaiterOrder>(fDBParams);
+            C5WaiterOrder *wo = __mainWindow->createTab<C5WaiterOrder>();
             wo->setOrder(id);
         }
+
         break;
     }
 }
 
 int CR5Documents::docType(QString id)
 {
-    C5Database db(fDBParams);
+    C5Database db;
     db[":f_id"] = id;
     db.exec("select f_type from a_header where f_id=:f_id");
-    if (!db.nextRow()) {
+
+    if(!db.nextRow()) {
         return 0;
     }
+
     return db.getInt(0);
 }
 
 void CR5Documents::saveDocs()
 {
-    if (!fColumnsVisible["distinct(h.f_id) as f_id"]) {
+    if(!fColumnsVisible["distinct(h.f_id) as f_id"]) {
         C5Message::error(tr("Please, set the 'Code' column to visible."));
         return;
     }
+
     QModelIndexList ml = fTableView->selectionModel()->selectedIndexes();
-    if (ml.count() == 0) {
+
+    if(ml.count() == 0) {
         return;
     }
-    if (C5Message::question(tr("Confirm to save selected documents")) != QDialog::Accepted) {
+
+    if(C5Message::question(tr("Confirm to save selected documents")) != QDialog::Accepted) {
         return;
-    }    
+    }
+
     QSet<int> rowsTemp;
-    foreach (QModelIndex mi, ml) {
+
+    foreach(QModelIndex mi, ml) {
         rowsTemp << mi.row();
     }
+
     QList<int> rows = rowsTemp.values();
     std::sort(rows.begin(), rows.end());
-
     auto *pd = new C5ProgressDialog(this);
     pd->setMax(rows.count());
-    connect(this, SIGNAL(updateProgressValueWithMessage(int,QString)), pd, SLOT(updateProgressValueWithMessage(int, QString)));
+    connect(this, SIGNAL(updateProgressValueWithMessage(int, QString)), pd, SLOT(updateProgressValueWithMessage(int, QString)));
     pd->show();
-    C5Database db(fDBParams);
+    C5Database db;
     QString err;
     int rowLeft = 0;
     int complete = 0;
-    foreach (int row, rows) {
+
+    foreach(int row, rows) {
         QString docid = fModel->data(row, fModel->indexForColumnName("f_id"), Qt::EditRole).toString();
         db[":f_id"] = docid;
         db.exec("select * from a_header where f_id=:f_id");
-        if (!db.nextRow()) {
+
+        if(!db.nextRow()) {
             continue;
         }
-        if (db.getInt("f_state") == DOC_STATE_SAVED) {
+
+        if(db.getInt("f_state") == DOC_STATE_SAVED) {
             emit updateProgressValueWithMessage(++rowLeft, QString("%1 %2, %3 %4").arg(tr("Success")).arg(complete).arg(tr("Fail")).arg(rowLeft - complete));
             continue;
         }
-        C5StoreDoc d(fDBParams);
+
+        C5StoreDoc d;
         QString e;
-        switch (db.getInt("f_type")) {
+
+        switch(db.getInt("f_type")) {
         case DOC_TYPE_STORE_INPUT:
         case DOC_TYPE_STORE_MOVE:
         case DOC_TYPE_STORE_OUTPUT:
         case DOC_TYPE_COMPLECTATION:
-            if (d.openDoc(docid, e)) {
-                if (d.writeDocument(DOC_STATE_SAVED, e)) {
+            if(d.openDoc(docid, e)) {
+                if(d.writeDocument(DOC_STATE_SAVED, e)) {
                     fModel->setData(row, fModel->indexForColumnName("f_statename"), tr("Saved"));
                     fModel->setData(row, fModel->indexForColumnName("f_amount"), 0);
                     complete++;
@@ -281,60 +309,76 @@ void CR5Documents::saveDocs()
             } else {
                 err += e;
             }
+
             e = "";
             break;
+
         default:
             continue;
             break;
         }
+
         emit updateProgressValueWithMessage(++rowLeft, QString("%1 %2, %3 %4").arg(tr("Success")).arg(complete).arg(tr("Fail")).arg(rowLeft - complete));
     }
+
     delete pd;
-    if (!err.isEmpty()) {
+
+    if(!err.isEmpty()) {
         C5Message::error(err);
     }
 }
 
 void CR5Documents::draftDocs()
 {
-    if (!fColumnsVisible["distinct(h.f_id) as f_id"]) {
+    if(!fColumnsVisible["distinct(h.f_id) as f_id"]) {
         C5Message::error(tr("Please, set the 'Code' column to visible."));
         return;
     }
+
     QModelIndexList ml = fTableView->selectionModel()->selectedIndexes();
-    if (ml.count() == 0) {
+
+    if(ml.count() == 0) {
         return;
     }
-    if (C5Message::question(tr("Confirm to create draft for selected documents")) != QDialog::Accepted) {
+
+    if(C5Message::question(tr("Confirm to create draft for selected documents")) != QDialog::Accepted) {
         return;
     }
+
     QSet<int> rowsTemp;
-    foreach (QModelIndex mi, ml) {
+
+    foreach(QModelIndex mi, ml) {
         rowsTemp << mi.row();
     }
+
     QList<int> rows = rowsTemp.values();
     std::sort(rows.begin(), rows.end());
-    C5Database db(fDBParams);
+    C5Database db;
     QString err;
-    foreach (int row, rows) {
+
+    foreach(int row, rows) {
         QString docid = fModel->data(row, fModel->indexForColumnName("f_id"), Qt::EditRole).toString();
         db[":f_id"] = docid;
         db.exec("select * from a_header where f_id=:f_id");
-        if (!db.nextRow()) {
+
+        if(!db.nextRow()) {
             continue;
         }
-        if (db.getInt("f_state") == DOC_STATE_DRAFT) {
+
+        if(db.getInt("f_state") == DOC_STATE_DRAFT) {
             continue;
         }
+
         QString e;
-        C5StoreDoc d(fDBParams);
-        switch (db.getInt("f_type")) {
+        C5StoreDoc d;
+
+        switch(db.getInt("f_type")) {
         case DOC_TYPE_STORE_INPUT:
         case DOC_TYPE_STORE_MOVE:
         case DOC_TYPE_STORE_OUTPUT:
         case DOC_TYPE_COMPLECTATION:
-            if (d.openDoc(docid, e)) {
-                if (d.writeDocument(DOC_STATE_DRAFT, e)) {
+            if(d.openDoc(docid, e)) {
+                if(d.writeDocument(DOC_STATE_DRAFT, e)) {
                     fModel->setData(row, fModel->indexForColumnName("f_statename"), tr("Draft"));
                     fModel->setData(row, fModel->indexForColumnName("f_amount"), 0);
                 } else {
@@ -343,63 +387,79 @@ void CR5Documents::draftDocs()
             } else {
                 err += e;
             }
+
             break;
+
         default:
             continue;
             break;
         }
     }
-    if (!err.isEmpty()) {
+
+    if(!err.isEmpty()) {
         C5Message::error(err);
     }
 }
 
 void CR5Documents::removeDocs()
 {
-    if (!fColumnsVisible["distinct(h.f_id) as f_id"]) {
+    if(!fColumnsVisible["distinct(h.f_id) as f_id"]) {
         C5Message::error(tr("Please, set the 'Code' column to visible."));
         return;
     }
+
     QModelIndexList ml = fTableView->selectionModel()->selectedIndexes();
-    if (ml.count() == 0) {
+
+    if(ml.count() == 0) {
         return;
     }
-    if (C5Message::question(tr("Confirm to remove selected documents")) != QDialog::Accepted) {
+
+    if(C5Message::question(tr("Confirm to remove selected documents")) != QDialog::Accepted) {
         return;
     }
+
     QSet<int> rowsTemp;
-    foreach (QModelIndex mi, ml) {
+
+    foreach(QModelIndex mi, ml) {
         rowsTemp << mi.row();
     }
+
     QList<int> rows = rowsTemp.values();
     std::sort(rows.begin(), rows.end());
     std::reverse(rows.begin(), rows.end());
-    foreach (int r, rows) {
+
+    foreach(int r, rows) {
         QString id = fModel->data(r, fModel->indexForColumnName("f_id"), Qt::EditRole).toString();
-        switch (docType(id)) {
+
+        switch(docType(id)) {
         case DOC_TYPE_STORE_INPUT:
         case DOC_TYPE_STORE_OUTPUT:
         case DOC_TYPE_STORE_MOVE:
         case DOC_TYPE_COMPLECTATION:
-            if (C5StoreDoc::removeDoc(fDBParams, id, false)) {
+            if(C5StoreDoc::removeDoc(id, false)) {
                 fModel->removeRow(r);
             } else {
                 return;
             }
+
             break;
+
         case DOC_TYPE_STORE_INVENTORY:
-            if (C5StoreInventory::removeDoc(fDBParams, id)) {
+            if(C5StoreInventory::removeDoc(id)) {
                 fModel->removeRow(r);
             } else {
                 return;
             }
+
             break;
+
         case DOC_TYPE_CASH:
-            if (C5CashDoc::removeDoc(fDBParams, id)) {
+            if(C5CashDoc::removeDoc(id)) {
                 fModel->removeRow(r);
             } else {
                 return;
             }
+
             break;
         }
     }
@@ -407,30 +467,38 @@ void CR5Documents::removeDocs()
 
 void CR5Documents::copySelectedDocs()
 {
-    if (!fColumnsVisible["distinct(h.f_id) as f_id"]) {
+    if(!fColumnsVisible["distinct(h.f_id) as f_id"]) {
         C5Message::error(tr("Please, set the 'Code' column to visible."));
         return;
     }
+
     QModelIndexList ml = fTableView->selectionModel()->selectedIndexes();
-    if (ml.count() == 0) {
+
+    if(ml.count() == 0) {
         return;
     }
+
     QSet<int> rowsTemp;
-    foreach (QModelIndex mi, ml) {
+
+    foreach(QModelIndex mi, ml) {
         rowsTemp << mi.row();
     }
+
     QList<int> rows = rowsTemp.values();
     std::sort(rows.begin(), rows.end());
     std::reverse(rows.begin(), rows.end());
-    C5Database db1(fDBParams);
-    C5Database db2(fDBParams);
-    foreach (int r, rows) {
+    C5Database db1;
+    C5Database db2;
+
+    foreach(int r, rows) {
         QString id = fModel->data(r, fModel->indexForColumnName("f_id"), Qt::EditRole).toString();
         db1[":f_id"] = id;
         db1.exec("select * from a_header where f_id=:f_id");
-        if (!db1.nextRow()) {
+
+        if(!db1.nextRow()) {
             continue;
         }
+
         QString newDocId = C5Database::uuid();
         db2.setBindValues(db1.getBindValues());
         db2.removeBindValue(":f_id");
@@ -438,33 +506,40 @@ void CR5Documents::copySelectedDocs()
         db2[":f_id"] = newDocId;
         db2.insert("a_header", false);
         QString tableName;
-        switch (db1.getInt("f_type")) {
+
+        switch(db1.getInt("f_type")) {
         case DOC_TYPE_STORE_INPUT:
         case DOC_TYPE_STORE_MOVE:
         case DOC_TYPE_STORE_OUTPUT:
             tableName = "a_store_draft";
             break;
+
         default:
             tableName = "UNKNOWN";
         }
+
         db1[":f_document"] = id;
         db1.exec(QString("select * from %1 where f_document=:f_document").arg(tableName));
-        while (db1.nextRow()) {
+
+        while(db1.nextRow()) {
             db2.setBindValues(db1.getBindValues());
             db2[":f_id"] = C5Database::uuid();
             db2[":f_document"] = newDocId;
-            if (!db2.insert(tableName, false)) {
+
+            if(!db2.insert(tableName, false)) {
                 C5Message::error(db2.fLastError);
             }
         }
+
         openDoc(newDocId);
     }
 }
 
 void CR5Documents::templates()
 {
-    C5DlgSelectReportTemplate d(1, fDBParams);
-    if (d.exec() == QDialog::Accepted) {
+    C5DlgSelectReportTemplate d(1);
+
+    if(d.exec() == QDialog::Accepted) {
         QString sql = d.fSelectedTemplate.sql;
         sql.replace("%date1", fFilter->date1().toString(FORMAT_DATE_TO_STR_MYSQL));
         sql.replace("%date2", fFilter->date2().toString(FORMAT_DATE_TO_STR_MYSQL));

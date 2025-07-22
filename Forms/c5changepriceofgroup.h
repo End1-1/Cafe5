@@ -12,11 +12,11 @@ class C5ChangePriceOfGroup : public C5Dialog
     Q_OBJECT
 
 public:
-    explicit C5ChangePriceOfGroup(const QStringList &dbParams);
+    explicit C5ChangePriceOfGroup();
 
     ~C5ChangePriceOfGroup();
 
-    static bool groupPrice(const QStringList &dbParams, double &price1, double &price2, double &price1disc, double &price2disc);
+    static bool groupPrice(double &price1, double &price2, double &price1disc, double &price2disc);
 
 private slots:
     void on_btnOk_clicked();

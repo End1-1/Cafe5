@@ -12,7 +12,7 @@ class CR5UsersFilter : public C5FilterWidget
     Q_OBJECT
 
 public:
-    explicit CR5UsersFilter(const QStringList &dbParams);
+    explicit CR5UsersFilter();
     ~CR5UsersFilter();
     virtual QString condition() override;
     virtual QString filterText() override;

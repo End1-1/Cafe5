@@ -5,17 +5,17 @@
 #include "c5message.h"
 #include <QJsonDocument>
 
-CE5MFTask::CE5MFTask(const QStringList &dbParams) :
-    CE5Editor(dbParams),
+CE5MFTask::CE5MFTask() :
+    CE5Editor(),
     ui(new Ui::CE5MFTask)
 {
     ui->setupUi(this);
     ui->teCreate->setTime(QTime::currentTime());
-    ui->leState->setSelector(dbParams, ui->leStateName, cache_mf_task_state);
-    ui->leWorkshop->setSelector(dbParams, ui->leWorkshowName, cache_mf_workshop);
-    ui->leStage->setSelector(dbParams, ui->leStageName, cache_mf_action_stage);
-    ui->leProduct->setSelector(dbParams, ui->leProductName, cache_mf_products);
-    ui->leResponsible->setSelector(dbParams, ui->leResponsibleName, cache_users);
+    ui->leState->setSelector(ui->leStateName, cache_mf_task_state);
+    ui->leWorkshop->setSelector(ui->leWorkshowName, cache_mf_workshop);
+    ui->leStage->setSelector(ui->leStageName, cache_mf_action_stage);
+    ui->leProduct->setSelector(ui->leProductName, cache_mf_products);
+    ui->leResponsible->setSelector(ui->leResponsibleName, cache_users);
 }
 
 CE5MFTask::~CE5MFTask()
@@ -44,7 +44,7 @@ void CE5MFTask::clear()
 void CE5MFTask::setId(int id)
 {
     CE5Editor::setId(id);
-    C5Database db(fDBParams);
+    C5Database db;
     db[":f_id"] = ui->leCode->getInteger();
     db.exec("select * from mf_tasks where f_id=:f_id");
     if (db.nextRow()) {
@@ -74,7 +74,7 @@ bool CE5MFTask::save(QString &err, QList<QMap<QString, QVariant> > &data)
     for (int i = 0; i < ui->tbl->rowCount(); i++) {
         jo[ui->tbl->getString(i, 0)] = ui->tbl->lineEdit(i, 1)->text();
     }
-    C5Database db(fDBParams);
+    C5Database db;
     db[":f_id"] = ui->leCode->getInteger();
     db[":f_notes"] = QJsonDocument(jo).toJson(QJsonDocument::Compact);
     db.exec("update mf_tasks set f_notes=:f_notes where f_id=:f_id");

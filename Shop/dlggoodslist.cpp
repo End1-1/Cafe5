@@ -5,12 +5,12 @@
 #include <QKeyEvent>
 
 DlgGoodsList::DlgGoodsList(int currency) :
-    C5Dialog(__c5config.dbParams(), true),
+    C5Dialog(true),
     ui(new Ui::DlgGoodsList)
 {
     ui->setupUi(this);
     setWindowState(windowState() | Qt::WindowMaximized);
-    C5Database db(__c5config.dbParams());
+    C5Database db;
     db[":f_store"] = __c5config.defaultStore();
     db[":f_currency"] = currency;
     db.exec("select ss.f_goods, "

@@ -3,8 +3,8 @@
 #include "c5translator.h"
 #include "c5config.h"
 
-DlgReceiptLanguage::DlgReceiptLanguage(const QStringList &dbParams) :
-    C5Dialog(dbParams),
+DlgReceiptLanguage::DlgReceiptLanguage() :
+    C5Dialog(),
     ui(new Ui::DlgReceiptLanguage)
 {
     ui->setupUi(this);
@@ -36,33 +36,40 @@ DlgReceiptLanguage::~DlgReceiptLanguage()
 
 int DlgReceiptLanguage::receipLanguage()
 {
-    DlgReceiptLanguage *d = new DlgReceiptLanguage(C5Config::dbParams());
+    DlgReceiptLanguage *d = new DlgReceiptLanguage();
     int result = -1;
-    if (d->exec() == QDialog::Accepted) {
+
+    if(d->exec() == QDialog::Accepted) {
         result = d->fResult;
     }
+
     delete d;
     return result;
 }
 
 void DlgReceiptLanguage::on_lst_clicked(const QModelIndex &index)
 {
-    if (!index.isValid()) {
+    if(!index.isValid()) {
         return;
     }
-    switch (index.row()) {
-        case 0:
-            fResult = LANG_AM;
-            break;
-        case 1:
-            fResult = LANG_EN;
-            break;
-        case 2:
-            fResult = LANG_RU;
-            break;
-        default:
-            reject();
-            return;
+
+    switch(index.row()) {
+    case 0:
+        fResult = LANG_AM;
+        break;
+
+    case 1:
+        fResult = LANG_EN;
+        break;
+
+    case 2:
+        fResult = LANG_RU;
+        break;
+
+    default:
+        reject();
+        return;
     }
+
     accept();
 }

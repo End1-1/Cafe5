@@ -14,7 +14,7 @@ class C5ReportWidget : public C5Grid
 {
     Q_OBJECT
 public:
-    C5ReportWidget(const QStringList &dbParams, QWidget *parent = nullptr);
+    C5ReportWidget(QWidget *parent = nullptr);
 
     ~C5ReportWidget();
 
@@ -22,19 +22,17 @@ public:
 
     virtual void hotKey(const QString &key) override;
 
-    virtual void changeDatabase(const QStringList &dbParams) override;
-
 public slots:
     virtual bool on_tblView_doubleClicked(const QModelIndex &index) override;
 
 protected:
-    C5Cache *createCache(int cacheId);
+    C5Cache* createCache(int cacheId);
 
     virtual void clearFilter() override;
 
-    C5LineEdit *fFilterLineEdit;
+    C5LineEdit* fFilterLineEdit;
 
-    CE5Editor *fEditor;
+    CE5Editor* fEditor;
 
 protected slots:
     virtual void completeRefresh() override;
@@ -42,7 +40,7 @@ protected slots:
     virtual int newRow();
 
 private:
-    QTimer *fSearchTimer;
+    QTimer* fSearchTimer;
 
 private slots:
     void searchText();

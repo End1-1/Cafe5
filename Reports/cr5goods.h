@@ -11,7 +11,7 @@ class CR5Goods : public C5ReportWidget
     Q_OBJECT
 
 public:
-    CR5Goods(const QStringList &dbParams, QWidget *parent = nullptr);
+    CR5Goods(QWidget *parent = nullptr);
 
     virtual QToolBar *toolBar();
 

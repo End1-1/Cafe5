@@ -6,15 +6,15 @@
 #include "c5database.h"
 #include <QFileDialog>
 
-CE5User::CE5User(const QStringList &dbParams, QWidget *parent) :
-    CE5Editor(dbParams, parent),
+CE5User::CE5User(QWidget *parent) :
+    CE5Editor(parent),
     ui(new Ui::CE5User)
 {
     ui->setupUi(this);
-    ui->leState->setSelector(dbParams, ui->leStateName, cache_users_states);
-    ui->leGroup->setSelector(dbParams, ui->leGroupName, cache_users_groups);
-    ui->leConfig->setSelector(dbParams, ui->leConfigName, cache_settings_names);
-    ui->leTeamLead->setSelector(dbParams, ui->leTeamLeadname, cache_users);
+    ui->leState->setSelector(ui->leStateName, cache_users_states);
+    ui->leGroup->setSelector(ui->leGroupName, cache_users_groups);
+    ui->leConfig->setSelector(ui->leConfigName, cache_settings_names);
+    ui->leTeamLead->setSelector(ui->leTeamLeadname, cache_users);
 }
 
 CE5User::~CE5User()
@@ -25,7 +25,7 @@ CE5User::~CE5User()
 bool CE5User::checkData(QString &err)
 {
     bool result = CE5Editor::checkData(err);
-    C5Database db(fDBParams);
+    C5Database db;
     db[":f_id"] = ui->leCode->text();
     db[":f_login"] = ui->leLogin->text();
     db.exec("select * from s_user where f_login=:f_login and length(f_login)>0 and f_id<>:f_id");
@@ -38,8 +38,8 @@ bool CE5User::checkData(QString &err)
 
 void CE5User::on_btnNewGroup_clicked()
 {
-    CE5UserGroup *ep = new CE5UserGroup(fDBParams);
-    C5Editor *e = C5Editor::createEditor(fDBParams, ep, 0);
+    CE5UserGroup *ep = new CE5UserGroup();
+    C5Editor *e = C5Editor::createEditor(ep, 0);
     QList<QMap<QString, QVariant> > data;
     if(e->getResult(data)) {
         ui->leGroup->setValue(data.at(0)["f_id"].toString());
@@ -65,7 +65,7 @@ void CE5User::on_btnLoadImage_clicked()
     qApp->processEvents();
     QFile f(fn);
     if (f.open(QIODevice::ReadOnly)) {
-        C5Database db(fDBParams);
+        C5Database db;
         db[":f_id"] = ui->leCode->getInteger();
         db.exec("delete from s_user_photo where f_id=:f_id");
         db[":f_id"] = ui->leCode->getInteger();
@@ -79,7 +79,7 @@ void CE5User::on_btnLoadImage_clicked()
 void CE5User::setId(int id)
 {
     CE5Editor::setId(id);
-    C5Database db(fDBParams);
+    C5Database db;
     db[":f_id"] = ui->leCode->getInteger();
     db.exec("select * from s_user_photo where f_id=:f_id");
     QPixmap p;

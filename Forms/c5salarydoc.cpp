@@ -13,8 +13,8 @@
 #include "c5message.h"
 #include "c5lineeditwithselector.h"
 
-C5SalaryDoc::C5SalaryDoc(const QStringList &dbParams, QWidget *parent) :
-    C5Document(dbParams, parent),
+C5SalaryDoc::C5SalaryDoc(QWidget *parent) :
+    C5Document(parent),
     ui(new Ui::C5SalaryDoc)
 {
     ui->setupUi(this);
@@ -39,7 +39,7 @@ bool C5SalaryDoc::openDoc()
         return false;
     }
     double total = 0;
-    C5Database db(fDBParams);
+    C5Database db;
     db[":f_shift"] = ui->cbShift->currentData();
     db.exec("select b.f_id, b.f_worker, b.f_position, g.f_name,"
             "concat(u.f_last, ' ', u.f_first) as f_employee, b.f_amount, "
@@ -94,7 +94,7 @@ void C5SalaryDoc::save()
         C5Message::error(error);
         return;
     }
-    C5Database db(fDBParams);
+    C5Database db;
     db[":f_shift"] = ui->cbShift->currentData();
     db.exec("delete from s_salary_attendance where f_shift=:f_shift");
     db[":f_shift"] = ui->cbShift->currentData();
@@ -131,7 +131,7 @@ void C5SalaryDoc::countAmounts(const QString &arg1)
 void C5SalaryDoc::createCashDocument()
 {
     removeSalaryOfShift();
-    C5Database db(fDBParams);
+    C5Database db;
     C5StoreDraftWriter dw(db);
     int docnum = genNumber(DOC_TYPE_CASH);
     updateGenNumber(docnum, DOC_TYPE_CASH);
@@ -161,7 +161,7 @@ void C5SalaryDoc::countSalaryResponse(const QJsonObject &jdoc)
 
 void C5SalaryDoc::getEmployesInOutList()
 {
-    C5Database db(fDBParams);
+    C5Database db;
     //db[":f_shift"] = ui->deDate->date();
     db.exec("select u.f_group, ug.f_name as position_name, u.f_id, concat(u.f_last, ' ', u.f_first) as employee_name "
             "from s_salary_inout io "
@@ -181,10 +181,10 @@ void C5SalaryDoc::getEmployesInOutList()
 void C5SalaryDoc::on_btnAddEmployee_clicked()
 {
     QJsonArray vals;
-    if (!C5Selector::getValue(fDBParams, cache_users, vals)) {
+    if (!C5Selector::getValue(cache_users, vals)) {
         return;
     }
-    C5Database db(fDBParams);
+    C5Database db;
     db[":f_id"] = vals.at(1).toInt();
     db.exec("select g.f_id, concat(u.f_last, ' ', u.f_first) as f_employee, "
             "g.f_starttime, g.f_duration "
@@ -228,7 +228,7 @@ int C5SalaryDoc::newRow()
     C5LineEditWithSelector *l1 = ui->tbl->createWidget<C5LineEditWithSelector>(row, 1);
     C5LineEditWithSelector *l2 = ui->tbl->createWidget<C5LineEditWithSelector>(row, 2);
     l2->setReadOnly(true);
-    l1->setSelector(fDBParams, l2, cache_users_groups);
+    l1->setSelector(l2, cache_users_groups);
     l1 = ui->tbl->createWidget<C5LineEditWithSelector>(row, 5);
     l1->setValidator(new QDoubleValidator(0, 999999999, 2));
     connect(l1, SIGNAL(textChanged(QString)), this, SLOT(countAmounts(QString)));
@@ -243,7 +243,7 @@ int C5SalaryDoc::newRow()
 void C5SalaryDoc::getSessions()
 {
     ui->cbShift->clear();
-    C5Database db(fDBParams);
+    C5Database db;
     QString ds =  QString("%1-%2-01")
                   .arg(fDate.year(), 4, 10, QChar('0'))
                   .arg(fDate.month(),  2, 10,  QChar('0'));
@@ -290,7 +290,7 @@ void C5SalaryDoc::countSalary()
 
 void C5SalaryDoc::removeSalaryOfShift()
 {
-    C5Database db(fDBParams);
+    C5Database db;
     db[":f_shift"] = ui->cbShift->currentData();
     db.exec("select f_paid from s_salary_attendance where f_shift=:f_shift");
     QStringList paid;

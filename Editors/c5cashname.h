@@ -12,7 +12,7 @@ class C5CashName : public CE5Editor
     Q_OBJECT
 
 public:
-    explicit C5CashName(const QStringList &dbParams, QWidget *parent = nullptr);
+    explicit C5CashName(QWidget *parent = nullptr);
 
     ~C5CashName();
 

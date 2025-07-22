@@ -24,7 +24,7 @@ C5ShopOrder::C5ShopOrder(OHeader &oheader, BHistory &bhistory, QVector<OGoods> &
 
 bool C5ShopOrder::write()
 {
-    //    C5Database db(__c5config.dbParams());
+    //    C5Database db;
     //    C5Database dblog(__c5config.dbParams());
     //    db.startTransaction();
     //    QString err;
@@ -124,7 +124,7 @@ bool C5ShopOrder::write()
 
 bool C5ShopOrder::writeFlags(int f1, int f2, int f3, int f4, int f5)
 {
-    C5Database db(__c5config.dbParams());
+    C5Database db;
     C5StoreDraftWriter dw(db);
     return dw.writeOHeaderFlags(fOHeader._id(), f1, f2, f3, f4, f5);
 }

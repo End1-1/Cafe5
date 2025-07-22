@@ -7,7 +7,7 @@ class CR5GoodsReservations : public C5ReportWidget
 {
     Q_OBJECT
 public:
-    CR5GoodsReservations(const QStringList &dbParams, QWidget *parent = nullptr);
+    CR5GoodsReservations(QWidget *parent = nullptr);
 
     virtual void buildQuery() override;
 

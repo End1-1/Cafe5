@@ -12,7 +12,7 @@ class CR5RouteReport : public C5Document
     Q_OBJECT
 
 public:
-    explicit CR5RouteReport(const QStringList &dbParams, QWidget *parent = nullptr);
+    explicit CR5RouteReport(QWidget *parent = nullptr);
     ~CR5RouteReport();
     virtual QToolBar *toolBar() override;
 

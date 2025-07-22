@@ -5,8 +5,8 @@
 #include <QPrinterInfo>
 #include <QGraphicsScene>
 
-C5PrintPreview::C5PrintPreview(C5Printing *printData, const QStringList &dbParams) :
-    C5Dialog(dbParams),
+C5PrintPreview::C5PrintPreview(C5Printing *printData) :
+    C5Dialog(),
     ui(new Ui::C5PrintPreview)
 {
     ui->setupUi(this);

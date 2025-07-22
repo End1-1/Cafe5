@@ -2,12 +2,12 @@
 #include "ui_cr5saleflags.h"
 #include "c5database.h"
 
-CR5SaleFlags::CR5SaleFlags(const QStringList &dbParams) :
-    C5Dialog(dbParams),
+CR5SaleFlags::CR5SaleFlags() :
+    C5Dialog(),
     ui(new Ui::CR5SaleFlags)
 {
     ui->setupUi(this);
-    C5Database db(fDBParams);
+    C5Database db;
     db.exec("select * from o_flags");
     while (db.nextRow()) {
         QLabel *l;

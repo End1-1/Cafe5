@@ -1,8 +1,8 @@
 #include "cr5routedailyfilter.h"
 #include "ui_cr5routedailyfilter.h"
 
-CR5RouteDailyFilter::CR5RouteDailyFilter(const QStringList &dbParams, QWidget *parent) :
-    C5FilterWidget(dbParams, parent),
+CR5RouteDailyFilter::CR5RouteDailyFilter(QWidget *parent) :
+    C5FilterWidget(parent),
     ui(new Ui::CR5RouteDailyFilter)
 {
     ui->setupUi(this);

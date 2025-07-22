@@ -1,8 +1,8 @@
 #include "cr5goodsstorages.h"
 #include "ce5storage.h"
 
-CR5GoodsStorages::CR5GoodsStorages(const QStringList &dbParams, QWidget *parent) :
-    C5ReportWidget(dbParams, parent)
+CR5GoodsStorages::CR5GoodsStorages(QWidget *parent) :
+    C5ReportWidget( parent)
 {
     fIcon = ":/goods.png";
     fLabel = tr("Storages");
@@ -16,7 +16,7 @@ CR5GoodsStorages::CR5GoodsStorages(const QStringList &dbParams, QWidget *parent)
     fTranslation["f_complectcounter"] = tr("Complectation counter");
     fTranslation["f_partner"] = tr("Partner");
 
-    fEditor = new CE5Storage(dbParams);
+    fEditor = new CE5Storage();
 }
 
 QToolBar *CR5GoodsStorages::toolBar()

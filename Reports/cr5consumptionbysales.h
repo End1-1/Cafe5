@@ -15,7 +15,7 @@ class CR5ConsumptionBySales : public C5ReportWidget
     Q_OBJECT
 
 public:
-    CR5ConsumptionBySales(const QStringList &dbParams, QWidget *parent = nullptr);
+    CR5ConsumptionBySales(QWidget *parent = nullptr);
 
     virtual QToolBar *toolBar() override;
 

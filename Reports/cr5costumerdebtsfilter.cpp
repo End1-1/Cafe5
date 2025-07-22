@@ -3,15 +3,15 @@
 #include "c5cache.h"
 #include "bclientdebts.h"
 
-CR5CostumerDebtsFilter::CR5CostumerDebtsFilter(const QStringList &dbParams, QWidget *parent) :
-    C5FilterWidget(dbParams, parent),
+CR5CostumerDebtsFilter::CR5CostumerDebtsFilter(QWidget *parent) :
+    C5FilterWidget(parent),
     ui(new Ui::CR5CostumerDebtsFilter)
 {
     ui->setupUi(this);
-    ui->leCostumer->setSelector(dbParams, ui->leCostumerName, cache_goods_partners);
+    ui->leCostumer->setSelector(ui->leCostumerName, cache_goods_partners);
     ui->deStart->setDate(QDate::currentDate().addDays(-1 * 90));
-    ui->leHall->setSelector(dbParams, ui->leHallName ,cache_halls);
-    ui->leManager->setSelector(dbParams, ui->leManagerName, cache_users);
+    ui->leHall->setSelector(ui->leHallName ,cache_halls);
+    ui->leManager->setSelector(ui->leManagerName, cache_users);
 }
 
 CR5CostumerDebtsFilter::~CR5CostumerDebtsFilter()

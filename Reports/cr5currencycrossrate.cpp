@@ -1,8 +1,8 @@
 #include "cr5currencycrossrate.h"
 #include "ce5currencycrossrate.h"
 
-CR5CurrencyCrossRate::CR5CurrencyCrossRate(const QStringList &dbParams, QWidget *parent) :
-    C5ReportWidget(dbParams, parent)
+CR5CurrencyCrossRate::CR5CurrencyCrossRate(QWidget *parent) :
+    C5ReportWidget( parent)
 {
     fIcon = ":/cash.png";
     fLabel = tr("Cross rates");
@@ -17,7 +17,7 @@ CR5CurrencyCrossRate::CR5CurrencyCrossRate(const QStringList &dbParams, QWidget 
     fTranslation["f_currname2"] = tr("Name 2");
     fTranslation["f_rate"] = tr("Rate");
     fTranslation["f_symbol"] = tr("Symbol");
-    fEditor = new CE5CurrencyCrossRate(dbParams);
+    fEditor = new CE5CurrencyCrossRate();
 }
 
 QToolBar *CR5CurrencyCrossRate::toolBar()

@@ -9,7 +9,7 @@ class CR5GeneralReportOnlyDate : public C5ReportWidget
 {
     Q_OBJECT
 public:
-    CR5GeneralReportOnlyDate(const QStringList &dbParams);
+    CR5GeneralReportOnlyDate();
 
     virtual void buildQuery() override;
 

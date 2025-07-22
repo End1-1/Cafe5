@@ -6,14 +6,14 @@
 #include "c5config.h"
 #include "c5user.h"
 
-C5ChangeDocInputPrice::C5ChangeDocInputPrice(const QStringList &dbParams, const QString &uuid) :
-    C5Dialog(dbParams),
+C5ChangeDocInputPrice::C5ChangeDocInputPrice(const QString &uuid) :
+    C5Dialog(),
     ui(new Ui::C5ChangeDocInputPrice)
 {
     ui->setupUi(this);
     ui->leUuid->setText(uuid);
-    ui->leGoods->setSelector(dbParams, ui->leGoodsName, cache_goods, 1, 3);
-    C5Database db(dbParams);
+    ui->leGoods->setSelector(ui->leGoodsName, cache_goods, 1, 3);
+    C5Database db;
     db[":f_id"] = uuid;
     db.exec("select f_goods, f_price from a_store where f_id=:f_id");
     if (db.nextRow()) {
@@ -32,9 +32,9 @@ C5ChangeDocInputPrice::~C5ChangeDocInputPrice()
     delete ui;
 }
 
-void C5ChangeDocInputPrice::changePrice(const QStringList &dbParams, const QString &uuid)
+void C5ChangeDocInputPrice::changePrice(const QString &uuid)
 {
-    auto *d = new C5ChangeDocInputPrice(dbParams, uuid);
+    auto *d = new C5ChangeDocInputPrice(uuid);
     d->exec();
     delete d;
 }
@@ -50,7 +50,7 @@ void C5ChangeDocInputPrice::on_btnChange_clicked()
         C5Message::error(tr("Goods is not selected"));
         return;
     }
-    C5Database db(fDBParams);
+    C5Database db;
     db[":f_id"] = ui->leUuid->text();
     db.exec("select f_base from a_store where f_id=:f_id");
     db.nextRow();

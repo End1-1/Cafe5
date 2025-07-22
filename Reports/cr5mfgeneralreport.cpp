@@ -3,12 +3,12 @@
 #include "c5tablemodel.h"
 #include <QApplication>
 
-CR5MFGeneralReport::CR5MFGeneralReport(const QStringList &dbParams, QWidget *parent) :
-    C5ReportWidget(dbParams, parent)
+CR5MFGeneralReport::CR5MFGeneralReport(QWidget *parent) :
+    C5ReportWidget( parent)
 {
     fIcon = ":/manufacturing.png";
     fLabel = tr("Manufacture general report");
-    fFilterWidget = new CR5MFGeneralReportFilter(dbParams);
+    fFilterWidget = new CR5MFGeneralReportFilter();
     fSimpleQuery = false;
     fMainTable = "mf_daily_process p";
     fLeftJoinTables << "left join mf_actions_group pr on pr.f_id=p.f_product [pr]"

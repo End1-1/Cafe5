@@ -2,17 +2,17 @@
 #include "ui_cr5mfgeneralreportfilter.h"
 #include "c5cache.h"
 
-CR5MFGeneralReportFilter::CR5MFGeneralReportFilter(const QStringList &dbParams, QWidget *parent) :
-    C5FilterWidget(dbParams, parent),
+CR5MFGeneralReportFilter::CR5MFGeneralReportFilter(QWidget *parent) :
+    C5FilterWidget(parent),
     ui(new Ui::CR5MFGeneralReportFilter)
 {
     ui->setupUi(this);
-    ui->leProduct->setSelector(dbParams, ui->leProducName, cache_mf_products);
-    ui->leProcess->setSelector(dbParams, ui->leProcessName, cache_mf_actions);
-    ui->lePosition->setSelector(dbParams, ui->lePositionName, cache_users_groups);
-    ui->leWorker->setSelector(dbParams, ui->leWorkerName, cache_users);
-    ui->leTeamlead->setSelector(dbParams, ui->leTeamleadName, cache_users);
-    ui->leWorkerState->setSelector(dbParams, ui->leWorkerStateName, cache_users_states);
+    ui->leProduct->setSelector(ui->leProducName, cache_mf_products);
+    ui->leProcess->setSelector(ui->leProcessName, cache_mf_actions);
+    ui->lePosition->setSelector(ui->lePositionName, cache_users_groups);
+    ui->leWorker->setSelector(ui->leWorkerName, cache_users);
+    ui->leTeamlead->setSelector(ui->leTeamleadName, cache_users);
+    ui->leWorkerState->setSelector(ui->leWorkerStateName, cache_users_states);
 }
 
 CR5MFGeneralReportFilter::~CR5MFGeneralReportFilter()

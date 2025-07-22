@@ -8,7 +8,7 @@ class CR5DishPart1 : public C5ReportWidget
     Q_OBJECT
 
 public:
-    CR5DishPart1(const QStringList &dbParams, QWidget *parent = nullptr);
+    CR5DishPart1(QWidget *parent = nullptr);
 
     virtual QToolBar *toolBar();
 };

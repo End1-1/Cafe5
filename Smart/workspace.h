@@ -22,7 +22,7 @@ class Workspace : public C5Dialog
     Q_OBJECT
 
 public:
-    explicit Workspace(const QStringList &dbParams);
+    explicit Workspace();
 
     ~Workspace();
 
@@ -30,7 +30,7 @@ public:
 
     virtual void reject() override;
 
-    static Workspace *fWorkspace;
+    static Workspace* fWorkspace;
 
     bool printReceipt(const QString &id, bool printSecond, bool precheck);
 
@@ -167,15 +167,15 @@ private slots:
     void on_btnService_clicked();
 
 private:
-    Ui::Workspace *ui;
+    Ui::Workspace* ui;
 
-    NLoadingDlg *fLoadingDlg;
+    NLoadingDlg* fLoadingDlg;
 
-    C5User *fUser;
+    C5User* fUser;
 
-    QList<Dish *> fDishes;
+    QList<Dish*> fDishes;
 
-    QMap<QString, Dish *> fDishesBarcode;
+    QMap<QString, Dish*> fDishesBarcode;
 
     QString fOrderUuid;
 
@@ -185,7 +185,7 @@ private:
 
     int fTable;
 
-    QTimer *fTimer;
+    QTimer* fTimer;
 
     int fCustomer;
 
@@ -207,7 +207,7 @@ private:
 
     bool mRejectEnabled;
 
-    WCustomerDisplay *fCustomerDisplay;
+    WCustomerDisplay* fCustomerDisplay;
 
     void configFiscalButton();
 
@@ -237,9 +237,9 @@ private:
 
     void updateInfo(int row);
 
-    void createHttpRequest(const QString &route, QJsonObject params, const char *responseOkSlot,
+    void createHttpRequest(const QString &route, QJsonObject params, const char* responseOkSlot,
                            const QVariant &marks = QVariant(),
-                           const char *responseErrorSlot = SLOT(slotHttpError(QString)));
+                           const char* responseErrorSlot = SLOT(slotHttpError(QString)));
 
     bool service();
 };

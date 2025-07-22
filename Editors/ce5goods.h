@@ -15,7 +15,7 @@ class CE5Goods : public CE5Editor
     Q_OBJECT
 
 public:
-    explicit CE5Goods(const QStringList &dbParams, QWidget *parent = nullptr);
+    explicit CE5Goods(QWidget *parent = nullptr);
 
     ~CE5Goods();
 

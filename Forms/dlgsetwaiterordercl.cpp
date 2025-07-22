@@ -4,12 +4,12 @@
 #include "c5config.h"
 #include "c5database.h"
 
-DlgSetWaiterOrderCL::DlgSetWaiterOrderCL(const QStringList &dbParams) :
-    C5Dialog(dbParams),
+DlgSetWaiterOrderCL::DlgSetWaiterOrderCL() :
+    C5Dialog(),
     ui(new Ui::DlgSetWaiterOrderCL)
 {
     ui->setupUi(this);
-    C5Database db(dbParams);
+    C5Database db;
     db.exec(QString("select f_id, f_name from %1.f_city_ledger ").arg(__c5config.hotelDatabase()));
     while (db.nextRow()) {
         int r = ui->tbl->addEmptyRow();
@@ -23,9 +23,9 @@ DlgSetWaiterOrderCL::~DlgSetWaiterOrderCL()
     delete ui;
 }
 
-bool DlgSetWaiterOrderCL::getCL(const QStringList &dbParams, QString &code, QString &name)
+bool DlgSetWaiterOrderCL::getCL(QString &code, QString &name)
 {
-    DlgSetWaiterOrderCL d(dbParams);
+    DlgSetWaiterOrderCL d;
     if (d.exec() == QDialog::Accepted) {
         code = d.property("code").toString();
         name = d.property("name").toString();
@@ -37,7 +37,7 @@ bool DlgSetWaiterOrderCL::getCL(const QStringList &dbParams, QString &code, QStr
 void DlgSetWaiterOrderCL::on_btnNew_clicked()
 {
     QString code, name;
-    if (DlgNewCL::createCL(fDBParams, code, name)) {
+    if (DlgNewCL::createCL(code, name)) {
         int r = ui->tbl->addEmptyRow();
         ui->tbl->setString(r, 0, code);
         ui->tbl->setString(r, 1, name);

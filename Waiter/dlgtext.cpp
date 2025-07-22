@@ -3,7 +3,7 @@
 #include "c5config.h"
 
 DlgText::DlgText() :
-    C5Dialog(__c5config.dbParams()),
+    C5Dialog(),
     ui(new Ui::DlgText)
 {
     ui->setupUi(this);

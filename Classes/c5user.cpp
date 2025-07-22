@@ -68,7 +68,7 @@ bool C5User::authByUsernamePass(const QString &username, const QString &pass)
 {
     fError.clear();
     fValid = false;
-    C5Database db(__c5config.dbParams());
+    C5Database db;
     db[":f_login"] = username;
     db[":f_password"] = pass;
     db.exec("select * from s_user where f_login=:f_login and f_password=md5(:f_password)");
@@ -93,7 +93,7 @@ bool C5User::authByPinPass(const QString &pin, const QString &pass)
 {
     fError.clear();
     fValid = false;
-    C5Database db(__c5config.dbParams());
+    C5Database db;
     db[":f_login"] = pin;
     db[":f_password"] = pass;
     db.exec("select * from s_user where f_login=:f_login and f_altpassword=md5(:f_password)");
@@ -130,7 +130,7 @@ bool C5User::enterWork()
         fError = tr("Cannot input without output");
         return false;
     } else {
-        C5Database db(__c5config.dbParams());
+        C5Database db;
         db[":f_id"] = db.uuid();
         db[":f_user"] = id();
         db[":f_datein"] = QDate::currentDate();
@@ -146,7 +146,7 @@ bool C5User::enterWork()
 
 bool C5User::leaveWork()
 {
-    C5Database db(__c5config.dbParams());
+    C5Database db;
     if (fState == usAtWork) {
         db[":f_dateout"] = QDate::currentDate();
         db[":f_timeout"] = QTime::currentTime();
@@ -169,7 +169,7 @@ C5User::UserState C5User::state()
 
 bool C5User::loadFromDB(int id)
 {
-    C5Database db(__c5config.dbParams());
+    C5Database db;
     db[":f_id"] = id;
     db.exec("select u.*, s.f_name as f_settingsname "
             "from s_user u "
@@ -202,7 +202,7 @@ QVariant C5User::data(const QString &name)
 
 void C5User::getState()
 {
-    C5Database db(__c5config.dbParams());
+    C5Database db;
     db[":f_user"] = id();
     db.exec("select * from s_salary_inout where f_user=:f_user and f_dateout is null");
     fState = db.nextRow() ? usAtWork : usNotAtWork;
@@ -211,7 +211,7 @@ void C5User::getState()
 void C5User::getPermissions()
 {
     fPermissions.clear();
-    C5Database db(__c5config.dbParams());
+    C5Database db;
     C5Permissions::init(db, group());
     db[":f_group"] = group();
     db.exec("select f_key, f_value from s_user_access where f_group=:f_group and f_value=1");
@@ -222,7 +222,7 @@ void C5User::getPermissions()
 
 bool C5User::authorize(const QString &altPassword)
 {
-    C5Database db(__c5config.dbParams());
+    C5Database db;
     db[":f_altpassword"] = altPassword;
     db.exec("select * from s_user where f_altpassword=md5(:f_altpassword) and f_state=1 ");
     if (!db.nextRow()) {

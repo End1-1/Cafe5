@@ -1,7 +1,8 @@
 #ifndef C5TRANSLATOR_H
 #define C5TRANSLATOR_H
 
-#include "c5database.h"
+#include <QMap>
+#include <QObject>
 
 static const int LANG_AM = 0;
 static const int LANG_EN = 1;
@@ -18,7 +19,7 @@ class C5Translator : public QObject
 public:
     C5Translator();
 
-    static void initTranslator(const QStringList &dbParams);
+    static void initTranslator();
 
     void setLanguage(int language);
 
@@ -29,8 +30,6 @@ public:
     static QString translate(const QString &str, int lang);
 
 private:
-
-    QStringList fDbParams;
 
     int fLanguage;
 
@@ -56,7 +55,7 @@ private:
 
     QMap<QString, QMap<QString, QString> > fTranslations;
 
-    static C5Translator *fInstance;
+    static C5Translator* fInstance;
 
 };
 

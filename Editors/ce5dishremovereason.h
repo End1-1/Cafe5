@@ -12,7 +12,7 @@ class CE5DishRemoveReason : public CE5Editor
     Q_OBJECT
 
 public:
-    explicit CE5DishRemoveReason(const QStringList &dbParams, QWidget *parent = nullptr);
+    explicit CE5DishRemoveReason(QWidget *parent = nullptr);
 
     ~CE5DishRemoveReason();
 

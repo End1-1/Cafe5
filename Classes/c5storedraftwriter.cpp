@@ -37,9 +37,11 @@ bool C5StoreDraftWriter::writeFromShopOutput(const QString &doc, int state, QStr
 {
     fDb[":f_id"] = doc;
     fDb.exec("select * from o_header where f_id=:f_id");
-    if (!fDb.nextRow()) {
+
+    if(!fDb.nextRow()) {
         return returnResult(false);
     }
+
     QDate docDate = fDb.getDate("f_datecash");
     int operatorId = fDb.getInt("f_staff");
     QString comment = QString("%1 %2%3").arg(tr("Output of sale"), fDb.getString("f_prefix"),
@@ -49,18 +51,22 @@ bool C5StoreDraftWriter::writeFromShopOutput(const QString &doc, int state, QStr
     fDb[":f_header"] = doc;
     fDb.exec("select * from o_goods where f_header=:f_header and f_sign=1");
     bool fetch = false;
+
     do {
         OGoods g;
         fetch = g.getRecord(fDb);
-        if (fetch) {
+
+        if(fetch) {
             items.append(g);
             stores.insert(g.store);
         }
-    } while (fetch);
-    if (items.count() == 0) {
+    } while(fetch);
+
+    if(items.count() == 0) {
         return true;
     }
-    for (int store : stores) {
+
+    for(int store : stores) {
         int rownum = 1;
         QString id;
         QString userid = storeDocNum(DOC_TYPE_STORE_OUTPUT, store, true, 0);
@@ -68,23 +74,29 @@ bool C5StoreDraftWriter::writeFromShopOutput(const QString &doc, int state, QStr
                      QDate::currentDate(), QTime::currentTime(), 0, 0, comment,
                      0, __c5config.getValue(param_default_currency).toInt());
         writeAHeaderStore(id, operatorId, operatorId, "", QDate(), 0, store, 1, "", 0, 0, doc);
-        for (OGoods i : items) {
-            if (i.store != store) {
+
+        for(OGoods i : items) {
+            if(i.store != store) {
                 continue;
             }
+
             QString drid;
-            if (!writeAStoreDraft(drid, id, store, -1, i.goods, i.qty, i.price, i.price *i.qty, DOC_REASON_SALE, i.id.toString(),
-                                  rownum++, "")) {
+
+            if(!writeAStoreDraft(drid, id, store, -1, i.goods, i.qty, i.price, i.price * i.qty, DOC_REASON_SALE, i.id.toString(),
+                                 rownum++, "")) {
                 err += fDb.fLastError;
                 return returnResult(false, err);
             }
+
             i.storeRec = drid;
-            if (!i.write(fDb, err)) {
+
+            if(!i.write(fDb, err)) {
                 return returnResult(false, err);
             }
         }
-        if (state == DOC_STATE_SAVED) {
-            if (writeOutput(id, err)) {
+
+        if(state == DOC_STATE_SAVED) {
+            if(writeOutput(id, err)) {
                 writeAHeader(id, userid, DOC_STATE_SAVED, DOC_TYPE_STORE_OUTPUT, operatorId, docDate, QDate::currentDate(),
                              QTime::currentTime(), 0, 0, comment, 0, __c5config.getValue(param_default_currency).toInt());
             } else {
@@ -94,6 +106,7 @@ bool C5StoreDraftWriter::writeFromShopOutput(const QString &doc, int state, QStr
             }
         }
     }
+
     return true;
 }
 
@@ -105,64 +118,79 @@ bool C5StoreDraftWriter::rollbackOutput(C5Database &db, const QString &id)
             "from o_goods g "
             "inner join a_store_draft d on g.f_storerec=d.f_id "
             "where g.f_id=:f_id");
-    while (db.nextRow()) {
+
+    while(db.nextRow()) {
         docs.insert(db.getString(0));
     }
+
     db[":f_id"] = id;
     db.exec("delete from o_goods where f_id=:f_id");
-    for (const QString &doc : docs) {
+
+    for(const QString &doc : docs) {
         QString err;
-        if (!removeStoreDocument(db, doc, err)) {
+
+        if(!removeStoreDocument(db, doc, err)) {
             return false;
         }
     }
+
     return true;
 }
 
 bool C5StoreDraftWriter::removeStoreDocument(C5Database &db, const QString &id, QString &err)
 {
     C5StoreDraftWriter dw(db);
-    if (dw.haveRelations(id, err, false)) {
+
+    if(dw.haveRelations(id, err, false)) {
         return false;
     }
+
     db[":f_id"] = id;
     db.exec("select f_baseonsale, f_cashuuid from a_header_store where f_id=:f_id");
     QString cashDoc;
-    if (db.nextRow()) {
-        if (db.getInt(0) > 0) {
+
+    if(db.nextRow()) {
+        if(db.getInt(0) > 0) {
             //err += tr("Document based on sale cannot be edited manually");
         }
+
         cashDoc = db.getString("f_cashuuid");
     }
-    if (err.isEmpty()) {
-        if (!dw.outputRollback(db, id)) {
+
+    if(err.isEmpty()) {
+        if(!dw.outputRollback(db, id)) {
             err += db.fLastError;
         }
     }
-    if (!err.isEmpty()) {
+
+    if(!err.isEmpty()) {
         return false;
     }
+
     int storei = 0;
     int storeo = 0;
     QStringList sqls;
     db[":f_id"] = id;
     db.exec("select f_storein, f_storeout from a_header_store where f_id=:f_id");
-    if (db.nextRow()) {
+
+    if(db.nextRow()) {
         storei = db.getInt(0);
         storeo = db.getInt(1);
     }
+
     db[":f_id1"] = storei;
     db[":f_id2"] = storeo;
     sqls.append(db.execDry("update c_storages set f_have_changes=1 where f_id=:f_id1 or f_id=:f_id2"));
     db[":f_document"] = id;
     sqls.append(db.execDry("delete from a_store_draft where f_document=:f_document"));
-    db[":f_storedoc"] = id;
+    db.exec(QString("call sp_del_bclientsdebts(%1, 1)").arg(id));
     sqls.append(db.execDry("delete from b_clients_debts where f_storedoc=:f_storedoc"));
     db[":f_id"] = id;
     sqls.append(db.execDry("delete from a_header where f_id=:f_id"));
     db[":f_id"] = id;
     sqls.append(db.execDry("delete from a_header_store where f_id=:f_id"));
-    if (!cashDoc.isEmpty()) {
+
+    if(!cashDoc.isEmpty()) {
         db[":f_header"] = cashDoc;
         sqls.append(db.execDry("delete from e_cash where f_header=:f_header"));
         db[":f_id"] = cashDoc;
@@ -170,6 +198,7 @@ bool C5StoreDraftWriter::removeStoreDocument(C5Database &db, const QString &id, 
         db[":f_id"] = cashDoc;
         sqls.append(db.execDry("delete from a_header where f_id=:f_id"));
     }
+
     db[":f_document"] = id;
     sqls.append(db.execDry("delete from a_store_dish_waste where f_document=:f_document"));
     db.execSqlList(sqls);
@@ -179,61 +208,78 @@ bool C5StoreDraftWriter::removeStoreDocument(C5Database &db, const QString &id, 
 bool C5StoreDraftWriter::outputRollback(C5Database &db, const QString &id)
 {
     db[":f_document"] = id;
-    if (!db.exec("delete from a_store where f_document=:f_document")) {
+
+    if(!db.exec("delete from a_store where f_document=:f_document")) {
         return false;
     }
+
     return true;
 }
 
 QString C5StoreDraftWriter::storeDocNum(int docType, int storeId, bool withUpdate, int value)
 {
     QString counterField;
-    switch (docType) {
-        case DOC_TYPE_STORE_INPUT:
-            counterField = "f_inputcounter";
-            break;
-        case DOC_TYPE_STORE_MOVE:
-            counterField = "f_movecounter";
-            break;
-        case DOC_TYPE_STORE_OUTPUT:
-            counterField = "f_outcounter";
-            break;
-        case DOC_TYPE_COMPLECTATION:
-            counterField = "f_complectcounter";
-            break;
+
+    switch(docType) {
+    case DOC_TYPE_STORE_INPUT:
+        counterField = "f_inputcounter";
+        break;
+
+    case DOC_TYPE_STORE_MOVE:
+        counterField = "f_movecounter";
+        break;
+
+    case DOC_TYPE_STORE_OUTPUT:
+        counterField = "f_outcounter";
+        break;
+
+    case DOC_TYPE_COMPLECTATION:
+        counterField = "f_complectcounter";
+        break;
     }
+
     fDb[":f_id"] = storeId;
     fDb.exec("select " + counterField + " + 1 from c_storages where f_id=:f_id for update");
-    if (!fDb.nextRow()) {
+
+    if(!fDb.nextRow()) {
         return "UNKNOWN STORE";
     }
+
     int val = fDb.getInt(0);
-    if (value > 0) {
+
+    if(value > 0) {
         val = value;
     }
-    if (withUpdate) {
+
+    if(withUpdate) {
         fDb[":f_id"] = storeId;
         fDb[":val"] = val;
         fDb.exec("update c_storages set " + counterField + " =:val where f_id=:f_id and " + counterField + "<:val");
     }
-    switch (docType) {
-        case DOC_TYPE_STORE_INPUT:
-            return QString("%1").arg(val, C5Config::docNumDigitsInput(), 10, QChar('0'));
-        case DOC_TYPE_STORE_MOVE:
-            return QString("%1").arg(val, C5Config::docNumDigitsMove(), 10, QChar('0'));
-        case DOC_TYPE_STORE_OUTPUT:
-            return QString("%1").arg(val, C5Config::docNumDigitsOut(), 10, QChar('0'));
-        case DOC_TYPE_COMPLECTATION:
-            return QString("%1").arg(val, C5Config::docNumDigitsInput(), 10, QChar('0'));
+
+    switch(docType) {
+    case DOC_TYPE_STORE_INPUT:
+        return QString("%1").arg(val, C5Config::docNumDigitsInput(), 10, QChar('0'));
+
+    case DOC_TYPE_STORE_MOVE:
+        return QString("%1").arg(val, C5Config::docNumDigitsMove(), 10, QChar('0'));
+
+    case DOC_TYPE_STORE_OUTPUT:
+        return QString("%1").arg(val, C5Config::docNumDigitsOut(), 10, QChar('0'));
+
+    case DOC_TYPE_COMPLECTATION:
+        return QString("%1").arg(val, C5Config::docNumDigitsInput(), 10, QChar('0'));
     }
+
     return "ERROR";
 }
 
-bool C5StoreDraftWriter::hallId(QString &prefix, int &id, int hall)
+bool C5StoreDraftWriter::hallId(QString &prefix, int& id, int hall)
 {
     fDb[":f_id"] = hall;
     fDb.exec("select f_counter + 1, f_prefix as f_counter from h_halls where f_id=:f_id for update");
-    if (fDb.nextRow()) {
+
+    if(fDb.nextRow()) {
         id = fDb.getInt(0);
         prefix = fDb.getString(1);
         fDb[":f_counter"] = fDb.getInt(0);
@@ -248,22 +294,27 @@ bool C5StoreDraftWriter::hallId(QString &prefix, int &id, int hall)
 int C5StoreDraftWriter::counterAType(int type)
 {
     fDb[":f_id"] = DOC_TYPE_CASH;
-    if (!fDb.exec("select cast(f_counter + 1 as int) "
-                  "from a_type "
-                  "where f_id=:f_id")) {
+
+    if(!fDb.exec("select cast(f_counter + 1 as int) "
+                 "from a_type "
+                 "where f_id=:f_id")) {
         return returnResult(false);
     }
-    if (!fDb.nextRow()) {
+
+    if(!fDb.nextRow()) {
         return returnResult(false, "Invalid counter number");
     }
+
     int result = fDb.getInt(0);
     Q_ASSERT(result > 0);
     fDb[":f_id"] = type;
     fDb[":f_counter"] = result;
-    if (!fDb.exec("update a_type set f_counter=:f_counter "
-                  "where f_id=:f_id and f_counter<:f_counter")) {
+
+    if(!fDb.exec("update a_type set f_counter=:f_counter "
+                 "where f_id=:f_id and f_counter<:f_counter")) {
         return returnResult(false);
     }
+
     return result > 0;
 }
 
@@ -274,20 +325,24 @@ bool C5StoreDraftWriter::updateField(const QString &tableName, const QString &fi
     fDb[":" + whereFieldName] = whereFieldValue;
     bool r = fDb.exec("update " + tableName + " set " + fieldName + "=:" + fieldName + " where " + whereFieldName + "=:" +
                       whereFieldName);
-    if (!r) {
+
+    if(!r) {
         fErrorMsg = fDb.fLastError;
     }
+
     return r;
 }
 
 bool C5StoreDraftWriter::readAHeaderStore(const QString &id)
 {
     fDb[":f_id"] = id;
-    if (!fDb.exec("select * from a_header_store where f_id=:f_id", fAHeaderStoreData, fAHeaderStoreDataMap)) {
+
+    if(!fDb.exec("select * from a_header_store where f_id=:f_id", fAHeaderStoreData, fAHeaderStoreDataMap)) {
         fErrorMsg = fDb.fLastError;
         return false;
     }
-    if (fAHeaderStoreData.size() > 0) {
+
+    if(fAHeaderStoreData.size() > 0) {
         return true;
     } else {
         fErrorMsg = tr("Error in store document, partial data was lost");
@@ -298,15 +353,16 @@ bool C5StoreDraftWriter::readAHeaderStore(const QString &id)
 bool C5StoreDraftWriter::readAStoreDraft(const QString &id)
 {
     fDb[":f_document"] = id;
-    if (fDb.exec("select d.f_id, d.f_goods, "
-                 "concat(g.f_name, if(g.f_scancode is null, '', concat(' ', g.f_scancode))) as f_goodsname, "
-                 "d.f_qty, u.f_name as f_unitname, d.f_price, d.f_total, d.f_reason, d.f_type, d.f_base, d.f_comment, "
-                 "v.f_date as f_validdate "
-                 "from a_store_draft d "
-                 "left join c_goods g on g.f_id=d.f_goods "
-                 "left join c_units u on u.f_id=g.f_unit "
-                 "left join a_store_valid v on v.f_id=d.f_id "
-                 "where d.f_document=:f_document order by d.f_row", fAStoreDraftData, fAStoreDraftDataMap)) {
+
+    if(fDb.exec("select d.f_id, d.f_goods, "
+                "concat(g.f_name, if(g.f_scancode is null, '', concat(' ', g.f_scancode))) as f_goodsname, "
+                "d.f_qty, u.f_name as f_unitname, d.f_price, d.f_total, d.f_reason, d.f_type, d.f_base, d.f_comment, "
+                "v.f_date as f_validdate "
+                "from a_store_draft d "
+                "left join c_goods g on g.f_id=d.f_goods "
+                "left join c_units u on u.f_id=g.f_unit "
+                "left join a_store_valid v on v.f_id=d.f_id "
+                "where d.f_document=:f_document order by d.f_row", fAStoreDraftData, fAStoreDraftDataMap)) {
         //        if (fAStoreDraftData.count() == 0) {
         //            fErrorMsg = tr("Empty store document");
         //            return false;
@@ -321,24 +377,28 @@ bool C5StoreDraftWriter::readAStoreDraft(const QString &id)
 bool C5StoreDraftWriter::readAStoreDishWaste(const QString &id)
 {
     fDb[":f_document"] = id;
-    if (!fDb.exec("select w.f_id, w.f_dish, d.f_name as f_dishname, w.f_qty, w.f_data "
-                  "from a_store_dish_waste w "
-                  "left join d_dish d on d.f_id=w.f_dish "
-                  "where w.f_document=:f_document", fAStoreDishWaste, fAStoreDishWasteDataMap)) {
+
+    if(!fDb.exec("select w.f_id, w.f_dish, d.f_name as f_dishname, w.f_qty, w.f_data "
+                 "from a_store_dish_waste w "
+                 "left join d_dish d on d.f_id=w.f_dish "
+                 "where w.f_document=:f_document", fAStoreDishWaste, fAStoreDishWasteDataMap)) {
         fErrorMsg = fDb.fLastError;
         return false;
     }
+
     return true;
 }
 
 bool C5StoreDraftWriter::readAHeaderCash(const QString &id)
 {
     fDb[":f_id"] = id;
-    if (!fDb.exec("select * from a_header_cash where f_id=:f_id", fAHeaderCashData, fAHeaderCashDataMap)) {
+
+    if(!fDb.exec("select * from a_header_cash where f_id=:f_id", fAHeaderCashData, fAHeaderCashDataMap)) {
         fErrorMsg = fDb.fLastError;
         return false;
     }
-    if (fAHeaderCashData.size() > 0) {
+
+    if(fAHeaderCashData.size() > 0) {
         return true;
     } else {
         fErrorMsg = tr("Error in cash document, partial data was lost");
@@ -349,11 +409,13 @@ bool C5StoreDraftWriter::readAHeaderCash(const QString &id)
 bool C5StoreDraftWriter::readECash(const QString &id)
 {
     fDb[":f_header"] = id;
-    if (fDb.exec("select * from e_cash where f_header=:f_header order by f_row", fECashData, fECashDataMap)) {
-        if (fECashData.size() == 0) {
+
+    if(fDb.exec("select * from e_cash where f_header=:f_header order by f_row", fECashData, fECashDataMap)) {
+        if(fECashData.size() == 0) {
             fErrorMsg = tr("Empty cash document");
             return false;
         }
+
         return true;
     } else {
         fErrorMsg = fDb.fLastError;
@@ -364,7 +426,8 @@ bool C5StoreDraftWriter::readECash(const QString &id)
 bool C5StoreDraftWriter::readBClientDebtsRefund(const QString &id)
 {
     fDb[":f_storedoc"] = id;
-    if (fDb.exec("select * from b_clients_debts where f_storedoc=:f_storedoc", fBClientsDebtsData, fBClientsDebtsDataMap)) {
+
+    if(fDb.exec("select * from b_clients_debts where f_storedoc=:f_storedoc", fBClientsDebtsData, fBClientsDebtsDataMap)) {
         return true;
     } else {
         fErrorMsg = fDb.fLastError;
@@ -374,13 +437,14 @@ bool C5StoreDraftWriter::readBClientDebtsRefund(const QString &id)
 
 bool C5StoreDraftWriter::returnResult(bool r, const QString &msg)
 {
-    if (!r) {
-        if (msg.isEmpty()) {
+    if(!r) {
+        if(msg.isEmpty()) {
             fErrorMsg = fDb.fLastError;
         } else {
             fErrorMsg = msg;
         }
     }
+
     return r;
 }
 
@@ -391,9 +455,11 @@ bool C5StoreDraftWriter::writeAHeader(QString &id, const QString &userid, int st
                                       int working_session)
 {
     bool u = true;
-    if (id.isEmpty()) {
+
+    if(id.isEmpty()) {
         id = fDb.uuid();
     }
+
     fDb[":f_id"] = id;
     fDb.exec("select f_id from a_header where f_id=:f_id");
     u = fDb.nextRow();
@@ -411,7 +477,8 @@ bool C5StoreDraftWriter::writeAHeader(QString &id, const QString &userid, int st
     fDb[":f_paid"] = paid;
     fDb[":f_working_session"] = working_session;
     fDb[":f_currency"] = currency;
-    if (u) {
+
+    if(u) {
         return returnResult(fDb.update("a_header", where_id(id)));
     } else {
         return returnResult(fDb.insert("a_header", false));
@@ -423,39 +490,51 @@ bool C5StoreDraftWriter::readAHeader(const QString &id)
     bool result = true;
     fDb[":f_id"] = id;
     fDb.exec("select * from a_header where f_id=:f_id", fAHeaderData, fAHeaderDataMap);
-    if (fAHeaderData.size() > 0) {
-        switch (value(container_aheader, 0, "f_type").toInt()) {
-            case DOC_TYPE_STORE_INPUT:
-                result = readAHeaderStore(id);
-                if (result) {
-                    result = readAStoreDraft(id);
-                }
-                if (result) {
-                    result = readBClientDebtsRefund(id);
-                }
-                break;
-            case DOC_TYPE_CASH:
-                result = readAHeaderCash(id);
-                if (result) {
-                    result = readECash(id);
-                }
-                break;
-            case DOC_TYPE_STORE_OUTPUT:
-            case DOC_TYPE_STORE_MOVE:
-            case DOC_TYPE_COMPLECTATION:
-                result = readAHeaderStore(id);
-                if (result) {
-                    result = readAStoreDraft(id);
-                }
-                break;
+
+    if(fAHeaderData.size() > 0) {
+        switch(value(container_aheader, 0, "f_type").toInt()) {
+        case DOC_TYPE_STORE_INPUT:
+            result = readAHeaderStore(id);
+
+            if(result) {
+                result = readAStoreDraft(id);
+            }
+
+            if(result) {
+                result = readBClientDebtsRefund(id);
+            }
+
+            break;
+
+        case DOC_TYPE_CASH:
+            result = readAHeaderCash(id);
+
+            if(result) {
+                result = readECash(id);
+            }
+
+            break;
+
+        case DOC_TYPE_STORE_OUTPUT:
+        case DOC_TYPE_STORE_MOVE:
+        case DOC_TYPE_COMPLECTATION:
+            result = readAHeaderStore(id);
+
+            if(result) {
+                result = readAStoreDraft(id);
+            }
+
+            break;
         }
-        if (result) {
+
+        if(result) {
             result = readAStoreDishWaste(id);
         }
     } else {
         fErrorMsg = tr("Document not exists");
         return false;
     }
+
     return result;
 }
 
@@ -493,7 +572,8 @@ bool C5StoreDraftWriter::writeAHeaderStore(const QString &id, int userAccept, in
     fDb[":f_complectation"] = complectation;
     fDb[":f_complectationqty"] = complectationQty;
     fDb[":f_saleuuid"] = saleuuid;
-    if (u) {
+
+    if(u) {
         return returnResult(fDb.update("a_header_store", where_id(id)));
     } else {
         return returnResult(fDb.insert("a_header_store", false));
@@ -516,7 +596,8 @@ bool C5StoreDraftWriter::writeAHeaderCash(const QString &id,
     fDb[":f_related"] = related;
     fDb[":f_storedoc"] = storedoc;
     fDb[":f_oheader"] = oheader;
-    if (u) {
+
+    if(u) {
         return returnResult(fDb.update("a_header_cash", where_id(id)));
     } else {
         return returnResult(fDb.insert("a_header_cash", false));
@@ -534,69 +615,85 @@ bool C5StoreDraftWriter::writeAHeader2ShopStore(const QString &id, int store, in
 int C5StoreDraftWriter::rowCount(int container)
 {
     unsigned long long rc = -1;
-    switch (container) {
-        case container_ecash:
-            rc =  fECashData.size();
-            break;
-        case container_aheader:
-            rc = fAHeaderData.size();
-            break;
-        case container_aheadercash:
-            rc = fAHeaderCashData.size();
-            break;
-        case container_aheaderstore:
-            rc = fAHeaderStoreData.size();
-            break;
-        case container_astoredraft:
-            rc = fAStoreDraftData.size();
-            break;
-        case container_astoredishwaste:
-            rc = fAStoreDishWaste.size();
-            break;
-        case container_bclient_debts:
-            rc = fBClientsDebtsData.size();
-            break;
+
+    switch(container) {
+    case container_ecash:
+        rc =  fECashData.size();
+        break;
+
+    case container_aheader:
+        rc = fAHeaderData.size();
+        break;
+
+    case container_aheadercash:
+        rc = fAHeaderCashData.size();
+        break;
+
+    case container_aheaderstore:
+        rc = fAHeaderStoreData.size();
+        break;
+
+    case container_astoredraft:
+        rc = fAStoreDraftData.size();
+        break;
+
+    case container_astoredishwaste:
+        rc = fAStoreDishWaste.size();
+        break;
+
+    case container_bclient_debts:
+        rc = fBClientsDebtsData.size();
+        break;
     }
+
     Q_ASSERT(rc != -1);
     return rc;
 }
 
 QVariant C5StoreDraftWriter::value(int container, int row, const QString &key)
 {
-    std::vector<QJsonArray > *c = nullptr;
-    QHash<QString, int> *d = nullptr;
-    switch (container) {
-        case container_ecash:
-            c = &fECashData;
-            d = &fECashDataMap;
-            break;
-        case container_aheader:
-            c = &fAHeaderData;
-            d = &fAHeaderDataMap;
-            break;
-        case container_aheadercash:
-            c = &fAHeaderCashData;
-            d = &fAHeaderCashDataMap;
-            break;
-        case container_aheaderstore:
-            c = &fAHeaderStoreData;
-            d = &fAHeaderStoreDataMap;
-            break;
-        case container_astoredraft:
-            c = &fAStoreDraftData;
-            d = &fAStoreDraftDataMap;
-            break;
-        case container_astoredishwaste:
-            c = &fAStoreDishWaste;
-            d = &fAStoreDishWasteDataMap;
-            break;
-        case container_bclient_debts:
-            c = &fBClientsDebtsData;
-            d = &fBClientsDebtsDataMap;
-            break;
+    std::vector<QJsonArray >* c = nullptr;
+    QHash<QString, int>* d = nullptr;
+
+    switch(container) {
+    case container_ecash:
+        c = &fECashData;
+        d = &fECashDataMap;
+        break;
+
+    case container_aheader:
+        c = &fAHeaderData;
+        d = &fAHeaderDataMap;
+        break;
+
+    case container_aheadercash:
+        c = &fAHeaderCashData;
+        d = &fAHeaderCashDataMap;
+        break;
+
+    case container_aheaderstore:
+        c = &fAHeaderStoreData;
+        d = &fAHeaderStoreDataMap;
+        break;
+
+    case container_astoredraft:
+        c = &fAStoreDraftData;
+        d = &fAStoreDraftDataMap;
+        break;
+
+    case container_astoredishwaste:
+        c = &fAStoreDishWaste;
+        d = &fAStoreDishWasteDataMap;
+        break;
+
+    case container_bclient_debts:
+        c = &fBClientsDebtsData;
+        d = &fBClientsDebtsDataMap;
+        break;
     }
+
     Q_ASSERT(c);
-    QJsonArray  &datarow = ( *c)[row];
+    QJsonArray  &datarow = (*c)[row];
     int column = d->value(key);
     return datarow.at(column);
 }
@@ -604,14 +701,16 @@ QVariant C5StoreDraftWriter::value(int container, int row, const QString &key)
 bool C5StoreDraftWriter::writeStoreOfSale(const QString &uuid,  QString &err, int storedocstate)
 {
     //Remove old docs
-    C5Database db(__c5config.dbParams());
+    C5Database db;
     db[":f_id"] = uuid;
     db.exec("select distinct(ad.f_document) from o_goods g "
             "left join a_store_draft ad on ad.f_id=g.f_storerec "
             "where g.f_header=:f_id");
-    while (db.nextRow()) {
+
+    while(db.nextRow()) {
         removeStoreDocument(fDb, db.getString(0), err);
     }
+
     //Check for store doc
     db[":f_header"] = uuid;;
     db.exec("select h.f_state, d.f_id, d.f_qty as f_dqty, g.f_qty as f_gqty, "
@@ -622,18 +721,22 @@ bool C5StoreDraftWriter::writeStoreOfSale(const QString &uuid,  QString &err, in
             "inner join c_goods gg on g.f_id=g.f_goods "
             "where g.f_header=:f_header");
     QList<tmpg> goods;
-    while (db.nextRow()) {
-        if (db.getInt("f_state") == DOC_STATE_SAVED) {
+
+    while(db.nextRow()) {
+        if(db.getInt("f_state") == DOC_STATE_SAVED) {
             err += tr("Document saved") + "<br>";
             return false;
         }
+
         goods.append(tmpg(db.getString("f_id"), db.getDouble("f_dqty"), db.getDouble("f_gqty"), db.getDouble("f_gprice")));
     }
-    foreach (const tmpg &t, goods) {
+
+    foreach(const tmpg &t, goods) {
         db[":f_id"] = t.recId;
         db[":f_qty"] = t.qtyGoods;
         db.exec("update a_store_draft set f_qty=f_qty-:f_qty where f_id=:f_id");
     }
+
     db[":f_header"] = uuid;
     db.exec("delete from o_goods where f_header=:f_header");
     //NONE COMPONNENTS EXIT (W/O COMPLECTATION)
@@ -647,7 +750,8 @@ bool C5StoreDraftWriter::writeStoreOfSale(const QString &uuid,  QString &err, in
             "inner join c_goods g on g.f_id=r.f_goods and f_component_exit=0 "
             "where b.f_header=:f_header and (b.f_state=:f_state1 or b.f_state=:f_state2) ");
     goods.clear();
-    while (db.nextRow()) {
+
+    while(db.nextRow()) {
         tmpg t;
         t.recId = db.getString("f_id");
         t.goodsId = db.getInt("f_goods");
@@ -656,6 +760,7 @@ bool C5StoreDraftWriter::writeStoreOfSale(const QString &uuid,  QString &err, in
         t.price = db.getDouble("f_lastinputprice");
         goods.append(t);
     }
+
     //COMPONENT EXIT WITH COMPLECTATON
     db[":f_header"] = uuid;
     db[":f_state1"] = DISH_STATE_OK;
@@ -667,7 +772,8 @@ bool C5StoreDraftWriter::writeStoreOfSale(const QString &uuid,  QString &err, in
             "inner join c_goods_complectation gc on gc.f_base=r.f_goods "
             "inner join c_goods g on g.f_id=r.f_goods and f_component_exit=1 "
             "where b.f_header=:f_header and (b.f_state=:f_state1 or b.f_state=:f_state2) ");
-    while (db.nextRow()) {
+
+    while(db.nextRow()) {
         tmpg t;
         t.recId = db.getString("f_id");
         t.goodsId = db.getInt("f_goods");
@@ -676,6 +782,7 @@ bool C5StoreDraftWriter::writeStoreOfSale(const QString &uuid,  QString &err, in
         t.price = db.getDouble("f_lastinputprice");
         goods.append(t);
     }
+
     //DISHES SET
     db[":f_header"] = uuid;
     db[":f_state1"] = DISH_STATE_OK;
@@ -687,7 +794,8 @@ bool C5StoreDraftWriter::writeStoreOfSale(const QString &uuid,  QString &err, in
             "inner join d_recipes r on r.f_dish=ds.f_part "
             "inner join c_goods g on g.f_id=r.f_goods and f_component_exit=0 "
             "where b.f_header=:f_header and (b.f_state=:f_state1 or b.f_state=:f_state2) ");
-    while (db.nextRow()) {
+
+    while(db.nextRow()) {
         tmpg t;
         t.recId = db.getString("f_id");
         t.goodsId = db.getInt("f_goods");
@@ -696,9 +804,11 @@ bool C5StoreDraftWriter::writeStoreOfSale(const QString &uuid,  QString &err, in
         t.price = db.getDouble("f_lastinputprice");
         goods.append(t);
     }
+
     //WRITE RESULT OF RECIPE
     int row = 1;
-    foreach (const tmpg &t, goods) {
+
+    foreach(const tmpg &t, goods) {
         db[":f_id"] = db.uuid();
         db[":f_header"] = uuid;
         db[":f_body"] = t.recId;
@@ -706,16 +816,18 @@ bool C5StoreDraftWriter::writeStoreOfSale(const QString &uuid,  QString &err, in
         db[":f_qty"] = t.qtyGoods;
         db[":f_store"] = t.store;
         db[":f_price"] = t.price;
-        db[":f_total"] = t.price *t.qtyGoods;
+        db[":f_total"] = t.price * t.qtyGoods;
         db[":f_row"] = row++;
         db[":f_tax"] = 0;
         db[":f_taxdept"] = 0;
         db.insert("o_goods", false);
     }
-    if (!writeFromShopOutput(uuid, storedocstate, err)) {
+
+    if(!writeFromShopOutput(uuid, storedocstate, err)) {
         err += fErrorMsg + "<br>";
         return false;
     }
+
     return true;
 }
 
@@ -729,85 +841,108 @@ bool C5StoreDraftWriter::transferToHotel(C5Database &db, const QString &uuid, QS
 #else
     fDb["f_id"] = uuid;
     fDb.exec("select * from o_header where f_id=:f_id");
-    if (!fDb.nextRow()) {
+
+    if(!fDb.nextRow()) {
         err = "o_header record not exists";
         return false;
     }
+
     QMap<QString, QVariant> fHeader;
     fDb.rowToMap(fHeader);
-    if (fHeader["f_state"].toInt() != ORDER_STATE_CLOSE) {
+
+    if(fHeader["f_state"].toInt() != ORDER_STATE_CLOSE) {
         err = tr("Order state is not closed");
         return false;
     }
+
     fDb[":f_order"] = uuid;
     QJsonObject fTax;
     fDb.exec("select * from o_tax_log where f_order=:f_order and f_state=1");
-    if (fDb.nextRow()) {
+
+    if(fDb.nextRow()) {
         fTax = __strjson(fDb.getString("f_out"));
     }
+
     int settings = 0;
     int item = 0;
     QString itemName;
     db[":f_id"] = fHeader["f_table"].toInt();
     db.exec("select f_special_config from h_tables where f_id=:f_id");
-    if (db.nextRow()) {
-        if (db.getInt(0) > 0) {
+
+    if(db.nextRow()) {
+        if(db.getInt(0) > 0) {
             settings = db.getInt(0);
         }
     }
-    if (settings == 0) {
+
+    if(settings == 0) {
         db[":f_id"] = fHeader["f_hall"].toInt();
         db.exec("select f_settings from h_halls where f_id=:f_id");
-        if (db.nextRow()) {
+
+        if(db.nextRow()) {
             settings = db.getInt(0);
         }
     }
-    if (settings == 0) {
+
+    if(settings == 0) {
         err = "Cannot get settings for hall";
         return false;
     }
+
     db[":f_settings"] = settings;
     db[":f_key"] = param_item_code_for_hotel;
     db.exec("select f_value from s_settings_values where f_settings=:f_settings and f_key=:f_key");
-    if (db.nextRow()) {
+
+    if(db.nextRow()) {
         item = db.getString("f_value").toInt();
     }
-    if (item == 0) {
+
+    if(item == 0) {
         err = "Cannot retrieve invoice item for hotel #1";
         return false;
     }
+
     bool no_hotel_invoice = false;
     db[":f_settings"] = settings;
     db[":f_key"] = param_hotel_noinvoice;
     db.exec("select f_value from s_settings_values where f_settings=:f_settings and f_key=:f_key");
-    if (db.nextRow()) {
+
+    if(db.nextRow()) {
         no_hotel_invoice = db.getString("f_value").toInt() > 0;
     }
+
     int hallid = 0;
     db[":f_settings"] = settings;
     db[":f_key"] = param_hotel_hall_id;
     db.exec("select f_value from s_settings_values where f_settings=:f_settings and f_key=:f_key");
-    if (db.nextRow()) {
+
+    if(db.nextRow()) {
         hallid = db.getString("f_value").toInt();
     }
-    if (hallid == 0) {
+
+    if(hallid == 0) {
         err = "Hall id undefined";
         return true;
     }
+
     int staffid = 0;
     db[":f_settings"] = settings;
     db[":f_key"] = param_hotel_user_Id;
     db.exec("select f_value from s_settings_values where f_settings=:f_settings and f_key=:f_key");
-    if (db.nextRow()) {
+
+    if(db.nextRow()) {
         staffid = db.getString("f_value").toInt();
     }
-    if (staffid == 0) {
+
+    if(staffid == 0) {
         err = "Staff id undefined";
         return true;
     }
-    if (!err.isEmpty()) {
+
+    if(!err.isEmpty()) {
         return false;
     }
+
     int paymentMode = 1;
     QString dc = "DEBET";
     int sign = -1;
@@ -815,8 +950,9 @@ bool C5StoreDraftWriter::transferToHotel(C5Database &db, const QString &uuid, QS
     QString room, res, inv, clcode, clname, guest;
     db[":f_id"] = fHeader["f_id"].toString();
     db.exec("select * from o_pay_room where f_id=:f_id");
-    if (db.nextRow()) {
-        if (!db.getString("f_inv").isEmpty()) {
+
+    if(db.nextRow()) {
+        if(!db.getString("f_inv").isEmpty()) {
             room = db.getString("f_room");
             inv = db.getString("f_inv");
             res = db.getString("f_res");
@@ -827,22 +963,26 @@ bool C5StoreDraftWriter::transferToHotel(C5Database &db, const QString &uuid, QS
             sign = 1;
         }
     }
-    if (fHeader["f_otherid"].toInt() == PAYOTHER_COMPLIMENTARY) {
+
+    if(fHeader["f_otherid"].toInt() == PAYOTHER_COMPLIMENTARY) {
         paymentMode = 6;
-    } else if (fHeader["f_otherid"].toInt() == PAYOTHER_PRIMECOST) {
+    } else if(fHeader["f_otherid"].toInt() == PAYOTHER_PRIMECOST) {
         paymentMode = 14;
     }
-    if (fHeader["f_otherid"].toInt() == PAYOTHER_CL) {
+
+    if(fHeader["f_otherid"].toInt() == PAYOTHER_CL) {
         clcode = fHeader["f_other_clcode"].toString();
         clname = fHeader["f_other_clname"].toString();
         paymentMode = 4;
         dc = "DEBIT";
         sign = -1;
     }
+
     db[":f_id"] = fHeader["f_id"].toString();
     db.exec("select * from o_pay_cl where f_id=:f_id");
-    if (db.nextRow()) {
-        if (db.getInt("f_code") > 0) {
+
+    if(db.nextRow()) {
+        if(db.getInt("f_code") > 0) {
             clcode = db.getString("f_code");
             clname = db.getString("f_name");
             paymentMode = 4;
@@ -850,12 +990,15 @@ bool C5StoreDraftWriter::transferToHotel(C5Database &db, const QString &uuid, QS
             sign = -1;
         }
     }
-    if (fHeader["f_amountcard"].toDouble() > 0.001) {
+
+    if(fHeader["f_amountcard"].toDouble() > 0.001) {
         paymentMode = 2;
     }
-    if (fHeader["f_amountbank"].toDouble() > 0.001) {
+
+    if(fHeader["f_amountbank"].toDouble() > 0.001) {
         paymentMode = 3;
     }
+
     QString result = QString("%1%2").arg(fHeader["f_prefix"].toString(), QString::number(fHeader["f_hallid"].toInt()));
     //Remove old
     db[":f_header"] = result;
@@ -866,19 +1009,24 @@ bool C5StoreDraftWriter::transferToHotel(C5Database &db, const QString &uuid, QS
     db.exec(QString("delete from %1.m_register where f_id=:f_id").arg(__c5config.hotelDatabase()));
     db[":f_id"] = item;
     db.exec(QString("select f_en from %1.f_invoice_item where f_id=:f_id").arg(__c5config.hotelDatabase()));
-    if (db.nextRow()) {
+
+    if(db.nextRow()) {
         itemName = db.getString(0);
     } else {
         err = QString("Cannot retrieve invoice item for hotel #2 %1").arg(item);
         return false;
     }
+
     QString payComment = "CASH";
-    if (fHeader["f_amountcard"].toDouble() > 0.001) {
+
+    if(fHeader["f_amountcard"].toDouble() > 0.001) {
         payComment = C5CafeCommon::creditCardName(fHeader["f_creditcardid"].toInt());
     }
-    if (!clcode.isEmpty()) {
+
+    if(!clcode.isEmpty()) {
         payComment = clname;
     }
+
     db[":f_id"] = result;
     db[":f_source"] = "PS";
     db[":f_res"] = no_hotel_invoice ? "" : res;
@@ -916,10 +1064,12 @@ bool C5StoreDraftWriter::transferToHotel(C5Database &db, const QString &uuid, QS
     db[":f_cancelDate"] = 0;
     db[":f_cancelUser"] = 0;
     db[":f_side"] = 0;
-    if (!db.insert(QString("%1.m_register").arg(__c5config.hotelDatabase()), false)) {
+
+    if(!db.insert(QString("%1.m_register").arg(__c5config.hotelDatabase()), false)) {
         err = "Cannot insert into m_register<br>" + db.fLastError;
         return false;
     }
+
     db[":f_id"] = result;
     db[":f_state"] = 2;
     db[":f_hall"] = hallid;
@@ -940,10 +1090,12 @@ bool C5StoreDraftWriter::transferToHotel(C5Database &db, const QString &uuid, QS
     db[":f_tax"] = fTax["rseq"].toInt();
     db[":f_roomComment"] = "";
     db[":f_total"] = fHeader["f_total"].toDouble();
-    if (!db.insert(QString("%1.o_header").arg(__c5config.hotelDatabase()), false)) {
+
+    if(!db.insert(QString("%1.o_header").arg(__c5config.hotelDatabase()), false)) {
         err = "Cannot insert into o_header<br>" + db.fLastError;
         return false;
     }
+
     QJsonArray fItems;
     db[":f_header"] = fHeader["f_id"].toString();
     db.exec("select ob.f_id, ob.f_header, ob.f_state, dp1.f_name as part1, dp2.f_name as part2, ob.f_adgcode, d.f_name as f_name, \
@@ -957,23 +1109,30 @@ bool C5StoreDraftWriter::transferToHotel(C5Database &db, const QString &uuid, QS
               left join d_part1 dp1 on dp1.f_id=dp2.f_part \
               left join c_storages s on s.f_id=ob.f_store \
               where ob.f_header=:f_header");
-    while (db.nextRow()) {
+
+    while(db.nextRow()) {
         QMap<QString, QVariant> h;
         db.rowToMap(h);
         fItems.append(QJsonObject::fromVariantMap(h));
     }
-    for (int i = 0; i < fItems.count(); i++) {
+
+    for(int i = 0; i < fItems.count(); i++) {
         QJsonObject o = fItems.at(i).toObject();
-        if (o["f_state"].toInt() != DISH_STATE_OK) {
+
+        if(o["f_state"].toInt() != DISH_STATE_OK) {
             continue;
         }
+
         double price = o["f_price"].toDouble();
-        if (o["f_service"].toDouble() > 0.001) {
-            price += price *o["f_service"].toDouble();
+
+        if(o["f_service"].toDouble() > 0.001) {
+            price += price * o["f_service"].toDouble();
         }
-        if (o["f_discount"].toDouble() > 0.001) {
-            price -= price *o["f_discount"].toDouble();
+
+        if(o["f_discount"].toDouble() > 0.001) {
+            price -= price * o["f_discount"].toDouble();
         }
+
         db[":f_id"] = getHotelID("DR", err);
         db[":f_state"] = 1;
         db[":f_header"] = result;
@@ -997,11 +1156,13 @@ bool C5StoreDraftWriter::transferToHotel(C5Database &db, const QString &uuid, QS
         db[":f_adgt"] = o["f_adgcode"].toString();
         db[":f_complexRec"] = 0;
         db[":f_canceluser"] = 0;
-        if (!db.insert(QString("%1.o_dish").arg(__c5config.hotelDatabase()), false)) {
+
+        if(!db.insert(QString("%1.o_dish").arg(__c5config.hotelDatabase()), false)) {
             err = "Cannot insert into o_dish<br>" + db.fLastError;
             return false;
         }
     }
+
     db[":f_comp"] = QHostInfo::localHostName().toUpper();
     db[":f_date"] = QDate::currentDate();
     db[":f_time"] = QTime::currentTime();
@@ -1028,17 +1189,20 @@ QString C5StoreDraftWriter::getHotelID(const QString &source, QString &err)
 #else
     QStringList dbparams = __c5config.dbParams();
     dbparams[1] = "airwick";
-    C5Database dba(dbparams);
+    C5Database dba;
     int totaltrynum = 0;
     bool done = false;
     QString result;
+
     do {
-        QString query = QString ("select f_max, f_zero from airwick.serv_id_counter where f_id='%1' for update").arg(source);
-        if (!dba.exec(query)) {
+        QString query = QString("select f_max, f_zero from airwick.serv_id_counter where f_id='%1' for update").arg(source);
+
+        if(!dba.exec(query)) {
             err = "<H1><font color=\"red\">ID ERROR. COUNTER ID GENERATOR FAIL</font></h1><br>" + dba.fLastError;
             exit(0);
         }
-        if (dba.nextRow()) {
+
+        if(dba.nextRow()) {
             int max = dba.getInt(0) + 1;
             int zero = dba.getInt(1);
             dba[":f_max"] = max;
@@ -1052,6 +1216,7 @@ QString C5StoreDraftWriter::getHotelID(const QString &source, QString &err)
             totaltrynum++;
             continue;
         }
+
         dba.exec(QString("insert into airwick.f_id (f_value, f_try, f_comp, f_user, f_date, f_time, f_db) values ('%1-%2', %3, '%4', '%5', '%6', '%7', database())")
                  .arg(source)
                  .arg(result).arg(totaltrynum)
@@ -1059,16 +1224,19 @@ QString C5StoreDraftWriter::getHotelID(const QString &source, QString &err)
                  .arg(1) //user id
                  .arg(QDate::currentDate().toString("yyyy-MM-dd"))
                  .arg(QTime::currentTime().toString("HH:mm:ss")));
-        if (dba.fLastError.toLower().contains("duplicate entry")) {
+
+        if(dba.fLastError.toLower().contains("duplicate entry")) {
             totaltrynum++;
         } else {
             done = true;
         }
-        if (totaltrynum > 20) {
+
+        if(totaltrynum > 20) {
             err = "<H1><font color=\"red\">ID ERROR, TRYNUM>20. COUNTER ID GENERATOR FAIL, GIVE UP</font></h1>";
             exit(0);
         }
-    } while (!done);
+    } while(!done);
+
     result = source + result;
     return result;
 #endif
@@ -1079,10 +1247,12 @@ bool C5StoreDraftWriter::writeAStoreDraft(QString &id, const QString &docId, int
         const QString &comment)
 {
     bool u = true;
-    if (id.isEmpty()) {
+
+    if(id.isEmpty()) {
         id = fDb.uuid();
         u = false;
     }
+
     fDb[":f_id"] = id;
     fDb.exec("select f_id from a_store_draft where f_id=:f_id");
     u = fDb.nextRow();
@@ -1098,7 +1268,8 @@ bool C5StoreDraftWriter::writeAStoreDraft(QString &id, const QString &docId, int
     fDb[":f_base"] = baseid;
     fDb[":f_row"] = rownum;
     fDb[":f_comment"] = comment;
-    if (u) {
+
+    if(u) {
         return returnResult(fDb.update("a_store_draft", where_id(id)));
     } else {
         return returnResult(fDb.insert("a_store_draft", false));
@@ -1120,9 +1291,11 @@ bool C5StoreDraftWriter::writeAStoreInventory(QString &id, const QString &docId,
     fDb[":f_id"] = id;
     fDb.exec("select * from a_store_inventory where f_id=:f_id");
     bool u = fDb.nextRow();
-    if (!u) {
+
+    if(!u) {
         id = fDb.uuid();
     }
+
     fDb[":f_id"] = id;
     fDb[":f_document"] = docId;
     fDb[":f_store"] = store;
@@ -1130,7 +1303,8 @@ bool C5StoreDraftWriter::writeAStoreInventory(QString &id, const QString &docId,
     fDb[":f_qty"] = qty;
     fDb[":f_price"] = price;
     fDb[":f_total"] = total;
-    if (u) {
+
+    if(u) {
         return returnResult(fDb.update("a_store_inventory", "f_id", id));
     } else {
         return returnResult(fDb.insert("a_store_inventory", true));
@@ -1141,16 +1315,19 @@ bool C5StoreDraftWriter::writeAStoreDishWaste(QString &id, const QString &docId,
         const QString &data)
 {
     bool u = true;
-    if (id.isEmpty()) {
+
+    if(id.isEmpty()) {
         id = fDb.uuid();
         u = false;
     }
+
     fDb[":f_id"] = id;
     fDb[":f_document"] = docId;
     fDb[":f_dish"] = dish;
     fDb[":f_qty"] = qty;
     fDb[":f_data"] = data;
-    if (u) {
+
+    if(u) {
         return returnResult(fDb.update("a_store_dish_waste", "f_id", id));
     } else {
         return returnResult(fDb.insert("a_store_dish_waste", false));
@@ -1161,14 +1338,17 @@ bool C5StoreDraftWriter::writeECash(QString &id, const QString &header, int cash
                                     double amount, QString &base, int rownum)
 {
     bool u = false;
-    if (id.isEmpty()) {
+
+    if(id.isEmpty()) {
         id = fDb.uuid();
     } else {
         u = true;
     }
-    if (base.isEmpty()) {
+
+    if(base.isEmpty()) {
         base = fDb.uuid();
     }
+
     fDb[":f_id"] = id;
     fDb[":f_header"] = header;
     fDb[":f_cash"] = cash;
@@ -1178,7 +1358,8 @@ bool C5StoreDraftWriter::writeECash(QString &id, const QString &header, int cash
     fDb[":f_base"] = base;
     fDb[":f_row"] = rownum;
     fDb[":f_working_session"] = __c5config.getRegValue("sessionid");
-    if (u) {
+
+    if(u) {
         return returnResult(fDb.update("e_cash", where_id(id)));
     } else {
         return returnResult(fDb.insert("e_cash", false));
@@ -1191,11 +1372,13 @@ bool C5StoreDraftWriter::writeOBody(QString &id, const QString &header, int stat
                                     int removereason, int timeorder, int package, int row, const QDateTime &appendTime, const QString &emarks)
 {
     bool u = false;
-    if (id.isEmpty()) {
+
+    if(id.isEmpty()) {
         id = fDb.uuid();
     } else {
         u = true;
     }
+
     fDb[":f_id"] = id;
     fDb[":f_header"] = header;
     fDb[":f_state"] = state;
@@ -1218,7 +1401,8 @@ bool C5StoreDraftWriter::writeOBody(QString &id, const QString &header, int stat
     fDb[":f_row"] = row;
     fDb[":f_emarks"] = emarks;
     fDb[":f_working_day"] = __c5config.dateCash();
-    if (u) {
+
+    if(u) {
         return returnResult(fDb.update("o_body", where_id(id)));
     } else {
         fDb[":f_appendtime"] = appendTime;
@@ -1239,13 +1423,15 @@ bool C5StoreDraftWriter::writeOBodyToOGoods(const QString &id, const QString &he
     int row = 0;
     OGoods g;
     QString err;
-    while (g.getRecord(fDb)) {
+
+    while(g.getRecord(fDb)) {
         g.row = ++row;
         g.header = headerid;
         g.body = id;
-        g.total = g.qty *g.price;
+        g.total = g.qty * g.price;
         g.write(fDb, err);
     }
+
     return true;
 }
 
@@ -1268,22 +1454,25 @@ bool C5StoreDraftWriter::writeOHeaderOptions(const QString &id, int guest, int s
     return returnResult(fDb.update("o_header_options", "f_id", id));
 }
 
-bool C5StoreDraftWriter::writeOPackage(int &id, const QString &header, int package, double qty, double price)
+bool C5StoreDraftWriter::writeOPackage(int& id, const QString &header, int package, double qty, double price)
 {
     fDb[":f_id"] = id;
     fDb[":f_header"] = header;
     fDb[":f_package"] = package;
     fDb[":f_qty"] = qty;
     fDb[":f_price"] = price;
-    if (id == 0) {
+
+    if(id == 0) {
         id = fDb.insert("o_package");
-        if (id == 0) {
+
+        if(id == 0) {
             fErrorMsg = fDb.fLastError;
             return false;
         }
     } else {
         return returnResult(fDb.update("o_package", "f_id", id));
     }
+
     return true;
 }
 
@@ -1297,12 +1486,14 @@ bool C5StoreDraftWriter::writeInput(const QString &docId, QString &err)
         "f_qty, f_price, f_total, "
         "f_base, f_basedoc, f_reason, f_draft) values ";
     bool f = true;
-    while (fDb.nextRow()) {
-        if (f) {
+
+    while(fDb.nextRow()) {
+        if(f) {
             f = false;
         } else {
             longsql.append(",");
         }
+
         longsql.append(QString("('%1', '%2', %3, %4, %5, %6, %7, %8, '%9', '%10', %11, '%12')")
                        .arg(fDb.getString("f_id"))
                        .arg(fDb.getString("f_document"))
@@ -1318,10 +1509,12 @@ bool C5StoreDraftWriter::writeInput(const QString &docId, QString &err)
                        .arg(fDb.getString("f_id")));
         total += fDb.getDouble("f_total");
     }
-    if (!fDb.exec(longsql)) {
+
+    if(!fDb.exec(longsql)) {
         err += fDb.fLastError + "<br>";
         return false;
     }
+
     updateField("a_header", "f_amount", total, "f_id", docId);
     return true;
 }
@@ -1340,7 +1533,8 @@ bool C5StoreDraftWriter::writeOutput(const QString &docId, QString &err)
     fDb[":f_id"] = docId;
     fDb.exec("select h.f_type, h.f_date, hh.f_storein, hh.f_storeout, hh.f_complectation, hh.f_complectationqty"
              " from a_header h inner join a_header_store hh on hh.f_id=h.f_id where h.f_id=:f_id");
-    if (fDb.nextRow()) {
+
+    if(fDb.nextRow()) {
         date = fDb.getDate("f_date");
         storeIn = fDb.getInt("f_storein");
         storeOut = fDb.getInt("f_storeout");
@@ -1351,14 +1545,17 @@ bool C5StoreDraftWriter::writeOutput(const QString &docId, QString &err)
         err += tr("Invalid document id") + "<br>";
         return false;
     }
-    if (complectCode > 0) {
+
+    if(complectCode > 0) {
         fDb[":f_document"] = docId;
         fDb[":f_type"] = 1;
         fDb.exec("select f_id from a_store_draft where f_document=:f_document and f_type=:f_type");
-        if (fDb.nextRow()) {
+
+        if(fDb.nextRow()) {
             complectId = fDb.getString(0);
         }
     }
+
     QStringList recID;
     QStringList baseID;
     QStringList goodsID;
@@ -1372,7 +1569,8 @@ bool C5StoreDraftWriter::writeOutput(const QString &docId, QString &err)
              "from a_store_draft s "
              "inner join c_goods g on g.f_id=s.f_goods "
              "where f_document=:f_document and f_type=-1");
-    while (fDb.nextRow()) {
+
+    while(fDb.nextRow()) {
         recID.append(fDb.getString("f_id"));
         baseID.append(fDb.getString("f_base"));
         goodsID.append(QString::number(fDb.getInt("f_goods")));
@@ -1382,47 +1580,55 @@ bool C5StoreDraftWriter::writeOutput(const QString &docId, QString &err)
         priceList.append(fDb.getDouble("f_price"));
         totalList.append(fDb.getDouble("f_total"));
     }
-    if (goodsID.isEmpty()) {
+
+    if(goodsID.isEmpty()) {
         err = tr("Emtpy document");
         return false;
     }
+
     QList<QMap<QString, QVariant> > storeData;
     fDb[":f_store"] = storeOut;
-    if (!fDb.exec(
+
+    if(!fDb.exec(
                 QString("select s.f_id, s.f_goods, sm.f_qty, sm.f_price, sm.f_total, "
-                        "s.f_document, s.f_base, s.f_basedoc, d.f_date "
-                        "from a_store s "
-                        "left join ( "
-                        "select   sum(ss.f_qty*ss.f_type) as f_qty, ss.f_price, "
-                        "sum(ss.f_total*ss.f_type) as f_total, ss.f_base "
-                        "from a_store ss "
-                        "where ss.f_goods in (%1) and ss.f_store=:f_store "
-                        "group by ss.f_base  "
-                        "having sum(ss.f_qty*ss.f_type)>0 "
-                        ") sm on sm.f_base=s.f_id "
-                        "inner join a_header d on d.f_id=s.f_document "
-                        "where s.f_goods in (%1) and s.f_store=:f_store and s.f_type=1 and sm.f_qty>0 "
-                        "order by d.f_date "
-                        "for update ").arg(goodsID.join(",")))) {
+            "s.f_document, s.f_base, s.f_basedoc, d.f_date "
+            "from a_store s "
+            "left join ( "
+            "select   sum(ss.f_qty*ss.f_type) as f_qty, ss.f_price, "
+            "sum(ss.f_total*ss.f_type) as f_total, ss.f_base "
+            "from a_store ss "
+            "where ss.f_goods in (%1) and ss.f_store=:f_store "
+            "group by ss.f_base  "
+            "having sum(ss.f_qty*ss.f_type)>0 "
+            ") sm on sm.f_base=s.f_id "
+            "inner join a_header d on d.f_id=s.f_document "
+            "where s.f_goods in (%1) and s.f_store=:f_store and s.f_type=1 and sm.f_qty>0 "
+            "order by d.f_date "
+            "for update ").arg(goodsID.join(",")))) {
         err = fDb.fLastError + "<br>";
         return false;
     }
-    while (fDb.nextRow()) {
-        if (fDb.getDate("f_date") > date) {
+
+    while(fDb.nextRow()) {
+        if(fDb.getDate("f_date") > date) {
             continue;
         }
+
         QMap<QString, QVariant> v;
         fDb.rowToMap(v);
         storeData.append(v);
     }
+
     QList<QMap<QString, QVariant> > queries;
-    for (int i = 0; i < goodsID.count(); i++) {
+
+    for(int i = 0; i < goodsID.count(); i++) {
         double qty = qtyList.at(i);
         totalList[i] = 0;
-        for (int j = 0; j < storeData.count(); j++) {
-            if (storeData.at(j)["f_goods"].toInt() == goodsID.at(i).toInt()) {
-                if (storeData.at(j)["f_qty"].toDouble() > 0) {
-                    if (storeData.at(j)["f_qty"].toDouble() >= qty) {
+
+        for(int j = 0; j < storeData.count(); j++) {
+            if(storeData.at(j)["f_goods"].toInt() == goodsID.at(i).toInt()) {
+                if(storeData.at(j)["f_qty"].toDouble() > 0) {
+                    if(storeData.at(j)["f_qty"].toDouble() >= qty) {
                         storeData[j]["f_qty"] = storeData.at(j)["f_qty"].toDouble() - qty;
                         QMap<QString, QVariant> newrec;
                         newrec[":f_document"] = docId;
@@ -1463,78 +1669,90 @@ bool C5StoreDraftWriter::writeOutput(const QString &docId, QString &err)
                     }
                 }
             }
-            if (qty < 0.00001) {
+
+            if(qty < 0.00001) {
                 break;
             }
         }
-        if (qty > 0.00001) {
-            if (err.isEmpty()) {
+
+        if(qty > 0.00001) {
+            if(err.isEmpty()) {
                 err += tr("Not enough materials in the store") + "<br>";
             }
+
             err += QString("%1 - %2").arg(goodsName.at(i)).arg(qty) + "<br>";
         }
     }
-    if (err.isEmpty()) {
+
+    if(err.isEmpty()) {
         QStringList outId;
-        for (QList<QMap<QString, QVariant> >::const_iterator it = queries.constBegin(); it != queries.constEnd(); it++) {
+
+        for(QList<QMap<QString, QVariant> >::const_iterator it = queries.constBegin(); it != queries.constEnd(); it++) {
             QString newId = C5Database::uuid();
             outId << newId;
-            fDb.setBindValues( *it);
+            fDb.setBindValues(*it);
             fDb[":f_id"] = newId;
             fDb.insert("a_store", false);
         }
+
         writeTotalStoreAmount(docId);
-        if (storeIn > 0) {
-            switch (docType) {
-                case DOC_TYPE_STORE_MOVE:
-                    foreach (QString recid, outId) {
-                        fDb[":f_id"] = recid;
-                        fDb.exec("select * from a_store where f_id=:f_id");
-                        fDb.nextRow();
-                        fDb.setBindValues(fDb.getBindValues());
-                        QString mid = C5Database::uuid();
-                        fDb[":f_base"] = mid;
-                        fDb[":f_basedoc"] = fDb[":f_id"];
-                        fDb[":f_id"] = mid;
-                        fDb[":f_document"] = docId;
-                        fDb[":f_type"] = 1;
-                        fDb[":f_store"] = storeIn;
-                        fDb.insert("a_store", false);
-                    }
-                    break;
-                case DOC_TYPE_COMPLECTATION:
-                    fDb[":f_header"] = docId;
-                    fDb.exec("select sum(f_amount) from a_complectation_additions where f_header=:f_header");
+
+        if(storeIn > 0) {
+            switch(docType) {
+            case DOC_TYPE_STORE_MOVE:
+                foreach(QString recid, outId) {
+                    fDb[":f_id"] = recid;
+                    fDb.exec("select * from a_store where f_id=:f_id");
                     fDb.nextRow();
-                    amount += fDb.getDouble(0);
-                    QString id = C5Database::uuid();
-                    fDb[":f_id"] = id;
+                    fDb.setBindValues(fDb.getBindValues());
+                    QString mid = C5Database::uuid();
+                    fDb[":f_base"] = mid;
+                    fDb[":f_basedoc"] = fDb[":f_id"];
+                    fDb[":f_id"] = mid;
                     fDb[":f_document"] = docId;
-                    fDb[":f_store"] = storeIn;
                     fDb[":f_type"] = 1;
-                    fDb[":f_goods"] = complectCode;
-                    fDb[":f_qty"] = complectQty;
-                    fDb[":f_price"] = amount / complectQty;
-                    fDb[":f_total"] = amount;
-                    fDb[":f_base"] = id;
-                    fDb[":f_basedoc"] = docId;
-                    fDb[":f_reason"] = reason;
-                    fDb[":f_draft"] = complectId;
+                    fDb[":f_store"] = storeIn;
                     fDb.insert("a_store", false);
-                    break;
+                }
+
+                break;
+
+            case DOC_TYPE_COMPLECTATION:
+                fDb[":f_header"] = docId;
+                fDb.exec("select sum(f_amount) from a_complectation_additions where f_header=:f_header");
+                fDb.nextRow();
+                amount += fDb.getDouble(0);
+                QString id = C5Database::uuid();
+                fDb[":f_id"] = id;
+                fDb[":f_document"] = docId;
+                fDb[":f_store"] = storeIn;
+                fDb[":f_type"] = 1;
+                fDb[":f_goods"] = complectCode;
+                fDb[":f_qty"] = complectQty;
+                fDb[":f_price"] = amount / complectQty;
+                fDb[":f_total"] = amount;
+                fDb[":f_base"] = id;
+                fDb[":f_basedoc"] = docId;
+                fDb[":f_reason"] = reason;
+                fDb[":f_draft"] = complectId;
+                fDb.insert("a_store", false);
+                break;
             }
         }
-        for (int i = 0; i < recID.count(); i++) {
+
+        for(int i = 0; i < recID.count(); i++) {
             fDb[":f_price"] = priceList.at(i);
             fDb[":f_total"] = totalList.at(i);
             fDb.update("a_store_draft", where_id(recID.at(i)));
-            if (!baseID.at(i).isEmpty()) {
+
+            if(!baseID.at(i).isEmpty()) {
                 fDb[":f_price"] = priceList.at(i);
                 fDb[":f_total"] = totalList.at(i);
                 fDb.update("a_store_draft", where_id(baseID.at(i)));
             }
         }
-        if (docType == DOC_TYPE_COMPLECTATION) {
+
+        if(docType == DOC_TYPE_COMPLECTATION) {
             fDb[":f_type"] = 1;
             fDb[":f_document"] = docId;
             fDb[":f_price"] = amount / complectQty;
@@ -1542,6 +1760,7 @@ bool C5StoreDraftWriter::writeOutput(const QString &docId, QString &err)
             fDb.exec("update a_store_draft set f_price=:f_price, f_total=:f_total where f_type=:f_type and f_document=:f_document");
         }
     }
+
     return err.isEmpty();
 }
 
@@ -1549,10 +1768,12 @@ bool C5StoreDraftWriter::writeTotalStoreAmount(const QString &docId)
 {
     fDb[":f_document"] = docId;
     fDb.exec("select f_type, sum(f_total) as f_total from a_store where f_document=:f_document group by 1");
-    if (fDb.nextRow()) {
+
+    if(fDb.nextRow()) {
         fDb[":f_amount"] = fDb.getDouble("f_total");
         fDb.update("a_header", where_id(docId));
     }
+
     return true;
 }
 
@@ -1563,25 +1784,30 @@ bool C5StoreDraftWriter::haveRelations(const QString &id, QString &err, bool cle
              "inner join a_header d on d.f_id=s.f_document "
              "where f_basedoc=:f_basedoc and f_document<>:f_basedoc and s.f_type=-1");
     err = "";
-    while (fDb.nextRow()) {
+
+    while(fDb.nextRow()) {
         err += QString("No: %1, %2<br>").arg(fDb.getString("f_userid")).arg(fDb.getDate("f_date").toString(FORMAT_DATE_TO_STR));
     }
-    if (!err.isEmpty()) {
+
+    if(!err.isEmpty()) {
         err = tr("This order used in next documents") + "<br>" + err;
     }
-    if (clear && err.isEmpty()) {
-        if (!outputRollback(fDb, id)) {
+
+    if(clear && err.isEmpty()) {
+        if(!outputRollback(fDb, id)) {
             err = fDb.fLastError;
         }
     }
+
     return !err.isEmpty();
 }
 
 bool C5StoreDraftWriter::clearAStoreDraft(const QString &id)
 {
-    if (id.isEmpty()) {
+    if(id.isEmpty()) {
         return true;
     }
+
     fDb[":f_document"] = id;
     fDb.exec("delete from a_store_draft where f_document=:f_document");
     return true;

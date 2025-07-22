@@ -2,14 +2,12 @@
 #include "cr5consuptionreasonfilter.h"
 #include "c5tablemodel.h"
 
-CR5ConsuptionReason::CR5ConsuptionReason(const QStringList &dbParams, QWidget *parent) :
-    C5ReportWidget(dbParams, parent)
+CR5ConsuptionReason::CR5ConsuptionReason(QWidget *parent) :
+    C5ReportWidget(parent)
 {
     fLabel = tr("Reason for consuption");
     fIcon = ":/goods.png";
-    
 //    fSimpleQuery = false;
-
 //    fMainTable = "o_body ob";
 //    fLeftJoinTables << "left join o_header oh on oh.f_id=ob.f_header [oh]"
 //                    << "left join d_dish d on d.f_id=ob.f_dish [d]"
@@ -18,7 +16,6 @@ CR5ConsuptionReason::CR5ConsuptionReason(const QStringList &dbParams, QWidget *p
 //                    << "left join c_goods g on g.f_id=og.f_goods [g]"
 //                    << "left join c_storages st on st.f_id=og.f_store [st]"
 //                       ;
-
 //    fColumnsFields << "oh.f_id"
 //                   << "oh.f_datecash"
 //                   << "concat(oh.f_prefix, oh.f_hallid) as f_prefix"
@@ -28,8 +25,7 @@ CR5ConsuptionReason::CR5ConsuptionReason(const QStringList &dbParams, QWidget *p
 //                   << "st.f_name as f_storename"
 //                   << "og.f_qty as f_recipeqty"
 //                   << "ob.f_qty1 as f_saleqty"
-                      ;
-
+    ;
 //    fColumnsGroup << "concat(oh.f_prefix, oh.f_hallid) as f_prefix"
 //                   << "oh.f_id"
 //                   << "oh.f_datecash"
@@ -38,12 +34,10 @@ CR5ConsuptionReason::CR5ConsuptionReason(const QStringList &dbParams, QWidget *p
 //                   << "g.f_name as f_goodsname"
 //                   << "og.f_qty as f_recipeqty"
 //                      ;
-
     fColumnsSum << "f_recipeqty"
                 << "f_saleqty"
                 << "f_output"
-                      ;
-
+                ;
     fTranslation["f_prefix"] = tr("Order");
     fTranslation["f_id"] = tr("UUID");
     fTranslation["f_datecash"] = tr("Date");
@@ -53,7 +47,6 @@ CR5ConsuptionReason::CR5ConsuptionReason(const QStringList &dbParams, QWidget *p
     fTranslation["f_storename"] = tr("Storage");
     fTranslation["f_recipeqty"] = tr("Qty, recipe");
     fTranslation["f_saleqty"] = tr("Qty, sale");
-
 //    fColumnsVisible["concat(oh.f_prefix, oh.f_hallid) as f_prefix"] = true;
 //    fColumnsVisible["oh.f_id"] = true;
 //    fColumnsVisible["os.f_name as f_statename"] = true;
@@ -64,18 +57,15 @@ CR5ConsuptionReason::CR5ConsuptionReason(const QStringList &dbParams, QWidget *p
 //    fColumnsVisible["st.f_name as f_storename"] = true;
 //    fColumnsVisible["og.f_qty as f_recipeqty"] = true;
 //    fColumnsVisible["ob.f_qty1 as f_saleqty"] = true;
-
     //fOrderCondition = "order by oh.f_datecash, dp.f_name";
-
     restoreColumnsVisibility();
-
-    fFilterWidget = new CR5ConsuptionReasonFilter(fDBParams);
+    fFilterWidget = new CR5ConsuptionReasonFilter();
     fFilter = static_cast<CR5ConsuptionReasonFilter*>(fFilterWidget);
 }
 
-QToolBar *CR5ConsuptionReason::toolBar()
+QToolBar* CR5ConsuptionReason::toolBar()
 {
-    if (!fToolBar) {
+    if(!fToolBar) {
         QList<ToolBarButtons> btn;
         btn << ToolBarButtons::tbFilter
             << ToolBarButtons::tbClearFilter
@@ -84,13 +74,15 @@ QToolBar *CR5ConsuptionReason::toolBar()
             << ToolBarButtons::tbPrint;
         fToolBar = createStandartToolbar(btn);
     }
+
     return fToolBar;
 }
 
 void CR5ConsuptionReason::restoreColumnsWidths()
 {
     C5Grid::restoreColumnsWidths();
-    if (fColumnsVisible["oh.f_id"]) {
+
+    if(fColumnsVisible["oh.f_id"]) {
         fTableView->setColumnWidth(fModel->fColumnNameIndex["f_id"], 0);
     }
 }
@@ -119,7 +111,6 @@ void CR5ConsuptionReason::buildQuery()
 //                "left join c_storages st on st.f_id=ob.f_store  "
 //                "%where% "
 //                "order by oh.f_datecash, dp.f_name";
-
     fSqlQuery = "select "
                 "dp.f_name as f_partname,d.f_name as f_dishname,g.f_name as f_goodsname,"
                 "st.f_name as f_storename,og.f_qty as f_recipeqty,sum(ob.f_qty1) as f_saleqty, "

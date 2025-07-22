@@ -1,8 +1,8 @@
 #include "ce5storereason.h"
 #include "ui_ce5storereason.h"
 
-CE5StoreReason::CE5StoreReason(const QStringList &dbParams, QWidget *parent) :
-    CE5Editor(dbParams, parent),
+CE5StoreReason::CE5StoreReason(QWidget *parent) :
+    CE5Editor(parent),
     ui(new Ui::CE5StoreReason)
 {
     ui->setupUi(this);

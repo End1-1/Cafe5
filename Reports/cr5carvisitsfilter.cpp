@@ -2,12 +2,12 @@
 #include "ui_cr5carvisitsfilter.h"
 #include "c5cache.h"
 
-CR5CarVisitsFilter::CR5CarVisitsFilter(const QStringList &dbParams, QWidget *parent) :
-    C5FilterWidget(dbParams, parent),
+CR5CarVisitsFilter::CR5CarVisitsFilter(QWidget *parent) :
+    C5FilterWidget(parent),
     ui(new Ui::CR5CarVisitsFilter)
 {
     ui->setupUi(this);
-    ui->leCostumer->setSelector(dbParams, ui->leCostumerName, cache_goods_partners);
+    ui->leCostumer->setSelector(ui->leCostumerName, cache_goods_partners);
 }
 
 CR5CarVisitsFilter::~CR5CarVisitsFilter()

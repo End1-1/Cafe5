@@ -1,8 +1,8 @@
 #include "cr5goodsunit.h"
 #include "ce5goodsunit.h"
 
-CR5GoodsUnit::CR5GoodsUnit(const QStringList &dbParams, QWidget *parent) :
-    C5ReportWidget(dbParams, parent)
+CR5GoodsUnit::CR5GoodsUnit(QWidget *parent) :
+    C5ReportWidget( parent)
 {
     fIcon = ":/goods.png";
     fLabel = tr("Units");
@@ -13,7 +13,7 @@ CR5GoodsUnit::CR5GoodsUnit(const QStringList &dbParams, QWidget *parent) :
     fTranslation["f_fullname"] = tr("Full caption");
     fTranslation["f_defaultqty"] = tr("Default qty");
 
-    fEditor = new CE5GoodsUnit(dbParams);
+    fEditor = new CE5GoodsUnit();
 }
 
 QToolBar *CR5GoodsUnit::toolBar()

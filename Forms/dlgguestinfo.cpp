@@ -5,7 +5,7 @@
 #include "c5message.h"
 
 DlgGuestInfo::DlgGuestInfo() :
-    C5Dialog(__c5config.dbParams()),
+    C5Dialog(),
     ui(new Ui::DlgGuestInfo)
 {
     ui->setupUi(this);
@@ -24,7 +24,7 @@ void DlgGuestInfo::on_btnCancel_clicked()
 
 void DlgGuestInfo::on_btnSave_clicked()
 {
-    C5Database db(fDBParams);
+    C5Database db;
     db[":f_contactname"] = ui->leContactName->text();
     db[":f_phone"] = ui->lePhoneNumber->text();
     if (fCode == 0) {

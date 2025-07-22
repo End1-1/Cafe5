@@ -1,8 +1,8 @@
 #include "cr5creditcards.h"
 #include "ce5creditcard.h"
 
-CR5CreditCards::CR5CreditCards(const QStringList &dbParams, QWidget *parent) :
-    C5ReportWidget(dbParams, parent)
+CR5CreditCards::CR5CreditCards(QWidget *parent) :
+    C5ReportWidget( parent)
 {
     fLabel = tr("Credit cards");
     fIcon = ":/credit-card.png";
@@ -15,7 +15,7 @@ CR5CreditCards::CR5CreditCards(const QStringList &dbParams, QWidget *parent) :
 
     restoreColumnsVisibility();
 
-    fEditor = new CE5CreditCard(dbParams);
+    fEditor = new CE5CreditCard();
 }
 
 QToolBar *CR5CreditCards::toolBar()

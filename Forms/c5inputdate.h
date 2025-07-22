@@ -12,11 +12,11 @@ class C5InputDate : public C5Dialog
     Q_OBJECT
 
 public:
-    explicit C5InputDate(const QStringList &dbParams);
+    explicit C5InputDate();
 
     ~C5InputDate();
 
-    static bool date(const QStringList &dbParams, QDate &d, int &shift, QString &shiftName);
+    static bool date(QDate &d, int &shift, QString &shiftName);
 
 private slots:
     void on_btnCancel_clicked();

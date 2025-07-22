@@ -13,11 +13,11 @@ class DlgReservGoods : public C5Dialog
     Q_OBJECT
 
 public:
-    explicit DlgReservGoods(const QStringList &dbParams, int store, int goods, double qty);
+    explicit DlgReservGoods(int store, int goods, double qty);
 
-    explicit DlgReservGoods(const QStringList &dbParams, int id);
+    explicit DlgReservGoods(int id);
 
-    explicit DlgReservGoods(const QStringList &dbParams);
+    explicit DlgReservGoods();
 
     ~DlgReservGoods();
 
@@ -52,7 +52,7 @@ private:
 
     void setState(int state);
 
-    void updateState(const QStringList &dbparams, int state);
+    void updateState(int state);
 };
 
 #endif // DLGRESERVGOODS_H

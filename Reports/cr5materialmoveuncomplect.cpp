@@ -2,13 +2,13 @@
 #include "cr5materialmoveuncomplectfilter.h"
 #include "c5tablemodel.h"
 
-CR5MaterialMoveUncomplect::CR5MaterialMoveUncomplect(const QStringList &dbParams, QWidget *parent) :
-    C5ReportWidget(dbParams, parent)
+CR5MaterialMoveUncomplect::CR5MaterialMoveUncomplect(QWidget *parent) :
+    C5ReportWidget( parent)
 {
     fIcon = ":/goods.png";
     fLabel = tr("Storage movement, uncomplect");
     fSimpleQuery = true;
-    fFilter = new CR5MaterialmoveUncomplectFilter(dbParams);
+    fFilter = new CR5MaterialmoveUncomplectFilter();
     fFilterWidget = fFilter;
 
     fTranslation["f_doctype"] = tr("Document type");

@@ -4,8 +4,8 @@
 #include "worderw.h"
 #include "wguestorder.h"
 
-DlgGuests::DlgGuests(const QStringList &dbParams, C5OrderDriver *order) :
-    C5Dialog(dbParams),
+DlgGuests::DlgGuests(C5OrderDriver *order) :
+    C5Dialog(),
     ui(new Ui::DlgGuests),
     fOrder(order)
 {

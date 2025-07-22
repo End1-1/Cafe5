@@ -18,8 +18,8 @@
 #include <QMimeData>
 #include <QBuffer>
 
-CE5MFProduct::CE5MFProduct(const QStringList &dbParams, QWidget *parent) :
-    CE5Editor(dbParams, parent),
+CE5MFProduct::CE5MFProduct(QWidget *parent) :
+    CE5Editor(parent),
     ui(new Ui::CE5MFProduct)
 {
     ui->setupUi(this);
@@ -62,7 +62,7 @@ void CE5MFProduct::setId(int id)
     jo["mode"] = 1;
     fHttp->createHttpQuery("/engine/production/save-process.php", jo, SLOT(openResponse(QJsonObject)));
     // CE5Editor::setId(id);
-    // C5Database db(fDBParams);
+    // C5Database db;
     // db[":f_product"] = id;
     // db.exec("select p.f_id, p.f_process, ac.f_name as f_processname, p.f_durationsec, p.f_goalprice, p.f_price, p.f_process "
     //         "from mf_process p "
@@ -108,7 +108,7 @@ void CE5MFProduct::clear()
 bool CE5MFProduct::save(QString &err, QList<QMap<QString, QVariant> > &data)
 {
     // if (CE5Editor::save(err, data)) {
-    //     C5Database db(fDBParams);
+    //     C5Database db;
     //     for (int i = 0; i < ui->wt->rowCount(); i++) {
     //         db[":f_durationsec"] = ui->wt->getData(i, 4);
     //         db[":f_goalprice"] = ui->wt->lineEdit(i, 6)->getDouble();
@@ -263,7 +263,7 @@ void CE5MFProduct::startPriceUpdateOnRow()
     if (ui->wt->findWidget(row, column, pu) == false) {
         return;
     }
-    C5Database db(fDBParams);
+    C5Database db;
     db[":f_product"] = ui->leCode->getInteger();
     db[":f_process"] = ui->wt->getData(row, 1);
     db[":f_price"] = ui->wt->getData(row, 7);
@@ -322,14 +322,14 @@ void CE5MFProduct::on_btnAdd_clicked()
         C5Message::error(tr("Save first"));
     }
     QJsonArray vals;
-    if (!C5Selector::getValue(fDBParams, cache_mf_actions, vals)) {
+    if (!C5Selector::getValue(cache_mf_actions, vals)) {
         return;
     }
     if (vals.at(1).toInt() == 0) {
         C5Message::error(tr("Could not add goods without code"));
         return;
     }
-    C5Database db(fDBParams);
+    C5Database db;
     db[":f_rowid"] = ui->wt->rowCount();
     db[":f_product"] = ui->leCode->getInteger();
     db[":f_process"] = vals.at(1);
@@ -369,15 +369,15 @@ void CE5MFProduct::on_btnNew_clicked()
     if (ui->leCode->getInteger() == 0) {
         C5Message::error(tr("Save first"));
     }
-    auto *ep = new CE5MFProcess(fDBParams);
-    auto *e = C5Editor::createEditor(fDBParams, ep, 0);
+    auto *ep = new CE5MFProcess();
+    auto *e = C5Editor::createEditor(ep, 0);
     QList<QMap<QString, QVariant> > data;
     if(e->getResult(data)) {
         if (data.at(0)["f_id"].toInt() == 0) {
             C5Message::error(tr("Cannot add goods without code"));
             return;
         }
-        C5Database db(fDBParams);
+        C5Database db;
         int row;
         ui->wt->setData(row, 0, data.at(0)["f_id"])
         .setData(row, 1, data.at(0)["f_process"])
@@ -420,7 +420,7 @@ void CE5MFProduct::on_btnPrint_clicked()
     vals << "" << "" << "" << ui->wt->totalStr(4) << "" << ui->wt->totalStr(6) << ui->wt->totalStr(7);
     p.tableText(points, vals, p.fLineHeight + 20);
     p.br(p.fLineHeight + 20);
-    C5PrintPreview pp( &p, fDBParams);
+    C5PrintPreview pp( &p);
     pp.exec();
 }
 
@@ -462,7 +462,7 @@ void CE5MFProduct::on_btnMoveRowDown_clicked()
 
 void CE5MFProduct::on_btnUpdatePrices_clicked()
 {
-    C5Database db(fDBParams);
+    C5Database db;
     for (int i = 0; i < ui->wt->rowCount(); i++) {
         db[":f_product"] = ui->leCode->getInteger();
         db[":f_process"] = ui->wt->getData(i, 1);
@@ -497,7 +497,7 @@ void CE5MFProduct::on_btnPaste_clicked()
 {
     QString clipdata = qApp->clipboard()->text();
     QStringList rows = clipdata.split("\r", Qt::SkipEmptyParts);
-    C5Database db(fDBParams);
+    C5Database db;
     for (int i = 0; i < rows.count(); i++) {
         QStringList cols = rows.at(i).split("\t", Qt::SkipEmptyParts);
         if (cols.count() < 8) {

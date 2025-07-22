@@ -3,8 +3,8 @@
 #include "partnersasmap.h"
 #include "c5mainwindow.h"
 
-CR5GoodsPartners::CR5GoodsPartners(const QStringList &dbParams, QWidget *parent) :
-    C5ReportWidget(dbParams, parent)
+CR5GoodsPartners::CR5GoodsPartners(QWidget *parent) :
+    C5ReportWidget( parent)
 {
     fIcon = ":/goods.png";
     fLabel = tr("Partners");
@@ -34,7 +34,7 @@ CR5GoodsPartners::CR5GoodsPartners(const QStringList &dbParams, QWidget *parent)
     fTranslation["f_discount"] = tr("Discount");
     fTranslation["f_saletype"] = tr("Sale type");
     fTranslation["f_manager"] = tr("Manager");
-    fEditor = new CE5Partner(fDBParams);
+    fEditor = new CE5Partner();
 }
 
 QToolBar *CR5GoodsPartners::toolBar()
@@ -54,5 +54,5 @@ QToolBar *CR5GoodsPartners::toolBar()
 
 void CR5GoodsPartners::armSoftMap()
 {
-    __mainWindow->createTab<PartnersAsMap>(fDBParams);
+    __mainWindow->createTab<PartnersAsMap>();
 }

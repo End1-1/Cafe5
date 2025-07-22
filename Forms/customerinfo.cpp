@@ -8,7 +8,7 @@
 #include <QKeyEvent>
 
 CustomerInfo::CustomerInfo() :
-    C5Dialog(__c5config.dbParams()),
+    C5Dialog(),
     ui(new Ui::CustomerInfo)
 {
     ui->setupUi(this);
@@ -77,7 +77,7 @@ void CustomerInfo::on_pushButton_2_clicked()
 void CustomerInfo::on_pushButton_clicked()
 {
     if (fCustomerId > 0) {
-        C5Database db(fDBParams);
+        C5Database db;
         db[":f_taxname"] = ui->lePhone->text() + " " + ui->leCustomer->text();
         db[":f_contact"] = ui->leCustomer->text();
         db[":f_phone"] = ui->lePhone->text();
@@ -97,7 +97,7 @@ void CustomerInfo::on_pushButton_clicked()
         C5Message::error(err);
         return;
     }
-    C5Database db(fDBParams);
+    C5Database db;
     db[":f_taxname"] = ui->lePhone->text() + " " + ui->leCustomer->text();
     db[":f_contact"] = ui->leCustomer->text();
     db[":f_name"] = ui->leCustomer->text();
@@ -134,7 +134,7 @@ void CustomerInfo::on_lePhone_returnPressed()
         phone.insert(9, "-");
     }
     ui->lePhone->setText(phone);
-    C5Database db(fDBParams);
+    C5Database db;
     db[":f_phone"] = phone;
     db.exec("select * from c_partners where f_phone=:f_phone");
     if (db.nextRow()) {

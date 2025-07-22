@@ -12,7 +12,7 @@ class CR5RouteDailyFilter : public C5FilterWidget
     Q_OBJECT
 
 public:
-    explicit CR5RouteDailyFilter(const QStringList &dbParams, QWidget *parent = nullptr);
+    explicit CR5RouteDailyFilter(QWidget *parent = nullptr);
     ~CR5RouteDailyFilter();
     virtual QString condition() override;
 

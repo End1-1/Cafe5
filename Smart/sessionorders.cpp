@@ -5,7 +5,7 @@
 #include "c5utils.h"
 
 SessionOrders::SessionOrders() :
-    C5Dialog(__c5config.dbParams()),
+    C5Dialog(),
     ui(new Ui::SessionOrders)
 {
     ui->setupUi(this);
@@ -23,7 +23,7 @@ SessionOrders::~SessionOrders()
 
 void SessionOrders::loadOrders()
 {
-    C5Database db(fDBParams);
+    C5Database db;
     db[":f_session"] = __c5config.getRegValue("session").toInt();
     db.exec("SELECT o.f_id, CONCAT(f_prefix, f_hallid) as f_number, "
             "cast(CONCAT(o.f_dateclose, ' ', f_timeclose) as datetime) as f_date, o.f_amounttotal, "

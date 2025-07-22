@@ -12,7 +12,7 @@ class CR5GoodsQtyReminderFilter : public C5FilterWidget
     Q_OBJECT
 
 public:
-    explicit CR5GoodsQtyReminderFilter(const QStringList &dbParams, QWidget *parent = nullptr);
+    explicit CR5GoodsQtyReminderFilter(QWidget *parent = nullptr);
 
     ~CR5GoodsQtyReminderFilter();
 

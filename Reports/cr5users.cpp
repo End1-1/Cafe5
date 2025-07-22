@@ -3,8 +3,8 @@
 #include "ce5user.h"
 #include "cr5usersfilter.h"
 
-CR5Users::CR5Users(const QStringList &dbParams, QWidget *parent) :
-    C5ReportWidget(dbParams, parent)
+CR5Users::CR5Users(QWidget *parent) :
+    C5ReportWidget(parent)
 {
     fIcon = ":/users_groups.png";
     fLabel = tr("Users");
@@ -23,13 +23,13 @@ CR5Users::CR5Users(const QStringList &dbParams, QWidget *parent) :
     fTranslation["f_first"] = tr("First name");
     fTranslation["f_last"] = tr("Last name");
     fTranslation["f_configname"] = tr("Config");
-    fEditor = new CE5User(dbParams);
-    fFilterWidget = new CR5UsersFilter(dbParams);
+    fEditor = new CE5User();
+    fFilterWidget = new CR5UsersFilter();
 }
 
-QToolBar *CR5Users::toolBar()
+QToolBar* CR5Users::toolBar()
 {
-    if (!fToolBar) {
+    if(!fToolBar) {
         QList<ToolBarButtons> btn;
         btn << ToolBarButtons::tbNew
             << ToolBarButtons::tbFilter
@@ -40,12 +40,13 @@ QToolBar *CR5Users::toolBar()
         createStandartToolbar(btn);
         fToolBar->addAction(QIcon(":/password.png"), tr("Set\npasswords"), this, SLOT(setPasswords()));
     }
+
     return fToolBar;
 }
 
 void CR5Users::setPasswords()
 {
-    if (int id = rowId(0)) {
-        C5Passwords::setPasswords(fDBParams, id);
+    if(int id = rowId(0)) {
+        C5Passwords::setPasswords(id);
     };
 }

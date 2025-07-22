@@ -2,8 +2,8 @@
 #include "ui_ce5goodsunit.h"
 #include <QDoubleValidator>
 
-CE5GoodsUnit::CE5GoodsUnit(const QStringList &dbParams, QWidget *parent) :
-    CE5Editor(dbParams, parent),
+CE5GoodsUnit::CE5GoodsUnit(QWidget *parent) :
+    CE5Editor(parent),
     ui(new Ui::CE5GoodsUnit)
 {
     ui->setupUi(this);

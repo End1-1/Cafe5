@@ -10,7 +10,7 @@ class CR5DraftOutputByRecipe : public C5ReportWidget
     Q_OBJECT
 
 public:
-    CR5DraftOutputByRecipe(const QStringList &dbParams, QWidget *parent = nullptr);
+    CR5DraftOutputByRecipe(QWidget *parent = nullptr);
 
     virtual QToolBar *toolBar();
 

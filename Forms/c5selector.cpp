@@ -7,12 +7,12 @@
 
 QMap<QString, QMap<int, C5Selector *> > C5Selector::fSelectorList;
 
-C5Selector::C5Selector(const QStringList &dbParams) :
-    C5Dialog(dbParams),
+C5Selector::C5Selector() :
+    C5Dialog(),
     ui(new Ui::C5Selector)
 {
     ui->setupUi(this);
-    fGrid = new C5Grid(dbParams, nullptr);
+    fGrid = new C5Grid(nullptr);
     fGrid->fTableView->setSelectionBehavior(QAbstractItemView::SelectRows);
     ui->hl->addWidget(fGrid);
     connect(fGrid, SIGNAL(tblDoubleClick(int, int, QJsonArray)), this, SLOT(tblDoubleClicked(int, int,
@@ -30,13 +30,13 @@ C5Selector::~C5Selector()
     delete ui;
 }
 
-bool C5Selector::getValue(const QStringList &dbParams, int cache, QJsonArray &values)
+bool C5Selector::getValue(int cache, QJsonArray &values)
 {
-    QString cacheName = C5Cache::cacheName(dbParams, cache);
+    QString cacheName = C5Cache::cacheName(cache);
     C5Selector *c = nullptr;
     if (!fSelectorList[cacheName].contains(cache)) {
-        c = new C5Selector(dbParams);
-        c->fQuery = C5Cache(dbParams).query(cache);
+        c = new C5Selector();
+        c->fQuery = C5Cache().query(cache);
         c->fCache = cache;
         fSelectorList[cacheName][cache] = c;
     } else {
@@ -57,9 +57,9 @@ bool C5Selector::getValue(const QStringList &dbParams, int cache, QJsonArray &va
     return result;
 }
 
-bool C5Selector::getValue(const QStringList &dbParams, const QString &query, QJsonArray &values)
+bool C5Selector::getValue(const QString &query, QJsonArray &values)
 {
-    C5Selector *c = new C5Selector(dbParams);
+    C5Selector *c = new C5Selector();
     c->fQuery = query;
     c->fSearchColumn = -1;
     c->fMultipleSelection = false;
@@ -73,13 +73,13 @@ bool C5Selector::getValue(const QStringList &dbParams, const QString &query, QJs
     return result;
 }
 
-bool C5Selector::getValueOfColumn(const QStringList &dbParams, int cache, QJsonArray &values, int column)
+bool C5Selector::getValueOfColumn(int cache, QJsonArray &values, int column)
 {
-    QString cacheName = C5Cache::cacheName(dbParams, cache);
+    QString cacheName = C5Cache::cacheName(cache);
     C5Selector *c = nullptr;
     if (!fSelectorList[cacheName].contains(cache)) {
-        c = new C5Selector(dbParams);
-        c->fQuery = C5Cache(dbParams).query(cache).replace("%idcond%", "");
+        c = new C5Selector();
+        c->fQuery = C5Cache().query(cache).replace("%idcond%", "");
         c->fCache = cache;
         fSelectorList[cacheName][cache] = c;
     } else {
@@ -98,13 +98,13 @@ bool C5Selector::getValueOfColumn(const QStringList &dbParams, int cache, QJsonA
     return result;
 }
 
-bool C5Selector::getMultipleValues(const QStringList &dbParams, int cache, QVector<QJsonArray > &values)
+bool C5Selector::getMultipleValues(int cache, QVector<QJsonArray > &values)
 {
-    QString cacheName = C5Cache::cacheName(dbParams, cache);
+    QString cacheName = C5Cache::cacheName(cache);
     C5Selector *c = nullptr;
     if (!fSelectorList[cacheName].contains(cache)) {
-        c = new C5Selector(dbParams);
-        c->fQuery = C5Cache(dbParams).query(cache).replace("%idcond%", "");
+        c = new C5Selector();
+        c->fQuery = C5Cache().query(cache).replace("%idcond%", "");
         c->fCache = cache;
         fSelectorList[cacheName][cache] = c;
     } else {
@@ -128,10 +128,10 @@ bool C5Selector::getMultipleValues(const QStringList &dbParams, int cache, QVect
     return result;
 }
 
-bool C5Selector::getValues(const QStringList &dbParams, const QString &sql, QJsonArray &values,
+bool C5Selector::getValues(const QString &sql, QJsonArray &values,
                            const QHash<QString, QString> &translator)
 {
-    C5Selector *c = new C5Selector(dbParams);
+    C5Selector *c = new C5Selector();
     c->fQuery = sql;
     c->fGrid->fTranslation = translator;
     c->refresh();
@@ -170,9 +170,9 @@ void C5Selector::keyPressEvent(QKeyEvent *key)
     C5Dialog::keyPressEvent(key);
 }
 
-void C5Selector::resetCache(const QStringList &dbParams, int cacheId)
+void C5Selector::resetCache(int cacheId)
 {
-    QString cacheName = C5Cache::cacheName(dbParams, cacheId);
+    QString cacheName = C5Cache::cacheName(cacheId);
     if (fSelectorList.contains(cacheName)) {
         if (fSelectorList[cacheName].contains(cacheId)) {
             fSelectorList[cacheName][cacheId]->fReset = true;
@@ -209,7 +209,7 @@ void C5Selector::on_btnRefreshCache_clicked()
 void C5Selector::refresh()
 {
     if (fCache > 0) {
-        C5Cache::cache(fDBParams, fCache)->refresh();
+        C5Cache::cache(fCache)->refresh();
     }
     fGrid->setCheckboxes(true);
     fGrid->fModel->setSingleCheckBoxSelection(!fMultipleSelection);

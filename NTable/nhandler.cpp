@@ -32,66 +32,72 @@ void NHandler::configure(NFilterDlg *filter, const QVariantList &handlers, QTabl
 
 void NHandler::handle(const QJsonArray &ja)
 {
-    if (mHandlers.length() < 2) {
+    if(mHandlers.length() < 2) {
         return;
     }
-    if (mHandlers.at(1).toString() == hDebt) {
-        switch (mFilterDlg->filterValue("mode").toInt()) {
-            case 1:
-            case 4:
-                if (!ja.at(3).toString().isEmpty()) {
-                    C5Database db(__c5config.dbParams());
-                    db[":f_id"] = ja.at(3).toString();
-                    db.exec("select f_source from o_header where f_id=:f_id");
-                    if (db.nextRow()) {
-                        switch (abs(db.getInt(0))) {
-                            case 1: {
-                                C5WaiterOrder *wo = __mainWindow->createTab<C5WaiterOrder>(__c5config.dbParams());
-                                wo->setOrder(ja.at(3).toString());
-                                break;
-                            }
-                            case 2: {
-                                C5SaleFromStoreOrder::openOrder(__c5config.dbParams(), ja.at(3).toString());
-                                break;
-                            }
-                        }
+
+    if(mHandlers.at(1).toString() == hDebt) {
+        switch(mFilterDlg->filterValue("mode").toInt()) {
+        case 1:
+        case 4:
+            if(!ja.at(3).toString().isEmpty()) {
+                C5Database db;
+                db[":f_id"] = ja.at(3).toString();
+                db.exec("select f_source from o_header where f_id=:f_id");
+
+                if(db.nextRow()) {
+                    switch(abs(db.getInt(0))) {
+                    case 1: {
+                        C5WaiterOrder *wo = __mainWindow->createTab<C5WaiterOrder>();
+                        wo->setOrder(ja.at(3).toString());
+                        break;
                     }
-                } else if (!ja.at(4).toString().isEmpty()) {
-                    C5CostumerDebtPayment d(0, __c5config.dbParams());
-                    d.setId(ja.at(4).toString());
-                    d.exec();
-                } else if(!ja.at(5).toString().isEmpty()) {
-                    C5StoreDoc *sd = __mainWindow->createTab<C5StoreDoc>(__c5config.dbParams());
-                    QString err;
-                    sd->openDoc(ja.at(5).toString(), err);
-                    if (!err.isEmpty()) {
-                        C5Message::error(err);
+
+                    case 2: {
+                        C5SaleFromStoreOrder::openOrder(ja.at(3).toString());
+                        break;
+                    }
                     }
                 }
-                break;
+            } else if(!ja.at(4).toString().isEmpty()) {
+                C5CostumerDebtPayment d(0);
+                d.setId(ja.at(4).toString());
+                d.exec();
+            } else if(!ja.at(5).toString().isEmpty()) {
+                C5StoreDoc *sd = __mainWindow->createTab<C5StoreDoc>();
+                QString err;
+                sd->openDoc(ja.at(5).toString(), err);
+
+                if(!err.isEmpty()) {
+                    C5Message::error(err);
+                }
+            }
+
+            break;
         }
-    } else if (mHandlers.at(1).toString() == hShortDebt) {
-        C5CostumerDebtPayment d(0, __c5config.dbParams());
+    } else if(mHandlers.at(1).toString() == hShortDebt) {
+        C5CostumerDebtPayment d(0);
         d.setId(ja.at(0).toString());
         d.exec();
-    } else if (mHandlers.at(1).toString() == hDraftSale) {
-        auto *retaildoc = __mainWindow->createTab<C5SaleDoc>(__c5config.dbParams());
+    } else if(mHandlers.at(1).toString() == hDraftSale) {
+        auto *retaildoc = __mainWindow->createTab<C5SaleDoc>();
         retaildoc->openDraft(ja.at(0).toString());
     }
 }
 
 void NHandler::toolWidget(QWidget *w)
 {
-    auto *gl = static_cast<QGridLayout *>(w->layout());
-    if (mHandlers.size() > 0) {
-        if (mHandlers.contains(hDebt)) {
+    auto *gl = static_cast<QGridLayout*>(w->layout());
+
+    if(mHandlers.size() > 0) {
+        if(mHandlers.contains(hDebt)) {
             auto *b = new QToolButton(w);
             b->setIcon(QIcon(":/new.png"));
             b->setText(tr("New customer payment"));
             b->setAutoRaise(true);
             b->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
             connect(b, &QAbstractButton::clicked, []() {
-                C5CostumerDebtPayment(BCLIENTDEBTS_SOURCE_SALE, __c5config.dbParams()).exec();
+                C5CostumerDebtPayment(BCLIENTDEBTS_SOURCE_SALE).exec();
             });
             gl->addWidget(b, 0, 0, Qt::AlignLeft);
             b = new QToolButton(w);
@@ -100,7 +106,7 @@ void NHandler::toolWidget(QWidget *w)
             b->setAutoRaise(true);
             b->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
             connect(b, &QAbstractButton::clicked, []() {
-                C5CostumerDebtPayment(BCLIENTDEBTS_SOURCE_INPUT, __c5config.dbParams()).exec();
+                C5CostumerDebtPayment(BCLIENTDEBTS_SOURCE_INPUT).exec();
             });
             gl->addWidget(b, 1, 0, Qt::AlignLeft);
         } else if(mHandlers.contains(hShortDebt)) {
@@ -111,18 +117,20 @@ void NHandler::toolWidget(QWidget *w)
             b->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
             connect(b, &QAbstractButton::clicked, [this]() {
                 int row = mTableView->currentIndex().row();
-                if (row < 0) {
+
+                if(row < 0) {
                     return;
                 }
-                auto *m = static_cast<NTableModel *>(mTableView->model());
-                C5CostumerDebtPayment cb(BCLIENTDEBTS_SOURCE_SALE, __c5config.dbParams());
+
+                auto *m = static_cast<NTableModel*>(mTableView->model());
+                C5CostumerDebtPayment cb(BCLIENTDEBTS_SOURCE_SALE);
                 cb.setProperty("uuid", m->data(row, 0).toString());
                 cb.setPartnerAndAmount(m->data(row, 1, Qt::EditRole).toInt(), m->data(row, 6, Qt::EditRole).toDouble(),
                                        m->data(row, 0).toString());
                 cb.exec();
             });
             gl->addWidget(b, 0, 0, Qt::AlignLeft);
-        } else if (mHandlers.contains(hDraftSale)) {
+        } else if(mHandlers.contains(hDraftSale)) {
         }
     }
 }

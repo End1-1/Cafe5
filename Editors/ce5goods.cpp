@@ -33,21 +33,21 @@
 static int fLastGroup = 0;
 static int fLastUnit = 0;
 
-CE5Goods::CE5Goods(const QStringList &dbParams, QWidget *parent) :
-    CE5Editor(dbParams, parent),
+CE5Goods::CE5Goods(QWidget *parent) :
+    CE5Editor(parent),
     ui(new Ui::CE5Goods)
 {
     ui->setupUi(this);
-    ui->leSupplier->setSelector(dbParams, ui->leSupplierName, cache_goods_partners);
-    ui->leGroup->setSelector(dbParams, ui->leGroupName, cache_goods_group);
-    ui->leUnit->setSelector(dbParams, ui->leUnitName, cache_goods_unit);
+    ui->leSupplier->setSelector(ui->leSupplierName, cache_goods_partners);
+    ui->leGroup->setSelector(ui->leGroupName, cache_goods_group);
+    ui->leUnit->setSelector(ui->leUnitName, cache_goods_unit);
     ui->leLowLevel->setValidator(new QDoubleValidator(0, 100000, 4));
     ui->tblGoods->setColumnWidths(7, 0, 0, 400, 80, 80, 80, 80);
-    ui->leStoreId->setSelector(dbParams, ui->leStoreIdName, cache_goods, 1, 3);
+    ui->leStoreId->setSelector(ui->leStoreIdName, cache_goods, 1, 3);
 #ifndef QT_DEBUG
     ui->leIsComplect->setVisible(false);
 #endif
-    C5Database db(dbParams);
+    C5Database db;
     db.exec("select f_name from c_goods");
     while (db.nextRow()) {
         fStrings.insert(db.getString(0));
@@ -90,7 +90,7 @@ CE5Goods::CE5Goods(const QStringList &dbParams, QWidget *parent) :
     }
     ui->tblPricing->setHorizontalHeaderLabels(colLabels);
     ui->tblPricing->fitColumnsToWidth();
-    ui->cbCurrency->setDBValues(dbParams, "select f_id, f_name from e_currency");
+    ui->cbCurrency->setDBValues("select f_id, f_name from e_currency");
     int basecurrecny = __c5config.getValue(param_default_currency).toInt();
     ui->cbCurrency->setIndexForValue(basecurrecny);
     connect(ui->leScanCode, &C5LineEditWithSelector::doubleClicked, this, &CE5Goods::genScancode);
@@ -313,7 +313,7 @@ void CE5Goods::saveResponse(const QJsonObject &jdoc)
     fJsonData["goods"] = j;
     fHttp->httpQueryFinished(sender());
     if (jdoc["isnew"].toBool()) {
-        C5Cache::cache(fDBParams, cache_goods)->refreshId("g.f_id", j["f_id"].toInt());
+        C5Cache::cache(cache_goods)->refreshId("g.f_id", j["f_id"].toInt());
     }
     if (acceptOnSave()) {
         emit Accept();
@@ -479,7 +479,7 @@ void CE5Goods::printCard()
         p.rtext(QString("%1: %2").arg(tr("Complectation cost"), ui->leTotal->text()));
     }
     fEditor->close();
-    C5PrintPreview pp( &p, fDBParams);
+    C5PrintPreview pp( &p);
     pp.setWindowState( (windowState() & ~Qt::WindowMinimized) | Qt::WindowActive);
     pp.raise();  // for MacOS
     pp.activateWindow();
@@ -609,7 +609,7 @@ void CE5Goods::genScancode()
         C5Message::error(tr("Scancode field must be empty"));
         return;
     }
-    C5Database db(fDBParams);
+    C5Database db;
     db.exec("select * from c_goods_scancode_counter");
     db.nextRow();
     ui->leScanCode->setText(QString("%1").arg(db.getInt("f_counter") + 1, db.getInt("f_digitsnumber"), 10, QChar('0')));
@@ -620,8 +620,8 @@ void CE5Goods::genScancode()
 
 void CE5Goods::on_btnNewGroup_clicked()
 {
-    CE5GoodsGroup *ep = new CE5GoodsGroup(fDBParams);
-    C5Editor *e = C5Editor::createEditor(fDBParams, ep, 0);
+    CE5GoodsGroup *ep = new CE5GoodsGroup();
+    C5Editor *e = C5Editor::createEditor(ep, 0);
     QList<QMap<QString, QVariant> > data;
     if(e->getResult(data)) {
         ui->leGroup->setValue(data.at(0)["f_id"].toString());
@@ -631,8 +631,8 @@ void CE5Goods::on_btnNewGroup_clicked()
 
 void CE5Goods::on_btnNewUnit_clicked()
 {
-    CE5GoodsUnit *ep = new CE5GoodsUnit(fDBParams);
-    C5Editor *e = C5Editor::createEditor(fDBParams, ep, 0);
+    CE5GoodsUnit *ep = new CE5GoodsUnit();
+    C5Editor *e = C5Editor::createEditor(ep, 0);
     QList<QMap<QString, QVariant> > data;
     if(e->getResult(data)) {
         ui->leUnit->setValue(data.at(0)["f_id"].toString());
@@ -643,7 +643,7 @@ void CE5Goods::on_btnNewUnit_clicked()
 void CE5Goods::on_btnAddGoods_clicked()
 {
     QJsonArray vals;
-    if (!C5Selector::getValue(fDBParams, cache_goods, vals)) {
+    if (!C5Selector::getValue(cache_goods, vals)) {
         return;
     }
     int row = addGoodsRow();
@@ -728,8 +728,8 @@ void CE5Goods::countSalePrice(int r, double margin)
 
 void CE5Goods::on_btnNewGoods_clicked()
 {
-    CE5Goods *ep = new CE5Goods(fDBParams);
-    C5Editor *e = C5Editor::createEditor(fDBParams, ep, 0);
+    CE5Goods *ep = new CE5Goods();
+    C5Editor *e = C5Editor::createEditor(ep, 0);
     QJsonObject data;
     if(e->getJsonObject(data)) {
         int row = addGoodsRow();
@@ -745,8 +745,8 @@ void CE5Goods::on_btnNewGoods_clicked()
 
 void CE5Goods::on_btnNewPartner_clicked()
 {
-    CE5Partner *ep = new CE5Partner(fDBParams);
-    C5Editor *e = C5Editor::createEditor(fDBParams, ep, 0);
+    CE5Partner *ep = new CE5Partner();
+    C5Editor *e = C5Editor::createEditor(ep, 0);
     QList<QMap<QString, QVariant> > data;
     if(e->getResult(data)) {
         ui->leSupplier->setValue(data.at(0)["f_id"].toString());
@@ -802,7 +802,7 @@ void CE5Goods::on_tabWidget_currentChanged(int index)
 {
     switch (index) {
         case 3: {
-            C5Database db(fDBParams);
+            C5Database db;
             db[":f_id"] = ui->leCode->getInteger();
             db.exec("select * from c_goods_images where f_id=:f_id");
             if (db.nextRow()) {
@@ -887,8 +887,8 @@ void CE5Goods::on_leMargin2_textEdited(const QString &arg1)
 
 void CE5Goods::on_btnNewModel_clicked()
 {
-    CE5GoodsModel *ep = new CE5GoodsModel(fDBParams);
-    C5Editor *e = C5Editor::createEditor(fDBParams, ep, 0);
+    CE5GoodsModel *ep = new CE5GoodsModel();
+    C5Editor *e = C5Editor::createEditor(ep, 0);
     QList<QMap<QString, QVariant> > data;
     if(e->getResult(data)) {
     }

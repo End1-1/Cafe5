@@ -12,7 +12,7 @@ class CE5CurrencyRate : public CE5Editor
     Q_OBJECT
 
 public:
-    explicit CE5CurrencyRate(const QStringList &dbParams, QWidget *parent = nullptr);
+    explicit CE5CurrencyRate(QWidget *parent = nullptr);
     ~CE5CurrencyRate();
     virtual QString title();
     virtual QString table();

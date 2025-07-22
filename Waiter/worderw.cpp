@@ -2,13 +2,10 @@
 #include "ui_worderw.h"
 #include "c5ordertabledelegate.h"
 #include "c5orderdriver.h"
-#include "c5message.h"
 #include "c5utils.h"
 #include "dishitem.h"
 #include "dlgorder.h"
-#include "c5config.h"
 #include "dlgguestinfo.h"
-#include "dlgqty.h"
 #include <QJsonObject>
 
 #define PART2_COL_WIDTH 150
@@ -22,7 +19,7 @@ WOrder::WOrder(QWidget *parent) :
 {
     ui->setupUi(this);
     fSelected = false;
-    fOrderDriver = new C5OrderDriver(__c5config.dbParams());
+    fOrderDriver = new C5OrderDriver();
     fDlg = nullptr;
     setChanges();
 }
@@ -38,35 +35,9 @@ void WOrder::setDlg(DlgOrder *dlg)
     fDlg = dlg;
 }
 
-void WOrder::updateDishes()
-{
-    int r = -1;
-    for (int i = 0; i < fItems.count(); i++) {
-        if (fItems.at(i)->isFocused()) {
-            r = i;
-        }
-        fItems.at(i)->deleteLater();
-    }
-    fItems.clear();
-    while (ui->vl->itemAt(0)) {
-        ui->vl->removeItem(ui->vl->itemAt(0));
-    }
-    if (fOrderDriver->currentOrderId().isEmpty()) {
-        return;
-    }
-    for (int i = 0; i < fOrderDriver->dishesCount(); i++) {
-        DishItem *item = new DishItem(fOrderDriver, i);
-        connect(item, &DishItem::focused, this, &WOrder::focused);
-        ui->vl->addWidget(item);
-        fItems.append(item);
-        item->clearFocus(r);
-    }
-    ui->vl->addStretch(1);
-}
-
 void WOrder::checkAllItems(bool v)
 {
-    for (auto *w : fItems) {
+    for(auto *w : fItems) {
         w->setChecked(v);
     }
 }
@@ -74,85 +45,55 @@ void WOrder::checkAllItems(bool v)
 QList<int> WOrder::checkedItems()
 {
     QList<int> result;
-    for (int i = 0; i < fItems.count(); i++) {
-        if (fOrderDriver->dishesValue("f_state", i).toInt() == DISH_STATE_OK
+
+    for(int i = 0; i < fItems.count(); i++) {
+        if(fOrderDriver->dishesValue("f_state", i).toInt() == DISH_STATE_OK
                 || fOrderDriver->dishesValue("f_state", i).toInt() == DISH_STATE_SET) {
-            if (fItems.at(i)->isChecked()) {
+            if(fItems.at(i)->isChecked()) {
                 result.append(i);
             }
         }
     }
-    return result;
-}
 
-int WOrder::addItem(int menuid, const QString &comment, double price, const QString &emark)
-{
-    if (!fOrderDriver->addDish(menuid, comment, price, emark)) {
-        C5Message::error(fOrderDriver->error());
-        return -1;
-    }
-    int row = fOrderDriver->dishesCount() - 1;
-    DishItem *di = new DishItem(fOrderDriver, row);
-    fItems.append(di);
-    connect(di, &DishItem::focused, this, &WOrder::focused);
-    if (fDlg) {
-    } else {
-        di->setReadyOnly(true);
-    }
-    ui->vl->insertWidget(row, di);
-    focused(row);
-    setMinimumHeight(((row + 5) * 50) + 10);
-    return row;
+    return result;
 }
 
 void WOrder::updateItem(int index)
 {
-    for (auto *item : qAsConst(fItems)) {
+    for(auto *item : qAsConst(fItems)) {
         item->setChanges();
     }
 }
 
-bool WOrder::currentRow(int &row)
-{
-    row = -1;
-    for (int i = 0, count = ui->vl->count(); i < count; i++) {
-        QLayoutItem *l = ui->vl->itemAt(i);
-        DishItem *d = dynamic_cast<DishItem *>(l->widget());
-        if (d) {
-            if (d->isFocused()) {
-                row = d->index();
-                break;
-            }
-        }
-    }
-    return row > -1;
-}
-
 void WOrder::setCurrentRow(int row)
 {
-    for (int i = 0, count = ui->vl->count(); i < count; i++) {
-        QLayoutItem *l = ui->vl->itemAt(i);
-        DishItem *d = dynamic_cast<DishItem *>(l->widget());
-        if (d) {
-            if (i == row) {
-                d->clearFocus(row);
-            } else {
-                d->clearFocus(-1);
-            }
-        }
-    }
+    //  TODO
+    // FIX MIGRATION
+    // for(int i = 0, count = ui->vl->count(); i < count; i++) {
+    //     QLayoutItem *l = ui->vl->itemAt(i);
+    //     DishItem *d = dynamic_cast<DishItem*>(l->widget());
+    //     if(d) {
+    //         if(i == row) {
+    //             d->clearFocus(row);
+    //         } else {
+    //             d->clearFocus(-1);
+    //         }
+    //     }
+    // }
 }
 
 void WOrder::setSelected(bool v)
 {
     fSelected = v;
     setChanges();
-    if (!fSelected) {
-        for (int i = 0, count = ui->vl->count(); i < count; i++) {
+
+    if(!fSelected) {
+        for(int i = 0, count = ui->vl->count(); i < count; i++) {
             QLayoutItem *l = ui->vl->itemAt(i);
-            DishItem *d = dynamic_cast<DishItem *>(l->widget());
-            if (d) {
-                d->clearFocus(-1);
+            DishItem *d = dynamic_cast<DishItem*>(l->widget());
+
+            if(d) {
+                d->clearFocus();
             }
         }
     }
@@ -165,16 +106,17 @@ bool WOrder::isSelected()
 
 void WOrder::setCheckMode(bool v)
 {
-    for (int i = 0, count = ui->vl->count(); i < count; i++) {
+    for(int i = 0, count = ui->vl->count(); i < count; i++) {
         QLayoutItem *l = ui->vl->itemAt(i);
-        DishItem *d = dynamic_cast<DishItem *>(l->widget());
-        if (d) {
+        DishItem *d = dynamic_cast<DishItem*>(l->widget());
+
+        if(d) {
             d->setCheckMode(v);
         }
     }
 }
 
-DishItem *WOrder::dishWidget(int i)
+DishItem* WOrder::dishWidget(int i)
 {
     return fItems[i];
 }
@@ -187,20 +129,25 @@ void WOrder::setChanges()
 
 QPoint WOrder::focused(int index)
 {
-    if (!fSelected) {
+    if(!fSelected) {
         emit activated();
     }
+
     QPoint p(0, 0);
-    for (int i = 0, count = ui->vl->count(); i < count; i++) {
+
+    for(int i = 0, count = ui->vl->count(); i < count; i++) {
         QLayoutItem *l = ui->vl->itemAt(i);
-        DishItem *d = dynamic_cast<DishItem *>(l->widget());
-        if (d) {
-            d->clearFocus(index);
-            if (d->isFocused()) {
+        DishItem *d = dynamic_cast<DishItem*>(l->widget());
+
+        if(d) {
+            d->clearFocus();
+
+            if(d->isFocused()) {
                 p = d->mapTo(fDlg, QPoint(0, 0));
             }
         }
     }
+
     return p;
 }
 
@@ -213,6 +160,7 @@ void WOrder::on_btnEditGuestName_clicked()
 {
     DlgGuestInfo gi;
     gi.exec();
-    if (gi.fCode > 0) {
+
+    if(gi.fCode > 0) {
     }
 }

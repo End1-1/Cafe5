@@ -8,7 +8,7 @@
 #include <QFile>
 
 DlgSmartReports::DlgSmartReports() :
-    C5Dialog(__c5config.dbParams()),
+    C5Dialog(),
     ui(new Ui::DlgSmartReports)
 {
     ui->setupUi(this);
@@ -49,29 +49,35 @@ DlgSmartReports::~DlgSmartReports()
 }
 void DlgSmartReports::on_list_itemClicked(QListWidgetItem *item)
 {
-    if (item == nullptr) {
+    if(item == nullptr) {
         return;
     }
-    if (item->data(Qt::UserRole).toInt() == 0) {
+
+    if(item->data(Qt::UserRole).toInt() == 0) {
         reject();
         return;
     }
-    switch (item->data(Qt::UserRole).toInt()) {
-        case 1:
-            reportCommonDishes();
-            break;
-        case 2:
-            reportCommonDishesWithTime();
-            break;
-        case 3:
-            SessionOrders().exec();
-            break;
-        case 4:
-            printDeliveryReport();
-            break;
-        case 5:
-            printTotalReport();
-            break;
+
+    switch(item->data(Qt::UserRole).toInt()) {
+    case 1:
+        reportCommonDishes();
+        break;
+
+    case 2:
+        reportCommonDishesWithTime();
+        break;
+
+    case 3:
+        SessionOrders().exec();
+        break;
+
+    case 4:
+        printDeliveryReport();
+        break;
+
+    case 5:
+        printTotalReport();
+        break;
     }
 }
 
@@ -83,10 +89,12 @@ void DlgSmartReports::reportCommonDishes()
     C5Printing p;
     p.setSceneParams(650, 2800, QPageLayout::Portrait);
     p.setFont(font);
-    if (QFile::exists("./logo_receipt.png")) {
+
+    if(QFile::exists("./logo_receipt.png")) {
         p.image("./logo_receipt.png", Qt::AlignHCenter);
         p.br();
     }
+
     p.setFontBold(true);
     p.ctext(tr("End of day"));
     p.br();
@@ -97,7 +105,7 @@ void DlgSmartReports::reportCommonDishes()
     p.ctext(ui->leDateEnd->text());
     p.br();
     double total = 0;
-    C5Database dd(fDBParams);
+    C5Database dd;
     dd[":f_datecash1"] = ui->leDateStart->date();
     dd[":f_datecash2"] = ui->leDateEnd->date();
     dd[":f_stateh"] = ORDER_STATE_CLOSE;
@@ -119,10 +127,12 @@ void DlgSmartReports::reportCommonDishes()
             "group by 1, 3 ");
     p.setFontBold(false);
     p.setFontSize(22);
-    while (dd.nextRow()) {
-        if (p.checkBr(p.fLineHeight + 2)) {
+
+    while(dd.nextRow()) {
+        if(p.checkBr(p.fLineHeight + 2)) {
             p.br();
         }
+
         total += dd.getDouble("f_total");
         p.ltext(dd.getString("f_name"), 0);
         p.br();
@@ -132,6 +142,7 @@ void DlgSmartReports::reportCommonDishes()
         p.line();
         p.br(2);
     }
+
     p.line(4);
     p.br(3);
     p.setFontBold(true);
@@ -163,10 +174,12 @@ void DlgSmartReports::reportCommonDishesWithTime()
     C5Printing p;
     p.setSceneParams(650, 2800, QPageLayout::Portrait);
     p.setFont(font);
-    if (QFile::exists("./logo_receipt.png")) {
+
+    if(QFile::exists("./logo_receipt.png")) {
         p.image("./logo_receipt.png", Qt::AlignHCenter);
         p.br();
     }
+
     p.setFontBold(true);
     p.ctext(tr("End of day"));
     p.br();
@@ -177,7 +190,7 @@ void DlgSmartReports::reportCommonDishesWithTime()
     p.ctext(ui->leDateEnd->text() + " " + ui->leTimeEnd->text());
     p.br();
     double total = 0;
-    C5Database dd(fDBParams);
+    C5Database dd;
     dd[":f_date1"] = QDateTime::fromString(ui->leDateStart->text() + " " + ui->leTimeStart->text(), "dd/MM/yyyy HH:mm");
     dd[":f_date2"] = QDateTime::fromString(ui->leDateEnd->text() + " " + ui->leTimeEnd->text(), "dd/MM/yyyy HH:mm");
     dd[":f_stateh"] = ORDER_STATE_CLOSE;
@@ -198,10 +211,12 @@ void DlgSmartReports::reportCommonDishesWithTime()
             "group by 1, 3 ");
     p.setFontBold(false);
     p.setFontSize(22);
-    while (dd.nextRow()) {
-        if (p.checkBr(p.fLineHeight + 2)) {
+
+    while(dd.nextRow()) {
+        if(p.checkBr(p.fLineHeight + 2)) {
             p.br();
         }
+
         total += dd.getDouble("f_total");
         p.ltext(dd.getString("f_name"), 0);
         p.br();
@@ -211,6 +226,7 @@ void DlgSmartReports::reportCommonDishesWithTime()
         p.line();
         p.br(2);
     }
+
     p.line(4);
     p.br(3);
     p.setFontBold(true);
@@ -242,10 +258,12 @@ void DlgSmartReports::printDeliveryReport()
     C5Printing p;
     p.setSceneParams(650, 2800, QPageLayout::Portrait);
     p.setFont(font);
-    if (QFile::exists("./logo_receipt.png")) {
+
+    if(QFile::exists("./logo_receipt.png")) {
         p.image("./logo_receipt.png", Qt::AlignHCenter);
         p.br();
     }
+
     p.setFontBold(true);
     p.ctext(tr("Delivery report"));
     p.br();
@@ -255,21 +273,23 @@ void DlgSmartReports::printDeliveryReport()
     p.br();
     p.ctext(ui->leDateEnd->text() + " " + ui->leTimeEnd->text());
     p.br();
-    QString sql ("SELECT h.f_id, concat(h.f_prefix, h.f_hallid) as f_hallid, "
-                 "date_format(cast(concat(f_dateclose, ' ', f_timeclose) as datetime),'%d/%m/%Y %H:%i' ) as f_date, h.f_amounttotal "
-                 "from o_header h "
-                 "left join o_header_flags f on f.f_id=h.f_id "
-                 "where f.f_1=1 and h.f_state=:f_state and cast(concat(h.f_dateclose, ' ', h.f_timeclose) as datetime) between :f_date1 and :f_date2 ");
-    C5Database db(fDBParams);
+    QString sql("SELECT h.f_id, concat(h.f_prefix, h.f_hallid) as f_hallid, "
+                "date_format(cast(concat(f_dateclose, ' ', f_timeclose) as datetime),'%d/%m/%Y %H:%i' ) as f_date, h.f_amounttotal "
+                "from o_header h "
+                "left join o_header_flags f on f.f_id=h.f_id "
+                "where f.f_1=1 and h.f_state=:f_state and cast(concat(h.f_dateclose, ' ', h.f_timeclose) as datetime) between :f_date1 and :f_date2 ");
+    C5Database db;
     db[":f_date1"] = QDateTime::fromString(ui->leDateStart->text() + " " + ui->leTimeStart->text(), "dd/MM/yyyy HH:mm");
     db[":f_date2"] = QDateTime::fromString(ui->leDateEnd->text() + " " + ui->leTimeEnd->text(), "dd/MM/yyyy HH:mm");
     db[":f_state"] = ORDER_STATE_CLOSE;
     db.exec(sql);
     double total = 0;
     int count = db.rowCount();
-    while (db.nextRow()) {
+
+    while(db.nextRow()) {
         total += db.getDouble("f_amounttotal");
     }
+
     p.setFontBold(false);
     p.setFontSize(22);
     p.ltext(tr("Delivery total count"), 0);
@@ -296,10 +316,12 @@ void DlgSmartReports::printTotalReport()
     C5Printing p;
     p.setSceneParams(650, 2800, QPageLayout::Portrait);
     p.setFont(font);
-    if (QFile::exists("./logo_receipt.png")) {
+
+    if(QFile::exists("./logo_receipt.png")) {
         p.image("./logo_receipt.png", Qt::AlignHCenter);
         p.br();
     }
+
     p.setFontBold(true);
     p.ctext(tr("Total report"));
     p.br();
@@ -309,17 +331,18 @@ void DlgSmartReports::printTotalReport()
     p.br();
     p.ctext(ui->leDateEnd->text() + " " + ui->leTimeEnd->text());
     p.br();
-    QString sql ("SELECT date_format(f_datecash, '%d/%m/%Y' ) as f_datecash, sum(h.f_amounttotal) as f_amounttotal, "
-                 "sum(f_amountcash) as f_amountcash, sum(f_amountcard) as f_amountcard "
-                 "from o_header h "
-                 "where h.f_state=:f_state and f_datecash between :f_date1 and :f_date2 "
-                 "group by 1 ");
-    C5Database db(fDBParams);
+    QString sql("SELECT date_format(f_datecash, '%d/%m/%Y' ) as f_datecash, sum(h.f_amounttotal) as f_amounttotal, "
+                "sum(f_amountcash) as f_amountcash, sum(f_amountcard) as f_amountcard "
+                "from o_header h "
+                "where h.f_state=:f_state and f_datecash between :f_date1 and :f_date2 "
+                "group by 1 ");
+    C5Database db;
     db[":f_date1"] = ui->leDateStart->date();
     db[":f_date2"] = ui->leDateEnd->date();
     db[":f_state"] = ORDER_STATE_CLOSE;
     db.exec(sql);
-    while (db.nextRow()) {
+
+    while(db.nextRow()) {
         p.setFontBold(false);
         p.setFontSize(22);
         p.ctext(db.getDate("f_datecash").toString(FORMAT_DATE_TO_STR));
@@ -336,6 +359,7 @@ void DlgSmartReports::printTotalReport()
         p.line();
         p.br();
     }
+
     p.br();
     p.line();
     p.br();

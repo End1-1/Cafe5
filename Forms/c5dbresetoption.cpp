@@ -3,8 +3,8 @@
 #include "c5random.h"
 #include "c5message.h"
 
-C5DbResetOption::C5DbResetOption(const QStringList &dbParams) :
-    C5Dialog(dbParams),
+C5DbResetOption::C5DbResetOption() :
+    C5Dialog(),
     ui(new Ui::C5DbResetOption)
 {
     ui->setupUi(this);

@@ -2,12 +2,12 @@
 #include "ui_cr5cashdetailedfilter.h"
 #include "c5cache.h"
 
-CR5CashDetailedFilter::CR5CashDetailedFilter(const QStringList &dbParams, QWidget *parent) :
-    C5FilterWidget(dbParams, parent),
+CR5CashDetailedFilter::CR5CashDetailedFilter(QWidget *parent) :
+    C5FilterWidget(parent),
     ui(new Ui::CR5CashDetailedFilter)
 {
     ui->setupUi(this);
-    ui->leCash->setSelector(dbParams, ui->leCashName, cache_cash_names);
+    ui->leCash->setSelector(ui->leCashName, cache_cash_names);
 }
 
 CR5CashDetailedFilter::~CR5CashDetailedFilter()

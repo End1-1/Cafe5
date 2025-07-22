@@ -1,15 +1,14 @@
 #include "c5cache.h"
 #include "c5database.h"
 
-QMap<QString, C5Cache *> C5Cache::fCacheList;
+QMap<QString, C5Cache*> C5Cache::fCacheList;
 QMap<int, QString> C5Cache::fCacheQuery;
 QMap<QString, int> C5Cache::fTableCache;
 QMap<int, QHash<QString, int> > C5Cache::fCacheColumns;
 
-C5Cache::C5Cache(const QStringList &dbParams) :
-    fDBParams(dbParams)
+C5Cache::C5Cache()
 {
-    if (fCacheQuery.count() == 0) {
+    if(fCacheQuery.count() == 0) {
         setCacheSimpleQuery(cache_users_groups, "s_user_group");
         setCacheSimpleQuery(cache_users_states, "s_user_state");
         setCacheSimpleQuery(cache_dish_part1, "d_part1");
@@ -119,12 +118,12 @@ C5Cache::C5Cache(const QStringList &dbParams) :
                                         .arg(tr("Code"), tr("Name"));
         fCacheQuery[cache_mf_process] =
             QString("select p.f_id as `%1`, p.f_rowid as `%2`, p.f_product as `%3`, gr.f_name as `%4`, "
-                    "p.f_process as `%5`, ac.f_name as `%6`, "
-                    "p.f_durationsec as `%7`, p.f_price as `%8` "
-                    "from mf_process p "
-                    "inner join mf_actions_group gr on gr.f_id=p.f_product "
-                    "inner join mf_actions ac on ac.f_id=p.f_process "
-                    "order by gr.f_name, p.f_rowid")
+                "p.f_process as `%5`, ac.f_name as `%6`, "
+                "p.f_durationsec as `%7`, p.f_price as `%8` "
+                "from mf_process p "
+                "inner join mf_actions_group gr on gr.f_id=p.f_product "
+                "inner join mf_actions ac on ac.f_id=p.f_process "
+                "order by gr.f_name, p.f_rowid")
             .arg(tr("Code"), tr("Row"), tr("Product code"), tr("Product"), tr("Process code"), tr("Process"), tr("Duration"),
                  tr("Price"));
         setCacheSimpleQuery(cache_mf_products, "mf_actions_group");
@@ -139,18 +138,18 @@ C5Cache::C5Cache(const QStringList &dbParams) :
             QString("select f_id as `%1`, f_name as `%2`, f_rate as `%3`, f_symbol as `%4` from e_currency ")
             .arg(tr("Code"), tr("Name"), tr("Rate"), tr("Symbol"));
         fCacheQuery[cache_currency_cross_rate] = QString("select cr.f_id as `%1`, cr.f_currency1 as `%2`, c1.f_name as `%3`, "
-            "cr.f_currency2 as `%4`, c2.f_name as `%5`, cr.f_rate as `%6` "
-            "from e_currency_cross_rate cr "
-            "left join e_currency c1 on c1.f_id=cr.f_currency1 "
-            "left join e_currency c2 on c2.f_id=cr.f_currency2 ")
+                                                         "cr.f_currency2 as `%4`, c2.f_name as `%5`, cr.f_rate as `%6` "
+                                                         "from e_currency_cross_rate cr "
+                                                         "left join e_currency c1 on c1.f_id=cr.f_currency1 "
+                                                         "left join e_currency c2 on c2.f_id=cr.f_currency2 ")
             .arg(tr("Code"), tr("Currency code1"), tr("Currency name 1"),
                  tr("Currency code 2"), tr("Currency name 2"), tr("Rate"));
         fCacheQuery[cache_currency_cross_rate_history] =
             QString("select cr.f_id as `%1`, cr.f_date as `%2`, cr.f_currency1 as `%3`, c1.f_name as `%4`, "
-                    "cr.f_currency2 as `%5`, c2.f_name as `%6`, cr.f_rate as `%7` "
-                    "from e_currency_cross_rate_history cr "
-                    "left join e_currency c1 on c1.f_id=cr.f_currency1 "
-                    "left join e_currency c2 on c2.f_id=cr.f_currency2 ")
+                "cr.f_currency2 as `%5`, c2.f_name as `%6`, cr.f_rate as `%7` "
+                "from e_currency_cross_rate_history cr "
+                "left join e_currency c1 on c1.f_id=cr.f_currency1 "
+                "left join e_currency c2 on c2.f_id=cr.f_currency2 ")
             .arg(tr("Code"), tr("Currency code1"), tr("Currency name 1"),
                  tr("Currency code 2"), tr("Currency name 2"), tr("Rate"));
         setCacheSimpleQuery(cache_draft_sale_state, "o_draft_sale_state");
@@ -158,7 +157,8 @@ C5Cache::C5Cache(const QStringList &dbParams) :
         setCacheSimpleQuery(cache_partner_group, "c_partners_group");
         setCacheSimpleQuery(cache_partner_state, "c_partners_state");
     }
-    if (fTableCache.count() == 0) {
+
+    if(fTableCache.count() == 0) {
         fTableCache["c_partners"] = cache_goods_partners;
         fTableCache["c_units"] = cache_goods_unit;
         fTableCache["c_groups"] = cache_goods_group;
@@ -212,16 +212,19 @@ QJsonArray C5Cache::getJoinedColumn(const QString &columnName)
 {
     QJsonArray result;
     int columnIndex = fCacheColumns[fId][columnName.toLower()];
-    for (int i = 0; i < fCacheData.size(); i++) {
+
+    for(int i = 0; i < fCacheData.size(); i++) {
         result.append(fCacheData.at(i).at(columnIndex));
     }
+
     return result;
 }
 
 QString C5Cache::getString(int id)
 {
     int row = find(id);
-    if (row > -1) {
+
+    if(row > -1) {
         return getString(row, 1);
     } else {
         return "FIND ERROR";
@@ -244,54 +247,60 @@ void C5Cache::refresh()
 
 void C5Cache::refreshId(const QString &whereField, int id)
 {
-    if (fCacheIdRow.contains(id)) {
+    if(fCacheIdRow.contains(id)) {
         int row = fCacheIdRow[id];
         fCacheIdRow.remove(id);
         fCacheData.erase(fCacheData.begin() + row);
     }
-    C5Database db(fDBParams);
+
+    C5Database db;
     std::vector<QJsonArray > cacheData;
     QString sql = fCacheQuery[fId];
     db.exec(sql.replace("%idcond%", QString(" and %1=%2 ")
                         .arg(whereField, QString::number(id))), cacheData,
             fCacheColumns[fId]);
-    if (cacheData.empty() == false) {
+
+    if(cacheData.empty() == false) {
         fCacheData.push_back(cacheData.at(0));
         fCacheIdRow[id] = static_cast<int>(fCacheData.size()) - 1;
     }
 }
 
-C5Cache *C5Cache::cache(const QStringList &dbParams, int cacheId)
+C5Cache* C5Cache::cache(int cacheId)
 {
-    QString name = cacheName(dbParams, cacheId);
+    QString name = cacheName(cacheId);
     C5Cache *cache = nullptr;
-    if (!fCacheList.contains(name)) {
-        cache = new C5Cache(dbParams);
+
+    if(!fCacheList.contains(name)) {
+        cache = new C5Cache();
         cache->fId = cacheId;
         fCacheList[name] = cache;
     } else {
         cache = fCacheList[name];
     }
-    if (cache->fCacheData.size() == 0) {
+
+    if(cache->fCacheData.size() == 0) {
         QString query = fCacheQuery[cacheId];
-        if (query.isEmpty()) {
+
+        if(query.isEmpty()) {
             query = "select 0";
         }
+
         cache->loadFromDatabase(query);
     }
+
     return cache;
 }
 
-QString C5Cache::cacheName(const QStringList &dbParams, int cacheId)
+QString C5Cache::cacheName(int cacheId)
 {
-    Q_UNUSED(dbParams);
     return QString::number(cacheId);
 }
 
-void C5Cache::resetCache(const QStringList &dbParams, const QString &table)
+void C5Cache::resetCache(const QString &table)
 {
     int cacheId = fTableCache[table];
-    C5Cache *c = C5Cache::cache(dbParams, cacheId);
+    C5Cache *c = C5Cache::cache(cacheId);
     c->fCacheData.clear();
     c->fCacheIdRow.clear();
 }
@@ -304,11 +313,12 @@ QString C5Cache::query(int cacheId)
 void C5Cache::loadFromDatabase(const QString &query)
 {
     fCacheIdRow.clear();
-    C5Database db(fDBParams);
+    C5Database db;
     QString q = query;
     q.replace("%idcond%", "");
     db.exec(q, fCacheData, fCacheColumns[fId]);
-    for (int i = 0; i < fCacheData.size(); i++) {
+
+    for(int i = 0; i < fCacheData.size(); i++) {
         fCacheIdRow[fCacheData[i][0].toInt()] = i;
     }
 }

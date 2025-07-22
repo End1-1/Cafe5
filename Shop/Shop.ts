@@ -33,7 +33,7 @@
         <location filename="../Classes/c5cache.cpp" line="140"/>
         <location filename="../Classes/c5cache.cpp" line="146"/>
         <location filename="../Classes/c5cache.cpp" line="154"/>
-        <location filename="../Classes/c5cache.cpp" line="318"/>
+        <location filename="../Classes/c5cache.cpp" line="319"/>
         <source>Code</source>
         <translation></translation>
     </message>
@@ -69,7 +69,7 @@
         <location filename="../Classes/c5cache.cpp" line="116"/>
         <location filename="../Classes/c5cache.cpp" line="119"/>
         <location filename="../Classes/c5cache.cpp" line="140"/>
-        <location filename="../Classes/c5cache.cpp" line="318"/>
+        <location filename="../Classes/c5cache.cpp" line="319"/>
         <source>Name</source>
         <translation></translation>
     </message>
@@ -899,76 +899,111 @@ MS Excel</source>
     <name>CashCollection</name>
     <message>
         <location filename="cashcollection.ui" line="19"/>
-        <location filename="cashcollection.cpp" line="17"/>
+        <location filename="cashcollection.cpp" line="16"/>
         <source>Cash collection</source>
         <translation>Կանխիկի հանձնում</translation>
     </message>
     <message>
-        <location filename="cashcollection.ui" line="40"/>
+        <location filename="cashcollection.ui" line="234"/>
         <source>*collection not supported</source>
         <translation>*ցուցադրվում է միայն ստուգելու նպատակով</translation>
     </message>
     <message>
-        <location filename="cashcollection.ui" line="103"/>
+        <location filename="cashcollection.ui" line="219"/>
         <source>Amount,cash</source>
         <translation>Կանխիկ գումար</translation>
     </message>
     <message>
-        <location filename="cashcollection.ui" line="110"/>
+        <location filename="cashcollection.ui" line="255"/>
         <source>Amount,card *</source>
         <translation>Անկանխիկ գումար</translation>
     </message>
     <message>
-        <location filename="cashcollection.ui" line="117"/>
-        <location filename="cashcollection.ui" line="124"/>
-        <location filename="cashcollection.ui" line="141"/>
-        <location filename="cashcollection.ui" line="158"/>
+        <location filename="cashcollection.ui" line="202"/>
+        <location filename="cashcollection.ui" line="209"/>
+        <location filename="cashcollection.ui" line="262"/>
+        <location filename="cashcollection.ui" line="272"/>
         <source>0</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="cashcollection.ui" line="134"/>
+        <location filename="cashcollection.ui" line="241"/>
         <source>Amount,prepaid</source>
         <translation>Կանխավճարի օգտագործում</translation>
     </message>
     <message>
-        <location filename="cashcollection.ui" line="151"/>
+        <location filename="cashcollection.ui" line="195"/>
         <source>Amount, coin</source>
         <translation>Կոպեկ</translation>
     </message>
     <message>
-        <location filename="cashcollection.ui" line="96"/>
+        <location filename="cashcollection.ui" line="57"/>
+        <source>Final</source>
+        <translation>Վերջնահաշվարկ</translation>
+    </message>
+    <message>
+        <location filename="cashcollection.ui" line="64"/>
+        <source>Initial</source>
+        <translation>Նախորդ օր</translation>
+    </message>
+    <message>
+        <location filename="cashcollection.ui" line="85"/>
+        <source>Output</source>
+        <translation>Ելք, տեղաշարժ</translation>
+    </message>
+    <message>
+        <location filename="cashcollection.ui" line="92"/>
+        <source>Sale</source>
+        <translation>Վաճառք</translation>
+    </message>
+    <message>
+        <location filename="cashcollection.ui" line="99"/>
+        <source>Check</source>
+        <translation>Ստուգում</translation>
+    </message>
+    <message>
+        <location filename="cashcollection.ui" line="106"/>
+        <source>Discount</source>
+        <translation>Զեղչ</translation>
+    </message>
+    <message>
+        <location filename="cashcollection.ui" line="127"/>
+        <source>Input</source>
+        <translation>Մուտք</translation>
+    </message>
+    <message>
+        <location filename="cashcollection.ui" line="248"/>
         <source>Date</source>
         <translation>Ամսաթիվ</translation>
     </message>
     <message>
-        <location filename="cashcollection.ui" line="28"/>
+        <location filename="cashcollection.ui" line="279"/>
         <source>Purpose</source>
         <translation>Նպատակ</translation>
     </message>
     <message>
-        <location filename="cashcollection.ui" line="63"/>
+        <location filename="cashcollection.ui" line="153"/>
         <source>Save</source>
         <translation>Պահպանել</translation>
     </message>
     <message>
-        <location filename="cashcollection.ui" line="70"/>
+        <location filename="cashcollection.ui" line="160"/>
         <source>Cancel</source>
         <translation>Հրաժարվել</translation>
     </message>
     <message>
-        <location filename="cashcollection.cpp" line="68"/>
+        <location filename="cashcollection.cpp" line="46"/>
         <source>Amount must be greater then 0</source>
         <translation>Ելքագրվող գումարը պետք է մեծ լինի 0-ից</translation>
     </message>
     <message>
-        <location filename="cashcollection.cpp" line="79"/>
-        <location filename="cashcollection.cpp" line="106"/>
+        <location filename="cashcollection.cpp" line="59"/>
+        <location filename="cashcollection.cpp" line="87"/>
         <source>Amount coin</source>
         <translation>Կոպեկ</translation>
     </message>
     <message>
-        <location filename="cashcollection.cpp" line="151"/>
+        <location filename="cashcollection.cpp" line="141"/>
         <source>Saved</source>
         <translation>Պահպանված է</translation>
     </message>
@@ -1598,12 +1633,12 @@ MS Excel</source>
     <message>
         <location filename="dlgregistercard.cpp" line="39"/>
         <source>Incorrect card code</source>
-        <translation type="unfinished"></translation>
+        <translation>Քարտի կոդը սխալ է</translation>
     </message>
     <message>
         <location filename="dlgregistercard.cpp" line="43"/>
         <source>Partner is not selected</source>
-        <translation type="unfinished"></translation>
+        <translation>Հաճախորդը նշված չէ</translation>
     </message>
     <message>
         <location filename="dlgregistercard.cpp" line="47"/>
@@ -2122,18 +2157,18 @@ MS Excel</source>
 <context>
     <name>NDataProvider</name>
     <message>
-        <location filename="../NTable/ndataprovider.cpp" line="75"/>
-        <location filename="../NTable/ndataprovider.cpp" line="86"/>
+        <location filename="../NTable/ndataprovider.cpp" line="88"/>
+        <location filename="../NTable/ndataprovider.cpp" line="102"/>
         <source>Access denied</source>
         <translation>Մուտքը արգելված է</translation>
     </message>
     <message>
-        <location filename="../NTable/ndataprovider.cpp" line="79"/>
+        <location filename="../NTable/ndataprovider.cpp" line="93"/>
         <source>You must upgrade the application to continue using it</source>
         <translation>Արկա է նոր տարբերակ։ Ծրագիրը անհրաժեշտ է թարմացնել աշխատանքը շարունակելու համար։</translation>
     </message>
     <message>
-        <location filename="../NTable/ndataprovider.cpp" line="79"/>
+        <location filename="../NTable/ndataprovider.cpp" line="94"/>
         <source>Click here to launch updater</source>
         <translation>Սեղմեք հղումը՝ թարմացումը սկսելու համար</translation>
     </message>
@@ -2141,7 +2176,7 @@ MS Excel</source>
 <context>
     <name>NInterface</name>
     <message>
-        <location filename="../NTable/ninterface.cpp" line="65"/>
+        <location filename="../NTable/ninterface.cpp" line="96"/>
         <source>Unauthorized</source>
         <translation>Գործողությունը պահանջում է նույնականացում</translation>
     </message>
@@ -2551,12 +2586,12 @@ MS Excel</source>
         <translation>Ծրագիրը արդեն միացած է</translation>
     </message>
     <message>
-        <location filename="main.cpp" line="148"/>
+        <location filename="main.cpp" line="149"/>
         <source>Cancel</source>
         <translation>Հրաժարվել</translation>
     </message>
     <message>
-        <location filename="main.cpp" line="162"/>
+        <location filename="main.cpp" line="163"/>
         <source>Store is not defined.</source>
         <translation>Պահեստը նշված չէ</translation>
     </message>
@@ -2669,35 +2704,35 @@ X հաշվետվություն</translation>
 ամսաթիվը</translation>
     </message>
     <message>
-        <location filename="sales.ui" line="437"/>
+        <location filename="sales.ui" line="446"/>
         <location filename="sales.cpp" line="207"/>
         <location filename="sales.cpp" line="288"/>
         <source>UUID</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="sales.ui" line="442"/>
+        <location filename="sales.ui" line="451"/>
         <location filename="sales.cpp" line="208"/>
         <location filename="sales.cpp" line="289"/>
         <source>Sale type code</source>
         <translation>Վաճառքի տեսակի կոդ</translation>
     </message>
     <message>
-        <location filename="sales.ui" line="447"/>
+        <location filename="sales.ui" line="456"/>
         <location filename="sales.cpp" line="210"/>
         <location filename="sales.cpp" line="291"/>
         <source>Sale type</source>
         <translation>Վաճառքի տեսակ</translation>
     </message>
     <message>
-        <location filename="sales.ui" line="452"/>
+        <location filename="sales.ui" line="461"/>
         <location filename="sales.cpp" line="211"/>
         <location filename="sales.cpp" line="292"/>
         <source>Number</source>
         <translation>Համար</translation>
     </message>
     <message>
-        <location filename="sales.ui" line="457"/>
+        <location filename="sales.ui" line="466"/>
         <source>№№</source>
         <translation></translation>
     </message>
@@ -2707,49 +2742,49 @@ X հաշվետվություն</translation>
         <translation>ՀԴՄ</translation>
     </message>
     <message>
-        <location filename="sales.ui" line="462"/>
+        <location filename="sales.ui" line="471"/>
         <location filename="sales.cpp" line="213"/>
         <location filename="sales.cpp" line="294"/>
         <source>Date</source>
         <translation>Ամսաթիվ</translation>
     </message>
     <message>
-        <location filename="sales.ui" line="467"/>
+        <location filename="sales.ui" line="476"/>
         <location filename="sales.cpp" line="214"/>
         <location filename="sales.cpp" line="295"/>
         <source>Time</source>
         <translation>Ժամ</translation>
     </message>
     <message>
-        <location filename="sales.ui" line="472"/>
+        <location filename="sales.ui" line="481"/>
         <location filename="sales.cpp" line="215"/>
         <location filename="sales.cpp" line="403"/>
         <source>Amount</source>
         <translation>Գումար</translation>
     </message>
     <message>
-        <location filename="sales.ui" line="477"/>
+        <location filename="sales.ui" line="486"/>
         <location filename="sales.cpp" line="216"/>
         <source>Customer</source>
         <translation>Հաճախորդ</translation>
     </message>
     <message>
-        <location filename="sales.ui" line="507"/>
+        <location filename="sales.ui" line="516"/>
         <source>Total qty</source>
         <translation>Ընդհանուր քանակ</translation>
     </message>
     <message>
-        <location filename="sales.ui" line="530"/>
+        <location filename="sales.ui" line="539"/>
         <source>Retail</source>
         <translation>Մանրածախ</translation>
     </message>
     <message>
-        <location filename="sales.ui" line="553"/>
+        <location filename="sales.ui" line="562"/>
         <source>Whosale</source>
         <translation>Մեծածախ</translation>
     </message>
     <message>
-        <location filename="sales.ui" line="576"/>
+        <location filename="sales.ui" line="585"/>
         <source>Total amount</source>
         <translation>Ընդհանուր գումար</translation>
     </message>
@@ -3549,7 +3584,7 @@ reservation</source>
     <message>
         <location filename="vieworder.cpp" line="414"/>
         <source>he return reason must be specified.</source>
-        <translation type="unfinished"></translation>
+        <translation>Հետվերադարձի պատճառը նշված չէ</translation>
     </message>
     <message>
         <location filename="vieworder.cpp" line="615"/>

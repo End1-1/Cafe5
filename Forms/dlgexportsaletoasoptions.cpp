@@ -3,8 +3,8 @@
 #include "c5config.h"
 #include <QDoubleValidator>
 
-DlgExportSaleToAsOptions::DlgExportSaleToAsOptions(const QStringList &dbParams) :
-    C5Dialog(dbParams),
+DlgExportSaleToAsOptions::DlgExportSaleToAsOptions() :
+    C5Dialog(),
     ui(new Ui::DlgExportSaleToAsOptions)
 {
     ui->setupUi(this);
@@ -27,13 +27,14 @@ DlgExportSaleToAsOptions::~DlgExportSaleToAsOptions()
     delete ui;
 }
 
-int DlgExportSaleToAsOptions::getOption(const QStringList &dbParams, QString &partner, QString &store, QString &service,
+int DlgExportSaleToAsOptions::getOption(QString &partner, QString &store, QString &service,
                                         QString &srvinacc,
                                         QString &srvoutacc, QString &iteminacc, QString &itemoutacc, QString &bankacc, QString &vat,
                                         bool &exportSimple, QString &simpleItem)
 {
-    DlgExportSaleToAsOptions d(dbParams);
-    if (d.exec() == QDialog::Accepted) {
+    DlgExportSaleToAsOptions d;
+
+    if(d.exec() == QDialog::Accepted) {
         partner = d.ui->lePartnerCode->text();
         store = d.ui->leStoreCode->text();
         service = d.ui->leServiceItem->text();
@@ -45,9 +46,10 @@ int DlgExportSaleToAsOptions::getOption(const QStringList &dbParams, QString &pa
         vat = d.ui->leVATValue->text();
         simpleItem = d.ui->leSimpleItem->text();
         exportSimple = d.ui->chExportSimple->isChecked();
-        if (d.ui->rbTax->isChecked()) {
+
+        if(d.ui->rbTax->isChecked()) {
             return 1;
-        } else if (d.ui->rbNoTax->isChecked()) {
+        } else if(d.ui->rbNoTax->isChecked()) {
             return 2;
         } else {
             return 3;

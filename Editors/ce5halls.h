@@ -12,7 +12,7 @@ class CE5Halls : public CE5Editor
     Q_OBJECT
 
 public:
-    explicit CE5Halls(const QStringList &dbParams, QWidget *parent = nullptr);
+    explicit CE5Halls(QWidget *parent = nullptr);
 
     ~CE5Halls();
 

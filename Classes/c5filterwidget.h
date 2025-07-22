@@ -12,7 +12,7 @@ class C5FilterWidget : public C5Widget
     Q_OBJECT
 
 public:
-    explicit C5FilterWidget(const QStringList &dbParams, QWidget *parent = nullptr);
+    explicit C5FilterWidget(QWidget *parent = nullptr);
 
     virtual QString condition() = 0;
 
@@ -28,8 +28,6 @@ public:
 
     virtual bool fixDates();
 
-    void setDatabase(const QStringList &dbParams);
-
     void setFilterValue(const QString &key, const QVariant &value);
 
 public slots:
@@ -41,7 +39,7 @@ protected:
     QString inFilterText(QString &text, C5LineEdit *l);
 
 private:
-    QWidget *getWidget(const QString &key, QWidget *parent);
+    QWidget* getWidget(const QString &key, QWidget *parent);
 };
 
 #endif // C5FILTERWIDGET_H

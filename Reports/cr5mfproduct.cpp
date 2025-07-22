@@ -1,15 +1,15 @@
 #include "cr5mfproduct.h"
 #include "ce5mfproduct.h"
 
-CR5MFProduct::CR5MFProduct(const QStringList &dbParams, QWidget *parent) :
-    C5ReportWidget(dbParams, parent)
+CR5MFProduct::CR5MFProduct(QWidget *parent) :
+    C5ReportWidget( parent)
 {
     fIcon = ":/manufacturing.png";
     fLabel = tr("Products");
     fSqlQuery = "select f_id, f_name from mf_actions_group";
     fTranslation["f_id"] = tr("Code");
     fTranslation["f_name"] = tr("Name");
-    fEditor = new CE5MFProduct(dbParams);
+    fEditor = new CE5MFProduct();
 }
 
 QToolBar *CR5MFProduct::toolBar()

@@ -12,11 +12,11 @@ class DlgExportSaleToAsOptions : public C5Dialog
     Q_OBJECT
 
 public:
-    explicit DlgExportSaleToAsOptions(const QStringList &dbParams);
+    explicit DlgExportSaleToAsOptions();
 
     ~DlgExportSaleToAsOptions();
 
-    static int getOption(const QStringList &dbParams, QString &partner, QString &store, QString &service, QString &srvinacc, QString &srvoutacc, QString &iteminacc, QString &itemoutacc, QString &bankacc, QString &vat, bool &exportSimple, QString &simpleItem);
+    static int getOption(QString &partner, QString &store, QString &service, QString &srvinacc, QString &srvoutacc, QString &iteminacc, QString &itemoutacc, QString &bankacc, QString &vat, bool &exportSimple, QString &simpleItem);
 
 private slots:
     void on_btnOK_clicked();

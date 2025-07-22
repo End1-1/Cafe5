@@ -7,7 +7,7 @@ class CR5MFActiveTasks : public C5ReportWidget
 {
     Q_OBJECT
 public:
-    CR5MFActiveTasks(const QStringList &dbParams, QWidget *parent = nullptr);
+    CR5MFActiveTasks(QWidget *parent = nullptr);
 
     virtual QToolBar *toolBar() override;
 

@@ -6,8 +6,8 @@
 #include "c5tablemodel.h"
 #include "c5dlgselectreporttemplate.h"
 
-CR5GoodsMovement::CR5GoodsMovement(const QStringList &dbParams, QWidget *parent) :
-    C5ReportWidget(dbParams, parent)
+CR5GoodsMovement::CR5GoodsMovement(QWidget *parent) :
+    C5ReportWidget( parent)
 {
     fIcon = ":/goods.png";
     fLabel = tr("Movements in the store");
@@ -126,7 +126,7 @@ CR5GoodsMovement::CR5GoodsMovement(const QStringList &dbParams, QWidget *parent)
     fColumnsVisible["f_comment"] = true;
     fColumnsVisible["ass.f_name as f_statename"] = true;
     restoreColumnsVisibility();
-    fFilterWidget = new CR5GoodsMovementFilter(fDBParams);
+    fFilterWidget = new CR5GoodsMovementFilter();
     fFilter = static_cast<CR5GoodsMovementFilter *>(fFilterWidget);
 }
 
@@ -187,12 +187,12 @@ bool CR5GoodsMovement::tblDoubleClicked(int row, int column, const QJsonArray &v
         return true;
     }
 #ifdef NEWVERSION
-    auto *si = __mainWindow->createTab<StoreInputDocument>(fDBParams);
+    auto *si = __mainWindow->createTab<StoreInputDocument>();
     if (!si->openDoc(values.at(fModel->indexForColumnName("f_document")).toString())) {
         __mainWindow->removeTab(si);
     }
 #else
-    C5StoreDoc *sd = __mainWindow->createTab<C5StoreDoc>(fDBParams);
+    C5StoreDoc *sd = __mainWindow->createTab<C5StoreDoc>();
     QString e;
     if (!sd->openDoc(values.at(fModel->indexForColumnName("f_document")).toString(), e)) {
         __mainWindow->removeTab(sd);
@@ -221,14 +221,14 @@ void CR5GoodsMovement::changePrice()
         C5Message::error(tr("Nothing was selected"));
         return;
     }
-    C5ChangeDocInputPrice::changePrice(fDBParams, fModel->data(rows.values().at(0),
+    C5ChangeDocInputPrice::changePrice(fModel->data(rows.values().at(0),
                                        fModel->indexForColumnName("f_storerec"),
                                        Qt::EditRole).toString());
 }
 
 void CR5GoodsMovement::templates()
 {
-    C5DlgSelectReportTemplate d(2, fDBParams);
+    C5DlgSelectReportTemplate d(2);
     if (d.exec() == QDialog::Accepted) {
         QString sql = d.fSelectedTemplate.sql;
         sql.replace("%date1", fFilter->date1s());

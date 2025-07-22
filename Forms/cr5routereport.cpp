@@ -3,8 +3,8 @@
 #include "c5database.h"
 #include "dlgdriverroutedate.h"
 
-CR5RouteReport::CR5RouteReport(const QStringList &dbParams, QWidget *parent) :
-    C5Document(dbParams, parent),
+CR5RouteReport::CR5RouteReport(QWidget *parent) :
+    C5Document(parent),
     ui(new Ui::CR5RouteReport)
 {
     ui->setupUi(this);
@@ -31,11 +31,11 @@ void CR5RouteReport::newRow()
 {
     QDate d;
     int driver;
-    if (!DlgDriverRouteDate::getDate(fDBParams, d, driver, this)) {
+    if (!DlgDriverRouteDate::getDate(d, driver, this)) {
         return;
     }
     int day = d.dayOfWeek();
-    C5Database db(fDBParams);
+    C5Database db;
     db[":f_" + QString::number(day)];
     db.exec(QString("select f_partner from o_route where f_%1=1").arg(day));
     QString sql;

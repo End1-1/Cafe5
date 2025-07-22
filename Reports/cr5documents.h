@@ -10,7 +10,7 @@ class CR5Documents : public C5ReportWidget
     Q_OBJECT
 
 public:
-    CR5Documents(const QStringList &dbParams, QWidget *parent = nullptr);
+    CR5Documents(QWidget *parent = nullptr);
 
     virtual QToolBar *toolBar() override;
 

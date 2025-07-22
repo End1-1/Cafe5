@@ -14,9 +14,9 @@ class C5TableModel : public QAbstractTableModel
 {
     Q_OBJECT
 public:
-    C5TableModel(const QStringList &dbParams, QObject *parent = 0);
+    C5TableModel(QObject *parent = 0);
 
-    void translate(const QHash<QString, QString> &t);
+    void translate(const QHash<QString, QString>& t);
 
     void clearModel();
 
@@ -28,7 +28,7 @@ public:
 
     void sort(int column, Qt::SortOrder order = Qt::AscendingOrder) override;
 
-    void setExternalData(const QHash<QString, int> &columnNameIndex, const QHash<QString, QString> &translation);
+    void setExternalData(const QHash<QString, int>& columnNameIndex, const QHash<QString, QString>& translation);
 
     virtual int rowCount(const QModelIndex &parent = QModelIndex()) const override;
 
@@ -83,13 +83,13 @@ public:
 
     void clearFilter();
 
-    void uniqueValuesForColumn(int column, QSet<QString> &values);
+    void uniqueValuesForColumn(int column, QSet<QString>& values);
 
-    void sumForColumns(const QStringList &columns, QMap<QString, double> &values);
+    void sumForColumns(const QStringList &columns, QMap<QString, double>& values);
 
-    void sumForColumnsIndexes(const QList<int> &columns, QMap<int, double> &values);
+    void sumForColumnsIndexes(const QList<int>& columns, QMap<int, double>& values);
 
-    void insertSubTotals(QList<int> cols, const QList<int> &totalCols, bool title, bool insertempty);
+    void insertSubTotals(QList<int> cols, const QList<int>& totalCols, bool title, bool insertempty);
 
     void resetProxyData();
 
@@ -106,9 +106,7 @@ public:
     std::vector<QJsonArray > fRawData;
 
 private:
-    QStringList fDBParams;
-
-    QTableView *fTableView;
+    QTableView* fTableView;
 
     bool fSortAsc;
 
@@ -138,9 +136,9 @@ private:
 
     void filterData();
 
-    bool isRowDataEmpty(int row, const QList<int> &cols);
+    bool isRowDataEmpty(int row, const QList<int>& cols);
 
-    QString subtotalRowData(int row, const QList<int> &cols);
+    QString subtotalRowData(int row, const QList<int>& cols);
 
 };
 

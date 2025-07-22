@@ -8,7 +8,7 @@ class CR5SalesByDishes : public C5ReportWidget
     Q_OBJECT
 
 public:
-    CR5SalesByDishes(const QStringList &dbParams, QWidget *parent = nullptr);
+    CR5SalesByDishes(QWidget *parent = nullptr);
 
     virtual QToolBar *toolBar() override;
 

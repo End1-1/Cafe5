@@ -10,7 +10,7 @@
 #include <QJsonObject>
 
 DlgPin::DlgPin(QWidget *parent) :
-    C5Dialog(QStringList()),
+    C5Dialog(),
     ui(new Ui::DlgPin)
 {
     Q_UNUSED(parent);

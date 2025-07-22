@@ -10,8 +10,8 @@
  * 47 - div
  */
 
-Calculator::Calculator(const QStringList &dbParams) :
-    C5Dialog(dbParams),
+Calculator::Calculator() :
+    C5Dialog(),
     ui(new Ui::Calculator)
 {
     ui->setupUi(this);
@@ -28,10 +28,10 @@ Calculator::~Calculator()
     delete ui;
 }
 
-bool Calculator::get(const QStringList &dbParams, double &v)
+bool Calculator::get(double &v)
 {
     bool result = false;
-    Calculator *c = new Calculator(dbParams);
+    Calculator *c = new Calculator();
     if (c->exec() == QDialog::Accepted) {
         result = true;
         v = c->fResult;

@@ -10,7 +10,7 @@ class CR5GoodsMovement : public C5ReportWidget
     Q_OBJECT
 
 public:
-    CR5GoodsMovement(const QStringList &dbParams, QWidget *parent = nullptr);
+    CR5GoodsMovement(QWidget *parent = nullptr);
 
     virtual QToolBar *toolBar() override;
 

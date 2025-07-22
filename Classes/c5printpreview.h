@@ -3,7 +3,8 @@
 
 #include "c5dialog.h"
 
-namespace Ui {
+namespace Ui
+{
 class C5PrintPreview;
 }
 
@@ -14,7 +15,7 @@ class C5PrintPreview : public C5Dialog
     Q_OBJECT
 
 public:
-    explicit C5PrintPreview(C5Printing *printData, const QStringList &dbParams);
+    explicit C5PrintPreview(C5Printing *printData);
 
     ~C5PrintPreview();
 
@@ -42,9 +43,9 @@ private slots:
     void on_btnZoopIn_clicked();
 
 private:
-    Ui::C5PrintPreview *ui;
+    Ui::C5PrintPreview* ui;
 
-    C5Printing *fPrintData;
+    C5Printing* fPrintData;
 
     int fPageNumber;
 

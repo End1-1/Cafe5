@@ -3,8 +3,8 @@
 #include "c5message.h"
 #include "c5database.h"
 
-CE5UserGroup::CE5UserGroup(const QStringList &dbParams, QWidget *parent) :
-    CE5Editor(dbParams, parent),
+CE5UserGroup::CE5UserGroup(QWidget *parent) :
+    CE5Editor(parent),
     ui(new Ui::CE5UserGroup)
 {
     ui->setupUi(this);
@@ -29,7 +29,7 @@ void CE5UserGroup::clear()
 void CE5UserGroup::setId(int id)
 {
     CE5Editor::setId(id);
-    C5Database db(fDBParams);
+    C5Database db;
     db[":f_position"] = id;
     db.exec("select * from s_salary_rules where f_position=:f_position");
     if (db.nextRow()) {
@@ -48,7 +48,7 @@ bool CE5UserGroup::save(QString &err, QList<QMap<QString, QVariant> > &data)
         C5Message::error(err);
         return false;
     }
-    C5Database db(fDBParams);
+    C5Database db;
     db[":f_position"] = ui->leCode->getInteger();
     db.exec("delete from s_salary_rules where f_position=:f_position");
     db[":f_position"] = ui->leCode->getInteger();

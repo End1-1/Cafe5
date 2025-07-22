@@ -1,8 +1,8 @@
 #include "cr5goodsgroup.h"
 #include "ce5goodsgroup.h"
 
-CR5GoodsGroup::CR5GoodsGroup(const QStringList &dbParams, QWidget *parent) :
-    C5ReportWidget(dbParams, parent)
+CR5GoodsGroup::CR5GoodsGroup(QWidget *parent) :
+    C5ReportWidget( parent)
 {
     fIcon = ":/goods.png";
     fLabel = tr("Group of goods");
@@ -13,7 +13,7 @@ CR5GoodsGroup::CR5GoodsGroup(const QStringList &dbParams, QWidget *parent) :
     fTranslation["f_taxdept"] = tr("Tax dept");
     fTranslation["f_adgcode"] = tr("ADG code");
     fTranslation["f_chargevalue"] = tr("Charge value");
-    fEditor = new CE5GoodsGroup(dbParams);
+    fEditor = new CE5GoodsGroup();
 }
 
 QToolBar *CR5GoodsGroup::toolBar()

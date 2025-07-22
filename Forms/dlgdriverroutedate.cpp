@@ -3,12 +3,12 @@
 #include "c5cache.h"
 #include "c5message.h"
 
-DlgDriverRouteDate::DlgDriverRouteDate(const QStringList &dbParams, QWidget *parent) :
-    C5Dialog(dbParams, parent),
+DlgDriverRouteDate::DlgDriverRouteDate(QWidget *parent) :
+    C5Dialog(parent),
     ui(new Ui::DlgDriverRouteDate)
 {
     ui->setupUi(this);
-    ui->leDriver->setSelector(dbParams, ui->leDriverName, cache_users);
+    ui->leDriver->setSelector(ui->leDriverName, cache_users);
 }
 
 DlgDriverRouteDate::~DlgDriverRouteDate()
@@ -16,9 +16,9 @@ DlgDriverRouteDate::~DlgDriverRouteDate()
     delete ui;
 }
 
-bool DlgDriverRouteDate::getDate(const QStringList &dbParams, QDate &date, int &driver, QWidget *parent)
+bool DlgDriverRouteDate::getDate(QDate &date, int &driver, QWidget *parent)
 {
-    DlgDriverRouteDate d(dbParams, parent);
+    DlgDriverRouteDate d(parent);
     bool result = d.exec() == QDialog::Accepted;
     date = d.ui->leDate->date();
     driver = d.ui->leDriver->getInteger();

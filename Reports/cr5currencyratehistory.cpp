@@ -2,8 +2,8 @@
 #include "ce5currencyrate.h"
 #include "cr5currencyratehistoryfilter.h"
 
-CR5CurrencyRateHistory::CR5CurrencyRateHistory(const QStringList &dbParams, QWidget *parent) :
-    C5ReportWidget(dbParams, parent)
+CR5CurrencyRateHistory::CR5CurrencyRateHistory(QWidget *parent) :
+    C5ReportWidget( parent)
 {
     fIcon = ":/cash.png";
     fLabel = tr("Currency rates history");
@@ -30,8 +30,8 @@ CR5CurrencyRateHistory::CR5CurrencyRateHistory(const QStringList &dbParams, QWid
     fColumnsVisible["c.f_name as f_currencyname"] = true;
     fColumnsVisible["h.f_rate"] = true;
 
-    fEditor = new CE5CurrencyRate(dbParams);
-    fFilterWidget = new CR5CurrencyRateHistoryFilter(dbParams);
+    fEditor = new CE5CurrencyRate();
+    fFilterWidget = new CR5CurrencyRateHistoryFilter();
 }
 
 QToolBar *CR5CurrencyRateHistory::toolBar()

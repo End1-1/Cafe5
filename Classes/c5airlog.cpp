@@ -32,7 +32,7 @@ void C5Airlog::write(const QString &host, const QString &user, int type,
 
 void C5Airlog::writeToDatabase()
 {
-    C5Database db(__c5config.dbParams());
+    C5Database db;
     db[":f_comp"] = fHost;
     db[":f_date"] = QDate::currentDate();
     db[":f_time"] = QTime::currentTime();

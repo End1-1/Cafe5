@@ -12,9 +12,9 @@ class DlgSelectCurrency : public C5Dialog
     Q_OBJECT
 
 public:
-    explicit DlgSelectCurrency(const QStringList &dbParams, QWidget *parent = nullptr);
+    explicit DlgSelectCurrency(QWidget *parent = nullptr);
     ~DlgSelectCurrency();
-    static bool getCurrency(const QStringList &dbParams, int &id, QString &name, QWidget *parent);
+    static bool getCurrency(int &id, QString &name, QWidget *parent);
 
 private slots:
     void on_btnReject_clicked();

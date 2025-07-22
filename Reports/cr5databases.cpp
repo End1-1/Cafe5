@@ -8,8 +8,8 @@
 #include <QDesktopServices>
 #include <QApplication>
 
-CR5Databases::CR5Databases(const QStringList &dbParams, QWidget *parent) :
-    C5ReportWidget(dbParams, parent)
+CR5Databases::CR5Databases(QWidget *parent) :
+    C5ReportWidget( parent)
 {
     fIcon = ":/database.png";
     fLabel = tr("Databases");
@@ -48,7 +48,7 @@ QToolBar *CR5Databases::toolBar()
 
 void CR5Databases::actionAccess()
 {
-    __mainWindow->createTab<C5DbUserAccess>(fDBParams);
+    __mainWindow->createTab<C5DbUserAccess>();
 }
 
 void CR5Databases::backupDatabase()
@@ -85,7 +85,7 @@ void CR5Databases::backupDatabase()
 
 void CR5Databases::resetDatabase()
 {
-    auto *dr = new C5DbResetOption(fDBParams);
+    auto *dr = new C5DbResetOption();
     if (dr->exec() == QDialog::Accepted) {
         if (dr->saleAndBuy()) {
             fHttp->createHttpQuery("/engine/worker/cleardb.php", QJsonObject{{"mode", "storeandsale"}}, SLOT(done(QJsonObject)));

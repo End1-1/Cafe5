@@ -6,7 +6,7 @@
 class CR5Printers : public C5ReportWidget
 {
 public:
-    CR5Printers(const QStringList &dbParams, QWidget *parent = nullptr);
+    CR5Printers(QWidget *parent = nullptr);
 };
 
 #endif // CR5PRINTERS_H

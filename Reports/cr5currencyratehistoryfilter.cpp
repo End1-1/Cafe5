@@ -1,8 +1,8 @@
 #include "cr5currencyratehistoryfilter.h"
 #include "ui_cr5currencyratehistoryfilter.h"
 
-CR5CurrencyRateHistoryFilter::CR5CurrencyRateHistoryFilter(const QStringList &dbParams, QWidget *parent) :
-    C5FilterWidget(dbParams, parent),
+CR5CurrencyRateHistoryFilter::CR5CurrencyRateHistoryFilter(QWidget *parent) :
+    C5FilterWidget(parent),
     ui(new Ui::CR5CurrencyRateHistoryFilter)
 {
     ui->setupUi(this);

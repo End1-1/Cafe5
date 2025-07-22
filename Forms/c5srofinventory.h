@@ -12,7 +12,7 @@ class C5SrOfInventory : public C5Dialog
     Q_OBJECT
 
 public:
-    explicit C5SrOfInventory(const QStringList &dbParams, QWidget *parent = nullptr);
+    explicit C5SrOfInventory(QWidget *parent = nullptr);
     ~C5SrOfInventory();
     void setGoods(const QDate &date, int store, int goods);
     QString fUuid;

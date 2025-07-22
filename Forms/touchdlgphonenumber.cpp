@@ -3,7 +3,7 @@
 #include "c5config.h"
 
 TouchDlgPhoneNumber::TouchDlgPhoneNumber() :
-    C5Dialog(__c5config.dbParams()),
+    C5Dialog(),
     ui(new Ui::TouchDlgPhoneNumber)
 {
     ui->setupUi(this);

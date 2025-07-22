@@ -7,7 +7,7 @@
 static QSettings s(_ORGANIZATION_, _APPLICATION_ + QString("\\") + _MODULE_);
 
 DlgShowColumns::DlgShowColumns() :
-    C5Dialog(__c5config.dbParams()),
+    C5Dialog(),
     ui(new Ui::DlgShowColumns)
 {
     ui->setupUi(this);

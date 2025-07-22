@@ -34,8 +34,8 @@ public:
     }
 };
 
-C5GroupPermissionsEditor::C5GroupPermissionsEditor(const QStringList &dbParams, QWidget *parent) :
-    C5Widget(dbParams, parent),
+C5GroupPermissionsEditor::C5GroupPermissionsEditor(QWidget *parent) :
+    C5Widget(parent),
     ui(new Ui::C5GroupPermissionsEditor)
 {
     ui->setupUi(this);
@@ -53,7 +53,7 @@ C5GroupPermissionsEditor::~C5GroupPermissionsEditor()
 void C5GroupPermissionsEditor::setPermissionsGroupId(int id)
 {
     fGroupId = id;
-    C5Database db(fDBParams);
+    C5Database db;
     db[":f_id"] = id;
     db.exec("select f_name from s_user_group where f_id=:f_id");
     if (db.nextRow()) {
@@ -74,14 +74,14 @@ QToolBar *C5GroupPermissionsEditor::toolBar()
 void C5GroupPermissionsEditor::on_lbGroup_clicked()
 {
     QJsonArray values;
-    if (C5Selector::getValue(fDBParams, cache_users_groups, values)) {
+    if (C5Selector::getValue(cache_users_groups, values)) {
         setPermissionsGroupId(values.at(0).toInt());
     }
 }
 
 void C5GroupPermissionsEditor::savePemissions()
 {
-    C5Database db(fDBParams);
+    C5Database db;
     db[":f_group"] = fGroupId;
     db.exec("delete from s_user_access where f_group=:f_group");
     for (QMap<int, C5CheckBox * >::const_iterator it = fCheckBoxes.constBegin(); it != fCheckBoxes.constEnd(); it++) {
@@ -101,7 +101,7 @@ void C5GroupPermissionsEditor::getPermissions()
     foreach (C5CheckBox *c, l) {
         c->setChecked(false);
     }
-    C5Database db(fDBParams);
+    C5Database db;
     db[":f_group"] = fGroupId;
     db.exec("select f_key from s_user_access where f_group=:f_group");
     QSet<int> permissions;

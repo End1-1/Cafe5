@@ -5,12 +5,12 @@
 #include "c5database.h"
 #include "c5message.h"
 
-CE5CreateTablesForHall::CE5CreateTablesForHall(const QStringList &dbParams) :
-    C5Dialog(dbParams),
+CE5CreateTablesForHall::CE5CreateTablesForHall() :
+    C5Dialog(),
     ui(new Ui::CE5CreateTablesForHall)
 {
     ui->setupUi(this);
-    ui->leHall->setSelector(dbParams, ui->leHallName, cache_halls);
+    ui->leHall->setSelector(ui->leHallName, cache_halls);
 }
 
 CE5CreateTablesForHall::~CE5CreateTablesForHall()
@@ -18,9 +18,9 @@ CE5CreateTablesForHall::~CE5CreateTablesForHall()
     delete ui;
 }
 
-void CE5CreateTablesForHall::createTableForHall(const QStringList &dbParams)
+void CE5CreateTablesForHall::createTableForHall()
 {
-    CE5CreateTablesForHall *d = new CE5CreateTablesForHall(dbParams);
+    CE5CreateTablesForHall *d = new CE5CreateTablesForHall();
     d->exec();
     delete d;
 }
@@ -31,7 +31,7 @@ void CE5CreateTablesForHall::on_btnCreate_clicked()
         C5Message::error(tr("Hall is not selected"));
         return;
     }
-    C5Database db(fDBParams);
+    C5Database db;
     for (int i = ui->leStart->getInteger(); i < ui->leStart->getInteger() + ui->leCount->getInteger() + 1; i++) {
         db[":f_hall"] = ui->leHall->getInteger();
         db[":f_name"] = ui->lePrefix->text() + QString::number(i);
@@ -44,8 +44,8 @@ void CE5CreateTablesForHall::on_btnCreate_clicked()
 
 void CE5CreateTablesForHall::on_btnNewHall_clicked()
 {
-    CE5Halls *ep = new CE5Halls(fDBParams);
-    C5Editor *e = C5Editor::createEditor(fDBParams, ep, 0);
+    CE5Halls *ep = new CE5Halls();
+    C5Editor *e = C5Editor::createEditor(ep, 0);
     QList<QMap<QString, QVariant> > data;
     if(e->getResult(data)) {
         ui->leHall->setValue(data.at(0)["f_id"].toString());

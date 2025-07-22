@@ -2,14 +2,14 @@
 #include "ui_cr5saleandstorefilter.h"
 #include "c5cache.h"
 
-CR5SaleAndStoreFilter::CR5SaleAndStoreFilter(const QStringList &dbParams, QWidget *parent) :
-    C5FilterWidget(dbParams, parent),
+CR5SaleAndStoreFilter::CR5SaleAndStoreFilter(QWidget *parent) :
+    C5FilterWidget(parent),
     ui(new Ui::CR5SaleAndStoreFilter)
 {
     ui->setupUi(this);
-    ui->leGroup->setSelector(fDBParams, ui->leGroupName, cache_goods_group).setMultiselection(true);
-    ui->leGoods->setSelector(fDBParams, ui->leGoodsName, cache_goods, 1, 3).setMultiselection(true);
-    ui->leStore->setSelector(fDBParams, ui->leStoreName, cache_goods_store).setMultiselection(true);
+    ui->leGroup->setSelector(ui->leGroupName, cache_goods_group).setMultiselection(true);
+    ui->leGoods->setSelector(ui->leGoodsName, cache_goods, 1, 3).setMultiselection(true);
+    ui->leStore->setSelector(ui->leStoreName, cache_goods_store).setMultiselection(true);
 }
 
 CR5SaleAndStoreFilter::~CR5SaleAndStoreFilter()

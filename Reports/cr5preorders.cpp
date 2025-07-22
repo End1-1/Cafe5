@@ -1,8 +1,8 @@
 #include "cr5preorders.h"
 #include "c5tablemodel.h"
 
-CR5Preorders::CR5Preorders(const QStringList &dbParams, QWidget *parent) :
-    C5ReportWidget(dbParams, parent)
+CR5Preorders::CR5Preorders(QWidget *parent) :
+    C5ReportWidget( parent)
 {
     fLabel = tr("Preorders history");
     fIcon = ":/customers.png";

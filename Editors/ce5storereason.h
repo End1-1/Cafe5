@@ -12,7 +12,7 @@ class CE5StoreReason : public CE5Editor
     Q_OBJECT
 
 public:
-    explicit CE5StoreReason(const QStringList &dbParams, QWidget *parent = nullptr);
+    explicit CE5StoreReason(QWidget *parent = nullptr);
 
     ~CE5StoreReason() override;
 

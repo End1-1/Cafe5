@@ -2,17 +2,17 @@
 #include "ui_cr5materialmoveuncomplectfilter.h"
 #include "c5cache.h"
 
-CR5MaterialmoveUncomplectFilter::CR5MaterialmoveUncomplectFilter(const QStringList &dbParams, QWidget *parent) :
-    C5FilterWidget(dbParams, parent),
+CR5MaterialmoveUncomplectFilter::CR5MaterialmoveUncomplectFilter(QWidget *parent) :
+    C5FilterWidget(parent),
     ui(new Ui::CR5MaterialmoveUncomplectFilter)
 {
     ui->setupUi(this);
-    ui->leStore->setSelector(fDBParams, ui->leStoreName, cache_goods_store).setMultiselection(true);
-    ui->leGroup->setSelector(fDBParams, ui->leGroupname, cache_goods_group).setMultiselection(true);
-    ui->leMaterial->setSelector(fDBParams, ui->leMaterialName, cache_goods, 1, 3).setMultiselection(true);
-    ui->leUnit->setSelector(fDBParams, ui->leUnitName, cache_goods_unit).setMultiselection(true);
-    ui->leDocType->setSelector(fDBParams, ui->leDocTypeName, cache_doc_type).setMultiselection(true);
-    ui->leAction->setSelector(fDBParams, ui->leActionName, cache_store_inout);
+    ui->leStore->setSelector(ui->leStoreName, cache_goods_store).setMultiselection(true);
+    ui->leGroup->setSelector(ui->leGroupname, cache_goods_group).setMultiselection(true);
+    ui->leMaterial->setSelector(ui->leMaterialName, cache_goods, 1, 3).setMultiselection(true);
+    ui->leUnit->setSelector(ui->leUnitName, cache_goods_unit).setMultiselection(true);
+    ui->leDocType->setSelector(ui->leDocTypeName, cache_doc_type).setMultiselection(true);
+    ui->leAction->setSelector(ui->leActionName, cache_store_inout);
 }
 
 CR5MaterialmoveUncomplectFilter::~CR5MaterialmoveUncomplectFilter()

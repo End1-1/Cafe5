@@ -2,12 +2,12 @@
 #include "cr5mfgeneralreportfilter.h"
 #include "c5tablemodel.h"
 
-CR5GeneralReportOnlyDate::CR5GeneralReportOnlyDate(const QStringList &dbParams) :
-    C5ReportWidget(dbParams)
+CR5GeneralReportOnlyDate::CR5GeneralReportOnlyDate() :
+    C5ReportWidget()
 {
     fIcon = ":/manufacturing.png";
     fLabel = tr("Manufacture general report only date");
-    fFilterWidget = new CR5MFGeneralReportFilter(dbParams);
+    fFilterWidget = new CR5MFGeneralReportFilter();
     fFilter = static_cast<CR5MFGeneralReportFilter *>(fFilterWidget);
     fTranslation["f_date"] = tr("Date");
     fTranslation["f_workername"] = tr("Worker");

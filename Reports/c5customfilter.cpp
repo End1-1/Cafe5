@@ -8,8 +8,8 @@
 #include <QLabel>
 #include <QLayoutItem>
 
-C5CustomFilter::C5CustomFilter(const QStringList &dbParams) :
-    C5Dialog(dbParams),
+C5CustomFilter::C5CustomFilter() :
+    C5Dialog(),
     ui(new Ui::C5CustomFilter)
 {
     ui->setupUi(this);
@@ -115,7 +115,7 @@ void C5CustomFilter::on_lw_itemClicked(QListWidgetItem *item)
         } else if (type.contains("cache")) {
             C5LineEditWithSelector *l1 = new C5LineEditWithSelector();
             C5LineEditWithSelector *l2 = new C5LineEditWithSelector();
-            l1->setSelector(fDBParams, l2, type.mid(5, type.length() - 5).toInt());
+            l1->setSelector(l2, type.mid(5, type.length() - 5).toInt());
             l1->setProperty("FilterName", s);
             ui->gl->addWidget(l1, row, 1, 1, 1);
             ui->gl->addWidget(l2, row, 2, 1, 1);

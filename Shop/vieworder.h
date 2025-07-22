@@ -56,8 +56,10 @@ private slots:
 
     void on_btnEditReason_clicked();
 
+    void on_btnPrintPrices_clicked();
+
 private:
-    Ui::ViewOrder *ui;
+    Ui::ViewOrder* ui;
 
     OHeader fOHeader;
 
@@ -65,7 +67,7 @@ private:
 
     QString fUuid;
 
-    Working *fWorking;
+    Working* fWorking;
 
     void returnFalse(const QString &msg, C5Database *db);
 

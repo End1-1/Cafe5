@@ -2,12 +2,12 @@
 #include "ui_cr5saleremoveddishesfilter.h"
 #include "c5cache.h"
 
-CR5SaleRemovedDishesFilter::CR5SaleRemovedDishesFilter(const QStringList &dbParams, QWidget *parent) :
-    C5FilterWidget(dbParams, parent),
+CR5SaleRemovedDishesFilter::CR5SaleRemovedDishesFilter(QWidget *parent) :
+    C5FilterWidget(parent),
     ui(new Ui::CR5SaleRemovedDishesFilter)
 {
     ui->setupUi(this);
-    ui->leDishState->setSelector(dbParams, ui->leStateName, cache_dish_state);
+    ui->leDishState->setSelector(ui->leStateName, cache_dish_state);
 }
 
 CR5SaleRemovedDishesFilter::~CR5SaleRemovedDishesFilter()

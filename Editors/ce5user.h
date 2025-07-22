@@ -12,7 +12,7 @@ class CE5User : public CE5Editor
     Q_OBJECT
 
 public:
-    explicit CE5User(const QStringList &dbParams, QWidget *parent = nullptr);
+    explicit CE5User(QWidget *parent = nullptr);
 
     ~CE5User();
 

@@ -1,8 +1,8 @@
 #include "cr5discountsystem.h"
 #include "ce5discountcard.h"
 
-CR5DiscountSystem::CR5DiscountSystem(const QStringList &dbParams, QWidget *parent) :
-    C5ReportWidget(dbParams, parent)
+CR5DiscountSystem::CR5DiscountSystem(QWidget *parent) :
+    C5ReportWidget( parent)
 {
     fLabel = tr("Dicount system");
     fIcon = ":/discount.png";
@@ -38,7 +38,7 @@ CR5DiscountSystem::CR5DiscountSystem(const QStringList &dbParams, QWidget *paren
     fColumnsVisible["d.f_dateend"] = true;
     fColumnsVisible["d.f_active"] = true;
     restoreColumnsVisibility();
-    fEditor = new CE5DiscountCard(dbParams);
+    fEditor = new CE5DiscountCard();
 }
 
 QToolBar *CR5DiscountSystem::toolBar()

@@ -19,6 +19,7 @@ const QRegularExpression float_expr2("[\\.\\,]$");
 #define str_float(value) QLocale().toDouble(value)
 #define json_str(value) QString(QJsonDocument(value).toJson(QJsonDocument::Compact))
 #define str_json(value) QJsonDocument::fromJson(value.toUtf8()).object()
+#define  str_to_datetime(value) QDateTime::fromString(value, FORMAT_DATETIME_TO_STR_MYSQL)
 
 #define ORDER_STATE_NONE 0
 #define ORDER_STATE_OPEN 1

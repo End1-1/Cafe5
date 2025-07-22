@@ -12,7 +12,7 @@ class GoodsAsMap : public C5Widget
     Q_OBJECT
 
 public:
-    explicit GoodsAsMap(const QStringList &dbParams, QWidget *parent = nullptr);
+    explicit GoodsAsMap(QWidget *parent = nullptr);
     ~GoodsAsMap();
     virtual QToolBar *toolBar() override;
 

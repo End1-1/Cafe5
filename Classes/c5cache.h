@@ -64,7 +64,7 @@ class C5Cache : public QObject
     Q_OBJECT
 
 public:
-    C5Cache(const QStringList &dbParams);
+    C5Cache();
 
     inline QString getString(int row, int column)
     {
@@ -114,18 +114,18 @@ public:
 
     void refreshId(const QString &whereField, int id);
 
-    static C5Cache *cache(const QStringList &dbParams, int cacheId);
+    static C5Cache* cache(int cacheId);
 
-    static QMap<QString, C5Cache *> fCacheList;
+    static QMap<QString, C5Cache*> fCacheList;
 
     static int idForTable(const QString &table)
     {
         return fTableCache[table];
     }
 
-    static QString cacheName(const QStringList &dbParams, int cacheId);
+    static QString cacheName(int cacheId);
 
-    static void resetCache(const QStringList &dbParams, const QString &table);
+    static void resetCache(const QString &table);
 
     QString query(int cacheId);
 
@@ -144,8 +144,6 @@ private:
     static QMap<int, QHash<QString, int> > fCacheColumns;
 
     int fId;
-
-    QStringList fDBParams;
 
     void setCacheSimpleQuery(int cacheId, const QString &table);
 };

@@ -2,8 +2,8 @@
 #include "ce5table.h"
 #include "ce5createtablesforhall.h"
 
-CR5Tables::CR5Tables(const QStringList &dbParams, QWidget *parent) :
-    C5ReportWidget(dbParams, parent)
+CR5Tables::CR5Tables(QWidget *parent) :
+    C5ReportWidget( parent)
 {
     fIcon = ":/table.png";
     fLabel = tr("Tables");
@@ -26,7 +26,7 @@ CR5Tables::CR5Tables(const QStringList &dbParams, QWidget *parent) :
 
     restoreColumnsVisibility();
 
-    fEditor = new CE5Table(dbParams);
+    fEditor = new CE5Table();
 }
 
 QToolBar *CR5Tables::toolBar()
@@ -46,5 +46,5 @@ QToolBar *CR5Tables::toolBar()
 
 void CR5Tables::createHall()
 {
-    CE5CreateTablesForHall::createTableForHall(fDBParams);
+    CE5CreateTablesForHall::createTableForHall();
 }

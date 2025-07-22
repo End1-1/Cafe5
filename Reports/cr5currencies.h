@@ -8,7 +8,7 @@ class CR5Currencies : public C5ReportWidget
     Q_OBJECT
 
 public:
-    CR5Currencies(const QStringList &dbParams, QWidget *parent = nullptr);
+    CR5Currencies(QWidget *parent = nullptr);
     virtual QToolBar *toolBar() override;
 };
 

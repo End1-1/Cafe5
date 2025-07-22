@@ -5,12 +5,12 @@
 #include "c5message.h"
 #include "c5database.h"
 
-PartnersAsMap::PartnersAsMap(const QStringList &dbParams, QWidget *parent) :
-    C5Widget(dbParams, parent),
+PartnersAsMap::PartnersAsMap(QWidget *parent) :
+    C5Widget(parent),
     ui(new Ui::PartnersAsMap)
 {
     ui->setupUi(this);
-    C5Database db(fDBParams);
+    C5Database db;
     ui->tbl->setColumnWidths(5, 0, 100, 200, 200, 600);
     db.exec("select p.f_id, p.f_taxcode, p.f_name, p.f_taxname, p.f_address "
             "from c_partners p order by p.f_taxname ");
@@ -67,7 +67,7 @@ QToolBar *PartnersAsMap::toolBar()
 
 void PartnersAsMap::saveDataChanges()
 {
-    C5Database db(fDBParams);
+    C5Database db;
     db.exec("delete from as_convert where f_table='c_partners'");
     for (int i = 0; i < ui->tbl->rowCount(); i++) {
         for (int c = ui->tbl->columnCount() - asList.count(); c < ui->tbl->columnCount(); c++) {

@@ -20,8 +20,6 @@ class C5Database : public QObject
 public:
     C5Database();
 
-    C5Database(const QStringList &dbParams);
-
     C5Database(C5Database &db);
 
     C5Database(const QJsonObject &params);
@@ -38,7 +36,7 @@ public:
 
     static QString getDbNumber(const QString &prefix);
 
-    QVariant &operator[](const QString &name);
+    QVariant& operator[](const QString &name);
 
     void setDatabase(const QStringList &dbParam);
 
@@ -48,9 +46,9 @@ public:
 
     bool exec(const QString &sqlQuery);
 
-    bool exec(const QString &sqlQuery, std::vector<QJsonArray > &dbrows);
+    bool exec(const QString &sqlQuery, std::vector<QJsonArray >& dbrows);
 
-    bool exec(const QString &sqlQuery, std::vector<QJsonArray > &dbrows, QHash<QString, int> &columns);
+    bool exec(const QString &sqlQuery, std::vector<QJsonArray >& dbrows, QHash<QString, int>& columns);
 
     bool execSqlList(const QStringList &sqlList);
 
@@ -92,7 +90,7 @@ public:
 
     int insert(const QString &tableName, bool returnId = true);
 
-    bool insert(const QString &tableName, int &id);
+    bool insert(const QString &tableName, int& id);
 
     bool replaceInto(const QString &tableName);
 
@@ -105,13 +103,16 @@ public:
     inline QVariant getValue(int column)
     {
         QJsonValue v = fDbRows.at(fCursorPos).at(column);
-        switch (fColumnType[column]) {
-            case QMetaType::Int:
-                return v.toInt();
-            case QMetaType::Double:
-                return v.toDouble();
-            default:
-                return v.toVariant();
+
+        switch(fColumnType[column]) {
+        case QMetaType::Int:
+            return v.toInt();
+
+        case QMetaType::Double:
+            return v.toDouble();
+
+        default:
+            return v.toVariant();
         }
     }
 
@@ -130,12 +131,12 @@ public:
         return fDbRows.at(row).at(fNameColumnMap[columnName.toLower()]);
     }
 
-    inline QString getString (int column)
+    inline QString getString(int column)
     {
         return fDbRows.at(fCursorPos).at(column).toString();
     }
 
-    inline QString getString (const QString &columnName)
+    inline QString getString(const QString &columnName)
     {
         return fDbRows.at(fCursorPos).at(fNameColumnMap[columnName.toLower()]).toString();
     }
@@ -227,13 +228,13 @@ public:
 
     QMap<QString, QVariant> getBindValues();
 
-    void rowToMap(QMap<QString, QVariant> &m);
+    void rowToMap(QMap<QString, QVariant>& m);
 
-    void getBindValues(QMap<QString, QVariant> &b);
+    void getBindValues(QMap<QString, QVariant>& b);
 
-    void getBindValues(int row, QMap<QString, QVariant> &b);
+    void getBindValues(int row, QMap<QString, QVariant>& b);
 
-    void setBindValues(const QMap<QString, QVariant> &b);
+    void setBindValues(const QMap<QString, QVariant>& b);
 
     void removeBindValue(const QString &key);
 
@@ -269,7 +270,9 @@ public:
 
     static bool LOGGING;
 
-    QSqlQuery *fQuery;
+    QSqlQuery* fQuery;
+
+    static QStringList fDbParams;
 
 private:
     bool fIsReady;
@@ -292,7 +295,7 @@ private:
     bool exec(const QString &sqlQuery, bool &isSelect);
 
 signals:
-    void queryError(const QString &);
+    void queryError(const QString&);
 
 };
 

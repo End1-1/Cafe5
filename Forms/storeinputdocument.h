@@ -12,7 +12,7 @@ class StoreInputDocument : public C5Widget
     Q_OBJECT
 
 public:
-    explicit StoreInputDocument(const QStringList &dbParams, QWidget *parent = nullptr);
+    explicit StoreInputDocument(QWidget *parent = nullptr);
     ~StoreInputDocument();
     virtual QToolBar *toolBar() override;
     bool openDoc(const QString &id);

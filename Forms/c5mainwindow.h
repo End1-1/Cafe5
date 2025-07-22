@@ -33,16 +33,16 @@ public:
     virtual void closeEvent(QCloseEvent *event);
 
     template<typename T>
-    T *createTab(const QStringList &dbParams)
+    T* createTab()
     {
-        T *t = new T(dbParams);
+        T *t = new T();
         fTab->addTab(t, t->icon(), QString("%1").arg(t->label()));
         fTab->setCurrentIndex(fTab->count() - 1);
         t->postProcess();
         return t;
     }
 
-    NTableWidget *createNTab(const QString &route, const QString &image, const QJsonObject &initParams = QJsonObject{});
+    NTableWidget* createNTab(const QString &route, const QString &image, const QJsonObject &initParams = QJsonObject{});
 
     void nTabDesign(const QIcon &icon, const QString &label, NTableWidget *widget);
 
@@ -85,27 +85,27 @@ private slots:
     void on_btnShowMenu_clicked();
 
 private:
-    NInterface *http;
+    NInterface* http;
 
-    Ui::C5MainWindow *ui;
+    Ui::C5MainWindow* ui;
 
-    QList<QListWidget *> fMenuLists;
+    QList<QListWidget*> fMenuLists;
 
-    QLabel *fStatusLabel;
+    QLabel* fStatusLabel;
 
-    QPushButton *fConnectionLabel;
+    QPushButton* fConnectionLabel;
 
     QStringList fPrevTabUuid;
 
-    QTabWidget *fTab;
+    QTabWidget* fTab;
 
-    QMap<QString, C5Widget *> fBroadcastListeners;
+    QMap<QString, C5Widget*> fBroadcastListeners;
 
-    QToolBar *fReportToolbar;
+    QToolBar* fReportToolbar;
 
-    QToolBar *fRightToolbar;
+    QToolBar* fRightToolbar;
 
-    C5ToolBarWidget *fToolbarWidget;
+    C5ToolBarWidget* fToolbarWidget;
 
     QTimer fTimer;
 
@@ -113,13 +113,13 @@ private:
 
     void readFavoriteMenu();
 
-    bool addMainLevel(const QString &db, int permission, const QString &title, const QString &icon, QListWidget *&l);
+    bool addMainLevel(const QString &db, int permission, const QString &title, const QString &icon, QListWidget*& l);
 
     void setDB();
 
     void enableMenu(bool v);
 
-    QListWidgetItem *addTreeL3Item(QListWidget *l, int permission, const QString &text, const QString &icon);
+    QListWidgetItem* addTreeL3Item(QListWidget *l, int permission, const QString &text, const QString &icon);
 
     void animateMenu(QListWidget *l, bool hide);
 
@@ -128,6 +128,6 @@ private:
     void removeFromFavorite(int permission);
 };
 
-extern C5MainWindow *__mainWindow;
+extern C5MainWindow* __mainWindow;
 
 #endif // C5MAINWINDOW_H

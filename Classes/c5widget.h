@@ -15,7 +15,7 @@ public:
 
     enum ToolBarButtons {tbNone = 0, tbNew, tbEdit, tbSave, tbRefresh, tbFilter, tbClearFilter, tbPrint, tbExcel, tbDelete };
 
-    explicit C5Widget(const QStringList &dbParams, QWidget *parent = nullptr);
+    explicit C5Widget(QWidget *parent = nullptr);
 
     ~C5Widget();
 
@@ -25,17 +25,15 @@ public:
 
     virtual void postProcess();
 
-    virtual QToolBar *toolBar();
+    virtual QToolBar* toolBar();
 
-    virtual QWidget *widget();
+    virtual QWidget* widget();
 
     virtual void hotKey(const QString &key);
 
     virtual void selectorCallback(int row, const QJsonArray &values);
 
     virtual bool event(QEvent *event);
-
-    virtual void changeDatabase(const QStringList &dbParams);
 
     virtual bool allowChangeDatabase();
 
@@ -46,21 +44,19 @@ public:
     QString fWindowUuid;
 
 protected:
-    QToolBar *fToolBar;
-
-    QStringList fDBParams;
+    QToolBar* fToolBar;
 
     QString fIcon;
 
     QString fLabel;
 
-    NInterface *fHttp;
+    NInterface* fHttp;
 
     bool fFocusNextChild;
 
     bool createToolBar();
 
-    QToolBar *createStandartToolbar(const QList<ToolBarButtons> &btn);
+    QToolBar* createStandartToolbar(const QList<ToolBarButtons>& btn);
 
     virtual void nextChild();
 

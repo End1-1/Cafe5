@@ -3,13 +3,13 @@
 #include "c5cache.h"
 #include <QSettings>
 
-CR5DishPriceSelfCostFilter::CR5DishPriceSelfCostFilter(const QStringList &dbParams, QWidget *parent) :
-    C5FilterWidget(dbParams, parent),
+CR5DishPriceSelfCostFilter::CR5DishPriceSelfCostFilter(QWidget *parent) :
+    C5FilterWidget(parent),
     ui(new Ui::CR5DishPriceSelfCostFilter)
 {
     ui->setupUi(this);
-    ui->leMenu->setSelector(dbParams, ui->leMenuName, cache_menu_names);
-    ui->leGoods->setSelector(dbParams, ui->leGoodsName, cache_goods, 1, 3).setMultiselection(true);
+    ui->leMenu->setSelector(ui->leMenuName, cache_menu_names);
+    ui->leGoods->setSelector(ui->leGoodsName, cache_goods, 1, 3).setMultiselection(true);
     QSettings s(_ORGANIZATION_, QString("%1\\%2\\reportfilter\\%3")
                 .arg(_APPLICATION_)
                 .arg(_MODULE_)

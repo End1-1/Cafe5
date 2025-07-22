@@ -12,7 +12,7 @@ class CE5GoodsModel : public CE5Editor
     Q_OBJECT
 
 public:
-    explicit CE5GoodsModel(const QStringList &dbParams, QWidget *parent = nullptr);
+    explicit CE5GoodsModel(QWidget *parent = nullptr);
     ~CE5GoodsModel();
     virtual QString title();
 

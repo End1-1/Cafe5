@@ -13,7 +13,7 @@ class C5WaiterOrder : public C5Widget
     Q_OBJECT
 
 public:
-    explicit C5WaiterOrder(const QStringList &dbParams, QWidget *parent = nullptr);
+    explicit C5WaiterOrder(QWidget *parent = nullptr);
 
     ~C5WaiterOrder();
 

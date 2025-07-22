@@ -64,7 +64,7 @@
       <item>
        <spacer name="horizontalSpacer_2">
         <property name="orientation">
-         <enum>Qt::Horizontal</enum>
+         <enum>Qt::Orientation::Horizontal</enum>
         </property>
         <property name="sizeHint" stdset="0">
          <size>
@@ -183,7 +183,7 @@
       <item>
        <spacer name="horizontalSpacer">
         <property name="orientation">
-         <enum>Qt::Horizontal</enum>
+         <enum>Qt::Orientation::Horizontal</enum>
         </property>
         <property name="sizeHint" stdset="0">
          <size>
@@ -337,7 +337,7 @@
            <x>0</x>
            <y>0</y>
            <width>619</width>
-           <height>465</height>
+           <height>457</height>
           </rect>
          </property>
          <layout class="QHBoxLayout" name="horizontalLayout_5">
@@ -354,14 +354,7 @@
            <number>0</number>
           </property>
           <item>
-           <widget class="WOrder" name="o1" native="true">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-              <horstretch>0</horstretch>
-              <verstretch>1</verstretch>
-             </sizepolicy>
-            </property>
-           </widget>
+           <layout class="QVBoxLayout" name="vo1"/>
           </item>
          </layout>
         </widget>
@@ -378,7 +371,7 @@
            <x>0</x>
            <y>0</y>
            <width>618</width>
-           <height>465</height>
+           <height>457</height>
           </rect>
          </property>
          <layout class="QHBoxLayout" name="horizontalLayout_4">
@@ -395,7 +388,7 @@
            <number>0</number>
           </property>
           <item>
-           <widget class="WOrder" name="o2" native="true"/>
+           <layout class="QVBoxLayout" name="vo2"/>
           </item>
          </layout>
         </widget>
@@ -480,7 +473,7 @@
          <item>
           <spacer name="horizontalSpacer_3">
            <property name="orientation">
-            <enum>Qt::Horizontal</enum>
+            <enum>Qt::Orientation::Horizontal</enum>
            </property>
            <property name="sizeHint" stdset="0">
             <size>
@@ -572,7 +565,7 @@
          <item>
           <spacer name="horizontalSpacer_4">
            <property name="orientation">
-            <enum>Qt::Horizontal</enum>
+            <enum>Qt::Orientation::Horizontal</enum>
            </property>
            <property name="sizeHint" stdset="0">
             <size>
@@ -590,14 +583,6 @@
    </item>
   </layout>
  </widget>
- <customwidgets>
-  <customwidget>
-   <class>WOrder</class>
-   <extends>QWidget</extends>
-   <header>worderw.h</header>
-   <container>1</container>
-  </customwidget>
- </customwidgets>
  <resources>
   <include location="../resources/res.qrc"/>
   <include location="../resources/res.qrc"/>

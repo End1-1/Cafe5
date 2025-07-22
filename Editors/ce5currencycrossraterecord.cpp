@@ -5,13 +5,13 @@
 #include "c5message.h"
 #include <QDoubleValidator>
 
-CE5CurrencyCrossRateRecord::CE5CurrencyCrossRateRecord(const QStringList &dbParams, QWidget *parent) :
-    CE5Editor(dbParams, parent),
+CE5CurrencyCrossRateRecord::CE5CurrencyCrossRateRecord(QWidget *parent) :
+    CE5Editor(parent),
     ui(new Ui::CE5CurrencyCrossRateRecord)
 {
     ui->setupUi(this);
-    ui->leCurr->setSelector(dbParams, ui->leCurrName, cache_currency);
-    ui->leCurr_2->setSelector(dbParams, ui->leCurrName_2, cache_currency);
+    ui->leCurr->setSelector(ui->leCurrName, cache_currency);
+    ui->leCurr_2->setSelector(ui->leCurrName_2, cache_currency);
     ui->leRate->setValidator(new QDoubleValidator(0, 999999, 7));
 }
 
@@ -37,7 +37,7 @@ bool CE5CurrencyCrossRateRecord::save(QString &err, QList<QMap<QString, QVariant
         return false;
     }
     if (ui->chSetCurrentRate->isChecked()) {
-        C5Database db(fDBParams);
+        C5Database db;
         db[":f_date"] = ui->leDate->date();
         db[":f_currency1"] = ui->leCurr->getInteger();
         db[":f_currency2"] = ui->leCurr_2->getInteger();

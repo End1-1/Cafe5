@@ -15,7 +15,7 @@ class DlgPaymentChoose : public C5Dialog
     Q_OBJECT
 
 public:
-    explicit DlgPaymentChoose(const QStringList &dbParams);
+    explicit DlgPaymentChoose();
     ~DlgPaymentChoose();
     static bool getValues(double total, double &cash, double &card, double &idram, double &telcell, double &bank,
                           double &credit,

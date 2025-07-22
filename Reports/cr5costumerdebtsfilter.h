@@ -12,7 +12,7 @@ class CR5CostumerDebtsFilter : public C5FilterWidget
     Q_OBJECT
 
 public:
-    explicit CR5CostumerDebtsFilter(const QStringList &dbParams, QWidget *parent = nullptr);
+    explicit CR5CostumerDebtsFilter(QWidget *parent = nullptr);
 
     ~CR5CostumerDebtsFilter();
 

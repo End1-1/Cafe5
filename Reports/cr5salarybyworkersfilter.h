@@ -12,7 +12,7 @@ class CR5SalaryByWorkersFilter : public C5FilterWidget
     Q_OBJECT
 
 public:
-    explicit CR5SalaryByWorkersFilter(const QStringList &dbParams, QWidget *parent = nullptr);
+    explicit CR5SalaryByWorkersFilter(QWidget *parent = nullptr);
 
     ~CR5SalaryByWorkersFilter();
 

@@ -10,9 +10,9 @@ class C5Dialog : public QDialog
     Q_OBJECT
 
 public:
-    C5Dialog(const QStringList &dbParams);
+    C5Dialog();
 
-    C5Dialog(const QStringList &dbParams, bool noparent);
+    C5Dialog(bool noparent);
 
     ~C5Dialog();
 
@@ -21,18 +21,18 @@ public:
     virtual bool preambule();
 
     template<typename T>
-    static bool go(const QStringList &dbParams)
+    static bool go()
     {
-        T *t = new T(dbParams);
+        T *t = new T();
         bool result = false;
-        if (t->preambule()) {
+
+        if(t->preambule()) {
             result = t->exec() == QDialog::Accepted;
         }
+
         delete t;
         return result;
     }
-
-    QStringList getDbParams();
 
     void showFullScreen();
 
@@ -51,7 +51,6 @@ public:
     QString getFieldStringValue(const QString &name);
 
 protected:
-    QStringList fDBParams;
 
     virtual void keyPressEvent(QKeyEvent *e);
 
@@ -61,7 +60,7 @@ protected:
 
     virtual void keyAlterPlusEnter();
 
-    NInterface *fHttp;
+    NInterface* fHttp;
 
 protected slots:
     void handleError(int err, const QString &msg);

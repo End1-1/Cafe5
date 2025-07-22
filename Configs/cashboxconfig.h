@@ -6,7 +6,7 @@
 class CashboxConfig : public Configs
 {
 public:
-    CashboxConfig(const QStringList &dbParams, int id);
+    CashboxConfig(int id);
     virtual void readValues() override;
 
     int cash1;

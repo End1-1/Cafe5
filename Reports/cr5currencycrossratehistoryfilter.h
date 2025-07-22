@@ -12,7 +12,7 @@ class CR5CurrencyCrossRateHistoryFilter : public C5FilterWidget
     Q_OBJECT
 
 public:
-    explicit CR5CurrencyCrossRateHistoryFilter(const QStringList &dbParams, QWidget *parent = nullptr);
+    explicit CR5CurrencyCrossRateHistoryFilter(QWidget *parent = nullptr);
     ~CR5CurrencyCrossRateHistoryFilter();
     virtual QString condition() override;
 

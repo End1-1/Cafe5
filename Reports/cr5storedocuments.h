@@ -10,7 +10,7 @@ class CR5StoreDocuments : public C5ReportWidget
     Q_OBJECT
 
 public:
-    CR5StoreDocuments(const QStringList &dbParams, QWidget *parent = nullptr);
+    CR5StoreDocuments(QWidget *parent = nullptr);
 
     virtual void buildQuery() override;
 

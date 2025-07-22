@@ -12,7 +12,7 @@ class DlgPrintRecipesOptions : public QDialog
     Q_OBJECT
 
 public:
-    explicit DlgPrintRecipesOptions(const QStringList &dbParams, QWidget *parent = nullptr);
+    explicit DlgPrintRecipesOptions(QWidget *parent = nullptr);
     ~DlgPrintRecipesOptions();
 
 private slots:

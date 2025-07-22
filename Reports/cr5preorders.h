@@ -7,7 +7,7 @@ class CR5Preorders : public C5ReportWidget
 {
     Q_OBJECT
 public:
-    CR5Preorders(const QStringList &dbParams, QWidget *parent = nullptr);
+    CR5Preorders(QWidget *parent = nullptr);
 
     virtual QToolBar *toolBar() override;
 

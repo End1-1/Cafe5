@@ -174,18 +174,18 @@
 <context>
     <name>NDataProvider</name>
     <message>
-        <location filename="../NTable/ndataprovider.cpp" line="75"/>
-        <location filename="../NTable/ndataprovider.cpp" line="86"/>
+        <location filename="../NTable/ndataprovider.cpp" line="88"/>
+        <location filename="../NTable/ndataprovider.cpp" line="102"/>
         <source>Access denied</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../NTable/ndataprovider.cpp" line="79"/>
+        <location filename="../NTable/ndataprovider.cpp" line="93"/>
         <source>You must upgrade the application to continue using it</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../NTable/ndataprovider.cpp" line="79"/>
+        <location filename="../NTable/ndataprovider.cpp" line="94"/>
         <source>Click here to launch updater</source>
         <translation type="unfinished"></translation>
     </message>
@@ -193,7 +193,7 @@
 <context>
     <name>NInterface</name>
     <message>
-        <location filename="../NTable/ninterface.cpp" line="65"/>
+        <location filename="../NTable/ninterface.cpp" line="96"/>
         <source>Unauthorized</source>
         <translation type="unfinished"></translation>
     </message>

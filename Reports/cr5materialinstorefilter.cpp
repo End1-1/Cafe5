@@ -2,17 +2,17 @@
 #include "ui_cr5materialinstorefilter.h"
 #include "c5cache.h"
 
-CR5MaterialInStoreFilter::CR5MaterialInStoreFilter(const QStringList &dbParams, QWidget *parent) :
-    C5FilterWidget(dbParams, parent),
+CR5MaterialInStoreFilter::CR5MaterialInStoreFilter(QWidget *parent) :
+    C5FilterWidget(parent),
     ui(new Ui::CR5MaterialInStoreFilter)
 {
     ui->setupUi(this);
-    ui->leStore->setSelector(fDBParams, ui->leStoreName, cache_goods_store).setMultiselection(true);
-    ui->leGroup->setSelector(fDBParams, ui->leGroupname, cache_goods_group).setMultiselection(true);
-    ui->leMaterial->setSelector(fDBParams, ui->leMaterialName, cache_goods, 1, 3).setMultiselection(true);
-    ui->leUnit->setSelector(fDBParams, ui->leUnitName, cache_goods_unit).setMultiselection(true);
-    ui->leCurrency->setSelector(fDBParams, ui->leCurrencyName, cache_currency);
-    ui->lePartner->setSelector(fDBParams, ui->lePartnerName, cache_goods_partners);
+    ui->leStore->setSelector(ui->leStoreName, cache_goods_store).setMultiselection(true);
+    ui->leGroup->setSelector(ui->leGroupname, cache_goods_group).setMultiselection(true);
+    ui->leMaterial->setSelector(ui->leMaterialName, cache_goods, 1, 3).setMultiselection(true);
+    ui->leUnit->setSelector(ui->leUnitName, cache_goods_unit).setMultiselection(true);
+    ui->leCurrency->setSelector(ui->leCurrencyName, cache_currency);
+    ui->lePartner->setSelector(ui->lePartnerName, cache_goods_partners);
     restoreFilter(this);
 }
 

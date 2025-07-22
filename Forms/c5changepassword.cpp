@@ -5,8 +5,8 @@
 #include "c5config.h"
 #include "c5user.h"
 
-C5ChangePassword::C5ChangePassword(const QStringList &dbParams) :
-    C5Dialog(dbParams),
+C5ChangePassword::C5ChangePassword() :
+    C5Dialog(),
     ui(new Ui::C5ChangePassword)
 {
     ui->setupUi(this);
@@ -17,9 +17,9 @@ C5ChangePassword::~C5ChangePassword()
     delete ui;
 }
 
-bool C5ChangePassword::changePassword(const QStringList &dbParams, QString &password)
+bool C5ChangePassword::changePassword(QString &password)
 {
-    C5ChangePassword *d = new C5ChangePassword(dbParams);
+    C5ChangePassword *d = new C5ChangePassword();
     bool result = d->exec() == QDialog::Accepted;
     password = d->ui->leNewPassword->text();
     delete d;
@@ -41,7 +41,7 @@ void C5ChangePassword::on_btnOK_clicked()
         C5Message::error(tr("Password cannot be empty"));
         return;
     }
-    C5Database db(fDBParams);
+    C5Database db;
     db[":f_id"] = __user->id();
     db[":f_password"] = ui->leOldPassword->text();
     db.exec("select * from s_user where f_id=:f_id and f_password=md5(:f_password)");

@@ -3,13 +3,13 @@
 #include "c5cache.h"
 #include "c5config.h"
 
-CR5ConsumptionBySalesFilter::CR5ConsumptionBySalesFilter(const QStringList &dbParams, QWidget *parent) :
-    C5FilterWidget(dbParams, parent),
+CR5ConsumptionBySalesFilter::CR5ConsumptionBySalesFilter(QWidget *parent) :
+    C5FilterWidget(parent),
     ui(new Ui::CR5ConsumptionBySalesFilter)
 {
     ui->setupUi(this);
-    ui->leStore->setSelector(dbParams, ui->leStoreName, cache_goods_store);
-    ui->leGroup->setSelector(dbParams, ui->leGroupName, cache_goods_group);
+    ui->leStore->setSelector(ui->leStoreName, cache_goods_store);
+    ui->leGroup->setSelector(ui->leGroupName, cache_goods_group);
     ui->chDraft->setChecked(__c5config.getRegValue("draftconsuption", false).toBool());
 }
 

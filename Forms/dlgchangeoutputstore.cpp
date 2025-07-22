@@ -7,8 +7,8 @@
 #include "c5message.h"
 #include "c5utils.h"
 
-DlgChangeOutputStore::DlgChangeOutputStore(const QStringList &dbParams) :
-    C5Dialog(dbParams),
+DlgChangeOutputStore::DlgChangeOutputStore() :
+    C5Dialog(),
     ui(new Ui::DlgChangeOutputStore)
 {
     ui->setupUi(this);
@@ -18,7 +18,7 @@ DlgChangeOutputStore::DlgChangeOutputStore(const QStringList &dbParams) :
         connect(l, SIGNAL(textChanged(QString)), this, SLOT(search(QString)));
     }
     ui->tbl->setColumnWidths(ui->tbl->columnCount(), 0, 0, 100, 100, 200, 250, 100, 100, 30);
-    ui->leStore->setSelector(fDBParams, ui->leStoreName, cache_goods_store);
+    ui->leStore->setSelector(ui->leStoreName, cache_goods_store);
 }
 
 DlgChangeOutputStore::~DlgChangeOutputStore()
@@ -33,7 +33,7 @@ void DlgChangeOutputStore::refresh(const QDate &d1, const QDate &d2)
     for (int i = 0; i < ui->tbl->columnCount(); i++) {
         ui->tbl->lineEdit(0, i)->clear();
     }
-    C5Database db(fDBParams);
+    C5Database db;
     db[":f_datecash1"] = d1;
     db[":f_datecash2"] = d2;
     db[":f_headerstate"] = ORDER_STATE_CLOSE;
@@ -101,7 +101,7 @@ void DlgChangeOutputStore::on_btnGo_clicked()
     if (C5Message::question(tr("Are you sure to change store?")) != QDialog::Accepted) {
         return;
     }
-    C5Database db(fDBParams);
+    C5Database db;
     for (int i = 1; i < ui->tbl->rowCount(); i++) {
         if (ui->tbl->checkBox(i, 8)->isChecked()) {
             db[":f_store"] = ui->leStore->getInteger();

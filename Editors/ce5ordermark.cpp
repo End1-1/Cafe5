@@ -1,8 +1,8 @@
 #include "ce5ordermark.h"
 #include "ui_ce5ordermark.h"
 
-CE5OrderMark::CE5OrderMark(const QStringList &dbParams, QWidget *parent) :
-    CE5Editor(dbParams, parent),
+CE5OrderMark::CE5OrderMark(QWidget *parent) :
+    CE5Editor(parent),
     ui(new Ui::CE5OrderMark)
 {
     ui->setupUi(this);

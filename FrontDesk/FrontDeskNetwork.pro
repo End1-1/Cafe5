@@ -57,16 +57,19 @@ win32: QMAKE_CXXFLAGS -= -Zc:strictStrings
 FORMS += \
     ../Classes/dlgserverconnection.ui \
     ../Forms/c5goodsspecialprice.ui \
-    dlgemarks.ui
+    dlgemarks.ui \
+    storedecomplectation.ui
 
 HEADERS += \
     ../Classes/dlgserverconnection.h \
     ../Forms/c5goodsspecialprice.h \
-    dlgemarks.h
+    dlgemarks.h \
+    storedecomplectation.h
 
 SOURCES += \
     ../Classes/dlgserverconnection.cpp \
     ../Forms/c5goodsspecialprice.cpp \
-    dlgemarks.cpp
+    dlgemarks.cpp \
+    storedecomplectation.cpp
 
 

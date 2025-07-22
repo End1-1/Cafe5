@@ -3,7 +3,7 @@
 #include "c5config.h"
 
 DlgExitWithMessage::DlgExitWithMessage() :
-    C5Dialog(C5Config::dbParams()),
+    C5Dialog(),
     ui(new Ui::DlgExitWithMessage)
 {
     ui->setupUi(this);

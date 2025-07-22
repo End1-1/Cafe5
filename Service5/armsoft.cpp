@@ -15,8 +15,8 @@ ArmSoft::ArmSoft(const QJsonObject &data, QObject *parent) :
 bool ArmSoft::exportToAS(QString &err)
 {
     LogWriter::write(LogWriterLevel::verbose, "DATA OF MAGNIT PAYLOAD", QJsonDocument(fData).toJson());
-    Database dbas ("QODBC");
-    if (!dbas.open("", fData["asconnectionstring"].toString(), "sa", "SaSa111")) {
+    Database dbas("QODBC");
+    if(!dbas.open("", fData["asconnectionstring"].toString(), "sa", "SaSa111")) {
         err = dbas.lastDbError();
         return false;
     }
@@ -36,7 +36,7 @@ bool ArmSoft::exportToAS(QString &err)
     QString partnerTaxCode = jh["f_taxcode"].toString();
     double total = 0, vatamount = 0;
     QList<QMap<QString, QVariant> > items;
-    for (int i = 0; i < jb.size(); i++) {
+    for(int i = 0; i < jb.size(); i++) {
         QJsonObject jt = jb.at(i).toObject();
         QMap<QString, QVariant> tmp;
         tmp["f_ascode"] = jt["f_ascode"].toString();
@@ -52,14 +52,14 @@ bool ArmSoft::exportToAS(QString &err)
                             1);
         items.append(tmp);
         double ltotal = tmp["f_qty"].toDouble() * tmp["f_price"].toDouble();
-        total += ltotal + (ltotal *fData["withvat"].toDouble());
+        total += ltotal + (ltotal * fData["withvat"].toDouble());
         //vatamount += doctype == 5 ? ltotal * 0.2 : ltotal * 0.1667 ;
-        vatamount += ltotal *fData["vatpercent"].toDouble();
+        vatamount += ltotal * fData["vatpercent"].toDouble();
     }
-    if (!err.isEmpty()) {
+    if(!err.isEmpty()) {
         return false;
     }
-    if (items.count() == 0) {
+    if(items.count() == 0) {
         err = tr("Empty invoice");
         return false;
     }
@@ -73,19 +73,19 @@ bool ArmSoft::exportToAS(QString &err)
     dbas[":fSUMM"] = total;
     dbas[":fCOMMENT"] = partnerAddress;
     dbas[":fBODY"] = QString("\r\nPREPAYMENTACC:5231\r\n"
-                             "%6"
-                             "VATACC:5243\r\n"
-                             "SUMMVAT:%2\r\n"
-                             "BUYERACC:2211\r\n"
-                             "CUREXCHNG:1.0000\r\n"
-                             "COURSECOUNT:1.0000\r\n"
-                             "BUYCHACCPOST:Գլխավոր հաշվապահ \r\n"
-                             "MAXROWID:%1\r\n"
-                             "BUYTAXCODE:%3\r\n"
-                             "BUYADDRESS:%4\r\n"
-                             "BUYBUSADDRESS:%5\r\n"
-                             "POISN:00000000-0000-0000-0000-000000000000\r\n"
-                             "INVOICESTATES:0\r\n")
+         "%6"
+         "VATACC:5243\r\n"
+         "SUMMVAT:%2\r\n"
+         "BUYERACC:2211\r\n"
+         "CUREXCHNG:1.0000\r\n"
+         "COURSECOUNT:1.0000\r\n"
+         "BUYCHACCPOST:Գլխավոր հաշվապահ \r\n"
+         "MAXROWID:%1\r\n"
+         "BUYTAXCODE:%3\r\n"
+         "BUYADDRESS:%4\r\n"
+         "BUYBUSADDRESS:%5\r\n"
+         "POISN:00000000-0000-0000-0000-000000000000\r\n"
+         "INVOICESTATES:0\r\n")
                      .arg(items.count())
                      .arg(vatamount)
                      .arg(partnersMap[aspartner]["ftaxcode"].toString())
@@ -110,63 +110,63 @@ bool ArmSoft::exportToAS(QString &err)
     //                    .arg(bankacc)
     //                    .arg(float_str(card, 2).replace(",", "").replace(" ", ""));
     //        }
-    if (dbas.exec("insert into DOCUMENTS ("
-                  "fISN, fDOCTYPE, fDOCSTATE, fDATE, fORDERNUM, fDOCNUM, fCUR, fSUMM, fCOMMENT, fBODY, fPARTNAME, "
-                  "fUSERID, fPARTID, fCRPARTID, fMTID, fEXPTYPE, fINVN, fENTRYSTATE, "
-                  "fEMPLIDRESPIN, fEMPLIDRESPOUT, fVATTYPE, fSPEC, fCHANGEDATE,fEXTBODY,fETLSTATE) VALUES ("
-                  ":fISN, :fDOCTYPE, :fDOCSTATE, '" + docDate.toString("yyyy-MM-dd") + "', "
-                  ":fORDERNUM, :fDOCNUM, :fCUR, :fSUMM, :fCOMMENT, :fBODY, :fPARTNAME, "
-                  ":fUSERID, :fPARTID, :fCRPARTID, :fMTID, '', :fINVN, :fENTRYSTATE, "
-                  ":fEMPLIDRESPIN, :fEMPLIDRESPOUT, :fVATTYPE, :fSPEC, current_timestamp,'', '')") == false) {
+    if(dbas.exec("insert into DOCUMENTS ("
+                 "fISN, fDOCTYPE, fDOCSTATE, fDATE, fORDERNUM, fDOCNUM, fCUR, fSUMM, fCOMMENT, fBODY, fPARTNAME, "
+                 "fUSERID, fPARTID, fCRPARTID, fMTID, fEXPTYPE, fINVN, fENTRYSTATE, "
+                 "fEMPLIDRESPIN, fEMPLIDRESPOUT, fVATTYPE, fSPEC, fCHANGEDATE,fEXTBODY,fETLSTATE) VALUES ("
+                 ":fISN, :fDOCTYPE, :fDOCSTATE, '" + docDate.toString("yyyy-MM-dd") + "', "
+                 ":fORDERNUM, :fDOCNUM, :fCUR, :fSUMM, :fCOMMENT, :fBODY, :fPARTNAME, "
+                 ":fUSERID, :fPARTID, :fCRPARTID, :fMTID, '', :fINVN, :fENTRYSTATE, "
+                 ":fEMPLIDRESPIN, :fEMPLIDRESPOUT, :fVATTYPE, :fSPEC, current_timestamp,'', '')") == false) {
         dbas.rollback();
         err = dbas.lastDbError();
         return false;
     }
     int rowid = 1;
-    for (QList<QMap<QString, QVariant> >::const_iterator bi = items.constBegin(); bi != items.constEnd(); bi++) {
-        LogWriter::write(LogWriterLevel::special, ( *bi)["f_service"].toString(),
-                         ( *bi)["f_service"].toInt() == 1 ?
-                         servicesMap[( *bi)["f_ascode"].toString()]["funit"].toString()
-                         : goodsMap[( *bi)["f_ascode"].toString()]["funit"].toString());
+    for(QList<QMap<QString, QVariant> >::const_iterator bi = items.constBegin(); bi != items.constEnd(); bi++) {
+        LogWriter::write(LogWriterLevel::special, (*bi)["f_service"].toString(),
+                         (*bi)["f_service"].toInt() == 1 ?
+                         servicesMap[(*bi)["f_ascode"].toString()]["funit"].toString()
+                         : goodsMap[(*bi)["f_ascode"].toString()]["funit"].toString());
         LogWriter::write(LogWriterLevel::special, "", unitsMap.keys().join(","));
         dbas[":fISN"] = docid;
         dbas[":fROWNUM"] = rowid;
-        dbas[":fITEMTYPE"] = ( *bi)["f_service"].toInt() == 1 ? 2 : 1;
-        dbas[":fITEMID"] = ( *bi)["f_service"].toInt() == 1 ? servicesMap[( *bi)["f_ascode"].toString()]["fservid"] :
-                           goodsMap[( *bi)["f_ascode"].toString()]["fmtid"];
-        dbas[":fITEMNAME"] = ( *bi)["f_name"];
+        dbas[":fITEMTYPE"] = (*bi)["f_service"].toInt() == 1 ? 2 : 1;
+        dbas[":fITEMID"] = (*bi)["f_service"].toInt() == 1 ? servicesMap[(*bi)["f_ascode"].toString()]["fservid"] :
+                           goodsMap[(*bi)["f_ascode"].toString()]["fmtid"];
+        dbas[":fITEMNAME"] = (*bi)["f_name"];
         // dbas[":fUNITBRIEF"] = unitsMap[
         //                           ( *bi)["f_service"].toInt() == 1 ?
         //                           servicesMap[( *bi)["f_ascode"].toString()]["funit"].toString()
         //                           : goodsMap[( *bi)["f_ascode"].toString()]["funit"].toString()]["fbrief"].toString();
         dbas[":fUNITBRIEF"] = "հատ";
-        dbas[":fSTORAGE"] = ( *bi)["f_store"];
-        dbas[":fQUANTITY"] = ( *bi)["f_qty"];
-        dbas[":fINITPRICE"] = ( *bi)["f_initprice"];
-        dbas[":fDISCOUNT"] = ( *bi)["f_discount"];
-        dbas[":fPRICE"] = ( *bi)["f_price"];
-        dbas[":fSUMMA"] = ( *bi)["f_qty"].toDouble() * ( *bi)["f_price"].toDouble();
-        dbas[":fSUMMA1"] = ( *bi)["f_qty"].toDouble() * ( *bi)["f_price"].toDouble();
+        dbas[":fSTORAGE"] = (*bi)["f_store"];
+        dbas[":fQUANTITY"] = (*bi)["f_qty"];
+        dbas[":fINITPRICE"] = (*bi)["f_initprice"];
+        dbas[":fDISCOUNT"] = (*bi)["f_discount"];
+        dbas[":fPRICE"] = (*bi)["f_price"];
+        dbas[":fSUMMA"] = (*bi)["f_qty"].toDouble() * (*bi)["f_price"].toDouble();
+        dbas[":fSUMMA1"] = (*bi)["f_qty"].toDouble() * (*bi)["f_price"].toDouble();
         dbas[":fENVFEEPERCENT"] = 0;
         dbas[":fENVFEESUMMA"] = 0;
         dbas[":fVAT"] = 1;
         dbas[":fEXPMETHOD"] = 1;
-        dbas[":fACCEXPENSE"] = ( *bi)["f_service"].toInt() == 1 ? fData["lesexpenseacc"].toString() :
+        dbas[":fACCEXPENSE"] = (*bi)["f_service"].toInt() == 1 ? fData["lesexpenseacc"].toString() :
                                fData["lemexpenseacc"].toString();
-        dbas[":fACCINCOME"] = ( *bi)["f_service"].toInt() == 1 ? fData["lesincomeacc"].toString() :
+        dbas[":fACCINCOME"] = (*bi)["f_service"].toInt() == 1 ? fData["lesincomeacc"].toString() :
                               fData["lemincomeacc"].toString();
         dbas[":fPARTYMETHOD"] = 0;
         dbas[":fROWID"] = rowid++;
         //LogWriter::write(LogWriterLevel::errors, "EEEEEEEEEEEEEEEE", ( *bi));
-        dbas[":fDEALTYPE"] = ( *bi)["f_dealtype"].toString().isEmpty() ? "" : ( *bi)["f_dealtype"].toString();
-        if (!dbas.exec("insert into MTINVOICELIST (fISN, fROWNUM, fITEMTYPE, fITEMID, fITEMNAME, "
-                       "fUNITBRIEF, fSTORAGE, fQUANTITY, fINITPRICE, fDISCOUNT, fPRICE, fSUMMA, fSUMMA1, "
-                       "fENVFEEPERCENT, fENVFEESUMMA, fVAT, fEXPMETHOD, fACCEXPENSE, fACCINCOME, fPARTYMETHOD, fROWID, "
-                       "fDEALTYPE) "
-                       "VALUES (:fISN, :fROWNUM, :fITEMTYPE, :fITEMID, :fITEMNAME, "
-                       ":fUNITBRIEF, :fSTORAGE, :fQUANTITY, :fINITPRICE, :fDISCOUNT, :fPRICE, :fSUMMA, :fSUMMA1, "
-                       ":fENVFEEPERCENT, :fENVFEESUMMA, :fVAT, :fEXPMETHOD, :fACCEXPENSE, :fACCINCOME, :fPARTYMETHOD, :fROWID, "
-                       ":fDEALTYPE)")) {
+        dbas[":fDEALTYPE"] = (*bi)["f_dealtype"].toString().isEmpty() ? "" : (*bi)["f_dealtype"].toString();
+        if(!dbas.exec("insert into MTINVOICELIST (fISN, fROWNUM, fITEMTYPE, fITEMID, fITEMNAME, "
+                      "fUNITBRIEF, fSTORAGE, fQUANTITY, fINITPRICE, fDISCOUNT, fPRICE, fSUMMA, fSUMMA1, "
+                      "fENVFEEPERCENT, fENVFEESUMMA, fVAT, fEXPMETHOD, fACCEXPENSE, fACCINCOME, fPARTYMETHOD, fROWID, "
+                      "fDEALTYPE) "
+                      "VALUES (:fISN, :fROWNUM, :fITEMTYPE, :fITEMID, :fITEMNAME, "
+                      ":fUNITBRIEF, :fSTORAGE, :fQUANTITY, :fINITPRICE, :fDISCOUNT, :fPRICE, :fSUMMA, :fSUMMA1, "
+                      ":fENVFEEPERCENT, :fENVFEESUMMA, :fVAT, :fEXPMETHOD, :fACCEXPENSE, :fACCINCOME, :fPARTYMETHOD, :fROWID, "
+                      ":fDEALTYPE)")) {
             err = dbas.lastDbError();
             dbas.rollback();
             return false;
@@ -183,10 +183,10 @@ bool ArmSoft::getIndexes(QString &err, QSqlDatabase &dbas)
     q.exec("select fMTCODE, fMTID, fCAPTION, fUNIT from MATERIALS");
     QSqlRecord r = q.record();
     QStringList fields;
-    for (int i = 0; i < r.count(); i++) {
+    for(int i = 0; i < r.count(); i++) {
         fields.append(r.fieldName(i).toLower());
     }
-    while (q.next()) {
+    while(q.next()) {
         QMap<QString, QVariant> temp;
         recordToMap(temp, q, fields);
         goodsMap[q.value(0).toString()] = temp;
@@ -194,17 +194,17 @@ bool ArmSoft::getIndexes(QString &err, QSqlDatabase &dbas)
     fields.clear();
     q.exec("select fSERVID, fSERVCODE, fCAPTION, fFULLCAPTION, fUNIT from SERVICES");
     r = q.record();
-    for (int i = 0; i < r.count(); i++) {
+    for(int i = 0; i < r.count(); i++) {
         fields.append(r.fieldName(i).toLower());
     }
-    while (q.next()) {
+    while(q.next()) {
         QMap<QString, QVariant> temp;
         recordToMap(temp, q, fields);
         servicesMap[q.value(1).toString()] = temp;
     }
     fields.clear();
     q.exec("select fCODE, fBRIEF from QNTUNIT");
-    while (q.next()) {
+    while(q.next()) {
         QMap<QString, QVariant> temp;
         recordToMap(temp, q, fields);
         unitsMap[q.value(0).toString()] = temp;
@@ -212,10 +212,10 @@ bool ArmSoft::getIndexes(QString &err, QSqlDatabase &dbas)
     fields.clear();
     q.exec("select fPARTID, fPARTCODE, fCAPTION, fFULLCAPTION, fADDRESS, fBUSINESSADDRESS, fTAXCODE from PARTNERS");
     r = q.record();
-    for (int i = 0; i < r.count(); i++) {
+    for(int i = 0; i < r.count(); i++) {
         fields.append(r.fieldName(i).toLower());
     }
-    while (q.next()) {
+    while(q.next()) {
         QMap<QString, QVariant> temp;
         recordToMap(temp, q, fields);
         partnersMap[q.value(1).toString()] = temp;
@@ -223,9 +223,9 @@ bool ArmSoft::getIndexes(QString &err, QSqlDatabase &dbas)
     return true;
 }
 
-void ArmSoft::recordToMap(QMap<QString, QVariant> &m, QSqlQuery &q, QStringList &fields)
+void ArmSoft::recordToMap(QMap<QString, QVariant>& m, QSqlQuery &q, QStringList &fields)
 {
-    for (int i = 0; i < fields.count(); i++) {
+    for(int i = 0; i < fields.count(); i++) {
         m[fields[i]] = q.value(i);
     }
 }

@@ -10,7 +10,7 @@ class CR5MaterialMoveUncomplect : public C5ReportWidget
     Q_OBJECT
 
 public:
-    CR5MaterialMoveUncomplect(const QStringList &dbParams, QWidget *parent = nullptr);
+    CR5MaterialMoveUncomplect(QWidget *parent = nullptr);
 
     virtual QToolBar *toolBar() override;
 

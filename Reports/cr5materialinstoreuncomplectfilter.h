@@ -12,7 +12,7 @@ class CR5MaterialInStoreUncomplectFilter : public C5FilterWidget
     Q_OBJECT
 
 public:
-    explicit CR5MaterialInStoreUncomplectFilter(const QStringList &dbParams, QWidget *parent = nullptr);
+    explicit CR5MaterialInStoreUncomplectFilter(QWidget *parent = nullptr);
 
     ~CR5MaterialInStoreUncomplectFilter();
 

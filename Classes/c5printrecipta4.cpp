@@ -6,10 +6,9 @@
 #include "c5printpreview.h"
 #include "QRCodeGenerator.h"
 
-C5PrintReciptA4::C5PrintReciptA4(const QStringList &dbParams, const QString &orderid, QObject *parent) :
+C5PrintReciptA4::C5PrintReciptA4(const QString &orderid, QObject *parent) :
     QObject(parent),
-    fOrderUUID(orderid),
-    fDBParams(dbParams)
+    fOrderUUID(orderid)
 {
 }
 
@@ -17,7 +16,7 @@ bool C5PrintReciptA4::print(QString &err)
 {
     C5Printing p;
     QFont f(__c5config.getValue(param_app_font_family));
-    C5Database db(fDBParams);
+    C5Database db;
     p.setFont(f);
     QList<qreal> points;
     QStringList vals;
@@ -26,22 +25,28 @@ bool C5PrintReciptA4::print(QString &err)
     db.exec("select * from o_draft_sale where f_id=:f_id");
     bool oops = false;
     bool isDraft;
-    if (db.nextRow() == false) {
+
+    if(db.nextRow() == false) {
         oops = true;
     }
-    if (oops) {
+
+    if(oops) {
         db[":f_id"] = fOrderUUID;
         db.exec("select * from o_header where f_id=:f_id");
-        if (db.nextRow() == false) {
+
+        if(db.nextRow() == false) {
             err = "Order not exists";
             return false;
         }
+
         isDraft = db.getInt("f_state") != 2;
     } else {
         isDraft = db.getInt("f_state") == 1;
     }
+
     db[":f_id"] = fOrderUUID;
-    if (isDraft) {
+
+    if(isDraft) {
         db.exec("select '--' as f_ordernumber, ost.f_name as f_saletypename, "
                 "o.f_amount as f_amounttotal, 0 as f_amountcash, 0 as f_amountcard, 0 as f_amountother, o.f_date, "
                 "p.f_taxcode, p.f_taxname, p.f_address, o.f_datefor, "
@@ -66,15 +71,19 @@ bool C5PrintReciptA4::print(QString &err)
                 "left join c_partners p on p.f_id=o.f_partner "
                 "where o.f_id=:f_id ");
     }
+
     QMap<QString, QVariant> header;
-    if (db.nextRow()) {
+
+    if(db.nextRow()) {
         db.rowToMap(header);
     } else {
         err = "Order not exists";
         return false;
     }
+
     QMap<QString, QVariant> debt1, debt2;
-    if (header["f_partner"].toInt() > 0) {
+
+    if(header["f_partner"].toInt() > 0) {
         db[":f_costumer"] = header["f_partner"];
         db[":f_order"] = fOrderUUID;
         db.exec("select 0 as a, sum(f_amount) as dd from b_clients_debts "
@@ -88,9 +97,11 @@ bool C5PrintReciptA4::print(QString &err)
         db.nextRow();
         db.rowToMap(debt2);
     }
+
     QList<QMap<QString, QVariant> > body;
     db[":f_header"] = fOrderUUID;
-    if (isDraft) {
+
+    if(isDraft) {
         db.exec("select g.f_scancode, g.f_name as f_goodsname, "
                 "ob.f_qty, ob.f_price, ob.f_qty*ob.f_price as f_total, "
                 "s.f_name as f_storename, gu.f_name as f_unitname, ob.f_discount as f_discountfactor "
@@ -110,11 +121,13 @@ bool C5PrintReciptA4::print(QString &err)
                 "where ob.f_header=:f_header "
                 "order by ob.f_row ");
     }
-    while (db.nextRow()) {
+
+    while(db.nextRow()) {
         QMap<QString, QVariant> b;
         db.rowToMap(b);
         body.append(b);
     }
+
     int levelIndex = 1;
     int versionIndex = 0;
     bool bExtent = true;
@@ -123,22 +136,26 @@ bool C5PrintReciptA4::print(QString &err)
                            isDraft ? tr("Draft") : header["f_ordernumber"].toString(),
                            header["lu"].toString());
     CQR_Encode qrEncode;
-    bool successfulEncoding = qrEncode.EncodeData( levelIndex, versionIndex, bExtent, maskIndex,
-                              encodeString.toUtf8().data() );
-    if (!successfulEncoding) {
+    bool successfulEncoding = qrEncode.EncodeData(levelIndex, versionIndex, bExtent, maskIndex,
+                              encodeString.toUtf8().data());
+
+    if(!successfulEncoding) {
         //            fLog.append("Cannot encode qr image");
     }
+
     int qrImageSize = qrEncode.m_nSymbleSize;
-    int encodeImageSize = qrImageSize + ( QR_MARGIN * 2 );
+    int encodeImageSize = qrImageSize + (QR_MARGIN * 2);
     QImage encodeImage(encodeImageSize, encodeImageSize, QImage::Format_Mono);
     encodeImage.fill(1);
-    for ( int i = 0; i < qrImageSize; i++ ) {
-        for ( int j = 0; j < qrImageSize; j++ ) {
-            if ( qrEncode.m_byModuleData[i][j] ) {
+
+    for(int i = 0; i < qrImageSize; i++) {
+        for(int j = 0; j < qrImageSize; j++) {
+            if(qrEncode.m_byModuleData[i][j]) {
                 encodeImage.setPixel(i + QR_MARGIN, j + QR_MARGIN, 0);
             }
         }
     }
+
     QPixmap pix = QPixmap::fromImage(encodeImage);
     pix = pix.scaled(300, 300);
     p.image(pix, Qt::AlignLeft);
@@ -204,12 +221,15 @@ bool C5PrintReciptA4::print(QString &err)
     p.tableText(points, vals, p.fLineHeight + 20);
     p.br(p.fLineHeight + 20);
     p.setFontBold(false);
-    for (int i = 0; i < body.count(); i++) {
-        const QMap<QString, QVariant> &m = body.at(i);
-        if (p.checkBr(p.fLineHeight + 20)) {
+
+    for(int i = 0; i < body.count(); i++) {
+        const QMap<QString, QVariant>& m = body.at(i);
+
+        if(p.checkBr(p.fLineHeight + 20)) {
             p.br(p.fLineHeight + 20);
             p.br();
         }
+
         vals.clear();
         vals << QString::number(i + 1);
         vals << m["f_scancode"].toString();
@@ -219,15 +239,18 @@ bool C5PrintReciptA4::print(QString &err)
         double price = m["f_price"].toDouble();
         vals << float_str(price, 2);
         vals << float_str(m["f_discountfactor"].toDouble(), 2) + "%";
-        price -= price *(m["f_discountfactor"].toDouble() / 100);
+        price -= price * (m["f_discountfactor"].toDouble() / 100);
         vals << float_str(price, 1);
         vals << float_str(m["f_qty"].toDouble() *price, 2);
         p.tableText(points, vals, p.fLineHeight + 20);
-        if (p.checkBr(p.fLineHeight + 20)) {
+
+        if(p.checkBr(p.fLineHeight + 20)) {
             p.br(p.fLineHeight + 20);
         }
+
         p.br(p.fLineHeight + 20);
     }
+
     p.setFontBold(true);
     points.clear();
     points << 1200
@@ -240,7 +263,8 @@ bool C5PrintReciptA4::print(QString &err)
     p.br(p.fLineHeight + 20);
     p.br(p.fLineHeight + 20);
     p.br(p.fLineHeight + 20);
-    if (abs(debt1["dd"].toDouble()) > 0 || abs(debt2["dd"].toDouble()) > 0) {
+
+    if(abs(debt1["dd"].toDouble()) > 0 || abs(debt2["dd"].toDouble()) > 0) {
         p.ltext(tr("Debt before"), 50);
         p.ltext(float_str(debt1["dd"].toDouble(), 1), 400);
         p.br();
@@ -253,6 +277,7 @@ bool C5PrintReciptA4::print(QString &err)
         p.br(p.fLineHeight + 20);
         p.br(p.fLineHeight + 20);
     }
+
     p.ltext(tr("Passed"), 50);
     p.ltext(tr("Accepted"), 1000);
     p.br(p.fLineHeight + 20);
@@ -260,7 +285,7 @@ bool C5PrintReciptA4::print(QString &err)
     p.line(50, p.fTop, 700, p.fTop);
     p.line(1000, p.fTop, 1650, p.fTop);
     p.setFontBold(false);
-    C5PrintPreview pp( &p, fDBParams);
+    C5PrintPreview pp(&p);
     pp.exec();
     return true;
 }

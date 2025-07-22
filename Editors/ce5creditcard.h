@@ -12,7 +12,7 @@ class CE5CreditCard : public CE5Editor
     Q_OBJECT
 
 public:
-    explicit CE5CreditCard(const QStringList &dbParams, QWidget *parent = nullptr);
+    explicit CE5CreditCard(QWidget *parent = nullptr);
 
     ~CE5CreditCard();
 

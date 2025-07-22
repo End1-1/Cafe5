@@ -1,8 +1,8 @@
 #include "cr5menunames.h"
 #include "ce5menuname.h"
 
-CR5MenuNames::CR5MenuNames(const QStringList &dbParams, QWidget *parent) :
-    C5ReportWidget(dbParams, parent)
+CR5MenuNames::CR5MenuNames(QWidget *parent) :
+    C5ReportWidget( parent)
 {
     fIcon = ":/menu.png";
     fLabel = tr("Menu names");
@@ -14,7 +14,7 @@ CR5MenuNames::CR5MenuNames(const QStringList &dbParams, QWidget *parent) :
     fTranslation["f_enabled"] = tr("Enabled");
     fTranslation["f_comment"] = tr("Comment");
 
-    fEditor = new CE5MenuName(dbParams);
+    fEditor = new CE5MenuName();
 }
 
 QToolBar *CR5MenuNames::toolBar()

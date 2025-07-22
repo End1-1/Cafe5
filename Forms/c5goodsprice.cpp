@@ -5,9 +5,9 @@
 #include "c5selector.h"
 #include "c5cache.h"
 #include "c5lineedit.h"
+#include "c5utils.h"
 #include "c5printing.h"
 #include "c5message.h"
-#include "c5utils.h"
 #include "c5printpreview.h"
 #include <QInputDialog>
 #include <QMenu>
@@ -27,8 +27,8 @@ const quint32 col2_whosale_price = 4;
 const quint32 col2_retail = 5;
 const quint32 col2_whosale = 6;
 
-C5GoodsPriceOrder::C5GoodsPriceOrder(const QStringList &dbParams)
-    : C5Widget(dbParams)
+C5GoodsPriceOrder::C5GoodsPriceOrder()
+    : C5Widget()
     , ui(new Ui::C5GoodsPriceOrder)
 {
     ui->setupUi(this);
@@ -63,7 +63,8 @@ void C5GoodsPriceOrder::createGropuDiscountResponse(const QJsonObject &jdoc)
 void C5GoodsPriceOrder::getAllResponse(const QJsonObject &jdoc)
 {
     QJsonArray ja = jdoc["all"].toArray();
-    for (int i = 0; i < ja.size(); i++) {
+
+    for(int i = 0; i < ja.size(); i++) {
         const QJsonObject &j = ja.at(i).toObject();
         auto *item = new QListWidgetItem(ui->lwNames);
         item->setText(j["f_name"].toString());
@@ -71,38 +72,48 @@ void C5GoodsPriceOrder::getAllResponse(const QJsonObject &jdoc)
         item->setData(Qt::UserRole + 1, j["f_body"].toString());
         ui->lwNames->addItem(item);
     }
-    if (ui->lwNames->count() > 0) {
+
+    if(ui->lwNames->count() > 0) {
         ui->lwNames->setCurrentRow(0);
-        if (ui->tblDoc->rowCount() > 0) {
+
+        if(ui->tblDoc->rowCount() > 0) {
             setCurrentGroup(ui->tblDoc->getInteger(0, 0));
             ui->tblDoc->setCurrentCell(0, 0);
         }
     }
+
     fHttp->httpQueryFinished(sender());
 }
 
 void C5GoodsPriceOrder::addGroupResponse(const QJsonObject &jdoc)
 {
     QListWidgetItem *item = nullptr;
-    for (int i = 0; i < ui->lwNames->count(); i++) {
+
+    for(int i = 0; i < ui->lwNames->count(); i++) {
         item = ui->lwNames->item(i);
-        if (item->data(Qt::UserRole).toInt() == jdoc["itemid"].toInt()) {
+
+        if(item->data(Qt::UserRole).toInt() == jdoc["itemid"].toInt()) {
             break;
         }
     }
-    if (!item) {
+
+    if(!item) {
         return;
     }
+
     QString jstr = item->data(Qt::UserRole + 1).toString();
     QJsonObject jo = __strjson(jstr);
     QJsonArray jgroup = jo["groups"].toArray();
-    for (int i = 0; i < jgroup.size(); i++) {
+
+    for(int i = 0; i < jgroup.size(); i++) {
         const QJsonObject &j = jgroup.at(i).toObject();
-        if (j["f_id"].toInt() == jdoc["group"].toInt()) {
+
+        if(j["f_id"].toInt() == jdoc["group"].toInt()) {
             C5Message::error(tr("Group already added"));
             return;
         }
     }
+
     jgroup.append(QJsonObject{
         {"f_id", jdoc["group"].toInt()},
         {"retail", jdoc["retail"].toDouble()},
@@ -124,23 +135,25 @@ void C5GoodsPriceOrder::addGroupResponse(const QJsonObject &jdoc)
 
 void C5GoodsPriceOrder::editLwNameReponse(const QJsonObject &jdoc)
 {
-    for (int i = 0; i < ui->lwNames->count(); i++) {
-        if (ui->lwNames->item(i)->data(Qt::UserRole).toInt() == jdoc["id"].toInt()) {
+    for(int i = 0; i < ui->lwNames->count(); i++) {
+        if(ui->lwNames->item(i)->data(Qt::UserRole).toInt() == jdoc["id"].toInt()) {
             ui->lwNames->item(i)->setText(jdoc["name"].toString());
             break;
         }
     }
+
     fHttp->httpQueryFinished(sender());
 }
 
 void C5GoodsPriceOrder::removeLwName(const QJsonObject &jdoc)
 {
-    for (int i = 0; i < ui->lwNames->count(); i++) {
-        if (ui->lwNames->item(i)->data(Qt::UserRole).toInt() == jdoc["id"].toInt()) {
+    for(int i = 0; i < ui->lwNames->count(); i++) {
+        if(ui->lwNames->item(i)->data(Qt::UserRole).toInt() == jdoc["id"].toInt()) {
             delete ui->lwNames->item(i);
             break;
         }
     }
+
     fHttp->httpQueryFinished(sender());
 }
 
@@ -158,28 +171,34 @@ void C5GoodsPriceOrder::discountResponse(const QJsonObject &jdoc)
 
 void C5GoodsPriceOrder::refreshSaleStoreResponse(const QJsonObject &jdoc)
 {
-    for (int i = 0; i < ui->tblDoc->rowCount(); i++) {
+    for(int i = 0; i < ui->tblDoc->rowCount(); i++) {
         ui->tblDoc->setDouble(i, col1_saleqty, 0);
         ui->tblDoc->setDouble(i, col1_storeqty, 0);
     }
+
     QJsonArray jst = jdoc["store"].toArray();
     QJsonArray jsa = jdoc["sale"].toArray();
-    for (int i = 0; i < jsa.size(); i++) {
+
+    for(int i = 0; i < jsa.size(); i++) {
         QJsonArray ja = jsa.at(i).toArray();
-        for (int j = 0; j < ui->tblDoc->rowCount(); j++) {
-            if (ui->tblDoc->getInteger(j, 0) == ja[0].toInt()) {
+
+        for(int j = 0; j < ui->tblDoc->rowCount(); j++) {
+            if(ui->tblDoc->getInteger(j, 0) == ja[0].toInt()) {
                 ui->tblDoc->setDouble(j, col1_saleqty, ja[1].toDouble());
             }
         }
     }
-    for (int i = 0; i < jst.size(); i++) {
+
+    for(int i = 0; i < jst.size(); i++) {
         QJsonArray ja = jst.at(i).toArray();
-        for (int j = 0; j < ui->tblDoc->rowCount(); j++) {
-            if (ui->tblDoc->getInteger(j, 0) == ja[0].toInt()) {
+
+        for(int j = 0; j < ui->tblDoc->rowCount(); j++) {
+            if(ui->tblDoc->getInteger(j, 0) == ja[0].toInt()) {
                 ui->tblDoc->setDouble(j, col1_storeqty, ja[1].toDouble());
             }
         }
     }
+
     fHttp->httpQueryFinished(sender());
 }
 
@@ -204,9 +223,11 @@ void C5GoodsPriceOrder::on_btnAddNew_clicked()
 {
     bool ok;
     QString name = QInputDialog::getText(this, tr("Name"), tr("Name"), QLineEdit::Normal, "", &ok);
-    if (!ok || name.isEmpty()) {
+
+    if(!ok || name.isEmpty()) {
         return;
     }
+
     fHttp->createHttpQuery("/engine/goods/create-group-discount.php",
     QJsonObject{{"name", name}, {"action", "createGroupDiscount"}}, SLOT(createGropuDiscountResponse(QJsonObject)));
 }
@@ -214,19 +235,24 @@ void C5GoodsPriceOrder::on_btnAddNew_clicked()
 void C5GoodsPriceOrder::on_btnNewGroup_clicked()
 {
     int ci = ui->lwNames->currentRow();
-    if (ci < 0) {
+
+    if(ci < 0) {
         return;
     }
+
     auto *item = ui->lwNames->item(ci);
     int itemid = item->data(Qt::UserRole).toInt();
     QJsonArray vals;
-    if (!C5Selector::getValueOfColumn(fDBParams, cache_goods_group, vals, 2)) {
+
+    if(!C5Selector::getValueOfColumn(cache_goods_group, vals, 2)) {
         return;
     }
-    if (vals.at(1).toInt() == 0) {
+
+    if(vals.at(1).toInt() == 0) {
         C5Message::error(tr("Could not add goods without code"));
         return;
     }
+
     fHttp->createHttpQuery("/engine/goods/create-group-discount.php",
     QJsonObject{{"action", "getGroupItems"},
         {"item", itemid},
@@ -246,7 +272,8 @@ int C5GoodsPriceOrder::newRow()
     connect(l, &C5LineEdit::textChanged, [this, row](QString s) {
         setGroupPriceJson(row, 1, s.toDouble());
         ui->tblDoc->lineEdit(row, col1_whosale)->setDouble(s.toDouble() - (s.toDouble() * 0.3));
-        for (int i = 0; i < ui->tblGoods->rowCount(); i++) {
+
+        for(int i = 0; i < ui->tblGoods->rowCount(); i++) {
             ui->tblGoods->lineEdit(i, col2_whosale)->setText(s);
         }
     });
@@ -254,7 +281,8 @@ int C5GoodsPriceOrder::newRow()
     l->setValidator(new QDoubleValidator(0, 999999999, 0));
     connect(l, &C5LineEdit::textChanged, [this, row](QString s) {
         setGroupPriceJson(row, 2, s.toDouble());
-        for (int i = 0; i < ui->tblGoods->rowCount(); i++) {
+
+        for(int i = 0; i < ui->tblGoods->rowCount(); i++) {
             ui->tblGoods->lineEdit(i, col2_retail)->setText(s);
         }
     });
@@ -288,26 +316,33 @@ int C5GoodsPriceOrder::newGoodsRow()
 void C5GoodsPriceOrder::setCurrentGroup(int group)
 {
     int ci = ui->lwNames->currentRow();
-    if (ci < 0) {
+
+    if(ci < 0) {
         return;
     }
+
     auto *item = ui->lwNames->item(ci);
     QString jstr = item->data(Qt::UserRole + 1).toString();
     QJsonObject jo = __strjson(jstr);
     QJsonArray jgroup = jo["groups"].toArray();
     QJsonObject gr;
-    for (int i = 0; i < jgroup.size(); i++) {
+
+    for(int i = 0; i < jgroup.size(); i++) {
         const QJsonObject &j = jgroup.at(i).toObject();
-        if (j["f_id"].toInt() == group) {
+
+        if(j["f_id"].toInt() == group) {
             gr = j;
         }
     }
-    if (gr.isEmpty()) {
+
+    if(gr.isEmpty()) {
         return;
     }
+
     ui->tblGoods->setRowCount(0);
     QJsonArray ja = gr["items"].toArray();
-    for (int i = 0; i < ja.size(); i++) {
+
+    for(int i = 0; i < ja.size(); i++) {
         const QJsonObject &j = ja.at(i).toObject();
         int r = newGoodsRow();
         ui->tblGoods->setData(r, 0, j["f_id"].toInt());
@@ -323,16 +358,20 @@ void C5GoodsPriceOrder::setCurrentGroup(int group)
 void C5GoodsPriceOrder::getSaledQty()
 {
     QString goodsGroups;
-    for (int i = 0; i < ui->tblDoc->rowCount(); i++) {
-        if (!goodsGroups.isEmpty()) {
+
+    for(int i = 0; i < ui->tblDoc->rowCount(); i++) {
+        if(!goodsGroups.isEmpty()) {
             goodsGroups += ",";
         }
+
         goodsGroups += QString::number(ui->tblDoc->getInteger(i, 0));
     }
-    if (goodsGroups.isEmpty()) {
+
+    if(goodsGroups.isEmpty()) {
         C5Message::info(tr("Select group of goods"));
         return;
     }
+
     fHttp->createHttpQuery("/engine/goods/create-group-discount.php",
     QJsonObject{{"action", "refreshSaleStore"},
         {"groups", goodsGroups},
@@ -344,15 +383,19 @@ void C5GoodsPriceOrder::getSaledQty()
 void C5GoodsPriceOrder::setGroupPriceJson(int row, int col, double price)
 {
     QListWidgetItem *item = ui->lwNames->currentItem();
-    if (!item) {
+
+    if(!item) {
         return;
     }
+
     QString field = col == 1 ? "f_price1disc" : "f_price2disc";
     QJsonObject jo = __strjson(item->data(Qt::UserRole + 1).toString());
     QJsonArray ja = jo["groups"].toArray();
-    for (int i = 0; i < ja.size(); i++) {
+
+    for(int i = 0; i < ja.size(); i++) {
         QJsonObject j = ja.at(i).toObject();
-        if (ui->tblDoc->getInteger(row, 0) == j["f_id"].toInt()) {
+
+        if(ui->tblDoc->getInteger(row, 0) == j["f_id"].toInt()) {
             j["f_percent"] = ui->tblDoc->lineEdit(row, col1_percent)->getDouble();
             j["f_price1disc"] = ui->tblDoc->lineEdit(row, col1_retail)->getDouble();
             j["f_price2disc"] = ui->tblDoc->lineEdit(row, col1_whosale)->getDouble();;
@@ -360,6 +403,7 @@ void C5GoodsPriceOrder::setGroupPriceJson(int row, int col, double price)
             break;
         }
     }
+
     jo["groups"] = ja;
     item->setData(Qt::UserRole + 1, __jsonstr(jo));
 }
@@ -367,9 +411,11 @@ void C5GoodsPriceOrder::setGroupPriceJson(int row, int col, double price)
 void C5GoodsPriceOrder::on_btnSave_clicked()
 {
     QListWidgetItem *item = ui->lwNames->currentItem();
-    if (!item) {
+
+    if(!item) {
         return;
     }
+
     ui->tblDoc->setCurrentCell(-1, -1);
     fHttp->createHttpQuery("/engine/goods/create-group-discount.php",
     QJsonObject{{"action", "save"},
@@ -383,10 +429,12 @@ void C5GoodsPriceOrder::on_lwNames_currentItemChanged(QListWidgetItem *current, 
 {
     ui->tblDoc->setRowCount(0);
     ui->tblGoods->setRowCount(0);
-    if (current != nullptr) {
+
+    if(current != nullptr) {
         QJsonObject jo = __strjson(current->data(Qt::UserRole + 1).toString());
         QJsonArray jg = jo["groups"].toArray();
-        for (int i = 0; i < jg.size(); i++) {
+
+        for(int i = 0; i < jg.size(); i++) {
             const QJsonObject &j = jg.at(i).toObject();
             int r = newRow();
             ui->tblDoc->setData(r, 0, j["f_id"].toInt());
@@ -409,18 +457,23 @@ void C5GoodsPriceOrder::on_tblDoc_currentCellChanged(int currentRow, int current
         int previousColumn)
 {
     Q_UNUSED(currentColumn);
-    if (previousRow > -1) {
+
+    if(previousRow > -1) {
         int prevgroup = ui->tblDoc->item(previousRow, 0)->data(Qt::EditRole).toInt();
         auto *item = ui->lwNames->currentItem();
-        if (item) {
+
+        if(item) {
             QString jsonstr = item->data(Qt::UserRole + 1).toString();
             QJsonObject jo = __strjson(jsonstr);
             QJsonArray jgroup = jo["groups"].toArray();
-            for (int i = 0; i < jgroup.size(); i++) {
+
+            for(int i = 0; i < jgroup.size(); i++) {
                 QJsonObject jg = jgroup.at(i).toObject();
-                if (jg["f_id"].toInt() == prevgroup) {
+
+                if(jg["f_id"].toInt() == prevgroup) {
                     QJsonArray jitems;
-                    for (int j = 0; j < ui->tblGoods->rowCount(); j++) {
+
+                    for(int j = 0; j < ui->tblGoods->rowCount(); j++) {
                         QJsonObject ji;
                         ji["f_id"] = ui->tblGoods->getInteger(j, 0);
                         ji["f_name"] = ui->tblGoods->getString(j, 1);
@@ -431,6 +484,7 @@ void C5GoodsPriceOrder::on_tblDoc_currentCellChanged(int currentRow, int current
                         ji["f_price2disc"] = ui->tblGoods->lineEdit(j, col2_whosale)->getDouble();
                         jitems.append(ji);
                     }
+
                     jg["items"] = jitems;
                     jgroup[i] = jg;
                     jo["groups"] = jgroup;
@@ -440,18 +494,22 @@ void C5GoodsPriceOrder::on_tblDoc_currentCellChanged(int currentRow, int current
             }
         }
     }
+
     setCurrentGroup(ui->tblDoc->getInteger(currentRow, 0));
 }
 
 void C5GoodsPriceOrder::on_btnRollback_clicked()
 {
-    if (C5Message::question(tr("Confirm")) != QDialog::Accepted) {
+    if(C5Message::question(tr("Confirm")) != QDialog::Accepted) {
         return;
     }
+
     QListWidgetItem *item = ui->lwNames->currentItem();
-    if (!item) {
+
+    if(!item) {
         return;
     }
+
     ui->tblDoc->setCurrentCell(-1, -1);
     fHttp->createHttpQuery("/engine/goods/create-group-discount.php",
     QJsonObject{{"action", "rollback"},
@@ -472,34 +530,42 @@ void C5GoodsPriceOrder::on_tblDoc_customContextMenuRequested(const QPoint &pos)
 void C5GoodsPriceOrder::on_actionRemove_triggered()
 {
     int row = ui->tblDoc->currentRow();
-    if (row < 0) {
+
+    if(row < 0) {
         return;
     }
+
     int groupid = ui->tblDoc->getInteger(row, 0);
     ui->tblDoc->removeRow(row);
     auto *item = ui->lwNames->currentItem();
     QJsonObject jo = __strjson(item->data(Qt::UserRole + 1).toString());
     QJsonArray jgroup = jo["groups"].toArray();
-    for (int i = 0; i < jgroup.size(); i++) {
+
+    for(int i = 0; i < jgroup.size(); i++) {
         const QJsonObject &jg = jgroup.at(i).toObject();
-        if (jg["f_id"].toInt() == groupid) {
+
+        if(jg["f_id"].toInt() == groupid) {
             jgroup.removeAt(i);
             break;
         }
     }
+
     jo["groups"] = jgroup;
     item->setData(Qt::UserRole + 1, __jsonstr(jo));
 }
 
 void C5GoodsPriceOrder::on_btnApply_clicked()
 {
-    if (C5Message::question(tr("Confirm")) != QDialog::Accepted) {
+    if(C5Message::question(tr("Confirm")) != QDialog::Accepted) {
         return;
     }
+
     QListWidgetItem *item = ui->lwNames->currentItem();
-    if (!item) {
+
+    if(!item) {
         return;
     }
+
     ui->tblDoc->setCurrentCell(-1, -1);
     fHttp->createHttpQuery("/engine/goods/create-group-discount.php",
     QJsonObject{{"action", "discount"},
@@ -512,15 +578,19 @@ void C5GoodsPriceOrder::on_btnApply_clicked()
 void C5GoodsPriceOrder::on_actionChangeGoodsPrice_triggered()
 {
     QModelIndexList ml = ui->tblGoods->selectionModel()->selectedIndexes();
-    if (ml.count() == 0) {
+
+    if(ml.count() == 0) {
         return;
     }
+
     bool ok;
     double v = QInputDialog::getDouble(this, tr("Price"), tr("Retail"), 0, 0, 999999999, 0, &ok);
-    if (!ok) {
+
+    if(!ok) {
         return;
     }
-    for (const QModelIndex &m : ml) {
+
+    for(const QModelIndex &m : ml) {
         ui->tblGoods->lineEdit(m.row(), col2_whosale)->setDouble(v);
     }
 }
@@ -528,15 +598,19 @@ void C5GoodsPriceOrder::on_actionChangeGoodsPrice_triggered()
 void C5GoodsPriceOrder::on_actionSet_whosale_price_of_selected_goods_triggered()
 {
     QModelIndexList ml = ui->tblGoods->selectionModel()->selectedIndexes();
-    if (ml.count() == 0) {
+
+    if(ml.count() == 0) {
         return;
     }
+
     bool ok;
     double v = QInputDialog::getDouble(this, tr("Price"), tr("Whosale"), 0, 0, 999999999, 0, &ok);
-    if (!ok) {
+
+    if(!ok) {
         return;
     }
-    for (const QModelIndex &m : ml) {
+
+    for(const QModelIndex &m : ml) {
         ui->tblGoods->lineEdit(m.row(), col2_retail)->setDouble(v);
     }
 }
@@ -544,9 +618,11 @@ void C5GoodsPriceOrder::on_actionSet_whosale_price_of_selected_goods_triggered()
 void C5GoodsPriceOrder::on_btnChangeRange_clicked()
 {
     QDate d1 = fDate1, d2 = fDate2;
-    if (!C5DateRange::dateRange(d1, d2))  {
+
+    if(!C5DateRange::dateRange(d1, d2))  {
         return;
     }
+
     fDate1 = d1;
     fDate2 = d2;
     ui->lbDateRange->setText(QString("%1 - %2").arg(fDate1.toString(FORMAT_DATE_TO_STR),
@@ -563,13 +639,17 @@ void C5GoodsPriceOrder::on_actionEdit_name_triggered()
 {
     bool ok;
     QString newName = QInputDialog::getText(this, tr("New name"), "", QLineEdit::Normal, "", &ok).trimmed();
-    if (!ok || newName.isEmpty()) {
+
+    if(!ok || newName.isEmpty()) {
         return;
     }
+
     QListWidgetItem *item = ui->lwNames->currentItem();
-    if (!item) {
+
+    if(!item) {
         return;
     }
+
     fHttp->createHttpQuery("/engine/goods/create-group-discount.php",
     QJsonObject{{"name", newName}, {"id", item->data(Qt::UserRole).toInt()}, {"action", "editLwName"}}, SLOT(
         editLwNameReponse(QJsonObject)));
@@ -577,13 +657,16 @@ void C5GoodsPriceOrder::on_actionEdit_name_triggered()
 
 void C5GoodsPriceOrder::on_actionRemovelwName_triggered()
 {
-    if (C5Message::question(tr("Confirm to remove")) != QDialog::Accepted) {
+    if(C5Message::question(tr("Confirm to remove")) != QDialog::Accepted) {
         return;
     }
+
     QListWidgetItem *item = ui->lwNames->currentItem();
-    if (!item) {
+
+    if(!item) {
         return;
     }
+
     fHttp->createHttpQuery("/engine/goods/create-group-discount.php",
     QJsonObject{{"id", item->data(Qt::UserRole).toInt()}, {"action", "removeLwName"}}, SLOT(
         removeLwName(QJsonObject)));
@@ -591,17 +674,22 @@ void C5GoodsPriceOrder::on_actionRemovelwName_triggered()
 
 void C5GoodsPriceOrder::on_btnPrint_clicked()
 {
-    if (ui->lwNames->currentItem() == nullptr) {
+    if(ui->lwNames->currentItem() == nullptr) {
         return;
     }
+
     QModelIndexList ml = ui->tblDoc->selectionModel()->selectedIndexes();
-    if (ml.isEmpty()) {
+
+    if(ml.isEmpty()) {
         return;
     }
+
     QSet<int> rows;
-    for (const QModelIndex &i : ml) {
+
+    for(const QModelIndex &i : ml) {
         rows.insert(i.row());
     }
+
     C5Printing p;
     QFont f(qApp->font());
     p.setFont(f);
@@ -610,7 +698,8 @@ void C5GoodsPriceOrder::on_btnPrint_clicked()
     p.ctext(tr("Discount document"));
     p.br();
     p.setFontSize(25);
-    for (int row : rows) {
+
+    for(int row : rows) {
         p.setFontSize(25);
         p.setFontBold(true);
         p.ltext(QString("%1 / %2 / %3 - %4 (%5%) ")
@@ -628,13 +717,15 @@ void C5GoodsPriceOrder::on_btnPrint_clicked()
         p.setFontBold(false);
         points << 10 << 400 << 200 << 200 << 200;
         vals << tr("Name") << tr("Barcode") << tr("Retail") << tr("Whosale");
-        for (int i = 0; i < ui->tblGoods->rowCount(); i++) {
-            if ( ui->tblGoods->lineEdit(i, col2_whosale)->text().toDouble()
+
+        for(int i = 0; i < ui->tblGoods->rowCount(); i++) {
+            if(ui->tblGoods->lineEdit(i, col2_whosale)->text().toDouble()
                     - ui->tblDoc->lineEdit(row, col1_whosale)->text().toDouble() == 0
                     && ui->tblGoods->lineEdit(i, col2_retail)->text().toDouble()
                     - ui->tblDoc->lineEdit(row, col1_retail)->text().toDouble() == 0) {
                 continue;
             }
+
             vals.clear();
             vals << ui->tblGoods->getString(i, 1)
                  << ui->tblGoods->getString(i, 2)
@@ -644,6 +735,7 @@ void C5GoodsPriceOrder::on_btnPrint_clicked()
             p.br(p.fLineHeight + 20);
         }
     }
+
     QList<qreal> points;
     QStringList vals;
     p.setSceneParams(2000, 2700, QPageLayout::Portrait);
@@ -878,6 +970,6 @@ void C5GoodsPriceOrder::on_btnPrint_clicked()
     p.line(1000, p.fTop, 1650, p.fTop);
     p.setFontBold(false);
     */
-    C5PrintPreview pp( &p, fDBParams);
+    C5PrintPreview pp(&p);
     pp.exec();
 }

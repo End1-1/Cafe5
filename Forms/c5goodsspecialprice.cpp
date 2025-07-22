@@ -6,7 +6,7 @@
 #include "c5config.h"
 
 C5GoodsSpecialPrice::C5GoodsSpecialPrice(QWidget *parent)
-    : C5Dialog(__c5config.dbParams())
+    : C5Dialog()
     , ui(new Ui::C5GoodsSpecialPrice)
 {
     ui->setupUi(this);
@@ -36,7 +36,7 @@ void C5GoodsSpecialPrice::on_btnCancel_clicked()
 void C5GoodsSpecialPrice::on_btnSelectPartner_clicked()
 {
     QJsonArray values;
-    if (!C5Selector::getValue(fDBParams, cache_goods_partners, values)) {
+    if (!C5Selector::getValue(cache_goods_partners, values)) {
         return;
     }
     if (values.count() == 0) {
@@ -51,7 +51,7 @@ void C5GoodsSpecialPrice::on_btnSelectPartner_clicked()
 void C5GoodsSpecialPrice::on_btnSelectGoods_clicked()
 {
     QJsonArray vals;
-    if (!C5Selector::getValueOfColumn(fDBParams, cache_goods, vals, 3)) {
+    if (!C5Selector::getValueOfColumn(cache_goods, vals, 3)) {
         return;
     }
     if (vals.at(1).toInt() == 0) {

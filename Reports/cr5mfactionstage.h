@@ -7,7 +7,7 @@ class CR5MFActionStage : public C5ReportWidget
 {
     Q_OBJECT
 public:
-    CR5MFActionStage(const QStringList &dbParams, QWidget *parent = nullptr);
+    CR5MFActionStage(QWidget *parent = nullptr);
 
     virtual QToolBar *toolBar();
 };

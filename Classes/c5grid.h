@@ -28,19 +28,19 @@ class C5Grid : public C5Widget
     Q_OBJECT
 
 public:
-    explicit C5Grid(const QStringList &dbParams, QWidget *parent = nullptr);
+    explicit C5Grid(QWidget *parent = nullptr);
 
     ~C5Grid();
 
-    C5TableView *fTableView;
+    C5TableView* fTableView;
 
-    C5TableWidget *fTableTotal;
+    C5TableWidget* fTableTotal;
 
-    C5TableModel *fModel;
+    C5TableModel* fModel;
 
     QHash<QString, QString> fTranslation;
 
-    void setTableForUpdate(const QString &table, const QList<int> &columns);
+    void setTableForUpdate(const QString &table, const QList<int>& columns);
 
     virtual void postProcess();
 
@@ -52,16 +52,14 @@ public:
 
     virtual void hotKey(const QString &key);
 
-    virtual void changeDatabase(const QStringList &dbParams);
-
     virtual void setCheckboxes(bool v);
 
     virtual void setSimpleQuery(const QString &sql);
 
     template<class T>
-    T *filter()
+    T* filter()
     {
-        return static_cast<T *>(fFilterWidget);
+        return static_cast<T*>(fFilterWidget);
     }
 
 public slots:
@@ -70,7 +68,7 @@ public slots:
 protected:
     bool fSimpleQuery;
 
-    NLoadingDlg *fLoadingDlg;
+    NLoadingDlg* fLoadingDlg;
 
     QString fSqlQuery;
 
@@ -98,17 +96,17 @@ protected:
 
     QString fOrderCondition;
 
-    C5FilterWidget *fFilterWidget;
+    C5FilterWidget* fFilterWidget;
 
-    QWidget *widget();
+    QWidget* widget();
 
-    QHBoxLayout *hl();
+    QHBoxLayout* hl();
 
     int rowId();
 
     int rowId(int column);
 
-    int rowId(int &row, int column);
+    int rowId(int& row, int column);
 
     virtual void cellClicked(const QModelIndex &index);
 
@@ -122,11 +120,9 @@ protected:
 
     virtual void restoreColumnsWidths();
 
-    QStringList dbParams();
-
     virtual QString reportAdditionalTitle();
 
-    virtual QMenu *buildTableViewContextMenu(const QPoint &point);
+    virtual QMenu* buildTableViewContextMenu(const QPoint &point);
 
     virtual bool tblDoubleClicked(int row, int column, const QJsonArray &values);
 
@@ -136,7 +132,7 @@ protected slots:
     virtual void completeRefresh();
 
 private:
-    Ui::C5Grid *ui;
+    Ui::C5Grid* ui;
 
     QModelIndex fFilterIndex;
 
@@ -146,7 +142,7 @@ private:
 
     int fFilterColumn;
 
-    void insertJoinTable(QStringList &joins, QMap<QString, QString> &joinsMap, const QString &table,
+    void insertJoinTable(QStringList &joins, QMap<QString, QString>& joinsMap, const QString &table,
                          const QString &mainTable);
 
     int sumOfColumnsWidghtBefore(int column);
@@ -162,7 +158,7 @@ protected slots:
 
     virtual void saveDataChanges();
 
-    bool currentRow(int &row);
+    bool currentRow(int& row);
 
     virtual void editRow(int columnWidthId = 0);
 
@@ -204,7 +200,7 @@ private slots:
     void sqlError(const QString &errorMessage);
 
 signals:
-    void tblSingleClick(const QModelIndex &);
+    void tblSingleClick(const QModelIndex&);
 
     void tblDoubleClick(int row, int column, const QJsonArray &values);
 

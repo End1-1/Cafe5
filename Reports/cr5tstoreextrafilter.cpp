@@ -2,12 +2,12 @@
 #include "ui_cr5tstoreextrafilter.h"
 #include "c5cache.h"
 
-CR5TStoreExtraFilter::CR5TStoreExtraFilter(const QStringList &dbParams, QWidget *parent) :
-    C5FilterWidget(dbParams, parent),
+CR5TStoreExtraFilter::CR5TStoreExtraFilter(QWidget *parent) :
+    C5FilterWidget(parent),
     ui(new Ui::CR5TStoreExtraFilter)
 {
     ui->setupUi(this);
-    ui->leStore->setSelector(fDBParams, ui->leStoreName, cache_goods_store);
+    ui->leStore->setSelector(ui->leStoreName, cache_goods_store);
 }
 
 CR5TStoreExtraFilter::~CR5TStoreExtraFilter()

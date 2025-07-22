@@ -3,7 +3,8 @@
 
 #include "c5dialog.h"
 
-namespace Ui {
+namespace Ui
+{
 class DlgCashButtonOpions;
 }
 
@@ -12,8 +13,10 @@ class DlgCashButtonOpions : public C5Dialog
     Q_OBJECT
 
 public:
-    explicit DlgCashButtonOpions(const QStringList &dbParams);
+    explicit DlgCashButtonOpions();
+
     ~DlgCashButtonOpions();
+
     static int getOptions();
 
 private slots:
@@ -26,7 +29,7 @@ private slots:
     void on_btnViewReport_clicked();
 
 private:
-    Ui::DlgCashButtonOpions *ui;
+    Ui::DlgCashButtonOpions* ui;
 };
 
 #endif // DLGCASHBUTTONOPIONS_H

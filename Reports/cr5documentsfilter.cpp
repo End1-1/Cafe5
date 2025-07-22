@@ -2,19 +2,19 @@
 #include "ui_cr5documentsfilter.h"
 #include "c5cache.h"
 
-CR5DocumentsFilter::CR5DocumentsFilter(const QStringList &dbParams, QWidget *parent) :
-    C5FilterWidget(dbParams, parent),
+CR5DocumentsFilter::CR5DocumentsFilter(QWidget *parent) :
+    C5FilterWidget(parent),
     ui(new Ui::CR5DocumentsFilter)
 {
     ui->setupUi(this);
-    ui->leDocState->setSelector(dbParams, ui->leDocStateName, cache_doc_state);
-    ui->leDocType->setSelector(dbParams, ui->leDocTypeName, cache_doc_type);
-    ui->lePartner->setSelector(dbParams, ui->lePartnerName, cache_goods_partners, 1, 4);
-    ui->leOperator->setSelector(dbParams, ui->leOperatorName, cache_users);
-    ui->leReason->setSelector(dbParams, ui->leReasonName, cache_store_reason);
-    ui->lePayment->setSelector(dbParams, ui->lePaymentName, cache_header_payment);
-    ui->lePaid->setSelector(dbParams, ui->lePaidName, cache_header_paid);
-    ui->leCurrency->setSelector(dbParams, ui->leCurrencyName, cache_currency);
+    ui->leDocState->setSelector(ui->leDocStateName, cache_doc_state);
+    ui->leDocType->setSelector(ui->leDocTypeName, cache_doc_type);
+    ui->lePartner->setSelector(ui->lePartnerName, cache_goods_partners, 1, 4);
+    ui->leOperator->setSelector(ui->leOperatorName, cache_users);
+    ui->leReason->setSelector(ui->leReasonName, cache_store_reason);
+    ui->lePayment->setSelector(ui->lePaymentName, cache_header_payment);
+    ui->lePaid->setSelector(ui->lePaidName, cache_header_paid);
+    ui->leCurrency->setSelector(ui->leCurrencyName, cache_currency);
 }
 
 CR5DocumentsFilter::~CR5DocumentsFilter()

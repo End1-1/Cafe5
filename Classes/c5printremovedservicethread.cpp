@@ -15,7 +15,7 @@ C5PrintRemovedServiceThread::C5PrintRemovedServiceThread(const QString &id, QObj
 
 void C5PrintRemovedServiceThread::run()
 {
-    C5Database db(__c5config.dbParams());
+    C5Database db;
     db.exec("select f_alias, f_printer from d_print_aliases");
     while (db.nextRow()) {
         fPrinterAliases[db.getString("f_alias")] = db.getString("f_printer");

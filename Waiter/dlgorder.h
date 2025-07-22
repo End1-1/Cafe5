@@ -24,11 +24,9 @@ public:
 
     ~DlgOrder();
 
-    C5User *fUser;
+    C5User* fUser;
 
-    static DlgOrder *openTable(int table, C5User *user);
-
-    void itemsToTable();
+    static DlgOrder* openTable(int table, C5User *user);
 
     void setStoplistmode();
 
@@ -42,9 +40,11 @@ protected:
     virtual void reject();
 
 private:
-    Ui::DlgOrder *ui;
+    Ui::DlgOrder* ui;
 
-    QDateTime fOpenDateTime;
+    QMap<QString, QVariant> fHeader;
+
+    QList<QMap<QString, QVariant> > fBody;
 
     int fCarNumber;
 
@@ -62,11 +62,9 @@ private:
 
     bool fStoplistMode;
 
-    WOrder *worder();
+    QList<WOrder*> worders();
 
-    QList<WOrder *> worders();
-
-    void load(int table);
+    void updateData();
 
     void disableForCheckall(bool v);
 
@@ -108,6 +106,8 @@ private:
     void discountOrder(C5User *u, const QString &code);
 
 private slots:
+    void handleOrderDishClick(const QString &id);
+
     void openReserveError(const QString &err);
 
     void openReservationResponse(const QJsonObject &jdoc);
@@ -116,15 +116,11 @@ private slots:
 
     void moveTableResponse(const QJsonObject &jdoc);
 
-    void checkQrResponse(const QJsonObject &jdoc);
-
     void timeout();
 
     void worderActivated();
 
     void dishpart1Clicked();
-
-    void processMenuID(int menuid, const QString &emark);
 
     void qrListResponse(const QJsonObject &obj);
 
@@ -292,6 +288,8 @@ private slots:
 
 signals:
     void allDone();
+
+    void orderDishClicked(QString);
 };
 
 #endif // DLGORDER_H

@@ -18,7 +18,7 @@ class C5GoodsSpecialPrices : public C5Widget
     Q_OBJECT
 
 public:
-    explicit C5GoodsSpecialPrices(const QStringList &dbParams, QWidget *parent = nullptr);
+    explicit C5GoodsSpecialPrices(QWidget *parent = nullptr);
 
     ~C5GoodsSpecialPrices();
 

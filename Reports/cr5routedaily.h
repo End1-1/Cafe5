@@ -8,7 +8,7 @@ class CR5RouteDaily : public C5ReportWidget
 {
     Q_OBJECT
 public:
-    CR5RouteDaily(const QStringList &dbParams, QWidget *parent = nullptr);
+    CR5RouteDaily(QWidget *parent = nullptr);
     virtual QToolBar *toolBar() override;
 
 protected:

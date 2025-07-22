@@ -4,13 +4,13 @@
 #include "c5message.h"
 #include "c5database.h"
 
-DlgDirtyStoreDoc::DlgDirtyStoreDoc(const QString &uuid, const QStringList &dbParams) :
-    C5Dialog(dbParams),
+DlgDirtyStoreDoc::DlgDirtyStoreDoc(const QString &uuid) :
+    C5Dialog(),
     ui(new Ui::DlgDirtyStoreDoc),
     fUuid(uuid)
 {
     ui->setupUi(this);
-    C5Database db(dbParams);
+    C5Database db;
     db[":f_document"] = uuid;
     db.exec("select s.f_id, s.f_goods, g.f_scancode, g.f_name, s.f_qty, 0, s.f_price, s.f_total "
             "from a_store s "
@@ -120,7 +120,7 @@ void DlgDirtyStoreDoc::on_btnRemove_clicked()
     if (C5Message::question(tr("Confirm remove")) != QDialog::Accepted) {
         return;
     }
-    C5Database db(fDBParams);
+    C5Database db;
     db[":f_id"] = ui->tbl->getString(r, 0);
     db.exec("delete from a_store where f_id=:f_id");
     db[":f_id"] = ui->tbl->getString(r, 0);
@@ -140,7 +140,7 @@ void DlgDirtyStoreDoc::countTotal()
 
 void DlgDirtyStoreDoc::correctDocumentAmount()
 {
-    C5Database db(fDBParams);
+    C5Database db;
     db[":f_document"] = fUuid;
     db.exec("select sum(f_total) from a_store where f_document=:f_document");
     db.nextRow();
@@ -168,7 +168,7 @@ void DlgDirtyStoreDoc::on_btnSave_clicked()
         C5Message::error(tr("New quantity less than used"));
         return;
     }
-    C5Database db(fDBParams);
+    C5Database db;
     db[":f_qty"] = ui->tbl->lineEdit(r, 4)->getDouble();
     db[":f_price"] = ui->tbl->lineEdit(r, 6)->getDouble();
     db[":f_total"] = ui->tbl->lineEdit(r, 7)->getDouble();

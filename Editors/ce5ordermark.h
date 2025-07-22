@@ -12,7 +12,7 @@ class CE5OrderMark : public CE5Editor
     Q_OBJECT
 
 public:
-    explicit CE5OrderMark(const QStringList &dbParams, QWidget *parent = nullptr);
+    explicit CE5OrderMark(QWidget *parent = nullptr);
 
     ~CE5OrderMark();
 

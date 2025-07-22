@@ -12,7 +12,7 @@ class CE5MFTask : public CE5Editor
     Q_OBJECT
 
 public:
-    explicit CE5MFTask(const QStringList &dbParams);
+    explicit CE5MFTask();
     ~CE5MFTask();
 
     virtual QString title() override;

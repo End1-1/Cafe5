@@ -6,8 +6,8 @@
 #include "c5salefromstoreorder.h"
 #include "cr5carvisitsfilter.h"
 
-CR5CarVisits::CR5CarVisits(const QStringList &dbParams, QWidget *parent) :
-    C5ReportWidget(dbParams, parent)
+CR5CarVisits::CR5CarVisits(QWidget *parent) :
+    C5ReportWidget(parent)
 {
     fIcon = ":/graph.png";
     fLabel = tr("Car visits");
@@ -66,12 +66,12 @@ CR5CarVisits::CR5CarVisits(const QStringList &dbParams, QWidget *parent) :
     fColumnsVisible["sum(oh.f_amountother) as f_other"] = true;
     fColumnsVisible["sum(oh.f_amountdiscount) as f_discount"] = true;
     restoreColumnsVisibility();
-    fFilterWidget = new CR5CarVisitsFilter(dbParams);
+    fFilterWidget = new CR5CarVisitsFilter();
 }
 
-QToolBar *CR5CarVisits::toolBar()
+QToolBar* CR5CarVisits::toolBar()
 {
-    if (!fToolBar) {
+    if(!fToolBar) {
         QList<ToolBarButtons> btn;
         btn << ToolBarButtons::tbEdit
             << ToolBarButtons::tbFilter
@@ -81,13 +81,15 @@ QToolBar *CR5CarVisits::toolBar()
             << ToolBarButtons::tbPrint;
         fToolBar = createStandartToolbar(btn);
     }
+
     return fToolBar;
 }
 
 void CR5CarVisits::restoreColumnsWidths()
 {
     C5Grid::restoreColumnsWidths();
-    if (fColumnsVisible["oh.f_id"]) {
+
+    if(fColumnsVisible["oh.f_id"]) {
         fTableView->setColumnWidth(fModel->fColumnNameIndex["f_id"], 0);
     }
 }
@@ -96,37 +98,44 @@ bool CR5CarVisits::tblDoubleClicked(int row, int column, const QJsonArray &value
 {
     Q_UNUSED(row);
     Q_UNUSED(column);
-    if (!fColumnsVisible["oh.f_id"]) {
+
+    if(!fColumnsVisible["oh.f_id"]) {
         C5Message::info(tr("Column 'Header' must be checked in filter"));
         return true;
     }
-    if (values.count() == 0) {
+
+    if(values.count() == 0) {
         C5Message::info(tr("Nothing selected"));
         return true;
     }
-    C5Database db(fDBParams);
+
+    C5Database db;
     db[":f_id"] = values.at(fModel->fColumnNameIndex["f_id"]).toString();
     db.exec("select f_source from o_header where f_id=:f_id");
-    if (db.nextRow()) {
-        switch (abs(db.getInt(0))) {
-            case 1: {
-                C5WaiterOrder *wo = __mainWindow->createTab<C5WaiterOrder>(fDBParams);
-                wo->setOrder(values.at(fModel->fColumnNameIndex["f_id"]).toString());
-                break;
-            }
-            case 2: {
-                C5SaleFromStoreOrder::openOrder(fDBParams, values.at(fModel->fColumnNameIndex["f_id"]).toString());
-                break;
-            }
-            default: {
-                C5WaiterOrder *wo = __mainWindow->createTab<C5WaiterOrder>(fDBParams);
-                wo->setOrder(values.at(fModel->fColumnNameIndex["f_id"]).toString());
-                break;
-            }
+
+    if(db.nextRow()) {
+        switch(abs(db.getInt(0))) {
+        case 1: {
+            C5WaiterOrder *wo = __mainWindow->createTab<C5WaiterOrder>();
+            wo->setOrder(values.at(fModel->fColumnNameIndex["f_id"]).toString());
+            break;
+        }
+
+        case 2: {
+            C5SaleFromStoreOrder::openOrder(values.at(fModel->fColumnNameIndex["f_id"]).toString());
+            break;
+        }
+
+        default: {
+            C5WaiterOrder *wo = __mainWindow->createTab<C5WaiterOrder>();
+            wo->setOrder(values.at(fModel->fColumnNameIndex["f_id"]).toString());
+            break;
+        }
         }
     } else {
-        C5WaiterOrder *wo = __mainWindow->createTab<C5WaiterOrder>(fDBParams);
+        C5WaiterOrder *wo = __mainWindow->createTab<C5WaiterOrder>();
         wo->setOrder(values.at(fModel->fColumnNameIndex["f_id"]).toString());
     }
+
     return true;
 }

@@ -1,8 +1,8 @@
 #include "c5goodspricing.h"
 #include "ui_c5goodspricing.h"
 
-C5GoodsPricing::C5GoodsPricing(const QStringList &dbParams) :
-    C5Dialog(dbParams),
+C5GoodsPricing::C5GoodsPricing() :
+    C5Dialog(),
     ui(new Ui::C5GoodsPricing)
 {
     ui->setupUi(this);

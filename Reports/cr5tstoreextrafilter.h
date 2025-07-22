@@ -12,7 +12,7 @@ class CR5TStoreExtraFilter : public C5FilterWidget
     Q_OBJECT
 
 public:
-    explicit CR5TStoreExtraFilter(const QStringList &dbParams, QWidget *parent = nullptr);
+    explicit CR5TStoreExtraFilter(QWidget *parent = nullptr);
 
     ~CR5TStoreExtraFilter();
 

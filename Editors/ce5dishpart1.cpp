@@ -6,8 +6,8 @@
 #include <QFileDialog>
 #include <QBuffer>
 
-CE5DishPart1::CE5DishPart1(const QStringList &dbParams, QWidget *parent) :
-    CE5Editor(dbParams, parent),
+CE5DishPart1::CE5DishPart1(QWidget *parent) :
+    CE5Editor(parent),
     ui(new Ui::CE5DishPart1)
 {
     ui->setupUi(this);
@@ -31,7 +31,7 @@ QString CE5DishPart1::table()
 void CE5DishPart1::setId(int id)
 {
     CE5Editor::setId(id);
-    C5Database db(fDBParams);
+    C5Database db;
     if (ui->leImageUUID->text().isEmpty()) {
         ui->leImageUUID->setText(C5Database::uuid());
     }
@@ -87,7 +87,7 @@ void CE5DishPart1::uploadImage()
         buff.open(QIODevice::WriteOnly);
         pm.save( &buff, "JPG");
     } while (ba.size() > 100000 );
-    C5Database db(fDBParams);
+    C5Database db;
     db[":f_id"] = ui->leImageUUID->text();
     db.exec("delete from s_images where f_id=:f_id");
     db[":f_id"] = ui->leImageUUID->text();
@@ -100,7 +100,7 @@ void CE5DishPart1::removeImage()
     if (C5Message::question(tr("Remove image")) !=  QDialog::Accepted) {
         return;
     }
-    C5Database db(fDBParams);
+    C5Database db;
     db[":f_id"] = ui->leImageUUID->text();
     db.exec("delete from s_images where f_id=:f_id");
     ui->lbImg->setText(tr("Image"));

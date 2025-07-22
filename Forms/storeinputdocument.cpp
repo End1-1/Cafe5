@@ -29,13 +29,13 @@
 #define col_saleprice 13
 #define col_valid 14
 
-StoreInputDocument::StoreInputDocument(const QStringList &dbParams, QWidget *parent) :
-    C5Widget(dbParams, parent),
+StoreInputDocument::StoreInputDocument(QWidget *parent) :
+    C5Widget(parent),
     ui(new Ui::StoreInputDocument)
 {
     ui->setupUi(this);
     ui->tbl->setColumnWidths(ui->tbl->columnCount(), 30, 0, 0, 120, 120, 250, 80, 80, 0, 0, 80, 80, 80, 80, 80);
-    C5Cache::cache(fDBParams, cache_goods)->refresh();
+    C5Cache::cache(cache_goods)->refresh();
 }
 
 StoreInputDocument::~StoreInputDocument()
@@ -170,7 +170,7 @@ void StoreInputDocument::disconnectSlotSignal(int row)
 void StoreInputDocument::on_btnAddRow_clicked()
 {
     QJsonArray vals;
-    if (!C5Selector::getValueOfColumn(fDBParams, cache_goods, vals, 3)) {
+    if (!C5Selector::getValueOfColumn(cache_goods, vals, 3)) {
         return;
     }
     if (vals.at(1).toInt() == 0) {
@@ -184,7 +184,7 @@ void StoreInputDocument::on_btnAddRow_clicked()
 void StoreInputDocument::on_toolButton_clicked()
 {
     QJsonArray vals;
-    if (!C5Selector::getValueOfColumn(fDBParams, cache_goods_store, vals, 2)) {
+    if (!C5Selector::getValueOfColumn(cache_goods_store, vals, 2)) {
         return;
     }
     if (vals.at(1).toInt() == 0) {
@@ -193,7 +193,7 @@ void StoreInputDocument::on_toolButton_clicked()
     }
     ui->leStore->setProperty("f_id", vals.at(1));
     ui->leStore->setText(vals.at(2).toString());
-    C5Database db(fDBParams);
+    C5Database db;
     C5StoreDraftWriter dw(db);
     ui->leDocnum->setPlaceholderText(dw.storeDocNum(DOC_TYPE_STORE_INPUT, vals.at(1).toInt(), false, 0));
 }
@@ -223,7 +223,7 @@ void StoreInputDocument::saveDoc()
     if (ui->leDocnum->text().isEmpty()) {
         ui->leDocnum->setText(ui->leDocnum->placeholderText());
     }
-    C5Database db(fDBParams);
+    C5Database db;
     C5StoreDraftWriter dw(db);
     if (ui->leDocnum->text().isEmpty()) {
         ui->leDocnum->setText(dw.storeDocNum(DOC_TYPE_STORE_INPUT, ui->leStore->property("f_id").toInt(), true, 0));
@@ -285,12 +285,12 @@ void StoreInputDocument::saveDoc()
         db.update("c_goods", "f_id", ui->tbl->getInteger(i, col_goodsid));
     }
     fSave->setEnabled(false);
-    C5Cache::cache(fDBParams, cache_goods)->refresh();
+    C5Cache::cache(cache_goods)->refresh();
 }
 
 bool StoreInputDocument::openDoc(const QString &id)
 {
-    C5Database db(fDBParams);
+    C5Database db;
     db[":f_id"] = id;
     db.exec("select * from a_header where f_id=:f_id");
     if (db.nextRow() == false) {
@@ -346,7 +346,7 @@ bool StoreInputDocument::openDoc(const QString &id)
 
 void StoreInputDocument::setLastInputPrices()
 {
-    C5Database db(fDBParams);
+    C5Database db;
     db[":f_id"] = ui->leDocnum->property("f_id");
     db.exec("select b.f_goods, g.f_lastinputprice "
             "from a_store_draft b "
@@ -369,7 +369,7 @@ bool StoreInputDocument::draftDoc()
     if (C5Message::question(tr("Make draft?")) != QDialog::Accepted) {
         return false;
     }
-    C5Database db(fDBParams);
+    C5Database db;
     db[":f_basedoc"] = ui->leDocnum->property("f_id");
     db.exec("select distinct(s.f_document) as f_document, d.f_date, d.f_userid from a_store s "
             "inner join a_header d on d.f_id=s.f_document "
@@ -399,7 +399,7 @@ void StoreInputDocument::removeDocument()
     if (C5Message::question(tr("Confirm to remove selected documents")) != QDialog::Accepted) {
         return;
     }
-    if (C5StoreDoc::removeDoc(fDBParams, ui->leDocnum->property("f_id").toString(), false)) {
+    if (C5StoreDoc::removeDoc(ui->leDocnum->property("f_id").toString(), false)) {
         __mainWindow->removeTab(this);
     }
 }
@@ -407,7 +407,7 @@ void StoreInputDocument::removeDocument()
 void StoreInputDocument::on_btnSetPartner_clicked()
 {
     QJsonArray vals;
-    if (!C5Selector::getValueOfColumn(fDBParams, cache_goods_partners, vals, -1)) {
+    if (!C5Selector::getValueOfColumn(cache_goods_partners, vals, -1)) {
         return;
     }
     if (vals.at(1).toInt() == 0) {
@@ -420,7 +420,7 @@ void StoreInputDocument::on_btnSetPartner_clicked()
 
 void StoreInputDocument::on_leScancode_returnPressed()
 {
-    C5Database db(fDBParams);
+    C5Database db;
     QString code =  C5ReplaceCharacter::replace(ui->leScancode->text());
     db[":f_scancode"] = code.toLower();
     db.exec("select gg.f_scancode, gg.f_id, gg.f_name as f_name, gu.f_name as f_unitname, gg.f_saleprice, "
@@ -445,7 +445,7 @@ void StoreInputDocument::on_leScancode_returnPressed()
         ui->tbl->lineEdit(row, col_qty)->setFocus();
         connectSlotSignal(row);
         if (ui->leStore->property("f_id").toInt() > 0) {
-            C5Database db(fDBParams);
+            C5Database db;
             db[":f_store"] = ui->leStore->property("f_id");
             db[":f_goods"] = id;
             db.exec("select sum(f_qty*f_type) as f_qty from a_store where f_store=:f_store and f_goods=:f_goods");
@@ -471,8 +471,8 @@ void StoreInputDocument::on_btnEditGoods_clicked()
     if (row < 0) {
         return;
     }
-    CE5Goods *ep = new CE5Goods(fDBParams);
-    C5Editor *e = C5Editor::createEditor(fDBParams, ep, 0);
+    CE5Goods *ep = new CE5Goods();
+    C5Editor *e = C5Editor::createEditor(ep, 0);
     ep->setId(ui->tbl->getInteger(row, col_goodsid));
     QList<QMap<QString, QVariant> > data;
     if(e->getResult(data)) {

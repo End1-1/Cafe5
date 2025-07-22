@@ -13,7 +13,7 @@ class C5OrderDriver : public QObject
     Q_OBJECT
 
 public:
-    C5OrderDriver(const QStringList &dbParams);
+    C5OrderDriver();
 
     bool closeOrder();
 

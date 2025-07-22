@@ -1,15 +1,15 @@
 #include "cr5dishpart1.h"
 #include "ce5dishpart1.h"
 
-CR5DishPart1::CR5DishPart1(const QStringList &dbParams, QWidget *parent) :
-    C5ReportWidget(dbParams, parent)
+CR5DishPart1::CR5DishPart1(QWidget *parent) :
+    C5ReportWidget( parent)
 {
     fIcon = ":/menu.png";
     fLabel = tr("Dish depts");
     fSqlQuery = "select f_id, f_name from d_part1";
     fTranslation["f_id"] = tr("Code");
     fTranslation["f_name"] = tr("Name");
-    fEditor = new CE5DishPart1(dbParams);
+    fEditor = new CE5DishPart1();
 }
 
 QToolBar *CR5DishPart1::toolBar()

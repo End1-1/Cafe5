@@ -4,8 +4,8 @@
 #include "c5mainwindow.h"
 #include "cr5saleremoveddishesfilter.h"
 
-CR5SaleRemovedDishes::CR5SaleRemovedDishes(const QStringList &dbParams, QWidget *parent) :
-    C5ReportWidget(dbParams, parent)
+CR5SaleRemovedDishes::CR5SaleRemovedDishes(QWidget *parent) :
+    C5ReportWidget( parent)
 {
     fIcon = ":/delete.png";
     fLabel = tr("Sales, removed dishes");
@@ -66,7 +66,7 @@ CR5SaleRemovedDishes::CR5SaleRemovedDishes(const QStringList &dbParams, QWidget 
     fColumnsVisible["sum(ob.f_qty2) as f_qty"] = true;
     fColumnsVisible["sum(ob.f_total) as f_total"] = true;
     restoreColumnsVisibility();
-    fFilterWidget = new CR5SaleRemovedDishesFilter(fDBParams);
+    fFilterWidget = new CR5SaleRemovedDishesFilter();
     fFilter = static_cast<CR5SaleRemovedDishesFilter *>(fFilterWidget);
 }
 
@@ -103,7 +103,7 @@ bool CR5SaleRemovedDishes::tblDoubleClicked(int row, int column, const QVector<Q
     if (v.count() == 0) {
         return true;
     }
-    C5WaiterOrder *wo = __mainWindow->createTab<C5WaiterOrder>(fDBParams);
+    C5WaiterOrder *wo = __mainWindow->createTab<C5WaiterOrder>();
     wo->setOrder(v.at(fModel->fColumnNameIndex["f_header"]).toString());
     return true;
 }

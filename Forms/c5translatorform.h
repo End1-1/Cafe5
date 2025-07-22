@@ -13,7 +13,7 @@ class C5TranslatorForm : public C5Widget
     Q_OBJECT
 
 public:
-    explicit C5TranslatorForm(const QStringList &dbParams, QWidget *parent = nullptr);
+    explicit C5TranslatorForm(QWidget *parent = nullptr);
 
     ~C5TranslatorForm();
 

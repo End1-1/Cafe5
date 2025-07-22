@@ -12,9 +12,9 @@ class DlgSetWaiterOrderCL : public C5Dialog
     Q_OBJECT
 
 public:
-    explicit DlgSetWaiterOrderCL(const QStringList &dbParams);
+    explicit DlgSetWaiterOrderCL();
     ~DlgSetWaiterOrderCL();
-    static bool getCL(const QStringList &dbParams, QString &code, QString &name);
+    static bool getCL(QString &code, QString &name);
 
 private slots:
     void on_btnNew_clicked();

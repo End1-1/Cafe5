@@ -12,7 +12,7 @@ class CR5CurrencyRateHistoryFilter : public C5FilterWidget
     Q_OBJECT
 
 public:
-    explicit CR5CurrencyRateHistoryFilter(const QStringList &dbParams, QWidget *parent = nullptr);
+    explicit CR5CurrencyRateHistoryFilter(QWidget *parent = nullptr);
     ~CR5CurrencyRateHistoryFilter();
     virtual QString condition() override;
 

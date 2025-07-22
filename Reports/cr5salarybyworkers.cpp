@@ -1,8 +1,8 @@
 #include "cr5salarybyworkers.h"
 #include "cr5salarybyworkersfilter.h"
 
-CR5SalaryByWorkers::CR5SalaryByWorkers(const QStringList &dbParams, QWidget *parent) :
-    C5ReportWidget(dbParams, parent)
+CR5SalaryByWorkers::CR5SalaryByWorkers(QWidget *parent) :
+    C5ReportWidget( parent)
 {
     fIcon = ":/employee.png";
     fLabel = tr("Salary by workers");
@@ -17,7 +17,7 @@ CR5SalaryByWorkers::CR5SalaryByWorkers(const QStringList &dbParams, QWidget *par
              "ORDER BY 1, 3";
     fColumnsSum.append("գումար");
     restoreColumnsVisibility();
-    fFilterWidget = new CR5SalaryByWorkersFilter(fDBParams);
+    fFilterWidget = new CR5SalaryByWorkersFilter();
     fFilter = static_cast<CR5SalaryByWorkersFilter *>(fFilterWidget);
 }
 

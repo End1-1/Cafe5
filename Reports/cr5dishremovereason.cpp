@@ -1,8 +1,8 @@
 #include "cr5dishremovereason.h"
 #include "ce5dishremovereason.h"
 
-CR5DishRemoveReason::CR5DishRemoveReason(const QStringList &dbParams, QWidget *parent) :
-    C5ReportWidget(dbParams, parent)
+CR5DishRemoveReason::CR5DishRemoveReason(QWidget *parent) :
+    C5ReportWidget( parent)
 {
     fLabel = tr("Dish remove reason");
     fIcon = ":/menu.png";
@@ -13,7 +13,7 @@ CR5DishRemoveReason::CR5DishRemoveReason(const QStringList &dbParams, QWidget *p
     fColumnsVisible["f_id"] = true;
     fColumnsVisible["f_name"] = true;
     restoreColumnsVisibility();
-    fEditor = new CE5DishRemoveReason(dbParams);
+    fEditor = new CE5DishRemoveReason();
 }
 
 QToolBar *CR5DishRemoveReason::toolBar()

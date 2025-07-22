@@ -2,14 +2,14 @@
 #include "ui_cr5cashmovementfilter.h"
 #include "c5cache.h"
 
-CR5CashMovementFilter::CR5CashMovementFilter(const QStringList &dbParams, QWidget *parent) :
-    C5FilterWidget(dbParams, parent),
+CR5CashMovementFilter::CR5CashMovementFilter(QWidget *parent) :
+    C5FilterWidget(parent),
     ui(new Ui::CR5CashMovementFilter)
 {
     ui->setupUi(this);
-    ui->leCash->setSelector(dbParams, ui->leCashName, cache_cash_names).setMultiselection(true);
-    ui->leHall->setSelector(dbParams, ui->leHallname, cache_halls);
-    ui->leManager->setSelector(dbParams, ui->leManagerName, cache_users);
+    ui->leCash->setSelector(ui->leCashName, cache_cash_names).setMultiselection(true);
+    ui->leHall->setSelector(ui->leHallname, cache_halls);
+    ui->leManager->setSelector(ui->leManagerName, cache_users);
 }
 
 CR5CashMovementFilter::~CR5CashMovementFilter()

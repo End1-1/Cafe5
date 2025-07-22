@@ -8,7 +8,7 @@ class CR5GoodsQtyReminder : public C5ReportWidget
     Q_OBJECT
 
 public:
-    CR5GoodsQtyReminder(const QStringList &dbParams, QWidget *parent = nullptr);
+    CR5GoodsQtyReminder(QWidget *parent = nullptr);
 
     virtual QToolBar *toolBar() override;
 };

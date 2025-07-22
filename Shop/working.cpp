@@ -105,7 +105,7 @@ Working::Working(C5User *user, QWidget *parent) :
     fHaveChanges = false;
     fUpFinished = true;
     fTab = ui->tab;
-    C5Database db(__c5config.dbParams());
+    C5Database db;
     db.exec("select m.f_id, g.f_scancode from c_goods_multiscancode m "
             "inner join c_goods g on g.f_id=m.f_goods "
             "where length(g.f_scancode)>0");
@@ -160,7 +160,7 @@ bool Working::eventFilter(QObject *watched, QEvent *event)
                 if (ke->modifiers() &Qt::ControlModifier) {
                     QString pin, pass;
                     if (DlgPin::getPin(pin, pass, true)) {
-                        C5Database db(__c5config.dbParams());
+                        C5Database db;
                         C5User ua(0);
                         QString name;
                         if (ua.authByPinPass(pin, pass)) {
@@ -186,7 +186,7 @@ bool Working::eventFilter(QObject *watched, QEvent *event)
                 break;
             case Qt::Key_L:
                 if (ke->modifiers() &Qt::ControlModifier) {
-                    C5Database db(__c5config.dbParams());
+                    C5Database db;
                     db.exec("select concat(u.f_last, ' ', u.f_first) as f_name, u.f_login from s_salary_inout io "
                             "left join s_user u on u.f_id=io.f_user "
                             "where io.f_dateout is null ");
@@ -201,7 +201,7 @@ bool Working::eventFilter(QObject *watched, QEvent *event)
                 if (ke->modifiers() &Qt::ControlModifier) {
                     QString pin, pass;
                     if (DlgPin::getPin(pin, pass, true)) {
-                        C5Database db(__c5config.dbParams());
+                        C5Database db;
                         C5User ua(0);
                         QString name;
                         if (ua.authByPinPass(pin, pass)) {
@@ -230,7 +230,7 @@ bool Working::eventFilter(QObject *watched, QEvent *event)
 
 void Working::decQty(int id, double qty)
 {
-    C5Database db(__c5config.dbParams());
+    C5Database db;
     db[":f_goods"] = id;
     db[":f_store"] = __c5config.defaultStore();
     db[":f_qty"] = qty;
@@ -307,7 +307,7 @@ WOrder *Working::worder()
 void Working::loadStaff()
 {
     fCurrentUsers.clear();
-    C5Database db(__c5config.dbParams());
+    C5Database db;
     db[":f_hall"] = __c5config.defaultHall();
     db.exec("select u.f_id, u.f_group, concat(u.f_last, ' ' , u.f_first) as f_name, to_base64(p.f_data) as f_data "
             "from s_salary_inout s "
@@ -354,7 +354,7 @@ WOrder *Working::newSale(int type)
 
 int Working::ordersCount()
 {
-    C5Database db(C5Config::dbParams());
+    C5Database db;
     db[":f_state"] = ORDER_STATE_CLOSE;
     db[":f_datecash"] = QDate::currentDate();
     db[":f_hall"] = C5Config::defaultHall();
@@ -443,7 +443,7 @@ void Working::checkMessageResponse(const QJsonObject &jdoc)
                                     .arg(QString("%1 %2").arg(tr("End date")).arg(jjm["enddate"].toString())));
                     break;
                 case MSG_PRINT_TAX: {
-                    C5Database db(__c5config.dbParams());
+                    C5Database db;
                     QJsonObject jord = jjm["usermessage"].toObject();
                     QString id = jord["id"].toString();
                     QString rseq;
@@ -461,7 +461,7 @@ void Working::checkMessageResponse(const QJsonObject &jdoc)
                 case MSG_PRINT_RECEIPT: {
                     QString orderid = jjm["usermessage"].toString();
                     PrintReceiptGroup p;
-                    C5Database db(__c5config.dbParams());
+                    C5Database db;
                     switch (C5Config::shopPrintVersion()) {
                         case 1: {
                             bool p1, p2;
@@ -678,7 +678,7 @@ void Working::haveChanges(bool v)
 void Working::on_tab_tabCloseRequested(int index)
 {
     QString err;
-    C5Database db(__c5config.dbParams());
+    C5Database db;
     WOrder *w = static_cast<WOrder *>(ui->tab->widget(index));
     if (!w->fDraftSale.id.toString().isEmpty()) {
         if (w->rowCount() == 0) {
@@ -926,7 +926,7 @@ void Working::on_btnPrepaidFiscal_clicked()
         QElapsedTimer et;
         et.start();
         auto result = pt.printAdvanceJson(v, 0, in, out, err);
-        C5Database db(__c5config.dbParams());
+        C5Database db;
         db[":f_id"] = db.uuid();
         db[":f_order"] = db[":f_id"];
         db[":f_date"] = QDate::currentDate();

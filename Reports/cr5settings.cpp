@@ -3,8 +3,8 @@
 #include "c5tablemodel.h"
 #include "c5database.h"
 
-CR5Settings::CR5Settings(const QStringList &dbParams, QWidget *parent) :
-    C5ReportWidget(dbParams, parent)
+CR5Settings::CR5Settings(QWidget *parent) :
+    C5ReportWidget( parent)
 {
     fIcon = ":/configure.png";
     fLabel = tr("Settings");
@@ -14,7 +14,7 @@ CR5Settings::CR5Settings(const QStringList &dbParams, QWidget *parent) :
     fTranslation["f_description"] = tr("Description");
     fTableView->setItemDelegateForColumn(1, new C5TextDelegate(fTableView));
     fTableView->setItemDelegateForColumn(2, new C5TextDelegate(fTableView));
-    fEditor = new C5SettingsWidget(dbParams);
+    fEditor = new C5SettingsWidget();
     fSettingsWidget = nullptr;
 }
 
@@ -40,7 +40,7 @@ void CR5Settings::removeSettings()
         if (C5Message::question(tr("Confirm removal")) != QDialog::Accepted) {
             return;
         }
-        C5Database db(fDBParams);
+        C5Database db;
         db[":f_settings"] = id;
         db.exec("delete from s_settings_values where f_settings=:f_settings");
         db[":f_id"] = id;

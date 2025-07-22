@@ -12,7 +12,7 @@ class CR5BreezeService : public C5ReportWidget
     Q_OBJECT
 
 public:
-    explicit CR5BreezeService(const QStringList &dbParams, QWidget *parent = nullptr);
+    explicit CR5BreezeService(QWidget *parent = nullptr);
     ~CR5BreezeService();
 
 private:

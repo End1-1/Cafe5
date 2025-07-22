@@ -3,7 +3,7 @@
 #include "c5config.h"
 
 DlgTimeorder::DlgTimeorder() :
-    C5Dialog(__c5config.dbParams()),
+    C5Dialog(),
     ui(new Ui::DlgTimeorder)
 {
     ui->setupUi(this);

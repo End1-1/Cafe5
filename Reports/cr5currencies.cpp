@@ -1,8 +1,8 @@
 #include "cr5currencies.h"
 #include "ce5currency.h"
 
-CR5Currencies::CR5Currencies(const QStringList &dbParams, QWidget *parent) :
-    C5ReportWidget(dbParams, parent)
+CR5Currencies::CR5Currencies(QWidget *parent) :
+    C5ReportWidget( parent)
 {
     fIcon = ":/cash.png";
     fLabel = tr("Currencies");
@@ -11,7 +11,7 @@ CR5Currencies::CR5Currencies(const QStringList &dbParams, QWidget *parent) :
     fTranslation["f_name"] = tr("Name");
     fTranslation["f_rate"] = tr("Rate");
     fTranslation["f_symbol"] = tr("Symbol");
-    fEditor = new CE5Currency(dbParams);
+    fEditor = new CE5Currency();
 }
 
 QToolBar *CR5Currencies::toolBar()

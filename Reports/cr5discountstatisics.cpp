@@ -4,8 +4,8 @@
 #include "c5tablemodel.h"
 #include "cr5discountstatisticsfilter.h"
 
-CR5DiscountStatisics::CR5DiscountStatisics(const QStringList &dbParams, QWidget *parent) :
-    C5ReportWidget(dbParams, parent)
+CR5DiscountStatisics::CR5DiscountStatisics(QWidget *parent) :
+    C5ReportWidget( parent)
 {
     fIcon = ":/discount.png";
     fLabel = tr("Discount statistics");
@@ -64,7 +64,7 @@ CR5DiscountStatisics::CR5DiscountStatisics(const QStringList &dbParams, QWidget 
 
     restoreColumnsVisibility();
 
-    fFilterWidget = new CR5DiscountStatisticsFilter(dbParams);
+    fFilterWidget = new CR5DiscountStatisticsFilter();
 }
 
 QToolBar *CR5DiscountStatisics::toolBar()
@@ -100,7 +100,7 @@ bool CR5DiscountStatisics::tblDoubleClicked(int row, int column, const QJsonArra
     if (values.count() == 0) {
         return true;
     }
-    C5WaiterOrder *wo = __mainWindow->createTab<C5WaiterOrder>(fDBParams);
+    C5WaiterOrder *wo = __mainWindow->createTab<C5WaiterOrder>();
     wo->setOrder(values.at(fModel->fColumnNameIndex["f_id"]).toString());
     return true;
 }

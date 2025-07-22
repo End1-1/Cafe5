@@ -10,7 +10,7 @@ class CR5Settings : public C5ReportWidget
     Q_OBJECT
 
 public:
-    CR5Settings(const QStringList &dbParams, QWidget *parent = nullptr);
+    CR5Settings(QWidget *parent = nullptr);
 
     virtual QToolBar *toolBar();
 

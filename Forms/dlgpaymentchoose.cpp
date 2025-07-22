@@ -7,8 +7,8 @@
 #include <QShortcut>
 #include <QStyle>
 
-DlgPaymentChoose::DlgPaymentChoose(const QStringList &dbParams) :
-    C5Dialog(dbParams),
+DlgPaymentChoose::DlgPaymentChoose() :
+    C5Dialog(),
     ui(new Ui::DlgPaymentChoose)
 {
     ui->setupUi(this);
@@ -37,12 +37,12 @@ DlgPaymentChoose::~DlgPaymentChoose()
     delete ui;
 }
 
-bool DlgPaymentChoose::getValues(double total, double &cash, double &card, double &idram, double &telcell, double &bank,
-                                 double &credit,
-                                 double &prepaid, double &debt, double &cashin, double &change, bool &fiscal,
+bool DlgPaymentChoose::getValues(double total, double& cash, double& card, double& idram, double& telcell, double& bank,
+                                 double& credit,
+                                 double& prepaid, double& debt, double& cashin, double& change, bool &fiscal,
                                  bool readOnlyPrepaid, double maxPrepaid)
 {
-    DlgPaymentChoose d(__c5config.dbParams());
+    DlgPaymentChoose d;
     d.ui->leTotal->setDouble(total);
     d.ui->leCash->setDouble(cash);
     d.ui->leCard->setDouble(card);
@@ -58,11 +58,13 @@ bool DlgPaymentChoose::getValues(double total, double &cash, double &card, doubl
     d.setFiscalStyle();
     d.fFiscal = fiscal;
     d.fMaxPrepaid = maxPrepaid;
-    if (maxPrepaid < 1 && __c5config.fMainJson["prepaid_only_by_gift"].toBool()) {
+
+    if(maxPrepaid < 1 && __c5config.fMainJson["prepaid_only_by_gift"].toBool()) {
         d.ui->lePrepaid->setEnabled(false);
         d.ui->btnPrepaid->setEnabled(false);
     }
-    if (d.exec() == QDialog::Accepted) {
+
+    if(d.exec() == QDialog::Accepted) {
         cash = d.ui->leCash->getDouble();
         card = d.ui->leCard->getDouble();
         bank = d.ui->leBankTransfer->getDouble();
@@ -76,6 +78,7 @@ bool DlgPaymentChoose::getValues(double total, double &cash, double &card, doubl
         fiscal = d.fFiscal;
         return true;
     }
+
     d.ui->lePrepaid->setReadOnly(readOnlyPrepaid);
     d.ui->btnPrepaid->setEnabled(!readOnlyPrepaid);
     return false;
@@ -88,20 +91,23 @@ void DlgPaymentChoose::keyEnter()
 
 void DlgPaymentChoose::setFiscalStyle()
 {
-    if (fFiscal) {
+    if(fFiscal) {
         setStyleSheet("");
     } else {
         setStyleSheet("background:qlineargradient(spread:reflect, x1:0.449, y1:0, x2:0.511, y2:1, stop:0 rgba(210, 255, 197, 255), stop:1 rgba(238, 238, 238, 255))");
     }
+
     style()->polish(this);
 }
 
 void DlgPaymentChoose::checkFiscal()
 {
     fFiscal = !fFiscal;
-    if (ui->leCard->getDouble() > 0.01) {
+
+    if(ui->leCard->getDouble() > 0.01) {
         fFiscal = true;
     }
+
     setFiscalStyle();
 }
 
@@ -126,8 +132,9 @@ void DlgPaymentChoose::clearAll(QLineEdit *le)
     ui->leDebt->clear();
     ui->leCredit->clear();
     le->setText(ui->leTotal->text());
-    if (ui->lePrepaid == le) {
-        if (ui->lePrepaid->getDouble() > fMaxPrepaid && fMaxPrepaid > 1) {
+
+    if(ui->lePrepaid == le) {
+        if(ui->lePrepaid->getDouble() > fMaxPrepaid && fMaxPrepaid > 1) {
             ui->lePrepaid->setDouble(fMaxPrepaid);
         }
     }
@@ -137,9 +144,11 @@ void DlgPaymentChoose::countChange()
 {
     double diff = ui->leCashIn->getDouble()
                   - ui->leCash->getDouble();
-    if (diff > ui->leCashIn->getDouble()) {
+
+    if(diff > ui->leCashIn->getDouble()) {
         diff = ui->leCashIn->getDouble();
     }
+
     ui->leChange->setDouble(diff > 0.001 ? diff : 0);
 }
 
@@ -202,10 +211,12 @@ void DlgPaymentChoose::on_btnPay_clicked()
         + ui->lePrepaid->getDouble()
         + ui->leDebt->getDouble()
         + ui->leCredit->getDouble();
-    if (value > ui->leTotal->getDouble() || value < ui->leTotal->getDouble()) {
+
+    if(value > ui->leTotal->getDouble() || value < ui->leTotal->getDouble()) {
         C5Message::error(tr("Check amounts"));
         return;
     }
+
     accept();
 }
 
@@ -219,7 +230,8 @@ void DlgPaymentChoose::on_leCard_textChanged(const QString &arg1)
 {
     Q_UNUSED(arg1);
     countChange();
-    if (str_float(arg1) > 0.001) {
+
+    if(str_float(arg1) > 0.001) {
         fFiscal = true;
         setFiscalStyle();
     }
@@ -228,10 +240,12 @@ void DlgPaymentChoose::on_leCard_textChanged(const QString &arg1)
 void DlgPaymentChoose::on_leBankTransfer_textChanged(const QString &arg1)
 {
     Q_UNUSED(arg1);
-    if (str_float(arg1) > 0.001) {
+
+    if(str_float(arg1) > 0.001) {
         fFiscal = false;
         setFiscalStyle();
     }
+
     countChange();
 }
 
@@ -239,7 +253,8 @@ void DlgPaymentChoose::on_leIdram_textChanged(const QString &arg1)
 {
     Q_UNUSED(arg1);
     countChange();
-    if (str_float(arg1) > 0.001) {
+
+    if(str_float(arg1) > 0.001) {
         fFiscal = true;
         setFiscalStyle();
     }
@@ -249,7 +264,8 @@ void DlgPaymentChoose::on_leTelcell_textChanged(const QString &arg1)
 {
     Q_UNUSED(arg1);
     countChange();
-    if (str_float(arg1) > 0.001) {
+
+    if(str_float(arg1) > 0.001) {
         fFiscal = true;
         setFiscalStyle();
     }
@@ -258,9 +274,11 @@ void DlgPaymentChoose::on_leTelcell_textChanged(const QString &arg1)
 void DlgPaymentChoose::on_lePrepaid_textChanged(const QString &arg1)
 {
     Q_UNUSED(arg1);
-    if (arg1.toDouble() > fMaxPrepaid && fMaxPrepaid > 1) {
+
+    if(arg1.toDouble() > fMaxPrepaid && fMaxPrepaid > 1) {
         ui->lePrepaid->setDouble(fMaxPrepaid);
     }
+
     countChange();
 }
 

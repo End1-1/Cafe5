@@ -10,7 +10,7 @@ class CR5DishPriceSelfCost : public C5ReportWidget
     Q_OBJECT
 
 public:
-    CR5DishPriceSelfCost(const QStringList &dbParams, QWidget *parent = nullptr);
+    CR5DishPriceSelfCost(QWidget *parent = nullptr);
 
     virtual QToolBar *toolBar() override;
 

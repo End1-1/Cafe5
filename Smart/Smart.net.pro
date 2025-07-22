@@ -13,7 +13,7 @@ TEMPLATE = app
 
 RC_FILE = res.rc
 
-CONFIG += c++17
+CONFIG += c++23
 
 # The following define makes your compiler emit warnings if you use
 # any feature of Qt which has been marked as deprecated (the exact warnings
@@ -75,6 +75,7 @@ HEADERS += \
     ../Classes/amkbd.h \
     ../Classes/c5logtoserverthread.h \
     ../Classes/dlgserverconnection.h \
+    ../Classes/scopeguarde.h \
     ../NTable/ndataprovider.h \
     ../NTable/ninterface.h \
     ../NTable/nloadingdlg.h \
@@ -85,6 +86,7 @@ SOURCES += \
     ../Classes/QProgressIndicator.cpp \
     ../Classes/amkbd.cpp \
     ../Classes/dlgserverconnection.cpp \
+    ../Classes/scopeguarde.cpp \
     ../NTable/ndataprovider.cpp \
     ../NTable/ninterface.cpp \
     ../NTable/nloadingdlg.cpp \

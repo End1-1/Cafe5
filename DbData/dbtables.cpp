@@ -19,7 +19,7 @@ int DbTables::specialConfig(int id)
 
 bool DbTables::closeTable(int id, QString &err)
 {
-    C5Database db(fDbParams);
+    C5Database db;
     db[":f_lock"] = 0;
     db[":f_lockSrc"] = "";
     db[":f_locktime"] = QVariant();

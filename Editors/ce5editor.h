@@ -17,7 +17,7 @@ class CE5Editor : public C5Widget
     Q_OBJECT
 
 public:
-    CE5Editor(const QStringList &dbParams, QWidget *parent = nullptr);
+    CE5Editor(QWidget *parent = nullptr);
 
     ~CE5Editor();
 
@@ -29,7 +29,7 @@ public:
 
     virtual QString dbError(QString err);
 
-    virtual bool save(QString &err, QList<QMap<QString, QVariant> > &data);
+    virtual bool save(QString &err, QList<QMap<QString, QVariant> >& data);
 
     virtual bool checkData(QString &err);
 
@@ -41,32 +41,32 @@ public:
 
     virtual void copyObject();
 
-    virtual QPushButton *b1();
+    virtual QPushButton* b1();
 
     void getLineEdit(QObject *parent);
 
     void focusFirst();
 
-    void setDatabase(const QStringList &dbParams);
-
     virtual QJsonObject makeJsonObject();
 
     virtual bool acceptOnSave() const;
 
-    QWidget *fEditor;
+    QWidget* fEditor;
 
     QJsonObject fJsonData;
 
     template<typename T>
     bool getId(QString &id)
     {
-        T *ep = new T(fDBParams);
-        C5Editor *e = C5Editor::createEditor(fDBParams, ep, 0);
+        T *ep = new T();
+        C5Editor *e = C5Editor::createEditor(ep, 0);
         QList<QMap<QString, QVariant> > data;
         bool result = e->getResult(data);
-        if (result) {
+
+        if(result) {
             id = data.at(0)["f_id"].toString();
         }
+
         delete e;
         return result;
     }
@@ -75,17 +75,17 @@ protected:
     bool fRememberFields;
 
 private:
-    C5LineEditWithSelector *findLineEditWithId();
+    C5LineEditWithSelector* findLineEditWithId();
 
-    QSet<C5LineEditWithSelector *> fLines;
+    QSet<C5LineEditWithSelector*> fLines;
 
-    QSet<C5ComboBox *> fCombos;
+    QSet<C5ComboBox*> fCombos;
 
-    QSet<C5CheckBox *> fChecks;
+    QSet<C5CheckBox*> fChecks;
 
-    QSet<C5DateEdit *> fDates;
+    QSet<C5DateEdit*> fDates;
 
-    QSet<QPlainTextEdit *> fPlainText;
+    QSet<QPlainTextEdit*> fPlainText;
 
 signals:
     void Accept();

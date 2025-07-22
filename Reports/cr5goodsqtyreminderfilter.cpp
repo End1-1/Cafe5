@@ -2,15 +2,15 @@
 #include "ui_cr5goodsqtyreminderfilter.h"
 #include "c5cache.h"
 
-CR5GoodsQtyReminderFilter::CR5GoodsQtyReminderFilter(const QStringList &dbParams, QWidget *parent) :
-    C5FilterWidget(dbParams, parent),
+CR5GoodsQtyReminderFilter::CR5GoodsQtyReminderFilter(QWidget *parent) :
+    C5FilterWidget(parent),
     ui(new Ui::CR5GoodsQtyReminderFilter)
 {
     ui->setupUi(this);
-    ui->leGroup->setSelector(dbParams, ui->leGroupname, cache_goods_group);
-    ui->leMaterial->setSelector(dbParams, ui->leMaterialName, cache_goods);
-    ui->leStore->setSelector(dbParams, ui->leStoreName, cache_goods_store);
-    ui->leUnit->setSelector(dbParams, ui->leUnitName, cache_goods_unit);
+    ui->leGroup->setSelector(ui->leGroupname, cache_goods_group);
+    ui->leMaterial->setSelector(ui->leMaterialName, cache_goods);
+    ui->leStore->setSelector(ui->leStoreName, cache_goods_store);
+    ui->leUnit->setSelector(ui->leUnitName, cache_goods_unit);
 }
 
 CR5GoodsQtyReminderFilter::~CR5GoodsQtyReminderFilter()

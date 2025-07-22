@@ -1,8 +1,8 @@
 #include "c5dlgselectreporttemplate.h"
 #include "ui_c5dlgselectreporttemplate.h"
 
-C5DlgSelectReportTemplate::C5DlgSelectReportTemplate(int reportGroup, const QStringList &dbParams) :
-    C5Dialog(dbParams),
+C5DlgSelectReportTemplate::C5DlgSelectReportTemplate(int reportGroup) :
+    C5Dialog(),
     ui(new Ui::C5DlgSelectReportTemplate)
 {
     ui->setupUi(this);

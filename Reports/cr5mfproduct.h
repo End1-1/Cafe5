@@ -8,7 +8,7 @@ class CR5MFProduct : public C5ReportWidget
     Q_OBJECT
 
 public:
-    CR5MFProduct(const QStringList &dbParams, QWidget *parent = nullptr);
+    CR5MFProduct(QWidget *parent = nullptr);
 
     virtual QToolBar *toolBar();
 };

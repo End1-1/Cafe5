@@ -47,7 +47,7 @@ void DlgRegisterCard::on_btnRegister_clicked()
         C5Message::error(tr("Card value cannot be zero"));
         return;
     }
-    C5Database db(__c5config.dbParams());
+    C5Database db;
     if (ui->lePartner->property("id").toInt() == 0) {
         db[":f_name"] = ui->lePartner->text();
         db[":f_taxname"] = ui->lePartner->text();

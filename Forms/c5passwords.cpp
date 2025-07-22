@@ -4,8 +4,8 @@
 #include "c5utils.h"
 #include "c5message.h"
 
-C5Passwords::C5Passwords(const QStringList &dbParams) :
-    C5Dialog(dbParams),
+C5Passwords::C5Passwords() :
+    C5Dialog(),
     ui(new Ui::C5Passwords)
 {
     ui->setupUi(this);
@@ -18,9 +18,9 @@ C5Passwords::~C5Passwords()
     delete ui;
 }
 
-void C5Passwords::setPasswords(const QStringList &dbParams, int userId)
+void C5Passwords::setPasswords(int userId)
 {
-    C5Passwords *p = new C5Passwords(dbParams);
+    C5Passwords *p = new C5Passwords();
     p->setUser(userId);
     p->exec();
     delete p;
@@ -28,7 +28,7 @@ void C5Passwords::setPasswords(const QStringList &dbParams, int userId)
 
 void C5Passwords::on_btnOK_clicked()
 {
-    C5Database db(fDBParams);
+    C5Database db;
     if (ui->chFrontPassword->isChecked()) {
         if (ui->leFrontPass->text().isEmpty()) {
             db[":f_password"] = "";
@@ -61,7 +61,7 @@ void C5Passwords::on_btnCancel_clicked()
 void C5Passwords::setUser(int userId)
 {
     fUserId = userId;
-    C5Database db(fDBParams);
+    C5Database db;
     db[":f_id"] = userId;
     db.exec("select concat(f_last, ' ', f_first) from s_user where f_id=:f_id");
     if (db.nextRow()) {

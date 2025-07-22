@@ -1,8 +1,8 @@
 #include "cr5mfactions.h"
 #include "ce5mfprocess.h"
 
-CR5MfActions::CR5MfActions(const QStringList &dbParams, QWidget *parent) :
-    C5ReportWidget(dbParams, parent)
+CR5MfActions::CR5MfActions(QWidget *parent) :
+    C5ReportWidget( parent)
 {
     fIcon = ":/manufacturing.png";
     fLabel = tr("Manufacture actions");
@@ -10,7 +10,7 @@ CR5MfActions::CR5MfActions(const QStringList &dbParams, QWidget *parent) :
                 "from mf_actions a "
                 "left join mf_actions_state s on s.f_id=a.f_state "
                 "order by s.f_name ";
-    fEditor = new CE5MFProcess(dbParams);
+    fEditor = new CE5MFProcess();
     fTranslation["f_id"] = tr("Code");
     fTranslation["f_name"] = tr("Name");
     fTranslation["f_state"] = tr("Stage code");

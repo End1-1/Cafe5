@@ -5,7 +5,7 @@
 #include "c5config.h"
 
 DlgViewStopList::DlgViewStopList() :
-    C5Dialog(__c5config.dbParams()),
+    C5Dialog(),
     ui(new Ui::DlgViewStopList)
 {
     ui->setupUi(this);

@@ -30,7 +30,7 @@ void C5ReportTemplateDriver::getTemplatesList(int reportGroup, QList<TemplateDri
 void C5ReportTemplateDriver::getReportsTemplates(int group)
 {
     fTemplates.clear();
-    C5Database db(__c5config.dbParams());
+    C5Database db;
     db[":f_group"] = group;
     db.exec("select * from s_report_template where f_id in (select f_report from s_report_template_access where f_group=:f_group)");
     while (db.nextRow()) {

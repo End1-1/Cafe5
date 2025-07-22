@@ -12,7 +12,7 @@
 #include "jsons.h"
 
 DlgReturnItem::DlgReturnItem() :
-    C5Dialog(__c5config.dbParams()),
+    C5Dialog(),
     ui(new Ui::DlgReturnItem)
 {
     ui->setupUi(this);
@@ -52,7 +52,7 @@ void DlgReturnItem::on_btnSearchReceiptNumber_clicked()
     }
     ui->tblOrder->clearContents();
     ui->tblOrder->setRowCount(0);
-    C5Database db(fDBParams);
+    C5Database db;
     db.exec(QString(R"(select o.f_id, o.f_datecash, concat(o.f_prefix, o.f_hallid) as f_receipt,
                     h.f_name as f_hallname,
                     t.f_receiptnumber, concat(u.f_last, ' ', u.f_first) as f_saler, o.f_staff
@@ -85,7 +85,7 @@ void DlgReturnItem::on_tblOrder_cellClicked(int row, int column)
     Q_UNUSED(column);
     ui->tblBody->clearContents();
     ui->tblBody->setRowCount(0);
-    C5Database db(fDBParams);
+    C5Database db;
     int d14 = ui->tblOrder->item(row, 0)->data(Qt::UserRole).toInt();
     if (d14 > 0) {
         C5Message::error(tr("You cannot return this item"));
@@ -126,7 +126,7 @@ void DlgReturnItem::on_btnSearchTax_clicked()
 {
     ui->tblOrder->clearContents();
     ui->tblOrder->setRowCount(0);
-    C5Database db(fDBParams);
+    C5Database db;
     db.exec(QString("select o.f_id, o.f_datecash, h.f_name as f_hallname, concat(o.f_prefix, o.f_hallid) as f_receipt, "
                     "t.f_receiptnumber, concat(u.f_last, ' ', u.f_first) as f_saler, o.f_staff "
                     "from o_header o "
@@ -170,7 +170,7 @@ void DlgReturnItem::on_btnReturn_clicked()
     }
     ui->btnReturn->setEnabled(false);
     QMap<QString, QVariant> oldAmountsMap;
-    C5Database db(__c5config.dbParams());
+    C5Database db;
     db[":f_id"] = ui->tblOrder->getString(ui->tblOrder->currentRow(), 0);
     db.exec("select * from o_header where f_id=:f_id");
     db.nextRow();
@@ -194,7 +194,7 @@ void DlgReturnItem::on_btnReturn_clicked()
         int result;
         if (oldAmountsMap["f_amountcash"].toDouble() > 0) {
             pt.fCashAmountForReturn = returnAmount;
-        } else if (oldAmountsMap["f_amountcard"].toDouble() > 0) {
+        } else if (oldAmountsMap["f_amountcard"].toDouble() > 0 || oldAmountsMap["f_amountidram"].toDouble() > 0 ) {
             pt.fCardAmountForReturn = returnAmount;
         } else if (oldAmountsMap["f_amountprepaid"].toDouble() > 0) {
             pt.fPrepaymentAmountForReturn = returnAmount;

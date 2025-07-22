@@ -10,7 +10,7 @@ class CR5CashDetailed : public C5ReportWidget
     Q_OBJECT
 
 public:
-    CR5CashDetailed(const QStringList &dbParams, QWidget *parent = nullptr);
+    CR5CashDetailed(QWidget *parent = nullptr);
 
     virtual QToolBar *toolBar() override;
 

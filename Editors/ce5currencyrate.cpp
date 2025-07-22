@@ -4,12 +4,12 @@
 #include "c5database.h"
 #include "c5message.h"
 
-CE5CurrencyRate::CE5CurrencyRate(const QStringList &dbParams, QWidget *parent) :
-    CE5Editor(dbParams, parent),
+CE5CurrencyRate::CE5CurrencyRate(QWidget *parent) :
+    CE5Editor(parent),
     ui(new Ui::CE5CurrencyRate)
 {
     ui->setupUi(this);
-    ui->leCurr->setSelector(dbParams, ui->leCurrName, cache_currency);
+    ui->leCurr->setSelector(ui->leCurrName, cache_currency);
 }
 
 CE5CurrencyRate::~CE5CurrencyRate()
@@ -34,7 +34,7 @@ bool CE5CurrencyRate::save(QString &err, QList<QMap<QString, QVariant> > &data)
         return false;
     }
     if (ui->leDate->date() == QDate::currentDate()) {
-        C5Database db(fDBParams);
+        C5Database db;
         db[":f_id"] = ui->leCurr->getInteger();
         db[":f_rate"] = ui->leRate->getDouble();
         Q_ASSERT(db.exec("update e_Currency set f_rate=:f_rate where f_id=:f_id"));

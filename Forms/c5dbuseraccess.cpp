@@ -4,8 +4,8 @@
 #include "c5checkbox.h"
 #include "c5message.h"
 
-C5DbUserAccess::C5DbUserAccess(const QStringList &dbParams, QWidget *parent) :
-    C5Widget(dbParams, parent),
+C5DbUserAccess::C5DbUserAccess(QWidget *parent) :
+    C5Widget(parent),
     ui(new Ui::C5DbUserAccess)
 {
     ui->setupUi(this);
@@ -41,7 +41,7 @@ void C5DbUserAccess::refreshData()
     ui->tbl->setColumnWidth(0, 0);
     ui->tbl->setColumnWidth(1, 300);
     ui->tbl->setColumnWidth(2, 120);
-    C5Database db(fDBParams);
+    C5Database db;
     db[":f_key"] = cp_t1_login_to_manager;
     db.exec("select u.f_id, concat(u.f_last, ' ', u.f_first), u.f_login \
             from s_user u \
@@ -83,7 +83,7 @@ void C5DbUserAccess::refreshData()
 
 void C5DbUserAccess::saveDataChanges()
 {
-    C5Database db(fDBParams);
+    C5Database db;
     db.exec("delete from s_db_access");
     for (int c = 3; c < ui->tbl->columnCount(); c++) {
         for (int r = 0; r < ui->tbl->rowCount(); r++) {

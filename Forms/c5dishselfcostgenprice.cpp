@@ -4,8 +4,8 @@
 #include "c5database.h"
 #include "proxytablewidgetdatabase.h"
 
-C5DishSelfCostGenPrice::C5DishSelfCostGenPrice(const QStringList &dbParams, QWidget *parent) :
-    C5Widget(dbParams, parent),
+C5DishSelfCostGenPrice::C5DishSelfCostGenPrice(QWidget *parent) :
+    C5Widget(parent),
     ui(new Ui::C5DishSelfCostGenPrice)
 {
     ui->setupUi(this);
@@ -33,7 +33,7 @@ void C5DishSelfCostGenPrice::on_btnStart_clicked()
 {
     fGoodsRowMap.clear();
     QMap<int, bool> goods;
-    C5Database db(fDBParams);
+    C5Database db;
     db.exec("select distinct(d.f_goods), gr.f_name, g.f_name, u.f_name, 0, '-' "
             "from d_recipes d "
             "left join c_goods g on g.f_id=d.f_goods "
@@ -103,7 +103,7 @@ void C5DishSelfCostGenPrice::on_btnStart_clicked()
 
 void C5DishSelfCostGenPrice::saveDataChanges()
 {
-    C5Database db(fDBParams);
+    C5Database db;
     for (int i = 0; i < ui->tbl->rowCount(); i++) {
         db[":f_goods"] = ui->tbl->getInteger(i, 0);
         db[":f_price"] = ui->tbl->lineEdit(i, 4)->getDouble();

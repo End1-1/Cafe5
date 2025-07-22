@@ -5,15 +5,15 @@
 #include "ce5partner.h"
 #include <QDoubleValidator>
 
-CE5DiscountCard::CE5DiscountCard(const QStringList &dbParams, QWidget *parent) :
-    CE5Editor(dbParams, parent),
+CE5DiscountCard::CE5DiscountCard(QWidget *parent) :
+    CE5Editor(parent),
     ui(new Ui::CE5DiscountCard)
 {
     ui->setupUi(this);
     ui->deDateEnd->setDate(QDate::currentDate().addDays(365 * 10));
     // ui->leValue->setValidator(new QDoubleValidator(-10, 100, 3));
-    ui->leClient->setSelector(dbParams, ui->leFirstName, cache_goods_partners);
-    ui->leDiscount->setSelector(dbParams, ui->leDiscountName, cache_discount_type);
+    ui->leClient->setSelector(ui->leFirstName, cache_goods_partners);
+    ui->leDiscount->setSelector(ui->leDiscountName, cache_discount_type);
 }
 
 CE5DiscountCard::~CE5DiscountCard()
@@ -23,7 +23,7 @@ CE5DiscountCard::~CE5DiscountCard()
 
 bool CE5DiscountCard::save(QString &err, QList<QMap<QString, QVariant> > &data)
 {
-    C5Database db(fDBParams);
+    C5Database db;
     db[":f_code"] = ui->leCard->text();
     db.exec("select * from b_cards_discount where f_code=:f_code");
     if (db.nextRow()) {
@@ -74,7 +74,7 @@ void CE5DiscountCard::on_leFirstName_textChanged(const QString &arg1)
         ui->leClientInfo->clear();
         return;
     }
-    C5Cache *c = C5Cache::cache(fDBParams, cache_goods_partners);
+    C5Cache *c = C5Cache::cache(cache_goods_partners);
     int r = c->find(ui->leClient->getInteger());
     if (r > -1) {
         ui->leClientInfo->setText(c->getString(r, 3));

@@ -12,7 +12,7 @@ class C5Route : public C5Document
     Q_OBJECT
 
 public:
-    explicit C5Route(const QStringList &dbParams, QWidget *parent = nullptr);
+    explicit C5Route(QWidget *parent = nullptr);
     ~C5Route();
     virtual QToolBar *toolBar() override;
 

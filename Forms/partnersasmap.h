@@ -12,7 +12,7 @@ class PartnersAsMap : public C5Widget
     Q_OBJECT
 
 public:
-    explicit PartnersAsMap(const QStringList &dbParams, QWidget *parent = nullptr);
+    explicit PartnersAsMap(QWidget *parent = nullptr);
     ~PartnersAsMap();
     virtual QToolBar *toolBar() override;
 

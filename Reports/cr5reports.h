@@ -9,7 +9,7 @@ class CR5Reports : public C5ReportWidget
 {
     Q_OBJECT
 public:
-    CR5Reports(const QStringList &dbParams, QWidget *parent = nullptr);
+    CR5Reports(QWidget *parent = nullptr);
 
     virtual QToolBar *toolBar() override;
 

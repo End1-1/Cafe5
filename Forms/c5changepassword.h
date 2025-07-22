@@ -12,11 +12,11 @@ class C5ChangePassword : public C5Dialog
     Q_OBJECT
 
 public:
-    explicit C5ChangePassword(const QStringList &dbParams);
+    explicit C5ChangePassword();
 
     ~C5ChangePassword();
 
-    static bool changePassword(const QStringList &dbParams, QString &password);
+    static bool changePassword(QString &password);
 
 private slots:
     void on_btnCancel_clicked();

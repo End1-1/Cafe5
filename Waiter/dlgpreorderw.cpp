@@ -18,7 +18,7 @@
 #include <QDir>
 
 DlgPreorder::DlgPreorder(const QJsonObject &jdoc) :
-    C5Dialog(__c5config.dbParams()),
+    C5Dialog(),
     ui(new Ui::DlgPreorder),
     fDoc(jdoc)
 {
@@ -94,7 +94,7 @@ void DlgPreorder::on_btnEditGuestname_clicked()
     QString txt;
     if (DlgText::getText(tr("Guest name"), txt)) {
         ui->leGuestName->setText(txt);
-        C5Database db(__c5config.dbParams());
+        C5Database db;
         db[":f_contact"] = ui->leGuestName->text();
     }
 }

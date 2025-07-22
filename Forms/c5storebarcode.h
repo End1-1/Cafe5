@@ -13,7 +13,7 @@ class C5StoreBarcode : public C5Widget
     Q_OBJECT
 
 public:
-    explicit C5StoreBarcode(const QStringList &dbParams, QWidget *parent = nullptr);
+    explicit C5StoreBarcode(QWidget *parent = nullptr);
 
     ~C5StoreBarcode();
 

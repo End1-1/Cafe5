@@ -15,7 +15,7 @@ public:
 
     ~C5LineEditWithSelector();
 
-    C5LineEditWithSelector &setSelector(const QStringList &dbParams, QLineEdit *selName, int cacheId, int colId = 1,
+    C5LineEditWithSelector& setSelector(QLineEdit *selName, int cacheId, int colId = 1,
                                         int colName = 2);
 
     void setMultiselection(bool v);
@@ -38,26 +38,24 @@ protected:
     virtual void focusOutEvent(QFocusEvent *e);
 
 private:
-    QStringList fDBParams;
-
     int fCache;
 
     int fColumnId;
 
     int fColumnName;
 
-    QLineEdit *fNameLineEdit;
+    QLineEdit* fNameLineEdit;
 
-    C5Widget *fWidget;
+    C5Widget* fWidget;
 
-    C5Dialog *fDialog;
+    C5Dialog* fDialog;
 
     bool fMultiselection;
 
 signals:
-    void singleSelect(int, const QString &);
+    void singleSelect(int, const QString&);
 };
 
-C5LineEditWithSelector *isLineEditWithSelector(QObject *o);
+C5LineEditWithSelector* isLineEditWithSelector(QObject *o);
 
 #endif // C5LINEEDITWITHSELECTOR_H

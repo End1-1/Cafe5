@@ -2,17 +2,17 @@
 #include "ui_cr5salesbydishesfilter.h"
 #include "c5cache.h"
 
-CR5SalesByDishesFilter::CR5SalesByDishesFilter(const QStringList &dbParams, QWidget *parent) :
-    C5FilterWidget(dbParams, parent),
+CR5SalesByDishesFilter::CR5SalesByDishesFilter(QWidget *parent) :
+    C5FilterWidget(parent),
     ui(new Ui::CR5SalesByDishesFilter)
 {
     ui->setupUi(this);
-    ui->leOrderState->setSelector(dbParams, ui->leOrderStateName, cache_order_state);
-    ui->leDishState->setSelector(dbParams, ui->leStateName, cache_dish_state).setMultiselection(true);
+    ui->leOrderState->setSelector(ui->leOrderStateName, cache_order_state);
+    ui->leDishState->setSelector(ui->leStateName, cache_dish_state).setMultiselection(true);
     ui->leDishState->setValue(DISH_STATE_OK);
-    ui->lePart1->setSelector(dbParams, ui->lePart1Name, cache_dish_part1).setMultiselection(true);
-    ui->lePart2->setSelector(dbParams, ui->lePart2Name, cache_dish_part2).setMultiselection(true);
-    ui->leStore->setSelector(dbParams, ui->leStoreName, cache_goods_store).setMultiselection(true);
+    ui->lePart1->setSelector(ui->lePart1Name, cache_dish_part1).setMultiselection(true);
+    ui->lePart2->setSelector(ui->lePart2Name, cache_dish_part2).setMultiselection(true);
+    ui->leStore->setSelector(ui->leStoreName, cache_goods_store).setMultiselection(true);
     ui->dt1->setDateTime(QDateTime::fromString(QDate::currentDate().toString("dd.MM.yyyy") + " 00:00", "dd.MM.yyyy HH:mm"));
     ui->dt2->setDateTime(QDateTime::fromString(QDate::currentDate().addDays(1).toString("dd.MM.yyyy") + " 00:00",
                          "dd.MM.yyyy HH:mm"));

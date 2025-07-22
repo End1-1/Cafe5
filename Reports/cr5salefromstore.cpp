@@ -6,8 +6,8 @@
 #include <QJsonObject>
 #include <QJsonDocument>
 
-CR5SaleFromStore::CR5SaleFromStore(const QStringList &dbParams, QWidget *parent) :
-    C5ReportWidget(dbParams, parent)
+CR5SaleFromStore::CR5SaleFromStore(QWidget *parent) :
+    C5ReportWidget( parent)
 {
     fIcon = ":/graph.png";
     fLabel = tr("Sales by goods");
@@ -133,7 +133,7 @@ CR5SaleFromStore::CR5SaleFromStore(const QStringList &dbParams, QWidget *parent)
     fColumnsVisible["asd.f_price as f_selfcost"] = false;
     fColumnsVisible["sum(asd.f_price*og.f_qty*og.f_sign) as f_selfcosttotal"] = false;
     restoreColumnsVisibility();
-    fFilterWidget = new CR5SaleFromStoreFilter(fDBParams);
+    fFilterWidget = new CR5SaleFromStoreFilter();
     fFilter = static_cast<CR5SaleFromStoreFilter *>(fFilterWidget);
 }
 
@@ -170,7 +170,7 @@ bool CR5SaleFromStore::tblDoubleClicked(int row, int column, const QJsonArray &v
     if (values.count() == 0) {
         return true;
     }
-    auto *doc = __mainWindow->createTab<C5SaleDoc>(fDBParams);
+    auto *doc = __mainWindow->createTab<C5SaleDoc>();
     doc->openDoc(values.at(fModel->indexForColumnName("f_header")).toString());
     return true;
 }

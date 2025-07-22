@@ -5,8 +5,8 @@
 #include <QShortcut>
 #include <QKeyEvent>
 
-C5Editor::C5Editor(const QStringList &dbParams) :
-    C5Dialog(dbParams),
+C5Editor::C5Editor() :
+    C5Dialog(),
     ui(new Ui::C5Editor)
 {
     ui->setupUi(this);
@@ -21,9 +21,9 @@ C5Editor::~C5Editor()
     delete ui;
 }
 
-C5Editor *C5Editor::createEditor(const QStringList &dbParams, CE5Editor *e, int id)
+C5Editor* C5Editor::createEditor(CE5Editor *e, int id)
 {
-    C5Editor *de = new C5Editor(dbParams);
+    C5Editor *de = new C5Editor();
     e->fFocusNextChild = false;
     de->fEditor = e;
     de->fVerticalLayout->addWidget(e);
@@ -33,31 +33,37 @@ C5Editor *C5Editor::createEditor(const QStringList &dbParams, CE5Editor *e, int 
     e->setId(id);
     de->ui->btnCopy->setVisible(e->canCopy());
     de->setWindowTitle(e->title());
-    if (e->b1()) {
+
+    if(e->b1()) {
         de->insertButton(e->b1());
     }
+
     e->fEditor = de;
     connect(e, &CE5Editor::Accept, de, &C5Editor::EditorAccepted);
     return de;
 }
 
-bool C5Editor::getResult(QList<QMap<QString, QVariant> > &data)
+bool C5Editor::getResult(QList<QMap<QString, QVariant> >& data)
 {
     fEditor->focusFirst();
-    if (exec() == QDialog::Accepted) {
+
+    if(exec() == QDialog::Accepted) {
         data = fData;
         return true;
     }
+
     return false;
 }
 
 bool C5Editor::getJsonObject(QJsonObject &j)
 {
     fEditor->focusFirst();
-    if (exec() == QDialog::Accepted) {
+
+    if(exec() == QDialog::Accepted) {
         j = fEditor->fJsonData;
         return true;
     }
+
     return false;
 }
 
@@ -74,11 +80,12 @@ void C5Editor::insertButton(QPushButton *b)
 
 bool C5Editor::event(QEvent *e)
 {
-    if (e->type() == QEvent::KeyPress) {
-        QKeyEvent *ke = static_cast<QKeyEvent *>(e);
-        if (ke->key() == Qt::Key_Return || ke->key() == Qt::Key_Enter) {
-            if (ke->modifiers() &Qt::ControlModifier) {
-                if (ke->modifiers() &Qt::ShiftModifier) {
+    if(e->type() == QEvent::KeyPress) {
+        QKeyEvent *ke = static_cast<QKeyEvent*>(e);
+
+        if(ke->key() == Qt::Key_Return || ke->key() == Qt::Key_Enter) {
+            if(ke->modifiers() &Qt::ControlModifier) {
+                if(ke->modifiers() &Qt::ShiftModifier) {
                     on_btnSaveAndNew_clicked();
                 } else {
                     on_btnSave_clicked();
@@ -86,6 +93,7 @@ bool C5Editor::event(QEvent *e)
             }
         }
     }
+
     return C5Dialog::event(e);
 }
 
@@ -104,20 +112,26 @@ void C5Editor::EditorAccepted()
 void C5Editor::on_btnSave_clicked()
 {
     QString err;
-    if (!fEditor->checkData(err)) {
+
+    if(!fEditor->checkData(err)) {
         C5Message::error(err);
         return;
     }
+
     err = "";
-    if (!fEditor->save(err, fData)) {
+
+    if(!fEditor->save(err, fData)) {
         C5Message::error(err);
         return;
     }
+
     setProperty("saveandnew", false);
-    if (fEditor->isOnline()) {
+
+    if(fEditor->isOnline()) {
         return;
     }
-    if (!fEditor->acceptOnSave()) {
+
+    if(!fEditor->acceptOnSave()) {
         fEditor->clear();
         accept();
     }
@@ -126,22 +140,29 @@ void C5Editor::on_btnSave_clicked()
 bool C5Editor::on_btnSaveAndNew_clicked()
 {
     QString err;
-    if (!fEditor->checkData(err)) {
+
+    if(!fEditor->checkData(err)) {
         C5Message::error(err);
         return false;
     }
+
     err = "";
-    if (!fEditor->save(err, fData)) {
+
+    if(!fEditor->save(err, fData)) {
         C5Message::error(err);
         return false;
     }
+
     setProperty("saveandnew", true);
-    if (fEditor->isOnline()) {
+
+    if(fEditor->isOnline()) {
         return true;
     }
-    if (!fEditor->acceptOnSave()) {
+
+    if(!fEditor->acceptOnSave()) {
         fEditor->clear();
     }
+
     return true;
 }
 

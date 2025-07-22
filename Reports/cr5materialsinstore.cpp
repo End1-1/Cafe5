@@ -6,13 +6,13 @@
 #include "c5storebarcode.h"
 #include "ce5goods.h"
 
-CR5MaterialsInStore::CR5MaterialsInStore(const QStringList &dbParams, QWidget *parent) :
-    C5ReportWidget(dbParams, parent)
+CR5MaterialsInStore::CR5MaterialsInStore(QWidget *parent) :
+    C5ReportWidget( parent)
 {
     fIcon = ":/goods.png";
     fLabel = tr("Materials in the store");
     fSimpleQuery = false;
-    fFilterWidget = new CR5MaterialInStoreFilter(fDBParams);
+    fFilterWidget = new CR5MaterialInStoreFilter();
     fFilter = static_cast<CR5MaterialInStoreFilter *>(fFilterWidget);
     if (fFilter->showDrafts()) {
         prepareDrafts();
@@ -284,12 +284,12 @@ void CR5MaterialsInStore::setColors()
 
 void CR5MaterialsInStore::printBarcode()
 {
-    C5Database db(fDBParams);
+    C5Database db;
     db[":f_id"] = fFilter->currency().isEmpty() ? __c5config.getValue(param_default_currency) : fFilter->currency();
     db.exec("select f_symbol from e_currency where f_id=:f_id");
     db.nextRow();
     QString s = db.getString("f_symbol");
-    C5StoreBarcode *b = __mainWindow->createTab<C5StoreBarcode>(fDBParams);
+    C5StoreBarcode *b = __mainWindow->createTab<C5StoreBarcode>();
     b->fCurrencyName = s;
     for (int i = 0; i < fModel->rowCount(); i++) {
         if (fFilter->unit().isEmpty()) {
@@ -328,8 +328,8 @@ bool CR5MaterialsInStore::on_tblView_doubleClicked(const QModelIndex &index)
         C5Message::info(tr("Code column must be included in report"));
         return false;
     }
-    CE5Goods *ep = new CE5Goods(fDBParams);
-    C5Editor *e = C5Editor::createEditor(fDBParams, ep, fModel->data(index.row(), fModel->indexForColumnName("f_code"),
+    CE5Goods *ep = new CE5Goods();
+    C5Editor *e = C5Editor::createEditor(ep, fModel->data(index.row(), fModel->indexForColumnName("f_code"),
                                          Qt::EditRole).toInt());
     QList<QMap<QString, QVariant> > data;
     if(e->getResult(data)) {

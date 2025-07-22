@@ -10,7 +10,7 @@ class CR5CostumerDebts : public C5ReportWidget
     Q_OBJECT
 
 public:
-    CR5CostumerDebts(const QStringList &dbParams, QWidget *parent = nullptr);
+    CR5CostumerDebts(QWidget *parent = nullptr);
 
     virtual QToolBar *toolBar() override;
 

@@ -14,7 +14,7 @@ class C5CashDoc : public C5Document
     Q_OBJECT
 
 public:
-    explicit C5CashDoc(const QStringList &dbParams, QWidget *parent = nullptr);
+    explicit C5CashDoc(QWidget *parent = nullptr);
 
     ~C5CashDoc() override;
 
@@ -62,7 +62,7 @@ public:
 
     bool fNoSavedMessage = false;
 
-    static bool removeDoc(const QStringList &dbParams, const QString &uuid);
+    static bool removeDoc(const QString &uuid);
 
     static bool removeDoc(C5Database &db, const QString &uuid);
 

@@ -7,6 +7,7 @@
 #include "c5servername.h"
 #include "ndataprovider.h"
 #include "dlgserverconnection.h"
+#include "logwriter.h"
 #include "c5message.h"
 #include <QApplication>
 #include <QTranslator>
@@ -16,10 +17,21 @@
 #include <QLockFile>
 #include <QMessageBox>
 #include <QSettings>
+#include <QScreen>
 
-int main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
     QApplication a(argc, argv);
+    QList<QScreen*> screens = QGuiApplication::screens();
+    int targetScreenIndex = 0;
+
+    if(targetScreenIndex >= screens.size()) {
+        targetScreenIndex = 0; // запасной вариант
+    }
+
+    QRect screenGeometry = screens[targetScreenIndex]->geometry();
+    LogWriter::write(LogWriterLevel::verbose, "Support SSL", QSslSocket::supportsSsl() ? "true" : "false");
+    LogWriter::write(LogWriterLevel::verbose, "Support SSL version", QSslSocket::sslLibraryBuildVersionString());
 #ifndef QT_DEBUG
     QStringList libPath;
     libPath << qApp->applicationDirPath();
@@ -31,27 +43,33 @@ int main(int argc, char *argv[])
 #endif
     qputenv("QT_ASSUME_UTF8", "1");
     QFile styleSheet(a.applicationDirPath() + "/waiter.css");
-    if (styleSheet.open(QIODevice::ReadOnly)) {
+
+    if(styleSheet.open(QIODevice::ReadOnly)) {
         a.setStyleSheet(styleSheet.readAll());
         styleSheet.close();
     }
+
     QDir d;
     QFile file(d.homePath() + "/" + _APPLICATION_ + "/" + _MODULE_ + ".lock.pid");
     file.remove();
     QLockFile lockFile(d.homePath() + "/" + _APPLICATION_  + "/" + _MODULE_ + ".lock.pid");
-    if (!lockFile.tryLock()) {
+
+    if(!lockFile.tryLock()) {
         C5Message::error(QObject::tr("An instance of application already running"));
         return -1;
     }
+
     auto *dlgsplash = new DlgSplashScreen();
     dlgsplash->show();
     emit dlgsplash->messageSignal("Get server name");
     auto sng = new C5ServerName(__c5config.getRegValue("ss_server_address").toString());
-    if (!sng->getConnection(__c5config.getRegValue("ss_database").toString())) {
+
+    if(!sng->getConnection(__c5config.getRegValue("ss_database").toString())) {
         C5Message::error(sng->mErrorString);
         DlgServerConnection::showSettings(0);
         return 1;
     }
+
     QJsonObject js = sng->mReply;
     sng->deleteLater();
     C5Config::fDBHost = js["settings"].toString();
@@ -62,35 +80,42 @@ int main(int argc, char *argv[])
 #else
     C5Config::fFullScreen = true;
 #endif
+    C5Database::fDbParams = C5Config::dbParams();
     C5Config::initParamsFromDb();
     C5Database::LOGGING = C5Config::getValue(param_debuge_mode).toInt() == 1;
     NDataProvider::mProtocol = js["settings"].toString();
-    if (!C5SystemPreference::checkDecimalPointAndSeparator()) {
+
+    if(!C5SystemPreference::checkDecimalPointAndSeparator()) {
         return 0;
     }
+
     QTranslator t;
-    if (t.load(":/Waiter.qm")) {
-        a.installTranslator( &t);
+
+    if(t.load(":/Waiter.qm")) {
+        a.installTranslator(&t);
     }
+
     QFont font(a.font());
     font.setFamily("Arial LatArm Unicode");
     font.setPointSize(11);
     a.setFont(font);
-    C5Database db(__c5config.dbParams());
-    DbData::setDBParams(__c5config.dbParams());
+    C5Database db;
     DataDriver::fInstance = new DataDriver();
     DataDriver::norefresh.append("goods");
     DataDriver::init(__c5config.dbParams(), dlgsplash);
     NDataProvider::mAppName = "waiter";
     NDataProvider::mFileVersion = FileVersion::getVersionString(qApp->applicationFilePath());
     NDataProvider::mHost = C5Config::fDBPath;
-    NDataProvider::mDebug = C5Config::getValue(param_debuge_mode).toInt() > 0;
+    NDataProvider::mDebug = C5Config::getValue(param_debuge_mode).toInt() > 0 || a.arguments().contains("/debug");
     dlgsplash->deleteLater();
     DlgScreen w;
+    w.move(screenGeometry.x(), screenGeometry.y());
     C5Config::fParentWidget = &w;
-    if (C5Config::isAppFullScreen()) {
+
+    if(C5Config::isAppFullScreen()) {
         w.setWindowState(Qt::WindowFullScreen);
     }
+
     w.show();
     a.processEvents();
     return a.exec();

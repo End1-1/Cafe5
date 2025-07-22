@@ -15,7 +15,7 @@ class C5GoodsPriceOrder : public C5Widget
     Q_OBJECT
 
 public:
-    explicit C5GoodsPriceOrder(const QStringList &dbParams);
+    explicit C5GoodsPriceOrder();
 
     ~C5GoodsPriceOrder();
 

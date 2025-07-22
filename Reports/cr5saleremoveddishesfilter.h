@@ -12,7 +12,7 @@ class CR5SaleRemovedDishesFilter : public C5FilterWidget
     Q_OBJECT
 
 public:
-    explicit CR5SaleRemovedDishesFilter(const QStringList &dbParams, QWidget *parent = nullptr);
+    explicit CR5SaleRemovedDishesFilter(QWidget *parent = nullptr);
 
     ~CR5SaleRemovedDishesFilter();
 

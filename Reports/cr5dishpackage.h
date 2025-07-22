@@ -7,7 +7,7 @@ class CR5DishPackage : public C5ReportWidget
 {
     Q_OBJECT
 public:
-    CR5DishPackage(const QStringList &dbParams, QWidget *parent = nullptr);
+    CR5DishPackage(QWidget *parent = nullptr);
 
     virtual QToolBar *toolBar();
 

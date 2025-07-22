@@ -12,11 +12,11 @@ class DlgListOfMenu : public C5Dialog
     Q_OBJECT
 
 public:
-    explicit DlgListOfMenu(const QStringList &dbParams);
+    explicit DlgListOfMenu();
 
     ~DlgListOfMenu();
 
-    static bool getMenuId(int &id, const QStringList &dbParams);
+    static bool getMenuId(int &id);
 
 private slots:
     void on_lst_clicked(const QModelIndex &index);

@@ -9,7 +9,7 @@
 #include <QDoubleValidator>
 
 DlgCashOp::DlgCashOp(bool in, C5User *u) :
-    C5Dialog(__c5config.dbParams()),
+    C5Dialog(),
     ui(new Ui::DlgCashOp)
 {
     ui->setupUi(this);
@@ -41,7 +41,7 @@ void DlgCashOp::on_btnSave_clicked()
         C5Message::error(tr("Purpose must be defined"));
         return;
     }
-    C5Database db(fDBParams);
+    C5Database db;
     C5StoreDraftWriter dw(db);
     int counter = dw.counterAType(DOC_TYPE_CASH);
     QString cashdoc;

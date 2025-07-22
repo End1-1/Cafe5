@@ -26,7 +26,7 @@ class C5StoreDoc : public C5Document
 public:
     enum STORE_DOC {sdInput = 1, sdOutput, sdMovement, sdInventory, sdCash, sdComplectation, sdSalary, sdDeComplectation};
 
-    explicit C5StoreDoc(const QStringList &dbParams, QWidget *parent = nullptr);
+    explicit C5StoreDoc(QWidget *parent = nullptr);
 
     ~C5StoreDoc() override;
 
@@ -50,7 +50,7 @@ public:
 
     bool writeDocument(int state, QString &err);
 
-    static bool removeDoc(const QStringList &dbParams, QString id, bool showmessage = true);
+    static bool removeDoc(QString id, bool showmessage = true);
 
     QVariant docProperty(const QString &field) const;
 

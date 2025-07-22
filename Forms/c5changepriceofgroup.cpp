@@ -3,8 +3,8 @@
 #include "c5random.h"
 #include "c5message.h"
 
-C5ChangePriceOfGroup::C5ChangePriceOfGroup(const QStringList &dbParams) :
-    C5Dialog(dbParams),
+C5ChangePriceOfGroup::C5ChangePriceOfGroup() :
+    C5Dialog(),
     ui(new Ui::C5ChangePriceOfGroup)
 {
     ui->setupUi(this);
@@ -16,10 +16,10 @@ C5ChangePriceOfGroup::~C5ChangePriceOfGroup()
     delete ui;
 }
 
-bool C5ChangePriceOfGroup::groupPrice(const QStringList &dbParams, double &price1, double &price2, double &price1disc,
+bool C5ChangePriceOfGroup::groupPrice(double &price1, double &price2, double &price1disc,
                                       double &price2disc)
 {
-    auto *c = new  C5ChangePriceOfGroup(dbParams);
+    auto *c = new  C5ChangePriceOfGroup();
     bool r = c->exec() == QDialog::Accepted;
     price1 = c->ui->lePrice1->getDouble();
     price2 = c->ui->lePrice2->getDouble();

@@ -8,7 +8,7 @@
 #include <QScreen>
 
 DlgStaffList::DlgStaffList() :
-    C5Dialog(__c5config.dbParams()),
+    C5Dialog(),
     ui(new Ui::DlgStaffList)
 {
     ui->setupUi(this);
@@ -66,7 +66,7 @@ void DlgStaffList::on_tbl_cellClicked(int row, int column)
                                         pass)) {
         return;
     }
-    C5Database db(__c5config.dbParams());
+    C5Database db;
     db[":f_altpassword"] = pass;
     db[":f_id"] = id;
     if (!db.exec("update s_user set f_altpassword=md5(:f_altpassword) where f_id=:f_id")) {

@@ -3,7 +3,7 @@
 #include "c5config.h"
 
 DlgDate::DlgDate() :
-    C5Dialog(__c5config.dbParams()),
+    C5Dialog(),
     ui(new Ui::DlgDate)
 {
     ui->setupUi(this);
@@ -16,7 +16,7 @@ DlgDate::~DlgDate()
 
 bool DlgDate::getDate(QDate &date)
 {
-    DlgDate d;
+      DlgDate d;
     if (d.exec() == QDialog::Accepted) {
         date = d.ui->leDate->date();
         return true;

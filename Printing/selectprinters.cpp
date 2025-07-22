@@ -3,7 +3,7 @@
 #include "c5config.h"
 
 SelectPrinters::SelectPrinters() :
-    C5Dialog(__c5config.dbParams()),
+    C5Dialog(),
     ui(new Ui::SelectPrinters)
 {
     ui->setupUi(this);

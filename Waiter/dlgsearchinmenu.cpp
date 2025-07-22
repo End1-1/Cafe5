@@ -4,7 +4,7 @@
 #include "c5tabledata.h"
 
 DlgSearchInMenu::DlgSearchInMenu() :
-    C5Dialog(C5Config::dbParams()),
+    C5Dialog(),
     ui(new Ui::DlgSearchInMenu)
 {
     ui->setupUi(this);

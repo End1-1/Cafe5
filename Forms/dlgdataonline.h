@@ -29,11 +29,11 @@ public:
         }
     };
 
-    explicit DlgDataOnline(const QStringList &dbParams, const QString &table);
+    explicit DlgDataOnline(const QString &table);
 
     ~DlgDataOnline();
 
-    static bool get(const QStringList &dbParams, const QString &table, DataResult &result, bool multiselect = false,
+    static bool get(const QString &table, DataResult &result, bool multiselect = false,
                     int searchcolumn = -1);
 
 private slots:

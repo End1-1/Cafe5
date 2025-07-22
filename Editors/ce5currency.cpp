@@ -1,8 +1,8 @@
 #include "ce5currency.h"
 #include "ui_ce5currency.h"
 
-CE5Currency::CE5Currency(const QStringList &dbParams, QWidget *parent) :
-    CE5Editor(dbParams, parent),
+CE5Currency::CE5Currency(QWidget *parent) :
+    CE5Editor(parent),
     ui(new Ui::CE5Currency)
 {
     ui->setupUi(this);

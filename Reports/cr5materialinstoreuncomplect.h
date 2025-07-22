@@ -10,7 +10,7 @@ class CR5MaterialInStoreUncomplect : public C5ReportWidget
     Q_OBJECT
 
 public:
-    CR5MaterialInStoreUncomplect(const QStringList &dbParams, QWidget *parent = nullptr);
+    CR5MaterialInStoreUncomplect(QWidget *parent = nullptr);
 
     virtual QToolBar *toolBar();
 

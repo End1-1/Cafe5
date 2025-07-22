@@ -8,7 +8,7 @@ class CR5Complectations : public C5ReportWidget
     Q_OBJECT
 
 public:
-    CR5Complectations(const QStringList &dbparams, QWidget *parent = nullptr);
+    CR5Complectations(QWidget *parent = nullptr);
 
     virtual QToolBar *toolBar() override;
 

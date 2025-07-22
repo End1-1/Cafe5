@@ -8,7 +8,7 @@ class CR5MenuReview : public C5ReportWidget
     Q_OBJECT
 
 public:
-    CR5MenuReview(const QStringList &dbParams, QWidget *parent = nullptr);
+    CR5MenuReview(QWidget *parent = nullptr);
 
     virtual QToolBar *toolBar() override;
 

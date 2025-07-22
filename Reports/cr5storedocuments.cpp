@@ -4,13 +4,13 @@
 #include "c5mainwindow.h"
 #include "c5storedoc.h"
 
-CR5StoreDocuments::CR5StoreDocuments(const QStringList &dbParams, QWidget *parent) :
-    C5ReportWidget(dbParams, parent)
+CR5StoreDocuments::CR5StoreDocuments(QWidget *parent) :
+    C5ReportWidget( parent)
 {
     fLabel = tr("Document in the store");
     fIcon = ":/documents.png";
     fSimpleQuery = true;
-    fFilterWidget = new CR5StoreDocumentsFilter(dbParams);
+    fFilterWidget = new CR5StoreDocumentsFilter();
     fFilter = static_cast<CR5StoreDocumentsFilter *>(fFilterWidget);
     fTranslation["f_document"] = tr("Document");
     fTranslation["f_docstatename"] = tr("State");
@@ -67,7 +67,7 @@ bool CR5StoreDocuments::tblDoubleClicked(int row, int column, const QJsonArray &
         return true;
     }
     QString e;
-    C5StoreDoc *sd = __mainWindow->createTab<C5StoreDoc>(fDBParams);
+    C5StoreDoc *sd = __mainWindow->createTab<C5StoreDoc>();
     if (!sd->openDoc(values.at(0).toString(), e )) {
         __mainWindow->removeTab(sd);
         C5Message::error(e);

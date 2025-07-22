@@ -7,7 +7,7 @@
 #include <QValidator>
 
 DlgCashout::DlgCashout()
-    : C5Dialog(__c5config.dbParams())
+    : C5Dialog()
     , ui(new Ui::DlgCashout)
 {
     ui->setupUi(this);

@@ -3,8 +3,8 @@
 #include "c5cache.h"
 #include "c5lineeditwithselector.h"
 
-CR5ReportsFilter::CR5ReportsFilter(const QStringList &dbParams, QWidget *parent) :
-    C5FilterWidget(dbParams, parent),
+CR5ReportsFilter::CR5ReportsFilter(QWidget *parent) :
+    C5FilterWidget(parent),
     ui(new Ui::CR5ReportsFilter)
 {
     ui->setupUi(this);
@@ -101,7 +101,7 @@ void CR5ReportsFilter::addFilterField(const QString &title, const QString &data,
     e1->setProperty("fieldname", kv.at(1));
     e1->setMaximumWidth(150);
     auto *e2 = new C5LineEditWithSelector(this);
-    e1->setSelector(fDBParams, e2, kv.at(0).toInt());
+    e1->setSelector(e2, kv.at(0).toInt());
     e2->setReadOnly(true);
     e2->setMinimumWidth(250);
     ui->gr->addWidget(l, row, 0);

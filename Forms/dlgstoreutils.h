@@ -12,7 +12,7 @@ class DlgStoreUtils : public C5Dialog
     Q_OBJECT
 
 public:
-    explicit DlgStoreUtils(const QStringList &dbParams);
+    explicit DlgStoreUtils();
     ~DlgStoreUtils();
 
 private slots:

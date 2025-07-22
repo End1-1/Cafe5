@@ -14,14 +14,14 @@
 #include <QShortcut>
 #include <QUuid>
 
-C5StoreInventory::C5StoreInventory(const QStringList &dbParams, QWidget *parent) :
-    C5Widget(dbParams, parent),
+C5StoreInventory::C5StoreInventory(QWidget *parent) :
+    C5Widget(parent),
     ui(new Ui::C5StoreInventory)
 {
     ui->setupUi(this);
     fIcon = ":/goods.png";
     fLabel = tr("Store inventory");
-    ui->leStore->setSelector(fDBParams, ui->leStoreName, cache_goods_store);
+    ui->leStore->setSelector(ui->leStoreName, cache_goods_store);
     ui->tblGoods->setColumnWidths(7, 0, 0, 300, 80, 80, 80, 80);
     ui->wSearch->setVisible(false);
     connect(ui->leStore, SIGNAL(keyPressed(QChar)), this, SLOT(keyPressed(QChar)));
@@ -48,7 +48,7 @@ QToolBar *C5StoreInventory::toolBar()
 bool C5StoreInventory::openDoc(QString id)
 {
     fInternalID = id;
-    C5Database db(fDBParams);
+    C5Database db;
     db[":f_id"] = id;
     db.exec("select * from a_header where f_id=:f_id");
     if (!db.nextRow()) {
@@ -79,9 +79,9 @@ bool C5StoreInventory::openDoc(QString id)
     return true;
 }
 
-bool C5StoreInventory::removeDoc(const QStringList &dbParams, QString id)
+bool C5StoreInventory::removeDoc(QString id)
 {
-    C5Database db(dbParams);
+    C5Database db;
     db[":f_document"] = id;
     db.exec("delete from a_store_inventory where f_document=:f_document");
     db[":f_id"] = id;
@@ -114,7 +114,7 @@ void C5StoreInventory::keyPressed(const QChar &c)
 
 void C5StoreInventory::saveDoc()
 {
-    C5Database db(fDBParams);
+    C5Database db;
     QString err;
     if (!docCheck(err)) {
         C5Message::error(err);
@@ -265,14 +265,14 @@ void C5StoreInventory::printDoc()
     p.br(p.fLineHeight + 20);
     p.line(50, p.fTop, 700, p.fTop);
     p.line(1000, p.fTop, 1650, p.fTop);
-    C5PrintPreview pp( &p, fDBParams);
+    C5PrintPreview pp( &p);
     pp.exec();
 }
 
 void C5StoreInventory::on_btnAddGoods_clicked()
 {
     QJsonArray vals;
-    if (!C5Selector::getValueOfColumn(fDBParams, cache_goods, vals, 3)) {
+    if (!C5Selector::getValueOfColumn(cache_goods, vals, 3)) {
         return;
     }
     int row = addGoodsRow();
@@ -390,8 +390,8 @@ void C5StoreInventory::tblTotalChanged(const QString &arg1)
 
 void C5StoreInventory::on_btnNew_clicked()
 {
-    CE5Goods *ep = new CE5Goods(fDBParams);
-    C5Editor *e = C5Editor::createEditor(fDBParams, ep, 0);
+    CE5Goods *ep = new CE5Goods();
+    C5Editor *e = C5Editor::createEditor(ep, 0);
     QList<QMap<QString, QVariant> > data;
     if(e->getResult(data)) {
         if (data.at(0)["f_id"].toInt() == 0) {

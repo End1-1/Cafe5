@@ -3,7 +3,7 @@
 #include "ui_dlgprecheckoptions.h"
 
 DlgPrecheckOptions::DlgPrecheckOptions() :
-    C5Dialog(__c5config.dbParams()),
+    C5Dialog(),
     ui(new Ui::DlgPrecheckOptions)
 {
     ui->setupUi(this);

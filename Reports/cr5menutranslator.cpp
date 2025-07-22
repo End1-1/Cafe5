@@ -5,8 +5,8 @@
 #include "c5message.h"
 #include <QJsonArray>
 
-CR5MenuTranslator::CR5MenuTranslator(const QStringList &dbParams,  QWidget *parent) :
-    C5Widget(dbParams, parent),
+CR5MenuTranslator::CR5MenuTranslator( QWidget *parent) :
+    C5Widget(parent),
     ui(new Ui::CR5MenuTranslator)
 {
     ui->setupUi(this);
@@ -33,7 +33,7 @@ QToolBar *CR5MenuTranslator::toolBar()
 
 void CR5MenuTranslator::setMode(int mode)
 {
-    C5Database db(fDBParams);
+    C5Database db;
     fMode = mode;
     if (mode == 1) {
         db.exec("select d.f_id, p2.f_name, d.f_name, t.f_en, t.f_ru "

@@ -12,7 +12,7 @@ class CR5MenuReviewFilter : public C5FilterWidget
     Q_OBJECT
 
 public:
-    explicit CR5MenuReviewFilter(const QStringList &dbParams, QWidget *parent = nullptr);
+    explicit CR5MenuReviewFilter(QWidget *parent = nullptr);
 
     ~CR5MenuReviewFilter();
 

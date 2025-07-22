@@ -8,7 +8,7 @@ class C5SearchEngine : public QObject
 {
 public:
     C5SearchEngine();
-    static C5SearchEngine *mInstance;
+    static C5SearchEngine* mInstance;
     static void init(QStringList databases);
     QString search(const QJsonObject &jo);
     QString searchPartner(const QJsonObject &jo);
@@ -16,7 +16,6 @@ public:
     QString searchGoods(const QJsonObject &jo);
     QString searchStore(const QJsonObject &jo);
     QString searchUpdatePartnerCache(const QJsonObject &jo);
-
 };
 
 #endif // C5SEARCHENGINE_H

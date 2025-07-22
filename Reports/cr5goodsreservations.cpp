@@ -2,22 +2,22 @@
 #include "cr5goodsreservationsfilter.h"
 #include "dlgreservgoods.h"
 
-CR5GoodsReservations::CR5GoodsReservations(const QStringList &dbParams, QWidget *parent) :
-    C5ReportWidget(dbParams, parent)
+CR5GoodsReservations::CR5GoodsReservations(QWidget *parent) :
+    C5ReportWidget(parent)
 {
     fIcon = ":/calendar.png";
     fLabel = tr("Goods reservation");
     setProperty("sql", "select rs.f_id, arn.f_name as f_statename, rs.f_date, "
-            "ss.f_name as f_sourcestore, sd.f_name as f_storename, "
-            "g.f_name as f_goodsname, g.f_scancode, "
-            "rs.f_qty, rs.f_message "
-            "from a_store_reserve rs "
-            "left join c_storages ss on ss.f_id=rs.f_source "
-            "left join c_storages sd on sd.f_id=rs.f_store "
-            "left join c_goods g on g.f_id=rs.f_goods "
-            "left join a_store_reserve_state arn on arn.f_id=rs.f_state "
-            "%where% "
-            "order by rs.f_date ");
+                "ss.f_name as f_sourcestore, sd.f_name as f_storename, "
+                "g.f_name as f_goodsname, g.f_scancode, "
+                "rs.f_qty, rs.f_message "
+                "from a_store_reserve rs "
+                "left join c_storages ss on ss.f_id=rs.f_source "
+                "left join c_storages sd on sd.f_id=rs.f_store "
+                "left join c_goods g on g.f_id=rs.f_goods "
+                "left join a_store_reserve_state arn on arn.f_id=rs.f_state "
+                "%where% "
+                "order by rs.f_date ");
     fTranslation["f_id"] = tr("Code");
     fTranslation["f_statename"] = tr("State");
     fTranslation["f_date"] = tr("Date");
@@ -27,7 +27,7 @@ CR5GoodsReservations::CR5GoodsReservations(const QStringList &dbParams, QWidget 
     fTranslation["f_scancode"] = tr("Scancode");
     fTranslation["f_qty"] = tr("Qty");
     fTranslation["f_message"] = tr("Message");
-    fFilterWidget = new CR5GoodsReservationsFilter(dbParams);
+    fFilterWidget = new CR5GoodsReservationsFilter();
 }
 
 void CR5GoodsReservations::buildQuery()
@@ -38,9 +38,9 @@ void CR5GoodsReservations::buildQuery()
     C5ReportWidget::buildQuery();
 }
 
-QToolBar *CR5GoodsReservations::toolBar()
+QToolBar* CR5GoodsReservations::toolBar()
 {
-    if (!fToolBar) {
+    if(!fToolBar) {
         QList<ToolBarButtons> btn;
         btn << ToolBarButtons::tbNew
             << ToolBarButtons::tbFilter
@@ -48,14 +48,15 @@ QToolBar *CR5GoodsReservations::toolBar()
             << ToolBarButtons::tbRefresh
             << ToolBarButtons::tbExcel
             << ToolBarButtons::tbPrint;
-            createStandartToolbar(btn);
+        createStandartToolbar(btn);
     }
+
     return fToolBar;
 }
 
 int CR5GoodsReservations::newRow()
 {
-    DlgReservGoods d(fDBParams);
+    DlgReservGoods d;
     d.exec();
     return -1;
 }
@@ -63,10 +64,12 @@ int CR5GoodsReservations::newRow()
 bool CR5GoodsReservations::tblDoubleClicked(int row, int column, const QJsonArray &values)
 {
     Q_UNUSED(column);
-    if (row < 0 || values.count() == 0) {
+
+    if(row < 0 || values.count() == 0) {
         return true;
     }
-    DlgReservGoods d(fDBParams, values.at(0).toInt());
+
+    DlgReservGoods d(values.at(0).toInt());
     d.exec();
     return true;
 }

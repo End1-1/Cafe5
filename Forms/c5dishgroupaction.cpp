@@ -2,13 +2,13 @@
 #include "ui_c5dishgroupaction.h"
 #include "c5cache.h"
 
-C5DishGroupAction::C5DishGroupAction(const QStringList &dbParams) :
-    C5Dialog(dbParams),
+C5DishGroupAction::C5DishGroupAction() :
+    C5Dialog(),
     ui(new Ui::C5DishGroupAction)
 {
     ui->setupUi(this);
-    ui->leState->setSelector(dbParams, ui->leStateName, cache_dish_menu_state);
-    ui->leStore->setSelector(dbParams, ui->leStoreName, cache_goods_store);
+    ui->leState->setSelector(ui->leStateName, cache_dish_menu_state);
+    ui->leStore->setSelector(ui->leStoreName, cache_goods_store);
 }
 
 C5DishGroupAction::~C5DishGroupAction()

@@ -6,18 +6,18 @@
 #include "c5utils.h"
 #include <QFileDialog>
 
-C5SettingsWidget::C5SettingsWidget(const QStringList &dbParams, QWidget *parent) :
-    CE5Editor(dbParams, parent),
+C5SettingsWidget::C5SettingsWidget(QWidget *parent) :
+    CE5Editor(parent),
     ui(new Ui::C5SettingsWidget)
 {
     ui->setupUi(this);
-    ui->cbMenu->setDBValues(fDBParams, "select f_id, f_name from d_menu_names order by 2");
-    ui->cbDefaultStore->setDBValues(fDBParams, "select f_id, f_name from c_storages order by 2");
+    ui->cbMenu->setDBValues("select f_id, f_name from d_menu_names order by 2");
+    ui->cbDefaultStore->setDBValues("select f_id, f_name from c_storages order by 2");
     ui->cbTaxUseExtPos->addItem(tr("Yes"), "true");
     ui->cbTaxUseExtPos->addItem(tr("No"), "false");
     ui->cbFronDeskMode->addItem(tr("Waiter"), 0);
     ui->cbFronDeskMode->addItem(tr("Shop"), 1);
-    ui->cbDefaultCurrency->setDBValues(dbParams, "select f_id, f_name from e_currency");
+    ui->cbDefaultCurrency->setDBValues("select f_id, f_name from e_currency");
 }
 
 C5SettingsWidget::~C5SettingsWidget()
@@ -30,36 +30,45 @@ void C5SettingsWidget::setId(int id)
     CE5Editor::setId(id);
     clear(this);
     fSettingsId = id;
-    C5Database db(fDBParams);
+    C5Database db;
     db[":f_settings"] = id;
     db.exec("select f_key, f_value from s_settings_values where f_settings=:f_settings");
-    while (db.nextRow()) {
+
+    while(db.nextRow()) {
         QWidget *w = widget(this, db.getInt(0));
-        if (w) {
+
+        if(w) {
             setWidgetValue(w, db.getString(1));
         } else {
             qDebug() << "No widget for: " << db.getInt(0) << db.getString(1);
         }
     }
+
     db.exec("select f_id, f_counter from a_type");
-    while (db.nextRow()) {
-        switch (db.getInt(0)) {
-            case DOC_TYPE_STORE_INPUT:
-                ui->leInputDocCounter->setInteger(db.getInt(1));
-                break;
-            case DOC_TYPE_STORE_OUTPUT:
-                ui->leOutDocCounter->setInteger(db.getInt(1));
-                break;
-            case DOC_TYPE_STORE_MOVE:
-                ui->leMoveDocCounter->setInteger(db.getInt(1));
-                break;
-            default:
-                break;
+
+    while(db.nextRow()) {
+        switch(db.getInt(0)) {
+        case DOC_TYPE_STORE_INPUT:
+            ui->leInputDocCounter->setInteger(db.getInt(1));
+            break;
+
+        case DOC_TYPE_STORE_OUTPUT:
+            ui->leOutDocCounter->setInteger(db.getInt(1));
+            break;
+
+        case DOC_TYPE_STORE_MOVE:
+            ui->leMoveDocCounter->setInteger(db.getInt(1));
+            break;
+
+        default:
+            break;
         }
     }
+
     db[":f_id"] = id;
     db.exec("select * from sys_json_config where f_id=:f_id");
-    if (db.nextRow()) {
+
+    if(db.nextRow()) {
         QJsonObject jo = __strjson(db.getString("f_config"));
         //company data
         ui->leCompanyInfo->setText(jo["companydata"].toString());
@@ -85,6 +94,7 @@ void C5SettingsWidget::setId(int id)
         ui->chmStoreInputCheck->setChecked(jo["chm_storeinputcheck"].toBool());
         ui->chmSaleOutputConfirmation->setChecked(jo["chm_saleoutconfirmation"].toBool());
         ui->chmReturnGoods->setChecked(jo["chm_returngoods"].toBool());
+        ui->chmLoadingGoods->setChecked(jo["chm_loaindggoods"].toBool());
         ui->chDebugMode->setChecked(jo["debug_mode"].toBool());
         ui->chClearSaveDraft->setChecked(jo["clear_sale_draft"].toBool());
         ui->chChangeDraftDateToCurrent->setChecked(jo["change_draft_date_to_current"].toBool());
@@ -95,25 +105,31 @@ void C5SettingsWidget::setId(int id)
         ui->leServiceItemCode->setInteger(jo["service_item_code"].toInt());
         ui->leDiscountItemCode->setInteger(jo["discount_item_code"].toInt());
         QString s;
-        for (int i = 0; i < ja.count(); i++) {
-            if (!s.isEmpty()) {
+
+        for(int i = 0; i < ja.count(); i++) {
+            if(!s.isEmpty()) {
                 s += ",";
             }
+
             s += QString::number(ja.at(i).toInt());
         }
+
         ui->leAvailableStore->setText(s);
     }
 }
 
-bool C5SettingsWidget::save(QString &err, QList<QMap<QString, QVariant> > &data)
+bool C5SettingsWidget::save(QString &err, QList<QMap<QString, QVariant> >& data)
 {
     bool isNew = false;
-    if (ui->leCode->getInteger() == 0) {
+
+    if(ui->leCode->getInteger() == 0) {
         isNew = true;
     }
-    if (!CE5Editor::save(err, data)) {
+
+    if(!CE5Editor::save(err, data)) {
         return false;
     }
+
     QMap<int, QString> fTags;
     fTags[ui->leLocalReceiptPrinter->getTag()] = ui->leLocalReceiptPrinter->text();
     fTags[ui->leServiceFactor->getTag()] = ui->leServiceFactor->text();
@@ -142,7 +158,6 @@ bool C5SettingsWidget::save(QString &err, QList<QMap<QString, QVariant> > &data)
     fTags[ui->leFDFontSize->getTag()] = ui->leFDFontSize->text();
     fTags[ui->chCarMode->getTag()] = ui->chCarMode->isChecked() ? "1" : "0";
     fTags[ui->cbFronDeskMode->getTag()] = ui->cbFronDeskMode->currentData().toString();
-    fTags[ui->chEnterShopPin->getTag()] = ui->chEnterShopPin->isChecked() ? "1" : "0";
     fTags[ui->chAutoCash->getTag()] = ui->chAutoCash->isChecked() ? "1" : "0";
     fTags[ui->leCashId->getTag()] = ui->leCashId->text();
     fTags[ui->leCardId->getTag()] = ui->leCardId->text();
@@ -158,8 +173,6 @@ bool C5SettingsWidget::save(QString &err, QList<QMap<QString, QVariant> > &data)
     fTags[ui->rbPrintV1->property("tag").toInt()] = ui->rbPrintV1->isChecked() ? "1" : "0";
     fTags[ui->rbPrintV2->property("tag").toInt()] = ui->rbPrintV2->isChecked() ? "1" : "0";
     fTags[ui->rbPrintV3->property("tag").toInt()] = ui->rbPrintV3->isChecked() ? "1" : "0";
-    fTags[ui->leAutologinPin1->getTag()] = ui->leAutologinPin1->text();
-    fTags[ui->leAutologinPin2->getTag()] = ui->leAutologinPin2->text();
     fTags[ui->chFixAutoenterInputDocPrice->getTag()] = ui->chFixAutoenterInputDocPrice->isChecked() ? "1" : "0";
     fTags[ui->leReceiptFooterText->getTag()] = ui->leReceiptFooterText->text();
     fTags[ui->rbPrintDown->property("tag").toInt()] = ui->rbPrintDown->isChecked() ? "1" : "0";
@@ -224,24 +237,29 @@ bool C5SettingsWidget::save(QString &err, QList<QMap<QString, QVariant> > &data)
     fTags[ui->leDeliveryCostumerId->getTag()] = ui->leDeliveryCostumerId->text();
     fTags[ui->leDebtholderFilterId->getTag()] = ui->leDebtholderFilterId->text();
     fTags[ui->chSimpleFiscal->getTag()] = ui->chSimpleFiscal->isChecked() ? "1" : "0";
-    C5Database db(fDBParams);
-    if (isNew) {
+    C5Database db;
+
+    if(isNew) {
         db[":f_id"] = ui->leCode->getInteger();
         db[":f_name"] = ui->leSettingsName->text();
         db.insert("sys_json_config", false);
     }
+
     db[":f_settings"] = ui->leCode->getInteger();
     db.exec("delete from s_settings_values where f_settings=:f_settings");
     QString sql = "insert into s_settings_values (f_settings, f_key, f_value) values ";
     bool first = true;
-    for (QMap<int, QString>::const_iterator it = fTags.constBegin(); it != fTags.constEnd(); it++) {
-        if (first) {
+
+    for(QMap<int, QString>::const_iterator it = fTags.constBegin(); it != fTags.constEnd(); it++) {
+        if(first) {
             first = false;
         } else {
             sql += ",";
         }
+
         sql += QString("(%1, %2, '%3')").arg(ui->leCode->text(), QString::number(it.key()), it.value());
     }
+
     db.exec(sql);
     db[":f_counter"] = ui->leInputDocCounter->getInteger();
     db.update("a_type", where_id(DOC_TYPE_STORE_INPUT));
@@ -250,10 +268,13 @@ bool C5SettingsWidget::save(QString &err, QList<QMap<QString, QVariant> > &data)
     db[":f_counter"] = ui->leMoveDocCounter->getInteger();
     db.update("a_type", where_id(DOC_TYPE_STORE_MOVE));
     QStringList halls = ui->leHall->text().split(",", Qt::SkipEmptyParts);
-    if (halls.isEmpty()) {
+
+    if(halls.isEmpty()) {
         halls.append("0");
     }
+
     QJsonObject jc;
+    jc["id"] = ui->leCode->getInteger();
     jc["store"] = ui->cbDefaultStore->currentData().toInt();
     jc["store_name"] = ui->cbDefaultStore->currentText();
     jc["first_page_title"] = ui->leSettingsName->text();
@@ -288,6 +309,7 @@ bool C5SettingsWidget::save(QString &err, QList<QMap<QString, QVariant> > &data)
     jc["chm_draftsale"] = ui->chmDraftSale->isChecked();
     jc["chm_storeinputcheck"] = ui->chmStoreInputCheck->isChecked();
     jc["chm_saleoutconfirmation"] = ui->chmSaleOutputConfirmation->isChecked();
+    jc["chm_loaindggoods"] = ui->chmLoadingGoods->isChecked();
     jc["chm_returngoods"] = ui->chmReturnGoods->isChecked();
     jc["use_websocket"] = ui->chUseWebsocket->isChecked();
     jc["debug_mode"] = ui->chDebugMode->isChecked();
@@ -299,9 +321,11 @@ bool C5SettingsWidget::save(QString &err, QList<QMap<QString, QVariant> > &data)
     jc["discount_item_code"] = ui->leDiscountItemCode->getInteger();
     QJsonArray ja;
     QStringList a = ui->leAvailableStore->text().split(",", Qt::SkipEmptyParts);
-    for  (const QString &s : a) {
+
+    for(const QString &s : a) {
         ja.append(s.toInt());
     }
+
     jc["availableoutstore"] = ja;
     db[":f_id"] = ui->leCode->getInteger();
     db[":f_name"] = ui->leSettingsName->text();
@@ -313,60 +337,66 @@ bool C5SettingsWidget::save(QString &err, QList<QMap<QString, QVariant> > &data)
 
 void C5SettingsWidget::clearWidgetValue(QWidget *w)
 {
-    if (!strcmp(w->metaObject()->className(), "C5LineEdit")) {
-        static_cast<C5LineEdit *>(w)->clear();
-    } else if (!strcmp(w->metaObject()->className(), "C5ComboBox")) {
-        static_cast<C5ComboBox *>(w)->setCurrentIndex(-1);
-    } else if  (!strcmp(w->metaObject()->className(), "QRadioButton")) {
-        static_cast<QRadioButton *>(w)->setAutoExclusive(false);
-        static_cast<QRadioButton *>(w)->setChecked(false);
-        static_cast<QRadioButton *>(w)->setAutoExclusive(true);
-    } else if (!strcmp(w->metaObject()->className(), "QComboBox")) {
-        static_cast<QComboBox *>(w)->setCurrentIndex(-1);
-    } else if (!strcmp(w->metaObject()->className(), "QFontComboBox")) {
-        static_cast<QFontComboBox *>(w)->setCurrentIndex(-1);
+    if(!strcmp(w->metaObject()->className(), "C5LineEdit")) {
+        static_cast<C5LineEdit*>(w)->clear();
+    } else if(!strcmp(w->metaObject()->className(), "C5ComboBox")) {
+        static_cast<C5ComboBox*>(w)->setCurrentIndex(-1);
+    } else if(!strcmp(w->metaObject()->className(), "QRadioButton")) {
+        static_cast<QRadioButton*>(w)->setAutoExclusive(false);
+        static_cast<QRadioButton*>(w)->setChecked(false);
+        static_cast<QRadioButton*>(w)->setAutoExclusive(true);
+    } else if(!strcmp(w->metaObject()->className(), "QComboBox")) {
+        static_cast<QComboBox*>(w)->setCurrentIndex(-1);
+    } else if(!strcmp(w->metaObject()->className(), "QFontComboBox")) {
+        static_cast<QFontComboBox*>(w)->setCurrentIndex(-1);
     }
 }
 
 void C5SettingsWidget::setWidgetValue(QWidget *w, const QString &value)
 {
-    if (!strcmp(w->metaObject()->className(), "C5LineEdit")
+    if(!strcmp(w->metaObject()->className(), "C5LineEdit")
             || !strcmp(w->metaObject()->className(), "C5LineEditWithSelector")) {
-        static_cast<C5LineEdit *>(w)->setText(value);
-    } else if (!strcmp(w->metaObject()->className(), "C5ComboBox")) {
-        static_cast<C5ComboBox *>(w)->setIndexForValue(value);
-    } else if (!strcmp(w->metaObject()->className(), "C5CheckBox")) {
-        static_cast<C5CheckBox *>(w)->setChecked(value == "1");
-    } else if  (!strcmp(w->metaObject()->className(), "QRadioButton")) {
-        static_cast<QRadioButton *>(w)->setChecked(value == "1");
-    } else if (!strcmp(w->metaObject()->className(), "QComboBox")) {
-        static_cast<QComboBox *>(w)->setCurrentText(value);
-    } else if (!strcmp(w->metaObject()->className(), "QFontComboBox")) {
-        static_cast<QFontComboBox *>(w)->setCurrentText(value);
+        static_cast<C5LineEdit*>(w)->setText(value);
+    } else if(!strcmp(w->metaObject()->className(), "C5ComboBox")) {
+        static_cast<C5ComboBox*>(w)->setIndexForValue(value);
+    } else if(!strcmp(w->metaObject()->className(), "C5CheckBox")) {
+        static_cast<C5CheckBox*>(w)->setChecked(value == "1");
+    } else if(!strcmp(w->metaObject()->className(), "QRadioButton")) {
+        static_cast<QRadioButton*>(w)->setChecked(value == "1");
+    } else if(!strcmp(w->metaObject()->className(), "QComboBox")) {
+        static_cast<QComboBox*>(w)->setCurrentText(value);
+    } else if(!strcmp(w->metaObject()->className(), "QFontComboBox")) {
+        static_cast<QFontComboBox*>(w)->setCurrentText(value);
     }
 }
 
 void C5SettingsWidget::clear(QWidget *parent)
 {
-    if (!parent) {
+    if(!parent) {
         parent = this;
     }
+
     fSettingsId = 0;
     QObjectList ol = parent->children();
-    foreach (QObject *o, ol) {
-        if (o->children().count() > 0) {
-            clear(static_cast<QWidget *>(o));
+
+    foreach(QObject *o, ol) {
+        if(o->children().count() > 0) {
+            clear(static_cast<QWidget*>(o));
         }
+
         QVariant p = o->property("Tag");
-        if (p.isValid()) {
-            clearWidgetValue(static_cast<QWidget *>(o));
+
+        if(p.isValid()) {
+            clearWidgetValue(static_cast<QWidget*>(o));
         } else {
             p = o->property("tag");
-            if (p.isValid()) {
-                clearWidgetValue(static_cast<QWidget *>(o));
+
+            if(p.isValid()) {
+                clearWidgetValue(static_cast<QWidget*>(o));
             }
         }
     }
+
     ui->leInputDocCounter->clear();
     ui->leOutDocCounter->clear();
     ui->leMoveDocCounter->clear();
@@ -383,56 +413,64 @@ void C5SettingsWidget::copyObject()
     ui->leCode->clear();
 }
 
-QWidget *C5SettingsWidget::widget(QWidget *parent, int tag)
+QWidget* C5SettingsWidget::widget(QWidget *parent, int tag)
 {
     Q_ASSERT(tag != 0);
     QObjectList ol = parent->children();
-    foreach (QObject *o, ol) {
-        if (!strcmp(o->metaObject()->className(), "C5LineEdit")
+
+    foreach(QObject *o, ol) {
+        if(!strcmp(o->metaObject()->className(), "C5LineEdit")
                 || !strcmp(o->metaObject()->className(), "C5LineEditWithSelector")) {
-            C5LineEdit *l = static_cast<C5LineEdit *>(o);
-            if (l->getTag() == tag) {
+            C5LineEdit *l = static_cast<C5LineEdit*>(o);
+
+            if(l->getTag() == tag) {
                 return l;
             }
-        } else if (!strcmp(o->metaObject()->className(), "QComboBox")) {
-            QComboBox *c = static_cast<QComboBox *>(o);
-            if (c->property("Tag").toInt() == tag) {
+        } else if(!strcmp(o->metaObject()->className(), "QComboBox")) {
+            QComboBox *c = static_cast<QComboBox*>(o);
+
+            if(c->property("Tag").toInt() == tag) {
                 return c;
             }
-        } else if (!strcmp(o->metaObject()->className(), "C5ComboBox")) {
-            C5ComboBox *l = static_cast<C5ComboBox *>(o);
-            if (l->getTag() == tag) {
+        } else if(!strcmp(o->metaObject()->className(), "C5ComboBox")) {
+            C5ComboBox *l = static_cast<C5ComboBox*>(o);
+
+            if(l->getTag() == tag) {
                 return l;
             }
-        } else if (!strcmp(o->metaObject()->className(), "C5CheckBox")) {
-            C5CheckBox *c = static_cast<C5CheckBox *>(o);
-            if (c->getTag() == tag) {
+        } else if(!strcmp(o->metaObject()->className(), "C5CheckBox")) {
+            C5CheckBox *c = static_cast<C5CheckBox*>(o);
+
+            if(c->getTag() == tag) {
                 return c;
             }
-        } else if (!strcmp(o->metaObject()->className(), "QRadioButton")) {
-            if (o->property("tag").toInt() == tag) {
-                return static_cast<QRadioButton *>(o);
+        } else if(!strcmp(o->metaObject()->className(), "QRadioButton")) {
+            if(o->property("tag").toInt() == tag) {
+                return static_cast<QRadioButton*>(o);
             }
-        } else if (!strcmp(o->metaObject()->className(), "QFontComboBox")) {
-            if (o->property("Tag").toInt() == tag) {
-                return static_cast<QFontComboBox *>(o);
+        } else if(!strcmp(o->metaObject()->className(), "QFontComboBox")) {
+            if(o->property("Tag").toInt() == tag) {
+                return static_cast<QFontComboBox*>(o);
             }
-        } else if (o->children().count() > 0) {
-            QWidget *w = widget(static_cast<QWidget *>(o), tag);
-            if (w) {
+        } else if(o->children().count() > 0) {
+            QWidget *w = widget(static_cast<QWidget*>(o), tag);
+
+            if(w) {
                 return w;
             }
         } else {
             //qDebug() << "Strange widget" << o ;
         }
     }
+
     return nullptr;
 }
 
 void C5SettingsWidget::on_btnScalePath_clicked()
 {
     QString path = QFileDialog::getExistingDirectory(this, "", "");
-    if (!path.isEmpty()) {
+
+    if(!path.isEmpty()) {
         ui->leScalePath->setText(path);
     }
 }

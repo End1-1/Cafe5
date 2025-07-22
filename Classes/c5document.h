@@ -7,7 +7,7 @@ class C5Document : public C5Widget
 {
     Q_OBJECT
 public:
-    explicit C5Document(const QStringList &dbParams, QWidget *parent = nullptr);
+    explicit C5Document(QWidget *parent = nullptr);
 
     int genNumber(int docType) const;
 

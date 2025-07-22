@@ -7,7 +7,7 @@
 #include "c5config.h"
 
 DlgMemoryRead::DlgMemoryRead() :
-    C5Dialog(__c5config.dbParams()),
+    C5Dialog(),
     ui(new Ui::DlgMemoryRead)
 {
     ui->setupUi(this);
@@ -78,7 +78,7 @@ int DlgMemoryRead::getSessionHistory()
                  "from o_header h "
                  "INNER JOIN a_header_cash hc ON hc.f_oheader=h.f_id and hc.f_session=:f_session "
                  "order by f_dateclose desc, f_timeclose desc ");
-    C5Database db(fDBParams);
+    C5Database db;
     db[":f_session"] = __c5config.getRegValue("session");
     db.exec(sql);
     while (db.nextRow()) {
@@ -95,7 +95,7 @@ int DlgMemoryRead::getSessionHistory()
 
 int DlgMemoryRead::getIncompleteOrders()
 {
-    C5Database db(fDBParams);
+    C5Database db;
     db.exec("select distinct(f_window) as f_window, sum(f_qty*f_price) as f_total from a_sale_temp group by 1");
     while (db.nextRow()) {
         int r = ui->tblMemory->rowCount();
@@ -123,7 +123,7 @@ void DlgMemoryRead::on_btnOpen_2_clicked()
                  "from o_header h "
                  "where cast(concat(f_dateclose, ' ', f_timeclose) as datetime)>date_sub(current_timestamp(), interval 24 hour) "
                  "order by f_dateclose desc, f_timeclose desc ");
-    C5Database db(fDBParams);
+    C5Database db;
     db[":f_session"] = __c5config.getRegValue("session");
     db.exec(sql);
     ui->tblMemory->setRowCount(0);

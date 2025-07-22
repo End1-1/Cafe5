@@ -2,13 +2,13 @@
 #include "ui_cr5salarybyworkersfilter.h"
 #include "c5cache.h"
 
-CR5SalaryByWorkersFilter::CR5SalaryByWorkersFilter(const QStringList &dbParams, QWidget *parent) :
-    C5FilterWidget(dbParams, parent),
+CR5SalaryByWorkersFilter::CR5SalaryByWorkersFilter(QWidget *parent) :
+    C5FilterWidget(parent),
     ui(new Ui::CR5SalaryByWorkersFilter)
 {
     ui->setupUi(this);
-    ui->lePosition->setSelector(dbParams, ui->lePositionName, cache_users_groups);
-    ui->leEmployee->setSelector(dbParams, ui->leEmployeeName, cache_users);
+    ui->lePosition->setSelector(ui->lePositionName, cache_users_groups);
+    ui->leEmployee->setSelector(ui->leEmployeeName, cache_users);
 }
 
 CR5SalaryByWorkersFilter::~CR5SalaryByWorkersFilter()

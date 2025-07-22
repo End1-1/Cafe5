@@ -1,8 +1,8 @@
 #include "cr5cashnames.h"
 #include "c5cashname.h"
 
-CR5CashNames::CR5CashNames(const QStringList &dbParams, QWidget *parent) :
-    C5ReportWidget(dbParams, parent)
+CR5CashNames::CR5CashNames(QWidget *parent) :
+    C5ReportWidget( parent)
 {
     fIcon = ":/cash.png";
     fLabel = tr("Cash names");
@@ -13,7 +13,7 @@ CR5CashNames::CR5CashNames(const QStringList &dbParams, QWidget *parent) :
     fTranslation["f_name"] = tr("Name");
     fTranslation["f_currency"] = tr("Currency code");
     fTranslation["f_currencyname"] = tr("Currency");
-    fEditor = new C5CashName(dbParams);
+    fEditor = new C5CashName();
 }
 
 QToolBar *CR5CashNames::toolBar()

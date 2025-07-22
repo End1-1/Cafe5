@@ -12,11 +12,11 @@ class C5Passwords : public C5Dialog
     Q_OBJECT
 
 public:
-    explicit C5Passwords(const QStringList &dbParams);
+    explicit C5Passwords();
 
     ~C5Passwords();
 
-    static void setPasswords(const QStringList &dbParams, int userId);
+    static void setPasswords(int userId);
 
 private slots:
     void on_btnOK_clicked();

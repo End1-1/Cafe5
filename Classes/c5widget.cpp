@@ -3,9 +3,8 @@
 #include <QKeyEvent>
 #include <QUuid>
 
-C5Widget::C5Widget(const QStringList &dbParams, QWidget *parent) :
-    QWidget(parent),
-    fDBParams(dbParams)
+C5Widget::C5Widget(QWidget *parent) :
+    QWidget(parent)
 {
     fToolBar = nullptr;
     fFocusNextChild = true;
@@ -32,7 +31,7 @@ void C5Widget::postProcess()
 {
 }
 
-QToolBar *C5Widget::toolBar()
+QToolBar* C5Widget::toolBar()
 {
     createToolBar();
     return fToolBar;
@@ -40,47 +39,57 @@ QToolBar *C5Widget::toolBar()
 
 bool C5Widget::createToolBar()
 {
-    if (!fToolBar) {
+    if(!fToolBar) {
         fToolBar = new QToolBar();
         fToolBar->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
         return true;
     }
-    return false;
+
+    return true;
 }
 
-QToolBar *C5Widget::createStandartToolbar(const QList<ToolBarButtons> &btn)
+QToolBar* C5Widget::createStandartToolbar(const QList<ToolBarButtons>& btn)
 {
-    if (createToolBar()) {
-        if (btn.contains(ToolBarButtons::tbNew)) {
+    if(createToolBar()) {
+        if(btn.contains(ToolBarButtons::tbNew)) {
             fToolBar->addAction(QIcon(":/new.png"), tr("New"), this, SLOT(newRow()));
         }
-        if (btn.contains(ToolBarButtons::tbEdit)) {
+
+        if(btn.contains(ToolBarButtons::tbEdit)) {
             fToolBar->addAction(QIcon(":/edit.png"), tr("Edit"), this, SLOT(editRow()));
         }
-        if (btn.contains(ToolBarButtons::tbDelete)) {
+
+        if(btn.contains(ToolBarButtons::tbDelete)) {
             fToolBar->addAction(QIcon(":/delete.png"), tr("Remove"), this, SLOT(removeRow()));
         }
-        if (btn.contains(ToolBarButtons::tbSave)) {
+
+        if(btn.contains(ToolBarButtons::tbSave)) {
             fToolBar->addAction(QIcon(":/save.png"), tr("Save\nchanges"), this, SLOT(saveDataChanges()));
         }
-        if (btn.contains(ToolBarButtons::tbFilter)) {
+
+        if(btn.contains(ToolBarButtons::tbFilter)) {
             auto *a = fToolBar->addAction(QIcon(":/filter_set.png"), tr("Search by\nparameters"), this,
                                           SLOT(setSearchParameters()));
             a->setProperty("filter", true);
         }
-        if (btn.contains(ToolBarButtons::tbClearFilter)) {
+
+        if(btn.contains(ToolBarButtons::tbClearFilter)) {
             fToolBar->addAction(QIcon(":/filter_clear.png"), tr("Clear\nfilter"), this, SLOT(clearFilter()));
         }
-        if (btn.contains(ToolBarButtons::tbRefresh)) {
+
+        if(btn.contains(ToolBarButtons::tbRefresh)) {
             fToolBar->addAction(QIcon(":/refresh.png"), tr("Refresh"), this, SLOT(refreshData()));
         }
-        if (btn.contains(ToolBarButtons::tbPrint)) {
+
+        if(btn.contains(ToolBarButtons::tbPrint)) {
             fToolBar->addAction(QIcon(":/print.png"), tr("Print"), this, SLOT(print()));
         }
-        if (btn.contains(ToolBarButtons::tbExcel)) {
+
+        if(btn.contains(ToolBarButtons::tbExcel)) {
             fToolBar->addAction(QIcon(":/excel.png"), tr("Export to\nMS Excel"), this, SLOT(exportToExcel()));
         }
     }
+
     return fToolBar;
 }
 
@@ -92,7 +101,7 @@ void C5Widget::print()
 {
 }
 
-QWidget *C5Widget::widget()
+QWidget* C5Widget::widget()
 {
     return nullptr;
 }
@@ -110,29 +119,27 @@ void C5Widget::selectorCallback(int row, const QJsonArray &values)
 
 bool C5Widget::event(QEvent *event)
 {
-    if (event->type() == QEvent::KeyRelease) {
-        QKeyEvent *ke = static_cast<QKeyEvent *>(event);
-        switch (ke->key()) {
-            case Qt::Key_Enter:
-            case Qt::Key_Return:
-                if (ke->modifiers() &Qt::ControlModifier) {
-                    break;
+    if(event->type() == QEvent::KeyRelease) {
+        QKeyEvent *ke = static_cast<QKeyEvent*>(event);
+
+        switch(ke->key()) {
+        case Qt::Key_Enter:
+        case Qt::Key_Return:
+            if(ke->modifiers() &Qt::ControlModifier) {
+                break;
+            } else {
+                if(fFocusNextChild) {
+                    focusNextChild();
                 } else {
-                    if (fFocusNextChild) {
-                        focusNextChild();
-                    } else {
-                        nextChild();
-                    }
-                    return true;
+                    nextChild();
                 }
+
+                return true;
+            }
         }
     }
-    return QWidget::event(event);
-}
 
-void C5Widget::changeDatabase(const QStringList &dbParams)
-{
-    fDBParams = dbParams;
+    return QWidget::event(event);
 }
 
 bool C5Widget::allowChangeDatabase()

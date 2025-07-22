@@ -4,8 +4,8 @@
 #include "c5database.h"
 #include "ce5partner.h"
 
-C5Route::C5Route(const QStringList &dbParams, QWidget *parent) :
-    C5Document(dbParams, parent),
+C5Route::C5Route(QWidget *parent) :
+    C5Document(parent),
     ui(new Ui::C5Route)
 {
     ui->setupUi(this);
@@ -14,8 +14,8 @@ C5Route::C5Route(const QStringList &dbParams, QWidget *parent) :
     ui->tbl->setColumnWidths(ui->tbl->columnCount(), 0, 0, 80, 200, 300, 300, 100, 40, 40, 40, 40, 40, 40, 40);
     ui->cbDriver->disconnect(this, SLOT(on_cbDriver_currentIndexChanged(int)));
     ui->cbPartnerStatus->disconnect(this, SLOT(on_cbPartnerStatus_currentIndexChanged(int)));
-    ui->cbPartnerStatus->setDBValues(fDBParams, "select f_id, f_name from c_partners_state", 0);
-    ui->cbDriver->setDBValues(fDBParams, "select f_id, concat_ws(' ', f_last, f_first) as f_name from s_user", 0);
+    ui->cbPartnerStatus->setDBValues("select f_id, f_name from c_partners_state", 0);
+    ui->cbDriver->setDBValues("select f_id, concat_ws(' ', f_last, f_first) as f_name from s_user", 0);
     connect(ui->cbDriver, SIGNAL(currentIndexChanged(int)), this, SLOT(on_cbDriver_currentIndexChanged(int)));
     connect(ui->cbPartnerStatus, SIGNAL(currentIndexChanged(int)), this, SLOT(on_cbDriver_currentIndexChanged(int)));
 }
@@ -40,7 +40,7 @@ void C5Route::loadPartners()
 {
     ui->tbl->clearContents();
     ui->tbl->setRowCount(0);
-    C5Database db(fDBParams);
+    C5Database db;
     db.exec("select f_rounds from o_route_round where f_id=1");
     db.nextRow();
     int round = db.getInt(0);
@@ -121,7 +121,7 @@ void C5Route::on_leFilter_textChanged(const QString &arg1)
 
 void C5Route::saveDataChanges()
 {
-    C5Database db(fDBParams);
+    C5Database db;
     db.exec("select * from o_route_round where f_Id=1");
     db.nextRow();
     int round = db.getInt("f_rounds");
@@ -170,8 +170,8 @@ void C5Route::on_tbl_doubleClicked(const QModelIndex &index)
     if (id < 1) {
         return;
     }
-    CE5Partner *ep = new CE5Partner(fDBParams);
-    C5Editor *e = C5Editor::createEditor(fDBParams, ep, 0);
+    CE5Partner *ep = new CE5Partner();
+    C5Editor *e = C5Editor::createEditor(ep, 0);
     ep->setId(id);
     QList<QMap<QString, QVariant> > data;
     if(e->getResult(data)) {

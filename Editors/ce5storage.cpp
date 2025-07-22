@@ -1,12 +1,12 @@
 #include "ce5storage.h"
 #include "ui_ce5storage.h"
 
-CE5Storage::CE5Storage(const QStringList &dbParams, QWidget *parent) :
-    CE5Editor(dbParams, parent),
+CE5Storage::CE5Storage(QWidget *parent) :
+    CE5Editor(parent),
     ui(new Ui::CE5Storage)
 {
     ui->setupUi(this);
-    ui->cbState->setDBValues(dbParams, "select f_id, f_name from c_storages_state ");
+    ui->cbState->setDBValues("select f_id, f_name from c_storages_state ");
 }
 
 CE5Storage::~CE5Storage()

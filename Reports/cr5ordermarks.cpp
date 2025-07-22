@@ -1,8 +1,8 @@
 #include "cr5ordermarks.h"
 #include "ce5ordermark.h"
 
-CR5OrderMarks::CR5OrderMarks(const QStringList &dbParams, QWidget *parent) :
-    C5ReportWidget(dbParams, parent)
+CR5OrderMarks::CR5OrderMarks(QWidget *parent) :
+    C5ReportWidget( parent)
 {
     fLabel = tr("Orders marks");
     fIcon = ":/flag.png";
@@ -11,7 +11,7 @@ CR5OrderMarks::CR5OrderMarks(const QStringList &dbParams, QWidget *parent) :
     fTranslation["f_id"] = tr("ID");
     fTranslation["f_active"] = tr("Active");
     fTranslation["f_name"] = tr("Name");
-    fEditor = new CE5OrderMark(dbParams);
+    fEditor = new CE5OrderMark();
 }
 
 QToolBar *CR5OrderMarks::toolBar()

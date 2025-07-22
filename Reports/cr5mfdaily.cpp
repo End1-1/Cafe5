@@ -7,8 +7,8 @@
 #include "c5database.h"
 #include "c5cache.h"
 
-CR5MfDaily::CR5MfDaily(const QStringList &dbParams, QWidget *parent) :
-    C5Widget(dbParams, parent),
+CR5MfDaily::CR5MfDaily(QWidget *parent) :
+    C5Widget(parent),
     ui(new Ui::CR5MfDaily)
 {
     ui->setupUi(this);
@@ -56,7 +56,7 @@ void CR5MfDaily::loadDoc(const QDate &date, int worker, int teamlead)
     ui->lstWorkers->clear();
     ui->lstTeamlead->clear();
     ui->wt->clearTables();
-    C5Database db(fDBParams);
+    C5Database db;
     QListWidgetItem *litem = new QListWidgetItem(ui->lstTeamlead);
     litem->setText(tr("All"));
     litem->setData(Qt::UserRole, 0);
@@ -167,7 +167,7 @@ void CR5MfDaily::loadDoc(const QDate &date, int worker, int teamlead)
 void CR5MfDaily::refreshTasks()
 {
     ui->cbTasks->clear();
-    C5Database db(fDBParams);
+    C5Database db;
     db[":f_state"] = 1;
     db.exec("select t.f_id, t.f_product, concat(t.f_id, ' ', p.f_name) as f_name from mf_tasks t "
             "left join mf_actions_group p on p.f_id=t.f_product   "
@@ -187,7 +187,7 @@ void CR5MfDaily::processTaskDbClick()
         return;
     }
     QJsonArray vals;
-    if (!C5Selector::getValueOfColumn(fDBParams, cache_mf_active_task, vals, 3)) {
+    if (!C5Selector::getValueOfColumn(cache_mf_active_task, vals, 3)) {
         return;
     }
     if (vals.at(1).toInt() == 0) {
@@ -206,10 +206,10 @@ void CR5MfDaily::exportToExcel()
 void CR5MfDaily::addWorker()
 {
     QJsonArray vals;
-    if (!C5Selector::getValue(fDBParams, cache_users, vals)) {
+    if (!C5Selector::getValue(cache_users, vals)) {
         return;
     }
-    C5Database db(fDBParams);
+    C5Database db;
     db[":f_date"] = ui->leDate->date();
     db[":f_worker"] = vals.at(1);
     db.exec("select f_id from mf_daily_workers where f_date=:f_date and f_worker=:f_worker");
@@ -238,7 +238,7 @@ void CR5MfDaily::removeWorker()
     if (C5Message::question(tr("Are you sure to remove?")) != QDialog::Accepted) {
         return;
     }
-    C5Database db(fDBParams);
+    C5Database db;
     db[":f_date"] = ui->leDate->date();
     db[":f_worker"] = item->data(Qt::UserRole + 1);
     db.exec("delete from mf_daily_workers where f_date=:f_date and f_worker=:f_worker");
@@ -268,10 +268,10 @@ void CR5MfDaily::addProcess()
                          tr("Stage code"),
                          ui->cbTasks->itemData(ui->cbTasks->currentIndex(), Qt::UserRole + 1).toString());
     QJsonArray vals;
-    if (!C5Selector::getValue(fDBParams, query, vals)) {
+    if (!C5Selector::getValue(query, vals)) {
         return;
     }
-    C5Database db(fDBParams);
+    C5Database db;
     db[":f_product"] = vals.at(3).toInt();
     db.exec("SELECT f_process FROM mf_process WHERE f_product=:f_product ORDER BY f_rowid DESC LIMIT 1 ");
     db.nextRow();
@@ -342,7 +342,7 @@ void CR5MfDaily::removeProcess()
                                  ui->wt->getData(r, 2).toString())) != QDialog::Accepted) {
         return;
     }
-    C5Database db(fDBParams);
+    C5Database db;
     db[":f_id"] = ui->wt->getData(r, 0);
     db.exec("delete from mf_daily_process where f_id=:f_id");
     if (ui->wt->getData(r, 10).toInt() == 1) {
@@ -357,7 +357,7 @@ void CR5MfDaily::removeProcess()
 
 void CR5MfDaily::saveWork()
 {
-    C5Database db(fDBParams);
+    C5Database db;
     bool qtywarning = false;
     for (int i = 0; i < ui->wt->rowCount(); i++) {
         //        if (ui->wt->getData(i, 6).toInt() == 0) {
@@ -458,7 +458,7 @@ void CR5MfDaily::on_lstWorkers_itemClicked(QListWidgetItem *item)
     int checked = item->checkState() == Qt::Checked ? 1 : 0;
     int worker = item->data(Qt::UserRole + 1).toInt();
     if (worker > 0) {
-        C5Database db(fDBParams);
+        C5Database db;
         db[":f_checked"] = checked;
         db[":f_worker"] = worker;
         db[":f_date"] = ui->leDate->date();

@@ -9,7 +9,7 @@
 #include <QScrollBar>
 
 DlgMovement::DlgMovement()
-    : C5Dialog(__c5config.dbParams(), true)
+    : C5Dialog(true)
     , ui(new Ui::DlgMovement),
       mSetupComplete(false)
 {
@@ -34,7 +34,7 @@ bool DlgMovement::openDoc(const QString &doc)
         return true;
     }
     fUuid = doc;
-    C5Database db(__c5config.dbParams());
+    C5Database db;
     db.exec(QString("select sf_open_store_document('{\"f_id\":\"%1\"}')").arg(doc));
     if (!db.nextRow()) {
         C5Message::error(tr("Document not exists"));
@@ -222,7 +222,7 @@ bool DlgMovement::saveDoc(int state)
     QString session = C5Database::uuid();
     jdoc["session"] = session;
     QJsonDocument json(jdoc);
-    C5Database db(fDBParams);
+    C5Database db;
     if (!db.execNetwork(QString("call sf_create_store_document('%1')").arg(QString(json.toJson(QJsonDocument::Compact))))) {
         C5Message::error(db.fLastError);
     }

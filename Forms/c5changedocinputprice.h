@@ -12,11 +12,11 @@ class C5ChangeDocInputPrice : public C5Dialog
     Q_OBJECT
 
 public:
-    explicit C5ChangeDocInputPrice(const QStringList &dbParams, const QString &uuid);
+    explicit C5ChangeDocInputPrice(const QString &uuid);
 
     ~C5ChangeDocInputPrice();
 
-    static void changePrice(const QStringList &dbParams, const QString &uuid);
+    static void changePrice(const QString &uuid);
 
 private slots:
     void on_btnCancel_clicked();

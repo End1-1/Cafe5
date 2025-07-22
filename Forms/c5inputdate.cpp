@@ -3,12 +3,12 @@
 #include "c5cache.h"
 #include "c5message.h"
 
-C5InputDate::C5InputDate(const QStringList &dbParams) :
-    C5Dialog(dbParams),
+C5InputDate::C5InputDate() :
+    C5Dialog(),
     ui(new Ui::C5InputDate)
 {
     ui->setupUi(this);
-    ui->leShift->setSelector(dbParams, ui->leShiftName, cache_salary_shift);
+    ui->leShift->setSelector(ui->leShiftName, cache_salary_shift);
 }
 
 C5InputDate::~C5InputDate()
@@ -16,9 +16,9 @@ C5InputDate::~C5InputDate()
     delete ui;
 }
 
-bool C5InputDate::date(const QStringList &dbParams, QDate &d, int &shift, QString &shiftName)
+bool C5InputDate::date(QDate &d, int &shift, QString &shiftName)
 {
-    auto *id = new C5InputDate(dbParams);
+    auto *id = new C5InputDate();
     id->ui->deDate->setDate(d);
     bool result = id->exec() == QDialog::Accepted;
     if (result) {

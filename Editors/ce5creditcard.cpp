@@ -6,8 +6,8 @@
 #include <QGraphicsPixmapItem>
 #include <QBuffer>
 
-CE5CreditCard::CE5CreditCard(const QStringList &dbParams, QWidget *parent) :
-    CE5Editor(dbParams, parent),
+CE5CreditCard::CE5CreditCard(QWidget *parent) :
+    CE5Editor(parent),
     ui(new Ui::CE5CreditCard)
 {
     ui->setupUi(this);
@@ -21,7 +21,7 @@ CE5CreditCard::~CE5CreditCard()
 void CE5CreditCard::setId(int id)
 {
     CE5Editor::setId(id);
-    C5Database db(fDBParams);
+    C5Database db;
     db[":f_id"] = id;
     db.exec("select f_image from o_credit_card where f_id=:f_id");
     if (db.nextRow()) {
@@ -58,7 +58,7 @@ bool CE5CreditCard::save(QString &err, QList<QMap<QString, QVariant> > &data)
         QBuffer buff( &ba);
         p->pixmap().toImage().save( &buff, "PNG");
         QString str = ba.toBase64().data();
-        C5Database db(fDBParams);
+        C5Database db;
         db[":f_image"] = str;
         db.update(table(), where_id(ui->leCode->getInteger()));
     }

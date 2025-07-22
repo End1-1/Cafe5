@@ -12,7 +12,7 @@ class DlgSemireadyInOut : public C5Dialog
     Q_OBJECT
 
 public:
-    explicit DlgSemireadyInOut(const QStringList &dbParams, QWidget *parent = nullptr);
+    explicit DlgSemireadyInOut(QWidget *parent = nullptr);
     ~DlgSemireadyInOut();
     int dishId();
     double dishQty();

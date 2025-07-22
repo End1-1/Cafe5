@@ -13,7 +13,7 @@ class CE5MFProduct : public CE5Editor
     Q_OBJECT
 
 public:
-    explicit CE5MFProduct(const QStringList &dbParams, QWidget *parent = nullptr);
+    explicit CE5MFProduct(QWidget *parent = nullptr);
 
     ~CE5MFProduct();
 

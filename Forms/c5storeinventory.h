@@ -12,7 +12,7 @@ class C5StoreInventory : public C5Widget
     Q_OBJECT
 
 public:
-    explicit C5StoreInventory(const QStringList &dbParams, QWidget *parent = nullptr);
+    explicit C5StoreInventory(QWidget *parent = nullptr);
 
     ~C5StoreInventory();
 
@@ -20,7 +20,7 @@ public:
 
     bool openDoc(QString id);
 
-    static bool removeDoc(const QStringList &dbParams, QString id);
+    static bool removeDoc(QString id);
 
     virtual bool allowChangeDatabase();
 

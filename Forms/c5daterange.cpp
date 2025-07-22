@@ -1,8 +1,8 @@
 #include "c5daterange.h"
 #include "ui_c5daterange.h"
 
-C5DateRange::C5DateRange(const QStringList &dbParams) :
-    C5Dialog(dbParams),
+C5DateRange::C5DateRange() :
+    C5Dialog(),
     ui(new Ui::C5DateRange)
 {
     ui->setupUi(this);
@@ -15,7 +15,7 @@ C5DateRange::~C5DateRange()
 
 bool C5DateRange::dateRange(QDate &d1, QDate &d2)
 {
-    auto *dr = new C5DateRange(QStringList());
+    auto *dr = new C5DateRange();
     bool result = (dr->exec() == QDialog::Accepted);
     d1 = dr->ui->deStart->date();
     d2 = dr->ui->deEnd->date();
@@ -25,7 +25,7 @@ bool C5DateRange::dateRange(QDate &d1, QDate &d2)
 
 bool C5DateRange::date(QDate &d)
 {
-    auto *a = new C5DateRange(QStringList());
+    auto *a = new C5DateRange();
     a->ui->deEnd->setVisible(false);
     a->ui->label_2->setVisible(false);
     a->adjustSize();

@@ -24,7 +24,7 @@ C5PrintServiceThread::~C5PrintServiceThread()
 bool C5PrintServiceThread::run()
 {
     QSet<QString> fPrint1, fPrint2;
-    C5Database db(__c5config.dbParams());
+    C5Database db;
     if (fUseAliases) {
         db.exec("select f_alias, f_printer from d_print_aliases");
         while (db.nextRow()) {

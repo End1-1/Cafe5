@@ -12,7 +12,7 @@ class CE5MFWorkshop : public CE5Editor
     Q_OBJECT
 
 public:
-    explicit CE5MFWorkshop(const QStringList &dbParams, QWidget *parent = nullptr);
+    explicit CE5MFWorkshop(QWidget *parent = nullptr);
 
     ~CE5MFWorkshop();
 

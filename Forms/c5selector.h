@@ -17,24 +17,24 @@ class C5Selector : public C5Dialog
     Q_OBJECT
 
 public:
-    explicit C5Selector(const QStringList &dbParams);
+    explicit C5Selector();
 
     ~C5Selector();
 
-    static bool getValue(const QStringList &dbParams, int cache, QJsonArray &values);
+    static bool getValue(int cache, QJsonArray &values);
 
-    static bool getValue(const QStringList &dbParams, const QString &query, QJsonArray &values);
+    static bool getValue(const QString &query, QJsonArray &values);
 
-    static bool getValueOfColumn(const QStringList &dbParams, int cache, QJsonArray &values, int column);
+    static bool getValueOfColumn(int cache, QJsonArray &values, int column);
 
-    static bool getMultipleValues(const QStringList &dbParams, int cache, QVector<QJsonArray> &values);
+    static bool getMultipleValues(int cache, QVector<QJsonArray> &values);
 
-    static bool getValues(const QStringList &dbParams, const QString &sql, QJsonArray &values,
+    static bool getValues(const QString &sql, QJsonArray &values,
                           const QHash<QString, QString> &translator);
 
     void keyPressEvent(QKeyEvent *key) override;
 
-    static void resetCache(const QStringList &dbParams, int cacheId);
+    static void resetCache(int cacheId);
 
 private slots:
     void selectionChanged(const QItemSelection &selected, const QItemSelection &deselected);

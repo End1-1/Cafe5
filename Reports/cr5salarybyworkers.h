@@ -10,7 +10,7 @@ class CR5SalaryByWorkers : public C5ReportWidget
     Q_OBJECT
 
 public:
-    CR5SalaryByWorkers(const QStringList &dbParams, QWidget *parent = nullptr);
+    CR5SalaryByWorkers(QWidget *parent = nullptr);
 
     virtual void restoreColumnsVisibility();
 

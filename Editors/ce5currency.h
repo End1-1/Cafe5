@@ -12,7 +12,7 @@ class CE5Currency : public CE5Editor
     Q_OBJECT
 
 public:
-    explicit CE5Currency(const QStringList &dbParams, QWidget *parent = nullptr);
+    explicit CE5Currency(QWidget *parent = nullptr);
     ~CE5Currency();
     virtual QString title() override;
     virtual QString table() override;

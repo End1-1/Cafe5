@@ -12,7 +12,7 @@ class DlgConfigTable : public C5Dialog
     Q_OBJECT
 
 public:
-    explicit DlgConfigTable(const QStringList &dbParams);
+    explicit DlgConfigTable();
     ~DlgConfigTable();
 
 private:

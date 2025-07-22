@@ -9,14 +9,14 @@
 #include <QFileDialog>
 #include <QBuffer>
 
-CE5DishPart2::CE5DishPart2(const QStringList &dbParams, QWidget *parent) :
-    CE5Editor(dbParams, parent),
+CE5DishPart2::CE5DishPart2(QWidget *parent) :
+    CE5Editor(parent),
     ui(new Ui::CE5DishPart2)
 {
     ui->setupUi(this);
-    ui->leDept->setSelector(dbParams, ui->leDeptName, cache_dish_part1);
-    ui->leParent->setSelector(dbParams, ui->leParentName, cache_dish_part2);
-    ui->lePosition->setSelector(dbParams, ui->lePositionName, cache_users_groups);
+    ui->leDept->setSelector(ui->leDeptName, cache_dish_part1);
+    ui->leParent->setSelector(ui->leParentName, cache_dish_part2);
+    ui->lePosition->setSelector(ui->lePositionName, cache_users_groups);
     connect(ui->leColor, SIGNAL(doubleClicked()), this, SLOT(selectColor()));
 }
 
@@ -49,7 +49,7 @@ bool CE5DishPart2::checkData(QString &err)
 void CE5DishPart2::setId(int id)
 {
     CE5Editor::setId(id);
-    C5Database db(fDBParams);
+    C5Database db;
     db[":f_id"] = ui->leImageUUID->text();
     db.exec("select * from s_images where f_id=:f_id");
     if (db.nextRow()) {
@@ -80,8 +80,8 @@ void CE5DishPart2::selectColor()
 
 void CE5DishPart2::on_btnNewPart_clicked()
 {
-    CE5DishPart1 *ep = new CE5DishPart1(fDBParams);
-    C5Editor *e = C5Editor::createEditor(fDBParams, ep, 0);
+    CE5DishPart1 *ep = new CE5DishPart1();
+    C5Editor *e = C5Editor::createEditor(ep, 0);
     QList<QMap<QString, QVariant> > data;
     if(e->getResult(data)) {
         ui->leDept->setValue(data.at(0)["f_id"].toString());
@@ -131,7 +131,7 @@ void CE5DishPart2::uploadImage()
         buff.open(QIODevice::WriteOnly);
         pm.save( &buff, "JPG");
     } while (ba.size() > 100000 && !ui->chDonNotResize->isChecked());
-    C5Database db(fDBParams);
+    C5Database db;
     db[":f_id"] = ui->leImageUUID->text();
     db.exec("delete from s_images where f_id=:f_id");
     db[":f_id"] = ui->leImageUUID->text();
@@ -144,7 +144,7 @@ void CE5DishPart2::removeImage()
     if (C5Message::question(tr("Remove image")) !=  QDialog::Accepted) {
         return;
     }
-    C5Database db(fDBParams);
+    C5Database db;
     db[":f_id"] = ui->leImageUUID->text();
     db.exec("delete from s_images where f_id=:f_id");
     ui->lbImg->setText(tr("Image"));

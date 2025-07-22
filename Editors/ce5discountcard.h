@@ -12,7 +12,7 @@ class CE5DiscountCard : public CE5Editor
     Q_OBJECT
 
 public:
-    explicit CE5DiscountCard(const QStringList &dbParams, QWidget *parent = nullptr);
+    explicit CE5DiscountCard(QWidget *parent = nullptr);
 
     ~CE5DiscountCard();
 

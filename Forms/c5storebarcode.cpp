@@ -14,8 +14,8 @@
 #include <QGraphicsScene>
 #include <QGraphicsTextItem>
 
-C5StoreBarcode::C5StoreBarcode(const QStringList &dbParams, QWidget *parent) :
-    C5Widget(dbParams, parent),
+C5StoreBarcode::C5StoreBarcode(QWidget *parent) :
+    C5Widget(parent),
     ui(new Ui::C5StoreBarcode)
 {
     ui->setupUi(this);
@@ -43,7 +43,7 @@ void C5StoreBarcode::addRow(const QString &name, const QString &barcode, int qty
     ui->tbl->setString(row, 1, barcode);
     ui->tbl->createLineEdit(row, 2)->setInteger(qty);
     ui->tbl->createCheckbox(row, 3)->setChecked(true);
-    C5Database db(fDBParams);
+    C5Database db;
     db[":f_scancode"] = barcode;
     db[":f_currency"] = curr;
     db.exec("select c.*, gpr.f_price1 "
@@ -236,10 +236,10 @@ void C5StoreBarcode::setSearchParameters()
 {
     int id;
     QString name;
-    if (DlgSelectCurrency::getCurrency(fDBParams, id, name, this) == false) {
+    if (DlgSelectCurrency::getCurrency(id, name, this) == false) {
         return;
     }
-    C5Database db(fDBParams);
+    C5Database db;
     db[":f_currency"] = id;
     db.exec("select g.f_scancode, gpr.f_price1 "
             "from c_goods_prices gpr "

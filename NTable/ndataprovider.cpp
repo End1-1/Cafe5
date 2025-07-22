@@ -43,6 +43,7 @@ void NDataProvider::getData(const QString &route, const QJsonObject &data)
                   route);
     QNetworkRequest rq(url);
     rq.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
+    rq.setRawHeader("Authorization", "Bearer " + sessionKey.toUtf8());
     QJsonObject jo;
     jo["sessionkey"] = sessionKey;
     jo["hostinfo"] = QHostInfo::localHostName().toLower();
@@ -53,10 +54,12 @@ void NDataProvider::getData(const QString &route, const QJsonObject &data)
     //jo["appversion"] = "2.5.32.771";
 #endif
     QStringList keys = data.keys();
-    for (const auto &s : std::as_const(keys)) {
+
+    for(const auto &s : std::as_const(keys)) {
         jo[s] = data[s];
     }
-    if (mDebug) {
+
+    if(mDebug) {
         LogWriter::write(LogWriterLevel::verbose, "", url);
         LogWriter::write(LogWriterLevel::verbose, "", QJsonDocument(data).toJson(QJsonDocument::Compact));
     } else {
@@ -65,6 +68,7 @@ void NDataProvider::getData(const QString &route, const QJsonObject &data)
         LogWriter::write(LogWriterLevel::verbose, "", QJsonDocument(jo).toJson(QJsonDocument::Compact));
 #endif
     }
+
     mNetworkAccessManager->post(rq, QJsonDocument(jo).toJson(QJsonDocument::Compact));
 }
 
@@ -82,41 +86,47 @@ void NDataProvider::overwriteHost(const QString &protocol, const QString &host, 
 
 void NDataProvider::queryFinished(QNetworkReply *r)
 {
-    if (r->error() != QNetworkReply::NoError) {
+    if(r->error() != QNetworkReply::NoError) {
         QString err = r->errorString() + r->readAll();
-        if (err.contains("access denied", Qt::CaseInsensitive)) {
+
+        if(err.contains("access denied", Qt::CaseInsensitive)) {
             err = tr("Access denied");
-        } else if (err.contains("Application version must be", Qt::CaseInsensitive)) {
+        } else if(err.contains("Application version must be", Qt::CaseInsensitive)) {
             LogWriter::write(LogWriterLevel::errors, "", err);
             QJsonObject  je = QJsonDocument::fromJson(err.toUtf8()).object();
             err = QString("<p>%1</p><p><a href=\"launch-updater?version=%3\">%2</a></p>")
                   .arg(tr("You must upgrade the application to continue using it"),
                        tr("Click here to launch updater"),
                        je["expected_version"].toString());
-        } else if (err.contains("server replied:")) {
+        } else if(err.contains("server replied:")) {
             int index = err.indexOf("server replied:") + 15;
             err = err.mid(index, err.length());
-        } else if (err.contains("<html>")) {
+        } else if(err.contains("<html>")) {
             err = err.mid(err.indexOf("<html>"), err.length());
-        } else  if (err.contains("Unauthorized", Qt::CaseInsensitive)) {
+        } else  if(err.contains("Unauthorized", Qt::CaseInsensitive)) {
             err = tr("Access denied");
         } else {
             int index = err.indexOf("Server error");
-            if (index > -1) {
+
+            if(index > -1) {
                 index += 12;
             } else {
                 index = 0;
             }
+
             err = err.mid(index, err.length());
         }
+
         LogWriter::write(LogWriterLevel::errors, "Error", err);
         emit error(err);
         r->deleteLater();
         return;
     }
+
     QByteArray ba = r->readAll();
     r->deleteLater();
-    if (mDebug) {
+
+    if(mDebug) {
         LogWriter::write(LogWriterLevel::verbose, "Data size", (ba.size() < 1000 ? QString("%1 bytes").arg(ba.size())
                          : (ba.size() < 1000000 ? QString("%1 kb").arg(ba.size() / 1000) : QString("%1 mb").arg(
                                 ba.size() / 1000000))));
@@ -131,9 +141,11 @@ void NDataProvider::queryFinished(QNetworkReply *r)
         LogWriter::write(LogWriterLevel::verbose, "", ba);
 #endif
     }
+
     QJsonParseError err;
     QJsonObject jdoc = QJsonDocument::fromJson(ba, &err).object();
-    if (err.error == QJsonParseError::NoError) {
+
+    if(err.error == QJsonParseError::NoError) {
         emit done(jdoc);
     } else {
         LogWriter::write(LogWriterLevel::errors, err.errorString(), ba);

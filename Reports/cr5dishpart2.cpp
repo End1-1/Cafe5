@@ -6,8 +6,8 @@
 #include "c5mainwindow.h"
 #include <QHeaderView>
 
-CR5DishPart2::CR5DishPart2(const QStringList &dbParams, QWidget *parent) :
-    C5ReportWidget(dbParams, parent)
+CR5DishPart2::CR5DishPart2(QWidget *parent) :
+    C5ReportWidget( parent)
 {
     fIcon = ":/menu.png";
     fLabel = tr("Types of dishes");
@@ -26,7 +26,7 @@ CR5DishPart2::CR5DishPart2(const QStringList &dbParams, QWidget *parent) :
     fTranslation["f_parentname"] = tr("Parent");
     fTranslation["f_salary_percent"] = tr("Salary");
     fTranslation["f_positionname"] = tr("Position");
-    fEditor = new CE5DishPart2(dbParams);
+    fEditor = new CE5DishPart2();
 }
 
 QToolBar *CR5DishPart2::toolBar()
@@ -81,7 +81,7 @@ void CR5DishPart2::deletePart2()
     if (id == 0) {
         return;
     }
-    C5Database db(fDBParams);
+    C5Database db;
     db[":f_part"] = id;
     db.exec("select f_id from d_dish where f_part=:f_part");
     QList<int> ids;
@@ -118,6 +118,6 @@ void CR5DishPart2::deletePart2()
 
 void CR5DishPart2::translator()
 {
-    auto *mt = __mainWindow->createTab<CR5MenuTranslator>(fDBParams);
+    auto *mt = __mainWindow->createTab<CR5MenuTranslator>();
     mt->setMode(2);
 }

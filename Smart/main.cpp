@@ -18,7 +18,7 @@
 #include <QTranslator>
 #include <QDir>
 
-int main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
     qputenv("QT_OPENGL", "angle");
     QApplication a(argc, argv);
@@ -38,41 +38,52 @@ int main(int argc, char *argv[])
     QFile file(d.homePath() + "/" + _APPLICATION_ + "/" + _MODULE_ + "lock.pid");
     file.remove();
     QLockFile lockFile(d.homePath() + "/" + _APPLICATION_ + "/" + _MODULE_ + "lock.pid");
-    if (!lockFile.tryLock()) {
+
+    if(!lockFile.tryLock()) {
         C5Message::error(QObject::tr("An instance of application already running"));
         return -1;
     }
+
     LogWriter::write(LogWriterLevel::verbose, "Support SSL", QSslSocket::supportsSsl() ? "true" : "false");
     LogWriter::write(LogWriterLevel::verbose, "Support SSL version", QSslSocket::sslLibraryBuildVersionString());
     auto *dlgsplash = new DlgSplashScreen();
     dlgsplash->show();
     emit dlgsplash->messageSignal("Please, wait...");
     QTranslator t;
-    if (t.load(":/Smart.qm")) {
-        a.installTranslator( &t);
+
+    if(t.load(":/Smart.qm")) {
+        a.installTranslator(&t);
     }
+
     QStringList args;
-    for (int i = 0; i < argc; i++) {
+
+    for(int i = 0; i < argc; i++) {
         args << argv[i];
     }
+
     QFont f("Arial LatArm Unicode", 10);
     //QFont f(__c5config.getValue(param_app_font_family), 10);
     qApp->setFont(f);
     QFile styleFile(qApp->applicationDirPath() + "/smartstyle.css");
-    if (styleFile.open(QIODevice::ReadOnly)) {
+
+    if(styleFile.open(QIODevice::ReadOnly)) {
         a.setStyleSheet(styleFile.readAll());
     }
+
     C5ServerName sng(__c5config.getRegValue("ss_server_address").toString());
-    if (!sng.getConnection(__c5config.getRegValue("ss_database").toString())) {
+
+    if(!sng.getConnection(__c5config.getRegValue("ss_database").toString())) {
         C5Message::error(sng.mErrorString);
         DlgServerConnection::showSettings(0);
         return 1;
     }
+
     QJsonObject js = sng.mReply;
     C5Config::fDBHost = js["settings"].toString();
     C5Config::fDBPath = js["database"].toString();
     C5Config::fDBUser = js["username"].toString();
     C5Config::fDBPassword = js["password"].toString();
+    C5Database::fDbParams = C5Config::dbParams();
     C5Config::fSettingsName = __c5config.getRegValue("ss_settings").toString();
     C5Config::fFullScreen = true;
     NDataProvider::mProtocol = C5Config::fDBHost;
@@ -82,18 +93,22 @@ int main(int argc, char *argv[])
     QSettings ss(_ORGANIZATION_, _APPLICATION_ + QString("\\") + _MODULE_);
     ss.setValue("server", "");
     C5Config::initParamsFromDb();
-    if (!C5SystemPreference::checkDecimalPointAndSeparator()) {
+
+    if(!C5SystemPreference::checkDecimalPointAndSeparator()) {
         return 0;
     }
-    Workspace w(C5Config::dbParams());
+
+    Workspace w;
     C5Config::fParentWidget = &w;
 #ifdef QT_DEBUG
     C5Database::LOGGING = true;
 #endif
-    if (C5Config::getValue(param_debuge_mode).toInt() > 0) {
+
+    if(C5Config::getValue(param_debuge_mode).toInt() > 0) {
         C5Database::LOGGING = true;
         NDataProvider::mDebug = true;
     }
+
     dlgsplash->hide();
     dlgsplash->deleteLater();
     w.showFullScreen();

@@ -8,7 +8,7 @@ class CR5CashMovement : public C5ReportWidget
     Q_OBJECT
 
 public:
-    CR5CashMovement(const QStringList &dbParams, QWidget *parent = nullptr);
+    CR5CashMovement(QWidget *parent = nullptr);
 
     virtual QToolBar *toolBar() override;
 

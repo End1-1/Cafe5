@@ -16,14 +16,13 @@
 #include <QDesktopServices>
 #include <QXlsx/header/xlsxdocument.h>
 
-C5Grid::C5Grid(const QStringList &dbParams, QWidget *parent) :
-    C5Widget(dbParams, parent),
+C5Grid::C5Grid(QWidget *parent) :
+    C5Widget(parent),
     ui(new Ui::C5Grid)
 {
     ui->setupUi(this);
     fCheckboxes = false;
-    fDBParams = dbParams;
-    fModel = new C5TableModel(dbParams, ui->tblView);
+    fModel = new C5TableModel(ui->tblView);
     ui->tblView->setModel(fModel);
     fSimpleQuery = true;
     fTableView = ui->tblView;
@@ -51,13 +50,14 @@ C5Grid::C5Grid(const QStringList &dbParams, QWidget *parent) :
 
 C5Grid::~C5Grid()
 {
-    if (fFilterWidget) {
+    if(fFilterWidget) {
         delete fFilterWidget;
     }
+
     delete ui;
 }
 
-void C5Grid::setTableForUpdate(const QString &table, const QList<int> &columns)
+void C5Grid::setTableForUpdate(const QString &table, const QList<int>& columns)
 {
     fModel->fTableForUpdate = table;
     fModel->fColumnsForUpdate = columns;
@@ -65,10 +65,11 @@ void C5Grid::setTableForUpdate(const QString &table, const QList<int> &columns)
 
 void C5Grid::postProcess()
 {
-    if (fFilterWidget) {
+    if(fFilterWidget) {
         fFilterWidget->restoreFilter(fFilterWidget);
         fWhereCondition = fFilterWidget->condition();
     }
+
     buildQuery();
 }
 
@@ -80,99 +81,123 @@ void C5Grid::buildQuery()
     QStringList leftJoinTables;
     QMap<QString, QString> leftJoinTablesMap;
     QStringList groupFields;
-    if (fSimpleQuery) {
-        if (fSqlQuery.isEmpty()) {
+
+    if(fSimpleQuery) {
+        if(fSqlQuery.isEmpty()) {
             fLoadingDlg->hide();
             return;
         }
     } else {
         fSqlQuery = "select ";
         bool first = true;
-        foreach (QString s, fColumnsFields) {
-            if (fColumnsVisible[s]) {
-                if (first) {
+
+        foreach(QString s, fColumnsFields) {
+            if(fColumnsVisible[s]) {
+                if(first) {
                     first = false;
                 } else {
                     fSqlQuery += ",";
                 }
+
                 fSqlQuery += s;
                 int pos = -1;
+
                 do {
                     pos = s.indexOf(QRegularExpression("\\b[a-z,A-Z]*\\."), pos + 1);
                     QString tableOfField = s.mid(pos, s.indexOf(".", pos) - pos);
-                    if (tableOfField != mainTable) {
+
+                    if(tableOfField != mainTable) {
                         insertJoinTable(leftJoinTables, leftJoinTablesMap, tableOfField, mainTable);
                     }
-                } while (pos > 0);
-                if (fColumnsGroup.contains(s)) {
+                } while(pos > 0);
+
+                if(fColumnsGroup.contains(s)) {
                     pos = s.indexOf(" as");
                     s = s.mid(0, pos);
-                    if (!groupFields.contains(s)) {
+
+                    if(!groupFields.contains(s)) {
                         groupFields << s;
                     }
                 }
             }
         }
-        if (fFilterWidget) {
+
+        if(fFilterWidget) {
             fWhereCondition = fFilterWidget->condition();
         }
+
         int p = 0;
         QRegularExpression re("\\b[a-z]*\\.");
         re.setPatternOptions(QRegularExpression::PatternOption::DotMatchesEverythingOption);
-        while (true) {
+
+        while(true) {
             QRegularExpressionMatch match = re.match(fWhereCondition, p);
-            if (!match.hasMatch()) {
+
+            if(!match.hasMatch()) {
                 break;
             }
+
             QString table = match.captured(0);
             p += match.capturedLength();
             table = table.remove(table.length() - 1, 1);
-            if (table != mainTable) {
+
+            if(table != mainTable) {
                 insertJoinTable(leftJoinTables, leftJoinTablesMap, table, mainTable);
             }
         }
+
         fSqlQuery += " from " + fMainTable + " ";
-        foreach (QString s, leftJoinTables) {
+
+        foreach(QString s, leftJoinTables) {
             fSqlQuery += s + " ";
         }
-        if (!fWhereCondition.isEmpty()) {
-            if (fSqlQuery.contains("%where%")) {
+
+        if(!fWhereCondition.isEmpty()) {
+            if(fSqlQuery.contains("%where%")) {
                 fSqlQuery.replace("%where%", fWhereCondition);
             } else {
-                if (fWhereCondition.contains("where", Qt::CaseInsensitive)) {
+                if(fWhereCondition.contains("where", Qt::CaseInsensitive)) {
                     fSqlQuery += " and " + fWhereCondition;
                 } else {
                     fSqlQuery += " where " + fWhereCondition;
                 }
             }
         }
-        if (groupFields.count() > 0) {
+
+        if(groupFields.count() > 0) {
             first = true;
             fSqlQuery += " group by ";
-            foreach (QString s, groupFields) {
-                if (first) {
+
+            foreach(QString s, groupFields) {
+                if(first) {
                     first = false;
                 } else {
                     fSqlQuery += ",";
                 }
+
                 fSqlQuery += s;
             }
         }
+
         fSqlQuery += fOrderCondition;
-        foreach (const QString &o, fColumnsOrder) {
-            if (fColumnsVisible[o]) {
-                if (fSqlQuery.contains("order by ", Qt::CaseInsensitive)) {
+
+        foreach(const QString &o, fColumnsOrder) {
+            if(fColumnsVisible[o]) {
+                if(fSqlQuery.contains("order by ", Qt::CaseInsensitive)) {
                     fSqlQuery += ",";
                 } else {
                     fSqlQuery += " order by ";
                 }
+
                 fSqlQuery += columnName(o);
             }
         }
-        if (!fHavindCondition.isEmpty()) {
+
+        if(!fHavindCondition.isEmpty()) {
             fSqlQuery += fHavindCondition;
         }
     }
+
     fModel->translate(fTranslation);
     refreshData();
     emit refreshed();
@@ -191,20 +216,12 @@ void C5Grid::setFilter(int column, const QString &filter)
 
 void C5Grid::hotKey(const QString &key)
 {
-    if (key == "Ctrl++") {
+    if(key == "Ctrl++") {
         fTableView->selectAll();
         return;
     }
-    C5Widget::hotKey(key);
-}
 
-void C5Grid::changeDatabase(const QStringList &dbParams)
-{
-    C5Widget::changeDatabase(dbParams);
-    refreshData();
-    if (fFilterWidget) {
-        fFilterWidget->setDatabase(dbParams);
-    }
+    C5Widget::hotKey(key);
 }
 
 void C5Grid::setCheckboxes(bool v)
@@ -218,8 +235,9 @@ void C5Grid::setSimpleQuery(const QString &sql)
     fSqlQuery = sql;
     fOrderCondition.clear();
     refreshData();
-    for (auto *a : fToolBar->actions()) {
-        if (a->property("filter").toBool()) {
+
+    for(auto *a : fToolBar->actions()) {
+        if(a->property("filter").toBool()) {
             a->setVisible(false);
         }
     }
@@ -227,22 +245,25 @@ void C5Grid::setSimpleQuery(const QString &sql)
 
 bool C5Grid::on_tblView_doubleClicked(const QModelIndex &index)
 {
-    if (index.row() < 0 || index.column() < 0) {
+    if(index.row() < 0 || index.column() < 0) {
         return false;
     }
+
     QJsonArray values = fModel->getRowValues(index.row());
-    if (tblDoubleClicked(index.row(), index.column(), values)) {
+
+    if(tblDoubleClicked(index.row(), index.column(), values)) {
         return false;
     }
+
     return true;
 }
 
-QWidget *C5Grid::widget()
+QWidget* C5Grid::widget()
 {
     return ui->wd;
 }
 
-QHBoxLayout *C5Grid::hl()
+QHBoxLayout* C5Grid::hl()
 {
     return ui->hl;
 }
@@ -250,29 +271,35 @@ QHBoxLayout *C5Grid::hl()
 int C5Grid::rowId()
 {
     QModelIndexList ml = fTableView->selectionModel()->selectedIndexes();
-    if (ml.count() == 0) {
+
+    if(ml.count() == 0) {
         return 0;
     }
+
     return fModel->data(ml.at(0).row(), 0, Qt::EditRole).toInt();
 }
 
 int C5Grid::rowId(int column)
 {
     QModelIndexList ml = fTableView->selectionModel()->selectedIndexes();
-    if (ml.count() == 0) {
+
+    if(ml.count() == 0) {
         C5Message::info(tr("Nothing was selected"));
         return 0;
     }
+
     return fModel->data(ml.at(0).row(), column, Qt::EditRole).toInt();
 }
 
-int C5Grid::rowId(int &row, int column)
+int C5Grid::rowId(int& row, int column)
 {
     QModelIndexList ml = fTableView->selectionModel()->selectedIndexes();
-    if (ml.count() == 0) {
+
+    if(ml.count() == 0) {
         C5Message::info(tr("Nothing was selected"));
         return 0;
     }
+
     row = ml.at(0).row();
     return fModel->data(row, column, Qt::EditRole).toInt();
 }
@@ -295,25 +322,30 @@ void C5Grid::removeWithId(int id, int row)
 
 void C5Grid::sumColumnsData()
 {
-    if (fColumnsSum.count() == 0 && fColumnsSumIndex.count() == 0) {
+    if(fColumnsSum.count() == 0 && fColumnsSumIndex.count() == 0) {
         return;
     }
-    if (fColumnsSum.count() > 0) {
+
+    if(fColumnsSum.count() > 0) {
         QMap<QString, double> values;
         fModel->sumForColumns(fColumnsSum, values);
-        for (QMap<QString, double>::const_iterator it = values.begin(); it != values.end(); it++) {
+
+        for(QMap<QString, double>::const_iterator it = values.begin(); it != values.end(); it++) {
             int idx = fModel->indexForColumnName(it.key());
             double value = it.value();
             ui->tblTotal->setData(0, idx, value);
         }
     }
-    if (fColumnsSumIndex.count() > 0) {
+
+    if(fColumnsSumIndex.count() > 0) {
         QMap<int, double> values;
         fModel->sumForColumnsIndexes(fColumnsSumIndex, values);
-        for (int idx : fColumnsSumIndex) {
+
+        for(int idx : fColumnsSumIndex) {
             ui->tblTotal->setData(0, idx, values[idx]);
         }
     }
+
     QStringList vheader;
     vheader << QString::number(fModel->rowCount());
     ui->tblTotal->setVerticalHeaderLabels(vheader);
@@ -326,8 +358,9 @@ void C5Grid::restoreColumnsVisibility()
                 .arg(_APPLICATION_)
                 .arg(_MODULE_)
                 .arg(fLabel));
-    for (QMap<QString, bool>::iterator it = fColumnsVisible.begin(); it != fColumnsVisible.end(); it++) {
-        if (s.contains(it.key())) {
+
+    for(QMap<QString, bool>::iterator it = fColumnsVisible.begin(); it != fColumnsVisible.end(); it++) {
+        if(s.contains(it.key())) {
             it.value() = s.value(it.key()).toBool();
         }
     }
@@ -340,37 +373,46 @@ void C5Grid::restoreColumnsWidths()
                 .arg(_MODULE_)
                 .arg(fLabel));
     ui->tblTotal->setColumnCount(fModel->columnCount());
-    for (int i = 0; i < ui->tblTotal->columnCount(); i++) {
+
+    for(int i = 0; i < ui->tblTotal->columnCount(); i++) {
         ui->tblTotal->setItem(0, i, new C5TableWidgetItem());
         QString colName = fModel->nameForColumnIndex(i);
-        if (colName.isEmpty()) {
+
+        if(colName.isEmpty()) {
             continue;
         }
+
         QString fullColName = colName;
-        for (QMap<QString, bool>::const_iterator it = fColumnsVisible.begin(); it != fColumnsVisible.end(); it++) {
+
+        for(QMap<QString, bool>::const_iterator it = fColumnsVisible.begin(); it != fColumnsVisible.end(); it++) {
             QString c = it.key().toLower();
-            if (c.contains(" as ")) {
+
+            if(c.contains(" as ")) {
                 int pos = c.indexOf(" as ");
-                if (fullColName == c.mid(pos + 4, c.length() - pos)) {
+
+                if(fullColName == c.mid(pos + 4, c.length() - pos)) {
                     fullColName = c;
                     break;
                 }
-            } else if (c.contains(".")) {
+            } else if(c.contains(".")) {
                 int pos = c.indexOf(".");
-                if (fullColName == c.mid(pos + 1, c.length() - pos)) {
+
+                if(fullColName == c.mid(pos + 1, c.length() - pos)) {
                     fullColName = c;
                     break;
                 }
-            } else if (c == fullColName) {
+            } else if(c == fullColName) {
                 fullColName = c;
                 break;
             }
         }
-        if (!fColumnsVisible[fullColName] || ui->tblView->columnWidth(i) == 0) {
+
+        if(!fColumnsVisible[fullColName] || ui->tblView->columnWidth(i) == 0) {
             ui->tblView->horizontalHeader()->setSectionResizeMode(i, QHeaderView::Interactive);
             //continue; why this row was commented, i dont know
         }
-        if (s.contains(colName)) {
+
+        if(s.contains(colName)) {
             ui->tblView->horizontalHeader()->setSectionResizeMode(i, QHeaderView::Interactive);
             int w = s.value(colName).toInt();
             ui->tblView->setColumnWidth(i, w);
@@ -382,29 +424,27 @@ void C5Grid::restoreColumnsWidths()
     }
 }
 
-QStringList C5Grid::dbParams()
-{
-    return fDBParams;
-}
-
 QString C5Grid::reportAdditionalTitle()
 {
-    if (fFilterWidget) {
+    if(fFilterWidget) {
         return fFilterWidget->conditionText();
     }
+
     return "";
 }
 
-QMenu *C5Grid::buildTableViewContextMenu(const QPoint &point)
+QMenu* C5Grid::buildTableViewContextMenu(const QPoint &point)
 {
     QModelIndex index = fTableView->indexAt(point);
     QMenu *m = new QMenu(this);
-    if (index.row() > -1 && index.column() > -1) {
+
+    if(index.row() > -1 && index.column() > -1) {
         fFilterString = fModel->data(index, Qt::DisplayRole).toString();
         fFilterIndex = index;
         m->addAction(QIcon(":/filter_set.png"), QString("%1 '%2'").arg(tr("Filter")).arg(fFilterString), this,
                      SLOT(filterByStringAndIndex()));
     }
+
     m->addAction(QIcon(":/copy.png"), tr("Copy selection"), this, SLOT(copySelection()));
     m->addAction(QIcon(":/copy.png"), tr("Copy all"), this, SLOT(copyAll()));
     return m;
@@ -419,16 +459,20 @@ bool C5Grid::tblDoubleClicked(int row, int column, const QJsonArray &values)
 void C5Grid::executeSql(const QString &sql)
 {
     fModel->execQuery(sql, this);
-    if (fSimpleQuery) {
-        for (int i = 0; i < fModel->columnCount(); i++) {
+
+    if(fSimpleQuery) {
+        for(int i = 0; i < fModel->columnCount(); i++) {
             fColumnsVisible[fModel->fColumnIndexName[i]] = true;
         }
     }
+
     restoreColumnsWidths();
     sumColumnsData();
-    if (!ui->tblTotal->isVisible()) {
+
+    if(!ui->tblTotal->isVisible()) {
         ui->tblView->setHorizontalScrollBarPolicy(Qt::ScrollBarAsNeeded);
     }
+
     completeRefresh();
 }
 
@@ -437,17 +481,19 @@ void C5Grid::completeRefresh()
     fTableView->clearSpans();
 }
 
-void C5Grid::insertJoinTable(QStringList &joins, QMap<QString, QString> &joinsMap, const QString &table,
+void C5Grid::insertJoinTable(QStringList &joins, QMap<QString, QString>& joinsMap, const QString &table,
                              const QString &mainTable)
 {
     QString j;
-    for (int i = 0; i < fLeftJoinTables.count(); i++) {
+
+    for(int i = 0; i < fLeftJoinTables.count(); i++) {
         QString tmpJoinTable = fLeftJoinTables.at(i);
         int pos = tmpJoinTable.indexOf(QRegularExpression("\\[.*\\]"));
         tmpJoinTable = tmpJoinTable.mid(pos, tmpJoinTable.length() - pos);
         tmpJoinTable.replace("[", "").replace("]", "");
-        if (tmpJoinTable == table) {
-            if (!joinsMap.contains(tmpJoinTable)) {
+
+        if(tmpJoinTable == table) {
+            if(!joinsMap.contains(tmpJoinTable)) {
                 j = fLeftJoinTables.at(i).mid(0, fLeftJoinTables.at(i).length() - (fLeftJoinTables.at(i).length() - fLeftJoinTables.at(
                                                   i).indexOf(" [")));
                 QRegularExpression rx("=.*$");
@@ -455,14 +501,17 @@ void C5Grid::insertJoinTable(QStringList &joins, QMap<QString, QString> &joinsMa
                 QString otherTable = match.captured(0).trimmed();
                 otherTable.remove(0, 1);
                 otherTable = otherTable.mid(0, otherTable.indexOf(".", 0));
-                if (otherTable != mainTable && !otherTable.isEmpty()) {
-                    if (!joinsMap.contains(otherTable)) {
+
+                if(otherTable != mainTable && !otherTable.isEmpty()) {
+                    if(!joinsMap.contains(otherTable)) {
                         insertJoinTable(joins, joinsMap, otherTable, mainTable);
                     }
                 }
+
                 joinsMap[tmpJoinTable] = j;
                 joins << joinsMap[tmpJoinTable];
             }
+
             break;
         }
     }
@@ -471,16 +520,19 @@ void C5Grid::insertJoinTable(QStringList &joins, QMap<QString, QString> &joinsMa
 int C5Grid::sumOfColumnsWidghtBefore(int column)
 {
     int sum = 0;
-    for (int i = 0; i < column; i++) {
+
+    for(int i = 0; i < column; i++) {
         sum += fTableView->columnWidth(i);
     }
+
     return sum;
 }
 
 QString C5Grid::columnName(const QString &s) const
 {
     int pos = s.indexOf(" as");
-    if (pos > -1) {
+
+    if(pos > -1) {
         return s.mid(0, pos);
     } else {
         return s;
@@ -496,28 +548,35 @@ void C5Grid::selectionChanged(const QItemSelection &selected, const QItemSelecti
 void C5Grid::copySelection()
 {
     QModelIndexList sel = fTableView->selectionModel()->selectedIndexes();
-    if (sel.count() == 0) {
+
+    if(sel.count() == 0) {
         return;
     }
+
     QString data;
     int currCol = -1;
     bool first = true;
-    foreach (QModelIndex m, sel) {
-        if (currCol < 0) {
+
+    foreach(QModelIndex m, sel) {
+        if(currCol < 0) {
             currCol = m.row();
         }
-        if (currCol != m.row()) {
+
+        if(currCol != m.row()) {
             currCol = m.row();
             first = true;
             data += "\r\n";
         }
-        if (first) {
+
+        if(first) {
             first = false;
         } else {
             data += "\t";
         }
+
         data += m.data(Qt::DisplayRole).toString();
     }
+
     QClipboard *c = qApp->clipboard();
     c->setText(data);
 }
@@ -525,34 +584,41 @@ void C5Grid::copySelection()
 void C5Grid::copyAll()
 {
     QString data;
-    for (int i = 0; i < fModel->columnCount(); i++) {
+
+    for(int i = 0; i < fModel->columnCount(); i++) {
         data += fModel->headerData(i, Qt::Horizontal, Qt::DisplayRole).toString();
-        if (i < fModel->columnCount() - 1) {
+
+        if(i < fModel->columnCount() - 1) {
             data += "\t";
         } else {
             data += "\r\n";
         }
     }
-    for (int r = 0, rc = fModel->rowCount(); r < rc; r++) {
-        for (int c = 0, cc = fModel->columnCount(); c < cc; c++) {
+
+    for(int r = 0, rc = fModel->rowCount(); r < rc; r++) {
+        for(int c = 0, cc = fModel->columnCount(); c < cc; c++) {
             data += fModel->data(r, c, Qt::DisplayRole).toString();
-            if (c == cc - 1) {
+
+            if(c == cc - 1) {
                 data += "\r\n";
             } else {
                 data += "\t";
             }
         }
     }
-    if (ui->tblTotal->isVisible()) {
-        for (int i = 0; i < ui->tblTotal->columnCount(); i++) {
+
+    if(ui->tblTotal->isVisible()) {
+        for(int i = 0; i < ui->tblTotal->columnCount(); i++) {
             data += ui->tblTotal->getString(0, i);
-            if (i < fModel->columnCount() - 1) {
+
+            if(i < fModel->columnCount() - 1) {
                 data += "\t";
             } else {
                 data += "\r\n";
             }
         }
     }
+
     QClipboard *c = qApp->clipboard();
     c->setText(data);
 }
@@ -563,22 +629,26 @@ void C5Grid::filterByColumn()
     fModel->uniqueValuesForColumn(fFilterColumn, filterValues);
     QStringList sortedValues = filterValues.values();
     std::sort(sortedValues.begin(), sortedValues.end());
-    if (C5FilterValues::filterValues(sortedValues)) {
-        if (fModel->fColumnType[fFilterColumn] == QMetaType::Double) {
-            for (int i = 0; i < sortedValues.length(); i++) {
+
+    if(C5FilterValues::filterValues(sortedValues)) {
+        if(fModel->fColumnType[fFilterColumn] == QMetaType::Double) {
+            for(int i = 0; i < sortedValues.length(); i++) {
                 sortedValues[i] = QVariant(str_float(sortedValues[i])).toString();
             }
         }
+
         fModel->setFilter(fFilterColumn, sortedValues.join("|"));
     }
+
     sumColumnsData();
 }
 
 void C5Grid::filterByStringAndIndex()
 {
-    if (fFilterString.isEmpty()) {
+    if(fFilterString.isEmpty()) {
         return;
     }
+
     fModel->setFilter(fFilterIndex.column(), fFilterString);
     fFilterString.clear();
     sumColumnsData();
@@ -594,14 +664,16 @@ void C5Grid::tblValueChanged(int pos)
     fTableView->horizontalScrollBar()->setValue(pos);
 }
 
-bool C5Grid::currentRow(int &row)
+bool C5Grid::currentRow(int& row)
 {
     row = -1;
     QModelIndexList ml = ui->tblView->selectionModel()->selectedIndexes();
-    if (ml.count() == 0) {
+
+    if(ml.count() == 0) {
         C5Message::info(tr("Nothing was selected"));
         return false;
     }
+
     row = ml.at(0).row();
     return true;
 }
@@ -609,18 +681,22 @@ bool C5Grid::currentRow(int &row)
 void C5Grid::editRow(int columnWidthId)
 {
     int row = 0;
-    if (!currentRow(row)) {
+
+    if(!currentRow(row)) {
         return;
     }
+
     callEditor(fModel->data(row, columnWidthId, Qt::EditRole).toString());
 }
 
 void C5Grid::removeRow(int columnWithId)
 {
     int row = 0;
-    if (!currentRow(row)) {
+
+    if(!currentRow(row)) {
         return;
     }
+
     removeWithId(fModel->data(row, columnWithId, Qt::EditRole).toInt(), row);
 }
 
@@ -637,38 +713,48 @@ void C5Grid::print()
     int columnsWidth = 0;
     qreal scaleFactor = 0.40;
     qreal rowScaleFactor = 0.79;
-    for (int i = 0; i < fModel->columnCount(); i++) {
+
+    for(int i = 0; i < fModel->columnCount(); i++) {
         columnsWidth += fTableView->columnWidth(i);
     }
+
     columnsWidth /= scaleFactor;
-    if (columnsWidth > 1950) {
+
+    if(columnsWidth > 1950) {
         p.setSceneParams(paperSize.height(), paperSize.width(), QPageLayout::Landscape);
     } else {
         p.setSceneParams(paperSize.width(), paperSize.height(), QPageLayout::Portrait);
     }
+
     do {
         p.setFontBold(true);
         p.ltext(fLabel, 0);
         p.br();
         QString filterText;
-        if (fFilterWidget) {
+
+        if(fFilterWidget) {
             filterText = fFilterWidget->filterText();
         }
-        if (!filterText.isEmpty()) {
+
+        if(!filterText.isEmpty()) {
             p.ltext(filterText, 0);
             p.br();
         }
-        if (reportAdditionalTitle().isEmpty() == false) {
+
+        if(reportAdditionalTitle().isEmpty() == false) {
             p.ltext(reportAdditionalTitle(), 0);
             p.br();
         }
+
         p.setFontBold(false);
         p.line(0, p.fTop, columnsWidth, p.fTop);
-        for (int c = 0; c < fModel->columnCount(); c++) {
-            if (fTableView->columnWidth(c) == 0) {
+
+        for(int c = 0; c < fModel->columnCount(); c++) {
+            if(fTableView->columnWidth(c) == 0) {
                 continue;
             }
-            if (c > 0) {
+
+            if(c > 0) {
                 p.ltext(fModel->headerData(c, Qt::Horizontal, Qt::DisplayRole).toString(),
                         (sumOfColumnsWidghtBefore(c) / scaleFactor) + 1);
                 p.line(sumOfColumnsWidghtBefore(c) / scaleFactor, p.fTop, sumOfColumnsWidghtBefore(c) / scaleFactor,
@@ -678,19 +764,24 @@ void C5Grid::print()
                 p.line(0, p.fTop, 0, p.fTop + (fTableView->verticalHeader()->defaultSectionSize() / rowScaleFactor));
             }
         }
+
         p.line(columnsWidth, p.fTop, columnsWidth,
                p.fTop + (fTableView->verticalHeader()->defaultSectionSize() / rowScaleFactor));
         p.br();
         p.line(0, p.fTop, columnsWidth, p.fTop);
-        for (int r = startFrom; r < fModel->rowCount(); r++) {
+
+        for(int r = startFrom; r < fModel->rowCount(); r++) {
             p.line(0, p.fTop, columnsWidth, p.fTop);
-            for (int c = 0; c < fModel->columnCount(); c++) {
-                if (fTableView->columnWidth(c) == 0) {
+
+            for(int c = 0; c < fModel->columnCount(); c++) {
+                if(fTableView->columnWidth(c) == 0) {
                     continue;
                 }
+
                 int s = fTableView->columnSpan(r, c) - 1;
                 p.setFontBold(fModel->data(r, c, Qt::FontRole).value<QFont>().bold());
-                if (c > 0) {
+
+                if(c > 0) {
                     p.ltext(fModel->data(r, c, Qt::DisplayRole).toString(), (sumOfColumnsWidghtBefore(c) / scaleFactor) + 1);
                     p.line(sumOfColumnsWidghtBefore(c + s) / scaleFactor, p.fTop, sumOfColumnsWidghtBefore(c + s) / scaleFactor,
                            p.fTop + (fTableView->rowHeight(r) / rowScaleFactor));
@@ -698,13 +789,17 @@ void C5Grid::print()
                     p.ltext(fModel->data(r, c, Qt::DisplayRole).toString(), 1);
                     p.line(0, p.fTop, 0, p.fTop + (fTableView->rowHeight(r) / rowScaleFactor));
                 }
+
                 c += s;
             }
+
             //last vertical line
             p.line(columnsWidth, p.fTop, columnsWidth, p.fTop + (fTableView->rowHeight(r) / rowScaleFactor));
-            if (ui->tblTotal->isVisible() && r == fModel->rowCount() - 1) {
+
+            if(ui->tblTotal->isVisible() && r == fModel->rowCount() - 1) {
                 p.setFontBold(true);
-                if (p.checkBr(ui->tblTotal->rowHeight(0))) {
+
+                if(p.checkBr(ui->tblTotal->rowHeight(0))) {
                     p.line(0, p.fTop + (ui->tblTotal->rowHeight(0) / rowScaleFactor), columnsWidth,
                            p.fTop + (ui->tblTotal->rowHeight(0) / rowScaleFactor));
                     \
@@ -718,20 +813,24 @@ void C5Grid::print()
                             .arg(QDateTime::currentDateTime().toString(FORMAT_DATETIME_TO_STR2))
                             .arg(hostinfo)
                             .arg(hostusername()), 0);
-                    p.rtext(fDBParams.at(1));
+                    p.rtext(__c5config.dbParams().at(1));
                     page++;
                 } else {
                     p.br();
                 }
+
                 p.line(0, p.fTop, columnsWidth, p.fTop);
                 p.line(0, p.fTop + (ui->tblTotal->rowHeight(0) / rowScaleFactor), columnsWidth,
                        p.fTop + (ui->tblTotal->rowHeight(0) / rowScaleFactor));
                 \
-                for (int c = 0; c < fModel->columnCount(); c++) {
-                    if (fTableView->columnWidth(c) == 0) {
+
+                for(int c = 0; c < fModel->columnCount(); c++) {
+
+                    if(fTableView->columnWidth(c) == 0) {
                         continue;
                     }
-                    if (c > 0) {
+
+                    if(c > 0) {
                         p.ltext(ui->tblTotal->getString(0, c), (sumOfColumnsWidghtBefore(c) / scaleFactor) + 1);
                         p.line(sumOfColumnsWidghtBefore(c) / scaleFactor, p.fTop, sumOfColumnsWidghtBefore(c) / scaleFactor,
                                p.fTop + (fTableView->verticalHeader()->defaultSectionSize() / rowScaleFactor));
@@ -740,9 +839,11 @@ void C5Grid::print()
                         p.line(0, p.fTop, 0, p.fTop + (fTableView->verticalHeader()->defaultSectionSize() / rowScaleFactor));
                     }
                 }
+
                 p.line(columnsWidth, p.fTop, columnsWidth, p.fTop + (ui->tblTotal->rowHeight(0) / rowScaleFactor));
             }
-            if (p.checkBr(p.fLineHeight * 4) || r >= fModel->rowCount() - 1) {
+
+            if(p.checkBr(p.fLineHeight * 4) || r >= fModel->rowCount() - 1) {
                 p.line(0, p.fTop + (fTableView->rowHeight(r) / rowScaleFactor), columnsWidth,
                        p.fTop + (fTableView->rowHeight(r) / rowScaleFactor));
                 \
@@ -757,23 +858,29 @@ void C5Grid::print()
                         .arg(QDateTime::currentDateTime().toString(FORMAT_DATETIME_TO_STR2))
                         .arg(hostinfo)
                         .arg(hostusername()), 0);
-                p.rtext(fDBParams.at(1));
-                if (r < fModel->rowCount() - 1) {
+                p.rtext(__c5config.dbParams().at(1));
+
+                if(r < fModel->rowCount() - 1) {
                     p.br(p.fLineHeight * 4);
                 }
-                if (r < fModel->rowCount() - 1) {
+
+                if(r < fModel->rowCount() - 1) {
                     page++;
                 }
+
                 break;
             } else {
                 p.br();
             }
         }
-        if (fModel->rowCount() == 0) {
+
+        if(fModel->rowCount() == 0) {
             stopped = true;
         }
-    } while (!stopped);
-    C5PrintPreview pp( &p, fDBParams);
+
+    } while(!stopped);
+
+    C5PrintPreview pp(&p);
     pp.exec();
 }
 
@@ -781,10 +888,12 @@ void C5Grid::exportToExcel()
 {
     int colCount = fModel->columnCount();
     int rowCount = fModel->rowCount();
-    if (colCount == 0 || rowCount == 0) {
+
+    if(colCount == 0 || rowCount == 0) {
         C5Message::info(tr("Empty report!"));
         return;
     }
+
     QXlsx::Document d;
     d.addSheet("Sheet1");
     /* HEADER */
@@ -795,47 +904,59 @@ void C5Grid::exportToExcel()
     hf.setFont(headerFont);
     hf.setBorderStyle(QXlsx::Format::BorderThin);
     hf.setPatternBackgroundColor(color);
-    for (int i = 0; i < colCount; i++) {
+
+    for(int i = 0; i < colCount; i++) {
         d.write(1, i + 1, fModel->headerData(i, Qt::Horizontal, Qt::DisplayRole).toString(), hf);
         d.setColumnWidth(i + 1, fTableView->columnWidth(i) / 7);
     }
+
     /* BODY */
     QFont bodyFont(qApp->font());
     QXlsx::Format bf;
     bf.setFont(bodyFont);
     bf.setHorizontalAlignment(QXlsx::Format::AlignHCenter);
     bf.setBorderStyle(QXlsx::Format::BorderThin);
-    for (int j = 0; j < rowCount; j++) {
-        for (int i = 0; i < colCount; i++) {
-            if (fModel->data(j, i, Qt::EditRole).typeId() == QMetaType::Double) {
-                if (fModel->data(j, i, Qt::EditRole).toDouble() == 0) {
+
+    for(int j = 0; j < rowCount; j++) {
+        for(int i = 0; i < colCount; i++) {
+            if(fModel->data(j, i, Qt::EditRole).typeId() == QMetaType::Double) {
+                if(fModel->data(j, i, Qt::EditRole).toDouble() == 0) {
                     // continue;
                 }
             }
+
             d.write(j + 2, i + 1, fModel->data(j, i, Qt::EditRole), bf);
         }
     }
+
     /* MERGE cells */
     QMap<int, QList<int> > skiprow, skipcol;
-    for (int r = 0; r < rowCount; r++) {
-        for (int c = 0; c < colCount; c++) {
-            if (fTableView->columnSpan(r, c) > 1 || fTableView->rowSpan(r, c) > 1) {
+
+    for(int r = 0; r < rowCount; r++) {
+        for(int c = 0; c < colCount; c++) {
+            if(fTableView->columnSpan(r, c) > 1 || fTableView->rowSpan(r, c) > 1) {
                 int rs = -1, cs = -1;
-                if (fTableView->columnSpan(r, c) > 1 && skipcol[r].contains(c) == false) {
+
+                if(fTableView->columnSpan(r, c) > 1 && skipcol[r].contains(c) == false) {
                     cs = fTableView->columnSpan(r, c) - 1;
-                    for (int i = c + 1; i < c + cs + 1; i++) {
+
+                    for(int i = c + 1; i < c + cs + 1; i++) {
                         skipcol[r].append(i);
                     }
                 }
-                if (fTableView->rowSpan(r, c) > 1 && skiprow[c].contains(r) == false) {
+
+                if(fTableView->rowSpan(r, c) > 1 && skiprow[c].contains(r) == false) {
                     rs = fTableView->rowSpan(r, c) - 1;
-                    for (int i = r + 1; i < r + rs + 1; i++) {
+
+                    for(int i = r + 1; i < r + rs + 1; i++) {
                         skiprow[c].append(i);
                     }
                 }
-                if (rs == -1 && cs == -1) {
+
+                if(rs == -1 && cs == -1) {
                     continue;
                 }
+
                 rs = rs < 0 ? 0 : rs;
                 cs = cs < 0 ? 0 : cs;
                 d.mergeCells(QString("%1%2:%3:%4")
@@ -846,41 +967,48 @@ void C5Grid::exportToExcel()
             }
         }
     }
+
     /* TOTALS ROWS */
-    if (ui->tblTotal->isVisible()) {
-        for (int i = 0; i < colCount; i++) {
+    if(ui->tblTotal->isVisible()) {
+        for(int i = 0; i < colCount; i++) {
             d.write(1 + fModel->rowCount() + 1, i + 1, ui->tblTotal->getData(0, i), hf);
         }
     }
+
     QString filename = QFileDialog::getSaveFileName(nullptr, "", "", "*.xlsx");
-    if (filename.isEmpty()) {
+
+    if(filename.isEmpty()) {
         return;
     }
+
     d.saveAs(filename);
     QDesktopServices::openUrl(filename);
 }
 
 void C5Grid::clearFilter()
 {
-    if (fFilterWidget) {
+    if(fFilterWidget) {
         fFilterWidget->clearFilter(fFilterWidget);
         fFilterWidget->saveFilter(fFilterWidget);
     }
+
     fModel->clearFilter();
     sumColumnsData();
 }
 
 void C5Grid::setSearchParameters()
 {
-    if (fFilterWidget) {
-        if (C5GridGilter::filter(fFilterWidget, fWhereCondition, fColumnsVisible, fTranslation)) {
+    if(fFilterWidget) {
+        if(C5GridGilter::filter(fFilterWidget, fWhereCondition, fColumnsVisible, fTranslation)) {
             QSettings s(_ORGANIZATION_, QString("%1\\%2\\reports\\%3\\visiblecolumns")
                         .arg(_APPLICATION_)
                         .arg(_MODULE_)
                         .arg(fLabel));
-            for (QMap<QString, bool>::const_iterator it = fColumnsVisible.begin(); it != fColumnsVisible.end(); it++) {
+
+            for(QMap<QString, bool>::const_iterator it = fColumnsVisible.begin(); it != fColumnsVisible.end(); it++) {
                 s.setValue(it.key(), it.value());
             }
+
             buildQuery();
         }
     }
@@ -944,35 +1072,43 @@ void C5Grid::saveDataChanges()
 void C5Grid::refreshData()
 {
     QString sqlQuery = fSqlQuery;
-    if (fSimpleQuery) {
-        if (fFilterWidget) {
+
+    if(fSimpleQuery) {
+        if(fFilterWidget) {
             fWhereCondition = fFilterWidget->condition();
         }
-        if (!fWhereCondition.isEmpty()) {
-            if (sqlQuery.contains("%where%")) {
+
+        if(!fWhereCondition.isEmpty()) {
+            if(sqlQuery.contains("%where%")) {
                 sqlQuery.replace("%where%", fWhereCondition);
-            } else if (fSqlQuery.contains("where")) {
-                if (fWhereCondition.contains("where")) {
+            } else if(fSqlQuery.contains("where")) {
+                if(fWhereCondition.contains("where")) {
                     fWhereCondition.replace("where", " ");
                 }
+
                 sqlQuery += " and " + fWhereCondition;
             } else {
-                if (!fWhereCondition.contains("where", Qt::CaseInsensitive)) {
+                if(!fWhereCondition.contains("where", Qt::CaseInsensitive)) {
                     fWhereCondition = " where " + fWhereCondition;
                 }
+
                 sqlQuery += fWhereCondition;
             }
         }
-        if (!fGroupCondition.isEmpty()) {
+
+        if(!fGroupCondition.isEmpty()) {
             sqlQuery += fGroupCondition;
         }
-        if (!fHavindCondition.isEmpty()) {
+
+        if(!fHavindCondition.isEmpty()) {
             sqlQuery += fHavindCondition;
         }
-        if (!fOrderCondition.isEmpty()) {
+
+        if(!fOrderCondition.isEmpty()) {
             sqlQuery += fOrderCondition;
         }
     }
+
     fModel->setCheckboxes(fCheckboxes);
     executeSql(sqlQuery);
 }

@@ -7,12 +7,13 @@
 class Configs
 {
 public:
-    Configs(const QStringList &dbParams, int id);
+    Configs(int id);
     virtual void readValues() = 0;
 
     template<class T>
-    static T* construct(const QStringList &dbParams, int id) {
-        T *t = new T(dbParams, id);
+    static T* construct(int id)
+    {
+        T *t = new T(id);
         t->readValues();
         return t;
     }
@@ -21,7 +22,6 @@ protected:
     QJsonObject jo;
 
 private:
-    QStringList fDbParams;
     int fId;
 };
 

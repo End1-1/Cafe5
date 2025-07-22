@@ -1,8 +1,8 @@
 #ifndef ARMSOFT_H
 #define ARMSOFT_H
 
-#include <QObject>
 #include <QJsonObject>
+#include <QObject>
 #include <QSqlDatabase>
 
 class ArmSoft : public QObject
@@ -18,9 +18,8 @@ private:
     QMap<QString, QMap<QString, QVariant> > servicesMap;
     QMap<QString, QMap<QString, QVariant> > goodsMap;
     QMap<QString, QMap<QString, QVariant> > unitsMap;
-
     bool getIndexes(QString &err, QSqlDatabase &dbas);
-    void recordToMap(QMap<QString, QVariant> &m, QSqlQuery &q, QStringList &fields);
+    void recordToMap(QMap<QString, QVariant>& m, QSqlQuery &q, QStringList &fields);
 };
 
 #endif // ARMSOFT_H

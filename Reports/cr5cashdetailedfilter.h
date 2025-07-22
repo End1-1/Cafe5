@@ -13,7 +13,7 @@ class CR5CashDetailedFilter : public C5FilterWidget
     Q_OBJECT
 
 public:
-    explicit CR5CashDetailedFilter(const QStringList &dbParams, QWidget *parent = nullptr);
+    explicit CR5CashDetailedFilter(QWidget *parent = nullptr);
 
     ~CR5CashDetailedFilter() override;
 
@@ -30,7 +30,7 @@ public:
     int shift();
 
 private:
-    Ui::CR5CashDetailedFilter *ui;
+    Ui::CR5CashDetailedFilter* ui;
 };
 
 #endif // CR5CASHDETAILEDFILTER_H

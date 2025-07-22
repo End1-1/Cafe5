@@ -12,9 +12,9 @@ class DlgNewCL : public C5Dialog
     Q_OBJECT
 
 public:
-    explicit DlgNewCL(const QStringList &dbParams);
+    explicit DlgNewCL();
     ~DlgNewCL();
-    static bool createCL(const QStringList &dbParams, QString &code, QString &name);
+    static bool createCL(QString &code, QString &name);
 
 private slots:
     void on_btnCancel_clicked();

@@ -16,7 +16,7 @@ class C5CostumerDebtPayment : public C5Dialog
     Q_OBJECT
 
 public:
-    explicit C5CostumerDebtPayment(int type, const QStringList &dbParams);
+    explicit C5CostumerDebtPayment(int type);
 
     ~C5CostumerDebtPayment();
 
@@ -34,7 +34,7 @@ private slots:
     void on_btnRemove_clicked();
 
 private:
-    Ui::C5CostumerDebtPayment *ui;
+    Ui::C5CostumerDebtPayment* ui;
 
     BClientDebts fBClientDebt;
 

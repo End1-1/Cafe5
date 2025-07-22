@@ -12,11 +12,11 @@ class Calculator : public C5Dialog
     Q_OBJECT
 
 public:
-    explicit Calculator(const QStringList &dbParams);
+    explicit Calculator();
 
     ~Calculator();
 
-    static bool get(const QStringList &dbParams, double &v);
+    static bool get(double &v);
 
     bool event(QEvent *e) override;
 

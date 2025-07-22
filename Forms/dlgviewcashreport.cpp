@@ -4,7 +4,7 @@
 #include "c5utils.h"
 
 DlgViewCashReport::DlgViewCashReport() :
-    C5Dialog(__c5config.dbParams()),
+    C5Dialog(),
     ui(new Ui::DlgViewCashReport)
 {
     ui->setupUi(this);

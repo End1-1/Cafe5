@@ -6,8 +6,8 @@
 #include <QScrollBar>
 #include <QMenu>
 
-C5DataSynchronize::C5DataSynchronize(const QStringList &dbParams) :
-    C5Dialog(dbParams),
+C5DataSynchronize::C5DataSynchronize() :
+    C5Dialog(),
     ui(new Ui::C5DataSynchronize)
 {
     ui->setupUi(this);

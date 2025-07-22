@@ -7,7 +7,7 @@ class CR5MFWorkshops : public C5ReportWidget
 {
     Q_OBJECT
 public:
-    CR5MFWorkshops(const QStringList &dbParams, QWidget *parent = nullptr);
+    CR5MFWorkshops(QWidget *parent = nullptr);
 
     virtual QToolBar *toolBar();
 };

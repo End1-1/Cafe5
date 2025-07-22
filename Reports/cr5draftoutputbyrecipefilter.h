@@ -12,7 +12,7 @@ class CR5DraftOutputByRecipeFilter : public C5FilterWidget
     Q_OBJECT
 
 public:
-    explicit CR5DraftOutputByRecipeFilter(const QStringList &dbParams, QWidget *parent = nullptr);
+    explicit CR5DraftOutputByRecipeFilter(QWidget *parent = nullptr);
 
     ~CR5DraftOutputByRecipeFilter();
 

@@ -2,8 +2,8 @@
 #include "c5tablemodel.h"
 #include "c5database.h"
 
-CR5Complectations::CR5Complectations(const QStringList &dbparams, QWidget *parent) :
-    C5ReportWidget(dbparams, parent)
+CR5Complectations::CR5Complectations(QWidget *parent) :
+    C5ReportWidget( parent)
 {
     fLabel = tr("Complectations");
     fIcon = ":/goods.png";
@@ -37,7 +37,7 @@ void CR5Complectations::buildQuery()
     fModel->insertColumn(col++, tr("Unit"));
     fModel->insertColumn(col++, tr("Price"));
     fModel->insertColumn(col++, tr("Total"));
-    C5Database db(fDBParams);
+    C5Database db;
     std::vector<QJsonArray > complectNames;
     db.exec("select distinct(g.f_name), c.f_base, g.f_complectout, u.f_name from "
             "c_goods_complectation c "

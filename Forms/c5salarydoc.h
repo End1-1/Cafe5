@@ -14,7 +14,7 @@ class C5SalaryDoc : public C5Document
     Q_OBJECT
 
 public:
-    explicit C5SalaryDoc(const QStringList &dbParams, QWidget *parent = nullptr);
+    explicit C5SalaryDoc(QWidget *parent = nullptr);
 
     ~C5SalaryDoc();
 

@@ -17,10 +17,9 @@ C5LineEditWithSelector::~C5LineEditWithSelector()
 {
 }
 
-C5LineEditWithSelector &C5LineEditWithSelector::setSelector(const QStringList &dbParams, QLineEdit *selName,
+C5LineEditWithSelector& C5LineEditWithSelector::setSelector(QLineEdit *selName,
         int cacheId, int colId, int colName)
 {
-    fDBParams = dbParams;
     fNameLineEdit = selName;
     fCache = cacheId;
     fColumnId = colId;
@@ -46,37 +45,46 @@ void C5LineEditWithSelector::setCallbackDialog(C5Dialog *d)
 void C5LineEditWithSelector::setValue(const QString &id)
 {
     setText(id);
-    if (fCache == 0) {
+
+    if(fCache == 0) {
         return;
     }
-    C5Cache *c = C5Cache::cache(fDBParams, fCache);
+
+    C5Cache *c = C5Cache::cache(fCache);
     QString text;
     int row = -1;
     QStringList ids = id.split(",", Qt::SkipEmptyParts);
-    foreach (const QString &s, ids) {
+
+    foreach(const QString &s, ids) {
         row = c->find(s.toInt());
-        if (row > -1) {
-            if (!text.isEmpty()) {
+
+        if(row > -1) {
+            if(!text.isEmpty()) {
                 text += ",";
             }
+
             text += c->getString(row, fColumnName - 1);
         }
     }
-    if (!text.isEmpty()) {
+
+    if(!text.isEmpty()) {
         fNameLineEdit->setText(text);
     } else {
         clear();
         fNameLineEdit->clear();
     }
-    if (!fMultiselection) {
-        if (row > -1) {
+
+    if(!fMultiselection) {
+        if(row > -1) {
             const QJsonArray &j = c->getRow(row);
             emit singleSelect(j.at(fColumnId).toInt(), j.at(fColumnName).toString());
         }
-        if (fWidget && row > -1) {
+
+        if(fWidget && row > -1) {
             fWidget->selectorCallback(fCache, c->getRow(row));
         }
-        if (fDialog && row > -1) {
+
+        if(fDialog && row > -1) {
             fDialog->selectorCallback(fCache, c->getRow(row));
         }
     }
@@ -89,40 +97,49 @@ void C5LineEditWithSelector::setValue(int id)
 
 QString C5LineEditWithSelector::text()
 {
-    if (!property("checkallowed").toBool()) {
+    if(!property("checkallowed").toBool()) {
         return C5LineEdit::text();
     }
+
     QString allowedChar("-0123456789,");
     QString t = C5LineEdit::text().trimmed();
-    if (fCache > 0) {
-        for (int i = t.length() - 1; i > -1; i--) {
-            if (!allowedChar.contains(t.at(i))) {
+
+    if(fCache > 0) {
+        for(int i = t.length() - 1; i > -1; i--) {
+            if(!allowedChar.contains(t.at(i))) {
                 t.remove(i, 1);
             }
         }
     }
+
     int i = t.length() - 1;
-    while (i > 0) {
-        if (t.at(i) == "-") {
+
+    while(i > 0) {
+        if(t.at(i) == "-") {
             t.remove(i, 1);
         }
-        if (t.at(i) == ",") {
-            if (t.at(i - 1) == ",") {
+
+        if(t.at(i) == ",") {
+            if(t.at(i - 1) == ",") {
                 t.remove(i, 1);
             }
         }
+
         i--;
     }
-    if (t.length() > 0) {
-        if (t.at(0) == ",") {
+
+    if(t.length() > 0) {
+        if(t.at(0) == ",") {
             t.remove(0, 1);
         }
     }
-    if (t.length() > 0) {
-        if (t.at(t.length() - 1) == ",") {
+
+    if(t.length() > 0) {
+        if(t.at(t.length() - 1) == ",") {
             t.remove(t.length() - 1, 1);
         }
     }
+
     setValue(t);
     return t;
 }
@@ -135,44 +152,58 @@ int C5LineEditWithSelector::cacheId()
 void C5LineEditWithSelector::mouseDoubleClickEvent(QMouseEvent *e)
 {
     Q_UNUSED(e);
-    if (fCache == 0) {
+
+    if(fCache == 0) {
         emit doubleClicked();
         return;
     }
-    if (fMultiselection) {
+
+    if(fMultiselection) {
         QVector<QJsonArray > values;
-        if (!C5Selector::getMultipleValues(fDBParams, fCache, values)) {
+
+        if(!C5Selector::getMultipleValues(fCache, values)) {
             return;
         }
+
         QString textId, textName;
-        foreach (const QJsonArray &c, values) {
-            if (!textId.isEmpty()) {
+
+        foreach(const QJsonArray &c, values) {
+            if(!textId.isEmpty()) {
                 textId += ",";
                 textName += ",";
             }
+
             textId += QString::number(c.at(fColumnId).toInt());
             textName += c.at(fColumnName).toString();
         }
+
         setText(textId);
-        if (fNameLineEdit) {
+
+        if(fNameLineEdit) {
             fNameLineEdit->setText(textName);
         }
     } else {
         QJsonArray values;
-        if (!C5Selector::getValue(fDBParams, fCache, values)) {
+
+        if(!C5Selector::getValue(fCache, values)) {
             return;
         }
-        if (values.count() == 0) {
+
+        if(values.count() == 0) {
             return;
         }
+
         setText(QString::number(values.at(fColumnId).toInt()));
-        if (fNameLineEdit) {
+
+        if(fNameLineEdit) {
             fNameLineEdit->setText(values.at(fColumnName).toString());
         }
-        if (fWidget && values.count() > 0) {
+
+        if(fWidget && values.count() > 0) {
             fWidget->selectorCallback(0, values);
         }
-        if (fDialog && values.count() > 0) {
+
+        if(fDialog && values.count() > 0) {
             fDialog->selectorCallback(0, values);
         }
     }
@@ -180,14 +211,15 @@ void C5LineEditWithSelector::mouseDoubleClickEvent(QMouseEvent *e)
 
 void C5LineEditWithSelector::focusOutEvent(QFocusEvent *e)
 {
-    if (fCache) {
+    if(fCache) {
         setValue(text());
     }
+
     C5LineEdit::focusOutEvent(e);
 }
 
-C5LineEditWithSelector *isLineEditWithSelector(QObject *o)
+C5LineEditWithSelector* isLineEditWithSelector(QObject *o)
 {
-    C5LineEditWithSelector *le = dynamic_cast<C5LineEditWithSelector *>(o);
+    C5LineEditWithSelector *le = dynamic_cast<C5LineEditWithSelector*>(o);
     return le;
 }

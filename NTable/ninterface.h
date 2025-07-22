@@ -22,7 +22,8 @@ public:
                          const QVariant &marks = QVariant(), bool progress = true, int timeout = 60000);
 
     void createHttpQueryLambda(const QString &route, const QJsonObject &params,
-                               std::function<void(const QJsonObject &)> callback, std::function<void (const QJsonObject &)> errCallback,
+                               std::function<void(const QJsonObject &)> callback,
+                               std::function<void (const QJsonObject &)> errCallback,
                                const QVariant &marks = QVariant(), bool progress = true, int timeout = 60000);
 
 public slots:

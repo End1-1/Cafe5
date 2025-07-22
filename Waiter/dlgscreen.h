@@ -58,10 +58,12 @@ private slots:
 
     void on_lePassword_returnPressed();
 
-private:
-    Ui::DlgScreen *ui;
+    void on_btnSettings_clicked();
 
-    C5WaiterServer *mWaiterServer;
+private:
+    Ui::DlgScreen* ui;
+
+    C5WaiterServer* mWaiterServer;
 
     void tryExit();
 };

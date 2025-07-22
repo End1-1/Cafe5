@@ -4,7 +4,7 @@
 #include "c5config.h"
 
 TouchSelectTaxReport::TouchSelectTaxReport() :
-    C5Dialog(__c5config.dbParams()),
+    C5Dialog(),
     ui(new Ui::TouchSelectTaxReport)
 {
     ui->setupUi(this);

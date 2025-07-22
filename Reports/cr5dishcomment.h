@@ -8,7 +8,7 @@ class CR5DishComment : public C5ReportWidget
     Q_OBJECT
 
 public:
-    CR5DishComment(const QStringList &dbParams, QWidget *parent = nullptr);
+    CR5DishComment(QWidget *parent = nullptr);
 
     virtual QToolBar *toolBar();
 };

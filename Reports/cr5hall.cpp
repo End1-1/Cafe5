@@ -1,8 +1,8 @@
 #include "cr5hall.h"
 #include "ce5halls.h"
 
-CR5Hall::CR5Hall(const QStringList &dbParams, QWidget *parent) :
-    C5ReportWidget(dbParams, parent)
+CR5Hall::CR5Hall(QWidget *parent) :
+    C5ReportWidget( parent)
 {
     fIcon = ":/hall.png";
     fLabel = tr("Halls");
@@ -35,7 +35,7 @@ CR5Hall::CR5Hall(const QStringList &dbParams, QWidget *parent) :
 
     restoreColumnsVisibility();
 
-    fEditor = new CE5Halls(fDBParams);
+    fEditor = new CE5Halls();
 }
 
 QToolBar *CR5Hall::toolBar()

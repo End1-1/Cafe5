@@ -5,16 +5,18 @@
 #include "c5user.h"
 #include <QSettings>
 
-DlgCashButtonOpions::DlgCashButtonOpions(const QStringList &dbParams) :
-    C5Dialog(dbParams),
+DlgCashButtonOpions::DlgCashButtonOpions() :
+    C5Dialog(),
     ui(new Ui::DlgCashButtonOpions)
 {
     ui->setupUi(this);
     QSettings _ls(qApp->applicationDirPath() + "/ls.inf", QSettings::IniFormat);
-    if (_ls.value("cashoptions/view", 0).toInt() > 0) {
+
+    if(_ls.value("cashoptions/view", 0).toInt() > 0) {
         ui->btnViewReport->setEnabled(_ls.value("cashoptions/view", -1).toInt() == __user->id());
     }
-    if (_ls.value("cashoptions/print", 0).toInt() > 0) {
+
+    if(_ls.value("cashoptions/print", 0).toInt() > 0) {
         ui->btnPrintReport->setEnabled(_ls.value("cashoptions/print", -1).toInt() == __user->id());
     }
 }
@@ -26,7 +28,7 @@ DlgCashButtonOpions::~DlgCashButtonOpions()
 
 int DlgCashButtonOpions::getOptions()
 {
-    DlgCashButtonOpions d(C5Config::dbParams());
+    DlgCashButtonOpions d;
     return d.exec();
 }
 
@@ -42,10 +44,11 @@ void DlgCashButtonOpions::on_btnPrintReport_clicked()
 
 void DlgCashButtonOpions::on_btnCloseCash_clicked()
 {
-    if (C5Message::question(tr("Confirm cash closing")) != QDialog::Accepted) {
+    if(C5Message::question(tr("Confirm cash closing")) != QDialog::Accepted) {
         done(0);
         return;
     }
+
     done(3);
 }
 

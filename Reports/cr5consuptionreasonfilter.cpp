@@ -2,15 +2,15 @@
 #include "ui_cr5consuptionreasonfilter.h"
 #include "c5cache.h"
 
-CR5ConsuptionReasonFilter::CR5ConsuptionReasonFilter(const QStringList &dbParams, QWidget *parent) :
-    C5FilterWidget(dbParams, parent),
+CR5ConsuptionReasonFilter::CR5ConsuptionReasonFilter(QWidget *parent) :
+    C5FilterWidget(parent),
     ui(new Ui::CR5ConsuptionReasonFilter)
 {
     ui->setupUi(this);
-    ui->leStore->setSelector(dbParams, ui->leStoreName, cache_goods_store);
-    ui->leDishPart->setSelector(dbParams, ui->leDishPartName, cache_dish_part2);
-    ui->leDish->setSelector(dbParams, ui->leDishName, cache_dish);
-    ui->leGoods->setSelector(dbParams, ui->leGoodsName, cache_goods);
+    ui->leStore->setSelector(ui->leStoreName, cache_goods_store);
+    ui->leDishPart->setSelector(ui->leDishPartName, cache_dish_part2);
+    ui->leDish->setSelector(ui->leDishName, cache_dish);
+    ui->leGoods->setSelector(ui->leGoodsName, cache_goods);
 }
 
 CR5ConsuptionReasonFilter::~CR5ConsuptionReasonFilter()

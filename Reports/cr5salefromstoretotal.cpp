@@ -4,13 +4,13 @@
 #include "c5tablewidget.h"
 #include "c5database.h"
 
-CR5SaleFromStoreTotal::CR5SaleFromStoreTotal(const QStringList &dbParams, QWidget *parent) :
-    C5ReportWidget(dbParams, parent)
+CR5SaleFromStoreTotal::CR5SaleFromStoreTotal(QWidget *parent) :
+    C5ReportWidget( parent)
 {
     fIcon = ":/graph.png";
     fLabel = tr("Sales from store total");
     fSimpleQuery = false;
-    fFilterWidget = new CR5SaleFromStoreTotalFilter(dbParams);
+    fFilterWidget = new CR5SaleFromStoreTotalFilter();
     fFilter = static_cast<CR5SaleFromStoreTotalFilter *>(fFilterWidget);
 }
 
@@ -43,7 +43,7 @@ void CR5SaleFromStoreTotal::buildQuery()
     fTranslation["f_goodsname"] = tr("Goods name");
     fTranslation["f_qtybegin"] = tr("Initial") + "\r\n" + tr("Qty");
     fTranslation["f_sumbegin"] = tr("Initial") + "\r\n" + tr("Amount");
-    C5Database db(fDBParams);
+    C5Database db;
     QMap<int, int> typeMap1, typeMap2;
     db[":f_date1"] = fFilter->start();
     db[":f_date2"] = fFilter->end();

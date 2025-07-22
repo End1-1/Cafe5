@@ -4,12 +4,12 @@
 #include "c5saledoc.h"
 #include "c5mainwindow.h"
 
-CR5RouteDaily::CR5RouteDaily(const QStringList &dbParams, QWidget *parent) :
-    C5ReportWidget(dbParams, parent)
+CR5RouteDaily::CR5RouteDaily(QWidget *parent) :
+    C5ReportWidget( parent)
 {
     fLabel = tr("Edit route");
     fIcon = ":/route.png";
-    fFilterWidget = new CR5RouteDailyFilter(dbParams);
+    fFilterWidget = new CR5RouteDailyFilter();
     fSimpleQuery = true;
     fSqlQuery = "SELECT ro.f_id, p.f_address, p.f_taxname, ro.f_date, "
                 "CONCAT_WS(' ', d.f_last, d.f_first) AS f_driver, ro.f_action_comment, ro.f_action_datetime, "
@@ -52,7 +52,7 @@ bool CR5RouteDaily::on_tblView_doubleClicked(const QModelIndex &index)
         return true;
     }
     if (!fModel->data(index.row(), 7, Qt::EditRole).toString().isEmpty()) {
-        auto *s = __mainWindow->createTab<C5SaleDoc>(fDBParams);
+        auto *s = __mainWindow->createTab<C5SaleDoc>();
         s->openDoc(fModel->data(index.row(), 7, Qt::EditRole).toString());
     }
     return true;

@@ -23,9 +23,6 @@ public:
     void configOrder(int table);
 
 private slots:
-    void openO1Response(const QJsonObject &jdoc);
-
-    void openO2Response(const QJsonObject &jdoc);
 
     void on_btnChoseTable_clicked();
 
@@ -50,9 +47,9 @@ private slots:
     void on_btnScrollDown2_clicked();
 
 private:
-    Ui::DlgSplitOrder *ui;
+    Ui::DlgSplitOrder* ui;
 
-    C5User *fUser;
+    C5User* fUser;
 
     bool moveItem(C5OrderDriver *or1, C5OrderDriver *or2, int row);
 

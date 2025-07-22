@@ -2,14 +2,14 @@
 #include "ui_cr5goodsfilter.h"
 #include "c5cache.h"
 
-CR5GoodsFilter::CR5GoodsFilter(const QStringList &dbParams, QWidget *parent) :
-    C5FilterWidget(dbParams, parent),
+CR5GoodsFilter::CR5GoodsFilter(QWidget *parent) :
+    C5FilterWidget(parent),
     ui(new Ui::CR5GoodsFilter)
 {
     ui->setupUi(this);
-    ui->leSupplier->setSelector(dbParams, ui->leSupplierName, cache_goods_partners);
-    ui->leGroup->setSelector(dbParams, ui->leGroupName, cache_goods_group);
-    ui->leCurr->setSelector(dbParams, ui->leCurrName, cache_currency);
+    ui->leSupplier->setSelector(ui->leSupplierName, cache_goods_partners);
+    ui->leGroup->setSelector(ui->leGroupName, cache_goods_group);
+    ui->leCurr->setSelector(ui->leCurrName, cache_currency);
 }
 
 CR5GoodsFilter::~CR5GoodsFilter()

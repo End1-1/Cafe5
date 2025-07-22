@@ -5,8 +5,8 @@
 #include "c5config.h"
 #include "c5database.h"
 
-C5TranslatorForm::C5TranslatorForm(const QStringList &dbParams, QWidget *parent) :
-    C5Widget(dbParams, parent),
+C5TranslatorForm::C5TranslatorForm(QWidget *parent) :
+    C5Widget(parent),
     ui(new Ui::C5TranslatorForm)
 {
     ui->setupUi(this);
@@ -35,7 +35,7 @@ QToolBar *C5TranslatorForm::toolBar()
 
 void C5TranslatorForm::saveDataChanges()
 {
-    C5Database db(fDBParams);
+    C5Database db;
     db.exec("delete from s_translator");
     QString sql;
     for (int i = 0; i < ui->tbl->rowCount(); i++) {
@@ -56,7 +56,7 @@ void C5TranslatorForm::saveDataChanges()
 void C5TranslatorForm::refreshData()
 {
     ui->tbl->setRowCount(0);
-    C5Database db(__c5config.dbParams());
+    C5Database db;
     db.exec("select f_en, f_am, f_ru from s_translator");
     while (db.nextRow()) {
         int row = ui->tbl->addEmptyRow();

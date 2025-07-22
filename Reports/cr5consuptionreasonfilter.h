@@ -12,7 +12,7 @@ class CR5ConsuptionReasonFilter : public C5FilterWidget
     Q_OBJECT
 
 public:
-    explicit CR5ConsuptionReasonFilter(const QStringList &dbParams, QWidget *parent = nullptr);
+    explicit CR5ConsuptionReasonFilter(QWidget *parent = nullptr);
 
     ~CR5ConsuptionReasonFilter();
 

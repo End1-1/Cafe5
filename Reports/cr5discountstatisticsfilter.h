@@ -12,7 +12,7 @@ class CR5DiscountStatisticsFilter : public C5FilterWidget
     Q_OBJECT
 
 public:
-    explicit CR5DiscountStatisticsFilter(const QStringList &dbParams, QWidget *parent = nullptr);
+    explicit CR5DiscountStatisticsFilter(QWidget *parent = nullptr);
 
     ~CR5DiscountStatisticsFilter();
 

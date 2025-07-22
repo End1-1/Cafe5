@@ -14,7 +14,7 @@
 #include <QProcess>
 
 DlgManagerTools::DlgManagerTools(C5User *u) :
-    C5Dialog(__c5config.dbParams()),
+    C5Dialog(),
     ui(new Ui::DlgManagerTools)
 {
     ui->setupUi(this);
@@ -66,7 +66,7 @@ void DlgManagerTools::on_btnChangeMyPassword_clicked()
     if (!DlgPassword::getPasswordString(tr("Enter the new password"), pass)) {
         return;
     }
-    C5Database db(__c5config.dbParams());
+    C5Database db;
     db[":f_altpassword"] = pass;
     db[":f_id"] = fUser->id();
     if (!db.exec("update s_user set f_altpassword=md5(:f_altpassword) where f_id=:f_id")) {

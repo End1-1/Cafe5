@@ -3,8 +3,8 @@
 #include "c5goodsimage.h"
 #include "c5database.h"
 
-CR5GoodsImages::CR5GoodsImages(const QStringList &dbParams, QWidget *parent) :
-    C5Widget(dbParams, parent),
+CR5GoodsImages::CR5GoodsImages(QWidget *parent) :
+    C5Widget(parent),
     ui(new Ui::CR5GoodsImages)
 {
     ui->setupUi(this);
@@ -33,13 +33,13 @@ void CR5GoodsImages::postProcess()
     }
     fImages.clear();
     int r = 0, c = 0;
-    C5Database db(fDBParams);
+    C5Database db;
     db.exec("select g.f_id, g.f_name, gi.f_data, g.f_scancode "
             "from c_goods_images gi "
             "inner join c_goods g on g.f_id=gi.f_id "
             "order by 1 ");
     while (db.nextRow()) {
-        C5GoodsImage *gi = new C5GoodsImage(fDBParams);
+        C5GoodsImage *gi = new C5GoodsImage();
         gi->setProperty("goodsid", db.getString("f_id"));
         fImages.append(gi);
         QPixmap p;

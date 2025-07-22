@@ -2,8 +2,8 @@
 #include "ui_ce5menuname.h"
 #include "c5database.h"
 
-CE5MenuName::CE5MenuName(const QStringList &dbParams, QWidget *parent) :
-    CE5Editor(dbParams, parent),
+CE5MenuName::CE5MenuName(QWidget *parent) :
+    CE5Editor(parent),
     ui(new Ui::CE5MenuName)
 {
     ui->setupUi(this);
@@ -27,7 +27,7 @@ QString CE5MenuName::table()
 bool CE5MenuName::checkData(QString &err)
 {
     bool result = CE5Editor::checkData(err);
-    C5Database db(fDBParams);
+    C5Database db;
     db[":f_name"] = ui->leName->text();
     db[":f_id"] = ui->leCode->getInteger();
     db.exec("select * from d_menu_names where lower(f_name)=lower(:f_name) and f_id<>:f_id");

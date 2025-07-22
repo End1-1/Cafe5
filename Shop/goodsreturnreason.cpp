@@ -5,11 +5,11 @@
 #include <QListWidgetItem>
 
 GoodsReturnReason::GoodsReturnReason() :
-    C5Dialog(__c5config.dbParams()),
+    C5Dialog(),
     ui(new Ui::GoodsReturnReason)
 {
     ui->setupUi(this);
-    C5Database db(fDBParams);
+    C5Database db;
     db.exec("select f_id, f_name from o_goods_return_reason");
     while (db.nextRow()) {
         QListWidgetItem *item = new QListWidgetItem(ui->lst);

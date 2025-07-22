@@ -13,8 +13,8 @@
 #include "c5storedraftwriter.h"
 #include "c5message.h"
 
-C5CashDoc::C5CashDoc(const QStringList &dbParams, QWidget *parent) :
-    C5Document(dbParams, parent),
+C5CashDoc::C5CashDoc(QWidget *parent) :
+    C5Document(parent),
     ui(new Ui::C5CashDoc)
 {
     ui->setupUi(this);
@@ -23,11 +23,11 @@ C5CashDoc::C5CashDoc(const QStringList &dbParams, QWidget *parent) :
     ui->tbl->setColumnWidths(ui->tbl->columnCount(), 0, 0, 400, 100, 0);
     ui->leDocNum->setPlaceholderText(QString("%1").arg(genNumber(DOC_TYPE_CASH), C5Config::docNumDigitsInput(), 10,
                                      QChar('0')));
-    ui->leInput->setSelector(dbParams, ui->leInputName, cache_cash_names);
-    ui->leOutput->setSelector(dbParams, ui->leOutputName, cache_cash_names);
+    ui->leInput->setSelector(ui->leInputName, cache_cash_names);
+    ui->leOutput->setSelector(ui->leOutputName, cache_cash_names);
     ui->leInput->setCallbackWidget(this);
     ui->leOutput->setCallbackWidget(this);
-    ui->lePartner->setSelector(dbParams, ui->lePartnerName, cache_goods_partners);
+    ui->lePartner->setSelector(ui->lePartnerName, cache_goods_partners);
     ui->lbStoreDoc->setEnabled(false);
     ui->leStoreDoc->setEnabled(false);
     ui->btnOpenStoreDoc->setEnabled(false);
@@ -36,7 +36,7 @@ C5CashDoc::C5CashDoc(const QStringList &dbParams, QWidget *parent) :
     fActionFromSale = nullptr;
     fActionDraft = nullptr;
     fActionSave = nullptr;
-    C5Database db(dbParams);
+    C5Database db;
     db.exec("select * from e_currency order by f_id");
     while (db.nextRow()) {
         ui->cbCurrency->addItem(db.getString("f_name"), db.getInt("f_id"));
@@ -102,7 +102,7 @@ void C5CashDoc::setComment(const QString &t)
 
 void C5CashDoc::loadSuggest()
 {
-    C5Database db(fDBParams);
+    C5Database db;
     db.exec("select * from e_cash_suggest order by f_name");
     while (db.nextRow()) {
         ui->cbComment->addItem(db.getString("f_name"));
@@ -135,7 +135,7 @@ bool C5CashDoc::openDoc(const QString &uuid)
         fActionFromSale->setVisible(false);
     }
     fUuid = uuid;
-    C5Database db(fDBParams);
+    C5Database db;
     C5StoreDraftWriter dw(db);
     if (!dw.readAHeader(uuid)) {
         C5Message::error(dw.fErrorMsg);
@@ -202,7 +202,7 @@ bool C5CashDoc::openDoc(const QString &uuid)
 void C5CashDoc::setStoreDoc(const QString &uuid)
 {
     fStoreUuid = uuid;
-    C5Database db(fDBParams);
+    C5Database db;
     db[":f_id"] = uuid;
     db.exec("select * from a_header where f_id=:f_id");
     if (db.nextRow()) {
@@ -244,9 +244,9 @@ int C5CashDoc::outputCash()
     return ui->leOutput->getInteger();
 }
 
-bool C5CashDoc::removeDoc(const QStringList &dbParams, const QString &uuid)
+bool C5CashDoc::removeDoc(const QString &uuid)
 {
-    C5Database db(dbParams);
+    C5Database db;
     removeDoc(db, uuid);
     return true;
 }
@@ -278,7 +278,7 @@ void C5CashDoc::amountChanged(const QString &arg1)
 
 void C5CashDoc::draft()
 {
-    C5Database db(fDBParams);
+    C5Database db;
     C5StoreDraftWriter dw(db);
     dw.updateField("a_header", "f_state", DOC_STATE_DRAFT, "f_id", fUuid);
     C5Message::info(tr("Draft created"));
@@ -313,7 +313,7 @@ bool C5CashDoc::save(bool writedebt, bool fromrelation)
         C5Message::error(err);
         return false;
     }
-    C5Database db(fDBParams);
+    C5Database db;
     C5StoreDraftWriter dw(db);
     if (ui->leDocNum->text().isEmpty()) {
         ui->leDocNum->setInteger(genNumber(DOC_TYPE_CASH));
@@ -380,7 +380,7 @@ void C5CashDoc::saveDoc()
 {
     if (save(true, false)) {
         if (ui->cbComment->currentText().isEmpty() == false) {
-            C5Database db(fDBParams);
+            C5Database db;
             db[":f_comment"] = ui->cbComment->currentText().toLower();
             db.exec("select * from e_cash_suggest where lower(f_name)=:f_comment");
             if (db.nextRow() == false) {
@@ -401,7 +401,7 @@ void C5CashDoc::removeDoc()
         return;
     }
     if (!fUuid.isEmpty()) {
-        if (!removeDoc(fDBParams, fUuid)) {
+        if (!removeDoc(fUuid)) {
             return;
         }
     }
@@ -413,8 +413,8 @@ void C5CashDoc::inputFromSale()
     QDate d = QDate::currentDate();
     int shift;
     QString shiftname;
-    if (C5InputDate::date(fDBParams, d, shift, shiftname)) {
-        C5Database db(fDBParams);
+    if (C5InputDate::date(d, shift, shiftname)) {
+        C5Database db;
         db[":f_date"] = d;
         db[":f_state"] = ORDER_STATE_CLOSE;
         db[":f_shift"] = shift;
@@ -446,7 +446,7 @@ void C5CashDoc::on_btnOpenStoreDoc_clicked()
         return;
     }
     QString e;
-    auto *sd = __mainWindow->createTab<C5StoreDoc>(fDBParams);
+    auto *sd = __mainWindow->createTab<C5StoreDoc>();
     if (!sd->openDoc(fStoreUuid, e)) {
         __mainWindow->removeTab(sd);
         C5Message::error(e);

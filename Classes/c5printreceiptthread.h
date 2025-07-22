@@ -13,7 +13,7 @@ public:
 
     bool fBill;
 
-    bool print(const QStringList &dbParams);
+    bool print();
 
     QString fError;
 

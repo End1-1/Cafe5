@@ -15,8 +15,8 @@
 #include <QDesktopServices>
 #include <QUrl>
 
-CR5CommonSales::CR5CommonSales(const QStringList &dbParams, QWidget *parent) :
-    C5ReportWidget(dbParams, parent)
+CR5CommonSales::CR5CommonSales(QWidget *parent) :
+    C5ReportWidget(parent)
 {
     fIcon = ":/graph.png";
     fLabel = tr("Sales by tickets");
@@ -123,11 +123,13 @@ CR5CommonSales::CR5CommonSales(const QStringList &dbParams, QWidget *parent) :
     fTranslation["f_buyer"] = tr("Buyer");
     fTranslation["f_receiptnumber"] = tr("Tax");
     fTranslation["f_buyertaxcode"] = tr("Buyer taxcode");
-    if (__c5config.frontDeskMode() == FRONTDESK_SHOP) {
+
+    if(__c5config.frontDeskMode() == FRONTDESK_SHOP) {
         fTranslation["f_tablename"] = tr("Cashdesk");
     } else {
         fTranslation["f_tablename"] = tr("Table");
     }
+
     fTranslation["f_amounttotal"] = tr("Total");
     fTranslation["f_amountcash"] = tr("Cash");
     fTranslation["f_amountcard"] = tr("Card");
@@ -177,13 +179,13 @@ CR5CommonSales::CR5CommonSales(const QStringList &dbParams, QWidget *parent) :
     fColumnsVisible["ot.f_receiptnumber"] = false;
     fColumnsVisible["sum(ec.f_amount) as f_amountout"] = false;
     restoreColumnsVisibility();
-    fFilterWidget = new CR5CommonSalesFilter(fDBParams);
-    fFilter = static_cast<CR5CommonSalesFilter *>(fFilterWidget);
+    fFilterWidget = new CR5CommonSalesFilter();
+    fFilter = static_cast<CR5CommonSalesFilter*>(fFilterWidget);
 }
 
-QToolBar *CR5CommonSales::toolBar()
+QToolBar* CR5CommonSales::toolBar()
 {
-    if (!fToolBar) {
+    if(!fToolBar) {
         QList<ToolBarButtons> btn;
         btn << ToolBarButtons::tbEdit
             << ToolBarButtons::tbFilter
@@ -196,6 +198,7 @@ QToolBar *CR5CommonSales::toolBar()
         connect(a, SIGNAL(triggered()), this, SLOT(templates()));
         fToolBar->insertAction(fToolBar->actions().at(3), a);
     }
+
     return fToolBar;
 }
 
@@ -208,7 +211,8 @@ void CR5CommonSales::editRow(int columnWidthId)
 void CR5CommonSales::restoreColumnsWidths()
 {
     C5Grid::restoreColumnsWidths();
-    if (fColumnsVisible["oh.f_id"]) {
+
+    if(fColumnsVisible["oh.f_id"]) {
         fTableView->setColumnWidth(fModel->fColumnNameIndex["f_id"], 0);
     }
 }
@@ -217,84 +221,101 @@ bool CR5CommonSales::tblDoubleClicked(int row, int column, const QJsonArray &val
 {
     Q_UNUSED(row);
     Q_UNUSED(column);
-    if (!fColumnsVisible["oh.f_id"]) {
+
+    if(!fColumnsVisible["oh.f_id"]) {
         C5Message::info(tr("Column 'Header' must be checked in filter"));
         return true;
     }
-    if (values.count() == 0) {
+
+    if(values.count() == 0) {
         C5Message::info(tr("Nothing selected"));
         return true;
     }
-    C5Database db(fDBParams);
+
+    C5Database db;
     db[":f_id"] = values.at(fModel->fColumnNameIndex["f_id"]).toString();
     db.exec("select * from o_header where f_id=:f_id");
-    if (db.nextRow()) {
-        switch (abs(db.getInt("f_source"))) {
-            case 1: {
-                if (db.getDouble("f_amounttotal") > 0) {
-                    C5WaiterOrder *wo = __mainWindow->createTab<C5WaiterOrder>(fDBParams);
-                    wo->setOrder(values.at(fModel->fColumnNameIndex["f_id"]).toString());
-                } else {
-                    C5SaleFromStoreOrder::openOrder(fDBParams, values.at(fModel->fColumnNameIndex["f_id"]).toString());
-                }
-                break;
-            }
-            case 2: {
-                auto *doc = __mainWindow->createTab<C5SaleDoc>(fDBParams);
-                doc->openDoc(values.at(fModel->fColumnNameIndex["f_id"]).toString());
-                //C5SaleFromStoreOrder::openOrder(fDBParams, values.at(fModel->fColumnNameIndex["f_id"]).toString());
-                break;
-            }
-            default: {
-                C5WaiterOrder *wo = __mainWindow->createTab<C5WaiterOrder>(fDBParams);
+
+    if(db.nextRow()) {
+        switch(abs(db.getInt("f_source"))) {
+        case 1: {
+            if(db.getDouble("f_amounttotal") > 0) {
+                C5WaiterOrder *wo = __mainWindow->createTab<C5WaiterOrder>();
                 wo->setOrder(values.at(fModel->fColumnNameIndex["f_id"]).toString());
-                break;
+            } else {
+                C5SaleFromStoreOrder::openOrder(values.at(fModel->fColumnNameIndex["f_id"]).toString());
             }
+
+            break;
+        }
+
+        case 2: {
+            auto *doc = __mainWindow->createTab<C5SaleDoc>();
+            doc->openDoc(values.at(fModel->fColumnNameIndex["f_id"]).toString());
+            //C5SaleFromStoreOrder::openOrder(values.at(fModel->fColumnNameIndex["f_id"]).toString());
+            break;
+        }
+
+        default: {
+            C5WaiterOrder *wo = __mainWindow->createTab<C5WaiterOrder>();
+            wo->setOrder(values.at(fModel->fColumnNameIndex["f_id"]).toString());
+            break;
+        }
         }
     } else {
         C5Message::error(tr("Order not exists"));
     }
+
     return true;
 }
 
 void CR5CommonSales::transferToRoom()
 {
-    if (!fColumnsVisible["oh.f_id"]) {
+    if(!fColumnsVisible["oh.f_id"]) {
         C5Message::info(tr("Column 'Header' must be checked in filter"));
         return;
     }
+
     QModelIndexList ml = this->fTableView->selectionModel()->selectedIndexes();
     QSet<int> rows;
-    foreach (QModelIndex m, ml) {
+
+    foreach(QModelIndex m, ml) {
         rows << m.row();
     }
-    C5Database db1(fDBParams);;
-    foreach (int r, rows) {
+
+    C5Database db1;
+
+    foreach(int r, rows) {
         QString err;
         C5StoreDraftWriter w(db1);
         w.transferToHotel(db1, fModel->data(r, fModel->fColumnNameIndex["f_id"], Qt::EditRole).toString(), err);
-        if (!err.isEmpty()) {
+
+        if(!err.isEmpty()) {
             C5Message::error(err + "<br>" + fModel->data(r, 0, Qt::EditRole).toString());
             return;
         }
     }
+
     C5Message::info(tr("Done"));
 }
 
 void CR5CommonSales::templates()
 {
-    C5DlgSelectReportTemplate d(reporttemplate_commonsales, fDBParams);
-    if (d.exec() == QDialog::Accepted) {
+    C5DlgSelectReportTemplate d(reporttemplate_commonsales);
+
+    if(d.exec() == QDialog::Accepted) {
         QString condition;
         QMap<QString, bool> showColumns = fColumnsVisible;
         fColumnsVisible.clear();
-        if (C5GridGilter::filter(fFilterWidget, condition, fColumnsVisible, fTranslation)) {
+
+        if(C5GridGilter::filter(fFilterWidget, condition, fColumnsVisible, fTranslation)) {
             QString sql = d.fSelectedTemplate.sql;
             sql.replace("%date1", fFilter->date1().toString(FORMAT_DATE_TO_STR_MYSQL));
             sql.replace("%date2", fFilter->date2().toString(FORMAT_DATE_TO_STR_MYSQL));
             executeSql(sql);
             fTableView->resizeColumnsToContents();
         }
+
         fColumnsVisible = showColumns;
     }
 }

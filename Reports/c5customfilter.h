@@ -14,7 +14,7 @@ class C5CustomFilter : public C5Dialog
     Q_OBJECT
 
 public:
-    explicit C5CustomFilter(const QStringList &dbParams);
+    explicit C5CustomFilter();
 
     ~C5CustomFilter();
 

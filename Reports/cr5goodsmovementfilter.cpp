@@ -2,21 +2,21 @@
 #include "ui_cr5goodsmovementfilter.h"
 #include "c5cache.h"
 
-CR5GoodsMovementFilter::CR5GoodsMovementFilter(const QStringList &dbParams, QWidget *parent) :
-    C5FilterWidget(dbParams, parent),
+CR5GoodsMovementFilter::CR5GoodsMovementFilter(QWidget *parent) :
+    C5FilterWidget(parent),
     ui(new Ui::CR5GoodsMovementFilter)
 {
     ui->setupUi(this);
-    ui->leDocType->setSelector(fDBParams, ui->leDocTypeName, cache_doc_type).setMultiselection(true);
-    ui->leGroup->setSelector(fDBParams, ui->leGroupName, cache_goods_group).setMultiselection(true);
-    ui->leGoods->setSelector(fDBParams, ui->leGoodsName, cache_goods, 1, 3).setMultiselection(true);
-    ui->leStore->setSelector(fDBParams, ui->leStoreName, cache_goods_store).setMultiselection(true);
-    ui->leReason->setSelector(fDBParams, ui->leReasonName, cache_store_reason).setMultiselection(true);
-    ui->leStoreIn->setSelector(fDBParams, ui->leStoreNameIn, cache_goods_store).setMultiselection(true);
-    ui->leStoreOut->setSelector(fDBParams, ui->leStoreNameOut, cache_goods_store).setMultiselection(true);
-    ui->leInOut->setSelector(fDBParams, ui->leInOutName, cache_store_inout);
-    ui->leDocState->setSelector(fDBParams, ui->leDocStateName, cache_doc_state);
-    ui->leSupplier->setSelector(fDBParams, ui->leSupplierName, cache_goods_partners);
+    ui->leDocType->setSelector(ui->leDocTypeName, cache_doc_type).setMultiselection(true);
+    ui->leGroup->setSelector(ui->leGroupName, cache_goods_group).setMultiselection(true);
+    ui->leGoods->setSelector(ui->leGoodsName, cache_goods, 1, 3).setMultiselection(true);
+    ui->leStore->setSelector(ui->leStoreName, cache_goods_store).setMultiselection(true);
+    ui->leReason->setSelector(ui->leReasonName, cache_store_reason).setMultiselection(true);
+    ui->leStoreIn->setSelector(ui->leStoreNameIn, cache_goods_store).setMultiselection(true);
+    ui->leStoreOut->setSelector(ui->leStoreNameOut, cache_goods_store).setMultiselection(true);
+    ui->leInOut->setSelector(ui->leInOutName, cache_store_inout);
+    ui->leDocState->setSelector(ui->leDocStateName, cache_doc_state);
+    ui->leSupplier->setSelector(ui->leSupplierName, cache_goods_partners);
 }
 
 CR5GoodsMovementFilter::~CR5GoodsMovementFilter()

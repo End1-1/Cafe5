@@ -5,8 +5,8 @@
 #include "c5database.h"
 #include <QBuffer>
 
-C5GoodsImage::C5GoodsImage(const QStringList &dbParams, QWidget *parent) :
-    C5Widget(dbParams, parent),
+C5GoodsImage::C5GoodsImage(QWidget *parent) :
+    C5Widget(parent),
     ui(new Ui::C5GoodsImage)
 {
     ui->setupUi(this);
@@ -32,11 +32,11 @@ void C5GoodsImage::showCompressButton(bool b)
 void C5GoodsImage::on_btnEdit_clicked()
 {
     int id = property("goodsid").toInt();
-    CE5Goods *ep = new CE5Goods(fDBParams);
-    C5Editor *e = C5Editor::createEditor(fDBParams, ep, id);
+    CE5Goods *ep = new CE5Goods();
+    C5Editor *e = C5Editor::createEditor(ep, id);
     QList<QMap<QString, QVariant> > data;
     if(e->getResult(data)) {
-        C5Database db(fDBParams);
+        C5Database db;
         db[":f_id"] = id;
         db.exec("select g.f_id, g.f_name, gi.f_data, g.f_scancode "
                 "from c_goods_images gi "
@@ -53,7 +53,7 @@ void C5GoodsImage::on_btnEdit_clicked()
 
 void C5GoodsImage::on_btnCompress_clicked()
 {
-    C5Database db(fDBParams);
+    C5Database db;
     db[":f_id"] = property("goodsid");
     db.exec("select f_data from c_goods_images where f_id=:f_id");
     if (db.nextRow()) {
@@ -67,7 +67,7 @@ void C5GoodsImage::on_btnCompress_clicked()
             buff.open(QIODevice::WriteOnly);
             pm.save( &buff, "JPG");
         } while (ba.size() > 100000);
-        C5Database db(fDBParams);
+        C5Database db;
         db[":f_id"] =  property("goodsid");
         db.exec("delete from c_goods_images where f_id=:f_id");
         db[":f_id"] = property("goodsid");

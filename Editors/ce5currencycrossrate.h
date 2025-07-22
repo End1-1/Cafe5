@@ -12,7 +12,7 @@ class CE5CurrencyCrossRate : public CE5Editor
     Q_OBJECT
 
 public:
-    explicit CE5CurrencyCrossRate(const QStringList &dbParams, QWidget *parent = nullptr);
+    explicit CE5CurrencyCrossRate(QWidget *parent = nullptr);
     ~CE5CurrencyCrossRate();
     virtual QString title() override;
     virtual QString table() override;

@@ -3,8 +3,8 @@
 #include "c5database.h"
 #include "c5message.h"
 
-C5SrOfInventory::C5SrOfInventory(const QStringList &dbParams, QWidget *parent) :
-    C5Dialog(dbParams, parent),
+C5SrOfInventory::C5SrOfInventory(QWidget *parent) :
+    C5Dialog(parent),
     ui(new Ui::C5SrOfInventory)
 {
     ui->setupUi(this);
@@ -18,7 +18,7 @@ C5SrOfInventory::~C5SrOfInventory()
 
 void C5SrOfInventory::setGoods(const QDate &date, int store, int goods)
 {
-    C5Database db(fDBParams);
+    C5Database db;
     db[":f_date"] = date;
     db[":f_store"] = store;
     db[":f_goods"] = goods;

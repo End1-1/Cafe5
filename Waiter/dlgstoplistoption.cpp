@@ -9,7 +9,7 @@
 #include "c5user.h"
 
 DlgStopListOption::DlgStopListOption(DlgOrder *o, C5User *u) :
-    C5Dialog(__c5config.dbParams()),
+    C5Dialog(),
     ui(new Ui::DlgStopListOption),
     fDlgOrder(o),
     fUser(u)

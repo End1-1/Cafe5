@@ -7,8 +7,8 @@
 #include "ce5editor.h"
 #include "c5dishwidget.h"
 
-CR5SalesByDishes::CR5SalesByDishes(const QStringList &dbParams, QWidget *parent) :
-    C5ReportWidget(dbParams, parent)
+CR5SalesByDishes::CR5SalesByDishes(QWidget *parent) :
+    C5ReportWidget(parent)
 {
     fIcon = ":/delete.png";
     fLabel = tr("Sales, dishes");
@@ -103,12 +103,12 @@ CR5SalesByDishes::CR5SalesByDishes(const QStringList &dbParams, QWidget *parent)
     fColumnsVisible["sum(ob.f_total) as f_total"] = true;
     fColumnsVisible["oh.f_comment"] = false;
     restoreColumnsVisibility();
-    fFilterWidget = new CR5SalesByDishesFilter(dbParams);
+    fFilterWidget = new CR5SalesByDishesFilter();
 }
 
-QToolBar *CR5SalesByDishes::toolBar()
+QToolBar* CR5SalesByDishes::toolBar()
 {
-    if (!fToolBar) {
+    if(!fToolBar) {
         QList<ToolBarButtons> btn;
         btn << ToolBarButtons::tbFilter
             << ToolBarButtons::tbClearFilter
@@ -118,45 +118,53 @@ QToolBar *CR5SalesByDishes::toolBar()
         fToolBar = createStandartToolbar(btn);
         fToolBar->addAction(QIcon(":/menu.png"), tr("Dish"), this, SLOT(actionShowDish()));
     }
+
     return fToolBar;
 }
 
 void CR5SalesByDishes::restoreColumnsWidths()
 {
     C5Grid::restoreColumnsWidths();
-    if (fColumnsVisible["oh.f_id as f_header"]) {
+
+    if(fColumnsVisible["oh.f_id as f_header"]) {
         fTableView->setColumnWidth(fModel->fColumnNameIndex["f_header"], 0);
     }
 }
 
-bool CR5SalesByDishes::tblDoubleClicked(int row, int column, const QVector<QJsonValue> &v)
+bool CR5SalesByDishes::tblDoubleClicked(int row, int column, const QVector<QJsonValue>& v)
 {
     Q_UNUSED(row);
     Q_UNUSED(column);
-    if (!fColumnsVisible["oh.f_id as f_header"]) {
+
+    if(!fColumnsVisible["oh.f_id as f_header"]) {
         C5Message::info(tr("Column 'Header' must be checked in filter"));
         return true;
     }
-    if (v.count() == 0) {
+
+    if(v.count() == 0) {
         return true;
     }
-    C5WaiterOrder *wo = __mainWindow->createTab<C5WaiterOrder>(fDBParams);
+
+    C5WaiterOrder *wo = __mainWindow->createTab<C5WaiterOrder>();
     wo->setOrder(v.at(fModel->fColumnNameIndex["f_id"]).toString());
     return true;
 }
 
 void CR5SalesByDishes::actionShowDish()
 {
-    if (!fColumnsVisible["d.f_id as f_dishid"]) {
+    if(!fColumnsVisible["d.f_id as f_dishid"]) {
         C5Message::info(tr("Column 'Dish code' must be checked in filter"));
         return;
     }
+
     int r;
-    if (!currentRow(r)) {
+
+    if(!currentRow(r)) {
         return;
     }
-    C5DishWidget *ep = new C5DishWidget(fDBParams);
-    C5Editor *e = C5Editor::createEditor(fDBParams, ep, fModel->data(r, fModel->fColumnNameIndex["f_dishid"],
+
+    C5DishWidget *ep = new C5DishWidget();
+    C5Editor *e = C5Editor::createEditor(ep, fModel->data(r, fModel->fColumnNameIndex["f_dishid"],
                                          Qt::EditRole).toInt());
     QList<QMap<QString, QVariant> > data;
     e->getResult(data);

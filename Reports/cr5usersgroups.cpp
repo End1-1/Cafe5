@@ -3,8 +3,8 @@
 #include "ce5usergroup.h"
 #include "c5mainwindow.h"
 
-CR5UsersGroups::CR5UsersGroups(const QStringList &dbParams, QWidget *parent) :
-    C5ReportWidget(dbParams, parent)
+CR5UsersGroups::CR5UsersGroups(QWidget *parent) :
+    C5ReportWidget( parent)
 {
     fIcon = ":/users_groups.png";
     fLabel = tr("Users groups");
@@ -13,12 +13,12 @@ CR5UsersGroups::CR5UsersGroups(const QStringList &dbParams, QWidget *parent) :
     fTranslation["f_name"] = tr("Name");
     fTranslation["f_starttime"] = tr("Start time");
     fTranslation["f_duration"] = tr("Duration");
-    fEditor = new CE5UserGroup(dbParams);
+    fEditor = new CE5UserGroup();
 }
 
-QToolBar *CR5UsersGroups::toolBar()
+QToolBar* CR5UsersGroups::toolBar()
 {
-    if (!fToolBar) {
+    if(!fToolBar) {
         QList<ToolBarButtons> btn;
         btn << ToolBarButtons::tbNew
             << ToolBarButtons::tbClearFilter
@@ -28,13 +28,14 @@ QToolBar *CR5UsersGroups::toolBar()
         createStandartToolbar(btn);
         fToolBar->addAction(QIcon(":/permissions.png"), tr("Set group\npermissions"), this, SLOT(setPermissions()));
     }
+
     return fToolBar;
 }
 
 void CR5UsersGroups::setPermissions()
 {
-    if (int id = rowId(0)) {
-        C5GroupPermissionsEditor *p = __mainWindow->createTab<C5GroupPermissionsEditor>(fDBParams);
+    if(int id = rowId(0)) {
+        C5GroupPermissionsEditor *p = __mainWindow->createTab<C5GroupPermissionsEditor>();
         p->setPermissionsGroupId(id);
     }
 }

@@ -5,7 +5,7 @@
 #include <QCheckBox>
 
 C5GridGilter::C5GridGilter() :
-    C5Dialog(QStringList()),
+    C5Dialog(),
     ui(new Ui::C5GridGilter)
 {
     ui->setupUi(this);

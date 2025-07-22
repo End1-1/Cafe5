@@ -2,8 +2,8 @@
 #include "cr5cashmovementfilter.h"
 #include "c5tablemodel.h"
 
-CR5CashMovement::CR5CashMovement(const QStringList &dbParams, QWidget *parent) :
-    C5ReportWidget(dbParams, parent)
+CR5CashMovement::CR5CashMovement(QWidget *parent) :
+    C5ReportWidget( parent)
 {
     fIcon = ":/cash.png";
     fLabel = tr("Cash movement");
@@ -40,7 +40,7 @@ CR5CashMovement::CR5CashMovement(const QStringList &dbParams, QWidget *parent) :
 
     restoreColumnsVisibility();
 
-    fFilterWidget = new CR5CashMovementFilter(fDBParams);
+    fFilterWidget = new CR5CashMovementFilter();
 }
 
 QToolBar *CR5CashMovement::toolBar()

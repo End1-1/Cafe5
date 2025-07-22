@@ -3,7 +3,8 @@
 
 #include "c5dialog.h"
 
-namespace Ui {
+namespace Ui
+{
 class supplier;
 }
 
@@ -12,16 +13,16 @@ class supplier : public C5Dialog
     Q_OBJECT
 
 public:
-    explicit supplier(const QStringList &dbParams);
+    explicit supplier();
     ~supplier();
-    static bool getSupplier(const QStringList &dbParams, int &id, QString &name);
+    static bool getSupplier(int& id, QString &name);
 
 private slots:
     void on_btnCancel_clicked();
     void on_btnOK_clicked();
 
 private:
-    Ui::supplier *ui;
+    Ui::supplier* ui;
     int fId;
     QString fName;
 };

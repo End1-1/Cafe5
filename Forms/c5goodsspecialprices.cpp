@@ -20,8 +20,8 @@
 #define col_goods_retail_diff 12
 #define col_goods_whosale_diff 13
 
-C5GoodsSpecialPrices::C5GoodsSpecialPrices(const QStringList &dbParams, QWidget *parent) :
-    C5Widget(dbParams, parent),
+C5GoodsSpecialPrices::C5GoodsSpecialPrices(QWidget *parent) :
+    C5Widget(parent),
     ui(new Ui::C5GoodsSpecialPrices)
 {
     ui->setupUi(this);
@@ -48,7 +48,7 @@ void C5GoodsSpecialPrices::getPrices()
 {
     ui->tblp->clearContents();
     ui->tblp->setRowCount(0);
-    C5Database db(fDBParams);
+    C5Database db;
     db.exec("select sp.f_partner as f_partnerid, p.f_taxcode, p.f_name as f_partnername, p.f_address, "
             "sp.f_id, sp.f_goods, gr.f_name as f_groupname, g.f_name as f_goodsname, gp.f_price1, gp.f_price2, sp.f_price, "
             "((sp.f_price * 100)/gp.f_price1)-100 as f_price1diff, ((sp.f_price * 100)/gp.f_price2)-100 as f_price2diff, "
@@ -139,7 +139,7 @@ void C5GoodsSpecialPrices::on_btnAdd_clicked()
 
 void C5GoodsSpecialPrices::on_btnSave_clicked()
 {
-    C5Database db(fDBParams);
+    C5Database db;
     db.exec("delete from c_goods_special_prices");
     for (int i = 0; i < ui->tblp->rowCount(); i++) {
         db[":f_partner"] = ui->tblp->getInteger(i, col_partner_id);

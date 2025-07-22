@@ -13,8 +13,6 @@ public:
 
     DbData(int id);
 
-    static void setDBParams(const QStringList &dbParams);
-
     virtual QString name(int id);
 
     int id();
@@ -22,6 +20,8 @@ public:
     QList<int> list();
 
     virtual void refresh();
+
+    QVariant get(int id, const QString &key);
 
     void updateField(int id, const QString &field, const QVariant &value);
 
@@ -35,8 +35,6 @@ protected:
     QString fCondition;
 
     QMap<int, QMap<QString, QVariant> > fData;
-
-    QVariant get(int id, const QString &key);
 
     virtual void getFromDatabase();
 };

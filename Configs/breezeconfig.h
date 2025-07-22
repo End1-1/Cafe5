@@ -13,7 +13,7 @@ public:
     QString password;
     QString session;
     QString dealtype;
-    BreezeConfig(const QStringList &dbParams, int id);
+    BreezeConfig(int id);
     virtual void readValues() override;
 };
 

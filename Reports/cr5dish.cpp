@@ -8,8 +8,8 @@
 #include <QAbstractScrollArea>
 #include <QPrintDialog>
 
-CR5Dish::CR5Dish(const QStringList &dbParams, QWidget *parent) :
-    C5ReportWidget(dbParams, parent)
+CR5Dish::CR5Dish(QWidget *parent) :
+    C5ReportWidget( parent)
 {
     fIcon = ":/menu.png";
     fLabel = tr("Dishes");
@@ -31,7 +31,7 @@ CR5Dish::CR5Dish(const QStringList &dbParams, QWidget *parent) :
     fTranslation["f_color"] = tr("Color");
     fTranslation["f_netweight"] = tr("Weight");
     fTranslation["f_cost"] = tr("Cost");
-    fEditor = new C5DishWidget(dbParams);
+    fEditor = new C5DishWidget();
 }
 
 QToolBar *CR5Dish::toolBar()
@@ -89,13 +89,13 @@ void CR5Dish::setColors()
 
 void CR5Dish::translator()
 {
-    auto *mt = __mainWindow->createTab<CR5MenuTranslator>(fDBParams);
+    auto *mt = __mainWindow->createTab<CR5MenuTranslator>();
     mt->setMode(1);
 }
 
 void CR5Dish::descriptionTranslator()
 {
-    auto *mt = __mainWindow->createTab<CR5MenuTranslator>(fDBParams);
+    auto *mt = __mainWindow->createTab<CR5MenuTranslator>();
     mt->setMode(3);
 }
 
@@ -106,7 +106,7 @@ void CR5Dish::deleteDish()
     if (id == 0) {
         return;
     }
-    C5Database db(fDBParams);
+    C5Database db;
     db[":f_dish"] = id;
     db.exec("select * from o_body where f_dish=:f_dish");
     if (db.nextRow()) {
@@ -133,7 +133,7 @@ void CR5Dish::printRecipes(bool v)
     Q_UNUSED(v);
     C5DishWidget *w = static_cast<C5DishWidget *>(fEditor);
     bool showprice = false;
-    switch (DlgPrintRecipesOptions(fDBParams).exec()) {
+    switch (DlgPrintRecipesOptions().exec()) {
         case 1:
             showprice = true;
             break;

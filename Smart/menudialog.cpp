@@ -19,7 +19,7 @@
 #include <QScreen>
 
 MenuDialog::MenuDialog(Workspace *w, C5User *u) :
-    C5Dialog(__c5config.dbParams()),
+    C5Dialog(),
     ui(new Ui::MenuDialog),
     fWorkspace(w)
 {
@@ -58,7 +58,7 @@ void MenuDialog::on_btnFiscalZReport_clicked()
     QString jsnin, jsnout, err;
     int result;
     result = pt.printReport(date1, date2, reporttype, jsnin, jsnout, err);
-    C5Database db(C5Config::dbParams());
+    C5Database db;
     db[":f_id"] = db.uuid();
     db[":f_order"] = QString("Report %1").arg(reporttype == report_x ? "X" : "Z");
     db[":f_date"] = QDate::currentDate();
@@ -77,7 +77,7 @@ void MenuDialog::on_btnReturnFiscalReceipt_clicked()
     if (TouchEnterTaxReceiptNumber::getTaxReceiptNumber(number)) {
         QElapsedTimer et;
         et.start();
-        C5Database db(C5Config::dbParams());
+        C5Database db;
         db[":f_receiptnumber"] = number;
         db.exec("select * from o_tax where cast(f_receiptnumber as signed)=cast(:f_receiptnumber as signed)");
         QString uuid = "--";
@@ -133,7 +133,7 @@ void MenuDialog::on_btnReportByOrder_clicked()
     if (!Calendar::getDate2(date1, date2)) {
         return;
     }
-    C5Database db(fDBParams);
+    C5Database db;
     db[":f_datecash1"] = date1;
     db[":f_datecash2"] = date2;
     db[":f_state"] = ORDER_STATE_CLOSE;

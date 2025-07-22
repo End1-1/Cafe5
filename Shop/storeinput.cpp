@@ -18,7 +18,7 @@
 #define VM_DOCS 4
 
 StoreInput::StoreInput(C5User *user) :
-    C5Dialog(__c5config.dbParams(), true),
+    C5Dialog(true),
     ui(new Ui::StoreInput)
 {
     ui->setupUi(this);
@@ -122,7 +122,7 @@ void StoreInput::on_btnAccept_clicked()
         C5Message::error(tr("Nothing is selected"));
         return;
     }
-    C5Database db(__c5config.dbParams());
+    C5Database db;
     QSet<QString> ids;
     foreach (int r, rows) {
         QString id = ui->tbl->getString(r, 0);
@@ -217,7 +217,7 @@ void StoreInput::history()
     ui->tbl->setColumnCount(header.count());
     ui->tbl->setHorizontalHeaderLabels(header);
     ui->tbl->setColumnWidths(ui->tbl->columnCount(), 0, 30, 100, 0, 300, 140, 100, 100);
-    C5Database db(__c5config.dbParams());
+    C5Database db;
     db[":f_store"] = __c5config.defaultStore();
     db[":f_date1"] = ui->deStart->date();
     db[":f_date2"] = ui->deEnd->date();
@@ -272,7 +272,7 @@ void StoreInput::storeByGroup()
     ui->tbl->setColumnCount(header.count());
     ui->tbl->setHorizontalHeaderLabels(header);
     ui->tbl->setColumnWidths(ui->tbl->columnCount(), 30, 400, 100, 100);
-    C5Database db(__c5config.dbParams());
+    C5Database db;
     db[":f_store"] = __c5config.defaultStore();
     db[":f_date"] = QDate::currentDate();
     if (!db.exec("select gg.f_name as f_group,sum(s.f_qty*s.f_type) as f_qty, "
@@ -314,7 +314,7 @@ void StoreInput::storeByItems()
     ui->tbl->setColumnCount(header.count());
     ui->tbl->setHorizontalHeaderLabels(header);
     ui->tbl->setColumnWidths(ui->tbl->columnCount(), 30, 300, 200, 200, 100, 100);
-    C5Database db(__c5config.dbParams());
+    C5Database db;
     db[":f_store"] = __c5config.defaultStore();
     db[":f_date"] = QDate::currentDate();
     if (!db.exec("select gg.f_name as f_group, g.f_name, g.f_scancode, "
@@ -359,7 +359,7 @@ void StoreInput::docs()
     ui->tbl->setColumnCount(header.count());
     ui->tbl->setHorizontalHeaderLabels(header);
     ui->tbl->setColumnWidths(ui->tbl->columnCount(), 30, 0,  200, 150, 250, 250);
-    C5Database db(__c5config.dbParams());
+    C5Database db;
     db[":f_store1"] = __c5config.defaultStore();
     db[":f_store2"] = __c5config.defaultStore();
     db[":f_date1"] = ui->deStart->date();

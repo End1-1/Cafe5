@@ -1343,6 +1343,13 @@ background:#fff6e5;
              <property name="bottomMargin">
               <number>0</number>
              </property>
+             <item>
+              <layout class="QVBoxLayout" name="vlDishes">
+               <property name="sizeConstraint">
+                <enum>QLayout::SizeConstraint::SetMinimumSize</enum>
+               </property>
+              </layout>
+             </item>
             </layout>
            </widget>
           </widget>

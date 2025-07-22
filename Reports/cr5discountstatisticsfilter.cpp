@@ -2,12 +2,12 @@
 #include "ui_cr5discountstatisticsfilter.h"
 #include "c5cache.h"
 
-CR5DiscountStatisticsFilter::CR5DiscountStatisticsFilter(const QStringList &dbParams, QWidget *parent) :
-    C5FilterWidget(dbParams, parent),
+CR5DiscountStatisticsFilter::CR5DiscountStatisticsFilter(QWidget *parent) :
+    C5FilterWidget(parent),
     ui(new Ui::CR5DiscountStatisticsFilter)
 {
     ui->setupUi(this);
-    ui->leDisc->setSelector(dbParams, ui->leDiscName, cache_discount_type);
+    ui->leDisc->setSelector(ui->leDiscName, cache_discount_type);
 }
 
 CR5DiscountStatisticsFilter::~CR5DiscountStatisticsFilter()

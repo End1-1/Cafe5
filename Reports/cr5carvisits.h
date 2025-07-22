@@ -7,7 +7,7 @@ class CR5CarVisits : public C5ReportWidget
 {
     Q_OBJECT
 public:
-    CR5CarVisits(const QStringList &dbParams, QWidget *parent = nullptr);
+    CR5CarVisits(QWidget *parent = nullptr);
 
     virtual QToolBar *toolBar() override;
 

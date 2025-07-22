@@ -7,7 +7,7 @@
 #include <QPushButton>
 
 DlgMenuSet::DlgMenuSet(const QString &bodyId) :
-    C5Dialog(__c5config.dbParams()),
+    C5Dialog(),
     ui(new Ui::DlgMenuSet)
 {
     ui->setupUi(this);
@@ -15,7 +15,7 @@ DlgMenuSet::DlgMenuSet(const QString &bodyId) :
     ui->t1->configColumns({4, 0, 300, 100, 50});
     ui->t2->configColumns({5, 0, 0, 300, 100, 50});
     setProperty("bodyid", bodyId);
-    C5Database db(fDBParams);
+    C5Database db;
     db[":f_id"] = bodyId;
     db.exec("select ds.f_part, ds.f_qty, d.f_name, d2.f_setqty "
             "from d_dish_set ds "
@@ -78,7 +78,7 @@ void DlgMenuSet::on_toolButton_clicked()
             continue;
         }
         QString id = C5Database::uuid();
-        C5Database db(fDBParams);
+        C5Database db;
         db[":f_id"] = id;
         db[":f_header"] = property("header");
         db[":f_state"] = DISH_STATE_SET;

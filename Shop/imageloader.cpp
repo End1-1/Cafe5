@@ -1,6 +1,5 @@
 #include "imageloader.h"
 #include "c5database.h"
-#include "c5config.h"
 #include <QThread>
 #include <QPixmap>
 
@@ -8,7 +7,6 @@ ImageLoader::ImageLoader(int id, QObject *parent) :
     QObject(parent),
     fId(id)
 {
-
 }
 
 void ImageLoader::start()
@@ -25,12 +23,14 @@ void ImageLoader::start()
 
 void ImageLoader::loadImage()
 {
-    C5Database db(__c5config.dbParams());
+    C5Database db;
     db[":f_id"] = fId;
     db.exec("select * from c_goods_images where f_id=:f_id");
-    if (db.nextRow()) {
+
+    if(db.nextRow()) {
         QPixmap p;
-        if (p.loadFromData(db.getValue("f_data").toByteArray())) {
+
+        if(p.loadFromData(db.getValue("f_data").toByteArray())) {
             emit imageLoaded(p);
         } else {
             emit noImage();
@@ -38,5 +38,6 @@ void ImageLoader::loadImage()
     } else {
         emit noImage();
     }
+
     emit finished();
 }

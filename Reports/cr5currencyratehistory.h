@@ -7,7 +7,7 @@ class CR5CurrencyRateHistory : public C5ReportWidget
 {
     Q_OBJECT
 public:
-    CR5CurrencyRateHistory(const QStringList &dbParams, QWidget *parent = nullptr);
+    CR5CurrencyRateHistory(QWidget *parent = nullptr);
     virtual QToolBar *toolBar();
 };
 

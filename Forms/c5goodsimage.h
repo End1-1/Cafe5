@@ -12,7 +12,7 @@ class C5GoodsImage : public C5Widget
     Q_OBJECT
 
 public:
-    explicit C5GoodsImage(const QStringList &dbParams, QWidget *parent = nullptr);
+    explicit C5GoodsImage(QWidget *parent = nullptr);
 
     ~C5GoodsImage();
 

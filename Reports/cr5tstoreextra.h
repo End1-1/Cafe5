@@ -10,7 +10,7 @@ class CR5TStoreExtra : public C5ReportWidget
     Q_OBJECT
 
 public:
-    CR5TStoreExtra(const QStringList &dbParams, QWidget *parent = nullptr);
+    CR5TStoreExtra(QWidget *parent = nullptr);
 
     virtual QToolBar *toolBar() override;
 

@@ -7,8 +7,8 @@
 #include "c5config.h"
 #include "c5utils.h"
 
-C5CheckDatabase::C5CheckDatabase(const QStringList &dbParams) :
-    C5Dialog(dbParams),
+C5CheckDatabase::C5CheckDatabase() :
+    C5Dialog(),
     ui(new Ui::C5CheckDatabase)
 {
     ui->setupUi(this);
@@ -21,21 +21,24 @@ C5CheckDatabase::~C5CheckDatabase()
 
 void C5CheckDatabase::on_btnStart_clicked()
 {
-    C5Database db1(fDBParams);
-    C5Database db2(fDBParams);
+    C5Database db1;
+    C5Database db2;
     C5StoreDraftWriter dw(db2);
-    C5Document doc(fDBParams);
+    C5Document doc;
     db1[":f_type"] = DOC_TYPE_STORE_INPUT;
     db1.exec("select * from a_header where f_type=:f_type");
     int errnum = 0;
     int r = 0;
-    while (db1.nextRow()) {
+
+    while(db1.nextRow()) {
         db2[":f_id"] = db1.getString("f_id");
         db2.exec("select * from a_header_store where f_id=:f_id");
-        if (db2.nextRow()) {
+
+        if(db2.nextRow()) {
             QString cashuuid = db2.getString("f_cashuuid");
-            if (cashuuid.isEmpty()) {
-            CORRECTCASH:
+
+            if(cashuuid.isEmpty()) {
+CORRECTCASH:
                 errnum++;
                 QString purpose = tr("Store input") + " #" + db1.getString("f_userid") + ", " + db1.getDate("f_date").toString(
                                       FORMAT_DATE_TO_STR);
@@ -52,7 +55,8 @@ void C5CheckDatabase::on_btnStart_clicked()
             } else {
                 db2[":f_id"] = cashuuid;
                 db2.exec("select * from a_header where f_id=:f_id");
-                if (db2.nextRow()) {
+
+                if(db2.nextRow()) {
                     //check existing document
                 } else {
                     goto CORRECTCASH;
@@ -61,15 +65,17 @@ void C5CheckDatabase::on_btnStart_clicked()
         } else {
             //error
         }
+
         ui->lst->item(0)->setText(QString("Store input documents. (%1 of %2, %3 errors)").arg(++r).arg(db1.rowCount()).arg(
                                       errnum));
         qApp->processEvents();
     }
+
     C5Message::info(tr("Complete"));
 }
 
 void C5CheckDatabase::on_btnStoreUtlis_clicked()
 {
-    DlgStoreUtils d(fDBParams);
+    DlgStoreUtils d;
     d.exec();
 }

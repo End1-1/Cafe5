@@ -3,7 +3,7 @@
 #include "c5config.h"
 
 DlgEmarks::DlgEmarks(const QStringList &emarks)
-    : C5Dialog(__c5config.dbParams())
+    : C5Dialog()
     , ui(new Ui::DlgEmarks)
 {
     ui->setupUi(this);

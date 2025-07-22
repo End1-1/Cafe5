@@ -2,13 +2,13 @@
 #include "ui_cr5currencycrossratehistoryfilter.h"
 #include "c5cache.h"
 
-CR5CurrencyCrossRateHistoryFilter::CR5CurrencyCrossRateHistoryFilter(const QStringList &dbParams, QWidget *parent) :
-    C5FilterWidget(dbParams, parent),
+CR5CurrencyCrossRateHistoryFilter::CR5CurrencyCrossRateHistoryFilter(QWidget *parent) :
+    C5FilterWidget(parent),
     ui(new Ui::CR5CurrencyCrossRateHistoryFilter)
 {
     ui->setupUi(this);
-    ui->leCurrency->setSelector(dbParams, ui->leCurrencyName, cache_currency);
-    ui->leCurrency_2->setSelector(dbParams, ui->leCurrencyName_2, cache_currency);
+    ui->leCurrency->setSelector(ui->leCurrencyName, cache_currency);
+    ui->leCurrency_2->setSelector(ui->leCurrencyName_2, cache_currency);
 }
 
 CR5CurrencyCrossRateHistoryFilter::~CR5CurrencyCrossRateHistoryFilter()

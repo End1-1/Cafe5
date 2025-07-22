@@ -7,8 +7,8 @@
 #include "c5user.h"
 #include "ogoods.h"
 
-CR5DraftOutputByRecipe::CR5DraftOutputByRecipe(const QStringList &dbParams, QWidget *parent) :
-    C5ReportWidget(dbParams, parent)
+CR5DraftOutputByRecipe::CR5DraftOutputByRecipe(QWidget *parent) :
+    C5ReportWidget( parent)
 {
     fIcon = ":/goods.png";
     fLabel = tr("Draft output by receipes");
@@ -71,7 +71,7 @@ CR5DraftOutputByRecipe::CR5DraftOutputByRecipe(const QStringList &dbParams, QWid
     fColumnsSum << "f_saleqty"
                 << "f_storeqty";
     fMainTable = "o_body ob";
-    fFilterWidget = new CR5DraftOutputByRecipeFilter(dbParams);
+    fFilterWidget = new CR5DraftOutputByRecipeFilter();
     fFilter = static_cast<CR5DraftOutputByRecipeFilter *>(fFilterWidget);
 }
 
@@ -148,7 +148,7 @@ void CR5DraftOutputByRecipe::createStoreOutput()
         goodsSale.append(g);
     }
     if (goodsSale.count() > 0) {
-        C5Database db(fDBParams);
+        C5Database db;
         C5StoreDraftWriter dw(db);
         QString documentId;
         QString cashid;
@@ -167,7 +167,7 @@ void CR5DraftOutputByRecipe::createStoreOutput()
                                 "", rownum++, "");
         }
         //= dw.writeDraft(docDate, doctype, store, reason, data, comment);
-        auto *sd = __mainWindow->createTab<C5StoreDoc>(fDBParams);
+        auto *sd = __mainWindow->createTab<C5StoreDoc>();
         QString e;
         if (!sd->openDoc(documentId, e)) {
             __mainWindow->removeTab(sd);

@@ -4,8 +4,8 @@
 #include "ce5mftask.h"
 #include "c5permissions.h"
 
-CR5MFActiveTasks::CR5MFActiveTasks(const QStringList &dbParams, QWidget *parent) :
-    C5ReportWidget(dbParams, parent)
+CR5MFActiveTasks::CR5MFActiveTasks(QWidget *parent) :
+    C5ReportWidget( parent)
 {
     fIcon = ":/manufacturing.png";
     fLabel = tr("Tasks");
@@ -30,7 +30,7 @@ CR5MFActiveTasks::CR5MFActiveTasks(const QStringList &dbParams, QWidget *parent)
     fTranslation["f_workshopname"] = tr("Workshop");
     fTranslation["f_stagename"] = tr("Stage");
     fTranslation["f_out"] = tr("Out");
-    fEditor = new CE5MFTask(dbParams);
+    fEditor = new CE5MFTask();
 }
 
 QToolBar *CR5MFActiveTasks::toolBar()
@@ -55,5 +55,5 @@ QToolBar *CR5MFActiveTasks::toolBar()
 
 void CR5MFActiveTasks::configTablet()
 {
-    DlgConfigTable(fDBParams).exec();
+    DlgConfigTable().exec();
 }

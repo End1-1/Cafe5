@@ -14,7 +14,7 @@ class CR5MfDaily : public C5Widget
     Q_OBJECT
 
 public:
-    explicit CR5MfDaily(const QStringList &dbParams, QWidget *parent = nullptr);
+    explicit CR5MfDaily(QWidget *parent = nullptr);
 
     ~CR5MfDaily();
 

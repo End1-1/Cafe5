@@ -31,7 +31,7 @@
 #define view_mode_waiter 2
 
 DlgFace::DlgFace(C5User *user) :
-    C5Dialog(C5Config::dbParams()),
+    C5Dialog(),
     ui(new Ui::DlgFace),
     fUser(user)
 
@@ -135,7 +135,7 @@ void DlgFace::openReservationResponse(const QJsonObject &jdoc)
 void DlgFace::timeout()
 {
     ui->lbTime->setText(QTime::currentTime().toString(FORMAT_TIME_TO_SHORT_STR));
-    C5Database db(__c5config.dbParams());
+    C5Database db;
     if (__c5config.getValue(param_date_cash_auto).toInt() == 0) {
         db[":f_key"] = param_date_cash;
         db.exec("select f_value from s_settings_values where f_key=:f_key");

@@ -12,7 +12,7 @@ class C5SalaryPayment : public C5Widget
     Q_OBJECT
 
 public:
-    explicit C5SalaryPayment(const QStringList &dbParams, QWidget *parent = nullptr);
+    explicit C5SalaryPayment(QWidget *parent = nullptr);
     ~C5SalaryPayment();
 
     virtual QToolBar *toolBar();

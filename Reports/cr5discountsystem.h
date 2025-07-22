@@ -7,7 +7,7 @@ class CR5DiscountSystem : public C5ReportWidget
 {
     Q_OBJECT
 public:
-    CR5DiscountSystem(const QStringList &dbParams, QWidget *parent = nullptr);
+    CR5DiscountSystem(QWidget *parent = nullptr);
 
     virtual QToolBar *toolBar();
 };

@@ -9,14 +9,14 @@
 #include <QFile>
 
 DlgCashinOut::DlgCashinOut(C5User *u) :
-    C5Dialog(__c5config.dbParams()),
+    C5Dialog(),
     ui(new Ui::DlgCashinOut)
 {
     ui->setupUi(this);
     fUser = u;
     ui->tbl->setColumnWidth(0, 300);
     ui->tbl->setColumnWidth(1, 100);
-    C5Database db(__c5config.dbParams());
+    C5Database db;
     double balance = 0;
     db[":f_working_session"] = __c5config.getRegValue("sessionid");
     //db[":f_cash"] = __c5config.cashId();
@@ -97,7 +97,7 @@ void DlgCashinOut::on_btnCloseSession_clicked()
     if (C5Message::question(tr("Confirm to close session")) != QDialog::Accepted) {
         return;
     }
-    C5Database db(__c5config.dbParams());
+    C5Database db;
     db[":f_working_session"] = __c5config.getRegValue("sessionid");
     db[":f_close"] = QDateTime::currentDateTime();
     db.exec("update s_working_sessions "

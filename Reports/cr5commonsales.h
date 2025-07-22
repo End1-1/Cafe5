@@ -10,7 +10,7 @@ class CR5CommonSales : public C5ReportWidget
     Q_OBJECT
 
 public:
-    CR5CommonSales(const QStringList &dbParams, QWidget *parent = nullptr);
+    CR5CommonSales(QWidget *parent = nullptr);
 
     virtual QToolBar *toolBar() override;
 

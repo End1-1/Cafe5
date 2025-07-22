@@ -3,7 +3,7 @@
 #include "c5config.h"
 
 DlgQty::DlgQty() :
-    C5Dialog(__c5config.dbParams()),
+    C5Dialog(),
     ui(new Ui::DlgQty)
 {
     ui->setupUi(this);

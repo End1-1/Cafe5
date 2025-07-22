@@ -12,7 +12,7 @@ class C5DishSelfCostGenPrice : public C5Widget
     Q_OBJECT
 
 public:
-    explicit C5DishSelfCostGenPrice(const QStringList &dbParams, QWidget *parent = nullptr);
+    explicit C5DishSelfCostGenPrice(QWidget *parent = nullptr);
 
     ~C5DishSelfCostGenPrice();
 

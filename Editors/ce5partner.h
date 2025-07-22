@@ -13,7 +13,7 @@ class CE5Partner : public CE5Editor
     Q_OBJECT
 
 public:
-    explicit CE5Partner(const QStringList &dbParams, QWidget *parent = nullptr);
+    explicit CE5Partner(QWidget *parent = nullptr);
 
     ~CE5Partner();
 

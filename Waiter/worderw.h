@@ -23,17 +23,11 @@ public:
 
     void setDlg(DlgOrder *dlg);
 
-    void updateDishes();
-
     void checkAllItems(bool v);
 
     QList<int> checkedItems();
 
-    int addItem(int menuid, const QString &comment, double price, const QString &emark);
-
     void updateItem(int index);
-
-    bool currentRow(int &row);
 
     void setCurrentRow(int row);
 
@@ -43,18 +37,18 @@ public:
 
     void setCheckMode(bool v);
 
-    DishItem *dishWidget(int i);
+    DishItem* dishWidget(int i);
 
-    C5OrderDriver *fOrderDriver;
+    C5OrderDriver* fOrderDriver;
 
 private:
-    Ui::WOrder *ui;
+    Ui::WOrder* ui;
 
-    DlgOrder *fDlg;
+    DlgOrder* fDlg;
 
     bool fSelected;
 
-    QList<DishItem *> fItems;
+    QList<DishItem*> fItems;
 
     void setChanges();
 

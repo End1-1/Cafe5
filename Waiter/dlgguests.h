@@ -3,7 +3,8 @@
 
 #include "c5dialog.h"
 
-namespace Ui {
+namespace Ui
+{
 class DlgGuests;
 }
 
@@ -14,7 +15,7 @@ class DlgGuests : public C5Dialog
     Q_OBJECT
 
 public:
-    explicit DlgGuests(const QStringList &dbParams, C5OrderDriver *order);
+    explicit DlgGuests(C5OrderDriver *order);
 
     ~DlgGuests();
 
@@ -28,9 +29,9 @@ private slots:
     void on_btnClose_clicked();
 
 private:
-    Ui::DlgGuests *ui;
+    Ui::DlgGuests* ui;
 
-    C5OrderDriver *fOrder;
+    C5OrderDriver* fOrder;
 };
 
 #endif // DLGGUESTS_H

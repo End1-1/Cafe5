@@ -7,13 +7,13 @@
 #include "c5message.h"
 #include <QMenu>
 
-CE5DishPackage::CE5DishPackage(const QStringList &dbParams, QWidget *parent) :
-    CE5Editor(dbParams, parent),
+CE5DishPackage::CE5DishPackage(QWidget *parent) :
+    CE5Editor(parent),
     ui(new Ui::CE5DishPackage)
 {
     ui->setupUi(this);
     ui->tblDishes->setColumnWidths(ui->tblDishes->columnCount(), 0, 0, 300, 80, 80, 200, 200, 80);
-    ui->leMenu->setSelector(fDBParams, ui->leMenuName, cache_menu_names);
+    ui->leMenu->setSelector(ui->leMenuName, cache_menu_names);
 }
 
 CE5DishPackage::~CE5DishPackage()
@@ -34,7 +34,7 @@ QString CE5DishPackage::table()
 void CE5DishPackage::setId(int id)
 {
     CE5Editor::setId(id);
-    C5Database db(fDBParams);
+    C5Database db;
     db[":f_package"] = id;
     db.exec("select p.f_id, p.f_dish, d.f_name, p.f_qty, p.f_price, p.f_store, p.f_printer, "
             "d.f_cost "
@@ -51,10 +51,10 @@ void CE5DishPackage::setId(int id)
         ui->tblDishes->createLineEdit(r, 4)->setDouble(db.getDouble(4));
         connect(ui->tblDishes->lineEdit(r, 4), SIGNAL(textChanged(QString)), this, SLOT(setPrice(QString)));
         C5ComboBox *cb = ui->tblDishes->createComboBox(r, 5);
-        cb->setCache(fDBParams, cache_goods_store);
+        cb->setCache(cache_goods_store);
         cb->setIndexForValue(db.getInt(5));
         cb = ui->tblDishes->createComboBox(r, 6);
-        cb->setCache(fDBParams, cache_waiter_printers);
+        cb->setCache(cache_waiter_printers);
         cb->setCurrentIndex(cb->findText(db.getString(6)));
         ui->tblDishes->setData(r, 7, db.getDouble("f_cost"));
     }
@@ -80,7 +80,7 @@ bool CE5DishPackage::save(QString &err, QList<QMap<QString, QVariant> > &data)
         C5Message::error(err);
         return false;
     }
-    C5Database db(fDBParams);
+    C5Database db;
     for (int id : fRemovedDish) {
         db[":f_id"] = id;
         db.exec("delete from d_package_list where f_id=:f_id");
@@ -124,7 +124,7 @@ bool CE5DishPackage::checkData(QString &err)
 void CE5DishPackage::newDish()
 {
     QJsonArray vals;
-    if (!C5Selector::getValue(fDBParams, cache_dish, vals)) {
+    if (!C5Selector::getValue(cache_dish, vals)) {
         return;
     }
     int r = ui->tblDishes->addEmptyRow();
@@ -136,8 +136,8 @@ void CE5DishPackage::newDish()
     ui->tblDishes->createLineEdit(r, 4);
     connect(ui->tblDishes->lineEdit(r, 4), SIGNAL(textChanged(QString)), this, SLOT(setPrice(QString)));
     ui->tblDishes->lineEdit(r, 3)->setFocus();
-    ui->tblDishes->createComboBox(r, 5)->setCache(fDBParams, cache_goods_store);
-    ui->tblDishes->createComboBox(r, 6)->setCache(fDBParams, cache_waiter_printers);
+    ui->tblDishes->createComboBox(r, 5)->setCache(cache_goods_store);
+    ui->tblDishes->createComboBox(r, 6)->setCache(cache_waiter_printers);
 }
 
 void CE5DishPackage::removeDish()

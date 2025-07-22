@@ -16,7 +16,7 @@ class CR5ConsumptionBySalesFilter : public C5FilterWidget
     Q_OBJECT
 
 public:
-    explicit CR5ConsumptionBySalesFilter(const QStringList &dbParams, QWidget *parent = nullptr);
+    explicit CR5ConsumptionBySalesFilter(QWidget *parent = nullptr);
 
     ~CR5ConsumptionBySalesFilter();
 

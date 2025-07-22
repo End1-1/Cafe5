@@ -13,7 +13,7 @@ class CR5StoreDocumentsFilter : public C5FilterWidget
     Q_OBJECT
 
 public:
-    explicit CR5StoreDocumentsFilter(const QStringList &dbParams, QWidget *parent = nullptr);
+    explicit CR5StoreDocumentsFilter(QWidget *parent = nullptr);
 
     ~CR5StoreDocumentsFilter();
 

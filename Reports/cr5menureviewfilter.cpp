@@ -2,17 +2,17 @@
 #include "ui_cr5menureviewfilter.h"
 #include "c5cache.h"
 
-CR5MenuReviewFilter::CR5MenuReviewFilter(const QStringList &dbParams, QWidget *parent) :
-    C5FilterWidget(dbParams, parent),
+CR5MenuReviewFilter::CR5MenuReviewFilter(QWidget *parent) :
+    C5FilterWidget(parent),
     ui(new Ui::CR5MenuReviewFilter)
 {
     ui->setupUi(this);
-    ui->leMenu->setSelector(dbParams, ui->leMenuName, cache_menu_names);
-    ui->leDept->setSelector(dbParams, ui->leDeptName, cache_dish_part1);
-    ui->leType->setSelector(dbParams, ui->leTypeName, cache_dish_part2, 1, 2).setMultiselection(true);
-    ui->leStore->setSelector(dbParams, ui->leStoreName, cache_goods_store);
-    ui->leState->setSelector(dbParams, ui->leStateName, cache_dish_menu_state);
-    ui->leGoods->setSelector(dbParams, ui->leGoods, cache_goods, 1, 3).setMultiselection(true);
+    ui->leMenu->setSelector(ui->leMenuName, cache_menu_names);
+    ui->leDept->setSelector(ui->leDeptName, cache_dish_part1);
+    ui->leType->setSelector(ui->leTypeName, cache_dish_part2, 1, 2).setMultiselection(true);
+    ui->leStore->setSelector(ui->leStoreName, cache_goods_store);
+    ui->leState->setSelector(ui->leStateName, cache_dish_menu_state);
+    ui->leGoods->setSelector(ui->leGoods, cache_goods, 1, 3).setMultiselection(true);
 }
 
 CR5MenuReviewFilter::~CR5MenuReviewFilter()

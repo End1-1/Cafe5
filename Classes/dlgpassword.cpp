@@ -7,7 +7,7 @@
 #include <QDoubleValidator>
 
 DlgPassword::DlgPassword(C5User *u) :
-    C5Dialog(QStringList()),
+    C5Dialog(),
     ui(new Ui::DlgPassword),
     fUser(u)
 {
@@ -24,35 +24,39 @@ DlgPassword::~DlgPassword()
     delete ui;
 }
 
-bool DlgPassword::getUser(const QString &title, C5User *&user)
+bool DlgPassword::getUser(const QString &title, C5User*& user)
 {
     user = new C5User(0);
     DlgPassword *d = new DlgPassword(user);
     d->ui->label->setText(title);
     bool result = d->exec() == QDialog::Accepted;
     delete d;
-    if (!result) {
+
+    if(!result) {
         delete user;
     }
+
     return result;
 }
 
-bool DlgPassword::getUserAndCheck(const QString &title, C5User *&user, int permission)
+bool DlgPassword::getUserAndCheck(const QString &title, C5User*& user, int permission)
 {
-    if (!getUser(title, user)) {
+    if(!getUser(title, user)) {
         return false;
     }
-    if (!user->check(permission)) {
+
+    if(!user->check(permission)) {
         C5Message::error(tr("You have not permission for this action"));
         return false;
     }
+
     return true;
 }
 
-bool DlgPassword::getQty(const QString &title, int &qty)
+bool DlgPassword::getQty(const QString &title, int& qty)
 {
     C5User u(0);
-    DlgPassword *d = new DlgPassword( &u);
+    DlgPassword *d = new DlgPassword(&u);
     d->ui->label->setText(title);
     d->ui->lePassword->setEchoMode(QLineEdit::Normal);
     d->ui->lePassword->setMaxLength(2);
@@ -62,16 +66,18 @@ bool DlgPassword::getQty(const QString &title, int &qty)
     return result;
 }
 
-bool DlgPassword::getAmount(const QString &title, double &amount, bool defaultAmount)
+bool DlgPassword::getAmount(const QString &title, double& amount, bool defaultAmount)
 {
     C5User u(0);
-    DlgPassword *d = new DlgPassword( &u);
+    DlgPassword *d = new DlgPassword(&u);
     d->ui->label->setText(title);
     d->ui->lePassword->setEchoMode(QLineEdit::Normal);
     d->ui->lePassword->setValidator(new QDoubleValidator(0, amount, 2));
-    if (defaultAmount) {
+
+    if(defaultAmount) {
         d->ui->lePassword->setDouble(amount);
     }
+
     d->fMax = amount;
     bool result = d->exec() == QDialog::Accepted;
     amount = d->ui->lePassword->getDouble();
@@ -82,7 +88,7 @@ bool DlgPassword::getAmount(const QString &title, double &amount, bool defaultAm
 bool DlgPassword::getString(const QString &title, QString &str)
 {
     C5User u(0);
-    DlgPassword *d = new DlgPassword( &u);
+    DlgPassword *d = new DlgPassword(&u);
     d->ui->label->setText(title);
     d->ui->lePassword->setEchoMode(QLineEdit::Normal);
     d->ui->lePassword->setMaxLength(20);
@@ -95,7 +101,7 @@ bool DlgPassword::getString(const QString &title, QString &str)
 bool DlgPassword::getPassword(const QString &title, QString &str)
 {
     C5User u(0);
-    DlgPassword *d = new DlgPassword( &u);
+    DlgPassword *d = new DlgPassword(&u);
     d->ui->label->setText(title);
     d->ui->lePassword->setEchoMode(QLineEdit::Password);
     d->ui->lePassword->setMaxLength(20);
@@ -109,7 +115,7 @@ bool DlgPassword::getPassword(const QString &title, QString &str)
 bool DlgPassword::getPasswordString(const QString &title, QString &pass)
 {
     C5User u(0);
-    DlgPassword *d = new DlgPassword( &u);
+    DlgPassword *d = new DlgPassword(&u);
     d->setProperty("pass", true);
     d->ui->label->setText(title);
     d->ui->lePassword->setEchoMode(QLineEdit::Password);
@@ -127,11 +133,12 @@ void DlgPassword::on_pushButton_clicked()
 
 void DlgPassword::click(const QString &text)
 {
-    if (text == ".") {
-        if (ui->lePassword->text().contains(".")) {
+    if(text == ".") {
+        if(ui->lePassword->text().contains(".")) {
             return;
         }
     }
+
     ui->lePassword->setText(ui->lePassword->text() + text);
 }
 
@@ -188,16 +195,19 @@ void DlgPassword::on_pushButton_11_clicked()
 void DlgPassword::on_pushButton_12_clicked()
 {
     QString pwd = ui->lePassword->text().replace(";", "").replace("?", "");
-    if (property("pass").toBool()) {
+
+    if(property("pass").toBool()) {
         accept();
         return;
     }
-    if (ui->lePassword->echoMode() == QLineEdit::Password) {
-        if (!fUser->authorize(pwd)) {
+
+    if(ui->lePassword->echoMode() == QLineEdit::Password) {
+        if(!fUser->authorize(pwd)) {
             ui->lePassword->clear();
             C5Message::error(fUser->error());
             return;
         }
+
         accept();
     } else {
         accept();
@@ -211,8 +221,8 @@ void DlgPassword::on_lePassword_returnPressed()
 
 void DlgPassword::on_lePassword_textChanged(const QString &arg1)
 {
-    if (fMax > 0.01) {
-        if (arg1.toDouble() > fMax) {
+    if(fMax > 0.01) {
+        if(arg1.toDouble() > fMax) {
             ui->lePassword->setText(QString::number(fMax, 'f',
                                                     2).remove(QRegularExpression("\\.0+$")).remove(QRegularExpression("\\.$")));
         }

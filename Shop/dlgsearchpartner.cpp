@@ -4,7 +4,7 @@
 #include "ui_dlgsearchpartner.h"
 
 DlgSearchPartner::DlgSearchPartner() :
-    C5Dialog(__c5config.dbParams()),
+    C5Dialog(),
     ui(new Ui::DlgSearchPartner)
 {
     ui->setupUi(this);
@@ -32,7 +32,7 @@ void DlgSearchPartner::on_btnCancel_clicked()
 void DlgSearchPartner::loadPartners()
 {
     ui->tbl->setRowCount(0);
-    C5Database db(fDBParams);
+    C5Database db;
     db.exec("select f_id, f_taxcode, f_taxname, f_contact, f_phone from c_partners");
     while (db.nextRow()) {
         int r = ui->tbl->rowCount();
@@ -55,7 +55,7 @@ void DlgSearchPartner::on_tbl_cellDoubleClicked(int row, int column)
 
 void DlgSearchPartner::on_btnSave_clicked()
 {
-    C5Database db(fDBParams);
+    C5Database db;
     db[":f_taxcode"] = ui->leTaxcode->text();
     db[":f_taxname"] = ui->leTaxName->text();
     db[":f_contact"] = ui->leContact->text();

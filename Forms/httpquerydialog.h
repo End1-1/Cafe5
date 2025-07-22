@@ -16,7 +16,7 @@ class HttpQueryDialog : public C5Dialog
     Q_OBJECT
 
 public:
-    explicit HttpQueryDialog(const QStringList &dbParams, const QString &url, const QJsonObject &jo,
+    explicit HttpQueryDialog(const QString &url, const QJsonObject &jo,
                              QWidget *parent = nullptr);
     ~HttpQueryDialog();
     virtual int exec() override;

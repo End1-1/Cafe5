@@ -12,7 +12,7 @@ class DlgDirtyStoreDoc : public C5Dialog
     Q_OBJECT
 
 public:
-    explicit DlgDirtyStoreDoc(const QString &uuid, const QStringList &dbParams);
+    explicit DlgDirtyStoreDoc(const QString &uuid);
     ~DlgDirtyStoreDoc();
 
 private slots:

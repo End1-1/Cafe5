@@ -10,7 +10,7 @@ class CR5ConsuptionReason : public C5ReportWidget
     Q_OBJECT
 
 public:
-    CR5ConsuptionReason(const QStringList &dbParams, QWidget *parent = nullptr);
+    CR5ConsuptionReason(QWidget *parent = nullptr);
 
     virtual QToolBar *toolBar() override;
 

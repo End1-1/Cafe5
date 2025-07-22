@@ -12,7 +12,7 @@ class CR5SaleFlags : public C5Dialog
     Q_OBJECT
 
 public:
-    explicit CR5SaleFlags(const QStringList &dbParams);
+    explicit CR5SaleFlags();
 
     ~CR5SaleFlags();
 

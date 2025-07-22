@@ -20,22 +20,19 @@ DbData::DbData(int id)
 
 QVariant DbData::get(int id, const QString &key)
 {
-    if (!fData.contains(id)) {
+    if(!fData.contains(id)) {
         C5Database db;
         db[":f_id"] = id;
         db.exec("select * from " + fTable + " where f_id=:f_id");
-        if (db.nextRow()) {
+
+        if(db.nextRow()) {
             QMap<QString, QVariant> m;
             db.rowToMap(m);
             fData[id] = m;
         }
     }
-    return fData[id][key];
-}
 
-void DbData::setDBParams(const QStringList &dbParams)
-{
-    fDbParams = dbParams;
+    return fData[id][key];
 }
 
 QString DbData::name(int id)
@@ -70,17 +67,22 @@ void DbData::updateField(int id, const QString &field, const QVariant &value)
 void DbData::getFromDatabase()
 {
     fData.clear();
-    if (fTable.isEmpty()) {
+
+    if(fTable.isEmpty()) {
         return;
     }
-    C5Database db(fDbParams);
+
+    C5Database db;
     bool success = db.exec("select * from " + fTable + (fCondition.isEmpty() ? "" : " where " + fCondition));
     Q_ASSERT(success);
-    while (db.nextRow()) {
+
+    while(db.nextRow()) {
         QMap<QString, QVariant> row;
-        for (int i = 0; i < db.columnCount(); i++) {
+
+        for(int i = 0; i < db.columnCount(); i++) {
             row[db.columnName(i)] = db.getValue(i);
         }
+
         fData[db.getInt("f_id")] = row;
     }
 }

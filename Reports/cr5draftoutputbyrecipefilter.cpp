@@ -3,16 +3,16 @@
 #include "c5cache.h"
 #include "c5utils.h"
 
-CR5DraftOutputByRecipeFilter::CR5DraftOutputByRecipeFilter(const QStringList &dbParams, QWidget *parent) :
-    C5FilterWidget(dbParams, parent),
+CR5DraftOutputByRecipeFilter::CR5DraftOutputByRecipeFilter(QWidget *parent) :
+    C5FilterWidget(parent),
     ui(new Ui::CR5DraftOutputByRecipeFilter)
 {
     ui->setupUi(this);
-    ui->leDishState->setSelector(dbParams, ui->leDishStateName, cache_dish_state).setMultiselection(true);
+    ui->leDishState->setSelector(ui->leDishStateName, cache_dish_state).setMultiselection(true);
     ui->leDishState->setValue(DISH_STATE_OK);
-    ui->lePart2->setSelector(dbParams, ui->lePart2Name, cache_dish_part2).setMultiselection(true);
-    ui->leStore->setSelector(dbParams, ui->leStoreName, cache_goods_store).setMultiselection(true);
-    ui->leGoodsGroup->setSelector(dbParams, ui->leGoodsGroupName, cache_goods_group).setMultiselection(true);
+    ui->lePart2->setSelector(ui->lePart2Name, cache_dish_part2).setMultiselection(true);
+    ui->leStore->setSelector(ui->leStoreName, cache_goods_store).setMultiselection(true);
+    ui->leGoodsGroup->setSelector(ui->leGoodsGroupName, cache_goods_group).setMultiselection(true);
 }
 
 CR5DraftOutputByRecipeFilter::~CR5DraftOutputByRecipeFilter()

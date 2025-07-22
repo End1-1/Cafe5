@@ -339,7 +339,7 @@ C5WaiterServer::~C5WaiterServer()
 // {
 //     QElapsedTimer et;
 //     et.start();
-//     C5Database db(__c5config.dbParams());
+//     C5Database db;
 //     PrintTaxN pt(C5Config::taxIP(), C5Config::taxPort(), C5Config::taxPassword(), C5Config::taxUseExtPos(),
 //                  C5Config::taxCashier(), C5Config::taxPin(),  this);
 //     pt.fEmarks.append(emarks);

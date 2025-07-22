@@ -4,12 +4,12 @@
 #include "c5message.h"
 #include "c5database.h"
 
-GoodsAsMap::GoodsAsMap(const QStringList &dbParams, QWidget *parent) :
-    C5Widget(dbParams, parent),
+GoodsAsMap::GoodsAsMap(QWidget *parent) :
+    C5Widget(parent),
     ui(new Ui::GoodsAsMap)
 {
     ui->setupUi(this);
-    C5Database db(fDBParams);
+    C5Database db;
     ui->tbl->setColumnWidths(3, 0, 150, 400);
     db.exec("select g.f_id, gr.f_name as f_group, g.f_name "
             "from c_goods g "
@@ -67,7 +67,7 @@ QToolBar *GoodsAsMap::toolBar()
 
 void GoodsAsMap::saveDataChanges()
 {
-    C5Database db(fDBParams);
+    C5Database db;
     db.exec("delete from as_convert where f_table='c_goods'");
     for (int i = 0; i < ui->tbl->rowCount(); i++) {
         for (int c = ui->tbl->columnCount() - asList.count(); c < ui->tbl->columnCount(); c++) {

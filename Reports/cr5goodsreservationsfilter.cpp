@@ -2,8 +2,8 @@
 #include "ui_cr5goodsreservationsfilter.h"
 #include "goodsreserve.h"
 
-CR5GoodsReservationsFilter::CR5GoodsReservationsFilter(const QStringList &dbParams, QWidget *parent) :
-    C5FilterWidget(dbParams, parent),
+CR5GoodsReservationsFilter::CR5GoodsReservationsFilter(QWidget *parent) :
+    C5FilterWidget(parent),
     ui(new Ui::CR5GoodsReservationsFilter)
 {
     ui->setupUi(this);

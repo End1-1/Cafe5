@@ -8,7 +8,7 @@ class CR5StoreReason : public C5ReportWidget
     Q_OBJECT
 
 public:
-    CR5StoreReason(const QStringList &dbParams, QWidget *parent = nullptr);
+    CR5StoreReason(QWidget *parent = nullptr);
 
     virtual QToolBar *toolBar() override;
 };

@@ -3,8 +3,8 @@
 #include "ce5packagelist.h"
 #include "c5tablemodel.h"
 
-CR5DishPackage::CR5DishPackage(const QStringList &dbParams, QWidget *parent) :
-    C5ReportWidget(dbParams, parent)
+CR5DishPackage::CR5DishPackage(QWidget *parent) :
+    C5ReportWidget(parent)
 {
     fIcon = ":/menu.png";
     fLabel = tr("Dish package");
@@ -14,12 +14,12 @@ CR5DishPackage::CR5DishPackage(const QStringList &dbParams, QWidget *parent) :
     fTranslation["f_price"] = tr("Price");
     fTranslation["f_enabled"] = tr("Active");
     fTranslation["f_menuname"] = tr("Menu");
-    fEditor = new CE5DishPackage(dbParams);
+    fEditor = new CE5DishPackage();
 }
 
-QToolBar *CR5DishPackage::toolBar()
+QToolBar* CR5DishPackage::toolBar()
 {
-    if (!fToolBar) {
+    if(!fToolBar) {
         QList<ToolBarButtons> btn;
         btn << ToolBarButtons::tbNew
             << ToolBarButtons::tbFilter
@@ -32,17 +32,20 @@ QToolBar *CR5DishPackage::toolBar()
         connect(a, SIGNAL(triggered(bool)), this, SLOT(editDishList()));
         fToolBar->insertAction(fToolBar->actions().at(1), a);
     }
+
     return fToolBar;
 }
 
 void CR5DishPackage::editDishList()
 {
     int row = 0;
-    if (!currentRow(row)) {
+
+    if(!currentRow(row)) {
         return;
     }
+
     int id = fModel->data(row, 0, Qt::EditRole).toInt();
-    CE5PackageList *pl = new CE5PackageList(fDBParams, id);
+    CE5PackageList *pl = new CE5PackageList(id);
     pl->exec();
     delete pl;
 }

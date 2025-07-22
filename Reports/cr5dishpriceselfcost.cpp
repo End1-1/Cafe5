@@ -4,12 +4,12 @@
 #include "c5database.h"
 #include "c5dishwidget.h"
 
-CR5DishPriceSelfCost::CR5DishPriceSelfCost(const QStringList &dbParams, QWidget *parent) :
-    C5ReportWidget(dbParams, parent)
+CR5DishPriceSelfCost::CR5DishPriceSelfCost(QWidget *parent) :
+    C5ReportWidget( parent)
 {
     fLabel = tr("Dish prices and self cost");
     fIcon = ":/menu.png";
-    fFilterWidget = new CR5DishPriceSelfCostFilter(dbParams);
+    fFilterWidget = new CR5DishPriceSelfCostFilter();
     fFilter = static_cast<CR5DishPriceSelfCostFilter *>(fFilterWidget);
     fSimpleQuery = true;
 }
@@ -87,7 +87,7 @@ void CR5DishPriceSelfCost::buildQueryV1()
     for (int i = 0; i < fModel->rowCount(); i++) {
         dishMap[fModel->data(i, 0, Qt::DisplayRole).toInt()] = i;
     }
-    C5Database db(fDBParams);
+    C5Database db;
     QString menuid;
     if (!fFilterWidget->condition().isEmpty()) {
         menuid = "where m.f_id in(" + fFilter->menuId() + ") ";
@@ -129,7 +129,7 @@ void CR5DishPriceSelfCost::buildQueryV2()
     fModel->insertColumn(6, tr("Unit"));
     fModel->insertColumn(7, tr("Price"));
     fModel->insertColumn(8, tr("Cost"));
-    C5Database db(fDBParams);
+    C5Database db;
     QString query =
         "select r.f_goods, g.f_name, r.f_qty, u.f_name, g.f_lastinputprice, g.f_lastinputprice*r.f_qty, r.f_dish "
         "from d_recipes r "
@@ -236,8 +236,8 @@ bool CR5DishPriceSelfCost::tblDoubleClicked(int row, int column, const QJsonArra
     if (values.at(0).toInt() == 0) {
         return true;
     }
-    C5DishWidget *ep = new C5DishWidget(fDBParams);
-    C5Editor *e = C5Editor::createEditor(fDBParams, ep, values.at(0).toInt());
+    C5DishWidget *ep = new C5DishWidget();
+    C5Editor *e = C5Editor::createEditor(ep, values.at(0).toInt());
     QList<QMap<QString, QVariant> > data;
     if(e->getResult(data)) {
     }

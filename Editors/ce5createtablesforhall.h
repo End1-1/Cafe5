@@ -12,11 +12,11 @@ class CE5CreateTablesForHall : public C5Dialog
     Q_OBJECT
 
 public:
-    explicit CE5CreateTablesForHall(const QStringList &dbParams);
+    explicit CE5CreateTablesForHall();
 
     ~CE5CreateTablesForHall();
 
-    static void createTableForHall(const QStringList &dbParams);
+    static void createTableForHall();
 
 private slots:
     void on_btnCreate_clicked();

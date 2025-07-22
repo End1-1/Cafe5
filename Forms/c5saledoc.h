@@ -12,9 +12,6 @@ namespace Ui
 class C5SaleDoc;
 }
 
-static const int PRICEMODE_RETAIL = 1;
-static const int PRICEMODE_WHOSALE = 2;
-
 #define REPORT_HANDLER_SALE_DOC_OPEN_DRAFT "39617ca7-8fa4-11ed-8ad3-1078d2d2b808"
 
 class C5SaleDoc : public C5Widget
@@ -22,7 +19,7 @@ class C5SaleDoc : public C5Widget
     Q_OBJECT
 
 public:
-    explicit C5SaleDoc(const QStringList &dbParams, QWidget *parent = nullptr);
+    explicit C5SaleDoc(QWidget *parent = nullptr);
 
     ~C5SaleDoc();
 
@@ -30,7 +27,7 @@ public:
 
     virtual bool reportHandler(const QString &handleId, const QVariant &data) override;
 
-    virtual QToolBar *toolBar() override;
+    virtual QToolBar* toolBar() override;
 
     bool openDoc(const QString &uuid);
 
@@ -114,18 +111,18 @@ private slots:
     void on_btnCashier_clicked();
 
 private:
-    Ui::C5SaleDoc *ui;
+    Ui::C5SaleDoc* ui;
     CPartners fPartner;
     ODraftSale fDraftSale;
     ODraftSaleBody fDraftSaleBody;
     int fMode;
-    QAction *fActionSave;
-    QAction *fActionDraft;
-    QAction *fActionCopy;
-    QAction *fRemoveAction;
-    QAction *fPrintTax;
-    QAction *fPrintReturnTax;
-    QAction *fActionReturn;
+    QAction* fActionSave;
+    QAction* fActionDraft;
+    QAction* fActionCopy;
+    QAction* fRemoveAction;
+    QAction* fPrintTax;
+    QAction* fPrintReturnTax;
+    QAction* fActionReturn;
     void saveReturnItems();
     int addGoods(int goodsId, C5Database &db);
     int addGoods(const QString &uuid, int store, int goodsId, const QString &barcode, const QString &name,

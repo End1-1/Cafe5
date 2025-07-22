@@ -3,8 +3,8 @@
 #include "QRCodeGenerator.h"
 #include "c5config.h"
 
-DlgConfigTable::DlgConfigTable(const QStringList &dbParams) :
-    C5Dialog(dbParams),
+DlgConfigTable::DlgConfigTable() :
+    C5Dialog(),
     ui(new Ui::DlgConfigTable)
 {
     ui->setupUi(this);

@@ -5,13 +5,13 @@
 #include "c5database.h"
 #include "c5message.h"
 
-CE5PackageList::CE5PackageList(const QStringList &dbParams, int package) :
-    C5Dialog(dbParams),
+CE5PackageList::CE5PackageList(int package) :
+    C5Dialog(),
     ui(new Ui::CE5PackageList)
 {
     ui->setupUi(this);
     ui->tbl->setColumnWidths(5, 0, 200, 0, 300, 80);
-    ui->lePackage->setSelector(fDBParams, ui->lePackageName, cache_dish_package);
+    ui->lePackage->setSelector(ui->lePackageName, cache_dish_package);
     setPackage(package);
     connect(ui->lePackage, SIGNAL(done(QVector<QJsonValue>)), this, SLOT(packageChanged(QVector<QJsonValue>)));
 }
@@ -26,7 +26,7 @@ void CE5PackageList::setPackage(int id)
     ui->lePackage->setValue(id);
     ui->tbl->setRowCount(0);
     setWindowTitle(QString("%1 %2").arg(tr("Package")).arg(ui->lePackageName->text()));
-    C5Database db(fDBParams);
+    C5Database db;
     db[":f_id"] = id;
     db.exec("select f_price from d_package where f_id=:f_id");
     if (db.nextRow()) {
@@ -81,7 +81,7 @@ void CE5PackageList::packageChanged(const QVector<QJsonValue> &val)
 void CE5PackageList::on_btnAdd_clicked()
 {
     QJsonArray values;
-    if (!C5Selector::getValue(fDBParams, cache_dish, values)) {
+    if (!C5Selector::getValue(cache_dish, values)) {
         return;
     }
     addDish(0, values.at(2).toString(), values.at(0).toInt(), values.at(1).toString(), 0);
@@ -90,7 +90,7 @@ void CE5PackageList::on_btnAdd_clicked()
 
 void CE5PackageList::on_btnSave_clicked()
 {
-    C5Database db(fDBParams);
+    C5Database db;
     db[":f_package"] = ui->lePackage->getInteger();
     db.exec("delete from d_package_list where f_package=:f_package");
     for (int i = 0; i < ui->tbl->rowCount(); i++) {

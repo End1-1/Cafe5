@@ -1,8 +1,8 @@
 #include "ce5goodsmodel.h"
 #include "ui_ce5goodsmodel.h"
 
-CE5GoodsModel::CE5GoodsModel(const QStringList &dbParams, QWidget *parent) :
-    CE5Editor(dbParams, parent),
+CE5GoodsModel::CE5GoodsModel(QWidget *parent) :
+    CE5Editor(parent),
     ui(new Ui::CE5GoodsModel)
 {
     ui->setupUi(this);

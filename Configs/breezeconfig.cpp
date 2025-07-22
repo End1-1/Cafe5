@@ -1,7 +1,7 @@
 #include "breezeconfig.h"
 
-BreezeConfig::BreezeConfig(const QStringList &dbParams, int id) :
-    Configs(dbParams, id)
+BreezeConfig::BreezeConfig(int id) :
+    Configs(id)
 {
 }
 

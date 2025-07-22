@@ -15,7 +15,7 @@ class DlgListDishSpecial : public C5Dialog
     Q_OBJECT
 
 public:
-    explicit DlgListDishSpecial(const QStringList &dbParams);
+    explicit DlgListDishSpecial();
     ~DlgListDishSpecial();
     static bool getSpecial(int dish, QString &special);
 

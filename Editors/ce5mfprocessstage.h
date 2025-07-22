@@ -12,7 +12,7 @@ class CE5MFProcessStage : public CE5Editor
     Q_OBJECT
 
 public:
-    explicit CE5MFProcessStage(const QStringList &dbParams, QWidget *parent = nullptr);
+    explicit CE5MFProcessStage(QWidget *parent = nullptr);
 
     ~CE5MFProcessStage();
 

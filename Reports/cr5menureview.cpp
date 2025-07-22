@@ -5,8 +5,8 @@
 #include "cr5menureviewfilter.h"
 #include "c5dishgroupaction.h"
 
-CR5MenuReview::CR5MenuReview(const QStringList &dbParams, QWidget *parent) :
-    C5ReportWidget(dbParams, parent)
+CR5MenuReview::CR5MenuReview(QWidget *parent) :
+    C5ReportWidget(parent)
 {
     fIcon = ":/menu.png";
     fLabel = tr("Review menu");
@@ -35,14 +35,14 @@ CR5MenuReview::CR5MenuReview(const QStringList &dbParams, QWidget *parent) :
     fTranslation["f_print1"] = tr("Print 1");
     fTranslation["f_print2"] = tr("Print 2");
     fTranslation["f_color"] = tr("Color");
-    fEditor = new C5DishWidget(dbParams);
+    fEditor = new C5DishWidget();
     restoreColumnsVisibility();
-    fFilterWidget = new CR5MenuReviewFilter(dbParams);
+    fFilterWidget = new CR5MenuReviewFilter();
 }
 
-QToolBar *CR5MenuReview::toolBar()
+QToolBar* CR5MenuReview::toolBar()
 {
-    if (!fToolBar) {
+    if(!fToolBar) {
         QList<ToolBarButtons> btn;
         btn << ToolBarButtons::tbNew
             << ToolBarButtons::tbFilter
@@ -53,13 +53,15 @@ QToolBar *CR5MenuReview::toolBar()
         createStandartToolbar(btn);
         fToolBar->addAction(QIcon(":/hammer.png"), tr("Set group\naction"), this, SLOT(groupAction()));
     }
+
     return fToolBar;
 }
 
 void CR5MenuReview::restoreColumnsWidths()
 {
     C5Grid::restoreColumnsWidths();
-    if (fColumnsVisible["f_mid"]) {
+
+    if(fColumnsVisible["f_mid"]) {
         fTableView->setColumnWidth(fModel->fColumnNameIndex["f_mid"], 0);
     }
 }
@@ -67,7 +69,8 @@ void CR5MenuReview::restoreColumnsWidths()
 void CR5MenuReview::refreshData()
 {
     C5ReportWidget::refreshData();
-    for (int i = 0; i < fModel->rowCount(); i++) {
+
+    for(int i = 0; i < fModel->rowCount(); i++) {
         fModel->setRowColor(i, QColor::fromRgb(fModel->data(i, fModel->indexForColumnName("f_color"), Qt::EditRole).toInt()));
     }
 }
@@ -76,16 +79,20 @@ bool CR5MenuReview::tblDoubleClicked(int row, int column, const QJsonArray &v)
 {
     Q_UNUSED(row);
     Q_UNUSED(column);
-    if (v.count() == 0) {
+
+    if(v.count() == 0) {
         return true;
     }
-    C5DishWidget *ep = new C5DishWidget(fDBParams);
-    C5Editor *e = C5Editor::createEditor(fDBParams, ep, 0);
+
+    C5DishWidget *ep = new C5DishWidget();
+    C5Editor *e = C5Editor::createEditor(ep, 0);
     int col = fModel->indexForColumnName("f_id");
     ep->setId(v.at(col).toInt());
     QList<QMap<QString, QVariant> > data;
+
     if(e->getResult(data)) {
     }
+
     delete e;
     return true;
 }
@@ -93,37 +100,48 @@ bool CR5MenuReview::tblDoubleClicked(int row, int column, const QJsonArray &v)
 void CR5MenuReview::groupAction()
 {
     QModelIndexList ml = fTableView->selectionModel()->selectedIndexes();
-    if (ml.count() == 0) {
+
+    if(ml.count() == 0) {
         C5Message::info(tr("Nothing was selected"));
         return;
     }
+
     QSet<int> rows;
-    for (int i = 0; i < ml.count(); i++) {
+
+    for(int i = 0; i < ml.count(); i++) {
         rows.insert(ml.at(i).row());
     }
+
     int col = fModel->indexForColumnName("f_mid");
-    C5DishGroupAction *da = new C5DishGroupAction(fDBParams);
-    if (da->exec() == QDialog::Accepted) {
-        C5Database db(fDBParams);
+    C5DishGroupAction *da = new C5DishGroupAction();
+
+    if(da->exec() == QDialog::Accepted) {
+        C5Database db;
         bool work = false;
         QString id;
-        if (da->setStore(id)) {
-            foreach (int row, rows) {
+
+        if(da->setStore(id)) {
+            foreach(int row, rows) {
                 db[":f_store"] = id;
                 db.update("d_menu", where_id(fModel->data(row, col, Qt::EditRole).toString()));
             }
+
             work = true;
         }
-        if (da->setState(id)) {
-            foreach (int row, rows) {
+
+        if(da->setState(id)) {
+            foreach(int row, rows) {
                 db[":f_state"] = id;
                 db.update("d_menu", where_id(fModel->data(row, col, Qt::EditRole).toString()));
             }
+
             work = true;
         }
-        if (work) {
+
+        if(work) {
             C5Message::info(tr("Done"));
         }
     }
+
     delete da;
 }

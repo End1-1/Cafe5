@@ -13,7 +13,7 @@ class CR5ReportsFilter : public C5FilterWidget
     Q_OBJECT
 
 public:
-    explicit CR5ReportsFilter(const QStringList &dbParams, QWidget *parent = nullptr);
+    explicit CR5ReportsFilter(QWidget *parent = nullptr);
     ~CR5ReportsFilter();
 
     void setFields(const QStringList &cache);

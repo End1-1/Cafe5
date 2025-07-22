@@ -7,8 +7,8 @@ QStringList docs;
 QList<int> types;
 int total;
 
-DlgStoreUtils::DlgStoreUtils(const QStringList &dbParams) :
-    C5Dialog(dbParams),
+DlgStoreUtils::DlgStoreUtils() :
+    C5Dialog(),
     ui(new Ui::DlgStoreUtils)
 {
     ui->setupUi(this);
@@ -20,7 +20,7 @@ DlgStoreUtils::~DlgStoreUtils()
 }
 void DlgStoreUtils::on_btnWriteAllDocuments_clicked()
 {
-    C5Database db(fDBParams);
+    C5Database db;
     C5StoreDraftWriter dw(db);
     QString err;
     if (docs.isEmpty()) {

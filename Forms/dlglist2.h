@@ -12,9 +12,9 @@ class DlgList2 : public C5Dialog
     Q_OBJECT
 
 public:
-    explicit DlgList2(const QStringList &dbParams, QWidget *parent = nullptr);
+    explicit DlgList2(QWidget *parent = nullptr);
     ~DlgList2();
-    static int indexOfList(const QString &title, const QStringList &dbParams, const QStringList &list);
+    static int indexOfList(const QString &title, const QStringList &list);
 
 private slots:
     void on_btnCancel_clicked();

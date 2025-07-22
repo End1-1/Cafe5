@@ -10,7 +10,7 @@
 #include "c5utils.h"
 
 DlgShiftRotation::DlgShiftRotation(C5User *user) :
-    C5Dialog(__c5config.dbParams()),
+    C5Dialog(),
     ui(new Ui::DlgShiftRotation),
     fUser(user)
 {
@@ -56,7 +56,7 @@ void DlgShiftRotation::on_btnChange_clicked()
     if (C5Message::question(tr("Change the shift?")) != QDialog::Accepted) {
         return;
     }
-    C5Database db(__c5config.dbParams());
+    C5Database db;
     //Check checkin reservation
     db[":f_checkin"] = date;
     db.exec("select o.f_id, ohh.f_id from o_header_hotel ohh "

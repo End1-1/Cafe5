@@ -4,7 +4,7 @@
 #include "c5database.h"
 
 DlgGuest::DlgGuest() :
-    C5Dialog(C5Config::dbParams()),
+    C5Dialog(),
     ui(new Ui::DlgGuest)
 {
     ui->setupUi(this);

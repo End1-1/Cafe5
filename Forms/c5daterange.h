@@ -12,7 +12,7 @@ class C5DateRange : public C5Dialog
     Q_OBJECT
 
 public:
-    explicit C5DateRange(const QStringList &dbParams);
+    explicit C5DateRange();
 
     ~C5DateRange();
 

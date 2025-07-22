@@ -4,14 +4,14 @@
 #include "c5tablemodel.h"
 #include "dataonline.h"
 
-QHash<QString, DlgDataOnline *> DlgDataOnline::fInstances;
+QHash<QString, DlgDataOnline*> DlgDataOnline::fInstances;
 
-DlgDataOnline::DlgDataOnline(const QStringList &dbParams, const QString &table) :
-    C5Dialog(dbParams),
+DlgDataOnline::DlgDataOnline(const QString &table) :
+    C5Dialog(),
     ui(new Ui::DlgDataOnline)
 {
     ui->setupUi(this);
-    fTableModel = new C5TableModel(dbParams, this);
+    fTableModel = new C5TableModel(this);
     ui->tableView->setModel(fTableModel);
     ui->tableView->setSelectionBehavior(QAbstractItemView::SelectRows);
     connect(ui->tableView, SIGNAL(tblDoubleClick(int, int, QVector<QJsonValue>)), this, SLOT(tblDoubleClicked(int, int,
@@ -21,7 +21,7 @@ DlgDataOnline::DlgDataOnline(const QStringList &dbParams, const QString &table) 
             SLOT(selectionChanged(QItemSelection, QItemSelection)));
     fReset = true;
     fSearchColumn = -1;
-    DataOnline d(dbParams);
+    DataOnline d;
     fQuery = d.fTableQueries[table];
     refresh();
 }
@@ -31,23 +31,27 @@ DlgDataOnline::~DlgDataOnline()
     delete ui;
 }
 
-bool DlgDataOnline::get(const QStringList &dbParams, const QString &table, DataResult &result, bool multiselect,
+bool DlgDataOnline::get(const QString &table, DataResult &result, bool multiselect,
                         int searchcolumn)
 {
-    QString hash = dbParams.join(',') + table;
-    if (!fInstances.contains(hash)) {
-        fInstances.insert(hash, new DlgDataOnline(dbParams, table));
+    QString hash = __c5config.dbParams().join(',') + table;
+
+    if(!fInstances.contains(hash)) {
+        fInstances.insert(hash, new DlgDataOnline(table));
     }
+
     auto *d = fInstances[hash];
     d->fMultipleSelection = multiselect;
     d->fSearchColumn = searchcolumn;
     d->ui->leFilter->setFocus();
     d->fValues.clear();
-    if (d->exec()) {
-        result.fColumns = DataOnline(dbParams).fColumnNames[table];
+
+    if(d->exec()) {
+        result.fColumns = DataOnline().fColumnNames[table];
         result.fRows = d->fValues;
         return true;
     }
+
     return false;
 }
 
@@ -58,8 +62,8 @@ void DlgDataOnline::on_leFilter_textChanged(const QString &arg1)
 
 void DlgDataOnline::on_btnCheck_clicked()
 {
-    for (int i = 0; i < fTableModel->rowCount(); i++) {
-        if (fTableModel->data(i, 0, Qt::CheckStateRole) == Qt::Checked) {
+    for(int i = 0; i < fTableModel->rowCount(); i++) {
+        if(fTableModel->data(i, 0, Qt::CheckStateRole) == Qt::Checked) {
             fValues.append(fTableModel->getRowValues(i));
             accept();
             return;
@@ -74,10 +78,11 @@ void DlgDataOnline::sqlError(const QString &errorMessage)
 
 void DlgDataOnline::selectionChanged(const QItemSelection &selected, const QItemSelection &deselected)
 {
-    for (QModelIndex i : deselected.indexes()) {
+    for(QModelIndex i : deselected.indexes()) {
         fTableModel->setData(i.row(), 0, 0, Qt::CheckStateRole);
     }
-    for (QModelIndex i : selected.indexes()) {
+
+    for(QModelIndex i : selected.indexes()) {
         fTableModel->setData(i.row(), 0, 1, Qt::CheckStateRole);
     }
 }
@@ -86,9 +91,11 @@ bool DlgDataOnline::tblDoubleClicked(int row, int column, const QJsonArray &valu
 {
     Q_UNUSED(column);
     Q_UNUSED(row);
-    if (values.count() == 0) {
+
+    if(values.count() == 0) {
         return false;
     }
+
     fValues.append(values);
     accept();
     return true;
