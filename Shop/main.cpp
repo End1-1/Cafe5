@@ -25,6 +25,8 @@
 #include <QJsonArray>
 #include <QJsonDocument>
 #include <QJsonObject>
+#include <QScreen>
+#include <QDesktopServices>
 #include <QSettings>
 
 int main(int argc, char* argv[])
@@ -182,6 +184,25 @@ int main(int argc, char* argv[])
     s->deleteLater();
     Working w(__user);
     w.setWindowTitle("");
+    QStringList args;
+
+    for(int i = 0; i < argc; i++) {
+        args << argv[i];
+    }
+
+    for(const QString &s : args) {
+        if(s.startsWith("/monitor")) {
+            QList<QScreen*> screens = a.screens();
+            int monitor = 0;
+            QStringList mon = s.split("=");
+
+            if(mon.length() == 2) {
+                monitor = mon.at(1).toInt();
+            }
+
+            w.move(screens.at(monitor)->geometry().topLeft());
+        }
+    }
 
     if(__c5config.defaultHall() > 0) {
         w.setWindowTitle(w.windowTitle() + "[" + dbhall->name(__c5config.defaultHall()) + "]");

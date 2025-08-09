@@ -22,6 +22,14 @@ CashCollection::CashCollection() :
         ui->leAmount->setDouble(fMax);
         ui->leAmountCard->setDouble(jo["card"].toDouble());
         ui->leAmountPrepaid->setDouble(jo["prepaid"].toDouble());
+        QJsonObject joo = jo["daily"].toObject();
+        ui->leRInit->setDouble(joo["f_prevday"].toDouble());
+        ui->leRInput->setDouble(joo["f_income"].toDouble());
+        ui->leRSale->setDouble(joo["sale"].toDouble());
+        ui->leROut->setDouble(joo["f_output"].toDouble());
+        ui->leRDiscount->setDouble(joo["f_discount"].toDouble());
+        ui->leRFinal->setDouble(joo["f_final"].toDouble());
+        ui->leRCheck->setDouble(joo["f_check"].toDouble());
     }, [](const QJsonObject & je) {
     });
     fCoinCashId = __c5config.fMainJson["coincash_id"].toInt();
@@ -42,13 +50,10 @@ void CashCollection::on_btnCancel_clicked()
 
 void CashCollection::on_btnSave_clicked()
 {
-    if(ui->leAmount->getDouble() < 0.001) {
-        C5Message::error(tr("Amount must be greater then 0"));
-        return;
-    }
-
-    C5Database db;
-
+    // if(ui->leAmount->getDouble() < 0.001) {
+    //     C5Message::error(tr("Amount must be greater then 0"));
+    //     return;
+    // }
     if(ui->leAmountCoin->getDouble() > 0.001) {
         fHttp->createHttpQuery("/engine/cashdesk/create.php",
         QJsonObject {
@@ -57,7 +62,9 @@ void CashCollection::on_btnSave_clicked()
             {"cashin", 0},
             {"cashout", __c5config.cashId()},
             {"remarks", tr("Amount coin")},
-            {"amount", ui->leAmountCoin->text()}
+            {"amount", ui->leAmountCoin->text()},
+            {"config", C5Config::fMainJson["id"].toInt()},
+            {"daily_check", ui->leRCheck->getDouble()}
         }, SLOT(responseOfCreate(QJsonObject)));
     } else {
         collectCash();

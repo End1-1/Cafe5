@@ -163,6 +163,7 @@ void ViewOrder::on_btnReturn_clicked()
 
 void ViewOrder::returnFalse(const QString &msg, C5Database *db)
 {
+    Q_UNUSED(db);
     C5Message::error(msg);
 }
 
@@ -728,10 +729,10 @@ void ViewOrder::on_btnEditReason_clicked()
 
 void ViewOrder::on_btnPrintPrices_clicked()
 {
-    QString p = "f_price1";
+    QString ppp = "f_price1";
 
     if(C5Message::question("Զեղչված՞") == QDialog::Accepted) {
-        p = "f_price1disc";
+        ppp = "f_price1disc";
     }
 
     QPrintDialog pd;
@@ -759,7 +760,7 @@ void ViewOrder::on_btnPrintPrices_clicked()
     WHERE f_header=:f_header
     ORDER BY og.f_row desc
               )";
-    sql.replace("%1", p);
+    sql.replace("%1", ppp);
     db.exec(sql);
 
     while(db.nextRow()) {
@@ -767,7 +768,13 @@ void ViewOrder::on_btnPrintPrices_clicked()
         font.setPointSize(46);
         font.setBold(true);
         C5Printing p;
-        p.setSceneParams(350, 100, QPageLayout::Portrait);
+
+        if(ppp == "f_price1") {
+            p.setSceneParams(350, 100, QPageLayout::Portrait);
+        } else {
+            p.setSceneParams(350, 100, QPageLayout::Portrait);
+        }
+
         p.setFont(font);
         p.br(2);
         p.br(6);

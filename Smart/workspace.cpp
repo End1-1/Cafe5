@@ -1290,10 +1290,19 @@ int Workspace::printTax(double cardAmount, double idramAmount)
         useExtPos = "true";
     }
 
-    PrintTaxN pt(C5Config::taxIP(), C5Config::taxPort(),
-                 C5Config::taxPassword(), useExtPos,
-                 C5Config::taxCashier(),
-                 C5Config::taxPin(), this);
+    QTableWidgetItem *citem = ui->tblTables->currentItem();
+
+    if(!citem) {
+        C5Message::error(tr("Program error QTableWidgetItem *citem = ui->tblTables->currentItem();"));
+        return false;
+    }
+
+    QJsonObject jc = citem->data(Qt::UserRole + 5).toJsonObject();
+    PrintTaxN pt(jc["tax_ip"].toString(),
+                 jc["tax_port"].toString().toInt(),
+                 jc["tax_password"].toString(), useExtPos,
+                 jc["tax_op"].toString(),
+                 jc["tax_pin"].toString(), this);
 
     if(ui->leTaxpayerId->text().isEmpty() == false) {
         pt.fPartnerTin = ui->leTaxpayerId->text();
@@ -1315,7 +1324,7 @@ int Workspace::printTax(double cardAmount, double idramAmount)
         switch(fDiscountMode) {
         case CARD_TYPE_DISCOUNT:
             pt.addGoods(db.getInt("f_taxdept") == 0
-                        ? C5Config::taxDept().toInt()
+                        ? jc["tax_dept"].toString().toInt()
                         : db.getInt("f_taxdept"),
                         db.getString("f_adgcode"), QString::number(db.getInt("f_dish")),
                         db.getString("f_name"), db.getDouble("f_price"),
@@ -1324,7 +1333,7 @@ int Workspace::printTax(double cardAmount, double idramAmount)
 
         case CARD_TYPE_SPECIAL_DISHES:
             pt.addGoods(db.getInt("f_taxdept") == 0
-                        ? C5Config::taxDept().toInt()
+                        ? jc["tax_dept"].toString().toInt()
                         : db.getInt("f_taxdept"),
                         db.getString("f_adgcode"), db.getString("f_dish"),
                         db.getString("f_name"), db.getDouble("f_price"),
@@ -1333,7 +1342,7 @@ int Workspace::printTax(double cardAmount, double idramAmount)
 
         default:
             pt.addGoods(db.getInt("f_taxdept") == 0
-                        ? C5Config::taxDept().toInt()
+                        ? jc["tax_dept"].toString().toInt()
                         : db.getInt("f_taxdept"),
                         db.getString("f_adgcode"), db.getString("f_dish"),
                         db.getString("f_name"), db.getDouble("f_price"),
@@ -1349,7 +1358,7 @@ int Workspace::printTax(double cardAmount, double idramAmount)
         result = pt.makeJsonAndPrint(cardAmount, 0, jsonIn, jsonOut, err);
     } else {
         pt.fJsonHeader["paidAmount"] = ui->leTotal->getDouble();
-        result = pt.makeJsonAndPrintSimple(cardAmount, 0, jsonIn, jsonOut, err);
+        result = pt.makeJsonAndPrintSimple(jc["tax_dept"].toString().toInt(), cardAmount, 0, jsonIn, jsonOut, err);
     }
 
 #ifdef QT_DEBUG
@@ -1535,9 +1544,14 @@ bool Workspace::printReceipt(const QString &id, bool printSecond, bool precheck)
             "order by b.f_package, b.f_row ");
     int package = 0;
     double clearTotal = 0;
+    double service = 0;
 
     while(dd.nextRow()) {
-        clearTotal += dd.getDouble("f_qty1") * dd.getDouble("f_clearPrice");
+        if(dd.getInt("f_dish") != C5Config::fMainJson["service_item_code"].toInt()) {
+            clearTotal += dd.getDouble("f_qty1") * dd.getDouble("f_clearPrice");
+        } else {
+            service = dd.getDouble("f_qty1") * dd.getDouble("f_clearPrice");
+        }
 
         if(dd.getInt("f_package") > 0) {
             if(package != dd.getInt("f_package")) {
@@ -1631,7 +1645,7 @@ bool Workspace::printReceipt(const QString &id, bool printSecond, bool precheck)
     }
 
     p.ltext(tr("Need to pay"), 0);
-    p.rtext(float_str(clearTotal, 2));
+    p.rtext(float_str(clearTotal  + service, 2));
     p.br();
     p.br();
     p.line();
@@ -1912,46 +1926,7 @@ void Workspace::initResponse(const QJsonObject &jdoc)
     }
 
     LogWriter::write(LogWriterLevel::verbose, "init", "menu");
-    jta = jo["menu"].toArray();
-
-    for(int i = 0; i < jta.size(); i++) {
-        const QJsonObject &j = jta.at(i).toObject();
-
-        if(j["f_id"].toInt() == C5Config::fMainJson["service_item_code"].toInt()
-                || j["f_id"].toInt() == C5Config::fMainJson["discount_item_code"].toInt()) {
-            continue;
-        }
-
-        Dish *d = new Dish();
-        d->menuid = j["menuid"].toInt();
-        d->id = j["f_id"].toInt();
-        d->state = DISH_STATE_OK;
-        d->typeId = j["f_part"].toInt();
-        d->name = j["f_name"].toString();
-        d->printer = j["f_print1"].toString();
-        d->printer2 = j["f_print2"].toString();
-        d->price = j["f_price"].toDouble();
-        d->store = j["f_store"].toInt();
-        d->adgCode = j["f_adgt"].toString().isEmpty() ? j["f_adgcode"].toString() : j["f_adgt"].toString();
-        d->color = j["f_color"].toInt();
-        d->netWeight = j["f_netweight"].toDouble();
-        d->cost = j["f_cost"].toDouble();
-        d->quick = j["f_recent"].toInt();
-        d->barcode = j["f_barcode"].toString();
-        d->typeName = j["f_groupname"].toString();
-        d->specialDiscount = j["f_specialdiscount"].toDouble() / 100;
-        d->qrRequired = j["f_qr"].toString().toInt();
-        fDishes.append(d);
-
-        if(d->barcode.isEmpty() == false) {
-            QStringList barcodes = d->barcode.split(",", Qt::SkipEmptyParts);
-
-            for(const QString &b : barcodes) {
-                fDishesBarcode[b] = d;
-            }
-        }
-    }
-
+    jMenu = jo["menu"].toArray();
     LogWriter::write(LogWriterLevel::verbose, "init", "package");
     jta = jo["package"].toArray();
 
@@ -1998,6 +1973,7 @@ void Workspace::initResponse(const QJsonObject &jdoc)
         ui->tblTables->setColumnCount(c + 1);
         QTableWidgetItem *item = new QTableWidgetItem(j["f_name"].toString());
         item->setData(Qt::UserRole, j["f_id"].toInt());
+        item->setData(Qt::UserRole + 5, QJsonDocument::fromJson(j["f_config"].toString().toUtf8()).object());
         ui->tblTables->setItem(0, c, item);
     }
 
@@ -2229,6 +2205,9 @@ void Workspace::openTableResponse(const QJsonObject &jdoc)
     }
 
     currentItem->setData(Qt::UserRole + 1, "");
+    QJsonObject jconfig = currentItem->data(Qt::UserRole + 5).toJsonObject();
+    fTableMenu = jconfig["menu"].toInt();
+    initMenu();
 
     if(!jo["empty"].toBool()) {
         QJsonObject jt = jo["header"].toObject();
@@ -2759,4 +2738,55 @@ void Workspace::on_btnService_clicked()
     }
 
     createHttpRequest("/engine/smart/get-service-values.php", QJsonObject(), SLOT(serviceValuesResponse(QJsonObject)));
+}
+
+void Workspace::initMenu()
+{
+    fDishes.clear();
+    fDishesBarcode.clear();
+
+    for(int i = 0; i < jMenu.size(); i++) {
+        const QJsonObject &j = jMenu.at(i).toObject();
+
+        if(j["f_id"].toInt() == C5Config::fMainJson["service_item_code"].toInt()
+                || j["f_id"].toInt() == C5Config::fMainJson["discount_item_code"].toInt()) {
+            continue;
+        }
+
+        if(j["f_menu"].toInt() != fTableMenu) {
+            continue;
+        }
+
+        Dish *d = new Dish();
+        d->menuid = j["menuid"].toInt();
+        d->id = j["f_id"].toInt();
+        d->state = DISH_STATE_OK;
+        d->typeId = j["f_part"].toInt();
+        d->name = j["f_name"].toString();
+        d->printer = j["f_print1"].toString();
+        d->printer2 = j["f_print2"].toString();
+        d->price = j["f_price"].toDouble();
+        d->store = j["f_store"].toInt();
+        d->adgCode = j["f_adgt"].toString().isEmpty() ? j["f_adgcode"].toString() : j["f_adgt"].toString();
+        d->color = j["f_color"].toInt();
+        d->netWeight = j["f_netweight"].toDouble();
+        d->cost = j["f_cost"].toDouble();
+        d->quick = j["f_recent"].toInt();
+        d->barcode = j["f_barcode"].toString();
+        d->typeName = j["f_groupname"].toString();
+        d->specialDiscount = j["f_specialdiscount"].toDouble() / 100;
+        d->qrRequired = j["f_qr"].toString().toInt();
+        fDishes.append(d);
+
+        if(d->barcode.isEmpty() == false) {
+            QStringList barcodes = d->barcode.split(",", Qt::SkipEmptyParts);
+
+            for(const QString &b : barcodes) {
+                fDishesBarcode[b] = d;
+            }
+        }
+    }
+
+    QTableWidgetItem *tblPart2Item = ui->tblPart2->currentItem();
+    on_tblPart2_itemClicked(tblPart2Item);
 }

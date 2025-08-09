@@ -16,6 +16,8 @@
 #include <QApplication>
 #include <QSettings>
 #include <QTranslator>
+#include <QScreen>
+#include <QDesktopServices>
 #include <QDir>
 
 int main(int argc, char* argv[])
@@ -86,6 +88,9 @@ int main(int argc, char* argv[])
     C5Database::fDbParams = C5Config::dbParams();
     C5Config::fSettingsName = __c5config.getRegValue("ss_settings").toString();
     C5Config::fFullScreen = true;
+#ifdef QT_DEBUG
+    C5Config::fFullScreen = false;
+#endif
     NDataProvider::mProtocol = C5Config::fDBHost;
     NDataProvider::mHost = C5Config::fDBPath;
     NDataProvider::mAppName = "smart";
@@ -99,6 +104,21 @@ int main(int argc, char* argv[])
     }
 
     Workspace w;
+
+    for(const QString &s : args) {
+        if(s.startsWith("/monitor")) {
+            QList<QScreen*> screens = a.screens();
+            int monitor = 0;
+            QStringList mon = s.split("=");
+
+            if(mon.length() == 2) {
+                monitor = mon.at(1).toInt();
+            }
+
+            w.move(screens.at(monitor)->geometry().topLeft());
+        }
+    }
+
     C5Config::fParentWidget = &w;
 #ifdef QT_DEBUG
     C5Database::LOGGING = true;

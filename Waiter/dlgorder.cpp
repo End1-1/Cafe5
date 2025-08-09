@@ -472,7 +472,7 @@ void DlgOrder::addDishToOrder(int menuid, const QString &emark)
         {"class", "waiter"},
         {"method", "adddish"},
         {"f_header", fHeader["f_id"].toString()},
-        {"f_dish", menuid},
+        {"f_dish_menu_id", menuid},
         {"f_qty1", qty},
         {"f_price", price},
         {"f_special_comment", special},
@@ -820,13 +820,13 @@ void DlgOrder::dishClicked()
         fHttp->createHttpQueryLambda("/engine/v2/waiter/order/adddish",
         QJsonObject{{"action", "check"},
             {"f_header", fHeader["f_id"].toString()},
-            {"f_menu", menuid},
+            {"f_dish_menu_id", menuid},
             {"f_dish", dishid},
             {"f_row", 1},
             {"f_guest", 1},
             {"f_current_staff", __user->id()},
             {"emark", emarks},
-            {"f_qty", 1}}, [](const QJsonObject & jdoc) {
+            {"f_qty", qty}}, [](const QJsonObject & jdoc) {
         },
         [](const QJsonObject & err) {
         });

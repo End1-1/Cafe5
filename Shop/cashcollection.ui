@@ -35,17 +35,17 @@
      </property>
      <layout class="QGridLayout" name="gridLayout_2">
       <item row="6" column="1">
-       <widget class="C5LineEdit" name="lePurpose_9"/>
+       <widget class="C5LineEdit" name="leRCheck"/>
       </item>
       <item row="2" column="1">
-       <widget class="C5LineEdit" name="lePurpose_5">
+       <widget class="C5LineEdit" name="leRSale">
         <property name="readOnly">
          <bool>true</bool>
         </property>
        </widget>
       </item>
       <item row="5" column="1">
-       <widget class="C5LineEdit" name="lePurpose_8">
+       <widget class="C5LineEdit" name="leRFinal">
         <property name="readOnly">
          <bool>true</bool>
         </property>
@@ -66,14 +66,14 @@
        </widget>
       </item>
       <item row="0" column="1">
-       <widget class="C5LineEdit" name="lePurpose_2">
+       <widget class="C5LineEdit" name="leRInit">
         <property name="readOnly">
          <bool>true</bool>
         </property>
        </widget>
       </item>
       <item row="3" column="1">
-       <widget class="C5LineEdit" name="lePurpose_6">
+       <widget class="C5LineEdit" name="leROut">
         <property name="readOnly">
          <bool>true</bool>
         </property>
@@ -108,14 +108,14 @@
        </widget>
       </item>
       <item row="4" column="1">
-       <widget class="C5LineEdit" name="lePurpose_7">
+       <widget class="C5LineEdit" name="leRDiscount">
         <property name="readOnly">
          <bool>true</bool>
         </property>
        </widget>
       </item>
       <item row="1" column="1">
-       <widget class="C5LineEdit" name="lePurpose_4">
+       <widget class="C5LineEdit" name="leRInput">
         <property name="readOnly">
          <bool>true</bool>
         </property>

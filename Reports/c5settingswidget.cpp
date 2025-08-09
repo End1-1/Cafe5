@@ -319,6 +319,12 @@ bool C5SettingsWidget::save(QString &err, QList<QMap<QString, QVariant> >& data)
     jc["remind_out_of_stock"] = ui->chRemindOutOfStock->isChecked();
     jc["service_item_code"] = ui->leServiceItemCode->getInteger();
     jc["discount_item_code"] = ui->leDiscountItemCode->getInteger();
+    jc["tax_ip"] = ui->leTaxIP->text();
+    jc["tax_port"] = ui->leTaxPort->text();
+    jc["tax_password"] = ui->leTaxPassword->text();
+    jc["tax_dept"] = ui->leTaxDept->text();
+    jc["tax_op"] = ui->leCashierLogin->text();
+    jc["tax_pin"] = ui->leCashierPin->text();
     QJsonArray ja;
     QStringList a = ui->leAvailableStore->text().split(",", Qt::SkipEmptyParts);
 

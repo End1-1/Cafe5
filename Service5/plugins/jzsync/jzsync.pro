@@ -14,18 +14,12 @@ CONFIG += c++11
 SOURCES += \
     ../../utils/configini.cpp \
     ../../utils/database.cpp \
-    ../../utils/databaseconnectionmanager.cpp \
-    ../../utils/jsonhandler.cpp \
-    ../../utils/logwriter.cpp \
     jzsync.cpp \
     jzsyncmanager.cpp
 
 HEADERS += \
     ../../utils/configini.h \
     ../../utils/database.h \
-    ../../utils/databaseconnectionmanager.h \
-    ../../utils/jsonhandler.h \
-    ../../utils/logwriter.h \
     jzsync.h \
     jzsyncmanager.h
 

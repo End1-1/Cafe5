@@ -109,7 +109,9 @@ int main(int argc, char* argv[])
     NDataProvider::mDebug = C5Config::getValue(param_debuge_mode).toInt() > 0 || a.arguments().contains("/debug");
     dlgsplash->deleteLater();
     DlgScreen w;
-    w.move(screenGeometry.x(), screenGeometry.y());
+#ifdef QT_DEBUG
+    w.move(screenGeometry.x() + 200, screenGeometry.y() + 200);
+#endif
     C5Config::fParentWidget = &w;
 
     if(C5Config::isAppFullScreen()) {

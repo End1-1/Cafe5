@@ -173,6 +173,8 @@ private:
 
     C5User* fUser;
 
+    QJsonArray jMenu;
+
     QList<Dish*> fDishes;
 
     QMap<QString, Dish*> fDishesBarcode;
@@ -184,6 +186,8 @@ private:
     QMap<QString, QMap<QString, QVariant> > fAutoDiscounts;
 
     int fTable;
+
+    int fTableMenu;
 
     QTimer* fTimer;
 
@@ -208,6 +212,8 @@ private:
     bool mRejectEnabled;
 
     WCustomerDisplay* fCustomerDisplay;
+
+    void initMenu();
 
     void configFiscalButton();
 
