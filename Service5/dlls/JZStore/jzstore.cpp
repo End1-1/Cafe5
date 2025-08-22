@@ -229,14 +229,14 @@ bool requestStore(const QJsonObject &jreq, QJsonObject &jret, QString &err)
     mssqldb[":date2"] = d2;
 
     if(!mssqldb.exec(
-                QString("select cast(t.fMTCODE as integer) as food, m.fDBCR as sign, "
-            "sum(m.fQTY) as qty, sum(m.fCOSTSUMM) as amount "
-            "from %1.dbo.MTHI m, %1.dbo.MATERIALS t , %1.dbo.DOCUMENTS d "
-            "where m.fMTID=t.fMTID and d.fISN=m.fBASE and d.fDOCTYPE in (6, 7, 8, 17) "
-            "and d.fDATE between :date1 and :date2 and cast(m.fSTORAGE as integer)=cast(:store as integer)"
-            "and (t.fMTCODE NOT LIKE '1-%' and t.fMTCODE NOT LIKE '2-%') "
-            "group by cast(t.fMTCODE as integer), m.fDBCR "
-            "order by 1").arg(dbname))) {
+                QString(R"(select cast(t.fMTCODE as integer) as food, m.fDBCR as sign,
+            sum(m.fQTY) as qty, sum(m.fCOSTSUMM) as amount
+            from %1.dbo.MTHI m, %1.dbo.MATERIALS t , %1.dbo.DOCUMENTS d
+            where m.fMTID=t.fMTID and d.fISN=m.fBASE and d.fDOCTYPE in (10, 8, 11, 12)
+            and d.fDATE between :date1 and :date2 and cast(m.fSTORAGE as integer)=cast(:store as integer)
+            and (t.fMTCODE NOT LIKE '1-%' and t.fMTCODE NOT LIKE '2-%')
+            group by cast(t.fMTCODE as integer), m.fDBCR
+            order by 1)").arg(dbname))) {
         jret["errorCode"] = 1;
         err = mssqldb.lastDbError();
         return false;

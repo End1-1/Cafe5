@@ -34,34 +34,83 @@
       </size>
      </property>
      <layout class="QGridLayout" name="gridLayout_2">
-      <item row="6" column="1">
+      <item row="1" column="1">
+       <widget class="C5LineEdit" name="leRInput">
+        <property name="readOnly">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="7" column="0">
+       <widget class="QLabel" name="label_13">
+        <property name="text">
+         <string>Check</string>
+        </property>
+       </widget>
+      </item>
+      <item row="7" column="1">
        <widget class="C5LineEdit" name="leRCheck"/>
       </item>
-      <item row="2" column="1">
+      <item row="3" column="1">
        <widget class="C5LineEdit" name="leRSale">
         <property name="readOnly">
          <bool>true</bool>
         </property>
        </widget>
       </item>
-      <item row="5" column="1">
-       <widget class="C5LineEdit" name="leRFinal">
-        <property name="readOnly">
-         <bool>true</bool>
-        </property>
-       </widget>
-      </item>
-      <item row="5" column="0">
+      <item row="6" column="0">
        <widget class="QLabel" name="label_12">
         <property name="text">
          <string>Final</string>
         </property>
        </widget>
       </item>
-      <item row="0" column="0">
-       <widget class="QLabel" name="label_7">
+      <item row="5" column="0">
+       <widget class="QLabel" name="label_11">
         <property name="text">
-         <string>Initial</string>
+         <string>Discount</string>
+        </property>
+       </widget>
+      </item>
+      <item row="5" column="1">
+       <widget class="C5LineEdit" name="leRDiscount">
+        <property name="readOnly">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="6" column="1">
+       <widget class="C5LineEdit" name="leRFinal">
+        <property name="readOnly">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0">
+       <widget class="QLabel" name="label_8">
+        <property name="text">
+         <string>Input</string>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="1">
+       <widget class="C5LineEdit" name="leROut">
+        <property name="readOnly">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="0">
+       <widget class="QLabel" name="label_10">
+        <property name="text">
+         <string>Output</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="0">
+       <widget class="QLabel" name="label_9">
+        <property name="text">
+         <string>Sale</string>
         </property>
        </widget>
       </item>
@@ -72,59 +121,24 @@
         </property>
        </widget>
       </item>
-      <item row="3" column="1">
-       <widget class="C5LineEdit" name="leROut">
-        <property name="readOnly">
-         <bool>true</bool>
-        </property>
-       </widget>
-      </item>
-      <item row="3" column="0">
-       <widget class="QLabel" name="label_10">
+      <item row="0" column="0">
+       <widget class="QLabel" name="label_7">
         <property name="text">
-         <string>Output</string>
+         <string>Initial</string>
         </property>
        </widget>
       </item>
       <item row="2" column="0">
-       <widget class="QLabel" name="label_9">
+       <widget class="QLabel" name="label_14">
         <property name="text">
-         <string>Sale</string>
+         <string>Input other</string>
         </property>
        </widget>
       </item>
-      <item row="6" column="0">
-       <widget class="QLabel" name="label_13">
-        <property name="text">
-         <string>Check</string>
-        </property>
-       </widget>
-      </item>
-      <item row="4" column="0">
-       <widget class="QLabel" name="label_11">
-        <property name="text">
-         <string>Discount</string>
-        </property>
-       </widget>
-      </item>
-      <item row="4" column="1">
-       <widget class="C5LineEdit" name="leRDiscount">
+      <item row="2" column="1">
+       <widget class="C5LineEdit" name="leInputOther">
         <property name="readOnly">
          <bool>true</bool>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="1">
-       <widget class="C5LineEdit" name="leRInput">
-        <property name="readOnly">
-         <bool>true</bool>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="0">
-       <widget class="QLabel" name="label_8">
-        <property name="text">
-         <string>Input</string>
         </property>
        </widget>
       </item>

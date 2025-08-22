@@ -25,7 +25,8 @@ CashCollection::CashCollection() :
         QJsonObject joo = jo["daily"].toObject();
         ui->leRInit->setDouble(joo["f_prevday"].toDouble());
         ui->leRInput->setDouble(joo["f_income"].toDouble());
-        ui->leRSale->setDouble(joo["sale"].toDouble());
+        ui->leInputOther->setDouble(joo["f_inputother"].toDouble());
+        ui->leRSale->setDouble(joo["f_sale"].toDouble());
         ui->leROut->setDouble(joo["f_output"].toDouble());
         ui->leRDiscount->setDouble(joo["f_discount"].toDouble());
         ui->leRFinal->setDouble(joo["f_final"].toDouble());

@@ -5,9 +5,10 @@
 #include "c5changedocinputprice.h"
 #include "c5tablemodel.h"
 #include "c5dlgselectreporttemplate.h"
+#include "dlgimportfromas.h"
 
 CR5GoodsMovement::CR5GoodsMovement(QWidget *parent) :
-    C5ReportWidget( parent)
+    C5ReportWidget(parent)
 {
     fIcon = ":/goods.png";
     fLabel = tr("Movements in the store");
@@ -50,6 +51,7 @@ CR5GoodsMovement::CR5GoodsMovement(QWidget *parent) :
                    << "if(gpr.f_price2disc>0,gpr.f_price2disc,gpr.f_price2) as f_price2"
                    << "sum(s.f_qty*if(gpr.f_price2disc>0,gpr.f_price2disc,gpr.f_price2)) as f_salepricetotal2"
                    << "a.f_comment"
+                   << "a.lu"
                    ;
     fColumnsGroup << "s.f_document"
                   << "s.f_id as f_storerec"
@@ -101,6 +103,7 @@ CR5GoodsMovement::CR5GoodsMovement(QWidget *parent) :
     fTranslation["f_salepricetotal2"] = tr("Total whosale");
     fTranslation["f_comment"] = tr("Comment");
     fTranslation["f_statename"] = tr("State");
+    fTranslation["lu"] = tr("Last update");
     fColumnsVisible["a.f_date"] = true;
     fColumnsVisible["s.f_id as f_storerec"] = false;
     fColumnsVisible["dt.f_name as f_docname"] = true;
@@ -127,12 +130,12 @@ CR5GoodsMovement::CR5GoodsMovement(QWidget *parent) :
     fColumnsVisible["ass.f_name as f_statename"] = true;
     restoreColumnsVisibility();
     fFilterWidget = new CR5GoodsMovementFilter();
-    fFilter = static_cast<CR5GoodsMovementFilter *>(fFilterWidget);
+    fFilter = static_cast<CR5GoodsMovementFilter*>(fFilterWidget);
 }
 
-QToolBar *CR5GoodsMovement::toolBar()
+QToolBar* CR5GoodsMovement::toolBar()
 {
-    if (!fToolBar) {
+    if(!fToolBar) {
         QList<ToolBarButtons> btn;
         btn << ToolBarButtons::tbFilter
             << ToolBarButtons::tbClearFilter
@@ -144,7 +147,9 @@ QToolBar *CR5GoodsMovement::toolBar()
         a = new QAction(QIcon(":/template.png"), tr("Templates"), this);
         connect(a, SIGNAL(triggered()), this, SLOT(templates()));
         fToolBar->insertAction(fToolBar->actions().at(3), a);
+        fToolBar->addAction(QIcon(":/pricing.png"), tr("Import from AS"), this, SLOT(importFromAS()));
     }
+
     return fToolBar;
 }
 
@@ -182,64 +187,83 @@ bool CR5GoodsMovement::tblDoubleClicked(int row, int column, const QJsonArray &v
 {
     Q_UNUSED(row);
     Q_UNUSED(column);
-    if (!fColumnsVisible["s.f_document"]) {
+
+    if(!fColumnsVisible["s.f_document"]) {
         C5Message::info(tr("Document id column must be included in the report"));
         return true;
     }
+
 #ifdef NEWVERSION
     auto *si = __mainWindow->createTab<StoreInputDocument>();
-    if (!si->openDoc(values.at(fModel->indexForColumnName("f_document")).toString())) {
+
+    if(!si->openDoc(values.at(fModel->indexForColumnName("f_document")).toString())) {
         __mainWindow->removeTab(si);
     }
+
 #else
     C5StoreDoc *sd = __mainWindow->createTab<C5StoreDoc>();
     QString e;
-    if (!sd->openDoc(values.at(fModel->indexForColumnName("f_document")).toString(), e)) {
+
+    if(!sd->openDoc(values.at(fModel->indexForColumnName("f_document")).toString(), e)) {
         __mainWindow->removeTab(sd);
         C5Message::error(e);
     }
+
 #endif
     return true;
 }
 
 void CR5GoodsMovement::changePrice()
 {
-    if (!fColumnsVisible["s.f_id as f_storerec"]) {
+    if(!fColumnsVisible["s.f_id as f_storerec"]) {
         C5Message::info(tr("The store record column must be included in the report"));
         return;
     }
+
     QModelIndexList ml = this->fTableView->selectionModel()->selectedIndexes();
     QSet<int> rows;
-    foreach (QModelIndex m, ml) {
+
+    foreach(QModelIndex m, ml) {
         rows << m.row();
     }
-    if (rows.count() > 1) {
+
+    if(rows.count() > 1) {
         C5Message::error(tr("Select only one row"));
         return;
     }
-    if (rows.count() == 0) {
+
+    if(rows.count() == 0) {
         C5Message::error(tr("Nothing was selected"));
         return;
     }
+
     C5ChangeDocInputPrice::changePrice(fModel->data(rows.values().at(0),
                                        fModel->indexForColumnName("f_storerec"),
                                        Qt::EditRole).toString());
 }
 
+void CR5GoodsMovement::importFromAS()
+{
+    DlgImportFromAS().exec();
+}
+
 void CR5GoodsMovement::templates()
 {
     C5DlgSelectReportTemplate d(2);
-    if (d.exec() == QDialog::Accepted) {
+
+    if(d.exec() == QDialog::Accepted) {
         QString sql = d.fSelectedTemplate.sql;
         sql.replace("%date1", fFilter->date1s());
         sql.replace("%date2", fFilter->date2s());
-        if (sql.contains("%partner")) {
-            if (fFilter->partners().isEmpty()) {
+
+        if(sql.contains("%partner")) {
+            if(fFilter->partners().isEmpty()) {
                 sql.replace("%partner", "");
             } else {
                 sql.replace("%partner", QString("and a.f_partner in(%1)").arg(fFilter->partners()));
             }
         }
+
         executeSql(sql);
     }
 }
@@ -248,7 +272,8 @@ void CR5GoodsMovement::restoreColumnsWidths()
 {
     C5ReportWidget::restoreColumnsWidths();
     int idx = fModel->indexForColumnName("f_document");
-    if (idx != -1) {
+
+    if(idx != -1) {
         fTableView->setColumnWidth(idx, 0);
     }
 }

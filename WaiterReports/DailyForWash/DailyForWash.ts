@@ -4,20 +4,54 @@
 <context>
     <name>C5Cache</name>
     <message>
-        <location filename="../../Classes/c5cache.cpp" line="19"/>
-        <location filename="../../Classes/c5cache.cpp" line="21"/>
-        <location filename="../../Classes/c5cache.cpp" line="23"/>
-        <location filename="../../Classes/c5cache.cpp" line="34"/>
-        <location filename="../../Classes/c5cache.cpp" line="45"/>
+        <location filename="../../Classes/c5cache.cpp" line="18"/>
+        <location filename="../../Classes/c5cache.cpp" line="20"/>
+        <location filename="../../Classes/c5cache.cpp" line="22"/>
+        <location filename="../../Classes/c5cache.cpp" line="33"/>
+        <location filename="../../Classes/c5cache.cpp" line="44"/>
+        <location filename="../../Classes/c5cache.cpp" line="48"/>
+        <location filename="../../Classes/c5cache.cpp" line="58"/>
+        <location filename="../../Classes/c5cache.cpp" line="60"/>
+        <location filename="../../Classes/c5cache.cpp" line="62"/>
+        <location filename="../../Classes/c5cache.cpp" line="65"/>
+        <location filename="../../Classes/c5cache.cpp" line="67"/>
+        <location filename="../../Classes/c5cache.cpp" line="69"/>
+        <location filename="../../Classes/c5cache.cpp" line="71"/>
+        <location filename="../../Classes/c5cache.cpp" line="73"/>
+        <location filename="../../Classes/c5cache.cpp" line="84"/>
+        <location filename="../../Classes/c5cache.cpp" line="88"/>
+        <location filename="../../Classes/c5cache.cpp" line="91"/>
+        <location filename="../../Classes/c5cache.cpp" line="94"/>
+        <location filename="../../Classes/c5cache.cpp" line="98"/>
+        <location filename="../../Classes/c5cache.cpp" line="104"/>
+        <location filename="../../Classes/c5cache.cpp" line="108"/>
+        <location filename="../../Classes/c5cache.cpp" line="111"/>
+        <location filename="../../Classes/c5cache.cpp" line="113"/>
+        <location filename="../../Classes/c5cache.cpp" line="115"/>
+        <location filename="../../Classes/c5cache.cpp" line="118"/>
+        <location filename="../../Classes/c5cache.cpp" line="127"/>
+        <location filename="../../Classes/c5cache.cpp" line="139"/>
+        <location filename="../../Classes/c5cache.cpp" line="145"/>
+        <location filename="../../Classes/c5cache.cpp" line="153"/>
+        <location filename="../../Classes/c5cache.cpp" line="329"/>
+        <source>Code</source>
+        <translation>Կոդ</translation>
+    </message>
+    <message>
+        <location filename="../../Classes/c5cache.cpp" line="18"/>
+        <location filename="../../Classes/c5cache.cpp" line="20"/>
+        <location filename="../../Classes/c5cache.cpp" line="22"/>
+        <location filename="../../Classes/c5cache.cpp" line="35"/>
+        <location filename="../../Classes/c5cache.cpp" line="44"/>
         <location filename="../../Classes/c5cache.cpp" line="49"/>
-        <location filename="../../Classes/c5cache.cpp" line="59"/>
-        <location filename="../../Classes/c5cache.cpp" line="61"/>
-        <location filename="../../Classes/c5cache.cpp" line="63"/>
-        <location filename="../../Classes/c5cache.cpp" line="66"/>
-        <location filename="../../Classes/c5cache.cpp" line="68"/>
-        <location filename="../../Classes/c5cache.cpp" line="70"/>
-        <location filename="../../Classes/c5cache.cpp" line="72"/>
-        <location filename="../../Classes/c5cache.cpp" line="74"/>
+        <location filename="../../Classes/c5cache.cpp" line="58"/>
+        <location filename="../../Classes/c5cache.cpp" line="60"/>
+        <location filename="../../Classes/c5cache.cpp" line="62"/>
+        <location filename="../../Classes/c5cache.cpp" line="65"/>
+        <location filename="../../Classes/c5cache.cpp" line="67"/>
+        <location filename="../../Classes/c5cache.cpp" line="69"/>
+        <location filename="../../Classes/c5cache.cpp" line="71"/>
+        <location filename="../../Classes/c5cache.cpp" line="73"/>
         <location filename="../../Classes/c5cache.cpp" line="85"/>
         <location filename="../../Classes/c5cache.cpp" line="89"/>
         <location filename="../../Classes/c5cache.cpp" line="92"/>
@@ -25,219 +59,185 @@
         <location filename="../../Classes/c5cache.cpp" line="99"/>
         <location filename="../../Classes/c5cache.cpp" line="105"/>
         <location filename="../../Classes/c5cache.cpp" line="109"/>
-        <location filename="../../Classes/c5cache.cpp" line="112"/>
-        <location filename="../../Classes/c5cache.cpp" line="114"/>
-        <location filename="../../Classes/c5cache.cpp" line="116"/>
-        <location filename="../../Classes/c5cache.cpp" line="119"/>
-        <location filename="../../Classes/c5cache.cpp" line="128"/>
-        <location filename="../../Classes/c5cache.cpp" line="140"/>
-        <location filename="../../Classes/c5cache.cpp" line="146"/>
-        <location filename="../../Classes/c5cache.cpp" line="154"/>
-        <location filename="../../Classes/c5cache.cpp" line="319"/>
-        <source>Code</source>
-        <translation>Կոդ</translation>
-    </message>
-    <message>
-        <location filename="../../Classes/c5cache.cpp" line="19"/>
-        <location filename="../../Classes/c5cache.cpp" line="21"/>
-        <location filename="../../Classes/c5cache.cpp" line="23"/>
-        <location filename="../../Classes/c5cache.cpp" line="36"/>
-        <location filename="../../Classes/c5cache.cpp" line="45"/>
-        <location filename="../../Classes/c5cache.cpp" line="50"/>
-        <location filename="../../Classes/c5cache.cpp" line="59"/>
-        <location filename="../../Classes/c5cache.cpp" line="61"/>
-        <location filename="../../Classes/c5cache.cpp" line="63"/>
-        <location filename="../../Classes/c5cache.cpp" line="66"/>
-        <location filename="../../Classes/c5cache.cpp" line="68"/>
-        <location filename="../../Classes/c5cache.cpp" line="70"/>
-        <location filename="../../Classes/c5cache.cpp" line="72"/>
-        <location filename="../../Classes/c5cache.cpp" line="74"/>
-        <location filename="../../Classes/c5cache.cpp" line="86"/>
-        <location filename="../../Classes/c5cache.cpp" line="90"/>
-        <location filename="../../Classes/c5cache.cpp" line="93"/>
-        <location filename="../../Classes/c5cache.cpp" line="96"/>
-        <location filename="../../Classes/c5cache.cpp" line="100"/>
-        <location filename="../../Classes/c5cache.cpp" line="106"/>
-        <location filename="../../Classes/c5cache.cpp" line="110"/>
-        <location filename="../../Classes/c5cache.cpp" line="112"/>
-        <location filename="../../Classes/c5cache.cpp" line="114"/>
-        <location filename="../../Classes/c5cache.cpp" line="116"/>
-        <location filename="../../Classes/c5cache.cpp" line="119"/>
-        <location filename="../../Classes/c5cache.cpp" line="140"/>
-        <location filename="../../Classes/c5cache.cpp" line="319"/>
+        <location filename="../../Classes/c5cache.cpp" line="111"/>
+        <location filename="../../Classes/c5cache.cpp" line="113"/>
+        <location filename="../../Classes/c5cache.cpp" line="115"/>
+        <location filename="../../Classes/c5cache.cpp" line="118"/>
+        <location filename="../../Classes/c5cache.cpp" line="139"/>
+        <location filename="../../Classes/c5cache.cpp" line="329"/>
         <source>Name</source>
         <translation>Անվանում</translation>
     </message>
     <message>
-        <location filename="../../Classes/c5cache.cpp" line="19"/>
+        <location filename="../../Classes/c5cache.cpp" line="18"/>
         <source>Part</source>
         <translation>Տեսակ</translation>
     </message>
     <message>
-        <location filename="../../Classes/c5cache.cpp" line="21"/>
+        <location filename="../../Classes/c5cache.cpp" line="20"/>
         <source>Full caption</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Classes/c5cache.cpp" line="35"/>
+        <location filename="../../Classes/c5cache.cpp" line="34"/>
         <source>Group</source>
         <translation>Խումբ</translation>
     </message>
     <message>
-        <location filename="../../Classes/c5cache.cpp" line="37"/>
+        <location filename="../../Classes/c5cache.cpp" line="36"/>
         <source>Unit</source>
         <translation>ՉՄ</translation>
     </message>
     <message>
-        <location filename="../../Classes/c5cache.cpp" line="38"/>
+        <location filename="../../Classes/c5cache.cpp" line="37"/>
         <source>Scancode</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Classes/c5cache.cpp" line="40"/>
+        <location filename="../../Classes/c5cache.cpp" line="39"/>
         <source>Complect output</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Classes/c5cache.cpp" line="41"/>
+        <location filename="../../Classes/c5cache.cpp" line="40"/>
         <source>Qty in box</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Classes/c5cache.cpp" line="42"/>
+        <location filename="../../Classes/c5cache.cpp" line="41"/>
         <source>Retail price</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Classes/c5cache.cpp" line="43"/>
+        <location filename="../../Classes/c5cache.cpp" line="42"/>
         <source>Whosale price</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Classes/c5cache.cpp" line="51"/>
+        <location filename="../../Classes/c5cache.cpp" line="50"/>
         <source>Address</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Classes/c5cache.cpp" line="52"/>
+        <location filename="../../Classes/c5cache.cpp" line="51"/>
         <source>Legal name</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Classes/c5cache.cpp" line="53"/>
+        <location filename="../../Classes/c5cache.cpp" line="52"/>
         <source>Contact</source>
         <translation>Կոնտակտ</translation>
     </message>
     <message>
-        <location filename="../../Classes/c5cache.cpp" line="54"/>
+        <location filename="../../Classes/c5cache.cpp" line="53"/>
         <source>Info</source>
         <translation>Տեղեկություն</translation>
     </message>
     <message>
-        <location filename="../../Classes/c5cache.cpp" line="55"/>
+        <location filename="../../Classes/c5cache.cpp" line="54"/>
         <source>Phone</source>
         <translation>Հեռախոս</translation>
     </message>
     <message>
-        <location filename="../../Classes/c5cache.cpp" line="56"/>
+        <location filename="../../Classes/c5cache.cpp" line="55"/>
         <source>Email</source>
         <translation>Էլ․ փոսթ</translation>
     </message>
     <message>
-        <location filename="../../Classes/c5cache.cpp" line="57"/>
+        <location filename="../../Classes/c5cache.cpp" line="56"/>
         <source>Taxcode</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Classes/c5cache.cpp" line="66"/>
+        <location filename="../../Classes/c5cache.cpp" line="65"/>
         <source>Teamlead</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Classes/c5cache.cpp" line="74"/>
+        <location filename="../../Classes/c5cache.cpp" line="73"/>
         <source>Description</source>
         <translation>Նկարագրություն</translation>
     </message>
     <message>
-        <location filename="../../Classes/c5cache.cpp" line="97"/>
+        <location filename="../../Classes/c5cache.cpp" line="96"/>
         <source>Currency code</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Classes/c5cache.cpp" line="128"/>
+        <location filename="../../Classes/c5cache.cpp" line="127"/>
         <source>Row</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Classes/c5cache.cpp" line="128"/>
+        <location filename="../../Classes/c5cache.cpp" line="127"/>
         <source>Product code</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Classes/c5cache.cpp" line="128"/>
+        <location filename="../../Classes/c5cache.cpp" line="127"/>
         <source>Product</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Classes/c5cache.cpp" line="128"/>
+        <location filename="../../Classes/c5cache.cpp" line="127"/>
         <source>Process code</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Classes/c5cache.cpp" line="128"/>
+        <location filename="../../Classes/c5cache.cpp" line="127"/>
         <source>Process</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Classes/c5cache.cpp" line="128"/>
+        <location filename="../../Classes/c5cache.cpp" line="127"/>
         <source>Duration</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Classes/c5cache.cpp" line="140"/>
-        <location filename="../../Classes/c5cache.cpp" line="147"/>
-        <location filename="../../Classes/c5cache.cpp" line="155"/>
+        <location filename="../../Classes/c5cache.cpp" line="139"/>
+        <location filename="../../Classes/c5cache.cpp" line="146"/>
+        <location filename="../../Classes/c5cache.cpp" line="154"/>
         <source>Rate</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Classes/c5cache.cpp" line="140"/>
+        <location filename="../../Classes/c5cache.cpp" line="139"/>
         <source>Symbol</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Classes/c5cache.cpp" line="146"/>
-        <location filename="../../Classes/c5cache.cpp" line="154"/>
+        <location filename="../../Classes/c5cache.cpp" line="145"/>
+        <location filename="../../Classes/c5cache.cpp" line="153"/>
         <source>Currency code1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Classes/c5cache.cpp" line="146"/>
-        <location filename="../../Classes/c5cache.cpp" line="154"/>
+        <location filename="../../Classes/c5cache.cpp" line="145"/>
+        <location filename="../../Classes/c5cache.cpp" line="153"/>
         <source>Currency name 1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Classes/c5cache.cpp" line="147"/>
-        <location filename="../../Classes/c5cache.cpp" line="155"/>
+        <location filename="../../Classes/c5cache.cpp" line="146"/>
+        <location filename="../../Classes/c5cache.cpp" line="154"/>
         <source>Currency code 2</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Classes/c5cache.cpp" line="147"/>
-        <location filename="../../Classes/c5cache.cpp" line="155"/>
+        <location filename="../../Classes/c5cache.cpp" line="146"/>
+        <location filename="../../Classes/c5cache.cpp" line="154"/>
         <source>Currency name 2</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Classes/c5cache.cpp" line="39"/>
-        <location filename="../../Classes/c5cache.cpp" line="87"/>
-        <location filename="../../Classes/c5cache.cpp" line="129"/>
+        <location filename="../../Classes/c5cache.cpp" line="38"/>
+        <location filename="../../Classes/c5cache.cpp" line="86"/>
+        <location filename="../../Classes/c5cache.cpp" line="128"/>
         <source>Price</source>
         <translation>Գին</translation>
     </message>
     <message>
-        <location filename="../../Classes/c5cache.cpp" line="107"/>
+        <location filename="../../Classes/c5cache.cpp" line="106"/>
         <source>Type</source>
         <translation>Տեսակ</translation>
     </message>

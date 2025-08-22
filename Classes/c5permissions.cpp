@@ -1,5 +1,4 @@
 #include "c5permissions.h"
-#include "c5config.h"
 
 QList<int> C5Permissions::fTemplate;
 QMap<QString, QList<int> > C5Permissions::fPermissions;
@@ -153,25 +152,31 @@ void C5Permissions::init(C5Database &db, int group)
               << cp_t10_active_tasks
               << cp_t10_create_task
               ;
-    if (group == 1) {
+
+    if(group == 1) {
         db[":f_group"] = 1;
         db.exec("delete from s_user_access where f_group=:f_group");
         QString sql = "insert into s_user_access (f_group, f_key, f_value) values ";
         bool f = true;
-        for (auto i : fTemplate) {
-            if (f) {
+
+        for(auto i : fTemplate) {
+            if(f) {
                 f = false;
             } else {
                 sql += ",";
             }
+
             sql += QString("(1, %1, 1)").arg(i);
         }
+
         db.exec(sql);
     }
+
     db[":f_group"] = group;
     db.exec("select f_key from s_user_access where f_group=:f_group");
     fPermissions.clear();
-    while (db.nextRow()) {
+
+    while(db.nextRow()) {
         fPermissions[db.database()] << db.getInt(0);
     }
 }
