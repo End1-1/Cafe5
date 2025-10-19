@@ -219,6 +219,10 @@ int main(int argc, char* argv[])
     __c5config.fParentWidget = &w;
     delete dlgsplash;
     C5Dialog::setMainWindow(&w);
+#ifdef QT_DEBUG
+    w.show();
+#else
     w.showMaximized();
+#endif
     return a.exec();
 }

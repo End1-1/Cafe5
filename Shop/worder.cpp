@@ -919,7 +919,7 @@ void WOrder::countTotal()
     }
 
     for(int i = 0; i < fOGoods.count(); i++) {
-        const OGoods &og = fOGoods.at(i);
+        OGoods &og = fOGoods[i];
         ui->tblData->setData(i, col_bacode, og._barcode);
         ui->tblData->setData(i, col_group, og._groupName);
         ui->tblData->setData(i, col_name, og._goodsName);
@@ -950,7 +950,8 @@ void WOrder::countTotal()
             auto *ch = static_cast<C5CheckBox*>(ui->tblData->cellWidget(i, col_check_discount));
 
             if(ch->isChecked()) {
-                accAmount += og.total * fBHistory.value;
+                og.accumulateAmount = og.total * (fBHistory.value / 100);
+                accAmount += og.accumulateAmount;
             }
         }
     }
@@ -1574,25 +1575,41 @@ void WOrder::on_leCode_returnPressed()
 
 void WOrder::on_leCustomerTaxpayerId_returnPressed()
 {
-    if(ui->leCustomerTaxpayerId->text().isEmpty()) {
+    if(ui->leCustomerTaxpayerId->text().isEmpty() && ui->leCustomerTaxpayerId->property("id").toInt() == 0) {
+        on_btnRemovePartner_clicked();
         return;
     }
 
     C5Database db;
-    db[":f_taxcode"] = ui->leCustomerTaxpayerId->text();
-    db.exec("select f_id, f_taxname, f_contact from c_partners where f_taxcode=:f_taxcode");
+
+    if(!ui->leCustomerTaxpayerId->text().isEmpty()) {
+        db[":f_taxcode"] = ui->leCustomerTaxpayerId->text();
+        db.exec("select f_id, f_taxname, f_contact, f_phone, f_taxcode from c_partners where f_taxcode=:f_taxcode");
+    } else {
+        db[":f_id"] = ui->leCustomerTaxpayerId->property("id").toInt();
+        db.exec("select f_id, f_taxname, f_contact, f_phone, f_taxcode from c_partners where f_id=:f_id");
+    }
 
     if(db.nextRow()) {
         fOHeader.partner = db.getInt("f_id");
+        ui->leCustomerTaxpayerId->setText(db.getString("f_taxcode"));
         ui->leOrganization->setText(db.getString("f_taxname"));
         ui->leContact->setText(db.getString("f_contact"));
+        ui->lePhone->setText(db.getString("f_phone"));
         ui->btnF5->setVisible(true);
-    } else {
+    } else if(ui->leCustomerTaxpayerId->text().length() == 8) {
         db[":f_taxcode"] = ui->leCustomerTaxpayerId->text();
         fOHeader.partner = db.insert("c_partners");
     }
 
     fOHeader.taxpayerTin = ui->leCustomerTaxpayerId->text();
+    db[":f_costumer"] = ui->leCustomerTaxpayerId->property("id").toInt();
+    db.exec("select * from b_gift_card where f_costumer=:f_costumer");
+
+    if(db.nextRow()) {
+        ui->leCode->setText(db.getString("f_code"));
+        on_leCode_returnPressed();
+    }
 }
 
 void WOrder::on_btnSearchPartner_clicked()
@@ -1600,7 +1617,8 @@ void WOrder::on_btnSearchPartner_clicked()
     DlgSearchPartner d;
 
     if(d.exec() == QDialog::Accepted) {
-        ui->leCustomerTaxpayerId->setText(d.result);
+        on_btnRemovePartner_clicked();
+        ui->leCustomerTaxpayerId->setProperty("id", d.result);
         on_leCustomerTaxpayerId_returnPressed();
     }
 }
@@ -1613,5 +1631,44 @@ void WOrder::on_leUseAccumulated_textChanged(const QString &arg1)
 
     if(ui->leUseAccumulated->getDouble() > ui->leTotal->getDouble()) {
         ui->leUseAccumulated->setDouble(ui->leTotal->getDouble());
+    }
+}
+
+void WOrder::on_btnRemovePartner_clicked()
+{
+    fOHeader.partner  = 0;
+    fOHeader.taxpayerTin.clear();
+    ui->leOrganization->clear();
+    ui->leContact->clear();
+    ui->leCustomerTaxpayerId->setProperty("id", 0);
+    ui->leCustomerTaxpayerId->clear();
+    ui->lePhone->clear();
+}
+
+void WOrder::on_tblData_doubleClicked(const QModelIndex &index)
+{
+    qDebug() << index.column();
+
+    switch(index.column()) {
+    case col_discvalue: {
+        if(fBHistory.card == 0) {
+            return;
+        }
+
+        OGoods &g = fOGoods[index.row()];
+        double discount = DQty::getQty(tr("Discount"), 100, this);
+
+        if(discount < 0) {
+            return;
+        }
+
+        g.discountFactor = discount;
+        C5Database db;
+        db[":f_id"] = ui->tblData->item(index.row(), 0)->data(Qt::UserRole + 101);
+        db[":f_price"] = g.price;
+        db.exec("update o_draft_sale_body set f_price=:f_price where f_id=:f_id");
+        countTotal();
+        break;
+    }
     }
 }

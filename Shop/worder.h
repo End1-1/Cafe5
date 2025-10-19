@@ -99,7 +99,7 @@ public:
 
     bool setPriceOfRow(int row, double price);
 
-    C5ClearTableWidget *table();
+    C5ClearTableWidget* table();
 
     bool checkQty(int goods, double qty, QString &err, double oldqty);
 
@@ -132,14 +132,18 @@ private slots:
 
     void on_leUseAccumulated_textChanged(const QString &arg1);
 
+    void on_btnRemovePartner_clicked();
+
+    void on_tblData_doubleClicked(const QModelIndex &index);
+
 private:
-    Ui::WOrder *ui;
+    Ui::WOrder* ui;
 
-    C5User *fUser;
+    C5User* fUser;
 
-    Working *fWorking;
+    Working* fWorking;
 
-    WCustomerDisplay *fCustomerDisplay;
+    WCustomerDisplay* fCustomerDisplay;
 
     int fGiftCard;
 
@@ -147,11 +151,11 @@ private:
 
     QVector<OGoods> fOGoods;
 
-    NInterface *fHttp;
+    NInterface* fHttp;
 
     bool returnFalse(const QString &msg, C5Database &db);
 
-    bool getDiscountValue(int discountType, double &v);
+    bool getDiscountValue(int discountType, double& v);
 
     void removeDraft();
 

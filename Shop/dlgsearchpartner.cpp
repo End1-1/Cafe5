@@ -34,22 +34,29 @@ void DlgSearchPartner::loadPartners()
     ui->tbl->setRowCount(0);
     C5Database db;
     db.exec("select f_id, f_taxcode, f_taxname, f_contact, f_phone from c_partners");
-    while (db.nextRow()) {
+
+    while(db.nextRow()) {
         int r = ui->tbl->rowCount();
         ui->tbl->setRowCount(r + 1);
-        for (int i = 0; i < db.columnCount(); i++) {
+
+        for(int i = 0; i < db.columnCount(); i++) {
             ui->tbl->setItem(r, i, new QTableWidgetItem(db.getString(i)));
         }
+
+        ui->tbl->item(r, 0)->setData(Qt::DisplayRole, db.getInt(0));
     }
 }
 
 void DlgSearchPartner::on_tbl_cellDoubleClicked(int row, int column)
 {
     Q_UNUSED(column);
-    for (int i = 0; i < ui->tbl->columnCount(); i++) {
+
+    for(int i = 0; i < ui->tbl->columnCount(); i++) {
         fData[i] = ui->tbl->item(row, i)->data(Qt::EditRole);
     }
-    result = ui->tbl->item(row, 1)->text();
+
+    QString resultStr = ui->tbl->item(row, 0)->text();
+    result = resultStr.toInt();
     accept();
 }
 
@@ -68,14 +75,16 @@ void DlgSearchPartner::on_btnSave_clicked()
 
 void DlgSearchPartner::on_lineEdit_textChanged(const QString &arg1)
 {
-    for (int i = 0; i < ui->tbl->rowCount(); i++ ) {
+    for(int i = 0; i < ui->tbl->rowCount(); i++) {
         bool h = true;
-        for (int j = 0; j < ui->tbl->columnCount(); j++) {
-            if (ui->tbl->item(i, j)->text().contains(arg1, Qt::CaseInsensitive)) {
+
+        for(int j = 0; j < ui->tbl->columnCount(); j++) {
+            if(ui->tbl->item(i, j)->text().contains(arg1, Qt::CaseInsensitive)) {
                 h = false;
                 break;
             }
         }
+
         ui->tbl->setRowHidden(i, h);
     }
 }

@@ -306,7 +306,6 @@ HEADERS += \
     ../Cafe5/c5message.h \
     ../Cafe5/c5utils.h \
     ../Cafe5/c5dialog.h \
-    ../Cafe5/c5socketmessage.h \
     ../Controls/c5lineedit.h \
     ../Controls/c5combobox.h \
     ../Controls/c5dateedit.h \
@@ -388,7 +387,7 @@ RESOURCES += \
     ../resources/res.qrc \
     local.qrc
 
-include(C:/projects/QXlsx/QXlsx/QXlsx.pri)
+include(C:/projects/QXlsx/QXlsx.pri)
 
 LIBS += -lVersion
 LIBS += -lwsock32

@@ -32,10 +32,14 @@ private slots:
 
     void on_leExchange_returnPressed();
 
+    void on_btnClose_clicked();
+
 private:
-    Ui::DlgReturnItem *ui;
+    Ui::DlgReturnItem* ui;
 
     int fMode;
+
+    void countReturnAmount();
 };
 
 #endif // DLGRETURNITEM_H

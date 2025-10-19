@@ -3,7 +3,8 @@
 
 #include "c5dialog.h"
 
-namespace Ui {
+namespace Ui
+{
 class DlgSearchPartner;
 }
 
@@ -14,7 +15,7 @@ class DlgSearchPartner : public C5Dialog
 public:
     explicit DlgSearchPartner();
     ~DlgSearchPartner();
-    QString result;
+    int result;
     QMap<int, QVariant> fData;
 
 private slots:
@@ -29,7 +30,7 @@ private slots:
     void on_lineEdit_textChanged(const QString &arg1);
 
 private:
-    Ui::DlgSearchPartner *ui;
+    Ui::DlgSearchPartner* ui;
 
     void loadPartners();
 };
