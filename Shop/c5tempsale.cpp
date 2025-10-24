@@ -84,7 +84,8 @@ void C5TempSale::refreshData()
             "d.f_amount "
             "from o_draft_sale d "
             "left join s_user u on u.f_id=d.f_staff "
-            "where d.f_state=1 and f_hall=:f_hall ");
+            "where d.f_state=1 and f_hall=:f_hall "
+            "order by 2,3 ");
     ui->tbl->setRowCount(0);
 
     while(db.nextRow()) {

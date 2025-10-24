@@ -1468,18 +1468,23 @@ MS Excel</source>
         <translation type="unfinished">Հրաժարվել</translation>
     </message>
     <message>
-        <location filename="../Forms/customerinfo.cpp" line="91"/>
+        <location filename="../Forms/customerinfo.ui" line="175"/>
+        <source>Extended</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Forms/customerinfo.cpp" line="103"/>
         <source>Address must be defined</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Forms/customerinfo.cpp" line="94"/>
+        <location filename="../Forms/customerinfo.cpp" line="107"/>
         <source>Phone must defined</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Forms/customerinfo.cpp" line="124"/>
-        <location filename="../Forms/customerinfo.cpp" line="128"/>
+        <location filename="../Forms/customerinfo.cpp" line="143"/>
+        <location filename="../Forms/customerinfo.cpp" line="147"/>
         <source>Invalid phone number</source>
         <translation type="unfinished"></translation>
     </message>
@@ -4280,230 +4285,235 @@ STOPLIST-ից</translation>
 <context>
     <name>PrintReceiptGroup</name>
     <message>
-        <location filename="../Printing/printreceiptgroup.cpp" line="53"/>
-        <location filename="../Printing/printreceiptgroup.cpp" line="384"/>
-        <location filename="../Printing/printreceiptgroup.cpp" line="757"/>
+        <location filename="../Printing/printreceiptgroup.cpp" line="54"/>
+        <location filename="../Printing/printreceiptgroup.cpp" line="396"/>
+        <location filename="../Printing/printreceiptgroup.cpp" line="769"/>
         <source>Return</source>
         <translation>Հետ վերադարձ</translation>
     </message>
     <message>
-        <location filename="../Printing/printreceiptgroup.cpp" line="181"/>
-        <location filename="../Printing/printreceiptgroup.cpp" line="542"/>
-        <location filename="../Printing/printreceiptgroup.cpp" line="822"/>
+        <location filename="../Printing/printreceiptgroup.cpp" line="182"/>
+        <location filename="../Printing/printreceiptgroup.cpp" line="554"/>
+        <location filename="../Printing/printreceiptgroup.cpp" line="834"/>
         <source>Tax number</source>
         <translation>ՀՎՀՀ</translation>
     </message>
     <message>
-        <location filename="../Printing/printreceiptgroup.cpp" line="184"/>
-        <location filename="../Printing/printreceiptgroup.cpp" line="545"/>
-        <location filename="../Printing/printreceiptgroup.cpp" line="825"/>
+        <location filename="../Printing/printreceiptgroup.cpp" line="185"/>
+        <location filename="../Printing/printreceiptgroup.cpp" line="557"/>
+        <location filename="../Printing/printreceiptgroup.cpp" line="837"/>
         <source>Device number</source>
         <translation>ԳՀ</translation>
     </message>
     <message>
-        <location filename="../Printing/printreceiptgroup.cpp" line="187"/>
-        <location filename="../Printing/printreceiptgroup.cpp" line="548"/>
-        <location filename="../Printing/printreceiptgroup.cpp" line="828"/>
+        <location filename="../Printing/printreceiptgroup.cpp" line="188"/>
+        <location filename="../Printing/printreceiptgroup.cpp" line="560"/>
+        <location filename="../Printing/printreceiptgroup.cpp" line="840"/>
         <source>Serial</source>
         <translation>ԱՀ</translation>
     </message>
     <message>
-        <location filename="../Printing/printreceiptgroup.cpp" line="190"/>
-        <location filename="../Printing/printreceiptgroup.cpp" line="551"/>
-        <location filename="../Printing/printreceiptgroup.cpp" line="831"/>
+        <location filename="../Printing/printreceiptgroup.cpp" line="191"/>
+        <location filename="../Printing/printreceiptgroup.cpp" line="563"/>
+        <location filename="../Printing/printreceiptgroup.cpp" line="843"/>
         <source>Fiscal</source>
         <translation>Ֆիսկալ</translation>
     </message>
     <message>
-        <location filename="../Printing/printreceiptgroup.cpp" line="193"/>
-        <location filename="../Printing/printreceiptgroup.cpp" line="554"/>
-        <location filename="../Printing/printreceiptgroup.cpp" line="834"/>
+        <location filename="../Printing/printreceiptgroup.cpp" line="194"/>
+        <location filename="../Printing/printreceiptgroup.cpp" line="566"/>
+        <location filename="../Printing/printreceiptgroup.cpp" line="846"/>
         <source>Receipt number</source>
         <translation>ԿՀ</translation>
     </message>
     <message>
-        <location filename="../Printing/printreceiptgroup.cpp" line="557"/>
-        <location filename="../Printing/printreceiptgroup.cpp" line="854"/>
+        <location filename="../Printing/printreceiptgroup.cpp" line="569"/>
+        <location filename="../Printing/printreceiptgroup.cpp" line="866"/>
         <source>Date</source>
         <translation>Ամսաթիվ</translation>
     </message>
     <message>
-        <location filename="../Printing/printreceiptgroup.cpp" line="199"/>
-        <location filename="../Printing/printreceiptgroup.cpp" line="560"/>
-        <location filename="../Printing/printreceiptgroup.cpp" line="840"/>
+        <location filename="../Printing/printreceiptgroup.cpp" line="200"/>
+        <location filename="../Printing/printreceiptgroup.cpp" line="572"/>
+        <location filename="../Printing/printreceiptgroup.cpp" line="852"/>
         <source>(F)</source>
         <translation>(Ֆ)</translation>
     </message>
     <message>
-        <location filename="../Printing/printreceiptgroup.cpp" line="202"/>
+        <location filename="../Printing/printreceiptgroup.cpp" line="203"/>
         <source>Including VAT</source>
         <translation>ԱԱՀ-ն այդ թվում</translation>
     </message>
     <message>
-        <location filename="../Printing/printreceiptgroup.cpp" line="209"/>
-        <location filename="../Printing/printreceiptgroup.cpp" line="564"/>
-        <location filename="../Printing/printreceiptgroup.cpp" line="845"/>
+        <location filename="../Printing/printreceiptgroup.cpp" line="210"/>
+        <location filename="../Printing/printreceiptgroup.cpp" line="576"/>
+        <location filename="../Printing/printreceiptgroup.cpp" line="857"/>
         <source>Buyer taxcode</source>
         <translation>Գնորդի ՀՎՀՀ</translation>
     </message>
     <message>
-        <location filename="../Printing/printreceiptgroup.cpp" line="221"/>
-        <location filename="../Printing/printreceiptgroup.cpp" line="576"/>
-        <location filename="../Printing/printreceiptgroup.cpp" line="858"/>
+        <location filename="../Printing/printreceiptgroup.cpp" line="222"/>
+        <location filename="../Printing/printreceiptgroup.cpp" line="588"/>
+        <location filename="../Printing/printreceiptgroup.cpp" line="870"/>
         <source>Return from</source>
         <translation>Հետ վերադարձ</translation>
     </message>
     <message>
-        <location filename="../Printing/printreceiptgroup.cpp" line="227"/>
-        <location filename="../Printing/printreceiptgroup.cpp" line="582"/>
+        <location filename="../Printing/printreceiptgroup.cpp" line="228"/>
+        <location filename="../Printing/printreceiptgroup.cpp" line="594"/>
         <source>Class | Name | Qty | Price | Total</source>
         <translation>Դաս | Անվանում | Քանակ | Գին | Ընդամենը</translation>
     </message>
     <message>
-        <location filename="../Printing/printreceiptgroup.cpp" line="266"/>
-        <location filename="../Printing/printreceiptgroup.cpp" line="610"/>
+        <location filename="../Printing/printreceiptgroup.cpp" line="270"/>
+        <source>Total qty</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Printing/printreceiptgroup.cpp" line="278"/>
+        <location filename="../Printing/printreceiptgroup.cpp" line="622"/>
         <source>Need to pay</source>
         <translation>Ենթակա է վճարման</translation>
     </message>
     <message>
-        <location filename="../Printing/printreceiptgroup.cpp" line="275"/>
-        <location filename="../Printing/printreceiptgroup.cpp" line="285"/>
-        <location filename="../Printing/printreceiptgroup.cpp" line="618"/>
-        <location filename="../Printing/printreceiptgroup.cpp" line="907"/>
+        <location filename="../Printing/printreceiptgroup.cpp" line="287"/>
+        <location filename="../Printing/printreceiptgroup.cpp" line="297"/>
+        <location filename="../Printing/printreceiptgroup.cpp" line="630"/>
+        <location filename="../Printing/printreceiptgroup.cpp" line="919"/>
         <source>Payment, cash</source>
         <translation>Վճարումը առնձերն</translation>
     </message>
     <message>
-        <location filename="../Printing/printreceiptgroup.cpp" line="280"/>
-        <location filename="../Printing/printreceiptgroup.cpp" line="628"/>
-        <location filename="../Printing/printreceiptgroup.cpp" line="917"/>
+        <location filename="../Printing/printreceiptgroup.cpp" line="292"/>
+        <location filename="../Printing/printreceiptgroup.cpp" line="640"/>
+        <location filename="../Printing/printreceiptgroup.cpp" line="929"/>
         <source>Change</source>
         <translation>Մանր</translation>
     </message>
     <message>
-        <location filename="../Printing/printreceiptgroup.cpp" line="292"/>
-        <location filename="../Printing/printreceiptgroup.cpp" line="637"/>
-        <location filename="../Printing/printreceiptgroup.cpp" line="925"/>
+        <location filename="../Printing/printreceiptgroup.cpp" line="304"/>
+        <location filename="../Printing/printreceiptgroup.cpp" line="649"/>
+        <location filename="../Printing/printreceiptgroup.cpp" line="937"/>
         <source>Payment, card</source>
         <translation>Վճարումը անկանխիկ</translation>
     </message>
     <message>
-        <location filename="../Printing/printreceiptgroup.cpp" line="298"/>
+        <location filename="../Printing/printreceiptgroup.cpp" line="310"/>
         <source>Prepaid used</source>
         <translation>Կանխավճարի օգրտագործում</translation>
     </message>
     <message>
-        <location filename="../Printing/printreceiptgroup.cpp" line="347"/>
-        <location filename="../Printing/printreceiptgroup.cpp" line="730"/>
-        <location filename="../Printing/printreceiptgroup.cpp" line="974"/>
+        <location filename="../Printing/printreceiptgroup.cpp" line="359"/>
+        <location filename="../Printing/printreceiptgroup.cpp" line="742"/>
+        <location filename="../Printing/printreceiptgroup.cpp" line="986"/>
         <source>Thank you for visit!</source>
         <translation>Շնորհակալություն այցելության համար</translation>
     </message>
     <message>
-        <location filename="../Printing/printreceiptgroup.cpp" line="349"/>
-        <location filename="../Printing/printreceiptgroup.cpp" line="732"/>
-        <location filename="../Printing/printreceiptgroup.cpp" line="976"/>
+        <location filename="../Printing/printreceiptgroup.cpp" line="361"/>
+        <location filename="../Printing/printreceiptgroup.cpp" line="744"/>
+        <location filename="../Printing/printreceiptgroup.cpp" line="988"/>
         <source>Printed</source>
         <translation>Տպված</translation>
     </message>
     <message>
-        <location filename="../Printing/printreceiptgroup.cpp" line="598"/>
-        <location filename="../Printing/printreceiptgroup.cpp" line="655"/>
+        <location filename="../Printing/printreceiptgroup.cpp" line="610"/>
+        <location filename="../Printing/printreceiptgroup.cpp" line="667"/>
         <source>Discount</source>
         <translation>Զեղչ</translation>
     </message>
     <message>
-        <location filename="../Printing/printreceiptgroup.cpp" line="598"/>
+        <location filename="../Printing/printreceiptgroup.cpp" line="610"/>
         <source>:</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Printing/printreceiptgroup.cpp" line="623"/>
+        <location filename="../Printing/printreceiptgroup.cpp" line="635"/>
         <source>Cash in</source>
         <translation>Կանխիկ</translation>
     </message>
     <message>
-        <location filename="../Printing/printreceiptgroup.cpp" line="643"/>
+        <location filename="../Printing/printreceiptgroup.cpp" line="655"/>
         <source>Payment, idram</source>
         <translation>Վճարում Idram</translation>
     </message>
     <message>
-        <location filename="../Printing/printreceiptgroup.cpp" line="649"/>
+        <location filename="../Printing/printreceiptgroup.cpp" line="661"/>
         <source>Payment, TellCell</source>
         <translation>Վճարում TellCell</translation>
     </message>
     <message>
-        <location filename="../Printing/printreceiptgroup.cpp" line="661"/>
+        <location filename="../Printing/printreceiptgroup.cpp" line="673"/>
         <source>Prepaid</source>
         <translation>Կանխավճար</translation>
     </message>
     <message>
-        <location filename="../Printing/printreceiptgroup.cpp" line="667"/>
+        <location filename="../Printing/printreceiptgroup.cpp" line="679"/>
         <source>Bank transfer</source>
         <translation>Փոխանցում բանկով</translation>
     </message>
     <message>
-        <location filename="../Printing/printreceiptgroup.cpp" line="673"/>
+        <location filename="../Printing/printreceiptgroup.cpp" line="685"/>
         <source>Debt</source>
         <translation>Պարտք</translation>
     </message>
     <message>
-        <location filename="../Printing/printreceiptgroup.cpp" line="686"/>
+        <location filename="../Printing/printreceiptgroup.cpp" line="698"/>
         <source>Accumulated</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Printing/printreceiptgroup.cpp" line="688"/>
+        <location filename="../Printing/printreceiptgroup.cpp" line="700"/>
         <source>Accumulated amount</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Printing/printreceiptgroup.cpp" line="853"/>
+        <location filename="../Printing/printreceiptgroup.cpp" line="865"/>
         <source>Order</source>
         <translation>Պատվեր</translation>
     </message>
     <message>
-        <location filename="../Printing/printreceiptgroup.cpp" line="870"/>
+        <location filename="../Printing/printreceiptgroup.cpp" line="882"/>
         <source>NN</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Printing/printreceiptgroup.cpp" line="871"/>
+        <location filename="../Printing/printreceiptgroup.cpp" line="883"/>
         <source>Code</source>
         <translation>Կոդ</translation>
     </message>
     <message>
-        <location filename="../Printing/printreceiptgroup.cpp" line="872"/>
+        <location filename="../Printing/printreceiptgroup.cpp" line="884"/>
         <source>Name</source>
         <translation>Անվանում</translation>
     </message>
     <message>
-        <location filename="../Printing/printreceiptgroup.cpp" line="873"/>
+        <location filename="../Printing/printreceiptgroup.cpp" line="885"/>
         <source>Qty</source>
         <translation>Քնկ</translation>
     </message>
     <message>
-        <location filename="../Printing/printreceiptgroup.cpp" line="874"/>
+        <location filename="../Printing/printreceiptgroup.cpp" line="886"/>
         <source>Unit</source>
         <translation>ՉՄ</translation>
     </message>
     <message>
-        <location filename="../Printing/printreceiptgroup.cpp" line="875"/>
+        <location filename="../Printing/printreceiptgroup.cpp" line="887"/>
         <source>Price</source>
         <translation>Գին</translation>
     </message>
     <message>
-        <location filename="../Printing/printreceiptgroup.cpp" line="876"/>
+        <location filename="../Printing/printreceiptgroup.cpp" line="888"/>
         <source>Total</source>
         <translation>Ընդամենը</translation>
     </message>
     <message>
-        <location filename="../Printing/printreceiptgroup.cpp" line="899"/>
+        <location filename="../Printing/printreceiptgroup.cpp" line="911"/>
         <source>Payment</source>
         <translation>Վճարում</translation>
     </message>
     <message>
-        <location filename="../Printing/printreceiptgroup.cpp" line="912"/>
+        <location filename="../Printing/printreceiptgroup.cpp" line="924"/>
         <source>Cash</source>
         <translation>Կանխիկ</translation>
     </message>
@@ -4511,27 +4521,27 @@ STOPLIST-ից</translation>
 <context>
     <name>PrintTaxN</name>
     <message>
-        <location filename="../../NewTax/Src/printtaxn.cpp" line="30"/>
-        <location filename="../../NewTax/Src/printtaxn.cpp" line="92"/>
-        <location filename="../../NewTax/Src/printtaxn.cpp" line="101"/>
-        <location filename="../../NewTax/Src/printtaxn.cpp" line="385"/>
-        <location filename="../../NewTax/Src/printtaxn.cpp" line="424"/>
+        <location filename="../../NewTax/Src/printtaxn.cpp" line="35"/>
+        <location filename="../../NewTax/Src/printtaxn.cpp" line="98"/>
+        <location filename="../../NewTax/Src/printtaxn.cpp" line="107"/>
+        <location filename="../../NewTax/Src/printtaxn.cpp" line="358"/>
+        <location filename="../../NewTax/Src/printtaxn.cpp" line="397"/>
         <source>Connection error</source>
         <translation>Կապի սխալ</translation>
     </message>
     <message>
-        <location filename="../../NewTax/Src/printtaxn.cpp" line="92"/>
+        <location filename="../../NewTax/Src/printtaxn.cpp" line="98"/>
         <source>Socket read error</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../NewTax/Src/printtaxn.cpp" line="101"/>
+        <location filename="../../NewTax/Src/printtaxn.cpp" line="107"/>
         <source>Data read timeout</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../NewTax/Src/printtaxn.cpp" line="383"/>
-        <location filename="../../NewTax/Src/printtaxn.cpp" line="422"/>
+        <location filename="../../NewTax/Src/printtaxn.cpp" line="356"/>
+        <location filename="../../NewTax/Src/printtaxn.cpp" line="395"/>
         <source>Tax error code</source>
         <translation>ՀԴՄ-ի սխալի կոդ</translation>
     </message>

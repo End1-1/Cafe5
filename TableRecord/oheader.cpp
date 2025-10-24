@@ -96,9 +96,10 @@ void OHeader::bind(C5Database &db)
 
 bool OHeader::getRecord(C5Database &db)
 {
-    if (!db.nextRow()) {
+    if(!db.nextRow()) {
         return false;
     }
+
     id = db.getValue("f_id");
     hallId = db.getInt("f_hallid");
     prefix = db.getString("f_prefix");
@@ -147,16 +148,20 @@ bool OHeader::getRecord(C5Database &db)
 bool OHeader::write(C5Database &db, QString &err)
 {
     bool u = true;
-    if (id.toString().isEmpty()) {
+
+    if(id.toString().isEmpty()) {
         u = false;
         id = db.uuid();
     }
+
     bind(db);
-    if (u) {
+
+    if(u) {
         return update(db, "o_header", err);
     } else {
         bool b = insert(db, "o_header", err);
-        if (b) {
+
+        if(b) {
             db[":f_id"] = _id();
             db[":f_1"] = 0;
             db[":f_2"] = 0;
@@ -167,8 +172,10 @@ bool OHeader::write(C5Database &db, QString &err)
             db[":f_id"] = _id();
             b = b && getWriteResult(db, db.insert("o_header_options", false), err);
         }
+
         return b;
     }
+
     return true;
 }
 
@@ -182,35 +189,41 @@ bool OHeader::hasIdram()
     return amountIdram > 0.001 || amountTelcell > 0.001;
 }
 
-void OHeader::countAmount(QVector<OGoods> &goods, BHistory &bhistory)
+void OHeader::countAmount(QVector<OGoods>& goods, BHistory &bhistory)
 {
     Q_UNUSED(bhistory);
     amountTotal = 0;
     amountDiscount = 0;
-    for (int i = 0; i < goods.count(); i++) {
+
+    for(int i = 0; i < goods.count(); i++) {
         OGoods &g = goods[i];
         g.row = i;
-        g.total = g.qty   *g.price;
+        g.total = g.qty   * g.price;
         amountTotal += g.total;
-        switch (g.discountMode) {
-            case CARD_TYPE_DISCOUNT:
-                g.discountAmount = g.total *g.discountFactor;
-                g.total -= g.discountAmount;
-                amountTotal -= g.discountAmount;
-                amountDiscount += g.discountAmount;
-                break;
-            case CARD_TYPE_ACCUMULATIVE:
-                g.accumulateAmount = g.total *g.discountFactor;
-                break;
-            case CARD_TYPE_COUNT_ORDER:
-                break;
-            case CARD_TYPE_MANUAL:
-                amountTotal -= g.discountAmount;
-                amountDiscount += g.discountAmount;
-                g.total -= g.discountAmount;
-                break;
-            default:
-                break;
+
+        switch(g.discountMode) {
+        case CARD_TYPE_DISCOUNT:
+            g.discountAmount = g.total * g.discountFactor;
+            g.total -= g.discountAmount;
+            amountTotal -= g.discountAmount;
+            amountDiscount += g.discountAmount;
+            break;
+
+        case CARD_TYPE_ACCUMULATIVE:
+            g.accumulateAmount = g.total * g.discountFactor;
+            break;
+
+        case CARD_TYPE_COUNT_ORDER:
+            break;
+
+        case CARD_TYPE_MANUAL:
+            amountTotal -= g.discountAmount;
+            amountDiscount += g.discountAmount;
+            g.total -= g.discountAmount;
+            break;
+
+        default:
+            break;
         }
     }
 }

@@ -71,7 +71,6 @@
 #include "cr5storereason.h"
 #include "cr5salarybyworkers.h"
 #include "cr5goodspartners.h"
-#include "cr5discountstatisics.h"
 #include "cr5salefromstore.h"
 #include "cr5goodsunit.h"
 #include "cr5menunames.h"
@@ -486,7 +485,6 @@ void C5MainWindow::removeFromFavorite(int permission)
 void C5MainWindow::on_listWidgetItemClicked(const QModelIndex &index)
 {
     QListWidget *l = static_cast<QListWidget*>(sender());
-    QStringList dbParams = __c5config.dbParams();
     QListWidgetItem *item = l->item(index.row());
     int permission = item->data(Qt::UserRole).toInt();
     QString route = item->data(Qt::UserRole + 105).toString();
@@ -628,7 +626,7 @@ void C5MainWindow::on_listWidgetItemClicked(const QModelIndex &index)
         break;
 
     case cp_t3_discount_statistics:
-        createTab<CR5DiscountStatisics>();
+        createNTab("/engine/v2/reports/discount-statistic/get", ":/cash.png");
         break;
 
     case cp_t3_consuption_reason:

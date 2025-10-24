@@ -18,6 +18,7 @@ void PrintReceiptGroup::print(const QString &id, C5Database &db, int rw)
 {
     double cash = 0;
     double change = 0;
+    double totalQty = 0;
     db[":f_id"] = id;
     db.exec("select * from o_header where f_id=:f_id");
 
@@ -239,6 +240,7 @@ void PrintReceiptGroup::print(const QString &id, C5Database &db, int rw)
                     .arg(data.at(i).at(2).toDouble(), 2)
                     .arg(float_str(data.at(i).at(3).toDouble(), 2)), 0);
             p.br();
+            totalQty += data.at(i).at(1).toDouble();
         } else if(__c5config.getValue(param_shop_print_goods_qty_side_left).toInt() == 1) {
             p.ltext(QString("%1").arg(data.at(i).at(0).toString()), 0);
             p.rtext(QString("%1 X %2 = %3")
@@ -246,6 +248,7 @@ void PrintReceiptGroup::print(const QString &id, C5Database &db, int rw)
                     .arg(data.at(i).at(2).toDouble(), 2)
                     .arg(float_str(data.at(i).at(3).toDouble(), 2)));
             p.br();
+            totalQty += data.at(i).at(1).toDouble();
         } else {
             p.ltext(QString("%1").arg(data.at(i).at(0).toString()), 0);
             p.rtext(QString("%1 X %2 = %3")
@@ -253,11 +256,20 @@ void PrintReceiptGroup::print(const QString &id, C5Database &db, int rw)
                     .arg(data.at(i).at(2).toDouble(), 2)
                     .arg(float_str(data.at(i).at(3).toDouble(), 2)));
             p.br();
+            totalQty += data.at(i).at(1).toDouble();
         }
 
         p.br();
         p.line();
         p.br(2);
+    }
+
+    if(__c5config.fMainJson["print_total_qty_goods"].toBool()) {
+        p.line(4);
+        p.br();
+        p.lrtext(tr("Total qty"), float_str(totalQty, 2));
+        p.br();
+        p.br();
     }
 
     p.line(4);

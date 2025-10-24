@@ -2,21 +2,23 @@
 #include "nfilterdlg.h"
 #include "c5database.h"
 #include "c5waiterorder.h"
-#include "c5salefromstoreorder.h"
 #include "c5mainwindow.h"
-#include "c5costumerdebtpayment.h"
 #include "c5storedoc.h"
 #include "ntablemodel.h"
-#include "c5config.h"
 #include "c5saledoc.h"
 #include "c5message.h"
 #include <QToolButton>
 #include <QGridLayout>
 #include <QTableView>
 
+#include "c5discountredeem.h"
+#include "c5salefromstoreorder.h"
+#include "c5costumerdebtpayment.h"
+
 static const QString hDebt = "90dd520c-f072-11ee-b90b-7c10c9bcac82";
 static const QString hShortDebt = "ec26fd1c-2391-11ef-a99a-7c10c9bcac82";
 static const QString hDraftSale  = "39617ca7-8fa4-11ed-8ad3-1078d2d2b808";
+static const QString hDiscountReturnAmount = "d563c585-aeb9-11f0-a2cb-8a884be02f31";
 
 NHandler::NHandler(QObject *parent)
     : QObject{parent}
@@ -82,6 +84,16 @@ void NHandler::handle(const QJsonArray &ja)
     } else if(mHandlers.at(1).toString() == hDraftSale) {
         auto *retaildoc = __mainWindow->createTab<C5SaleDoc>();
         retaildoc->openDraft(ja.at(0).toString());
+    } else if(mHandlers.at(1).toString() == hDiscountReturnAmount) {
+        int row = mTableView->currentIndex().row();
+
+        if(row < 0) {
+            return;
+        }
+
+        auto *m = static_cast<NTableModel*>(mTableView->model());
+        C5DiscountRedeem dr(m->data(row, 0).toString(), m->data(row, 0).toInt());
+        dr.exec();
     }
 }
 
@@ -112,7 +124,7 @@ void NHandler::toolWidget(QWidget *w)
         } else if(mHandlers.contains(hShortDebt)) {
             auto *b = new QToolButton(w);
             b->setIcon(QIcon(":/new.png"));
-            b->setText(tr("New customer payment"));
+            b->setText(tr("Spent accumulated"));
             b->setAutoRaise(true);
             b->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
             connect(b, &QAbstractButton::clicked, [this]() {
@@ -131,6 +143,24 @@ void NHandler::toolWidget(QWidget *w)
             });
             gl->addWidget(b, 0, 0, Qt::AlignLeft);
         } else if(mHandlers.contains(hDraftSale)) {
+        } else if(mHandlers.contains(hDiscountReturnAmount)) {
+            auto * b  =  new QToolButton(w);
+            b->setIcon(QIcon(":/new.png"));
+            b->setText(tr("Redeem accumulated"));
+            b->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+            connect(b, &QToolButton::clicked, [this]() {
+                int row = mTableView->currentIndex().row();
+                int partner = 0;
+
+                if(row > -1) {
+                    auto *m = static_cast<NTableModel*>(mTableView->model());
+                    partner = m->data(row, 2).toInt();
+                }
+
+                C5DiscountRedeem dr("", partner);
+                dr.exec();
+            });
+            gl->addWidget(b);
         }
     }
 }

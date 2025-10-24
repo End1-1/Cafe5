@@ -2,7 +2,7 @@
 #include "ce5discountcard.h"
 
 CR5DiscountSystem::CR5DiscountSystem(QWidget *parent) :
-    C5ReportWidget( parent)
+    C5ReportWidget(parent)
 {
     fLabel = tr("Dicount system");
     fIcon = ":/discount.png";
@@ -11,8 +11,9 @@ CR5DiscountSystem::CR5DiscountSystem(QWidget *parent) :
     fLeftJoinTables << "left join c_partners c on c.f_id=d.f_client [c]";
     fLeftJoinTables << "left join b_card_types dt on dt.f_id=d.f_mode [dt]";
     fColumnsFields << "d.f_id"
+                   << "d.f_number"
                    << "dt.f_name as dtname"
-                   << "c.f_contact"
+                   << "concat_ws(', ', c.f_contact, c.f_taxname, c.f_name, c.f_phone) as f_contact"
                    << "d.f_value"
                    << "c.f_info"
                    << "d.f_code"
@@ -21,6 +22,7 @@ CR5DiscountSystem::CR5DiscountSystem(QWidget *parent) :
                    << "d.f_active";
     fTranslation["f_id"] = tr("Code");
     fTranslation["dtname"] = tr("Mode");
+    fTranslation["f_number"] = tr("Card number");
     fTranslation["f_contact"] = tr("Contact name");
     fTranslation["f_value"] = tr("Discount");
     fTranslation["f_info"] = tr("Client info");
@@ -29,8 +31,9 @@ CR5DiscountSystem::CR5DiscountSystem(QWidget *parent) :
     fTranslation["f_dateend"] = tr("End date");
     fTranslation["f_active"] = tr("State");
     fColumnsVisible["d.f_id"] = true;
+    fColumnsVisible[ "d.f_number"] = true;
     fColumnsVisible["dt.f_name as dtname"] = true;
-    fColumnsVisible["c.f_contact"] = true;
+    fColumnsVisible["concat_ws(', ', c.f_contact, c.f_taxname, c.f_name, c.f_phone) as f_contact"] = true;
     fColumnsVisible["d.f_value"] = true;
     fColumnsVisible["c.f_info"] = true;
     fColumnsVisible["d.f_code"] = true;
@@ -41,9 +44,9 @@ CR5DiscountSystem::CR5DiscountSystem(QWidget *parent) :
     fEditor = new CE5DiscountCard();
 }
 
-QToolBar *CR5DiscountSystem::toolBar()
+QToolBar* CR5DiscountSystem::toolBar()
 {
-    if (!fToolBar) {
+    if(!fToolBar) {
         QList<ToolBarButtons> btn;
         btn << ToolBarButtons::tbNew
             << ToolBarButtons::tbClearFilter
@@ -52,5 +55,6 @@ QToolBar *CR5DiscountSystem::toolBar()
             << ToolBarButtons::tbPrint;
         fToolBar = createStandartToolbar(btn);
     }
+
     return fToolBar;
 }

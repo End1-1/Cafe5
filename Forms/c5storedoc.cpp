@@ -964,6 +964,8 @@ bool C5StoreDoc::docCheck(QString &err, int state)
 
     switch(fDocType) {
     case sdInput:
+        ui->leStoreOutput->setValue(0);
+
         if(ui->leStoreInput->getInteger() == 0) {
             err += tr("Input store is not defined") + "<br>";
         }
@@ -979,6 +981,8 @@ bool C5StoreDoc::docCheck(QString &err, int state)
         break;
 
     case sdOutput:
+        ui->leStoreInput->setValue(0);
+
         if(ui->leStoreOutput->getInteger() == 0) {
             err += tr("Output store is not defined") + "<br>";
         }

@@ -1432,6 +1432,13 @@
         <widget class="QLineEdit" name="leBarcode"/>
        </item>
        <item>
+        <widget class="QRadioButton" name="rbGenEAN8">
+         <property name="text">
+          <string>Gen barcode EAN8</string>
+         </property>
+        </widget>
+       </item>
+       <item>
         <widget class="C5TableWidget" name="tblBarcodes">
          <column>
           <property name="text">

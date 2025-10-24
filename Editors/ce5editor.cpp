@@ -61,11 +61,21 @@ void CE5Editor::setId(int id)
                     } else {
                         switch(le->property("Type").toInt()) {
                         case 0:
-                            le->setText(db.getString(i));
+                            if(le->hasSelector()) {
+                                le->setValue(db.getString(i));
+                            } else {
+                                le->setText(db.getString(i));
+                            }
+
                             break;
 
                         case 1:
-                            le->setInteger(db.getInt(i));
+                            if(le->hasSelector()) {
+                                le->setValue(db.getInt(i));
+                            } else {
+                                le->setInteger(db.getInt(i));
+                            }
+
                             break;
 
                         case 2:

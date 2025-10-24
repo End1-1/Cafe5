@@ -169,6 +169,7 @@ void NTableWidget::queryFinished(const QJsonObject &ba)
         fFilter = new NFilterDlg(this);
         fFilter->setProperty("host", mHost);
         fFilter->setup(jfilter);
+        fFilter->mVersion = jwidget["version"].toInt(1);
     }
 
     static_cast<NTableModel* >(ui->mTableView->model())->setDatasource(jcols, jdata);

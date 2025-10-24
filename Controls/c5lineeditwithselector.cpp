@@ -149,6 +149,11 @@ int C5LineEditWithSelector::cacheId()
     return fCache;
 }
 
+bool C5LineEditWithSelector::hasSelector()
+{
+    return fCache > 0;
+}
+
 void C5LineEditWithSelector::mouseDoubleClickEvent(QMouseEvent *e)
 {
     Q_UNUSED(e);

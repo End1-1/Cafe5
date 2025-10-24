@@ -58,6 +58,7 @@ FORMS += \
     ../Classes/dlgserverconnection.ui \
     ../Forms/c5goodsspecialprice.ui \
     ../Forms/dlgimportfromas.ui \
+    c5discountredeem.ui \
     dlgemarks.ui \
     storedecomplectation.ui
 
@@ -65,6 +66,7 @@ HEADERS += \
     ../Classes/dlgserverconnection.h \
     ../Forms/c5goodsspecialprice.h \
     ../Forms/dlgimportfromas.h \
+    c5discountredeem.h \
     dlgemarks.h \
     storedecomplectation.h
 
@@ -72,6 +74,7 @@ SOURCES += \
     ../Classes/dlgserverconnection.cpp \
     ../Forms/c5goodsspecialprice.cpp \
     ../Forms/dlgimportfromas.cpp \
+    c5discountredeem.cpp \
     dlgemarks.cpp \
     storedecomplectation.cpp
 

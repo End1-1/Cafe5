@@ -22,6 +22,7 @@
 #include "ndataprovider.h"
 #include "wcustomerdisplay.h"
 #include "c5message.h"
+#include "dlgvisit.h"
 #include "scopeguarde.h"
 #include <QScreen>
 #include <QScrollBar>
@@ -180,6 +181,10 @@ void Workspace::setQty(double qty, int mode, int rownum, const QString &packageu
     Dish d = ui->tblOrder->item(row, 0)->data(Qt::UserRole).value<Dish>();
 
     if(d.state != DISH_STATE_OK) {
+        return;
+    }
+
+    if(d.specialMark > 0) {
         return;
     }
 
@@ -474,6 +479,7 @@ void Workspace::resetOrder()
         d.specialDiscount = 0;
     }
 
+    fCardCode.clear();
     ui->leCard->clear();
     ui->tblDishes->setEnabled(true);
     ui->wQty->setEnabled(true);
@@ -649,7 +655,18 @@ void Workspace::on_btnCheckout_clicked()
         }
     }
 
-    double  cardAmount = 0, idramAmount = 0, otherAmount = 0;
+    for(int i = 0; i < ui->tblOrder->rowCount(); i++) {
+        Dish d = ui->tblOrder->item(i, 0)->data(Qt::UserRole).value<Dish>();
+
+        if(d.specialMark > 0) {
+            if(fCardCode.isEmpty()) {
+                C5Message::error(tr("Swipe the card"));
+                return;
+            }
+        }
+    }
+
+    double  cardAmount = 0, idramAmount = 0;
 
     if(ui->btnSetCash->isChecked()) {
         //cashAmount = ui->leTotal->getDouble();
@@ -658,7 +675,7 @@ void Workspace::on_btnCheckout_clicked()
     } else if(ui->btnSetIdram->isChecked()) {
         idramAmount = ui->leTotal->getDouble();
     } else {
-        otherAmount = ui->leTotal->getDouble();
+        //otherAmount = ui->leTotal->getDouble();
     }
 
     cardAmount = ui->leCard->getDouble();
@@ -931,11 +948,57 @@ void Workspace::on_leReadCode_returnPressed()
 
     C5Database db;
     db[":f_code"] = code;
-    db.exec("select * from b_cards_discount where f_code=:f_code");
+    db.exec(R"(
+    SELECT b.*, p.f_taxname from b_cards_discount b
+    LEFT JOIN c_partners p ON p.f_id=b.f_client
+    where f_code=:f_code
+    )");
 
     if(db.nextRow()) {
         if(fDiscountMode > 0) {
             C5Message::error(tr("Discount already exists"));
+            return;
+        }
+
+        if(db.getInt("f_mode") == 8) {
+            if(ui->tblOrder->rowCount() > 0) {
+                int index = -1;
+
+                for(int i = 0; i < ui->tblOrder->rowCount(); i++) {
+                    Dish d = ui->tblOrder->item(i, 0)->data(Qt::UserRole).value<Dish>();
+
+                    if(d.specialMark > 0) {
+                        index = i;
+                        break;
+                    }
+                }
+
+                if(index > -1) {
+                    if(db.getInt("f_client") == 0) {
+                        C5Message::error(tr("Bind card to customer"));
+                        return;
+                    }
+
+                    fCardCode = code;
+                    Dish d = ui->tblOrder->item(index, 0)->data(Qt::UserRole).value<Dish>();
+                    fDiscountCard = db.getInt("f_id");
+                    fDiscountAmount = d.price;
+                    d.cardCode = fCardCode;
+                    d.modificator = db.getString("f_taxname");
+                    ui->tblOrder->item(index, 0)->setData(Qt::UserRole, QVariant::fromValue(d));
+                    updateInfo(index);
+                    ui->tblOrder->item(index, 0)->setBackground(Qt::cyan);
+                    return;
+                } else {
+                    C5Message::error(tr("Incorrect use of the card"));
+                    return;
+                }
+            } else {
+                auto *dv = new dlgvisit(code, this);
+                dv->exec();
+                dv->deleteLater();
+            }
+
             return;
         }
 
@@ -1018,6 +1081,22 @@ void Workspace::on_tblDishes_cellClicked(int row, int column)
 
     if(!d) {
         return;
+    }
+
+    if(d->specialMark > 0) {
+        if(ui->tblOrder->rowCount() > 0) {
+            C5Message::error(tr("Cannot use with other items"));
+            return;
+        }
+    }
+
+    for(int i = 0; i < ui->tblOrder->rowCount(); i++) {
+        Dish d = ui->tblOrder->item(i, 0)->data(Qt::UserRole).value<Dish>();
+
+        if(d.specialMark > 0) {
+            C5Message::error(tr("Cannot use with special items"));
+            return;
+        }
     }
 
     createAddDishRequest(Dish(d));
@@ -1234,6 +1313,7 @@ bool Workspace::saveOrder(int state, bool printService)
         jo["service"] = __c5config.serviceFactor().toDouble();
         jo["discount"] = d.discount;
         jo["store"] = d.store;
+        jo["cardcode"] = d.cardCode;
         jo["print1"] = d.printer;
         jo["print2"] = d.printer2;
         jo["comment"] = d.modificator;
@@ -2068,6 +2148,7 @@ void Workspace::addGoodsResponse(const QJsonObject &jdoc)
     d.cost = jo["f_cost"].toDouble();
     d.quick = jo["f_recent"].toInt();
     d.barcode = jo["f_barcode"].toString();
+    d.specialMark = jo["f_extra"].toInt();
     d.typeName = jo["f_groupname"].toString();
     d.specialDiscount = jo["f_specialdiscount"].toDouble() / 100;
     d.qrRequired = jo["f_qr"].toInt();
@@ -2244,6 +2325,7 @@ void Workspace::openTableResponse(const QJsonObject &jdoc)
             d.price = jt["f_price"].toDouble();
             d.modificator = jt["f_comment"].toString();
             d.printer = jt["f_print1"].toString();
+            d.specialMark = jt["f_extra"].toInt();
             d.printer2 = jt["f_print2"].toString();
             d.store = jt["f_store"].toInt();
             d.f_emarks = jt["f_emarks"].toString();
@@ -2698,6 +2780,7 @@ void Workspace::createAddDishRequest(const Dish &dish)
     jdish["menucode"] = C5Config::defaultMenu();
     jdish["f_emarks"] = dish.f_emarks.isEmpty() ? QJsonValue::Null : QJsonValue(dish.f_emarks);
     jdish["table"] = fTable;
+    jdish["f_extra"] = dish.specialMark;
     jdish["row"] =  row;
     jdish["mark"] = "addgoods";
     QJsonObject bhistory;
@@ -2770,6 +2853,7 @@ void Workspace::initMenu()
         d->adgCode = j["f_adgt"].toString().isEmpty() ? j["f_adgcode"].toString() : j["f_adgt"].toString();
         d->color = j["f_color"].toInt();
         d->netWeight = j["f_netweight"].toDouble();
+        d->specialMark = j["f_extra"].toInt();
         d->cost = j["f_cost"].toDouble();
         d->quick = j["f_recent"].toInt();
         d->barcode = j["f_barcode"].toString();

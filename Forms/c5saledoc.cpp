@@ -18,6 +18,7 @@
 #include "chatmessage.h"
 #include "httpquerydialog.h"
 #include "c5mainwindow.h"
+#include "nloadingdlg.h"
 #include "ce5partner.h"
 #include "outputofheader.h"
 #include "../../NewTax/Src/printtaxn.h"
@@ -140,6 +141,9 @@ QToolBar* C5SaleDoc::toolBar()
 
 bool C5SaleDoc::openDoc(const QString &uuid)
 {
+    NLoadingDlg loadingDlg(this);
+    loadingDlg.setWindowModality(Qt::ApplicationModal);
+    loadingDlg.show();
     C5Database db;
     //GOODS
     db[":f_header"] = uuid;
@@ -579,12 +583,12 @@ void C5SaleDoc::cancelFiscal()
 
 void C5SaleDoc::createInvoiceAS()
 {
-    exportToAs(5);
+    exportToAs(6);
 }
 
 void C5SaleDoc::createRetailAS()
 {
-    exportToAs(20);
+    exportToAs(7);
 }
 
 void C5SaleDoc::makeStoreOutput()
@@ -722,6 +726,9 @@ void C5SaleDoc::exportToExcel()
 
 void C5SaleDoc::returnItems()
 {
+    NLoadingDlg loadingDlg(this);
+    loadingDlg.setWindowModality(Qt::ApplicationModal);
+    loadingDlg.show();
     C5Database db;
     int hallid;
     QString prefix;
@@ -740,7 +747,6 @@ void C5SaleDoc::returnItems()
 
     QString err;
     OHeader oh;
-    oh.id;
     oh.prefix = prefix;
     oh.hallId = hallid;
     oh.partner = fPartner.id.toInt();
@@ -850,6 +856,13 @@ void C5SaleDoc::saveDataChanges()
         err += tr("Incomplete payment") + "<br>";
     }
 
+    QDate deliveryDate = QDate::fromString(ui->leDelivery->text(), "dd/MM/yyyy");
+
+    if(!deliveryDate.isValid()) {
+        deliveryDate = QDate::currentDate();
+        ui->leDelivery->setText(deliveryDate.toString(FORMAT_DATE_TO_STR));
+    }
+
     if(err.isEmpty() == false) {
         C5Message::error(err);
         return;
@@ -875,7 +888,7 @@ void C5SaleDoc::saveDataChanges()
     jdoc["organization"] = ui->leTaxpayerName->text();
     jdoc["contact"] = ui->leTaxpayerId->text();
     QJsonObject jd;
-    jd["f_delivery"] = QDate::fromString(ui->leDelivery->text(), "dd/MM/yyyy").toString(FORMAT_DATE_TO_STR_MYSQL);
+    jd["f_delivery"] = deliveryDate.toString(FORMAT_DATE_TO_STR);
     jdoc["draft"] = jd;
     QJsonObject jh;
     jh["f_id"] = uuid;
@@ -1168,6 +1181,9 @@ void C5SaleDoc::countTotalQty()
 
 bool C5SaleDoc::openDraft(const QString &id)
 {
+    NLoadingDlg loadingDlg(this);
+    loadingDlg.setWindowModality(Qt::ApplicationModal);
+    loadingDlg.show();
     C5Database db;
     db[":f_id"] = id;
     db.exec("select * from o_draft_sale where f_id=:f_id");
@@ -1842,6 +1858,9 @@ void C5SaleDoc::saveAsDraft()
 
 void C5SaleDoc::saveCopy()
 {
+    NLoadingDlg loadingDlg(this);
+    loadingDlg.setWindowModality(Qt::ApplicationModal);
+    loadingDlg.show();
     QString err;
     C5Database db;
     fDraftSale.id = "";
@@ -1856,7 +1875,7 @@ void C5SaleDoc::saveCopy()
     fDraftSale.payment = 1;
     fDraftSale.partner = fPartner.id.toInt();
     fDraftSale.discount = 0;
-    fDraftSale.deliveryDate = QDate::fromString(ui->leDelivery->text(), "dd/MM/yyyy");
+    fDraftSale.deliveryDate = QDate::currentDate();
 
     if(!fDraftSale.write(db, err)) {
         C5Message::error(err);
@@ -1883,6 +1902,7 @@ void C5SaleDoc::saveCopy()
         }
     }
 
+    loadingDlg.close();
     auto *doc = __mainWindow->createTab<C5SaleDoc>();
     doc->openDraft(fDraftSale.id.toString());
 }
@@ -1931,4 +1951,9 @@ void C5SaleDoc::on_btnCashier_clicked()
         db[":f_cashier"] = vals.at(1).toInt();
         db.exec("update o_header set f_cashier=:f_cashier where f_id=:f_id");
     }
+}
+
+void C5SaleDoc::on_btnCopyUUID_clicked()
+{
+    qApp->clipboard()->setText(ui->leUuid->text());
 }

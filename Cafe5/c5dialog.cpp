@@ -18,6 +18,10 @@ C5Dialog::C5Dialog() :
     //setWindowFlags(Qt::WindowStaysOnTopHint);
 #endif
 #endif
+#ifdef  QT_DEBUG
+    // setMaximumSize(QSize(1024, 768));
+    setMaximumSize(1280, 1024);
+#endif
 
     if(__mainWindow == nullptr) {
         __mainWindow = this;

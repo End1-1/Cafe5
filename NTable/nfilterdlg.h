@@ -4,7 +4,8 @@
 #include <QDialog>
 #include <QJsonArray>
 
-namespace Ui {
+namespace Ui
+{
 class NFilterDlg;
 }
 
@@ -21,6 +22,7 @@ public:
     QJsonObject filter() const;
     QVariant filterValue(const QString &name);
     void clear();
+    int mVersion;
 
 private slots:
     void openSuggestions();
@@ -31,10 +33,10 @@ private slots:
     void on_btnApply_clicked();
 
 private:
-    Ui::NFilterDlg *ui;
+    Ui::NFilterDlg* ui;
     QMap<QString, QJsonArray> mData;
     QMap<QString, QJsonArray> mCols;
-    NLoadingDlg *mLoadingDlg;
+    NLoadingDlg* mLoadingDlg;
 };
 
 #endif // NFILTERDLG_H

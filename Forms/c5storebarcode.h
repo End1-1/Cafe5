@@ -4,7 +4,8 @@
 #include "c5widget.h"
 #include <QPrintDialog>
 
-namespace Ui {
+namespace Ui
+{
 class C5StoreBarcode;
 }
 
@@ -21,7 +22,9 @@ public:
 
     void addRow(const QString &name, const QString &barcode, int qty, int curr, const QString &sizes);
 
-    virtual QToolBar *toolBar() override;
+    virtual QToolBar* toolBar() override;
+
+    static bool printOneBarcodeIllure(const QString &code, const QString &price, const QString &class1, const QString &name, QPrintDialog &pd);
 
     static bool printOneBarcode(const QString &code, const QString &price, const QString &class1, const QString &name, QPrintDialog &pd);
 
@@ -30,7 +33,7 @@ public:
     static bool printOneBarcode2(const QString &code, const QString &price, QString link, const QString &name, const QString &sizeList, QPrintDialog &pd);
 
 private:
-    Ui::C5StoreBarcode *ui;
+    Ui::C5StoreBarcode* ui;
 
     //bool printOneBarcode(const QString &code, QPrintDialog &pd);
 

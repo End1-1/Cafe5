@@ -28,6 +28,8 @@ struct Dish {
     int package;
     int quick;
     int qrRequired = 0;
+    int specialMark = 0;
+    QString cardCode;
     QString packageName;
     QString obodyId;
     QString f_emarks;
@@ -64,6 +66,8 @@ struct Dish {
         price = d->price;
         discount = d->discount;
         specialDiscount = d->specialDiscount;
+        specialMark = d->specialMark;
+        cardCode = d->cardCode;
         qty = d->qty;
         qty2 = d->qty2;
         netWeight = d->netWeight;
@@ -76,7 +80,7 @@ struct Dish {
         f_emarks = d->f_emarks;
     }
 };
-Q_DECLARE_METATYPE(Dish *)
+Q_DECLARE_METATYPE(Dish*)
 Q_DECLARE_METATYPE(Dish)
 
 #endif // DISH_H

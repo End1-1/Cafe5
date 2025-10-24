@@ -17,7 +17,7 @@ public:
 
     ~CustomerInfo();
 
-    static bool getCustomer(int &id, QString &name, QString &phone, QString &address);
+    static bool getCustomer(int& id, QString &name, QString &phone, QString &address);
 
     virtual bool eventFilter(QObject *o, QEvent *e) override;
 
@@ -32,8 +32,10 @@ private slots:
 
     void on_btnKdbAM_clicked(bool checked);
 
+    void on_btnExtendedVersion_clicked();
+
 private:
-    Ui::CustomerInfo *ui;
+    Ui::CustomerInfo* ui;
     int fCustomerId;
 };
 #endif // CUSTOMERINFO_H

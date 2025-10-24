@@ -21,28 +21,32 @@ CE5DiscountCard::~CE5DiscountCard()
     delete ui;
 }
 
-bool CE5DiscountCard::save(QString &err, QList<QMap<QString, QVariant> > &data)
+bool CE5DiscountCard::save(QString &err, QList<QMap<QString, QVariant> >& data)
 {
     C5Database db;
     db[":f_code"] = ui->leCard->text();
     db.exec("select * from b_cards_discount where f_code=:f_code");
-    if (db.nextRow()) {
-        if (ui->leCode->getInteger() != db.getInt("f_id")) {
+
+    if(db.nextRow()) {
+        if(ui->leCode->getInteger() != db.getInt("f_id")) {
             err += tr("Duplicate card code");
             return false;
         }
     }
+
     //kutakain
-    if (ui->leDiscount->getInteger() == 4) {
+    if(ui->leDiscount->getInteger() == 4) {
         db[":f_code"] = ui->leCard->text();
         db.exec("select * from b_gift_card where f_code=:f_code");
-        if (db.nextRow()) {
+
+        if(db.nextRow()) {
             int id = db.getInt("f_id");
             db[":f_costumer"] = ui->leClient->getInteger();
             db.update("b_gift_card", "f_code", ui->leCard->text());
             db[":f_id"] = id;
             db.exec("select * from b_gift_card_history where f_card=:f_card");
-            if (!db.nextRow()) {
+
+            if(!db.nextRow()) {
                 db[":f_card"] = id;
                 db[":f_amount"] = 0;
                 db.insert("b_gift_card_history");
@@ -57,26 +61,30 @@ bool CE5DiscountCard::save(QString &err, QList<QMap<QString, QVariant> > &data)
             db.insert("b_gift_card_history");
         }
     }
+
     return CE5Editor::save(err, data);
 }
 
 void CE5DiscountCard::on_btnNewClient_clicked()
 {
     QString id;
-    if (getId<CE5Partner>(id)) {
+
+    if(getId<CE5Partner>(id)) {
         ui->leClient->setValue(id);
     }
 }
 
 void CE5DiscountCard::on_leFirstName_textChanged(const QString &arg1)
 {
-    if (arg1.isEmpty()) {
+    if(arg1.isEmpty()) {
         ui->leClientInfo->clear();
         return;
     }
+
     C5Cache *c = C5Cache::cache(cache_goods_partners);
     int r = c->find(ui->leClient->getInteger());
-    if (r > -1) {
+
+    if(r > -1) {
         ui->leClientInfo->setText(c->getString(r, 3));
     }
 }

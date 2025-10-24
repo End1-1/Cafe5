@@ -380,6 +380,10 @@ bool WOrder::writeOrder()
 
     jdoc["goods"] = jg;
     QJsonObject jhistory;
+    jhistory["f_card"] = fBHistory.card;
+    jhistory["f_data"] = fBHistory.data;
+    jhistory["f_type"] = fBHistory.type;
+    jhistory["f_value"] = fBHistory.value;
 
     if(fBHistory.card > 0 && fBHistory.type == CARD_TYPE_ACCUMULATIVE) {
         QJsonObject jtemp;
@@ -387,11 +391,9 @@ bool WOrder::writeOrder()
         jtemp["accumulate"] = ui->leCurrentAccumulated->getDouble();
         jtemp["accumulatespend"] = ui->leUseAccumulated->getDouble();
         jdoc["accumulate"] = jtemp;
+        jhistory["f_data"] = ui->leCurrentAccumulated->getDouble() > 0 ? ui->leCurrentAccumulated->getDouble() : -1 *  ui->leUseAccumulated->getDouble();
     }
 
-    jhistory["f_card"] = fBHistory.card;
-    jhistory["f_data"] = fBHistory.data;
-    jhistory["f_type"] = fBHistory.type;
     jdoc["history"] = jhistory;
     QJsonObject jflags;
     jflags["f_1"] = ui->btnF1->isChecked() ? 1 : 0;
@@ -1148,6 +1150,9 @@ void WOrder::reponseProcessCode(const QJsonObject &jdoc)
         fBHistory.card = card["f_id"].toInt();
         fBHistory.type = card["f_mode"].toInt();
         fBHistory.value = card["f_value"].toDouble();
+        ui->leCustomerTaxpayerId->setProperty("id", partner["f_id"].toInt());
+        ui->leCustomerTaxpayerId->setProperty("nocard", true);
+        on_leCustomerTaxpayerId_returnPressed();
 
         if(card["f_mode"].toInt() == CARD_TYPE_DISCOUNT) {
             if(fBHistory.value < 0) {
@@ -1165,7 +1170,6 @@ void WOrder::reponseProcessCode(const QJsonObject &jdoc)
             ui->leDisc->setVisible(true);
             ui->lbDisc->setVisible(true);
             ui->leGiftCardAmount->setDouble(history["f_amount"].toDouble());
-            ui->leContact->setText(partner["f_name"].toString());
 
             for(int i = 0; i < fOGoods.count(); i++) {
                 OGoods &og = fOGoods[i];
@@ -1179,7 +1183,6 @@ void WOrder::reponseProcessCode(const QJsonObject &jdoc)
             ui->leDisc->setVisible(true);
             ui->lbDisc->setVisible(true);
             ui->leGiftCardAmount->setDouble(history["f_amount"].toDouble());
-            ui->leContact->setText(partner["f_name"].toString());
             ui->leUseAccumulated->setReadOnly(!(ui->leGiftCardAmount->getDouble() > 0));
             ui->lbUseAccumulated->setVisible(true);
             ui->leUseAccumulated->setVisible(true);
@@ -1413,7 +1416,12 @@ void WOrder::openDraftResponse(const QJsonObject &jdoc)
         og.discountAmount = 0;
         og.canDiscount = g.canDiscount();
         fOGoods.append(og);
-        ui->tblData->addEmptyRow();
+        int row = ui->tblData->addEmptyRow();
+        auto *ch = new C5CheckBox();
+        ch->setCheckable(s.value("learnaccumulate").toBool());
+        ch->setChecked(jo["f_candiscount"].toInt() == 1);
+        connect(ch, &C5CheckBox::clicked, this, &WOrder::checkCardClicked);
+        ui->tblData->setCellWidget(row, col_check_discount, ch);
     }
 
     countTotal();
@@ -1603,13 +1611,18 @@ void WOrder::on_leCustomerTaxpayerId_returnPressed()
     }
 
     fOHeader.taxpayerTin = ui->leCustomerTaxpayerId->text();
-    db[":f_costumer"] = ui->leCustomerTaxpayerId->property("id").toInt();
-    db.exec("select * from b_gift_card where f_costumer=:f_costumer");
 
-    if(db.nextRow()) {
-        ui->leCode->setText(db.getString("f_code"));
-        on_leCode_returnPressed();
+    if(ui->leCustomerTaxpayerId->property("nocard").toBool() == false) {
+        db[":f_client"] = ui->leCustomerTaxpayerId->property("id").toInt();
+        db.exec("select * from b_cards_discount where f_client=:f_client");
+
+        if(db.nextRow()) {
+            ui->leCode->setText(db.getString("f_code"));
+            on_leCode_returnPressed();
+        }
     }
+
+    ui->leCustomerTaxpayerId->setProperty("nocard", false);
 }
 
 void WOrder::on_btnSearchPartner_clicked()

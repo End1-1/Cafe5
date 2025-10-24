@@ -3,6 +3,7 @@
 #include "c5database.h"
 #include "c5config.h"
 #include "jsons.h"
+#include "nloadingdlg.h"
 #include "c5utils.h"
 #include <QFileDialog>
 
@@ -27,6 +28,9 @@ C5SettingsWidget::~C5SettingsWidget()
 
 void C5SettingsWidget::setId(int id)
 {
+    NLoadingDlg loadingDlg(this);
+    loadingDlg.setWindowModality(Qt::ApplicationModal);
+    loadingDlg.show();
     CE5Editor::setId(id);
     clear(this);
     fSettingsId = id;
@@ -98,6 +102,8 @@ void C5SettingsWidget::setId(int id)
         ui->chDebugMode->setChecked(jo["debug_mode"].toBool());
         ui->chClearSaveDraft->setChecked(jo["clear_sale_draft"].toBool());
         ui->chChangeDraftDateToCurrent->setChecked(jo["change_draft_date_to_current"].toBool());
+        ui->chPrintTotyalQntOfGoods->setChecked(jo["print_total_qty_goods"].toBool());
+        ui->chDenyChangeQtyReturnItems->setChecked(jo["change_qty_return_items"].toBool());
         QJsonArray ja = jo["availableoutstore"].toArray();
         ui->leWaiterServer->setText(jo["waiter_server"].toString());
         ui->chUseWebsocket->setChecked(jo["use_websocket"].toBool());
@@ -120,6 +126,9 @@ void C5SettingsWidget::setId(int id)
 
 bool C5SettingsWidget::save(QString &err, QList<QMap<QString, QVariant> >& data)
 {
+    NLoadingDlg loadingDlg(this);
+    loadingDlg.setWindowModality(Qt::ApplicationModal);
+    loadingDlg.show();
     bool isNew = false;
 
     if(ui->leCode->getInteger() == 0) {
@@ -275,6 +284,7 @@ bool C5SettingsWidget::save(QString &err, QList<QMap<QString, QVariant> >& data)
 
     QJsonObject jc;
     jc["id"] = ui->leCode->getInteger();
+    jc["settings_name"] = ui->leSettingsName->text();
     jc["store"] = ui->cbDefaultStore->currentData().toInt();
     jc["store_name"] = ui->cbDefaultStore->currentText();
     jc["first_page_title"] = ui->leSettingsName->text();
@@ -325,6 +335,8 @@ bool C5SettingsWidget::save(QString &err, QList<QMap<QString, QVariant> >& data)
     jc["tax_dept"] = ui->leTaxDept->text();
     jc["tax_op"] = ui->leCashierLogin->text();
     jc["tax_pin"] = ui->leCashierPin->text();
+    jc["print_total_qty_goods"] = ui->chPrintTotyalQntOfGoods->isChecked();
+    jc["change_qty_return_items"] = ui->chDenyChangeQtyReturnItems->isChecked();
     QJsonArray ja;
     QStringList a = ui->leAvailableStore->text().split(",", Qt::SkipEmptyParts);
 

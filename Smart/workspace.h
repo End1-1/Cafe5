@@ -205,6 +205,8 @@ private:
 
     int fDiscountMode;
 
+    QString fCardCode;
+
     double fDiscountValue;
 
     double fDiscountAmount;

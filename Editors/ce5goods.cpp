@@ -15,6 +15,7 @@
 #include "c5user.h"
 #include "c5permissions.h"
 #include "c5storebarcode.h"
+#include "ean8generator.h"
 #include "c5utils.h"
 #include "c5replacecharacter.h"
 #include <QClipboard>
@@ -114,6 +115,8 @@ CE5Goods::CE5Goods(QWidget *parent) :
         ui->tblAs->setString(r, 1, db.getString("f_name"));
         ui->tblAs->createLineEdit(r, 2);
     }
+
+    ui->rbGenEAN8->setChecked(__c5config.getRegValue("gen_ean8").toBool());
 }
 
 CE5Goods::~CE5Goods()
@@ -970,7 +973,16 @@ void CE5Goods::on_leUnitName_textChanged(const QString &arg1)
 
 void CE5Goods::on_btnPrintBarcode_clicked()
 {
-    QPrintDialog pd(this);
+    // if(ui->rbGenEAN8->isChecked()) {
+    //     if(ui->leScanCode->text().length() == 4) {
+    //         QString code = QString("%1").arg(ui->leGroup->getInteger(), 3, 10,  QChar('0'));
+    //         ui->leScanCode->setText(ui->leScanCode->text() + code);
+    //     }
+    //     if(ui->leScanCode->text().length() == 7) {
+    //         ui->leScanCode->setText(Ean8Generator::last(ui->leScanCode->text()));
+    //     }
+    // }
+    QPrintDialog pd;
 
     if(pd.exec() == QDialog::Accepted) {
         C5StoreBarcode::printOneBarcode(ui->leScanCode->text(), ui->tblPricing->lineEdit(0, 0)->text(), "", ui->leName->text(),
@@ -1032,4 +1044,9 @@ void CE5Goods::on_leBarcode_returnPressed()
 void CE5Goods::on_leTotal_textChanged(const QString &arg1)
 {
     //ui->leCostPrice->setText(arg1);
+}
+
+void CE5Goods::on_rbGenEAN8_clicked(bool checked)
+{
+    __c5config.setRegValue("gen_ean8", checked);
 }

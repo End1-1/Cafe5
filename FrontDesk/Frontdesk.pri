@@ -63,7 +63,6 @@ FORMS += \
     ../Forms/c5waiterorder.ui \
     ../Forms/change.ui \
     ../Forms/cr5routereport.ui \
-    ../Forms/customerinfo.ui \
     ../Forms/dlgcashinout.ui \
     ../Forms/dlgcashop.ui \
     ../Forms/dlgchangeoutputstore.ui \
@@ -101,7 +100,6 @@ FORMS += \
     ../Reports/cr5costumerdebtsfilter.ui \
     ../Reports/cr5currencycrossratehistoryfilter.ui \
     ../Reports/cr5currencyratehistoryfilter.ui \
-    ../Reports/cr5discountstatisticsfilter.ui \
     ../Reports/cr5draftoutputbyrecipefilter.ui \
     ../Reports/cr5goodsfilter.ui \
     ../Reports/cr5goodsimages.ui \
@@ -162,6 +160,7 @@ FORMS += \
 HEADERS += \
         $$PWD/../Classes/QProgressIndicator.h \
         $$PWD/../Classes/c5servername.h \
+        $$PWD/../Classes/ean8generator.h \
         $$PWD/../NTable/nhandler.h \
         $$PWD/../NTable/nsearchdlg.h \
         ../NTable/ntablemodel.h \
@@ -172,7 +171,6 @@ HEADERS += \
         ../Reports/cr5consuptionbysalesqty.h \
         ../../NewTax/Src/printtaxn.h \
         ../../NewTax/Src/printtaxn.h \
-        ../../XLSX/src/xlsxborder.h \
         ../Cafe5/c5double.h \
         ../Cafe5/c5systempreference.h \
         ../Classes/QRCodeGenerator.h \
@@ -269,7 +267,6 @@ HEADERS += \
         ../Forms/c5waiterorder.h \
         ../Forms/change.h \
         ../Forms/cr5routereport.h \
-        ../Forms/customerinfo.h \
         ../Forms/dlgcashinout.h \
         ../Forms/dlgcashop.h \
         ../Forms/dlgchangeoutputstore.h \
@@ -318,8 +315,6 @@ HEADERS += \
         ../Reports/cr5currencyratehistory.h \
         ../Reports/cr5currencyratehistoryfilter.h \
         ../Reports/cr5custom.h \
-        ../Reports/cr5discountstatisics.h \
-        ../Reports/cr5discountstatisticsfilter.h \
         ../Reports/cr5dishpackage.h \
         ../Reports/cr5draftoutputbyrecipe.h \
         ../Reports/cr5draftoutputbyrecipefilter.h \
@@ -467,6 +462,7 @@ HEADERS += \
 SOURCES += \
     $$PWD/../Classes/QProgressIndicator.cpp \
     $$PWD/../Classes/c5servername.cpp \
+    $$PWD/../Classes/ean8generator.cpp \
     $$PWD/../NTable/nhandler.cpp \
     $$PWD/../NTable/nsearchdlg.cpp \
         ../NTable/ntablemodel.cpp \
@@ -476,7 +472,6 @@ SOURCES += \
         ../Reports/cr5consuptionbysalesqty.cpp \
         ../Cafe5/c5cafecommon.cpp \
         ../../NewTax/Src/printtaxn.cpp \
-        ../../XLSX/src/xlsxborder.cpp \
         ../Cafe5/c5double.cpp \
         ../Cafe5/c5systempreference.cpp \
         ../Classes/QRCodeGenerator.cpp \
@@ -562,7 +557,6 @@ SOURCES += \
         ../Forms/c5waiterorder.cpp \
         ../Forms/change.cpp \
         ../Forms/cr5routereport.cpp \
-        ../Forms/customerinfo.cpp \
         ../Forms/dlgcashinout.cpp \
         ../Forms/dlgcashop.cpp \
         ../Forms/dlgchangeoutputstore.cpp \
@@ -616,8 +610,6 @@ SOURCES += \
         ../Forms/c5goodsprice.cpp \
         ../NTable/ninterface.cpp \
         c5aboutdlg.cpp \
-        ../Reports/cr5discountstatisics.cpp \
-        ../Reports/cr5discountstatisticsfilter.cpp \
         ../Reports/cr5dishpackage.cpp \
         ../Reports/cr5draftoutputbyrecipe.cpp \
         ../Reports/cr5draftoutputbyrecipefilter.cpp \
@@ -759,7 +751,7 @@ SOURCES += \
         ../Classes/c5waiterorderdoc.cpp \
         ../NTable/nfilterdlg.cpp
 
-include(C:/projects/QXlsx/QXlsx/QXlsx.pri)
+include(C:/projects/QXlsx/QXlsx.pri)
 
 INCLUDEPATH += ../Cafe5
 INCLUDEPATH += ../Cache

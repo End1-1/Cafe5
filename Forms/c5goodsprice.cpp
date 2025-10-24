@@ -274,7 +274,7 @@ int C5GoodsPriceOrder::newRow()
         ui->tblDoc->lineEdit(row, col1_whosale)->setDouble(s.toDouble() - (s.toDouble() * 0.3));
 
         for(int i = 0; i < ui->tblGoods->rowCount(); i++) {
-            ui->tblGoods->lineEdit(i, col2_whosale)->setText(s);
+            ui->tblGoods->lineEdit(i, col2_retail)->setText(s);
         }
     });
     l = ui->tblDoc->createLineEdit(row, col1_whosale);
@@ -283,7 +283,7 @@ int C5GoodsPriceOrder::newRow()
         setGroupPriceJson(row, 2, s.toDouble());
 
         for(int i = 0; i < ui->tblGoods->rowCount(); i++) {
-            ui->tblGoods->lineEdit(i, col2_retail)->setText(s);
+            ui->tblGoods->lineEdit(i, col2_whosale)->setText(s);
         }
     });
     l = ui->tblDoc->createLineEdit(row, col1_percent);

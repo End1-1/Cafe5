@@ -32,6 +32,8 @@ public:
 
     int cacheId();
 
+    bool hasSelector();
+
 protected:
     virtual void mouseDoubleClickEvent(QMouseEvent *e);
 

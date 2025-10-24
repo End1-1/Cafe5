@@ -27,11 +27,11 @@ public:
 
     virtual void setId(int id) override;
 
-    virtual bool save(QString &err, QList<QMap<QString, QVariant> > &data) override;
+    virtual bool save(QString &err, QList<QMap<QString, QVariant> >& data) override;
 
     virtual void clear() override;
 
-    virtual QPushButton *b1() override;
+    virtual QPushButton* b1() override;
 
     virtual QJsonObject makeJsonObject() override;
 
@@ -106,8 +106,10 @@ private slots:
 
     void on_leTotal_textChanged(const QString &arg1);
 
+    void on_rbGenEAN8_clicked(bool checked);
+
 private:
-    Ui::CE5Goods *ui;
+    Ui::CE5Goods* ui;
 
     int addGoodsRow();
 
@@ -121,7 +123,7 @@ private:
 
     bool fScancodeGenerated;
 
-    Barcode *fBarcode;
+    Barcode* fBarcode;
 
     QMap<QString, double> fCrossRate;
 

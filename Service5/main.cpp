@@ -12,7 +12,7 @@
 #define SVCNAME TEXT("Breeze")
 
 int ARGC;
-char **ARGV;
+char** ARGV;
 QString APPDIR;
 
 SERVICE_STATUS          gSvcStatus;
@@ -20,12 +20,12 @@ SERVICE_STATUS_HANDLE   gSvcStatusHandle;
 HANDLE                  ghSvcStopEvent = NULL;
 
 VOID SvcInstall(void);
-VOID WINAPI SvcCtrlHandler( DWORD );
-VOID WINAPI SvcMain( DWORD, LPTSTR * );
+VOID WINAPI SvcCtrlHandler(DWORD);
+VOID WINAPI SvcMain(DWORD, LPTSTR*);
 
-VOID ReportSvcStatus( DWORD, DWORD, DWORD );
-VOID SvcInit( DWORD, LPTSTR * );
-VOID SvcReportEvent( LPTSTR );
+VOID ReportSvcStatus(DWORD, DWORD, DWORD);
+VOID SvcInit(DWORD, LPTSTR*);
+VOID SvcReportEvent(LPTSTR);
 
 DWORD WINAPI ThreadProc(CONST LPVOID lpParam)
 {
@@ -33,18 +33,24 @@ DWORD WINAPI ThreadProc(CONST LPVOID lpParam)
     LogWriter::write(LogWriterLevel::verbose, "", "Start service thread");
     LogWriter::write(LogWriterLevel::verbose, "Database drivers", QSqlDatabase::drivers().join(","));
     QTranslator t;
-    t.load(":/Service5.qm");
-    app.installTranslator( &t);
+
+    if(t.load(":/Service5.qm")) {
+        app.installTranslator(&t);
+    }
+
     QString configFile;
-    for (const QString &a : app.arguments()) {
-        if (a.contains("--config")) {
+
+    for(const QString &a : app.arguments()) {
+        if(a.contains("--config")) {
             QStringList ac = a.split("=");
-            if (ac.length() == 2) {
+
+            if(ac.length() == 2) {
                 configFile = ac.at(1);
                 LogWriter::write(LogWriterLevel::verbose, "Config file", configFile);
             }
         }
     }
+
     ServerThread server(APPDIR);
     server.run();
     app.exec();
@@ -52,7 +58,7 @@ DWORD WINAPI ThreadProc(CONST LPVOID lpParam)
     return 0;
 }
 
-int __cdecl main(int argc, char *argv[])
+int __cdecl main(int argc, char* argv[])
 {
     ARGC = argc;
     ARGV = argv;
@@ -60,24 +66,29 @@ int __cdecl main(int argc, char *argv[])
     ConfigIni::init(APPDIR + "config.ini");
     LogWriter::fCurrentLevel = 100;
     LogWriter::write(LogWriterLevel::verbose, "", "Service started");
-    if (QString(argv[1]).toLocal8Bit() == "--install") {
+
+    if(QString(argv[1]).toLocal8Bit() == "--install") {
         SvcInstall();
         return 0;
     }
-    if (QString(argv[1]).toLower() == "--run") {
+
+    if(QString(argv[1]).toLower() == "--run") {
         ThreadProc(NULL);
         return 0;
     }
+
     // TO_DO: Add any additional services for the process to this table.
     SERVICE_TABLE_ENTRY DispatchTable[] = {
         {(LPWSTR) SVCNAME, (LPSERVICE_MAIN_FUNCTION) SvcMain},
         {NULL, NULL}
     };
     LogWriter::write(LogWriterLevel::verbose, "", "Starting service: main");
-    if (!StartServiceCtrlDispatcher(DispatchTable)) {
+
+    if(!StartServiceCtrlDispatcher(DispatchTable)) {
         LogWriter::write(LogWriterLevel::errors, "", QString("Service could not started. %1").arg(GetLastError()));
         SvcReportEvent((LPWSTR)TEXT("StartServiceCtrlDispatcher"));
     }
+
     return 0;
 }
 
@@ -86,18 +97,22 @@ VOID SvcInstall()
     SC_HANDLE schSCManager;
     SC_HANDLE schService;
     TCHAR szPath[MAX_PATH];
+
     if(!GetModuleFileName(0, (LPWSTR) szPath, MAX_PATH)) {
         LogWriter::write(LogWriterLevel::errors, "", QString("Cannot install service (%1)").arg(GetLastError()));
         return;
     }
+
     schSCManager = OpenSCManager(
                        NULL,                    // local computer
                        NULL,                    // ServicesActive database
                        SC_MANAGER_ALL_ACCESS);  // full access rights
-    if (NULL == schSCManager) {
+
+    if(NULL == schSCManager) {
         LogWriter::write(LogWriterLevel::errors, "", QString("OpenSCManager failed (%1)").arg(GetLastError()));
         return;
     }
+
     // Create the service
     schService = CreateService(
                      schSCManager,              // SCM database
@@ -113,13 +128,15 @@ VOID SvcInstall()
                      NULL,                      // no dependencies
                      NULL,                      // LocalSystem account
                      NULL);                     // no password
-    if (schService == NULL) {
+
+    if(schService == NULL) {
         LogWriter::write(LogWriterLevel::errors, "", QString("CreateService failed (%1)").arg(GetLastError()));
         CloseServiceHandle(schSCManager);
         return;
     } else {
         LogWriter::write(LogWriterLevel::verbose, "", QString("Service installed successfully"));
     }
+
     CloseServiceHandle(schService);
     CloseServiceHandle(schSCManager);
 }
@@ -138,16 +155,18 @@ VOID SvcInstall()
 //   None.
 //
 
-VOID WINAPI SvcMain( DWORD dwArgc, LPTSTR *lpszArgv )
+VOID WINAPI SvcMain(DWORD dwArgc, LPTSTR *lpszArgv)
 {
     LogWriter::write(LogWriterLevel::verbose, "", "Starting service: SvcMain");
     gSvcStatusHandle = RegisterServiceCtrlHandler(
                            SVCNAME,
                            SvcCtrlHandler);
-    if( !gSvcStatusHandle ) {
+
+    if(!gSvcStatusHandle) {
         SvcReportEvent((LPWSTR)TEXT("RegisterServiceCtrlHandler"));
         return;
     }
+
     // These SERVICE_STATUS members remain as set here
     gSvcStatus.dwServiceType = SERVICE_WIN32_OWN_PROCESS;
     gSvcStatus.dwServiceSpecificExitCode = 0;
@@ -170,7 +189,7 @@ VOID WINAPI SvcMain( DWORD dwArgc, LPTSTR *lpszArgv )
 // Return value:
 //   None
 //
-VOID SvcInit( DWORD dwArgc, LPTSTR *lpszArgv)
+VOID SvcInit(DWORD dwArgc, LPTSTR *lpszArgv)
 {
     LogWriter::write(LogWriterLevel::verbose, "", "Starting service: SvcInit");
     // TO_DO: Declare and set any required variables.
@@ -184,19 +203,22 @@ VOID SvcInit( DWORD dwArgc, LPTSTR *lpszArgv)
                          TRUE,    // manual reset event
                          FALSE,   // not signaled
                          NULL);   // no name
-    if ( ghSvcStopEvent == NULL) {
-        ReportSvcStatus( SERVICE_STOPPED, NO_ERROR, 0 );
+
+    if(ghSvcStopEvent == NULL) {
+        ReportSvcStatus(SERVICE_STOPPED, NO_ERROR, 0);
         return;
     }
+
     // Report running status when initialization is complete.
-    ReportSvcStatus( SERVICE_RUNNING, NO_ERROR, 0 );
+    ReportSvcStatus(SERVICE_RUNNING, NO_ERROR, 0);
     // TO_DO: Perform work until service stops.
     HANDLE hThread = CreateThread(NULL, 0, &ThreadProc, lpszArgv, 0, NULL);
     LogWriter::write(LogWriterLevel::verbose, "", QString("Socket server thread id: %1").arg(PtrToInt(hThread)));
+
     while(1) {
         // Check whether to stop the service.
         WaitForSingleObject(ghSvcStopEvent, INFINITE);
-        ReportSvcStatus( SERVICE_STOPPED, NO_ERROR, 0 );
+        ReportSvcStatus(SERVICE_STOPPED, NO_ERROR, 0);
         LogWriter::write(LogWriterLevel::verbose, "", "DO SOMETHING installed successfully\n");
         return;
     }
@@ -215,24 +237,29 @@ VOID SvcInit( DWORD dwArgc, LPTSTR *lpszArgv)
 // Return value:
 //   None
 //
-VOID ReportSvcStatus( DWORD dwCurrentState,
-                      DWORD dwWin32ExitCode,
-                      DWORD dwWaitHint)
+VOID ReportSvcStatus(DWORD dwCurrentState,
+                     DWORD dwWin32ExitCode,
+                     DWORD dwWaitHint)
 {
     static DWORD dwCheckPoint = 1;
     // Fill in the SERVICE_STATUS structure.
     gSvcStatus.dwCurrentState = dwCurrentState;
     gSvcStatus.dwWin32ExitCode = dwWin32ExitCode;
     gSvcStatus.dwWaitHint = dwWaitHint;
-    if (dwCurrentState == SERVICE_START_PENDING)
+
+    if(dwCurrentState == SERVICE_START_PENDING)
         gSvcStatus.dwControlsAccepted = 0;
-    else gSvcStatus.dwControlsAccepted = SERVICE_ACCEPT_STOP;
-    if ( (dwCurrentState == SERVICE_RUNNING) ||
-            (dwCurrentState == SERVICE_STOPPED) )
+    else
+        gSvcStatus.dwControlsAccepted = SERVICE_ACCEPT_STOP;
+
+    if((dwCurrentState == SERVICE_RUNNING) ||
+            (dwCurrentState == SERVICE_STOPPED))
         gSvcStatus.dwCheckPoint = 0;
-    else gSvcStatus.dwCheckPoint = dwCheckPoint++;
+    else
+        gSvcStatus.dwCheckPoint = dwCheckPoint++;
+
     // Report the status of the service to the SCM.
-    SetServiceStatus( gSvcStatusHandle, &gSvcStatus );
+    SetServiceStatus(gSvcStatusHandle, &gSvcStatus);
 }
 
 //
@@ -246,20 +273,22 @@ VOID ReportSvcStatus( DWORD dwCurrentState,
 // Return value:
 //   None
 //
-VOID WINAPI SvcCtrlHandler( DWORD dwCtrl )
+VOID WINAPI SvcCtrlHandler(DWORD dwCtrl)
 {
     // Handle the requested control code.
     switch(dwCtrl) {
-        case SERVICE_CONTROL_STOP:
-            ReportSvcStatus(SERVICE_STOP_PENDING, NO_ERROR, 0);
-            // Signal the service to stop.
-            SetEvent(ghSvcStopEvent);
-            ReportSvcStatus(gSvcStatus.dwCurrentState, NO_ERROR, 0);
-            return;
-        case SERVICE_CONTROL_INTERROGATE:
-            break;
-        default:
-            break;
+    case SERVICE_CONTROL_STOP:
+        ReportSvcStatus(SERVICE_STOP_PENDING, NO_ERROR, 0);
+        // Signal the service to stop.
+        SetEvent(ghSvcStopEvent);
+        ReportSvcStatus(gSvcStatus.dwCurrentState, NO_ERROR, 0);
+        return;
+
+    case SERVICE_CONTROL_INTERROGATE:
+        break;
+
+    default:
+        break;
     }
 }
 
@@ -282,7 +311,8 @@ VOID SvcReportEvent(LPTSTR szFunction)
     LPCTSTR lpszStrings[2];
     TCHAR Buffer[80];
     hEventSource = RegisterEventSource(NULL, SVCNAME);
-    if( NULL != hEventSource ) {
+
+    if(NULL != hEventSource) {
         StringCchPrintf(Buffer, 80, TEXT("%s failed with %d"), szFunction, GetLastError());
         lpszStrings[0] = SVCNAME;
         lpszStrings[1] = Buffer;

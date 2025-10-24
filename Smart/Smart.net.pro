@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core gui network printsupport sql multimedia websockets
+QT       += core gui network printsupport sql multimedia websockets multimediawidgets
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -68,7 +68,9 @@ RESOURCES += \
 FORMS += \
     ../Classes/dlgserverconnection.ui \
     ../NTable/nloadingdlg.ui \
-    dlgservicevalues.ui
+    dlgservicevalues.ui \
+    dlgvisit.ui \
+    registercustomer.ui
 
 HEADERS += \
     ../Classes/QProgressIndicator.h \
@@ -79,7 +81,9 @@ HEADERS += \
     ../NTable/ndataprovider.h \
     ../NTable/ninterface.h \
     ../NTable/nloadingdlg.h \
-    dlgservicevalues.h
+    dlgservicevalues.h \
+    dlgvisit.h \
+    registercustomer.h
 
 SOURCES += \
     ../../NewTax/Src/printtaxn.cpp \
@@ -91,7 +95,9 @@ SOURCES += \
     ../NTable/ninterface.cpp \
     ../NTable/nloadingdlg.cpp \
     ../Service5Working/utils/logwriter.cpp \
-    dlgservicevalues.cpp
+    dlgservicevalues.cpp \
+    dlgvisit.cpp \
+    registercustomer.cpp
 
 win32-g++ {
    QMAKE_CXXFLAGS += -Werror
