@@ -149,7 +149,7 @@ bool C5SaleDoc::openDoc(const QString &uuid)
     db[":f_header"] = uuid;
     db.exec(QString("select dsb.f_id as ogoodsid, dsb.f_store, dsb.f_qty, g.*, "
                     "gu.f_name as f_unitname, dsb.f_price, dsb.f_discountfactor,  "
-                    "dsb.f_returnfrom "
+                    "dsb.f_returnfrom, dsb.f_store "
                     "from o_goods dsb "
                     "left join c_goods g on g.f_id=dsb.f_goods "
                     "left join c_units gu on gu.f_id=g.f_unit "
@@ -167,6 +167,7 @@ bool C5SaleDoc::openDoc(const QString &uuid)
                  db.getDouble("f_price"),
                  db.getDouble("f_discountfactor") * 100, 0,
                  db.getString("f_returnfrom"));
+        ui->cbStorage->setCurrentIndex(ui->cbStorage->findData(db.getInt("f_store")));
     }
 
     //HEADER
@@ -888,7 +889,7 @@ void C5SaleDoc::saveDataChanges()
     jdoc["organization"] = ui->leTaxpayerName->text();
     jdoc["contact"] = ui->leTaxpayerId->text();
     QJsonObject jd;
-    jd["f_delivery"] = deliveryDate.toString(FORMAT_DATE_TO_STR);
+    jd["f_delivery"] = deliveryDate.toString(FORMAT_DATE_TO_STR_MYSQL);
     jdoc["draft"] = jd;
     QJsonObject jh;
     jh["f_id"] = uuid;

@@ -77,7 +77,7 @@ void init()
         addConnection(4, QString::fromUtf8("Կոմիտաս"), "10.10.4.2", "cafe4", "SYSDBA", "Inter_OneStep");
         addConnection(6, QString::fromUtf8("Աբովյան"), "10.10.13.2", "cafe4", "SYSDBA", "Inter_OneStep");
         addConnection(7, QString::fromUtf8("Արմենիա"), "10.10.7.1", "cafe4", "SYSDBA", "Inter_OneStep");
-        addConnection(8, QString::fromUtf8("Երևան Մոլլ"), "10.10.14.1", "cafe4", "SYSDBA", "Inter_OneStep");
+        addConnection(8, QString::fromUtf8("Երևան Մոլլ"), "10.10.14.2", "cafe4", "SYSDBA", "Inter_OneStep");
         fStorages[2] = QString::fromUtf8("Բար");
         fStorages[3] = QString::fromUtf8("Խոհանոց");
         fStorages[4] = QString::fromUtf8("Սառնարան");

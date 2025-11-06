@@ -25,7 +25,6 @@ C5SearchEngine::C5SearchEngine() : QObject()
 void C5SearchEngine::init(QStringList databases)
 {
     Database db;
-
     int totalitems = 0;
     mSearchObjects.clear();
     mSearchStrings.clear();
@@ -286,6 +285,7 @@ QString C5SearchEngine::searchPartner(const QJsonObject &jo)
     jrep["noresult"] = noResult;
     return QJsonDocument(jrep).toJson(QJsonDocument::Compact);
 }
+
 QString C5SearchEngine::searchGoodsGroups(const QJsonObject &jo)
 {
     QJsonObject jrep;
@@ -309,6 +309,7 @@ QString C5SearchEngine::searchGoodsGroups(const QJsonObject &jo)
     jrep["limit"] = jo["limit"];
     return QJsonDocument(jrep).toJson(QJsonDocument::Compact);
 }
+
 QString C5SearchEngine::searchGoods(const QJsonObject &jo)
 {
     QJsonObject jrep;
@@ -363,6 +364,7 @@ QString C5SearchEngine::searchGoods(const QJsonObject &jo)
     jrep["noresult"] = noResult;
     return QJsonDocument(jrep).toJson(QJsonDocument::Compact);
 }
+
 QString C5SearchEngine::searchStore(const QJsonObject &jo)
 {
     QString repMsg;
@@ -380,6 +382,7 @@ QString C5SearchEngine::searchStore(const QJsonObject &jo)
 
     return QJsonDocument(jrep).toJson(QJsonDocument::Compact);
 }
+
 QString C5SearchEngine::searchUpdatePartnerCache(const QJsonObject &jo)
 {
     QJsonObject jrep;

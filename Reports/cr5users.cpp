@@ -8,13 +8,15 @@ CR5Users::CR5Users(QWidget *parent) :
 {
     fIcon = ":/users_groups.png";
     fLabel = tr("Users");
-    fSqlQuery = "select u.f_id, g.f_name as f_groupname, concat(t.f_last, ' ', t.f_first) as f_teamleadname, "
-                "s.f_name as f_statename, u.f_login, u.f_first, u.f_last, ss.f_name as f_configname "
-                "from s_user u "
-                "left join s_user_group g on g.f_id=u.f_group "
-                "left join s_user t on t.f_id=u.f_teamlead "
-                "left join s_user_state s on s.f_id=u.f_state "
-                "left join s_settings_names ss on ss.f_id=u.f_config ";
+    fSqlQuery = R"(
+        select u.f_id, g.f_name as f_groupname, concat(t.f_last, ' ', t.f_first) as f_teamleadname,
+        s.f_name as f_statename, u.f_login, u.f_first, u.f_last, u.f_phone, ss.f_name as f_configname
+        from s_user u
+        left join s_user_group g on g.f_id=u.f_group
+        left join s_user t on t.f_id=u.f_teamlead
+        left join s_user_state s on s.f_id=u.f_state
+        left join s_settings_names ss on ss.f_id=u.f_config
+    )";
     fTranslation["f_id"] = tr("Code");
     fTranslation["f_groupname"] = tr("Group");
     fTranslation["f_teamleadname"] = tr("Teamlead");
@@ -23,6 +25,7 @@ CR5Users::CR5Users(QWidget *parent) :
     fTranslation["f_first"] = tr("First name");
     fTranslation["f_last"] = tr("Last name");
     fTranslation["f_configname"] = tr("Config");
+    fTranslation["f_phone"] = tr("Phone");
     fEditor = new CE5User();
     fFilterWidget = new CR5UsersFilter();
 }

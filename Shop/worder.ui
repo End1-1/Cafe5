@@ -654,12 +654,6 @@
            <property name="focusPolicy">
             <enum>Qt::FocusPolicy::NoFocus</enum>
            </property>
-           <property name="styleSheet">
-            <string notr="true">QPushButton:checked{
-                    background-color: rgb(250, 0, 0);
-					font-weight:bold;
-                }</string>
-           </property>
            <property name="text">
             <string>F1</string>
            </property>
@@ -678,12 +672,6 @@
           <widget class="QPushButton" name="btnF2">
            <property name="focusPolicy">
             <enum>Qt::FocusPolicy::NoFocus</enum>
-           </property>
-           <property name="styleSheet">
-            <string notr="true">QPushButton:checked{
-                    background-color: rgb(250, 0, 0);
-					font-weight:bold;
-                }</string>
            </property>
            <property name="text">
             <string>F2</string>
@@ -704,12 +692,6 @@
            <property name="focusPolicy">
             <enum>Qt::FocusPolicy::NoFocus</enum>
            </property>
-           <property name="styleSheet">
-            <string notr="true">QPushButton:checked{
-                    background-color: rgb(250, 0, 0);
-					font-weight:bold;
-                }</string>
-           </property>
            <property name="text">
             <string>F3</string>
            </property>
@@ -729,12 +711,6 @@
            <property name="focusPolicy">
             <enum>Qt::FocusPolicy::NoFocus</enum>
            </property>
-           <property name="styleSheet">
-            <string notr="true">QPushButton:checked{
-                    background-color: rgb(250, 0, 0);
-					font-weight:bold;
-                }</string>
-           </property>
            <property name="text">
             <string>F4</string>
            </property>
@@ -753,12 +729,6 @@
           <widget class="QPushButton" name="btnF5">
            <property name="focusPolicy">
             <enum>Qt::FocusPolicy::NoFocus</enum>
-           </property>
-           <property name="styleSheet">
-            <string notr="true">QPushButton:checked{
-                    background-color: rgb(250, 0, 0);
-					font-weight:bold;
-                }</string>
            </property>
            <property name="text">
             <string>Կարճ․ պարտք</string>
