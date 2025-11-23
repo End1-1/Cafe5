@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1260</width>
+    <width>1295</width>
     <height>741</height>
    </rect>
   </property>
@@ -508,7 +508,7 @@
         </property>
         <property name="icon">
          <iconset resource="../resources/res.qrc">
-          <normaloff>:/edit.png</normaloff>:/edit.png</iconset>
+          <normaloff>:/copy.png</normaloff>:/copy.png</iconset>
         </property>
        </widget>
       </item>

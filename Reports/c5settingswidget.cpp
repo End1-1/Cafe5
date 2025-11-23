@@ -104,6 +104,8 @@ void C5SettingsWidget::setId(int id)
         ui->chChangeDraftDateToCurrent->setChecked(jo["change_draft_date_to_current"].toBool());
         ui->chPrintTotyalQntOfGoods->setChecked(jo["print_total_qty_goods"].toBool());
         ui->chDenyChangeQtyReturnItems->setChecked(jo["change_qty_return_items"].toBool());
+        //Smart config
+        ui->chSmartPictures->setChecked(jo["smart_pictures"].toBool());
         QJsonArray ja = jo["availableoutstore"].toArray();
         ui->leWaiterServer->setText(jo["waiter_server"].toString());
         ui->chUseWebsocket->setChecked(jo["use_websocket"].toBool());
@@ -337,6 +339,7 @@ bool C5SettingsWidget::save(QString &err, QList<QMap<QString, QVariant> >& data)
     jc["tax_pin"] = ui->leCashierPin->text();
     jc["print_total_qty_goods"] = ui->chPrintTotyalQntOfGoods->isChecked();
     jc["change_qty_return_items"] = ui->chDenyChangeQtyReturnItems->isChecked();
+    jc["smart_pictures"] = ui->chSmartPictures->isChecked();
     QJsonArray ja;
     QStringList a = ui->leAvailableStore->text().split(",", Qt::SkipEmptyParts);
 

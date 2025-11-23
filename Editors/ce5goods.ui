@@ -220,6 +220,25 @@
            </spacer>
           </item>
           <item>
+           <widget class="C5CheckBox" name="chProduction">
+            <property name="focusPolicy">
+             <enum>Qt::FocusPolicy::NoFocus</enum>
+            </property>
+            <property name="layoutDirection">
+             <enum>Qt::LayoutDirection::RightToLeft</enum>
+            </property>
+            <property name="text">
+             <string>Production</string>
+            </property>
+            <property name="Field" stdset="0">
+             <string>f_production</string>
+            </property>
+            <property name="Default" stdset="0">
+             <string>0</string>
+            </property>
+           </widget>
+          </item>
+          <item>
            <widget class="C5CheckBox" name="chNoSpecialPrice">
             <property name="focusPolicy">
              <enum>Qt::FocusPolicy::NoFocus</enum>

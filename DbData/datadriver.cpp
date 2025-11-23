@@ -1,5 +1,7 @@
 #include "datadriver.h"
 #include "dlgsplashscreen.h"
+#include "c5database.h"
+#include "working.h"
 
 DataDriver* DataDriver::fInstance = nullptr;
 QStringList DataDriver::norefresh;
@@ -10,6 +12,8 @@ DataDriver::DataDriver()
 
 void DataDriver::init(const QStringList &dbParams, DlgSplashScreen *info)
 {
+    C5Database db;
+
     if(!fInstance) {
         fInstance = new DataDriver();
     }
@@ -43,5 +47,12 @@ void DataDriver::init(const QStringList &dbParams, DlgSplashScreen *info)
     fInstance->fDbDishComments = new DbDishComments();
     fInstance->fDbDishRemoveReason = new DbDishRemoveReason();
     fInstance->fDbCurrency = new DbCurrency();
+    emit(info->messageSignal("flags..."));
+    db.exec("select * from o_flags");
+
+    while(db.nextRow()) {
+        Working::fFlags[db.getInt("f_id")] = {db.getInt("f_id"), db.getInt("f_enabled"), db.getString("f_field"), db.getString("f_name")};
+    }
+
     info->messageSignal("datadriver complete.");
 }

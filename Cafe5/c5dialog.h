@@ -12,8 +12,6 @@ class C5Dialog : public QDialog
 public:
     C5Dialog();
 
-    C5Dialog(bool noparent);
-
     ~C5Dialog();
 
     static void setMainWindow(QWidget *widget);

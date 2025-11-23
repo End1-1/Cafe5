@@ -5,7 +5,7 @@
 #include "c5utils.h"
 
 DlgSemireadyInOut::DlgSemireadyInOut(QWidget *parent) :
-    C5Dialog(parent),
+    C5Dialog(),
     ui(new Ui::DlgSemireadyInOut)
 {
     ui->setupUi(this);

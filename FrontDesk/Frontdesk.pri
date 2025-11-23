@@ -329,7 +329,6 @@ HEADERS += \
         ../Reports/cr5materialinstoreuncomplectfilter.h \
         ../Reports/cr5materialmoveuncomplect.h \
         ../Reports/cr5materialmoveuncomplectfilter.h \
-        ../Reports/cr5menureview.h \
         ../Reports/cr5menureviewfilter.h \
         ../Reports/cr5mfactions.h \
         ../Reports/cr5mfactionstage.h \
@@ -624,7 +623,6 @@ SOURCES += \
         ../Reports/cr5materialinstoreuncomplectfilter.cpp \
         ../Reports/cr5materialmoveuncomplect.cpp \
         ../Reports/cr5materialmoveuncomplectfilter.cpp \
-        ../Reports/cr5menureview.cpp \
         ../Reports/cr5menureviewfilter.cpp \
         ../Reports/cr5mfactions.cpp \
         ../Reports/cr5mfactionstage.cpp \

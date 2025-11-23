@@ -105,7 +105,7 @@ void CE5MFProduct::clear()
     ui->lsNoSpin->clear();
 }
 
-bool CE5MFProduct::save(QString &err, QList<QMap<QString, QVariant> > &data)
+bool CE5MFProduct::save(QString &err, QList<QMap<QString, QVariant> >& data)
 {
     // if (CE5Editor::save(err, data)) {
     //     C5Database db;
@@ -130,7 +130,8 @@ bool CE5MFProduct::save(QString &err, QList<QMap<QString, QVariant> > &data)
     j["f_name"] = ui->leName->text();
     jo["main"] = j;
     QJsonArray ja;
-    for (int i = 0; i < ui->wt->rowCount(); i++) {
+
+    for(int i = 0; i < ui->wt->rowCount(); i++) {
         j = QJsonObject();
         j["f_process"] = ui->wt->getData(i, 1).toInt();
         j["f_durationsec"] = ui->wt->getData(i, 4).toInt();
@@ -139,31 +140,38 @@ bool CE5MFProduct::save(QString &err, QList<QMap<QString, QVariant> > &data)
         j["f_rowid"] = i;
         ja.append(j);
     }
+
     jo["process"] = ja;
     QJsonObject body;
     ja = QJsonArray();
-    for (int i = 0; i < ui->tblMeas->rowCount(); i++) {
+
+    for(int i = 0; i < ui->tblMeas->rowCount(); i++) {
         j = QJsonObject();
         j["f_name"] = ui->tblMeas->item(i, 1)->text();
         j["f_value"] = ui->tblMeas->item(i, 2)->text();
         j["f_add"] = ui->tblMeas->item(i, 3)->text();
         ja.append(j);
     }
+
     body["meas"] = ja;
     ja = QJsonArray();
-    for (int i = 0; i < ui->tblMaterials->rowCount(); i++) {
+
+    for(int i = 0; i < ui->tblMaterials->rowCount(); i++) {
         j = QJsonObject();
-        j["f_name"] = ui->tblMaterials->item(i, 1)->text();
-        j["f_value"] = ui->tblMaterials->item(i, 2)->text();
-        j["f_add"] = ui->tblMaterials->item(i, 3)->text();
+        j["f_material"] = ui->tblMaterials->getInteger(i, 1);
+        j["f_name"] = ui->tblMaterials->item(i, 2)->text();
+        j["f_code"] = ui->tblMaterials->getString(i, 3);
+        j["f_qty"] = ui->tblMaterials->getDouble(i, 4);
+        j["f_comment"] = ui->tblMaterials->item(i, 5)->text();
         ja.append(j);
     }
+
     body["materials"] = ja;
     QByteArray bimage;
-    QBuffer buff( &bimage);
+    QBuffer buff(&bimage);
     buff.open(QIODevice::WriteOnly);
     QPixmap p = ui->lbImage->pixmap();
-    p.save( &buff, "JPG");
+    p.save(&buff, "JPG");
     body["image"] = QString(bimage.toBase64());
     j = QJsonObject();
     j["chwash"] = ui->chWashTemp->isChecked();
@@ -189,6 +197,7 @@ void CE5MFProduct::openResponse(const QJsonObject &jdoc)
     ui->leCode->setInteger(jmain["f_id"].toInt());
     ui->leName->setText(jmain["f_name"].toString());
     QJsonArray ja =  jo ["process"].toArray();
+
     for(int i = 0; i < ja.size(); i++) {
         int row;
         const QJsonObject &j = ja.at(i).toObject();
@@ -204,34 +213,45 @@ void CE5MFProduct::openResponse(const QJsonObject &jdoc)
         connect(pu, &MFProcessProductPriceUpdate::startUpdate, this, &CE5MFProduct::startPriceUpdateOnRow);
         ui->wt->setWidget(row, 8, pu);
     }
+
     ui->wt->countTotal(-1);
     jmain = __strjson(jmain["f_data"].toString());
     ja = jmain["meas"].toArray();
-    for (int i = 0; i < ja.size(); i++) {
+
+    for(int i = 0; i < ja.size(); i++) {
         int r = ui->tblMeas->rowCount();
         ui->tblMeas->setRowCount(r + 1);
         const QJsonObject &j = ja.at(i).toObject();
-        for (int c = 0; c < ui->tblMeas->columnCount(); c++) {
+
+        for(int c = 0; c < ui->tblMeas->columnCount(); c++) {
             ui->tblMeas->setItem(r, c, new QTableWidgetItem());
         }
+
         ui->tblMeas->item(r, 0)->setText(QString::number(r + 1));
         ui->tblMeas->item(r, 1)->setText(j["f_name"].toString());
         ui->tblMeas->item(r, 2)->setText(j["f_value"].toString());
         ui->tblMeas->item(r, 3)->setText(j["f_add"].toString());
     }
-    ja = jmain["materials"].toArray();
-    for (int i = 0; i < ja.size(); i++) {
+
+    ja = jo["materials"].toArray();
+
+    for(int i = 0; i < ja.size(); i++) {
         int r = ui->tblMaterials->rowCount();
         ui->tblMaterials->setRowCount(r + 1);
         const QJsonObject &j = ja.at(i).toObject();
-        for (int c = 0; c < ui->tblMaterials->columnCount(); c++) {
+
+        for(int c = 0; c < ui->tblMaterials->columnCount(); c++) {
             ui->tblMaterials->setItem(r, c, new QTableWidgetItem());
         }
+
+        ui->tblMaterials->createLineEdit(r, 3)->setText(j["f_code"].toString());
+        ui->tblMaterials->createLineEdit(r, 4)->setDouble(j["f_qty"].toDouble());
+        ui->tblMaterials->createLineEdit(r, 5)->setText(j["f_comment"].toString());
         ui->tblMaterials->item(r, 0)->setText(QString::number(r + 1));
-        ui->tblMaterials->item(r, 1)->setText(j["f_name"].toString());
-        ui->tblMaterials->item(r, 2)->setText(j["f_value"].toString());
-        ui->tblMaterials->item(r, 3)->setText(j["f_add"].toString());
+        ui->tblMaterials->setInteger(r, 1, j["f_material"].toInt());
+        ui->tblMaterials->item(r, 2)->setText(j["f_name"].toString());
     }
+
     QByteArray bimage = QByteArray::fromBase64(jmain["image"].toString().toLatin1());
     QPixmap p;
     p.loadFromData(bimage);
@@ -259,10 +279,12 @@ void CE5MFProduct::saveResponse(const QJsonObject &jdoc)
 void CE5MFProduct::startPriceUpdateOnRow()
 {
     int row, column;
-    auto *pu = static_cast<MFProcessProductPriceUpdate *>(sender());
-    if (ui->wt->findWidget(row, column, pu) == false) {
+    auto *pu = static_cast<MFProcessProductPriceUpdate*>(sender());
+
+    if(ui->wt->findWidget(row, column, pu) == false) {
         return;
     }
+
     C5Database db;
     db[":f_product"] = ui->leCode->getInteger();
     db[":f_process"] = ui->wt->getData(row, 1);
@@ -275,9 +297,10 @@ void CE5MFProduct::startPriceUpdateOnRow()
 
 void CE5MFProduct::durationChanged(const QString &arg1)
 {
-    int row = static_cast<C5LineEdit *>(sender())->property("row").toInt();
+    int row = static_cast<C5LineEdit*>(sender())->property("row").toInt();
     int sec = arg1.toInt();
-    if (sec > 0) {
+
+    if(sec > 0) {
         ui->wt->setData(row, 3, durationStr(sec));
         ui->wt->setData(row, 5, (3600 * 7) / sec);
         ui->wt->setData(row, 7, ui->wt->getData(row, 5).toDouble() / sec);
@@ -286,12 +309,13 @@ void CE5MFProduct::durationChanged(const QString &arg1)
         ui->wt->setData(row, 5, 0);
         ui->wt->setData(row, 7, 0);
     }
+
     ui->wt->countTotal(-1);
 }
 
 void CE5MFProduct::goalPriceChanged(const QString &arg1)
 {
-    int row = static_cast<C5LineEdit *>(sender())->property("row").toInt();
+    int row = static_cast<C5LineEdit*>(sender())->property("row").toInt();
     ui->wt->setData(row, 7, str_float(arg1) / ui->wt->getData(row, 5).toInt());
 }
 
@@ -301,34 +325,43 @@ QString CE5MFProduct::durationStr(int sec)
     int m = (sec - (h * 3600)) / 60;
     int s = sec % 60;
     QString result;
-    if (h > 0) {
+
+    if(h > 0) {
         result += QString(" %1%2").arg(h).arg(tr("H"));
     }
-    if (m > 0) {
+
+    if(m > 0) {
         result += QString(" %1%2").arg(m).arg(tr("M"));
     }
-    if (s > 0) {
+
+    if(s > 0) {
         result += QString(" %1%2").arg(s).arg(tr("S"));
     }
-    if (result.isEmpty()) {
+
+    if(result.isEmpty()) {
         result = "-";
     }
+
     return result;
 }
 
 void CE5MFProduct::on_btnAdd_clicked()
 {
-    if (ui->leCode->getInteger() == 0) {
+    if(ui->leCode->getInteger() == 0) {
         C5Message::error(tr("Save first"));
     }
+
     QJsonArray vals;
-    if (!C5Selector::getValue(cache_mf_actions, vals)) {
+
+    if(!C5Selector::getValue(cache_mf_actions, vals)) {
         return;
     }
-    if (vals.at(1).toInt() == 0) {
+
+    if(vals.at(1).toInt() == 0) {
         C5Message::error(tr("Could not add goods without code"));
         return;
     }
+
     C5Database db;
     db[":f_rowid"] = ui->wt->rowCount();
     db[":f_product"] = ui->leCode->getInteger();
@@ -351,32 +384,39 @@ void CE5MFProduct::on_btnAdd_clicked()
 void CE5MFProduct::on_btnMinus_clicked()
 {
     int r = ui->wt->currentRow();
-    if (r < 0) {
+
+    if(r < 0) {
         return;
     }
-    if (C5Message::question(tr("Confirm to remove") + "<br>" + ui->wt->getData(r, 2).toString()) != QDialog::Accepted) {
+
+    if(C5Message::question(tr("Confirm to remove") + "<br>" + ui->wt->getData(r, 2).toString()) != QDialog::Accepted) {
         return;
     }
-    if (ui->wt->getData(r, 0).toInt() > 0) {
+
+    if(ui->wt->getData(r, 0).toInt() > 0) {
         fRemovedRow.append(ui->wt->getData(r, 0).toInt());
     }
+
     ui->wt->removeRow(r);
     ui->wt->countTotal(-1);
 }
 
 void CE5MFProduct::on_btnNew_clicked()
 {
-    if (ui->leCode->getInteger() == 0) {
+    if(ui->leCode->getInteger() == 0) {
         C5Message::error(tr("Save first"));
     }
+
     auto *ep = new CE5MFProcess();
     auto *e = C5Editor::createEditor(ep, 0);
     QList<QMap<QString, QVariant> > data;
+
     if(e->getResult(data)) {
-        if (data.at(0)["f_id"].toInt() == 0) {
+        if(data.at(0)["f_id"].toInt() == 0) {
             C5Message::error(tr("Cannot add goods without code"));
             return;
         }
+
         C5Database db;
         int row;
         ui->wt->setData(row, 0, data.at(0)["f_id"])
@@ -388,6 +428,7 @@ void CE5MFProduct::on_btnNew_clicked()
         .createLineEdit(row, 6, 0, this, SLOT(goalPriceChanged(QString)))
         .setData(row, 7, 0);
     }
+
     delete e;
 }
 
@@ -406,32 +447,38 @@ void CE5MFProduct::on_btnPrint_clicked()
     p.tableText(points, vals, p.fLineHeight + 20);
     p.br(p.fLineHeight + 20);
     p.setFontBold(false);
-    for (int i = 0; i < ui->wt->rowCount(); i++) {
+
+    for(int i = 0; i < ui->wt->rowCount(); i++) {
         vals.clear();
         vals << QString::number(i + 1);
-        for (int c = 2; c < ui->wt->columnCount(); c++) {
+
+        for(int c = 2; c < ui->wt->columnCount(); c++) {
             vals.append(ui->wt->getData(i, c).toString());
         }
+
         p.tableText(points, vals, p.fLineHeight + 20);
         p.br(p.fLineHeight + 20);
     }
+
     p.setFontBold(true);
     vals.clear();
     vals << "" << "" << "" << ui->wt->totalStr(4) << "" << ui->wt->totalStr(6) << ui->wt->totalStr(7);
     p.tableText(points, vals, p.fLineHeight + 20);
     p.br(p.fLineHeight + 20);
-    C5PrintPreview pp( &p);
+    C5PrintPreview pp(&p);
     pp.exec();
 }
 
 void CE5MFProduct::on_btnClear_clicked()
 {
-    if (C5Message::question(tr("Confirm to clear whole process")) != QDialog::Accepted) {
+    if(C5Message::question(tr("Confirm to clear whole process")) != QDialog::Accepted) {
         return;
     }
-    for (int i = 0; i < ui->wt->rowCount(); i++) {
+
+    for(int i = 0; i < ui->wt->rowCount(); i++) {
         fRemovedRow.append(ui->wt->getData(i, 0).toInt());
     }
+
     ui->wt->clearTables();
     ui->wt->countTotal(-1);
 }
@@ -439,7 +486,8 @@ void CE5MFProduct::on_btnClear_clicked()
 void CE5MFProduct::on_btnMoveRowUp_clicked()
 {
     int row = ui->wt->currentRow();
-    if (row > 0) {
+
+    if(row > 0) {
         ui->wt->moveRowUp(row);
         emit ui->wt->lineEdit(row, 4)->textChanged(ui->wt->lineEdit(row, 4)->text());
         emit ui->wt->lineEdit(row, 6)->textChanged(ui->wt->lineEdit(row, 6)->text());
@@ -451,7 +499,8 @@ void CE5MFProduct::on_btnMoveRowUp_clicked()
 void CE5MFProduct::on_btnMoveRowDown_clicked()
 {
     int row = ui->wt->currentRow();
-    if (row < ui->wt->rowCount() - 1) {
+
+    if(row < ui->wt->rowCount() - 1) {
         ui->wt->moveRowDown(row);
         emit ui->wt->lineEdit(row, 4)->textChanged(ui->wt->lineEdit(row, 4)->text());
         emit ui->wt->lineEdit(row, 6)->textChanged(ui->wt->lineEdit(row, 6)->text());
@@ -463,7 +512,8 @@ void CE5MFProduct::on_btnMoveRowDown_clicked()
 void CE5MFProduct::on_btnUpdatePrices_clicked()
 {
     C5Database db;
-    for (int i = 0; i < ui->wt->rowCount(); i++) {
+
+    for(int i = 0; i < ui->wt->rowCount(); i++) {
         db[":f_product"] = ui->leCode->getInteger();
         db[":f_process"] = ui->wt->getData(i, 1);
         db[":f_price"] = ui->wt->getData(i, 7);
@@ -471,6 +521,7 @@ void CE5MFProduct::on_btnUpdatePrices_clicked()
         db[":f_date2"] = ui->leDate2->date();
         db.exec("update mf_daily_process set f_price=:f_price where f_product=:f_product and f_process=:f_process and f_date between :f_date1 and :f_date2");
     }
+
     C5Message::info(tr("Done."));
 }
 
@@ -484,12 +535,15 @@ void CE5MFProduct::on_chUpdatePrice_clicked(bool checked)
 void CE5MFProduct::on_btnCopy_clicked()
 {
     QString clipdata;
-    for (int r = 0; r < ui->wt->rowCount(); r++) {
-        for (int c = 0; c < ui->wt->columnCount(); c++) {
+
+    for(int r = 0; r < ui->wt->rowCount(); r++) {
+        for(int c = 0; c < ui->wt->columnCount(); c++) {
             clipdata += ui->wt->getData(r, c, Qt::EditRole).toString() + "\t";
         }
+
         clipdata += "\r";
     }
+
     qApp->clipboard()->setText(clipdata);
 }
 
@@ -498,11 +552,14 @@ void CE5MFProduct::on_btnPaste_clicked()
     QString clipdata = qApp->clipboard()->text();
     QStringList rows = clipdata.split("\r", Qt::SkipEmptyParts);
     C5Database db;
-    for (int i = 0; i < rows.count(); i++) {
+
+    for(int i = 0; i < rows.count(); i++) {
         QStringList cols = rows.at(i).split("\t", Qt::SkipEmptyParts);
-        if (cols.count() < 8) {
+
+        if(cols.count() < 8) {
             return;
         }
+
         db[":f_rowid"] = ui->wt->rowCount();
         db[":f_product"] = ui->leCode->getInteger();
         db[":f_process"] = cols.at(1);
@@ -530,10 +587,12 @@ void CE5MFProduct::on_btnExportExcel_clicked()
 {
     int colCount = 8;
     int rowCount = ui->wt->rowCount();
-    if (colCount == 0 || rowCount == 0) {
+
+    if(colCount == 0 || rowCount == 0) {
         C5Message::info(tr("Empty report!"));
         return;
     }
+
     QXlsx::Document d;
     d.addSheet("Sheet1");
     /* HEADER */
@@ -544,34 +603,40 @@ void CE5MFProduct::on_btnExportExcel_clicked()
     hf.setFont(headerFont);
     hf.setBorderStyle(QXlsx::Format::BorderThin);
     hf.setPatternBackgroundColor(color);
-    for (int i = 0; i < colCount; i++) {
+
+    for(int i = 0; i < colCount; i++) {
         d.write(1, i + 1, ui->wt->columnTitle(i), hf);
         d.setColumnWidth(i + 1, ui->wt->columnWidth(i) / 7);
     }
+
     /* BODY */
     QFont bodyFont(qApp->font());
     QXlsx::Format bf;
     bf.setFont(bodyFont);
     bf.setHorizontalAlignment(QXlsx::Format::AlignHCenter);
     bf.setBorderStyle(QXlsx::Format::BorderThin);
-    for (int j = 0; j < rowCount; j++) {
-        for (int i = 0; i < colCount; i++) {
-            if (ui->wt->lineEdit(j, i) == nullptr) {
+
+    for(int j = 0; j < rowCount; j++) {
+        for(int i = 0; i < colCount; i++) {
+            if(ui->wt->lineEdit(j, i) == nullptr) {
                 d.write(j + 2, i + 1, ui->wt->getData(j, i, Qt::EditRole), bf);
             } else {
                 d.write(j + 2, i + 1, ui->wt->lineEdit(j, i)->text(), bf);
             }
         }
     }
+
     /* TOTALS ROWS */
     d.write(1 + ui->wt->rowCount() + 1, 4 + 1, ui->wt->total(4), hf);
     d.write(1 + ui->wt->rowCount() + 1, 5 + 1, ui->wt->total(5), hf);
     d.write(1 + ui->wt->rowCount() + 1, 6 + 1, ui->wt->total(6), hf);
     d.write(1 + ui->wt->rowCount() + 1, 7 + 1, ui->wt->total(7), hf);
     QString filename = QFileDialog::getSaveFileName(nullptr, "", "", "*.xlsx");
-    if (filename.isEmpty()) {
+
+    if(filename.isEmpty()) {
         return;
     }
+
     d.saveAs(filename);
     QDesktopServices::openUrl(filename);
 }
@@ -580,10 +645,12 @@ void CE5MFProduct::on_btnAdd_2_clicked()
 {
     int row = ui->tblMeas->rowCount();
     ui->tblMeas->setRowCount(row + 1);
-    for (int i = 0; i < ui->tblMeas->columnCount(); i++) {
+
+    for(int i = 0; i < ui->tblMeas->columnCount(); i++) {
         ui->tblMeas->setItem(row, i, new QTableWidgetItem());
     }
-    for (int i = 0; i < ui->tblMeas->rowCount(); i++) {
+
+    for(int i = 0; i < ui->tblMeas->rowCount(); i++) {
         ui->tblMeas->item(i, 0)->setText(QString::number(i + 1));
     }
 }
@@ -595,41 +662,61 @@ void CE5MFProduct::on_btnAddImage_clicked()
     //     return;
     // }
     QString fn = QFileDialog::getOpenFileName(this, tr("Image"), "", "*.jpg;*.png;*.bmp");
-    if (fn.isEmpty()) {
+
+    if(fn.isEmpty()) {
         return;
     }
+
     QPixmap pm;
-    if (!pm.load(fn)) {
+
+    if(!pm.load(fn)) {
         C5Message::error(tr("Could not load image"));
         return;
     }
+
     ui->lbImage->setPixmap(pm.scaled(ui->lbImage->size(), Qt::KeepAspectRatio));
     QByteArray ba;
+
     do {
         pm = pm.scaled(pm.width() * 0.8,  pm.height() * 0.8);
         ba.clear();
-        QBuffer buff( &ba);
+        QBuffer buff(&ba);
         buff.open(QIODevice::WriteOnly);
-        pm.save( &buff, "JPG");
-    } while (ba.size() > 100000);
+        pm.save(&buff, "JPG");
+    } while(ba.size() > 100000);
 }
 
 void CE5MFProduct::on_btnAdd_3_clicked()
 {
+    QJsonArray vals;
+
+    if(!C5Selector::getValue(cache_materials_actions, vals)) {
+        return;
+    }
+
     int row = ui->tblMaterials->rowCount();
     ui->tblMaterials->setRowCount(row + 1);
-    for (int i = 0; i < ui->tblMaterials->columnCount(); i++) {
+
+    for(int i = 0; i < ui->tblMaterials->columnCount(); i++) {
         ui->tblMaterials->setItem(row, i, new QTableWidgetItem());
     }
-    for (int i = 0; i < ui->tblMaterials->rowCount(); i++) {
+
+    for(int i = 0; i < ui->tblMaterials->rowCount(); i++) {
         ui->tblMaterials->item(i, 0)->setText(QString::number(i + 1));
     }
+
+    ui->tblMaterials->setInteger(row, 1, vals.at(1).toInt());
+    ui->tblMaterials->setString(row, 2, vals.at(2).toString());
+    ui->tblMaterials->createLineEdit(row, 3);
+    ui->tblMaterials->createLineEdit(row, 4);
+    ui->tblMaterials->createLineEdit(row, 5);
 }
 
 void CE5MFProduct::on_btnMinus_2_clicked()
 {
     int r = ui->tblMeas->currentRow();
-    if (r > -1) {
+
+    if(r > -1) {
         ui->tblMeas->removeRow(r);
     }
 }
@@ -652,13 +739,17 @@ void CE5MFProduct::on_btnClearTblMaterials_clicked()
 void CE5MFProduct::on_btnCopy_2_clicked()
 {
     QStringList brd;
-    for (int i = 0; i < ui->tblMeas->rowCount(); i++) {
+
+    for(int i = 0; i < ui->tblMeas->rowCount(); i++) {
         QStringList r;
-        for (int j = 0; j < ui->tblMeas->columnCount(); j++) {
+
+        for(int j = 0; j < ui->tblMeas->columnCount(); j++) {
             r.append(ui->tblMeas->item(i, j)->text());
         }
+
         brd.append(r.join("\t"));
     }
+
     QMimeData *m = new QMimeData();
     m->setData("copy2",  brd.join("\n").toUtf8());
     qApp->clipboard()->setMimeData(m);
@@ -667,13 +758,16 @@ void CE5MFProduct::on_btnCopy_2_clicked()
 void CE5MFProduct::on_btnPaste_2_clicked()
 {
     QStringList rows = QString(qApp->clipboard()->mimeData()->data("copy2")).split("\n", Qt::SkipEmptyParts);
-    for (const QString &r : rows) {
+
+    for(const QString &r : rows) {
         QStringList rr = r.split("\t", Qt::SkipEmptyParts);
         int ir = ui->tblMeas->rowCount();
         ui->tblMeas->setRowCount(ir + 1);
-        for (int j = 1; j < ui->tblMeas->columnCount(); j++) {
+
+        for(int j = 1; j < ui->tblMeas->columnCount(); j++) {
             ui->tblMeas->setItem(ir, j, new QTableWidgetItem(rr.at(j)));
         }
+
         ui->tblMeas->setItem(ir, 0, new QTableWidgetItem(QString::number(ir + 1)));
     }
 }
@@ -681,13 +775,17 @@ void CE5MFProduct::on_btnPaste_2_clicked()
 void CE5MFProduct::on_btnCopy_3_clicked()
 {
     QStringList brd;
-    for (int i = 0; i < ui->tblMaterials->rowCount(); i++) {
+
+    for(int i = 0; i < ui->tblMaterials->rowCount(); i++) {
         QStringList r;
-        for (int j = 0; j < ui->tblMaterials->columnCount(); j++) {
+
+        for(int j = 0; j < ui->tblMaterials->columnCount(); j++) {
             r.append(ui->tblMaterials->item(i, j)->text());
         }
+
         brd.append(r.join("\t"));
     }
+
     QMimeData *m = new QMimeData();
     m->setData("copy3",  brd.join("\n").toUtf8());
     qApp->clipboard()->setMimeData(m);
@@ -696,13 +794,16 @@ void CE5MFProduct::on_btnCopy_3_clicked()
 void CE5MFProduct::on_btnPaste_3_clicked()
 {
     QStringList rows = QString(qApp->clipboard()->mimeData()->data("copy3")).split("\n", Qt::SkipEmptyParts);
-    for (const QString &r : rows) {
+
+    for(const QString &r : rows) {
         QStringList rr = r.split("\t", Qt::SkipEmptyParts);
         int ir = ui->tblMaterials->rowCount();
         ui->tblMaterials->setRowCount(ir + 1);
-        for (int j = 1; j < ui->tblMaterials->columnCount(); j++) {
+
+        for(int j = 1; j < ui->tblMaterials->columnCount(); j++) {
             ui->tblMaterials->setItem(ir, j, new QTableWidgetItem(rr.at(j)));
         }
+
         ui->tblMaterials->setItem(ir, 0, new QTableWidgetItem(QString::number(ir + 1)));
     }
 }

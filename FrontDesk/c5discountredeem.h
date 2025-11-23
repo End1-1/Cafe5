@@ -22,9 +22,15 @@ private slots:
 
     void on_leAmountToRedeem_textChanged(const QString &arg1);
 
+    void on_cbCard_currentIndexChanged(int index);
+
+    void on_btnDeleteRecord_clicked();
+
 private:
     Ui::C5DiscountRedeem* ui;
+
     void processPartner(const QJsonArray &data);
+
 };
 
 #endif // C5DISCOUNTREDEEM_H

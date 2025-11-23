@@ -6,7 +6,7 @@ QHash<int, QString> DlgGetIDName::fQueries;
 QHash<int, DlgGetIDName*> DlgGetIDName::fDialogs;
 
 DlgGetIDName::DlgGetIDName(const QStringList &dbParams, QWidget *parent) :
-    C5Dialog(parent),
+    C5Dialog(),
     ui(new Ui::DlgGetIDName)
 {
     ui->setupUi(this);

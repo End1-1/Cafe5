@@ -4,7 +4,7 @@
 #include "c5message.h"
 
 DlgDriverRouteDate::DlgDriverRouteDate(QWidget *parent) :
-    C5Dialog(parent),
+    C5Dialog(),
     ui(new Ui::DlgDriverRouteDate)
 {
     ui->setupUi(this);
@@ -16,7 +16,7 @@ DlgDriverRouteDate::~DlgDriverRouteDate()
     delete ui;
 }
 
-bool DlgDriverRouteDate::getDate(QDate &date, int &driver, QWidget *parent)
+bool DlgDriverRouteDate::getDate(QDate &date, int& driver, QWidget *parent)
 {
     DlgDriverRouteDate d(parent);
     bool result = d.exec() == QDialog::Accepted;
@@ -32,9 +32,10 @@ void DlgDriverRouteDate::on_btnCancel_clicked()
 
 void DlgDriverRouteDate::on_btnOK_clicked()
 {
-    if (ui->leDriver->getInteger() == 0) {
+    if(ui->leDriver->getInteger() == 0) {
         C5Message::error(tr("Select driver"));
         return;
     }
+
     accept();
 }

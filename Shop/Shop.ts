@@ -2435,7 +2435,7 @@ MS Excel</source>
     <message>
         <location filename="../Printing/printreceiptgroup.cpp" line="270"/>
         <source>Total qty</source>
-        <translation type="unfinished">Ընդհանուր քանակ</translation>
+        <translation>Ընդհանուր քանակ</translation>
     </message>
     <message>
         <location filename="../Printing/printreceiptgroup.cpp" line="278"/>
@@ -2713,7 +2713,8 @@ MS Excel</source>
     <message>
         <location filename="sales.ui" line="220"/>
         <source>Item change</source>
-        <translation>Ապրանքի փոխանակում</translation>
+        <translation>Ապրանքի
+փոխանակում</translation>
     </message>
     <message>
         <location filename="sales.ui" line="358"/>

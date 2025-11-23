@@ -35,7 +35,7 @@ public:
 
     void line(int lineWidth = -1);
 
-    void tableText(const QList<qreal> &points, const QStringList &vals, int rowHeight);
+    void tableText(const QList<qreal>& points, const QStringList &vals, int rowHeight);
 
     void ltext(const QString &text, qreal x, qreal textWidth = -1);
 
@@ -59,7 +59,7 @@ public:
 
     int currentPageIndex();
 
-    QGraphicsScene *page(int index);
+    QGraphicsScene* page(int index);
 
     int pageCount();
 
@@ -86,9 +86,9 @@ public:
 private:
     qreal fTempTop;
 
-    QGraphicsScene *fCanvas;
+    QGraphicsScene* fCanvas;
 
-    QList<QGraphicsScene *> fCanvasList;
+    QList<QGraphicsScene*> fCanvasList;
 
     QPen fLinePen;
 
@@ -96,7 +96,7 @@ private:
 
     int fCurrentPageIndex;
 
-    QMap<QGraphicsScene *, QPageLayout::Orientation> fCanvasOrientation;
+    QMap<QGraphicsScene*, QPageLayout::Orientation> fCanvasOrientation;
 
     void setLineHeight();
 

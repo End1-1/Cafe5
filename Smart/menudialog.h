@@ -1,16 +1,17 @@
 #ifndef MENUDIALOG_H
 #define MENUDIALOG_H
 
-#include "c5dialog.h"
+#include <QDialog>
 
-namespace Ui {
+namespace Ui
+{
 class MenuDialog;
 }
 
 class C5User;
 class Workspace;
 
-class MenuDialog : public C5Dialog
+class MenuDialog : public QDialog
 {
     Q_OBJECT
 
@@ -42,11 +43,11 @@ private slots:
     void on_btnCustomerDisplay_clicked();
 
 private:
-    Ui::MenuDialog *ui;
+    Ui::MenuDialog* ui;
 
-    C5User *fUser;
+    C5User* fUser;
 
-    Workspace *fWorkspace;
+    Workspace* fWorkspace;
 };
 
 #endif // MENUDIALOG_H

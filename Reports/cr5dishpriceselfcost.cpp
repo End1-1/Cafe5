@@ -5,18 +5,18 @@
 #include "c5dishwidget.h"
 
 CR5DishPriceSelfCost::CR5DishPriceSelfCost(QWidget *parent) :
-    C5ReportWidget( parent)
+    C5ReportWidget(parent)
 {
     fLabel = tr("Dish prices and self cost");
     fIcon = ":/menu.png";
     fFilterWidget = new CR5DishPriceSelfCostFilter();
-    fFilter = static_cast<CR5DishPriceSelfCostFilter *>(fFilterWidget);
+    fFilter = static_cast<CR5DishPriceSelfCostFilter*>(fFilterWidget);
     fSimpleQuery = true;
 }
 
-QToolBar *CR5DishPriceSelfCost::toolBar()
+QToolBar* CR5DishPriceSelfCost::toolBar()
 {
-    if (!fToolBar) {
+    if(!fToolBar) {
         QList<ToolBarButtons> btn;
         btn << ToolBarButtons::tbFilter
             << ToolBarButtons::tbClearFilter
@@ -24,22 +24,26 @@ QToolBar *CR5DishPriceSelfCost::toolBar()
             << ToolBarButtons::tbPrint;
         createStandartToolbar(btn);
     }
+
     return fToolBar;
 }
 
 void CR5DishPriceSelfCost::buildQuery()
 {
-    switch  (fFilter->viewMode()) {
-        case 1:
-            buildQueryV1();
-            break;
-        case 2:
-            buildQueryV2();
-            break;
-        case 3:
-            buildQueryV3();
-            break;
+    switch(fFilter->viewMode()) {
+    case 1:
+        buildQueryV1();
+        break;
+
+    case 2:
+        buildQueryV2();
+        break;
+
+    case 3:
+        buildQueryV3();
+        break;
     }
+
     emit refreshed();
 }
 
@@ -54,18 +58,22 @@ void CR5DishPriceSelfCost::buildQueryV1()
                 "left join (select rr.f_dish, sum(rr.f_qty*gg.f_lastinputprice) as f_selfcost from d_recipes rr "
                 "left join c_goods gg on gg.f_id=rr.f_goods group by 1) scf on scf.f_dish=r.f_dish "
                 "where d.f_id>0 ";
-    switch (fFilter->menuState()) {
-        case 0:
-            fSqlQuery += " and m.f_state=0 ";
-            break;
-        case 1:
-            fSqlQuery += " and m.f_state=1 ";
-            break;
+
+    switch(fFilter->menuState()) {
+    case 0:
+        fSqlQuery += " and m.f_state=0 ";
+        break;
+
+    case 1:
+        fSqlQuery += " and m.f_state=1 ";
+        break;
     }
-    if (!fFilter->goods().isEmpty()) {
+
+    if(!fFilter->goods().isEmpty()) {
         fSqlQuery += " and r.f_goods in (" + fFilter->goods() + ") ";
     }
-    if (fFilter->baseOnSale()) {
+
+    if(fFilter->baseOnSale()) {
         fSqlQuery += QString(" and r.f_dish in (select distinct(b.f_dish) "
                              "from o_body b "
                              "left join o_header h on h.f_id=b.f_header "
@@ -73,47 +81,64 @@ void CR5DishPriceSelfCost::buildQueryV1()
                      .arg(fFilter->d1().toString(FORMAT_DATE_TO_STR_MYSQL))
                      .arg(fFilter->d2().toString(FORMAT_DATE_TO_STR_MYSQL));
     }
+
     fTranslation["f_id"] = tr("Code");
     fTranslation["f_part"] = tr("Part");
     fTranslation["f_name"] = tr("Name");
     fTranslation["f_selfcost"] = tr("Self cost");
-    if (!fFilterWidget->condition().isEmpty()) {
+
+    if(!fFilterWidget->condition().isEmpty()) {
         fSqlQuery += " and " + fFilterWidget->condition();
     }
+
     fSqlQuery += " group by 1, 2, 3";
     fSqlQuery += " order by 2, 3 ";
     C5Grid::buildQuery();
     QMap<int, int> dishMap;
-    for (int i = 0; i < fModel->rowCount(); i++) {
+
+    for(int i = 0; i < fModel->rowCount(); i++) {
         dishMap[fModel->data(i, 0, Qt::DisplayRole).toInt()] = i;
     }
+
     C5Database db;
     QString menuid;
-    if (!fFilterWidget->condition().isEmpty()) {
+
+    if(!fFilterWidget->condition().isEmpty()) {
         menuid = "where m.f_id in(" + fFilter->menuId() + ") ";
     }
+
     QMap<int, int> menuMap;
     db.exec("select m.f_id, m.f_name from d_menu_names m " + menuid);
-    while (db.nextRow()) {
+
+    while(db.nextRow()) {
         menuMap[db.getInt(0)] = fModel->columnCount();
         fModel->insertColumn(fModel->columnCount(), db.getString(1) + ", " + tr("price"));
         fModel->insertColumn(fModel->columnCount(), db.getString(1) + ", " + tr("factor"));
     }
+
     QString query =
-        "select mn.f_id, mn.f_name, m.f_dish, m.f_price from d_menu m left join d_menu_names mn on mn.f_id=m.f_menu " +
+        "select mn.f_id, mn.f_name, m.f_dish, m.f_price "
+        "from d_menu m "
+        "left join d_menu_names mn on mn.f_id=m.f_menu " +
         (fFilterWidget->condition().isEmpty() ? "" : " where " + fFilterWidget->condition());
     db.exec(query);
-    while (db.nextRow()) {
-        if (!dishMap.contains(db.getInt(2))) {
+
+    while(db.nextRow()) {
+        if(!dishMap.contains(db.getInt(2))) {
             continue;
         }
-        if (!menuMap.contains(db.getInt(0))) {
+
+        if(!menuMap.contains(db.getInt(0))) {
             continue;
         }
+
         fModel->setData(dishMap[db.getInt(2)], menuMap[db.getInt(0)], db.getDouble(3), Qt::EditRole);
-        if (fModel->data(dishMap[db.getInt(2)], 3, Qt::EditRole).toDouble() > 0.0001) {
-            fModel->setData(dishMap[db.getInt(2)], menuMap[db.getInt(0)] + 1, db.getDouble(3) / fModel->data(dishMap[db.getInt(2)],
-                            3, Qt::EditRole).toDouble(), Qt::EditRole);
+
+        if(fModel->data(dishMap[db.getInt(2)], 3, Qt::EditRole).toDouble() > 0.0001) {
+            fModel->setData(dishMap[db.getInt(2)],
+                            menuMap[db.getInt(0)] + 1,
+                            db.getDouble(3) / fModel->data(dishMap[db.getInt(2)],
+                                    3, Qt::EditRole).toDouble(), Qt::EditRole);
         } else {
             fModel->setData(dishMap[db.getInt(2)], menuMap[db.getInt(0)] + 1, 0, Qt::EditRole);
         }
@@ -130,31 +155,39 @@ void CR5DishPriceSelfCost::buildQueryV2()
     fModel->insertColumn(7, tr("Price"));
     fModel->insertColumn(8, tr("Cost"));
     C5Database db;
-    QString query =
-        "select r.f_goods, g.f_name, r.f_qty, u.f_name, g.f_lastinputprice, g.f_lastinputprice*r.f_qty, r.f_dish "
-        "from d_recipes r "
-        "left join c_goods g on g.f_id=r.f_goods "
-        "left join c_units u on u.f_id=g.f_unit "
-        "order by r.f_dish ";
+    QString query = R"(
+    select r.f_goods, g.f_name, r.f_qty, u.f_name,
+    g.f_lastinputprice, g.f_lastinputprice*r.f_qty, r.f_dish
+        from d_recipes r
+        left join c_goods g on g.f_id=r.f_goods
+        left join c_units u on u.f_id=g.f_unit
+        order by r.f_dish
+)";
     db.exec(query);
     int currDish = 0;
     int currRow = 0;
     int totalRows = 1;
     QMap<int, int> dishMap;
-    while (db.nextRow()) {
-        if (db.getInt(6) != currDish) {
+
+    while(db.nextRow()) {
+        if(db.getInt(6) != currDish) {
             dishMap.clear();
-            for (int i = 0; i < fModel->rowCount(); i++) {
+
+            for(int i = 0; i < fModel->rowCount(); i++) {
                 dishMap[fModel->data(i, 0, Qt::EditRole).toInt()] = i;
             }
+
             dishMap.remove(0);
-            if (!dishMap.contains(db.getInt(6))) {
+
+            if(!dishMap.contains(db.getInt(6))) {
                 continue;
             }
+
             currRow = dishMap[db.getInt(6)];
             currDish = db.getInt(6);
             totalRows = 0;
         }
+
         fModel->insertRow(currRow + totalRows);
         fModel->setData(currRow + totalRows + 1, 3, db.getInt(0));
         fModel->setData(currRow + totalRows + 1, 4, db.getString(1));
@@ -164,9 +197,10 @@ void CR5DishPriceSelfCost::buildQueryV2()
         fModel->setData(currRow + totalRows + 1, 8, db.getDouble(5));
         totalRows++;
     }
-    for (int i = 0; i < fModel->rowCount(); i++) {
-        if (fModel->data(i, 0, Qt::EditRole).toInt() > 0) {
-            fTableView->setSpan(i, 3, 1, 6);
+
+    for(int i = 0; i < fModel->rowCount(); i++) {
+        if(fModel->data(i, 0, Qt::EditRole).toInt() > 0) {
+            //fTableView->setSpan(i, 3, 1, 6);
             fModel->setData(i, 3, tr("Recipe") + " " + fModel->data(i, 2, Qt::EditRole).toString());
         }
     }
@@ -198,21 +232,25 @@ void CR5DishPriceSelfCost::buildQueryV3()
     fTranslation["f_goodsprice"] = tr("Goods price");
     fTranslation["f_goodscost"] = tr("Goods cost");
     C5Grid::buildQuery();
-    for (int i = fModel->rowCount() - 1; i > 0; i--) {
-        if (fModel->data(i, 1, Qt::EditRole).toInt() == 0) {
+
+    for(int i = fModel->rowCount() - 1; i > 0; i--) {
+        if(fModel->data(i, 1, Qt::EditRole).toInt() == 0) {
             continue;
         }
-        if (fModel->data(i, 1, Qt::EditRole).toInt() != fModel->data(i - 1, 1, Qt::EditRole).toInt()) {
+
+        if(fModel->data(i, 1, Qt::EditRole).toInt() != fModel->data(i - 1, 1, Qt::EditRole).toInt()) {
             fModel->insertRow(i - 1);
             i++;
         }
     }
-    for (int i = fModel->rowCount() - 1; i > 0; i--) {
-        if (fModel->data(i, 1, Qt::EditRole).toInt() == 0) {
+
+    for(int i = fModel->rowCount() - 1; i > 0; i--) {
+        if(fModel->data(i, 1, Qt::EditRole).toInt() == 0) {
             continue;
         }
-        if (fModel->data(i - 1, 1, Qt::EditRole).toInt() > 0) {
-            if (fModel->data(i, 1, Qt::EditRole).toInt() == fModel->data(i - 1, 1, Qt::EditRole).toInt()) {
+
+        if(fModel->data(i - 1, 1, Qt::EditRole).toInt() > 0) {
+            if(fModel->data(i, 1, Qt::EditRole).toInt() == fModel->data(i - 1, 1, Qt::EditRole).toInt()) {
                 fModel->setData(i, 0, QVariant());
                 fModel->setData(i, 1, QVariant());
                 fModel->setData(i, 2, QVariant());
@@ -223,6 +261,7 @@ void CR5DishPriceSelfCost::buildQueryV3()
             }
         }
     }
+
     fTableView->resizeColumnsToContents();
 }
 
@@ -230,17 +269,22 @@ bool CR5DishPriceSelfCost::tblDoubleClicked(int row, int column, const QJsonArra
 {
     Q_UNUSED(row);
     Q_UNUSED(column);
-    if (values.count() == 0) {
+
+    if(values.count() == 0) {
         return true;
     }
-    if (values.at(0).toInt() == 0) {
+
+    if(values.at(0).toInt() == 0) {
         return true;
     }
+
     C5DishWidget *ep = new C5DishWidget();
     C5Editor *e = C5Editor::createEditor(ep, values.at(0).toInt());
     QList<QMap<QString, QVariant> > data;
+
     if(e->getResult(data)) {
     }
+
     delete e;
     return true;
 }

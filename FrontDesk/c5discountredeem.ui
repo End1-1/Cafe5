@@ -11,20 +11,19 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Dialog</string>
+   <string>Reedem accumulated</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
-   <item row="0" column="0">
-    <widget class="QLabel" name="label_4">
-     <property name="text">
-      <string>Transaction</string>
-     </property>
-    </widget>
+   <item row="4" column="4">
+    <widget class="C5LineEditWithSelector" name="leAmountToRedeem"/>
    </item>
-   <item row="1" column="2" colspan="3">
-    <widget class="C5LineEditWithSelector" name="lePartnerName">
-     <property name="readOnly">
-      <bool>true</bool>
+   <item row="3" column="1" colspan="4">
+    <widget class="C5ComboBox" name="cbCard"/>
+   </item>
+   <item row="4" column="3">
+    <widget class="QLabel" name="label_3">
+     <property name="text">
+      <string>Amount to reedem</string>
      </property>
     </widget>
    </item>
@@ -35,34 +34,7 @@
      </property>
     </widget>
    </item>
-   <item row="1" column="1">
-    <widget class="C5LineEditWithSelector" name="lePartner">
-     <property name="maximumSize">
-      <size>
-       <width>50</width>
-       <height>16777215</height>
-      </size>
-     </property>
-    </widget>
-   </item>
-   <item row="3" column="1" colspan="2">
-    <widget class="C5LineEditWithSelector" name="leCurrentBalance">
-     <property name="readOnly">
-      <bool>true</bool>
-     </property>
-    </widget>
-   </item>
-   <item row="3" column="4">
-    <widget class="C5LineEditWithSelector" name="leAmountToRedeem"/>
-   </item>
-   <item row="3" column="0">
-    <widget class="QLabel" name="label_2">
-     <property name="text">
-      <string>Current balance</string>
-     </property>
-    </widget>
-   </item>
-   <item row="5" column="0" colspan="5">
+   <item row="6" column="0" colspan="5">
     <widget class="QFrame" name="frame">
      <property name="frameShape">
       <enum>QFrame::Shape::StyledPanel</enum>
@@ -121,29 +93,8 @@
      </layout>
     </widget>
    </item>
-   <item row="3" column="3">
-    <widget class="QLabel" name="label_3">
-     <property name="text">
-      <string>Amount to reedem</string>
-     </property>
-    </widget>
-   </item>
-   <item row="1" column="0">
-    <widget class="QLabel" name="label">
-     <property name="text">
-      <string>Customer</string>
-     </property>
-    </widget>
-   </item>
-   <item row="2" column="0">
-    <widget class="QLabel" name="label_5">
-     <property name="text">
-      <string>Card</string>
-     </property>
-    </widget>
-   </item>
    <item row="2" column="1">
-    <widget class="C5LineEditWithSelector" name="leCard">
+    <widget class="C5LineEditWithSelector" name="lePartner">
      <property name="maximumSize">
       <size>
        <width>50</width>
@@ -152,8 +103,63 @@
      </property>
     </widget>
    </item>
+   <item row="2" column="0">
+    <widget class="QLabel" name="label">
+     <property name="text">
+      <string>Customer</string>
+     </property>
+    </widget>
+   </item>
+   <item row="4" column="1" colspan="2">
+    <widget class="C5LineEditWithSelector" name="leCurrentBalance">
+     <property name="minimumSize">
+      <size>
+       <width>100</width>
+       <height>0</height>
+      </size>
+     </property>
+     <property name="readOnly">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="0">
+    <widget class="QLabel" name="label_5">
+     <property name="text">
+      <string>Card</string>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="0">
+    <widget class="QLabel" name="label_4">
+     <property name="text">
+      <string>Transaction</string>
+     </property>
+    </widget>
+   </item>
    <item row="2" column="2" colspan="3">
-    <widget class="C5LineEditWithSelector" name="leCardName">
+    <widget class="C5LineEditWithSelector" name="lePartnerName">
+     <property name="readOnly">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="4" column="0">
+    <widget class="QLabel" name="label_2">
+     <property name="text">
+      <string>Current balance</string>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="0">
+    <widget class="QLabel" name="label_6">
+     <property name="text">
+      <string>Date</string>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="1" colspan="4">
+    <widget class="C5DateEdit" name="leDate">
      <property name="readOnly">
       <bool>true</bool>
      </property>
@@ -166,6 +172,16 @@
    <class>C5LineEditWithSelector</class>
    <extends>QLineEdit</extends>
    <header location="global">c5lineeditwithselector.h</header>
+  </customwidget>
+  <customwidget>
+   <class>C5ComboBox</class>
+   <extends>QComboBox</extends>
+   <header location="global">c5combobox.h</header>
+  </customwidget>
+  <customwidget>
+   <class>C5DateEdit</class>
+   <extends>QLineEdit</extends>
+   <header location="global">c5dateedit.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

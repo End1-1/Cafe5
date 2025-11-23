@@ -156,6 +156,7 @@ C5Cache::C5Cache()
         setCacheSimpleQuery(cache_partner_category, "c_partners_category");
         setCacheSimpleQuery(cache_partner_group, "c_partners_group");
         setCacheSimpleQuery(cache_partner_state, "c_partners_state");
+        fCacheQuery[cache_materials_actions] = "select * from c_goods where f_enabled=1 and f_production=1";
     }
 
     if(fTableCache.count() == 0) {

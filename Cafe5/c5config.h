@@ -121,6 +121,9 @@
 #define SALE_WHOSALE 2
 #define SALE_RETURN 4
 
+//#define DEBUG_SIZE QSize(1024, 768)
+#define DEBUG_SIZE QSize(1280, 1024)
+
 class C5User;
 
 class C5Config
@@ -136,7 +139,7 @@ public:
 
     static QString fSettingsName;
 
-    static QWidget *fParentWidget;
+    static QWidget* fParentWidget;
 
     static QString fLastUsername;
 
@@ -266,7 +269,7 @@ public:
 
     static QString getValue(int key);
 
-    static void setValues(const QMap<int, QString> &values);
+    static void setValues(const QMap<int, QString>& values);
 
     static QJsonObject fMainJson;
 
@@ -279,6 +282,6 @@ extern C5Config __c5config;
 
 extern QStringList __databases;
 
-extern C5User *__user;
+extern C5User* __user;
 
 #endif // C5CONFIG_H

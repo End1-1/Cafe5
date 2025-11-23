@@ -49,9 +49,8 @@ Working::Working(C5User *user, QWidget *parent) :
 {
     ui->setupUi(this);
 #ifdef QT_DEBUG
-    //setMaximumSize(QSize(1024, 768));
-    setMaximumSize(1280, 1024);
-    setMinimumSize(1280, 1024);
+    setMaximumSize(DEBUG_SIZE);
+    setMinimumSize(DEBUG_SIZE);
 #endif
     fInstance = this;
     QString ip;
@@ -847,7 +846,7 @@ void Working::on_btnGoodsMovement_clicked()
         }
     }
 
-    StoreInput *si = new StoreInput(u);
+    auto *si = new StoreInput(u);
     si->showMaximized();
 
     if(u != fUser) {

@@ -23,7 +23,7 @@
 #define VM_GROUPS 3
 
 Sales::Sales(C5User *user) :
-    C5Dialog(true),
+    C5Dialog(),
     ui(new Ui::Sales)
 {
     ui->setupUi(this);
@@ -69,7 +69,6 @@ void Sales::showSales(Working *w, C5User *u)
 {
     Sales *s = new Sales(u);
     s->fWorking = w;
-    s->showMaximized();
     s->exec();
     delete s;
 }

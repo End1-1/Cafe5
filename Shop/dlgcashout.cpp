@@ -26,19 +26,23 @@ void DlgCashout::on_btnCancel_clicked()
 
 void DlgCashout::on_btnSave_clicked()
 {
-    if (ui->leAmount->getDouble() < 1) {
+    if(ui->leAmount->getDouble() < 1) {
         C5Message::error(tr("What did you try to save?"));
         return;
     }
-    if (ui->tePurpose->toPlainText().isEmpty()) {
+
+    if(ui->tePurpose->toPlainText().isEmpty()) {
         C5Message::error(tr("Please, explain your spend"));
         return;
     }
+
     fHttp->createHttpQuery("/engine/cashdesk/create.php",
     QJsonObject{
         {"date", QDate::currentDate().toString(FORMAT_DATE_TO_STR_MYSQL)},
         {"operator", __user->id() },
+        {"config", __c5config.fMainJson["id"].toInt()},
         {"cashin", 0},
+        {"daily_check", 0},
         {"cashout", __c5config.cashId()},
         {"remarks", ui->tePurpose->toPlainText()},
         {"amount", ui->leAmount->text()}

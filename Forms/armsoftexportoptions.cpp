@@ -3,7 +3,7 @@
 #include "c5config.h"
 
 ArmSoftExportOptions::ArmSoftExportOptions(QWidget *parent) :
-    C5Dialog(parent),
+    C5Dialog(),
     ui(new Ui::ArmSoftExportOptions)
 {
     ui->setupUi(this);

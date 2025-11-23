@@ -7,7 +7,7 @@
 #include <QDoubleValidator>
 
 DlgPassword::DlgPassword(C5User *u) :
-    C5Dialog(),
+    QDialog(),
     ui(new Ui::DlgPassword),
     fUser(u)
 {

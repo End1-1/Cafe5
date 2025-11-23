@@ -9,7 +9,7 @@
 #include <QScrollBar>
 
 DlgMovement::DlgMovement()
-    : C5Dialog(true)
+    : C5Dialog()
     , ui(new Ui::DlgMovement),
       mSetupComplete(false)
 {
@@ -29,50 +29,63 @@ DlgMovement::~DlgMovement()
 
 bool DlgMovement::openDoc(const QString &doc)
 {
-    if (!mSetupComplete) {
+    if(!mSetupComplete) {
         fPendingDoc = doc;
         return true;
     }
+
     fUuid = doc;
     C5Database db;
     db.exec(QString("select sf_open_store_document('{\"f_id\":\"%1\"}')").arg(doc));
-    if (!db.nextRow()) {
+
+    if(!db.nextRow()) {
         C5Message::error(tr("Document not exists"));
         return false;
     }
+
     QJsonObject reply = QJsonDocument::fromJson(db.getString(0).toUtf8()).object();
-    if (reply["status"].toInt() != 1) {
+
+    if(reply["status"].toInt() != 1) {
         C5Message::error(reply["data"].toString());
         return false;
     }
+
     reply = reply["data"].toObject();
     QJsonObject doc_header = reply["doc_header"].toObject();
     QJsonArray doc_body = reply["doc_body"].toArray();
     QJsonObject doc_client = reply["doc_client"].toObject();
     QJsonObject doc_header_store = doc_header["f_body"].toObject();
-    if (doc_header_store.isEmpty()) {
+
+    if(doc_header_store.isEmpty()) {
         doc_header_store = reply["doc_header_store"].toObject();
     }
+
     fState = doc_header["f_state"].toInt();
     ui->leComment->setText(doc_header["f_comment"].toString());
-    if (fState == DOC_STATE_SAVED) {
+
+    if(fState == DOC_STATE_SAVED) {
         ui->btnSave->setEnabled(false);
     }
-    if (__c5config.defaultStore() != doc_header_store["f_storeout"].toInt()) {
+
+    if(__c5config.defaultStore() != doc_header_store["f_storeout"].toInt()) {
         ui->btnSave->setEnabled(false);
     }
+
     fStoreOut = doc_header_store["f_storeout"].toInt();
     ui->cbDstStore->setCurrentIndex(ui->cbDstStore->findData(doc_header_store["f_storein"].toInt()));
-    ui->leComment->setEnabled(ui->btnSave->isEnabled() );
-    ui->cbDstStore->setEnabled(ui->btnSave->isEnabled() );
-    ui->leSearch->setEnabled(ui->btnSave->isEnabled() );
+    ui->leComment->setEnabled(ui->btnSave->isEnabled());
+    ui->cbDstStore->setEnabled(ui->btnSave->isEnabled());
+    ui->leSearch->setEnabled(ui->btnSave->isEnabled());
     ui->btnSaveAndAccept->setEnabled(fState == DOC_STATE_DRAFT
                                      && __c5config.defaultStore() == doc_header_store["f_storein"].toInt());
-    for (int i = 0; i < doc_body.size(); i++) {
+
+    for(int i = 0; i < doc_body.size(); i++) {
         const QJsonObject &jo = doc_body.at(i).toObject();
-        if (jo["f_type"].toInt() == 1) {
+
+        if(jo["f_type"].toInt() == 1) {
             continue;
         }
+
         int r = newRow();
         ui->tbl->setString(r, 0, jo["f_id"].toString());
         ui->tbl->setString(r, 1, jo["f_goodsname"].toString());
@@ -87,6 +100,7 @@ bool DlgMovement::openDoc(const QString &doc)
         l->setEnabled(ui->btnSave->isEnabled());
         ui->tbl->setInteger(r, 5, jo["f_goods"].toInt());
     }
+
     countQty();
     return true;
 }
@@ -94,21 +108,25 @@ bool DlgMovement::openDoc(const QString &doc)
 void DlgMovement::setupResponse(const QJsonObject &jdoc)
 {
     QJsonArray jstores = jdoc["availableoutstore"].toArray();
-    if (jstores.isEmpty()) {
+
+    if(jstores.isEmpty()) {
         fHttp->httpQueryFinished(sender());
         C5Message::error(tr("Missing available stores"));
         return;
     }
+
     mSetupComplete = true;
-    for (int i = 0; i < jstores.size(); i++) {
+
+    for(int i = 0; i < jstores.size(); i++) {
         QJsonObject jt = jstores.at(i).toObject();
         ui->cbDstStore->addItem(jt["f_name"].toString(), jt["f_id"].toInt());
     }
+
     fHttp->httpQueryFinished(sender());
-    if (!fPendingDoc.isEmpty()) {
+
+    if(!fPendingDoc.isEmpty()) {
         openDoc(fPendingDoc);
     }
-    showMaximized();
 }
 
 void DlgMovement::searchResponse(const QJsonObject &jdoc)
@@ -139,9 +157,11 @@ int DlgMovement::newRow()
     ui->tbl->setCellWidget(row, 7, btn);
     connect(btn, &QToolButton::clicked, [this, btn]() {
         int r, c;
-        if (!ui->tbl->findWidget(btn, r, c)) {
+
+        if(!ui->tbl->findWidget(btn, r, c)) {
             return;
         }
+
         ui->tbl->removeRow(r);
     });
     return row;
@@ -150,25 +170,29 @@ int DlgMovement::newRow()
 void DlgMovement::countQty()
 {
     double qty = 0, amount = 0;
-    for (int i = 0; i < ui->tbl->rowCount(); i++) {
+
+    for(int i = 0; i < ui->tbl->rowCount(); i++) {
         qty += ui->tbl->lineEdit(i, 4)->getDouble();
         amount += ui->tbl->lineEdit(i, 4)->getDouble() * ui->tbl->getDouble(i, 5);
     }
+
     ui->leTotalQty->setDouble(qty);
     ui->leTotalAmount->setDouble(amount);
 }
 
 bool DlgMovement::saveDoc(int state)
 {
-    for (int i = 0 ; i < ui->tbl->rowCount(); i++) {
-        if (ui->tbl->lineEdit(i, 4)->getDouble() < 0.01) {
+    for(int i = 0 ; i < ui->tbl->rowCount(); i++) {
+        if(ui->tbl->lineEdit(i, 4)->getDouble() < 0.01) {
             C5Message::error(tr("Check quantities"));
             return false;
         }
     }
-    if (fUuid.isEmpty()) {
+
+    if(fUuid.isEmpty()) {
         fUuid = C5Database::uuid();
     }
+
     QJsonObject jdoc;
     QJsonObject jheader;
     jheader["f_id"] = fUuid;
@@ -205,7 +229,8 @@ bool DlgMovement::saveDoc(int state)
     jcomplect["f_qty"] = 0 ;
     jdoc["complect"] = jcomplect;
     QJsonArray jgoods;
-    for (int i = 0; i < ui->tbl->rowCount(); i++) {
+
+    for(int i = 0; i < ui->tbl->rowCount(); i++) {
         QJsonObject jitem;
         jitem["f_goods"] = ui->tbl->getInteger(i, 6);
         jitem["f_qty"] = ui->tbl->lineEdit(i, 4)->getDouble();
@@ -213,6 +238,7 @@ bool DlgMovement::saveDoc(int state)
         jitem["f_row"] = i;
         jgoods.append(jitem);
     }
+
     jdoc["goods"] = jgoods;
     QJsonObject jpartner;
     jpartner["partner"] = 0;
@@ -223,28 +249,35 @@ bool DlgMovement::saveDoc(int state)
     jdoc["session"] = session;
     QJsonDocument json(jdoc);
     C5Database db;
-    if (!db.execNetwork(QString("call sf_create_store_document('%1')").arg(QString(json.toJson(QJsonDocument::Compact))))) {
+
+    if(!db.execNetwork(QString("call sf_create_store_document('%1')").arg(QString(json.toJson(QJsonDocument::Compact))))) {
         C5Message::error(db.fLastError);
     }
+
     db[":f_session"] = session;
     db.exec("select f_result from a_result where f_session=:f_session");
-    if (db.nextRow()) {
+
+    if(db.nextRow()) {
         QJsonObject js = QJsonDocument::fromJson(db.getString(0).toUtf8()).object();
-        if (js["status"].toInt() == 0) {
+
+        if(js["status"].toInt() == 0) {
             C5Message::error(js["message"].toString());
             return false;
         }
     }
+
     return true;
 }
 
 void DlgMovement::countTotals()
 {
     double q = 0, a = 0;
-    for (int i = 0; i < ui->tbl->rowCount(); i++) {
+
+    for(int i = 0; i < ui->tbl->rowCount(); i++) {
         q += ui->tbl->lineEdit(i, 4)->getDouble();
         a += ui->tbl->lineEdit(i, 4)->getDouble() * ui->tbl->getDouble(i, 5);
     }
+
     ui->leTotalQty->setDouble(q);
     ui->leTotalAmount->setDouble(a);
 }
@@ -261,7 +294,7 @@ void DlgMovement::on_leSearch_returnPressed()
 
 void DlgMovement::on_btnSave_clicked()
 {
-    if (saveDoc(DOC_STATE_DRAFT)) {
+    if(saveDoc(DOC_STATE_DRAFT)) {
         C5Message::info(tr("Saved"));
         close();
     }
@@ -269,15 +302,16 @@ void DlgMovement::on_btnSave_clicked()
 
 void DlgMovement::on_btnExit_clicked()
 {
-    if (C5Message::question(tr("Confirm to exit")) != QDialog::Accepted) {
+    if(C5Message::question(tr("Confirm to exit")) != QDialog::Accepted) {
         return;
     }
+
     accept();
 }
 
 void DlgMovement::on_leFilter_textChanged(const QString &arg1)
 {
-    for (int i = 0; i < ui->tbl->rowCount(); i++) {
+    for(int i = 0; i < ui->tbl->rowCount(); i++) {
         ui->tbl->setRowHidden(i,
                               !ui->tbl->getString(i, 1).contains(arg1, Qt::CaseInsensitive)
                               && !ui->tbl->getString(i, 2).contains(arg1, Qt::CaseInsensitive));
@@ -286,7 +320,7 @@ void DlgMovement::on_leFilter_textChanged(const QString &arg1)
 
 void DlgMovement::on_btnSaveAndAccept_clicked()
 {
-    if (saveDoc(DOC_STATE_SAVED)) {
+    if(saveDoc(DOC_STATE_SAVED)) {
         C5Message::info(tr("Saved"));
         close();
     }

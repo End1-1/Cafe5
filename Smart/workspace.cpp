@@ -82,6 +82,9 @@ Workspace::Workspace() :
     //setWindowFlags(Qt::WindowStaysOnTopHint);
     fTypeFilter = -1;
     QRect r = qApp->screens().at(0)->geometry();
+#ifdef  QT_DEBUG
+    r = this->geometry();
+#endif
 
     switch(r.width()) {
     case 1280:
@@ -299,6 +302,10 @@ void Workspace::filter(const QString &name)
 
         ui->tblDishes->setCellWidget(row, col, m);
         col++;
+
+        if(__c5config.fMainJson["smart_pictures"].toBool()) {
+            m->setImage();
+        }
 
         if(col > ui->tblDishes->columnCount() - 1) {
             col = 0;
@@ -994,7 +1001,7 @@ void Workspace::on_leReadCode_returnPressed()
                     return;
                 }
             } else {
-                auto *dv = new dlgvisit(code, this);
+                auto *dv = new dlgvisit(code);
                 dv->exec();
                 dv->deleteLater();
             }
@@ -2086,6 +2093,10 @@ void Workspace::initResponse(const QJsonObject &jdoc)
         return;
     }
 
+    if(__c5config.fMainJson["smart_pictures"].toBool()) {
+        ui->tblDishes->verticalHeader()->setDefaultSectionSize(300);
+    }
+
     if(ui->tblTables->columnCount() > 0) {
         LogWriter::write(LogWriterLevel::verbose, "init", "first table click");
         on_tblTables_itemClicked(ui->tblTables->item(0, 0));
@@ -2840,6 +2851,8 @@ void Workspace::initMenu()
             continue;
         }
 
+        QPixmap p;
+        p.loadFromData(QByteArray::fromBase64(j["f_image"].toString().toLatin1()));
         Dish *d = new Dish();
         d->menuid = j["menuid"].toInt();
         d->id = j["f_id"].toInt();
@@ -2860,6 +2873,7 @@ void Workspace::initMenu()
         d->typeName = j["f_groupname"].toString();
         d->specialDiscount = j["f_specialdiscount"].toDouble() / 100;
         d->qrRequired = j["f_qr"].toString().toInt();
+        d->pixmap = p.scaled(QSize(300, 300), Qt::KeepAspectRatio, Qt::SmoothTransformation);
         fDishes.append(d);
 
         if(d->barcode.isEmpty() == false) {

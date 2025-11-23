@@ -5,7 +5,7 @@
 #include <QKeyEvent>
 
 DlgGoodsList::DlgGoodsList(int currency) :
-    C5Dialog(true),
+    C5Dialog(),
     ui(new Ui::DlgGoodsList)
 {
     ui->setupUi(this);
@@ -46,7 +46,8 @@ DlgGoodsList::DlgGoodsList(int currency) :
     ui->tbl->setRowCount(db.rowCount());
     int row = 0;
     double totalRetail = 0, totalWholesale = 0;
-    while (db.nextRow()) {
+
+    while(db.nextRow()) {
         ui->tbl->setData(row, 0, db.getInt("f_goods"));
         ui->tbl->setData(row, 1, db.getString("f_groupname"));
         ui->tbl->setData(row, 2, db.getString("f_scancode"));
@@ -60,10 +61,11 @@ DlgGoodsList::DlgGoodsList(int currency) :
         totalWholesale += db.getDouble("f_price2") * db.getDouble("f_qty");
         row++;
     }
+
     ui->leTotalRetail->setDouble(totalRetail);
     // ui->leTotalRetail->setVisible(__c5config.getValue(param_shop_hide_store_qty).toInt() == 1);
     // ui->lbTotalRetail->setVisible(ui->leTotalRetail->isVisible());
-    ui->tbl->setColumnHidden(6, !__c5config.fMainJson["show_whosale_price"].toBool() );
+    ui->tbl->setColumnHidden(6, !__c5config.fMainJson["show_whosale_price"].toBool());
     ui->leSearch->installEventFilter(this);
     ui->tbl->resizeColumnsToContents();
 }
@@ -75,57 +77,69 @@ DlgGoodsList::~DlgGoodsList()
 
 bool DlgGoodsList::event(QEvent *event)
 {
-    if (event->type() == QEvent::KeyRelease) {
-        QKeyEvent *ke = static_cast<QKeyEvent *>(event);
+    if(event->type() == QEvent::KeyRelease) {
+        QKeyEvent *ke = static_cast<QKeyEvent*>(event);
+
         switch(ke->key()) {
-            case Qt::Key_Up: {
-                int r = ui->tbl->currentRow() - 1;
-                do {
-                    if (ui->tbl->isRowHidden(r)) {
-                        r--;
-                    } else {
+        case Qt::Key_Up: {
+            int r = ui->tbl->currentRow() - 1;
+
+            do {
+                if(ui->tbl->isRowHidden(r)) {
+                    r--;
+                } else {
+                    break;
+                }
+            } while(r > -1);
+
+            if(r < 0) {
+                for(int i = 0; i < ui->tbl->rowCount(); i++) {
+                    if(!ui->tbl->isRowHidden(i)) {
+                        r = i;
                         break;
                     }
-                } while (r > -1);
-                if (r < 0) {
-                    for (int i = 0; i < ui->tbl->rowCount(); i++) {
-                        if (!ui->tbl->isRowHidden(i)) {
-                            r = i;
-                            break;
-                        }
-                    }
                 }
-                ui->tbl->setCurrentCell(r, 0);
-                break;
             }
-            case Qt::Key_Down: {
-                int r = ui->tbl->currentRow() + 1;
-                do {
-                    if (ui->tbl->isRowHidden(r)) {
-                        r++;
-                    } else {
-                        break;
-                    }
-                } while (r < ui->tbl->rowCount());
-                if (r > ui->tbl->rowCount() - 1) {
-                    r = ui->tbl->rowCount() - 1;
+
+            ui->tbl->setCurrentCell(r, 0);
+            break;
+        }
+
+        case Qt::Key_Down: {
+            int r = ui->tbl->currentRow() + 1;
+
+            do {
+                if(ui->tbl->isRowHidden(r)) {
+                    r++;
+                } else {
+                    break;
                 }
-                ui->tbl->setCurrentCell(r, 0);
-                break;
+            } while(r < ui->tbl->rowCount());
+
+            if(r > ui->tbl->rowCount() - 1) {
+                r = ui->tbl->rowCount() - 1;
             }
-            case Qt::Key_Enter:
-            case Qt::Key_Return: {
-                int r = ui->tbl->currentRow();
-                if (r > -1) {
-                    fGoodsId = ui->tbl->getInteger(r, 0);
-                    emit getGoods(fGoodsId, ui->tbl->getDouble(r, 4) - ui->tbl->getDouble(r, 7) - - ui->tbl->getDouble(r, 8),
-                                  ui->tbl->getDouble(r, 5), ui->tbl->getDouble(r, 6) );
-                    accept();
-                }
-                break;
+
+            ui->tbl->setCurrentCell(r, 0);
+            break;
+        }
+
+        case Qt::Key_Enter:
+        case Qt::Key_Return: {
+            int r = ui->tbl->currentRow();
+
+            if(r > -1) {
+                fGoodsId = ui->tbl->getInteger(r, 0);
+                emit getGoods(fGoodsId, ui->tbl->getDouble(r, 4) - ui->tbl->getDouble(r, 7) - - ui->tbl->getDouble(r, 8),
+                              ui->tbl->getDouble(r, 5), ui->tbl->getDouble(r, 6));
+                accept();
             }
+
+            break;
+        }
         }
     }
+
     return QDialog::event(event);
 }
 
@@ -133,20 +147,25 @@ void DlgGoodsList::on_leSearch_textChanged(const QString &arg1)
 {
     ui->tbl->selectionModel()->clear();
     QList<int> cols;
-    if (ui->chName->isChecked()) {
+
+    if(ui->chName->isChecked()) {
         cols.append(3);
     }
-    if (ui->chScancode->isChecked()) {
+
+    if(ui->chScancode->isChecked()) {
         cols.append(2);
     }
-    for (int r = 0; r < ui->tbl->rowCount(); r++) {
+
+    for(int r = 0; r < ui->tbl->rowCount(); r++) {
         bool hidden = true && !arg1.isEmpty();
-        for (int c : cols) {
-            if (ui->tbl->getString(r, c).contains(arg1, Qt::CaseInsensitive)) {
+
+        for(int c : cols) {
+            if(ui->tbl->getString(r, c).contains(arg1, Qt::CaseInsensitive)) {
                 hidden = false;
                 break;
             }
         }
+
         ui->tbl->setRowHidden(r, hidden);
     }
 }

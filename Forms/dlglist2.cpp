@@ -2,7 +2,7 @@
 #include "ui_dlglist2.h"
 
 DlgList2::DlgList2(QWidget *parent) :
-    C5Dialog(parent),
+    C5Dialog(),
     ui(new Ui::DlgList2)
 {
     ui->setupUi(this);

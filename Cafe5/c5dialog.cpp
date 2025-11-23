@@ -19,26 +19,13 @@ C5Dialog::C5Dialog() :
 #endif
 #endif
 #ifdef  QT_DEBUG
-    // setMaximumSize(QSize(1024, 768));
-    setMaximumSize(1280, 1024);
+#ifndef FRONTDESK
+    setMinimumSize(DEBUG_SIZE);
+    setMaximumSize(DEBUG_SIZE);
+#endif
 #endif
 
     if(__mainWindow == nullptr) {
-        __mainWindow = this;
-    }
-
-    fHttp = new NInterface(this);
-}
-
-C5Dialog::C5Dialog(bool noparent) :
-    QDialog(noparent ? nullptr : __mainWindow,  C5Config::isAppFullScreen() ? Qt::FramelessWindowHint : Qt::Window)
-{
-#ifdef WAITER
-    QScreen *screen = QGuiApplication::primaryScreen();
-    setMaximumSize(screen->geometry().size());
-#endif
-
-    if(!noparent && __mainWindow == nullptr) {
         __mainWindow = this;
     }
 

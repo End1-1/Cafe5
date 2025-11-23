@@ -23,6 +23,7 @@ struct IUser {
 
 struct Flag {
     int id;
+    int enabled;
     QString field;
     QString name;
 };
@@ -39,9 +40,9 @@ public:
 
     ~Working();
 
-    WOrder *worder();
+    WOrder* worder();
 
-    WOrder *newSale(int type);
+    WOrder* newSale(int type);
 
     bool eventFilter(QObject *watched, QEvent *event);
 
@@ -49,11 +50,11 @@ public:
 
     void setActiveWidget(WOrder *w);
 
-    WOrder *findDraft(const QString &draftid);
+    WOrder* findDraft(const QString &draftid);
 
     void openDraft(const QString &draftid);
 
-    static Working *working();
+    static Working* working();
 
     static QMap<int, Flag> fFlags;
 
@@ -65,7 +66,7 @@ public:
 
     QList<IUser> fCurrentUsers;
 
-    QTabWidget *fTab;
+    QTabWidget* fTab;
 
     Flag flag(int id);
 
@@ -75,15 +76,15 @@ public slots:
     void getGoods(int id);
 
 private:
-    Ui::Working *ui;
+    Ui::Working* ui;
 
-    static Working *fInstance;
+    static Working* fInstance;
 
-    NInterface *fHttp;
+    NInterface* fHttp;
 
-    C5User *fUser;
+    C5User* fUser;
 
-    WCustomerDisplay *fCustomerDisplay;
+    WCustomerDisplay* fCustomerDisplay;
 
     void loadStaff();
 
@@ -95,7 +96,7 @@ private:
 
     bool fUpFinished;
 
-    QMovie *mMovie;
+    QMovie* mMovie;
 
     void openSearch();
 

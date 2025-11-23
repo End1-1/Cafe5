@@ -765,7 +765,7 @@ void ViewOrder::on_btnPrintPrices_clicked()
 
     while(db.nextRow()) {
         QFont font(qApp->font());
-        font.setPointSize(46);
+        font.setPointSize(44);
         font.setBold(true);
         C5Printing p;
 
@@ -780,17 +780,19 @@ void ViewOrder::on_btnPrintPrices_clicked()
         p.br(6);
         bool print = false;
         int qty =  db.getInt("f_qty");
+        //p.line(4);
+        p.line(50, p.fTop, 270, p.fTop, 4);
 
         if(db.getInt("gg") == 0) {
             if(db.getDouble("fp2") > 0) {
                 print = true;
-                p.ctext(float_str(db.getDouble("fp2"), 1));
+                p.ctext(float_str(db.getDouble("fp2"), 1) + "֏");
                 qty =  db.getInt("f_qty2");
             }
         } else {
             if(db.getDouble("fp1") > 0) {
                 print = true;
-                p.ctext(float_str(db.getDouble("fp1"), 1));
+                p.ctext(float_str(db.getDouble("fp1"), 1) + "֏");
             }
         }
 

@@ -63,7 +63,6 @@
 #include "cr5discountsystem.h"
 #include "cr5dishpackage.h"
 #include "cr5goodsgroup.h"
-#include "cr5menureview.h"
 #include "cr5mfproduct.h"
 #include "cr5databases.h"
 #include "cr5routedaily.h"
@@ -686,7 +685,7 @@ void C5MainWindow::on_listWidgetItemClicked(const QModelIndex &index)
         break;
 
     case cp_t4_menu_review:
-        createTab<CR5MenuReview>();
+        createNTab("/engine/v2/reports/menu-review/get", ":/hummer.png");
         break;
 
     case cp_t6_units:

@@ -693,7 +693,7 @@
             <enum>Qt::FocusPolicy::NoFocus</enum>
            </property>
            <property name="text">
-            <string>F3</string>
+            <string>MyPay</string>
            </property>
            <property name="checkable">
             <bool>true</bool>

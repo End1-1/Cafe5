@@ -14,11 +14,13 @@
 #include "c5discountredeem.h"
 #include "c5salefromstoreorder.h"
 #include "c5costumerdebtpayment.h"
+#include "c5dishwidget.h"
 
 static const QString hDebt = "90dd520c-f072-11ee-b90b-7c10c9bcac82";
 static const QString hShortDebt = "ec26fd1c-2391-11ef-a99a-7c10c9bcac82";
 static const QString hDraftSale  = "39617ca7-8fa4-11ed-8ad3-1078d2d2b808";
 static const QString hDiscountReturnAmount = "d563c585-aeb9-11f0-a2cb-8a884be02f31";
+static const QString hMenuReview = "65a0e1d4-c843-11f0-9ee3-0a002700000e";
 
 NHandler::NHandler(QObject *parent)
     : QObject{parent}
@@ -37,6 +39,9 @@ void NHandler::handle(const QJsonArray &ja)
     if(mHandlers.length() < 2) {
         return;
     }
+
+    int row = mTableView->currentIndex().row();
+    auto *m = static_cast<NTableModel*>(mTableView->model());
 
     if(mHandlers.at(1).toString() == hDebt) {
         switch(mFilterDlg->filterValue("mode").toInt()) {
@@ -85,21 +90,42 @@ void NHandler::handle(const QJsonArray &ja)
         auto *retaildoc = __mainWindow->createTab<C5SaleDoc>();
         retaildoc->openDraft(ja.at(0).toString());
     } else if(mHandlers.at(1).toString() == hDiscountReturnAmount) {
-        int row = mTableView->currentIndex().row();
-
         if(row < 0) {
             return;
         }
 
-        auto *m = static_cast<NTableModel*>(mTableView->model());
-        C5DiscountRedeem dr(m->data(row, 0).toString(), m->data(row, 0).toInt());
-        dr.exec();
+        int type = m->data(row, 3).toInt();
+
+        switch(type) {
+        case 4: {
+        }
+
+        case 9: {
+            C5DiscountRedeem dr(m->data(row, 0).toString(), m->data(row, 0).toInt());
+            dr.exec();
+        }
+        }
+    } else if(mHandlers.at(1).toString()  == hMenuReview) {
+        if(row < 0) {
+            return;
+        }
+
+        auto *ep = new C5DishWidget();
+        auto *e = C5Editor::createEditor(ep, m->data(row, 0).toInt());
+        QList<QMap<QString, QVariant> > data;
+
+        if(e->getResult(data)) {
+        }
+
+        delete e;
     }
 }
 
 void NHandler::toolWidget(QWidget *w)
 {
     auto *gl = static_cast<QGridLayout*>(w->layout());
+    auto *m = static_cast<NTableModel*>(mTableView->model());
+    int row = mTableView->currentIndex().row();
 
     if(mHandlers.size() > 0) {
         if(mHandlers.contains(hDebt)) {
@@ -127,14 +153,11 @@ void NHandler::toolWidget(QWidget *w)
             b->setText(tr("Spent accumulated"));
             b->setAutoRaise(true);
             b->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
-            connect(b, &QAbstractButton::clicked, [this]() {
-                int row = mTableView->currentIndex().row();
-
+            connect(b, &QAbstractButton::clicked, this, [m, row]() {
                 if(row < 0) {
                     return;
                 }
 
-                auto *m = static_cast<NTableModel*>(mTableView->model());
                 C5CostumerDebtPayment cb(BCLIENTDEBTS_SOURCE_SALE);
                 cb.setProperty("uuid", m->data(row, 0).toString());
                 cb.setPartnerAndAmount(m->data(row, 1, Qt::EditRole).toInt(), m->data(row, 6, Qt::EditRole).toDouble(),
@@ -148,12 +171,10 @@ void NHandler::toolWidget(QWidget *w)
             b->setIcon(QIcon(":/new.png"));
             b->setText(tr("Redeem accumulated"));
             b->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
-            connect(b, &QToolButton::clicked, [this]() {
-                int row = mTableView->currentIndex().row();
+            connect(b, &QToolButton::clicked, this, [m, row]() {
                 int partner = 0;
 
                 if(row > -1) {
-                    auto *m = static_cast<NTableModel*>(mTableView->model());
                     partner = m->data(row, 2).toInt();
                 }
 
@@ -161,6 +182,7 @@ void NHandler::toolWidget(QWidget *w)
                 dr.exec();
             });
             gl->addWidget(b);
+        } else if(mHandlers.contains(hMenuReview)) {
         }
     }
 }

@@ -5,7 +5,10 @@
 #include "c5message.h"
 #include "c5printing.h"
 
-dlgvisit::dlgvisit(const QString &code, QWidget *parent) : C5Dialog(parent), ui(new Ui::dlgvisit),  fCode(code)
+dlgvisit::dlgvisit(const QString &code) :
+    C5Dialog(),
+    ui(new Ui::dlgvisit),
+    fCode(code)
 {
     ui->setupUi(this);
     fHttp->createHttpQueryLambda("engine/smart/visitcard.php", QJsonObject{{"method", "get"}, {"code", code}, {"config_id", __c5config.fSettingsName}},

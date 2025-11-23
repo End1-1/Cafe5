@@ -256,6 +256,7 @@ QJsonObject CE5Goods::makeJsonObject()
     j["f_nospecial_price"] = ui->chNoSpecialPrice->isChecked() ? 1 : 0;
     j["f_service"] = ui->chService->isChecked() ? 1 : 0;
     j["f_enabled"] = ui->chEnabled->isChecked() ? 1 : 0;
+    j["f_production"] = ui->chProduction->isChecked() ? 1  : 0;
     j["f_wholenumber"] = ui->chOnlyWholeNumber->isChecked() ? 1 : 0;
     j["f_complectout"] = ui->leComplectOutputQty->getDouble();
     j["f_component_exit"] = ui->chComponentExit->isChecked() ? 1 : 0;

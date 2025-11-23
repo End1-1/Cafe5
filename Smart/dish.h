@@ -3,6 +3,7 @@
 
 #include <QString>
 #include <QMetaType>
+#include <QPixmap>
 
 struct Dish {
     int menuid;
@@ -29,6 +30,7 @@ struct Dish {
     int quick;
     int qrRequired = 0;
     int specialMark = 0;
+    QPixmap pixmap;
     QString cardCode;
     QString packageName;
     QString obodyId;
@@ -78,6 +80,7 @@ struct Dish {
         packageName = d->packageName;
         obodyId = d->obodyId;
         f_emarks = d->f_emarks;
+        pixmap = d->pixmap;
     }
 };
 Q_DECLARE_METATYPE(Dish*)

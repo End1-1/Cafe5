@@ -369,8 +369,8 @@ void DlgReturnItem::on_btnReturn_clicked()
         int storeid = db.getInt("f_storeid");
 
         if(!dw.writeAStoreDraft(adraftid, storeDocId, __c5config.defaultStore(), 1,
-                                storeid, ui->tblBody->getDouble(j, 4),
-                                price, price * ui->tblBody->getDouble(j, 4),
+                                storeid, l->getDouble(),
+                                price, price * l->getDouble(),
                                 DOC_REASON_SALE_RETURN, adraftid, j + 1, "")) {
             C5Message::error(dw.fErrorMsg);
             ui->btnReturn->setEnabled(true);
@@ -441,7 +441,8 @@ void DlgReturnItem::on_btnReturn_clicked()
     dw.writeAHeaderCash(fCashUuid, 0, __c5config.cashId(), 1, storeDocId, "");
     dw.writeECash(fCashRowId, fCashUuid, __c5config.cashId(), -1, purpose, ui->leReturnAmount->getDouble(), fCashRowId, 1);
 
-    if(!dw.writeAHeaderStore(storeDocId, oheader.staff, oheader.staff, "", QDate::currentDate(), __c5config.defaultStore(),
+    if(!dw.writeAHeaderStore(storeDocId, oheader.staff, oheader.staff, "",
+                             QDate::currentDate(), __c5config.defaultStore(),
                              0, 1, fCashUuid, 0, 0, oheader._id())) {
         C5Message::error(dw.fErrorMsg);
         ui->btnReturn->setEnabled(true);
@@ -485,7 +486,8 @@ void DlgReturnItem::on_btnReturn_clicked()
     }
 
     if(dw.writeInput(storeDocId, err)) {
-        if(!dw.writeAHeader(storeDocId, storedocUserNum, DOC_STATE_SAVED, DOC_TYPE_STORE_INPUT, oheader.staff,
+        if(!dw.writeAHeader(storeDocId, storedocUserNum, DOC_STATE_SAVED, DOC_TYPE_STORE_INPUT,
+                            oheader.staff,
                             QDate::currentDate(),
                             QDate::currentDate(), QTime::currentTime(), 0, 0, storeDocComment,
                             1, __c5config.getValue(param_default_currency).toInt())) {

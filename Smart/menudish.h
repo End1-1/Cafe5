@@ -3,7 +3,8 @@
 
 #include <QWidget>
 
-namespace Ui {
+namespace Ui
+{
 class menudish;
 }
 
@@ -16,10 +17,12 @@ class MenuDish : public QWidget
 public:
     explicit MenuDish(Dish *d, bool groupVisible);
     ~MenuDish();
-    Dish *fDish;
+    Dish* fDish;
+
+    void setImage();
 
 private:
-    Ui::menudish *ui;
+    Ui::menudish* ui;
 };
 
 #endif // MENUDISH_H

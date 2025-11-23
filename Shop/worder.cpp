@@ -94,9 +94,14 @@ WOrder::WOrder(C5User *user, int saleType, WCustomerDisplay *customerDisplay, QW
     fHttp = new NInterface(this);
     ui->btnF1->setVisible(false);
     ui->btnF2->setVisible(false);
-    ui->btnF3->setVisible(false);
-    ui->btnF4->setVisible(false);
+    ui->btnF3->setVisible(fWorking->flag(3).enabled);
+    ui->btnF4->setVisible(true);
     ui->btnF5->setVisible(false);
+    ui->btnF1->setText(fWorking->flag(1).name);
+    ui->btnF2->setText(fWorking->flag(2).name);
+    ui->btnF3->setText(fWorking->flag(3).name);
+    ui->btnF4->setText(fWorking->flag(4).name);
+    ui->btnF5->setText(fWorking->flag(5).name);
     C5Database db;
     QString err;
     fDraftSale.write(db, err);
@@ -212,6 +217,13 @@ void WOrder::imageConfig()
 
 bool WOrder::writeOrder()
 {
+    if(ui->btnF4->isChecked()) {
+        if(ui->leCustomerTaxpayerId->text().length() != 8) {
+            C5Message::error(tr("Invalid taxpayer tin"));
+            return false;
+        }
+    }
+
     if(fOGoods.count() == 0) {
         C5Message::error(tr("Empty order"));
         return false;
@@ -443,8 +455,8 @@ bool WOrder::writeOrder()
         QString jsonIn, jsonOut, err;
         int result = 0;
 
-        if(fOHeader.partner > 0) {
-            pt.fPartnerTin = fOHeader.taxpayerTin;
+        if(ui->btnF4->isChecked()) {
+            pt.fPartnerTin = ui->leCustomerTaxpayerId->text();
         }
 
         if(fOHeader.saleType != -1) {
