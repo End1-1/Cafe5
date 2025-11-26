@@ -61,7 +61,6 @@ void C5Permissions::init(C5Database &db, int group)
               << cp_t4_dishes
               << cp_t4_dish_remove_reason
               << cp_t4_dish_comments
-              << cp_t4_dish_price_self_cost
               << cp_t4_menu_review
               << cp_t4_dishes_packages
               << cp_t5_waiter

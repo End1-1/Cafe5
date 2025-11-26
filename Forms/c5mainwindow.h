@@ -18,6 +18,7 @@ class C5ToolBarWidget;
 class QListWidget;
 class C5Widget;
 class NTableWidget;
+class NTreeWidget;
 class NInterface;
 class QPushButton;
 
@@ -44,7 +45,11 @@ public:
 
     NTableWidget* createNTab(const QString &route, const QString &image, const QJsonObject &initParams = QJsonObject{});
 
+    NTreeWidget* createNTreeTab(const QString &route, const QString &image, const QJsonObject &initParams = QJsonObject{});
+
     void nTabDesign(const QIcon &icon, const QString &label, NTableWidget *widget);
+
+    void nTabTreeDesign(const QIcon &icon, const QString &label, NTreeWidget *widget);
 
     void removeTab(QWidget *w);
 

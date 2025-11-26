@@ -112,6 +112,8 @@ void C5SettingsWidget::setId(int id)
         ui->chRemindOutOfStock->setChecked(jo["remind_out_of_stock"].toBool());
         ui->leServiceItemCode->setInteger(jo["service_item_code"].toInt());
         ui->leDiscountItemCode->setInteger(jo["discount_item_code"].toInt());
+        //Shop
+        ui->leShopAutodiscountCardNumber->setText(jo["shop_autodiscount_card_number"].toString());
         QString s;
 
         for(int i = 0; i < ja.count(); i++) {
@@ -340,6 +342,7 @@ bool C5SettingsWidget::save(QString &err, QList<QMap<QString, QVariant> >& data)
     jc["print_total_qty_goods"] = ui->chPrintTotyalQntOfGoods->isChecked();
     jc["change_qty_return_items"] = ui->chDenyChangeQtyReturnItems->isChecked();
     jc["smart_pictures"] = ui->chSmartPictures->isChecked();
+    jc["shop_autodiscount_card_number"] =  ui->leShopAutodiscountCardNumber->text();
     QJsonArray ja;
     QStringList a = ui->leAvailableStore->text().split(",", Qt::SkipEmptyParts);
 

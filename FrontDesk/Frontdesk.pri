@@ -1,5 +1,6 @@
 FORMS += \
     $$PWD/../NTable/nsearchdlg.ui \
+    $$PWD/../NTable/ntreewidget.ui \
     ../Reports/cr5consuptionbysalesqty.ui \
     ../Classes/calculator.ui \
     ../Classes/notificationwidget.ui \
@@ -151,7 +152,6 @@ FORMS += \
     ../Editors/ce5table.ui \
     ../Editors/ce5createtablesforhall.ui \
     ../Reports/cr5menutranslator.ui \
-    ../Reports/cr5dishpriceselfcostfilter.ui \
     ../Reports/cr5storedocumentsfilter.ui \
     ../NTable/nloadingdlg.ui \
     ../NTable/nfilterdlg.ui
@@ -163,6 +163,9 @@ HEADERS += \
         $$PWD/../Classes/ean8generator.h \
         $$PWD/../NTable/nhandler.h \
         $$PWD/../NTable/nsearchdlg.h \
+        $$PWD/../NTable/ntreemodel.h \
+        $$PWD/../NTable/ntreenode.h \
+        $$PWD/../NTable/ntreewidget.h \
         ../NTable/ntablemodel.h \
         ../NTable/ndataprovider.h \
         ../NTable/ntablewidget.h \
@@ -449,8 +452,6 @@ HEADERS += \
         ../Editors/ce5table.h \
         ../Editors/ce5createtablesforhall.h \
         ../Reports/cr5menutranslator.h \
-        ../Reports/cr5dishpriceselfcost.h \
-        ../Reports/cr5dishpriceselfcostfilter.h \
         ../Reports/cr5storedocuments.h \
         ../Reports/cr5storedocumentsfilter.h \
         ../Classes/fileversion.h \
@@ -464,6 +465,9 @@ SOURCES += \
     $$PWD/../Classes/ean8generator.cpp \
     $$PWD/../NTable/nhandler.cpp \
     $$PWD/../NTable/nsearchdlg.cpp \
+    $$PWD/../NTable/ntreemodel.cpp \
+    $$PWD/../NTable/ntreenode.cpp \
+    $$PWD/../NTable/ntreewidget.cpp \
         ../NTable/ntablemodel.cpp \
         ../NTable/ndataprovider.cpp \
         ../NTable/ntablewidget.cpp \
@@ -741,8 +745,6 @@ SOURCES += \
         ../Editors/ce5table.cpp \
         ../Editors/ce5createtablesforhall.cpp \
         ../Reports/cr5menutranslator.cpp \
-        ../Reports/cr5dishpriceselfcost.cpp \
-        ../Reports/cr5dishpriceselfcostfilter.cpp \
         ../Reports/cr5storedocuments.cpp \
         ../Reports/cr5storedocumentsfilter.cpp \
         ../Classes/fileversion.cpp \

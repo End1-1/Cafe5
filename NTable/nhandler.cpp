@@ -23,7 +23,8 @@ static const QString hDiscountReturnAmount = "d563c585-aeb9-11f0-a2cb-8a884be02f
 static const QString hMenuReview = "65a0e1d4-c843-11f0-9ee3-0a002700000e";
 
 NHandler::NHandler(QObject *parent)
-    : QObject{parent}
+    : QObject{parent},
+      mTableView(nullptr)
 {
 }
 
@@ -121,10 +122,37 @@ void NHandler::handle(const QJsonArray &ja)
     }
 }
 
+void NHandler::handle(const QVariant &v)
+{
+    if(mHandlers.isEmpty()) {
+        return;
+    }
+
+    if(mHandlers.at(1).toString()  == hMenuReview) {
+        auto *ep = new C5DishWidget();
+        auto *e = C5Editor::createEditor(ep, v.toInt());
+        QList<QMap<QString, QVariant> > data;
+
+        if(e->getResult(data)) {
+        }
+
+        delete e;
+    }
+}
+
 void NHandler::toolWidget(QWidget *w)
 {
     auto *gl = static_cast<QGridLayout*>(w->layout());
-    auto *m = static_cast<NTableModel*>(mTableView->model());
+    NTableModel *m = nullptr;
+
+    if(mTableView) {
+        m = static_cast<NTableModel*>(mTableView->model());
+    }
+
+    if(!m) {
+        return;
+    }
+
     int row = mTableView->currentIndex().row();
 
     if(mHandlers.size() > 0) {

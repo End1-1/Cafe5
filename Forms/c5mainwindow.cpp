@@ -15,6 +15,7 @@
 #include "c5goodsprice.h"
 #include "c5translatorform.h"
 #include "ntablewidget.h"
+#include "ntreewidget.h"
 #include "c5goodsspecialprices.h"
 #include "c5login.h"
 #include "cr5breezeservice.h"
@@ -58,7 +59,6 @@
 #include "cr5dishpart2.h"
 #include "cr5ordermarks.h"
 #include "cr5draftoutputbyrecipe.h"
-#include "cr5dishpriceselfcost.h"
 #include "c5storeinventory.h"
 #include "cr5discountsystem.h"
 #include "cr5dishpackage.h"
@@ -191,10 +191,35 @@ NTableWidget* C5MainWindow::createNTab(const QString &route, const QString &imag
     return t;
 }
 
+NTreeWidget* C5MainWindow::createNTreeTab(const QString &route, const QString &image, const QJsonObject &initParams)
+{
+    auto *t = new NTreeWidget(route);
+    t->mMainWindow = this;
+    fTab->addTab(t, "");
+    fTab->setCurrentIndex(fTab->count() - 1);
+    t->mHost = __c5config.dbParams().at(1);
+    t->initParams(initParams);
+    t->query();
+    return t;
+}
+
 void C5MainWindow::nTabDesign(const QIcon &icon, const QString &label, NTableWidget *widget)
 {
     for(int i = 0; i < fTab->count(); i++) {
         auto *nt = dynamic_cast<NTableWidget*>(fTab->widget(i));
+
+        if(nt == widget) {
+            fTab->setTabText(i, label);
+            fTab->setTabIcon(i, icon);
+            return;
+        }
+    }
+}
+
+void C5MainWindow::nTabTreeDesign(const QIcon &icon, const QString &label, NTreeWidget *widget)
+{
+    for(int i = 0; i < fTab->count(); i++) {
+        auto *nt = dynamic_cast<NTreeWidget*>(fTab->widget(i));
 
         if(nt == widget) {
             fTab->setTabText(i, label);
@@ -680,12 +705,8 @@ void C5MainWindow::on_listWidgetItemClicked(const QModelIndex &index)
         createTab<CR5DishComment>();
         break;
 
-    case cp_t4_dish_price_self_cost:
-        createTab<CR5DishPriceSelfCost>();
-        break;
-
     case cp_t4_menu_review:
-        createNTab("/engine/v2/reports/menu-review/get", ":/hummer.png");
+        createNTreeTab("/engine/v2/reports/menu-review/get", ":/hummer.png");
         break;
 
     case cp_t6_units:
@@ -1044,7 +1065,6 @@ void C5MainWindow::setDB()
             addTreeL3Item(l, cp_t4_menu_names, tr("Menu names"), ":/menu.png");
             addTreeL3Item(l, cp_t4_dish_remove_reason, tr("Dish remove reasons"), ":/menu.png");
             addTreeL3Item(l, cp_t4_dish_comments, tr("Dish comments"), ":/menu.png");
-            addTreeL3Item(l, cp_t4_dish_price_self_cost, tr("Dish self cost report"), ":/menu.png");
             addTreeL3Item(l, cp_t4_menu_review, tr("Review menu"), ":/menu.png");
         }
     }

@@ -28,9 +28,9 @@ public:
 
     void setDish(int id);
 
-    virtual void selectorCallback(int row, const QVector<QJsonValue> &values);
+    virtual void selectorCallback(int row, const QVector<QJsonValue>& values);
 
-    virtual bool save(QString &err, QList<QMap<QString, QVariant> > &data);
+    virtual bool save(QString &err, QList<QMap<QString, QVariant> >& data);
 
     bool event(QEvent *e) override;
 
@@ -85,8 +85,10 @@ private slots:
 
     void on_leName_returnPressed();
 
+    void on_btnRecalcWeight_clicked();
+
 private:
-    Ui::C5DishWidget *ui;
+    Ui::C5DishWidget* ui;
 
     void countTotalSelfCost();
 

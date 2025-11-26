@@ -149,11 +149,12 @@
   <tabstop>leAddress</tabstop>
   <tabstop>leServerKey</tabstop>
   <tabstop>cbDatabases</tabstop>
+  <tabstop>leSettingsName</tabstop>
   <tabstop>leSettingsPassword</tabstop>
-  <tabstop>btnGetDatabases</tabstop>
-  <tabstop>btnShowPassword</tabstop>
   <tabstop>btnSave</tabstop>
   <tabstop>btnCancel</tabstop>
+  <tabstop>btnGetDatabases</tabstop>
+  <tabstop>btnShowPassword</tabstop>
  </tabstops>
  <resources>
   <include location="../resources/res.qrc"/>

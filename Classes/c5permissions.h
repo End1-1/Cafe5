@@ -59,7 +59,6 @@
 #define cp_t4_dishes 404
 #define cp_t4_dish_remove_reason 405
 #define cp_t4_dish_comments 406
-#define cp_t4_dish_price_self_cost 407
 #define cp_t4_menu_review 408
 #define cp_t4_dishes_packages 409
 

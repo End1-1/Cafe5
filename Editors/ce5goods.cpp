@@ -264,6 +264,7 @@ QJsonObject CE5Goods::makeJsonObject()
     j["f_queue"] = ui->leQueue->getInteger();
     j["f_description"] = ui->plainTextEdit->toPlainText();
     j["f_acc"] = ui->leAcc->text();
+    j["f_autodiscount"] = ui->leAutodiscount->text();
     fJsonData["goods"] = j;
     fJsonData["samestore"] = ui->chSameStoreId->isChecked();
     fJsonData["scangenerated"] = fScancodeGenerated;
@@ -390,6 +391,7 @@ void CE5Goods::openResponse(const QJsonObject &jdoc)
     ui->chComponentExit->setChecked(j["f_component_exit"].toInt() > 0);
     ui->leWebLink->setText(j["f_weblink"].toString());
     ui->leQueue->setInteger(j["f_queue"].toInt());
+    ui->leAutodiscount->setText(j["f_autodiscount"].toString());
     QJsonArray ja = jdoc["complect"].toArray();
 
     for(int i = 0; i < ja.size(); i++) {

@@ -14,12 +14,13 @@ public:
     explicit NHandler(QObject *parent = nullptr);
     void configure(NFilterDlg *filter, const QVariantList &handlers, QTableView *tv);
     void handle(const QJsonArray &ja);
+    void handle(const QVariant &v);
     void toolWidget(QWidget *w);
+    QVariantList mHandlers;
 
 private:
-    NFilterDlg *mFilterDlg;
-    QVariantList mHandlers;
-    QTableView *mTableView;
+    NFilterDlg* mFilterDlg;
+    QTableView* mTableView;
 
 signals:
 

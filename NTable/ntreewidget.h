@@ -1,11 +1,10 @@
-#ifndef NTABLEWIDGET_H
-#define NTABLEWIDGET_H
+#pragma once
 
 #include "c5widget.h"
 
 namespace Ui
 {
-class NTableWidget;
+class NTreeWidget;
 }
 
 class C5MainWindow;
@@ -13,13 +12,13 @@ class NLoadingDlg;
 class NFilterDlg;
 class NHandler;
 
-class NTableWidget : public C5Widget
+class NTreeWidget : public C5Widget
 {
     Q_OBJECT
 
 public:
-    explicit NTableWidget(const QString &route, QWidget *parent = nullptr);
-    ~NTableWidget();
+    explicit NTreeWidget(const QString &route, QWidget *parent = nullptr);
+    ~NTreeWidget();
     C5MainWindow* mMainWindow;
     static QString mHost;
     void query();
@@ -28,7 +27,7 @@ public:
     void initParams(const QJsonObject &o);
 
 private:
-    Ui::NTableWidget* ui;
+    Ui::NTreeWidget* ui;
     int fFilterColumn;
     QJsonObject fInitParams;
     QString mRoute;
@@ -51,9 +50,7 @@ private slots:
     void tblValueChanged(int v);
     void tblValueChanged2(int v);
     void on_leFilterLineedit_textEdited(const QString &arg1);
-    void on_mTableView_doubleClicked(const QModelIndex &index);
     virtual void tableViewHeaderContextMenuRequested(const QPoint &point);
     virtual void tableViewHeaderClicked(int index);
+    void on_mTreeView_doubleClicked(const QModelIndex &index);
 };
-
-#endif // NTABLEWIDGET_H

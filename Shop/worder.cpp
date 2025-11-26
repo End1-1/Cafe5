@@ -105,9 +105,6 @@ WOrder::WOrder(C5User *user, int saleType, WCustomerDisplay *customerDisplay, QW
     C5Database db;
     QString err;
     fDraftSale.write(db, err);
-#ifdef BF10
-    addGoods("10BF");
-#endif
 }
 
 WOrder::~WOrder()
@@ -1147,7 +1144,7 @@ void WOrder::reponseProcessCode(const QJsonObject &jdoc)
         QJsonObject card = jdoc["card"].toObject();
 
         if(card["f_mode"].toInt() == CARD_TYPE_DISCOUNT) {
-            if(__c5config.getValue(param_auto_discount) != card["f_code"].toString()) {
+            if(__c5config.fMainJson["shop_autodiscount_card_number"].toString() != card["f_code"].toString()) {
                 if(!checkDiscountRight()) {
                     fHttp->httpQueryFinished(sender());
                     return;
@@ -1216,6 +1213,15 @@ void WOrder::reponseProcessCode(const QJsonObject &jdoc)
         QJsonObject store = jdoc["store"].toObject();
         double price = 0;
 
+        if(ui->tblData->rowCount() > 0) {
+            if(!goods["f_autodiscount"].toString().isEmpty() && !__c5config.fMainJson["shop_autodiscount_card_number"].toString().isEmpty()) {
+                fHttp->httpQueryFinished(sender());
+                C5Message::error(tr("Only one item can be added to the special sale"));
+                return;
+            } else {
+            }
+        }
+
         switch(fOHeader.saleType) {
         case SALE_RETAIL:
             price = goods["f_price1"].toDouble();
@@ -1276,6 +1282,19 @@ void WOrder::reponseProcessCode(const QJsonObject &jdoc)
         ui->tblData->setDouble(row, col_stock, store["f_qty"].toDouble());
         ui->tblData->item(row, 0)->setData(Qt::UserRole + 101, jdoc["draftid"].toString());
         countTotal();
+
+        if(ui->tblData->rowCount() == 1) {
+            if(goods["f_autodiscount"].toString().isEmpty()) {
+                if(!__c5config.fMainJson["shop_autodiscount_card_number"].toString().isEmpty()) {
+                    addGoods(__c5config.fMainJson["shop_autodiscount_card_number"].toString());
+                }
+            } else {
+                if(!__c5config.fMainJson["shop_autodiscount_card_number"].toString().isEmpty()) {
+                    addGoods(goods["f_autodiscount"].toString());
+                }
+            }
+        }
+
         ImageLoader *il = new ImageLoader(goods["f_id"].toInt(), this);
         connect(il, SIGNAL(imageLoaded(QPixmap)), this, SLOT(imageLoaded(QPixmap)));
         connect(il, SIGNAL(noImage()), this, SLOT(noImage()));
