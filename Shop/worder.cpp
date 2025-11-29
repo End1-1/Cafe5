@@ -478,13 +478,36 @@ bool WOrder::writeOrder()
             }
 
             do {
-                result = pt.makeJsonAndPrint(fOHeader.amountCard + fOHeader.amountIdram + fOHeader.amountTelcell,
-                                             fOHeader.amountPrepaid, jsonIn, jsonOut, err);
+                if(__c5config.getValue(param_simple_fiscal).toInt() == 1) {
+                    if(__c5config.fMainJson["tax_dept"].toString().toInt() == 0) {
+                        C5Message::error(tr("Tax department is not set") + "<br>" + __c5config.fMainJson["tax_dept"].toString());
+                        return false;
+                    }
+
+                    result = pt.makeJsonAndPrintSimple(__c5config.fMainJson["tax_dept"].toString().toInt(), fOHeader.amountCard, 0, jsonIn, jsonOut, err);
+                } else {
+                    result = pt.makeJsonAndPrint(fOHeader.amountCard + fOHeader.amountIdram + fOHeader.amountTelcell,
+                                                 fOHeader.amountPrepaid, jsonIn, jsonOut, err);
+                }
 
                 if(result != pt_err_ok) {
                     if(err.contains("-5")) {
                         err = tr("Connection with fiscal machine lost");
                     }
+
+                    QJsonParseError jsonErr;
+                    QJsonObject jtax;
+                    jtax["f_order"] = fOHeader._id();
+                    jtax["f_elapsed"] = et.elapsed();
+                    jtax["f_in"] = QJsonDocument::fromJson(jsonIn.replace("'", "''").toUtf8(), &jsonErr).object();
+                    jtax["f_out"] = jsonOut;
+                    jtax["f_err"] = err;
+                    jtax["f_result"] = result;
+                    jtax["f_state"] = result == pt_err_ok ? 1 : 0;
+                    sql = QString(QJsonDocument(jtax).toJson(QJsonDocument::Compact));
+                    sql.replace("\\\"", "\\\\\"");
+                    sql.replace("'", "\\'");
+                    db.exec(QString("call sf_create_shop_tax('%1')").arg(sql));
 
                     switch(C5Message::question(err, tr("Try again"), tr("Do not print fiscal"))) {
                     case QDialog::Rejected:
@@ -497,7 +520,11 @@ bool WOrder::writeOrder()
                 }
             } while(result != pt_err_ok);
         } else {
-            result = pt.printAdvanceJson(fOHeader.amountCash, fOHeader.amountCard, jsonIn, jsonOut, err);
+            if(__c5config.getValue(param_simple_fiscal).toInt() == 1) {
+                result = pt.makeJsonAndPrintSimple(__c5config.fMainJson["tax_dept"].toString().toInt(), fOHeader.amountCard, 0, jsonIn, jsonOut, err);
+            } else {
+                result = pt.printAdvanceJson(fOHeader.amountCash, fOHeader.amountCard, jsonIn, jsonOut, err);
+            }
         }
 
         QJsonParseError jerr;
@@ -669,6 +696,10 @@ void WOrder::changeQty()
 
     if(fOGoods.at(row).discountMode == CARD_TYPE_MANUAL) {
         C5Message::error(tr("Cannot change the quantity on selected row with manual discount mode"));
+        return;
+    }
+
+    if(fOGoods.at(row).emarks.isEmpty() == false) {
         return;
     }
 
@@ -1145,10 +1176,10 @@ void WOrder::reponseProcessCode(const QJsonObject &jdoc)
 
         if(card["f_mode"].toInt() == CARD_TYPE_DISCOUNT) {
             if(__c5config.fMainJson["shop_autodiscount_card_number"].toString() != card["f_code"].toString()) {
-                if(!checkDiscountRight()) {
-                    fHttp->httpQueryFinished(sender());
-                    return;
-                }
+                // if(!checkDiscountRight()) {
+                //     fHttp->httpQueryFinished(sender());
+                //     return;
+                // }
             }
         }
 

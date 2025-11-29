@@ -174,18 +174,18 @@
 <context>
     <name>NDataProvider</name>
     <message>
-        <location filename="../NTable/ndataprovider.cpp" line="93"/>
-        <location filename="../NTable/ndataprovider.cpp" line="107"/>
+        <location filename="../NTable/ndataprovider.cpp" line="92"/>
+        <location filename="../NTable/ndataprovider.cpp" line="106"/>
         <source>Access denied</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../NTable/ndataprovider.cpp" line="98"/>
+        <location filename="../NTable/ndataprovider.cpp" line="97"/>
         <source>You must upgrade the application to continue using it</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../NTable/ndataprovider.cpp" line="99"/>
+        <location filename="../NTable/ndataprovider.cpp" line="98"/>
         <source>Click here to launch updater</source>
         <translation type="unfinished"></translation>
     </message>

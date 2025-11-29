@@ -124,6 +124,7 @@ void DlgReturnItem::on_tblOrder_cellClicked(int row, int column)
             ui->tblBody->setData(r, 8, jt["f_goods"].toInt());
             ui->tblBody->setData(r, 9, jt["f_return"].toInt());
             ui->tblBody->setData(r, 9, jt["f_returnedqty"].toDouble());
+            ui->tblBody->setData(r, 11, jt["f_discountfactor"].toDouble());
             auto *l = ui->tblBody->createLineEdit(r, 10);
             l->setEnabled(__c5config.fMainJson["change_qty_return_items"].toBool());
             l->setDouble(0);
@@ -528,7 +529,7 @@ void DlgReturnItem::countReturnAmount()
             double qtyTotalReturn = l->getDouble();
 
             if(qtyTotalReturn > 0) {
-                totalAmount += qtyTotalReturn * ui->tblBody->getDouble(i, 6);
+                totalAmount += qtyTotalReturn * (ui->tblBody->getDouble(i, 6) - (ui->tblBody->getDouble(i, 6) * (ui->tblBody->getDouble(i, 11) == 0 ? 0 : ui->tblBody->getDouble(i, 11))));
             }
         }
     }

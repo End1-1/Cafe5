@@ -248,7 +248,9 @@ void Workspace::removeDish(int rownum, const QString &packageuuid)
 
     if(d.id == C5Config::fMainJson["service_item_code"].toInt()
             || d.id == C5Config::fMainJson["discount_item_code"].toInt()) {
-        return;
+        if(packageuuid != "force") {
+            return;
+        }
     }
 
     if(d.qty2 > 0.01) {
@@ -2349,6 +2351,18 @@ void Workspace::openTableResponse(const QJsonObject &jdoc)
     }
 
     httpStop(sender());
+
+    if(ui->tblOrder->rowCount() == 1) {
+        Dish d = ui->tblOrder->item(0, 0)->data(Qt::UserRole).value<Dish>();
+
+        if(d.state == DISH_STATE_OK) {
+            if(d.id == C5Config::fMainJson["service_item_code"].toInt()) {
+                ui->tblOrder->setCurrentItem(ui->tblOrder->item(0, 0));
+                removeDish(0, "force");
+                return;
+            }
+        }
+    }
 }
 
 void Workspace::changeQtyResponse(const QJsonObject &jdoc)

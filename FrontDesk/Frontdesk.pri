@@ -166,6 +166,7 @@ HEADERS += \
         $$PWD/../NTable/ntreemodel.h \
         $$PWD/../NTable/ntreenode.h \
         $$PWD/../NTable/ntreewidget.h \
+        $$PWD/../NTable/treemodel.h \
         ../NTable/ntablemodel.h \
         ../NTable/ndataprovider.h \
         ../NTable/ntablewidget.h \
@@ -468,6 +469,7 @@ SOURCES += \
     $$PWD/../NTable/ntreemodel.cpp \
     $$PWD/../NTable/ntreenode.cpp \
     $$PWD/../NTable/ntreewidget.cpp \
+    $$PWD/../NTable/treemodel.cpp \
         ../NTable/ntablemodel.cpp \
         ../NTable/ndataprovider.cpp \
         ../NTable/ntablewidget.cpp \

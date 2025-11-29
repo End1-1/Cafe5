@@ -92,7 +92,7 @@
         <location filename="../Classes/c5cache.cpp" line="139"/>
         <location filename="../Classes/c5cache.cpp" line="145"/>
         <location filename="../Classes/c5cache.cpp" line="153"/>
-        <location filename="../Classes/c5cache.cpp" line="329"/>
+        <location filename="../Classes/c5cache.cpp" line="330"/>
         <source>Code</source>
         <translation>Կոդ</translation>
     </message>
@@ -128,7 +128,7 @@
         <location filename="../Classes/c5cache.cpp" line="115"/>
         <location filename="../Classes/c5cache.cpp" line="118"/>
         <location filename="../Classes/c5cache.cpp" line="139"/>
-        <location filename="../Classes/c5cache.cpp" line="329"/>
+        <location filename="../Classes/c5cache.cpp" line="330"/>
         <source>Name</source>
         <translation>Անվանում</translation>
     </message>
@@ -4006,18 +4006,18 @@ STOPLIST-ից</translation>
 <context>
     <name>NDataProvider</name>
     <message>
-        <location filename="../NTable/ndataprovider.cpp" line="93"/>
-        <location filename="../NTable/ndataprovider.cpp" line="107"/>
+        <location filename="../NTable/ndataprovider.cpp" line="92"/>
+        <location filename="../NTable/ndataprovider.cpp" line="106"/>
         <source>Access denied</source>
         <translation type="unfinished">Մուտքը արգելված է</translation>
     </message>
     <message>
-        <location filename="../NTable/ndataprovider.cpp" line="98"/>
+        <location filename="../NTable/ndataprovider.cpp" line="97"/>
         <source>You must upgrade the application to continue using it</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../NTable/ndataprovider.cpp" line="99"/>
+        <location filename="../NTable/ndataprovider.cpp" line="98"/>
         <source>Click here to launch updater</source>
         <translation type="unfinished"></translation>
     </message>

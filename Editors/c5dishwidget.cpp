@@ -917,7 +917,9 @@ void C5DishWidget::on_btnRecalcWeight_clicked()
         double weight  =  ui->tblRecipe->lineEdit(i, 3)->getDouble();
         double newWeight = weight * diff;
         ui->tblRecipe->lineEdit(i,  3)->setDouble(newWeight);
+        emit ui->tblRecipe->lineEdit(i, 3)->textEdited(ui->tblRecipe->lineEdit(i, 3)->text());
     }
 
     ui->leReadyWeight->setDouble(ui->leRecalcNewWeight->getDouble());
+    countTotalSelfCost();
 }

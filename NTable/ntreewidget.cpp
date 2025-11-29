@@ -47,27 +47,19 @@ NTreeWidget::NTreeWidget(const QString &route, QWidget *parent) :
     connect(ui->tblTotal->horizontalScrollBar(), SIGNAL(valueChanged(int)), this, SLOT(tblValueChanged2(int)));
     ui->widget->setVisible(false);
     mHandler = new NHandler(this);
-    // ui->mTreeView->setStyleSheet(
-    //     "QTreeView::branch { background: transparent; }"
-    //     "QTreeView::item {"
-    //     "border-right: 1px solid #ccc;"
-    //     "border-bottom: 1px solid #ccc;"
-    //     "color: black;"
-    //     "background: none;"    /* <--- ВАЖНО */
-    //     "}"
-    //     "QTreeView::item:selected {"
-    //     "background: #c8defc;"
-    //     "color: black;"
-    //     "}"
-    //     "QTreeView::item:selected:active {"
-    //     "background: #c8defc;"
-    //     "color: black;"
-    //     "}"
-    //     "QTreeView::item:selected:!active {"
-    //     "background: #dce9f9;"
-    //     "color: black;"
-    //     "}"
-    // );
+    ui->mTreeView->setRootIsDecorated(true);
+    ui->mTreeView->setIndentation(20);
+    ui->mTreeView->setStyleSheet(
+        "QTreeView::item {"
+        "border-right: 1px solid #ccc;"
+        "border-bottom: 1px solid #ccc;"
+        "color: black;"
+        "}"
+        "QTreeView::item:selected {"
+        "background: #c8defc;"
+        "color: black;"
+        "}"
+    );
 }
 
 NTreeWidget::~NTreeWidget()
@@ -181,6 +173,7 @@ void NTreeWidget::queryFinished(const QJsonObject &ba)
     QJsonObject jwidget = jo["widget"].toObject();
     mMainWindow->nTabTreeDesign(QIcon(jwidget["icon"].toString()), jwidget["title"].toString(), this);
     QJsonArray jcols = jo["cols"].toArray();
+    QJsonArray jchildcols = jo["childcols"].toArray();
     QJsonArray colSum = jo["sum"].toArray();
     QJsonArray jdata = jo["rows"].toArray();
     QJsonArray jhiddencols = jo["hiddencols"].toArray();
@@ -194,7 +187,7 @@ void NTreeWidget::queryFinished(const QJsonObject &ba)
     }
 
     auto *model = static_cast<NTreeModel* >(ui->mTreeView->model());
-    model->setDatasource(jcols, {}, jdata);
+    model->setDatasource(jcols, jchildcols, jdata);
     model->fSumColumnsSpecial = jo["sumspecial"].toArray();
     model->mRowColors.clear();
     ui->mTreeView->expandAll();
@@ -262,7 +255,11 @@ void NTreeWidget::exportToExcel()
     // Формат тела
     QXlsx::Format bf;
     bf.setBorderStyle(QXlsx::Format::BorderThin);
-    bf.setHorizontalAlignment(QXlsx::Format::AlignHCenter);
+    bf.setHorizontalAlignment(QXlsx::Format::AlignLeft);
+    QXlsx::Format bfb;
+    bfb.setBorderStyle(QXlsx::Format::BorderThin);
+    bfb.setHorizontalAlignment(QXlsx::Format::AlignLeft);
+    bfb.setFontBold(true);
     int currentExcelRow = 2;
     // Рекурсивный обход
     std::function<void(const QModelIndex&, int)> walk;

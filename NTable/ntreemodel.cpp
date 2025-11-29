@@ -26,16 +26,17 @@ void NTreeModel::setRoot(NTreeNode* node)
 
 bool NTreeModel::hasChildren(const QModelIndex &parent) const
 {
+    bool hc = false;
+
     if(!parent.isValid()) {
-        return m_root && !m_root->children.isEmpty();
+        hc = !m_root->children.isEmpty();
+    } else {
+        NTreeNode* node = static_cast<NTreeNode*>(parent.internalPointer());
+        hc = !node->children.isEmpty();
     }
 
-    NTreeNode *node = static_cast<NTreeNode*>(parent.internalPointer());
-
-    if(!node)
-        return false;
-
-    return !node->children.isEmpty();
+    qDebug() << "HasCHildreN" << hc;
+    return hc;
 }
 
 Qt::ItemFlags NTreeModel::flags(const QModelIndex &index) const
@@ -147,10 +148,10 @@ QVariant NTreeModel::data(const QModelIndex& index, int role) const
 
     int col = index.column();
 
-    if(col >= 0 && col < node->values.size())
-        return node->values[col];
+    if(col >= node->values.size())
+        return QVariant();   // пусто для отсутствующих полей
 
-    return QVariant();
+    return node->values[col];
 }
 
 QVariant NTreeModel::headerData(int section, Qt::Orientation orientation, int role) const

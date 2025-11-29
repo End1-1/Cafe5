@@ -297,6 +297,11 @@
        <string>Return Qty</string>
       </property>
      </column>
+     <column>
+      <property name="text">
+       <string>Discount</string>
+      </property>
+     </column>
     </widget>
    </item>
    <item row="5" column="0">
