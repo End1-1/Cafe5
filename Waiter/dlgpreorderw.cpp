@@ -3,12 +3,11 @@
 #include "dlgtext.h"
 #include "dlgface.h"
 #include "c5tabledata.h"
-#include "c5config.h"
-#include "c5database.h"
+#include "ninterface.h"
 #include "c5utils.h"
 #include "c5message.h"
 #include "c5tabledata.h"
-#include "axreporting.h"
+#include "c5waiterconfiguration.h"
 #include "dlgreceiptlanguage.h"
 #include <QClipboard>
 #include <QCalendarWidget>
@@ -17,15 +16,17 @@
 #include <QFile>
 #include <QDir>
 
-DlgPreorder::DlgPreorder(const QJsonObject &jdoc) :
-    C5Dialog(),
+DlgPreorder::DlgPreorder(C5User *user, const QJsonObject &jdoc) :
+    C5WaiterDialog(user),
     ui(new Ui::DlgPreorder),
     fDoc(jdoc)
 {
     ui->setupUi(this);
     ui->leDate->setMinimumDate(QDate::currentDate());
-    ui->leDate->setDate(QDate::fromString(__c5config.getValue(param_date_cash), FORMAT_DATE_TO_STR_MYSQL));
-    if (jdoc["header"].toObject().isEmpty() == false) {
+
+    //TODO
+    //ui->leDate->setDate(QDate::fromString(__c5config.getValue(param_date_cash), FORMAT_DATE_TO_STR_MYSQL));
+    if(jdoc["header"].toObject().isEmpty() == false) {
         openDoc();
     } else {
         ui->leTable->setText(tds("h_tables", "f_name", jdoc["f_table"].toInt()));
@@ -40,13 +41,14 @@ DlgPreorder::~DlgPreorder()
 
 void DlgPreorder::openReservationResponse(const QJsonObject &jdoc)
 {
-    fHttp->httpQueryFinished(sender());
-    AXReporting a(this);
-    int r = DlgReceiptLanguage::receipLanguage();
-    if (r < 0) {
-        return;
-    }
-    a.printReservation(jdoc, r);
+    //TODO
+    // fHttp->httpQueryFinished(sender());
+    // AXReporting a(this);
+    // int r = DlgReceiptLanguage::receipLanguage();
+    // if(r < 0) {
+    //     return;
+    // }
+    // a.printReservation(jdoc, r);
 }
 
 void DlgPreorder::checkinResponse(const QJsonObject &jdoc)
@@ -68,7 +70,8 @@ void DlgPreorder::saveResponse(const QJsonObject &jdoc)
     fDoc = jdoc;
     fHttp->httpQueryFinished(sender());
     C5Message::info(tr("Saved"));
-    if (fDoc["withcheckin"].toBool()) {
+
+    if(fDoc["withcheckin"].toBool()) {
         accept();
     } else {
         setState();
@@ -82,26 +85,29 @@ void DlgPreorder::on_btnCancel_clicked()
 
 void DlgPreorder::on_btnOK_clicked()
 {
-    if (ui->leTable->property("id").toInt() == 0) {
+    if(ui->leTable->property("id").toInt() == 0) {
         C5Message::error(tr("Select table for reservation"));
         return;
     }
+
     save(false);
 }
 
 void DlgPreorder::on_btnEditGuestname_clicked()
 {
     QString txt;
-    if (DlgText::getText(tr("Guest name"), txt)) {
+
+    if(DlgText::getText(tr("Guest name"), txt)) {
         ui->leGuestName->setText(txt);
-        C5Database db;
-        db[":f_contact"] = ui->leGuestName->text();
+        //TODO
+        // C5Database db;
+        // db[":f_contact"] = ui->leGuestName->text();
     }
 }
 
 void DlgPreorder::on_btnCancelReserve_clicked()
 {
-    if (C5Message::question(tr("Are you sure to cancel this booking?")) == QDialog::Accepted) {
+    if(C5Message::question(tr("Are you sure to cancel this booking?")) == QDialog::Accepted) {
         fHttp->createHttpQuery("/engine/waiter/reservation-cancel.php",
         QJsonObject{{"id", fDoc["header"].toObject()["f_id"].toString()}}, SLOT(
             cancelResponse(QJsonObject)));
@@ -111,9 +117,11 @@ void DlgPreorder::on_btnCancelReserve_clicked()
 void DlgPreorder::on_btnSelectTable_clicked()
 {
     int tableId;
-    if (!DlgFace::getTable(tableId, __c5config.defaultHall(), __user)) {
+
+    if(!DlgFace::getTable(tableId, C5WaiterConfiguration::instance()->defaultHall(), mUser)) {
         return;
     }
+
     ui->leTable->setProperty("id", tableId);
     ui->leTable->setText(tds("h_tables", "f_name", tableId));
 }
@@ -149,13 +157,15 @@ void DlgPreorder::openDoc()
 void DlgPreorder::save(bool withcheckin)
 {
     QJsonObject j = fDoc["header"].toObject();
-    if (j.isEmpty()) {
+
+    if(j.isEmpty()) {
         fDoc["id"] = "";
         j["f_state"] = ORDER_STATE_PREORDER_EMPTY;
         j["f_hall"] = fDoc["f_hall"];
     } else {
         fDoc["id"] = j["f_id"].toString();
     }
+
     j["f_table"] = ui->leTable->property("id").toInt();
     j["f_guests"] = ui->leGuest->value();
     fDoc["header"] = j;
@@ -179,13 +189,14 @@ void DlgPreorder::save(bool withcheckin)
 
 void DlgPreorder::setState()
 {
-    const QJsonObject &jheader = fDoc["header"].toObject();
-    const QJsonObject &jhotel = fDoc["hoteldata"].toObject();
-    ui->btnCheckin->setEnabled(jheader["f_state"].toInt() == ORDER_STATE_PREORDER_EMPTY
-                               || jheader["f_state"].toInt() == ORDER_STATE_PREORDER_WITH_ORDER);
-    QDate checkin = QDate::fromString(jhotel["f_checkin"].toString(), FORMAT_DATE_TO_STR_MYSQL);
-    QDate workingday = QDate::fromString(__c5config.dateCash(), FORMAT_DATE_TO_STR_MYSQL);
-    ui->btnCheckin->setEnabled(ui->btnCheckin->isEnabled() && (checkin == workingday));
+    //TODO
+    // const QJsonObject &jheader = fDoc["header"].toObject();
+    // const QJsonObject &jhotel = fDoc["hoteldata"].toObject();
+    // ui->btnCheckin->setEnabled(jheader["f_state"].toInt() == ORDER_STATE_PREORDER_EMPTY
+    //                            || jheader["f_state"].toInt() == ORDER_STATE_PREORDER_WITH_ORDER);
+    // QDate checkin = QDate::fromString(jhotel["f_checkin"].toString(), FORMAT_DATE_TO_STR_MYSQL);
+    // QDate workingday = QDate::fromString(__c5config.dateCash(), FORMAT_DATE_TO_STR_MYSQL);
+    // ui->btnCheckin->setEnabled(ui->btnCheckin->isEnabled() && (checkin == workingday));
 }
 
 void DlgPreorder::on_btnCopyID_clicked()

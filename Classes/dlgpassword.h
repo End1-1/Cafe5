@@ -1,7 +1,7 @@
 #ifndef DLGPASSWORD_H
 #define DLGPASSWORD_H
 
-#include <QDialog>
+#include "c5waiterdialog.h"
 
 namespace Ui
 {
@@ -10,7 +10,7 @@ class DlgPassword;
 
 class C5User;
 
-class DlgPassword : public QDialog
+class DlgPassword : public C5WaiterDialog
 {
     Q_OBJECT
 

@@ -6,6 +6,7 @@
 #include "dlgserverconnection.h"
 #include "c5config.h"
 #include "c5message.h"
+#include "c5officewidget.h"
 #include <QMessageBox>
 #include <QApplication>
 #include <QTranslator>
@@ -23,7 +24,7 @@ bool isDarkModeEnabled()
     return settings.value("AppsUseLightTheme", 1).toInt() == 0; // 0 — темная, 1 — светлая
 }
 
-int main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
 #ifndef QT_DEBUG
     QStringList libPath = QCoreApplication::libraryPaths();
@@ -37,36 +38,47 @@ int main(int argc, char *argv[])
     QApplication a(argc, argv);
     qputenv("QT_ASSUME_UTF8", "1");
     QTranslator t;
-    if (t.load(":/lang/FrontDesk.qm")) {
-        a.installTranslator( &t);
+
+    if(t.load(":/lang/FrontDesk.qm")) {
+        a.installTranslator(&t);
     }
+
     LogWriter::write(LogWriterLevel::verbose, "Support SSL", QSslSocket::supportsSsl() ? "true" : "false");
     LogWriter::write(LogWriterLevel::verbose, "Support SSL version", QSslSocket::sslLibraryBuildVersionString());
-    while (__c5config.getRegValue("ss_server_address").toString().isEmpty()) {
+
+    while(__c5config.getRegValue("ss_server_address").toString().isEmpty()) {
         DlgServerConnection::showSettings(nullptr);
     }
+
     auto c5sn  = new C5ServerName(__c5config.getRegValue("ss_server_address").toString());
-    if (!c5sn->getServers()) {
+
+    if(!c5sn->getServers()) {
         C5Message::error(c5sn->mErrorString);
         DlgServerConnection::showSettings(0);
         return -1;
     }
-    if (!c5sn->getConnection(__c5config.getRegValue("ss_database").toString())) {
+
+    if(!c5sn->getConnection(__c5config.getRegValue("ss_database").toString())) {
         C5Message::error(c5sn->mErrorString);
         DlgServerConnection::showSettings(0);
         return -1;
     }
+
     c5sn->deleteLater();
 #define LOGGING
-    if (__c5config.getRegValue("ss_server_address").toString().isEmpty() && C5ServerName::mServers.isEmpty()) {
+
+    if(__c5config.getRegValue("ss_server_address").toString().isEmpty() && C5ServerName::mServers.isEmpty()) {
         C5Message::error("Servername parameter must be pass as argument");
         return 1;
     }
+
     QString css;
-    if (!isDarkModeEnabled()) {
+
+    if(!isDarkModeEnabled()) {
         QFile style(a.applicationDirPath() + "/officestyle.css");
-        if (style.exists()) {
-            if (style.open(QIODevice::ReadOnly)) {
+
+        if(style.exists()) {
+            if(style.open(QIODevice::ReadOnly)) {
                 css = style.readAll();
                 QString css2(css);
                 css2.replace("%font-size%", "12");
@@ -75,21 +87,26 @@ int main(int argc, char *argv[])
             }
         }
     }
+
     C5Login l;
-    if (l.exec() == QDialog::Accepted) {
+
+    if(l.exec() == QDialog::Accepted) {
         C5Config::fSettingsName = __c5config.getRegValue("ss_settings").toString();
         C5Config::initParamsFromDb();
     } else {
         return 0;
     }
-    if (!isDarkModeEnabled()) {
+
+    if(!isDarkModeEnabled()) {
         css.replace("%font-size%", __c5config.getValue(param_fd_font_size));
         css.replace("%font-family%", __c5config.getValue(param_app_font_family));
         a.setStyleSheet(css);
     }
-    if (!C5SystemPreference::checkDecimalPointAndSeparator()) {
+
+    if(!C5SystemPreference::checkDecimalPointAndSeparator()) {
         return 0;
     }
+
     a.setStyle(QStyleFactory::create("fusion"));
     QFontDatabase::addApplicationFont(":/barcode.ttf");
     //    int id = QFontDatabase::addApplicationFont(":/ahuni.ttf");
@@ -100,8 +117,9 @@ int main(int argc, char *argv[])
     a.setFont(font);
     srand(time(NULL));
     C5MainWindow w;
+    w.mUser = C5OfficeWidget::mUser;
     w.showMaximized();
     a.processEvents();
-    w.on_actionLogin_triggered();
+    w.postLoginSetup();
     return a.exec();
 }

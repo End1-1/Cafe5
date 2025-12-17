@@ -1,9 +1,9 @@
 #ifndef C5DOCUMENT_H
 #define C5DOCUMENT_H
 
-#include "c5widget.h"
+#include "c5officewidget.h"
 
-class C5Document : public C5Widget
+class C5Document : public C5OfficeWidget
 {
     Q_OBJECT
 public:

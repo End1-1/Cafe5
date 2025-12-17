@@ -14,6 +14,8 @@ C5SettingsWidget::C5SettingsWidget(QWidget *parent) :
     ui->setupUi(this);
     ui->cbMenu->setDBValues("select f_id, f_name from d_menu_names order by 2");
     ui->cbDefaultStore->setDBValues("select f_id, f_name from c_storages order by 2");
+    ui->cbShopHall->setDBValues("select f_id, f_name from h_halls order by 2");
+    ui->cbWaiterHall->setDBValues("select f_id, f_name from h_halls order by 2");
     ui->cbTaxUseExtPos->addItem(tr("Yes"), "true");
     ui->cbTaxUseExtPos->addItem(tr("No"), "false");
     ui->cbFronDeskMode->addItem(tr("Waiter"), 0);
@@ -81,6 +83,8 @@ void C5SettingsWidget::setId(int id)
         ui->leCompanyBank->setText(jo["companybank"].toString());
         ui->leCompanyBankAccount->setText(jo["companybankaccount"].toString());
         ui->leCompanyAddress->setText(jo["companyaddress"].toString());
+        //shop config
+        ui->cbShopHall->setCurrentIndex(ui->cbShopHall->findText(jo["shop_hall_name"].toString()));
         //other
         ui->leChatOperatorUserId->setInteger(jo["chatoperatoruserid"].toInt());
         ui->chDenyLogout->setChecked(jo["denylogout"].toBool());
@@ -112,6 +116,8 @@ void C5SettingsWidget::setId(int id)
         ui->chRemindOutOfStock->setChecked(jo["remind_out_of_stock"].toBool());
         ui->leServiceItemCode->setInteger(jo["service_item_code"].toInt());
         ui->leDiscountItemCode->setInteger(jo["discount_item_code"].toInt());
+        //Waiter
+        ui->cbShopHall->setCurrentIndex(ui->cbShopHall->findText(jo["waiter_hall_name"].toString()));
         //Shop
         ui->leShopAutodiscountCardNumber->setText(jo["shop_autodiscount_card_number"].toString());
         QString s;
@@ -302,6 +308,7 @@ bool C5SettingsWidget::save(QString &err, QList<QMap<QString, QVariant> >& data)
     jc["companybankaccount"] = ui->leCompanyBankAccount->text();
     jc["companyaddress"] = ui->leCompanyAddress->text();
     jc["receiptprinter"] = ui->leLocalReceiptPrinter->text();
+    jc["receipt_printer"] = ui->leLocalReceiptPrinter->text();
     jc["chatoperatoruserid"] = ui->leChatOperatorUserId->text().toInt();
     jc["servicefactor"] = ui->leServiceFactor->getDouble();
     jc["debugmode"] = ui->chDebugMode->isChecked();
@@ -343,6 +350,12 @@ bool C5SettingsWidget::save(QString &err, QList<QMap<QString, QVariant> >& data)
     jc["change_qty_return_items"] = ui->chDenyChangeQtyReturnItems->isChecked();
     jc["smart_pictures"] = ui->chSmartPictures->isChecked();
     jc["shop_autodiscount_card_number"] =  ui->leShopAutodiscountCardNumber->text();
+    //waiter config
+    jc["default_hall"] = ui->cbWaiterHall->currentData().toInt();
+    jc["default_hall_name"] = ui->cbWaiterHall->currentText();
+    //shop config
+    jc["shop_hall_id"] = ui->cbShopHall->currentData().toInt();
+    jc["shop_hall_name"] = ui->cbShopHall->currentText();
     QJsonArray ja;
     QStringList a = ui->leAvailableStore->text().split(",", Qt::SkipEmptyParts);
 

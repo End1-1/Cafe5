@@ -16,6 +16,7 @@
 #include "c5printing.h"
 #include "dlgreturnitem.h"
 #include "dlgdate.h"
+#include <QPropertyAnimation>
 
 #define VM_TOTAL 0
 #define VM_ITEMS 1
@@ -23,40 +24,28 @@
 #define VM_GROUPS 3
 
 Sales::Sales(C5User *user) :
-    C5Dialog(),
+    C5ShopDialog(user),
     ui(new Ui::Sales)
 {
     ui->setupUi(this);
     fUser = user;
     setWindowTitle(__c5config.getRegValue("windowtitle").toString());
-    ui->lbRetail->setVisible(!__c5config.shopDenyF1());
-    ui->leRetail->setVisible(!__c5config.shopDenyF1());
-    ui->lbWhosale->setVisible(!__c5config.shopDenyF2());
-    ui->leWhosale->setVisible(!__c5config.shopDenyF2());
     ui->btnChangeDate->setVisible(fUser->check(cp_t5_change_date_of_sale));
+    ui->btnModeItems->setVisible(fUser->check(cp_t5_view_tax_and_no_sales));
+    ui->btnTotalByItems->setVisible(fUser->check(cp_t5_view_tax_and_no_sales));
+    ui->btnGroups->setVisible(fUser->check(cp_t5_view_tax_and_no_sales));
     fViewMode = VM_TOTAL;
-    C5Database db;
-    db[":f_id"] = __c5config.defaultHall();
-    db.exec("select * from h_halls where f_id=:f_id");
-
-    if(db.nextRow()) {
-        ui->cbHall->addItem(db.getString("f_name"), __c5config.defaultHall());
-    }
-
-    ui->cbHall->addItem(tr("Online"), 10);
-    ui->cbHall->addItem(tr("Ozon"), 13);
-    ui->cbHall->addItem(tr("WB"), 14);
-    ui->cbHall->setCurrentIndex(0);
     ui->lbTotalQty->setVisible(false);
-    ui->leTotalQty->setVisible(false);
     ui->leTotal->setVisible(__c5config.fMainJson["hide_revenue"].toBool() == false);
     ui->lbTotalAmount->setVisible(ui->leTotal->isVisible());
     ui->leTotalQty->setVisible(__c5config.fMainJson["hide_reenue"].toBool() == false);
     ui->lbTotalQty->setVisible(ui->leTotalQty->isVisible());
-    ui->leRetail->setVisible(__c5config.fMainJson["hide_revenue"].toBool() == false);
-    ui->lbRetail->setVisible(ui->leRetail->isVisible());
-    ui->leWhosale->setVisible(__c5config.fMainJson["hide_revenue"].toBool() == false);
-    ui->lbWhosale->setVisible(ui->leWhosale->isVisible());
+    ui->wMenuPanel->setMinimumWidth(0);
+    ui->wMenuPanel->setMaximumWidth(0);
+    ui->wMenuPanel->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding);
+    mPanelAnim = new QPropertyAnimation(ui->wMenuPanel, "maximumWidth", this);
+    mPanelAnim->setDuration(220);
+    mPanelAnim->setEasingCurve(QEasingCurve::OutCubic);
     refresh();
 }
 
@@ -240,7 +229,7 @@ void Sales::refreshTotal()
     ui->tbl->setHorizontalHeaderLabels(h);
     ui->tbl->setColumnWidths(ui->tbl->columnCount(), 40, 0, 0, 0, 120, 0, 100, 120, 120, 150, 100, 100, 300);
     C5Database db;
-    db[":f_hall"] = ui->cbHall->currentData();
+    db[":f_hall"] = __c5config.defaultHall();
     db[":f_start"] = ui->deStart->date();
     db[":f_end"] = ui->deEnd->date();
     db[":f_state"] = ORDER_STATE_CLOSE;
@@ -296,18 +285,6 @@ void Sales::refreshTotal()
 
     int acol = 9;
     ui->leTotal->setDouble(ui->tbl->sumOfColumn(acol));
-    double retail = 0, whosale = 0;
-
-    for(int i = 0; i < ui->tbl->rowCount(); i++) {
-        if(ui->tbl->getInteger(i, 2) == SALE_RETAIL) {
-            retail += ui->tbl->getDouble(i, acol);
-        } else {
-            whosale += ui->tbl->getDouble(i, acol);
-        }
-    }
-
-    ui->leRetail->setDouble(retail);
-    ui->leWhosale->setDouble(whosale);
 }
 
 void Sales::refreshItems()
@@ -371,18 +348,6 @@ void Sales::refreshItems()
 
     int acol = 12;
     ui->leTotal->setDouble(ui->tbl->sumOfColumn(acol));
-    double retail = 0, whosale = 0;
-
-    for(int i = 0; i < ui->tbl->rowCount(); i++) {
-        if(ui->tbl->getInteger(i, 1) == SALE_RETAIL) {
-            retail += ui->tbl->getDouble(i, acol);
-        } else {
-            whosale += ui->tbl->getDouble(i, acol);
-        }
-    }
-
-    ui->leRetail->setDouble(retail);
-    ui->leWhosale->setDouble(whosale);
 }
 
 void Sales::refreshTotalItems()
@@ -433,8 +398,6 @@ void Sales::refreshTotalItems()
 
     int acol = 3;
     ui->leTotal->setDouble(ui->tbl->sumOfColumn(acol));
-    ui->leRetail->setDouble(0);
-    ui->leWhosale->setDouble(0);
 }
 
 void Sales::refreshGroups()
@@ -534,14 +497,12 @@ void Sales::refreshGroups()
     ui->tbl->setString(row, 0, tr("Tax"));
     ui->tbl->setString(row, col + 2, float_str(db.getDouble("f_total"), 1));
     row++;
-    ui->leRetail->setDouble(0);
-    ui->leWhosale->setDouble(0);
 }
 
 void Sales::printpreview()
 {
     QString reportAdditionalTitle = tr("Sales by group");
-    QString fLabel = dbhall->name(__c5config.defaultHall()) + "," + dbstore->name(__c5config.defaultStore());
+    QString fLabel = __c5config.fMainJson["shop_hall_name"].toString() + "," + dbstore->name(__c5config.defaultStore());
     fLabel += QString(" %1-%2").arg(ui->deStart->text(), ui->deEnd->text());
     QFont fo(font());
     fo.setPointSize(20);
@@ -725,6 +686,15 @@ int Sales::sumOfColumnsWidghtBefore(int column)
     return sum;
 }
 
+void Sales::toggleMenu(bool visible)
+{
+    const int W = 300;
+    mPanelAnim->stop();
+    mPanelAnim->setStartValue(ui->wMenuPanel->width());
+    mPanelAnim->setEndValue(visible ? W : 0);
+    mPanelAnim->start();
+}
+
 void Sales::on_btnDateRight_clicked()
 {
     changeDate(1);
@@ -732,6 +702,7 @@ void Sales::on_btnDateRight_clicked()
 
 void Sales::on_btnItemBack_clicked()
 {
+    toggleMenu(false);
     DlgReturnItem i;
     i.exec();
 }
@@ -743,6 +714,7 @@ void Sales::on_btnRefresh_clicked()
 
 void Sales::on_btnModeTotal_clicked()
 {
+    toggleMenu(false);
     ui->btnModeItems->setChecked(false);
     ui->btnModeTotal->setChecked(true);
     ui->btnTotalByItems->setChecked(false);
@@ -755,6 +727,7 @@ void Sales::on_btnModeTotal_clicked()
 
 void Sales::on_btnModeItems_clicked()
 {
+    toggleMenu(false);
     ui->btnModeItems->setChecked(true);
     ui->btnModeTotal->setChecked(false);
     ui->btnTotalByItems->setChecked(false);
@@ -767,6 +740,7 @@ void Sales::on_btnModeItems_clicked()
 
 void Sales::on_btnTotalByItems_clicked()
 {
+    toggleMenu(false);
     ui->btnModeItems->setChecked(false);
     ui->btnModeTotal->setChecked(false);
     ui->btnTotalByItems->setChecked(true);
@@ -778,7 +752,8 @@ void Sales::on_btnTotalByItems_clicked()
 
 void Sales::on_btnCashColletion_clicked()
 {
-    auto *cc = new CashCollection();
+    toggleMenu(false);
+    auto *cc = new CashCollection(mUser);
     cc->exec();
     delete cc;
 }
@@ -801,6 +776,7 @@ void Sales::on_leFilter_textChanged(const QString &arg1)
 
 void Sales::on_btnGroups_clicked()
 {
+    toggleMenu(false);
     ui->btnModeItems->setChecked(false);
     ui->btnModeTotal->setChecked(false);
     ui->btnTotalByItems->setChecked(false);
@@ -813,11 +789,13 @@ void Sales::on_btnGroups_clicked()
 
 void Sales::on_btnPrintTaxZ_clicked()
 {
+    toggleMenu(false);
     printTaxReport(report_z);
 }
 
 void Sales::on_btnPrintTaxX_clicked()
 {
+    toggleMenu(false);
     printTaxReport(report_x);
 }
 
@@ -828,6 +806,7 @@ void Sales::on_btnExit_clicked()
 
 void Sales::on_btnViewOrder_clicked()
 {
+    toggleMenu(false);
     QModelIndexList ml = ui->tbl->selectionModel()->selectedRows();
 
     if(ml.count() == 0) {
@@ -835,11 +814,13 @@ void Sales::on_btnViewOrder_clicked()
     }
 
     int col = fViewMode == VM_TOTAL ? 1 : 0;
-    ViewOrder(fWorking, ui->tbl->getString(ml.at(0).row(), col)).exec();
+    ViewOrder(fWorking, ui->tbl->getString(ml.at(0).row(), col), mUser).exec();
 }
 
 void Sales::on_btnChangeDate_clicked()
 {
+    toggleMenu(false);
+
     if(fViewMode != VM_TOTAL) {
         return;
     }
@@ -895,4 +876,14 @@ void Sales::on_btnItemChange_clicked()
     DlgReturnItem i;
     i.setMode(2);
     i.exec();
+}
+
+void Sales::on_btnShowMenu_clicked()
+{
+    toggleMenu(true);
+}
+
+void Sales::on_btnCloseMenu_clicked()
+{
+    toggleMenu(false);
 }

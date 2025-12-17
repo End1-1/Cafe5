@@ -3,7 +3,8 @@
 
 #include <QDialog>
 #include <QJsonArray>
-#include "ninterface.h"
+
+class NInterface;
 
 class C5Dialog : public QDialog
 {
@@ -31,8 +32,6 @@ public:
         delete t;
         return result;
     }
-
-    void showFullScreen();
 
     virtual void selectorCallback(int row, const QJsonArray &values);
 

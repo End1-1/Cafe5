@@ -17,13 +17,17 @@ public:
 
     ConnectionState mConnectionState;
 
-    static QString host;
+    static QString mHost;
 
-    static AppWebSocket *instance;
+    static AppWebSocket* instance;
 
     static void initInstance();
 
+    static void reconnect(const QString &host, const QString &key, const QString &username, const QString &password);
+
     void sendMessage(const QString &message);
+
+    void sendBinaryMessage(const QByteArray &ba);
 
     void sendMessage(const QJsonObject &json);
 
@@ -31,7 +35,13 @@ public slots:
     void connectToServer();
 
 private:
-    QWebSocket *mSocket;
+    QWebSocket* mSocket;
+
+    QString mServerKey;
+
+    QString mUsername;
+
+    QString mPassword;
 
 private slots:
     void pingServer();
@@ -44,6 +54,8 @@ private slots:
 
     void textMessageReceived(const QString &message);
 
+    void binaryMessageReceived(const QByteArray &data);
+
 signals:
     void socketConnecting();
 
@@ -52,6 +64,8 @@ signals:
     void socketDisconnected();
 
     void messageReceived(const QString &message);
+
+    void bMessageReceived(const QJsonObject &jo);
 };
 
 #endif // APPWEBSOCKET_H

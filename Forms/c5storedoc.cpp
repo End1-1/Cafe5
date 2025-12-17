@@ -70,9 +70,9 @@ C5StoreDoc::C5StoreDoc(QWidget *parent) :
     ui->tblDishes->setColumnWidths(ui->tblDishes->columnCount(), 0, 0, 400, 80, 0);
 #endif
     ui->tblGoods->setColumnWidths(ui->tblGoods->columnCount(), 0, 0, 0, 0, 365, 80, 80, 80, 80, 80, 300, 100);
-    ui->btnNewPartner->setEnabled(__user->check(cp_t7_partners));
-    ui->btnNewGoods->setEnabled(__user->check(cp_t6_goods));
-    ui->btnEditGoods->setEnabled(__user->check(cp_t6_goods));
+    ui->btnNewPartner->setEnabled(mUser->check(cp_t7_partners));
+    ui->btnNewGoods->setEnabled(mUser->check(cp_t6_goods));
+    ui->btnEditGoods->setEnabled(mUser->check(cp_t6_goods));
     ui->leAccepted->setSelector(ui->leAcceptedName, cache_users);
     ui->lePassed->setSelector(ui->lePassedName, cache_users);
     ui->lbCashDoc->setVisible(!C5Config::noCashDocStore());
@@ -101,7 +101,7 @@ C5StoreDoc::C5StoreDoc(QWidget *parent) :
     fCanChangeFocus = true;
     ui->tblAdd->setColumnWidths(ui->tblAdd->columnCount(), 0, 300, 80);
     ui->leComplectationQty->setValidator(new QDoubleValidator(0, 999999999, 3));
-    ui->deDate->setEnabled(__user->check(cp_t1_allow_change_store_doc_date));
+    ui->deDate->setEnabled(mUser->check(cp_t1_allow_change_store_doc_date));
     ui->btnRememberStoreIn->setChecked(__c5config.getRegValue("storedoc_storeinput").toBool());
 
     if(__c5config.getRegValue("storedoc_storeinput").toBool()) {
@@ -122,10 +122,10 @@ C5StoreDoc::C5StoreDoc(QWidget *parent) :
     }
 
     ui->cbCurrency->setCurrentIndex(ui->cbCurrency->findData(__c5config.getValue(param_default_currency).toInt()));
-    ui->tblGoods->setColumnHidden(col_price, __user->check(cp_t11_do_now_show_input_prices));
-    ui->tblGoods->setColumnHidden(col_total, __user->check(cp_t11_do_now_show_input_prices));
-    ui->lbTotal->setVisible(!__user->check(cp_t11_do_now_show_input_prices));
-    ui->leTotal->setVisible(!__user->check(cp_t11_do_now_show_input_prices));
+    ui->tblGoods->setColumnHidden(col_price, !mUser->check(cp_t11_do_now_show_input_prices));
+    ui->tblGoods->setColumnHidden(col_total, !mUser->check(cp_t11_do_now_show_input_prices));
+    ui->lbTotal->setVisible(!mUser->check(cp_t11_do_now_show_input_prices));
+    ui->leTotal->setVisible(!mUser->check(cp_t11_do_now_show_input_prices));
 }
 
 C5StoreDoc::~C5StoreDoc()
@@ -791,7 +791,7 @@ bool C5StoreDoc::writeDocument(int state, QString &err)
     jheader["f_state"] = state;
     jheader["f_type"] = fDocType;
     jheader["f_date"] = ui->deDate->date().toString(FORMAT_DATE_TO_STR_MYSQL);
-    jheader["f_operator"] = __user->id();
+    jheader["f_operator"] = mUser->id();
     jheader["f_partner"] = ui->lePartner->getInteger();
     jheader["f_amount"] = ui->leTotal->getDouble();
     jheader["f_currency"] = ui->cbCurrency->currentData().toInt();
@@ -1189,7 +1189,7 @@ int C5StoreDoc::addGoods(int goods, const QString &name, double qty, const QStri
 
 void C5StoreDoc::setDocEnabled(bool v)
 {
-    ui->deDate->setEnabled(v && __user->check(cp_t1_allow_change_store_doc_date));
+    ui->deDate->setEnabled(v && mUser->check(cp_t1_allow_change_store_doc_date));
     ui->leStoreInput->setEnabled(v);
     ui->leStoreOutput->setEnabled(v);
     ui->wtoolbar->setEnabled(v);
@@ -1467,7 +1467,7 @@ void C5StoreDoc::printV1()
 
         val[4] = ui->tblGoods->getString(i, 6);
 
-        if(!__user->check(cp_t11_do_now_show_input_prices)) {
+        if(!mUser->check(cp_t11_do_now_show_input_prices)) {
             val[5] = ui->tblGoods->lineEdit(i, 7)->text();
 
             if(ui->chLeaveFocusOnBarcode->isChecked()) {
@@ -1930,7 +1930,7 @@ void C5StoreDoc::printV2()
         vals << ui->tblGoods->lineEdit(i, 5)->text();
         vals << ui->tblGoods->getString(i, 6);
 
-        if(!__user->check(cp_t11_do_now_show_input_prices)) {
+        if(!mUser->check(cp_t11_do_now_show_input_prices)) {
             vals << ui->tblGoods->lineEdit(i, 7)->text();
             vals << ui->tblGoods->lineEdit(i, 8)->text();
         } else {
@@ -1949,7 +1949,7 @@ void C5StoreDoc::printV2()
         vals << ui->tblGoods->lineEdit(i, 5)->text();
         vals << ui->tblGoods->getString(i, 6);
 
-        if(!__user->check(cp_t11_do_now_show_input_prices)) {
+        if(!mUser->check(cp_t11_do_now_show_input_prices)) {
             vals << ui->tblGoods->lineEdit(i, 7)->text();
             vals << ui->tblGoods->lineEdit(i, 8)->text();
         } else {
@@ -2384,7 +2384,7 @@ void C5StoreDoc::getOutput()
         return;
     }
 
-    QString showAmount = __user->check(cp_t11_do_now_show_input_prices) ? "0 as f_amount," :
+    QString showAmount = mUser->check(cp_t11_do_now_show_input_prices) ? "0 as f_amount," :
                          "sum(s.f_total*s.f_type) as f_amount,";
     QString query = QString("select s.f_goods, gg.f_name as f_groupname, g.f_name as f_goodsname, u.f_name as f_unitname, "
                             "sum(s.f_qty*s.f_type) as f_qty, %3 g.f_scancode "
@@ -3279,7 +3279,7 @@ void C5StoreDoc::on_btnSavePayment_clicked()
         jo["f_amount"] = ui->leTotal->getDouble();
         jo["f_purpose"] = QString("%1 %2").arg(tr("Store input"), ui->leDocNum->text());
         jo["f_comment"] = QString("%1 %2").arg(tr("Store input"), ui->leDocNum->text());
-        jo["f_operator"] = __user->id();
+        jo["f_operator"] = mUser->id();
         jo["f_date"] = ui->deCashDate->date().toString(FORMAT_DATE_TO_STR_MYSQL);
         db[":params"] = QString(QJsonDocument(jo).toJson());
         db.exec("select sf_create_cashdoc(:params)");

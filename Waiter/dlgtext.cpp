@@ -1,6 +1,5 @@
 #include "dlgtext.h"
 #include "ui_dlgtext.h"
-#include "c5config.h"
 
 DlgText::DlgText() :
     C5Dialog(),
@@ -21,9 +20,11 @@ bool DlgText::getText(const QString &title, QString &defaultText)
     DlgText d;
     d.setWindowTitle(title);
     d.ui->kbd->setText(defaultText);
-    if (d.exec() == QDialog::Accepted) {
+
+    if(d.exec() == QDialog::Accepted) {
         defaultText = d.ui->kbd->text();
         return true;
     }
+
     return false;
 }

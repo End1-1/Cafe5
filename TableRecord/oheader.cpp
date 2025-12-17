@@ -16,7 +16,7 @@ OHeader::OHeader()
     dateCash = QDate::currentDate();
     cashier = 0;
     staff = 0,
-    comment = "";
+        comment = "";
     print = 0;
     amountTotal = 0;
     amountCash = 0;
@@ -47,7 +47,7 @@ OHeader::OHeader()
     currency = 0;
 }
 
-void OHeader::bind(C5Database &db)
+void OHeader::bind(C5Database& db)
 {
     db[":f_id"] = _id();
     db[":f_hallid"] = hallId;
@@ -94,9 +94,9 @@ void OHeader::bind(C5Database &db)
     db[":f_taxpayertin"] = taxpayerTin;
 }
 
-bool OHeader::getRecord(C5Database &db)
+bool OHeader::getRecord(C5Database& db)
 {
-    if(!db.nextRow()) {
+    if (!db.nextRow()) {
         return false;
     }
 
@@ -145,23 +145,24 @@ bool OHeader::getRecord(C5Database &db)
     return true;
 }
 
-bool OHeader::write(C5Database &db, QString &err)
+bool OHeader::write(C5Database& db, QString& err)
 {
     bool u = true;
 
-    if(id.toString().isEmpty()) {
+    if (id.toString().isEmpty()) {
         u = false;
         id = db.uuid();
     }
 
     bind(db);
 
-    if(u) {
+    if (u) {
         return update(db, "o_header", err);
-    } else {
+    }
+    else {
         bool b = insert(db, "o_header", err);
 
-        if(b) {
+        if (b) {
             db[":f_id"] = _id();
             db[":f_1"] = 0;
             db[":f_2"] = 0;
@@ -189,19 +190,19 @@ bool OHeader::hasIdram()
     return amountIdram > 0.001 || amountTelcell > 0.001;
 }
 
-void OHeader::countAmount(QVector<OGoods>& goods, BHistory &bhistory)
+void OHeader::countAmount(QVector<OGoods>& goods, BHistory& bhistory)
 {
     Q_UNUSED(bhistory);
     amountTotal = 0;
     amountDiscount = 0;
 
-    for(int i = 0; i < goods.count(); i++) {
-        OGoods &g = goods[i];
+    for (int i = 0; i < goods.count(); i++) {
+        OGoods& g = goods[i];
         g.row = i;
-        g.total = g.qty   * g.price;
+        g.total = g.qty * g.price;
         amountTotal += g.total;
 
-        switch(g.discountMode) {
+        switch (g.discountMode) {
         case CARD_TYPE_DISCOUNT:
             g.discountAmount = g.total * g.discountFactor;
             g.total -= g.discountAmount;

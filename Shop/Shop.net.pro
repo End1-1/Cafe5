@@ -36,11 +36,10 @@ SOURCES += \
     ../Cafe5/dlgexitbyversion.cpp \
     ../Classes/QProgressIndicator.cpp \
     ../Classes/QRCodeGenerator.cpp \
+    ../Classes/appwebsocket.cpp \
     ../Classes/c5airlog.cpp \
     ../Classes/c5combodelegate.cpp \
     ../Classes/c5datedelegate.cpp \
-    ../Classes/c5document.cpp \
-    ../Classes/c5gridgilter.cpp \
     ../Classes/c5jsondb.cpp \
     ../Classes/c5logtoserverthread.cpp \
     ../Classes/c5menu.cpp \
@@ -50,7 +49,6 @@ SOURCES += \
     ../Classes/c5printpreview.cpp \
     ../Classes/c5printreceiptthread.cpp \
     ../Classes/c5printrecipta4.cpp \
-    ../Classes/c5printremovedservicethread.cpp \
     ../Classes/c5random.cpp \
     ../Classes/c5replacecharacter.cpp \
     ../Classes/c5reporttemplatedriver.cpp \
@@ -68,7 +66,6 @@ SOURCES += \
     ../Classes/c5witerconf.cpp \
     ../Classes/calculator.cpp \
     ../Classes/dataonline.cpp \
-    ../Classes/dlgpassword.cpp \
     ../Classes/dlgserverconnection.cpp \
     ../Classes/fileversion.cpp \
     ../Classes/idram.cpp \
@@ -83,31 +80,12 @@ SOURCES += \
     ../Controls/c5graphicsview.cpp \
     ../Controls/c5guicontrols.cpp \
     ../DbData/datadriver.cpp \
-    ../DbData/dbbodystate.cpp \
-    ../DbData/dbcar.cpp \
-    ../DbData/dbcurrency.cpp \
     ../DbData/dbdata.cpp \
-    ../DbData/dbdishcomments.cpp \
-    ../DbData/dbdishes.cpp \
-    ../DbData/dbdishpart1.cpp \
-    ../DbData/dbdishpart2.cpp \
-    ../DbData/dbdishremovereason.cpp \
-    ../DbData/dbdishspecial.cpp \
     ../DbData/dbgoods.cpp \
     ../DbData/dbgoodsgroup.cpp \
-    ../DbData/dbhalls.cpp \
-    ../DbData/dbmenu.cpp \
-    ../DbData/dbmenuname.cpp \
-    ../DbData/dbmenupackagelist.cpp \
-    ../DbData/dbmenupackages.cpp \
-    ../DbData/dbpartner.cpp \
-    ../DbData/dbservicevalues.cpp \
     ../DbData/dbstore.cpp \
     ../DbData/dbstoredoctype.cpp \
-    ../DbData/dbtables.cpp \
     ../DbData/dbunit.cpp \
-    ../DbData/dbusers.cpp \
-    ../Forms/dlgdataonline.cpp \
     ../Forms/dlgpaymentchoose.cpp \
     ../Forms/dlgreservgoods.cpp \
     ../Forms/dlgsplashscreen.cpp \
@@ -117,6 +95,7 @@ SOURCES += \
     ../Printing/printreceipt.cpp \
     ../Printing/printreceiptgroup.cpp \
     ../Printing/selectprinters.cpp \
+    ../StructModel/c5structtableview.cpp \
     ../TableRecord/aheader.cpp \
     ../TableRecord/bclientdebts.cpp \
     ../TableRecord/bhistory.cpp \
@@ -124,10 +103,10 @@ SOURCES += \
     ../TableRecord/cpartners.cpp \
     ../TableRecord/ecash.cpp \
     ../TableRecord/odraftsale.cpp \
-    ../TableRecord/odraftsalebody.cpp \
     ../TableRecord/ogoods.cpp \
     ../TableRecord/oheader.cpp \
     ../TableRecord/otax.cpp \
+    c5shopdialog.cpp \
     c5tempsale.cpp \
     cashcollection.cpp \
     dlgcashout.cpp \
@@ -148,7 +127,6 @@ SOURCES += \
     sales.cpp \
     searchitems.cpp \
     selectstaff.cpp \
-    settingsselection.cpp \
     storeinput.cpp \
     threadworker.cpp \
     userphoto.cpp \
@@ -178,12 +156,11 @@ HEADERS += \
     ../Cafe5/dlgexitbyversion.h \
     ../Classes/QProgressIndicator.h \
     ../Classes/QRCodeGenerator.h \
+    ../Classes/appwebsocket.h \
     ../Classes/barcode5.h \
     ../Classes/c5airlog.h \
     ../Classes/c5combodelegate.h \
     ../Classes/c5datedelegate.h \
-    ../Classes/c5document.h \
-    ../Classes/c5gridgilter.h \
     ../Classes/c5jsondb.h \
     ../Classes/c5logtoserverthread.h \
     ../Classes/c5menu.h \
@@ -193,7 +170,6 @@ HEADERS += \
     ../Classes/c5printpreview.h \
     ../Classes/c5printreceiptthread.h \
     ../Classes/c5printrecipta4.h \
-    ../Classes/c5printremovedservicethread.h \
     ../Classes/c5random.h \
     ../Classes/c5replacecharacter.h \
     ../Classes/c5reporttemplatedriver.h \
@@ -212,7 +188,6 @@ HEADERS += \
     ../Classes/calculator.h \
     ../Classes/chatmessage.h \
     ../Classes/dataonline.h \
-    ../Classes/dlgpassword.h \
     ../Classes/dlgserverconnection.h \
     ../Classes/fileversion.h \
     ../Classes/goodsreserve.h \
@@ -228,31 +203,14 @@ HEADERS += \
     ../Controls/c5graphicsview.h \
     ../Controls/c5guicontrols.h \
     ../DbData/datadriver.h \
-    ../DbData/dbbodystate.h \
-    ../DbData/dbcar.h \
-    ../DbData/dbcurrency.h \
     ../DbData/dbdata.h \
-    ../DbData/dbdishcomments.h \
-    ../DbData/dbdishes.h \
-    ../DbData/dbdishpart1.h \
-    ../DbData/dbdishpart2.h \
-    ../DbData/dbdishremovereason.h \
-    ../DbData/dbdishspecial.h \
     ../DbData/dbgoods.h \
     ../DbData/dbgoodsgroup.h \
     ../DbData/dbhalls.h \
-    ../DbData/dbmenu.h \
-    ../DbData/dbmenuname.h \
-    ../DbData/dbmenupackagelist.h \
-    ../DbData/dbmenupackages.h \
-    ../DbData/dbpartner.h \
-    ../DbData/dbservicevalues.h \
     ../DbData/dbstore.h \
     ../DbData/dbstoredoctype.h \
-    ../DbData/dbtables.h \
     ../DbData/dbunit.h \
     ../DbData/dbusers.h \
-    ../Forms/dlgdataonline.h \
     ../Forms/dlgpaymentchoose.h \
     ../Forms/dlgreservgoods.h \
     ../Forms/dlgsplashscreen.h \
@@ -262,6 +220,13 @@ HEADERS += \
     ../Printing/printreceipt.h \
     ../Printing/printreceiptgroup.h \
     ../Printing/selectprinters.h \
+    ../Service5/worker/StructStorage.h \
+    ../Service5/worker/c5jsonparser.h \
+    ../Service5/worker/c5structtraits.h \
+    ../Service5/worker/struct_goods_item.h \
+    ../Service5/worker/struct_storage_item.h \
+    ../StructModel/c5structmodel.h \
+    ../StructModel/c5structtableview.h \
     ../TableRecord/aheader.h \
     ../TableRecord/bclientdebts.h \
     ../TableRecord/bhistory.h \
@@ -269,10 +234,10 @@ HEADERS += \
     ../TableRecord/cpartners.h \
     ../TableRecord/ecash.h \
     ../TableRecord/odraftsale.h \
-    ../TableRecord/odraftsalebody.h \
     ../TableRecord/ogoods.h \
     ../TableRecord/oheader.h \
     ../TableRecord/otax.h \
+    c5shopdialog.h \
     c5tempsale.h \
     cashcollection.h \
     dlgcashout.h \
@@ -292,7 +257,6 @@ HEADERS += \
     sales.h \
     searchitems.h \
     selectstaff.h \
-    settingsselection.h \
     storeinput.h \
     threadworker.h \
     userphoto.h \
@@ -317,19 +281,17 @@ HEADERS += \
 FORMS += \
     ../Cafe5/calendar.ui \
     ../Cafe5/dlgexitbyversion.ui \
-    ../Classes/c5gridgilter.ui \
     ../Classes/c5printpreview.ui \
     ../Classes/calculator.ui \
-    ../Classes/dlgpassword.ui \
     ../Classes/dlgserverconnection.ui \
     ../Classes/notificationwidget.ui \
     ../Controls/c5tablewithtotal.ui \
-    ../Forms/dlgdataonline.ui \
     ../Forms/dlgpaymentchoose.ui \
     ../Forms/dlgreservgoods.ui \
     ../Forms/dlgsplashscreen.ui \
     ../NTable/nloadingdlg.ui \
     ../Printing/selectprinters.ui \
+    ../StructModel/c5structtableview.ui \
     c5tempsale.ui \
     cashcollection.ui \
     dlgcashout.ui \
@@ -348,7 +310,6 @@ FORMS += \
     sales.ui \
     searchitems.ui \
     selectstaff.ui \
-    settingsselection.ui \
     storeinput.ui \
     userphoto.ui \
     viewinputitem.ui \
@@ -375,6 +336,8 @@ INCLUDEPATH += ../DbData
 INCLUDEPATH += ../Forms
 INCLUDEPATH += ../Configs
 INCLUDEPATH += ../Service
+INCLUDEPATH += ../Service5/worker
+INCLUDEPATH += ../StructModel
 INCLUDEPATH += ../Printing
 INCLUDEPATH += ../RESOURCES
 INCLUDEPATH += C:/Projects/NewTax/Src

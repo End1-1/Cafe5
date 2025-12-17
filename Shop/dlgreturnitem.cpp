@@ -11,6 +11,7 @@
 #include "printtaxn.h"
 #include "c5message.h"
 #include "jsons.h"
+#include "ninterface.h"
 #include <QJsonArray>
 
 DlgReturnItem::DlgReturnItem() :

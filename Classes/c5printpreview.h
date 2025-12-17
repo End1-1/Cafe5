@@ -42,6 +42,8 @@ private slots:
 
     void on_btnZoopIn_clicked();
 
+    void on_btnClose_clicked();
+
 private:
     Ui::C5PrintPreview* ui;
 

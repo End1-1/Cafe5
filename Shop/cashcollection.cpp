@@ -4,10 +4,11 @@
 #include "c5config.h"
 #include "c5utils.h"
 #include "c5message.h"
+#include "ninterface.h"
 #include "c5user.h"
 
-CashCollection::CashCollection() :
-    C5Dialog(),
+CashCollection::CashCollection(C5User *user) :
+    C5ShopDialog(user),
     ui(new Ui::CashCollection)
 {
     ui->setupUi(this);
@@ -55,13 +56,13 @@ void CashCollection::on_btnSave_clicked()
     //     C5Message::error(tr("Amount must be greater then 0"));
     //     return;
     // }
-    if(ui->leAmountCoin->getDouble() > 0.001) {
+    if(ui->leAmountCoin->getDouble() > 0.001 && fCoinCashId > 0) {
         fHttp->createHttpQuery("/engine/cashdesk/create.php",
         QJsonObject {
             {"date", QDate::currentDate().toString(FORMAT_DATE_TO_STR_MYSQL)},
-            {"operator", __user->id() },
-            {"cashin", 0},
-            {"cashout", __c5config.cashId()},
+            {"operator", mUser->id() },
+            {"cashin", fCoinCashId},
+            {"cashout", 0},
             {"remarks", tr("Amount coin")},
             {"amount", ui->leAmountCoin->text()},
             {"config", C5Config::fMainJson["id"].toInt()},
@@ -89,7 +90,7 @@ void CashCollection::responseOfCreate(const QJsonObject &jdoc)
     fHttp->createHttpQuery("/engine/cashdesk/create.php",
     QJsonObject {
         {"date", QDate::currentDate().toString(FORMAT_DATE_TO_STR_MYSQL)},
-        {"operator", __user->id() },
+        {"operator", mUser->id() },
         {"cashin", fCoinCashId},
         {"cashout", 0},
         {"remarks", tr("Amount coin")},
@@ -124,7 +125,7 @@ void CashCollection::collectCash()
 
     QString cashdocid;
 
-    if(!dw.writeAHeader(cashdocid, QString::number(counter), DOC_STATE_SAVED, DOC_TYPE_CASH, __user->id(),
+    if(!dw.writeAHeader(cashdocid, QString::number(counter), DOC_STATE_SAVED, DOC_TYPE_CASH, mUser->id(),
                         QDate::currentDate(), QDate::currentDate(), QTime::currentTime(), 0,
                         ui->leAmount->getDouble() - ui->leAmountCoin->getDouble(),
                         ui->lePurpose->text(), 1, __c5config.getValue(param_default_currency).toInt())) {

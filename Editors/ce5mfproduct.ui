@@ -27,30 +27,16 @@
      </property>
     </widget>
    </item>
-   <item row="0" column="0">
-    <widget class="QLabel" name="Code">
-     <property name="text">
-      <string>Code</string>
-     </property>
-    </widget>
-   </item>
-   <item row="0" column="2">
-    <spacer name="horizontalSpacer">
-     <property name="orientation">
-      <enum>Qt::Orientation::Horizontal</enum>
-     </property>
-     <property name="sizeHint" stdset="0">
+   <item row="1" column="3">
+    <widget class="C5LineEditWithSelector" name="leGroupId">
+     <property name="maximumSize">
       <size>
-       <width>368</width>
-       <height>20</height>
+       <width>50</width>
+       <height>16777215</height>
       </size>
      </property>
-    </spacer>
-   </item>
-   <item row="1" column="0">
-    <widget class="QLabel" name="label_2">
-     <property name="text">
-      <string>Name</string>
+     <property name="Field" stdset="0">
+      <string>f_goods_group</string>
      </property>
     </widget>
    </item>
@@ -67,7 +53,31 @@
      </property>
     </widget>
    </item>
-   <item row="2" column="0" colspan="3">
+   <item row="0" column="0">
+    <widget class="QLabel" name="Code">
+     <property name="text">
+      <string>Code</string>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="0">
+    <widget class="QLabel" name="label_2">
+     <property name="text">
+      <string>Name</string>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="2">
+    <widget class="QLabel" name="label_4">
+     <property name="text">
+      <string>Group</string>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="4">
+    <widget class="C5LineEditWithSelector" name="leGroupName"/>
+   </item>
+   <item row="2" column="0" colspan="5">
     <widget class="QTabWidget" name="tabWidget">
      <property name="currentIndex">
       <number>0</number>
@@ -850,6 +860,19 @@
      </widget>
     </widget>
    </item>
+   <item row="0" column="2" colspan="3">
+    <spacer name="horizontalSpacer">
+     <property name="orientation">
+      <enum>Qt::Orientation::Horizontal</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>368</width>
+       <height>20</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
   </layout>
  </widget>
  <customwidgets>
@@ -859,14 +882,14 @@
    <header location="global">c5lineeditwithselector.h</header>
   </customwidget>
   <customwidget>
-   <class>C5TableWidget</class>
-   <extends>QTableWidget</extends>
-   <header location="global">c5tablewidget.h</header>
-  </customwidget>
-  <customwidget>
    <class>C5DateEdit</class>
    <extends>QLineEdit</extends>
    <header location="global">c5dateedit.h</header>
+  </customwidget>
+  <customwidget>
+   <class>C5TableWidget</class>
+   <extends>QTableWidget</extends>
+   <header location="global">c5tablewidget.h</header>
   </customwidget>
   <customwidget>
    <class>C5TableWithTotal</class>
@@ -878,6 +901,47 @@
  <tabstops>
   <tabstop>leCode</tabstop>
   <tabstop>leName</tabstop>
+  <tabstop>leGroupId</tabstop>
+  <tabstop>leGroupName</tabstop>
+  <tabstop>tabWidget</tabstop>
+  <tabstop>btnAdd</tabstop>
+  <tabstop>btnNew</tabstop>
+  <tabstop>btnMinus</tabstop>
+  <tabstop>btnClear</tabstop>
+  <tabstop>btnCopy</tabstop>
+  <tabstop>btnPaste</tabstop>
+  <tabstop>btnPrint</tabstop>
+  <tabstop>btnExportExcel</tabstop>
+  <tabstop>btnMoveRowUp</tabstop>
+  <tabstop>btnMoveRowDown</tabstop>
+  <tabstop>chUpdatePrice</tabstop>
+  <tabstop>leDate1</tabstop>
+  <tabstop>leDate2</tabstop>
+  <tabstop>btnUpdatePrices</tabstop>
+  <tabstop>btnAdd_2</tabstop>
+  <tabstop>btnMinus_2</tabstop>
+  <tabstop>btnClear_2</tabstop>
+  <tabstop>btnCopy_2</tabstop>
+  <tabstop>btnPaste_2</tabstop>
+  <tabstop>tblMeas</tabstop>
+  <tabstop>btnAddImage</tabstop>
+  <tabstop>btnAdd_3</tabstop>
+  <tabstop>btnMinus_3</tabstop>
+  <tabstop>btnClearTblMaterials</tabstop>
+  <tabstop>btnCopy_3</tabstop>
+  <tabstop>btnPaste_3</tabstop>
+  <tabstop>tblMaterials</tabstop>
+  <tabstop>ptDesc</tabstop>
+  <tabstop>chNoWhite</tabstop>
+  <tabstop>chDryClean</tabstop>
+  <tabstop>chIron</tabstop>
+  <tabstop>lsNoWhite</tabstop>
+  <tabstop>chWashTemp</tabstop>
+  <tabstop>lsIron</tabstop>
+  <tabstop>lsWash</tabstop>
+  <tabstop>lsDry</tabstop>
+  <tabstop>chNoSpin</tabstop>
+  <tabstop>lsNoSpin</tabstop>
  </tabstops>
  <resources>
   <include location="../resources/res.qrc"/>

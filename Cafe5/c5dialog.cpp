@@ -1,7 +1,7 @@
 #include "c5dialog.h"
 #include "c5message.h"
 #include "c5lineedit.h"
-#include "c5config.h"
+#include "ninterface.h"
 #include <QKeyEvent>
 #include <QApplication>
 #include <QScreen>
@@ -9,22 +9,8 @@
 static QWidget* __mainWindow = nullptr;
 
 C5Dialog::C5Dialog() :
-    QDialog(__mainWindow, C5Config::isAppFullScreen() ? Qt::FramelessWindowHint : Qt::Window)
+    QDialog(__mainWindow)
 {
-#ifdef WAITER
-#ifndef QT_DEBUG
-    QScreen *screen = QGuiApplication::primaryScreen();
-    setMaximumSize(screen->geometry().size());
-    //setWindowFlags(Qt::WindowStaysOnTopHint);
-#endif
-#endif
-#ifdef  QT_DEBUG
-#ifndef FRONTDESK
-    setMinimumSize(DEBUG_SIZE);
-    setMaximumSize(DEBUG_SIZE);
-#endif
-#endif
-
     if(__mainWindow == nullptr) {
         __mainWindow = this;
     }
@@ -47,21 +33,6 @@ void C5Dialog::setMainWindow(QWidget *widget)
 bool C5Dialog::preambule()
 {
     return true;
-}
-
-void C5Dialog::showFullScreen()
-{
-#ifdef WAITER
-
-    if(C5Config::isAppFullScreen()) {
-        QDialog::showFullScreen();
-    } else {
-        QDialog::showMaximized();
-    }
-
-#else
-    QDialog::showFullScreen();
-#endif
 }
 
 void C5Dialog::selectorCallback(int row, const QJsonArray &values)

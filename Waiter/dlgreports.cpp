@@ -2,9 +2,7 @@
 #include "ui_dlgreports.h"
 #include "dlgreportslist.h"
 #include "c5printjson.h"
-#include "c5translator.h"
 #include "c5user.h"
-#include "datadriver.h"
 #include "dlgreceiptlanguage.h"
 #include "dlglistofhall.h"
 #include "printtaxn.h"
@@ -12,11 +10,8 @@
 #include "c5printing.h"
 #include "c5utils.h"
 #include "ndataprovider.h"
-#include "dlgcashbuttonopions.h"
-#include "c5database.h"
-#include "c5config.h"
-#include "dlgviewcashreport.h"
-#include "qinputdialog.h"
+#include "c5waiterconfiguration.h"
+#include "ninterface.h"
 #include <QSettings>
 
 DlgReports::DlgReports(const QStringList &dbParams, C5User *user) :
@@ -62,20 +57,21 @@ void DlgReports::getDailyCommon(const QDate &date1, const QDate &date2)
 
 void DlgReports::setLangIcon()
 {
-    switch(C5Config::getRegValue("receipt_language").toInt()) {
+    switch(ui->btnReceiptLanguage->property("receipt_language").toInt()) {
     case 0:
         ui->btnReceiptLanguage->setIcon(QIcon(":/armenia.png"));
-        C5Config::setRegValue("receipt_language", LANG_AM);
         break;
 
     case 1:
         ui->btnReceiptLanguage->setIcon(QIcon(":/usa.png"));
-        C5Config::setRegValue("receipt_language", LANG_EN);
         break;
 
     case 2:
         ui->btnReceiptLanguage->setIcon(QIcon(":/russia.png"));
-        C5Config::setRegValue("receipt_language", LANG_RU);
+        break;
+
+    default:
+        ui->btnReceiptLanguage->setIcon(QIcon(":/armenia.png"));
         break;
     }
 }
@@ -108,7 +104,7 @@ void DlgReports::cashDocResponse(const QJsonObject &jdoc)
     p.br();
     p.setFontSize(bs - 4);
     p.setFontBold(false);
-    p.print(C5Config::localReceiptPrinter(), QPageSize::Custom);
+    p.print(C5WaiterConfiguration::instance()->receiptPrinter(), QPageSize::Custom);
     fHttp->httpQueryFinished(sender());
 }
 
@@ -178,7 +174,7 @@ void DlgReports::printReportResponse(const QJsonObject &obj)
     }
 
     QJsonArray ja = obj["report"].toArray();
-    ja.append(QJsonObject{{"cmd", "print"}, {"printer", __c5config.localReceiptPrinter()}, {"pagesize", QPageSize::Custom}});
+    ja.append(QJsonObject{{"cmd", "print"}, {"printer", C5WaiterConfiguration::instance()->receiptPrinter()}, {"pagesize", QPageSize::Custom}});
     C5PrintJson *pj = new C5PrintJson(ja);
     pj->start();
     fHttp->httpQueryFinished(sender());
@@ -254,51 +250,47 @@ void DlgReports::on_btnPrintOrderReceipt_clicked()
         return;
     }
 
-    QString orderid = ui->tbl->getString(l.at(0).row(), 0);
-    C5Database db;
-    db[":f_id"] = orderid;
-    db.exec("select * from o_header where f_id=:f_id");
-
-    if(!db.nextRow()) {
-        C5Message::error(tr("Invalid order id"));
-        return;
-    }
-
-    int tax = 0;
-
-    if(db.getDouble("f_amounttotal") - db.getDouble("f_amountcash") < 0.001) {
-        db[":f_id"] = orderid;
-        db.exec("select f_receiptnumber from o_tax where f_id=:f_id");
-
-        if(db.nextRow()) {
-            if(db.getInt("f_receiptnumber") == 0) {
-                tax = C5Message::question(tr("Do you want to print fiscal receipt?")) == QDialog::Accepted ? 1 : 0;
-            }
-        } else {
-            tax = C5Message::question(tr("Do you want to print fiscal receipt?")) == QDialog::Accepted ? 1 : 0;
-        }
-    } else if(db.getDouble("f_amountcard") > 0.001) {
-        tax = 1;
-    }
-
-    //TODO: CHECK L3
-    fHttp->createHttpQueryLambda("/engine/waiter/printreceipt.php", {
-        {"staffid", fUser->id()},
-        {"f_receiptlanguage", C5Config::getRegValue("receipt_language").toInt()},
-        {"order", orderid},
-        {"printtax", tax},
-        {"receipt_printer", C5Config::fSettingsName}
-    }, [this](const QJsonObject & jo) {
-        auto np = new NDataProvider(this);
-        np->overwriteHost("http", "127.0.0.1", 8080);
-        connect(np, &NDataProvider::done, this, [](const QJsonObject & jjo) {
-        });
-        connect(np, &NDataProvider::error, this, [](const QString & err) {
-        });
-        np->getData("/printjson", jo);
-    }, [](const QJsonObject & je) {
-        Q_UNUSED(je);
-    });
+    //TODO
+    // QString orderid = ui->tbl->getString(l.at(0).row(), 0);
+    // C5Database db;
+    // db[":f_id"] = orderid;
+    // db.exec("select * from o_header where f_id=:f_id");
+    // if(!db.nextRow()) {
+    //     C5Message::error(tr("Invalid order id"));
+    //     return;
+    // }
+    // int tax = 0;
+    // if(db.getDouble("f_amounttotal") - db.getDouble("f_amountcash") < 0.001) {
+    //     db[":f_id"] = orderid;
+    //     db.exec("select f_receiptnumber from o_tax where f_id=:f_id");
+    //     if(db.nextRow()) {
+    //         if(db.getInt("f_receiptnumber") == 0) {
+    //             tax = C5Message::question(tr("Do you want to print fiscal receipt?")) == QDialog::Accepted ? 1 : 0;
+    //         }
+    //     } else {
+    //         tax = C5Message::question(tr("Do you want to print fiscal receipt?")) == QDialog::Accepted ? 1 : 0;
+    //     }
+    // } else if(db.getDouble("f_amountcard") > 0.001) {
+    //     tax = 1;
+    // }
+    // //TODO: CHECK L3
+    // fHttp->createHttpQueryLambda("/engine/waiter/printreceipt.php", {
+    //     {"staffid", fUser->id()},
+    //     {"f_receiptlanguage", C5Config::getRegValue("receipt_language").toInt()},
+    //     {"order", orderid},
+    //     {"printtax", tax},
+    //     {"receipt_printer", C5Config::fSettingsName}
+    // }, [this](const QJsonObject & jo) {
+    //     auto np = new NDataProvider(this);
+    //     np->overwriteHost("http", "127.0.0.1", 8080);
+    //     connect(np, &NDataProvider::done, this, [](const QJsonObject & jjo) {
+    //     });
+    //     connect(np, &NDataProvider::error, this, [](const QString & err) {
+    //     });
+    //     np->getData("/printjson", jo);
+    // }, [](const QJsonObject & je) {
+    //     Q_UNUSED(je);
+    // });
 }
 
 void DlgReports::on_btnReceiptLanguage_clicked()
@@ -306,7 +298,7 @@ void DlgReports::on_btnReceiptLanguage_clicked()
     int r = DlgReceiptLanguage::receipLanguage();
 
     if(r > -1) {
-        C5Config::setRegValue("receipt_language", r);
+        ui->btnReceiptLanguage->setProperty("receipt_language", r);
         setLangIcon();
     }
 }
@@ -320,7 +312,8 @@ void DlgReports::on_btnHall_clicked()
     }
 
     fCurrentHall = hall;
-    ui->btnHall->setText(fCurrentHall == 0 ? tr("All") : dbhall->name(fCurrentHall));
+    //TODO
+    //ui->btnHall->setText(fCurrentHall == 0 ? tr("All") : dbhall->name(fCurrentHall));
 }
 
 void DlgReports::on_btnReturnTaxReceipt_clicked()
@@ -373,192 +366,4 @@ void DlgReports::on_btnPrintTaxZ_clicked()
         {"d2", ui->date2->date().toString(FORMAT_DATE_TO_STR_MYSQL)},
         {"type", report_z}
     });
-}
-
-void DlgReports::on_btnCashobx_clicked()
-{
-    bool closecash = false;
-    bool printreport = false;
-
-    switch(DlgCashButtonOpions::getOptions()) {
-    case 0:
-        return;
-
-    case 1:
-        break;
-
-    case 2:
-        printreport = true;
-        break;
-
-    case 3:
-        printreport = true;
-        closecash = true;
-        break;
-    }
-
-    C5Database db;
-    db.exec("SELECT 'Մուտք', 'title', 0, '' "
-            "UNION "
-            "SELECT en.f_name AS f_cashname, ah.f_comment, sum(e.f_amount), '' "
-            "FROM e_cash e "
-            "LEFT JOIN e_cash_names en ON en.f_id=e.f_cash "
-            "LEFT join a_header ah ON ah.f_id=e.f_header "
-            "WHERE e.f_sign=1 and ah.f_sessionid IS NULL "
-            "GROUP BY 1, 2 "
-            "UNION "
-            "SELECT 'Ելք', 'title', 0, '' "
-            "union "
-            "SELECT en.f_name AS f_cashname, concat_ws(' ',ah.f_comment, p.f_name) as f_comment,  sum(e.f_amount*-1), "
-            "e.f_id "
-            "FROM e_cash e "
-            "LEFT JOIN e_cash_names en ON en.f_id=e.f_cash "
-            "LEFT join a_header ah ON ah.f_id=e.f_header "
-            "left join c_partners p on p.f_id=ah.f_partner "
-            "WHERE e.f_sign=-1 and ah.f_sessionid IS NULL "
-            "GROUP BY 1, 2, 4 "
-            "UNION "
-            "SELECT 'վերջնահաշվարկ', 'title', 0, '' "
-            "union "
-            "SELECT en.f_name AS f_cashname, '',  sum(e.f_amount*e.f_sign), '' "
-            "FROM e_cash e "
-            "LEFT JOIN e_cash_names en ON en.f_id=e.f_cash "
-            "LEFT join a_header ah ON ah.f_id=e.f_header "
-            "WHERE ah.f_sessionid IS NULL "
-            "GROUP BY 1");
-
-    if(!printreport) {
-        DlgViewCashReport d;
-        double total = -1000000000;
-
-        while(db.nextRow()) {
-            if(db.getString(1) == "title") {
-                if(total > -1000000000) {
-                    d.addTotal(total);
-                }
-
-                total = 0;
-                d.addTitle(db.getString(0));
-                continue;
-            }
-
-            d.addRow(db.getString(0) + " " + db.getString(1), db.getDouble(2));
-            total += db.getDouble(2);
-        }
-
-        if(total > -1000000000) {
-            d.addTotal(total);
-        }
-
-        if(d.exec() == QDialog::Accepted) {
-            printreport = true;
-            db.first();
-        } else {
-            return;
-        }
-    }
-
-    if(printreport) {
-        int bs = 22;
-        QFont font(qApp->font());
-        font.setPointSize(bs);
-        C5Printing p;
-        p.setSceneParams(650, 2600, QPageLayout::Portrait);
-        p.setFont(font);
-        p.image("./logo_receipt.png", Qt::AlignHCenter);
-        p.br();
-        p.setFontSize(bs + 2);
-        p.setFontBold(true);
-        p.ctext(QDate::currentDate().toString(FORMAT_DATE_TO_STR));
-        p.br();
-
-        if(closecash) {
-            p.setFontSize(bs + 4);
-            p.setFontBold(true);
-            p.ctext(tr("Cash closing"));
-            p.br();
-        }
-
-        double total = -1000000000;
-
-        while(db.nextRow()) {
-            if(db.getString(1) == "title") {
-                if(total > -1000000000) {
-                    p.setFontSize(bs + 2);
-                    p.setFontBold(true);
-                    p.ltext(tr("Total"), 0, 490);
-                    p.rtext(float_str(total, 2));
-                    p.br();
-                    p.line();
-                    p.br();
-                    p.line();
-                    p.br();
-                    p.line();
-                    p.br(2);
-                    p.br(2);
-                }
-
-                total = 0;
-                p.setFontSize(bs + 2);
-                p.setFontBold(true);
-                p.ctext(db.getString(0));
-                p.br();
-                p.line();
-                p.br();
-                continue;
-            }
-
-            p.setFontSize(bs);
-            p.setFontBold(false);
-            total += db.getDouble(2);
-            p.ltext(db.getString(0) + " " + db.getString(1), 0, 490);
-            p.rtext(float_str(db.getDouble(2), 2));
-            p.br();
-        }
-
-        if(total > -1000000000) {
-            p.setFontSize(bs + 2);
-            p.setFontBold(true);
-            p.ltext(tr("Total"), 0, 490);
-            p.rtext(float_str(total, 2));
-            p.br();
-            p.line();
-            p.br();
-            p.line();
-            p.br();
-            p.line();
-            p.br(2);
-            p.br(2);
-        }
-
-        p.setFontSize(bs - 4);
-        p.ltext(tr("Printed"), 0);
-        p.rtext(QDateTime::currentDateTime().toString(FORMAT_DATETIME_TO_STR));
-        p.br();
-        p.print(C5Config::localReceiptPrinter(), QPageSize::Custom);
-    }
-
-    if(closecash) {
-        db[":f_sessionid"] = QDateTime::currentDateTime().toString("dd/MM/yyyy HH:mm:ss");
-        db.exec("update a_header set f_sessionid=:f_sessionid where f_sessionid is null");
-    }
-}
-
-void DlgReports::on_btnCashInput_clicked()
-{
-    bool ok;
-    double cash = QInputDialog::getDouble(this, tr("Cash input"), "", 0, 0, 999999999, 0, &ok);
-
-    if(!ok || cash < 0.001) {
-        return;
-    }
-
-    QJsonObject jo;
-    jo["cash_in"] = __c5config.cashId();
-    jo["cash_out"] = 0;
-    jo["purpose"] = tr("Change input");
-    jo["date"] = QDate::currentDate().toString(FORMAT_DATE_TO_STR_MYSQL);
-    jo["amount_in"] = cash;
-    jo["amount_out"] = 0;
-    fHttp->createHttpQuery("/engine/worker/cashdoc.php", jo, SLOT(cashDocResponse(QJsonObject)));
 }

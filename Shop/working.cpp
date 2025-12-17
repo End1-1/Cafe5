@@ -48,16 +48,12 @@ Working::Working(C5User *user, QWidget *parent) :
     ui(new Ui::Working)
 {
     ui->setupUi(this);
-#ifdef QT_DEBUG
-    setMaximumSize(DEBUG_SIZE);
-    setMinimumSize(DEBUG_SIZE);
-#endif
     fInstance = this;
     QString ip;
     fCustomerDisplay = nullptr;
     QString username;
     QString password;
-    fUser = user;
+    mUser = user;
     QShortcut *sF1 = new QShortcut(QKeySequence(Qt::Key_F1), this);
     QShortcut *sF2 = new QShortcut(QKeySequence(Qt::Key_F2), this);
     //    QShortcut *sF3 = new QShortcut(QKeySequence(Qt::Key_F3), this);
@@ -129,7 +125,7 @@ Working::Working(C5User *user, QWidget *parent) :
 
     ui->lbConfig->setText(__c5config.fSettingsName);
     ui->lbStore->setText(dbstore->name(__c5config.defaultStore()));
-    ui->lbCashier->setText(fUser->fullName());
+    ui->lbCashier->setText(mUser->fullName());
     fHttp = new NInterface(this);
     fHttp->createHttpQuery("/engine/shop/create-a-store-sale.php",
     QJsonObject{{"store", __c5config.defaultStore()}, {"forceupdate", true}},
@@ -178,10 +174,10 @@ bool Working::eventFilter(QObject *watched, QEvent *event)
 
                 if(DlgPin::getPin(pin, pass, true)) {
                     C5Database db;
-                    C5User ua(0);
+                    C5User ua;
                     QString name;
 
-                    if(ua.authByPinPass(pin, pass)) {
+                    if(ua.authByPinPass(pin, pass, fHttp)) {
                         db[":f_user"] = ua.id();
                         db.exec("select * from s_salary_inout where f_user=:f_user and f_dateout is null");
 
@@ -228,10 +224,10 @@ bool Working::eventFilter(QObject *watched, QEvent *event)
 
                 if(DlgPin::getPin(pin, pass, true)) {
                     C5Database db;
-                    C5User ua(0);
+                    C5User ua;
                     QString name;
 
-                    if(ua.authByPinPass(pin, pass)) {
+                    if(ua.authByPinPass(pin, pass, fHttp)) {
                         db[":f_user"] = ua.id();
                         db.exec("select * from s_salary_inout where f_user=:f_user and f_dateout is null");
 
@@ -367,7 +363,7 @@ void Working::loadStaff()
 
 WOrder* Working::newSale(int type)
 {
-    WOrder *w = new WOrder(fUser, type, fCustomerDisplay, this);
+    WOrder *w = new WOrder(mUser, type, fCustomerDisplay, this);
     QObjectList ol = w->children();
 
     for(QObject *o : ol) {
@@ -775,11 +771,11 @@ void Working::on_tab_tabCloseRequested(int index)
 
 void Working::on_btnItemBack_clicked()
 {
-    if(!fUser->check(cp_t5_refund_goods)) {
+    if(!mUser->check(cp_t5_refund_goods)) {
         return;
     }
 
-    Sales::showSales(this, fUser);
+    Sales::showSales(this, mUser);
 }
 
 void Working::on_tab_currentChanged(int index)
@@ -831,11 +827,11 @@ void Working::on_btnWriteOrder_clicked()
 
 void Working::on_btnGoodsMovement_clicked()
 {
-    C5User *u = fUser;
+    C5User *u = mUser;
 
     if(!u->check(cp_t5_refund_goods)) {
         QString password = QInputDialog::getText(this, tr("Password"), tr("Password"), QLineEdit::Password);
-        C5User *tmp = new C5User(password);
+        C5User *tmp = new C5User(password, fHttp);
 
         if(tmp->error().isEmpty()) {
             u = tmp;
@@ -849,7 +845,7 @@ void Working::on_btnGoodsMovement_clicked()
     auto *si = new StoreInput(u);
     si->showMaximized();
 
-    if(u != fUser) {
+    if(u != mUser) {
         delete u;
     }
 }
@@ -872,11 +868,11 @@ void Working::on_btnGoodsList_clicked()
 
 void Working::on_btnSalesReport_clicked()
 {
-    C5User *u = fUser;
+    C5User *u = mUser;
 
     if(!u->check(cp_t5_refund_goods)) {
         QString password = QInputDialog::getText(this, tr("Password"), tr("Password"), QLineEdit::Password);
-        C5User *tmp = new C5User(password);
+        C5User *tmp = new C5User(password, fHttp);
 
         if(tmp->error().isEmpty()) {
             u = tmp;
@@ -889,7 +885,7 @@ void Working::on_btnSalesReport_clicked()
 
     Sales::showSales(this, u);
 
-    if(u != fUser) {
+    if(u != mUser) {
         delete u;
     }
 }
@@ -1017,7 +1013,7 @@ void Working::on_chRegisterCard_clicked()
 
 void Working::on_btnCashout_clicked()
 {
-    DlgCashout().exec();
+    DlgCashout(mUser).exec();
 }
 
 void Working::on_btnBooking_clicked()

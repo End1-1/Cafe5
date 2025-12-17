@@ -1,7 +1,7 @@
 #ifndef CE5EDITOR_H
 #define CE5EDITOR_H
 
-#include "c5widget.h"
+#include "c5officewidget.h"
 #include "c5editor.h"
 #include <QSet>
 #include <QJsonObject>
@@ -12,7 +12,7 @@ class C5DateEdit;
 class C5ComboBox;
 class QPlainTextEdit;
 
-class CE5Editor : public C5Widget
+class CE5Editor : public C5OfficeWidget
 {
     Q_OBJECT
 

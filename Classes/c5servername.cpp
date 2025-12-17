@@ -17,9 +17,14 @@ C5ServerName::C5ServerName(const QString &server, QObject *parent)
 {
 }
 
+C5ServerName::~C5ServerName()
+{
+    mTimer.stop();
+}
+
 bool C5ServerName::getServers()
 {
-    connect( &mTimer, &QTimer::timeout, this, []() {
+    connect(&mTimer, &QTimer::timeout, this, []() {
         qDebug() << "Websocket timeout";
     });
     QWebSocket *s = new QWebSocket();
@@ -28,18 +33,20 @@ bool C5ServerName::getServers()
     connect(s, &QWebSocket::connected, &l1, &QEventLoop::quit);
     connect(s, &QWebSocket::disconnected, &l1, &QEventLoop::quit);
     connect(this, &C5ServerName::messageReceived, &l1, &QEventLoop::quit);
-    connect( &mTimer, &QTimer::timeout, &l1, &QEventLoop::quit);
+    connect(&mTimer, &QTimer::timeout, &l1, &QEventLoop::quit);
     mTimer.start(10000);
     s->open(url);
     l1.exec();
-    if (s->state() != QAbstractSocket::ConnectedState) {
+
+    if(s->state() != QAbstractSocket::ConnectedState) {
         qDebug() << s->error() << s->errorString();
         mErrorString = s->errorString();
         s->deleteLater();
         return false;
     }
+
     QEventLoop l2;
-    connect(s, &QWebSocket::textMessageReceived, this, [this](const QString &s) {
+    connect(s, &QWebSocket::textMessageReceived, this, [this](const QString & s) {
         fLastTextMessage = s;
         QJsonObject jrep = QJsonDocument::fromJson(s.toUtf8()).object();
         mServers = jrep["result"].toArray();
@@ -47,7 +54,7 @@ bool C5ServerName::getServers()
     });
     connect(this, &C5ServerName::messageReceived, &l2, &QEventLoop::quit);
     connect(s, &QWebSocket::disconnected, &l2, &QEventLoop::quit);
-    connect( &mTimer, &QTimer::timeout, &l2, &QEventLoop::quit);
+    connect(&mTimer, &QTimer::timeout, &l2, &QEventLoop::quit);
     QJsonObject jo;
     jo["command"] = "get_db_list";
     jo["server_key"] = __c5config.getRegValue("ss_server_key").toString();
@@ -60,7 +67,7 @@ bool C5ServerName::getServers()
 
 bool C5ServerName::getConnection(const QString &connectionName)
 {
-    connect( &mTimer, &QTimer::timeout, this, []() {
+    connect(&mTimer, &QTimer::timeout, this, []() {
         qDebug() << "Websocket timeout";
     });
     QWebSocket *s = new QWebSocket();
@@ -69,18 +76,20 @@ bool C5ServerName::getConnection(const QString &connectionName)
     connect(s, &QWebSocket::connected, &l1, &QEventLoop::quit);
     connect(s, &QWebSocket::disconnected, &l1, &QEventLoop::quit);
     connect(this, &C5ServerName::messageReceived, &l1, &QEventLoop::quit);
-    connect( &mTimer, &QTimer::timeout, &l1, &QEventLoop::quit);
+    connect(&mTimer, &QTimer::timeout, &l1, &QEventLoop::quit);
     mTimer.start(10000);
     s->open(url);
     l1.exec();
-    if (s->state() != QAbstractSocket::ConnectedState) {
+
+    if(s->state() != QAbstractSocket::ConnectedState) {
         qDebug() << s->error() << s->errorString();
         mErrorString = s->errorString();
         s->deleteLater();
         return false;
     }
+
     QEventLoop l2;
-    connect(s, &QWebSocket::textMessageReceived, this, [this](const QString &s) {
+    connect(s, &QWebSocket::textMessageReceived, this, [this](const QString & s) {
         fLastTextMessage = s;
         QJsonObject jrep = QJsonDocument::fromJson(s.toUtf8()).object();
         mReply = jrep["result"].toObject();
@@ -88,7 +97,7 @@ bool C5ServerName::getConnection(const QString &connectionName)
     });
     connect(this, &C5ServerName::messageReceived, &l2, &QEventLoop::quit);
     connect(s, &QWebSocket::disconnected, &l2, &QEventLoop::quit);
-    connect( &mTimer, &QTimer::timeout, &l2, &QEventLoop::quit);
+    connect(&mTimer, &QTimer::timeout, &l2, &QEventLoop::quit);
     QJsonObject jo;
     jo["command"] = "get_connection";
     jo["server_key"] = __c5config.getRegValue("ss_server_key").toString();

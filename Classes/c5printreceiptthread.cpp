@@ -3,11 +3,9 @@
 #include "c5translator.h"
 #include "QRCodeGenerator.h"
 #include "c5utils.h"
-#include "c5database.h"
-#include "c5utils.h"
-#include "c5config.h"
 #include <QApplication>
 #include <QSettings>
+#include <QJsonObject>
 
 C5PrintReceiptThread::C5PrintReceiptThread(const QString &header, const QMap<QString, QVariant>& headerInfo,
         const QList<QMap<QString, QVariant> >& bodyinfo, const QString &printer, int language, int paperWidth)
@@ -45,109 +43,109 @@ bool C5PrintReceiptThread::print()
     QMap<QString, QVariant> preorder;
     QMap<QString, QVariant> carinfo;
     QMap<QString, QVariant> giftcardinfo;
-    C5Database db;
-    db[":f_id"] = fHeader;
+    // C5Database db;
+    // db[":f_id"] = fHeader;
 
-    if(!db.exec("select * from o_header_options where f_id=:f_id")) {
-        fError = db.fLastError;
-        return false;
-    }
+    // if(!db.exec("select * from o_header_options where f_id=:f_id")) {
+    //     fError = db.fLastError;
+    //     return false;
+    // }
 
-    if(!db.nextRow()) {
-        fError = db.fLastError;
-        return false;
-    }
+    // if(!db.nextRow()) {
+    //     fError = db.fLastError;
+    //     return false;
+    // }
 
-    db.rowToMap(options);
-    db[":f_id"] = fHeader;
+    // db.rowToMap(options);
+    // db[":f_id"] = fHeader;
 
-    if(!db.exec("select * from o_preorder where f_id=:f_id")) {
-        fError = db.fLastError;
-        return false;
-    }
+    // if(!db.exec("select * from o_preorder where f_id=:f_id")) {
+    //     fError = db.fLastError;
+    //     return false;
+    // }
 
-    if(!db.nextRow()) {
-        fError = db.fLastError;
-        return false;
-    }
+    // if(!db.nextRow()) {
+    //     fError = db.fLastError;
+    //     return false;
+    // }
 
-    db.rowToMap(preorder);
-    QMap<QString, QVariant> guestInfo;
+    // db.rowToMap(preorder);
+    // QMap<QString, QVariant> guestInfo;
 
-    if(fHeaderInfo["f_partner"].toInt() > 0) {
-        db[":f_id"] = fHeaderInfo["f_partner"];
-        db.exec("select * from c_partners where f_id=:f_id");
+    // if(fHeaderInfo["f_partner"].toInt() > 0) {
+    //     db[":f_id"] = fHeaderInfo["f_partner"];
+    //     db.exec("select * from c_partners where f_id=:f_id");
 
-        if(db.nextRow()) {
-            db.rowToMap(guestInfo);
-        }
-    }
+    //     if(db.nextRow()) {
+    //         db.rowToMap(guestInfo);
+    //     }
+    // }
 
-    db[":f_id"] = fHeader;
+    // db[":f_id"] = fHeader;
 
-    if(!db.exec("select * from o_tax_log where f_order=:f_id and f_state=1")) {
-        fError = db.fLastError;
-        return false;
-    }
+    // if(!db.exec("select * from o_tax_log where f_order=:f_id and f_state=1")) {
+    //     fError = db.fLastError;
+    //     return false;
+    // }
 
-    if(db.nextRow()) {
-        jtax = str_json(db.getString("f_out"));
-    }
+    // if(db.nextRow()) {
+    //     jtax = str_json(db.getString("f_out"));
+    // }
 
-    db[":f_id"] = fHeader;
+    // db[":f_id"] = fHeader;
 
-    if(!db.exec("select * from o_pay_cl where f_id=:f_id")) {
-        fError = db.fLastError;
-        return false;
-    }
+    // if(!db.exec("select * from o_pay_cl where f_id=:f_id")) {
+    //     fError = db.fLastError;
+    //     return false;
+    // }
 
-    if(!db.nextRow()) {
-        fError = db.fLastError;
-        return false;
-    }
+    // if(!db.nextRow()) {
+    //     fError = db.fLastError;
+    //     return false;
+    // }
 
-    db.rowToMap(clinfo);
-    db[":f_id"] = fHeader;
+    // db.rowToMap(clinfo);
+    // db[":f_id"] = fHeader;
 
-    if(!db.exec("select * from o_pay_room where f_id=:f_id")) {
-        fError = db.fLastError;
-        return false;
-    }
+    // if(!db.exec("select * from o_pay_room where f_id=:f_id")) {
+    //     fError = db.fLastError;
+    //     return false;
+    // }
 
-    if(!db.nextRow()) {
-        fError = db.fLastError;
-        return false;
-    }
+    // if(!db.nextRow()) {
+    //     fError = db.fLastError;
+    //     return false;
+    // }
 
-    db.rowToMap(roominfo);
-    db[":f_id"] = options["f_car"].toInt();
+    // db.rowToMap(roominfo);
+    // db[":f_id"] = options["f_car"].toInt();
 
-    if(!db.exec("select * from b_car where f_id=:f_id")) {
-        fError = db.fLastError;
-        return false;
-    }
+    // if(!db.exec("select * from b_car where f_id=:f_id")) {
+    //     fError = db.fLastError;
+    //     return false;
+    // }
 
-    if(db.nextRow()) {
-        db.rowToMap(carinfo);
-    }
+    // if(db.nextRow()) {
+    //     db.rowToMap(carinfo);
+    // }
 
-    db[":f_trsale"] = fHeader;
-    db.exec("select h.f_value, i.f_amount from b_gift_card_history i "
-            "left join b_history h on h.f_id=i.f_trsale "
-            "where h.f_id=:f_trsale");
+    // db[":f_trsale"] = fHeader;
+    // db.exec("select h.f_value, i.f_amount from b_gift_card_history i "
+    //         "left join b_history h on h.f_id=i.f_trsale "
+    //         "where h.f_id=:f_trsale");
 
-    if(db.nextRow()) {
-        db.rowToMap(giftcardinfo);
-    }
+    // if(db.nextRow()) {
+    //     db.rowToMap(giftcardinfo);
+    // }
 
-    db[":f_trsale"] = fHeader;
-    db.exec("select c.f_code, concat(p.f_contact) as f_costumer, sum(h.f_amount) as f_totalamount  "
-            "from b_gift_card_history h "
-            "left join b_cards_discount c on c.f_id=h.f_card "
-            "left join c_partners p on p.f_id=c.f_client "
-            "where h.f_card in (select f_card from b_gift_card_history where f_trsale=:f_trsale)");
-    db.nextRow();
-    db.rowToMap(giftcardinfo);
+    // db[":f_trsale"] = fHeader;
+    // db.exec("select c.f_code, concat(p.f_contact) as f_costumer, sum(h.f_amount) as f_totalamount  "
+    //         "from b_gift_card_history h "
+    //         "left join b_cards_discount c on c.f_id=h.f_card "
+    //         "left join c_partners p on p.f_id=c.f_client "
+    //         "where h.f_card in (select f_card from b_gift_card_history where f_trsale=:f_trsale)");
+    // db.nextRow();
+    // db.rowToMap(giftcardinfo);
 
     if(fBill) {
         p.image("./logo_bill.png", Qt::AlignHCenter);
@@ -409,53 +407,53 @@ bool C5PrintReceiptThread::print()
     p.br();
     p.line();
 
-    if(fIdram[param_idram_id].length() > 0 && fBill) {
-        p.br();
-        p.br();
-        p.br();
-        p.br();
-        p.ctext(QString::fromUtf8("Վճարեք Idram-ով"));
-        p.br();
-        int levelIndex = 1;
-        int versionIndex = 0;
-        bool bExtent = true;
-        int maskIndex = -1;
-        QString encodeString = QString("%1;%2;%3;%4|%5;%6;%7")
-                               .arg(fIdram[param_idram_name])
-                               .arg(fIdram[param_idram_id]) //IDram ID
-                               .arg(fHeaderInfo["f_amounttotal"].toDouble())
-                               .arg(fHeader)
-                               .arg(fIdram[param_idram_phone])
-                               .arg(fIdram[param_idram_tips].toInt() == 1 ? "1" : "0")
-                               .arg(fIdram[param_idram_tips].toInt() == 1 ? fIdram[param_idram_tips_wallet] : "");
-        CQR_Encode qrEncode;
-        bool successfulEncoding = qrEncode.EncodeData(levelIndex, versionIndex, bExtent, maskIndex,
-                                  encodeString.toUtf8().data());
+    // if(fIdram[param_idram_id].length() > 0 && fBill) {
+    //     p.br();
+    //     p.br();
+    //     p.br();
+    //     p.br();
+    //     p.ctext(QString::fromUtf8("Վճարեք Idram-ով"));
+    //     p.br();
+    //     int levelIndex = 1;
+    //     int versionIndex = 0;
+    //     bool bExtent = true;
+    //     int maskIndex = -1;
+    //     QString encodeString = QString("%1;%2;%3;%4|%5;%6;%7")
+    //                            .arg(fIdram[param_idram_name])
+    //                            .arg(fIdram[param_idram_id]) //IDram ID
+    //                            .arg(fHeaderInfo["f_amounttotal"].toDouble())
+    //                            .arg(fHeader)
+    //                            .arg(fIdram[param_idram_phone])
+    //                            .arg(fIdram[param_idram_tips].toInt() == 1 ? "1" : "0")
+    //                            .arg(fIdram[param_idram_tips].toInt() == 1 ? fIdram[param_idram_tips_wallet] : "");
+    //     CQR_Encode qrEncode;
+    //     bool successfulEncoding = qrEncode.EncodeData(levelIndex, versionIndex, bExtent, maskIndex,
+    //                               encodeString.toUtf8().data());
 
-        if(!successfulEncoding) {
-            //            fLog.append("Cannot encode qr image");
-        }
+    //     if(!successfulEncoding) {
+    //         //            fLog.append("Cannot encode qr image");
+    //     }
 
-        int qrImageSize = qrEncode.m_nSymbleSize;
-        int encodeImageSize = qrImageSize + (QR_MARGIN * 2);
-        QImage encodeImage(encodeImageSize, encodeImageSize, QImage::Format_Mono);
-        encodeImage.fill(1);
+    //     int qrImageSize = qrEncode.m_nSymbleSize;
+    //     int encodeImageSize = qrImageSize + (QR_MARGIN * 2);
+    //     QImage encodeImage(encodeImageSize, encodeImageSize, QImage::Format_Mono);
+    //     encodeImage.fill(1);
 
-        for(int i = 0; i < qrImageSize; i++) {
-            for(int j = 0; j < qrImageSize; j++) {
-                if(qrEncode.m_byModuleData[i][j]) {
-                    encodeImage.setPixel(i + QR_MARGIN, j + QR_MARGIN, 0);
-                }
-            }
-        }
+    //     for(int i = 0; i < qrImageSize; i++) {
+    //         for(int j = 0; j < qrImageSize; j++) {
+    //             if(qrEncode.m_byModuleData[i][j]) {
+    //                 encodeImage.setPixel(i + QR_MARGIN, j + QR_MARGIN, 0);
+    //             }
+    //         }
+    //     }
 
-        QPixmap pix = QPixmap::fromImage(encodeImage);
-        pix = pix.scaled(300, 300);
-        p.image(pix, Qt::AlignHCenter);
-        p.br();
-        /* End QRCode */
-    } else {
-    }
+    //     QPixmap pix = QPixmap::fromImage(encodeImage);
+    //     pix = pix.scaled(300, 300);
+    //     p.image(pix, Qt::AlignHCenter);
+    //     p.br();
+    //     /* End QRCode */
+    // } else {
+    // }
 
     if(!fBill) {
         if(fHeaderInfo["f_amountcash"].toDouble() > 0.001) {
@@ -540,17 +538,16 @@ bool C5PrintReceiptThread::print()
         p.br(p.fLineHeight * 2);
     }
 
-    if(!guestInfo.isEmpty()) {
-        p.ctext(__translator.tt("Customer"));
-        p.br();
-        p.ctext(guestInfo["f_phone"].toString());
-        p.br();
-        p.ctext(guestInfo["f_contact"].toString());
-        p.br();
-        p.ctext(guestInfo["f_address"].toString());
-        p.br();
-    }
-
+    // if(!guestInfo.isEmpty()) {
+    //     p.ctext(__translator.tt("Customer"));
+    //     p.br();
+    //     p.ctext(guestInfo["f_phone"].toString());
+    //     p.br();
+    //     p.ctext(guestInfo["f_contact"].toString());
+    //     p.br();
+    //     p.ctext(guestInfo["f_address"].toString());
+    //     p.br();
+    // }
     p.setFontSize(bs);
     p.setFontBold(true);
     //p.ltext(__translator.tt("Thank you for visit!"), 0);

@@ -1,13 +1,14 @@
 #ifndef C5STOREINVENTORY_H
 #define C5STOREINVENTORY_H
 
-#include "c5widget.h"
+#include "c5officewidget.h"
 
-namespace Ui {
+namespace Ui
+{
 class C5StoreInventory;
 }
 
-class C5StoreInventory : public C5Widget
+class C5StoreInventory : public C5OfficeWidget
 {
     Q_OBJECT
 
@@ -16,7 +17,7 @@ public:
 
     ~C5StoreInventory();
 
-    virtual QToolBar *toolBar();
+    virtual QToolBar* toolBar();
 
     bool openDoc(QString id);
 
@@ -54,7 +55,7 @@ private slots:
     void on_btnBroadcast_clicked(bool checked);
 
 private:
-    Ui::C5StoreInventory *ui;
+    Ui::C5StoreInventory* ui;
 
     QString fInternalID;
 

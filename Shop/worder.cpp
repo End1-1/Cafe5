@@ -278,171 +278,8 @@ bool WOrder::writeOrder()
 
     QElapsedTimer t;
     t.start();
-
-    if((fOHeader.amountDebt > 0.001 || fOHeader.amountBank > 0.001) && fOHeader.partner == 0) {
-        C5Message::error(tr("Debt impossible on unknown partner"));
-        return false;
-    }
-
-    for(int i = 0; i < fOGoods.count(); i++) {
-        const OGoods &g = fOGoods.at(i);
-
-        if(g.qty < 0.0001) {
-            C5Message::error(tr("Invalid qty"));
-            return false;
-        }
-
-        if(g.price < 0) {
-            C5Message::error(tr("Invalid price"));
-            return false;
-        }
-    }
-
-    C5User *u = fUser;
-    SelectStaff ss(fWorking);
-
-    if(__c5config.shopDifferentStaff() && fWorking->fCurrentUsers.count() > 0) {
-        if(ss.exec() == QDialog::Rejected) {
-            return false;
-        }
-
-        u = ss.fUser;
-
-        if(!u->isValid()) {
-            return false;
-        }
-    }
-
-    QJsonObject jdoc;
-    jdoc["session"] = C5Database::uuid();
-    jdoc["giftcard"] = fGiftCard;
-    jdoc["settings"] = __c5config.fSettingsName;
-    jdoc["organization"] = ui->leOrganization->text();
-    jdoc["contact"] = ui->leContact->text();
-    QJsonObject jh;
-    jh["f_id"] = fOHeader._id().isEmpty() ? fDraftSale.id.toString() : fOHeader._id();
-    jh["f_hallid"] = fOHeader.hallId;
-    jh["f_prefix"] = fOHeader.prefix;
-    jh["f_state"] = ORDER_STATE_CLOSE;
-    jh["f_hall"] = fOHeader.hall;
-    jh["f_table"] = fOHeader.table;
-    jh["f_dateopen"] = fOHeader.dateOpen.toString(FORMAT_DATE_TO_STR_MYSQL);
-    jh["f_dateclose"] = QDate::currentDate().toString(FORMAT_DATE_TO_STR_MYSQL);
-    jh["f_datecash"] = QDate::currentDate().toString(FORMAT_DATE_TO_STR_MYSQL);
-    jh["f_timeopen"] = fOHeader.timeOpen.toString(FORMAT_TIME_TO_STR);
-    jh["f_timeclose"] = QTime::currentTime().toString(FORMAT_TIME_TO_STR);
-    jh["f_cashier"] = fOHeader.cashier;
-    jh["f_staff"] = u->id();
-    jh["f_comment"] = ui->leComment->text();
-    jh["f_print"] = fOHeader.print;
-    jh["f_amounttotal"] = fOHeader.amountTotal;
-    jh["f_amountcash"] = fOHeader.amountCash;
-    jh["f_amountcard"] = fOHeader.amountCard;
-    jh["f_amountprepaid"] = fOHeader.amountPrepaid;
-    jh["f_amountbank"] = fOHeader.amountBank;
-    jh["f_amountcredit"] = fOHeader.amountCredit;
-    jh["f_amountidram"] = fOHeader.amountIdram;
-    jh["f_amounttelcell"] = fOHeader.amountTelcell;
-    jh["f_amountdebt"] = fOHeader.amountDebt;
-    jh["f_amountpayx"] = fOHeader.amountPayX;
-    jh["f_amountother"] = fOHeader.amountOther;
-    jh["f_amountservice"] = fOHeader.amountService;
-    jh["f_amountdiscount"] = fOHeader.amountDiscount;
-    jh["f_servicefactor"] = fOHeader.serviceFactor;
-    jh["f_discountfactor"] = fOHeader.discountFactor;
-    jh["f_source"] = fOHeader.source;
-    jh["f_saletype"] = fOHeader.saleType;
-    jh["f_partner"] = fOHeader.partner;
-    jh["f_currency"] = fOHeader.currency;
-    jh["f_taxpayertin"] = fOHeader.taxpayerTin;
-    jh["f_cash"] = fOHeader.amountCashIn;
-    jh["f_change"] = fOHeader.amountChange;
-    jdoc["header"] = jh;
-    QJsonArray jg;
-
-    for(int i = 0; i < fOGoods.count(); i++) {
-        OGoods &g = fOGoods[i];
-        QJsonObject jt;
-        jt["f_id"] = C5Database::uuid();
-        jt["f_header"] = jh["f_id"];
-        jt["f_store"] = g.store;
-        jt["f_goods"] = g.goods;
-        jt["f_qty"] = g.qty;
-        jt["f_price"] = g.price;
-        jt["f_total"] = g.total;
-        jt["f_tax"] = g.tax;
-        jt["f_sign"] = g.sign;
-        jt["f_taxdebt"] = g.taxDept;
-        jt["f_adgcode"] = g.adgCode;
-        jt["f_row"] = i;
-        jt["f_storerec"] = g.storeRec;
-        jt["f_discountfactor"] = g.discountFactor;
-        jt["f_discountmode"] = g.discountMode;
-        jt["f_discountamount"] = g.discountAmount;
-        jt["f_return"] = g.return_;
-        jt["f_returnfrom"] = g.returnFrom.isEmpty() ? QJsonValue() : g.returnFrom;
-        jt["f_isservice"] = g.isService;
-        jt["f_amountaccumulate"] = g.accumulateAmount;
-        jt["f_emarks"] = QString(g.emarks).replace("\"", "\\\"");
-        jg.append(jt);
-    }
-
-    jdoc["goods"] = jg;
-    QJsonObject jhistory;
-    jhistory["f_card"] = fBHistory.card;
-    jhistory["f_data"] = fBHistory.data;
-    jhistory["f_type"] = fBHistory.type;
-    jhistory["f_value"] = fBHistory.value;
-
-    if(fBHistory.card > 0 && fBHistory.type == CARD_TYPE_ACCUMULATIVE) {
-        QJsonObject jtemp;
-        jtemp["card"] = fBHistory.card;
-        jtemp["accumulate"] = ui->leCurrentAccumulated->getDouble();
-        jtemp["accumulatespend"] = ui->leUseAccumulated->getDouble();
-        jdoc["accumulate"] = jtemp;
-        jhistory["f_data"] = ui->leCurrentAccumulated->getDouble() > 0 ? ui->leCurrentAccumulated->getDouble() : -1 *  ui->leUseAccumulated->getDouble();
-    }
-
-    jdoc["history"] = jhistory;
-    QJsonObject jflags;
-    jflags["f_1"] = ui->btnF1->isChecked() ? 1 : 0;
-    jflags["f_2"] = ui->btnF2->isChecked() ? 1 : 0;
-    jflags["f_3"] = ui->btnF3->isChecked() ? 1 : 0;
-    jflags["f_4"] = ui->btnF4->isChecked() ? 1 : 0;
-    jflags["f_5"] = ui->btnF5->isChecked() ? 1 : 0;
-    jdoc["flags"] = jflags;
-    QString sql = QString(QJsonDocument(jdoc).toJson(QJsonDocument::Compact));
-    sql.replace("'", "\\'");
-    sql = QString("call sf_create_shop_order('%1')").arg(sql);
     C5Database db;
-
-    if(!db.exec(sql)) {
-        C5Message::error(db.fLastError);
-        return false;
-    }
-
-    db[":f_session"] = jdoc["session"].toString();
-
-    if(!db.exec("select f_result from a_result where f_session=:f_session")) {
-        C5Message::error(db.fLastError);
-        return false;
-    }
-
-    if(!db.nextRow()) {
-        C5Message::error("Program error. Cannot get result of session");
-        return false;
-    }
-
-    QJsonObject jr = QJsonDocument::fromJson(db.getString("f_result").toUtf8()).object();
-
-    if(jr["status"].toInt() != 1) {
-        C5Message::error(jr["message"].toString());
-        return false;
-    }
-
-    if(C5Config::taxIP().isEmpty()) {
-        fOHeader._printFiscal = false;
-    }
+    QString sql;
 
     if(fOHeader._printFiscal) {
         QElapsedTimer et;
@@ -574,6 +411,166 @@ bool WOrder::writeOrder()
         if(result != pt_err_ok) {
             C5Message::error(err);
         }
+    }
+
+    if((fOHeader.amountDebt > 0.001 || fOHeader.amountBank > 0.001) && fOHeader.partner == 0) {
+        C5Message::error(tr("Debt impossible on unknown partner"));
+        return false;
+    }
+
+    for(int i = 0; i < fOGoods.count(); i++) {
+        const OGoods &g = fOGoods.at(i);
+
+        if(g.qty < 0.0001) {
+            C5Message::error(tr("Invalid qty"));
+            return false;
+        }
+
+        if(g.price < 0) {
+            C5Message::error(tr("Invalid price"));
+            return false;
+        }
+    }
+
+    C5User *u = fUser;
+    SelectStaff ss(fWorking);
+
+    if(__c5config.shopDifferentStaff() && fWorking->fCurrentUsers.count() > 0) {
+        if(ss.exec() == QDialog::Rejected) {
+            return false;
+        }
+
+        u = ss.fUser;
+    }
+
+    QJsonObject jdoc;
+    jdoc["session"] = C5Database::uuid();
+    jdoc["giftcard"] = fGiftCard;
+    jdoc["settings"] = __c5config.fSettingsName;
+    jdoc["organization"] = ui->leOrganization->text();
+    jdoc["contact"] = ui->leContact->text();
+    QJsonObject jh;
+    jh["f_id"] = fOHeader._id().isEmpty() ? fDraftSale.id.toString() : fOHeader._id();
+    jh["f_hallid"] = fOHeader.hallId;
+    jh["f_prefix"] = fOHeader.prefix;
+    jh["f_state"] = ORDER_STATE_CLOSE;
+    jh["f_hall"] = fOHeader.hall;
+    jh["f_table"] = fOHeader.table;
+    jh["f_dateopen"] = fOHeader.dateOpen.toString(FORMAT_DATE_TO_STR_MYSQL);
+    jh["f_dateclose"] = QDate::currentDate().toString(FORMAT_DATE_TO_STR_MYSQL);
+    jh["f_datecash"] = QDate::currentDate().toString(FORMAT_DATE_TO_STR_MYSQL);
+    jh["f_timeopen"] = fOHeader.timeOpen.toString(FORMAT_TIME_TO_STR);
+    jh["f_timeclose"] = QTime::currentTime().toString(FORMAT_TIME_TO_STR);
+    jh["f_cashier"] = fOHeader.cashier;
+    jh["f_staff"] = u->id();
+    jh["f_comment"] = ui->leComment->text();
+    jh["f_print"] = fOHeader.print;
+    jh["f_amounttotal"] = fOHeader.amountTotal;
+    jh["f_amountcash"] = fOHeader.amountCash;
+    jh["f_amountcard"] = fOHeader.amountCard;
+    jh["f_amountprepaid"] = fOHeader.amountPrepaid;
+    jh["f_amountbank"] = fOHeader.amountBank;
+    jh["f_amountcredit"] = fOHeader.amountCredit;
+    jh["f_amountidram"] = fOHeader.amountIdram;
+    jh["f_amounttelcell"] = fOHeader.amountTelcell;
+    jh["f_amountdebt"] = fOHeader.amountDebt;
+    jh["f_amountpayx"] = fOHeader.amountPayX;
+    jh["f_amountother"] = fOHeader.amountOther;
+    jh["f_amountservice"] = fOHeader.amountService;
+    jh["f_amountdiscount"] = fOHeader.amountDiscount;
+    jh["f_servicefactor"] = fOHeader.serviceFactor;
+    jh["f_discountfactor"] = fOHeader.discountFactor;
+    jh["f_source"] = fOHeader.source;
+    jh["f_saletype"] = fOHeader.saleType;
+    jh["f_partner"] = fOHeader.partner;
+    jh["f_currency"] = fOHeader.currency;
+    jh["f_taxpayertin"] = fOHeader.taxpayerTin;
+    jh["f_cash"] = fOHeader.amountCashIn;
+    jh["f_change"] = fOHeader.amountChange;
+    jdoc["header"] = jh;
+    QJsonArray jg;
+
+    for(int i = 0; i < fOGoods.count(); i++) {
+        OGoods &g = fOGoods[i];
+        QJsonObject jt;
+        jt["f_id"] = C5Database::uuid();
+        jt["f_header"] = jh["f_id"];
+        jt["f_store"] = g.store;
+        jt["f_goods"] = g.goods;
+        jt["f_qty"] = g.qty;
+        jt["f_price"] = g.price;
+        jt["f_total"] = g.total;
+        jt["f_tax"] = g.tax;
+        jt["f_sign"] = g.sign;
+        jt["f_taxdebt"] = g.taxDept;
+        jt["f_adgcode"] = g.adgCode;
+        jt["f_row"] = i;
+        jt["f_storerec"] = g.storeRec;
+        jt["f_discountfactor"] = g.discountFactor;
+        jt["f_discountmode"] = g.discountMode;
+        jt["f_discountamount"] = g.discountAmount;
+        jt["f_return"] = g.return_;
+        jt["f_returnfrom"] = g.returnFrom.isEmpty() ? QJsonValue() : g.returnFrom;
+        jt["f_isservice"] = g.isService;
+        jt["f_amountaccumulate"] = g.accumulateAmount;
+        jt["f_emarks"] = QString(g.emarks).replace("\"", "\\\"");
+        jg.append(jt);
+    }
+
+    jdoc["goods"] = jg;
+    QJsonObject jhistory;
+    jhistory["f_card"] = fBHistory.card;
+    jhistory["f_data"] = fBHistory.data;
+    jhistory["f_type"] = fBHistory.type;
+    jhistory["f_value"] = fBHistory.value;
+
+    if(fBHistory.card > 0 && fBHistory.type == CARD_TYPE_ACCUMULATIVE) {
+        QJsonObject jtemp;
+        jtemp["card"] = fBHistory.card;
+        jtemp["accumulate"] = ui->leCurrentAccumulated->getDouble();
+        jtemp["accumulatespend"] = ui->leUseAccumulated->getDouble();
+        jdoc["accumulate"] = jtemp;
+        jhistory["f_data"] = ui->leCurrentAccumulated->getDouble() > 0 ? ui->leCurrentAccumulated->getDouble() : -1 *  ui->leUseAccumulated->getDouble();
+    }
+
+    jdoc["history"] = jhistory;
+    QJsonObject jflags;
+    jflags["f_1"] = ui->btnF1->isChecked() ? 1 : 0;
+    jflags["f_2"] = ui->btnF2->isChecked() ? 1 : 0;
+    jflags["f_3"] = ui->btnF3->isChecked() ? 1 : 0;
+    jflags["f_4"] = ui->btnF4->isChecked() ? 1 : 0;
+    jflags["f_5"] = ui->btnF5->isChecked() ? 1 : 0;
+    jdoc["flags"] = jflags;
+    sql = QString(QJsonDocument(jdoc).toJson(QJsonDocument::Compact));
+    sql.replace("'", "\\'");
+    sql = QString("call sf_create_shop_order('%1')").arg(sql);
+
+    if(!db.exec(sql)) {
+        C5Message::error(db.fLastError);
+        return false;
+    }
+
+    db[":f_session"] = jdoc["session"].toString();
+
+    if(!db.exec("select f_result from a_result where f_session=:f_session")) {
+        C5Message::error(db.fLastError);
+        return false;
+    }
+
+    if(!db.nextRow()) {
+        C5Message::error("Program error. Cannot get result of session");
+        return false;
+    }
+
+    QJsonObject jr = QJsonDocument::fromJson(db.getString("f_result").toUtf8()).object();
+
+    if(jr["status"].toInt() != 1) {
+        C5Message::error(jr["message"].toString());
+        return false;
+    }
+
+    if(C5Config::taxIP().isEmpty()) {
+        fOHeader._printFiscal = false;
     }
 
     if(!C5Config::localReceiptPrinter().isEmpty()) {
@@ -865,7 +862,7 @@ void WOrder::removeRow()
 
     if(!tmp->check(cp_t5_remove_row_from_shop)) {
         QString password = QInputDialog::getText(this, tr("Password"), tr("Password"), QLineEdit::Password);
-        C5User *tmp = new C5User(password);
+        C5User *tmp = new C5User;
 
         if(tmp->error().isEmpty()) {
         } else {
@@ -1053,9 +1050,9 @@ bool WOrder::checkDiscountRight()
 {
     C5User *u = fUser;
 
-    if(!u->check(cp_t5_discount)) {
+    if(!u->check(cp_t5_shop_can_discount)) {
         QString password = QInputDialog::getText(this, tr("Password"), tr("Password"), QLineEdit::Password);
-        C5User *tmp = new C5User(password);
+        C5User *tmp = new C5User(password, fHttp);
 
         if(tmp->error().isEmpty()) {
             if(!tmp->check(cp_t5_discount)) {
@@ -1176,10 +1173,10 @@ void WOrder::reponseProcessCode(const QJsonObject &jdoc)
 
         if(card["f_mode"].toInt() == CARD_TYPE_DISCOUNT) {
             if(__c5config.fMainJson["shop_autodiscount_card_number"].toString() != card["f_code"].toString()) {
-                // if(!checkDiscountRight()) {
-                //     fHttp->httpQueryFinished(sender());
-                //     return;
-                // }
+                if(!checkDiscountRight()) {
+                    fHttp->httpQueryFinished(sender());
+                    return;
+                }
             }
         }
 

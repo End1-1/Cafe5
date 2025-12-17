@@ -1,20 +1,21 @@
 #ifndef STOREINPUTDOCUMENT_H
 #define STOREINPUTDOCUMENT_H
 
-#include "c5widget.h"
+#include "c5officewidget.h"
 
-namespace Ui {
+namespace Ui
+{
 class StoreInputDocument;
 }
 
-class StoreInputDocument : public C5Widget
+class StoreInputDocument : public C5OfficeWidget
 {
     Q_OBJECT
 
 public:
     explicit StoreInputDocument(QWidget *parent = nullptr);
     ~StoreInputDocument();
-    virtual QToolBar *toolBar() override;
+    virtual QToolBar* toolBar() override;
     bool openDoc(const QString &id);
     void setLastInputPrices();
 
@@ -36,9 +37,9 @@ private slots:
     void on_btnEditGoods_clicked();
 
 private:
-    QAction *fSave;
-    QAction *fDraft;
-    Ui::StoreInputDocument *ui;
+    QAction* fSave;
+    QAction* fDraft;
+    Ui::StoreInputDocument* ui;
     void countTotal();
     int newEmptyRow();
     void connectSlotSignal(int row);

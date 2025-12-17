@@ -1,14 +1,14 @@
 #ifndef C5WAITERORDER_H
 #define C5WAITERORDER_H
 
-#include "c5widget.h"
+#include "c5officewidget.h"
 
 namespace Ui
 {
 class C5WaiterOrder;
 }
 
-class C5WaiterOrder : public C5Widget
+class C5WaiterOrder : public C5OfficeWidget
 {
     Q_OBJECT
 
@@ -21,10 +21,10 @@ public:
 
     virtual bool allowChangeDatabase();
 
-    virtual QToolBar *toolBar();
+    virtual QToolBar* toolBar();
 
 private:
-    Ui::C5WaiterOrder *ui;
+    Ui::C5WaiterOrder* ui;
 
     void showLog();
 

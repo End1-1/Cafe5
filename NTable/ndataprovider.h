@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include <QNetworkReply>
+#include <QJsonObject>
 
 class QNetworkAccessManager;
 class QElapsedTimer;
@@ -34,9 +35,9 @@ public:
     static QString mFileVersion;
 
 private:
-    QElapsedTimer *mTimer;
+    QElapsedTimer* mTimer;
 
-    QNetworkAccessManager *mNetworkAccessManager;
+    QNetworkAccessManager* mNetworkAccessManager;
 
     QString mConnectionProtocol;
 
@@ -50,9 +51,9 @@ private slots:
 signals:
     void started();
 
-    void error(const QString &);
+    void error(const QString&);
 
-    void done(const QJsonObject &);
+    void done(const QJsonObject&);
 };
 
 #endif // NDATAPROVIDER_H

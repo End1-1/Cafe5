@@ -1,19 +1,19 @@
 #ifndef DLGMOVEMENT_H
 #define DLGMOVEMENT_H
 
-#include "c5dialog.h"
+#include "c5shopdialog.h"
 
 namespace Ui
 {
 class DlgMovement;
 }
 
-class DlgMovement : public C5Dialog
+class DlgMovement : public C5ShopDialog
 {
     Q_OBJECT
 
 public:
-    explicit DlgMovement();
+    explicit DlgMovement(C5User *user);
     ~DlgMovement();
     bool openDoc(const QString &doc);
 
@@ -28,7 +28,7 @@ private slots:
     void on_btnMinimize_clicked();
 
 private:
-    Ui::DlgMovement *ui;
+    Ui::DlgMovement* ui;
     QString fUuid;
     QString fPendingDoc;
     bool mSetupComplete;

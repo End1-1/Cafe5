@@ -7,7 +7,7 @@
 #include "c5tableview.h"
 #include "c5config.h"
 #include "c5message.h"
-#include "c5widget.h"
+#include "c5officewidget.h"
 #include <QDebug>
 #include <QHBoxLayout>
 #include <QTableView>
@@ -23,7 +23,7 @@ class C5TableWidget;
 class C5TableModel;
 class NLoadingDlg;
 
-class C5Grid : public C5Widget
+class C5Grid : public C5OfficeWidget
 {
     Q_OBJECT
 

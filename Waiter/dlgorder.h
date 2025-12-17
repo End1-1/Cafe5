@@ -1,7 +1,7 @@
 #ifndef DLGORDER_H
 #define DLGORDER_H
 
-#include "c5dialog.h"
+#include "c5waiterdialog.h"
 #include <QTableWidgetItem>
 #include <QTimer>
 
@@ -15,7 +15,7 @@ class C5OrderDriver;
 class WOrder;
 class C5LineEdit;
 
-class DlgOrder : public C5Dialog
+class DlgOrder : public C5WaiterDialog
 {
     Q_OBJECT
 
@@ -23,8 +23,6 @@ public:
     explicit DlgOrder(C5User *user);
 
     ~DlgOrder();
-
-    C5User* fUser;
 
     static DlgOrder* openTable(int table, C5User *user);
 

@@ -1,13 +1,14 @@
 #ifndef C5CHANGEDOCINPUTPRICE_H
 #define C5CHANGEDOCINPUTPRICE_H
 
-#include "c5dialog.h"
+#include "c5officedialog.h"
 
-namespace Ui {
+namespace Ui
+{
 class C5ChangeDocInputPrice;
 }
 
-class C5ChangeDocInputPrice : public C5Dialog
+class C5ChangeDocInputPrice : public C5OfficeDialog
 {
     Q_OBJECT
 
@@ -24,7 +25,7 @@ private slots:
     void on_btnChange_clicked();
 
 private:
-    Ui::C5ChangeDocInputPrice *ui;
+    Ui::C5ChangeDocInputPrice* ui;
 
 };
 

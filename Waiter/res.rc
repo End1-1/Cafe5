@@ -1,32 +1,37 @@
 IDI_ICON1 ICON DISCARDABLE "cup.ico"
 
 #include "rc.h"
-#include <windows.h>
 
 VS_VERSION_INFO VERSIONINFO
-FILEVERSION _PRODUCT_VERSION
-PRODUCTVERSION _PRODUCT_VERSION
-
+FILEVERSION FILE_VERSION
+PRODUCTVERSION FILE_VERSION
+FILEFLAGSMASK 0x3fL
+FILEFLAGS 0x0L
+FILEOS 0x40004L
+FILETYPE 0x1L
+FILESUBTYPE 0x0L
 BEGIN
-    BLOCK "StringFileInfo"
-    BEGIN
-        BLOCK "040904E4"
-        BEGIN
-            VALUE "Comments", "\0"
-            VALUE "CompanyName", "Kudryashov Vasili\0"
-            VALUE "FileDescription", "Waiter\0"
-            VALUE "FileVersion", _FILE_VERSION_STR
-            VALUE "InternalName", "Waiter\0"
-            VALUE "LegalCopyright", "(C)2017-2024, Kudryashov Vasili\0"
-            VALUE "OriginalFilename", "Waiter.exe\0"
-            VALUE "Email", "end1_1@yahoo.com\0"
-            VALUE "ProductName", "Waiter\0"
-            VALUE "ProductVersion", _PRODUCT_VERSION_STR
-        END
-    END
 
-    BLOCK "VarFileInfo"
-    BEGIN
-        VALUE "Translation", 0x409, 1252
-    END
+BLOCK "StringFileInfo"
+BEGIN
+BLOCK "040904E4"
+BEGIN
+VALUE "Comments", "\0"
+VALUE "CompanyName", "Kudryashov Vasili"
+VALUE "FileDescription", "Waiter"
+VALUE "FileVersion", FILE_VERSION_STR
+VALUE "InternalName", "Waiter"
+VALUE "LegalCopyright", "(C)2017-2026, Kudryashov Vasili"
+VALUE "OriginalFilename", "Waiter.exe"
+VALUE "Email", "end1_1@yahoo.com"
+VALUE "ProductName", "Waiter"
+VALUE "ProductVersion", FILE_VERSION_STR
+END
+END
+
+BLOCK "VarFileInfo"
+BEGIN
+VALUE "Translation", 0x409, 1252
+END
+
 END

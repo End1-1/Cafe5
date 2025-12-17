@@ -1,6 +1,6 @@
 #include "c5grouppermissionseditor.h"
 #include "ui_c5grouppermissionseditor.h"
-#include "c5permissions.h"
+#include "c5database.h"
 #include "c5selector.h"
 #include "c5cache.h"
 #include "c5message.h"
@@ -14,22 +14,25 @@ public:
                            const QSize &size, const QWidget *widget) const
     {
         QSize s = QProxyStyle::sizeFromContents(type, option, size, widget);
-        if (type == QStyle::CT_TabBarTab) {
+
+        if(type == QStyle::CT_TabBarTab) {
             s.transpose();
         }
+
         return s;
     }
 
     void drawControl(ControlElement element, const QStyleOption *option, QPainter *painter, const QWidget *widget) const
     {
-        if (element == CE_TabBarTabLabel) {
-            if (const QStyleOptionTab *tab = qstyleoption_cast<const QStyleOptionTab * >(option)) {
-                QStyleOptionTab opt( *tab);
+        if(element == CE_TabBarTabLabel) {
+            if(const QStyleOptionTab *tab = qstyleoption_cast<const QStyleOptionTab* >(option)) {
+                QStyleOptionTab opt(*tab);
                 opt.shape = QTabBar::RoundedNorth;
                 QProxyStyle::drawControl(element, &opt, painter, widget);
                 return;
             }
         }
+
         QProxyStyle::drawControl(element, option, painter, widget);
     }
 };
@@ -56,25 +59,29 @@ void C5GroupPermissionsEditor::setPermissionsGroupId(int id)
     C5Database db;
     db[":f_id"] = id;
     db.exec("select f_name from s_user_group where f_id=:f_id");
-    if (db.nextRow()) {
+
+    if(db.nextRow()) {
         ui->lbGroup->setText(QString("%1").arg(db.getString(0)));
     }
+
     getPermissions();
 }
 
-QToolBar *C5GroupPermissionsEditor::toolBar()
+QToolBar* C5GroupPermissionsEditor::toolBar()
 {
-    if (!fToolBar) {
+    if(!fToolBar) {
         C5Widget::toolBar();
         fToolBar->addAction(QIcon(":/save.png"), tr("Save"), this, SLOT(savePemissions()));
     }
+
     return fToolBar;
 }
 
 void C5GroupPermissionsEditor::on_lbGroup_clicked()
 {
     QJsonArray values;
-    if (C5Selector::getValue(cache_users_groups, values)) {
+
+    if(C5Selector::getValue(cache_users_groups, values)) {
         setPermissionsGroupId(values.at(0).toInt());
     }
 }
@@ -84,38 +91,40 @@ void C5GroupPermissionsEditor::savePemissions()
     C5Database db;
     db[":f_group"] = fGroupId;
     db.exec("delete from s_user_access where f_group=:f_group");
-    for (QMap<int, C5CheckBox * >::const_iterator it = fCheckBoxes.constBegin(); it != fCheckBoxes.constEnd(); it++) {
-        if (it.value()->isChecked()) {
+
+    for(QMap<int, C5CheckBox* >::const_iterator it = fCheckBoxes.constBegin(); it != fCheckBoxes.constEnd(); it++) {
+        if(it.value()->isChecked()) {
             db[":f_group"] = fGroupId;
             db[":f_key"] = it.key();
             db[":f_value"] = 1;
             db.insert("s_user_access", false);
         }
     }
+
     C5Message::info(tr("Saved"));
 }
 
 void C5GroupPermissionsEditor::getPermissions()
 {
-    QList<C5CheckBox *> l = fCheckBoxes.values();
-    foreach (C5CheckBox *c, l) {
+    QList<C5CheckBox*> l = fCheckBoxes.values();
+
+    foreach(C5CheckBox *c, l) {
         c->setChecked(false);
     }
+
     C5Database db;
     db[":f_group"] = fGroupId;
     db.exec("select f_key from s_user_access where f_group=:f_group");
     QSet<int> permissions;
-    while (db.nextRow()) {
+
+    while(db.nextRow()) {
         permissions << db.getInt(0);
     }
-    if (fGroupId == 1) {
-        foreach (int id, C5Permissions::fTemplate) {
-            permissions << id;
-        }
-    }
+
     QString err;
-    foreach (int p, permissions) {
-        if (!fCheckBoxes.contains(p)) {
+
+    foreach(int p, permissions) {
+        if(!fCheckBoxes.contains(p)) {
             err += QString::number(p) + "<br>";
         } else {
             fCheckBoxes[p]->setChecked(true);
@@ -126,12 +135,14 @@ void C5GroupPermissionsEditor::getPermissions()
 void C5GroupPermissionsEditor::getCheckBoxes(QWidget *parent)
 {
     QObjectList ol = parent->children();
-    foreach (QObject *o, ol) {
-        if (o->children().count() > 0) {
-            getCheckBoxes(static_cast<QWidget *>(o));
+
+    foreach(QObject *o, ol) {
+        if(o->children().count() > 0) {
+            getCheckBoxes(static_cast<QWidget*>(o));
         }
-        if (strcmp(o->metaObject()->className(), "C5CheckBox") == 0) {
-            C5CheckBox *cb = static_cast<C5CheckBox *>(o);
+
+        if(strcmp(o->metaObject()->className(), "C5CheckBox") == 0) {
+            C5CheckBox *cb = static_cast<C5CheckBox*>(o);
             fCheckBoxes[cb->getTag()] = cb;
         }
     }
@@ -139,8 +150,8 @@ void C5GroupPermissionsEditor::getCheckBoxes(QWidget *parent)
 
 void C5GroupPermissionsEditor::setChecked(int start, int end, bool v)
 {
-    for (QMap<int, C5CheckBox * >::const_iterator it = fCheckBoxes.constBegin(); it != fCheckBoxes.constEnd(); it++) {
-        if (it.key() >= start && it.key() <= end) {
+    for(QMap<int, C5CheckBox* >::const_iterator it = fCheckBoxes.constBegin(); it != fCheckBoxes.constEnd(); it++) {
+        if(it.key() >= start && it.key() <= end) {
             it.value()->setChecked(v);
         }
     }

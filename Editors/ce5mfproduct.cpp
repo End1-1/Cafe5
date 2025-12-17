@@ -23,6 +23,7 @@ CE5MFProduct::CE5MFProduct(QWidget *parent) :
     ui(new Ui::CE5MFProduct)
 {
     ui->setupUi(this);
+    ui->leGroupId->setSelector(ui->leGroupName, cache_goods_group);
 #ifdef QT_DEBUG
     int processcolwidth = 100;
 #else
@@ -128,6 +129,7 @@ bool CE5MFProduct::save(QString &err, QList<QMap<QString, QVariant> >& data)
     QJsonObject j;
     j["f_id"] = ui->leCode->getInteger();
     j["f_name"] = ui->leName->text();
+    j["f_goods_group"] = ui->leGroupId->getInteger();
     jo["main"] = j;
     QJsonArray ja;
 
@@ -196,6 +198,7 @@ void CE5MFProduct::openResponse(const QJsonObject &jdoc)
     QJsonObject jmain = jo["main"].toObject();
     ui->leCode->setInteger(jmain["f_id"].toInt());
     ui->leName->setText(jmain["f_name"].toString());
+    ui->leGroupId->setValue(jmain["f_goods_group"].toInt());
     QJsonArray ja =  jo ["process"].toArray();
 
     for(int i = 0; i < ja.size(); i++) {
@@ -706,7 +709,7 @@ void CE5MFProduct::on_btnAdd_3_clicked()
     }
 
     ui->tblMaterials->setInteger(row, 1, vals.at(1).toInt());
-    ui->tblMaterials->setString(row, 2, vals.at(2).toString());
+    ui->tblMaterials->setString(row, 2, vals.at(3).toString());
     ui->tblMaterials->createLineEdit(row, 3);
     ui->tblMaterials->createLineEdit(row, 4);
     ui->tblMaterials->createLineEdit(row, 5);

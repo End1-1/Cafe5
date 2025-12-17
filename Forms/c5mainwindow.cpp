@@ -106,7 +106,8 @@ QStringList mainDbParams;
 
 C5MainWindow::C5MainWindow(QWidget *parent) :
     QMainWindow(parent),
-    ui(new Ui::C5MainWindow)
+    ui(new Ui::C5MainWindow),
+    mUser(nullptr)
 {
     ui->setupUi(this);
     mainDbParams = __c5config.dbParams();
@@ -255,6 +256,28 @@ void C5MainWindow::removeBroadcastListener(C5Widget *w)
     }
 }
 
+void C5MainWindow::postLoginSetup()
+{
+    showMaximized();
+    setDB();
+    enableMenu(true);
+    ui->actionLogout->setVisible(true);
+    ui->actionChange_password->setVisible(true);
+    C5ReportTemplateDriver::init(mUser->group());
+    fStatusLabel->setText(mUser->fullName());
+    fConnectionLabel->setText(__c5config.fDBName);
+    C5Database db(C5Config::fDBHost, C5Config::fDBPath, C5Config::fDBUser, C5Config::fDBPassword);
+    db[":f_user"] = mUser->id();
+    db.exec("select f_name, f_description, f_host, f_db, f_user, f_password, f_main from s_db "
+            "where f_id in (select f_db from s_db_access where f_user=:f_user and f_permit=1)");
+
+    if(!db.nextRow()) {
+        C5Message::info(tr("No access to this database"));
+        qApp->quit();
+        return;
+    }
+}
+
 void C5MainWindow::tabCloseRequested(int index)
 {
     auto *w = static_cast<C5Widget*>(fTab->widget(index));
@@ -293,23 +316,19 @@ void C5MainWindow::currentTabChange(int index)
 
 void C5MainWindow::on_actionLogin_triggered()
 {
-    showMaximized();
-    setDB();
-    enableMenu(true);
-    ui->actionLogout->setVisible(true);
-    ui->actionChange_password->setVisible(true);
-    C5ReportTemplateDriver::init(__user->group());
-    fStatusLabel->setText(__user->fullName());
-    fConnectionLabel->setText(__c5config.fDBName);
-    C5Database db(C5Config::fDBHost, C5Config::fDBPath, C5Config::fDBUser, C5Config::fDBPassword);
-    db[":f_user"] = __user->id();
-    db.exec("select f_name, f_description, f_host, f_db, f_user, f_password, f_main from s_db "
-            "where f_id in (select f_db from s_db_access where f_user=:f_user and f_permit=1)");
+    if(!mUser) {
+        C5Login l;
 
-    if(!db.nextRow()) {
-        C5Message::info(tr("No access to this database"));
-        return;
+        if(l.exec() == QDialog::Accepted) {
+            C5Config::initParamsFromDb();
+            mUser = C5OfficeWidget::mUser;
+            on_actionLogin_triggered();
+        } else {
+            qApp->quit();
+        }
     }
+
+    postLoginSetup();
 }
 
 void C5MainWindow::menuListReponse(const QJsonObject &jdoc)
@@ -354,7 +373,7 @@ void C5MainWindow::updateTimeout()
 {
     fTimer.stop();
 
-    if(__user && (__user->id() == 77 || __user->id() == 81)) {
+    if(mUser && (mUser->id() == 77 || mUser->id() == 81)) {
         C5Database db;
         db.exec("select f_id from o_draft_sale where f_id not in (select f_header from o_draft_sound) and f_saletype<3 ");
 
@@ -402,7 +421,7 @@ QListWidgetItem* C5MainWindow::
 addTreeL3Item(QListWidget *l, int permission, const QString &text, const QString &icon)
 {
     if(permission > 0) {
-        if(!__user->check(permission)) {
+        if(!mUser->check(permission)) {
             return nullptr;
         }
     }
@@ -717,11 +736,9 @@ void C5MainWindow::on_listWidgetItemClicked(const QModelIndex &index)
         createTab<CR5GoodsGroup>();
         break;
 
+    case cp_t6_goods_price:
     case cp_t6_goods:
         createTab<CR5Goods>();
-        break;
-
-    case cp_t6_goods_price:
         createTab<C5GoodsPriceOrder>();
         break;
 
@@ -911,6 +928,7 @@ void C5MainWindow::on_actionLogout_triggered()
 
     if(l.exec() == QDialog::Accepted) {
         C5Config::initParamsFromDb();
+        mUser = C5OfficeWidget::mUser;
         on_actionLogin_triggered();
     } else {
         qApp->quit();
@@ -938,7 +956,7 @@ void C5MainWindow::on_splitter_splitterMoved(int pos, int index)
 bool C5MainWindow::addMainLevel(const QString &db, int permission, const QString &title, const QString &icon,
                                 QListWidget*& l)
 {
-    if(__user->check(permission)) {
+    if(mUser->check(permission)) {
         QPushButton *b = new QPushButton(QIcon(icon), title);
         b->setProperty("menu", "1");
         b->setProperty("cp", permission);
@@ -1074,11 +1092,6 @@ void C5MainWindow::setDB()
         addTreeL3Item(l, cp_t6_storage, tr("Storages"), ":/goods.png");
         addTreeL3Item(l, cp_t6_groups, tr("Groups of goods"), ":/goods.png");
         addTreeL3Item(l, cp_t6_goods, tr("Goods"), ":/goods.png");
-
-        if(C5Permissions::fPermissions[C5Permissions::fPermissions.firstKey()].contains(cp_t6_goods)) {
-            C5Permissions::fPermissions[C5Permissions::fPermissions.firstKey()].append(cp_t6_goods_price);
-        }
-
         addTreeL3Item(l, cp_t6_goods_price, tr("Group discount"), ":/goods.png");
         addTreeL3Item(l, cp_t6_units, tr("Units"), ":/goods.png");
         addTreeL3Item(l, cp_t6_goods_images, tr("Images"), ":/images.png");
@@ -1124,7 +1137,7 @@ void C5MainWindow::setDB()
     }
 
     C5Database dbb;
-    dbb[":f_group"] = __user->group();
+    dbb[":f_group"] = mUser->group();
     dbb.exec("select r.f_id, rg.f_level, r.f_name as f_reportname "
              "from reports r "
              "inner join reports_group rg on rg.f_id=r.f_group "
@@ -1218,7 +1231,7 @@ void C5MainWindow::readFavoriteMenu()
         if(ss.value(s).toBool()) {
             int prm = s.right(3).toInt();
 
-            if(__user->check(prm)) {
+            if(mUser->check(prm)) {
                 addTreeL3Item(l, prm, ss.value(s + "-name").toString(), itemIconName(prm));
             }
         } else {

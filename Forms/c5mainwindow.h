@@ -21,6 +21,7 @@ class NTableWidget;
 class NTreeWidget;
 class NInterface;
 class QPushButton;
+class C5User;
 
 class C5MainWindow : public QMainWindow
 {
@@ -56,6 +57,10 @@ public:
     void addBroadcastListener(C5Widget *w);
 
     void removeBroadcastListener(C5Widget *w);
+
+    C5User* mUser;
+
+    void postLoginSetup();
 
 public slots:
     void on_actionLogin_triggered();

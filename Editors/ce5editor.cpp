@@ -12,7 +12,7 @@
 #include <QPlainTextEdit>
 
 CE5Editor::CE5Editor(QWidget *parent) :
-    C5Widget(parent)
+    C5OfficeWidget(parent)
 {
     fRememberFields = false;
     fEditor = nullptr;

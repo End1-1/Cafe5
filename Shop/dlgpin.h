@@ -1,7 +1,7 @@
 #ifndef DLGPIN_H
 #define DLGPIN_H
 
-#include "c5dialog.h"
+#include "c5shopdialog.h"
 #include <QJsonObject>
 
 namespace Ui
@@ -11,7 +11,7 @@ class DlgPin;
 
 class NLoadingDlg;
 
-class DlgPin : public C5Dialog
+class DlgPin : public C5ShopDialog
 {
     Q_OBJECT
 
@@ -69,11 +69,11 @@ private slots:
     void on_btnSettings_clicked();
 
 private:
-    Ui::DlgPin *ui;
+    Ui::DlgPin* ui;
 
     bool fPinEmpty;
 
-    NLoadingDlg *fLoadingDlg;
+    NLoadingDlg* fLoadingDlg;
 
     bool fLastError;
 

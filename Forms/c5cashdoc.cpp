@@ -31,7 +31,7 @@ C5CashDoc::C5CashDoc(QWidget *parent) :
     ui->lbStoreDoc->setEnabled(false);
     ui->leStoreDoc->setEnabled(false);
     ui->btnOpenStoreDoc->setEnabled(false);
-    ui->deDate->setEnabled(__user->check(cp_t1_allow_change_cash_doc_date));
+    ui->deDate->setEnabled(mUser->check(cp_t1_allow_change_cash_doc_date));
     fRelation = false;
     fActionFromSale = nullptr;
     fActionDraft = nullptr;
@@ -319,7 +319,7 @@ bool C5CashDoc::save(bool writedebt, bool fromrelation)
         ui->leDocNum->setInteger(genNumber(DOC_TYPE_CASH));
         updateGenNumber(ui->leDocNum->getInteger(), DOC_TYPE_CASH);
     }
-    dw.writeAHeader(fUuid, ui->leDocNum->text(), DOC_STATE_SAVED, DOC_TYPE_CASH, __user->id(), ui->deDate->date(),
+    dw.writeAHeader(fUuid, ui->leDocNum->text(), DOC_STATE_SAVED, DOC_TYPE_CASH, mUser->id(), ui->deDate->date(),
                     QDate::currentDate(), QTime::currentTime(), ui->lePartner->getInteger(), ui->leTotal->getDouble(),
                     ui->cbComment->currentText(), 1, ui->cbCurrency->currentData().toInt(), ui->cbShift->currentData().toInt());
     dw.writeAHeaderCash(fUuid, ui->leInput->getInteger(), ui->leOutput->getInteger(), fRelation, fStoreUuid, "");

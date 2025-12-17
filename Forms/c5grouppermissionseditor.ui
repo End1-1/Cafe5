@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>678</width>
-    <height>689</height>
+    <width>968</width>
+    <height>852</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -20,7 +20,7 @@
       <enum>QTabWidget::TabPosition::West</enum>
      </property>
      <property name="currentIndex">
-      <number>3</number>
+      <number>11</number>
      </property>
      <widget class="QWidget" name="tab_2">
       <attribute name="title">
@@ -184,7 +184,7 @@
      </widget>
      <widget class="QWidget" name="tab_5">
       <attribute name="title">
-       <string>Sales</string>
+       <string>Waiter</string>
       </attribute>
       <layout class="QGridLayout" name="gridLayout_3">
        <item row="0" column="0">
@@ -197,8 +197,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>596</width>
-            <height>992</height>
+            <width>886</width>
+            <height>849</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_4">
@@ -229,26 +229,6 @@
              </property>
              <property name="Tag" stdset="0">
               <number>528</number>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="C5CheckBox" name="checkBox_97">
-             <property name="text">
-              <string>Show all sales (tax and all)</string>
-             </property>
-             <property name="Tag" stdset="0">
-              <number>536</number>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="C5CheckBox" name="checkBox_106">
-             <property name="text">
-              <string>Show sales of all users</string>
-             </property>
-             <property name="Tag" stdset="0">
-              <number>539</number>
              </property>
             </widget>
            </item>
@@ -523,22 +503,68 @@
             </widget>
            </item>
            <item>
-            <widget class="C5CheckBox" name="checkBox_54">
-             <property name="text">
-              <string>Refund goods (Shop)</string>
-             </property>
-             <property name="Tag" stdset="0">
-              <number>508</number>
-             </property>
-            </widget>
-           </item>
-           <item>
             <widget class="C5CheckBox" name="checkBox_60">
              <property name="text">
               <string>Shift rotation</string>
              </property>
              <property name="Tag" stdset="0">
               <number>509</number>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="Shop">
+      <attribute name="title">
+       <string>Shop</string>
+      </attribute>
+      <layout class="QVBoxLayout" name="verticalLayout_9">
+       <item>
+        <widget class="QScrollArea" name="scrollArea_5">
+         <property name="widgetResizable">
+          <bool>true</bool>
+         </property>
+         <widget class="QWidget" name="scrollAreaWidgetContents_5">
+          <property name="geometry">
+           <rect>
+            <x>0</x>
+            <y>0</y>
+            <width>900</width>
+            <height>764</height>
+           </rect>
+          </property>
+          <layout class="QVBoxLayout" name="verticalLayout_10">
+           <item>
+            <widget class="C5CheckBox" name="checkBox_97">
+             <property name="text">
+              <string>Show all sales (tax and all)</string>
+             </property>
+             <property name="Tag" stdset="0">
+              <number>536</number>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="C5CheckBox" name="checkBox_106">
+             <property name="text">
+              <string>Show sales of all users</string>
+             </property>
+             <property name="Tag" stdset="0">
+              <number>539</number>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="C5CheckBox" name="checkBox_54">
+             <property name="text">
+              <string>Refund goods</string>
+             </property>
+             <property name="Tag" stdset="0">
+              <number>508</number>
              </property>
             </widget>
            </item>
@@ -551,6 +577,29 @@
               <number>510</number>
              </property>
             </widget>
+           </item>
+           <item>
+            <widget class="C5CheckBox" name="checkBox_116">
+             <property name="text">
+              <string>Discount</string>
+             </property>
+             <property name="Tag" stdset="0">
+              <number>540</number>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <spacer name="verticalSpacer_11">
+             <property name="orientation">
+              <enum>Qt::Orientation::Vertical</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>20</width>
+               <height>40</height>
+              </size>
+             </property>
+            </spacer>
            </item>
           </layout>
          </widget>
@@ -715,8 +764,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>628</width>
-            <height>619</height>
+            <width>918</width>
+            <height>782</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_6">
@@ -1532,8 +1581,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>628</width>
-            <height>619</height>
+            <width>918</width>
+            <height>782</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_5">
@@ -1686,8 +1735,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>628</width>
-            <height>619</height>
+            <width>918</width>
+            <height>782</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_8">
@@ -1766,7 +1815,6 @@
   <tabstop>checkBox_42</tabstop>
   <tabstop>checkBox_43</tabstop>
   <tabstop>checkBox_44</tabstop>
-  <tabstop>checkBox_54</tabstop>
   <tabstop>checkBox_60</tabstop>
   <tabstop>chActions</tabstop>
   <tabstop>checkBox_16</tabstop>
@@ -1827,7 +1875,6 @@
   <tabstop>chGoods</tabstop>
   <tabstop>checkBox_80</tabstop>
   <tabstop>lbGroup</tabstop>
-  <tabstop>checkBox_74</tabstop>
   <tabstop>chWaiterAllItems</tabstop>
   <tabstop>checkBox_95</tabstop>
   <tabstop>scrollArea_2</tabstop>
@@ -1836,8 +1883,6 @@
   <tabstop>checkBox_78</tabstop>
   <tabstop>checkBox_77</tabstop>
   <tabstop>checkBox_104</tabstop>
-  <tabstop>checkBox_97</tabstop>
-  <tabstop>checkBox_106</tabstop>
   <tabstop>checkBox_102</tabstop>
   <tabstop>checkBox_103</tabstop>
   <tabstop>checkBox_211</tabstop>

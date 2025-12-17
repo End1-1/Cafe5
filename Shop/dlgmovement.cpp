@@ -6,10 +6,11 @@
 #include "c5message.h"
 #include "c5utils.h"
 #include "c5user.h"
+#include "ninterface.h"
 #include <QScrollBar>
 
-DlgMovement::DlgMovement()
-    : C5Dialog()
+DlgMovement::DlgMovement(C5User *user)
+    : C5ShopDialog(user)
     , ui(new Ui::DlgMovement),
       mSetupComplete(false)
 {
@@ -200,7 +201,7 @@ bool DlgMovement::saveDoc(int state)
     jheader["f_state"] = state;
     jheader["f_type"] = DOC_TYPE_STORE_MOVE;
     jheader["f_date"] = QDate::currentDate().toString(FORMAT_DATE_TO_STR_MYSQL);
-    jheader["f_operator"] = __user->id();
+    jheader["f_operator"] = mUser->id();
     jheader["f_partner"] = QJsonValue::Null;
     jheader["f_amount"] = 0;
     jheader["f_currency"] = 1;

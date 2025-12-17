@@ -7,7 +7,7 @@
 #include "c5user.h"
 
 C5ChangeDocInputPrice::C5ChangeDocInputPrice(const QString &uuid) :
-    C5Dialog(),
+    C5OfficeDialog(),
     ui(new Ui::C5ChangeDocInputPrice)
 {
     ui->setupUi(this);
@@ -16,7 +16,8 @@ C5ChangeDocInputPrice::C5ChangeDocInputPrice(const QString &uuid) :
     C5Database db;
     db[":f_id"] = uuid;
     db.exec("select f_goods, f_price from a_store where f_id=:f_id");
-    if (db.nextRow()) {
+
+    if(db.nextRow()) {
         ui->leGoods->setValue(db.getString("f_goods"));
         ui->lePrice->setDouble(db.getDouble("f_price"));
         ui->leGoods->fixValue();
@@ -46,10 +47,11 @@ void C5ChangeDocInputPrice::on_btnCancel_clicked()
 
 void C5ChangeDocInputPrice::on_btnChange_clicked()
 {
-    if (ui->leGoods->getInteger() == 0) {
+    if(ui->leGoods->getInteger() == 0) {
         C5Message::error(tr("Goods is not selected"));
         return;
     }
+
     C5Database db;
     db[":f_id"] = ui->leUuid->text();
     db.exec("select f_base from a_store where f_id=:f_id");
@@ -63,22 +65,26 @@ void C5ChangeDocInputPrice::on_btnChange_clicked()
     db.exec("select f_draft, f_document from a_store where f_base=:f_base");
     QSet<QString> docs;
     QStringList drafts;
-    while (db.nextRow()) {
+
+    while(db.nextRow()) {
         drafts.append(db.getString("f_draft"));
         docs.insert(db.getString("f_document"));
     }
-    for (const QString &s : drafts) {
+
+    for(const QString &s : drafts) {
         db[":f_id"] = s;
         db[":f_goods"] = ui->leGoods->getInteger();
         db[":f_price"] = ui->lePrice->text();
         db.exec("update a_store_draft set f_goods=:f_goods, f_price=:f_price, f_total=:f_price*f_qty where f_id=:f_id");
     }
-    for (const QString &s : docs) {
+
+    for(const QString &s : docs) {
         db[":f_id"] = s;
         db.exec("update a_header set f_amount=(select sum(f_total) from a_store_draft where f_document=:f_id) where f_id=:f_id");
     }
+
     db[":f_date"] = QDateTime::currentDateTime();
-    db[":f_user"] = __user->id();
+    db[":f_user"] = mUser->id();
     db[":f_base"] = base;
     db[":f_old_goods"] = ui->leGoods->old();
     db[":f_new_goods"] = ui->leGoods->text();

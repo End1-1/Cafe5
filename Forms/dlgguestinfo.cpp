@@ -1,7 +1,5 @@
 #include "dlgguestinfo.h"
 #include "ui_dlgguestinfo.h"
-#include "c5config.h"
-#include "c5database.h"
 #include "c5message.h"
 
 DlgGuestInfo::DlgGuestInfo() :
@@ -24,14 +22,15 @@ void DlgGuestInfo::on_btnCancel_clicked()
 
 void DlgGuestInfo::on_btnSave_clicked()
 {
-    C5Database db;
-    db[":f_contactname"] = ui->leContactName->text();
-    db[":f_phone"] = ui->lePhoneNumber->text();
-    if (fCode == 0) {
-        fCode = db.insert("c_partners");
-    } else {
-        db.update("c_partners", "f_id", fCode);
-    }
-    C5Message::info(tr("Saved"));
-    accept();
+    //TODO
+    // C5Database db;
+    // db[":f_contactname"] = ui->leContactName->text();
+    // db[":f_phone"] = ui->lePhoneNumber->text();
+    // if (fCode == 0) {
+    //     fCode = db.insert("c_partners");
+    // } else {
+    //     db.update("c_partners", "f_id", fCode);
+    // }
+    // C5Message::info(tr("Saved"));
+    // accept();
 }

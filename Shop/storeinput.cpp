@@ -8,6 +8,7 @@
 #include "c5message.h"
 #include "c5user.h"
 #include "viewinputitem.h"
+#include "ninterface.h"
 #include "dlgmovement.h"
 #include <QSet>
 
@@ -18,7 +19,7 @@
 #define VM_DOCS 4
 
 StoreInput::StoreInput(C5User *user) :
-    C5Dialog(),
+    C5ShopDialog(user),
     ui(new Ui::StoreInput)
 {
     ui->setupUi(this);
@@ -102,7 +103,7 @@ void StoreInput::on_btnView_clicked()
 
     switch(fViewMode) {
     case VM_DOCS: {
-        auto *dd = new DlgMovement();
+        auto *dd = new DlgMovement(mUser);
         dd->openDoc(ui->tbl->getString(l.at(0).row(), 1));
         dd->show();
         break;
@@ -579,7 +580,7 @@ void StoreInput::on_btnDocs_clicked()
 
 void StoreInput::on_btnNewMovement_clicked()
 {
-    auto *d = new DlgMovement();
+    auto *d = new DlgMovement(mUser);
     d->showMaximized();
 }
 

@@ -26,8 +26,8 @@
 #include <QPrinter>
 #include <QPrintDialog>
 
-ViewOrder::ViewOrder(Working *w, const QString &order) :
-    C5Dialog(),
+ViewOrder::ViewOrder(Working *w, const QString &order, C5User *user) :
+    C5ShopDialog(user),
     ui(new Ui::ViewOrder),
     fWorking(w)
 {
@@ -540,7 +540,7 @@ void ViewOrder::on_btnSaveReturn_clicked()
     }
 
     oheader.state = ORDER_STATE_CLOSE;
-    oheader.cashier = __user->id();
+    oheader.cashier = mUser->id();
     oheader.hall = __c5config.defaultHall();
     oheader.table = __c5config.defaultTable();
     oheader.staff = uid;

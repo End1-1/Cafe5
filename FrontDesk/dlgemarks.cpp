@@ -1,13 +1,14 @@
 #include "dlgemarks.h"
 #include "ui_dlgemarks.h"
-#include "c5config.h"
+#include "ninterface.h"
 
 DlgEmarks::DlgEmarks(const QStringList &emarks)
     : C5Dialog()
     , ui(new Ui::DlgEmarks)
 {
     ui->setupUi(this);
-    for (auto const &s : emarks) {
+
+    for(auto const &s : emarks) {
         QListWidgetItem *item = new QListWidgetItem(ui->lst);
         item->setText(s);
         ui->lst->addItem(s);

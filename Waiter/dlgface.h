@@ -1,17 +1,19 @@
 #ifndef DLGFACE_H
 #define DLGFACE_H
 
-#include "c5dialog.h"
-#include "c5user.h"
+#include "c5waiterdialog.h"
 #include <QTableWidgetItem>
 #include <QTimer>
+#include <QJsonObject>
 
 namespace Ui
 {
 class DlgFace;
 }
 
-class DlgFace : public C5Dialog
+class C5User;
+
+class DlgFace : public C5WaiterDialog
 {
     Q_OBJECT
 
@@ -20,7 +22,7 @@ public:
 
     ~DlgFace();
 
-    static bool getTable(int &tableId, int hall, C5User *user);
+    static bool getTable(int& tableId, int hall, C5User *user);
 
 private slots:
     void initResponse(const QJsonObject &jdoc);
@@ -54,9 +56,7 @@ private slots:
     void on_btnTools_clicked();
 
 private:
-    Ui::DlgFace *ui;
-
-    C5User *fUser;
+    Ui::DlgFace* ui;
 
     QJsonObject fHallState;
 

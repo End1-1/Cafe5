@@ -1,19 +1,19 @@
 #ifndef CASHCOLLECTION_H
 #define CASHCOLLECTION_H
 
-#include "c5dialog.h"
+#include "c5shopdialog.h"
 
 namespace Ui
 {
 class CashCollection;
 }
 
-class CashCollection : public C5Dialog
+class CashCollection : public C5ShopDialog
 {
     Q_OBJECT
 
 public:
-    explicit CashCollection();
+    explicit CashCollection(C5User *user);
 
     ~CashCollection();
 
@@ -29,7 +29,7 @@ private slots:
     void responseOfCreateIn(const QJsonObject &jdoc);
 
 private:
-    Ui::CashCollection *ui;
+    Ui::CashCollection* ui;
 
     double fMax;
 

@@ -30,7 +30,7 @@
 #define col_valid 14
 
 StoreInputDocument::StoreInputDocument(QWidget *parent) :
-    C5Widget(parent),
+    C5OfficeWidget(parent),
     ui(new Ui::StoreInputDocument)
 {
     ui->setupUi(this);
@@ -43,9 +43,9 @@ StoreInputDocument::~StoreInputDocument()
     delete ui;
 }
 
-QToolBar *StoreInputDocument::toolBar()
+QToolBar* StoreInputDocument::toolBar()
 {
-    if (!fToolBar) {
+    if(!fToolBar) {
         fToolBar = createStandartToolbar(QList<ToolBarButtons>());
         fSave = fToolBar->addAction(QIcon(":/save.png"), tr("Save"), this, SLOT(saveDoc()));
         fDraft = fToolBar->addAction(QIcon(":/draft.png"), tr("Draft"), this, SLOT(draftDoc()));
@@ -55,6 +55,7 @@ QToolBar *StoreInputDocument::toolBar()
         fToolBar->addAction(QIcon(":/excel.png"), tr("Export\nto Excel"),  this, SLOT(exportToExcel()));
         fDraft->setEnabled(true);
     }
+
     return fToolBar;
 }
 
@@ -62,9 +63,11 @@ void StoreInputDocument::qtyChanged(const QString &arg1)
 {
     Q_UNUSED(arg1);
     int row, col;
-    if (!ui->tbl->findWidget(static_cast<QWidget * >(sender()), row, col)) {
+
+    if(!ui->tbl->findWidget(static_cast<QWidget* >(sender()), row, col)) {
         return;
     }
+
     disconnectSlotSignal(row);
     ui->tbl->lineEdit(row, col_qtybox)->setDouble(ui->tbl->lineEdit(row, col_qty)->getDouble() / ui->tbl->getDouble(row,
             col_qtyinbox));
@@ -78,9 +81,11 @@ void StoreInputDocument::qtyBoxChanged(const QString &arg1)
 {
     Q_UNUSED(arg1);
     int row, col;
-    if (!ui->tbl->findWidget(static_cast<QWidget * >(sender()), row, col)) {
+
+    if(!ui->tbl->findWidget(static_cast<QWidget* >(sender()), row, col)) {
         return;
     }
+
     disconnectSlotSignal(row);
     ui->tbl->lineEdit(row, col_qty)->setDouble(ui->tbl->lineEdit(row, col_qtybox)->getDouble() *ui->tbl->getDouble(row,
             col_qtyinbox));
@@ -94,9 +99,11 @@ void StoreInputDocument::priceChanged(const QString &arg1)
 {
     Q_UNUSED(arg1);
     int row, col;
-    if (!ui->tbl->findWidget(static_cast<QWidget * >(sender()), row, col)) {
+
+    if(!ui->tbl->findWidget(static_cast<QWidget* >(sender()), row, col)) {
         return;
     }
+
     disconnectSlotSignal(row);
     ui->tbl->lineEdit(row, col_total)->setDouble(ui->tbl->lineEdit(row, col_qtybox)->getDouble() *ui->tbl->lineEdit(row,
             col_price)->getDouble());
@@ -108,12 +115,15 @@ void StoreInputDocument::totalChanged(const QString &arg1)
 {
     Q_UNUSED(arg1);
     int row, col;
-    if (!ui->tbl->findWidget(static_cast<QWidget * >(sender()), row, col)) {
+
+    if(!ui->tbl->findWidget(static_cast<QWidget* >(sender()), row, col)) {
         return;
     }
-    if (ui->tbl->lineEdit(row, col_qtybox)->getDouble() < 0.001) {
+
+    if(ui->tbl->lineEdit(row, col_qtybox)->getDouble() < 0.001) {
         return;
     }
+
     ui->tbl->lineEdit(row, col_price)->setDouble(ui->tbl->lineEdit(row, col_total)->getDouble() / ui->tbl->lineEdit(row,
             col_qtybox)->getDouble());
     countTotal();
@@ -121,20 +131,23 @@ void StoreInputDocument::totalChanged(const QString &arg1)
 
 void StoreInputDocument::on_btnDeleteRow_clicked()
 {
-    for (int i = ui->tbl->rowCount() - 1; i > -1; i--) {
-        if (ui->tbl->checkBox(i, col_checkbox)->isChecked()) {
+    for(int i = ui->tbl->rowCount() - 1; i > -1; i--) {
+        if(ui->tbl->checkBox(i, col_checkbox)->isChecked()) {
             ui->tbl->removeRow(i);
         }
     }
+
     countTotal();
 }
 
 void StoreInputDocument::countTotal()
 {
     double total = 0;
-    for (int i = 0; i < ui->tbl->rowCount(); i++) {
+
+    for(int i = 0; i < ui->tbl->rowCount(); i++) {
         total += ui->tbl->lineEdit(i, col_total)->getDouble();
     }
+
     ui->leTotal->setDouble(total);
 }
 
@@ -170,13 +183,16 @@ void StoreInputDocument::disconnectSlotSignal(int row)
 void StoreInputDocument::on_btnAddRow_clicked()
 {
     QJsonArray vals;
-    if (!C5Selector::getValueOfColumn(cache_goods, vals, 3)) {
+
+    if(!C5Selector::getValueOfColumn(cache_goods, vals, 3)) {
         return;
     }
-    if (vals.at(1).toInt() == 0) {
+
+    if(vals.at(1).toInt() == 0) {
         C5Message::error(tr("Could not add goods without code"));
         return;
     }
+
     ui->leScancode->setText(vals.at(5).toString());
     on_leScancode_returnPressed();
 }
@@ -184,13 +200,16 @@ void StoreInputDocument::on_btnAddRow_clicked()
 void StoreInputDocument::on_toolButton_clicked()
 {
     QJsonArray vals;
-    if (!C5Selector::getValueOfColumn(cache_goods_store, vals, 2)) {
+
+    if(!C5Selector::getValueOfColumn(cache_goods_store, vals, 2)) {
         return;
     }
-    if (vals.at(1).toInt() == 0) {
+
+    if(vals.at(1).toInt() == 0) {
         C5Message::error(tr("Could not add goods without code"));
         return;
     }
+
     ui->leStore->setProperty("f_id", vals.at(1));
     ui->leStore->setText(vals.at(2).toString());
     C5Database db;
@@ -201,37 +220,46 @@ void StoreInputDocument::on_toolButton_clicked()
 void StoreInputDocument::saveDoc()
 {
     QString err;
-    if (ui->tbl->rowCount() == 0) {
+
+    if(ui->tbl->rowCount() == 0) {
         err += tr("Empty document") + "\r\n";
     }
-    if (ui->leStore->property("f_id").toInt() == 0) {
+
+    if(ui->leStore->property("f_id").toInt() == 0) {
         err += tr("Store not defined") + "\r\n";
     }
-    if (ui->lePartner->property("f_id").toInt() == 0) {
+
+    if(ui->lePartner->property("f_id").toInt() == 0) {
         err += tr("Partner not defined") + "\r\n";
     }
-    for (int i = 0; i < ui->tbl->rowCount(); i++) {
-        if (ui->tbl->lineEdit(i, col_qty)->getDouble() > 10000 || ui->tbl->lineEdit(i, col_qty)->getDouble() < 0.001) {
+
+    for(int i = 0; i < ui->tbl->rowCount(); i++) {
+        if(ui->tbl->lineEdit(i, col_qty)->getDouble() > 10000 || ui->tbl->lineEdit(i, col_qty)->getDouble() < 0.001) {
             err += tr("Check quantity");
             break;
         }
     }
-    if (!err.isEmpty()) {
+
+    if(!err.isEmpty()) {
         C5Message::error(err);
         return;
     }
-    if (ui->leDocnum->text().isEmpty()) {
+
+    if(ui->leDocnum->text().isEmpty()) {
         ui->leDocnum->setText(ui->leDocnum->placeholderText());
     }
+
     C5Database db;
     C5StoreDraftWriter dw(db);
-    if (ui->leDocnum->text().isEmpty()) {
+
+    if(ui->leDocnum->text().isEmpty()) {
         ui->leDocnum->setText(dw.storeDocNum(DOC_TYPE_STORE_INPUT, ui->leStore->property("f_id").toInt(), true, 0));
     }
+
     db[":f_userid"] = ui->leDocnum->text();
     db[":f_state"] = DOC_STATE_SAVED;
     db[":f_type"]  = DOC_TYPE_STORE_INPUT;
-    db[":f_operator"] = __user->id();
+    db[":f_operator"] = mUser->id();
     db[":f_date"] = ui->leDate->date();
     db[":f_createdate"] = QDate::currentDate();
     db[":f_createtime"] = QTime::currentTime();
@@ -240,16 +268,19 @@ void StoreInputDocument::saveDoc()
     db[":f_comment"] = ui->leComment->text();
     db[":f_paid"] = 0;
     db[":f_currency"] = 1;
-    if (ui->leDocnum->property("f_id").toString().isEmpty()) {
+
+    if(ui->leDocnum->property("f_id").toString().isEmpty()) {
         ui->leDocnum->setProperty("f_id", db.uuid());
         db[":f_id"] = ui->leDocnum->property("f_id");
         db.insert("a_header", false);
     } else {
         db.update("a_header", "f_id", ui->leDocnum->property("f_id"));
     }
+
     db[":f_document"] = ui->leDocnum->property("f_id");
     db.exec("delete from a_store_draft where f_document=:f_document");
-    for (int i = 0; i < ui->tbl->rowCount(); i++) {
+
+    for(int i = 0; i < ui->tbl->rowCount(); i++) {
         ui->tbl->setString(i, col_uuid, db.uuid());
         db[":f_id"] = ui->tbl->getString(i, col_uuid);
         db[":f_document"] = ui->leDocnum->property("f_id");
@@ -277,13 +308,14 @@ void StoreInputDocument::saveDoc()
         db.insert("a_store", false);
         db[":f_id"] = ui->tbl->getString(i, col_uuid);
         db[":f_document"] = ui->leDocnum->property("f_id");
-        db[":f_date"] = static_cast<C5DateEdit *>(ui->tbl->cellWidget(i, col_valid))->date();
+        db[":f_date"] = static_cast<C5DateEdit*>(ui->tbl->cellWidget(i, col_valid))->date();
         db.insert("a_store_valid", false);
-        db[":f_lastvaliddate"] = static_cast<C5DateEdit *>(ui->tbl->cellWidget(i, col_valid))->date();
+        db[":f_lastvaliddate"] = static_cast<C5DateEdit*>(ui->tbl->cellWidget(i, col_valid))->date();
         db.update("c_goods_option", "f_id", ui->tbl->getInteger(i, col_goodsid));
         db[":f_lastinputprice"] = ui->tbl->getDouble(i, col_price);
         db.update("c_goods", "f_id", ui->tbl->getInteger(i, col_goodsid));
     }
+
     fSave->setEnabled(false);
     C5Cache::cache(cache_goods)->refresh();
 }
@@ -293,9 +325,11 @@ bool StoreInputDocument::openDoc(const QString &id)
     C5Database db;
     db[":f_id"] = id;
     db.exec("select * from a_header where f_id=:f_id");
-    if (db.nextRow() == false) {
+
+    if(db.nextRow() == false) {
         return false;
     }
+
     ui->leDate->setDate(db.getDate("f_date"));
     ui->leDocnum->setProperty("f_id", id);
     ui->leDocnum->setText(db.getString("f_userid"));
@@ -312,7 +346,8 @@ bool StoreInputDocument::openDoc(const QString &id)
             "left join c_groups gr on gr.f_id=g.f_group "
             "left join c_units u on u.f_id=g.f_unit "
             "where d.f_document=:f_document ");
-    while (db.nextRow()) {
+
+    while(db.nextRow()) {
         int row = newEmptyRow();
         ui->tbl->setString(row, col_uuid, db.getString("f_id"));
         ui->tbl->setInteger(row, col_goodsid, db.getInt("f_goods"));
@@ -327,20 +362,24 @@ bool StoreInputDocument::openDoc(const QString &id)
         ui->tbl->lineEdit(row, col_qtybox)->setDouble(db.getDouble("f_qty"));
         ui->tbl->lineEdit(row, col_total)->setDouble(db.getDouble("f_total"));
         connectSlotSignal(row);
-        if (ui->leStore->property("f_id").toInt() == 0) {
+
+        if(ui->leStore->property("f_id").toInt() == 0) {
             ui->leStore->setProperty("f_id", db.getInt("f_store"));
         }
     }
+
     db[":f_id"] = ui->leStore->property("f_id");
     db.exec("select * from c_storages where f_id=:f_id");
     db.nextRow();
     ui->leStore->setText(db.getString("f_name"));
     db[":f_id"] = ui->lePartner->property("f_id");
     db.exec("select * from c_partners where f_id=:f_id");
-    if (db.nextRow()) {
+
+    if(db.nextRow()) {
         db.nextRow();
         ui->lePartner->setText(db.getString("f_name"));
     }
+
     return true;
 }
 
@@ -352,39 +391,46 @@ void StoreInputDocument::setLastInputPrices()
             "from a_store_draft b "
             "left join c_goods g on g.f_id=b.f_goods "
             "where b.f_document=:f_id");
-    for (int i = 0; i < ui->tbl->rowCount(); i++) {
-        for (int j = 0; j < db.rowCount(); j++) {
-            if (ui->tbl->getInteger(i, 2) == db.getInt(j, "f_goods")) {
+
+    for(int i = 0; i < ui->tbl->rowCount(); i++) {
+        for(int j = 0; j < db.rowCount(); j++) {
+            if(ui->tbl->getInteger(i, 2) == db.getInt(j, "f_goods")) {
                 ui->tbl->lineEdit(i, 10)->setDouble(db.getDouble(j, "f_lastinputprice"));
                 ui->tbl->lineEdit(i, 11)->setDouble(ui->tbl->lineEdit(i, 6)->getDouble() *db.getDouble(j, "f_lastinputprice"));
                 break;
             }
         }
     }
+
     countTotal();
 }
 
 bool StoreInputDocument::draftDoc()
 {
-    if (C5Message::question(tr("Make draft?")) != QDialog::Accepted) {
+    if(C5Message::question(tr("Make draft?")) != QDialog::Accepted) {
         return false;
     }
+
     C5Database db;
     db[":f_basedoc"] = ui->leDocnum->property("f_id");
     db.exec("select distinct(s.f_document) as f_document, d.f_date, d.f_userid from a_store s "
             "inner join a_header d on d.f_id=s.f_document "
             "where f_basedoc=:f_basedoc and f_document<>:f_basedoc and s.f_type=-1");
     QString err = "";
-    while (db.nextRow()) {
+
+    while(db.nextRow()) {
         err += QString("No: %1, %2<br>").arg(db.getString("f_userid")).arg(db.getDate("f_date").toString(FORMAT_DATE_TO_STR));
     }
-    if (!err.isEmpty()) {
+
+    if(!err.isEmpty()) {
         err = tr("This order used in next documents") + "<br>" + err;
     }
-    if (!err.isEmpty()) {
+
+    if(!err.isEmpty()) {
         C5Message::error(err);
         return false;
     }
+
     db[":f_document"] = ui->leDocnum->property("f_id");
     db.exec("delete from a_store where f_document=:f_document");
     db[":f_state"] = DOC_STATE_DRAFT;
@@ -396,10 +442,11 @@ bool StoreInputDocument::draftDoc()
 
 void StoreInputDocument::removeDocument()
 {
-    if (C5Message::question(tr("Confirm to remove selected documents")) != QDialog::Accepted) {
+    if(C5Message::question(tr("Confirm to remove selected documents")) != QDialog::Accepted) {
         return;
     }
-    if (C5StoreDoc::removeDoc(ui->leDocnum->property("f_id").toString(), false)) {
+
+    if(C5StoreDoc::removeDoc(ui->leDocnum->property("f_id").toString(), false)) {
         __mainWindow->removeTab(this);
     }
 }
@@ -407,13 +454,16 @@ void StoreInputDocument::removeDocument()
 void StoreInputDocument::on_btnSetPartner_clicked()
 {
     QJsonArray vals;
-    if (!C5Selector::getValueOfColumn(cache_goods_partners, vals, -1)) {
+
+    if(!C5Selector::getValueOfColumn(cache_goods_partners, vals, -1)) {
         return;
     }
-    if (vals.at(1).toInt() == 0) {
+
+    if(vals.at(1).toInt() == 0) {
         C5Message::error(tr("Could not add goods without code"));
         return;
     }
+
     ui->lePartner->setProperty("f_id", vals.at(1));
     ui->lePartner->setText(vals.at(2).toString());
 }
@@ -431,7 +481,8 @@ void StoreInputDocument::on_leScancode_returnPressed()
             "left join c_goods_prices gpr on gpr.f_goods=gg.f_id and gpr.f_currency=1 "
             "where gg.f_scancode=lower(:f_scancode)");
     ui->leScancode->clear();
-    if (db.nextRow()) {
+
+    if(db.nextRow()) {
         int row = newEmptyRow();
         int id = db.getInt("f_id");
         ui->tbl->setInteger(row, col_goodsid, id);
@@ -444,23 +495,29 @@ void StoreInputDocument::on_leScancode_returnPressed()
         ui->tbl->lineEdit(row, col_price)->setPlaceholderText(float_str(db.getDouble("f_lastinputprice"), 2));
         ui->tbl->lineEdit(row, col_qty)->setFocus();
         connectSlotSignal(row);
-        if (ui->leStore->property("f_id").toInt() > 0) {
+
+        if(ui->leStore->property("f_id").toInt() > 0) {
             C5Database db;
             db[":f_store"] = ui->leStore->property("f_id");
             db[":f_goods"] = id;
             db.exec("select sum(f_qty*f_type) as f_qty from a_store where f_store=:f_store and f_goods=:f_goods");
-            if (db.nextRow()) {
+
+            if(db.nextRow()) {
                 ui->tbl->setDouble(row,  col_stock, db.getDouble("f_qty"));
             }
         }
+
         db[":f_id"] = id;
         db.exec("select f_lastvaliddate from c_goods_option where f_id=:f_id");
-        if (db.nextRow()) {
+
+        if(db.nextRow()) {
             QDate date = db.getDate(0);
-            if (!date.isValid()) {
+
+            if(!date.isValid()) {
                 date = QDate::currentDate();
             }
-            static_cast<C5DateEdit * >(ui->tbl->cellWidget(row, col_valid))->setDate(date);
+
+            static_cast<C5DateEdit* >(ui->tbl->cellWidget(row, col_valid))->setDate(date);
         }
     }
 }
@@ -468,21 +525,26 @@ void StoreInputDocument::on_leScancode_returnPressed()
 void StoreInputDocument::on_btnEditGoods_clicked()
 {
     int row = ui->tbl->currentRow();
-    if (row < 0) {
+
+    if(row < 0) {
         return;
     }
+
     CE5Goods *ep = new CE5Goods();
     C5Editor *e = C5Editor::createEditor(ep, 0);
     ep->setId(ui->tbl->getInteger(row, col_goodsid));
     QList<QMap<QString, QVariant> > data;
+
     if(e->getResult(data)) {
-        if (data.at(0)["f_id"].toInt() == 0) {
+        if(data.at(0)["f_id"].toInt() == 0) {
             C5Message::error(tr("Cannot change goods without code"));
             return;
         }
+
         ui->tbl->setData(row, col_name, data.at(0)["f_name"]);
         ui->tbl->setData(row, col_unit, data.at(0)["f_unitname"]);
         ui->tbl->setData(row, col_saleprice, data.at(0)["f_saleprice1"]);
     }
+
     delete e;
 }

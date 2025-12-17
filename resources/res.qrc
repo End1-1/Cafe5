@@ -231,5 +231,6 @@
         <file>xml.png</file>
         <file>apps.png</file>
         <file>deletefolder.png</file>
+        <file>list.png</file>
     </qresource>
 </RCC>

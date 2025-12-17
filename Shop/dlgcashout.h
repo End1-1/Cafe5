@@ -1,19 +1,20 @@
 #ifndef DLGCASHOUT_H
 #define DLGCASHOUT_H
 
-#include "c5dialog.h"
+#include "c5shopdialog.h"
 
 namespace Ui
 {
 class DlgCashout;
 }
 
-class DlgCashout : public C5Dialog
+class DlgCashout : public C5ShopDialog
 {
     Q_OBJECT
 
 public:
-    explicit DlgCashout();
+    explicit DlgCashout(C5User *user);
+
     ~DlgCashout();
 
 private slots:
@@ -25,7 +26,7 @@ private slots:
     void responseOfCreate(const QJsonObject &jdoc);
 
 private:
-    Ui::DlgCashout *ui;
+    Ui::DlgCashout* ui;
 };
 
 #endif // DLGCASHOUT_H

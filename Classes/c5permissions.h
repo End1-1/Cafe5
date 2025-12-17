@@ -1,7 +1,6 @@
 #ifndef C5PERMISSIONS_H
 #define C5PERMISSIONS_H
 
-#include "c5database.h"
 #include <QList>
 
 #define cp_append_database 1
@@ -103,6 +102,7 @@
 #define cp_t5_pay_idram 537
 #define cp_t5_pay_payx 538
 #define cp_t5_view_sales_of_all_users 539
+#define cp_t5_shop_can_discount 540
 
 #define cp_t6_goods_menu 600
 #define cp_t6_units 601
@@ -160,15 +160,5 @@
 
 #define cp_t11_miscelanous 1100
 #define cp_t11_do_now_show_input_prices 1101
-
-class C5Permissions
-{
-public:
-    C5Permissions();
-    static QList<int> fTemplate;
-    static void init(C5Database &db, int group);
-    static void clear();
-    static QMap<QString, QList<int> > fPermissions;
-};
 
 #endif // C5PERMISSIONS_H

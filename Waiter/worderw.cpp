@@ -1,7 +1,5 @@
 #include "worderw.h"
 #include "ui_worderw.h"
-#include "c5ordertabledelegate.h"
-#include "c5orderdriver.h"
 #include "c5utils.h"
 #include "dishitem.h"
 #include "dlgorder.h"
@@ -19,7 +17,6 @@ WOrder::WOrder(QWidget *parent) :
 {
     ui->setupUi(this);
     fSelected = false;
-    fOrderDriver = new C5OrderDriver();
     fDlg = nullptr;
     setChanges();
 }
@@ -27,7 +24,6 @@ WOrder::WOrder(QWidget *parent) :
 WOrder::~WOrder()
 {
     delete ui;
-    delete fOrderDriver;
 }
 
 void WOrder::setDlg(DlgOrder *dlg)
@@ -45,16 +41,15 @@ void WOrder::checkAllItems(bool v)
 QList<int> WOrder::checkedItems()
 {
     QList<int> result;
-
-    for(int i = 0; i < fItems.count(); i++) {
-        if(fOrderDriver->dishesValue("f_state", i).toInt() == DISH_STATE_OK
-                || fOrderDriver->dishesValue("f_state", i).toInt() == DISH_STATE_SET) {
-            if(fItems.at(i)->isChecked()) {
-                result.append(i);
-            }
-        }
-    }
-
+    //TODO
+    // for(int i = 0; i < fItems.count(); i++) {
+    //     if(fOrderDriver->dishesValue("f_state", i).toInt() == DISH_STATE_OK
+    //             || fOrderDriver->dishesValue("f_state", i).toInt() == DISH_STATE_SET) {
+    //         if(fItems.at(i)->isChecked()) {
+    //             result.append(i);
+    //         }
+    //     }
+    // }
     return result;
 }
 

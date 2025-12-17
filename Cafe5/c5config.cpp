@@ -13,7 +13,7 @@ QString C5Config::fAppLogFile;
 QString C5Config::fSettingsName;
 int C5Config::fSettingsId;
 QString C5Config::fLastUsername;
-QWidget *C5Config::fParentWidget = nullptr;
+QWidget* C5Config::fParentWidget = nullptr;
 QString C5Config::fDBName;
 QString C5Config::fDBHost;
 QString C5Config::fDBPath;
@@ -22,7 +22,6 @@ QString C5Config::fDBPassword;
 int C5Config::fJsonConfigId = 1;
 bool C5Config::fFullScreen;
 C5Config __c5config;
-C5User *__user;
 QStringList __databases;
 QMap<int, QString> C5Config::fSettings;
 QJsonObject C5Config::fMainJson;
@@ -33,9 +32,11 @@ C5Config::C5Config()
 {
     QDir d;
     fAppHomePath = d.homePath() + "\\" + _APPLICATION_ + "\\" + _MODULE_;
-    if (!d.exists(fAppHomePath)) {
+
+    if(!d.exists(fAppHomePath)) {
         d.mkpath(fAppHomePath);
     }
+
     fAppLogFile = fAppHomePath + "\\logs.log";
 }
 
@@ -178,7 +179,8 @@ QString C5Config::defaultMenuName()
 int C5Config::defaultHall()
 {
     QStringList halls = getValue(param_default_hall).split(",", Qt::SkipEmptyParts);
-    if (halls.count() > 0) {
+
+    if(halls.count() > 0) {
         return halls.at(0).toInt();
     } else {
         return 0;
@@ -201,17 +203,21 @@ void C5Config::initParamsFromDb()
     fSettings.clear();
     db[":f_name"] = fSettingsName;
     db.exec("select f_id from s_settings_names where f_name=:f_name");
-    if (db.nextRow()) {
+
+    if(db.nextRow()) {
         fSettingsId = db.getInt(0);
         db[":f_settings"] = db.getInt(0);
         db.exec("select f_key, f_value from s_settings_values where f_settings=:f_settings");
-        while (db.nextRow()) {
+
+        while(db.nextRow()) {
             fSettings[db.getInt(0)] = db.getString(1);
         }
     }
+
     db[":f_id"] = __c5config.fSettingsId;
     db.exec("select * from sys_json_config where f_id=:f_id");
-    if (db.nextRow()) {
+
+    if(db.nextRow()) {
         fMainJson = QJsonDocument::fromJson(db.getString("f_config").toUtf8()).object();
     }
 }
@@ -230,7 +236,7 @@ void C5Config::setRegValue(const QString &key, const QVariant &value)
 
 void C5Config::setValue(int key, const QString &value)
 {
-    QMutexLocker ml( &settingsMutex);
+    QMutexLocker ml(&settingsMutex);
     fSettings[key] = value;
 }
 
@@ -242,9 +248,11 @@ bool C5Config::isAppFullScreen()
 int C5Config::fronDeskFontSize()
 {
     int s = getValue(param_fd_font_size).toInt();
-    if (s == 0) {
+
+    if(s == 0) {
         s = 8;
     }
+
     return s;
 }
 
@@ -321,11 +329,11 @@ int C5Config::shopPrintVersion()
      * 2 - v2
      * 3 - v3
      */
-    if (getValue(param_shop_print_v1).toInt() == 1) {
+    if(getValue(param_shop_print_v1).toInt() == 1) {
         return 1;
-    } else if (getValue(param_shop_print_v2).toInt() == 1) {
+    } else if(getValue(param_shop_print_v2).toInt() == 1) {
         return 2;
-    } else if (getValue(param_shop_print_v3).toInt() == 1) {
+    } else if(getValue(param_shop_print_v3).toInt() == 1) {
         return 3;
     } else {
         return 0;
@@ -360,19 +368,20 @@ QString C5Config::httpServerPassword()
 
 int C5Config::receipPrinterWidth()
 {
-    if (getValue(param_printer_paper_width_50mm).toInt() == 1) {
+    if(getValue(param_printer_paper_width_50mm).toInt() == 1) {
         return 50;
     }
+
     return 80;
 }
 
 QString C5Config::getValue(int key)
 {
-    QMutexLocker ml( &settingsMutex);
+    QMutexLocker ml(&settingsMutex);
     return fSettings[key];
 }
 
-void C5Config::setValues(const QMap<int, QString> &values)
+void C5Config::setValues(const QMap<int, QString>& values)
 {
     fSettings = values;
 }

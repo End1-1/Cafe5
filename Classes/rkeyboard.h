@@ -60,7 +60,7 @@ signals:
     void reject();
 
 private:
-    Ui::RKeyboard *ui;
+    Ui::RKeyboard* ui;
 
     QString fText;
 
@@ -70,17 +70,17 @@ private:
 
     QString fCurrentLanguage;
 
-    QList<QPushButton *> fLine1b;
+    QList<QPushButton*> fLine1b;
 
-    QList<QPushButton *> fLine2b;
+    QList<QPushButton*> fLine2b;
 
-    QList<QPushButton *> fLine3b;
+    QList<QPushButton*> fLine3b;
 
-    QList<QPushButton *> fLine4b;
+    QList<QPushButton*> fLine4b;
 
-    void connectButtons(QList<QPushButton *> &buttons);
+    void connectButtons(QList<QPushButton*>& buttons);
 
-    void setButtonsText(QList<QPushButton *> &buttons, const QString &text);
+    void setButtonsText(QList<QPushButton*>& buttons, const QString &text);
 
     void setupEnglish();
 
@@ -95,6 +95,8 @@ private:
     void setupArmenianCaps();
 
     void setupKbd();
+
+    static int mKbdLang;
 };
 
 #endif // RKEYBOARD_H

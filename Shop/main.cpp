@@ -1,12 +1,9 @@
-#include "working.h"
 #include "c5config.h"
 #include "dlgpin.h"
 #include "dlgserverconnection.h"
 #include "ndataprovider.h"
 #include "datadriver.h"
-#include "c5user.h"
 #include "c5servername.h"
-#include "settingsselection.h"
 #include "c5dialog.h"
 #include "c5systempreference.h"
 #include "c5database.h"
@@ -73,16 +70,19 @@ int main(int argc, char* argv[])
     LogWriter::write(LogWriterLevel::verbose, "", "get server names");
     emit dlgsplash->messageSignal("Get server name");
     bool noconfig = true;
-    C5ServerName sng(__c5config.getRegValue("ss_server_address").toString());
+    QJsonObject js;
+    {
+        C5ServerName sng(__c5config.getRegValue("ss_server_address").toString());
 
-    if(!sng.getConnection(__c5config.getRegValue("ss_database").toString())) {
-        C5Message::error(sng.mErrorString);
-        DlgServerConnection::showSettings(0);
-        return 1;
+        if(!sng.getConnection(__c5config.getRegValue("ss_database").toString())) {
+            C5Message::error(sng.mErrorString);
+            DlgServerConnection::showSettings(0);
+            return 1;
+        }
+
+        js = sng.mReply;
     }
-
     noconfig = false;
-    QJsonObject js = sng.mReply;
     C5Config::fDBHost = js["settings"].toString();
     C5Config::fDBPath = js["database"].toString();
     C5Config::fDBUser = js["username"].toString();
@@ -117,6 +117,10 @@ int main(int argc, char* argv[])
         }
     }
 
+    if(!C5SystemPreference::checkDecimalPointAndSeparator()) {
+        return 0;
+    }
+
     NDataProvider::mAppName = "shop";
     NDataProvider::mFileVersion = FileVersion::getVersionString(a.applicationFilePath());
     QString user, pin;
@@ -126,24 +130,6 @@ int main(int argc, char* argv[])
     C5Config::initParamsFromDb();
     NDataProvider::mDebug = __c5config.getValue(param_debuge_mode).toInt() > 0;
     C5Database db;
-    __user = new C5User(0);
-
-    while(!__user->isValid() || !__user->isActive()) {
-        if(!DlgPin::getPin(user, pin, false)) {
-            return 0;
-        }
-
-        LogWriter::write(LogWriterLevel::verbose, "", "try login to db");
-        emit dlgsplash->messageSignal("try login to db");
-
-        if(__user->authByPinPass(user, pin)) {
-        } else {
-            C5Message::error(__user->error() + " 2");
-        }
-
-        pin.clear();
-        user.clear();
-    }
 
     if(C5Config::fMainJson["clear_sale_draft"].toBool()) {
         emit dlgsplash->messageSignal("clear draft");
@@ -154,43 +140,13 @@ int main(int argc, char* argv[])
         db.exec("update o_draft_sale set f_state=10 where f_hall=:f_hall and f_state=1");
     }
 
-    if(__user->value("f_settingsname").toString() != __c5config.fSettingsName) {
-        if(__user->value("f_settingsname").toString().isEmpty() == false) {
-            __c5config.fSettingsName = __user->value("f_settingsname").toString();
-        }
-    }
-
     DataDriver::init(__c5config.dbParams(), dlgsplash);
+    dlgsplash->hide();
+    dlgsplash->deleteLater();
+    C5Dialog::setMainWindow(nullptr);
+    auto *dlgPin = new DlgPin();
 
-    if(!C5SystemPreference::checkDecimalPointAndSeparator()) {
-        return 0;
-    }
-
-    db[":f_user"] = __user->id();
-    db.exec("select sn.f_id, sn.f_name from s_settings_names sn where sn.f_id in (select f_settings from s_user_config where f_user=:f_user)");
-    auto *s = new SettingsSelection();
-
-    while(db.nextRow()) {
-        s->addSettingsId(db.getInt("f_id"), db.getString("f_name"));
-    }
-
-    s->addSettingsId(-1, QObject::tr("Cancel"));
-
-    if(db.rowCount() > 1) {
-        if(s->exec() == QDialog::Accepted) {
-        }
-    }
-
-    s->deleteLater();
-    Working w(__user);
-    w.setWindowTitle("");
-    QStringList args;
-
-    for(int i = 0; i < argc; i++) {
-        args << argv[i];
-    }
-
-    for(const QString &s : args) {
+    for(const QString &s : a.arguments()) {
         if(s.startsWith("/monitor")) {
             QList<QScreen*> screens = a.screens();
             int monitor = 0;
@@ -200,29 +156,12 @@ int main(int argc, char* argv[])
                 monitor = mon.at(1).toInt();
             }
 
-            w.move(screens.at(monitor)->geometry().topLeft());
+            if(screens.count() > monitor - 1) {
+                dlgPin->move(screens.at(monitor)->geometry().topLeft());
+            }
         }
     }
 
-    if(__c5config.defaultHall() > 0) {
-        w.setWindowTitle(w.windowTitle() + "[" + dbhall->name(__c5config.defaultHall()) + "]");
-    }
-
-    if(__c5config.defaultStore() > 0) {
-        w.setWindowTitle(w.windowTitle() + "[" + dbstore->name(__c5config.defaultStore()) + "]");
-    } else {
-        C5Message::error(QObject::tr("Store is not defined."));
-        return 0;
-    }
-
-    __c5config.setRegValue("windowtitle", w.windowTitle());
-    __c5config.fParentWidget = &w;
-    delete dlgsplash;
-    C5Dialog::setMainWindow(&w);
-#ifdef QT_DEBUG
-    w.show();
-#else
-    w.showMaximized();
-#endif
+    dlgPin->show();
     return a.exec();
 }

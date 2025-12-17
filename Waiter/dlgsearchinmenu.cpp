@@ -1,6 +1,5 @@
 #include "dlgsearchinmenu.h"
 #include "ui_dlgsearchinmenu.h"
-#include "c5config.h"
 #include "c5tabledata.h"
 
 DlgSearchInMenu::DlgSearchInMenu() :
@@ -14,18 +13,22 @@ DlgSearchInMenu::DlgSearchInMenu() :
     connect(ui->kb, SIGNAL(reject()), this, SLOT(reject()));
     QPushButton *firstBtn = nullptr;
     QJsonArray ja = objs("d_menu_names");
-    for (int i = 0; i < ja.size(); i++) {
+
+    for(int i = 0; i < ja.size(); i++) {
         QJsonObject jo = ja.at(i).toObject();
         QPushButton *b = new QPushButton();
-        if (!firstBtn) {
+
+        if(!firstBtn) {
             firstBtn = b;
         }
+
         b->setText(jo["f_name"].toString());
         b->setProperty("id", jo["f_id"].toString());
         ui->hl->insertWidget(0, b);
         connect(b, SIGNAL(clicked()), this, SLOT(menuClicked()));
     }
-    if (firstBtn) {
+
+    if(firstBtn) {
         firstBtn->click();
     }
 }
@@ -40,7 +43,8 @@ void DlgSearchInMenu::buildMenu(int menuid)
     ui->tbl->clearContents();
     ui->tbl->setRowCount(0);
     QJsonArray ja = C5TableData::instance()->dishes(menuid, 0);
-    for (int i = 0; i < ja.size(); i++) {
+
+    for(int i = 0; i < ja.size(); i++) {
         int row = ui->tbl->addEmptyRow();
         const QJsonObject &j = ja.at(i).toObject();
         ui->tbl->setInteger(row, 0, j["f_id"].toInt());
@@ -49,7 +53,8 @@ void DlgSearchInMenu::buildMenu(int menuid)
         ui->tbl->setString(row, 3, j["f_name"].toString());
         ui->tbl->setDouble(row, 4, j["f_price"].toDouble());
     }
-    if (ui->leDishName->text().length() > 0) {
+
+    if(ui->leDishName->text().length() > 0) {
         searchDish(ui->leDishName->text());
     }
 }
@@ -57,27 +62,32 @@ void DlgSearchInMenu::buildMenu(int menuid)
 void DlgSearchInMenu::searchDish(const QString &name)
 {
     ui->leDishName->setText(name);
-    for (int i = 0; i < ui->tbl->rowCount(); i++) {
+
+    for(int i = 0; i < ui->tbl->rowCount(); i++) {
         bool hidden = true;
-        if (ui->tbl->getString(i, 3).contains(name, Qt::CaseInsensitive)) {
+
+        if(ui->tbl->getString(i, 3).contains(name, Qt::CaseInsensitive)) {
             hidden = false;
         }
+
         ui->tbl->setRowHidden(i, hidden);
     }
 }
 
 void DlgSearchInMenu::menuClicked()
 {
-    QPushButton *btn = static_cast<QPushButton *>(sender());
+    QPushButton *btn = static_cast<QPushButton*>(sender());
     buildMenu(btn->property("id").toInt());
 }
 
 void DlgSearchInMenu::kbdAccept()
 {
     QModelIndexList ml = ui->tbl->selectionModel()->selectedRows();
-    if (ml.count() == 0) {
+
+    if(ml.count() == 0) {
         return;
     }
+
     int menuid = ui->tbl->getInteger(ml.at(0).row(), 0);
     emit dish(menuid, "");
     accept();

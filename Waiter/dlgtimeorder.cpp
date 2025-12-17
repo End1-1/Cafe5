@@ -1,6 +1,5 @@
 #include "dlgtimeorder.h"
 #include "ui_dlgtimeorder.h"
-#include "c5config.h"
 
 DlgTimeorder::DlgTimeorder() :
     C5Dialog(),
@@ -14,13 +13,15 @@ DlgTimeorder::~DlgTimeorder()
     delete ui;
 }
 
-bool DlgTimeorder::timeOrder(int &order)
+bool DlgTimeorder::timeOrder(int& order)
 {
     DlgTimeorder d;
-    if (d.exec() == QDialog::Accepted) {
+
+    if(d.exec() == QDialog::Accepted) {
         order = d.fOrder;
         return true;
     }
+
     return false;
 }
 

@@ -18,7 +18,7 @@
 #include <QClipboard>
 
 C5WaiterOrder::C5WaiterOrder(QWidget *parent) :
-    C5Widget(parent),
+    C5OfficeWidget(parent),
     ui(new Ui::C5WaiterOrder)
 {
     ui->setupUi(this);
@@ -49,7 +49,8 @@ void C5WaiterOrder::setOrder(const QString &id)
             "left join o_state os on os.f_id=o.f_state "
             "left join o_pay_other oth on oth.f_id=o.f_otherid "
             "where o.f_id=:f_id ");
-    if (db.nextRow()) {
+
+    if(db.nextRow()) {
         ui->leUuid->setText(id);
         ui->leNumber->setText(db.getString("f_prefix") + QString::number(db.getInt("f_hallid")));
         ui->deDateOpen->setDate(db.getDate("f_dateopen"));
@@ -69,7 +70,8 @@ void C5WaiterOrder::setOrder(const QString &id)
         ui->leIdram->setDouble(db.getDouble("f_amountidram"));
         ui->lePayX->setDouble(db.getDouble("f_amountpayx"));
         ui->leOtherName->setText(db.getString("f_othername"));
-        if (db.getDouble("f_servicefactor") > 0.001) {
+
+        if(db.getDouble("f_servicefactor") > 0.001) {
             ui->lbService->setText(QString("%1 %2%").arg(tr("Service")).arg(db.getDouble("f_servicefactor") * 100));
             ui->leService->setDouble(db.getDouble("f_amountservice"));
         }
@@ -77,6 +79,7 @@ void C5WaiterOrder::setOrder(const QString &id)
         C5Message::error(tr("Invalid order uuid"));
         return;
     }
+
     db[":f_header"] = id;
     db.exec("select ob.f_id, ob.f_header, ob.f_state, obs.f_name as f_statename, dp1.f_name as part1, dp2.f_name as part2, ob.f_adgcode, d.f_name as f_name, "
             "ob.f_qty1, ob.f_qty2, ob.f_price, ob.f_service, ob.f_discount, ob.f_total, "
@@ -90,7 +93,8 @@ void C5WaiterOrder::setOrder(const QString &id)
             "left join o_body_state obs on obs.f_id=ob.f_state "
             "left join c_storages st on st.f_id=ob.f_store "
             "where ob.f_header=:f_header");
-    while (db.nextRow()) {
+
+    while(db.nextRow()) {
         int row = ui->tblDishes->addEmptyRow();
         ui->tblDishes->setString(row, 0, db.getString("f_id"));
         ui->tblDishes->setString(row, 1, db.getString("f_state"));
@@ -106,19 +110,24 @@ void C5WaiterOrder::setOrder(const QString &id)
         ui->tblDishes->setString(row, 11, db.getString("f_store"));
         ui->tblDishes->setString(row, 12, db.getString("f_storename"));
         ui->tblDishes->setString(row, 13, db.getString("f_comment"));
-        if (db.getInt("f_state") != DISH_STATE_OK) {
+
+        if(db.getInt("f_state") != DISH_STATE_OK) {
             ui->tblDishes->setRowHidden(row, true);
         }
     }
+
     ui->tblDishes->setColumnWidths(ui->tblDishes->columnCount(), 0, 0, 100, 0, 300, 80, 80, 80, 80, 0, 0, 0, 100, 100, 100);
     db[":f_id"] = ui->leUuid->text();
     db.exec("select * from o_tax where f_id=:f_id");
-    if (db.nextRow()) {
+
+    if(db.nextRow()) {
         ui->leTax->setText(db.getString("f_receiptnumber"));
     }
+
     db[":f_id"] = ui->leUuid->text();
     db.exec("select * from o_pay_cl where f_id=:f_id");
-    if (db.nextRow()) {
+
+    if(db.nextRow()) {
         ui->leCityLedger->setText(db.getString("f_code"));
     }
 }
@@ -128,9 +137,9 @@ bool C5WaiterOrder::allowChangeDatabase()
     return false;
 }
 
-QToolBar *C5WaiterOrder::toolBar()
+QToolBar* C5WaiterOrder::toolBar()
 {
-    if (!fToolBar) {
+    if(!fToolBar) {
         QList<ToolBarButtons> btn;
         fToolBar = createStandartToolbar(btn);
         fToolBar->addAction(QIcon(":/app.png"), tr("Transfer to hotel"), this, SLOT(transferToHotel()));
@@ -138,7 +147,8 @@ QToolBar *C5WaiterOrder::toolBar()
         fToolBar->addAction(QIcon(":/eye.png"), tr("Show all"), this, SLOT(showAll()));
         fToolBar->addAction(QIcon(":/eye-no.png"), tr("Hide removed"), this, SLOT(hideRemoved()));
         fToolBar->addAction(QIcon(":/delete.png"), tr("Remove"), this, SLOT(removeOrder()));
-        if (__user->check(cp_t5_edit_closed_order)) {
+
+        if(mUser->check(cp_t5_edit_closed_order)) {
             fToolBar->addAction(QIcon(":/save.png"), tr("Save"), this, SLOT(saveOrder()));
             fToolBar->addAction(QIcon(":/storeinput.png"), tr("Store output"), this, SLOT(storeOutput()));
         } else {
@@ -150,6 +160,7 @@ QToolBar *C5WaiterOrder::toolBar()
             ui->btnClearTax->setEnabled(false);
         }
     }
+
     return fToolBar;
 }
 
@@ -168,7 +179,8 @@ void C5WaiterOrder::showLog()
             "order by 1 desc, f_time desc, 6 desc ");
     ui->tblLog->setRowCount(db.rowCount());
     int row = 0;
-    while (db.nextRow()) {
+
+    while(db.nextRow()) {
         ui->tblLog->setData(row, 0, db.getDate("f_date"));
         ui->tblLog->setData(row, 1, db.getTime("f_time"));
         ui->tblLog->setData(row, 2, db.getString("f_user"));
@@ -199,11 +211,13 @@ void C5WaiterOrder::showStore()
                     "inner join c_goods g on g.f_id=o.f_goods "
                     "where b.f_header=:f_header and (b.f_state=:f_state1 or b.f_state=:f_state2) "
                    ).arg(priceField));
-    ProxyTableWidgetDatabase::fillTableWidgetRowFromDatabase( &db, ui->tblStore);
+    ProxyTableWidgetDatabase::fillTableWidgetRowFromDatabase(&db, ui->tblStore);
     double t = 0;
-    for (int i = 0; i < ui->tblStore->rowCount(); i++) {
+
+    for(int i = 0; i < ui->tblStore->rowCount(); i++) {
         t += ui->tblStore->getDouble(i, 8);
     }
+
     ui->leSelfCost->setDouble(t);
 }
 
@@ -224,28 +238,32 @@ void C5WaiterOrder::saveOrder()
 
 void C5WaiterOrder::removeOrder()
 {
-    if (C5Message::question(tr("Confirm to remove")) != QDialog::Accepted) {
+    if(C5Message::question(tr("Confirm to remove")) != QDialog::Accepted) {
         return;
     }
+
     C5Database db;
     C5StoreDraftWriter dw(db);
     db[":f_header"] = ui->leUuid->text();
     db.exec("select f_id from o_goods where f_header=:f_header");
     QStringList idList;
-    while (db.nextRow()) {
+
+    while(db.nextRow()) {
         idList.append(db.getString("f_id"));
     }
-    for (const QString &id : idList) {
-        if (!dw.rollbackOutput(db, id)) {
+
+    for(const QString &id : idList) {
+        if(!dw.rollbackOutput(db, id)) {
             C5Message::error(dw.fErrorMsg);
             return;
         }
     }
+
     db[":f_state"] = ORDER_STATE_VOID;
     db[":f_id"] = ui->leUuid->text();
     db.exec("update o_header set f_state=:f_state where f_id=:f_id");
     C5WaiterOrderDoc::removeDocument(db, ui->leUuid->text());
-    C5Airlog::write(hostinfo, __user->fullName(), LOG_WAITER, "", ui->leUuid->text(), "", tr("Order removed from cash"),
+    C5Airlog::write(hostinfo, mUser->fullName(), LOG_WAITER, "", ui->leUuid->text(), "", tr("Order removed from cash"),
                     ui->leTax->text(), "");
     __mainWindow->removeTab(this);
     C5Message::info(tr("Removed"));
@@ -253,15 +271,15 @@ void C5WaiterOrder::removeOrder()
 
 void C5WaiterOrder::showAll()
 {
-    for (int i = 0; i < ui->tblDishes->rowCount(); i++) {
+    for(int i = 0; i < ui->tblDishes->rowCount(); i++) {
         ui->tblDishes->setRowHidden(i, false);
     }
 }
 
 void C5WaiterOrder::hideRemoved()
 {
-    for (int i = 0; i < ui->tblDishes->rowCount(); i++) {
-        if (ui->tblDishes->getInteger(i, 1) != DISH_STATE_OK) {
+    for(int i = 0; i < ui->tblDishes->rowCount(); i++) {
+        if(ui->tblDishes->getInteger(i, 1) != DISH_STATE_OK) {
             ui->tblDishes->setRowHidden(i, true);
         }
     }
@@ -273,7 +291,8 @@ void C5WaiterOrder::transferToHotel()
     C5StoreDraftWriter d(db);
     QString err;
     d.transferToHotel(db, ui->leUuid->text(), err);
-    if (err.isEmpty()) {
+
+    if(err.isEmpty()) {
         C5Message::info(tr("Done"));
     } else {
         C5Message::error(err);
@@ -295,7 +314,8 @@ void C5WaiterOrder::storeOutput()
     QString err;
     C5StoreDraftWriter d(db);
     d.writeStoreOfSale(ui->leUuid->text(),  err, DOC_STATE_SAVED);
-    if (err.isEmpty()) {
+
+    if(err.isEmpty()) {
         C5Message::info(tr("Done"));
     } else {
         C5Message::error(err);
@@ -305,9 +325,11 @@ void C5WaiterOrder::storeOutput()
 void C5WaiterOrder::openMenuItem()
 {
     QModelIndexList ml = ui->tblDishes->selectionModel()->selectedRows();
-    if (ml.count() == 0) {
+
+    if(ml.count() == 0) {
         return;
     }
+
     C5DishWidget *ep = new C5DishWidget();
     C5Editor *e = C5Editor::createEditor(ep, 0);
     QList<QMap<QString, QVariant> > d;
@@ -325,13 +347,14 @@ void C5WaiterOrder::on_tblDishes_customContextMenuRequested(const QPoint &pos)
 
 void C5WaiterOrder::on_tabWidget_currentChanged(int index)
 {
-    switch (index) {
-        case 2:
-            showStore();
-            break;
-        case 3:
-            showLog();
-            break;
+    switch(index) {
+    case 2:
+        showStore();
+        break;
+
+    case 3:
+        showLog();
+        break;
     }
 }
 
@@ -342,18 +365,21 @@ void C5WaiterOrder::on_btnCopyUUID_clicked()
 
 void C5WaiterOrder::on_btnClearTax_clicked()
 {
-    if (C5Message::question(tr("Are you sure to clear tax info?")) != QDialog::Accepted) {
+    if(C5Message::question(tr("Are you sure to clear tax info?")) != QDialog::Accepted) {
         return;
     }
+
     C5Database db;
     db[":f_id"] = ui->leUuid->text();
     db.exec("select * from o_tax where f_id=:f_id");
-    if (db.nextRow()) {
-        for (int i = 0; i < db.columnCount(); i++) {
+
+    if(db.nextRow()) {
+        for(int i = 0; i < db.columnCount(); i++) {
             db[":" + db.columnName(i)] = QVariant();
         }
+
         db.update("o_tax", "f_id", ui->leUuid->text());
-        C5Airlog::write(hostinfo, __user->fullName(), LOG_WAITER, "", ui->leUuid->text(), "", "Clear tax info",
+        C5Airlog::write(hostinfo, mUser->fullName(), LOG_WAITER, "", ui->leUuid->text(), "", "Clear tax info",
                         ui->leTax->text(), "");
         ui->leTax->clear();
     }
@@ -361,37 +387,44 @@ void C5WaiterOrder::on_btnClearTax_clicked()
 
 void C5WaiterOrder::on_btnOpenTable_clicked()
 {
-    if (C5Message::question(tr("Open order?")) != QDialog::Accepted) {
+    if(C5Message::question(tr("Open order?")) != QDialog::Accepted) {
         return;
     }
+
     C5Database db;
     db[":f_table"] = ui->leTable->property("table_id");
     db[":f_state"] = ORDER_STATE_OPEN;
     db.exec("select f_id from o_header where f_table=:f_table and f_state=:f_state");
-    if (db.nextRow()) {
+
+    if(db.nextRow()) {
         C5Message::error(tr("An opened order exists on table, cannot continue"));
         return;
     }
+
     db[":f_oheader"] = ui->leUuid->text();
     db.exec("select f_id from a_header_Cash where f_oheader=:f_oheader");
-    while (db.nextRow()) {
+
+    while(db.nextRow()) {
         C5CashDoc ::removeDoc(db.getString("f_id"));
     }
+
     db[":f_order"] = ui->leUuid->text();
     db.exec("delete from b_clients_debts where f_order=:f_order");
     db[":f_id"] = ui->leUuid->text();
     db[":f_state"] = ORDER_STATE_OPEN;
     db.exec("update o_header set f_state=:f_state where f_id=:f_id");
-    C5Airlog::write(hostinfo, __user->fullName(), LOG_WAITER, "", ui->leUuid->text(), "", "Open order from cash", "", "");
+    C5Airlog::write(hostinfo, mUser->fullName(), LOG_WAITER, "", ui->leUuid->text(), "", "Open order from cash", "", "");
 }
 
 void C5WaiterOrder::on_btnSetCL_clicked()
 {
-    if (__c5config.hotelDatabase().isEmpty()) {
+    if(__c5config.hotelDatabase().isEmpty()) {
         return;
     }
+
     QString clcode, clname;
-    if (DlgSetWaiterOrderCL::getCL(clcode, clname)) {
+
+    if(DlgSetWaiterOrderCL::getCL(clcode, clname)) {
         ui->leCityLedger->setText(clcode);
         C5Database db;
         db[":f_code"] = clcode;
@@ -402,18 +435,20 @@ void C5WaiterOrder::on_btnSetCL_clicked()
         db[":f_dc"] = "DEBIT";
         db[":f_sign"] = -1;
         db[":f_cityledger"] = clcode.toInt();
-        if (!db.exec(QString("update %1.m_register set f_cityledger=:f_cityledger, "
-                             "f_paymentmode=:f_paymentmode, f_dc=:f_dc, f_sign=:f_sign where f_id=:f_id").arg(__c5config.hotelDatabase()))) {
+
+        if(!db.exec(QString("update %1.m_register set f_cityledger=:f_cityledger, "
+                            "f_paymentmode=:f_paymentmode, f_dc=:f_dc, f_sign=:f_sign where f_id=:f_id").arg(__c5config.hotelDatabase()))) {
             C5Message::error(db.fLastError);
             return;
         }
+
         C5Message::info(tr("Saved"));
     }
 }
 
 void C5WaiterOrder::on_btnClearCL_clicked()
 {
-    if (C5Message::question(tr("Clear CL information?")) == QDialog::Accepted) {
+    if(C5Message::question(tr("Clear CL information?")) == QDialog::Accepted) {
         C5Database db;
         db[":f_code"] = "";
         db[":f_name"] = "";

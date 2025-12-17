@@ -1,12 +1,8 @@
-#include "datadriver.h"
 #include "dlgscreen.h"
 #include "c5systempreference.h"
 #include "fileversion.h"
-#include "c5config.h"
-#include "c5database.h"
-#include "c5servername.h"
+#include "c5connectiondialog.h"
 #include "ndataprovider.h"
-#include "dlgserverconnection.h"
 #include "logwriter.h"
 #include "c5message.h"
 #include <QApplication>
@@ -22,14 +18,6 @@
 int main(int argc, char* argv[])
 {
     QApplication a(argc, argv);
-    QList<QScreen*> screens = QGuiApplication::screens();
-    int targetScreenIndex = 0;
-
-    if(targetScreenIndex >= screens.size()) {
-        targetScreenIndex = 0; // запасной вариант
-    }
-
-    QRect screenGeometry = screens[targetScreenIndex]->geometry();
     LogWriter::write(LogWriterLevel::verbose, "Support SSL", QSslSocket::supportsSsl() ? "true" : "false");
     LogWriter::write(LogWriterLevel::verbose, "Support SSL version", QSslSocket::sslLibraryBuildVersionString());
 #ifndef QT_DEBUG
@@ -62,28 +50,6 @@ int main(int argc, char* argv[])
     auto *dlgsplash = new DlgSplashScreen();
     dlgsplash->show();
     emit dlgsplash->messageSignal("Get server name");
-    auto sng = new C5ServerName(__c5config.getRegValue("ss_server_address").toString());
-
-    if(!sng->getConnection(__c5config.getRegValue("ss_database").toString())) {
-        C5Message::error(sng->mErrorString);
-        DlgServerConnection::showSettings(0);
-        return 1;
-    }
-
-    QJsonObject js = sng->mReply;
-    sng->deleteLater();
-    C5Config::fDBHost = js["settings"].toString();
-    C5Config::fDBPath = js["database"].toString();
-    C5Config::fSettingsName = __c5config.getRegValue("ss_settings").toString();
-#ifdef QT_DEBUG
-    C5Config::fFullScreen = false;
-#else
-    C5Config::fFullScreen = true;
-#endif
-    C5Database::fDbParams = C5Config::dbParams();
-    C5Config::initParamsFromDb();
-    C5Database::LOGGING = C5Config::getValue(param_debuge_mode).toInt() == 1;
-    NDataProvider::mProtocol = js["settings"].toString();
 
     if(!C5SystemPreference::checkDecimalPointAndSeparator()) {
         return 0;
@@ -99,26 +65,28 @@ int main(int argc, char* argv[])
     font.setFamily("Arial LatArm Unicode");
     font.setPointSize(11);
     a.setFont(font);
-    C5Database db;
-    DataDriver::fInstance = new DataDriver();
-    DataDriver::norefresh.append("goods");
-    DataDriver::init(__c5config.dbParams(), dlgsplash);
     NDataProvider::mAppName = "waiter";
     NDataProvider::mFileVersion = FileVersion::getVersionString(qApp->applicationFilePath());
-    NDataProvider::mHost = C5Config::fDBPath;
-    NDataProvider::mDebug = C5Config::getValue(param_debuge_mode).toInt() > 0 || a.arguments().contains("/debug");
+    NDataProvider::mProtocol = C5ConnectionDialog::instance()->noneSecure ? "http" : "https";
+    NDataProvider::mHost = C5ConnectionDialog::instance()->serverAddress();
+    NDataProvider::mDebug = a.arguments().contains("/debug");
     dlgsplash->deleteLater();
     DlgScreen w;
-#ifdef QT_DEBUG
-    w.move(screenGeometry.x() + 200, screenGeometry.y() + 200);
-#endif
-    C5Config::fParentWidget = &w;
+    w.showFullScreen();
 
-    if(C5Config::isAppFullScreen()) {
-        w.setWindowState(Qt::WindowFullScreen);
+    for(const QString &s : a.arguments()) {
+        if(s.startsWith("/monitor")) {
+            QList<QScreen*> screens = a.screens();
+            int monitor = 0;
+            QStringList mon = s.split("=");
+
+            if(mon.length() == 2) {
+                monitor = mon.at(1).toInt();
+            }
+
+            w.move(screens.at(monitor)->geometry().topLeft());
+        }
     }
 
-    w.show();
-    a.processEvents();
     return a.exec();
 }

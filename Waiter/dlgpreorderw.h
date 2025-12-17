@@ -1,7 +1,8 @@
 #ifndef DLGPREORDERW_H
 #define DLGPREORDERW_H
 
-#include "c5dialog.h"
+#include "c5waiterdialog.h"
+#include <QJsonObject>
 
 class C5OrderDriver;
 
@@ -10,7 +11,7 @@ namespace Ui
 class DlgPreorder;
 }
 
-class DlgPreorder : public C5Dialog
+class DlgPreorder : public C5WaiterDialog
 {
     Q_OBJECT
 
@@ -19,7 +20,7 @@ public:
 
     const static int RESULT_CANCELED = 2;
 
-    explicit DlgPreorder(const QJsonObject &jdoc);
+    explicit DlgPreorder(C5User *user, const QJsonObject &jdoc);
 
     ~DlgPreorder();
 
@@ -50,7 +51,7 @@ private slots:
     void on_btnCopyID_clicked();
 
 private:
-    Ui::DlgPreorder *ui;
+    Ui::DlgPreorder* ui;
 
     QJsonObject fDoc;
 

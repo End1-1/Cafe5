@@ -12,12 +12,14 @@ CONFIG += c++11
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
+    ../../../Classes/logwriter.cpp \
     ../../utils/configini.cpp \
     ../../utils/database.cpp \
     jzsync.cpp \
     jzsyncmanager.cpp
 
 HEADERS += \
+    ../../../Classes/logwriter.h \
     ../../utils/configini.h \
     ../../utils/database.h \
     jzsync.h \
@@ -25,6 +27,7 @@ HEADERS += \
 
 DEFINES += _APPLICATION_=\\\"Breeze\\\"
 DEFINES += _MODULE_=\\\"Service5_jzsync_dll\\\"
+DEFINES += _DBDRIVER_=\\\"QMARIADB\\\"
 
 INCLUDEPATH += ../../raw
 INCLUDEPATH += ../../socket

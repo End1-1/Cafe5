@@ -7,11 +7,12 @@
 #include "dlgserverconnection.h"
 #include "c5config.h"
 #include "c5database.h"
-#include "c5message.h"
+#include "ninterface.h"
+#include "c5officewidget.h"
 #include <QSettings>
 
 C5Login::C5Login() :
-    C5Dialog(),
+    C5OfficeDialog(),
     ui(new Ui::C5Login)
 {
     ui->setupUi(this);
@@ -29,43 +30,6 @@ C5Login::~C5Login()
     delete ui;
 }
 
-void C5Login::loginResponse(const QJsonObject &jdoc)
-{
-    QJsonObject jo = jdoc["data"].toObject();
-    NDataProvider::sessionKey = jo["sessionkey"].toString();
-
-    if(!__user) {
-        __user = new C5User(0);
-    }
-
-    if(!__user->authByUsernamePass(ui->leUsername->currentText(), ui->lePassword->text())) {
-        fHttp->httpQueryFinished(sender());
-        C5Message::error(tr("Login failed"));
-        return;
-    }
-
-    if(!__user->isActive()) {
-        fHttp->httpQueryFinished(sender());
-        C5Message::error(tr("User is inactive"));
-        return;
-    }
-
-    for(int i = 0; i < fServers.size(); i++) {
-        QJsonObject js = fServers.at(i).toObject();
-        js["lastusername"] = "";
-        js["lastdb"] = "";
-        fServers[i] = js;
-    }
-
-    QSettings s(_ORGANIZATION_, _APPLICATION_ + QString("\\") + _MODULE_);
-    s.setValue("lastdb", ui->cbDatabases->currentText());
-    s.setValue("lastusername", ui->leUsername->currentText());
-    s.setValue("lastversion", ui->leVersion->text());
-    __c5config.fDBName = ui->cbDatabases->currentText();
-    fHttp->httpQueryFinished(sender());
-    accept();
-}
-
 void C5Login::on_btnCancel_clicked()
 {
     reject();
@@ -73,12 +37,28 @@ void C5Login::on_btnCancel_clicked()
 
 void C5Login::on_btnOk_clicked()
 {
+    if(!mUser) {
+        mUser = new C5User();
+        C5OfficeWidget::mUser = mUser;
+    }
+
     NDataProvider::mFileVersion = ui->leVersion->text();
-    fHttp->createHttpQuery("/engine/login.php",
-    QJsonObject{{"method", 1},
-        {"username", ui->leUsername->currentText()},
-        {"password", ui->lePassword->text()}},
-    SLOT(loginResponse(QJsonObject)));
+    mUser->authByUsernamePass(ui->leUsername->currentText(), ui->lePassword->text(), fHttp, [this](const QJsonObject & jo) {
+        for(int i = 0; i < fServers.size(); i++) {
+            QJsonObject js = fServers.at(i).toObject();
+            js["lastusername"] = "";
+            js["lastdb"] = "";
+            fServers[i] = js;
+        }
+
+        QSettings s(_ORGANIZATION_, _APPLICATION_ + QString("\\") + _MODULE_);
+        s.setValue("lastdb", ui->cbDatabases->currentText());
+        s.setValue("lastusername", ui->leUsername->currentText());
+        s.setValue("lastversion", ui->leVersion->text());
+        __c5config.fDBName = ui->cbDatabases->currentText();
+        fHttp->httpQueryFinished(sender());
+        accept();
+    });
 }
 
 void C5Login::on_cbDatabases_currentIndexChanged(int index)

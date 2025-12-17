@@ -1,7 +1,5 @@
 #include "dlgsplitorder.h"
 #include "ui_dlgsplitorder.h"
-#include "c5orderdriver.h"
-#include "c5config.h"
 #include "c5utils.h"
 #include "dlgpassword.h"
 #include <QScrollBar>
@@ -22,17 +20,17 @@ DlgSplitOrder::~DlgSplitOrder()
 
 void DlgSplitOrder::configOrder(int table)
 {
-    fHttp->createHttpQuery("/engine/waiter/order.php",
-    QJsonObject{{"action", "open"}, {"table", table},
-        {"current_staff", fUser->id()},
-        {"locksrc", hostinfo},
-        {"service_factor", __c5config.getValue(param_service_factor).toDouble()},},
-    SLOT(openO1Response(QJsonObject)));
+    //TODO
+    // fHttp->createHttpQuery("/engine/waiter/order.php",
+    // QJsonObject{{"action", "open"}, {"table", table},
+    //     {"current_staff", fUser->id()},
+    //     {"locksrc", hostinfo},
+    //     {"service_factor", __c5config.getValue(param_service_factor).toDouble()},},
+    // SLOT(openO1Response(QJsonObject)));
 }
 
 void DlgSplitOrder::on_btnChoseTable_clicked()
 {
-
 }
 
 void DlgSplitOrder::on_btnExit_clicked()

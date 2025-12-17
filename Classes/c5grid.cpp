@@ -17,7 +17,7 @@
 #include <QXlsx/header/xlsxdocument.h>
 
 C5Grid::C5Grid(QWidget *parent) :
-    C5Widget(parent),
+    C5OfficeWidget(parent),
     ui(new Ui::C5Grid)
 {
     ui->setupUi(this);

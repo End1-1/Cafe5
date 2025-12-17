@@ -37,7 +37,7 @@ QToolBar *CR5MFActiveTasks::toolBar()
 {
     if (!fToolBar) {
         QList<ToolBarButtons> btn;
-        if (__user->check(cp_t10_create_task)) {
+        if (mUser->check(cp_t10_create_task)) {
             btn << ToolBarButtons::tbNew;
         }
         btn << ToolBarButtons::tbFilter

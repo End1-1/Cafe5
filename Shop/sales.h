@@ -1,7 +1,7 @@
 #ifndef SALES_H
 #define SALES_H
 
-#include "c5dialog.h"
+#include "c5shopdialog.h"
 #include "c5database.h"
 
 namespace Ui
@@ -11,8 +11,9 @@ class Sales;
 
 class C5User;
 class Working;
+class QPropertyAnimation;
 
-class Sales : public C5Dialog
+class Sales : public C5ShopDialog
 {
     Q_OBJECT
 
@@ -64,12 +65,18 @@ private slots:
 
     void on_btnItemChange_clicked();
 
+    void on_btnShowMenu_clicked();
+
+    void on_btnCloseMenu_clicked();
+
 private:
-    Ui::Sales *ui;
+    Ui::Sales* ui;
 
-    C5User *fUser;
+    C5User* fUser;
 
-    Working *fWorking;
+    Working* fWorking;
+
+    QPropertyAnimation* mPanelAnim;
 
     void changeDate(int d);
 
@@ -90,6 +97,8 @@ private:
     void printTaxReport(int report_type);
 
     int sumOfColumnsWidghtBefore(int column);
+
+    void toggleMenu(bool visible);
 };
 
 #endif // SALES_H

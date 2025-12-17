@@ -1,13 +1,14 @@
 #ifndef C5CHANGEPASSWORD_H
 #define C5CHANGEPASSWORD_H
 
-#include "c5dialog.h"
+#include "c5officedialog.h"
 
-namespace Ui {
+namespace Ui
+{
 class C5ChangePassword;
 }
 
-class C5ChangePassword : public C5Dialog
+class C5ChangePassword : public C5OfficeDialog
 {
     Q_OBJECT
 
@@ -24,7 +25,7 @@ private slots:
     void on_btnOK_clicked();
 
 private:
-    Ui::C5ChangePassword *ui;
+    Ui::C5ChangePassword* ui;
 };
 
 #endif // C5CHANGEPASSWORD_H

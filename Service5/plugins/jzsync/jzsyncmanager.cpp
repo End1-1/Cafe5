@@ -4,7 +4,7 @@
 #include <QTimer>
 #include <QDebug>
 
-JzSyncManager::JzSyncManager(const QHash<QString, QString> &opt) :
+JzSyncManager::JzSyncManager(const QHash<QString, QString>& opt) :
     QObject()
 {
     fOptions = opt;
@@ -28,43 +28,56 @@ void JzSyncManager::resumeTimer()
 
 void JzSyncManager::timeout()
 {
+    LogWriter::write(LogWriterLevel::verbose, "", QString("Synchronization started"));
     fTimer->stop();
     Database db("QIBASE");
-    if (!db.open(fOptions["db_remote_host"], fOptions["db_remote_path"], fOptions["db_remote_user"], fOptions["db_remote_pass"])) {
+
+    if(!db.open(fOptions["db_remote_host"], fOptions["db_remote_path"], fOptions["db_remote_user"], fOptions["db_remote_pass"])) {
         resumeTimer();
         return;
     }
+
     Database db2("QIBASE");
-    if (!db2.open(fOptions["db_local_host"], fOptions["db_local_path"], fOptions["db_local_user"], fOptions["db_local_pass"])) {
+
+    if(!db2.open(fOptions["db_local_host"], fOptions["db_local_path"], fOptions["db_local_user"], fOptions["db_local_pass"])) {
         resumeTimer();
         return;
     }
+
+    LogWriter::write(LogWriterLevel::verbose, "", QString("Last id %1").arg(fOptions["last_id"].toInt()));
     db[":fid"] = fOptions["last_id"].toInt();
     db.exec("select * from sys_sync where fid>:fid");
+    LogWriter::write(LogWriterLevel::verbose, "", QString("Found updates %1").arg(db.rowCount()));
     QStringList ops, rec, tables;
-    while (db.next()) {
+
+    while(db.next()) {
         fOptions["last_id"] = QString::number(db.integer("fid"));
         ops.append(db.string("fop"));
         rec.append(db.string("frec"));
         tables.append(db.string("ftable"));
     }
-    for (int i = 0; i < ops.count(); i++) {
-        switch (ops.at(i).toInt()) {
+
+    for(int i = 0; i < ops.count(); i++) {
+        switch(ops.at(i).toInt()) {
         case 1:
             db[":id"] = rec.at(i);
             db.exec(QString("select * from %1 where id=:id").arg(tables.at(i)));
-            if (db.next()) {
+
+            if(db.next()) {
                 QMap<QString, QVariant> v = db.getBindValues();
                 db2.setBindValues(v);
                 db2.insert(tables.at(i));
             } else {
                 LogWriter::write(LogWriterLevel::errors, "", QString("Record missing: %1 - %2").arg(tables.at(i), rec.at(i)));
             }
+
             break;
+
         case 2:
             db[":id"] = rec.at(i);
             db.exec(QString("select * from %1 where id=:id").arg(tables.at(i)));
-            if (db.next()) {
+
+            if(db.next()) {
                 QMap<QString, QVariant> v = db.getBindValues();
                 qDebug() << v;
                 db2.setBindValues(v);
@@ -72,18 +85,23 @@ void JzSyncManager::timeout()
             } else {
                 LogWriter::write(LogWriterLevel::errors, "", QString("Record missing: %1 - %2").arg(tables.at(i), rec.at(i)));
             }
+
             break;
+
         case 3:
             db2[":id"] = rec.at(i);
             db2.deleteFromTable(tables.at(i), "id", rec.at(i));
             break;
         }
     }
+
     Database db3("QMYSQL");
-    if (!db3.open(fOptions["server_db_config"])) {
+
+    if(!db3.open(fOptions["server_db_config"])) {
         resumeTimer();
         return;
     }
+
     db3[":fplugin"] = "jzsync";
     db3[":fkey"] = "last_id";
     db3[":fvalue"] = fOptions["last_id"];

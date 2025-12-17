@@ -1,6 +1,5 @@
 #include "c5message.h"
 #include "ui_c5message.h"
-#include "c5config.h"
 #include <QClipboard>
 #include <QTimer>
 #include <QMediaPlayer>
@@ -50,7 +49,8 @@ void C5Message::timeout()
 {
 #if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
 #else
-    if (fPlaySound) {
+
+    if(fPlaySound) {
         QMediaPlayer *mp = new QMediaPlayer();
         auto *ao = new QAudioOutput();
         mp->setAudioOutput(ao);
@@ -58,34 +58,41 @@ void C5Message::timeout()
         ao->setVolume(0.5);
         mp->play();
     }
+
 #endif
 }
 
 int C5Message::showMessage(const QString &text, int tp, const QString &yes, const QString &no, const QString &a3,
                            bool playsound)
 {
-    C5Message *c5 = new C5Message(__c5config.fParentWidget);
+    C5Message *c5 = new C5Message();
     c5->fPlaySound = playsound;
     c5->ui->btnYes->setText(yes);
     c5->ui->btnCancel->setText(no);
-    if (no.isEmpty()) {
+
+    if(no.isEmpty()) {
         c5->ui->btnCancel->setVisible(false);
     }
+
     c5->ui->btnA3->setVisible(!a3.isEmpty());
     c5->ui->btnA3->setText(a3);
     QString img;
-    switch (tp) {
-        case 1:
-            img = "info";
-            break;
-        case 2:
-            img = "error";
-            c5->ui->btnCopy->setVisible(true);
-            break;
-        case 3:
-            img = "help";
-            break;
+
+    switch(tp) {
+    case 1:
+        img = "info";
+        break;
+
+    case 2:
+        img = "error";
+        c5->ui->btnCopy->setVisible(true);
+        break;
+
+    case 3:
+        img = "help";
+        break;
     }
+
 #ifdef WAITER
     c5->ui->btnYes->setMinimumHeight(50);
     c5->ui->btnCancel->setMinimumHeight(50);
@@ -123,14 +130,17 @@ void C5Message::on_btnCopy_clicked()
 void C5Message::on_label_linkActivated(const QString &link)
 {
     QUrl url(link);
-    if (url.path() == "launch-updater") {
+
+    if(url.path() == "launch-updater") {
         QUrlQuery urlQuery(url);
         QString updaterPath = QCoreApplication::applicationDirPath() + "/updater.exe";
         QStringList params;
-        if (urlQuery.hasQueryItem("version")) {
+
+        if(urlQuery.hasQueryItem("version")) {
             params.append("--app=officen");
             params.append("--version=" +  urlQuery.queryItemValue("version"));
         }
+
         QProcess::startDetached(updaterPath, params);
     }
 }

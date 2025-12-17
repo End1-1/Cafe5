@@ -24,6 +24,7 @@
 #include "../../NewTax/Src/printtaxn.h"
 #include "oheader.h"
 #include "c5storedoc.h"
+#include "c5fiscalcancel.h"
 #include <QXlsx/header/xlsxdocument.h>
 #include <QClipboard>
 #include <QSqlQuery>
@@ -51,7 +52,7 @@
 #define float_str_(value, f) QString::number(value, 'f', f)
 
 C5SaleDoc::C5SaleDoc(QWidget *parent) :
-    C5Widget(parent),
+    C5OfficeWidget(parent),
     ui(new Ui::C5SaleDoc)
 {
     ui->setupUi(this);
@@ -540,46 +541,8 @@ void C5SaleDoc::fiscale()
 
 void C5SaleDoc::cancelFiscal()
 {
-    C5Database db;
-    db[":f_order"] = ui->leUuid->text();
-    db[":f_state"] = 1;
-    db.exec("select * from o_tax_log where f_order=:f_order and f_state=:f_state");
-
-    if(db.nextRow()) {
-        QJsonObject jo = __strjson(db.getString("f_out"));
-        ui->leFiscal->setInteger(jo["rseq"].toInt());
-        QString crn = jo["crn"].toString();
-        int rseq = jo["rseq"].toInt();
-        PrintTaxN pt(C5Config::taxIP(), C5Config::taxPort(), C5Config::taxPassword(), C5Config::taxUseExtPos(),
-                     C5Config::taxCashier(), C5Config::taxPin(), this);
-        QString jsnin, jsnout, err;
-        int result;
-        result = pt.printTaxback(rseq, crn, jsnin, jsnout, err);
-        db[":f_id"] = db.uuid();
-        db[":f_order"] = ui->leUuid->text();
-        db[":f_date"] = QDate::currentDate();
-        db[":f_time"] = QTime::currentTime();
-        db[":f_in"] = jsnin;
-        db[":f_out"] = jsnout;
-        db[":f_err"] = err;
-        db[":f_result"] = result;
-        db.insert("o_tax_log", false);
-
-        if(result != pt_err_ok) {
-            C5Message::error(err);
-        } else {
-            db[":f_fiscal"] = QVariant();
-            db[":f_receiptnumber"] = QVariant();
-            db[":f_time"] = QVariant();
-            db.update("o_tax", "f_id", ui->leUuid->text());
-            db[":f_order"] = ui->leUuid->text();
-            db.exec("update o_tax_log set f_state=0 where f_order=:f_order and f_state=1");
-            C5Message::info(tr("Taxback complete"));
-            getFiscalNum();
-        }
-    } else {
-        C5Message::error(tr("Nothing to cancel"));
-    }
+    C5FiscalCancel fc(ui->leUuid->text());
+    fc.exec();
 }
 
 void C5SaleDoc::createInvoiceAS()
@@ -759,7 +722,7 @@ void C5SaleDoc::returnItems()
     oh.timeOpen = QTime::currentTime();
     oh.timeClose = QTime::currentTime();
     oh.dateCash = QDate::currentDate();
-    oh.cashier = __user->id();
+    oh.cashier = mUser->id();
     oh.staff = ui->leDeluveryMan->property("id").toInt();
     oh.comment = QString("%1 %2").arg(tr("Return from"), ui->leDocnumber->text());
     oh.print = 0;
@@ -903,9 +866,9 @@ void C5SaleDoc::saveDataChanges()
     jh["f_datecash"] = ui->leDate->date().toString(FORMAT_DATE_TO_STR_MYSQL);
     jh["f_timeopen"] = QTime::currentTime().toString(FORMAT_TIME_TO_STR);
     jh["f_timeclose"] = QTime::currentTime().toString(FORMAT_TIME_TO_STR);
-    jh["f_cashier"] = ui->leCashier->property("f_cashier").toInt()  == 0 ? __user->id() :
+    jh["f_cashier"] = ui->leCashier->property("f_cashier").toInt()  == 0 ? mUser->id() :
                       ui->leCashier->property("f_cashier").toInt();
-    jh["f_staff"] = __user->id();
+    jh["f_staff"] = mUser->id();
     jh["f_comment"] = ui->leComment->text();
     jh["f_print"] = 0;
     jh["f_amounttotal"] = ui->leGrandTotal->getDouble();
@@ -1688,7 +1651,7 @@ void C5SaleDoc::saveReturnItems()
     C5StoreDraftWriter dw(db);
     OHeader oheader;
     oheader.id = ui->leUuid->text();
-    oheader.staff = __user->id();
+    oheader.staff = mUser->id();
     oheader.state = ORDER_STATE_CLOSE;
     oheader.amountTotal = ui->leGrandTotal->getDouble() * -1;
     oheader.amountCash = ui->leCash->getDouble() * -1;
@@ -1740,7 +1703,7 @@ void C5SaleDoc::saveReturnItems()
 
     QJsonObject js;
     js["id"] = oheader._id();
-    js["user"] = __user->id();
+    js["user"] = mUser->id();
     js["storein"] = ui->cbStorage->currentData().toInt();
     js["currency"] = ui->cbCurrency->currentData().toInt();
     js["date"] = ui->leDate->date().toString(FORMAT_DATE_TO_STR_MYSQL);
@@ -1784,7 +1747,7 @@ void C5SaleDoc::saveAsDraft()
     jh["f_datecash"] = QDate::currentDate().toString(FORMAT_DATE_TO_STR_MYSQL);
     jh["f_timeopen"] = QTime::currentTime().toString(FORMAT_TIME_TO_STR);
     jh["f_timeclose"] = QTime::currentTime().toString(FORMAT_TIME_TO_STR);
-    jh["f_cashier"] = __user->id();
+    jh["f_cashier"] = mUser->id();
     jh["f_staff"] = fDraftSale.staff;
     jh["f_comment"] = ui->leComment->text();
     jh["f_print"] = 0;
@@ -1869,7 +1832,7 @@ void C5SaleDoc::saveCopy()
     fDraftSale.saleType = ui->leSaleType->property("id").toInt();
     fDraftSale.date = ui->leDate->date();
     fDraftSale.time = QTime::currentTime();
-    fDraftSale.cashier = __user->id();
+    fDraftSale.cashier = mUser->id();
     fDraftSale.staff = ui->leDeluveryMan->property("id").toInt();
     fDraftSale.amount = ui->leGrandTotal->getDouble();
     fDraftSale.comment = ui->leComment->text();
@@ -1895,7 +1858,7 @@ void C5SaleDoc::saveCopy()
         fDraftSaleBody.qty = ui->tblGoods->lineEdit(i, col_qty)->getDouble();
         fDraftSaleBody.price = ui->tblGoods->lineEdit(i, col_price)->getDouble();
         fDraftSaleBody.discount = ui->tblGoods->lineEdit(i, col_discount_value)->getDouble();
-        fDraftSaleBody.userAppend = __user->id();
+        fDraftSaleBody.userAppend = mUser->id();
 
         if(!fDraftSaleBody.write(db, err)) {
             C5Message::error(err);

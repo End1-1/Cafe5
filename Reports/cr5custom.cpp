@@ -14,7 +14,7 @@ CR5Custom::CR5Custom(QWidget *parent) :
     rnames.clear();
     rsqls.clear();
     C5Database db;
-    db[":f_access"] = __user->group();
+    db[":f_access"] = mUser->group();
     db.exec("select f_name, f_sql from s_custom_reports where f_access=-1 or f_access=:f_access");
 
     while(db.nextRow()) {

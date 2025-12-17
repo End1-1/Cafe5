@@ -108,6 +108,8 @@ private slots:
 
     void on_rbGenEAN8_clicked(bool checked);
 
+    void on_btnFromProduct_clicked();
+
 private:
     Ui::CE5Goods* ui;
 

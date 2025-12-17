@@ -156,7 +156,36 @@ C5Cache::C5Cache()
         setCacheSimpleQuery(cache_partner_category, "c_partners_category");
         setCacheSimpleQuery(cache_partner_group, "c_partners_group");
         setCacheSimpleQuery(cache_partner_state, "c_partners_state");
-        fCacheQuery[cache_materials_actions] = "select * from c_goods where f_enabled=1 and f_production=1";
+        fCacheQuery[cache_materials_actions] = QString(R"(select g.f_id as `%1`, gg.f_name as `%2`, g.f_name as `%3`, u.f_name as `%4`,
+                                                        g.f_scancode as `%5`, g.f_lastinputprice as `%6`, g.f_complectout as `%7`, g.f_qtybox as `%8`,
+                                                        gpr.f_price1 as `%9`, gpr.f_price2 as `%10`
+                                                        from c_goods g
+                                                        left join c_groups gg on gg.f_id=g.f_group
+                                                        left join c_units as u on u.f_id=g.f_unit
+                                                        left join c_goods_prices gpr on gpr.f_goods=g.f_id and gpr.f_currency=1
+                                                        where g.f_production=1 and g.f_enabled=1
+                                                        order by 3 )")
+                                               .arg(tr("Code").toLower())
+                                               .arg(tr("Group").toLower())
+                                               .arg(tr("Name").toLower())
+                                               .arg(tr("Unit").toLower())
+                                               .arg(tr("Scancode").toLower())
+                                               .arg(tr("Price").toLower())
+                                               .arg(tr("Complect output").toLower())
+                                               .arg(tr("Qty in box").toLower())
+                                               .arg(tr("Retail price").toLower())
+                                               .arg(tr("Whosale price").toLower());
+        fCacheQuery[cache_goal_products] = QString(R"(
+SELECT gp.f_id as `%1`, gp.f_date as `%2`, ms.f_name as `%3`, mf.f_name as `%4`
+FROM m_goal_product gp
+LEFT JOIN mf_actions_group mf ON mf.f_id=gp.f_product
+LEFT JOIN m_goal_product_status ms ON ms.f_id=gp.f_status
+)").arg(
+                                               tr("Code"),
+                                               tr("Date"),
+                                               tr("Status"),
+                                               tr("Product")
+                                           );
     }
 
     if(fTableCache.count() == 0) {
@@ -206,6 +235,8 @@ C5Cache::C5Cache()
         fTableCache["c_partners_group"] = cache_partner_group;
         fTableCache["c_partners_state"] = cache_partner_state;
         fTableCache["c_goods_model"] = cache_goods_model;
+        fTableCache["cache_materials_actions"] = cache_materials_actions;
+        fTableCache["cache_goal_products"] = cache_goal_products;
     }
 }
 

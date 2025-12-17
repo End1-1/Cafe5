@@ -23,18 +23,21 @@ void OGoods::bind(C5Database &db)
     db[":f_return"] = return_;
     db[":f_returnfrom"] = returnFrom;
     db[":f_isservice"] = isService;
-    db[":f_emarks"] = emarks;
+    db[":f_emarks"] = emarks.isEmpty() ? QVariant()  : emarks;
 }
 
 bool OGoods::write(C5Database &db, QString &err)
 {
     bool u = true;
-    if (id.toString().isEmpty()) {
+
+    if(id.toString().isEmpty()) {
         id = db.uuid();
         u = false;
     }
+
     bind(db);
-    if (u) {
+
+    if(u) {
         return getWriteResult(db, db.update("o_goods", where_id(id.toString())), err);
     } else {
         return getWriteResult(db, db.insert("o_goods", false), err);
@@ -43,9 +46,10 @@ bool OGoods::write(C5Database &db, QString &err)
 
 bool OGoods::getRecord(C5Database &db)
 {
-    if (!db.nextRow()) {
+    if(!db.nextRow()) {
         return false;
     }
+
     id = db.getString("f_id");
     header = db.getString("f_header");
     body = db.getString("f_body");
@@ -53,7 +57,7 @@ bool OGoods::getRecord(C5Database &db)
     goods = db.getInt("f_goods");
     qty = db.getDouble("f_qty");
     price = db.getDouble("f_price");
-    total = qty *price;
+    total = qty * price;
     tax = db.getInt("f_tax");
     sign = db.getInt("f_sign");
     discountFactor = db.getDouble("f_discountfactor");

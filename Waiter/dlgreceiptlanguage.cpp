@@ -1,7 +1,6 @@
 #include "dlgreceiptlanguage.h"
 #include "ui_dlgreceiptlanguage.h"
 #include "c5translator.h"
-#include "c5config.h"
 
 DlgReceiptLanguage::DlgReceiptLanguage() :
     C5Dialog(),

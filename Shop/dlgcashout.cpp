@@ -2,12 +2,14 @@
 #include "ui_dlgcashout.h"
 #include "c5user.h"
 #include "c5config.h"
+#include "ninterface.h"
 #include "c5message.h"
+#include "ninterface.h"
 #include "c5utils.h"
 #include <QValidator>
 
-DlgCashout::DlgCashout()
-    : C5Dialog()
+DlgCashout::DlgCashout(C5User *user)
+    : C5ShopDialog(user)
     , ui(new Ui::DlgCashout)
 {
     ui->setupUi(this);
@@ -39,7 +41,7 @@ void DlgCashout::on_btnSave_clicked()
     fHttp->createHttpQuery("/engine/cashdesk/create.php",
     QJsonObject{
         {"date", QDate::currentDate().toString(FORMAT_DATE_TO_STR_MYSQL)},
-        {"operator", __user->id() },
+        {"operator", mUser->id() },
         {"config", __c5config.fMainJson["id"].toInt()},
         {"cashin", 0},
         {"daily_check", 0},

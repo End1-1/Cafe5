@@ -5,13 +5,17 @@
 #include "c5message.h"
 #include "chatmessage.h"
 #include "dataonline.h"
-#include "dlgdataonline.h"
 #include "c5config.h"
 #include "printtaxn.h"
+#include "ninterface.h"
+
 #include "c5user.h"
 #if(!defined FRONTDESK && !defined WAITER)
 #include "worder.h"
 #include "working.h"
+#include "c5structtableview.h"
+#include "struct_storage_item.h"
+#include "struct_goods_item.h"
 #endif
 #include <QJsonDocument>
 #include <QJsonObject>
@@ -212,25 +216,50 @@ void DlgReservGoods::on_leReservedQty_textEdited(const QString &arg1)
 
 void DlgReservGoods::on_btnGoods_clicked()
 {
-    DlgDataOnline::DataResult r;
+#if(!defined FRONTDESK && !defined WAITER)
+    QVector<GoodsItem> result = C5StructTableView::get<GoodsItem>(this, search_goods, false, false);
 
-    if(DlgDataOnline::get("c_goods", r)) {
-        ui->leName->setText(r.value(0, tr("Name")).toString());
-        ui->leScancode->setText(r.value(0, tr("Scancode")).toString());
-        fGoods = r.value(0, tr("Code")).toInt();
-        getAvailableGoods();
+    if(result.isEmpty()) {
+        return;
     }
+
+    GoodsItem si = result.at(0);
+    ui->leName->setText(si.name);
+    ui->leScancode->setText(si.barcode);
+    fGoods = si.id;
+    getAvailableGoods();
+    //TODO
+    // DlgDataOnline::DataResult r;
+    // if(DlgDataOnline::get("c_goods", r)) {
+    //     ui->leName->setText(r.value(0, tr("Name")).toString());
+    //     ui->leScancode->setText(r.value(0, tr("Scancode")).toString());
+    //     fGoods = r.value(0, tr("Code")).toInt();
+    //     getAvailableGoods();
+    // }
+#endif
 }
 
 void DlgReservGoods::on_btnStore_clicked()
 {
-    DlgDataOnline::DataResult r;
+#if(!defined FRONTDESK && !defined WAITER)
+    QVector<StorageItem> result = C5StructTableView::get<StorageItem>(this, search_storage, true, false);
 
-    if(DlgDataOnline::get("c_storages", r)) {
-        ui->leStore->setText(r.value(0, tr("Name")).toString());
-        fStore = r.value(0, tr("Code")).toInt();
-        getAvailableGoods();
+    if(result.isEmpty()) {
+        return;
     }
+
+    StorageItem si = result.at(0);
+    ui->leStore->setText(si.name);
+    fStore = si.id;
+    getAvailableGoods();
+    //TODO
+    // DlgDataOnline::DataResult r;
+    // if(DlgDataOnline::get("c_storages", r)) {
+    //     ui->leStore->setText(r.value(0, tr("Name")).toString());
+    //     fStore = r.value(0, tr("Code")).toInt();
+    //     getAvailableGoods();
+    // }
+#endif
 }
 
 void DlgReservGoods::getAvailableGoods()

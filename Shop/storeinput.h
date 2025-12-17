@@ -1,7 +1,7 @@
 #ifndef STOREINPUT_H
 #define STOREINPUT_H
 
-#include "c5dialog.h"
+#include "c5shopdialog.h"
 
 namespace Ui
 {
@@ -10,7 +10,7 @@ class StoreInput;
 
 class C5User;
 
-class StoreInput : public C5Dialog
+class StoreInput : public C5ShopDialog
 {
     Q_OBJECT
 
@@ -55,11 +55,11 @@ private slots:
     void on_btnNewMovement_clicked();
 
 private:
-    Ui::StoreInput *ui;
+    Ui::StoreInput* ui;
 
     int fViewMode;
 
-    C5User *fUser;
+    C5User* fUser;
 
     void getList();
 

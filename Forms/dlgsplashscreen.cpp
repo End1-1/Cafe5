@@ -3,7 +3,7 @@
 #include <QTimer>
 
 DlgSplashScreen::DlgSplashScreen() :
-    QDialog(),
+    C5Dialog(),
     ui(new Ui::DlgSplashScreen)
 {
     ui->setupUi(this);

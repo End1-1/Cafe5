@@ -56,6 +56,7 @@ win32: QMAKE_CXXFLAGS -= -Zc:strictStrings
 
 FORMS += \
     ../Classes/dlgserverconnection.ui \
+    ../Forms/c5fiscalcancel.ui \
     ../Forms/c5goodsspecialprice.ui \
     ../Forms/dlgimportfromas.ui \
     c5discountredeem.ui \
@@ -64,17 +65,23 @@ FORMS += \
 
 HEADERS += \
     ../Classes/dlgserverconnection.h \
+    ../Forms/c5fiscalcancel.h \
     ../Forms/c5goodsspecialprice.h \
     ../Forms/dlgimportfromas.h \
     c5discountredeem.h \
+    c5officedialog.h \
+    c5officewidget.h \
     dlgemarks.h \
     storedecomplectation.h
 
 SOURCES += \
     ../Classes/dlgserverconnection.cpp \
+    ../Forms/c5fiscalcancel.cpp \
     ../Forms/c5goodsspecialprice.cpp \
     ../Forms/dlgimportfromas.cpp \
     c5discountredeem.cpp \
+    c5officedialog.cpp \
+    c5officewidget.cpp \
     dlgemarks.cpp \
     storedecomplectation.cpp
 

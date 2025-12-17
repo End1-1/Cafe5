@@ -4,8 +4,8 @@
 #include "c5database.h"
 #include "c5storedraftwriter.h"
 #include "c5dbrecord.h"
-#include "bhistory.h"
 #include "oheader.h"
+#include "bhistory.h"
 #include "ogoods.h"
 
 class C5User;
@@ -15,7 +15,7 @@ class C5ShopOrder : public QObject
     Q_OBJECT
 
 public:
-    C5ShopOrder(OHeader &oheader, BHistory &bhistory, QVector<OGoods> &ogoods);
+    C5ShopOrder(OHeader &oheader, BHistory &bhistory, QVector<OGoods>& ogoods);
 
     bool write();
 
@@ -28,11 +28,11 @@ public:
     bool writeCash(C5Database &db, double value, int cash);
 
 private:
-    OHeader &fOHeader;
+    OHeader& fOHeader;
 
-    BHistory &fBHistory;
+    BHistory& fBHistory;
 
-    QVector<OGoods> &fOGoods;
+    QVector<OGoods>& fOGoods;
 };
 
 #endif // C5SHOPORDER_H

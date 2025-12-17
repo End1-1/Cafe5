@@ -19,13 +19,15 @@ SOURCES += \
     handlers/httpheader.cpp \
     serverthread.cpp \
     utils/sqlqueries.cpp \
-    waiter.cpp
+    waiter.cpp \
+    worker/socketstruct.cpp
 
 HEADERS += \
     ../Classes/fileversion.h \
     ../Classes/logwriter.h \
     armsoft.h \
     c5searchengine.h \
+    struct_storage_item.h \
     utils/configini.h \
     utils/database.h \
     datadriver/datadriver.h \
@@ -35,7 +37,10 @@ HEADERS += \
     rc.h \
     serverthread.h \
     utils/sqlqueries.h \
-    waiter.h
+    waiter.h \
+    worker/socketstruct.h \
+    worker/struct_goods_item.h \
+    worker/struct_storage_item.h
 
 FORMS += \
     dlglicenses.ui
@@ -52,6 +57,7 @@ INCLUDEPATH += headers
 INCLUDEPATH += store
 INCLUDEPATH += datadriver
 INCLUDEPATH += utils
+INCLUDEPATH += worker
 INCLUDEPATH += ../Service5Working/raw
 INCLUDEPATH += ../Service5Working/socket
 INCLUDEPATH += ../Classes
@@ -74,7 +80,7 @@ QMAKE_LFLAGS_WINDOWS += /MANIFESTUAC:"level='requireAdministrator'"
 }
 
 linux {
-    VERSION = 1.3.4.50
+    VERSION = 1.4.5.53
     QMAKE_LFLAGS += -Wl,--build-id
     DEFINES += APP_VERSION=\\\"$$VERSION\\\"
 }

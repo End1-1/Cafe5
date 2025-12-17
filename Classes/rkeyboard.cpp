@@ -1,8 +1,9 @@
 #include "rkeyboard.h"
 #include "ui_rkeyboard.h"
-#include "c5config.h"
 #include "amkbd.h"
 #include <QKeyEvent>
+
+int RKeyboard::mKbdLang = 2;
 
 RKeyboard::RKeyboard(QWidget *parent) :
     QWidget(parent),
@@ -65,20 +66,25 @@ RKeyboard::RKeyboard(QWidget *parent) :
     setupEnglish();
     setStyleSheet("");
     ui->btnRu->setVisible(false);
-    switch (__c5config.getRegValue("kbd").toInt()) {
-        case 1:
-            setupEnglish();
-            break;
-        case 2:
-            setupArmenian();
-            break;
-        case 3:
-            setupRussia();
-            break;
-        default:
-            setupArmenian();
-            break;
+
+    switch(mKbdLang) {
+    case 1:
+        setupEnglish();
+        break;
+
+    case 2:
+        setupArmenian();
+        break;
+
+    case 3:
+        setupRussia();
+        break;
+
+    default:
+        setupArmenian();
+        break;
     }
+
     ui->leResult->installEventFilter(this);
     ui->btnAm->click();
 }
@@ -101,19 +107,24 @@ QString RKeyboard::text() const
 
 bool RKeyboard::eventFilter(QObject *o, QEvent *e)
 {
-    if (o == ui->leResult) {
-        if (e->type() == QEvent::KeyPress) {
-            QKeyEvent *ek = static_cast<QKeyEvent *>(e);
-            if (ui->btnAm->isChecked()) {
-                if (ek->key()) {
+    if(o == ui->leResult) {
+        if(e->type() == QEvent::KeyPress) {
+            QKeyEvent *ek = static_cast<QKeyEvent*>(e);
+
+            if(ui->btnAm->isChecked()) {
+                if(ek->key()) {
                     int index = keys.indexOf(ek->nativeVirtualKey());
-                    if (index < 0) {
+
+                    if(index < 0) {
                         return QWidget::eventFilter(o, e);
                     }
+
                     QString txt = chars[index];
-                    if (ek->modifiers() &Qt::ShiftModifier) {
+
+                    if(ek->modifiers() &Qt::ShiftModifier) {
                         txt = txt.toUpper();
                     }
+
                     auto *ekk = new QKeyEvent(QEvent::KeyPress, chars[index].at(0).unicode(), ek->modifiers(), txt);
                     qApp->postEvent(o, ekk);
                     return true;
@@ -122,17 +133,20 @@ bool RKeyboard::eventFilter(QObject *o, QEvent *e)
             }
         }
     }
+
     return QWidget::eventFilter(o, e);
 }
 
 void RKeyboard::btnTextClicked()
 {
-    QPushButton *b = static_cast<QPushButton *>(sender());
+    QPushButton *b = static_cast<QPushButton*>(sender());
     fText.append(b->text());
-    if (fShiftOn) {
+
+    if(fShiftOn) {
         fShiftOn = false;
         setupEnglish();
     }
+
     ui->leResult->setText(fText);
     ui->leResult->setCursorPosition(ui->leResult->text().length());
     emit textChanged(fText);
@@ -152,17 +166,17 @@ void RKeyboard::on_btnBackspace_clicked()
     emit textChanged(fText);
 }
 
-void RKeyboard::connectButtons(QList<QPushButton *> &buttons)
+void RKeyboard::connectButtons(QList<QPushButton*>& buttons)
 {
-    for (QList<QPushButton * >::const_iterator it = buttons.begin(); it != buttons.end(); it++) {
-        connect( *it, SIGNAL(clicked()), this, SLOT(btnTextClicked()));
-        ( *it)->setStyleSheet(styleSheet());
+    for(QList<QPushButton* >::const_iterator it = buttons.begin(); it != buttons.end(); it++) {
+        connect(*it, SIGNAL(clicked()), this, SLOT(btnTextClicked()));
+        (*it)->setStyleSheet(styleSheet());
     }
 }
 
-void RKeyboard::setButtonsText(QList<QPushButton *> &buttons, const QString &text)
+void RKeyboard::setButtonsText(QList<QPushButton*>& buttons, const QString &text)
 {
-    for (int i = 0; i < buttons.count(); i++) {
+    for(int i = 0; i < buttons.count(); i++) {
         buttons[i]->setText(text.at(i));
     }
 }
@@ -217,18 +231,18 @@ void RKeyboard::setupArmenianCaps()
 
 void RKeyboard::setupKbd()
 {
-    if ((fShiftOn && !fCapsOn) || (!fShiftOn && fCapsOn)) {
-        if (fCurrentLanguage == "en") {
+    if((fShiftOn && !fCapsOn) || (!fShiftOn && fCapsOn)) {
+        if(fCurrentLanguage == "en") {
             setupEnglishCaps();
-        } else if (fCurrentLanguage == "ru" ) {
+        } else if(fCurrentLanguage == "ru") {
             setupRussiaCaps();
         } else {
             setupArmenianCaps();
         }
     } else {
-        if (fCurrentLanguage == "en") {
+        if(fCurrentLanguage == "en") {
             setupEnglish();
-        } else if (fCurrentLanguage == "ru" ) {
+        } else if(fCurrentLanguage == "ru") {
             setupRussia();
         } else {
             setupArmenian();
@@ -269,7 +283,7 @@ void RKeyboard::on_btnEn_clicked()
     ui->btnRu->setChecked(false);
     ui->btnAm->setChecked(false);
     setupKbd();
-    __c5config.setRegValue("kbd", 1);
+    mKbdLang = 1;
 }
 
 void RKeyboard::on_btnAm_clicked()
@@ -280,7 +294,7 @@ void RKeyboard::on_btnAm_clicked()
     setupKbd();
     ui->leResult->setFocus();
     ui->leResult->setSelection(ui->leResult->text().length(), 1);
-    __c5config.setRegValue("kbd", 2);
+    mKbdLang = 2;
 }
 
 void RKeyboard::on_btnRu_clicked()
@@ -289,7 +303,7 @@ void RKeyboard::on_btnRu_clicked()
     setupKbd();
     ui->leResult->setFocus();
     ui->leResult->setSelection(ui->leResult->text().length(), 1);
-    __c5config.setRegValue("kbd", 3);
+    mKbdLang = 3;
 }
 
 void RKeyboard::on_btnClear_clicked()

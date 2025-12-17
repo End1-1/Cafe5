@@ -3,6 +3,7 @@
 #include "c5permissions.h"
 #include "c5checkbox.h"
 #include "c5message.h"
+#include "c5database.h"
 
 C5DbUserAccess::C5DbUserAccess(QWidget *parent) :
     C5Widget(parent),
@@ -19,9 +20,9 @@ C5DbUserAccess::~C5DbUserAccess()
     delete ui;
 }
 
-QToolBar *C5DbUserAccess::toolBar()
+QToolBar* C5DbUserAccess::toolBar()
 {
-    if (!fToolBar) {
+    if(!fToolBar) {
         QList<ToolBarButtons> btn;
         btn << ToolBarButtons::tbSave
             << ToolBarButtons::tbRefresh
@@ -29,6 +30,7 @@ QToolBar *C5DbUserAccess::toolBar()
             << ToolBarButtons::tbPrint;
         createStandartToolbar(btn);
     }
+
     return fToolBar;
 }
 
@@ -48,35 +50,43 @@ void C5DbUserAccess::refreshData()
             where (u.f_group in (select f_group from s_user_access where f_key=:f_key and f_value='1') or u.f_group=1) \
             and u.f_state=1 \
             group by 1,2");
-    while (db.nextRow()) {
+
+    while(db.nextRow()) {
         int row = ui->tbl->addEmptyRow();
         fUserMap[db.getInt(0)] = row;
         ui->tbl->setInteger(row, 0, db.getInt(0));
         ui->tbl->setString(row, 1, db.getString(1));
         ui->tbl->setString(row, 2, db.getString(2));
     }
+
     db.exec("select f_id, f_name from s_db");
     QStringList headers;
     headers << ""
             << tr("Name")
             << tr("Login");
-    while (db.nextRow()) {
+
+    while(db.nextRow()) {
         ui->tbl->setColumnCount(ui->tbl->columnCount() + 1);
         fDbMap[db.getInt(0)] = ui->tbl->columnCount() - 1;
         headers << db.getString(1);
     }
+
     ui->tbl->setHorizontalHeaderLabels(headers);
-    for (int i = 3; i < ui->tbl->columnCount(); i++) {
-        for (int j = 0; j < ui->tbl->rowCount(); j++) {
+
+    for(int i = 3; i < ui->tbl->columnCount(); i++) {
+        for(int j = 0; j < ui->tbl->rowCount(); j++) {
             ui->tbl->createCheckbox(j, i);
         }
     }
+
     db.exec("select f_user, f_db from s_db_access where f_permit=1");
-    while (db.nextRow()) {
-        if (!fDbMap.contains(db.getInt(1))) {
+
+    while(db.nextRow()) {
+        if(!fDbMap.contains(db.getInt(1))) {
             C5Message::error("Check database list in the s_db_access");
             break;
         }
+
         ui->tbl->checkBox(fUserMap[db.getInt(0)], fDbMap[db.getInt(1)])->setChecked(true);
     }
 }
@@ -85,9 +95,10 @@ void C5DbUserAccess::saveDataChanges()
 {
     C5Database db;
     db.exec("delete from s_db_access");
-    for (int c = 3; c < ui->tbl->columnCount(); c++) {
-        for (int r = 0; r < ui->tbl->rowCount(); r++) {
-            if (ui->tbl->checkBox(r, c)->isChecked()) {
+
+    for(int c = 3; c < ui->tbl->columnCount(); c++) {
+        for(int r = 0; r < ui->tbl->rowCount(); r++) {
+            if(ui->tbl->checkBox(r, c)->isChecked()) {
                 db[":f_user"] = ui->tbl->getInteger(r, 0);
                 db[":f_db"] = fDbMap.key(c);
                 db[":f_permit"] = 1;
@@ -95,18 +106,21 @@ void C5DbUserAccess::saveDataChanges()
             }
         }
     }
+
     C5Message::info(tr("Saved"));
 }
 
 void C5DbUserAccess::on_leUsername_textChanged(const QString &arg1)
 {
-    for (int r = 0; r < ui->tbl->rowCount(); r++) {
+    for(int r = 0; r < ui->tbl->rowCount(); r++) {
         bool hidden = true;
-        for (int c = 1; c < 3; c++) {
-            if (ui->tbl->getString(r, c).contains(arg1, Qt::CaseInsensitive)) {
+
+        for(int c = 1; c < 3; c++) {
+            if(ui->tbl->getString(r, c).contains(arg1, Qt::CaseInsensitive)) {
                 hidden = false;
             }
         }
+
         ui->tbl->setRowHidden(r, hidden);
     }
 }

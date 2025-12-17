@@ -11,6 +11,7 @@ class C5ServerName : public QObject
     Q_OBJECT
 public:
     explicit C5ServerName(const QString &server, QObject *parent = nullptr);
+    ~C5ServerName();
     bool getServers();
     bool getConnection(const QString &connectionName);
     static QJsonArray mServers;

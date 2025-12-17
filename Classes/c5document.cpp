@@ -2,7 +2,7 @@
 #include "c5database.h"
 
 C5Document::C5Document(QWidget *parent) :
-    C5Widget(parent)
+    C5OfficeWidget(parent)
 {
 }
 
@@ -11,7 +11,8 @@ int C5Document::genNumber(int docType) const
     C5Database db;
     db[":f_id"] = docType;
     db.exec("select f_counter + 1 from a_type where f_id=:f_id for update");
-    if (!db.nextRow()) {
+
+    if(!db.nextRow()) {
         db[":f_id"] = docType;
         db[":f_counter"] = 1;
         db[":f_name"] = tr("Cash doc");
@@ -20,6 +21,7 @@ int C5Document::genNumber(int docType) const
         db.exec("select f_counter from a_type where f_id=:f_id for update");
         db.nextRow();
     }
+
     return db.getInt(0);
 }
 

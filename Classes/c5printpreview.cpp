@@ -16,7 +16,8 @@ C5PrintPreview::C5PrintPreview(C5Printing *printData) :
     QString lastPrinter = C5Config::getRegValue("last_printer").toString();
     ui->cbPrinters->addItems(QPrinterInfo::availablePrinterNames());
     ui->cbPrinters->setCurrentIndex(ui->cbPrinters->findText(lastPrinter));
-    if (ui->cbPrinters->currentIndex() < 0) {
+
+    if(ui->cbPrinters->currentIndex() < 0) {
         ui->cbPrinters->setCurrentIndex(ui->cbPrinters->findText(QPrinterInfo::defaultPrinterName()));
     }
 }
@@ -51,9 +52,10 @@ void C5PrintPreview::renderPage()
 
 void C5PrintPreview::zoom()
 {
-    if (fScaleFactor > 0.0) {
+    if(fScaleFactor > 0.0) {
         ui->gv->scale(1 / fScaleFactor, 1 / fScaleFactor);
     }
+
     qreal z = ui->cbZoom->currentText().remove(ui->cbZoom->currentText().length() - 1, 1).toInt() / 100.0;
     z /= 2.5;
     fScaleFactor = z;
@@ -88,7 +90,7 @@ void C5PrintPreview::on_cbPrinters_currentIndexChanged(const QString &arg1)
 
 void C5PrintPreview::on_btnNext_clicked()
 {
-    if (fPageNumber < fPrintData->pageCount() + 1) {
+    if(fPageNumber < fPrintData->pageCount() + 1) {
         fPageNumber++;
         renderPage();
     }
@@ -102,7 +104,7 @@ void C5PrintPreview::on_btnLast_clicked()
 
 void C5PrintPreview::on_btnBack_clicked()
 {
-    if (fPageNumber > 1) {
+    if(fPageNumber > 1) {
         fPageNumber--;
         renderPage();
     }
@@ -117,7 +119,8 @@ void C5PrintPreview::on_btnFirst_clicked()
 void C5PrintPreview::on_btnZoomOut_clicked()
 {
     int index = ui->cbZoom->currentIndex();
-    if (index < ui->cbZoom->count() - 1) {
+
+    if(index < ui->cbZoom->count() - 1) {
         index++;
         ui->cbZoom->setCurrentIndex(index);
     }
@@ -126,8 +129,14 @@ void C5PrintPreview::on_btnZoomOut_clicked()
 void C5PrintPreview::on_btnZoopIn_clicked()
 {
     int index = ui->cbZoom->currentIndex();
-    if (index > 0) {
+
+    if(index > 0) {
         index--;
         ui->cbZoom->setCurrentIndex(index);
     }
+}
+
+void C5PrintPreview::on_btnClose_clicked()
+{
+    accept();
 }

@@ -22,9 +22,9 @@ public:
     static void openReports(C5User *user);
 
 private:
-    Ui::DlgReports *ui;
+    Ui::DlgReports* ui;
 
-    C5User *fUser;
+    C5User* fUser;
 
     int fCurrentHall;
 
@@ -76,10 +76,6 @@ private slots:
     void on_btnPrintTaxX_clicked();
 
     void on_btnPrintTaxZ_clicked();
-
-    void on_btnCashobx_clicked();
-
-    void on_btnCashInput_clicked();
 };
 
 #endif // DLGREPORTS_H

@@ -154,7 +154,7 @@ QToolBar* CR5Goods::toolBar()
             << ToolBarButtons::tbPrint;
         createStandartToolbar(btn);
 
-        if(__user->check(cp_t1_goods_pricing)) {
+        if(mUser->check(cp_t1_goods_pricing)) {
             fToolBar->addAction(QIcon(":/pricing.png"), tr("Pricing"), this, SLOT(pricing()));
         }
 

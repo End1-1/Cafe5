@@ -30,6 +30,7 @@ struct Flag {
 
 class WCustomerDisplay;
 class QMovie;
+class C5User;
 
 class Working : public QWidget
 {
@@ -82,7 +83,7 @@ private:
 
     NInterface* fHttp;
 
-    C5User* fUser;
+    C5User* mUser;
 
     WCustomerDisplay* fCustomerDisplay;
 

@@ -121,9 +121,6 @@
 #define SALE_WHOSALE 2
 #define SALE_RETURN 4
 
-//#define DEBUG_SIZE QSize(1024, 768)
-#define DEBUG_SIZE QSize(1280, 1024)
-
 class C5User;
 
 class C5Config
@@ -281,7 +278,5 @@ private:
 extern C5Config __c5config;
 
 extern QStringList __databases;
-
-extern C5User* __user;
 
 #endif // C5CONFIG_H

@@ -1,7 +1,7 @@
 #ifndef C5SALEDOC_H
 #define C5SALEDOC_H
 
-#include "c5widget.h"
+#include "c5officewidget.h"
 #include "cpartners.h"
 #include "odraftsale.h"
 #include "odraftsalebody.h"
@@ -14,7 +14,7 @@ class C5SaleDoc;
 
 #define REPORT_HANDLER_SALE_DOC_OPEN_DRAFT "39617ca7-8fa4-11ed-8ad3-1078d2d2b808"
 
-class C5SaleDoc : public C5Widget
+class C5SaleDoc : public C5OfficeWidget
 {
     Q_OBJECT
 

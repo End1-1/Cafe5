@@ -448,7 +448,7 @@ void CE5Goods::openResponse(const QJsonObject &jdoc)
         ui->tblAs->lineEdit(asrow, 2)->setText(o["f_ascode"].toString());
     }
 
-    if(__user->check(cp_t6_goods_only_price_edit)) {
+    if(mUser->check(cp_t6_goods_only_price_edit)) {
         bool enabled = ui->leCode->getInteger() == 0;
         ui->tab_2->setEnabled(enabled);
         ui->tab_3->setEnabled(enabled);
@@ -1052,4 +1052,41 @@ void CE5Goods::on_leTotal_textChanged(const QString &arg1)
 void CE5Goods::on_rbGenEAN8_clicked(bool checked)
 {
     __c5config.setRegValue("gen_ean8", checked);
+}
+
+void CE5Goods::on_btnFromProduct_clicked()
+{
+    if(C5Message::question(tr("Clear current data")) == QDialog::Accepted) {
+        ui->tblGoods->setRowCount(0);
+    }
+
+    QJsonArray vals;
+
+    if(!C5Selector::getValue(cache_goal_products, vals)) {
+        return;
+    }
+
+    C5Database db;
+    db[":f_product"]  = vals.at(1).toInt();
+    db.exec(R"(
+    SELECT pm.f_material as f_goods, g1.f_name as f_goodsname, u.f_name  as f_unitname,
+    f_qtyperone, f_totalqty, g1.f_lastinputprice
+    FROM m_goal_product_material pm
+    LEFT JOIN c_goods  g1 ON g1.f_id=pm.f_material
+    left join c_units u on u.f_id=g1.f_unit
+    where pm.f_product=:f_product
+    )");
+
+    while(db.nextRow()) {
+        int row = addGoodsRow();
+        ui->tblGoods->setInteger(row, 0, 0);
+        ui->tblGoods->setInteger(row, 1, db.getInt("f_goods"));
+        ui->tblGoods->setString(row, 2, db.getString("f_goodsname"));
+        ui->tblGoods->lineEdit(row, 3)->setDouble(db.getDouble("f_qtyperone"));
+        ui->tblGoods->setString(row, 4, db.getString("f_unitname"));
+        ui->tblGoods->lineEdit(row, 5)->setDouble(db.getDouble("f_lastinputprice"));
+        ui->tblGoods->lineEdit(row, 6)->setDouble(db.getDouble("f_qtyperon")*db.getDouble("f_lastinputprice"));
+    }
+
+    countTotal();
 }

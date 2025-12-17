@@ -1,3 +1,4 @@
+
 #ifndef ODRAFTSALEBODY_H
 #define ODRAFTSALEBODY_H
 

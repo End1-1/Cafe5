@@ -1,13 +1,12 @@
 #include "dishitem.h"
 #include "ui_dishitem.h"
-#include "datadriver.h"
 #include "dlgqty.h"
 #include "c5utils.h"
 #include <QPaintEvent>
 #include <QPainter>
 #include <QPushButton>
 
-DishItem::DishItem(const QMap<QString, QVariant> &d, int index, QWidget *parent) :
+DishItem::DishItem(const QMap<QString, QVariant>& d, int index, QWidget *parent) :
     QWidget(parent),
     fData(d),
     ui(new Ui::DishItem)
@@ -20,7 +19,8 @@ DishItem::DishItem(const QMap<QString, QVariant> &d, int index, QWidget *parent)
     QString name = fData["f_dish_name"].toString();
 
     if(fData["f_fromtable"].toInt() > 0) {
-        name = QString("(%1) %2").arg(dbtable->name(fData["f_fromtable"].toInt()), name);
+        //TODO
+        //name = QString("(%1) %2").arg(dbtable->name(fData["f_fromtable"].toInt()), name);
     }
 
     ui->btnDish->setText(name);

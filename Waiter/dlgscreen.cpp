@@ -2,14 +2,14 @@
 #include "ui_dlgscreen.h"
 #include "c5user.h"
 #include "dlgface.h"
-#include "c5cafecommon.h"
 #include "c5tabledata.h"
 #include "ndataprovider.h"
+#include "ninterface.h"
 #include "c5waiterserver.h"
-#include "c5config.h"
-#include "dlgserverconnection.h"
+#include "ninterface.h"
 #include "c5permissions.h"
 #include "c5message.h"
+#include "c5connectiondialog.h"
 #include <QTimer>
 
 DlgScreen::DlgScreen() :
@@ -20,14 +20,13 @@ DlgScreen::DlgScreen() :
     QTimer *t = new QTimer(this);
     connect(t, &QTimer::timeout, this, &DlgScreen::timerTimeout);
     t->start(1000);
-    C5Database db;
-    db.exec("select f_settings, f_key, f_value from s_settings_values");
-    C5CafeCommon::fHallConfigs.clear();
-
-    while(db.nextRow()) {
-        C5CafeCommon::fHallConfigs[db.getInt("f_settings")][db.getInt("f_key")] = db.getString("f_value");
-    }
-
+    //TODO
+    // C5Database db;
+    // db.exec("select f_settings, f_key, f_value from s_settings_values");
+    // C5CafeCommon::fHallConfigs.clear();
+    // while(db.nextRow()) {
+    //     C5CafeCommon::fHallConfigs[db.getInt("f_settings")][db.getInt("f_key")] = db.getString("f_value");
+    // }
     fHttp->createHttpQuery("/engine/waiter/init.php", QJsonObject{{"version", C5TableData::instance()->version()}, {"dick", 1}},
     SLOT(
         initResponse(QJsonObject)), "", false);
@@ -74,7 +73,7 @@ void DlgScreen::loginResponse(const QJsonObject &jdoc)
     QJsonObject jo = jdoc["data"].toObject();
     NDataProvider::sessionKey = jo["sessionkey"].toString();
     QString pass = sender()->property("marks").toString();
-    C5User u(pass);
+    C5User u(pass, fHttp);
 
     if(!u.isValid()) {
         fHttp->httpQueryFinished(sender());
@@ -104,7 +103,8 @@ void DlgScreen::loginResponse(const QJsonObject &jdoc)
         }
     }
 
-    __user = &u;
+    //TODO
+    //__user = &u;
     fHttp->httpQueryFinished(sender());
     DlgFace d(&u);
     C5Dialog::setMainWindow(&d);
@@ -115,27 +115,25 @@ void DlgScreen::timerTimeout()
 {
     QDate d = QDate::currentDate();
     int dateShift = 1;
-
-    if(__c5config.getValue(param_date_cash_auto).toInt() == 1) {
-        QTime t = QTime::fromString(__c5config.getValue(param_working_date_change_time), "HH:mm:ss");
-
-        if(t.isValid()) {
-            if(QTime::currentTime() < t) {
-                d = d.addDays(-1);
-                dateShift = 2;
-            }
-        }
-    } else {
-        d = QDate::fromString(__c5config.dateCash(), FORMAT_DATE_TO_STR_MYSQL);
-        dateShift = __c5config.dateShift();
-    }
-
-    ui->lbDateOfClose->setText(QString("%1: %2")
-                               .arg(tr("Date of close"))
-                               .arg(QDate::fromString(__c5config.getValue(param_date_cash), FORMAT_DATE_TO_STR_MYSQL).toString(FORMAT_DATE_TO_STR)));
-    ui->lbCurrentTime->setText(QString("%1: %2")
-                               .arg(tr("System datetime"))
-                               .arg(QDateTime::currentDateTime().toString(FORMAT_DATETIME_TO_STR)));
+    //TODO
+    // if(__c5config.getValue(param_date_cash_auto).toInt() == 1) {
+    //     QTime t = QTime::fromString(__c5config.getValue(param_working_date_change_time), "HH:mm:ss");
+    //     if(t.isValid()) {
+    //         if(QTime::currentTime() < t) {
+    //             d = d.addDays(-1);
+    //             dateShift = 2;
+    //         }
+    //     }
+    // } else {
+    //     d = QDate::fromString(__c5config.dateCash(), FORMAT_DATE_TO_STR_MYSQL);
+    //     dateShift = __c5config.dateShift();
+    // }
+    // ui->lbDateOfClose->setText(QString("%1: %2")
+    //                            .arg(tr("Date of close"))
+    //                            .arg(QDate::fromString(__c5config.getValue(param_date_cash), FORMAT_DATE_TO_STR_MYSQL).toString(FORMAT_DATE_TO_STR)));
+    // ui->lbCurrentTime->setText(QString("%1: %2")
+    //                            .arg(tr("System datetime"))
+    //                            .arg(QDateTime::currentDateTime().toString(FORMAT_DATETIME_TO_STR)));
 }
 
 void DlgScreen::on_btnClear_clicked()
@@ -224,5 +222,5 @@ void DlgScreen::tryExit()
 
 void DlgScreen::on_btnSettings_clicked()
 {
-    DlgServerConnection::showSettings(this);
+    C5ConnectionDialog::showSettings(this);
 }

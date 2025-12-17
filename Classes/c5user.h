@@ -8,6 +8,8 @@
 #include <QMap>
 #include <QVariant>
 
+class NInterface;
+
 class C5User : public QObject
 {
     Q_OBJECT
@@ -15,13 +17,13 @@ class C5User : public QObject
 public:
     enum UserState {usAtWork, usNotAtWork};
 
-    C5User(const QMap<QString, QVariant> &m);
+    C5User();
 
-    C5User(const QString &altPassword);
+    C5User(const QMap<QString, QVariant>& m);
 
-    C5User(int id);
+    C5User(const QString &altPassword, NInterface *n);
 
-    bool isValid();
+    C5User(int id, NInterface *n);
 
     QString error();
 
@@ -33,13 +35,11 @@ public:
 
     int group();
 
-    bool isActive();
+    void authByUsernamePass(const QString &username, const QString &pass, NInterface *n, std::function<void (const QJsonObject&)> callback);
 
-    bool authByUsernamePass(const QString &username, const QString &pass);
+    bool authByPinPass(const QString &pin, const QString &pass, NInterface *n);
 
-    bool authByPinPass(const QString &pin, const QString &pass);
-
-    bool authorize(const QString &altPassword);
+    bool authorize(const QString &altPassword, NInterface *n);
 
     bool check(int permission);
 
@@ -49,14 +49,14 @@ public:
 
     UserState state();
 
-    bool loadFromDB(int id);
+    bool loadFromDB(int id, NInterface *n);
+
+    QJsonObject fConfig;
+
+    QMap<int, QString> fSettings;
 
 private:
-    C5User();
-
     QVector<int> fPermissions;
-
-    bool fValid;
 
     QString fError;
 
@@ -66,9 +66,9 @@ private:
 
     UserState fState;
 
-    void getState();
+    void getState(NInterface *n);
 
-    void getPermissions();
+    void getPermissions(NInterface *n);
 };
 
 #endif // C5USER_H

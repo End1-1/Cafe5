@@ -1,5 +1,4 @@
 #include "dlgprecheckoptions.h"
-#include "c5config.h"
 #include "ui_dlgprecheckoptions.h"
 
 DlgPrecheckOptions::DlgPrecheckOptions() :

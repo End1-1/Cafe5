@@ -1,33 +1,34 @@
 #ifndef SELECTSTAFF_H
 #define SELECTSTAFF_H
 
-#include <QDialog>
+#include "c5dialog.h"
 
-namespace Ui {
+namespace Ui
+{
 class SelectStaff;
 }
 
 class Working;
 class C5User;
 
-class SelectStaff : public QDialog
+class SelectStaff : public C5Dialog
 {
     Q_OBJECT
 
 public:
-    explicit SelectStaff(QWidget *parent = nullptr);
+    explicit SelectStaff(Working *w);
 
     ~SelectStaff();
 
-    C5User *fUser;
+    C5User* fUser;
 
 private slots:
     void on_leNum_returnPressed();
 
 private:
-    Ui::SelectStaff *ui;
+    Ui::SelectStaff* ui;
 
-    Working *fWorking;
+    Working* fWorking;
 };
 
 #endif // SELECTSTAFF_H

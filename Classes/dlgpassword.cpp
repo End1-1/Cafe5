@@ -3,13 +3,13 @@
 #include "c5config.h"
 #include "c5user.h"
 #include "c5message.h"
+#include "ninterface.h"
 #include <QCryptographicHash>
 #include <QDoubleValidator>
 
 DlgPassword::DlgPassword(C5User *u) :
-    QDialog(),
-    ui(new Ui::DlgPassword),
-    fUser(u)
+    C5WaiterDialog(u),
+    ui(new Ui::DlgPassword)
 {
     ui->setupUi(this);
     fMax = 0;
@@ -26,7 +26,7 @@ DlgPassword::~DlgPassword()
 
 bool DlgPassword::getUser(const QString &title, C5User*& user)
 {
-    user = new C5User(0);
+    user = new C5User();
     DlgPassword *d = new DlgPassword(user);
     d->ui->label->setText(title);
     bool result = d->exec() == QDialog::Accepted;
@@ -55,7 +55,7 @@ bool DlgPassword::getUserAndCheck(const QString &title, C5User*& user, int permi
 
 bool DlgPassword::getQty(const QString &title, int& qty)
 {
-    C5User u(0);
+    C5User u;
     DlgPassword *d = new DlgPassword(&u);
     d->ui->label->setText(title);
     d->ui->lePassword->setEchoMode(QLineEdit::Normal);
@@ -68,7 +68,7 @@ bool DlgPassword::getQty(const QString &title, int& qty)
 
 bool DlgPassword::getAmount(const QString &title, double& amount, bool defaultAmount)
 {
-    C5User u(0);
+    C5User u;
     DlgPassword *d = new DlgPassword(&u);
     d->ui->label->setText(title);
     d->ui->lePassword->setEchoMode(QLineEdit::Normal);
@@ -87,7 +87,7 @@ bool DlgPassword::getAmount(const QString &title, double& amount, bool defaultAm
 
 bool DlgPassword::getString(const QString &title, QString &str)
 {
-    C5User u(0);
+    C5User u;
     DlgPassword *d = new DlgPassword(&u);
     d->ui->label->setText(title);
     d->ui->lePassword->setEchoMode(QLineEdit::Normal);
@@ -100,7 +100,7 @@ bool DlgPassword::getString(const QString &title, QString &str)
 
 bool DlgPassword::getPassword(const QString &title, QString &str)
 {
-    C5User u(0);
+    C5User u;
     DlgPassword *d = new DlgPassword(&u);
     d->ui->label->setText(title);
     d->ui->lePassword->setEchoMode(QLineEdit::Password);
@@ -114,7 +114,7 @@ bool DlgPassword::getPassword(const QString &title, QString &str)
 
 bool DlgPassword::getPasswordString(const QString &title, QString &pass)
 {
-    C5User u(0);
+    C5User u;
     DlgPassword *d = new DlgPassword(&u);
     d->setProperty("pass", true);
     d->ui->label->setText(title);
@@ -202,7 +202,7 @@ void DlgPassword::on_pushButton_12_clicked()
     }
 
     if(ui->lePassword->echoMode() == QLineEdit::Password) {
-        if(!fUser->authorize(pwd)) {
+        if(!fUser->authorize(pwd, fHttp)) {
             ui->lePassword->clear();
             C5Message::error(fUser->error());
             return;

@@ -6,11 +6,16 @@
 #include "ndataprovider.h"
 #include "c5config.h"
 #include "dlgserverconnection.h"
+#include "ninterface.h"
+#include "datadriver.h"
+#include "working.h"
+#include "c5user.h"
+#include "appwebsocket.h"
 #include <QKeyEvent>
 #include <QJsonObject>
 
 DlgPin::DlgPin(QWidget *parent) :
-    C5Dialog(),
+    C5ShopDialog(nullptr),
     ui(new Ui::DlgPin)
 {
     Q_UNUSED(parent);
@@ -31,43 +36,50 @@ bool DlgPin::getPin(QString &pin, QString &pass, bool donotauth)
     bool result = false;
     DlgPin *d = new DlgPin();
     d->fDoNotAuth = donotauth;
-    if (!pin.isEmpty()) {
+
+    if(!pin.isEmpty()) {
         d->ui->leUser->setText(pin);
         d->ui->lePin->setText(pass);
         result = true;
     }
-    if (!result) {
-        if (d->exec() == QDialog::Accepted) {
+
+    if(!result) {
+        if(d->exec() == QDialog::Accepted) {
             pin = d->ui->leUser->text();
             pass = d->ui->lePin->text();
             result = true;
         }
     }
+
     delete d;
     return result;
 }
 
 void DlgPin::btnNumPressed()
 {
-    QPushButton *btn = static_cast<QPushButton *>(sender());
+    QPushButton *btn = static_cast<QPushButton*>(sender());
     QLineEdit *l = ui->leUser;
-    if (ui->lePin->hasFocus()) {
+
+    if(ui->lePin->hasFocus()) {
         l = ui->lePin;
     }
+
     l->setText(l->text() + btn->text());
 }
 
 void DlgPin::on_btnEnter_clicked()
 {
-    if (fDoNotAuth) {
+    if(fDoNotAuth) {
         accept();
         return;
     }
+
     fLastError = false;
     NDataProvider::mHost = __c5config.dbParams().at(1);
     fHttp->fErrorObject = this;
-    fHttp->fErrorSlot = const_cast<char *>(SLOT(errorResponse(QString)));
-    if (ui->lePin->text().length() == 4 && ui->leUser->text().length() == 4) {
+    fHttp->fErrorSlot = const_cast<char*>(SLOT(errorResponse(QString)));
+
+    if(ui->lePin->text().length() == 4 && ui->leUser->text().length() == 4) {
         fHttp->createHttpQuery("/engine/login.php", QJsonObject{{"method", 1},
             {"username", ui->leUser->text()},
             {"password", ui->lePin->text()}},
@@ -84,7 +96,7 @@ void DlgPin::on_btnClear_clicked()
 
 void DlgPin::on_btnClose_clicked()
 {
-    reject();
+    qApp->quit();
 }
 
 void DlgPin::on_btn1_clicked()
@@ -139,36 +151,44 @@ void DlgPin::on_btn0_clicked()
 
 void DlgPin::keyReleaseEvent(QKeyEvent *event)
 {
-    switch (event->key()) {
-        case Qt::Key_Backspace:
-            if (ui->lePin->isEmpty() && ui->lePin->hasFocus() && fPinEmpty) {
-                ui->leUser->setFocus();
-                if (ui->leUser->text().length() == 4) {
-                    ui->leUser->setText(ui->leUser->text().left(3));
-                }
-                ui->leUser->setCursorPosition(ui->leUser->text().length());
-                event->accept();
+    switch(event->key()) {
+    case Qt::Key_Backspace:
+        if(ui->lePin->isEmpty() && ui->lePin->hasFocus() && fPinEmpty) {
+            ui->leUser->setFocus();
+
+            if(ui->leUser->text().length() == 4) {
+                ui->leUser->setText(ui->leUser->text().left(3));
             }
-            break;
+
+            ui->leUser->setCursorPosition(ui->leUser->text().length());
+            event->accept();
+        }
+
+        break;
     }
-    if (ui->lePin->text().length() < 4 || ui->leUser->text().length() < 4) {
+
+    if(ui->lePin->text().length() < 4 || ui->leUser->text().length() < 4) {
         fLastError = false;
     }
-    if (ui->leUser->hasFocus() && ui->leUser->text().length() == 4) {
+
+    if(ui->leUser->hasFocus() && ui->leUser->text().length() == 4) {
         ui->lePin->setFocus();
         event->accept();
         return;
     }
-    if (ui->lePin->hasFocus() && ui->lePin->text().length() == 4 && !fLastError) {
+
+    if(ui->lePin->hasFocus() && ui->lePin->text().length() == 4 && !fLastError) {
         on_btnEnter_clicked();
         event->accept();
         return;
     }
-    if (ui->lePin->isEmpty()) {
+
+    if(ui->lePin->isEmpty()) {
         fPinEmpty = true;
     } else {
         fPinEmpty = false;
     }
+
     QDialog::keyReleaseEvent(event);
 }
 
@@ -177,7 +197,37 @@ void DlgPin::loginResponse(const QJsonObject &jdoc)
     QJsonObject jo = jdoc["data"].toObject();
     NDataProvider::sessionKey = jo["sessionkey"].toString();
     fHttp->httpQueryFinished(sender());
-    accept();
+    hide();
+    QMap<int, QString> settings;
+    QJsonObject juser = jo["user"].toObject();
+    QJsonArray jsettings = jo["settings"].toArray();
+
+    for(int i = 0; i < jsettings.count(); i++) {
+        const QJsonObject &js = jsettings.at(i).toObject();
+        settings[js["f_key"].toInt()] = js["f_value"].toString();
+    }
+
+    mUser = new C5User(juser.toVariantMap());
+    mUser->fSettings = settings;
+    mUser->fConfig = jo["config"].toObject();
+    __c5config.setValues(settings);
+    auto *w = new Working(mUser);
+    w->setWindowTitle("");
+
+    if(__c5config.defaultHall() > 0) {
+        w->setWindowTitle(w->windowTitle() + "[" + __c5config.fMainJson["shop_hall_name"].toString() + "]");
+    }
+
+    if(__c5config.defaultStore() > 0) {
+        w->setWindowTitle(w->windowTitle() + "[" + dbstore->name(__c5config.defaultStore()) + "]");
+    } else {
+        C5Message::error(QObject::tr("Store is not defined."));
+        qApp->quit();
+    }
+
+    __c5config.setRegValue("windowtitle", w->windowTitle());
+    AppWebSocket::reconnect(__c5config.getRegValue("ss_server_address").toString() + "/ws", __c5config.getRegValue("ss_server_key").toString(), ui->leUser->text(), ui->lePin->text());
+    w->showMaximized();
 }
 
 void DlgPin::errorResponse(const QString &err)
@@ -217,7 +267,8 @@ void DlgPin::on_btnSettings_clicked()
 {
     DlgServerConnection::showSettings(this);
     C5ServerName sng(__c5config.getRegValue("ss_server_address").toString());
-    if (!sng.getServers()) {
+
+    if(!sng.getServers()) {
         C5Message::error(sng.mErrorString);
     }
 }

@@ -1,5 +1,4 @@
 #include "c5translator.h"
-#include "c5database.h"
 #include <QFile>
 
 static C5Translator __tr;
@@ -24,30 +23,28 @@ QString C5Translator::translate(const QString &str, int lang)
 
 void C5Translator::initTranslator()
 {
-    if(fInstance == nullptr) {
-        fInstance = new C5Translator();
-        fInstance->fAm.clear();
-        fInstance->fEn.clear();
-        fInstance->fRu.clear();
-        C5Database db;
-        db.exec("select * from s_translator");
-
-        while(db.nextRow()) {
-            fInstance->fEn[db.getString("f_en").toLower()] = db.getString("f_en");
-            fInstance->fRu[db.getString("f_en").toLower()] = db.getString("f_ru");
-            fInstance->fAm[db.getString("f_en").toLower()] = db.getString("f_am");
-        }
-
-        db.exec("select d.f_id, d.f_name, t.f_en, t.f_ru "
-                "from d_dish d "
-                "left join d_translator t on d.f_id=t.f_id ");
-
-        while(db.nextRow()) {
-            fInstance->fAmDish.insert(db.getInt("f_id"), db.getString("f_name"));
-            fInstance->fEnDish.insert(db.getInt("f_id"), db.getString("f_en"));
-            fInstance->fRuDish.insert(db.getInt("f_id"), db.getString("f_ru"));
-        }
-    }
+    //TODO
+    // if(fInstance == nullptr) {
+    //     fInstance = new C5Translator();
+    //     fInstance->fAm.clear();
+    //     fInstance->fEn.clear();
+    //     fInstance->fRu.clear();
+    //     C5Database db;
+    //     db.exec("select * from s_translator");
+    //     while(db.nextRow()) {
+    //         fInstance->fEn[db.getString("f_en").toLower()] = db.getString("f_en");
+    //         fInstance->fRu[db.getString("f_en").toLower()] = db.getString("f_ru");
+    //         fInstance->fAm[db.getString("f_en").toLower()] = db.getString("f_am");
+    //     }
+    //     db.exec("select d.f_id, d.f_name, t.f_en, t.f_ru "
+    //             "from d_dish d "
+    //             "left join d_translator t on d.f_id=t.f_id ");
+    //     while(db.nextRow()) {
+    //         fInstance->fAmDish.insert(db.getInt("f_id"), db.getString("f_name"));
+    //         fInstance->fEnDish.insert(db.getInt("f_id"), db.getString("f_en"));
+    //         fInstance->fRuDish.insert(db.getInt("f_id"), db.getString("f_ru"));
+    //     }
+    // }
 }
 
 void C5Translator::setLanguage(int language)
@@ -148,7 +145,8 @@ QString C5Translator::RU(const QString &value)
 
 void C5Translator::insertUnknown(const QString &value)
 {
-    C5Database db;
-    db[":f_en"] = value;
-    db.insert("s_translator", false);
+    // TODO
+    // C5Database db;
+    // db[":f_en"] = value;
+    // db.insert("s_translator", false);
 }

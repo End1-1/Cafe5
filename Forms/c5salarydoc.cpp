@@ -136,7 +136,7 @@ void C5SalaryDoc::createCashDocument()
     int docnum = genNumber(DOC_TYPE_CASH);
     updateGenNumber(docnum, DOC_TYPE_CASH);
     QString fUuid;
-    dw.writeAHeader(fUuid, QString::number(docnum), DOC_STATE_SAVED, DOC_TYPE_CASH, __user->id(),
+    dw.writeAHeader(fUuid, QString::number(docnum), DOC_STATE_SAVED, DOC_TYPE_CASH, mUser->id(),
                     QDate::currentDate(),
                     QDate::currentDate(), QTime::currentTime(),
                     0, ui->leTotal->getDouble(),
