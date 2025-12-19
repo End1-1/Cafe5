@@ -75,7 +75,6 @@ FORMS += \
     ../Forms/dlgguestinfo.ui \
     ../Forms/dlglist2.ui \
     ../Forms/dlgnewcl.ui \
-    ../Forms/dlgpaymentchoose.ui \
     ../Forms/dlgprintrecipesoptions.ui \
     ../Forms/dlgqty.ui \
     ../Forms/dlgreservgoods.ui \
@@ -282,7 +281,6 @@ HEADERS += \
         ../Forms/dlgguestinfo.h \
         ../Forms/dlglist2.h \
         ../Forms/dlgnewcl.h \
-        ../Forms/dlgpaymentchoose.h \
         ../Forms/dlgprintrecipesoptions.h \
         ../Forms/dlgqty.h \
         ../Forms/dlgreservgoods.h \
@@ -573,7 +571,6 @@ SOURCES += \
         ../Forms/dlgguestinfo.cpp \
         ../Forms/dlglist2.cpp \
         ../Forms/dlgnewcl.cpp \
-        ../Forms/dlgpaymentchoose.cpp \
         ../Forms/dlgprintrecipesoptions.cpp \
         ../Forms/dlgqty.cpp \
         ../Forms/dlgreservgoods.cpp \

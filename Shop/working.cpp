@@ -44,7 +44,7 @@ Working* Working::fInstance = nullptr;
 static QSettings __s(QString("%1\\%2\\%3").arg(_ORGANIZATION_, _APPLICATION_, _MODULE_));
 
 Working::Working(C5User *user, QWidget *parent) :
-    QWidget(parent, Qt::FramelessWindowHint),
+    C5ShopDialog(user),
     ui(new Ui::Working)
 {
     ui->setupUi(this);
@@ -73,6 +73,12 @@ Working::Working(C5User *user, QWidget *parent) :
     QShortcut *sPlus = new QShortcut(QKeySequence(Qt::Key_Plus), this);
     QShortcut *sAsterix = new QShortcut(QKeySequence(Qt::Key_Asterisk), this);
     QShortcut *keyNumpadDot = new QShortcut(QKeySequence(Qt::Key_Comma), this);
+    QShortcut *sci = new QShortcut(QKeySequence(Qt::CTRL | Qt::Key_I), this);
+    QShortcut *sco = new QShortcut(QKeySequence(Qt::CTRL | Qt::Key_O), this);
+    QShortcut *scl = new QShortcut(QKeySequence(Qt::CTRL | Qt::Key_L), this);
+    connect(sci, &QShortcut::activated, this, &Working::onCtrlI);
+    connect(sco, &QShortcut::activated, this, &Working::onCtrlO);
+    connect(scl, &QShortcut::activated, this, &Working::onCtrlL);
     connect(sF1, SIGNAL(activated()), this, SLOT(shortcutF1()));
     connect(sF2, SIGNAL(activated()), this, SLOT(shortcutF2()));
     //    connect(sF3, SIGNAL(activated()), this, SLOT(shortcutF3()));
@@ -164,87 +170,6 @@ bool Working::eventFilter(QObject *watched, QEvent *event)
                 openSearch();
                 event->accept();
                 return true;
-            }
-
-            break;
-
-        case Qt::Key_I:
-            if(ke->modifiers() &Qt::ControlModifier) {
-                QString pin, pass;
-
-                if(DlgPin::getPin(pin, pass, true)) {
-                    C5Database db;
-                    C5User ua;
-                    QString name;
-
-                    if(ua.authByPinPass(pin, pass, fHttp)) {
-                        db[":f_user"] = ua.id();
-                        db.exec("select * from s_salary_inout where f_user=:f_user and f_dateout is null");
-
-                        if(db.nextRow()) {
-                            C5Message::error(tr("Cannot input without output"));
-                        } else {
-                            db[":f_id"] = db.uuid();
-                            db[":f_user"] = ua.id();
-                            db[":f_hall"] = __c5config.getValue(param_default_hall).toInt();
-                            db[":f_datein"] = QDate::currentDate();
-                            db[":f_timein"] = QTime::currentTime();
-                            db.insert("s_salary_inout", false);
-                            loadStaff();
-                            C5Message::info(QString("%1,<br>%2").arg(tr("Welcome"), name));
-                        }
-                    } else {
-                        C5Message::error(ua.error());
-                    }
-                }
-            }
-
-            break;
-
-        case Qt::Key_L:
-            if(ke->modifiers() &Qt::ControlModifier) {
-                C5Database db;
-                db.exec("select concat(u.f_last, ' ', u.f_first) as f_name, u.f_login from s_salary_inout io "
-                        "left join s_user u on u.f_id=io.f_user "
-                        "where io.f_dateout is null ");
-                QString users;
-
-                while(db.nextRow()) {
-                    users += QString("%1, %2<br>").arg(db.getString("f_login"), db.getString("f_name"));
-                }
-
-                C5Message::info(users);
-            }
-
-            break;
-
-        case Qt::Key_O:
-            if(ke->modifiers() &Qt::ControlModifier) {
-                QString pin, pass;
-
-                if(DlgPin::getPin(pin, pass, true)) {
-                    C5Database db;
-                    C5User ua;
-                    QString name;
-
-                    if(ua.authByPinPass(pin, pass, fHttp)) {
-                        db[":f_user"] = ua.id();
-                        db.exec("select * from s_salary_inout where f_user=:f_user and f_dateout is null");
-
-                        if(db.nextRow()) {
-                            db[":f_user"] = ua.id();
-                            db[":f_dateout"] = QDate::currentDate();
-                            db[":f_timeout"] = QTime::currentTime();
-                            db.update("s_salary_inout", where_id(db.getString("f_id")));
-                            loadStaff();
-                            C5Message::info(QString("%1,<br>%2").arg(tr("Good bye"), name));
-                        } else {
-                            C5Message::error(tr("Cannot output without input"));
-                        }
-                    } else {
-                        C5Message::error(ua.error());
-                    }
-                }
             }
 
             break;
@@ -408,7 +333,7 @@ int Working::ordersCount()
 
 void Working::openSearch()
 {
-    SearchItems *si = new SearchItems();
+    SearchItems *si = new SearchItems(mUser);
     si->exec();
     si->deleteLater();
 }
@@ -431,7 +356,76 @@ void Working::timeout()
     }
 }
 
-void Working::checkMessageResponse(const QJsonObject &jdoc)
+void Working::onCtrlI()
+{
+    QString pin, pass;
+
+    if(DlgPin::getPin(pin, pass, true)) {
+        C5User *ua = new C5User();
+        //TODO: REMOVE UA IF ERROR, MEMORY LEAK OTHERWISSE
+        ua->authByPinPass(pin, pass, fHttp, [this, ua](const QJsonObject & jo) {
+            C5Database db;
+            db[":f_user"] = ua->id();
+            db.exec("select * from s_salary_inout where f_user=:f_user and f_dateout is null");
+
+            if(db.nextRow()) {
+                C5Message::error(tr("Cannot input without output"));
+            } else {
+                db[":f_id"] = db.uuid();
+                db[":f_user"] = ua->id();
+                db[":f_hall"] = __c5config.getValue(param_default_hall).toInt();
+                db[":f_datein"] = QDate::currentDate();
+                db[":f_timein"] = QTime::currentTime();
+                db.insert("s_salary_inout", false);
+                loadStaff();
+                ua->deleteLater();
+                C5Message::info(QString("%1,<br>%2").arg(tr("Welcome"), ua->fullName()));
+            }
+        });
+    }
+}
+
+void Working::onCtrlO()
+{
+    QString pin, pass;
+
+    if(DlgPin::getPin(pin, pass, true)) {
+        C5User *ua = new C5User();
+        ua->authByPinPass(pin, pass, fHttp, [this, ua](const QJsonObject & jo) {
+            C5Database db;
+            db[":f_user"] = ua->id();
+            db.exec("select * from s_salary_inout where f_user=:f_user and f_dateout is null");
+
+            if(db.nextRow()) {
+                db[":f_user"] = ua->id();
+                db[":f_dateout"] = QDate::currentDate();
+                db[":f_timeout"] = QTime::currentTime();
+                db.update("s_salary_inout", where_id(db.getString("f_id")));
+                loadStaff();
+                C5Message::info(QString("%1,<br>%2").arg(tr("Good bye"), ua->fullName()));
+            } else {
+                C5Message::error(tr("Cannot output without input"));
+            }
+        });
+    }
+}
+
+void Working::onCtrlL()
+{
+    C5Database db;
+    db.exec("select concat(u.f_last, ' ', u.f_first) as f_name, u.f_login from s_salary_inout io "
+            "left join s_user u on u.f_id=io.f_user "
+            "where io.f_dateout is null ");
+    QString users;
+
+    while(db.nextRow()) {
+        users += QString("%1, %2<br>").arg(db.getString("f_login"), db.getString("f_name"));
+    }
+
+    C5Message::info(users);
+}
+
+void Working::checkMessageResponse(const QJsonObject & jdoc)
 {
     if(jdoc["messages"].toArray().isEmpty()) {
         return;
@@ -559,8 +553,7 @@ void Working::checkMessageResponse(const QJsonObject &jdoc)
     p.rtext(QDateTime::currentDateTime().toString(FORMAT_DATETIME_TO_STR2));
     p.print(C5Config::localReceiptPrinter(), QPageSize(QPageSize::Custom));
 }
-
-void Working::astoresaleResponse(const QJsonObject &jdoc)
+void Working::astoresaleResponse(const QJsonObject & jdoc)
 {
     Q_UNUSED(jdoc);
 
@@ -571,41 +564,34 @@ void Working::astoresaleResponse(const QJsonObject &jdoc)
     fHttp->httpQueryFinished(sender());
     ui->lbStatus->setPixmap(QPixmap(":/checked.png"));
 }
-
-void Working::checkStoreResponse(const QJsonObject &jdoc)
+void Working::checkStoreResponse(const QJsonObject & jdoc)
 {
     Q_UNUSED(jdoc);
     fHttp->httpQueryFinished(sender());
-    auto *dg = new DlgGoodsList(C5Config::getValue(param_default_currency).toInt());
+    auto *dg = new DlgGoodsList(mUser, C5Config::getValue(param_default_currency).toInt());
     connect(dg, &DlgGoodsList::getGoods, this, &Working::getGoods);
     dg->showMaximized();
 }
-
 void Working::uploadDataFinished()
 {
     fUpFinished = true;
 }
-
 void Working::shortcutEscape()
 {
     worder()->clearCode();
 }
-
 void Working::shortcutMinus()
 {
     worder()->keyMinus();
 }
-
 void Working::shortcutPlus()
 {
     worder()->keyPlus();
 }
-
 void Working::shortcutAsterix()
 {
     worder()->keyAsterix();
 }
-
 void Working::shortcutF1()
 {
     if(__c5config.shopDenyF1()) {
@@ -614,7 +600,6 @@ void Working::shortcutF1()
 
     newSale(SALE_RETAIL);
 }
-
 void Working::shortcutF2()
 {
     if(__c5config.shopDenyF2()) {
@@ -623,12 +608,10 @@ void Working::shortcutF2()
 
     newSale(SALE_WHOSALE);
 }
-
 void Working::shortcutF5()
 {
     on_btnGoodsList_clicked();
 }
-
 void Working::shortcurF6()
 {
     WOrder *w = static_cast<WOrder*>(ui->tab->currentWidget());
@@ -639,34 +622,27 @@ void Working::shortcurF6()
 
     w->focusTaxpayerId();
 }
-
 void Working::shortcutF7()
 {
 }
-
 void Working::shortcutF8()
 {
 }
-
 void Working::shortcutF9()
 {
 }
-
 void Working::shortcutF10()
 {
     on_btnItemBack_clicked();
 }
-
 void Working::shortcutF11()
 {
     on_btnGoodsMovement_clicked();
 }
-
 void Working::shortcutF12()
 {
     on_btnWriteOrder_clicked();
 }
-
 void Working::shortcutDown()
 {
     WOrder *w = static_cast<WOrder*>(ui->tab->currentWidget());
@@ -677,7 +653,6 @@ void Working::shortcutDown()
 
     w->nextRow();
 }
-
 void Working::shortcutUp()
 {
     WOrder *w = static_cast<WOrder*>(ui->tab->currentWidget());
@@ -688,7 +663,6 @@ void Working::shortcutUp()
 
     w->prevRow();
 }
-
 void Working::shortcutComma()
 {
     WOrder *w = static_cast<WOrder*>(ui->tab->currentWidget());
@@ -697,8 +671,7 @@ void Working::shortcutComma()
         w->comma();
     }
 }
-
-void Working::qtyRemains(const QJsonObject &jdoc)
+void Working::qtyRemains(const QJsonObject & jdoc)
 {
     //TODO:: BY OPTIONS
     QJsonObject jo = jdoc["data"].toObject();
@@ -740,14 +713,12 @@ void Working::qtyRemains(const QJsonObject &jdoc)
 
     sender()->deleteLater();
 }
-
 void Working::haveChanges(bool v)
 {
     if(!fHaveChanges) {
         fHaveChanges = v;
     }
 }
-
 void Working::on_tab_tabCloseRequested(int index)
 {
     QString err;
@@ -768,7 +739,6 @@ void Working::on_tab_tabCloseRequested(int index)
         newSale(SALE_RETAIL);
     }
 }
-
 void Working::on_btnItemBack_clicked()
 {
     if(!mUser->check(cp_t5_refund_goods)) {
@@ -777,7 +747,6 @@ void Working::on_btnItemBack_clicked()
 
     Sales::showSales(this, mUser);
 }
-
 void Working::on_tab_currentChanged(int index)
 {
     Q_UNUSED(index)
@@ -787,14 +756,12 @@ void Working::on_tab_currentChanged(int index)
         wo->updateCustomerDisplay(fCustomerDisplay);
     }
 }
-
 void Working::on_btnCloseApplication_clicked()
 {
     if(C5Message::question(tr("Confirm to close application")) == QDialog::Accepted) {
         qApp->quit();
     }
 }
-
 void Working::on_btnWriteOrder_clicked()
 {
     WOrder *w = static_cast<WOrder*>(ui->tab->currentWidget());
@@ -824,72 +791,68 @@ void Working::on_btnWriteOrder_clicked()
         dp->getData("/engine/shop/check-qty-remain.php", QJsonObject{{"header", id}});
     }
 }
-
 void Working::on_btnGoodsMovement_clicked()
 {
-    C5User *u = mUser;
+    C5User *tmp = new C5User(mUser);
 
-    if(!u->check(cp_t5_refund_goods)) {
+    if(!tmp->check(cp_t12_shop_enter_store)) {
         QString password = QInputDialog::getText(this, tr("Password"), tr("Password"), QLineEdit::Password);
-        C5User *tmp = new C5User(password, fHttp);
+        C5User *tmp = new C5User();
+        tmp->authorize(password, fHttp, [this, tmp](const QJsonObject & jo) {
+            Q_UNUSED(jo);
 
-        if(tmp->error().isEmpty()) {
-            u = tmp;
-        } else {
-            C5Message::error(tmp->error());
-            delete tmp;
-            return;
-        }
-    }
+            if(tmp->check(cp_t12_shop_enter_store)) {
+                if(tmp->fConfig["copyfrom"].toInt() != 0) {
+                    tmp->copySettings(mUser);
+                }
 
-    auto *si = new StoreInput(u);
-    si->showMaximized();
-
-    if(u != mUser) {
-        delete u;
+                auto *si = new StoreInput(tmp);
+                si->showMaximized();
+            } else {
+                tmp->deleteLater();
+            }
+        });
+    } else {
+        auto *si = new StoreInput(tmp);
+        si->showMaximized();
     }
 }
-
 void Working::on_btnNewRetail_clicked()
 {
     newSale(SALE_RETAIL);
 }
-
 void Working::on_btnNewWhosale_clicked()
 {
     newSale(SALE_WHOSALE);
 }
-
 void Working::on_btnGoodsList_clicked()
 {
     fHttp->createHttpQuery("/engine/shop/create-a-store-sale.php", QJsonObject{{"store", __c5config.defaultStore()}}, SLOT(
         checkStoreResponse(QJsonObject)));
 }
-
 void Working::on_btnSalesReport_clicked()
 {
-    C5User *u = mUser;
+    C5User *tmp = new C5User(mUser);
 
-    if(!u->check(cp_t5_refund_goods)) {
+    if(!tmp->check(cp_t12_shop_enter_sale)) {
         QString password = QInputDialog::getText(this, tr("Password"), tr("Password"), QLineEdit::Password);
-        C5User *tmp = new C5User(password, fHttp);
+        tmp->authorize(password, fHttp, [this, tmp](const QJsonObject & jo) {
+            Q_UNUSED(jo)
 
-        if(tmp->error().isEmpty()) {
-            u = tmp;
-        } else {
-            C5Message::error(tmp->error());
-            delete tmp;
-            return;
-        }
-    }
+            if(tmp->check(cp_t12_shop_enter_sale)) {
+                if(tmp->fConfig["copyfrom"].toInt() != 0) {
+                    tmp->copySettings(mUser);
+                }
 
-    Sales::showSales(this, u);
-
-    if(u != mUser) {
-        delete u;
+                Sales::showSales(this, tmp);
+            } else {
+                tmp->deleteLater();
+            }
+        });
+    } else {
+        Sales::showSales(this, tmp);
     }
 }
-
 void Working::on_btnHelp_clicked()
 {
     QString info = QString("Ctrl+S: %1<br>"
@@ -910,12 +873,10 @@ void Working::on_btnHelp_clicked()
                         tr("List of workers at work"));
     C5Message::info(info);
 }
-
 void Working::on_btnMinimize_clicked()
 {
     showMinimized();
 }
-
 void Working::on_btnClientConfigQR_clicked()
 {
     WOrder *wo = static_cast<WOrder*>(ui->tab->currentWidget());
@@ -924,7 +885,6 @@ void Working::on_btnClientConfigQR_clicked()
         wo->imageConfig();
     }
 }
-
 void Working::on_btnGiftCard_clicked()
 {
     WOrder *wo = static_cast<WOrder*>(ui->tab->currentWidget());
@@ -949,7 +909,6 @@ void Working::on_btnGiftCard_clicked()
         wo->fOHeader.saleType = -1;
     }
 }
-
 void Working::on_btnCostumerDisplay_clicked(bool checked)
 {
     Q_UNUSED(checked);
@@ -978,7 +937,6 @@ void Working::on_btnCostumerDisplay_clicked(bool checked)
         wo->updateCustomerDisplay(fCustomerDisplay);
     }
 }
-
 void Working::on_btnOpenDraft_clicked()
 {
     C5TempSale t;
@@ -1000,27 +958,22 @@ void Working::on_btnOpenDraft_clicked()
         }
     }
 }
-
 void Working::on_btnColumns_clicked()
 {
     DlgShowColumns().exec();
 }
-
 void Working::on_chRegisterCard_clicked()
 {
     DlgRegisterCard().exec();
 }
-
 void Working::on_btnCashout_clicked()
 {
     DlgCashout(mUser).exec();
 }
-
 void Working::on_btnBooking_clicked()
 {
     openSearch();
 }
-
 void Working::on_btnPrepaidFiscal_clicked()
 {
     bool ok;

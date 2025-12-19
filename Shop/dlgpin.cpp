@@ -1,16 +1,13 @@
 #include "dlgpin.h"
 #include "ui_dlgpin.h"
-#include "nloadingdlg.h"
-#include "c5servername.h"
-#include "c5message.h"
 #include "ndataprovider.h"
 #include "c5config.h"
-#include "dlgserverconnection.h"
 #include "ninterface.h"
-#include "datadriver.h"
 #include "working.h"
 #include "c5user.h"
+#include "c5database.h"
 #include "appwebsocket.h"
+#include "c5connectiondialog.h"
 #include <QKeyEvent>
 #include <QJsonObject>
 
@@ -75,15 +72,38 @@ void DlgPin::on_btnEnter_clicked()
     }
 
     fLastError = false;
-    NDataProvider::mHost = __c5config.dbParams().at(1);
+    NDataProvider::mProtocol = C5ConnectionDialog::instance()->noneSecure ? "http" : "https";
+    NDataProvider::mHost = C5ConnectionDialog::instance()->serverAddress();
     fHttp->fErrorObject = this;
     fHttp->fErrorSlot = const_cast<char*>(SLOT(errorResponse(QString)));
 
     if(ui->lePin->text().length() == 4 && ui->leUser->text().length() == 4) {
-        fHttp->createHttpQuery("/engine/login.php", QJsonObject{{"method", 1},
+        fHttp->createHttpQueryLambda("/engine/login.php", QJsonObject{{"method", 1},
             {"username", ui->leUser->text()},
-            {"password", ui->lePin->text()}},
-        SLOT(loginResponse(QJsonObject)));
+            {"password", ui->lePin->text()}}, [this](const QJsonObject & jdoc) {
+            QJsonObject jo = jdoc["data"].toObject();
+            NDataProvider::sessionKey = jo["sessionkey"].toString();
+            QMap<int, QString> settings;
+            QJsonObject juser = jo["user"].toObject();
+            QJsonArray jsettings = jo["settings"].toArray();
+
+            for(int i = 0; i < jsettings.count(); i++) {
+                const QJsonObject &js = jsettings.at(i).toObject();
+                settings[js["f_key"].toInt()] = js["f_value"].toString();
+            }
+
+            mUser = new C5User(juser.toVariantMap());
+            mUser->fSettings = settings;
+            mUser->fConfig = jo["config"].toObject()["f_config"].toObject();
+            C5Database::fDbParams = {"", "", "", ""};
+            C5Database::fUrl = QString("%1://%2").arg(C5ConnectionDialog::instance()->noneSecure ? "http" : "https",
+                               C5ConnectionDialog::instance()->serverAddress());
+            __c5config.setValues(settings);
+            __c5config.fMainJson = mUser->fConfig;
+            AppWebSocket::reconnect(__c5config.getRegValue("ss_server_address").toString() + "/ws", __c5config.getRegValue("ss_server_key").toString(), ui->leUser->text(), ui->lePin->text());
+            accept();
+        }, [](const QJsonObject & jerr) {
+        });
     }
 }
 
@@ -96,7 +116,11 @@ void DlgPin::on_btnClear_clicked()
 
 void DlgPin::on_btnClose_clicked()
 {
-    qApp->quit();
+    reject();
+
+    if(!fDoNotAuth) {
+        qApp->quit();
+    }
 }
 
 void DlgPin::on_btn1_clicked()
@@ -192,83 +216,22 @@ void DlgPin::keyReleaseEvent(QKeyEvent *event)
     QDialog::keyReleaseEvent(event);
 }
 
-void DlgPin::loginResponse(const QJsonObject &jdoc)
+void DlgPin::showEvent(QShowEvent *e)
 {
-    QJsonObject jo = jdoc["data"].toObject();
-    NDataProvider::sessionKey = jo["sessionkey"].toString();
-    fHttp->httpQueryFinished(sender());
-    hide();
-    QMap<int, QString> settings;
-    QJsonObject juser = jo["user"].toObject();
-    QJsonArray jsettings = jo["settings"].toArray();
+    C5ShopDialog::showEvent(e);
 
-    for(int i = 0; i < jsettings.count(); i++) {
-        const QJsonObject &js = jsettings.at(i).toObject();
-        settings[js["f_key"].toInt()] = js["f_value"].toString();
+    if(!fDoNotAuth) {
+        if(!C5ConnectionDialog::instance()->username().isEmpty()) {
+            ui->leUser->setText(C5ConnectionDialog::instance()->username());
+            ui->lePin->setText(C5ConnectionDialog::instance()->password());
+            on_btnEnter_clicked();
+        }
     }
-
-    mUser = new C5User(juser.toVariantMap());
-    mUser->fSettings = settings;
-    mUser->fConfig = jo["config"].toObject();
-    __c5config.setValues(settings);
-    auto *w = new Working(mUser);
-    w->setWindowTitle("");
-
-    if(__c5config.defaultHall() > 0) {
-        w->setWindowTitle(w->windowTitle() + "[" + __c5config.fMainJson["shop_hall_name"].toString() + "]");
-    }
-
-    if(__c5config.defaultStore() > 0) {
-        w->setWindowTitle(w->windowTitle() + "[" + dbstore->name(__c5config.defaultStore()) + "]");
-    } else {
-        C5Message::error(QObject::tr("Store is not defined."));
-        qApp->quit();
-    }
-
-    __c5config.setRegValue("windowtitle", w->windowTitle());
-    AppWebSocket::reconnect(__c5config.getRegValue("ss_server_address").toString() + "/ws", __c5config.getRegValue("ss_server_key").toString(), ui->leUser->text(), ui->lePin->text());
-    w->showMaximized();
-}
-
-void DlgPin::errorResponse(const QString &err)
-{
-    fLastError = true;
-    fHttp->httpQueryFinished(sender());
-    C5Message::error(err);
-}
-
-void DlgPin::queryLoading()
-{
-    fLoadingDlg = new NLoadingDlg(this);
-    fLoadingDlg->open();
-}
-
-void DlgPin::queryStopped(QObject *sender)
-{
-    fLoadingDlg->hide();
-    fLoadingDlg->deleteLater();
-    sender->deleteLater();
-}
-
-void DlgPin::queryFinished(const QJsonObject &json)
-{
-    QJsonObject jo = json["data"].toObject();
-    Q_UNUSED(jo);
-    queryStopped(sender());
-}
-
-void DlgPin::queryError(const QString &err)
-{
-    C5Message::error(err);
-    queryStopped(sender());
 }
 
 void DlgPin::on_btnSettings_clicked()
 {
-    DlgServerConnection::showSettings(this);
-    C5ServerName sng(__c5config.getRegValue("ss_server_address").toString());
-
-    if(!sng.getServers()) {
-        C5Message::error(sng.mErrorString);
-    }
+    C5ConnectionDialog::showSettings(this);
+    NDataProvider::mProtocol = C5ConnectionDialog::instance()->noneSecure ? "http" : "https";
+    NDataProvider::mHost = C5ConnectionDialog::instance()->serverAddress();
 }

@@ -69,6 +69,16 @@ QString C5ConnectionDialog::serverKey()
     return ui->leServerKey->text();
 }
 
+QString C5ConnectionDialog::username()
+{
+    return ui->leServerUsername->text();
+}
+
+QString C5ConnectionDialog::password()
+{
+    return ui->leServerUsername->text();
+}
+
 int C5ConnectionDialog::connectionType()
 {
     return ui->cbConnection->currentIndex();

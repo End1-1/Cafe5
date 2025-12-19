@@ -1,6 +1,5 @@
 #include "c5config.h"
 #include "dlgpin.h"
-#include "dlgserverconnection.h"
 #include "ndataprovider.h"
 #include "datadriver.h"
 #include "c5servername.h"
@@ -11,6 +10,8 @@
 #include "dlgsplashscreen.h"
 #include "fileversion.h"
 #include "logwriter.h"
+#include "working.h"
+#include "c5user.h"
 #include <QApplication>
 #include <QMessageBox>
 #include <QLockFile>
@@ -65,86 +66,8 @@ int main(int argc, char* argv[])
         a.installTranslator(&t);
     }
 
-    auto *dlgsplash = new DlgSplashScreen();
-    dlgsplash->show();
-    LogWriter::write(LogWriterLevel::verbose, "", "get server names");
-    emit dlgsplash->messageSignal("Get server name");
-    bool noconfig = true;
-    QJsonObject js;
-    {
-        C5ServerName sng(__c5config.getRegValue("ss_server_address").toString());
-
-        if(!sng.getConnection(__c5config.getRegValue("ss_database").toString())) {
-            C5Message::error(sng.mErrorString);
-            DlgServerConnection::showSettings(0);
-            return 1;
-        }
-
-        js = sng.mReply;
-    }
-    noconfig = false;
-    C5Config::fDBHost = js["settings"].toString();
-    C5Config::fDBPath = js["database"].toString();
-    C5Config::fDBUser = js["username"].toString();
-    NDataProvider::mProtocol = js["settings"].toString();
-    C5Config::fDBPassword = js["password"].toString();
-    C5Config::fSettingsName = __c5config.getRegValue("ss_settings").toString();
-    C5Config::fFullScreen = true;
-    QSettings ss(_ORGANIZATION_, _APPLICATION_ + QString("\\") + _MODULE_);
-    ss.setValue("server", "");
-
-    if(noconfig) {
-        QMessageBox::critical(0, "Error", "No config");
-        return 1;
-    }
-
-    if(!d.exists(d.homePath() + "/" + _APPLICATION_)) {
-        d.mkpath(d.homePath() + "/" + _APPLICATION_);
-    }
-
-    if(!d.exists(d.homePath() + "/" + _APPLICATION_ + "/logs")) {
-        d.mkpath(d.homePath() + "/" + _APPLICATION_ + "/logs");
-    }
-
-    QFontDatabase::addApplicationFont(":/barcode.ttf");
-    //    int id = QFontDatabase::addApplicationFont(":/ahuni.ttf");
-    //    QString family = QFontDatabase::applicationFontFamilies(id).at(0);
-    QFile shopstyle(a.applicationDirPath() + "/shopstyle.qss");
-
-    if(shopstyle.exists()) {
-        if(shopstyle.open(QIODevice::ReadOnly)) {
-            a.setStyleSheet(shopstyle.readAll());
-        }
-    }
-
-    if(!C5SystemPreference::checkDecimalPointAndSeparator()) {
-        return 0;
-    }
-
-    NDataProvider::mAppName = "shop";
-    NDataProvider::mFileVersion = FileVersion::getVersionString(a.applicationFilePath());
-    QString user, pin;
-    LogWriter::write(LogWriterLevel::verbose, "", "Init params from db");
-    emit dlgsplash->messageSignal("Init params from db");
-    C5Database::fDbParams = C5Config::dbParams();
-    C5Config::initParamsFromDb();
-    NDataProvider::mDebug = __c5config.getValue(param_debuge_mode).toInt() > 0;
-    C5Database db;
-
-    if(C5Config::fMainJson["clear_sale_draft"].toBool()) {
-        emit dlgsplash->messageSignal("clear draft");
-        db[":f_hall"] = C5Config::defaultHall();
-        db.exec("update o_draft_sale_body set f_state=10 where f_state=1 "
-                "and f_header in (select f_id from o_draft_sale where f_hall=:f_hall and f_state=1)");
-        db[":f_hall"] = C5Config::defaultHall();
-        db.exec("update o_draft_sale set f_state=10 where f_hall=:f_hall and f_state=1");
-    }
-
-    DataDriver::init(__c5config.dbParams(), dlgsplash);
-    dlgsplash->hide();
-    dlgsplash->deleteLater();
-    C5Dialog::setMainWindow(nullptr);
-    auto *dlgPin = new DlgPin();
+    QString fileVersion =  FileVersion::getVersionString(a.applicationFilePath());
+    bool debug = false;
 
     for(const QString &s : a.arguments()) {
         if(s.startsWith("/monitor")) {
@@ -157,11 +80,77 @@ int main(int argc, char* argv[])
             }
 
             if(screens.count() > monitor - 1) {
-                dlgPin->move(screens.at(monitor)->geometry().topLeft());
+                C5Dialog::mScreen = monitor;
             }
+        }
+
+        if(s.startsWith("/setversion")) {
+            QStringList ver = s.split("=");
+
+            if(ver.length() == 2) {
+                fileVersion = ver.at(1);
+            }
+        }
+
+        if(s.startsWith("/debug")) {
+            debug = true;
         }
     }
 
-    dlgPin->show();
+    if(!d.exists(d.homePath() + "/" + _APPLICATION_)) {
+        d.mkpath(d.homePath() + "/" + _APPLICATION_);
+    }
+
+    if(!d.exists(d.homePath() + "/" + _APPLICATION_ + "/logs")) {
+        d.mkpath(d.homePath() + "/" + _APPLICATION_ + "/logs");
+    }
+
+    if(!C5SystemPreference::checkDecimalPointAndSeparator()) {
+        return 0;
+    }
+
+    NDataProvider::mAppName = "shop";
+    NDataProvider::mFileVersion = fileVersion;
+    NDataProvider::mDebug = debug;
+    auto *dlgPin = new DlgPin();
+
+    if(dlgPin->exec() == QDialog::Rejected) {
+        return 0;
+    }
+
+    auto *user = new C5User(dlgPin->mUser);
+    auto *dlgsplash = new DlgSplashScreen();
+    dlgsplash->show();
+    C5Database db;
+    emit dlgsplash->messageSignal("init data driver...");
+    DataDriver::init(__c5config.dbParams(), dlgsplash);
+    C5Dialog::setMainWindow(nullptr);
+    auto *w = new Working(user);
+    w->setWindowTitle("");
+
+    if(__c5config.defaultHall() > 0) {
+        w->setWindowTitle(w->windowTitle() + "[" + __c5config.fMainJson["shop_hall_name"].toString() + "]");
+    }
+
+    if(__c5config.defaultStore() > 0) {
+        w->setWindowTitle(w->windowTitle() + "[" + dbstore->name(__c5config.defaultStore()) + "]");
+    } else {
+        C5Message::error(QObject::tr("Store is not defined."));
+        qApp->quit();
+    }
+
+    if(__c5config.fMainJson["clear_sale_draft"].toBool()) {
+        emit dlgsplash->messageSignal("clear drafts...");
+        db[":f_hall"] = C5Config::defaultHall();
+        db.exec("update o_draft_sale_body set f_state=10 where f_state=1 "
+                "and f_header in (select f_id from o_draft_sale where f_hall=:f_hall and f_state=1)");
+        db[":f_hall"] = C5Config::defaultHall();
+        db.exec("update o_draft_sale set f_state=10 where f_hall=:f_hall and f_state=1");
+    }
+
+    dlgsplash->hide();
+    dlgsplash->deleteLater();
+    __c5config.setRegValue("windowtitle", w->windowTitle());
+    w->showMaximized();
     return a.exec();
 }

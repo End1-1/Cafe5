@@ -448,16 +448,16 @@ void CE5Goods::openResponse(const QJsonObject &jdoc)
         ui->tblAs->lineEdit(asrow, 2)->setText(o["f_ascode"].toString());
     }
 
-    if(mUser->check(cp_t6_goods_only_price_edit)) {
-        bool enabled = ui->leCode->getInteger() == 0;
-        ui->tab_2->setEnabled(enabled);
-        ui->tab_3->setEnabled(enabled);
-        ui->tab_4->setEnabled(enabled);
-        ui->leGroup->setEnabled(enabled);
-        ui->leName->setEnabled(enabled);
-        ui->leScanCode->setEnabled(enabled);
-    }
-
+    //TODO
+    // if(mUser->check(cp_t6_goods_only_price_edit)) {
+    //     bool enabled = ui->leCode->getInteger() == 0;
+    //     ui->tab_2->setEnabled(enabled);
+    //     ui->tab_3->setEnabled(enabled);
+    //     ui->tab_4->setEnabled(enabled);
+    //     ui->leGroup->setEnabled(enabled);
+    //     ui->leName->setEnabled(enabled);
+    //     ui->leScanCode->setEnabled(enabled);
+    // }
     QJsonArray jbarcodes = jdoc["barcodes"].toArray();
 
     for(int i = 0; i < jbarcodes.count(); i++) {

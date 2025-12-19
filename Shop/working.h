@@ -1,8 +1,7 @@
 #ifndef WORKING_H
 #define WORKING_H
 
-#include "ninterface.h"
-#include <QWidget>
+#include "c5shopdialog.h"
 
 namespace Ui
 {
@@ -32,7 +31,7 @@ class WCustomerDisplay;
 class QMovie;
 class C5User;
 
-class Working : public QWidget
+class Working : public C5ShopDialog
 {
     Q_OBJECT
 
@@ -83,8 +82,6 @@ private:
 
     NInterface* fHttp;
 
-    C5User* mUser;
-
     WCustomerDisplay* fCustomerDisplay;
 
     void loadStaff();
@@ -103,6 +100,12 @@ private:
 
 private slots:
     void timeout();
+
+    void onCtrlI();
+
+    void onCtrlO();
+
+    void onCtrlL();
 
     void checkMessageResponse(const QJsonObject &jdoc);
 
@@ -189,6 +192,7 @@ private slots:
     void on_btnCashout_clicked();
 
     void on_btnBooking_clicked();
+
     void on_btnPrepaidFiscal_clicked();
 };
 

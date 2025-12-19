@@ -81,7 +81,6 @@
 #define param_waiter_close_order_after_precheck 85
 #define param_shop_dont_check_qty 86
 #define param_vat 87
-#define param_shop_report_of_logged_staff 88
 #define param_shop_hide_store_qty 89
 #define param_shop_config_mobile_client 90
 #define param_shop_print_v3 92

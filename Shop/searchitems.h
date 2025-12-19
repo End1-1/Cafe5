@@ -1,19 +1,19 @@
 #ifndef SEARCHITEMS_H
 #define SEARCHITEMS_H
 
-#include "c5dialog.h"
+#include "c5shopdialog.h"
 
 namespace Ui
 {
 class SearchItems;
 }
 
-class SearchItems : public C5Dialog
+class SearchItems : public C5ShopDialog
 {
     Q_OBJECT
 
 public:
-    explicit SearchItems();
+    explicit SearchItems(C5User *user);
 
     ~SearchItems();
 
@@ -33,7 +33,7 @@ private slots:
     void on_btnExit_clicked();
 
 private:
-    Ui::SearchItems *ui;
+    Ui::SearchItems* ui;
 };
 
 #endif // SEARCHITEMS_H

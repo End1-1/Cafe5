@@ -1,7 +1,7 @@
 #ifndef DLGPAYMENTCHOOSE_H
 #define DLGPAYMENTCHOOSE_H
 
-#include "c5dialog.h"
+#include "c5shopdialog.h"
 
 namespace Ui
 {
@@ -10,16 +10,18 @@ class DlgPaymentChoose;
 
 class QLineEdit;
 
-class DlgPaymentChoose : public C5Dialog
+class DlgPaymentChoose : public C5ShopDialog
 {
     Q_OBJECT
 
 public:
-    explicit DlgPaymentChoose();
+    explicit DlgPaymentChoose(C5User *user);
+
     ~DlgPaymentChoose();
-    static bool getValues(double total, double &cash, double &card, double &idram, double &telcell, double &bank,
-                          double &credit,
-                          double &prepaid, double &debt, double &cashin, double &change,
+
+    static bool getValues(C5User *user, double total, double& cash, double& card, double& idram, double& telcell, double& bank,
+                          double& credit,
+                          double& prepaid, double& debt, double& cashin, double& change,
                           bool &fiscal, bool readOnlyPrepaid, double maxPrepaid);
 
     virtual void keyEnter() override;
@@ -90,7 +92,7 @@ private slots:
     void on_leCredit_returnPressed();
 
 private:
-    Ui::DlgPaymentChoose *ui;
+    Ui::DlgPaymentChoose* ui;
 
     void clearAll(QLineEdit *le);
 

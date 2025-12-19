@@ -68,49 +68,6 @@ void DlgScreen::serviceTimeout()
     np->getData("/mobile", {});
 }
 
-void DlgScreen::loginResponse(const QJsonObject &jdoc)
-{
-    QJsonObject jo = jdoc["data"].toObject();
-    NDataProvider::sessionKey = jo["sessionkey"].toString();
-    QString pass = sender()->property("marks").toString();
-    C5User u(pass, fHttp);
-
-    if(!u.isValid()) {
-        fHttp->httpQueryFinished(sender());
-        C5Message::error(u.error());
-        return;
-    }
-
-    if(!u.check(cp_t5_enter_dlgface)) {
-        fHttp->httpQueryFinished(sender());
-        C5Message::error(tr("You have not permission to enter the working area"));
-        return;
-    }
-
-    if(u.state() == C5User::usNotAtWork) {
-        if(C5Message::question(tr("Worker not registered at the work. Register?")) != QDialog::Accepted) {
-            fHttp->httpQueryFinished(sender());
-            C5Message::error(tr("Worker must be registered at the work to continue."));
-            return;
-        }
-
-        if(!u.enterWork()) {
-            fHttp->httpQueryFinished(sender());
-            C5Message::info(u.error());
-            return;
-        } else {
-            C5Message::info(tr("Welcome") + " " + u.fullName());
-        }
-    }
-
-    //TODO
-    //__user = &u;
-    fHttp->httpQueryFinished(sender());
-    DlgFace d(&u);
-    C5Dialog::setMainWindow(&d);
-    d.exec();
-}
-
 void DlgScreen::timerTimeout()
 {
     QDate d = QDate::currentDate();
@@ -204,8 +161,39 @@ void DlgScreen::on_btnAccept_clicked()
 {
     QString pass = ui->lePassword->text().replace(";", "").replace("?", "");
     ui->lePassword->clear();
-    fHttp->createHttpQuery("/engine/login.php", QJsonObject{{"method", 2}, {"pin", pass}}, SLOT(loginResponse(QJsonObject)),
-    pass);
+    auto *user = new C5User();
+    user->authorize(pass, fHttp, [this, user](const  QJsonObject & jdoc) {
+        QJsonObject jo = jdoc["data"].toObject();
+        NDataProvider::sessionKey = jo["sessionkey"].toString();
+        QString pass = sender()->property("marks").toString();
+
+        if(!user->check(cp_t5_enter_dlgface)) {
+            fHttp->httpQueryFinished(sender());
+            C5Message::error(tr("You have not permission to enter the working area"));
+            return;
+        }
+
+        if(user->state() == C5User::usNotAtWork) {
+            if(C5Message::question(tr("Worker not registered at the work. Register?")) != QDialog::Accepted) {
+                fHttp->httpQueryFinished(sender());
+                C5Message::error(tr("Worker must be registered at the work to continue."));
+                return;
+            }
+
+            if(!user->enterWork()) {
+                fHttp->httpQueryFinished(sender());
+                C5Message::info(user->error());
+                return;
+            } else {
+                C5Message::info(tr("Welcome") + " " + user->fullName());
+            }
+        }
+
+        DlgFace d(user);
+        C5Dialog::setMainWindow(&d);
+        d.exec();
+        user->deleteLater();
+    });
 }
 
 void DlgScreen::on_lePassword_returnPressed()

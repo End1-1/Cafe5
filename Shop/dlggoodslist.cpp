@@ -4,8 +4,8 @@
 #include "c5config.h"
 #include <QKeyEvent>
 
-DlgGoodsList::DlgGoodsList(int currency) :
-    C5Dialog(),
+DlgGoodsList::DlgGoodsList(C5User *user, int currency) :
+    C5ShopDialog(user),
     ui(new Ui::DlgGoodsList)
 {
     ui->setupUi(this);

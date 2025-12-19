@@ -27,6 +27,7 @@
 int C5Database::fCounter = 0;
 bool C5Database::LOGGING = false;
 QStringList C5Database::fDbParams;
+QString C5Database::fUrl;
 
 static QMutex fMutex;
 
@@ -323,7 +324,7 @@ bool C5Database::execSqlList(const QStringList &sqlList)
 
 bool C5Database::execNetwork(const QString &sqlQuery)
 {
-    if(C5Config::fDBPath.isEmpty()) {
+    if(fUrl.isEmpty()) {
         fLastError = "Database not configured";
         return false;
     }
@@ -332,7 +333,7 @@ bool C5Database::execNetwork(const QString &sqlQuery)
     t.start();
     QString sql = execDry(sqlQuery);
     QNetworkAccessManager m;
-    QString netPath = QString("%1://%2/engine/info.php").arg(C5Config::fDBHost, C5Config::fDBPath);
+    QString netPath = QString("%1/engine/info.php").arg(fUrl);
     QNetworkRequest rq(netPath);
     m.setTransferTimeout(60000);
     rq.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");

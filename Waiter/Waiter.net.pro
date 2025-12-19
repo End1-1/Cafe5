@@ -11,7 +11,9 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 TARGET = Waiter
 TEMPLATE = app
 
-RC_FILE = res.rc
+win32 {
+    RC_FILE = res.rc
+}
 
 ICON = cup.ico
 
@@ -381,7 +383,7 @@ RESOURCES += \
 
 DISTFILES += \
     cup.ico \
-    increase_version.bat \
+    increase_version.ps1 \
     version.h
 
 LIBS += -lVersion
@@ -394,3 +396,16 @@ win32: QMAKE_CXXFLAGS_RELEASE -= -Zc:strictStrings
 win32: QMAKE_CFLAGS_RELEASE -= -Zc:strictStrings
 win32: QMAKE_CFLAGS -= -Zc:strictStrings
 win32: QMAKE_CXXFLAGS -= -Zc:strictStrings
+
+win32 {
+    version_inc.target = version_inc
+    version_inc.commands = powershell -NoProfile -ExecutionPolicy Bypass -File $$shell_path($$PWD/increase_version.ps1)
+    QMAKE_EXTRA_TARGETS += version_inc
+    PRE_TARGETDEPS += version_inc
+}
+
+
+win32 {
+    res_rc.depends += $$PWD/version.h
+}
+

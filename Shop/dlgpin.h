@@ -9,8 +9,6 @@ namespace Ui
 class DlgPin;
 }
 
-class NLoadingDlg;
-
 class DlgPin : public C5ShopDialog
 {
     Q_OBJECT
@@ -25,18 +23,9 @@ public:
 protected:
     virtual void keyReleaseEvent(QKeyEvent *event) override;
 
+    virtual void showEvent(QShowEvent *e) override;
+
 private slots:
-    void loginResponse(const QJsonObject &jdoc);
-
-    void errorResponse(const QString &err);
-
-    void queryLoading();
-
-    void queryStopped(QObject *sender);
-
-    void queryFinished(const QJsonObject &json);
-
-    void queryError(const QString &err);
 
     void btnNumPressed();
 
@@ -72,8 +61,6 @@ private:
     Ui::DlgPin* ui;
 
     bool fPinEmpty;
-
-    NLoadingDlg* fLoadingDlg;
 
     bool fLastError;
 

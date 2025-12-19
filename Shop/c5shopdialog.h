@@ -11,8 +11,12 @@ class C5ShopDialog : public C5Dialog
 public:
     C5ShopDialog(C5User *user);
 
-protected:
+    ~C5ShopDialog();
+
     C5User* mUser;
+
+protected:
+
 };
 
 #endif // C5SHOPDIALOG_H

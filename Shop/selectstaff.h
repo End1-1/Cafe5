@@ -20,7 +20,7 @@ public:
 
     ~SelectStaff();
 
-    C5User* fUser;
+    int mUserId = 0;
 
 private slots:
     void on_leNum_returnPressed();

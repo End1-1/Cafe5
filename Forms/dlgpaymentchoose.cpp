@@ -7,8 +7,8 @@
 #include <QShortcut>
 #include <QStyle>
 
-DlgPaymentChoose::DlgPaymentChoose() :
-    C5Dialog(),
+DlgPaymentChoose::DlgPaymentChoose(C5User *user) :
+    C5ShopDialog(user),
     ui(new Ui::DlgPaymentChoose)
 {
     ui->setupUi(this);
@@ -37,12 +37,12 @@ DlgPaymentChoose::~DlgPaymentChoose()
     delete ui;
 }
 
-bool DlgPaymentChoose::getValues(double total, double& cash, double& card, double& idram, double& telcell, double& bank,
+bool DlgPaymentChoose::getValues(C5User *user, double total, double& cash, double& card, double& idram, double& telcell, double& bank,
                                  double& credit,
                                  double& prepaid, double& debt, double& cashin, double& change, bool &fiscal,
                                  bool readOnlyPrepaid, double maxPrepaid)
 {
-    DlgPaymentChoose d;
+    DlgPaymentChoose d(user);
     d.ui->leTotal->setDouble(total);
     d.ui->leCash->setDouble(cash);
     d.ui->leCard->setDouble(card);

@@ -48,8 +48,10 @@ void NInterface::createHttpQueryLambda(const QString &route, const QJsonObject &
     np->changeTimeout(timeout);
     connect(np, &NDataProvider::started, this, &NInterface::httpQueryStarted);
     connect(np, &NDataProvider::error, this->parent(), [this, np, errCallback](const QString & msg) {
-        if(fProgress && fLoadingDlg) {
-            fLoadingDlg->hide();
+        if(fProgress || fLoadingDlg) {
+            if(fLoadingDlg) {
+                fLoadingDlg->hide();
+            }
         }
 
         if(fProgress) {
@@ -62,8 +64,10 @@ void NInterface::createHttpQueryLambda(const QString &route, const QJsonObject &
     connect(np, &NDataProvider::done, this->parent(), [this, np, callback](const QJsonObject & data) {
         callback(data);
 
-        if(fProgress && fLoadingDlg) {
-            fLoadingDlg->hide();
+        if(fProgress || fLoadingDlg) {
+            if(fLoadingDlg) {
+                fLoadingDlg->hide();
+            }
         }
 
         np->deleteLater();

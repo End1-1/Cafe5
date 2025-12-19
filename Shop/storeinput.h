@@ -8,8 +8,6 @@ namespace Ui
 class StoreInput;
 }
 
-class C5User;
-
 class StoreInput : public C5ShopDialog
 {
     Q_OBJECT
@@ -58,8 +56,6 @@ private:
     Ui::StoreInput* ui;
 
     int fViewMode;
-
-    C5User* fUser;
 
     void getList();
 

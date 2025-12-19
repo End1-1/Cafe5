@@ -14,11 +14,12 @@
 #include "ninterface.h"
 #include <QJsonArray>
 
-DlgReturnItem::DlgReturnItem() :
-    C5Dialog(),
+DlgReturnItem::DlgReturnItem(C5User *u) :
+    C5ShopDialog(u),
     ui(new Ui::DlgReturnItem)
 {
     ui->setupUi(this);
+    showMaximized();
     ui->tblOrder->setColumnWidths(ui->tblOrder->columnCount(), 0, 140, 100, 120, 100, 230, 0, 200);
     ui->tblBody->setColumnWidths(ui->tblBody->columnCount(), 0, 30, 120, 200, 80, 80, 80, 80, 0, 150, 150);
     ui->wexchange->setVisible(false);

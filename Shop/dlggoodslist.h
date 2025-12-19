@@ -1,18 +1,19 @@
 #ifndef DLGGOODSLIST_H
 #define DLGGOODSLIST_H
 
-#include "c5dialog.h"
+#include "c5shopdialog.h"
 
-namespace Ui {
+namespace Ui
+{
 class DlgGoodsList;
 }
 
-class DlgGoodsList : public C5Dialog
+class DlgGoodsList : public C5ShopDialog
 {
     Q_OBJECT
 
 public:
-    explicit DlgGoodsList(int currency);
+    explicit DlgGoodsList(C5User *user, int currency);
 
     ~DlgGoodsList();
 
@@ -27,12 +28,12 @@ private slots:
     void on_btnMinimize_clicked();
 
 private:
-    Ui::DlgGoodsList *ui;
+    Ui::DlgGoodsList* ui;
 
     int fGoodsId;
 
 signals:
-    void getGoods(int , double, double, double);
+    void getGoods(int, double, double, double);
 };
 
 #endif // DLGGOODSLIST_H

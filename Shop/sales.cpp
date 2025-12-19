@@ -52,14 +52,14 @@ Sales::Sales(C5User *user) :
 Sales::~Sales()
 {
     delete ui;
+    delete mUser;
 }
 
 void Sales::showSales(Working *w, C5User *u)
 {
     Sales *s = new Sales(u);
     s->fWorking = w;
-    s->exec();
-    delete s;
+    s->showMaximized();
 }
 
 bool Sales::printCheckWithTax(C5Database &db, const QString &id)
@@ -190,6 +190,15 @@ void Sales::changeDate(int d)
 
 void Sales::refresh()
 {
+    int md = mUser->fConfig["shop_max_days_of_history"].toInt();
+
+    if(md > 0) {
+        if(QDate::currentDate().addDays(-md) > ui->deStart->date()) {
+            ui->deStart->setDate(QDate::currentDate().addDays(-md));
+            ui->deEnd->setDate(ui->deStart->date());
+        }
+    }
+
     switch(fViewMode) {
     case VM_TOTAL:
         refreshTotal();
@@ -235,14 +244,12 @@ void Sales::refreshTotal()
     db[":f_state"] = ORDER_STATE_CLOSE;
     QString sqlCond = "";
 
-    if(!fUser->check(cp_t5_view_tax_and_no_sales)) {
+    if(!fUser->check(cp_t12_shop_fiscal_report)) {
         sqlCond += " and length(ot.f_receiptnumber)>0 ";
     }
 
-    if(!fUser->check(cp_t5_view_sales_of_all_users)) {
-        //if (__c5config.getValue(param_shop_report_of_logged_staff).toInt() == 1){
+    if(!fUser->check(cp_t12_shop_sale_of_all_users)) {
         sqlCond += QString(" and oh.f_staff=%1 ").arg(fUser->id());
-        //}
     }
 
     QString sql =
@@ -703,8 +710,9 @@ void Sales::on_btnDateRight_clicked()
 void Sales::on_btnItemBack_clicked()
 {
     toggleMenu(false);
-    DlgReturnItem i;
-    i.exec();
+    //todo: memory leak
+    DlgReturnItem *i = new DlgReturnItem(mUser);
+    i->exec();
 }
 
 void Sales::on_btnRefresh_clicked()
@@ -802,6 +810,7 @@ void Sales::on_btnPrintTaxX_clicked()
 void Sales::on_btnExit_clicked()
 {
     reject();
+    deleteLater();
 }
 
 void Sales::on_btnViewOrder_clicked()
@@ -853,29 +862,13 @@ void Sales::on_btnChangeDate_clicked()
     }
 }
 
-void Sales::on_deStart_textChanged(const QString &arg1)
-{
-    Q_UNUSED(arg1);
-
-    if(ui->deStart->date() < QDate::currentDate().addDays(-31)) {
-        ui->deStart->setDate(QDate::currentDate().addDays(-31));
-    }
-}
-
-void Sales::on_deEnd_textChanged(const QString &arg1)
-{
-    Q_UNUSED(arg1);
-
-    if(ui->deEnd->date() < QDate::currentDate().addDays(-31)) {
-        ui->deEnd->setDate(QDate::currentDate().addDays(-31));
-    }
-}
-
 void Sales::on_btnItemChange_clicked()
 {
-    DlgReturnItem i;
-    i.setMode(2);
-    i.exec();
+    toggleMenu(false);
+    //todo: memory leak
+    DlgReturnItem *i = new DlgReturnItem(mUser);;
+    i->setMode(2);
+    i->showMaximized();
 }
 
 void Sales::on_btnShowMenu_clicked()

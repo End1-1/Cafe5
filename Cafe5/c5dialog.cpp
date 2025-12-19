@@ -5,8 +5,10 @@
 #include <QKeyEvent>
 #include <QApplication>
 #include <QScreen>
+#include <QWindow>
 
 static QWidget* __mainWindow = nullptr;
+int C5Dialog::mScreen = -1;
 
 C5Dialog::C5Dialog() :
     QDialog(__mainWindow)
@@ -15,6 +17,12 @@ C5Dialog::C5Dialog() :
         __mainWindow = this;
     }
 
+    // if(mScreen > -1) {
+    //     QScreen *screen = qApp->screens().at(mScreen);
+    //     this->create();
+    //     if(windowHandle())
+    //         windowHandle()->setScreen(screen);
+    // }
     fHttp = new NInterface(this);
 }
 
@@ -146,6 +154,16 @@ void C5Dialog::keyControlPlusEnter()
 
 void C5Dialog::keyAlterPlusEnter()
 {
+}
+
+void C5Dialog::showEvent(QShowEvent *e)
+{
+    QWidget::showEvent(e);
+    // if(mScreen > -1) {
+    //     QScreen *screen = qApp->screens().at(mScreen);
+    //     QRect geo = screen->availableGeometry();
+    //     move(geo.topLeft());
+    // }
 }
 
 void C5Dialog::handleError(int err, const QString &msg)

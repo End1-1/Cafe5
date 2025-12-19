@@ -26,6 +26,10 @@ public:
 
     QString serverKey();
 
+    QString username();
+
+    QString password();
+
     int  connectionType();
 
 private slots:

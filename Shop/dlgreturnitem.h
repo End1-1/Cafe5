@@ -1,19 +1,20 @@
 #ifndef DLGRETURNITEM_H
 #define DLGRETURNITEM_H
 
-#include "c5dialog.h"
+#include "c5shopdialog.h"
+#include "c5user.h"
 
 namespace Ui
 {
 class DlgReturnItem;
 }
 
-class DlgReturnItem : public C5Dialog
+class DlgReturnItem : public C5ShopDialog
 {
     Q_OBJECT
 
 public:
-    explicit DlgReturnItem();
+    explicit DlgReturnItem(C5User *u);
 
     ~DlgReturnItem();
 

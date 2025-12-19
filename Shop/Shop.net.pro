@@ -66,7 +66,6 @@ SOURCES += \
     ../Classes/c5witerconf.cpp \
     ../Classes/calculator.cpp \
     ../Classes/dataonline.cpp \
-    ../Classes/dlgserverconnection.cpp \
     ../Classes/fileversion.cpp \
     ../Classes/idram.cpp \
     ../Classes/logwriter.cpp \
@@ -86,6 +85,7 @@ SOURCES += \
     ../DbData/dbstore.cpp \
     ../DbData/dbstoredoctype.cpp \
     ../DbData/dbunit.cpp \
+    ../Forms/c5connectiondialog.cpp \
     ../Forms/dlgpaymentchoose.cpp \
     ../Forms/dlgreservgoods.cpp \
     ../Forms/dlgsplashscreen.cpp \
@@ -188,7 +188,6 @@ HEADERS += \
     ../Classes/calculator.h \
     ../Classes/chatmessage.h \
     ../Classes/dataonline.h \
-    ../Classes/dlgserverconnection.h \
     ../Classes/fileversion.h \
     ../Classes/goodsreserve.h \
     ../Classes/idram.h \
@@ -211,6 +210,7 @@ HEADERS += \
     ../DbData/dbstoredoctype.h \
     ../DbData/dbunit.h \
     ../DbData/dbusers.h \
+    ../Forms/c5connectiondialog.h \
     ../Forms/dlgpaymentchoose.h \
     ../Forms/dlgreservgoods.h \
     ../Forms/dlgsplashscreen.h \
@@ -283,9 +283,9 @@ FORMS += \
     ../Cafe5/dlgexitbyversion.ui \
     ../Classes/c5printpreview.ui \
     ../Classes/calculator.ui \
-    ../Classes/dlgserverconnection.ui \
     ../Classes/notificationwidget.ui \
     ../Controls/c5tablewithtotal.ui \
+    ../Forms/c5connectiondialog.ui \
     ../Forms/dlgpaymentchoose.ui \
     ../Forms/dlgreservgoods.ui \
     ../Forms/dlgsplashscreen.ui \

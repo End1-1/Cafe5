@@ -76,6 +76,8 @@ void C5SettingsWidget::setId(int id)
 
     if(db.nextRow()) {
         QJsonObject jo = __strjson(db.getString("f_config"));
+        //Main
+        ui->leCopyFrom->setInteger(jo["copyfrom"].toInt());
         //company data
         ui->leCompanyInfo->setText(jo["companydata"].toString());
         ui->leCompanyname->setText(jo["companyname"].toString());
@@ -120,6 +122,7 @@ void C5SettingsWidget::setId(int id)
         ui->cbShopHall->setCurrentIndex(ui->cbShopHall->findText(jo["waiter_hall_name"].toString()));
         //Shop
         ui->leShopAutodiscountCardNumber->setText(jo["shop_autodiscount_card_number"].toString());
+        ui->leShopMaxDaysOfHistory->setInteger(jo["shop_max_days_of_history"].toInt());
         QString s;
 
         for(int i = 0; i < ja.count(); i++) {
@@ -293,7 +296,9 @@ bool C5SettingsWidget::save(QString &err, QList<QMap<QString, QVariant> >& data)
     }
 
     QJsonObject jc;
+    //Main
     jc["id"] = ui->leCode->getInteger();
+    jc["copyfrom"] = ui->leCopyFrom->getInteger();
     jc["settings_name"] = ui->leSettingsName->text();
     jc["store"] = ui->cbDefaultStore->currentData().toInt();
     jc["store_name"] = ui->cbDefaultStore->currentText();
@@ -356,6 +361,7 @@ bool C5SettingsWidget::save(QString &err, QList<QMap<QString, QVariant> >& data)
     //shop config
     jc["shop_hall_id"] = ui->cbShopHall->currentData().toInt();
     jc["shop_hall_name"] = ui->cbShopHall->currentText();
+    jc["shop_max_days_of_history"] = ui->leShopMaxDaysOfHistory->getInteger();
     QJsonArray ja;
     QStringList a = ui->leAvailableStore->text().split(",", Qt::SkipEmptyParts);
 

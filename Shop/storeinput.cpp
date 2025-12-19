@@ -25,13 +25,13 @@ StoreInput::StoreInput(C5User *user) :
     ui->setupUi(this);
     ui->tbl->setColumnWidths(ui->tbl->columnCount(), 0, 30, 100, 0, 300, 140, 100, 100);
     fViewMode = VM_ACCEPT;
-    fUser = user;
     refresh();
 }
 
 StoreInput::~StoreInput()
 {
     delete ui;
+    delete mUser;
 }
 
 void StoreInput::checkboxCheck(bool v)
@@ -564,6 +564,7 @@ void StoreInput::on_btnStoreGoods_clicked()
 void StoreInput::on_btnExit_clicked()
 {
     accept();
+    deleteLater();
 }
 
 void StoreInput::on_btnMinimize_clicked()

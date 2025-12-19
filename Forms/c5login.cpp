@@ -80,7 +80,8 @@ void C5Login::on_cbDatabases_currentIndexChanged(int index)
     C5Config::fSettingsName = js["settings"].toString();
     C5Config::fLastUsername = js["lastusername"].toString();
     C5Config::fFullScreen = js["fullscreen"].toBool();
-    C5Database::fDbParams = C5Config::dbParams();
+    C5Database::fDbParams = {"", "", "", ""};
+    C5Database::fUrl = QString("%1://%2").arg(js["settings"].toString(), js["database"].toString());
     C5Database db(js);
     db.exec("select f_login from s_user where f_id in (select f_user from s_db_access where f_permit=1)");
     ui->leUsername->clear();

@@ -2,8 +2,6 @@
 #include "ui_selectstaff.h"
 #include "working.h"
 #include "userphoto.h"
-#include "c5user.h"
-#include "c5config.h"
 
 SelectStaff::SelectStaff(Working *w) :
     C5Dialog(),
@@ -11,7 +9,6 @@ SelectStaff::SelectStaff(Working *w) :
     fWorking(w)
 {
     ui->setupUi(this);
-    fUser = new C5User;
     int r = 0, c = 0;
 
     for(int i = 0; i < fWorking->fCurrentUsers.count(); i++) {
@@ -32,7 +29,6 @@ SelectStaff::SelectStaff(Working *w) :
 SelectStaff::~SelectStaff()
 {
     delete ui;
-    delete fUser;
 }
 
 void SelectStaff::on_leNum_returnPressed()
@@ -43,8 +39,9 @@ void SelectStaff::on_leNum_returnPressed()
     }
 
     const IUser &u = fWorking->fCurrentUsers.at(ui->leNum->getInteger() - 1);
+    mUserId = u.id;
 
-    if(fUser->loadFromDB(u.id, fHttp)) {
+    if(mUserId > 0) {
         accept();
     }
 }

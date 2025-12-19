@@ -1,6 +1,7 @@
 #ifndef C5LOGTOSERVERTHREAD_H
 #define C5LOGTOSERVERTHREAD_H
 
+#include <QObject>
 #include <QDate>
 #include <QTime>
 

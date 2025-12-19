@@ -21,9 +21,9 @@ public:
 
     C5User(const QMap<QString, QVariant>& m);
 
-    C5User(const QString &altPassword, NInterface *n);
+    C5User(C5User *other);
 
-    C5User(int id, NInterface *n);
+    void copySettings(C5User *other);
 
     QString error();
 
@@ -37,9 +37,9 @@ public:
 
     void authByUsernamePass(const QString &username, const QString &pass, NInterface *n, std::function<void (const QJsonObject&)> callback);
 
-    bool authByPinPass(const QString &pin, const QString &pass, NInterface *n);
+    void authByPinPass(const QString &pin, const QString &pass, NInterface *n, std::function<void (const QJsonObject&)> callback);
 
-    bool authorize(const QString &altPassword, NInterface *n);
+    void authorize(const QString &pin, NInterface *n, std::function<void(const QJsonObject&)> callback);
 
     bool check(int permission);
 
@@ -49,11 +49,13 @@ public:
 
     UserState state();
 
-    bool loadFromDB(int id, NInterface *n);
-
     QJsonObject fConfig;
 
     QMap<int, QString> fSettings;
+
+    void addPermission(int permission);
+
+    void removePermission(int permission);
 
 private:
     QVector<int> fPermissions;
@@ -68,7 +70,6 @@ private:
 
     void getState(NInterface *n);
 
-    void getPermissions(NInterface *n);
 };
 
 #endif // C5USER_H

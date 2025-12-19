@@ -20,7 +20,7 @@
       <enum>QTabWidget::TabPosition::West</enum>
      </property>
      <property name="currentIndex">
-      <number>11</number>
+      <number>2</number>
      </property>
      <widget class="QWidget" name="tab_2">
       <attribute name="title">
@@ -539,12 +539,32 @@
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_10">
            <item>
-            <widget class="C5CheckBox" name="checkBox_97">
+            <widget class="C5CheckBox" name="checkBox_117">
              <property name="text">
-              <string>Show all sales (tax and all)</string>
+              <string>Enter to sales</string>
              </property>
              <property name="Tag" stdset="0">
-              <number>536</number>
+              <number>1203</number>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="C5CheckBox" name="checkBox_118">
+             <property name="text">
+              <string>Enter to storages deals</string>
+             </property>
+             <property name="Tag" stdset="0">
+              <number>1204</number>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="C5CheckBox" name="checkBox_97">
+             <property name="text">
+              <string>Fiscal report</string>
+             </property>
+             <property name="Tag" stdset="0">
+              <number>1205</number>
              </property>
             </widget>
            </item>
@@ -554,7 +574,7 @@
               <string>Show sales of all users</string>
              </property>
              <property name="Tag" stdset="0">
-              <number>539</number>
+              <number>1206</number>
              </property>
             </widget>
            </item>

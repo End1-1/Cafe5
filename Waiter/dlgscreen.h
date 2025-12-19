@@ -24,8 +24,6 @@ private slots:
 
     void serviceTimeout();
 
-    void loginResponse(const QJsonObject &jdoc);
-
     void timerTimeout();
 
     void on_btnClear_clicked();

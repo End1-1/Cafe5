@@ -1,7 +1,6 @@
 #include "datadriver.h"
 #include "dlgsplashscreen.h"
 #include "c5database.h"
-#include "working.h"
 
 DataDriver* DataDriver::fInstance = nullptr;
 QStringList DataDriver::norefresh;

@@ -274,6 +274,8 @@ public:
 
     static QStringList fDbParams;
 
+    static QString fUrl;
+
 private:
     bool fIsReady;
 

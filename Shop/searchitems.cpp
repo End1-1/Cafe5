@@ -7,8 +7,8 @@
 #include "goodsreserve.h"
 #include <QDebug>
 
-SearchItems::SearchItems() :
-    C5Dialog(),
+SearchItems::SearchItems(C5User *user) :
+    C5ShopDialog(user),
     ui(new Ui::SearchItems)
 {
     ui->setupUi(this);

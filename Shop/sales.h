@@ -59,10 +59,6 @@ private slots:
 
     void on_btnChangeDate_clicked();
 
-    void on_deStart_textChanged(const QString &arg1);
-
-    void on_deEnd_textChanged(const QString &arg1);
-
     void on_btnItemChange_clicked();
 
     void on_btnShowMenu_clicked();

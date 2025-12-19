@@ -47,15 +47,19 @@ public:
 
     QString getFieldStringValue(const QString &name);
 
+    static int mScreen;
+
 protected:
 
-    virtual void keyPressEvent(QKeyEvent *e);
+    virtual void keyPressEvent(QKeyEvent *e) override;
 
     virtual void keyEnter();
 
     virtual void keyControlPlusEnter();
 
     virtual void keyAlterPlusEnter();
+
+    virtual void showEvent(QShowEvent *e) override;
 
     NInterface* fHttp;
 

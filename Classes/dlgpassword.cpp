@@ -202,13 +202,9 @@ void DlgPassword::on_pushButton_12_clicked()
     }
 
     if(ui->lePassword->echoMode() == QLineEdit::Password) {
-        if(!fUser->authorize(pwd, fHttp)) {
-            ui->lePassword->clear();
-            C5Message::error(fUser->error());
-            return;
-        }
-
-        accept();
+        fUser->authorize(pwd, fHttp, [this](const QJsonObject & jdoc) {
+            accept();
+        });
     } else {
         accept();
     }

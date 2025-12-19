@@ -159,7 +159,7 @@ private:
 
     void removeDraft();
 
-    bool checkDiscountRight();
+    void checkDiscountRight(const QString &code);
 
 };
 

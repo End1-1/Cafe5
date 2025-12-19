@@ -114,11 +114,11 @@ void C5TableModel::sort(int column, Qt::SortOrder order)
     beginResetModel();
 
     if(!data_s.isEmpty()) {
-        fProxyData = data_s.values();
+        fProxyData = data_s.values().toVector();
     } else  if(!data_i.isEmpty()) {
-        fProxyData = data_i.values();
+        fProxyData = data_i.values().toVector();
     } else if(!data_d.isEmpty()) {
-        fProxyData = data_d.values();
+        fProxyData = data_d.values().toVector();
     }
 
     if(!fSortAsc) {

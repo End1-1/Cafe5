@@ -32,6 +32,7 @@ ViewOrder::ViewOrder(Working *w, const QString &order, C5User *user) :
     fWorking(w)
 {
     ui->setupUi(this);
+    showMaximized();
     fUuid = order;
     ui->tbl->setColumnWidths(ui->tbl->columnCount(), 0, 30, 300, 100, 100, 100, 0, 200);
     C5Database db;

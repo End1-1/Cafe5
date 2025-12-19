@@ -161,4 +161,9 @@
 #define cp_t11_miscelanous 1100
 #define cp_t11_do_now_show_input_prices 1101
 
+#define cp_t12_shop_enter_sale 1203
+#define cp_t12_shop_enter_store 1204
+#define cp_t12_shop_fiscal_report 1205
+#define cp_t12_shop_sale_of_all_users 1206
+
 #endif // C5PERMISSIONS_H

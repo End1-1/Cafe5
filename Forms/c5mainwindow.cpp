@@ -737,9 +737,11 @@ void C5MainWindow::on_listWidgetItemClicked(const QModelIndex &index)
         break;
 
     case cp_t6_goods_price:
+        createTab<C5GoodsPriceOrder>();
+        break;
+
     case cp_t6_goods:
         createTab<CR5Goods>();
-        createTab<C5GoodsPriceOrder>();
         break;
 
     case cp_t6_goods_special_prices:
