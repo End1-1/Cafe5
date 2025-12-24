@@ -6,8 +6,8 @@
 #include "c5database.h"
 #include "ninterface.h"
 
-C5DiscountRedeem::C5DiscountRedeem(const QString &id, int partnerId)
-    : C5Dialog(), ui(new Ui::C5DiscountRedeem)
+C5DiscountRedeem::C5DiscountRedeem(C5User *user, const QString &id, int partnerId)
+    : C5Dialog(user), ui(new Ui::C5DiscountRedeem)
 {
     ui->setupUi(this);
     ui->leTransaction->setText(id);

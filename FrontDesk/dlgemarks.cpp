@@ -2,8 +2,8 @@
 #include "ui_dlgemarks.h"
 #include "ninterface.h"
 
-DlgEmarks::DlgEmarks(const QStringList &emarks)
-    : C5Dialog()
+DlgEmarks::DlgEmarks(C5User *user, const QStringList &emarks)
+    : C5Dialog(user)
     , ui(new Ui::DlgEmarks)
 {
     ui->setupUi(this);

@@ -3,10 +3,10 @@
 #include "c5login.h"
 #include "logwriter.h"
 #include "c5servername.h"
-#include "dlgserverconnection.h"
 #include "c5config.h"
 #include "c5message.h"
 #include "c5officewidget.h"
+#include "c5connectiondialog.h"
 #include <QMessageBox>
 #include <QApplication>
 #include <QTranslator>
@@ -45,22 +45,16 @@ int main(int argc, char* argv[])
 
     LogWriter::write(LogWriterLevel::verbose, "Support SSL", QSslSocket::supportsSsl() ? "true" : "false");
     LogWriter::write(LogWriterLevel::verbose, "Support SSL version", QSslSocket::sslLibraryBuildVersionString());
-
-    while(__c5config.getRegValue("ss_server_address").toString().isEmpty()) {
-        DlgServerConnection::showSettings(nullptr);
-    }
-
-    auto c5sn  = new C5ServerName(__c5config.getRegValue("ss_server_address").toString());
+    auto c5sn  = new C5ServerName(QString("%1://%2").arg(C5ConnectionDialog::instance()->connectionType() == C5ConnectionDialog::noneSecure ? "ws" : "wss",
+                                  C5ConnectionDialog::instance()->serverAddress() + "/ws"));
 
     if(!c5sn->getServers()) {
         C5Message::error(c5sn->mErrorString);
-        DlgServerConnection::showSettings(0);
         return -1;
     }
 
     if(!c5sn->getConnection(__c5config.getRegValue("ss_database").toString())) {
         C5Message::error(c5sn->mErrorString);
-        DlgServerConnection::showSettings(0);
         return -1;
     }
 
@@ -88,7 +82,7 @@ int main(int argc, char* argv[])
         }
     }
 
-    C5Login l;
+    C5Login l(nullptr);
 
     if(l.exec() == QDialog::Accepted) {
         C5Config::fSettingsName = __c5config.getRegValue("ss_settings").toString();

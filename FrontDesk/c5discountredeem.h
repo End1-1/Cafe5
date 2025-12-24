@@ -12,7 +12,7 @@ class C5DiscountRedeem : public C5Dialog
 {
     Q_OBJECT
 public:
-    explicit C5DiscountRedeem(const QString &id, int partnerId);
+    explicit C5DiscountRedeem(C5User *user, const QString &id, int partnerId);
     ~C5DiscountRedeem();
     virtual void selectorCallback(int selector, const QJsonArray &data) override;
 private slots:

@@ -9,11 +9,7 @@ class C5User;
 class C5OfficeDialog : public C5Dialog
 {
 public:
-    C5OfficeDialog();
-
-protected:
-    static C5User* mUser;
-
+    C5OfficeDialog(C5User *user);
 };
 
 #endif // C5OFFICEDIALOG_H

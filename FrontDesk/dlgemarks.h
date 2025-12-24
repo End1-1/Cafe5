@@ -13,7 +13,7 @@ class DlgEmarks : public C5Dialog
     Q_OBJECT
 
 public:
-    explicit DlgEmarks(const QStringList &emarks);
+    explicit DlgEmarks(C5User *user, const QStringList &emarks);
 
     ~DlgEmarks();
 

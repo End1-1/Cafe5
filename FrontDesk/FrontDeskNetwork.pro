@@ -10,7 +10,10 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 include ($$PWD/Frontdesk.pri)
 
-RC_FILE = res.rc
+win32 {
+    RC_FILE = res.rc
+}
+
 
 TARGET = OfficeN
 TEMPLATE = app
@@ -32,6 +35,7 @@ RESOURCES += \
 DISTFILES += \
     ../resources/down-arrow.png \
     ../resources/up-arrow.png \
+    increase_version.ps1 \
     storehouse.ico
 
 ICON = storehouse.ico
@@ -55,7 +59,7 @@ win32: QMAKE_CXXFLAGS -= -Zc:strictStrings
  # }
 
 FORMS += \
-    ../Classes/dlgserverconnection.ui \
+    ../Forms/c5connectiondialog.ui \
     ../Forms/c5fiscalcancel.ui \
     ../Forms/c5goodsspecialprice.ui \
     ../Forms/dlgimportfromas.ui \
@@ -64,7 +68,8 @@ FORMS += \
     storedecomplectation.ui
 
 HEADERS += \
-    ../Classes/dlgserverconnection.h \
+    ../Classes/appwebsocket.h \
+    ../Forms/c5connectiondialog.h \
     ../Forms/c5fiscalcancel.h \
     ../Forms/c5goodsspecialprice.h \
     ../Forms/dlgimportfromas.h \
@@ -72,10 +77,12 @@ HEADERS += \
     c5officedialog.h \
     c5officewidget.h \
     dlgemarks.h \
-    storedecomplectation.h
+    storedecomplectation.h \
+    version.h
 
 SOURCES += \
-    ../Classes/dlgserverconnection.cpp \
+    ../Classes/appwebsocket.cpp \
+    ../Forms/c5connectiondialog.cpp \
     ../Forms/c5fiscalcancel.cpp \
     ../Forms/c5goodsspecialprice.cpp \
     ../Forms/dlgimportfromas.cpp \
@@ -85,4 +92,14 @@ SOURCES += \
     dlgemarks.cpp \
     storedecomplectation.cpp
 
+win32 {
+    version_inc.target = version_inc
+    version_inc.commands = powershell -NoProfile -ExecutionPolicy Bypass -File $$shell_path($$PWD/increase_version.ps1)
+    QMAKE_EXTRA_TARGETS += version_inc
+    PRE_TARGETDEPS += version_inc
+}
 
+
+win32 {
+    res_rc.depends += $$PWD/version.h
+}
