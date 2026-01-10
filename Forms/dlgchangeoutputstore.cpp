@@ -4,19 +4,22 @@
 #include "c5checkbox.h"
 #include "c5cache.h"
 #include "c5database.h"
+#include "dict_dish_state.h"
 #include "c5message.h"
 #include "c5utils.h"
 
-DlgChangeOutputStore::DlgChangeOutputStore() :
-    C5Dialog(),
+DlgChangeOutputStore::DlgChangeOutputStore(C5User *user) :
+    C5Dialog(user),
     ui(new Ui::DlgChangeOutputStore)
 {
     ui->setupUi(this);
     ui->tbl->setRowCount(1);
-    for (int i = 0; i < ui->tbl->columnCount(); i++) {
+
+    for(int i = 0; i < ui->tbl->columnCount(); i++) {
         C5LineEdit *l = ui->tbl->createLineEdit(0, i);
         connect(l, SIGNAL(textChanged(QString)), this, SLOT(search(QString)));
     }
+
     ui->tbl->setColumnWidths(ui->tbl->columnCount(), 0, 0, 100, 100, 200, 250, 100, 100, 30);
     ui->leStore->setSelector(ui->leStoreName, cache_goods_store);
 }
@@ -30,9 +33,11 @@ void DlgChangeOutputStore::refresh(const QDate &d1, const QDate &d2)
 {
     ui->deStart->setDate(d1);
     ui->deEnd->setDate(d2);
-    for (int i = 0; i < ui->tbl->columnCount(); i++) {
+
+    for(int i = 0; i < ui->tbl->columnCount(); i++) {
         ui->tbl->lineEdit(0, i)->clear();
     }
+
     C5Database db;
     db[":f_datecash1"] = d1;
     db[":f_datecash2"] = d2;
@@ -52,10 +57,12 @@ void DlgChangeOutputStore::refresh(const QDate &d1, const QDate &d2)
             "order by p2.f_name ");
     ui->tbl->setRowCount(1 + db.rowCount());
     int row = 1;
-    while (db.nextRow()) {
-        for (int i = 0; i < ui->tbl->columnCount() - 1; i++) {
+
+    while(db.nextRow()) {
+        for(int i = 0; i < ui->tbl->columnCount() - 1; i++) {
             ui->tbl->setData(row, i, db.getValue(i));
         }
+
         ui->tbl->createCheckbox(row, 8);
         row++;
     }
@@ -63,7 +70,7 @@ void DlgChangeOutputStore::refresh(const QDate &d1, const QDate &d2)
 
 void DlgChangeOutputStore::searchInTable(int col, const QString &str)
 {
-    for (int i = 1; i < ui->tbl->rowCount(); i++) {
+    for(int i = 1; i < ui->tbl->rowCount(); i++) {
         bool rh = true;
         rh = ui->tbl->getString(i, col).contains(str, Qt::CaseInsensitive);
         ui->tbl->setRowHidden(i, !rh);
@@ -72,17 +79,19 @@ void DlgChangeOutputStore::searchInTable(int col, const QString &str)
 
 void DlgChangeOutputStore::search(const QString &arg1)
 {
-    C5LineEdit *l = static_cast<C5LineEdit *>(sender());
+    C5LineEdit *l = static_cast<C5LineEdit*>(sender());
     int r, c;
-    if (!ui->tbl->findWidget(l, r, c)) {
+
+    if(!ui->tbl->findWidget(l, r, c)) {
         return;
     }
+
     searchInTable(c, arg1);
 }
 
 void DlgChangeOutputStore::on_btnCheckVisible_clicked()
 {
-    for (int i = 1; i < ui->tbl->rowCount(); i++) {
+    for(int i = 1; i < ui->tbl->rowCount(); i++) {
         ui->tbl->checkBox(i, 8)->setChecked(!ui->tbl->isRowHidden(i));
     }
 }
@@ -94,20 +103,24 @@ void DlgChangeOutputStore::on_btnRefresh_clicked()
 
 void DlgChangeOutputStore::on_btnGo_clicked()
 {
-    if (ui->leStore->getInteger() == 0) {
+    if(ui->leStore->getInteger() == 0) {
         C5Message::error(tr("Store is not selected"));
         return;
     }
-    if (C5Message::question(tr("Are you sure to change store?")) != QDialog::Accepted) {
+
+    if(C5Message::question(tr("Are you sure to change store?")) != QDialog::Accepted) {
         return;
     }
+
     C5Database db;
-    for (int i = 1; i < ui->tbl->rowCount(); i++) {
-        if (ui->tbl->checkBox(i, 8)->isChecked()) {
+
+    for(int i = 1; i < ui->tbl->rowCount(); i++) {
+        if(ui->tbl->checkBox(i, 8)->isChecked()) {
             db[":f_store"] = ui->leStore->getInteger();
             db[":f_id"] = ui->tbl->getString(i, 1);
             db.exec("update o_body set f_store=:f_store where f_id=:f_id");
         }
     }
+
     C5Message::info(tr("Done"));
 }

@@ -16,11 +16,11 @@ class DlgPrecheckOptions : public C5Dialog
     Q_OBJECT
 
 public:
-    explicit DlgPrecheckOptions();
+    explicit DlgPrecheckOptions(C5User *user);
 
     ~DlgPrecheckOptions();
-
-    static int precheck();
+    
+    static int precheck(C5User *user);
 
 private slots:
     void on_btnCancel_clicked();

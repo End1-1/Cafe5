@@ -2,14 +2,13 @@
 #include "c5config.h"
 #include "c5systempreference.h"
 #include "ndataprovider.h"
-#include "c5servername.h"
+#include "dlgpin.h"
 #include "ndataprovider.h"
-#include "dlgsplashscreen.h"
 #include "fileversion.h"
 #include "logwriter.h"
 #include "c5message.h"
+#include "printtaxn.h"
 #include "c5database.h"
-#include "dlgserverconnection.h"
 #include <QFile>
 #include <QLockFile>
 #include <QSslSocket>
@@ -24,6 +23,7 @@ int main(int argc, char* argv[])
 {
     qputenv("QT_OPENGL", "angle");
     QApplication a(argc, argv);
+    a.setQuitOnLastWindowClosed(false);
 #ifndef QT_DEBUG
     QStringList libPath = QCoreApplication::libraryPaths();
     libPath << a.applicationDirPath();
@@ -48,9 +48,6 @@ int main(int argc, char* argv[])
 
     LogWriter::write(LogWriterLevel::verbose, "Support SSL", QSslSocket::supportsSsl() ? "true" : "false");
     LogWriter::write(LogWriterLevel::verbose, "Support SSL version", QSslSocket::sslLibraryBuildVersionString());
-    auto *dlgsplash = new DlgSplashScreen();
-    dlgsplash->show();
-    emit dlgsplash->messageSignal("Please, wait...");
     QTranslator t;
 
     if(t.load(":/Smart.qm")) {
@@ -72,66 +69,47 @@ int main(int argc, char* argv[])
         a.setStyleSheet(styleFile.readAll());
     }
 
-    C5ServerName sng(__c5config.getRegValue("ss_server_address").toString());
-
-    if(!sng.getConnection(__c5config.getRegValue("ss_database").toString())) {
-        C5Message::error(sng.mErrorString);
-        DlgServerConnection::showSettings(0);
-        return 1;
-    }
-
-    QJsonObject js = sng.mReply;
-    C5Config::fDBHost = js["settings"].toString();
-    C5Config::fDBPath = js["database"].toString();
-    C5Config::fDBUser = js["username"].toString();
-    C5Config::fDBPassword = js["password"].toString();
-    C5Database::fDbParams = C5Config::dbParams();
-    C5Config::fSettingsName = __c5config.getRegValue("ss_settings").toString();
-    C5Config::fFullScreen = true;
-#ifdef QT_DEBUG
-    C5Config::fFullScreen = false;
-#endif
-    NDataProvider::mProtocol = C5Config::fDBHost;
-    NDataProvider::mHost = C5Config::fDBPath;
-    NDataProvider::mAppName = "smart";
-    NDataProvider::mFileVersion = FileVersion::getVersionString(a.applicationFilePath());
-    QSettings ss(_ORGANIZATION_, _APPLICATION_ + QString("\\") + _MODULE_);
-    ss.setValue("server", "");
-    C5Config::initParamsFromDb();
-
-    if(!C5SystemPreference::checkDecimalPointAndSeparator()) {
-        return 0;
-    }
-
-    Workspace w;
-
-    for(const QString &s : args) {
+    for(const QString &s : std::as_const(args)) {
         if(s.startsWith("/monitor")) {
-            QList<QScreen*> screens = a.screens();
             int monitor = 0;
             QStringList mon = s.split("=");
 
             if(mon.length() == 2) {
                 monitor = mon.at(1).toInt();
+                C5Dialog::mScreen = monitor;
             }
-
-            w.move(screens.at(monitor)->geometry().topLeft());
         }
     }
 
-    C5Config::fParentWidget = &w;
-#ifdef QT_DEBUG
-    C5Database::LOGGING = true;
-#endif
+    QString fileVersion =  FileVersion::getVersionString(a.applicationFilePath());
+    int build = 0;
+    const QStringList parts = fileVersion.split('.');
+
+    if(parts.size() >= 4) {
+        build = parts.at(3).toInt();
+    }
+
+    PrintTaxN::mDebugRseq = build;
+    NDataProvider::mAppName = "smart";
+    NDataProvider::mFileVersion = fileVersion;
+    auto *dlgPin = new DlgPin();
+
+    if(dlgPin->exec() == QDialog::Rejected) {
+        return 0;
+    }
+
+    if(!C5SystemPreference::checkDecimalPointAndSeparator()) {
+        return 0;
+    }
 
     if(C5Config::getValue(param_debuge_mode).toInt() > 0) {
         C5Database::LOGGING = true;
         NDataProvider::mDebug = true;
     }
 
-    dlgsplash->hide();
-    dlgsplash->deleteLater();
-    w.showFullScreen();
-    w.login();
+    C5Dialog::setMainWindow(nullptr);
+    auto *w = new Workspace(dlgPin->mUser);
+    w->setWindowModality(Qt::NonModal);
+    w->showMaximized();
     return a.exec();
 }

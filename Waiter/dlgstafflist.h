@@ -12,7 +12,7 @@ class DlgStaffList : public C5Dialog
     Q_OBJECT
 
 public:
-    explicit DlgStaffList();
+    explicit DlgStaffList(C5User *user);
 
     ~DlgStaffList();
 

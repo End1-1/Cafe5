@@ -7,8 +7,8 @@
 #include "c5message.h"
 #include <QDoubleValidator>
 
-C5CostumerDebtPayment::C5CostumerDebtPayment(int type) :
-    C5Dialog(),
+C5CostumerDebtPayment::C5CostumerDebtPayment(C5User *user, int type) :
+    C5Dialog(user),
     ui(new Ui::C5CostumerDebtPayment)
 {
     ui->setupUi(this);

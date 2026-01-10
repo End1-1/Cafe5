@@ -145,6 +145,7 @@ QString C5Translator::RU(const QString &value)
 
 void C5Translator::insertUnknown(const QString &value)
 {
+    Q_UNUSED(value);
     // TODO
     // C5Database db;
     // db[":f_en"] = value;

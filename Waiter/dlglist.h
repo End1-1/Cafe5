@@ -12,11 +12,11 @@ class DlgList : public C5Dialog
     Q_OBJECT
 
 public:
-    explicit DlgList();
+    explicit DlgList(C5User *user);
 
     ~DlgList();
-
-    static bool getValue(const QStringList &names, int &index);
+    
+    static bool getValue(C5User *user, const QStringList &names, int &index);
 
 private slots:
     void on_lst_clicked(const QModelIndex &index);

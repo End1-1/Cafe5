@@ -12,7 +12,7 @@ class DlgGuestInfo : public C5Dialog
     Q_OBJECT
 
 public:
-    explicit DlgGuestInfo();
+    explicit DlgGuestInfo(C5User *user);
     ~DlgGuestInfo();
     int fCode;
 

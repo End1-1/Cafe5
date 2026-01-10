@@ -12,9 +12,9 @@ class TouchEnterTaxReceiptNumber : public C5Dialog
     Q_OBJECT
 
 public:
-    explicit TouchEnterTaxReceiptNumber();
+    explicit TouchEnterTaxReceiptNumber(C5User *user);
     ~TouchEnterTaxReceiptNumber();
-    static bool getTaxReceiptNumber(QString &number);
+    static bool getTaxReceiptNumber(QString &number, C5User *user);
 
 private slots:
     void on_btnBackspace_clicked();

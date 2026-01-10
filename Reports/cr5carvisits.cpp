@@ -5,6 +5,7 @@
 #include "c5database.h"
 #include "c5salefromstoreorder.h"
 #include "cr5carvisitsfilter.h"
+#include "c5message.h"
 
 CR5CarVisits::CR5CarVisits(QWidget *parent) :
     C5ReportWidget(parent)
@@ -122,7 +123,7 @@ bool CR5CarVisits::tblDoubleClicked(int row, int column, const QJsonArray &value
         }
 
         case 2: {
-            C5SaleFromStoreOrder::openOrder(values.at(fModel->fColumnNameIndex["f_id"]).toString());
+            C5SaleFromStoreOrder::openOrder(mUser, values.at(fModel->fColumnNameIndex["f_id"]).toString());
             break;
         }
 

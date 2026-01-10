@@ -4,11 +4,12 @@
 #include "sessionorders.h"
 #include "c5config.h"
 #include "c5database.h"
+#include "dict_dish_state.h"
 #include "c5utils.h"
 #include <QFile>
 
-DlgSmartReports::DlgSmartReports() :
-    C5Dialog(),
+DlgSmartReports::DlgSmartReports(C5User *user) :
+    C5Dialog(user),
     ui(new Ui::DlgSmartReports)
 {
     ui->setupUi(this);
@@ -68,7 +69,7 @@ void DlgSmartReports::on_list_itemClicked(QListWidgetItem *item)
         break;
 
     case 3:
-        SessionOrders().exec();
+        SessionOrders(mUser).exec();
         break;
 
     case 4:
@@ -87,7 +88,16 @@ void DlgSmartReports::reportCommonDishes()
     QFont font(qApp->font());
     font.setPointSize(28);
     C5Printing p;
-    p.setSceneParams(650, 2800, QPageLayout::Portrait);
+    QPrinterInfo pi = QPrinterInfo::printerInfo(C5Config::localReceiptPrinter());
+    QPrinter printer(pi);
+    printer.setPageSize(QPageSize::Custom);
+    printer.setFullPage(false);
+    QRectF pr = printer.pageRect(QPrinter::DevicePixel);
+    constexpr qreal SAFE_RIGHT_MM = 2.0;
+    qreal safePx = SAFE_RIGHT_MM * printer.logicalDpiX() / 25.4;
+    p.setSceneParams(pr.width() - safePx, pr.height(), printer.logicalDpiX());
+    const int bs = 14;
+    font.setPointSize(bs);
     p.setFont(font);
 
     if(QFile::exists("./logo_receipt.png")) {
@@ -126,13 +136,8 @@ void DlgSmartReports::reportCommonDishes()
             "where h.f_state=:f_stateh and b.f_state=:f_stated and h.f_hall=:f_hall and h.f_datecash between :f_datecash1 and :f_datecash2 "
             "group by 1, 3 ");
     p.setFontBold(false);
-    p.setFontSize(22);
 
     while(dd.nextRow()) {
-        if(p.checkBr(p.fLineHeight + 2)) {
-            p.br();
-        }
-
         total += dd.getDouble("f_total");
         p.ltext(dd.getString("f_name"), 0);
         p.br();
@@ -146,7 +151,6 @@ void DlgSmartReports::reportCommonDishes()
     p.line(4);
     p.br(3);
     p.setFontBold(true);
-    p.setFontSize(28);
     p.br();
     p.br();
     p.ltext(tr("Quantity of orders"), 0);
@@ -159,11 +163,11 @@ void DlgSmartReports::reportCommonDishes()
     p.br();
     p.line();
     p.br();
-    p.setFontSize(18);
+    p.setFontSize(bs - 2);
     p.ltext(tr("Printed"), 0);
     p.rtext(QDateTime::currentDateTime().toString(FORMAT_DATETIME_TO_STR));
     p.br();
-    p.print(C5Config::localReceiptPrinter(), QPageSize::Custom);
+    p.print(printer);
 }
 
 void DlgSmartReports::reportCommonDishesWithTime()
@@ -172,7 +176,16 @@ void DlgSmartReports::reportCommonDishesWithTime()
     QFont font(qApp->font());
     font.setPointSize(28);
     C5Printing p;
-    p.setSceneParams(650, 2800, QPageLayout::Portrait);
+    QPrinterInfo pi = QPrinterInfo::printerInfo(C5Config::localReceiptPrinter());
+    QPrinter printer(pi);
+    printer.setPageSize(QPageSize::Custom);
+    printer.setFullPage(false);
+    QRectF pr = printer.pageRect(QPrinter::DevicePixel);
+    constexpr qreal SAFE_RIGHT_MM = 2.0;
+    qreal safePx = SAFE_RIGHT_MM * printer.logicalDpiX() / 25.4;
+    p.setSceneParams(pr.width() - safePx, pr.height(), printer.logicalDpiX());
+    const int bs = 14;
+    font.setPointSize(bs);
     p.setFont(font);
 
     if(QFile::exists("./logo_receipt.png")) {
@@ -213,10 +226,6 @@ void DlgSmartReports::reportCommonDishesWithTime()
     p.setFontSize(22);
 
     while(dd.nextRow()) {
-        if(p.checkBr(p.fLineHeight + 2)) {
-            p.br();
-        }
-
         total += dd.getDouble("f_total");
         p.ltext(dd.getString("f_name"), 0);
         p.br();
@@ -243,11 +252,11 @@ void DlgSmartReports::reportCommonDishesWithTime()
     p.br();
     p.line();
     p.br();
-    p.setFontSize(18);
+    p.setFontSize(bs - 2);
     p.ltext(tr("Printed"), 0);
     p.rtext(QDateTime::currentDateTime().toString(FORMAT_DATETIME_TO_STR));
     p.br();
-    p.print(C5Config::localReceiptPrinter(), QPageSize::Custom);
+    p.print(printer);
 }
 
 void DlgSmartReports::printDeliveryReport()
@@ -256,7 +265,16 @@ void DlgSmartReports::printDeliveryReport()
     QFont font(qApp->font());
     font.setPointSize(28);
     C5Printing p;
-    p.setSceneParams(650, 2800, QPageLayout::Portrait);
+    QPrinterInfo pi = QPrinterInfo::printerInfo(C5Config::localReceiptPrinter());
+    QPrinter printer(pi);
+    printer.setPageSize(QPageSize::Custom);
+    printer.setFullPage(false);
+    QRectF pr = printer.pageRect(QPrinter::DevicePixel);
+    constexpr qreal SAFE_RIGHT_MM = 2.0;
+    qreal safePx = SAFE_RIGHT_MM * printer.logicalDpiX() / 25.4;
+    p.setSceneParams(pr.width() - safePx, pr.height(), printer.logicalDpiX());
+    const int bs = 14;
+    font.setPointSize(bs);
     p.setFont(font);
 
     if(QFile::exists("./logo_receipt.png")) {
@@ -301,11 +319,11 @@ void DlgSmartReports::printDeliveryReport()
     p.br();
     p.line();
     p.br();
-    p.setFontSize(18);
+    p.setFontSize(bs - 2);
     p.ltext(tr("Printed"), 0);
     p.rtext(QDateTime::currentDateTime().toString(FORMAT_DATETIME_TO_STR));
     p.br();
-    p.print(C5Config::localReceiptPrinter(), QPageSize::Custom);
+    p.print(printer);
 }
 
 void DlgSmartReports::printTotalReport()
@@ -314,7 +332,14 @@ void DlgSmartReports::printTotalReport()
     QFont font(qApp->font());
     font.setPointSize(28);
     C5Printing p;
-    p.setSceneParams(650, 2800, QPageLayout::Portrait);
+    QPrinterInfo pi = QPrinterInfo::printerInfo(C5Config::localReceiptPrinter());
+    QPrinter printer(pi);
+    printer.setPageSize(QPageSize::Custom);
+    printer.setFullPage(false);
+    QRectF pr = printer.pageRect(QPrinter::DevicePixel);
+    constexpr qreal SAFE_RIGHT_MM = 2.0;
+    qreal safePx = SAFE_RIGHT_MM * printer.logicalDpiX() / 25.4;
+    p.setSceneParams(pr.width() - safePx, pr.height(), printer.logicalDpiX());
     p.setFont(font);
 
     if(QFile::exists("./logo_receipt.png")) {
@@ -367,7 +392,7 @@ void DlgSmartReports::printTotalReport()
     p.ltext(tr("Printed"), 0);
     p.rtext(QDateTime::currentDateTime().toString(FORMAT_DATETIME_TO_STR));
     p.br();
-    p.print(C5Config::localReceiptPrinter(), QPageSize::Custom);
+    p.print(printer);
 }
 
 void DlgSmartReports::on_btnStartBack_clicked()

@@ -13,9 +13,9 @@ class supplier : public C5Dialog
     Q_OBJECT
 
 public:
-    explicit supplier();
+    explicit supplier(C5User *user);
     ~supplier();
-    static bool getSupplier(int& id, QString &name);
+    static bool getSupplier(int& id, QString &name, C5User *user);
 
 private slots:
     void on_btnCancel_clicked();

@@ -6,7 +6,8 @@
 #define idname_users_fullname 1
 #define idname_partners_full 2
 
-namespace Ui {
+namespace Ui
+{
 class DlgGetIDName;
 }
 
@@ -15,9 +16,11 @@ class DlgGetIDName : public C5Dialog
     Q_OBJECT
 
 public:
-    explicit DlgGetIDName(const QStringList &dbParams, QWidget *parent = nullptr);
+    explicit DlgGetIDName(C5User *user);
+
     ~DlgGetIDName();
-    static bool get(const QStringList &dbParams, QString &id, QString &name, int table, QWidget *parent = nullptr);
+
+    static bool get(C5User *user, QString &id, QString &name, int table, QWidget *parent = nullptr);
 
 private slots:
     void on_btnCancel_clicked();
@@ -31,7 +34,7 @@ private slots:
     void on_tbl_cellDoubleClicked(int row, int column);
 
 private:
-    Ui::DlgGetIDName *ui;
+    Ui::DlgGetIDName* ui;
     int fTable;
     QString fId;
     QString fName;

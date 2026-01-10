@@ -325,7 +325,7 @@ void C5StoreBarcode::setSearchParameters()
     int id;
     QString name;
 
-    if(DlgSelectCurrency::getCurrency(id, name, this) == false) {
+    if(DlgSelectCurrency::getCurrency(mUser, id, name) == false) {
         return;
     }
 

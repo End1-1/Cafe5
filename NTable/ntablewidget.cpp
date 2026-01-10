@@ -9,6 +9,7 @@
 #include "c5utils.h"
 #include "nfilterdlg.h"
 #include "nhandler.h"
+#include "c5user.h"
 #include "c5message.h"
 #include <QJsonDocument>
 #include <QJsonObject>
@@ -26,7 +27,7 @@
 
 QString NTableWidget::mHost;
 
-NTableWidget::NTableWidget(const QString &route, QWidget *parent) :
+NTableWidget::NTableWidget(C5User *user, const QString &route, QWidget *parent) :
     C5Widget(parent),
     ui(new Ui::NTableWidget),
     mRoute(route),
@@ -46,7 +47,7 @@ NTableWidget::NTableWidget(const QString &route, QWidget *parent) :
     connect(ui->mTableView->horizontalScrollBar(), SIGNAL(valueChanged(int)), this, SLOT(tblValueChanged(int)));
     connect(ui->tblTotal->horizontalScrollBar(), SIGNAL(valueChanged(int)), this, SLOT(tblValueChanged2(int)));
     ui->widget->setVisible(false);
-    mHandler = new NHandler(this);
+    mHandler = new NHandler(user, this);
 }
 
 NTableWidget::~NTableWidget()
@@ -128,7 +129,7 @@ void NTableWidget::sum()
 
 void NTableWidget::queryStarted()
 {
-    mLoadingDlg = new NLoadingDlg(this);
+    mLoadingDlg = new NLoadingDlg(tr("Query"), this);
     mLoadingDlg->open();
 }
 
@@ -139,7 +140,7 @@ void NTableWidget::filterByColumn()
     QStringList sortedValues = filterValues.values();
     std::sort(sortedValues.begin(), sortedValues.end());
 
-    if(C5FilterValues::filterValues(sortedValues)) {
+    if(C5FilterValues::filterValues(sortedValues, mUser)) {
         static_cast<NTableModel*>(ui->mTableView->model())->setColumnFilter(sortedValues.join("|"), fFilterColumn);
     }
 

@@ -70,5 +70,9 @@
         <file>tv.png</file>
         <file>qrcode.png</file>
         <file>takeaway.png</file>
+        <file>broom.png</file>
+        <file>checkall.png</file>
+        <file>checked.png</file>
+        <file>icon_1024x1024_transparent.png</file>
     </qresource>
 </RCC>

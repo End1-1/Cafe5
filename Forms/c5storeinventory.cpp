@@ -2,16 +2,17 @@
 #include "ui_c5storeinventory.h"
 #include "c5selector.h"
 #include "c5cache.h"
-#include "c5printing.h"
-#include "c5printpreview.h"
 #include "c5config.h"
 #include "c5user.h"
 #include "ce5goods.h"
 #include "c5message.h"
+#include "c5htmlprint.h"
 #include "ce5editor.h"
 #include "c5utils.h"
 #include "c5storedraftwriter.h"
+#include <QPrinter>
 #include <QShortcut>
+#include <QPrintPreviewDialog>
 #include <QUuid>
 
 C5StoreInventory::C5StoreInventory(QWidget *parent) :
@@ -174,132 +175,77 @@ void C5StoreInventory::saveDoc()
     C5Message::info(tr("Saved"));
 }
 
+QString C5StoreInventory::makeInventoryTable(C5TableWidget *tbl)
+{
+    QString h;
+    QTextStream s(&h);
+    s << "<table>";
+    s << "<tr>"
+      << "<th>NN</th>"
+      << "<th>Material code</th>"
+      << "<th>Goods</th>"
+      << "<th class='right'>Qty</th>"
+      << "<th>Unit</th>"
+      << "<th class='right'>Price</th>"
+      << "<th class='right'>Total</th>"
+      << "</tr>";
+
+    for(int i = 0; i < tbl->rowCount(); ++i) {
+        s << "<tr>";
+        s << "<td class='center'>" << i + 1 << "</td>";
+        s << "<td>" << tbl->getString(i, 1) << "</td>";
+        s << "<td>" << tbl->getString(i, 2) << "</td>";
+        s << "<td class='right'>" << tbl->lineEdit(i, 3)->text() << "</td>";
+        s << "<td>" << tbl->getString(i, 4) << "</td>";
+        s << "<td class='right'>" << tbl->lineEdit(i, 5)->text() << "</td>";
+        s << "<td class='right'>" << tbl->lineEdit(i, 6)->text() << "</td>";
+        s << "</tr>";
+    }
+
+    s << "</table>";
+    return h;
+}
+
 void C5StoreInventory::printDoc()
 {
-    if(ui->leDocNum->text().isEmpty()) {
-        C5Message::error(tr("Document is not saved"));
+    QString html = loadTemplate("store_inventory_a4.html");
+
+    if(html.isEmpty()) {
+        C5Message::error("Template not found");
         return;
     }
 
-    C5Printing p;
-    QList<qreal> points;
-    QStringList vals;
-    p.setSceneParams(2000, 2700, QPageLayout::Portrait);
-    p.setFontSize(25);
-    p.setFontBold(true);
-    QString docTypeText = tr("Store inventorization");
-    p.ctext(QString("%1 N%2").arg(docTypeText).arg(ui->leDocNum->text()));
-    p.br();
-    p.br();
-    p.setFontSize(20);
-    p.setFontBold(false);
-    QString storeInName = ui->leStoreName->text();
-    p.br();
-    p.setFontBold(true);
-    points.clear();
-    points << 50 << 200;
-    vals << tr("Date");
-
-    if(!storeInName.isEmpty()) {
-        vals << tr("Store, input");
-        points << 400;
-    }
-
-    if(!ui->leComment->isEmpty()) {
-        vals << tr("Comment");
-        points << 600;
-    }
-
-    p.tableText(points, vals, p.fLineHeight + 20);
-    p.br(p.fLineHeight + 20);
-    p.setFontBold(false);
-    vals.clear();
-    vals << ui->deDate->text();
-
-    if(!storeInName.isEmpty()) {
-        vals << ui->leStoreName->text();
-    }
-
-    if(!ui->leComment->isEmpty()) {
-        vals << ui->leComment->text();
-    }
-
-    p.tableText(points, vals, p.fLineHeight + 20);
-    p.br(p.fLineHeight + 20);
-    p.br(p.fLineHeight + 20);
-    points.clear();
-    vals.clear();
-    p.setFontBold(true);
-    points << 50;
-    p.tableText(points, vals, p.fLineHeight + 20);
-    p.br(p.fLineHeight + 20);
-    p.setFontBold(false);
-    points.clear();
-    vals.clear();
-    points << 50;
-    p.tableText(points, vals, p.fLineHeight + 20);
-    p.br();
-    p.br();
-    p.br();
-    points.clear();
-    points << 50 << 100 << 200 << 600 << 250 << 250 << 250 << 270;
-    vals.clear();
-    vals << tr("NN")
-         << tr("Material code")
-         << tr("Goods")
-         << tr("Qty")
-         << tr("Unit")
-         << tr("Price")
-         << tr("Total");
-    p.setFontBold(true);
-    p.tableText(points, vals, p.fLineHeight + 20);
-    p.br(p.fLineHeight + 20);
-    p.setFontBold(false);
-
-    for(int i = 0; i < ui->tblGoods->rowCount(); i++) {
-        if(p.checkBr(p.fLineHeight + 20)) {
-            p.br(p.fLineHeight + 20);
-            p.br();
-        }
-
-        vals.clear();
-        vals << QString::number(i + 1);
-        vals << ui->tblGoods->getString(i, 1);
-        vals << ui->tblGoods->getString(i, 2);
-        vals << ui->tblGoods->lineEdit(i, 3)->text();
-        vals << ui->tblGoods->getString(i, 4);
-        vals << ui->tblGoods->lineEdit(i, 5)->text();
-        vals << ui->tblGoods->lineEdit(i, 6)->text();
-        p.tableText(points, vals, p.fLineHeight + 20);
-
-        if(p.checkBr(p.fLineHeight + 20)) {
-            p.br(p.fLineHeight + 20);
-        }
-
-        p.br(p.fLineHeight + 20);
-    }
-
-    points.clear();
-    points << 1200
-           << 500
-           << 270;
-    vals.clear();
-    vals << tr("Total amount");
-    vals << ui->leTotal->text();
-    p.tableText(points, vals, p.fLineHeight + 20);
-    p.br(p.fLineHeight + 20);
-    p.br(p.fLineHeight + 20);
-    p.line(50, p.fTop, 700, p.fTop);
-    p.line(1000, p.fTop, 1650, p.fTop);
-    C5PrintPreview pp(&p);
-    pp.exec();
+    QMap<QString, QString> vars;
+    vars["title"] =
+        tr("Store inventorization") + " N" + ui->leDocNum->text();
+    vars["date"] = ui->deDate->text();
+    vars["total"] = ui->leTotal->text();
+    vars["goods_table"] = makeInventoryTable(ui->tblGoods);
+    // динамические колонки
+    vars["store_header"] =
+        ui->leStoreName->text().isEmpty() ? "" : "<th>Store, input</th>";
+    vars["store_value"] =
+        ui->leStoreName->text().isEmpty() ? "" : "<td>" + ui->leStoreName->text() + "</td>";
+    vars["comment_header"] =
+        ui->leComment->isEmpty() ? "" : "<th>Comment</th>";
+    vars["comment_value"] =
+        ui->leComment->isEmpty() ? "" : "<td>" + ui->leComment->text() + "</td>";
+    html = applyTemplate(html, vars);
+    QTextDocument doc;
+    doc.setHtml(html);
+    QPrinter printer(QPrinter::HighResolution);
+    printer.setPageSize(QPageSize::A4);
+    printer.setFullPage(false);
+    QPrintPreviewDialog preview(&printer, this);
+    connect(&preview, &QPrintPreviewDialog::paintRequested, [&](QPrinter * p) { doc.print(p); });
+    preview.exec();
 }
 
 void C5StoreInventory::on_btnAddGoods_clicked()
 {
     QJsonArray vals;
 
-    if(!C5Selector::getValueOfColumn(cache_goods, vals, 3)) {
+    if(!C5Selector::getValueOfColumn(mUser, cache_goods, vals, 3)) {
         return;
     }
 
@@ -435,7 +381,7 @@ void C5StoreInventory::tblTotalChanged(const QString &arg1)
 void C5StoreInventory::on_btnNew_clicked()
 {
     CE5Goods *ep = new CE5Goods();
-    C5Editor *e = C5Editor::createEditor(ep, 0);
+    C5Editor *e = C5Editor::createEditor(mUser, ep, 0);
     QList<QMap<QString, QVariant> > data;
 
     if(e->getResult(data)) {

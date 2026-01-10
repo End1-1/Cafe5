@@ -3,7 +3,8 @@
 
 #include "c5dialog.h"
 
-namespace Ui {
+namespace Ui
+{
 class DlgMemoryRead;
 }
 
@@ -12,10 +13,13 @@ class DlgMemoryRead : public C5Dialog
     Q_OBJECT
 
 public:
-    explicit DlgMemoryRead();
+    explicit DlgMemoryRead(C5User *user);
+
     ~DlgMemoryRead();
-    static int getWindow();
-    static int sessionHistory();
+
+    static int getWindow(C5User *user);
+
+    static int sessionHistory(C5User *user);
 
 private slots:
     void on_btnCancel_clicked();
@@ -29,7 +33,7 @@ private slots:
     void on_btnOpen_2_clicked();
 
 private:
-    Ui::DlgMemoryRead *ui;
+    Ui::DlgMemoryRead* ui;
     int fResult;
     int getSessionHistory();
     int getIncompleteOrders();

@@ -12,7 +12,7 @@ class dlgvisit : public C5Dialog
 {
     Q_OBJECT
 public:
-    explicit dlgvisit(const QString &code);
+    explicit dlgvisit(const QString &code, C5User *user);
     ~dlgvisit();
 private slots:
     void on_btnClose_clicked();

@@ -6,6 +6,8 @@
 #include <QIcon>
 #include <QToolBar>
 
+class C5User;
+
 class C5Widget : public QWidget
 {
     Q_OBJECT
@@ -42,6 +44,8 @@ public:
     virtual bool reportHandler(const QString &handleId, const QVariant &data);
 
     QString fWindowUuid;
+
+    C5User* mUser;
 
 protected:
     QToolBar* fToolBar;

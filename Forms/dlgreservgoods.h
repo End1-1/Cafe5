@@ -13,11 +13,11 @@ class DlgReservGoods : public C5Dialog
     Q_OBJECT
 
 public:
-    explicit DlgReservGoods(int store, int goods, double qty);
+    explicit DlgReservGoods(C5User *user, int store, int goods, double qty);
 
-    explicit DlgReservGoods(int id);
-
-    explicit DlgReservGoods();
+    explicit DlgReservGoods(int id, C5User *user);
+    
+    explicit DlgReservGoods(C5User *user);
 
     ~DlgReservGoods();
 

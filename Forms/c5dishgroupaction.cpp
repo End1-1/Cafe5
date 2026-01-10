@@ -2,8 +2,8 @@
 #include "ui_c5dishgroupaction.h"
 #include "c5cache.h"
 
-C5DishGroupAction::C5DishGroupAction() :
-    C5Dialog(),
+C5DishGroupAction::C5DishGroupAction(C5User *user) :
+    C5Dialog(user),
     ui(new Ui::C5DishGroupAction)
 {
     ui->setupUi(this);
@@ -38,11 +38,12 @@ void C5DishGroupAction::on_btnSave_clicked()
 
 bool C5DishGroupAction::setParam(QString &id, C5LineEditWithSelector *l, QCheckBox *c)
 {
-    if (c->isChecked()) {
-        if (!l->isEmpty()) {
+    if(c->isChecked()) {
+        if(!l->isEmpty()) {
             id = l->text();
             return true;
         }
     }
+
     return false;
 }

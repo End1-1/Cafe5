@@ -18,8 +18,8 @@
 #include <QDesktopServices>
 #include <QXlsx/header/xlsxdocument.h>
 
-C5SaleFromStoreOrder::C5SaleFromStoreOrder() :
-    C5Dialog(),
+C5SaleFromStoreOrder::C5SaleFromStoreOrder(C5User *user) :
+    C5Dialog(user),
     ui(new Ui::C5SaleFromStoreOrder)
 {
     ui->setupUi(this);
@@ -36,9 +36,9 @@ C5SaleFromStoreOrder::~C5SaleFromStoreOrder()
     delete ui;
 }
 
-void C5SaleFromStoreOrder::openOrder(const QString &id)
+void C5SaleFromStoreOrder::openOrder(C5User *user, const QString &id)
 {
-    C5SaleFromStoreOrder *d = new C5SaleFromStoreOrder();
+    C5SaleFromStoreOrder *d = new C5SaleFromStoreOrder(user);
     d->loadOrder(id);
     d->exec();
     delete d;
@@ -165,7 +165,7 @@ void C5SaleFromStoreOrder::exportToAS(int doctype)
     jo["vattype"] = index == 0 ? (doctype == 5 ? "1" : "5") : "3";
     jo["pricewithoutvat"] = index == 0 ? (doctype == 5 ? 1.2 : 1) : 1;
     jo["withvat"] = index == 0 ? (doctype == 5 ? 0.2 : 0) : 0;
-    HttpQueryDialog *qd = new HttpQueryDialog(QString("https://%1:%2/magnit").arg(b->ipAddress,
+    HttpQueryDialog *qd = new HttpQueryDialog(mUser, QString("https://%1:%2/magnit").arg(b->ipAddress,
         QString::number(b->port)), jo, this);
     qd->exec();
     qd->deleteLater();
@@ -276,7 +276,7 @@ void C5SaleFromStoreOrder::on_btnCopyUUID_clicked()
 
 void C5SaleFromStoreOrder::on_btnPrintA4_clicked()
 {
-    C5PrintReciptA4 p(ui->leUUID->text(), this);
+    C5PrintReciptA4 p(ui->leUUID->text(), mUser, this);
     QString err;
 
     if(!p.print(err)) {

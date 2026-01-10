@@ -12,7 +12,7 @@ class C5FiscalCancel : public C5Dialog
 {
     Q_OBJECT
 public:
-    explicit C5FiscalCancel(const QString &id = nullptr);
+    explicit C5FiscalCancel(C5User *user, const QString &id = nullptr);
     ~C5FiscalCancel();
 private slots:
     void on_btnRequestCancel_clicked();

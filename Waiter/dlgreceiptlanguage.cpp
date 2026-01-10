@@ -2,8 +2,8 @@
 #include "ui_dlgreceiptlanguage.h"
 #include "c5translator.h"
 
-DlgReceiptLanguage::DlgReceiptLanguage() :
-    C5Dialog(),
+DlgReceiptLanguage::DlgReceiptLanguage(C5User *user) :
+    C5Dialog(user),
     ui(new Ui::DlgReceiptLanguage)
 {
     ui->setupUi(this);
@@ -33,9 +33,9 @@ DlgReceiptLanguage::~DlgReceiptLanguage()
     delete ui;
 }
 
-int DlgReceiptLanguage::receipLanguage()
+int DlgReceiptLanguage::receipLanguage(C5User *user)
 {
-    DlgReceiptLanguage *d = new DlgReceiptLanguage();
+    DlgReceiptLanguage *d = new DlgReceiptLanguage(user);
     int result = -1;
 
     if(d->exec() == QDialog::Accepted) {

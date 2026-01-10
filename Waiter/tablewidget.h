@@ -1,41 +1,40 @@
 #ifndef TABLEWIDGET_H
 #define TABLEWIDGET_H
 
-#include <QWidget>
-#include <QJsonObject>
+#include "c5widget.h"
+#include "struct_table.h"
+
+namespace Ui
+{
+class TableWidget;
+}
 
 class QLabel;
 class QFrame;
 
-class TableWidget : public QWidget
+class TableWidget : public C5Widget
 {
     Q_OBJECT
+
 public:
     explicit TableWidget(QWidget *parent = nullptr);
 
-    virtual void configOrder(const QJsonObject &jo);
+    ~TableWidget();
 
-    virtual QLabel *labelTable() = 0;
+    void setTable(const TableItem &t);
 
-    virtual QLabel *labelStaff() = 0;
+    void updateTable(const TableItem &t);
 
-    virtual QLabel *labelTime() = 0;
+    TableItem mTable;
 
-    virtual QLabel *labelAmount() = 0;
+protected:
+    virtual void mouseReleaseEvent(QMouseEvent *me) override;
 
-    virtual QLabel *labelComment() = 0;
-
-    virtual QFrame *frame() = 0;
-
-    void config(int id);
-
-    virtual void mouseReleaseEvent(QMouseEvent *me);
-
-    int fTable;
+private:
+    Ui::TableWidget* ui;
 
 signals:
     void clicked(int);
-
 };
 
 #endif // TABLEWIDGET_H

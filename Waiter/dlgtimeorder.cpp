@@ -1,8 +1,8 @@
 #include "dlgtimeorder.h"
 #include "ui_dlgtimeorder.h"
 
-DlgTimeorder::DlgTimeorder() :
-    C5Dialog(),
+DlgTimeorder::DlgTimeorder(C5User *user) :
+    C5Dialog(user),
     ui(new Ui::DlgTimeorder)
 {
     ui->setupUi(this);
@@ -13,9 +13,9 @@ DlgTimeorder::~DlgTimeorder()
     delete ui;
 }
 
-bool DlgTimeorder::timeOrder(int& order)
+bool DlgTimeorder::timeOrder(C5User *user, int& order)
 {
-    DlgTimeorder d;
+    DlgTimeorder d(user);
 
     if(d.exec() == QDialog::Accepted) {
         order = d.fOrder;

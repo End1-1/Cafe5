@@ -15,12 +15,14 @@ C5User::C5User(C5User *other)
     fPermissions = other->fPermissions;
     fConfig = other->fConfig;
     fSettings = other->fSettings;
+    mSessionKey = other->mSessionKey;
 }
 
 void C5User::copySettings(C5User *other)
 {
     fConfig = other->fConfig;
     fSettings = other->fSettings;
+    mSessionKey = other->mSessionKey;
 }
 
 QString C5User::error()
@@ -38,6 +40,17 @@ QString C5User::fullName()
     return QString("%1 %2").arg(data("f_last").toString(), data("f_first").toString());
 }
 
+QString C5User::shortFullName()
+{
+    QString first = data("f_first").toString();
+
+    if(first.isEmpty()) {
+        first = " ";
+    }
+
+    return QString("%1 %2.").arg(data("f_last").toString(), first.at(0));
+}
+
 QVariant C5User::value(const QString & key)
 {
     return fUserData[key];
@@ -53,29 +66,11 @@ void C5User::authByUsernamePass(const QString & username, const QString & pass, 
     n->createHttpQueryLambda("/engine/login.php",
     QJsonObject{{"method", 1},
         {"username", username},
-        {"password", pass}}, [this, callback](const QJsonObject & jo) {
-        const QJsonObject &jdata = jo["data"].toObject();
-        NDataProvider::sessionKey = jdata["sessionkey"].toString();
-        QMap<int, QString> settings;
-        QJsonArray jsettings = jdata["settings"].toArray();
-
-        for(int i = 0; i < jsettings.count(); i++) {
-            const QJsonObject &js = jsettings.at(i).toObject();
-            settings[js["f_key"].toInt()] = js["f_value"].toString();
-        }
-
-        fPermissions.clear();
-        QJsonArray jpermissions = jdata["permissions"].toArray();
-
-        for(int i = 0; i < jpermissions.count(); i++) {
-            fPermissions.append(jpermissions.at(i).toInt());
-        }
-
-        fSettings = settings;
-        fConfig = jdata["config"].toObject();
-        fUserData = jdata["user"].toObject().toVariantMap();
-        callback(jo);
+        {"password", pass}}, [this, callback](const QJsonObject & jdoc) {
+        setUserData(jdoc);
+        callback(jdoc);
     }, [ = ](const QJsonObject & jerr) {
+        Q_UNUSED(jerr);
     });
 }
 
@@ -84,29 +79,11 @@ void C5User::authByPinPass(const QString & pin, const QString & pass, NInterface
     n->createHttpQueryLambda("/engine/login.php",
     QJsonObject{{"method", 6},
         {"pin", pin},
-        {"pass", pass}}, [this, callback](const QJsonObject & jo) {
-        const QJsonObject &jdata = jo["data"].toObject();
-        NDataProvider::sessionKey = jdata["sessionkey"].toString();
-        QMap<int, QString> settings;
-        QJsonArray jsettings = jdata["settings"].toArray();
-
-        for(int i = 0; i < jsettings.count(); i++) {
-            const QJsonObject &js = jsettings.at(i).toObject();
-            settings[js["f_key"].toInt()] = js["f_value"].toString();
-        }
-
-        fPermissions.clear();
-        QJsonArray jpermissions = jdata["permissions"].toArray();
-
-        for(int i = 0; i < jpermissions.count(); i++) {
-            fPermissions.append(jpermissions.at(i).toInt());
-        }
-
-        fSettings = settings;
-        fConfig = jdata["config"].toObject();
-        fUserData = jdata["user"].toObject().toVariantMap();
-        callback(jo);
+        {"pass", pass}}, [this, callback](const QJsonObject & jdoc) {
+        setUserData(jdoc);
+        callback(jdoc);
     }, [ = ](const QJsonObject & jerr) {
+        Q_UNUSED(jerr);
     });
 }
 
@@ -122,49 +99,6 @@ bool C5User::check(int permission)
 
     fError = tr("You have not permission");
     return false;
-}
-bool C5User::enterWork()
-{
-    if(fState == usAtWork) {
-        fError = tr("Cannot input without output");
-        return false;
-    } else {
-        //TODO
-        // C5Database db;
-        // db[":f_id"] = db.uuid();
-        // db[":f_user"] = id();
-        // db[":f_datein"] = QDate::currentDate();
-        // db[":f_timein"] = QTime::currentTime();
-        // if(!db.insert("s_salary_inout", false)) {
-        //     fError = db.fLastError;
-        //     return false;
-        // }
-    }
-
-    fState = usAtWork;
-    return true;
-}
-bool C5User::leaveWork()
-{
-    //TODO
-    // C5Database db;
-    // if(fState == usAtWork) {
-    //     db[":f_dateout"] = QDate::currentDate();
-    //     db[":f_timeout"] = QTime::currentTime();
-    //     if(!db.update("s_salary_inout", "f_user", id())) {
-    //         fError = db.fLastError;
-    //         return false;
-    //     }
-    // } else {
-    //     fError = tr("Cannot output without input");
-    //     return false;
-    // }
-    fState = usNotAtWork;
-    return true;
-}
-C5User::UserState C5User::state()
-{
-    return fState;
 }
 
 void C5User::addPermission(int permission)
@@ -182,7 +116,6 @@ void C5User::removePermission(int permission)
 C5User::C5User() :
     QObject()
 {
-    fState = usNotAtWork;
 }
 
 QVariant C5User::data(const QString & name)
@@ -193,6 +126,7 @@ QVariant C5User::data(const QString & name)
 
 void C5User::getState(NInterface * n)
 {
+    Q_UNUSED(n);
     //TODO
     // C5Database db;
     // db[":f_user"] = id();
@@ -200,32 +134,40 @@ void C5User::getState(NInterface * n)
     // fState = db.nextRow() ? usAtWork : usNotAtWork;
 }
 
-void C5User::authorize(const QString & pin, NInterface * n, std::function<void (const QJsonObject&)> callback)
+void C5User::setUserData(const QJsonObject &jdoc)
+{
+    const QJsonObject &jdata = jdoc["data"].toObject();
+    NDataProvider::sessionKey = jdata["sessionkey"].toString();
+    mSessionKey = jdata["sessionkey"].toString();
+    QMap<int, QString> settings;
+    QJsonArray jsettings = jdata["settings"].toArray();
+
+    for(int i = 0; i < jsettings.count(); i++) {
+        const QJsonObject &js = jsettings.at(i).toObject();
+        settings[js["f_key"].toInt()] = js["f_value"].toString();
+    }
+
+    fPermissions.clear();
+    QJsonArray jpermissions = jdata["permissions"].toArray();
+
+    for(int i = 0; i < jpermissions.count(); i++) {
+        fPermissions.append(jpermissions.at(i).toInt());
+    }
+
+    fSettings = settings;
+    fConfig = jdata["config"].toObject()["f_config"].toObject();
+    fUserData = jdata["user"].toObject().toVariantMap();
+}
+
+void C5User::authorize(const QString & pin, NInterface * n, std::function<void (const QJsonObject&)> callback, std::function<void ()> errorCallback)
 {
     n->createHttpQueryLambda("/engine/login.php",
     QJsonObject{{"method", 2},
-        {"pin", pin}}, [this, callback](const QJsonObject & jo) {
-        const QJsonObject &jdata = jo["data"].toObject();
-        NDataProvider::sessionKey = jdata["sessionkey"].toString();
-        QMap<int, QString> settings;
-        QJsonArray jsettings = jdata["settings"].toArray();
-
-        for(int i = 0; i < jsettings.count(); i++) {
-            const QJsonObject &js = jsettings.at(i).toObject();
-            settings[js["f_key"].toInt()] = js["f_value"].toString();
-        }
-
-        fPermissions.clear();
-        QJsonArray jpermissions = jdata["permissions"].toArray();
-
-        for(int i = 0; i < jpermissions.count(); i++) {
-            fPermissions.append(jpermissions.at(i).toInt());
-        }
-
-        fSettings = settings;
-        fConfig = jdata["config"].toObject()["f_config"].toObject();
-        fUserData = jdata["user"].toObject().toVariantMap();
-        callback(jo);
+        {"pin", pin}}, [this, callback](const QJsonObject & jdoc) {
+        setUserData(jdoc);
+        callback(jdoc);
     }, [ = ](const QJsonObject & jerr) {
+        Q_UNUSED(jerr);
+        errorCallback();
     });
 }

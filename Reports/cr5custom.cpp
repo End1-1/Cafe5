@@ -41,7 +41,7 @@ QToolBar* CR5Custom::toolBar()
 
 void CR5Custom::setSearchParameters()
 {
-    C5CustomFilter f;
+    C5CustomFilter f(mUser);
     f.setQueries(rnames, rsqls);
 
     if(f.exec() == QDialog::Accepted) {

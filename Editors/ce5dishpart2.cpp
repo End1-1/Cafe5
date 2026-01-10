@@ -38,11 +38,13 @@ QString CE5DishPart2::table()
 bool CE5DishPart2::checkData(QString &err)
 {
     CE5Editor::checkData(err);
-    if (ui->leParent->getInteger()) {
-        if (ui->leParent->getInteger() == ui->leCode->getInteger()) {
+
+    if(ui->leParent->getInteger()) {
+        if(ui->leParent->getInteger() == ui->leCode->getInteger()) {
             err += "<br>" + tr("Cannot parent itself");
         }
     }
+
     return err.isEmpty();
 }
 
@@ -52,9 +54,11 @@ void CE5DishPart2::setId(int id)
     C5Database db;
     db[":f_id"] = ui->leImageUUID->text();
     db.exec("select * from s_images where f_id=:f_id");
-    if (db.nextRow()) {
+
+    if(db.nextRow()) {
         QString base64 = db.getString("f_data");
-        if (!base64.isEmpty()) {
+
+        if(!base64.isEmpty()) {
             QPixmap pix;
             QByteArray ba = QByteArray::fromBase64(base64.toLatin1());
             pix.loadFromData(ba);
@@ -81,11 +85,13 @@ void CE5DishPart2::selectColor()
 void CE5DishPart2::on_btnNewPart_clicked()
 {
     CE5DishPart1 *ep = new CE5DishPart1();
-    C5Editor *e = C5Editor::createEditor(ep, 0);
+    C5Editor *e = C5Editor::createEditor(mUser, ep, 0);
     QList<QMap<QString, QVariant> > data;
+
     if(e->getResult(data)) {
         ui->leDept->setValue(data.at(0)["f_id"].toString());
     }
+
     delete e;
 }
 
@@ -99,11 +105,12 @@ void CE5DishPart2::on_lbImg_customContextMenuRequested(const QPoint &pos)
 
 void CE5DishPart2::uploadImage()
 {
-    if (ui->leCode->getInteger() == 0) {
-        if (C5Message::question(tr("You should to save before upload an image")) ==  QDialog::Accepted) {
+    if(ui->leCode->getInteger() == 0) {
+        if(C5Message::question(tr("You should to save before upload an image")) ==  QDialog::Accepted) {
             QString err;
             QList<QMap<QString, QVariant> > data;
-            if (!save(err, data)) {
+
+            if(!save(err, data)) {
                 C5Message::error(err);
                 return;
             }
@@ -111,26 +118,34 @@ void CE5DishPart2::uploadImage()
             return;
         }
     }
+
     QString fn = QFileDialog::getOpenFileName(this, tr("Image"), "", "*.jpg;*.png;*.bmp");
-    if (fn.isEmpty()) {
+
+    if(fn.isEmpty()) {
         return;
     }
+
     QPixmap pm;
-    if (!pm.load(fn)) {
+
+    if(!pm.load(fn)) {
         C5Message::error(tr("Could not load image"));
         return;
     }
+
     ui->lbImg->setPixmap(pm.scaled(ui->lbImg->size(), Qt::KeepAspectRatio));
     QByteArray ba;
+
     do {
-        if (!ui->chDonNotResize->isChecked()) {
+        if(!ui->chDonNotResize->isChecked()) {
             pm = pm.scaled(pm.width() * 0.8,  pm.height() * 0.8);
         }
+
         ba.clear();
-        QBuffer buff( &ba);
+        QBuffer buff(&ba);
         buff.open(QIODevice::WriteOnly);
-        pm.save( &buff, "JPG");
-    } while (ba.size() > 100000 && !ui->chDonNotResize->isChecked());
+        pm.save(&buff, "JPG");
+    } while(ba.size() > 100000 && !ui->chDonNotResize->isChecked());
+
     C5Database db;
     db[":f_id"] = ui->leImageUUID->text();
     db.exec("delete from s_images where f_id=:f_id");
@@ -141,9 +156,10 @@ void CE5DishPart2::uploadImage()
 
 void CE5DishPart2::removeImage()
 {
-    if (C5Message::question(tr("Remove image")) !=  QDialog::Accepted) {
+    if(C5Message::question(tr("Remove image")) !=  QDialog::Accepted) {
         return;
     }
+
     C5Database db;
     db[":f_id"] = ui->leImageUUID->text();
     db.exec("delete from s_images where f_id=:f_id");

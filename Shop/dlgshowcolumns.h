@@ -12,7 +12,7 @@ class DlgShowColumns : public C5Dialog
     Q_OBJECT
 
 public:
-    explicit DlgShowColumns();
+    explicit DlgShowColumns(C5User *user);
     ~DlgShowColumns();
 
 private slots:

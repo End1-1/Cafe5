@@ -6,8 +6,8 @@
 #include "c5utils.h"
 #include <QFile>
 
-SessionsHistory::SessionsHistory(const QDate &d1, const QDate &d2) :
-    C5Dialog(),
+SessionsHistory::SessionsHistory(const QDate &d1, const QDate &d2, C5User *user) :
+    C5Dialog(user),
     ui(new Ui::SessionsHistory)
 {
     ui->setupUi(this);
@@ -56,11 +56,20 @@ void SessionsHistory::on_btnPrintReport_clicked()
         sessions.append(db.getString("f_id"));
     }
 
+    const int bs = 14;
     QFont font(qApp->font());
     font.setPointSize(__c5config.getValue(param_receipt_print_font_size).toInt());
     font.setFamily(__c5config.getValue(param_receipt_print_font_family));
     C5Printing p;
-    p.setSceneParams(650, 2800, QPageLayout::Portrait);
+    QPrinterInfo pi = QPrinterInfo::printerInfo(C5Config::localReceiptPrinter());
+    QPrinter printer(pi);
+    printer.setPageSize(QPageSize::Custom);
+    printer.setFullPage(false);
+    QRectF pr = printer.pageRect(QPrinter::DevicePixel);
+    constexpr qreal SAFE_RIGHT_MM = 2.0;
+    qreal safePx = SAFE_RIGHT_MM * printer.logicalDpiX() / 25.4;
+    p.setSceneParams(pr.width() - safePx, pr.height(), printer.logicalDpiX());
+    font.setPointSize(bs);
     p.setFont(font);
 
     if(QFile::exists("./logo_receipt.png")) {
@@ -138,11 +147,11 @@ void SessionsHistory::on_btnPrintReport_clicked()
         p.br();
     }
 
-    p.setFontSize(18);
+    p.setFontSize(bs - 2);
     p.ltext(tr("Printed"), 0);
     p.rtext(QDateTime::currentDateTime().toString(FORMAT_DATETIME_TO_STR));
     p.br();
-    p.print(C5Config::localReceiptPrinter(), QPageSize::Custom);
+    p.print(printer);
 }
 
 void SessionsHistory::on_btnCancel_clicked()
@@ -185,7 +194,14 @@ void SessionsHistory::on_btnPrintSession_clicked()
     font.setPointSize(__c5config.getValue(param_receipt_print_font_size).toInt());
     font.setFamily(__c5config.getValue(param_receipt_print_font_family));
     C5Printing p;
-    p.setSceneParams(650, 2800, QPageLayout::Portrait);
+    QPrinterInfo pi = QPrinterInfo::printerInfo(C5Config::localReceiptPrinter());
+    QPrinter printer(pi);
+    printer.setPageSize(QPageSize::Custom);
+    printer.setFullPage(false);
+    QRectF pr = printer.pageRect(QPrinter::DevicePixel);
+    constexpr qreal SAFE_RIGHT_MM = 2.0;
+    qreal safePx = SAFE_RIGHT_MM * printer.logicalDpiX() / 25.4;
+    p.setSceneParams(pr.width() - safePx, pr.height(), printer.logicalDpiX());
     p.setFont(font);
 
     if(QFile::exists("./logo_receipt.png")) {
@@ -260,5 +276,5 @@ void SessionsHistory::on_btnPrintSession_clicked()
     p.ltext(tr("Printed"), 0);
     p.rtext(QDateTime::currentDateTime().toString(FORMAT_DATETIME_TO_STR));
     p.br();
-    p.print(C5Config::localReceiptPrinter(), QPageSize::Custom);
+    p.print(printer);
 }

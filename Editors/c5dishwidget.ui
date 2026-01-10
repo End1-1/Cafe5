@@ -884,23 +884,6 @@
               </widget>
              </item>
              <item>
-              <widget class="QPushButton" name="btnPrintRecipe">
-               <property name="focusPolicy">
-                <enum>Qt::FocusPolicy::NoFocus</enum>
-               </property>
-               <property name="toolTip">
-                <string>Print receipe (Control + P)</string>
-               </property>
-               <property name="text">
-                <string/>
-               </property>
-               <property name="icon">
-                <iconset resource="../resources/res.qrc">
-                 <normaloff>:/print.png</normaloff>:/print.png</iconset>
-               </property>
-              </widget>
-             </item>
-             <item>
               <spacer name="horizontalSpacer">
                <property name="orientation">
                 <enum>Qt::Orientation::Horizontal</enum>
@@ -1354,14 +1337,14 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>C5TableWidget</class>
-   <extends>QTableWidget</extends>
-   <header location="global">c5tablewidget.h</header>
-  </customwidget>
-  <customwidget>
    <class>C5LineEditWithSelector</class>
    <extends>QLineEdit</extends>
    <header location="global">c5lineeditwithselector.h</header>
+  </customwidget>
+  <customwidget>
+   <class>C5TableWidget</class>
+   <extends>QTableWidget</extends>
+   <header location="global">c5tablewidget.h</header>
   </customwidget>
   <customwidget>
    <class>C5CheckBox</class>

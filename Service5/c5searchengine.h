@@ -22,6 +22,7 @@ public:
     //New version of search
     QString searchStorage(const QJsonObject &jo, const SocketStruct &ss);
     QString searchGoodsItem(const QJsonObject &jo, const SocketStruct &ss);
+    QString searchPartnerItem(const QJsonObject &jo, const SocketStruct &ss);
 
 private:
 

@@ -26,11 +26,12 @@
 
 QString NTreeWidget::mHost;
 
-NTreeWidget::NTreeWidget(const QString &route, QWidget *parent) :
+NTreeWidget::NTreeWidget(C5User *user, const QString &route, QWidget *parent) :
     C5Widget(parent),
     ui(new Ui::NTreeWidget),
     mRoute(route),
     fFilter(nullptr),
+    mUser(user),
     mToolWidget(nullptr)
 {
     ui->setupUi(this);
@@ -46,7 +47,7 @@ NTreeWidget::NTreeWidget(const QString &route, QWidget *parent) :
     connect(ui->mTreeView->horizontalScrollBar(), SIGNAL(valueChanged(int)), this, SLOT(tblValueChanged(int)));
     connect(ui->tblTotal->horizontalScrollBar(), SIGNAL(valueChanged(int)), this, SLOT(tblValueChanged2(int)));
     ui->widget->setVisible(false);
-    mHandler = new NHandler(this);
+    mHandler = new NHandler(mUser, this);
     ui->mTreeView->setRootIsDecorated(true);
     ui->mTreeView->setIndentation(20);
     ui->mTreeView->setStyleSheet(
@@ -141,7 +142,7 @@ void NTreeWidget::sum()
 
 void NTreeWidget::queryStarted()
 {
-    mLoadingDlg = new NLoadingDlg(this);
+    mLoadingDlg = new NLoadingDlg(tr("Query"), this);
     mLoadingDlg->open();
 }
 
@@ -152,7 +153,7 @@ void NTreeWidget::filterByColumn()
     QStringList sortedValues = filterValues.values();
     std::sort(sortedValues.begin(), sortedValues.end());
 
-    if(C5FilterValues::filterValues(sortedValues)) {
+    if(C5FilterValues::filterValues(sortedValues, mUser)) {
         static_cast<NTreeModel*>(ui->mTreeView->model())->setColumnFilter(sortedValues.join("|"), fFilterColumn);
     }
 

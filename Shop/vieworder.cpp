@@ -138,7 +138,7 @@ void ViewOrder::on_btnReturn_clicked()
         return;
     }
 
-    GoodsReturnReason r;
+    GoodsReturnReason r(mUser);
     r.exec();
     int reason = r.fReason;
     ui->leReturnReason->setProperty("reason", r.fReason);
@@ -229,7 +229,7 @@ void ViewOrder::on_btnEditDate_clicked()
 {
     QDate d;
 
-    if(DlgDate::getDate(d)) {
+    if(DlgDate::getDate(d, mUser)) {
         if(C5Message::question(tr("Confirm to change date")) != QDialog::Accepted) {
             return;
         }
@@ -252,7 +252,7 @@ void ViewOrder::on_btnEditDeliveryMan_clicked()
 {
     QString id, name;
 
-    if(DlgGetIDName::get(__c5config.dbParams(), id, name, idname_users_fullname, this) == false) {
+    if(DlgGetIDName::get(mUser,  id, name, idname_users_fullname) == false) {
         return;
     }
 
@@ -272,7 +272,7 @@ void ViewOrder::on_btnEditSaler_clicked()
 {
     QString id, name;
 
-    if(DlgGetIDName::get(__c5config.dbParams(), id, name, idname_users_fullname, this) == false) {
+    if(DlgGetIDName::get(mUser, id, name, idname_users_fullname) == false) {
         return;
     }
 
@@ -292,7 +292,7 @@ void ViewOrder::on_btnEditBuyer_clicked()
 {
     QString id, name;
 
-    if(DlgGetIDName::get(__c5config.dbParams(), id, name, idname_partners_full, this) == false) {
+    if(DlgGetIDName::get(mUser, id, name, idname_partners_full) == false) {
         return;
     }
 
@@ -318,7 +318,7 @@ void ViewOrder::on_btnPrintReceipt_clicked()
         case 1: {
             bool p1, p2;
 
-            if(SelectPrinters::selectPrinters(p1, p2)) {
+            if(SelectPrinters::selectPrinters(p1, p2, mUser)) {
                 if(p1) {
                     p.print(ui->leUUID->text(), db, 1);
                 }
@@ -439,7 +439,7 @@ bool ViewOrder::printCheckWithTax(C5Database &db, const QString &id, QString &rs
 
 void ViewOrder::on_btnPrintReceiptA4_clicked()
 {
-    C5PrintReciptA4 p(ui->leUUID->text(), this);
+    C5PrintReciptA4 p(ui->leUUID->text(), mUser, this);
     QString err;
 
     if(!p.print(err)) {
@@ -769,6 +769,14 @@ void ViewOrder::on_btnPrintPrices_clicked()
         font.setPointSize(44);
         font.setBold(true);
         C5Printing p;
+        QPrinterInfo pi = QPrinterInfo::printerInfo(printerName);
+        QPrinter printer(pi);
+        printer.setPageSize(QPageSize::Custom);
+        printer.setFullPage(false);
+        QRectF pr = printer.pageRect(QPrinter::DevicePixel);
+        constexpr qreal SAFE_RIGHT_MM = 2.0;
+        qreal safePx = SAFE_RIGHT_MM * printer.logicalDpiX() / 25.4;
+        p.setSceneParams(pr.width() - safePx, pr.height(), printer.logicalDpiX());
 
         if(ppp == "f_price1") {
             p.setSceneParams(350, 100, QPageLayout::Portrait);
@@ -799,7 +807,7 @@ void ViewOrder::on_btnPrintPrices_clicked()
 
         if(print) {
             for(int i = 0; i < qty; i++) {
-                p.print(printerName, QPageSize::Custom);
+                p.print(printer);
             }
         }
     }

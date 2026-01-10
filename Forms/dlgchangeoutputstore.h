@@ -12,7 +12,7 @@ class DlgChangeOutputStore : public C5Dialog
     Q_OBJECT
 
 public:
-    explicit DlgChangeOutputStore();
+    explicit DlgChangeOutputStore(C5User *user);
 
     ~DlgChangeOutputStore();
 

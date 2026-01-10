@@ -12,7 +12,7 @@ class ArmSoftExportOptions : public C5Dialog
     Q_OBJECT
 
 public:
-    explicit ArmSoftExportOptions(QWidget *parent = nullptr);
+    explicit ArmSoftExportOptions(C5User *user = nullptr);
     ~ArmSoftExportOptions();
 
 private slots:

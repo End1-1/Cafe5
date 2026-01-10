@@ -13,7 +13,7 @@ AppWebSocket::AppWebSocket(QObject *parent)
     mSocket = new QWebSocket();
     connect(mSocket, &QWebSocket::connected, this, &AppWebSocket::connectedToServer);
     connect(mSocket, &QWebSocket::disconnected, this, &AppWebSocket::disconnectedFromServer);
-    connect(mSocket, QOverload<QAbstractSocket::SocketError>::of(&QWebSocket::error), this, &AppWebSocket::socketError);
+    connect(mSocket, &QWebSocket::errorOccurred, this, &AppWebSocket::socketError);
     connect(mSocket, &QWebSocket::textMessageReceived, this, &AppWebSocket::textMessageReceived);
     connect(mSocket, &QWebSocket::binaryMessageReceived, this, &AppWebSocket::binaryMessageReceived);
     connectToServer();
@@ -119,6 +119,7 @@ void AppWebSocket::disconnectedFromServer()
 
 void AppWebSocket::socketError(QAbstractSocket::SocketError error)
 {
+    Q_UNUSED(error);
     qDebug() << "websocket error" << mSocket->errorString();
     mSocket->close();
     emit socketDisconnected();

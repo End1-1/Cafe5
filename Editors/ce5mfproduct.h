@@ -8,6 +8,8 @@ namespace Ui
 class CE5MFProduct;
 }
 
+class C5TableWithTotal;
+
 class CE5MFProduct : public CE5Editor
 {
     Q_OBJECT
@@ -17,15 +19,15 @@ public:
 
     ~CE5MFProduct();
 
-    virtual QString title();
+    virtual QString title() override;
 
-    virtual QString table();
+    virtual QString table() override;
 
-    virtual void setId(int id);
+    virtual void setId(int id) override;
 
-    virtual void clear();
+    virtual void clear() override;
 
-    virtual bool save(QString &err, QList<QMap<QString, QVariant> > &data);
+    virtual bool save(QString &err, QList<QMap<QString, QVariant> >& data)  override;
 
 private slots:
     void openResponse(const QJsonObject &jdoc);
@@ -84,12 +86,20 @@ private slots:
 
     void on_btnPaste_3_clicked();
 
+    void on_tabWidget_currentChanged(int index);
+
+    void on_pushButton_clicked();
+
 private:
-    Ui::CE5MFProduct *ui;
+    Ui::CE5MFProduct* ui;
 
     QString durationStr(int sec);
 
     QList<int> fRemovedRow;
+
+    void getCurrentTasks();
+
+    QString makeProductRows(C5TableWithTotal *wt);
 };
 
 #endif // CE5MFPRODUCT_H

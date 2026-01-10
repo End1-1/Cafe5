@@ -10,7 +10,6 @@
 #include "datadriver.h"
 #include "vieworder.h"
 #include "cashcollection.h"
-#include "c5printpreview.h"
 #include "c5permissions.h"
 #include "c5user.h"
 #include "c5printing.h"
@@ -21,7 +20,6 @@
 #define VM_TOTAL 0
 #define VM_ITEMS 1
 #define VM_TOTAL_ITEMS 2
-#define VM_GROUPS 3
 
 Sales::Sales(C5User *user) :
     C5ShopDialog(user),
@@ -31,9 +29,8 @@ Sales::Sales(C5User *user) :
     fUser = user;
     setWindowTitle(__c5config.getRegValue("windowtitle").toString());
     ui->btnChangeDate->setVisible(fUser->check(cp_t5_change_date_of_sale));
-    ui->btnModeItems->setVisible(fUser->check(cp_t5_view_tax_and_no_sales));
-    ui->btnTotalByItems->setVisible(fUser->check(cp_t5_view_tax_and_no_sales));
-    ui->btnGroups->setVisible(fUser->check(cp_t5_view_tax_and_no_sales));
+    ui->btnModeItems->setVisible(fUser->check(cp_t12_shop_report_goods));
+    ui->btnTotalByItems->setVisible(fUser->check(cp_t12_shop_report_goods));
     fViewMode = VM_TOTAL;
     ui->lbTotalQty->setVisible(false);
     ui->leTotal->setVisible(__c5config.fMainJson["hide_revenue"].toBool() == false);
@@ -141,7 +138,7 @@ bool Sales::printCheckWithTax(C5Database &db, const QString &id)
     return resultb;
 }
 
-bool Sales::printReceipt(const QString &id)
+bool Sales::printReceipt(const QString &id, C5User *user)
 {
     if(!C5Config::localReceiptPrinter().isEmpty()) {
         C5Database db;
@@ -151,7 +148,7 @@ bool Sales::printReceipt(const QString &id)
         case 1: {
             bool p1, p2;
 
-            if(SelectPrinters::selectPrinters(p1, p2)) {
+            if(SelectPrinters::selectPrinters(p1, p2, user)) {
                 if(p1) {
                     p.print(id, db, 1);
                 }
@@ -210,10 +207,6 @@ void Sales::refresh()
 
     case VM_TOTAL_ITEMS:
         refreshTotalItems();
-        break;
-
-    case VM_GROUPS:
-        refreshGroups();
         break;
     }
 }
@@ -407,261 +400,6 @@ void Sales::refreshTotalItems()
     ui->leTotal->setDouble(ui->tbl->sumOfColumn(acol));
 }
 
-void Sales::refreshGroups()
-{
-    QStringList h;
-    h.append(tr("Group"));
-    h.append(tr("Qty"));
-    h.append(tr("Amount"));
-    //h.append(tr(""));
-    ui->tbl->clearContents();
-    ui->tbl->setRowCount(0);
-    ui->tbl->setColumnCount(h.count());
-    ui->tbl->setHorizontalHeaderLabels(h);
-    //ui->tbl->setColumnWidths(ui->tbl->columnCount(), 180, 60, 60, 10, 180, 60, 60, 10, 180, 60, 60);
-    ui->tbl->setColumnWidths(ui->tbl->columnCount(), 200, 80, 80);
-    C5Database db;
-    db[":f_hall"] = __c5config.defaultHall();
-    db[":f_start"] = ui->deStart->date();
-    db[":f_end"] = ui->deEnd->date();
-    db[":f_state"] = ORDER_STATE_CLOSE;
-    QString sqlCond = "";
-
-    if(!fUser->check(cp_t5_view_tax_and_no_sales)) {
-        sqlCond += " and length(ot.f_receiptnumber)>0 ";
-    }
-
-    if(!fUser->check(cp_t5_view_sales_of_all_users)) {
-        sqlCond += QString(" and oh.f_staff=%1 ").arg(fUser->id());
-    }
-
-    db.exec("select oh.f_datecash, h.f_name as f_hallname, gg.f_name as f_groupname, "
-            "sum(og.f_qty * og.f_sign) as f_qty, sum(og.f_total*og.f_sign) as f_total "
-            "from o_goods og "
-            "inner join o_header oh on oh.f_id=og.f_header "
-            "left join o_tax ot on ot.f_id=oh.f_id "
-            "inner join c_goods g on g.f_id=og.f_goods "
-            "left join c_groups gg on gg.f_id=g.f_group "
-            "left join s_user u on u.f_id=oh.f_staff "
-            "left join h_halls h on h.f_id=oh.f_hall "
-            "where oh.f_datecash between :f_start and :f_end and oh.f_state=:f_state " + sqlCond +
-            "and oh.f_hall=:f_hall "
-            "group by 1, 2, 3 "
-            "order by 3 desc ");
-    int row = 0, col = 0;
-    ui->leTotal->setDouble(0);
-    ui->leTotalQty->setDouble(0);
-
-    while(db.nextRow()) {
-        if(row > ui->tbl->rowCount() - 1) {
-            ui->tbl->addEmptyRow();
-        }
-
-        ui->tbl->setString(row, col, db.getString("f_groupname"));
-        ui->tbl->setDouble(row, col + 1, db.getDouble("f_qty"));
-        ui->tbl->setString(row, col + 2, float_str(db.getDouble("f_total"), 1));
-        ui->leTotalQty->setDouble(ui->leTotalQty->getDouble() + db.getDouble("f_qty"));
-        ui->leTotal->setDouble(ui->leTotal->getDouble() + db.getDouble("f_total"));
-        //        col += 4;
-        //        if (col > 11) {
-        //            col = 0;
-        //            row++;
-        //        }
-        row++;
-    }
-
-    ui->tbl->addEmptyRow();
-    ui->tbl->setString(row, col + 1, float_str(ui->leTotalQty->getDouble(), 1));
-    ui->tbl->setString(row, col + 2, float_str(ui->leTotal->getDouble(), 1));
-    row++;
-    ui->tbl->addEmptyRow();
-    row++;
-    db[":f_hall"] = __c5config.defaultHall();
-    db[":f_start"] = ui->deStart->date();
-    db[":f_end"] = ui->deEnd->date();
-    db[":f_state"] = ORDER_STATE_CLOSE;
-    db.exec("select count(oh.f_id) as f_total "
-            "from o_header oh "
-            "inner join o_tax ot on ot.f_id=oh.f_id "
-            "where ot.f_receiptnumber>0 and oh.f_datecash between :f_start and :f_end and oh.f_state=:f_state "
-            "and oh.f_hall=:f_hall " + sqlCond);
-    db.nextRow();
-    ui->tbl->addEmptyRow();
-    ui->tbl->setString(row, 0, tr("Count of orders"));
-    ui->tbl->setString(row, col + 2, float_str(db.getDouble("f_total"), 1));
-    row++;
-    db[":f_hall"] = __c5config.defaultHall();
-    db[":f_start"] = ui->deStart->date();
-    db[":f_end"] = ui->deEnd->date();
-    db[":f_state"] = ORDER_STATE_CLOSE;
-    db.exec("select sum(oh.f_amounttotal) as f_total "
-            "from o_header oh "
-            "inner join o_tax ot on ot.f_id=oh.f_id "
-            "where ot.f_receiptnumber>0 and oh.f_datecash between :f_start and :f_end and oh.f_state=:f_state "
-            "and oh.f_hall=:f_hall ");
-    db.nextRow();
-    ui->tbl->addEmptyRow();
-    ui->tbl->setString(row, 0, tr("Tax"));
-    ui->tbl->setString(row, col + 2, float_str(db.getDouble("f_total"), 1));
-    row++;
-}
-
-void Sales::printpreview()
-{
-    QString reportAdditionalTitle = tr("Sales by group");
-    QString fLabel = __c5config.fMainJson["shop_hall_name"].toString() + "," + dbstore->name(__c5config.defaultStore());
-    fLabel += QString(" %1-%2").arg(ui->deStart->text(), ui->deEnd->text());
-    QFont fo(font());
-    fo.setPointSize(20);
-    C5Printing p;
-    QSize paperSize(2000, 2800);
-    p.setFont(fo);
-    int page = p.currentPageIndex();
-    int startFrom = 0;
-    bool stopped = false;
-    int columnsWidth = 0;
-    qreal scaleFactor = 0.40;
-    qreal rowScaleFactor = 0.79;
-
-    for(int i = 0; i < ui->tbl->columnCount(); i++) {
-        columnsWidth += ui->tbl->columnWidth(i);
-    }
-
-    columnsWidth /= scaleFactor;
-
-    if(columnsWidth > 2000) {
-        p.setSceneParams(paperSize.height(), paperSize.width(), QPageLayout::Landscape);
-    } else {
-        p.setSceneParams(paperSize.width(), paperSize.height(), QPageLayout::Portrait);
-    }
-
-    do {
-        p.setFontBold(true);
-        p.ltext(QString("%1 %2")
-                .arg(fLabel)
-                .arg(reportAdditionalTitle), 0);
-        p.br();
-        p.setFontBold(false);
-        p.line(0, p.fTop, columnsWidth, p.fTop);
-
-        for(int c = 0; c < ui->tbl->columnCount(); c++) {
-            if(ui->tbl->columnWidth(c) == 0) {
-                continue;
-            }
-
-            if(c > 0) {
-                p.ltext(ui->tbl->horizontalHeaderItem(c)->text(), (sumOfColumnsWidghtBefore(c) / scaleFactor) + 1);
-                p.line(sumOfColumnsWidghtBefore(c) / scaleFactor, p.fTop, sumOfColumnsWidghtBefore(c) / scaleFactor,
-                       p.fTop + (ui->tbl->verticalHeader()->defaultSectionSize() / rowScaleFactor));
-            } else {
-                p.ltext(ui->tbl->horizontalHeaderItem(c)->text(), 1);
-                p.line(0, p.fTop, 0, p.fTop + (ui->tbl->verticalHeader()->defaultSectionSize() / rowScaleFactor));
-            }
-        }
-
-        p.line(columnsWidth, p.fTop, columnsWidth, p.fTop + (ui->tbl->verticalHeader()->defaultSectionSize() / rowScaleFactor));
-        p.br();
-        p.line(0, p.fTop, columnsWidth, p.fTop);
-
-        for(int r = startFrom; r < ui->tbl->rowCount(); r++) {
-            p.line(0, p.fTop, columnsWidth, p.fTop);
-
-            for(int c = 0; c < ui->tbl->columnCount(); c++) {
-                if(ui->tbl->columnWidth(c) == 0) {
-                    continue;
-                }
-
-                int s = ui->tbl->columnSpan(r, c) - 1;
-
-                if(c > 0) {
-                    p.ltext(ui->tbl->getString(r, c), (sumOfColumnsWidghtBefore(c) / scaleFactor) + 1);
-                    p.line(sumOfColumnsWidghtBefore(c + s) / scaleFactor, p.fTop, sumOfColumnsWidghtBefore(c + s) / scaleFactor,
-                           p.fTop + (ui->tbl->rowHeight(r) / rowScaleFactor));
-                } else {
-                    p.ltext(ui->tbl->getString(r, c), 1);
-                    p.line(0, p.fTop, 0, p.fTop + (ui->tbl->rowHeight(r) / rowScaleFactor));
-                }
-
-                c += s;
-            }
-
-            //last vertical line
-            //        p.line(columnsWidth, p.fTop, columnsWidth, p.fTop + (ui->tbl->rowHeight(r) / rowScaleFactor));
-            //        if (ui->tblTotal->isVisible() && r == ui->tbl->rowCount() - 1) {
-            //            p.setFontBold(true);
-            //            if (p.checkBr(ui->tblTotal->rowHeight(0))) {
-            //                p.line(0, p.fTop + (ui->tblTotal->rowHeight(0) / rowScaleFactor), columnsWidth, p.fTop + (ui->tblTotal->rowHeight(0) / rowScaleFactor));\
-            //                p.br();
-            //                stopped = startFrom >= fModel->rowCount() - 1;
-            //                p.fTop = p.fNormalHeight - p.fLineHeight;
-            //                p.ltext(QString("%1 %2, %3 %4, %5/%6")
-            //                        .arg("Page")
-            //                        .arg(page + 1)
-            //                        .arg(tr("Printed"))
-            //                        .arg(QDateTime::currentDateTime().toString(FORMAT_DATETIME_TO_STR2))
-            //                        .arg(hostinfo)
-            //                        .arg(hostusername()), 0);
-            //                p.rtext(fDBParams.at(1));
-            //                page++;
-            //            } else {
-            //                p.br();
-            //            }
-            //            p.line(0, p.fTop, columnsWidth, p.fTop);
-            //            p.line(0, p.fTop + (ui->tblTotal->rowHeight(0) / rowScaleFactor), columnsWidth, p.fTop + (ui->tblTotal->rowHeight(0) / rowScaleFactor));\
-            //            for (int c = 0; c < ui->tbl->columnCount(); c++) {
-            //                if (ui->tbl->columnWidth(c) == 0) {
-            //                    continue;
-            //                }
-            //                if (c > 0) {
-            //                    p.ltext(ui->tblTotal->getString(0, c), (sumOfColumnsWidghtBefore(c) / scaleFactor) + 1);
-            //                    p.line(sumOfColumnsWidghtBefore(c) / scaleFactor, p.fTop, sumOfColumnsWidghtBefore(c) / scaleFactor, p.fTop + (fTableView->verticalHeader()->defaultSectionSize() / rowScaleFactor));
-            //                } else {
-            //                    p.ltext(ui->tblTotal->getString(0, c), 1);
-            //                    p.line(0, p.fTop, 0, p.fTop + (ui->tbl->verticalHeader()->defaultSectionSize() / rowScaleFactor));
-            //                }
-            //            }
-            //            p.line(columnsWidth, p.fTop, columnsWidth, p.fTop + (ui->tblTotal->rowHeight(0) / rowScaleFactor));
-            //        }
-            if(p.checkBr(p.fLineHeight * 4) || r >= ui->tbl->rowCount() - 1) {
-                p.line(0, p.fTop + (ui->tbl->rowHeight(r) / rowScaleFactor), columnsWidth,
-                       p.fTop + (ui->tbl->rowHeight(r) / rowScaleFactor));
-                \
-                p.br();
-                startFrom = r + 1;
-                stopped = startFrom >= ui->tbl->rowCount() - 1;
-                p.fTop = p.fNormalHeight - p.fLineHeight;
-                p.ltext(QString("%1 %2, %3 %4, %5/%6")
-                        .arg("Page")
-                        .arg(page + 1)
-                        .arg(tr("Printed"))
-                        .arg(QDateTime::currentDateTime().toString(FORMAT_DATETIME_TO_STR2))
-                        .arg(hostinfo)
-                        .arg(hostusername()), 0);
-                p.rtext(__c5config.dbParams().at(1));
-
-                if(r < ui->tbl->rowCount() - 1) {
-                    p.br(p.fLineHeight * 4);
-                }
-
-                if(r < ui->tbl->rowCount() - 1) {
-                    page++;
-                }
-
-                break;
-            } else {
-                p.br();
-            }
-        }
-
-        if(ui->tbl->rowCount() == 0) {
-            stopped = true;
-        }
-    } while(!stopped);
-
-    C5PrintPreview pp(&p);
-    pp.exec();
-}
-
 void Sales::printTaxReport(int report_type)
 {
     PrintTaxN pt(C5Config::taxIP(), C5Config::taxPort(), C5Config::taxPassword(), C5Config::taxUseExtPos(),
@@ -726,7 +464,6 @@ void Sales::on_btnModeTotal_clicked()
     ui->btnModeItems->setChecked(false);
     ui->btnModeTotal->setChecked(true);
     ui->btnTotalByItems->setChecked(false);
-    ui->btnGroups->setChecked(false);
     ui->btnViewOrder->setEnabled(true);
     ui->btnItemBack->setEnabled(true);
     fViewMode = VM_TOTAL;
@@ -739,7 +476,6 @@ void Sales::on_btnModeItems_clicked()
     ui->btnModeItems->setChecked(true);
     ui->btnModeTotal->setChecked(false);
     ui->btnTotalByItems->setChecked(false);
-    ui->btnGroups->setChecked(false);
     ui->btnViewOrder->setEnabled(true);
     ui->btnItemBack->setEnabled(true);
     fViewMode = VM_ITEMS;
@@ -780,19 +516,6 @@ void Sales::on_leFilter_textChanged(const QString &arg1)
 
         ui->tbl->setRowHidden(r, h);
     }
-}
-
-void Sales::on_btnGroups_clicked()
-{
-    toggleMenu(false);
-    ui->btnModeItems->setChecked(false);
-    ui->btnModeTotal->setChecked(false);
-    ui->btnTotalByItems->setChecked(false);
-    ui->btnViewOrder->setEnabled(false);
-    ui->btnItemBack->setEnabled(false);
-    fViewMode = VM_GROUPS;
-    refresh();
-    printpreview();
 }
 
 void Sales::on_btnPrintTaxZ_clicked()
@@ -840,7 +563,7 @@ void Sales::on_btnChangeDate_clicked()
     for(int  i = 0; i < ui->tbl->rowCount(); i++) {
         if(ui->tbl->item(i, 0)->checkState() == Qt::Checked) {
             if(!d.isValid()) {
-                if(!DlgDate::getDate(d)) {
+                if(!DlgDate::getDate(d, mUser)) {
                     return;
                 }
             }

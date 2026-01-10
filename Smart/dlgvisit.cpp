@@ -4,14 +4,19 @@
 #include "c5utils.h"
 #include "c5message.h"
 #include "c5printing.h"
+#include "ninterface.h"
+#include "c5user.h"
 
-dlgvisit::dlgvisit(const QString &code) :
-    C5Dialog(),
+dlgvisit::dlgvisit(const QString &code, C5User *user) :
+    C5Dialog(user),
     ui(new Ui::dlgvisit),
     fCode(code)
 {
     ui->setupUi(this);
-    fHttp->createHttpQueryLambda("engine/smart/visitcard.php", QJsonObject{{"method", "get"}, {"code", code}, {"config_id", __c5config.fSettingsName}},
+    fHttp->createHttpQueryLambda2("engine/smart/visitcard.php", QJsonObject{
+        {"method", "get"},
+        {"code", code},
+        {"config_id", mUser->fConfig["settings_name"]}},
     [this](const QJsonObject & jdoc) {
         qDebug() << jdoc;
         const QJsonObject &jcard = jdoc["card"].toObject();
@@ -22,8 +27,14 @@ dlgvisit::dlgvisit(const QString &code) :
         fPrice = jcard["f_value"].toDouble();
         ui->lbVisitPrice->setText(float_str(fPrice, 2));
     },
-    [](const QJsonObject & je) {
+    [this](const QJsonObject & je) {
         qDebug() << je;
+        ui->lbCardNumber->setText("");
+        ui->lbBalance->setText("");
+        ui->lbCustomer->setText("");
+        ui->lbVisitPrice->setText("");
+        accept();
+        return false;
     });
 }
 
@@ -41,14 +52,22 @@ void dlgvisit::on_btnVisit_clicked()
         return;
     }
 
-    fHttp->createHttpQueryLambda("engine/smart/visitcard.php", QJsonObject{{"method", "visit"}, {"code", fCode}, {"config_id", __c5config.fSettingsName}},
+    fHttp->createHttpQueryLambda("engine/smart/visitcard.php", QJsonObject{{"method", "visit"}, {"code", fCode}, {"config_id", mUser->fConfig["settings_name"]}},
     [this](const QJsonObject & jdoc) {
         QFont font;
         font.setFamily(__c5config.getValue(param_service_print_font_family));
         int basesize = __c5config.getValue(param_service_print_font_size).toInt() + 8;
         font.setPointSize(basesize);
+        font.setPointSize(12);
         C5Printing p;
-        p.setSceneParams(650, 2800, QPageLayout::Portrait);
+        QPrinterInfo pi = QPrinterInfo::printerInfo(C5Config::localReceiptPrinter());
+        QPrinter printer(pi);
+        printer.setPageSize(QPageSize::Custom);
+        printer.setFullPage(false);
+        QRectF pr = printer.pageRect(QPrinter::DevicePixel);
+        constexpr qreal SAFE_RIGHT_MM = 2.0;
+        qreal safePx = SAFE_RIGHT_MM * printer.logicalDpiX() / 25.4;
+        p.setSceneParams(pr.width() - safePx, pr.height(), printer.logicalDpiX());
         p.setFont(font);
         p.setFontBold(true);
         p.ctext(tr("Date") + " " + QDate::currentDate().toString(FORMAT_DATE_TO_STR));
@@ -71,8 +90,7 @@ void dlgvisit::on_btnVisit_clicked()
         p.br();
         p.ltext("_", 0);
         p.br();
-        QString finalPrinter = C5Config::localReceiptPrinter();
-        p.print(finalPrinter, QPageSize::Custom);
+        p.print(printer);
         accept();
         return;
     },

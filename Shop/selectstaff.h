@@ -16,7 +16,7 @@ class SelectStaff : public C5Dialog
     Q_OBJECT
 
 public:
-    explicit SelectStaff(Working *w);
+    explicit SelectStaff(Working *w, C5User *user);
 
     ~SelectStaff();
 

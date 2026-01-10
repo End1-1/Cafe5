@@ -2,15 +2,15 @@
 
 C5ReplaceCharacter::C5ReplaceCharacter()
 {
-
 }
 
 QString C5ReplaceCharacter::replace(const QString &str)
 {
-    QString hya("էթփձջւևրչճԷԹՓՁՋՒևՐՉՃ"
+    QString hya("էթփձջւևրչճ"
                 "քոեռտըւիօպխծ"
                 "ասդֆգհյկլ;՛շ"
                 "զղցվբնմ,․/"
+                "ԷԹՓՁՋՒևՐՉՃ"
                 "ՔՈԵՌՏԸՒԻՕՊԽԾ"
                 "ԱՍԴՖԳՀՅԿԼ;՛Շ"
                 "ԶՂՑՎԲՆՄ,․/");
@@ -29,18 +29,24 @@ QString C5ReplaceCharacter::replace(const QString &str)
                 "ASDFGHJKL;'\""
                 "ZXCVBNM,./");
     QString out;
-    for (int i = 0; i < str.length(); i++) {
+
+    for(int i = 0; i < str.length(); i++) {
         int p = hya.indexOf(str.at(i));
-        if (p != -1) {
+
+        if(p != -1) {
             out += num.at(p);
             continue;
         }
+
         p = rus.indexOf(str.at(i));
-        if (p != -1) {
+
+        if(p != -1) {
             out += num.at(p);
             continue;
         }
+
         out += str.at(i);
     }
+
     return out.toUpper();
 }

@@ -12,7 +12,7 @@ class CE5PackageList : public C5Dialog
     Q_OBJECT
 
 public:
-    explicit CE5PackageList(int package);
+    explicit CE5PackageList(C5User *user, int package);
 
     ~CE5PackageList();
 

@@ -1,75 +1,44 @@
 #include "tablewidget.h"
+#include "ui_tablewidget.h"
 #include "c5utils.h"
-#include <QLabel>
-#include <QFrame>
+#include <QDebug>
 #include <QStyle>
 
-TableWidget::TableWidget(QWidget *parent) : QWidget(parent)
+TableWidget::TableWidget(QWidget *parent) :
+    C5Widget(parent),
+    ui(new Ui::TableWidget)
 {
+    ui->setupUi(this);
+    installEventFilter(this);
 }
 
-void TableWidget::configOrder(const QJsonObject &jo)
+TableWidget::~TableWidget()
 {
-    bool commentVisible = !jo["f_comment"].toString().isEmpty();
-    labelComment()->setVisible(commentVisible);
-    QString state = "1";
+    delete ui;
+}
 
-    if(jo.isEmpty()) {
-        labelStaff()->setText("-");
-        labelTime()->setText("00:00");
-        labelAmount()->clear();
-    } else {
-        state = "2";
+void TableWidget::setTable(const TableItem &t)
+{
+    mTable = t;
+    ui->tw1lbName->setText(mTable.name);
+    ui->tw1lbStaff->setText(mTable.staffName);
+    ui->tw1lbAmount->setText(float_str(mTable.amount, 2));
+    ui->tw1lbAmount->setVisible(mTable.amount > 0);
+    ui->lbComment->setText(mTable.comment);
+    ui->lbComment->setVisible(!mTable.comment.isEmpty());
+    ui->frame->setProperty("t1_state", mTable.tableState);
+    ui->frame->style()->polish(ui->frame);
+}
 
-        if(jo["f_precheck"].toInt() > 0) {
-            state = "3";
-        }
-
-        if(jo["f_print"].toInt() > 0) {
-            state = "4";
-        }
-
-        labelComment()->setText(jo["f_comment"].toString());
-        labelStaff()->setText(jo["f_staffname"].toString());
-        labelAmount()->setText(float_str(jo["f_amounttotal"].toDouble(), 2));
-        QString dd = QString("<html><body><p align=\"center\" "
-                             "style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"> "
-                             "<span style=\" font-size:6pt;\">%1</span></p>\n<p align=\"center\" "
-                             "style=\" margin-top:0px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"> "
-                             "<span style=\" font-size:8pt;\">%2</span></p></body></html>")
-                     .arg(jo["f_dateopen"].toString(), jo["f_timeopen"].toString());
-        labelTime()->setText(QDate::currentDate() == QDate::fromString(jo["f_dateopen"].toString(), FORMAT_DATE_TO_STR) ?
-                             jo["f_timeopen"].toString() : dd);
-
-        if(jo["f_state"].toInt() == ORDER_STATE_PREORDER_EMPTY
-                || jo["f_state"].toInt() == ORDER_STATE_PREORDER_WITH_ORDER) {
-            state = "5";
-        }
-
-        if(jo["f_state"].toInt() == ORDER_STATE_OPEN) {
-            if(!jo["f_fortablename"].toString().isEmpty()) {
-                //TODO
-                // if(QDate::fromString(__c5config.dateCash(), FORMAT_DATE_TO_STR_MYSQL) == QDate::fromString(jo["f_checkout"].toString(),
-                //         FORMAT_DATE_TO_STR)) {
-                //     state = "6";
-                // }
-            }
-        }
+void TableWidget::updateTable(const TableItem &t)
+{
+    if(t.id == mTable.id) {
+        setTable(t);
     }
-
-    frame()->setProperty("t1_state", state);
-    frame()->style()->polish(frame());
-}
-
-void TableWidget::config(int id)
-{
-    fTable = id;
-    //TODO
-    //labelTable()->setText(dbtable->name(id));
 }
 
 void TableWidget::mouseReleaseEvent(QMouseEvent *me)
 {
     QWidget::mouseReleaseEvent(me);
-    emit clicked(fTable);
+    emit clicked(mTable.id);
 }

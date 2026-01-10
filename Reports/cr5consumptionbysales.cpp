@@ -1,7 +1,6 @@
 #include "cr5consumptionbysales.h"
 #include "cr5consumptionbysalesfilter.h"
 #include "c5gridgilter.h"
-#include "cr5consuptionreason.h"
 #include "c5tablemodel.h"
 #include "c5mainwindow.h"
 #include "c5waiterorderdoc.h"
@@ -11,7 +10,8 @@
 #include "c5double.h"
 #include "dlgchangeoutputstore.h"
 #include "c5storedraftwriter.h"
-#include "storeinputdocument.h"
+#include "c5message.h"
+#include "c5config.h"
 #include "c5storedoc.h"
 #include "cr5goodsmovement.h"
 #include "dlgsemireadyinout.h"
@@ -129,7 +129,7 @@ void CR5ConsumptionBySales::buildQuery()
     CR5ConsumptionBySalesFilter *f = static_cast<CR5ConsumptionBySalesFilter*>(fFilterWidget);
 
     if(f->store() ==  0) {
-        if(!C5GridGilter::filter(f, fWhereCondition, fColumnsVisible, fTranslation)) {
+        if(!C5GridGilter::filter(mUser, f, fWhereCondition, fColumnsVisible, fTranslation)) {
             return;
         }
     }
@@ -606,7 +606,7 @@ bool CR5ConsumptionBySales::tblDoubleClicked(int row, int column, const QJsonArr
     }
 
     case col_qty_sr:
-        C5SrOfInventory soi(this);
+        C5SrOfInventory soi(mUser);
         soi.setGoods(fFilter->date2(), fFilter->store(), values.at(0).toInt());
 
         if(soi.exec() == QDialog::Accepted) {
@@ -799,7 +799,7 @@ void CR5ConsumptionBySales::countOutputBasedOnRecipes()
 
 void CR5ConsumptionBySales::changeOutputStore()
 {
-    DlgChangeOutputStore *d = new DlgChangeOutputStore();
+    DlgChangeOutputStore *d = new DlgChangeOutputStore(mUser);
     d->refresh(fFilter->date1(), fFilter->date2());
     d->exec();
     delete d;
@@ -836,7 +836,7 @@ void CR5ConsumptionBySales::updateInventorizatinPrices()
 
 void CR5ConsumptionBySales::semireadyInOut()
 {
-    DlgSemireadyInOut d(this);
+    DlgSemireadyInOut d(mUser);
 
     if(d.exec()) {
         C5Database db;

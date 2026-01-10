@@ -3,6 +3,7 @@
 #include "c5config.h"
 #include "chatmessage.h"
 #include "c5cafecommon.h"
+#include "dict_dish_state.h"
 #include "jsons.h"
 #include "ogoods.h"
 #include <QVariant>

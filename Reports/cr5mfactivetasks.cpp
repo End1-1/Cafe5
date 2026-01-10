@@ -5,7 +5,7 @@
 #include "c5permissions.h"
 
 CR5MFActiveTasks::CR5MFActiveTasks(QWidget *parent) :
-    C5ReportWidget( parent)
+    C5ReportWidget(parent)
 {
     fIcon = ":/manufacturing.png";
     fLabel = tr("Tasks");
@@ -33,13 +33,15 @@ CR5MFActiveTasks::CR5MFActiveTasks(QWidget *parent) :
     fEditor = new CE5MFTask();
 }
 
-QToolBar *CR5MFActiveTasks::toolBar()
+QToolBar* CR5MFActiveTasks::toolBar()
 {
-    if (!fToolBar) {
+    if(!fToolBar) {
         QList<ToolBarButtons> btn;
-        if (mUser->check(cp_t10_create_task)) {
+
+        if(mUser->check(cp_t10_create_task)) {
             btn << ToolBarButtons::tbNew;
         }
+
         btn << ToolBarButtons::tbFilter
             << ToolBarButtons::tbClearFilter
             << ToolBarButtons::tbRefresh
@@ -50,10 +52,11 @@ QToolBar *CR5MFActiveTasks::toolBar()
         connect(cp, &QAction::triggered, this, &CR5MFActiveTasks::configTablet);
         fToolBar->addAction(cp);
     }
+
     return fToolBar;
 }
 
 void CR5MFActiveTasks::configTablet()
 {
-    DlgConfigTable().exec();
+    DlgConfigTable(mUser).exec();
 }

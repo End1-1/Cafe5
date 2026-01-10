@@ -15,7 +15,6 @@ class C5User : public QObject
     Q_OBJECT
 
 public:
-    enum UserState {usAtWork, usNotAtWork};
 
     C5User();
 
@@ -31,6 +30,8 @@ public:
 
     QString fullName();
 
+    QString shortFullName();
+
     QVariant value(const QString &key);
 
     int group();
@@ -39,7 +40,7 @@ public:
 
     void authByPinPass(const QString &pin, const QString &pass, NInterface *n, std::function<void (const QJsonObject&)> callback);
 
-    void authorize(const QString &pin, NInterface *n, std::function<void(const QJsonObject&)> callback);
+    void authorize(const QString &pin, NInterface *n, std::function<void(const QJsonObject&)> callback, std::function<void ()> errorCallback);
 
     bool check(int permission);
 
@@ -47,9 +48,11 @@ public:
 
     bool leaveWork();
 
-    UserState state();
+    QString mSessionKey;
 
     QJsonObject fConfig;
+
+    QMap<QString, QVariant> fUserData;
 
     QMap<int, QString> fSettings;
 
@@ -62,13 +65,10 @@ private:
 
     QString fError;
 
-    QVariant data(const QString &name);
-
-    QMap<QString, QVariant> fUserData;
-
-    UserState fState;
-
+    QVariant data(const QString &name); \
     void getState(NInterface *n);
+
+    void setUserData(const QJsonObject &jdoc);
 
 };
 

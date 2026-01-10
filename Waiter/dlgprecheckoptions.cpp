@@ -1,8 +1,8 @@
 #include "dlgprecheckoptions.h"
 #include "ui_dlgprecheckoptions.h"
 
-DlgPrecheckOptions::DlgPrecheckOptions() :
-    C5Dialog(),
+DlgPrecheckOptions::DlgPrecheckOptions(C5User *user) :
+    C5Dialog(user),
     ui(new Ui::DlgPrecheckOptions)
 {
     ui->setupUi(this);
@@ -13,9 +13,9 @@ DlgPrecheckOptions::~DlgPrecheckOptions()
     delete ui;
 }
 
-int DlgPrecheckOptions::precheck()
+int DlgPrecheckOptions::precheck(C5User *user)
 {
-    DlgPrecheckOptions d;
+    DlgPrecheckOptions d(user);
     return d.exec();
 }
 

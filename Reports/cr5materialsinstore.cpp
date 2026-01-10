@@ -3,27 +3,30 @@
 #include "c5tablemodel.h"
 #include "c5mainwindow.h"
 #include "c5database.h"
+#include "c5message.h"
 #include "c5storebarcode.h"
+#include "c5config.h"
 #include "ce5goods.h"
 
 CR5MaterialsInStore::CR5MaterialsInStore(QWidget *parent) :
-    C5ReportWidget( parent)
+    C5ReportWidget(parent)
 {
     fIcon = ":/goods.png";
     fLabel = tr("Materials in the store");
     fSimpleQuery = false;
     fFilterWidget = new CR5MaterialInStoreFilter();
-    fFilter = static_cast<CR5MaterialInStoreFilter *>(fFilterWidget);
-    if (fFilter->showDrafts()) {
+    fFilter = static_cast<CR5MaterialInStoreFilter*>(fFilterWidget);
+
+    if(fFilter->showDrafts()) {
         prepareDrafts();
     } else {
         prepareNoDrafts();
     }
 }
 
-QToolBar *CR5MaterialsInStore::toolBar()
+QToolBar* CR5MaterialsInStore::toolBar()
 {
-    if (!fToolBar) {
+    if(!fToolBar) {
         QList<ToolBarButtons> btn;
         btn << ToolBarButtons::tbFilter
             << ToolBarButtons::tbClearFilter
@@ -33,6 +36,7 @@ QToolBar *CR5MaterialsInStore::toolBar()
         fToolBar = createStandartToolbar(btn);
         fToolBar->addAction(QIcon(":/barcode.png"), tr("Print\nbarcode"), this, SLOT(printBarcode()));
     }
+
     return fToolBar;
 }
 
@@ -103,11 +107,13 @@ void CR5MaterialsInStore::prepareDrafts()
                 << "f_totalretaildiscounted"
                 << "f_totalsale2discount"
                 ;
-    if (fFilter->showZero()) {
+
+    if(fFilter->showZero()) {
         fHavindCondition = "";
     } else {
         fHavindCondition = " having sum(s.f_qty*s.f_type) <> 0 ";
     }
+
     fTranslation["f_code"] = tr("Code");
     fTranslation["f_storage"] = tr("Storage");
     fTranslation["f_group"] = tr("Group");
@@ -212,11 +218,13 @@ void CR5MaterialsInStore::prepareNoDrafts()
                 << "f_totalretaildiscounted"
                 << "f_totalsale2discount"
                 ;
-    if (fFilter->showZero()) {
+
+    if(fFilter->showZero()) {
         fHavindCondition = "";
     } else {
         fHavindCondition = " having sum(s.f_qty*s.f_type) > 0.01 ";
     }
+
     fTranslation["f_code"] = tr("Code");
     fTranslation["f_storage"] = tr("Storage");
     fTranslation["f_group"] = tr("Group");
@@ -268,14 +276,16 @@ void CR5MaterialsInStore::prepareNoDrafts()
 
 void CR5MaterialsInStore::setColors()
 {
-    if (fColumnsVisible["g.f_lowlevel"] && fColumnsVisible["sum(s.f_qty*s.f_type) as f_qty"]) {
+    if(fColumnsVisible["g.f_lowlevel"] && fColumnsVisible["sum(s.f_qty*s.f_type) as f_qty"]) {
         int colQty = fModel->indexForColumnName("f_qty");
         int colLow = fModel->indexForColumnName("f_lowlevel");
-        for (int i = 0; i < fModel->rowCount(); i++) {
-            if (fModel->data(i, colLow, Qt::EditRole).toDouble() < 0.0001) {
+
+        for(int i = 0; i < fModel->rowCount(); i++) {
+            if(fModel->data(i, colLow, Qt::EditRole).toDouble() < 0.0001) {
                 continue;
             }
-            if (fModel->data(i, colQty, Qt::EditRole).toDouble() < fModel->data(i, colLow, Qt::EditRole).toDouble()) {
+
+            if(fModel->data(i, colQty, Qt::EditRole).toDouble() < fModel->data(i, colLow, Qt::EditRole).toDouble()) {
                 fModel->setRowColor(i, QColor::fromRgb(255, 165, 165));
             }
         }
@@ -291,18 +301,20 @@ void CR5MaterialsInStore::printBarcode()
     QString s = db.getString("f_symbol");
     C5StoreBarcode *b = __mainWindow->createTab<C5StoreBarcode>();
     b->fCurrencyName = s;
-    for (int i = 0; i < fModel->rowCount(); i++) {
-        if (fFilter->unit().isEmpty()) {
+
+    for(int i = 0; i < fModel->rowCount(); i++) {
+        if(fFilter->unit().isEmpty()) {
             b->addRow(fModel->data(i, fModel->indexForColumnName("f_goods"), Qt::EditRole).toString(),
                       fModel->data(i, fModel->indexForColumnName("f_scancode"), Qt::EditRole).toString(),
                       fModel->data(i, fModel->indexForColumnName("f_qty"), Qt::EditRole).toInt(), fFilter->currency().toInt(), "");
-        } else if (fFilter->unit() == "10") {
+        } else if(fFilter->unit() == "10") {
             db[":f_qty"] = fModel->data(i, fModel->indexForColumnName("f_qty"), Qt::EditRole);
             db[":f_base"] = fModel->data(i, fModel->indexForColumnName("f_code"), Qt::EditRole);
             db.exec("select g.f_name, g.f_id, g.f_scancode, c.f_qty*:f_qty as f_qty from c_goods_complectation c "
                     "left join c_goods g on g.f_id=c.f_goods "
                     "where c.f_base=:f_base ");
-            while (db.nextRow()) {
+
+            while(db.nextRow()) {
                 b->addRow(db.getString("f_name"),
                           db.getString("f_scancode"),
                           db.getDouble("f_qty"), fFilter->currency().toInt(),
@@ -314,25 +326,29 @@ void CR5MaterialsInStore::printBarcode()
 
 void CR5MaterialsInStore::buildQuery()
 {
-    if (fFilter->showDrafts()) {
+    if(fFilter->showDrafts()) {
         prepareDrafts();
     } else {
         prepareNoDrafts();
     }
+
     C5Grid::buildQuery();
 }
 
 bool CR5MaterialsInStore::on_tblView_doubleClicked(const QModelIndex &index)
 {
-    if (!fColumnsVisible["g.f_id as f_code"]) {
+    if(!fColumnsVisible["g.f_id as f_code"]) {
         C5Message::info(tr("Code column must be included in report"));
         return false;
     }
+
     CE5Goods *ep = new CE5Goods();
-    C5Editor *e = C5Editor::createEditor(ep, fModel->data(index.row(), fModel->indexForColumnName("f_code"),
+    C5Editor *e = C5Editor::createEditor(mUser, ep, fModel->data(index.row(), fModel->indexForColumnName("f_code"),
                                          Qt::EditRole).toInt());
     QList<QMap<QString, QVariant> > data;
+
     if(e->getResult(data)) {
     }
+
     return C5ReportWidget::on_tblView_doubleClicked(index);
 }

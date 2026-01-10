@@ -3,9 +3,10 @@
 #include "c5waiterorder.h"
 #include "c5mainwindow.h"
 #include "cr5saleremoveddishesfilter.h"
+#include "c5message.h"
 
 CR5SaleRemovedDishes::CR5SaleRemovedDishes(QWidget *parent) :
-    C5ReportWidget( parent)
+    C5ReportWidget(parent)
 {
     fIcon = ":/delete.png";
     fLabel = tr("Sales, removed dishes");
@@ -67,12 +68,12 @@ CR5SaleRemovedDishes::CR5SaleRemovedDishes(QWidget *parent) :
     fColumnsVisible["sum(ob.f_total) as f_total"] = true;
     restoreColumnsVisibility();
     fFilterWidget = new CR5SaleRemovedDishesFilter();
-    fFilter = static_cast<CR5SaleRemovedDishesFilter *>(fFilterWidget);
+    fFilter = static_cast<CR5SaleRemovedDishesFilter*>(fFilterWidget);
 }
 
-QToolBar *CR5SaleRemovedDishes::toolBar()
+QToolBar* CR5SaleRemovedDishes::toolBar()
 {
-    if (!fToolBar) {
+    if(!fToolBar) {
         QList<ToolBarButtons> btn;
         btn << ToolBarButtons::tbFilter
             << ToolBarButtons::tbClearFilter
@@ -81,28 +82,33 @@ QToolBar *CR5SaleRemovedDishes::toolBar()
             << ToolBarButtons::tbPrint;
         fToolBar = createStandartToolbar(btn);
     }
+
     return fToolBar;
 }
 
 void CR5SaleRemovedDishes::restoreColumnsWidths()
 {
     C5Grid::restoreColumnsWidths();
-    if (fColumnsVisible["oh.f_id as f_header"]) {
+
+    if(fColumnsVisible["oh.f_id as f_header"]) {
         fTableView->setColumnWidth(fModel->fColumnNameIndex["f_header"], 0);
     }
 }
 
-bool CR5SaleRemovedDishes::tblDoubleClicked(int row, int column, const QVector<QJsonValue> &v)
+bool CR5SaleRemovedDishes::tblDoubleClicked(int row, int column, const QVector<QJsonValue>& v)
 {
     Q_UNUSED(row);
     Q_UNUSED(column);
-    if (!fColumnsVisible["oh.f_id as f_header"]) {
+
+    if(!fColumnsVisible["oh.f_id as f_header"]) {
         C5Message::info(tr("Column 'Header' must be checked in filter"));
         return true;
     }
-    if (v.count() == 0) {
+
+    if(v.count() == 0) {
         return true;
     }
+
     C5WaiterOrder *wo = __mainWindow->createTab<C5WaiterOrder>();
     wo->setOrder(v.at(fModel->fColumnNameIndex["f_header"]).toString());
     return true;

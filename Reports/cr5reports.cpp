@@ -5,6 +5,7 @@
 #include "c5storedoc.h"
 #include "c5saledoc.h"
 #include "cr5reportsfilter.h"
+#include "c5message.h"
 #include "ntablewidget.h"
 #include <QJsonObject>
 

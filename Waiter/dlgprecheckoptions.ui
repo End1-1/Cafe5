@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>331</width>
+    <width>253</width>
     <height>154</height>
    </rect>
   </property>
@@ -30,7 +30,23 @@
     <number>0</number>
    </property>
    <item>
-    <widget class="QPushButton" name="btnRepeatPrecheck">
+    <widget class="QLabel" name="label">
+     <property name="text">
+      <string>Precheck options</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignmentFlag::AlignCenter</set>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QToolButton" name="btnRepeatPrecheck">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
      <property name="minimumSize">
       <size>
        <width>0</width>
@@ -43,7 +59,13 @@
     </widget>
    </item>
    <item>
-    <widget class="QPushButton" name="btnCancelPrecheck">
+    <widget class="QToolButton" name="btnCancelPrecheck">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
      <property name="minimumSize">
       <size>
        <width>0</width>
@@ -56,7 +78,13 @@
     </widget>
    </item>
    <item>
-    <widget class="QPushButton" name="btnCancel">
+    <widget class="QToolButton" name="btnCancel">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
      <property name="minimumSize">
       <size>
        <width>0</width>

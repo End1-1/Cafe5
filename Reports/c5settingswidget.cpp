@@ -12,7 +12,7 @@ C5SettingsWidget::C5SettingsWidget(QWidget *parent) :
     ui(new Ui::C5SettingsWidget)
 {
     ui->setupUi(this);
-    ui->cbMenu->setDBValues("select f_id, f_name from d_menu_names order by 2");
+    ui->cbMenu->setDBValues("select f_id, f_name from c_menu_names order by 2");
     ui->cbDefaultStore->setDBValues("select f_id, f_name from c_storages order by 2");
     ui->cbShopHall->setDBValues("select f_id, f_name from h_halls order by 2");
     ui->cbWaiterHall->setDBValues("select f_id, f_name from h_halls order by 2");
@@ -30,7 +30,7 @@ C5SettingsWidget::~C5SettingsWidget()
 
 void C5SettingsWidget::setId(int id)
 {
-    NLoadingDlg loadingDlg(this);
+    NLoadingDlg loadingDlg(tr("Loading"), this);
     loadingDlg.setWindowModality(Qt::ApplicationModal);
     loadingDlg.show();
     CE5Editor::setId(id);
@@ -120,6 +120,7 @@ void C5SettingsWidget::setId(int id)
         ui->leDiscountItemCode->setInteger(jo["discount_item_code"].toInt());
         //Waiter
         ui->cbShopHall->setCurrentIndex(ui->cbShopHall->findText(jo["waiter_hall_name"].toString()));
+        ui->leServiceFactor->setDouble(jo["service_factor"].toDouble());
         //Shop
         ui->leShopAutodiscountCardNumber->setText(jo["shop_autodiscount_card_number"].toString());
         ui->leShopMaxDaysOfHistory->setInteger(jo["shop_max_days_of_history"].toInt());
@@ -139,7 +140,7 @@ void C5SettingsWidget::setId(int id)
 
 bool C5SettingsWidget::save(QString &err, QList<QMap<QString, QVariant> >& data)
 {
-    NLoadingDlg loadingDlg(this);
+    NLoadingDlg loadingDlg(tr("Saving"), this);
     loadingDlg.setWindowModality(Qt::ApplicationModal);
     loadingDlg.show();
     bool isNew = false;
@@ -348,6 +349,7 @@ bool C5SettingsWidget::save(QString &err, QList<QMap<QString, QVariant> >& data)
     jc["tax_ip"] = ui->leTaxIP->text();
     jc["tax_port"] = ui->leTaxPort->text();
     jc["tax_password"] = ui->leTaxPassword->text();
+    jc["tax_external_pos"] = ui->cbTaxUseExtPos->currentIndex() == 1 ? "true" : "false";
     jc["tax_dept"] = ui->leTaxDept->text();
     jc["tax_op"] = ui->leCashierLogin->text();
     jc["tax_pin"] = ui->leCashierPin->text();
@@ -358,6 +360,8 @@ bool C5SettingsWidget::save(QString &err, QList<QMap<QString, QVariant> >& data)
     //waiter config
     jc["default_hall"] = ui->cbWaiterHall->currentData().toInt();
     jc["default_hall_name"] = ui->cbWaiterHall->currentText();
+    jc["default_menu"] = ui->cbMenu->currentData().toInt();
+    jc["service_factor"] = ui->leServiceFactor->getDouble();
     //shop config
     jc["shop_hall_id"] = ui->cbShopHall->currentData().toInt();
     jc["shop_hall_name"] = ui->cbShopHall->currentText();

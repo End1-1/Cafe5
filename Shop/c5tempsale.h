@@ -16,7 +16,7 @@ class C5TempSale : public C5Dialog
     Q_OBJECT
 
 public:
-    explicit C5TempSale();
+    explicit C5TempSale(C5User *user);
 
     ~C5TempSale();
 
@@ -32,7 +32,7 @@ private slots:
     void on_btnTrash_clicked();
 
 private:
-    Ui::C5TempSale *ui;
+    Ui::C5TempSale* ui;
 
     void refreshData();
 };

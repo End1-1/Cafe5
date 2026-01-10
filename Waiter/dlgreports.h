@@ -1,7 +1,7 @@
 #ifndef DLGREPORTS_H
 #define DLGREPORTS_H
 
-#include "c5dialog.h"
+#include "c5waiterdialog.h"
 
 namespace Ui
 {
@@ -10,12 +10,12 @@ class DlgReports;
 
 class C5User;
 
-class DlgReports : public C5Dialog
+class DlgReports : public C5WaiterDialog
 {
     Q_OBJECT
 
 public:
-    explicit DlgReports(const QStringList &dbParams, C5User *user);
+    explicit DlgReports(C5User *user);
 
     ~DlgReports();
 
@@ -24,24 +24,19 @@ public:
 private:
     Ui::DlgReports* ui;
 
-    C5User* fUser;
-
     int fCurrentHall;
 
-    int fShiftId;
+    QDate mDate1;
 
-    QString fShiftName;
+    QDate mDate2;
 
-    void getDailyCommon(const QDate &date1 = QDate::currentDate(), const QDate &date2 = QDate::currentDate());
+    void getDailyCommon();
 
     void setLangIcon();
 
 private slots:
-    void cashDocResponse(const QJsonObject &jdoc);
 
     void handleDailyCommon(const QJsonObject &obj);
-
-    void reportListResponse(const QJsonObject &obj);
 
     void printReportResponse(const QJsonObject &obj);
 
@@ -52,14 +47,6 @@ private slots:
     void handleTaxReport(const QJsonObject &obj);
 
     void on_btnRefresh_clicked();
-
-    void on_btnDateLeft1_clicked();
-
-    void on_btnDateLeft2_clicked();
-
-    void on_btnDateRight1_clicked();
-
-    void on_btnDateRight2_clicked();
 
     void on_btnExit_clicked();
 
@@ -76,6 +63,7 @@ private slots:
     void on_btnPrintTaxX_clicked();
 
     void on_btnPrintTaxZ_clicked();
+    void on_btnParams_clicked();
 };
 
 #endif // DLGREPORTS_H

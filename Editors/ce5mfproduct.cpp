@@ -4,15 +4,16 @@
 #include "ce5mfprocess.h"
 #include "c5selector.h"
 #include "c5cache.h"
-#include "c5printing.h"
-#include "c5printpreview.h"
 #include "c5database.h"
 #include "c5message.h"
 #include "mfprocessproductpriceupdate.h"
 #include "ninterface.h"
 #include "c5utils.h"
+#include "c5htmlprint.h"
+#include <QPrinter>
 #include <QFileDialog>
 #include <QDesktopServices>
+#include <QPrintPreviewDialog>
 #include <QXlsx/header/xlsxdocument.h>
 #include <QClipboard>
 #include <QMimeData>
@@ -23,7 +24,6 @@ CE5MFProduct::CE5MFProduct(QWidget *parent) :
     ui(new Ui::CE5MFProduct)
 {
     ui->setupUi(this);
-    ui->leGroupId->setSelector(ui->leGroupName, cache_goods_group);
 #ifdef QT_DEBUG
     int processcolwidth = 100;
 #else
@@ -129,7 +129,7 @@ bool CE5MFProduct::save(QString &err, QList<QMap<QString, QVariant> >& data)
     QJsonObject j;
     j["f_id"] = ui->leCode->getInteger();
     j["f_name"] = ui->leName->text();
-    j["f_goods_group"] = ui->leGroupId->getInteger();
+    j["f_goods_group"] = ui->leGroupId->text();
     jo["main"] = j;
     QJsonArray ja;
 
@@ -198,7 +198,7 @@ void CE5MFProduct::openResponse(const QJsonObject &jdoc)
     QJsonObject jmain = jo["main"].toObject();
     ui->leCode->setInteger(jmain["f_id"].toInt());
     ui->leName->setText(jmain["f_name"].toString());
-    ui->leGroupId->setValue(jmain["f_goods_group"].toInt());
+    ui->leGroupId->setText(jmain["f_goods_group"].toString());
     QJsonArray ja =  jo ["process"].toArray();
 
     for(int i = 0; i < ja.size(); i++) {
@@ -271,6 +271,10 @@ void CE5MFProduct::openResponse(const QJsonObject &jdoc)
     ui->chNoSpin->setChecked(j["chnospin"].toBool());
     ui->lsNoSpin->setText(j["lsnospin"].toString());
     fHttp->httpQueryFinished(sender());
+
+    if(ui->tabWidget->currentIndex() == 5) {
+        getCurrentTasks();
+    }
 }
 
 void CE5MFProduct::saveResponse(const QJsonObject &jdoc)
@@ -348,6 +352,26 @@ QString CE5MFProduct::durationStr(int sec)
     return result;
 }
 
+void CE5MFProduct::getCurrentTasks()
+{
+    fHttp->createHttpQueryLambda("engine/v2/reports/m-goal-product/get", {
+        {"product", ui->leCode->getInteger()},
+        {"status", 0}
+    }, [this](const QJsonObject & jdoc) {
+        qDebug() << jdoc;
+        QJsonArray jrows = jdoc["rows"].toArray();
+        ui->tblCurrent->setRowCount(jrows.count());
+
+        for(int i = 0; i < jrows.count(); i++) {
+            const QJsonArray &jo = jrows.at(i).toArray();
+            ui->tblCurrent->setInteger(i, 0, jo.at(0).toInt());
+            ui->tblCurrent->setString(i, 1, jo.at(1).toString());
+            ui->tblCurrent->setString(i, 2, jo.at(2).toString());
+        }
+    }, [](const QJsonObject & jerr) {
+    });
+}
+
 void CE5MFProduct::on_btnAdd_clicked()
 {
     if(ui->leCode->getInteger() == 0) {
@@ -356,7 +380,7 @@ void CE5MFProduct::on_btnAdd_clicked()
 
     QJsonArray vals;
 
-    if(!C5Selector::getValue(cache_mf_actions, vals)) {
+    if(!C5Selector::getValue(mUser, cache_mf_actions, vals)) {
         return;
     }
 
@@ -411,7 +435,7 @@ void CE5MFProduct::on_btnNew_clicked()
     }
 
     auto *ep = new CE5MFProcess();
-    auto *e = C5Editor::createEditor(ep, 0);
+    auto *e = C5Editor::createEditor(mUser, ep, 0);
     QList<QMap<QString, QVariant> > data;
 
     if(e->getResult(data)) {
@@ -435,41 +459,59 @@ void CE5MFProduct::on_btnNew_clicked()
     delete e;
 }
 
-void CE5MFProduct::on_btnPrint_clicked()
+QString CE5MFProduct::makeProductRows(C5TableWithTotal *wt)
 {
-    C5Printing p;
-    QList<qreal> points;
-    QStringList vals;
-    p.setSceneParams(2000, 2700, QPageLayout::Portrait);
-    p.setFontSize(25);
-    p.setFontBold(true);
-    p.ctext(QString("%1: %2").arg(tr("Product"), ui->leName->text()));
-    p.br();
-    points << 50 << 100 << 500 << 250 << 250 << 250 << 250 << 250;
-    vals << "NN" << tr("Process") << tr("Duration") << tr("Duration") << tr("7h goal") << tr("Goal price") << tr("Price");
-    p.tableText(points, vals, p.fLineHeight + 20);
-    p.br(p.fLineHeight + 20);
-    p.setFontBold(false);
+    QString h;
+    QTextStream s(&h);
 
-    for(int i = 0; i < ui->wt->rowCount(); i++) {
-        vals.clear();
-        vals << QString::number(i + 1);
+    for(int i = 0; i < wt->rowCount(); ++i) {
+        s << "<tr>";
+        s << "<td class='center'>" << i + 1 << "</td>";
 
-        for(int c = 2; c < ui->wt->columnCount(); c++) {
-            vals.append(ui->wt->getData(i, c).toString());
+        for(int c = 2; c < wt->columnCount(); ++c) {
+            s << "<td class='right'>"
+              << wt->getData(i, c).toString()
+              << "</td>";
         }
 
-        p.tableText(points, vals, p.fLineHeight + 20);
-        p.br(p.fLineHeight + 20);
+        s << "</tr>";
     }
 
-    p.setFontBold(true);
-    vals.clear();
-    vals << "" << "" << "" << ui->wt->totalStr(4) << "" << ui->wt->totalStr(6) << ui->wt->totalStr(7);
-    p.tableText(points, vals, p.fLineHeight + 20);
-    p.br(p.fLineHeight + 20);
-    C5PrintPreview pp(&p);
-    pp.exec();
+    return h;
+}
+
+void CE5MFProduct::on_btnPrint_clicked()
+{
+    QString html = loadTemplate("product_process_a4.html");
+
+    if(html.isEmpty()) {
+        C5Message::error("Template not found");
+        return;
+    }
+
+    QMap<QString, QString> vars;
+    vars["title"] =
+        tr("Product") + ": " + ui->leName->text();
+    vars["col_process"] = tr("Process");
+    vars["col_duration1"] = tr("Duration");
+    vars["col_duration2"] = tr("Duration");
+    vars["col_goal7h"] = tr("7h goal");
+    vars["col_goal_price"] = tr("Goal price");
+    vars["col_price"] = tr("Price");
+    vars["rows"] = makeProductRows(ui->wt);
+    vars["total_duration"] = ui->wt->totalStr(4);
+    vars["total_goal_price"] = ui->wt->totalStr(6);
+    vars["total_price"] = ui->wt->totalStr(7);
+    html = applyTemplate(html, vars);
+    QTextDocument doc;
+    doc.setHtml(html);
+    QPrinter printer(QPrinter::HighResolution);
+    printer.setPageSize(QPageSize::A4);
+    printer.setFullPage(false);
+    QPrintPreviewDialog preview(&printer, this);
+    connect(&preview, &QPrintPreviewDialog::paintRequested,
+    [&](QPrinter * p) { doc.print(p); });
+    preview.exec();
 }
 
 void CE5MFProduct::on_btnClear_clicked()
@@ -693,7 +735,7 @@ void CE5MFProduct::on_btnAdd_3_clicked()
 {
     QJsonArray vals;
 
-    if(!C5Selector::getValue(cache_materials_actions, vals)) {
+    if(!C5Selector::getValue(mUser, cache_materials_actions, vals)) {
         return;
     }
 
@@ -809,4 +851,42 @@ void CE5MFProduct::on_btnPaste_3_clicked()
 
         ui->tblMaterials->setItem(ir, 0, new QTableWidgetItem(QString::number(ir + 1)));
     }
+}
+
+void CE5MFProduct::on_tabWidget_currentChanged(int index)
+{
+    if(index == 5) {
+        getCurrentTasks();
+    }
+}
+
+void CE5MFProduct::on_pushButton_clicked()
+{
+    int row = ui->tblCurrent->currentRow();
+
+    if(row < 0) {
+        return;
+    }
+
+    if(C5Message::question(tr("Do you want to create complectation documents?")) != QDialog::Accepted) {
+        return;
+    }
+
+    int product = ui->tblCurrent->getInteger(row, 0);
+    fHttp->createHttpQueryLambda("engine/v2/workshop/docs/create-complect", {
+        {"product", product},
+    }, [this](const QJsonObject & jdoc) {
+        qDebug() << jdoc;
+        QJsonArray jr = jdoc["completed_codes"].toArray();
+        QJsonObject jb = jdoc["barcode_done"].toObject();
+        QString result = "<br>";
+
+        for(int i = 0; i < jr.size(); i++) {
+            QString code = jr.at(i).toString();
+            result += QString("[%1] %2<br>").arg(jb[code].toBool() ? "+" : "-", code);
+        }
+
+        C5Message::info(tr("Created") + result);
+    }, [](const QJsonObject & jerr) {
+    });
 }

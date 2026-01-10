@@ -15,7 +15,7 @@ class C5DataSynchronize : public C5Dialog
     Q_OBJECT
 
 public:
-    explicit C5DataSynchronize();
+    explicit C5DataSynchronize(C5User *user);
 
     ~C5DataSynchronize();
 

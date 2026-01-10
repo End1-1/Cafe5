@@ -1,8 +1,8 @@
 #include "dlgaskforprecheck.h"
 #include "ui_dlgaskforprecheck.h"
 
-DlgAskForPrecheck::DlgAskForPrecheck() :
-    C5Dialog(),
+DlgAskForPrecheck::DlgAskForPrecheck(C5User *user) :
+    C5Dialog(user),
     ui(new Ui::DlgAskForPrecheck)
 {
     ui->setupUi(this);
@@ -13,9 +13,9 @@ DlgAskForPrecheck::~DlgAskForPrecheck()
     delete ui;
 }
 
-int DlgAskForPrecheck::get()
+int DlgAskForPrecheck::get(C5User *user)
 {
-    DlgAskForPrecheck d;
+    DlgAskForPrecheck d(user);
     return d.exec();
 }
 

@@ -12,7 +12,7 @@ class C5GoodsPricing : public C5Dialog
     Q_OBJECT
 
 public:
-    explicit C5GoodsPricing();
+    explicit C5GoodsPricing(C5User *user);
 
     ~C5GoodsPricing();
 

@@ -72,7 +72,7 @@ bool C5ReportWidget::on_tblView_doubleClicked(const QModelIndex &index)
 
     if(fEditor) {
         if(values.count() > 0) {
-            C5Editor *e = C5Editor::createEditor(fEditor, values.at(0).toInt());
+            C5Editor *e = C5Editor::createEditor(mUser, fEditor, values.at(0).toInt());
             QList<QMap<QString, QVariant> > data;
             bool yes = e->getResult(data);
             fEditor->setParent(nullptr);
@@ -129,7 +129,7 @@ int C5ReportWidget::newRow()
         return -1;
     }
 
-    C5Editor *e = C5Editor::createEditor(fEditor, 0);
+    C5Editor *e = C5Editor::createEditor(mUser, fEditor, 0);
     QList<QMap<QString, QVariant> > data;
     bool yes = e->getResult(data);
     fEditor->setParent(nullptr);

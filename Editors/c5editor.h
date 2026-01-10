@@ -16,11 +16,11 @@ class C5Editor : public C5Dialog
     Q_OBJECT
 
 public:
-    explicit C5Editor();
+    explicit C5Editor(C5User *user);
 
     ~C5Editor();
-
-    static C5Editor *createEditor(CE5Editor *e, int id);
+    
+    static C5Editor *createEditor(C5User *user, CE5Editor *e, int id);
 
     bool getResult(QList<QMap<QString, QVariant> > &data);
 

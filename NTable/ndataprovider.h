@@ -20,6 +20,8 @@ public:
 
     void changeTimeout(int value);
 
+    void changeBearer(const QString &bearer);
+
     void overwriteHost(const QString &protocol, const QString &host, int port);
 
     static bool mDebug;
@@ -44,6 +46,10 @@ private:
     QString mConnectionHost;
 
     int mConnectionPort;
+
+    QString mBearer;
+
+    QDateTime mStartDate;
 
 private slots:
     void queryFinished(QNetworkReply *r);

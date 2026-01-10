@@ -49,6 +49,7 @@ int main(int argc, char* argv[])
                                   C5ConnectionDialog::instance()->serverAddress() + "/ws"));
 
     if(!c5sn->getServers()) {
+        C5ConnectionDialog::showSettings(nullptr);
         C5Message::error(c5sn->mErrorString);
         return -1;
     }

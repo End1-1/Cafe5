@@ -15,7 +15,7 @@ class C5Login : public C5OfficeDialog
     Q_OBJECT
 
 public:
-    explicit C5Login();
+    explicit C5Login(C5User *user);
 
     ~C5Login();
 

@@ -20,8 +20,8 @@
 #include <QJsonDocument>
 #include <QJsonObject>
 
-DlgReservGoods::DlgReservGoods(int store, int goods, double qty) :
-    DlgReservGoods()
+DlgReservGoods::DlgReservGoods(C5User *user, int store, int goods, double qty) :
+    C5Dialog(user)
 {
     fStore = store;
     fGoods = goods;
@@ -34,8 +34,8 @@ DlgReservGoods::DlgReservGoods(int store, int goods, double qty) :
     ui->leEndDay->setDate(QDate::currentDate().addDays(1));
 }
 
-DlgReservGoods::DlgReservGoods(int id) :
-    DlgReservGoods()
+DlgReservGoods::DlgReservGoods(int id, C5User *user) :
+    C5Dialog(user)
 {
     C5Database db;
     db[":f_id"] = id;
@@ -67,8 +67,8 @@ DlgReservGoods::DlgReservGoods(int id) :
     ui->btnPrintFiscal->setEnabled(ui->leFiscal->getInteger() == 0);
 }
 
-DlgReservGoods::DlgReservGoods() :
-    C5Dialog(),
+DlgReservGoods::DlgReservGoods(C5User *user) :
+    C5Dialog(user),
     ui(new Ui::DlgReservGoods)
 {
     ui->setupUi(this);
@@ -165,7 +165,8 @@ void DlgReservGoods::setState(int state)
     ui->btnCompleteReserve->setVisible(false);
 #if(!defined FRONTDESK && !defined WAITER)
     WOrder *wo = Working::working()->newSale(SALE_RETAIL);
-    wo->addGoods(fGoods);
+    //TODO UPDATE
+    //wo->addGoods(fGoods);
     wo->setQtyOfRow(0, ui->leReservedQty->getDouble());
     wo->fOHeader.amountPrepaid = ui->lePrepaid->getDouble() + ui->lePrepaidCard->getDouble();
 #endif
@@ -217,7 +218,7 @@ void DlgReservGoods::on_leReservedQty_textEdited(const QString &arg1)
 void DlgReservGoods::on_btnGoods_clicked()
 {
 #if(!defined FRONTDESK && !defined WAITER)
-    QVector<GoodsItem> result = C5StructTableView::get<GoodsItem>(this, search_goods, false, false);
+    QVector<GoodsItem> result = C5StructTableView::get<GoodsItem>(search_goods, false, false);
 
     if(result.isEmpty()) {
         return;
@@ -242,7 +243,7 @@ void DlgReservGoods::on_btnGoods_clicked()
 void DlgReservGoods::on_btnStore_clicked()
 {
 #if(!defined FRONTDESK && !defined WAITER)
-    QVector<StorageItem> result = C5StructTableView::get<StorageItem>(this, search_storage, true, false);
+    QVector<StorageItem> result = C5StructTableView::get<StorageItem>(search_storage, true, false);
 
     if(result.isEmpty()) {
         return;
@@ -252,13 +253,6 @@ void DlgReservGoods::on_btnStore_clicked()
     ui->leStore->setText(si.name);
     fStore = si.id;
     getAvailableGoods();
-    //TODO
-    // DlgDataOnline::DataResult r;
-    // if(DlgDataOnline::get("c_storages", r)) {
-    //     ui->leStore->setText(r.value(0, tr("Name")).toString());
-    //     fStore = r.value(0, tr("Code")).toInt();
-    //     getAvailableGoods();
-    // }
 #endif
 }
 

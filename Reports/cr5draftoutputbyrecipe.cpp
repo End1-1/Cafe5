@@ -2,13 +2,15 @@
 #include "cr5draftoutputbyrecipefilter.h"
 #include "c5tablemodel.h"
 #include "c5storedraftwriter.h"
+#include "c5config.h"
+#include "c5message.h"
 #include "c5storedoc.h"
 #include "c5mainwindow.h"
 #include "c5user.h"
 #include "ogoods.h"
 
 CR5DraftOutputByRecipe::CR5DraftOutputByRecipe(QWidget *parent) :
-    C5ReportWidget( parent)
+    C5ReportWidget(parent)
 {
     fIcon = ":/goods.png";
     fLabel = tr("Draft output by receipes");
@@ -72,12 +74,12 @@ CR5DraftOutputByRecipe::CR5DraftOutputByRecipe(QWidget *parent) :
                 << "f_storeqty";
     fMainTable = "o_body ob";
     fFilterWidget = new CR5DraftOutputByRecipeFilter();
-    fFilter = static_cast<CR5DraftOutputByRecipeFilter *>(fFilterWidget);
+    fFilter = static_cast<CR5DraftOutputByRecipeFilter*>(fFilterWidget);
 }
 
-QToolBar *CR5DraftOutputByRecipe::toolBar()
+QToolBar* CR5DraftOutputByRecipe::toolBar()
 {
-    if (!fToolBar) {
+    if(!fToolBar) {
         QList<ToolBarButtons> btn;
         btn << ToolBarButtons::tbFilter
             << ToolBarButtons::tbClearFilter
@@ -89,6 +91,7 @@ QToolBar *CR5DraftOutputByRecipe::toolBar()
         fToolBar->addAction(QIcon(":/tomorrow.png"), tr("Date\nforward"), this, SLOT(dateForward()));
         fToolBar->addAction(QIcon(":/storeinput.png"), tr("Create store\noutput"), this, SLOT(createStoreOutput()));
     }
+
     return fToolBar;
 }
 
@@ -141,13 +144,15 @@ void CR5DraftOutputByRecipe::dateForward()
 void CR5DraftOutputByRecipe::createStoreOutput()
 {
     QList<OGoods> goodsSale;
-    for (int i = 0; i < fModel->rowCount(); i++) {
+
+    for(int i = 0; i < fModel->rowCount(); i++) {
         OGoods g;
         g.goods = fModel->data(i, fModel->indexForColumnName("f_goods"), Qt::EditRole).toInt();
         g.qty = fModel->data(i, fModel->indexForColumnName("f_storeqty"), Qt::EditRole).toDouble();
         goodsSale.append(g);
     }
-    if (goodsSale.count() > 0) {
+
+    if(goodsSale.count() > 0) {
         C5Database db;
         C5StoreDraftWriter dw(db);
         QString documentId;
@@ -161,15 +166,18 @@ void CR5DraftOutputByRecipe::createStoreOutput()
                         QDate::currentDate(), QTime::currentTime(), 0, 0, comment, 0, __c5config.getValue(param_default_currency).toInt());
         dw.writeAHeaderStore(documentId, mUser->id(), mUser->id(), "", QDate(), 0, fFilter->store(), 0, cashid, 0, 0, "");
         int rownum = 1;
-        foreach (const OGoods &g, goodsSale) {
+
+        foreach(const OGoods &g, goodsSale) {
             QString sdid;
-            dw.writeAStoreDraft(sdid, documentId, fFilter->store(), -1, g.goods, g.qty, g.price, g.price *g.qty, DOC_REASON_SALE,
+            dw.writeAStoreDraft(sdid, documentId, fFilter->store(), -1, g.goods, g.qty, g.price, g.price * g.qty, DOC_REASON_SALE,
                                 "", rownum++, "");
         }
+
         //= dw.writeDraft(docDate, doctype, store, reason, data, comment);
         auto *sd = __mainWindow->createTab<C5StoreDoc>();
         QString e;
-        if (!sd->openDoc(documentId, e)) {
+
+        if(!sd->openDoc(documentId, e)) {
             __mainWindow->removeTab(sd);
             sd = nullptr;
             C5Message::error(e);

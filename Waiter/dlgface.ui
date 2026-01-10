@@ -27,36 +27,9 @@
     <number>0</number>
    </property>
    <property name="spacing">
-    <number>2</number>
+    <number>1</number>
    </property>
    <item row="1" column="1" rowspan="2">
-    <widget class="QWidget" name="wstaff" native="true">
-     <property name="minimumSize">
-      <size>
-       <width>50</width>
-       <height>0</height>
-      </size>
-     </property>
-     <layout class="QVBoxLayout" name="vlStaff">
-      <property name="spacing">
-       <number>2</number>
-      </property>
-      <property name="leftMargin">
-       <number>0</number>
-      </property>
-      <property name="topMargin">
-       <number>0</number>
-      </property>
-      <property name="rightMargin">
-       <number>0</number>
-      </property>
-      <property name="bottomMargin">
-       <number>0</number>
-      </property>
-     </layout>
-    </widget>
-   </item>
-   <item row="1" column="2" rowspan="2">
     <widget class="QFrame" name="frame">
      <property name="minimumSize">
       <size>
@@ -71,12 +44,15 @@
       </size>
      </property>
      <property name="frameShape">
-      <enum>QFrame::Box</enum>
+      <enum>QFrame::Shape::Box</enum>
      </property>
      <property name="frameShadow">
-      <enum>QFrame::Raised</enum>
+      <enum>QFrame::Shadow::Raised</enum>
      </property>
      <layout class="QVBoxLayout" name="verticalLayout">
+      <property name="spacing">
+       <number>1</number>
+      </property>
       <property name="leftMargin">
        <number>0</number>
       </property>
@@ -92,14 +68,14 @@
       <item>
        <layout class="QVBoxLayout" name="vlHall">
         <property name="spacing">
-         <number>2</number>
+         <number>1</number>
         </property>
        </layout>
       </item>
       <item>
        <spacer name="verticalSpacer">
         <property name="orientation">
-         <enum>Qt::Vertical</enum>
+         <enum>Qt::Orientation::Vertical</enum>
         </property>
         <property name="sizeHint" stdset="0">
          <size>
@@ -109,47 +85,22 @@
         </property>
        </spacer>
       </item>
-     </layout>
-    </widget>
-   </item>
-   <item row="2" column="0">
-    <widget class="QWidget" name="wall" native="true">
-     <layout class="QHBoxLayout" name="horizontalLayout">
-      <property name="spacing">
-       <number>2</number>
-      </property>
-      <property name="leftMargin">
-       <number>0</number>
-      </property>
-      <property name="topMargin">
-       <number>0</number>
-      </property>
-      <property name="rightMargin">
-       <number>0</number>
-      </property>
-      <property name="bottomMargin">
-       <number>0</number>
-      </property>
       <item>
-       <widget class="QToolButton" name="btnCancel">
+       <widget class="QToolButton" name="btnReports">
         <property name="minimumSize">
          <size>
-          <width>60</width>
-          <height>60</height>
+          <width>140</width>
+          <height>50</height>
          </size>
         </property>
         <property name="maximumSize">
          <size>
-          <width>60</width>
-          <height>60</height>
+          <width>16777215</width>
+          <height>50</height>
          </size>
         </property>
         <property name="text">
-         <string/>
-        </property>
-        <property name="icon">
-         <iconset resource="../resources/res.qrc">
-          <normaloff>:/cancel.png</normaloff>:/cancel.png</iconset>
+         <string>Reports</string>
         </property>
         <property name="iconSize">
          <size>
@@ -160,71 +111,21 @@
        </widget>
       </item>
       <item>
-       <widget class="QPushButton" name="btnViewHall">
+       <widget class="QToolButton" name="btnOrders">
         <property name="minimumSize">
          <size>
           <width>140</width>
-          <height>60</height>
+          <height>50</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>16777215</width>
+          <height>50</height>
          </size>
         </property>
         <property name="text">
-         <string>Schema of hall</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QPushButton" name="btnViewWaiter">
-        <property name="minimumSize">
-         <size>
-          <width>140</width>
-          <height>60</height>
-         </size>
-        </property>
-        <property name="text">
-         <string>By waiters</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QPushButton" name="btnGuests">
-        <property name="minimumSize">
-         <size>
-          <width>140</width>
-          <height>60</height>
-         </size>
-        </property>
-        <property name="text">
-         <string>Guests</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <spacer name="horizontalSpacer_2">
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
-        </property>
-        <property name="sizeHint" stdset="0">
-         <size>
-          <width>500</width>
-          <height>20</height>
-         </size>
-        </property>
-       </spacer>
-      </item>
-      <item>
-       <widget class="QPushButton" name="btnTools">
-        <property name="minimumSize">
-         <size>
-          <width>140</width>
-          <height>60</height>
-         </size>
-        </property>
-        <property name="text">
-         <string>Tools</string>
-        </property>
-        <property name="icon">
-         <iconset resource="../resources/res.qrc">
-          <normaloff>:/pentools.png</normaloff>:/pentools.png</iconset>
+         <string>Orders</string>
         </property>
         <property name="iconSize">
          <size>
@@ -235,11 +136,17 @@
        </widget>
       </item>
       <item>
-       <widget class="QPushButton" name="btnExit">
+       <widget class="QToolButton" name="btnExit">
         <property name="minimumSize">
          <size>
           <width>140</width>
-          <height>60</height>
+          <height>50</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>16777215</width>
+          <height>50</height>
          </size>
         </property>
         <property name="text">
@@ -269,6 +176,9 @@
       </sizepolicy>
      </property>
      <layout class="QVBoxLayout" name="verticalLayout_2">
+      <property name="spacing">
+       <number>1</number>
+      </property>
       <property name="leftMargin">
        <number>0</number>
       </property>
@@ -291,7 +201,7 @@
         </property>
         <layout class="QGridLayout" name="glTables">
          <property name="sizeConstraint">
-          <enum>QLayout::SetMaximumSize</enum>
+          <enum>QLayout::SizeConstraint::SetMaximumSize</enum>
          </property>
          <property name="leftMargin">
           <number>0</number>
@@ -317,10 +227,10 @@
             </sizepolicy>
            </property>
            <property name="verticalScrollBarPolicy">
-            <enum>Qt::ScrollBarAlwaysOn</enum>
+            <enum>Qt::ScrollBarPolicy::ScrollBarAlwaysOn</enum>
            </property>
            <property name="horizontalScrollBarPolicy">
-            <enum>Qt::ScrollBarAlwaysOff</enum>
+            <enum>Qt::ScrollBarPolicy::ScrollBarAlwaysOff</enum>
            </property>
            <property name="widgetResizable">
             <bool>true</bool>
@@ -330,13 +240,13 @@
              <rect>
               <x>0</x>
               <y>0</y>
-              <width>898</width>
-              <height>682</height>
+              <width>951</width>
+              <height>694</height>
              </rect>
             </property>
             <layout class="QGridLayout" name="sglHall">
              <property name="sizeConstraint">
-              <enum>QLayout::SetMaximumSize</enum>
+              <enum>QLayout::SizeConstraint::SetMaximumSize</enum>
              </property>
              <property name="leftMargin">
               <number>0</number>
@@ -363,11 +273,102 @@
      </layout>
     </widget>
    </item>
-   <item row="0" column="0" colspan="3">
+   <item row="2" column="0">
+    <widget class="QWidget" name="wall" native="true">
+     <layout class="QHBoxLayout" name="horizontalLayout">
+      <property name="spacing">
+       <number>1</number>
+      </property>
+      <property name="leftMargin">
+       <number>0</number>
+      </property>
+      <property name="topMargin">
+       <number>0</number>
+      </property>
+      <property name="rightMargin">
+       <number>0</number>
+      </property>
+      <property name="bottomMargin">
+       <number>0</number>
+      </property>
+      <item>
+       <widget class="QToolButton" name="btnNormalView">
+        <property name="minimumSize">
+         <size>
+          <width>140</width>
+          <height>50</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>16777215</width>
+          <height>50</height>
+         </size>
+        </property>
+        <property name="text">
+         <string>Normal view</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QToolButton" name="btnMyOrders">
+        <property name="minimumSize">
+         <size>
+          <width>140</width>
+          <height>50</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>16777215</width>
+          <height>50</height>
+         </size>
+        </property>
+        <property name="text">
+         <string>By waiters</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QToolButton" name="btnGuests">
+        <property name="minimumSize">
+         <size>
+          <width>140</width>
+          <height>50</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>16777215</width>
+          <height>50</height>
+         </size>
+        </property>
+        <property name="text">
+         <string>Guests</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <spacer name="horizontalSpacer_2">
+        <property name="orientation">
+         <enum>Qt::Orientation::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>500</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item row="0" column="0" colspan="2">
     <widget class="QWidget" name="widget" native="true">
      <layout class="QHBoxLayout" name="horizontalLayout_2">
       <property name="spacing">
-       <number>2</number>
+       <number>1</number>
       </property>
       <property name="leftMargin">
        <number>0</number>
@@ -387,24 +388,14 @@
          <string>00:00</string>
         </property>
         <property name="alignment">
-         <set>Qt::AlignCenter</set>
+         <set>Qt::AlignmentFlag::AlignCenter</set>
         </property>
        </widget>
       </item>
       <item>
-       <widget class="QLabel" name="lbStaff">
-        <property name="text">
-         <string>Staffname</string>
-        </property>
-        <property name="alignment">
-         <set>Qt::AlignCenter</set>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <spacer name="horizontalSpacer">
+       <spacer name="horizontalSpacer_3">
         <property name="orientation">
-         <enum>Qt::Horizontal</enum>
+         <enum>Qt::Orientation::Horizontal</enum>
         </property>
         <property name="sizeHint" stdset="0">
          <size>
@@ -413,6 +404,29 @@
          </size>
         </property>
        </spacer>
+      </item>
+      <item>
+       <spacer name="horizontalSpacer">
+        <property name="orientation">
+         <enum>Qt::Orientation::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item>
+       <widget class="QLabel" name="lbStaff">
+        <property name="text">
+         <string>Staffname</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignmentFlag::AlignCenter</set>
+        </property>
+       </widget>
       </item>
      </layout>
     </widget>

@@ -81,7 +81,7 @@ void C5GroupPermissionsEditor::on_lbGroup_clicked()
 {
     QJsonArray values;
 
-    if(C5Selector::getValue(cache_users_groups, values)) {
+    if(C5Selector::getValue(mUser, cache_users_groups, values)) {
         setPermissionsGroupId(values.at(0).toInt());
     }
 }

@@ -2,8 +2,8 @@
 #include "ui_supplier.h"
 #include "c5database.h"
 
-supplier::supplier() :
-    C5Dialog(),
+supplier::supplier(C5User *user) :
+    C5Dialog(user),
     ui(new Ui::supplier)
 {
     ui->setupUi(this);
@@ -24,10 +24,10 @@ supplier::~supplier()
     delete ui;
 }
 
-bool supplier::getSupplier(int& id, QString &name)
+bool supplier::getSupplier(int& id, QString &name, C5User *user)
 {
     bool result = false;
-    supplier s;
+    supplier s(user);
 
     if(s.exec() == QDialog::Accepted) {
         result = true;

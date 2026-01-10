@@ -4,14 +4,12 @@
 #include "cr5documentsfilter.h"
 #include "c5tablemodel.h"
 #include "c5mainwindow.h"
-#include "c5salarydoc.h"
-#include "c5storedraftwriter.h"
 #include "c5cashdoc.h"
+#include "c5message.h"
 #include "c5progressdialog.h"
 #include "c5waiterorder.h"
 #include "c5dlgselectreporttemplate.h"
 #include "c5salefromstoreorder.h"
-#include "storeinputdocument.h"
 #include <QMenu>
 
 CR5Documents::CR5Documents(QWidget *parent) :
@@ -210,7 +208,7 @@ void CR5Documents::openDoc(QString id)
             }
 
             case 2: {
-                C5SaleFromStoreOrder::openOrder(id);
+                C5SaleFromStoreOrder::openOrder(mUser, id);
                 break;
             }
 
@@ -537,7 +535,7 @@ void CR5Documents::copySelectedDocs()
 
 void CR5Documents::templates()
 {
-    C5DlgSelectReportTemplate d(1);
+    C5DlgSelectReportTemplate d(mUser, 1);
 
     if(d.exec() == QDialog::Accepted) {
         QString sql = d.fSelectedTemplate.sql;

@@ -33,8 +33,9 @@ void C5GoodsImage::on_btnEdit_clicked()
 {
     int id = property("goodsid").toInt();
     CE5Goods *ep = new CE5Goods();
-    C5Editor *e = C5Editor::createEditor(ep, id);
+    C5Editor *e = C5Editor::createEditor(mUser, ep, id);
     QList<QMap<QString, QVariant> > data;
+
     if(e->getResult(data)) {
         C5Database db;
         db[":f_id"] = id;
@@ -42,12 +43,14 @@ void C5GoodsImage::on_btnEdit_clicked()
                 "from c_goods_images gi "
                 "inner join c_goods g on g.f_id=gi.f_id "
                 "where g.f_id=:f_id");
-        if (db.nextRow()) {
+
+        if(db.nextRow()) {
             QPixmap p;
             p.loadFromData(db.getValue("f_data").toByteArray());
             setImage(p.scaled(190, 190, Qt::KeepAspectRatio), db.getString("f_name"), db.getString("f_scancode"));
         }
     }
+
     delete e;
 }
 
@@ -56,17 +59,20 @@ void C5GoodsImage::on_btnCompress_clicked()
     C5Database db;
     db[":f_id"] = property("goodsid");
     db.exec("select f_data from c_goods_images where f_id=:f_id");
-    if (db.nextRow()) {
+
+    if(db.nextRow()) {
         QByteArray ba = db.getValue("f_data").toByteArray();
         QPixmap pm;
         pm.loadFromData(ba);
+
         do {
             pm = pm.scaled(pm.width() * 0.8,  pm.height() * 0.8);
             ba.clear();
-            QBuffer buff( &ba);
+            QBuffer buff(&ba);
             buff.open(QIODevice::WriteOnly);
-            pm.save( &buff, "JPG");
-        } while (ba.size() > 100000);
+            pm.save(&buff, "JPG");
+        } while(ba.size() > 100000);
+
         C5Database db;
         db[":f_id"] =  property("goodsid");
         db.exec("delete from c_goods_images where f_id=:f_id");
@@ -74,5 +80,6 @@ void C5GoodsImage::on_btnCompress_clicked()
         db[":f_image"] = ba;
         db.exec("insert into c_goods_images (f_id, f_data) values (:f_id, :f_image)");
     }
+
     ui->btnCompress->setVisible(false);
 }

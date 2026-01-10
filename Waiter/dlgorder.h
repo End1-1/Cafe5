@@ -2,8 +2,14 @@
 #define DLGORDER_H
 
 #include "c5waiterdialog.h"
+#include "struct_goods_group.h"
+#include "struct_dish.h"
+#include "struct_waiter_order.h"
+#include "struct_hall.h"
+#include "struct_table.h"
 #include <QTableWidgetItem>
 #include <QTimer>
+#include <QStack>
 
 namespace Ui
 {
@@ -14,17 +20,17 @@ class C5User;
 class C5OrderDriver;
 class WOrder;
 class C5LineEdit;
+class WaiterOrderItemWidget;
+class QDishButton;
 
 class DlgOrder : public C5WaiterDialog
 {
     Q_OBJECT
 
 public:
-    explicit DlgOrder(C5User *user);
+    explicit DlgOrder(C5User *user, HallItem h, TableItem t,  const QVector<GoodsGroupItem*>* groups, const QVector<DishAItem*>* dishes);
 
     ~DlgOrder();
-
-    static DlgOrder* openTable(int table, C5User *user);
 
     void setStoplistmode();
 
@@ -32,48 +38,69 @@ public:
 
     void viewStoplist();
 
-protected:
-    virtual void accept();
+    virtual void accept() override;
 
-    virtual void reject();
+    virtual void reject() override;
+
+protected:
+    virtual bool eventFilter(QObject *o, QEvent *e) override;
+
+    virtual void showEvent(QShowEvent *e) override;
 
 private:
     Ui::DlgOrder* ui;
 
-    QMap<QString, QVariant> fHeader;
+    WaiterOrder mOrder;
 
-    QList<QMap<QString, QVariant> > fBody;
+    QStack<int> mPreviouseParent;
 
-    int fCarNumber;
+    QToolButton* mBtnGroupsUp;
 
-    int fTable;
+    QToolButton* mBtnGroupsDown;
+
+    QToolButton* mBtnDishUp;
+
+    QToolButton* mBtnDishDown;
+
+    QToolButton* mBtnOrderUp;
+
+    QToolButton* mBtnOrderDown;
+
+    HallItem mHall;
+
+    TableItem mTable;
 
     int fMenuID;
 
-    int fPart1;
-
     int fPart2Parent;
 
+    bool mShowRemoved = false;
+
     QTimer fTimer;
+
+    QString mStringBuffer;
+
+    const QVector<GoodsGroupItem*>* mGroups;
+
+    const QVector<DishAItem*>* mDishes;
 
     int fTimerCounter;
 
     bool fStoplistMode;
 
-    QList<WOrder*> worders();
+    void makeFavorites();
 
-    void updateData();
+    void makeGroups(int parent, int dept);
+
+    void makeDishes(int group, int favorite);
+
+    void confirmStringBuffer();
 
     void disableForCheckall(bool v);
 
-    void buildMenu(int menuid, int part1, int part2);
+    void createScrollButtons();
 
-    void logRecord(const QString &username, const QString &orderid, const QString &rec, const QString &action,
-                   const QString &value1, const QString &value2);
-
-    void setButtonsState();
-
-    void removeWOrder(WOrder *wo);
+    void updateScrollButtonPositions();
 
     void restoreStoplistQty(int dish, double qty);
 
@@ -97,52 +124,49 @@ private:
 
     void setDiscountComment();
 
-    bool worderPaymentOK();
-
-    bool buildDishes(int menuid, int part2);
-
     void discountOrder(C5User *u, const QString &code);
 
+    //NEW METHODS
+    void createPaymentButtons();
+
+    void configBtnNum();
+
+    int selectedWaiterDishIndex();
+
+    WaiterOrderItemWidget* createOrderItemWidget(WaiterDish d);
+
+    void printPrecheck(const QString &currentStaff);
+
+    void printService(const QJsonObject &jdoc);
+
+    void printRemovedDish(const QJsonObject &jdoc);
+
+    void setDishQty(std::function<double (WaiterDish)> getQty);
+
+    void addDishToOrder(DishAItem *g, QDishButton *btn);
+
+    void funcWithAuth(int permission, const QString &title, std::function<void(C5User*)> function);
+
 private slots:
+    void parseOrder(const QJsonObject &jdoc);
+
     void handleOrderDishClick(const QString &id);
 
-    void openReserveError(const QString &err);
+    void setPaymentButtonChecked(bool checked);
 
     void openReservationResponse(const QJsonObject &jdoc);
-
-    void openTableResponse(const QJsonObject &jdoc);
 
     void moveTableResponse(const QJsonObject &jdoc);
 
     void timeout();
 
-    void worderActivated();
-
-    void dishpart1Clicked();
-
     void qrListResponse(const QJsonObject &obj);
-
-    //void handleVisit(const QJsonObject &obj);
-
-    void addDishToOrder(int menuid, const QString &emark);
-
-    void handlePrintService(const QJsonObject &obj);
 
     void handleStopList(const QJsonObject &obj);
 
     void restoreStoplistQtyResponse(const QJsonObject &jdoc);
 
     void addStopListResponse(const QJsonObject &jdoc);
-
-    void checkStopListResponse(const QJsonObject &jdoc);
-
-    virtual void handleError(int err, const QString &msg);
-
-    void dishPart2Clicked();
-
-    void dishClicked();
-
-    void dishPartClicked();
 
     void on_btnExit_clicked();
 
@@ -160,15 +184,7 @@ private slots:
 
     void on_btnSit_clicked();
 
-    void on_btnMovement_clicked();
-
-    void on_btnRecent_clicked();
-
     void on_btnChangeStaff_clicked();
-
-    void on_btnScrollUp_clicked();
-
-    void on_btnScrollDown_clicked();
 
     void on_btnDiscount_clicked();
 
@@ -176,39 +192,11 @@ private slots:
 
     void on_btnReceiptLanguage_clicked();
 
-    void on_btnCalcCash_clicked();
-
-    void on_btnCalcCard_clicked();
-
-    void on_btnCalcBank_clicked();
-
-    void on_btnCalcPrepaid_clicked();
-
-    void on_btnCalcOther_clicked();
-
-    void on_btnPaymentCash_clicked();
-
-    void on_btnPaymentCard_clicked();
-
-    void on_btnPaymentBank_clicked();
-
-    void on_btnPrepayment_clicked();
-
-    void on_btnPaymentOther_clicked();
-
-    void on_btnPayCityLedger_clicked();
-
-    void on_btnPayComplimentary_clicked();
-
-    void on_btnPayTransferToRoom_clicked();
-
     void on_btnReceipt_clicked();
 
     void on_btnCloseOrder_clicked();
 
     void on_btnService_clicked();
-
-    void on_btnTax_clicked();
 
     void on_btnStopListMode_clicked();
 
@@ -219,34 +207,6 @@ private slots:
     void on_btnMinus1_clicked();
 
     void on_btnAnyqty_clicked();
-
-    void on_btnDishPart2Down_clicked();
-
-    void on_btnDishPart2Up_clicked();
-
-    void on_btnBillWithoutService_clicked();
-
-    void on_btnFillCash_clicked();
-
-    void on_btnFillCard_clicked();
-
-    void on_btnFillPrepaiment_clicked();
-
-    void on_btnDishDown_clicked();
-
-    void on_btnDishUp_clicked();
-
-    void on_btnPreorder_clicked();
-
-    void on_btnPaymentIdram_clicked();
-
-    void on_btnFillPayX_clicked();
-
-    void on_btnCalcPayX_clicked();
-
-    void on_btnPayX_clicked();
-
-    void on_btnFillIdram_clicked();
 
     void on_btnCloseCheckAll_clicked();
 
@@ -262,30 +222,29 @@ private slots:
 
     void on_btnSetPrecent_clicked();
 
-    void on_btnReceived_clicked();
+    void on_btnPartFavorite_clicked();
 
-    void on_btnSelfCost_clicked();
+    void on_btnMenuHome_clicked();
 
-    void on_btnDelivery_clicked();
+    void on_btnPart1_clicked();
 
-    void on_btnCalcIdram_clicked();
+    void on_btnPart2_clicked();
 
-    void on_btnFillBank_clicked();
+    void on_btnPart3_clicked();
 
-    void on_btnCashout_clicked();
+    void on_btnBackGroup_clicked();
 
-    void on_btnMenuSet_clicked();
+    void on_btnShowHideRemoved_clicked(bool checked);
 
-    void on_btnQR_clicked();
+    void on_btnSetWholeAmount_clicked();
 
-    void on_btnTable_clicked();
+    void on_btnNumClear_clicked();
 
-    void on_leCmd_returnPressed();
+    void on_btnTransferDishes_clicked();
 
-    void on_btnSetQr_clicked();
+    void on_btnTransferTable_clicked();
 
 signals:
-    void allDone();
 
     void orderDishClicked(QString);
 };

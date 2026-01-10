@@ -161,17 +161,23 @@ void PrintReceiptGroup::print(const QString &id, C5Database &db, int rw)
     }
 
     QFont font(qApp->font());
-    font.setPointSize(20);
+    const int bs = 12;
+    font.setPointSize(bs);
     C5Printing p;
-    p.setSceneParams(600, 2800, QPageLayout::Portrait);
+    QPrinterInfo pi = QPrinterInfo::printerInfo(C5Config::localReceiptPrinter());
+    QPrinter printer(pi);
+    printer.setPageSize(QPageSize::Custom);
+    printer.setFullPage(false);
+    QRectF pr = printer.pageRect(QPrinter::DevicePixel);
+    constexpr qreal SAFE_RIGHT_MM = 2.0;
+    qreal safePx = SAFE_RIGHT_MM * printer.logicalDpiX() / 25.4;
+    p.setSceneParams(pr.width() - safePx, pr.height(), printer.logicalDpiX());
     p.setFont(font);
     p.br(2);
 
     if(!saletype.isEmpty()) {
-        p.setFontSize(22);
         p.ctext(saletype);
         p.br();
-        p.setFontSize(20);
     }
 
     if(jtax["rseq"].toInt() > 0) {
@@ -224,7 +230,7 @@ void PrintReceiptGroup::print(const QString &id, C5Database &db, int rw)
         p.br();
     }
 
-    p.setFontSize(20);
+    p.setFontSize(bs - 2);
     p.ctext(tr("Class | Name | Qty | Price | Total"));
     p.setFontBold(false);
     p.br();
@@ -353,15 +359,13 @@ void PrintReceiptGroup::print(const QString &id, C5Database &db, int rw)
         /* End QRCode */
     }
 
-    p.setFontSize(20);
-    p.setFontBold(true);
     p.br();
     p.ltext(tr("Thank you for visit!"), 0);
     p.br();
     p.ltext(tr("Printed"), 0);
     p.rtext(QDateTime::currentDateTime().toString(FORMAT_DATETIME_TO_STR));
     p.br();
-    p.print(C5Config::localReceiptPrinter(), QPageSize(QPageSize::Custom));
+    p.print(printer);
 }
 
 void PrintReceiptGroup::print2(const QString &id, C5Database &db)
@@ -528,10 +532,18 @@ void PrintReceiptGroup::print2(const QString &id, C5Database &db)
         tt += db.getDouble("f_total");
     }
 
+    const int bs = 12;
     QFont font(qApp->font());
-    font.setPointSize(20);
+    font.setPointSize(bs);
     C5Printing p;
-    p.setSceneParams(600, 2800, QPageLayout::Portrait);
+    QPrinterInfo pi = QPrinterInfo::printerInfo(C5Config::localReceiptPrinter());
+    QPrinter printer(pi);
+    printer.setPageSize(QPageSize::Custom);
+    printer.setFullPage(false);
+    QRectF pr = printer.pageRect(QPrinter::DevicePixel);
+    constexpr qreal SAFE_RIGHT_MM = 2.0;
+    qreal safePx = SAFE_RIGHT_MM * printer.logicalDpiX() / 25.4;
+    p.setSceneParams(pr.width() - safePx, pr.height(), printer.logicalDpiX());
     p.image("./logo_receipt.png", Qt::AlignHCenter);
     p.br();
     p.br();
@@ -540,10 +552,8 @@ void PrintReceiptGroup::print2(const QString &id, C5Database &db)
     p.br(2);
 
     if(!saletype.isEmpty()) {
-        p.setFontSize(22);
         p.ctext(saletype);
         p.br();
-        p.setFontSize(20);
     }
 
     if(jtax["rseq"].toInt() > 0) {
@@ -590,38 +600,37 @@ void PrintReceiptGroup::print2(const QString &id, C5Database &db)
         p.br();
     }
 
-    p.setFontSize(20);
-    p.ctext(tr("Class | Name | Qty | Price | Total"));
+    p.setFontSize(bs - 2);
+    p.ltext(tr("Name"), 0, 31);
+    p.ltext(tr("Qty"), 33, 10);
+    p.ltext(tr("Price"), 41, 12);
+    p.rtext(tr("Total"));
     p.setFontBold(false);
     p.br();
-    p.line(3);
+    p.line(1);
     p.br(3);
 
     for(int i = 0; i < data.count(); i++) {
-        p.ltext(QString("%1").arg(data.at(i).at(0).toString()), 0);
-        p.br();
-        p.ltext(QString("%1 X %2 = %3")
-                .arg(float_str(data.at(i).at(1).toDouble(), 3))
-                .arg(data.at(i).at(2).toDouble(), 2)
-                .arg(float_str(data.at(i).at(3).toDouble(), 2)), 0);
+        p.ltext(QString("%1").arg(data.at(i).at(0).toString()), 0, 31);
+        p.ltext(float_str(data.at(i).at(1).toDouble(), 3), 33, 10);
+        p.ltext(float_str(data.at(i).at(2).toDouble(), 2), 41, 12);
+        p.rtext(float_str(data.at(i).at(3).toDouble(), 2));
         p.br();
 
         if(data.at(i).at(4).toDouble() > 0.001) {
-            p.ltext(QString("%1%2 %3").arg(tr("Discount"), tr(":"), float_str(data.at(i).at(4).toDouble(), 2)), 0);
+            p.ltext(QString("%1%2 %3").arg(tr("Discount"), tr(":"), float_str(data.at(i).at(4).toDouble(), 2)));
             p.br();
         }
 
-        p.br();
         p.line();
         p.br(2);
     }
 
-    p.line(4);
+    p.line(1);
     p.br(3);
     p.setFontBold(true);
     p.ltext(tr("Need to pay"), 0);
     p.rtext(float_str(tt, 2));
-    p.br();
     p.br();
     p.line();
     p.br();
@@ -736,15 +745,13 @@ void PrintReceiptGroup::print2(const QString &id, C5Database &db)
         /* End QRCode */
     }
 
-    p.setFontSize(20);
-    p.setFontBold(true);
-    p.br();
+    p.setFontBold(false);
     p.ltext(tr("Thank you for visit!"), 0);
     p.br();
     p.ltext(tr("Printed"), 0);
     p.rtext(QDateTime::currentDateTime().toString(FORMAT_DATETIME_TO_STR));
     p.br();
-    p.print(C5Config::localReceiptPrinter(), QPageSize(QPageSize::Custom));
+    p.print(printer);
 }
 
 void PrintReceiptGroup::print3(const QString &id, C5Database &db)
@@ -815,7 +822,14 @@ void PrintReceiptGroup::print3(const QString &id, C5Database &db)
     QFont font(qApp->font());
     font.setPointSize(20);
     C5Printing p;
-    p.setSceneParams(2000, 2700, QPageLayout::Portrait);
+    QPrinterInfo pi = QPrinterInfo::printerInfo(C5Config::localReceiptPrinter());
+    QPrinter printer(pi);
+    printer.setPageSize(QPageSize::Custom);
+    printer.setFullPage(false);
+    QRectF pr = printer.pageRect(QPrinter::DevicePixel);
+    constexpr qreal SAFE_RIGHT_MM = 2.0;
+    qreal safePx = SAFE_RIGHT_MM * printer.logicalDpiX() / 25.4;
+    p.setSceneParams(pr.width() - safePx, pr.height(), printer.logicalDpiX());
     p.setFont(font);
     p.br(2);
 
@@ -886,7 +900,8 @@ void PrintReceiptGroup::print3(const QString &id, C5Database &db)
          << tr("Unit")
          << tr("Price")
          << tr("Total");
-    p.tableText(points, vals, p.fLineHeight + 20);
+    //TODO
+    //p.tableText(points, vals, p.fLineHeight + 20);
     p.br(p.fLineHeight + 20);
 
     for(int i = 0; i < ogoods.count(); i++) {
@@ -899,7 +914,8 @@ void PrintReceiptGroup::print3(const QString &id, C5Database &db)
              << row["f_unit"].toString()
              << float_str(row["f_price"].toDouble(), 2)
              << float_str(row["f_total"].toDouble(), 2);
-        p.tableText(points, vals, p.fLineHeight + 20);
+        //TODO
+        //p.tableText(points, vals, p.fLineHeight + 20);
         p.br(p.fLineHeight + 20);
     }
 
@@ -988,5 +1004,5 @@ void PrintReceiptGroup::print3(const QString &id, C5Database &db)
     p.ltext(tr("Printed"), 0);
     p.rtext(QDateTime::currentDateTime().toString(FORMAT_DATETIME_TO_STR));
     p.br();
-    p.print(C5Config::localReceiptPrinter(), QPageSize(QPageSize::A4));
+    p.print(printer);
 }

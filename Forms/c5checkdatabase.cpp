@@ -7,8 +7,8 @@
 #include "c5config.h"
 #include "c5utils.h"
 
-C5CheckDatabase::C5CheckDatabase() :
-    C5Dialog(),
+C5CheckDatabase::C5CheckDatabase(C5User *user) :
+    C5Dialog(user),
     ui(new Ui::C5CheckDatabase)
 {
     ui->setupUi(this);
@@ -76,6 +76,6 @@ CORRECTCASH:
 
 void C5CheckDatabase::on_btnStoreUtlis_clicked()
 {
-    DlgStoreUtils d;
+    DlgStoreUtils d(mUser);
     d.exec();
 }

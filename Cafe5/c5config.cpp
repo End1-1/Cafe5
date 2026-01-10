@@ -1,6 +1,5 @@
 #include "c5config.h"
 #include "c5database.h"
-#include "c5user.h"
 #include <QDir>
 #include <QMutex>
 #include <QDebug>
@@ -13,7 +12,6 @@ QString C5Config::fAppLogFile;
 QString C5Config::fSettingsName;
 int C5Config::fSettingsId;
 QString C5Config::fLastUsername;
-QWidget* C5Config::fParentWidget = nullptr;
 QString C5Config::fDBName;
 QString C5Config::fDBHost;
 QString C5Config::fDBPath;
@@ -22,7 +20,6 @@ QString C5Config::fDBPassword;
 int C5Config::fJsonConfigId = 1;
 bool C5Config::fFullScreen;
 C5Config __c5config;
-QStringList __databases;
 QMap<int, QString> C5Config::fSettings;
 QJsonObject C5Config::fMainJson;
 

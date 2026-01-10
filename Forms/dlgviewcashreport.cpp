@@ -1,10 +1,9 @@
 #include "dlgviewcashreport.h"
 #include "ui_dlgviewcashreport.h"
-#include "c5config.h"
 #include "c5utils.h"
 
-DlgViewCashReport::DlgViewCashReport() :
-    C5Dialog(),
+DlgViewCashReport::DlgViewCashReport(C5User *user) :
+    C5Dialog(user),
     ui(new Ui::DlgViewCashReport)
 {
     ui->setupUi(this);

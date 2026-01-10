@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>667</width>
-    <height>809</height>
+    <height>811</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -26,6 +26,9 @@
       <font>
        <pointsize>26</pointsize>
       </font>
+     </property>
+     <property name="focusPolicy">
+      <enum>Qt::FocusPolicy::StrongFocus</enum>
      </property>
      <property name="text">
       <string>999999999</string>
@@ -46,7 +49,7 @@
       </font>
      </property>
      <property name="focusPolicy">
-      <enum>Qt::NoFocus</enum>
+      <enum>Qt::FocusPolicy::NoFocus</enum>
      </property>
      <property name="text">
       <string>Card</string>
@@ -67,7 +70,7 @@
       </font>
      </property>
      <property name="focusPolicy">
-      <enum>Qt::NoFocus</enum>
+      <enum>Qt::FocusPolicy::NoFocus</enum>
      </property>
      <property name="text">
       <string>Bank transfer</string>
@@ -88,7 +91,7 @@
       </font>
      </property>
      <property name="focusPolicy">
-      <enum>Qt::NoFocus</enum>
+      <enum>Qt::FocusPolicy::NoFocus</enum>
      </property>
      <property name="text">
       <string>Change</string>
@@ -109,7 +112,7 @@
       </font>
      </property>
      <property name="focusPolicy">
-      <enum>Qt::NoFocus</enum>
+      <enum>Qt::FocusPolicy::NoFocus</enum>
      </property>
      <property name="text">
       <string>Prepaid</string>
@@ -125,7 +128,7 @@
       </font>
      </property>
      <property name="focusPolicy">
-      <enum>Qt::NoFocus</enum>
+      <enum>Qt::FocusPolicy::NoFocus</enum>
      </property>
      <property name="styleSheet">
       <string notr="true">color: red</string>
@@ -152,7 +155,7 @@
       </font>
      </property>
      <property name="focusPolicy">
-      <enum>Qt::NoFocus</enum>
+      <enum>Qt::FocusPolicy::NoFocus</enum>
      </property>
      <property name="text">
       <string>Cash in</string>
@@ -166,6 +169,9 @@
        <pointsize>26</pointsize>
       </font>
      </property>
+     <property name="focusPolicy">
+      <enum>Qt::FocusPolicy::ClickFocus</enum>
+     </property>
      <property name="text">
       <string>999999999</string>
      </property>
@@ -177,6 +183,9 @@
       <font>
        <pointsize>26</pointsize>
       </font>
+     </property>
+     <property name="focusPolicy">
+      <enum>Qt::FocusPolicy::ClickFocus</enum>
      </property>
      <property name="text">
       <string>999999999</string>
@@ -190,6 +199,9 @@
        <pointsize>26</pointsize>
       </font>
      </property>
+     <property name="focusPolicy">
+      <enum>Qt::FocusPolicy::ClickFocus</enum>
+     </property>
      <property name="text">
       <string>999999999</string>
      </property>
@@ -201,6 +213,9 @@
       <font>
        <pointsize>26</pointsize>
       </font>
+     </property>
+     <property name="focusPolicy">
+      <enum>Qt::FocusPolicy::ClickFocus</enum>
      </property>
      <property name="text">
       <string>999999999</string>
@@ -221,7 +236,7 @@
       </font>
      </property>
      <property name="focusPolicy">
-      <enum>Qt::NoFocus</enum>
+      <enum>Qt::FocusPolicy::NoFocus</enum>
      </property>
      <property name="text">
       <string>Cash</string>
@@ -234,6 +249,9 @@
       <font>
        <pointsize>26</pointsize>
       </font>
+     </property>
+     <property name="focusPolicy">
+      <enum>Qt::FocusPolicy::ClickFocus</enum>
      </property>
      <property name="text">
       <string>999999999</string>
@@ -250,6 +268,9 @@
        <pointsize>26</pointsize>
       </font>
      </property>
+     <property name="focusPolicy">
+      <enum>Qt::FocusPolicy::ClickFocus</enum>
+     </property>
      <property name="text">
       <string>999999999</string>
      </property>
@@ -261,6 +282,9 @@
       <font>
        <pointsize>26</pointsize>
       </font>
+     </property>
+     <property name="focusPolicy">
+      <enum>Qt::FocusPolicy::ClickFocus</enum>
      </property>
      <property name="text">
       <string>999999999</string>
@@ -285,7 +309,7 @@
       <item>
        <spacer name="horizontalSpacer">
         <property name="orientation">
-         <enum>Qt::Horizontal</enum>
+         <enum>Qt::Orientation::Horizontal</enum>
         </property>
         <property name="sizeHint" stdset="0">
          <size>
@@ -314,6 +338,9 @@
           <pointsize>26</pointsize>
          </font>
         </property>
+        <property name="focusPolicy">
+         <enum>Qt::FocusPolicy::ClickFocus</enum>
+        </property>
         <property name="text">
          <string>Pay (Enter)</string>
         </property>
@@ -338,6 +365,9 @@
           <pointsize>26</pointsize>
          </font>
         </property>
+        <property name="focusPolicy">
+         <enum>Qt::FocusPolicy::ClickFocus</enum>
+        </property>
         <property name="text">
          <string>Back (Esc)</string>
         </property>
@@ -346,7 +376,7 @@
       <item>
        <spacer name="horizontalSpacer_2">
         <property name="orientation">
-         <enum>Qt::Horizontal</enum>
+         <enum>Qt::Orientation::Horizontal</enum>
         </property>
         <property name="sizeHint" stdset="0">
          <size>
@@ -378,6 +408,9 @@
        <pointsize>26</pointsize>
       </font>
      </property>
+     <property name="focusPolicy">
+      <enum>Qt::FocusPolicy::ClickFocus</enum>
+     </property>
      <property name="text">
       <string>999999999</string>
      </property>
@@ -397,7 +430,7 @@
       </font>
      </property>
      <property name="focusPolicy">
-      <enum>Qt::NoFocus</enum>
+      <enum>Qt::FocusPolicy::NoFocus</enum>
      </property>
      <property name="text">
       <string>Idram</string>
@@ -418,7 +451,7 @@
       </font>
      </property>
      <property name="focusPolicy">
-      <enum>Qt::NoFocus</enum>
+      <enum>Qt::FocusPolicy::NoFocus</enum>
      </property>
      <property name="text">
       <string>Telcell</string>
@@ -439,7 +472,7 @@
       </font>
      </property>
      <property name="focusPolicy">
-      <enum>Qt::NoFocus</enum>
+      <enum>Qt::FocusPolicy::NoFocus</enum>
      </property>
      <property name="text">
       <string>Debt</string>
@@ -460,7 +493,7 @@
       </font>
      </property>
      <property name="focusPolicy">
-      <enum>Qt::NoFocus</enum>
+      <enum>Qt::FocusPolicy::NoFocus</enum>
      </property>
      <property name="text">
       <string>Credit</string>
@@ -474,6 +507,9 @@
        <pointsize>26</pointsize>
       </font>
      </property>
+     <property name="focusPolicy">
+      <enum>Qt::FocusPolicy::ClickFocus</enum>
+     </property>
      <property name="text">
       <string>999999999</string>
      </property>
@@ -485,7 +521,7 @@
   <customwidget>
    <class>C5LineEdit</class>
    <extends>QLineEdit</extends>
-   <header location="global">c5lineedit.h</header>
+   <header>c5lineedit.h</header>
   </customwidget>
  </customwidgets>
  <tabstops>

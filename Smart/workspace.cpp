@@ -8,6 +8,7 @@
 #include "logwriter.h"
 #include "printtaxn.h"
 #include "bhistory.h"
+#include "dict_dish_state.h"
 #include "c5utils.h"
 #include "c5airlog.h"
 #include "nloadingdlg.h"
@@ -24,6 +25,7 @@
 #include "c5message.h"
 #include "dlgvisit.h"
 #include "scopeguarde.h"
+#include "ninterface.h"
 #include <QScreen>
 #include <QScrollBar>
 #include <QInputDialog>
@@ -73,18 +75,14 @@ protected:
     }
 };
 
-Workspace::Workspace() :
-    C5Dialog(),
+Workspace::Workspace(C5User *user) :
+    C5Dialog(user),
     ui(new Ui::Workspace),
     fLoadingDlg(nullptr)
 {
     ui->setupUi(this);
-    //setWindowFlags(Qt::WindowStaysOnTopHint);
     fTypeFilter = -1;
-    QRect r = qApp->screens().at(0)->geometry();
-#ifdef  QT_DEBUG
-    r = this->geometry();
-#endif
+    QRect r = qApp->screens().at(C5Dialog::mScreen == -1 ? 0 : C5Dialog::mScreen)->geometry();
 
     switch(r.width()) {
     case 1280:
@@ -132,28 +130,14 @@ Workspace::Workspace() :
 
     ui->tblTables->setVisible(__c5config.getRegValue("tables").toBool());
     mRejectEnabled = true;
+    createHttpRequest("/engine/smart/init.php",
+    QJsonObject{{"config_id", "Sale"}},
+    SLOT(initResponse(QJsonObject)), "init");
 }
 
 Workspace::~Workspace()
 {
     delete ui;
-}
-
-bool Workspace::login()
-{
-    QString pin;
-
-    if(!DlgPassword::getPassword(tr("ENTER"), pin)) {
-        accept();
-        return false;
-    }
-
-    fHttp->fErrorObject = this;
-    fHttp->fErrorSlot = (char*)    SLOT(slotHttpError(const QString&));
-    createHttpRequest("/engine/login.php", QJsonObject{{"method", 2}, {"pin", pin}},
-    SLOT(loginResponse(QJsonObject)),
-    "login");
-    return true;
 }
 
 void Workspace::reject()
@@ -589,7 +573,7 @@ void Workspace::createHttpRequest(const QString &route, QJsonObject params, cons
 {
     params["sessionkey"] = __c5config.getRegValue("sessionkey").toString();
     params["host"] = hostinfo;
-    params["config_id"] = __c5config.fSettingsName;
+    params["config_id"] = "Sale";
     params["user_session"] = __c5config.getRegValue("session").toString();
     params["sessionid"] = __c5config.getRegValue("cashsession").toInt();
     auto np = new NDataProvider(this);
@@ -716,7 +700,7 @@ void Workspace::on_btnCheckout_clicked()
     }
 
     saveOrder(ORDER_STATE_CLOSE, true);
-    C5Airlog::write(hostinfo, fUser->fullName(), 1, "", fOrderUuid, "", tr("Order saved"), "", "");
+    C5Airlog::write(hostinfo, mUser->fullName(), 1, "", fOrderUuid, "", tr("Order saved"), "", "");
 
     if(ui->btnSetIdram->isChecked()) {
     }
@@ -752,7 +736,7 @@ void Workspace::on_btnAny_clicked()
 {
     double newQty = 0;
 
-    if(DlgQty::getQty(newQty, "")) {
+    if(DlgQty::getQty(newQty, "", mUser)) {
         setQty(newQty, 1, -1, "");
     }
 }
@@ -1003,7 +987,7 @@ void Workspace::on_leReadCode_returnPressed()
                     return;
                 }
             } else {
-                auto *dv = new dlgvisit(code);
+                auto *dv = new dlgvisit(code, mUser);
                 dv->exec();
                 dv->deleteLater();
             }
@@ -1053,7 +1037,7 @@ void Workspace::on_btnCostumer_clicked()
     QString phone, address, name;
     int id;
 
-    if(CustomerInfo::getCustomer(id, name, phone, address)) {
+    if(CustomerInfo::getCustomer(id, name, phone, address, mUser)) {
         fCustomer = id;
         ui->lbCostumerPhone->setText(QString("%1\r\n%2\r\n%3").arg(phone, name, address));
         ui->lbCostumerPhone->setVisible(true);
@@ -1255,7 +1239,7 @@ void Workspace::on_btnReceived_clicked()
 {
     double v = ui->leTotal->getDouble();
 
-    if(Change::getReceived(v)) {
+    if(Change::getReceived(v, mUser)) {
         ui->leReceived->setDouble(v);
     }
 }
@@ -1490,15 +1474,15 @@ int Workspace::printTax(double cardAmount, double idramAmount)
     if(result != pt_err_ok) {
         switch(C5Message::question(err, tr("Try again"), tr("Do not print fiscal"), tr("Return to editing"))) {
         case QDialog::Rejected:
-            C5Airlog::write(hostinfo, fUser->fullName(), 1, "", fOrderUuid, "", tr("Fiscal fail, continue without fiscal"), "", "");
+            C5Airlog::write(hostinfo, mUser->fullName(), 1, "", fOrderUuid, "", tr("Fiscal fail, continue without fiscal"), "", "");
             return 1;
 
         case QDialog::Accepted:
-            C5Airlog::write(hostinfo, fUser->fullName(), 1, "", fOrderUuid, "", tr("Fiscal fail, try again"), "", "");
+            C5Airlog::write(hostinfo, mUser->fullName(), 1, "", fOrderUuid, "", tr("Fiscal fail, try again"), "", "");
             return 0;
 
         case 2:
-            C5Airlog::write(hostinfo, fUser->fullName(), 1, "", fOrderUuid, "", tr("Return to edit"), "", "");
+            C5Airlog::write(hostinfo, mUser->fullName(), 1, "", fOrderUuid, "", tr("Return to edit"), "", "");
             return 2;
         }
     }
@@ -1515,7 +1499,14 @@ bool Workspace::printReceipt(const QString &id, bool printSecond, bool precheck)
     font.setPointSize(basefont);
     font.setBold(true);
     C5Printing p;
-    p.setSceneParams(650, 2800, QPageLayout::Portrait);
+    QPrinterInfo pi = QPrinterInfo::printerInfo(C5Config::localReceiptPrinter());
+    QPrinter printer(pi);
+    printer.setPageSize(QPageSize::Custom);
+    printer.setFullPage(false);
+    QRectF pr = printer.pageRect(QPrinter::DevicePixel);
+    constexpr qreal SAFE_RIGHT_MM = 2.0;
+    qreal safePx = SAFE_RIGHT_MM * printer.logicalDpiX() / 25.4;
+    p.setSceneParams(pr.width() - safePx, pr.height(), printer.logicalDpiX());
     p.setFont(font);
     QMap<int, QMap<QString, QVariant> > packages;
     QJsonObject jtax, jin;
@@ -1797,7 +1788,7 @@ bool Workspace::printReceipt(const QString &id, bool printSecond, bool precheck)
     p.ltext(QString("%1: %2").arg(tr("Sample")).arg(db.getInt("f_print") + 1), 0);
     p.br();
     p.ltext(".", 0);
-    p.print(C5Config::localReceiptPrinter(), QPageSize::Custom);
+    p.print(printer);
     db[":f_print"] = db.getInt("f_print") + 1;
     db.update("o_header", "f_id", id);
 
@@ -1814,10 +1805,23 @@ void Workspace::printService(const QString &printerName, const QJsonObject &h, c
     Q_UNUSED(jf);
     QFont font(qApp->font());
     font.setFamily(__c5config.getValue(param_service_print_font_family));
-    int basesize = __c5config.getValue(param_service_print_font_size).toInt();
-    font.setPointSize(basesize);
+    int bs = __c5config.getValue(param_service_print_font_size).toInt();
+    font.setPointSize(bs);
+    QString finalPrinter = printerName;
+
+    if(fPrinterAliases.contains(printerName)) {
+        finalPrinter = fPrinterAliases[printerName];
+    }
+
     C5Printing p;
-    p.setSceneParams(650, 2800, QPageLayout::Portrait);
+    QPrinterInfo pi = QPrinterInfo::printerInfo(finalPrinter);
+    QPrinter printer(pi);
+    printer.setPageSize(QPageSize::Custom);
+    printer.setFullPage(false);
+    QRectF pr = printer.pageRect(QPrinter::DevicePixel);
+    constexpr qreal SAFE_RIGHT_MM = 2.0;
+    qreal safePx = SAFE_RIGHT_MM * printer.logicalDpiX() / 25.4;
+    p.setSceneParams(pr.width() - safePx, pr.height(), printer.logicalDpiX());
     p.setFont(font);
     p.setFontBold(true);
     p.ctext(tr("Receipt #") + QString("%1%2").arg(h["f_prefix"].toString(), QString::number(h["f_hallid"].toInt())));
@@ -1838,7 +1842,7 @@ void Workspace::printService(const QString &printerName, const QJsonObject &h, c
     }
 
     if(jf["f_3"].toInt() > 0) {
-        p.setFontSize(basesize + 4);
+        p.setFontSize(bs + 2);
         p.setFontBold(true);
         p.ctext(tr("TAKE AWAY"));
         p.br();
@@ -1851,17 +1855,16 @@ void Workspace::printService(const QString &printerName, const QJsonObject &h, c
 
     for(int i = 0; i < d.size(); i++) {
         const QJsonObject &j = d.at(i).toObject();
-        p.setFontSize(basesize);
-        p.setFontBold(true);
+        p.setFontBold(false);
+        p.setFontSize(bs);
         p.setFontStrike(j["f_state"].toInt() != 1);
         p.ltext(j["f_name"].toString(), 0);
-        p.setFontSize(basesize + 8);
         p.setFontBold(true);
         p.rtext(float_str(j["f_qty1"].toDouble(), 2));
         p.br();
 
         if(j["f_comment"].toString().isEmpty() == false) {
-            p.setFontSize(basesize - 4);
+            p.setFontSize(bs - 2);
             p.ltext(j["f_comment"].toString(), 0);
             p.br();
         }
@@ -1871,7 +1874,7 @@ void Workspace::printService(const QString &printerName, const QJsonObject &h, c
     }
 
     p.setFontStrike(false);
-    p.setFontSize(basesize - 4);
+    p.setFontSize(bs - 2);
     // p.setFontBold(false);
     p.ltext(QString("%1 %2 [%3]").arg(tr("[1] Printed:"), QDateTime::currentDateTime().toString(FORMAT_DATETIME_TO_STR),
                                       QString::number(side)), 0);
@@ -1879,13 +1882,7 @@ void Workspace::printService(const QString &printerName, const QJsonObject &h, c
     p.br();
     p.ltext("_", 0);
     p.br();
-    QString finalPrinter = printerName;
-
-    if(fPrinterAliases.contains(printerName)) {
-        finalPrinter = fPrinterAliases[printerName];
-    }
-
-    p.print(finalPrinter, QPageSize::Custom);
+    p.print(printer);
 }
 
 void Workspace::showCustomerDisplay()
@@ -1913,7 +1910,7 @@ void Workspace::showCustomerDisplay()
 void Workspace::httpQueryLoading()
 {
     if(!fLoadingDlg) {
-        fLoadingDlg = new NLoadingDlg(this);
+        fLoadingDlg = new NLoadingDlg(tr("Loading"), this);
     }
 
     fLoadingDlg->resetSeconds();
@@ -1939,30 +1936,6 @@ void Workspace::slotHttpError(const QString &err)
         mRejectEnabled = false;
         qApp->quit();
     }
-}
-
-void Workspace::loginResponse(const QJsonObject &jdoc)
-{
-    if(jdoc["status"].toInt() == 0) {
-        C5Message::error(jdoc["data"].toString());
-        return;
-    }
-
-    QJsonObject jo = jdoc["data"].toObject();
-    __c5config.setRegValue("sessionkey", jo["sessionkey"].toString());
-    NDataProvider::sessionKey = jo["sessionkey"].toString();
-    jo = jdoc["data"].toObject()["user"].toObject();
-    __c5config.setRegValue("username", QString("%1 %2").arg(jo["f_last"].toString(), jo["f_first"].toString()));
-    __c5config.setRegValue("json_config_id",
-                           jo["f_config"].toInt() > 0 ? jo["f_config"].toInt() : __c5config.fJsonConfigId);
-    __c5config.setRegValue("session", C5Database::uuid());
-    __c5config.setRegValue("cashsession", jdoc["data"].toObject()["cashsession"].toObject()["f_id"].toInt());
-    fUser = new C5User(jo["f_id"].toInt());
-    httpStop(sender());
-    QJsonArray jsessions = jdoc["data"].toObject()["sessions"].toArray();
-    createHttpRequest("/engine/smart/init.php",
-    QJsonObject{{"config_id", __c5config.fSettingsName}},
-    SLOT(initResponse(QJsonObject)), "init");
 }
 
 void Workspace::initResponse(const QJsonObject &jdoc)
@@ -2421,10 +2394,11 @@ void Workspace::focusLineIn()
 
 void Workspace::on_btnAppMenu_clicked()
 {
-    MenuDialog m(this, fUser);
+    MenuDialog m(this, mUser);
     m.exec();
 
-    if(fUser->property("session_close").toBool()) {
+    if(mUser->property("session_close").toBool()) {
+        accept();
         qApp->quit();
     }
 }
@@ -2464,7 +2438,7 @@ void Workspace::on_leReadCode_textChanged(const QString &arg1)
 
         double v = ui->leTotal->getDouble();
 
-        if(Change::getReceived(v)) {
+        if(Change::getReceived(v, mUser)) {
             ui->leReceived->setDouble(v);
             ui->btnCheckout->click();
         }
@@ -2605,7 +2579,7 @@ void Workspace::on_btnMRead_clicked()
 
 void Workspace::on_btnHistoryOrder_clicked()
 {
-    DlgMemoryRead::sessionHistory();
+    DlgMemoryRead::sessionHistory(mUser);
 }
 
 void Workspace::on_btnSetCardExternal_clicked()
@@ -2648,7 +2622,7 @@ void Workspace::on_btnSaveAndPrecheck_clicked()
         return;
     }
 
-    C5Airlog::write(hostinfo, fUser->fullName(), 1, "", fOrderUuid, "", tr("Print precheck"),
+    C5Airlog::write(hostinfo, mUser->fullName(), 1, "", fOrderUuid, "", tr("Print precheck"),
                     QString::number(fTable),  "");
     printReceipt(fOrderUuid, false, true);
 }

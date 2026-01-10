@@ -15,9 +15,9 @@ class DlgListDishSpecial : public C5Dialog
     Q_OBJECT
 
 public:
-    explicit DlgListDishSpecial();
+    explicit DlgListDishSpecial(C5User *user);
     ~DlgListDishSpecial();
-    static bool getSpecial(int dish, QString &special);
+    static bool getSpecial(C5User *user, int dish, QString &special);
 
 private slots:
     void on_lst_itemClicked(QListWidgetItem *item);

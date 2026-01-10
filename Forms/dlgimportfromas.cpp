@@ -5,8 +5,8 @@
 #include <QSqlDatabase>
 #include <QSqlError>
 
-DlgImportFromAS::DlgImportFromAS(QWidget *parent)
-    : C5Dialog(), ui(new Ui::DlgImportFromAS)
+DlgImportFromAS::DlgImportFromAS(C5User *user)
+    : C5Dialog(user), ui(new Ui::DlgImportFromAS)
 {
     ui->setupUi(this);
     ui->leAddressString->setText(__c5config.getRegValue("armsoft_import_as_string").toString());

@@ -12,11 +12,11 @@ class DlgText : public C5Dialog
     Q_OBJECT
 
 public:
-    explicit DlgText();
+    explicit DlgText(C5User *user);
 
     ~DlgText();
-
-    static bool getText(const QString &title, QString &defaultText);
+    
+    static bool getText(C5User *user, const QString &title, QString &defaultText);
 
 private:
     Ui::DlgText *ui;

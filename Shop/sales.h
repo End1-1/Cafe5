@@ -26,7 +26,7 @@ public:
 
     static bool printCheckWithTax(C5Database &db, const QString &id);
 
-    static bool printReceipt(const QString &id);
+    static bool printReceipt(const QString &id, C5User *user);
 
 private slots:
     void on_btnDateLeft_clicked();
@@ -46,8 +46,6 @@ private slots:
     void on_btnCashColletion_clicked();
 
     void on_leFilter_textChanged(const QString &arg1);
-
-    void on_btnGroups_clicked();
 
     void on_btnPrintTaxZ_clicked();
 
@@ -84,11 +82,7 @@ private:
 
     void refreshTotalItems();
 
-    void refreshGroups();
-
     int fViewMode;
-
-    void printpreview();
 
     void printTaxReport(int report_type);
 

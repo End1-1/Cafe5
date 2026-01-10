@@ -8,8 +8,8 @@
 #include <QEvent>
 #include <QKeyEvent>
 
-CustomerInfo::CustomerInfo() :
-    C5Dialog(),
+CustomerInfo::CustomerInfo(C5User *user) :
+    C5Dialog(user),
     ui(new Ui::CustomerInfo)
 {
     ui->setupUi(this);
@@ -32,9 +32,9 @@ CustomerInfo::~CustomerInfo()
     delete ui;
 }
 
-bool CustomerInfo::getCustomer(int& id, QString &name, QString &phone, QString &address)
+bool CustomerInfo::getCustomer(int& id, QString &name, QString &phone, QString &address, C5User *user)
 {
-    CustomerInfo ci;
+    CustomerInfo ci(user);
     bool result = ci.exec() == QDialog::Accepted;
 
     if(result) {

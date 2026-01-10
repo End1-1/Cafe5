@@ -3,8 +3,8 @@
 #include "c5database.h"
 #include "c5config.h"
 
-DlgSelectCurrency::DlgSelectCurrency(QWidget *parent) :
-    C5Dialog(),
+DlgSelectCurrency::DlgSelectCurrency(C5User *user) :
+    C5Dialog(user),
     ui(new Ui::DlgSelectCurrency)
 {
     ui->setupUi(this);
@@ -23,9 +23,9 @@ DlgSelectCurrency::~DlgSelectCurrency()
     delete ui;
 }
 
-bool DlgSelectCurrency::getCurrency(int& id, QString &name, QWidget *parent)
+bool DlgSelectCurrency::getCurrency(C5User *user, int& id, QString &name)
 {
-    DlgSelectCurrency d(parent);
+    DlgSelectCurrency d(user);
 
     if(d.exec() == QDialog::Accepted) {
         id = d.ui->cbCurrency->currentData().toInt();

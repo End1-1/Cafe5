@@ -1,6 +1,7 @@
 #include "c5waiterorderdoc.h"
 #include "c5utils.h"
 #include "c5storedraftwriter.h"
+#include "dict_dish_state.h"
 #include <QHostInfo>
 
 C5WaiterOrderDoc::C5WaiterOrderDoc():
@@ -37,11 +38,12 @@ C5WaiterOrderDoc::~C5WaiterOrderDoc()
 
 bool C5WaiterOrderDoc::isEmpty()
 {
-    for (int i = 0, c = itemsCount(); i < c; i++) {
-        if (iInt("f_state", i) == DISH_STATE_OK) {
+    for(int i = 0, c = itemsCount(); i < c; i++) {
+        if(iInt("f_state", i) == DISH_STATE_OK) {
             return false;
         }
     }
+
     return true;
 }
 
@@ -79,31 +81,38 @@ bool C5WaiterOrderDoc::clearStoreOutput(C5Database &db, const QDate &d1, const Q
     QSet<QString> as;
     QSet<QString> ad;
     QSet<QString> og;
-    while (db.nextRow()) {
+
+    while(db.nextRow()) {
         oh.insert(db.getString(0));
         ah.insert(db.getString(1));
         ad.insert(db.getString(2));
         as.insert(db.getString(3));
         og.insert(db.getString(4));
     }
-    for (const QString &id : ad) {
+
+    for(const QString &id : ad) {
         db[":f_id"] = id;
         db.exec("delete from a_store_draft where f_id=:f_id");
     }
-    for (const QString &id : og) {
+
+    for(const QString &id : og) {
         db[":f_id"] = id;
         db.exec("update o_goods set f_storerec=null where f_id=:f_id");
     }
+
     C5StoreDraftWriter dw(db);
-    for (const QString &id : ah) {
+
+    for(const QString &id : ah) {
         db[":f_id"] = id;
         db.exec("delete from a_header where f_id=:f_id");
         db[":f_id"] = id;
         db.exec("delete from a_header_store where f_id=:f_id");
-        if (!dw.outputRollback(db, id)) {
+
+        if(!dw.outputRollback(db, id)) {
             return false;
         }
     }
+
     return true;
 }
 
@@ -121,12 +130,14 @@ void C5WaiterOrderDoc::removeDocument(C5Database &db, const QString &id)
     db[":f_oheader"] = id;
     db.exec("select * from a_header_cash where f_oheader=:f_oheader");
     QString cashid;
-    if (db.nextRow()) {
+
+    if(db.nextRow()) {
         cashid = db.getString("f_id");
         db.deleteFromTable("e_cash", "f_header", cashid);
         db.deleteFromTable("a_header_cash", cashid);
         db.deleteFromTable("a_header", cashid);
     }
+
     db[":f_id"] = id;
     db.exec("delete from b_history where f_id=:f_id");
     db[":f_trsale"] = id;
@@ -140,14 +151,17 @@ void C5WaiterOrderDoc::removeDocument(C5Database &db, const QString &id)
             "where ob.f_header=:f_header");
     QSet<QString> aheader;
     QSet<QString> ogoods;
-    while (db.nextRow()) {
+
+    while(db.nextRow()) {
         aheader.insert(db.getString("f_header"));
         ogoods.insert(db.getString("f_goods"));
     }
-    foreach (const QString &s, ogoods) {
+
+    foreach(const QString &s, ogoods) {
         db.deleteFromTable("o_goods", s);
     }
-    foreach (const QString &s, aheader) {
+
+    foreach(const QString &s, aheader) {
         db.deleteFromTable("a_store", "f_document", s);
         db.deleteFromTable("a_store_draft", "f_document", s);
         db.deleteFromTable("a_header_store", s);
@@ -229,11 +243,13 @@ void C5WaiterOrderDoc::open(C5Database &db)
         left join o_header_options oo on oo.f_id=o.f_id \
         where o.f_id=:f_id \
         order by o.f_id ");
-    if (db.nextRow()) {
+
+    if(db.nextRow()) {
         QMap<QString, QVariant> h;
         db.rowToMap(h);
         fHeader = QJsonObject::fromVariantMap(h);
     }
+
     getTaxInfo(db);
     db[":f_header"] = fHeader["f_id"].toString();
     db.exec("select ob.f_id, ob.f_header, ob.f_state, dp1.f_name as part1, dp2.f_name as part2, ob.f_adgcode, d.f_name as f_name, \
@@ -247,11 +263,13 @@ void C5WaiterOrderDoc::open(C5Database &db)
              left join d_part1 dp1 on dp1.f_id=dp2.f_part \
              left join c_storages s on s.f_id=ob.f_store \
              where ob.f_header=:f_header");
-    while (db.nextRow()) {
+
+    while(db.nextRow()) {
         QMap<QString, QVariant> h;
         db.rowToMap(h);
         fItems.append(QJsonObject::fromVariantMap(h));
     }
+
     // Discount
     db[":f_id"] = fHeader["f_id"].toString();
     db.exec("select c.f_id, c.f_value, c.f_mode, cn.f_name, p.f_contact "
@@ -260,7 +278,8 @@ void C5WaiterOrderDoc::open(C5Database &db)
             "left join c_partners p on p.f_id=c.f_client "
             "left join b_card_types cn on cn.f_id=c.f_mode "
             "where h.f_id=:f_id");
-    if (db.nextRow()) {
+
+    if(db.nextRow()) {
         fHeader["f_bonusid"] = db.getString("f_id");
         fHeader["f_bonustype"] = db.getString("f_mode");
         fHeader["f_bonusname"] = db.getString("f_name");
@@ -268,17 +287,21 @@ void C5WaiterOrderDoc::open(C5Database &db)
         fHeader["f_bonusholder"] = db.getString("f_contact");
         fHeader["f_discountfactor"] = QString::number(db.getDouble("f_value") / 100, 'f', 3);
     }
+
     db[":f_id"] = fHeader["f_id"].toString();
     db.exec("select * from o_pay_room where f_id=:f_id");
-    if (db.nextRow()) {
+
+    if(db.nextRow()) {
         fHeader["f_other_res"] = db.getString("f_res");
         fHeader["f_other_room"] = db.getString("f_room");
         fHeader["f_other_guest"] = db.getString("f_guest");
         fHeader["f_other_inv"] = db.getString("f_inv");
     }
+
     db[":f_id"] = fHeader["f_id"].toString();
     db.exec("select * from o_pay_cl where f_id=:f_id");
-    if (db.nextRow()) {
+
+    if(db.nextRow()) {
         fHeader["f_other_clcode"] = db.getString("f_code");
         fHeader["f_other_clname"] = db.getString("f_name");
     }
@@ -288,8 +311,9 @@ void C5WaiterOrderDoc::getTaxInfo(C5Database &db)
 {
     db[":f_id"] = hString("f_id");
     db.exec("select * from o_tax where f_id=:f_id");
-    if (db.nextRow()) {
-        for (int i = 0; i < db.columnCount(); i++) {
+
+    if(db.nextRow()) {
+        for(int i = 0; i < db.columnCount(); i++) {
             fTax[db.columnName(i)] = db.getString(i);
         }
     }
@@ -306,42 +330,53 @@ void C5WaiterOrderDoc::calculateSelfCost(C5Database &db)
             "left join o_body b on b.f_dish=r.f_dish "
             "left join o_header h on h.f_id=b.f_header "
             "where b.f_state=1 and h.f_id=:f_id ");
-    while (db.nextRow()) {
+
+    while(db.nextRow()) {
         goodsQty[db.getInt(0)][db.getInt(1)] = db.getDouble(2);
     }
+
     db.exec("select s.f_goods, sum(s.f_total)/sum(f_qty) "
             "from a_store s "
             "left join a_header h on h.f_id=s.f_document "
             "where h.f_state=1 and h.f_type=1 and s.f_type=1 "
             "group by 1");
-    while (db.nextRow()) {
+
+    while(db.nextRow()) {
         price[db.getInt(0)] = db.getDouble(1);
     }
+
     double total = 0;
-    for (int i = 0; i < fItems.count(); i++) {
+
+    for(int i = 0; i < fItems.count(); i++) {
         QJsonObject o = fItems.at(i).toObject();
-        if (o["f_state"].toInt() != DISH_STATE_OK) {
+
+        if(o["f_state"].toInt() != DISH_STATE_OK) {
             continue;
         }
-        if (!goodsQty.contains(o["f_dish"].toInt())) {
+
+        if(!goodsQty.contains(o["f_dish"].toInt())) {
             total += o["f_total"].toDouble();
             continue;
         }
+
         double selfcost = 0;
         QMap<int, double> recipe = goodsQty[o["f_dish"].toInt()];
-        for (QMap<int, double>::const_iterator it = recipe.constBegin(); it != recipe.constEnd(); it++) {
+
+        for(QMap<int, double>::const_iterator it = recipe.constBegin(); it != recipe.constEnd(); it++) {
             selfcost += price[it.key()] * it.value();
         }
+
         o["f_price"] = QString::number(selfcost, 'f', 2);
         o["f_service"] = "0";
-        o["f_total"] = QString::number(selfcost *o["f_qty1"].toDouble(), 'f', 2);
+        o["f_total"] = QString::number(selfcost * o["f_qty1"].toDouble(), 'f', 2);
         db[":f_id"] = o["f_id"].toString();
         db[":f_price"] = selfcost;
-        db[":f_total"] = selfcost *o["f_qty1"].toDouble();
+        db[":f_total"] = selfcost * o["f_qty1"].toDouble();
         db.exec("update o_body set f_price=:f_price, f_total=:f_total where f_id=:f_id");
-        total += selfcost *o["f_qty1"].toDouble();
+        total += selfcost * o["f_qty1"].toDouble();
         fItems[i] = o;
     }
+
     fHeader["f_amountother"] = QString::number(total, 'f', 2);
     fHeader["f_amounttotal"] = QString::number(total, 'f', 2);
     fHeader["f_servicefactor"] = "0";

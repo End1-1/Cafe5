@@ -12,11 +12,11 @@ class C5FilterValues : public C5Dialog
     Q_OBJECT
 
 public:
-    explicit C5FilterValues();
+    explicit C5FilterValues(C5User *user);
 
     ~C5FilterValues();
 
-    static bool filterValues(QStringList &values);
+    static bool filterValues(QStringList &values, C5User *user);
 
 private slots:
     void on_leFilter_textChanged(const QString &arg1);

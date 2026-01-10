@@ -1,6 +1,7 @@
 #include "dlgreports.h"
 #include "ui_dlgreports.h"
 #include "dlgreportslist.h"
+#include "dlgreportsfilter.h"
 #include "c5printjson.h"
 #include "c5user.h"
 #include "dlgreceiptlanguage.h"
@@ -9,23 +10,19 @@
 #include "c5message.h"
 #include "c5printing.h"
 #include "c5utils.h"
-#include "ndataprovider.h"
-#include "c5waiterconfiguration.h"
 #include "ninterface.h"
 #include <QSettings>
+#include <QFile>
 
-DlgReports::DlgReports(const QStringList &dbParams, C5User *user) :
-    C5Dialog(),
-    ui(new Ui::DlgReports),
-    fUser(user)
+DlgReports::DlgReports(C5User *user) :
+    C5WaiterDialog(user),
+    ui(new Ui::DlgReports)
 {
     ui->setupUi(this);
-    setWindowState(Qt::WindowFullScreen);
-    ui->date1->setDate(QDate::currentDate());
-    ui->date2->setDate(QDate::currentDate());
-    fShiftId = 0;
     fCurrentHall = 0;
     setLangIcon();
+    mDate1 = QDate::currentDate();
+    mDate2 = QDate::currentDate();
 }
 
 DlgReports::~DlgReports()
@@ -35,77 +32,73 @@ DlgReports::~DlgReports()
 
 void DlgReports::openReports(C5User *user)
 {
-    DlgReports *d = new DlgReports(QStringList(), user);
+    DlgReports *d = new DlgReports(user);
     d->getDailyCommon();
     d->exec();
     delete d;
 }
 
-void DlgReports::getDailyCommon(const QDate &date1, const QDate &date2)
+void DlgReports::getDailyCommon()
 {
-    //TODO: CHECK L1
-    fHttp->createHttpQueryLambda("/engine/reports/dailycommon.php", {
-        {"date1", date1.toString(FORMAT_DATE_TO_STR_MYSQL)},
-        {"date2", date2.toString(FORMAT_DATE_TO_STR_MYSQL)},
-        {"hall", fCurrentHall},
-        {"opened", ui->btnOpened->isChecked()}
-    }, [](const QJsonObject & jdoc) {
+    NInterface::query("/engine/v2/waiter/reports/get-orders", mUser->mSessionKey, this, {
+        {"date1", mDate1.toString(FORMAT_DATE_TO_STR_MYSQL)},
+        {"date2", mDate2.toString(FORMAT_DATE_TO_STR_MYSQL)},
+        {"hall", fCurrentHall}
+    }, [ = ](const QJsonObject & jdoc) {
+        QJsonArray jorders = jdoc["orders"].toArray();
+        ui->tbl->clearContents();
+        ui->tbl->setRowCount(0);
+        double total = 0;
+
+        for(int i = 0; i < jorders.count(); i++) {
+            QJsonObject o = jorders.at(i).toObject();
+            int r = ui->tbl->addEmptyRow();
+            ui->tbl->setString(r, 0, o["f_id"].toString());
+            ui->tbl->setString(r, 1, o["f_prefix"].toString());
+            ui->tbl->setString(r, 2, o["f_date_close"].toString());
+            ui->tbl->setString(r, 3, o["f_time_close"].toString());
+            ui->tbl->setString(r, 4, o["f_hall_name"].toString());
+            ui->tbl->setString(r, 5, o["f_table_name"].toString());
+            ui->tbl->setString(r, 6, o["f_staff_name"].toString());
+            ui->tbl->setString(r, 7, float_str(o["f_amount_total"].toDouble(), 2));
+            ui->tbl->setString(r, 8, o["f_fiscal"].toString());
+            total += o["f_amount_total"].toDouble();
+        }
+
+        ui->tblTotal->setColumnCount(ui->tbl->columnCount());
+        ui->tbl->resizeColumnsToContents();
+        ui->tbl->setColumnWidth(0, 0);
+
+        for(int i = 0; i < ui->tbl->columnCount(); i++) {
+            ui->tblTotal->setColumnWidth(i, ui->tbl->columnWidth(i));
+        }
+
+        ui->tblTotal->setString(0, 7, float_str(total, 2));
+        QStringList l;
+        l.append(QString::number(ui->tbl->rowCount()));
+        ui->tblTotal->setVerticalHeaderLabels(l);
     }, [](const QJsonObject & je) {
         Q_UNUSED(je);
+        return false;
     });
 }
 
 void DlgReports::setLangIcon()
 {
-    switch(ui->btnReceiptLanguage->property("receipt_language").toInt()) {
-    case 0:
-        ui->btnReceiptLanguage->setIcon(QIcon(":/armenia.png"));
-        break;
-
-    case 1:
-        ui->btnReceiptLanguage->setIcon(QIcon(":/usa.png"));
-        break;
-
-    case 2:
-        ui->btnReceiptLanguage->setIcon(QIcon(":/russia.png"));
-        break;
-
-    default:
-        ui->btnReceiptLanguage->setIcon(QIcon(":/armenia.png"));
-        break;
-    }
-}
-
-void DlgReports::cashDocResponse(const QJsonObject &jdoc)
-{
-    int bs = 22;
-    QFont font(qApp->font());
-    font.setPointSize(bs);
-    C5Printing p;
-    p.setSceneParams(700, 2600, QPageLayout::Portrait);
-    p.setFont(font);
-    p.image("./logo_receipt.png", Qt::AlignHCenter);
-    p.br();
-    p.setFontSize(bs + 2);
-    p.setFontBold(true);
-    p.ctext(QDate::currentDate().toString(FORMAT_DATE_TO_STR));
-    p.br();
-    p.setFontSize(bs + 4);
-    p.setFontBold(true);
-    p.ctext(jdoc["purpose"].toString());
-    p.br();
-    p.setFontSize(bs);
-    p.setFontBold(false);
-    p.ctext(float_str(jdoc["cash_in"].toDouble(), 2));
-    p.br();
-    p.setFontSize(bs - 4);
-    p.ltext(tr("Printed"), 0);
-    p.rtext(QDateTime::currentDateTime().toString(FORMAT_DATETIME_TO_STR));
-    p.br();
-    p.setFontSize(bs - 4);
-    p.setFontBold(false);
-    p.print(C5WaiterConfiguration::instance()->receiptPrinter(), QPageSize::Custom);
-    fHttp->httpQueryFinished(sender());
+    // switch(ui->btnReceiptLanguage->property("receipt_language").toInt()) {
+    // case 0:
+    //     ui->btnReceiptLanguage->setIcon(QIcon(":/armenia.png"));
+    //     break;
+    // case 1:
+    //     ui->btnReceiptLanguage->setIcon(QIcon(":/usa.png"));
+    //     break;
+    // case 2:
+    //     ui->btnReceiptLanguage->setIcon(QIcon(":/russia.png"));
+    //     break;
+    // default:
+    //     ui->btnReceiptLanguage->setIcon(QIcon(":/armenia.png"));
+    //     break;
+    // }
 }
 
 void DlgReports::handleDailyCommon(const QJsonObject &obj)
@@ -151,21 +144,6 @@ void DlgReports::handleDailyCommon(const QJsonObject &obj)
     ui->tblTotal->setVerticalHeaderLabels(l);
 }
 
-void DlgReports::reportListResponse(const QJsonObject &obj)
-{
-    fHttp->httpQueryFinished(sender());
-    QString file;
-
-    if(!DlgReportsList::getReport(obj["list"].toArray(), file)) {
-        return;
-    }
-
-    fHttp->createHttpQuery(QString("/engine/waiter/reports/%1.php").arg(file),
-    QJsonObject{{"date1", ui->date1->date().toString(FORMAT_DATE_TO_STR_MYSQL)},
-        {"date2", ui->date2->date().toString(FORMAT_DATE_TO_STR_MYSQL)}},
-    SLOT(printReportResponse(QJsonObject)));
-}
-
 void DlgReports::printReportResponse(const QJsonObject &obj)
 {
     if(obj["reply"].toInt() != 0) {
@@ -174,7 +152,7 @@ void DlgReports::printReportResponse(const QJsonObject &obj)
     }
 
     QJsonArray ja = obj["report"].toArray();
-    ja.append(QJsonObject{{"cmd", "print"}, {"printer", C5WaiterConfiguration::instance()->receiptPrinter()}, {"pagesize", QPageSize::Custom}});
+    ja.append(QJsonObject{{"cmd", "print"}, {"printer", mUser->fConfig["receipt_printer"].toString()}, {"pagesize", QPageSize::Custom}});
     C5PrintJson *pj = new C5PrintJson(ja);
     pj->start();
     fHttp->httpQueryFinished(sender());
@@ -209,27 +187,7 @@ void DlgReports::handleTaxReport(const QJsonObject &obj)
 
 void DlgReports::on_btnRefresh_clicked()
 {
-    getDailyCommon(ui->date1->date(), ui->date2->date());
-}
-
-void DlgReports::on_btnDateLeft1_clicked()
-{
-    ui->date1->setDate(ui->date1->date().addDays(-1));
-}
-
-void DlgReports::on_btnDateLeft2_clicked()
-{
-    ui->date2->setDate(ui->date2->date().addDays(-1));
-}
-
-void DlgReports::on_btnDateRight1_clicked()
-{
-    ui->date1->setDate(ui->date1->date().addDays(1));
-}
-
-void DlgReports::on_btnDateRight2_clicked()
-{
-    ui->date2->setDate(ui->date2->date().addDays(1));
+    getDailyCommon();
 }
 
 void DlgReports::on_btnExit_clicked()
@@ -239,7 +197,85 @@ void DlgReports::on_btnExit_clicked()
 
 void DlgReports::on_btnReports_clicked()
 {
-    fHttp->createHttpQuery("/engine/waiter/reports/list.php", QJsonObject(), SLOT(reportListResponse(QJsonObject)));
+    fHttp->createHttpQueryLambda("/engine/v2/waiter/reports/get-daily", {
+        {"date1", mDate1.toString(FORMAT_DATE_TO_STR_MYSQL)},
+        {"date2", mDate2.toString(FORMAT_DATE_TO_STR_MYSQL)},
+
+    }, [ = ](const QJsonObject & jdoc) {
+        int bs = 12;
+        QFont font(qApp->font());
+        font.setPointSize(bs);
+        C5Printing p;
+        QPrinterInfo pi = QPrinterInfo::printerInfo(mUser->fConfig["receipt_printer"].toString());
+        QPrinter printer(pi);
+        printer.setPageSize(QPageSize::Custom);
+        printer.setFullPage(false);
+        QRectF pr = printer.pageRect(QPrinter::DevicePixel);
+        constexpr qreal SAFE_RIGHT_MM = 2.0;
+        qreal safePx = SAFE_RIGHT_MM * printer.logicalDpiX() / 25.4;
+        p.setSceneParams(pr.width() - safePx, pr.height(), printer.logicalDpiX());
+        p.setFont(font);
+        p.setFontBold(true);
+        QString logoFile = qApp->applicationDirPath() + "/logo_receipt.png";
+
+        if(QFile::exists(logoFile)) {
+            p.image(logoFile, Qt::AlignHCenter);
+            p.br();
+        }
+
+        p.br();
+        p.ctext(tr("Daily report"));
+        p.br();
+        p.setFontBold(true);
+        p.ctext(mDate1.toString(FORMAT_DATE_TO_STR));
+        p.br();
+        p.ctext(mDate2.toString(FORMAT_DATE_TO_STR));
+        p.br();
+        p.ltext(tr("Orders count"));
+        p.rtext(float_str((double)jdoc["f_count_id"].toInt(), 2));
+        p.br();
+        p.ltext(tr("Daily revenue"));
+        p.rtext(float_str((double)jdoc["f_amount_total"].toInt(), 2));
+        p.br();
+        p.br();
+
+        if(jdoc["f_amount_cash"].toDouble() > 0.01) {
+            p.line();
+            p.br();
+            p.ltext(tr("Cash"));
+            p.rtext(float_str(jdoc["f_amount_cash"].toDouble(), 2));
+            p.br();
+        }
+
+        if(jdoc["f_amount_card"].toDouble() > 0.01) {
+            p.line();
+            p.br();
+            p.ltext(tr("Card"));
+            p.rtext(float_str(jdoc["f_amount_card"].toDouble(), 2));
+            p.br();
+        }
+
+        if(jdoc["f_service_amount"].toDouble() > 0.01) {
+            p.line();
+            p.br();
+            p.ltext(tr("Service amount"));
+            p.rtext(float_str(jdoc["f_service_amount"].toDouble(), 2));
+            p.br();
+        }
+
+        p.line();
+        p.br();
+        p.br();
+        p.br();
+        p.br();
+        p.setFontSize(bs - 4);
+        p.setFontBold(false);
+        p.ltext(QString("%1 %2").arg(tr("Printed"), QDateTime::currentDateTime().toString(FORMAT_DATETIME_TO_STR)));
+        p.br();
+        p.ltext(".");
+        p.print(printer);
+    }, [](const QJsonObject & jerr) {
+    });
 }
 
 void DlgReports::on_btnPrintOrderReceipt_clicked()
@@ -295,10 +331,10 @@ void DlgReports::on_btnPrintOrderReceipt_clicked()
 
 void DlgReports::on_btnReceiptLanguage_clicked()
 {
-    int r = DlgReceiptLanguage::receipLanguage();
+    int r = DlgReceiptLanguage::receipLanguage(mUser);
 
     if(r > -1) {
-        ui->btnReceiptLanguage->setProperty("receipt_language", r);
+        //ui->btnReceiptLanguage->setProperty("receipt_language", r);
         setLangIcon();
     }
 }
@@ -325,45 +361,56 @@ void DlgReports::on_btnReturnTaxReceipt_clicked()
     }
 
     //TODO: CHECK L7
-    auto np = new NDataProvider(this);
-    np->overwriteHost("http", "127.0.0.1", 8080);
-    connect(np, &NDataProvider::done, this, [](const QJsonObject & jo) {
-    });
-    connect(np, &NDataProvider::error, this, [](const QString & err) {
-    });
-    np->getData("/taxreturn", {
-        {"order",  ui->tbl->getString(l.at(0).row(), 0)}
-    });
+    // auto np = new NDataProvider(this);
+    // np->overwriteHost("http", "127.0.0.1", 8080);
+    // connect(np, &NDataProvider::done, this, [](const QJsonObject & jo) {
+    // });
+    // connect(np, &NDataProvider::error, this, [](const QString & err) {
+    // });
+    // np->getData("/taxreturn", {
+    //     {"order",  ui->tbl->getString(l.at(0).row(), 0)}
+    // });
 }
 
 void DlgReports::on_btnPrintTaxX_clicked()
 {
     //TODO: CHECK L6
-    auto np = new NDataProvider(this);
-    np->overwriteHost("http", "127.0.0.1", 8080);
-    connect(np, &NDataProvider::done, this, [](const QJsonObject & jo) {
-    });
-    connect(np, &NDataProvider::error, this, [](const QString & err) {
-    });
-    np->getData("/taxreport", {
-        {"d1", ui->date1->date().toString(FORMAT_DATE_TO_STR_MYSQL)},
-        {"d2", ui->date2->date().toString(FORMAT_DATE_TO_STR_MYSQL)},
-        {"type", report_x}
-    });
+    // auto np = new NDataProvider(this);
+    // np->overwriteHost("http", "127.0.0.1", 8080);
+    // connect(np, &NDataProvider::done, this, [](const QJsonObject & jo) {
+    // });
+    // connect(np, &NDataProvider::error, this, [](const QString & err) {
+    // });
+    // np->getData("/taxreport", {
+    //     {"d1", ui->date1->date().toString(FORMAT_DATE_TO_STR_MYSQL)},
+    //     {"d2", ui->date2->date().toString(FORMAT_DATE_TO_STR_MYSQL)},
+    //     {"type", report_x}
+    // });
 }
 
 void DlgReports::on_btnPrintTaxZ_clicked()
 {
     //TODO: CHECK L5
-    auto np = new NDataProvider(this);
-    np->overwriteHost("http", "127.0.0.1", 8080);
-    connect(np, &NDataProvider::done, this, [](const QJsonObject & jo) {
-    });
-    connect(np, &NDataProvider::error, this, [](const QString & err) {
-    });
-    np->getData("/taxreport", {
-        {"d1", ui->date1->date().toString(FORMAT_DATE_TO_STR_MYSQL)},
-        {"d2", ui->date2->date().toString(FORMAT_DATE_TO_STR_MYSQL)},
-        {"type", report_z}
-    });
+    // auto np = new NDataProvider(this);
+    // np->overwriteHost("http", "127.0.0.1", 8080);
+    // connect(np, &NDataProvider::done, this, [](const QJsonObject & jo) {
+    // });
+    // connect(np, &NDataProvider::error, this, [](const QString & err) {
+    // });
+    // np->getData("/taxreport", {
+    //     {"d1", ui->date1->date().toString(FORMAT_DATE_TO_STR_MYSQL)},
+    //     {"d2", ui->date2->date().toString(FORMAT_DATE_TO_STR_MYSQL)},
+    //     {"type", report_z}
+    // });
+}
+
+void DlgReports::on_btnParams_clicked()
+{
+    DlgReportsFilter d(mDate1, mDate2, mUser);
+
+    if(d.exec() == QDialog::Accepted) {
+        mDate1 = d.date1();
+        mDate2 = d.date2();
+        on_btnRefresh_clicked();
+    }
 }

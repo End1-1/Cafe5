@@ -3,7 +3,8 @@
 
 #include "c5dialog.h"
 
-namespace Ui {
+namespace Ui
+{
 class DlgGiftCardSale;
 }
 
@@ -12,10 +13,14 @@ class DlgGiftCardSale : public C5Dialog
     Q_OBJECT
 
 public:
-    explicit DlgGiftCardSale(const QStringList &dbParams);
+    explicit DlgGiftCardSale(C5User *user);
+
     ~DlgGiftCardSale();
+
     int fGiftGoodsId;
+
     QString fGiftScancode;
+
     double fGiftPrice;
 
 private slots:
@@ -26,7 +31,7 @@ private slots:
     void on_btnCancel_clicked();
 
 private:
-    Ui::DlgGiftCardSale *ui;
+    Ui::DlgGiftCardSale* ui;
 };
 
 #endif // DLGGIFTCARDSALE_H

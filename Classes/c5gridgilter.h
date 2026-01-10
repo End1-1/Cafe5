@@ -3,7 +3,8 @@
 
 #include "c5dialog.h"
 
-namespace Ui {
+namespace Ui
+{
 class C5GridGilter;
 }
 
@@ -14,11 +15,11 @@ class C5GridGilter : public C5Dialog
     Q_OBJECT
 
 public:
-    explicit C5GridGilter();
+    explicit C5GridGilter(C5User *user);
 
     ~C5GridGilter();
 
-    static bool filter(C5FilterWidget *filterWidget, QString &condition, QMap<QString, bool> &showColumns, QHash<QString, QString> &colTranslation);
+    static bool filter(C5User *user, C5FilterWidget *filterWidget, QString &condition, QMap<QString, bool>& showColumns, QHash<QString, QString>& colTranslation);
 
 protected:
     virtual void keyControlPlusEnter() override;
@@ -31,7 +32,7 @@ private slots:
     void on_btnOK_clicked();
 
 private:
-    Ui::C5GridGilter *ui;
+    Ui::C5GridGilter* ui;
 };
 
 #endif // C5GRIDGILTER_H

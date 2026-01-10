@@ -13,11 +13,11 @@ class DlgExitWithMessage : public C5Dialog
     Q_OBJECT
 
 public:
-    explicit DlgExitWithMessage();
+    explicit DlgExitWithMessage(C5User *user);
 
     ~DlgExitWithMessage();
 
-    static void openDialog(const QString &msg, int closeTimeout = 10);
+    static void openDialog(C5User *user, const QString &msg, int closeTimeout = 10);
 
 private slots:
     void timeout();

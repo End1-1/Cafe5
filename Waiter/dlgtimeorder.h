@@ -12,11 +12,11 @@ class DlgTimeorder : public C5Dialog
     Q_OBJECT
 
 public:
-    explicit DlgTimeorder();
+    explicit DlgTimeorder(C5User *user);
 
     ~DlgTimeorder();
 
-    static bool timeOrder(int &order);
+    static bool timeOrder(C5User *user, int &order);
 
 private slots:
     void on_btnCancel_clicked();

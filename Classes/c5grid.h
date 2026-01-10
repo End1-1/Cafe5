@@ -1,12 +1,7 @@
 #ifndef C5GRID_H
 #define C5GRID_H
 
-#include "c5textdelegate.h"
-#include "c5datedelegate.h"
-#include "c5combodelegate.h"
 #include "c5tableview.h"
-#include "c5config.h"
-#include "c5message.h"
 #include "c5officewidget.h"
 #include <QDebug>
 #include <QHBoxLayout>
@@ -149,6 +144,11 @@ private:
 
     QString columnName(const QString &s) const;
 
+    QString makeColumns();
+
+    QString makeHeaders();
+
+    QString makeRows();
 protected slots:
     virtual void selectionChanged(const QItemSelection &selected, const QItemSelection &deselected);
 

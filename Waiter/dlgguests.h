@@ -15,7 +15,7 @@ class DlgGuests : public C5Dialog
     Q_OBJECT
 
 public:
-    explicit DlgGuests(C5OrderDriver *order);
+    explicit DlgGuests(C5User *user, C5OrderDriver *order);
 
     ~DlgGuests();
 

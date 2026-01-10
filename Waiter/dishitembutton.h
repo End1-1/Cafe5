@@ -1,5 +1,4 @@
-#ifndef DISHITEMBUTTON_H
-#define DISHITEMBUTTON_H
+#pragma once
 
 #include <QPushButton>
 
@@ -11,5 +10,3 @@ public:
 protected:
     virtual void paintEvent(QPaintEvent *e);
 };
-
-#endif // DISHITEMBUTTON_H

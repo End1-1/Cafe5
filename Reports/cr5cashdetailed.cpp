@@ -5,6 +5,7 @@
 #include "c5tablewidget.h"
 #include "c5mainwindow.h"
 #include "c5cashdoc.h"
+#include "c5message.h"
 
 static const int col_header = 0;
 static const int col_date = 1;
@@ -77,7 +78,7 @@ bool CR5CashDetailed::on_tblView_doubleClicked(const QModelIndex &index)
 void CR5CashDetailed::buildQuery()
 {
     if(fFilter->cash() == 0) {
-        if(!C5GridGilter::filter(fFilter, fWhereCondition, fColumnsVisible, fTranslation)) {
+        if(!C5GridGilter::filter(mUser, fFilter, fWhereCondition, fColumnsVisible, fTranslation)) {
             return;
         }
 

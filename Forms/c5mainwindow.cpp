@@ -21,6 +21,7 @@
 #include "cr5breezeservice.h"
 #include "cr5reports.h"
 #include "cr5mfgeneralreport.h"
+#include "c5config.h"
 #include "c5saledoc.h"
 #include "c5salarypayment.h"
 #include "cr5saleremoveddishes.h"
@@ -106,14 +107,13 @@ QStringList mainDbParams;
 
 C5MainWindow::C5MainWindow(QWidget *parent) :
     QMainWindow(parent),
-    ui(new Ui::C5MainWindow),
-    mUser(nullptr)
+    mUser(nullptr),
+    ui(new Ui::C5MainWindow)
 {
     ui->setupUi(this);
     mainDbParams = __c5config.dbParams();
     ui->splitter->setStretchFactor(0, 0);
     ui->splitter->setStretchFactor(1, 1);
-    __c5config.fParentWidget = this;
     fStatusLabel = new QLabel(tr("Disconnected"));
     fConnectionLabel = new QPushButton("");
     connect(fConnectionLabel, &QPushButton::clicked, this, [this]() {
@@ -182,7 +182,7 @@ void C5MainWindow::closeEvent(QCloseEvent *event)
 NTableWidget* C5MainWindow::createNTab(const QString &route, const QString &image,
                                        const QJsonObject &initParams)
 {
-    auto *t = new NTableWidget(route);
+    auto *t = new NTableWidget(mUser, route);
     t->mMainWindow = this;
     fTab->addTab(t, "");
     fTab->setCurrentIndex(fTab->count() - 1);
@@ -194,7 +194,7 @@ NTableWidget* C5MainWindow::createNTab(const QString &route, const QString &imag
 
 NTreeWidget* C5MainWindow::createNTreeTab(const QString &route, const QString &image, const QJsonObject &initParams)
 {
-    auto *t = new NTreeWidget(route);
+    auto *t = new NTreeWidget(mUser, route);
     t->mMainWindow = this;
     fTab->addTab(t, "");
     fTab->setCurrentIndex(fTab->count() - 1);
@@ -317,7 +317,7 @@ void C5MainWindow::currentTabChange(int index)
 void C5MainWindow::on_actionLogin_triggered()
 {
     if(!mUser) {
-        C5Login l;
+        C5Login l(mUser);
 
         if(l.exec() == QDialog::Accepted) {
             C5Config::initParamsFromDb();
@@ -926,7 +926,7 @@ void C5MainWindow::on_actionLogout_triggered()
     fMenuLists.clear();
     ui->actionLogout->setVisible(false);
     ui->actionChange_password->setVisible(false);
-    C5Login l;
+    C5Login l(mUser);
 
     if(l.exec() == QDialog::Accepted) {
         C5Config::initParamsFromDb();
@@ -941,7 +941,7 @@ void C5MainWindow::on_actionChange_password_triggered()
 {
     QString password;
 
-    if(!C5ChangePassword::changePassword(password)) {
+    if(!C5ChangePassword::changePassword(password, mUser)) {
         return;
     }
 

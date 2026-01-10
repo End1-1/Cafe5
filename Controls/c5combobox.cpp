@@ -44,3 +44,10 @@ void C5ComboBox::setCache(int cacheid, int colId, int colName)
         addItem(c->getString(i, colName), c->getInt(i, colId));
     }
 }
+
+void C5ComboBox::setValues(const QList<int> values, const QStringList &names)
+{
+    for(int i = 0; i  < values.size(); i++) {
+        addItem(names.at(i), values.at(i));
+    }
+}

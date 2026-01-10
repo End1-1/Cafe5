@@ -3,8 +3,8 @@
 #include "c5config.h"
 #include <QDoubleValidator>
 
-DlgExportSaleToAsOptions::DlgExportSaleToAsOptions() :
-    C5Dialog(),
+DlgExportSaleToAsOptions::DlgExportSaleToAsOptions(C5User *user) :
+    C5Dialog(user),
     ui(new Ui::DlgExportSaleToAsOptions)
 {
     ui->setupUi(this);
@@ -30,9 +30,9 @@ DlgExportSaleToAsOptions::~DlgExportSaleToAsOptions()
 int DlgExportSaleToAsOptions::getOption(QString &partner, QString &store, QString &service,
                                         QString &srvinacc,
                                         QString &srvoutacc, QString &iteminacc, QString &itemoutacc, QString &bankacc, QString &vat,
-                                        bool &exportSimple, QString &simpleItem)
+                                        bool &exportSimple, QString &simpleItem, C5User *user)
 {
-    DlgExportSaleToAsOptions d;
+    DlgExportSaleToAsOptions d(user);
 
     if(d.exec() == QDialog::Accepted) {
         partner = d.ui->lePartnerCode->text();

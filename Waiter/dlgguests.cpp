@@ -1,9 +1,8 @@
 #include "dlgguests.h"
 #include "ui_dlgguests.h"
-#include "worderw.h"
 
-DlgGuests::DlgGuests(C5OrderDriver *order) :
-    C5Dialog(),
+DlgGuests::DlgGuests(C5User *user, C5OrderDriver *order) :
+    C5Dialog(user),
     ui(new Ui::DlgGuests),
     fOrder(order)
 {

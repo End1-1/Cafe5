@@ -1,8 +1,11 @@
-#ifndef DLGFACE_H
-#define DLGFACE_H
+#pragma once
 
 #include "c5waiterdialog.h"
 #include <QTableWidgetItem>
+#include "struct_hall.h"
+#include "struct_table.h"
+#include "struct_goods_group.h"
+#include "struct_dish.h"
 #include <QTimer>
 #include <QJsonObject>
 
@@ -22,14 +25,7 @@ public:
 
     ~DlgFace();
 
-    static bool getTable(int& tableId, int hall, C5User *user);
-
 private slots:
-    void initResponse(const QJsonObject &jdoc);
-
-    void refreshResponse(const QJsonObject &jdoc);
-
-    void openReservationResponse(const QJsonObject &jdoc);
 
     void timeout();
 
@@ -39,49 +35,39 @@ private slots:
 
     void filterStaffClicked();
 
-    void refreshTables();
-
-    void handleCreditCards(const QJsonObject &obj);
+    void updateHall();
 
     void on_btnExit_clicked();
 
-    void on_btnCancel_clicked();
-
-    void on_btnViewHall_clicked();
-
-    void on_btnViewWaiter_clicked();
-
     void on_btnGuests_clicked();
 
-    void on_btnTools_clicked();
+    void on_btnReports_clicked();
+
+    void on_btnOrders_clicked();
 
 private:
     Ui::DlgFace* ui;
 
-    QJsonObject fHallState;
-
-    int fCurrentHall;
-
-    int fCurrentStaff;
-
     QTimer fTimer;
 
-    bool fModeJustSelectTable;
+    QVector<HallItem> mHall;
 
-    int fSelectedTable;
+    QVector<TableItem> mTables;
 
-    int fView;
+    QVector<GoodsGroupItem*> mGoodsGroups;
+
+    QVector<DishAItem*> mDishes;
+
+    int mSelectedHall = 0;
+
+    int mTablesOfStaff = 0;
+
+    void initData();
 
     virtual void showEvent(QShowEvent *e) override;
 
-    void filterHall(int hall, int staff);
+    void filterHall();
 
     void colorizeHall();
 
-    void viewMode(int m);
-
-    void setViewMode(int v);
-
 };
-
-#endif // DLGFACE_H

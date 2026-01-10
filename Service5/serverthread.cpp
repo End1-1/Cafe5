@@ -9,12 +9,13 @@
 #include <QWebSocketServer>
 #include <QWebSocket>
 #include <QJsonObject>
-#include <QtConcurrent/QtConcurrent>
 #include <QJsonDocument>
 #include <QJsonArray>
 #include <QApplication>
 #include <QLibrary>
 #include <QMutex>
+#include <QPointer>
+#include <QThreadPool>
 
 QMutex mSocketMutex;
 
@@ -441,6 +442,8 @@ void ServerThread::handleCommand(SocketStruct ws, const QJsonObject &jdoc, QStri
             repMsg = C5SearchEngine::mInstance->searchStorage(jdoc, ss);
         } else if(command == "search_goods_item") {
             repMsg = C5SearchEngine::mInstance->searchGoodsItem(jdoc, ss);
+        } else if(command == "search_partner_item") {
+            repMsg = C5SearchEngine::mInstance->searchPartnerItem(jdoc, ss);
         } else if(command == "search_partner") {
             repMsg = C5SearchEngine::mInstance->searchPartner(jdoc);
         } else if(command == "search_goods_groups") {

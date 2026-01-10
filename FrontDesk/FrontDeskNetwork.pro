@@ -62,6 +62,7 @@ FORMS += \
     ../Forms/c5connectiondialog.ui \
     ../Forms/c5fiscalcancel.ui \
     ../Forms/c5goodsspecialprice.ui \
+    ../Forms/c5menu.ui \
     ../Forms/dlgimportfromas.ui \
     c5discountredeem.ui \
     dlgemarks.ui \
@@ -69,9 +70,12 @@ FORMS += \
 
 HEADERS += \
     ../Classes/appwebsocket.h \
+    ../Classes/c5htmlprint.h \
+    ../Classes/dict_dish_state.h \
     ../Forms/c5connectiondialog.h \
     ../Forms/c5fiscalcancel.h \
     ../Forms/c5goodsspecialprice.h \
+    ../Forms/c5menu.h \
     ../Forms/dlgimportfromas.h \
     c5discountredeem.h \
     c5officedialog.h \
@@ -82,9 +86,11 @@ HEADERS += \
 
 SOURCES += \
     ../Classes/appwebsocket.cpp \
+    ../Classes/c5htmlprint.cpp \
     ../Forms/c5connectiondialog.cpp \
     ../Forms/c5fiscalcancel.cpp \
     ../Forms/c5goodsspecialprice.cpp \
+    ../Forms/c5menu.cpp \
     ../Forms/dlgimportfromas.cpp \
     c5discountredeem.cpp \
     c5officedialog.cpp \

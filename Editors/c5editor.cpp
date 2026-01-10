@@ -5,8 +5,8 @@
 #include <QShortcut>
 #include <QKeyEvent>
 
-C5Editor::C5Editor() :
-    C5Dialog(),
+C5Editor::C5Editor(C5User *user) :
+    C5Dialog(user),
     ui(new Ui::C5Editor)
 {
     ui->setupUi(this);
@@ -21,9 +21,9 @@ C5Editor::~C5Editor()
     delete ui;
 }
 
-C5Editor* C5Editor::createEditor(CE5Editor *e, int id)
+C5Editor* C5Editor::createEditor(C5User *user, CE5Editor *e, int id)
 {
-    C5Editor *de = new C5Editor();
+    C5Editor *de = new C5Editor(user);
     e->fFocusNextChild = false;
     de->fEditor = e;
     de->fVerticalLayout->addWidget(e);

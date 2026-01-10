@@ -4,27 +4,27 @@
 <context>
     <name>C5Message</name>
     <message>
-        <location filename="../Cafe5/c5message.ui" line="185"/>
+        <location filename="../Cafe5/c5message.ui" line="197"/>
         <source>&lt;html&gt;msg&lt;/html&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Cafe5/c5message.ui" line="257"/>
+        <location filename="../Cafe5/c5message.ui" line="272"/>
         <source>A1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Cafe5/c5message.ui" line="270"/>
+        <location filename="../Cafe5/c5message.ui" line="285"/>
         <source>A3</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Cafe5/c5message.ui" line="283"/>
+        <location filename="../Cafe5/c5message.ui" line="298"/>
         <source>A2</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Cafe5/c5message.ui" line="296"/>
+        <location filename="../Cafe5/c5message.ui" line="311"/>
         <source>Copy</source>
         <translation type="unfinished"></translation>
     </message>
@@ -174,18 +174,18 @@
 <context>
     <name>NDataProvider</name>
     <message>
-        <location filename="../NTable/ndataprovider.cpp" line="92"/>
-        <location filename="../NTable/ndataprovider.cpp" line="106"/>
+        <location filename="../NTable/ndataprovider.cpp" line="97"/>
+        <location filename="../NTable/ndataprovider.cpp" line="120"/>
         <source>Access denied</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../NTable/ndataprovider.cpp" line="97"/>
+        <location filename="../NTable/ndataprovider.cpp" line="102"/>
         <source>You must upgrade the application to continue using it</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../NTable/ndataprovider.cpp" line="98"/>
+        <location filename="../NTable/ndataprovider.cpp" line="103"/>
         <source>Click here to launch updater</source>
         <translation type="unfinished"></translation>
     </message>
@@ -193,7 +193,13 @@
 <context>
     <name>NInterface</name>
     <message>
-        <location filename="../NTable/ninterface.cpp" line="104"/>
+        <location filename="../NTable/ninterface.cpp" line="197"/>
+        <location filename="../NTable/ninterface.cpp" line="211"/>
+        <source>Query</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../NTable/ninterface.cpp" line="237"/>
         <source>Unauthorized</source>
         <translation type="unfinished"></translation>
     </message>
@@ -201,8 +207,13 @@
 <context>
     <name>NLoadingDlg</name>
     <message>
-        <location filename="../NTable/nloadingdlg.ui" line="44"/>
+        <location filename="../NTable/nloadingdlg.ui" line="99"/>
         <source>1 sec</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../NTable/nloadingdlg.ui" line="119"/>
+        <source>Title</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

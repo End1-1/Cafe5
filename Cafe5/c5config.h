@@ -135,8 +135,6 @@ public:
 
     static QString fSettingsName;
 
-    static QWidget* fParentWidget;
-
     static QString fLastUsername;
 
     static bool fFullScreen;
@@ -275,7 +273,5 @@ private:
 };
 
 extern C5Config __c5config;
-
-extern QStringList __databases;
 
 #endif // C5CONFIG_H

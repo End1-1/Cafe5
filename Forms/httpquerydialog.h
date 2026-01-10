@@ -16,13 +16,13 @@ class HttpQueryDialog : public C5Dialog
     Q_OBJECT
 
 public:
-    explicit HttpQueryDialog(const QString &url, const QJsonObject &jo,
+    explicit HttpQueryDialog(C5User *user, const QString &url, const QJsonObject &jo,
                              QWidget *parent = nullptr);
     ~HttpQueryDialog();
     virtual int exec() override;
 
 private:
-    Ui::HttpQueryDialog *ui;
+    Ui::HttpQueryDialog* ui;
 
     void sendRequest();
     QString fUrl;

@@ -1,8 +1,8 @@
 #include "dlgtext.h"
 #include "ui_dlgtext.h"
 
-DlgText::DlgText() :
-    C5Dialog(),
+DlgText::DlgText(C5User *user) :
+    C5Dialog(user),
     ui(new Ui::DlgText)
 {
     ui->setupUi(this);
@@ -15,9 +15,9 @@ DlgText::~DlgText()
     delete ui;
 }
 
-bool DlgText::getText(const QString &title, QString &defaultText)
+bool DlgText::getText(C5User *user, const QString &title, QString &defaultText)
 {
-    DlgText d;
+    DlgText d(user);
     d.setWindowTitle(title);
     d.ui->kbd->setText(defaultText);
 

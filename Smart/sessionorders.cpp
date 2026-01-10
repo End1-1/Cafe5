@@ -4,8 +4,8 @@
 #include "c5database.h"
 #include "c5utils.h"
 
-SessionOrders::SessionOrders() :
-    C5Dialog(),
+SessionOrders::SessionOrders(C5User *user) :
+    C5Dialog(user),
     ui(new Ui::SessionOrders)
 {
     ui->setupUi(this);
@@ -32,7 +32,8 @@ void SessionOrders::loadOrders()
             "LEFT JOIN a_header_cash c ON c.f_oheader=o.f_id "
             "left join o_tax ot on ot.f_id=o.f_id "
             "WHERE c.f_session=:f_session ");
-    while (db.nextRow()) {
+
+    while(db.nextRow()) {
         int r = ui->tblOrders->rowCount();
         ui->tblOrders->setRowCount(r + 1);
         ui->tblOrders->setItem(r, 0, new QTableWidgetItem(db.getString("f_id")));

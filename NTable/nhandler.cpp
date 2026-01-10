@@ -22,9 +22,10 @@ static const QString hDraftSale  = "39617ca7-8fa4-11ed-8ad3-1078d2d2b808";
 static const QString hDiscountReturnAmount = "d563c585-aeb9-11f0-a2cb-8a884be02f31";
 static const QString hMenuReview = "65a0e1d4-c843-11f0-9ee3-0a002700000e";
 
-NHandler::NHandler(QObject *parent)
+NHandler::NHandler(C5User *user, QObject *parent)
     : QObject{parent},
-      mTableView(nullptr)
+      mTableView(nullptr),
+      mUser(user)
 {
 }
 
@@ -62,13 +63,13 @@ void NHandler::handle(const QJsonArray &ja)
                     }
 
                     case 2: {
-                        C5SaleFromStoreOrder::openOrder(ja.at(3).toString());
+                        C5SaleFromStoreOrder::openOrder(mUser, ja.at(3).toString());
                         break;
                     }
                     }
                 }
             } else if(!ja.at(4).toString().isEmpty()) {
-                C5CostumerDebtPayment d(0);
+                C5CostumerDebtPayment d(mUser, 0);
                 d.setId(ja.at(4).toString());
                 d.exec();
             } else if(!ja.at(5).toString().isEmpty()) {
@@ -84,7 +85,7 @@ void NHandler::handle(const QJsonArray &ja)
             break;
         }
     } else if(mHandlers.at(1).toString() == hShortDebt) {
-        C5CostumerDebtPayment d(0);
+        C5CostumerDebtPayment d(mUser, 0);
         d.setId(ja.at(0).toString());
         d.exec();
     } else if(mHandlers.at(1).toString() == hDraftSale) {
@@ -102,7 +103,7 @@ void NHandler::handle(const QJsonArray &ja)
         }
 
         case 9: {
-            C5DiscountRedeem dr(m->data(row, 0).toString(), m->data(row, 0).toInt());
+            C5DiscountRedeem dr(mUser, m->data(row, 0).toString(), m->data(row, 0).toInt());
             dr.exec();
         }
         }
@@ -112,7 +113,7 @@ void NHandler::handle(const QJsonArray &ja)
         }
 
         auto *ep = new C5DishWidget();
-        auto *e = C5Editor::createEditor(ep, m->data(row, 0).toInt());
+        auto *e = C5Editor::createEditor(mUser, ep, m->data(row, 0).toInt());
         QList<QMap<QString, QVariant> > data;
 
         if(e->getResult(data)) {
@@ -130,7 +131,7 @@ void NHandler::handle(const QVariant &v)
 
     if(mHandlers.at(1).toString()  == hMenuReview) {
         auto *ep = new C5DishWidget();
-        auto *e = C5Editor::createEditor(ep, v.toInt());
+        auto *e = C5Editor::createEditor(mUser, ep, v.toInt());
         QList<QMap<QString, QVariant> > data;
 
         if(e->getResult(data)) {
@@ -162,8 +163,8 @@ void NHandler::toolWidget(QWidget *w)
             b->setText(tr("New customer payment"));
             b->setAutoRaise(true);
             b->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
-            connect(b, &QAbstractButton::clicked, []() {
-                C5CostumerDebtPayment(BCLIENTDEBTS_SOURCE_SALE).exec();
+            connect(b, &QAbstractButton::clicked, [this]() {
+                C5CostumerDebtPayment(mUser, BCLIENTDEBTS_SOURCE_SALE).exec();
             });
             gl->addWidget(b, 0, 0, Qt::AlignLeft);
             b = new QToolButton(w);
@@ -171,8 +172,8 @@ void NHandler::toolWidget(QWidget *w)
             b->setText(tr("New partner payment"));
             b->setAutoRaise(true);
             b->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
-            connect(b, &QAbstractButton::clicked, []() {
-                C5CostumerDebtPayment(BCLIENTDEBTS_SOURCE_INPUT).exec();
+            connect(b, &QAbstractButton::clicked, [this]() {
+                C5CostumerDebtPayment(mUser, BCLIENTDEBTS_SOURCE_INPUT).exec();
             });
             gl->addWidget(b, 1, 0, Qt::AlignLeft);
         } else if(mHandlers.contains(hShortDebt)) {
@@ -181,12 +182,12 @@ void NHandler::toolWidget(QWidget *w)
             b->setText(tr("Spent accumulated"));
             b->setAutoRaise(true);
             b->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
-            connect(b, &QAbstractButton::clicked, this, [m, row]() {
+            connect(b, &QAbstractButton::clicked, this, [this, m, row]() {
                 if(row < 0) {
                     return;
                 }
 
-                C5CostumerDebtPayment cb(BCLIENTDEBTS_SOURCE_SALE);
+                C5CostumerDebtPayment cb(mUser, BCLIENTDEBTS_SOURCE_SALE);
                 cb.setProperty("uuid", m->data(row, 0).toString());
                 cb.setPartnerAndAmount(m->data(row, 1, Qt::EditRole).toInt(), m->data(row, 6, Qt::EditRole).toDouble(),
                                        m->data(row, 0).toString());
@@ -199,14 +200,14 @@ void NHandler::toolWidget(QWidget *w)
             b->setIcon(QIcon(":/new.png"));
             b->setText(tr("Redeem accumulated"));
             b->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
-            connect(b, &QToolButton::clicked, this, [m, row]() {
+            connect(b, &QToolButton::clicked, this, [this, m, row]() {
                 int partner = 0;
 
                 if(row > -1) {
                     partner = m->data(row, 2).toInt();
                 }
 
-                C5DiscountRedeem dr("", partner);
+                C5DiscountRedeem dr(mUser, "", partner);
                 dr.exec();
             });
             gl->addWidget(b);

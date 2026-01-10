@@ -13,11 +13,11 @@ class C5SaleFromStoreOrder : public C5Dialog
     Q_OBJECT
 
 public:
-    explicit C5SaleFromStoreOrder();
+    explicit C5SaleFromStoreOrder(C5User *user);
 
     ~C5SaleFromStoreOrder();
 
-    static void openOrder(const QString &id);
+    static void openOrder(C5User *user, const QString &id);
 
 private slots:
     void removeOrderResponse(const QJsonObject &jdoc);

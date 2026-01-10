@@ -24,6 +24,8 @@ public:
 
     void setCache(int cacheid, int colId = 0, int colName = 1);
 
+    void setValues(const QList<int> values, const QStringList &names);
+
 private:
     int fTag;
 

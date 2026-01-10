@@ -129,8 +129,6 @@ private slots:
 
     void shortcutF5();
 
-    void shortcurF6();
-
     void shortcutF7();
 
     void shortcutF8();
@@ -177,8 +175,6 @@ private slots:
 
     void on_btnMinimize_clicked();
 
-    void on_btnClientConfigQR_clicked();
-
     void on_btnGiftCard_clicked();
 
     void on_btnCostumerDisplay_clicked(bool checked);
@@ -192,8 +188,6 @@ private slots:
     void on_btnCashout_clicked();
 
     void on_btnBooking_clicked();
-
-    void on_btnPrepaidFiscal_clicked();
 };
 
 #endif // WORKING_H

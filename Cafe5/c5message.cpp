@@ -7,12 +7,8 @@
 #include <QUrlQuery>
 #include <QAudioOutput>
 
-C5Message::C5Message(QWidget *parent) :
-#ifdef WAITER
-    QDialog(parent, Qt::FramelessWindowHint),
-#else
-    QDialog(parent),
-#endif
+C5Message::C5Message() :
+    C5Dialog(nullptr),
     ui(new Ui::C5Message)
 {
     ui->setupUi(this);
@@ -96,8 +92,6 @@ int C5Message::showMessage(const QString &text, int tp, const QString &yes, cons
 #ifdef WAITER
     c5->ui->btnYes->setMinimumHeight(50);
     c5->ui->btnCancel->setMinimumHeight(50);
-    c5->ui->btnYes->setMinimumWidth(100);
-    c5->ui->btnCancel->setMinimumWidth(100);
 #endif
     c5->ui->img->setPixmap(QPixmap(QString(":/%1.png").arg(img)));
     c5->ui->label->setText(text);

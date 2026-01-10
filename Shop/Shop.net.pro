@@ -11,7 +11,9 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 TARGET = Shop.net
 TEMPLATE = app
 
-RC_FILE = res.rc
+win32 {
+    RC_FILE = res.rc
+}
 
 # The following define makes your compiler emit warnings if you use
 # any feature of Qt which has been marked as deprecated (the exact warnings
@@ -46,8 +48,6 @@ SOURCES += \
     ../Classes/c5permissions.cpp \
     ../Classes/c5printing.cpp \
     ../Classes/c5printjson.cpp \
-    ../Classes/c5printpreview.cpp \
-    ../Classes/c5printreceiptthread.cpp \
     ../Classes/c5printrecipta4.cpp \
     ../Classes/c5random.cpp \
     ../Classes/c5replacecharacter.cpp \
@@ -119,10 +119,8 @@ SOURCES += \
     dlgpin.cpp \
     dlgregistercard.cpp \
     dlgreturnitem.cpp \
-    dlgsearchpartner.cpp \
     dlgshowcolumns.cpp \
     goodsreturnreason.cpp \
-    imageloader.cpp \
         main.cpp \
     sales.cpp \
     searchitems.cpp \
@@ -167,8 +165,6 @@ HEADERS += \
     ../Classes/c5permissions.h \
     ../Classes/c5printing.h \
     ../Classes/c5printjson.h \
-    ../Classes/c5printpreview.h \
-    ../Classes/c5printreceiptthread.h \
     ../Classes/c5printrecipta4.h \
     ../Classes/c5random.h \
     ../Classes/c5replacecharacter.h \
@@ -224,6 +220,7 @@ HEADERS += \
     ../Service5/worker/c5jsonparser.h \
     ../Service5/worker/c5structtraits.h \
     ../Service5/worker/struct_goods_item.h \
+    ../Service5/worker/struct_partner.h \
     ../Service5/worker/struct_storage_item.h \
     ../StructModel/c5structmodel.h \
     ../StructModel/c5structtableview.h \
@@ -250,16 +247,17 @@ HEADERS += \
     dlgpin.h \
     dlgregistercard.h \
     dlgreturnitem.h \
-    dlgsearchpartner.h \
     dlgshowcolumns.h \
+    goodscols.h \
     goodsreturnreason.h \
-    imageloader.h \
+    rc.h \
     sales.h \
     searchitems.h \
     selectstaff.h \
     storeinput.h \
     threadworker.h \
     userphoto.h \
+    version.h \
     viewinputitem.h \
     vieworder.h \
     wcustomerdisplay.h \
@@ -281,7 +279,6 @@ HEADERS += \
 FORMS += \
     ../Cafe5/calendar.ui \
     ../Cafe5/dlgexitbyversion.ui \
-    ../Classes/c5printpreview.ui \
     ../Classes/calculator.ui \
     ../Classes/notificationwidget.ui \
     ../Controls/c5tablewithtotal.ui \
@@ -304,7 +301,6 @@ FORMS += \
     dlgpin.ui \
     dlgregistercard.ui \
     dlgreturnitem.ui \
-    dlgsearchpartner.ui \
     dlgshowcolumns.ui \
     goodsreturnreason.ui \
     sales.ui \
@@ -359,7 +355,7 @@ LIBS += -lopenssl
 LIBS += -llibcrypto
 
 DEFINES += _CRYPT_KEY_=\\\"shop2022!!!\\\"
-DEFINES += WAITER
+DEFINES += BORDERLESSDIALOGS
 
 #win32: QMAKE_CXXFLAGS_RELEASE -= -Zc:strictStrings
 #win32: QMAKE_CFLAGS_RELEASE -= -Zc:strictStrings
@@ -372,3 +368,17 @@ DEFINES += WAITER
 ##win32-msvc*{
  #  QMAKE_CXXFLAGS += /WX
 #}
+
+DISTFILES += \
+    increase_version.ps1
+win32 {
+    version_inc.target = version_inc
+    version_inc.commands = powershell -NoProfile -ExecutionPolicy Bypass -File $$shell_path($$PWD/increase_version.ps1)
+    QMAKE_EXTRA_TARGETS += version_inc
+    PRE_TARGETDEPS += version_inc
+}
+
+
+win32 {
+    res_rc.depends += $$PWD/version.h
+}

@@ -5,6 +5,7 @@
 #include "c5salefromstoreorder.h"
 #include "c5waiterorder.h"
 #include "c5mainwindow.h"
+#include "c5message.h"
 #include "c5storedoc.h"
 
 CR5CostumerDebts::CR5CostumerDebts(QWidget *parent) :
@@ -244,7 +245,7 @@ bool CR5CostumerDebts::tblDoubleClicked(int row, int column, const QJsonArray &v
                 }
 
                 case 2: {
-                    C5SaleFromStoreOrder::openOrder(vals.at(3).toString());
+                    C5SaleFromStoreOrder::openOrder(mUser, vals.at(3).toString());
                     break;
                 }
                 }
@@ -253,7 +254,7 @@ bool CR5CostumerDebts::tblDoubleClicked(int row, int column, const QJsonArray &v
             return true;
         }
     } else if(!vals.at(4).toString().isEmpty()) {
-        C5CostumerDebtPayment d(0);
+        C5CostumerDebtPayment d(mUser, 0);
         d.setId(vals.at(4).toString());
         d.exec();
     } else if(!vals.at(5).toString().isEmpty()) {
@@ -271,12 +272,12 @@ bool CR5CostumerDebts::tblDoubleClicked(int row, int column, const QJsonArray &v
 
 void CR5CostumerDebts::newCustomerPayment()
 {
-    C5CostumerDebtPayment(BCLIENTDEBTS_SOURCE_SALE).exec();
+    C5CostumerDebtPayment(mUser, BCLIENTDEBTS_SOURCE_SALE).exec();
 }
 
 void CR5CostumerDebts::newPartnerPayment()
 {
-    C5CostumerDebtPayment(BCLIENTDEBTS_SOURCE_INPUT).exec();
+    C5CostumerDebtPayment(mUser, BCLIENTDEBTS_SOURCE_INPUT).exec();
 }
 
 void CR5CostumerDebts::queryDebt3()

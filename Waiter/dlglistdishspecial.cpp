@@ -4,8 +4,8 @@
 
 static DlgListDishSpecial* __d = nullptr;
 
-DlgListDishSpecial::DlgListDishSpecial() :
-    C5Dialog(),
+DlgListDishSpecial::DlgListDishSpecial(C5User *user) :
+    C5Dialog(user),
     ui(new Ui::DlgListDishSpecial)
 {
     ui->setupUi(this);
@@ -16,10 +16,10 @@ DlgListDishSpecial::~DlgListDishSpecial()
     delete ui;
 }
 
-bool DlgListDishSpecial::getSpecial(int dish, QString &special)
+bool DlgListDishSpecial::getSpecial(C5User *user, int dish, QString &special)
 {
     if(!__d) {
-        __d = new DlgListDishSpecial();
+        __d = new DlgListDishSpecial(user);
     }
 
     __d->fResult = "";

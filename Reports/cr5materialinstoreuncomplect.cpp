@@ -1,5 +1,6 @@
 #include "cr5materialinstoreuncomplect.h"
 #include "cr5materialinstoreuncomplectfilter.h"
+#include "c5message.h"
 
 CR5MaterialInStoreUncomplect::CR5MaterialInStoreUncomplect(QWidget *parent) :
     C5ReportWidget(parent)

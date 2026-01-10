@@ -4,12 +4,13 @@
 #include "c5tablemodel.h"
 #include "cr5menutranslator.h"
 #include "c5database.h"
+#include "c5message.h"
 #include "dlgprintrecipesoptions.h"
 #include <QAbstractScrollArea>
 #include <QPrintDialog>
 
 CR5Dish::CR5Dish(QWidget *parent) :
-    C5ReportWidget( parent)
+    C5ReportWidget(parent)
 {
     fIcon = ":/menu.png";
     fLabel = tr("Dishes");
@@ -34,9 +35,9 @@ CR5Dish::CR5Dish(QWidget *parent) :
     fEditor = new C5DishWidget();
 }
 
-QToolBar *CR5Dish::toolBar()
+QToolBar* CR5Dish::toolBar()
 {
-    if (!fToolBar) {
+    if(!fToolBar) {
         QList<ToolBarButtons> btn;
         btn << ToolBarButtons::tbNew
             << ToolBarButtons::tbClearFilter
@@ -55,15 +56,17 @@ QToolBar *CR5Dish::toolBar()
         connect(g, SIGNAL(triggered(bool)), this, SLOT(printRecipes(bool)));
         fToolBar->addAction(g);
     }
+
     return fToolBar;
 }
 
 bool CR5Dish::on_tblView_doubleClicked(const QModelIndex &index)
 {
-    if (C5ReportWidget::on_tblView_doubleClicked(index)) {
+    if(C5ReportWidget::on_tblView_doubleClicked(index)) {
         fModel->setRowColor(index.row(), QColor::fromRgb(fModel->data(index.row(), fModel->indexForColumnName("f_color"),
                             Qt::EditRole).toInt()));
     }
+
     return true;
 }
 
@@ -82,7 +85,8 @@ void CR5Dish::refreshData()
 void CR5Dish::setColors()
 {
     fTableView->setColumnWidth(fModel->indexForColumnName("f_color"), 0);
-    for (int i = 0, count = fModel->rowCount(); i < count; i++) {
+
+    for(int i = 0, count = fModel->rowCount(); i < count; i++) {
         fModel->setRowColor(i, QColor::fromRgb(fModel->data(i, fModel->indexForColumnName("f_color"), Qt::EditRole).toInt()));
     }
 }
@@ -103,19 +107,24 @@ void CR5Dish::deleteDish()
 {
     int row = 0;
     int id = rowId(row, 0);
-    if (id == 0) {
+
+    if(id == 0) {
         return;
     }
+
     C5Database db;
     db[":f_dish"] = id;
     db.exec("select * from o_body where f_dish=:f_dish");
-    if (db.nextRow()) {
+
+    if(db.nextRow()) {
         C5Message::error(tr("This name in use and cannot be removed"));
         return;
     }
-    if (C5Message::question(tr("Confirm to remove the selected dish")) != QDialog::Accepted) {
+
+    if(C5Message::question(tr("Confirm to remove the selected dish")) != QDialog::Accepted) {
         return;
     }
+
     db[":f_dish"] = id;
     db.exec("delete from d_recipes where f_dish=:f_dish");
     db[":f_id"] = id;
@@ -131,36 +140,6 @@ void CR5Dish::deleteDish()
 void CR5Dish::printRecipes(bool v)
 {
     Q_UNUSED(v);
-    C5DishWidget *w = static_cast<C5DishWidget *>(fEditor);
-    bool showprice = false;
-    switch (DlgPrintRecipesOptions().exec()) {
-        case 1:
-            showprice = true;
-            break;
-        case 2:
-            showprice = false;
-            break;
-        default:
-            return;
-    }
-    QPrintDialog pd(this);
-    if (pd.exec() != QDialog::Accepted) {
-        return;
-    }
-    C5Printing p;
-    QFont font(this->font());
-    font.setPointSize(20);
-    QSize paperSize(2000, 2800);
-    p.setSceneParams(paperSize.width(), paperSize.height(), QPageLayout::Portrait);
-    p.setFont(font);
-    for (int i = 0; i < fModel->rowCount(); i++) {
-        if (i > 0) {
-            p.newPage();
-        }
-        w->setId(fModel->data(i, fModel->fColumnNameIndex[tr("Code")], Qt::EditRole).toInt());
-        w->printPreview(p, showprice);
-    }
-    p.print(pd.printer()->printerName(), QPageSize::A4);
 }
 
 void CR5Dish::buildWeb()

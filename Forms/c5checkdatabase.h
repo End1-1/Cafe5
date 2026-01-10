@@ -12,7 +12,7 @@ class C5CheckDatabase : public C5Dialog
     Q_OBJECT
 
 public:
-    explicit C5CheckDatabase();
+    explicit C5CheckDatabase(C5User *user);
 
     ~C5CheckDatabase();
 

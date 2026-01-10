@@ -11,13 +11,14 @@ class C5MainWindow;
 class NLoadingDlg;
 class NFilterDlg;
 class NHandler;
+class C5User;
 
 class NTreeWidget : public C5Widget
 {
     Q_OBJECT
 
 public:
-    explicit NTreeWidget(const QString &route, QWidget *parent = nullptr);
+    explicit NTreeWidget(C5User *user, const QString &route, QWidget *parent = nullptr);
     ~NTreeWidget();
     C5MainWindow* mMainWindow;
     static QString mHost;
@@ -34,6 +35,7 @@ private:
     NLoadingDlg* mLoadingDlg;
     NFilterDlg* fFilter;
     NHandler* mHandler;
+    C5User* mUser;
     QWidget* mToolWidget;
     void sum();
 

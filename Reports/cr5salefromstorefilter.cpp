@@ -78,7 +78,7 @@ QDate CR5SaleFromStoreFilter::d2()
 
 void CR5SaleFromStoreFilter::on_btnFlags_clicked()
 {
-    CR5SaleFlags f;
+    CR5SaleFlags f(mUser);
 
     if(f.exec() == QDialog::Accepted) {
         fFlags = f.flagsCond();

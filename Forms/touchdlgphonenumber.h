@@ -3,7 +3,8 @@
 
 #include "c5dialog.h"
 
-namespace Ui {
+namespace Ui
+{
 class TouchDlgPhoneNumber;
 }
 
@@ -12,9 +13,11 @@ class TouchDlgPhoneNumber : public C5Dialog
     Q_OBJECT
 
 public:
-    explicit TouchDlgPhoneNumber();
+    explicit TouchDlgPhoneNumber(C5User *user);
+
     ~TouchDlgPhoneNumber();
-    static bool getPhoneNumber(QString &number);
+    
+    static bool getPhoneNumber(QString &number, C5User *user);
 
 private slots:
     void on_btnOk_clicked();
@@ -44,7 +47,7 @@ private slots:
     void on_btnBackspace_clicked();
 
 private:
-    Ui::TouchDlgPhoneNumber *ui;
+    Ui::TouchDlgPhoneNumber* ui;
     void buttonClicked(QPushButton *b);
 };
 

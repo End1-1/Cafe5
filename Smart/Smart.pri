@@ -17,8 +17,6 @@ SOURCES += \
     ../Classes/c5permissions.cpp \
     ../Classes/c5printing.cpp \
     ../Classes/c5printjson.cpp \
-    ../Classes/c5printpreview.cpp \
-    ../Classes/c5printreceiptthread.cpp \
     ../Classes/c5random.cpp \
     ../Classes/c5storedraftwriter.cpp \
     ../Classes/c5tablemodel.cpp \
@@ -80,6 +78,7 @@ SOURCES += \
 
 HEADERS += \
     $$PWD/../Classes/c5servername.h \
+    $$PWD/../Classes/dict_dish_state.h \
     $$PWD/../Forms/dlgsplashscreen.h \
     ../../NewTax/Src/printtaxn.h \
     ../Cafe5/c5cafecommon.h \
@@ -98,8 +97,6 @@ HEADERS += \
     ../Classes/c5permissions.h \
     ../Classes/c5printing.h \
     ../Classes/c5printjson.h \
-    ../Classes/c5printpreview.h \
-    ../Classes/c5printreceiptthread.h \
     ../Classes/c5random.h \
     ../Classes/c5storedraftwriter.h \
     ../Classes/c5tablemodel.h \
@@ -158,7 +155,6 @@ HEADERS += \
     ../Cafe5/c5dialog.h \
     ../Cafe5/c5message.h \
     ../Cafe5/c5utils.h \
-    ../Cafe5/c5socketmessage.h \
     ../Controls/c5lineedit.h \
     ../Classes/c5user.h
 
@@ -166,7 +162,6 @@ FORMS += \
     $$PWD/../Forms/dlgsplashscreen.ui \
     ../Cafe5/calendar.ui \
     ../Cafe5/dlgexitbyversion.ui \
-    ../Classes/c5printpreview.ui \
     ../Classes/calculator.ui \
     ../Classes/dlgpassword.ui \
     ../Classes/notificationwidget.ui \

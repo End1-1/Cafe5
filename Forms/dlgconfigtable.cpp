@@ -2,8 +2,8 @@
 #include "ui_dlgconfigtable.h"
 #include "QRCodeGenerator.h"
 
-DlgConfigTable::DlgConfigTable() :
-    C5Dialog(),
+DlgConfigTable::DlgConfigTable(C5User *user) :
+    C5Dialog(user),
     ui(new Ui::DlgConfigTable)
 {
     ui->setupUi(this);

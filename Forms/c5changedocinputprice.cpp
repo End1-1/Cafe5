@@ -6,8 +6,8 @@
 #include "c5config.h"
 #include "c5user.h"
 
-C5ChangeDocInputPrice::C5ChangeDocInputPrice(const QString &uuid) :
-    C5OfficeDialog(),
+C5ChangeDocInputPrice::C5ChangeDocInputPrice(C5User *user, const QString &uuid) :
+    C5OfficeDialog(user),
     ui(new Ui::C5ChangeDocInputPrice)
 {
     ui->setupUi(this);
@@ -33,9 +33,9 @@ C5ChangeDocInputPrice::~C5ChangeDocInputPrice()
     delete ui;
 }
 
-void C5ChangeDocInputPrice::changePrice(const QString &uuid)
+void C5ChangeDocInputPrice::changePrice(C5User *user, const QString &uuid)
 {
-    auto *d = new C5ChangeDocInputPrice(uuid);
+    auto *d = new C5ChangeDocInputPrice(user, uuid);
     d->exec();
     delete d;
 }

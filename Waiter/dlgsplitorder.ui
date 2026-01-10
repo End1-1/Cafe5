@@ -15,28 +15,49 @@
   </property>
   <layout class="QGridLayout" name="gridLayout">
    <property name="leftMargin">
-    <number>0</number>
+    <number>1</number>
    </property>
    <property name="topMargin">
-    <number>0</number>
+    <number>1</number>
    </property>
    <property name="rightMargin">
-    <number>0</number>
+    <number>1</number>
    </property>
    <property name="bottomMargin">
-    <number>0</number>
+    <number>1</number>
    </property>
    <property name="spacing">
-    <number>2</number>
+    <number>1</number>
    </property>
    <item row="2" column="0" colspan="2">
-    <widget class="QWidget" name="widget_2" native="true">
+    <widget class="QWidget" name="wfooter" native="true">
      <layout class="QHBoxLayout" name="horizontalLayout_2">
+      <property name="spacing">
+       <number>1</number>
+      </property>
+      <property name="leftMargin">
+       <number>0</number>
+      </property>
+      <property name="topMargin">
+       <number>0</number>
+      </property>
+      <property name="rightMargin">
+       <number>0</number>
+      </property>
+      <property name="bottomMargin">
+       <number>0</number>
+      </property>
       <item>
-       <widget class="QPushButton" name="btnExit">
+       <widget class="QToolButton" name="btnExit">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+          <horstretch>100</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
         <property name="minimumSize">
          <size>
-          <width>0</width>
+          <width>100</width>
           <height>50</height>
          </size>
         </property>
@@ -50,14 +71,17 @@
          <string>Back</string>
         </property>
         <property name="icon">
-         <iconset>
-          <normaloff>:/back-arrow.png</normaloff>:/back-arrow.png</iconset>
+         <iconset resource="../resources/res.qrc">
+          <normaloff>:/left-chevron.png</normaloff>:/left-chevron.png</iconset>
         </property>
         <property name="iconSize">
          <size>
           <width>32</width>
           <height>32</height>
          </size>
+        </property>
+        <property name="toolButtonStyle">
+         <enum>Qt::ToolButtonStyle::ToolButtonTextBesideIcon</enum>
         </property>
        </widget>
       </item>
@@ -75,7 +99,7 @@
        </spacer>
       </item>
       <item>
-       <widget class="QPushButton" name="btnSave">
+       <widget class="QToolButton" name="btnSave">
         <property name="minimumSize">
          <size>
           <width>0</width>
@@ -93,7 +117,7 @@
         </property>
         <property name="icon">
          <iconset resource="../resources/res.qrc">
-          <normaloff>:/checked.png</normaloff>:/checked.png</iconset>
+          <normaloff>:/check.png</normaloff>:/check.png</iconset>
         </property>
         <property name="iconSize">
          <size>
@@ -101,16 +125,40 @@
           <height>32</height>
          </size>
         </property>
+        <property name="toolButtonStyle">
+         <enum>Qt::ToolButtonStyle::ToolButtonTextBesideIcon</enum>
+        </property>
        </widget>
       </item>
      </layout>
     </widget>
    </item>
    <item row="0" column="0" colspan="2">
-    <widget class="QWidget" name="widget" native="true">
+    <widget class="QWidget" name="wtop" native="true">
      <layout class="QHBoxLayout" name="horizontalLayout">
+      <property name="spacing">
+       <number>1</number>
+      </property>
+      <property name="leftMargin">
+       <number>0</number>
+      </property>
+      <property name="topMargin">
+       <number>0</number>
+      </property>
+      <property name="rightMargin">
+       <number>0</number>
+      </property>
+      <property name="bottomMargin">
+       <number>0</number>
+      </property>
       <item>
        <widget class="QLabel" name="lbLeft">
+        <property name="minimumSize">
+         <size>
+          <width>100</width>
+          <height>0</height>
+         </size>
+        </property>
         <property name="font">
          <font>
           <pointsize>16</pointsize>
@@ -123,7 +171,7 @@
        </widget>
       </item>
       <item>
-       <widget class="QPushButton" name="btnLeftToRight">
+       <widget class="QToolButton" name="btnLeftToRight">
         <property name="minimumSize">
          <size>
           <width>50</width>
@@ -152,7 +200,7 @@
        </widget>
       </item>
       <item>
-       <widget class="QPushButton" name="btnAllLeftToRigh">
+       <widget class="QToolButton" name="btnAllLeftToRigh">
         <property name="minimumSize">
          <size>
           <width>50</width>
@@ -194,7 +242,7 @@
        </spacer>
       </item>
       <item>
-       <widget class="QPushButton" name="btnAllRightToLeft">
+       <widget class="QToolButton" name="btnAllRightToLeft">
         <property name="minimumSize">
          <size>
           <width>50</width>
@@ -223,7 +271,7 @@
        </widget>
       </item>
       <item>
-       <widget class="QPushButton" name="btnRightToLeft">
+       <widget class="QToolButton" name="btnRightToLeft">
         <property name="minimumSize">
          <size>
           <width>50</width>
@@ -252,7 +300,7 @@
        </widget>
       </item>
       <item>
-       <widget class="QPushButton" name="btnChoseTable">
+       <widget class="QToolButton" name="btnChoseTable">
         <property name="minimumSize">
          <size>
           <width>50</width>
@@ -282,6 +330,12 @@
       </item>
       <item>
        <widget class="QLabel" name="lbRight">
+        <property name="minimumSize">
+         <size>
+          <width>100</width>
+          <height>0</height>
+         </size>
+        </property>
         <property name="font">
          <font>
           <pointsize>16</pointsize>
@@ -290,6 +344,9 @@
         </property>
         <property name="text">
          <string>Table</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
         </property>
        </widget>
       </item>
@@ -324,23 +381,26 @@
        <number>0</number>
       </property>
       <property name="spacing">
-       <number>2</number>
+       <number>1</number>
       </property>
       <item row="0" column="0">
-       <widget class="QScrollArea" name="scrollArea">
+       <widget class="QScrollArea" name="scrollArea1">
         <property name="widgetResizable">
          <bool>true</bool>
         </property>
-        <widget class="QWidget" name="scrollAreaWidgetContents">
+        <widget class="QWidget" name="scrollAreaWidgetContents1">
          <property name="geometry">
           <rect>
            <x>0</x>
            <y>0</y>
-           <width>619</width>
-           <height>457</height>
+           <width>618</width>
+           <height>553</height>
           </rect>
          </property>
          <layout class="QHBoxLayout" name="horizontalLayout_5">
+          <property name="spacing">
+           <number>1</number>
+          </property>
           <property name="leftMargin">
            <number>0</number>
           </property>
@@ -354,27 +414,40 @@
            <number>0</number>
           </property>
           <item>
-           <layout class="QVBoxLayout" name="vo1"/>
+           <layout class="QVBoxLayout" name="vo1">
+            <property name="spacing">
+             <number>1</number>
+            </property>
+           </layout>
           </item>
          </layout>
         </widget>
        </widget>
       </item>
       <item row="0" column="2">
-       <widget class="QScrollArea" name="scrollArea_2">
+       <widget class="QScrollArea" name="scrollArea2">
         <property name="widgetResizable">
          <bool>true</bool>
         </property>
-        <widget class="QWidget" name="scrollAreaWidgetContents_2">
+        <widget class="QWidget" name="scrollAreaWidgetContents2">
          <property name="geometry">
           <rect>
            <x>0</x>
            <y>0</y>
            <width>618</width>
-           <height>457</height>
+           <height>553</height>
           </rect>
          </property>
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
          <layout class="QHBoxLayout" name="horizontalLayout_4">
+          <property name="spacing">
+           <number>1</number>
+          </property>
           <property name="leftMargin">
            <number>0</number>
           </property>
@@ -388,194 +461,14 @@
            <number>0</number>
           </property>
           <item>
-           <layout class="QVBoxLayout" name="vo2"/>
+           <layout class="QVBoxLayout" name="vo2">
+            <property name="spacing">
+             <number>1</number>
+            </property>
+           </layout>
           </item>
          </layout>
         </widget>
-       </widget>
-      </item>
-      <item row="1" column="0">
-       <widget class="QWidget" name="widget_3" native="true">
-        <layout class="QHBoxLayout" name="horizontalLayout_3">
-         <property name="spacing">
-          <number>1</number>
-         </property>
-         <property name="leftMargin">
-          <number>0</number>
-         </property>
-         <property name="topMargin">
-          <number>0</number>
-         </property>
-         <property name="rightMargin">
-          <number>0</number>
-         </property>
-         <property name="bottomMargin">
-          <number>0</number>
-         </property>
-         <item>
-          <widget class="QPushButton" name="btnScrollUp1">
-           <property name="minimumSize">
-            <size>
-             <width>50</width>
-             <height>50</height>
-            </size>
-           </property>
-           <property name="maximumSize">
-            <size>
-             <width>50</width>
-             <height>50</height>
-            </size>
-           </property>
-           <property name="text">
-            <string/>
-           </property>
-           <property name="icon">
-            <iconset resource="../resources/res.qrc">
-             <normaloff>:/down.png</normaloff>:/down.png</iconset>
-           </property>
-           <property name="iconSize">
-            <size>
-             <width>32</width>
-             <height>32</height>
-            </size>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QPushButton" name="btnScrollDown1">
-           <property name="minimumSize">
-            <size>
-             <width>50</width>
-             <height>50</height>
-            </size>
-           </property>
-           <property name="maximumSize">
-            <size>
-             <width>50</width>
-             <height>50</height>
-            </size>
-           </property>
-           <property name="text">
-            <string/>
-           </property>
-           <property name="icon">
-            <iconset resource="../resources/res.qrc">
-             <normaloff>:/up.png</normaloff>:/up.png</iconset>
-           </property>
-           <property name="iconSize">
-            <size>
-             <width>32</width>
-             <height>32</height>
-            </size>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <spacer name="horizontalSpacer_3">
-           <property name="orientation">
-            <enum>Qt::Orientation::Horizontal</enum>
-           </property>
-           <property name="sizeHint" stdset="0">
-            <size>
-             <width>40</width>
-             <height>20</height>
-            </size>
-           </property>
-          </spacer>
-         </item>
-        </layout>
-       </widget>
-      </item>
-      <item row="1" column="2">
-       <widget class="QWidget" name="widget_4" native="true">
-        <layout class="QHBoxLayout" name="horizontalLayout_6">
-         <property name="spacing">
-          <number>1</number>
-         </property>
-         <property name="leftMargin">
-          <number>0</number>
-         </property>
-         <property name="topMargin">
-          <number>0</number>
-         </property>
-         <property name="rightMargin">
-          <number>0</number>
-         </property>
-         <property name="bottomMargin">
-          <number>0</number>
-         </property>
-         <item>
-          <widget class="QPushButton" name="btnScrollUp2">
-           <property name="minimumSize">
-            <size>
-             <width>50</width>
-             <height>50</height>
-            </size>
-           </property>
-           <property name="maximumSize">
-            <size>
-             <width>50</width>
-             <height>50</height>
-            </size>
-           </property>
-           <property name="text">
-            <string/>
-           </property>
-           <property name="icon">
-            <iconset resource="../resources/res.qrc">
-             <normaloff>:/down.png</normaloff>:/down.png</iconset>
-           </property>
-           <property name="iconSize">
-            <size>
-             <width>32</width>
-             <height>32</height>
-            </size>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QPushButton" name="btnScrollDown2">
-           <property name="minimumSize">
-            <size>
-             <width>50</width>
-             <height>50</height>
-            </size>
-           </property>
-           <property name="maximumSize">
-            <size>
-             <width>50</width>
-             <height>50</height>
-            </size>
-           </property>
-           <property name="text">
-            <string/>
-           </property>
-           <property name="icon">
-            <iconset resource="../resources/res.qrc">
-             <normaloff>:/up.png</normaloff>:/up.png</iconset>
-           </property>
-           <property name="iconSize">
-            <size>
-             <width>32</width>
-             <height>32</height>
-            </size>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <spacer name="horizontalSpacer_4">
-           <property name="orientation">
-            <enum>Qt::Orientation::Horizontal</enum>
-           </property>
-           <property name="sizeHint" stdset="0">
-            <size>
-             <width>40</width>
-             <height>20</height>
-            </size>
-           </property>
-          </spacer>
-         </item>
-        </layout>
        </widget>
       </item>
      </layout>

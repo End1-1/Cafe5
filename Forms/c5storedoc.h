@@ -10,11 +10,13 @@ class C5StoreDoc;
 }
 
 class QTableWidgetItem;
+class C5TableWidget;
+class C5LineEdit;
 
 class TableCell : public QLabel
 {
 public:
-    QTableWidgetItem *fOldItem;
+    QTableWidgetItem* fOldItem;
 
     TableCell(QWidget *parent, QTableWidgetItem *item);
 };
@@ -46,7 +48,7 @@ public:
 
     void setFlag(const QString &name, const QVariant &value);
 
-    virtual QToolBar *toolBar() override;
+    virtual QToolBar* toolBar() override;
 
     bool writeDocument(int state, QString &err);
 
@@ -75,7 +77,7 @@ protected:
     virtual void nextChild() override;
 
 private:
-    Ui::C5StoreDoc *ui;
+    Ui::C5StoreDoc* ui;
 
     int fDocType;
 
@@ -125,6 +127,9 @@ private:
 
     double additionalCostForEveryGoods();
 
+    QString makeGoodsTableHtml(const QStringList &headers, const QList<QStringList>& rows, const QSet<int>& rightCols);
+    QString makeOtherChargesHtml(C5TableWidget *tbl, const QStringList &hdr);
+    QString makeComplectationInputHtml(const C5LineEdit *code, const C5LineEdit *name, const C5LineEdit *qty, double total, double qtyVal, const QStringList &hdr);
 private slots:
     virtual void selectorCallback(int row, const QJsonArray &values) override;
 

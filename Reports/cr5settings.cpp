@@ -2,9 +2,11 @@
 #include "c5settingswidget.h"
 #include "c5tablemodel.h"
 #include "c5database.h"
+#include "c5textdelegate.h"
+#include  "c5message.h"
 
 CR5Settings::CR5Settings(QWidget *parent) :
-    C5ReportWidget( parent)
+    C5ReportWidget(parent)
 {
     fIcon = ":/configure.png";
     fLabel = tr("Settings");
@@ -18,9 +20,9 @@ CR5Settings::CR5Settings(QWidget *parent) :
     fSettingsWidget = nullptr;
 }
 
-QToolBar *CR5Settings::toolBar()
+QToolBar* CR5Settings::toolBar()
 {
-    if (!fToolBar) {
+    if(!fToolBar) {
         QList<ToolBarButtons> btn;
         btn << ToolBarButtons::tbNew
             << ToolBarButtons::tbClearFilter
@@ -30,23 +32,27 @@ QToolBar *CR5Settings::toolBar()
         createStandartToolbar(btn);
         fToolBar->addAction(QIcon(":/delete.png"), tr("Delete\nsettings"), this, SLOT(removeSettings()));
     }
+
     return fToolBar;
 }
 
 void CR5Settings::removeSettings()
 {
     int row;
-    if (int id = rowId(row, 0)) {
-        if (C5Message::question(tr("Confirm removal")) != QDialog::Accepted) {
+
+    if(int id = rowId(row, 0)) {
+        if(C5Message::question(tr("Confirm removal")) != QDialog::Accepted) {
             return;
         }
+
         C5Database db;
         db[":f_settings"] = id;
         db.exec("delete from s_settings_values where f_settings=:f_settings");
         db[":f_id"] = id;
         db.exec("delete from s_settings_names where f_id=:f_id");
         fModel->removeRow(row);
-        if (fSettingsWidget) {
+
+        if(fSettingsWidget) {
             fSettingsWidget->clear(0);
         }
     }

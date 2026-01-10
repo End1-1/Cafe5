@@ -1,8 +1,8 @@
 #include "c5goodspricing.h"
 #include "ui_c5goodspricing.h"
 
-C5GoodsPricing::C5GoodsPricing() :
-    C5Dialog(),
+C5GoodsPricing::C5GoodsPricing(C5User *user) :
+    C5Dialog(user),
     ui(new Ui::C5GoodsPricing)
 {
     ui->setupUi(this);

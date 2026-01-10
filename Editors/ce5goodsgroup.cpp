@@ -1,13 +1,15 @@
 #include "ce5goodsgroup.h"
 #include "ui_ce5goodsgroup.h"
-#include "c5database.h"
-#include "c5message.h"
+#include "c5cache.h"
+#include <QColorDialog>
 
 CE5GoodsGroup::CE5GoodsGroup(QWidget *parent) :
     CE5Editor(parent),
     ui(new Ui::CE5GoodsGroup)
 {
     ui->setupUi(this);
+    ui->leParentGroup->setSelector(ui->leParentGroupName, cache_goods_group);
+    connect(ui->leColor, &C5LineEditWithSelector::doubleClicked, this, &CE5GoodsGroup::setColor);
 }
 
 CE5GoodsGroup::~CE5GoodsGroup()
@@ -15,11 +17,10 @@ CE5GoodsGroup::~CE5GoodsGroup()
     delete ui;
 }
 
-void CE5GoodsGroup::on_btnSetStoreReminderQty_clicked()
+void CE5GoodsGroup::setColor()
 {
-    C5Database db;
-    db[":f_group"] = ui->leCode->getInteger();
-    db[":f_lowlevel"] = ui->leLowLevel->getInteger();
-    db.exec("update c_goods set f_lowlevel=:f_lowlevel where f_group=:f_group");
-    C5Message::info(tr("Done"));
+    QColor initColor = QColor::fromRgb(ui->leColor->color());
+    int color = QColorDialog::getColor(initColor, this, tr("Background color")).rgb();
+    ui->leColor->setColor(color);
+    ui->leColor->setInteger(color);
 }

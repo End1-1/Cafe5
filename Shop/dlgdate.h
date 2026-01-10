@@ -12,11 +12,11 @@ class DlgDate : public C5Dialog
     Q_OBJECT
 
 public:
-    explicit DlgDate();
+    explicit DlgDate(C5User *user);
 
     ~DlgDate();
-
-    static bool getDate(QDate &date);
+    
+    static bool getDate(QDate &date, C5User *user);
 
 private slots:
     void on_btnCancel_clicked();

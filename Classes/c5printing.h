@@ -6,6 +6,7 @@
 #include <QPrinter>
 #include <QJsonArray>
 #include <QMap>
+#include <QPrinterInfo>
 
 class C5Printing : public QObject
 {
@@ -15,9 +16,7 @@ public:
 
     ~C5Printing();
 
-    void newPage();
-
-    void setSceneParams(qreal width, qreal height, QPageLayout::Orientation orientation);
+    void setSceneParams(qreal width,  qreal height, qreal logicalDpiX);
 
     void setFont(const QFont &font);
 
@@ -35,17 +34,11 @@ public:
 
     void line(int lineWidth = -1);
 
-    void tableText(const QList<qreal>& points, const QStringList &vals, int rowHeight);
-
-    void ltext(const QString &text, qreal x, qreal textWidth = -1);
+    void ltext(const QString &text, qreal x = 0, qreal textWidth = -1);
 
     void lrtext(const QString &leftText, const QString &rightText, qreal textWidth = -1);
 
-    void ltext90(const QString &text, qreal x);
-
     void ctext(const QString &text);
-
-    void ctextof(const QString &text, qreal x);
 
     void rtext(const QString text);
 
@@ -55,25 +48,13 @@ public:
 
     bool br(qreal height = 0);
 
-    bool checkBr(int height);
-
     int currentPageIndex();
 
-    QGraphicsScene* page(int index);
-
-    int pageCount();
-
-    QPageLayout::Orientation orientation(int index);
-
-    bool print(const QString &printername, QPageSize pageSize, bool rotate90 = false);
-
-    void print(QPainter *p);
+    bool print(QPrinter &prn);
 
     qreal fTop;
 
     qreal fLineHeight;
-
-    qreal fNormalHeight;
 
     qreal fNormalWidth;
 
@@ -84,19 +65,20 @@ public:
     QString fErrorString;
 
 private:
+
+    qreal fLogicalDpiX;
+
+    qreal fMM;
+
     qreal fTempTop;
 
     QGraphicsScene* fCanvas;
-
-    QList<QGraphicsScene*> fCanvasList;
 
     QPen fLinePen;
 
     QFont fFont;
 
     int fCurrentPageIndex;
-
-    QMap<QGraphicsScene*, QPageLayout::Orientation> fCanvasOrientation;
 
     void setLineHeight();
 

@@ -12,9 +12,9 @@ class Change : public C5Dialog
     Q_OBJECT
 
 public:
-    explicit Change();
+    explicit Change(C5User *user);
     ~Change();
-    static bool getReceived(double &v);
+    static bool getReceived(double &v, C5User *user);
 
 private slots:
     void buttonClicked();

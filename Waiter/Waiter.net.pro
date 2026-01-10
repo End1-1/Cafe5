@@ -23,7 +23,7 @@ DEFINES += _APPLICATION_=\\\"Cafe5\\\"
 DEFINES += _MODULE_=\\\"WAITER\\\"
 DEFINES += WAITER
 DEFINES += _CRYPT_KEY_=\\\"shop2022!!!\\\"
-DEFINES += NETWORKDB
+DEFINES += BORDERLESSDIALOGS
 # DEFINES += LOGGING
 
 # The following define makes your compiler emit warnings if you use
@@ -46,13 +46,13 @@ SOURCES += \
     ../Classes/QProgressIndicator.cpp \
     ../Classes/amkbd.cpp \
     ../Classes/c5gridgilter.cpp \
-    ../Classes/c5printreceiptthread.cpp \
     ../Classes/c5random.cpp \
     ../Classes/c5replacecharacter.cpp \
     ../Classes/c5tabledata.cpp \
     ../Classes/c5tablerec.cpp \
     ../Classes/c5threadobject.cpp \
     ../Classes/calculator.cpp \
+    ../Classes/dict_payment_type.cpp \
     ../Classes/dlgpassword.cpp \
     ../Classes/idram.cpp \
     ../Classes/logwriter.cpp \
@@ -93,9 +93,7 @@ SOURCES += \
     ../NTable/ntablemodel.cpp \
     ../Printing/selectprinters.cpp \
     ../Service5Working/utils/configini.cpp \
-    c5waiterconfiguration.cpp \
     c5waiterdialog.cpp \
-    dishitem.cpp \
     dishitembutton.cpp \
     dlgaskforprecheck.cpp \
     dlgeditphone.cpp \
@@ -103,17 +101,20 @@ SOURCES += \
     dlglist.cpp \
     dlglistdishspecial.cpp \
     dlglistofpackages.cpp \
-    dlgmanagertools.cpp \
     dlgprecheckoptions.cpp \
     dlgpreorderw.cpp \
+    dlgreportsfilter.cpp \
     dlgscreen.cpp \
     dlgsearchinmenu.cpp \
+    dlgsimleoptions.cpp \
     dlgsplitorder.cpp \
     dlgstafflist.cpp \
     dlgstoplistoption.cpp \
+    dlgtables.cpp \
     dlgtext.cpp \
     dlgtimeorder.cpp \
     dlgviewstoplist.cpp \
+    goodsgroupbutton.cpp \
         main.cpp \
         dlgface.cpp \
     ../Cafe5/c5dialog.cpp \
@@ -125,23 +126,20 @@ SOURCES += \
     ../Classes/c5witerconf.cpp \
     ../Classes/c5waiterserver.cpp \
     ../Classes/c5printing.cpp \
-    ../Classes/c5printservicethread.cpp \
     ../Classes/QRCodeGenerator.cpp \
-    ../../NewTax/Src/printtaxn.cpp \
     ../Controls/c5lineedit.cpp \
-    ../Classes/c5printremovedservicethread.cpp \
     ../Controls/c5checkbox.cpp \
     ../Controls/c5dateedit.cpp \
     ../Controls/c5graphicsview.cpp \
     ../Classes/c5widget.cpp \
     qdishbutton.cpp \
-    qdishpart2button.cpp \
     tablewidget.cpp \
-    tablewidgetv1.cpp \
+    waiterdishwidget.cpp \
+    waiterguestwidget.cpp \
+    waitermodificatorwidget.cpp \
+    waiterorderitemwidget.cpp \
     waiterordermodel.cpp \
     waitertablewidget.cpp \
-    worderw.cpp \
-    wpaymentoptions.cpp \
     dlgcreditcardlist.cpp \
     dlgdishremovereason.cpp \
     dlglistofhall.cpp \
@@ -153,7 +151,6 @@ SOURCES += \
     ../Classes/rkeyboard.cpp \
     dlgreceiptlanguage.cpp \
     dlgcl.cpp \
-    ../Classes/c5logtoserverthread.cpp \
     ../Classes/c5permissions.cpp \
     dlgexitwithmessage.cpp \
     ../Classes/c5translator.cpp \
@@ -169,7 +166,6 @@ HEADERS += \
     ../Classes/amkbd.h \
     ../Classes/barcode5.h \
     ../Classes/c5gridgilter.h \
-    ../Classes/c5printreceiptthread.h \
     ../Classes/c5random.h \
     ../Classes/c5replacecharacter.h \
     ../Classes/c5tabledata.h \
@@ -177,6 +173,10 @@ HEADERS += \
     ../Classes/c5threadobject.h \
     ../Classes/calculator.h \
     ../Classes/chatmessage.h \
+    ../Classes/dict_currency.h \
+    ../Classes/dict_dish_state.h \
+    ../Classes/dict_goods_types.h \
+    ../Classes/dict_payment_type.h \
     ../Classes/dlgpassword.h \
     ../Classes/goodsreserve.h \
     ../Classes/idram.h \
@@ -217,12 +217,15 @@ HEADERS += \
     ../NTable/nsearchdlg.h \
     ../NTable/ntablemodel.h \
     ../Printing/selectprinters.h \
+    ../Service5/worker/struct_dish.h \
+    ../Service5/worker/struct_goods_group.h \
+    ../Service5/worker/struct_hall.h \
+    ../Service5/worker/struct_table.h \
+    ../Service5/worker/struct_waiter_dish.h \
+    ../Service5/worker/struct_waiter_order.h \
     ../Service5Working/utils/configini.h \
     ../Service5Working/utils/servicecommands.h \
-    c5waiterconfiguration.h \
     c5waiterdialog.h \
-    dishitem.h \
-    dishitembutton.h \
     dlgaskforprecheck.h \
     dlgeditphone.h \
         dlgface.h \
@@ -233,41 +236,41 @@ HEADERS += \
     dlglist.h \
     dlglistdishspecial.h \
     dlglistofpackages.h \
-    dlgmanagertools.h \
     dlgorder.h \
     ../Classes/c5user.h \
     ../Classes/c5menu.h \
     ../Classes/c5witerconf.h \
     ../Classes/c5waiterserver.h \
     ../Classes/c5printing.h \
-    ../Classes/c5printservicethread.h \
     ../Classes/QRCodeGenerator.h \
-    ../../NewTax/Src/printtaxn.h \
     ../Controls/c5lineedit.h \
-    ../Classes/c5printremovedservicethread.h \
     dlgprecheckoptions.h \
     dlgpreorderw.h \
+    dlgreportsfilter.h \
     dlgscreen.h \
     dlgsearchinmenu.h \
+    dlgsimleoptions.h \
     dlgsplitorder.h \
     dlgstafflist.h \
     dlgstoplistoption.h \
+    dlgtables.h \
     dlgtext.h \
     dlgtimeorder.h \
     dlgviewstoplist.h \
+    goodsgroupbutton.h \
     qdishbutton.h \
-    qdishpart2button.h \
     rc.h \
     ../Controls/c5checkbox.h \
     ../Controls/c5dateedit.h \
     ../Controls/c5graphicsview.h \
     ../Classes/c5widget.h \
     tablewidget.h \
-    tablewidgetv1.h \
+    waiterdishwidget.h \
+    waiterguestwidget.h \
+    waitermodificatorwidget.h \
+    waiterorderitemwidget.h \
     waiterordermodel.h \
     waitertablewidget.h \
-    worderw.h \
-    wpaymentoptions.h \
     dlgcreditcardlist.h \
     dlgdishremovereason.h \
     dlglistofhall.h \
@@ -279,7 +282,6 @@ HEADERS += \
     ../Classes/rkeyboard.h \
     dlgreceiptlanguage.h \
     dlgcl.h \
-    ../Classes/c5logtoserverthread.h \
     ../Classes/c5permissions.h \
     dlgexitwithmessage.h \
     ../Classes/c5translator.h \
@@ -320,7 +322,6 @@ FORMS += \
     ../NTable/nsearchdlg.ui \
     ../Printing/preorders.ui \
     ../Printing/selectprinters.ui \
-    dishitem.ui \
     dlgaskforprecheck.ui \
     dlgeditphone.ui \
         dlgface.ui \
@@ -329,21 +330,22 @@ FORMS += \
     dlglist.ui \
     dlglistdishspecial.ui \
     dlglistofpackages.ui \
-    dlgmanagertools.ui \
     dlgorder.ui \
     dlgprecheckoptions.ui \
     dlgpreorderw.ui \
+    dlgreportsfilter.ui \
     dlgscreen.ui \
     dlgsearchinmenu.ui \
+    dlgsimleoptions.ui \
     dlgsplitorder.ui \
     dlgstafflist.ui \
     dlgstoplistoption.ui \
+    dlgtables.ui \
     dlgtext.ui \
     dlgtimeorder.ui \
     dlgviewstoplist.ui \
-    tablewidgetv1.ui \
-    worderw.ui \
-    wpaymentoptions.ui \
+    tablewidget.ui \
+    waiterdishwidget.ui \
     dlgcreditcardlist.ui \
     dlgdishremovereason.ui \
     dlglistofhall.ui \
@@ -369,13 +371,15 @@ FORMS += \
     INCLUDEPATH += ../NTable
     INCLUDEPATH += ../Service5Working/raw
     INCLUDEPATH += ../Service5Working/socket
+    INCLUDEPATH += ../Service5/worker
     INCLUDEPATH += ../DbData
     INCLUDEPATH += ../Configs
     INCLUDEPATH += ../Controls
     INCLUDEPATH += ../NTable
-    INCLUDEPATH += C:/Projects/NewTax/Src
     INCLUDEPATH += C:/Soft/OpenSSLWin64/include
     INCLUDEPATH += C:/Soft/OpenSSLWin64/include/openssl
+
+include(C:/projects/NewTax/NewTax.pri)
 
 RESOURCES += \
     ../resources/res.qrc \

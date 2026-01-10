@@ -184,7 +184,7 @@ void StoreInputDocument::on_btnAddRow_clicked()
 {
     QJsonArray vals;
 
-    if(!C5Selector::getValueOfColumn(cache_goods, vals, 3)) {
+    if(!C5Selector::getValueOfColumn(mUser, cache_goods, vals, 3)) {
         return;
     }
 
@@ -201,7 +201,7 @@ void StoreInputDocument::on_toolButton_clicked()
 {
     QJsonArray vals;
 
-    if(!C5Selector::getValueOfColumn(cache_goods_store, vals, 2)) {
+    if(!C5Selector::getValueOfColumn(mUser, cache_goods_store, vals, 2)) {
         return;
     }
 
@@ -455,7 +455,7 @@ void StoreInputDocument::on_btnSetPartner_clicked()
 {
     QJsonArray vals;
 
-    if(!C5Selector::getValueOfColumn(cache_goods_partners, vals, -1)) {
+    if(!C5Selector::getValueOfColumn(mUser, cache_goods_partners, vals, -1)) {
         return;
     }
 
@@ -531,7 +531,7 @@ void StoreInputDocument::on_btnEditGoods_clicked()
     }
 
     CE5Goods *ep = new CE5Goods();
-    C5Editor *e = C5Editor::createEditor(ep, 0);
+    C5Editor *e = C5Editor::createEditor(mUser, ep, 0);
     ep->setId(ui->tbl->getInteger(row, col_goodsid));
     QList<QMap<QString, QVariant> > data;
 

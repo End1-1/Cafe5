@@ -26,15 +26,8 @@ const QRegularExpression float_expr2("[\\.\\,]$");
 #define ORDER_STATE_CLOSE 2
 #define ORDER_STATE_VOID 3
 #define ORDER_STATE_EMPTY 4
-#define ORDER_STATE_PREORDER_EMPTY 5 //empty
-#define ORDER_STATE_PREORDER_WITH_ORDER 6 //with order
-#define ORDER_STATE_MOVED 7
-
-#define DISH_STATE_NONE 0
-#define DISH_STATE_OK 1
-#define DISH_STATE_MISTAKE 2
-#define DISH_STATE_VOID 3
-#define DISH_STATE_SET 4
+#define ORDER_STATE_PREORDER 5
+#define ORDER_STATE_MOVED 6
 
 #define DOC_STATE_SAVED 1
 #define DOC_STATE_DRAFT 2

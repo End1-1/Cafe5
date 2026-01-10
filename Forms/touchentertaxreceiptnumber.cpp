@@ -2,8 +2,8 @@
 #include "ui_touchentertaxreceiptnumber.h"
 #include "c5config.h"
 
-TouchEnterTaxReceiptNumber::TouchEnterTaxReceiptNumber() :
-    C5Dialog(),
+TouchEnterTaxReceiptNumber::TouchEnterTaxReceiptNumber(C5User *user) :
+    C5Dialog(user),
     ui(new Ui::TouchEnterTaxReceiptNumber)
 {
     ui->setupUi(this);
@@ -14,13 +14,15 @@ TouchEnterTaxReceiptNumber::~TouchEnterTaxReceiptNumber()
     delete ui;
 }
 
-bool TouchEnterTaxReceiptNumber::getTaxReceiptNumber(QString &number)
+bool TouchEnterTaxReceiptNumber::getTaxReceiptNumber(QString &number, C5User *user)
 {
-    TouchEnterTaxReceiptNumber d;
-    if (d.exec() == QDialog::Accepted) {
+    TouchEnterTaxReceiptNumber d(user);
+
+    if(d.exec() == QDialog::Accepted) {
         number = d.ui->leNumber->text();
         return true;
     }
+
     return false;
 }
 
@@ -33,64 +35,64 @@ void TouchEnterTaxReceiptNumber::on_btnBackspace_clicked()
 
 void TouchEnterTaxReceiptNumber::on_btnOk_clicked()
 {
-    if (ui->leNumber->text().isEmpty() == false) {
+    if(ui->leNumber->text().isEmpty() == false) {
         accept();
     }
 }
 
 void TouchEnterTaxReceiptNumber::on_btn1_clicked()
 {
-    buttonClicked(static_cast<QPushButton *>(sender()));
+    buttonClicked(static_cast<QPushButton*>(sender()));
 }
 
 void TouchEnterTaxReceiptNumber::on_btn0_clicked()
 {
-    buttonClicked(static_cast<QPushButton *>(sender()));
+    buttonClicked(static_cast<QPushButton*>(sender()));
 }
 
 void TouchEnterTaxReceiptNumber::on_btn2_clicked()
 {
-    buttonClicked(static_cast<QPushButton *>(sender()));
+    buttonClicked(static_cast<QPushButton*>(sender()));
 }
 
 void TouchEnterTaxReceiptNumber::on_btn3_clicked()
 {
-    buttonClicked(static_cast<QPushButton *>(sender()));
+    buttonClicked(static_cast<QPushButton*>(sender()));
 }
 
 void TouchEnterTaxReceiptNumber::on_btn4_clicked()
 {
-    buttonClicked(static_cast<QPushButton *>(sender()));
+    buttonClicked(static_cast<QPushButton*>(sender()));
 }
 
 void TouchEnterTaxReceiptNumber::on_btn5_clicked()
 {
-    buttonClicked(static_cast<QPushButton *>(sender()));
+    buttonClicked(static_cast<QPushButton*>(sender()));
 }
 
 void TouchEnterTaxReceiptNumber::on_btn6_clicked()
 {
-    buttonClicked(static_cast<QPushButton *>(sender()));
+    buttonClicked(static_cast<QPushButton*>(sender()));
 }
 
 void TouchEnterTaxReceiptNumber::on_btn7_clicked()
 {
-    buttonClicked(static_cast<QPushButton *>(sender()));
+    buttonClicked(static_cast<QPushButton*>(sender()));
 }
 
 void TouchEnterTaxReceiptNumber::on_btn8_clicked()
 {
-    buttonClicked(static_cast<QPushButton *>(sender()));
+    buttonClicked(static_cast<QPushButton*>(sender()));
 }
 
 void TouchEnterTaxReceiptNumber::on_btn9_clicked()
 {
-    buttonClicked(static_cast<QPushButton *>(sender()));
+    buttonClicked(static_cast<QPushButton*>(sender()));
 }
 
 void TouchEnterTaxReceiptNumber::buttonClicked(QPushButton *b)
 {
-    QString t = static_cast<QPushButton *>(b)->text();
+    QString t = static_cast<QPushButton*>(b)->text();
     ui->leNumber->setText(ui->leNumber->text() + t);
 }
 

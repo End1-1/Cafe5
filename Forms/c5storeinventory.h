@@ -8,6 +8,8 @@ namespace Ui
 class C5StoreInventory;
 }
 
+class C5TableWidget;
+
 class C5StoreInventory : public C5OfficeWidget
 {
     Q_OBJECT
@@ -64,6 +66,8 @@ private:
     void countTotal();
 
     bool docCheck(QString &err);
+
+    QString makeInventoryTable(C5TableWidget *tbl);
 };
 
 #endif // C5STOREINVENTORY_H

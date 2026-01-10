@@ -3,11 +3,10 @@
 
 #include "c5dialog.h"
 
-namespace Ui {
+namespace Ui
+{
 class DlgCashinOut;
 }
-
-class C5User;
 
 class DlgCashinOut : public C5Dialog
 {
@@ -26,9 +25,7 @@ private slots:
     void on_btnCloseSession_clicked();
 
 private:
-    Ui::DlgCashinOut *ui;
-
-    C5User *fUser;
+    Ui::DlgCashinOut* ui;
 
     double fBalance;
 };

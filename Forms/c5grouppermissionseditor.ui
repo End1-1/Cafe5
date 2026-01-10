@@ -20,7 +20,7 @@
       <enum>QTabWidget::TabPosition::West</enum>
      </property>
      <property name="currentIndex">
-      <number>2</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="tab_2">
       <attribute name="title">
@@ -579,6 +579,26 @@
             </widget>
            </item>
            <item>
+            <widget class="C5CheckBox" name="checkBox_119">
+             <property name="text">
+              <string>Report, by goods</string>
+             </property>
+             <property name="Tag" stdset="0">
+              <number>1208</number>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="C5CheckBox" name="checkBox_120">
+             <property name="text">
+              <string>Report, by groups of goods</string>
+             </property>
+             <property name="Tag" stdset="0">
+              <number>1209</number>
+             </property>
+            </widget>
+           </item>
+           <item>
             <widget class="C5CheckBox" name="checkBox_54">
              <property name="text">
               <string>Refund goods</string>
@@ -604,7 +624,7 @@
               <string>Discount</string>
              </property>
              <property name="Tag" stdset="0">
-              <number>540</number>
+              <number>1207</number>
              </property>
             </widget>
            </item>
@@ -1808,22 +1828,22 @@
   </customwidget>
  </customwidgets>
  <tabstops>
-  <tabstop>chCash</tabstop>
-  <tabstop>checkBox_49</tabstop>
-  <tabstop>checkBox_115</tabstop>
-  <tabstop>checkBox_50</tabstop>
-  <tabstop>checkBox_51</tabstop>
-  <tabstop>checkBox_52</tabstop>
+  <tabstop>scrollArea_5</tabstop>
   <tabstop>checkBox_68</tabstop>
   <tabstop>checkBox_59</tabstop>
-  <tabstop>checkBox_62</tabstop>
+  <tabstop>checkBox_51</tabstop>
+  <tabstop>checkBox_52</tabstop>
+  <tabstop>checkBox_117</tabstop>
+  <tabstop>checkBox_118</tabstop>
+  <tabstop>checkBox_97</tabstop>
   <tabstop>checkBox_112</tabstop>
-  <tabstop>checkBox_113</tabstop>
-  <tabstop>checkBox_82</tabstop>
-  <tabstop>checkBox_83</tabstop>
-  <tabstop>checkBox_93</tabstop>
-  <tabstop>checkBox_84</tabstop>
+  <tabstop>checkBox_106</tabstop>
+  <tabstop>checkBox_119</tabstop>
+  <tabstop>checkBox_120</tabstop>
+  <tabstop>checkBox_54</tabstop>
+  <tabstop>checkBox_74</tabstop>
   <tabstop>checkBox_90</tabstop>
+  <tabstop>checkBox_116</tabstop>
   <tabstop>checkBox_85</tabstop>
   <tabstop>checkBox_86</tabstop>
   <tabstop>checkBox_88</tabstop>
@@ -1923,6 +1943,40 @@
   <tabstop>checkBox_150</tabstop>
   <tabstop>checkBox_151</tabstop>
   <tabstop>checkBox_36</tabstop>
+  <tabstop>chCash</tabstop>
+  <tabstop>checkBox_50</tabstop>
+  <tabstop>checkBox_49</tabstop>
+  <tabstop>checkBox_115</tabstop>
+  <tabstop>checkBox_62</tabstop>
+  <tabstop>checkBox_83</tabstop>
+  <tabstop>checkBox_93</tabstop>
+  <tabstop>checkBox_84</tabstop>
+  <tabstop>scrollArea_3</tabstop>
+  <tabstop>chREportsAllItems</tabstop>
+  <tabstop>checkBox_20</tabstop>
+  <tabstop>checkBox_27</tabstop>
+  <tabstop>checkBox_40</tabstop>
+  <tabstop>checkBox_73</tabstop>
+  <tabstop>checkBox_75</tabstop>
+  <tabstop>checkBox_96</tabstop>
+  <tabstop>checkBox_22</tabstop>
+  <tabstop>checkBox_72</tabstop>
+  <tabstop>checkBox_25</tabstop>
+  <tabstop>checkBox_48</tabstop>
+  <tabstop>checkBox_19</tabstop>
+  <tabstop>checkBox_45</tabstop>
+  <tabstop>checkBox_47</tabstop>
+  <tabstop>checkBox_31</tabstop>
+  <tabstop>checkBox_64</tabstop>
+  <tabstop>checkBox_57</tabstop>
+  <tabstop>checkBox_55</tabstop>
+  <tabstop>checkBox_61</tabstop>
+  <tabstop>checkBox_70</tabstop>
+  <tabstop>checkBox_76</tabstop>
+  <tabstop>scrollArea_4</tabstop>
+  <tabstop>chREportsAllItems_2</tabstop>
+  <tabstop>checkBox_113</tabstop>
+  <tabstop>checkBox_82</tabstop>
  </tabstops>
  <resources/>
  <connections/>

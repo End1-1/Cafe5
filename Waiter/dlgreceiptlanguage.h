@@ -12,11 +12,11 @@ class DlgReceiptLanguage : public C5Dialog
     Q_OBJECT
 
 public:
-    explicit DlgReceiptLanguage();
+    explicit DlgReceiptLanguage(C5User *user);
 
     ~DlgReceiptLanguage();
-
-    static int receipLanguage();
+    
+    static int receipLanguage(C5User *user);
 
 private slots:
     void on_lst_clicked(const QModelIndex &index);

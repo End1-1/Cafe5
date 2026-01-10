@@ -15,7 +15,7 @@ class GoodsReturnReason : public C5Dialog
     Q_OBJECT
 
 public:
-    explicit GoodsReturnReason();
+    explicit GoodsReturnReason(C5User *user);
 
     ~GoodsReturnReason();
 

@@ -15,7 +15,7 @@ class C5DishGroupAction : public C5Dialog
     Q_OBJECT
 
 public:
-    explicit C5DishGroupAction();
+    explicit C5DishGroupAction(C5User *user);
 
     ~C5DishGroupAction();
 

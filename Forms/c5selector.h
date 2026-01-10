@@ -17,19 +17,19 @@ class C5Selector : public C5Dialog
     Q_OBJECT
 
 public:
-    explicit C5Selector();
+    explicit C5Selector(C5User *user);
 
     ~C5Selector();
+    
+    static bool getValue(C5User *user, int cache, QJsonArray &values);
+    
+    static bool getValue(C5User *user, const QString &query, QJsonArray &values);
+    
+    static bool getValueOfColumn(C5User *user, int cache, QJsonArray &values, int column);
 
-    static bool getValue(int cache, QJsonArray &values);
+    static bool getMultipleValues(C5User *user, int cache, QVector<QJsonArray> &values);
 
-    static bool getValue(const QString &query, QJsonArray &values);
-
-    static bool getValueOfColumn(int cache, QJsonArray &values, int column);
-
-    static bool getMultipleValues(int cache, QVector<QJsonArray> &values);
-
-    static bool getValues(const QString &sql, QJsonArray &values,
+    static bool getValues(C5User *user, const QString &sql, QJsonArray &values,
                           const QHash<QString, QString> &translator);
 
     void keyPressEvent(QKeyEvent *key) override;

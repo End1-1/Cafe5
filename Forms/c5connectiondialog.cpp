@@ -81,7 +81,8 @@ QString C5ConnectionDialog::password()
 
 int C5ConnectionDialog::connectionType()
 {
-    return ui->cbConnection->currentIndex();
+    ConnectionType ct = ui->cbConnection->currentIndex() == 0 ? noneSecure : Secure;
+    return ct;
 }
 
 void C5ConnectionDialog::on_btnSave_clicked()

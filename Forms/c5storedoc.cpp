@@ -4,7 +4,6 @@
 #include "c5cache.h"
 #include "c5printing.h"
 #include "c5cashdoc.h"
-#include "c5printpreview.h"
 #include "c5editor.h"
 #include "c5mainwindow.h"
 #include "c5daterange.h"
@@ -21,6 +20,7 @@
 #include "bclientdebts.h"
 #include "c5storedocselectprinttemplate.h"
 #include "c5permissions.h"
+#include "c5htmlprint.h"
 #include <QMenu>
 #include <QHash>
 #include <QClipboard>
@@ -28,6 +28,7 @@
 #include <QJsonParseError>
 #include <QJsonDocument>
 #include <QJsonObject>
+#include <QPrintPreviewDialog>
 #include <QShortcut>
 #include <QSqlQuery>
 #include <QFileDialog>
@@ -1269,185 +1270,208 @@ void C5StoreDoc::addGoodsByCalculation(int goods, const QString &name, double qt
     ui->tblDishes->lineEdit(r, 3)->setDouble(qty);
 }
 
+QString C5StoreDoc::makeGoodsTableHtml(const QStringList &headers,
+                                       const QList<QStringList>& rows,
+                                       const QSet<int>& rightCols)
+{
+    QString h;
+    QTextStream s(&h);
+    s << "<table>";
+    s << "<thead><tr>";
+
+    for(int i = 0; i < headers.size(); ++i) {
+        s << "<th>" << htmlEscape(headers[i]) << "</th>";
+    }
+
+    s << "</tr></thead>";
+    s << "<tbody>";
+
+    for(const auto &r : rows) {
+        s << "<tr>";
+
+        for(int c = 0; c < headers.size(); ++c) {
+            const QString cell = (c < r.size() ? r[c] : "");
+            const bool isRight = rightCols.contains(c);
+            s << "<td" << (isRight ? " class='right'" : "") << ">"
+              << htmlEscape(cell)
+              << "</td>";
+        }
+
+        s << "</tr>";
+    }
+
+    s << "</tbody></table>";
+    return h;
+}
+
+QString C5StoreDoc::makeOtherChargesHtml(C5TableWidget *tbl, const QStringList &hdr)
+{
+    QString h;
+    QTextStream s(&h);
+    s << "<div class='mt10'><table>";
+    s << "<thead><tr>";
+
+    for(auto &x : hdr)
+        s << "<th>" << htmlEscape(x) << "</th>";
+
+    s << "</tr></thead><tbody>";
+
+    for(int i = 0; i < tbl->rowCount(); ++i) {
+        s << "<tr>";
+        s << "<td class='center'>" << (i + 1) << "</td>";
+        s << "<td>" << htmlEscape(tbl->getString(i, 1)) << "</td>";
+        s << "<td class='right'>" << htmlEscape(float_str(tbl->lineEdit(i, 2)->getDouble(), 2)) << "</td>";
+        s << "</tr>";
+    }
+
+    s << "</tbody></table></div>";
+    return h;
+}
+
+QString C5StoreDoc::makeComplectationInputHtml(const C5LineEdit *code,
+        const C5LineEdit *name,
+        const C5LineEdit *qty,
+        double total,
+        double qtyVal,
+        const QStringList &hdr)
+{
+    const double unitPrice = (qtyVal != 0.0 ? (total / qtyVal) : 0.0);
+    QString h;
+    QTextStream s(&h);
+    s << "<div class='mt10'><table>";
+    s << "<thead><tr>";
+
+    for(auto &x : hdr)
+        s << "<th>" << htmlEscape(x) << "</th>";
+
+    s << "</tr></thead><tbody>";
+    s << "<tr>";
+    s << "<td class='center'>1</td>";
+    s << "<td>" << htmlEscape(code->text()) << "</td>";
+    s << "<td>" << htmlEscape(name->text()) << "</td>";
+    s << "<td class='right'>" << htmlEscape(qty->text()) << "</td>";
+    s << "<td class='right'>" << htmlEscape(float_str(unitPrice, 2)) << "</td>";
+    s << "<td class='right'>" << htmlEscape(float_str(total, 2)) << "</td>";
+    s << "</tr>";
+    s << "</tbody></table></div>";
+    return h;
+}
+
 void C5StoreDoc::printV1()
 {
-    C5Printing p;
-    QFont f(qApp->font());
-    C5Database().logEvent(f.family());
-    p.setFont(f);
-    QList<qreal> points;
-    QStringList vals;
-    p.setSceneParams(2000, 2700, QPageLayout::Portrait);
-    p.setFontSize(25);
-    p.setFontBold(true);
+    QString tpl = loadTemplate("store_doc_v1.html");
+
+    if(tpl.isEmpty()) {
+        C5Message::error(tr("Template not found: store_doc_v1.html"));
+        return;
+    }
+
+    // 1) Заголовок (docTypeText)
     QString docTypeText;
 
     switch(fDocType) {
-    case DOC_TYPE_STORE_INPUT:
-        docTypeText = tr("Store input");
-        break;
+    case DOC_TYPE_STORE_INPUT:    docTypeText = tr("Store input"); break;
 
-    case DOC_TYPE_STORE_OUTPUT:
-        docTypeText = tr("Store output");
-        break;
+    case DOC_TYPE_STORE_OUTPUT:   docTypeText = tr("Store output"); break;
 
-    case DOC_TYPE_STORE_MOVE:
-        docTypeText = tr("Store movement");
-        break;
+    case DOC_TYPE_STORE_MOVE:     docTypeText = tr("Store movement"); break;
 
-    case DOC_TYPE_COMPLECTATION:
-        docTypeText = tr("Store complectation");
-        break;
+    case DOC_TYPE_COMPLECTATION:  docTypeText = tr("Store complectation"); break;
+
+    default: docTypeText = tr("Store document"); break;
     }
 
-    p.ctext(QString("%1 N%2").arg(docTypeText, ui->leDocNum->text()));
-    p.br();
-    p.ctext(ui->leReasonName->text());
-    p.br();
-    p.br();
-    p.setFontSize(20);
-    p.setFontBold(false);
+    // 2) Stores
     QString storeInName, storeOutName;
 
-    if(ui->leStoreInput->getInteger() > 0) {
-        storeInName = ui->leStoreInputName->text();
-    }
+    if(ui->leStoreInput->getInteger() > 0)
+        storeInName  = ui->leStoreInputName->text();
 
-    if(ui->leStoreOutput->getInteger() > 0) {
+    if(ui->leStoreOutput->getInteger() > 0)
         storeOutName = ui->leStoreOutputName->text();
-    }
+
+    // 3) Комментарий
+    QString commentBlock;
 
     if(!ui->leComment->isEmpty()) {
-        p.ltext(ui->leComment->text(), 50);
-        p.br();
+        commentBlock = "<div class='note'>" + htmlEscape(ui->leComment->text()) + "</div>";
     }
 
-    p.br();
-    p.setFontBold(true);
-    points.clear();
-    points << 50 << 200;
-    vals << tr("Date");
+    // 4) Header (date/stores) — динамические колонки
+    QString thStoreIn, tdStoreIn, thStoreOut, tdStoreOut;
 
     if(!storeInName.isEmpty()) {
-        vals << tr("Store, input");
-        points << 500;
+        thStoreIn = "<th>" + htmlEscape(tr("Store, input")) + "</th>";
+        tdStoreIn = "<td>" + htmlEscape(storeInName) + "</td>";
     }
 
     if(!storeOutName.isEmpty()) {
-        vals << tr("Store, output");
-        points << 500;
+        thStoreOut = "<th>" + htmlEscape(tr("Store, output")) + "</th>";
+        tdStoreOut = "<td>" + htmlEscape(storeOutName) + "</td>";
     }
 
-    p.tableText(points, vals, p.fLineHeight + 20);
-    p.br(p.fLineHeight + 20);
-    p.setFontBold(false);
-    vals.clear();
-    vals << ui->deDate->text();
+    // 5) Supplier/Invoice block — как у тебя через tableText(points)
+    QString supplierInvoiceBlock;
+    {
+        bool hasSupplier = ui->lePartner->getInteger() > 0;
+        bool hasInvoice = !ui->leInvoiceNumber->isEmpty();
 
-    if(!storeInName.isEmpty()) {
-        vals << ui->leStoreInputName->text();
+        if(hasSupplier || hasInvoice) {
+            QString t;
+            QTextStream s(&t);
+            s << "<table class='mt6'>"
+              << "<tr>";
+
+            if(hasSupplier)
+                s << "<th style='width:55%'>" << htmlEscape(tr("Supplier")) << "</th>";
+
+            if(hasInvoice)
+                s << "<th>" << htmlEscape(tr("Purchase document")) << "</th>";
+
+            s << "</tr><tr>";
+
+            if(hasSupplier)
+                s << "<td>" << htmlEscape(ui->lePartnerName->text()) << "</td>";
+
+            if(hasInvoice)
+                s << "<td>" << htmlEscape(ui->leInvoiceNumber->text() + " / " + ui->deInvoiceDate->text()) << "</td>";
+
+            s << "</tr></table>";
+            supplierInvoiceBlock = t;
+        } else {
+            supplierInvoiceBlock = "";
+        }
     }
-
-    if(!storeOutName.isEmpty()) {
-        vals << ui->leStoreOutputName->text();
-    }
-
-    p.tableText(points, vals, p.fLineHeight + 20);
-    p.br(p.fLineHeight + 20);
-    p.br(p.fLineHeight + 20);
-    points.clear();
-    vals.clear();
-    p.setFontBold(true);
-    points << 50;
-
-    if(ui->lePartner->getInteger() > 0) {
-        vals << tr("Supplier");
-        points << 1000;
-    }
-
-    if(!ui->leInvoiceNumber->isEmpty()) {
-        vals << tr("Purchase document");
-        points << 800;
-    }
-
-    p.tableText(points, vals, p.fLineHeight + 20);
-    p.br(p.fLineHeight + 20);
-    p.setFontBold(false);
-    points.clear();
-    vals.clear();
-    points << 50;
-
-    if(ui->lePartner->getInteger() > 0) {
-        vals << ui->lePartnerName->text();
-        points << 1000;
-    }
-
-    if(!ui->leInvoiceNumber->isEmpty()) {
-        vals << ui->leInvoiceNumber->text() + " /    " + ui->deInvoiceDate->text();
-        points << 800;
-    }
-
-    p.tableText(points, vals, p.fLineHeight + 20);
-    p.br();
-    p.br();
-    p.br();
+    // 6) Complectation blocks (если тип = комплектация)
+    QString complectationBlock;
 
     if(fDocType == DOC_TYPE_COMPLECTATION) {
-        points.clear();
-        points << 50 << 100 << 800 << 250;
-        vals.clear();
-        vals.append(tr("NN"));
-        vals.append(tr("Other charges"));
-        vals.append(tr("Amount"));
-        p.setFontBold(true);
-        p.tableText(points, vals, p.fLineHeight + 20);
-        p.br(p.fLineHeight + 20);
-
-        for(int i = 0; i < ui->tblAdd->rowCount(); i++) {
-            vals.clear();
-            vals.append(QString::number(i + 1));
-            vals.append(ui->tblAdd->getString(i, 1));
-            vals.append(float_str(ui->tblAdd->lineEdit(i, 2)->getDouble(), 2));
-            p.setFontBold(false);
-            p.tableText(points, vals, p.fLineHeight + 20);
-            p.br(p.fLineHeight + 20);
-        }
-
-        p.br();
-        points.clear();
-        points << 50 << 100 << 200 << 600 << 250 << 250 << 250;
-        vals.clear();
-        vals.append(tr("NN"));
-        vals.append(tr("Code"));
-        vals.append(tr("Input material"));
-        vals.append(tr("Qty"));
-        vals.append(tr("Price"));
-        vals.append(tr("Amount"));
-        p.setFontBold(true);
-        p.tableText(points, vals, p.fLineHeight + 20);
-        p.br(p.fLineHeight + 20);
-        vals.clear();
-        vals.append("1");
-        vals.append(ui->leComplectationCode->text());
-        vals.append(ui->leComplectationName->text());
-        vals.append(ui->leComplectationQty->text());
-        vals.append(float_str(ui->leTotal->getDouble() / ui->leComplectationQty->getDouble(), 2));
-        vals.append(ui->leTotal->text());
-        p.setFontBold(false);
-        p.tableText(points, vals, p.fLineHeight + 20);
-        p.br(p.fLineHeight + 20);
+        QStringList hdrCharges { tr("NN"), tr("Other charges"), tr("Amount") };
+        QString charges = makeOtherChargesHtml(ui->tblAdd, hdrCharges);
+        QStringList hdrInput { tr("NN"), tr("Code"), tr("Input material"), tr("Qty"), tr("Price"), tr("Amount") };
+        QString inputMat = makeComplectationInputHtml(
+                               ui->leComplectationCode,
+                               ui->leComplectationName,
+                               ui->leComplectationQty,
+                               ui->leTotal->getDouble(),
+                               ui->leComplectationQty->getDouble(),
+                               hdrInput
+                           );
+        complectationBlock = charges + inputMat;
     }
 
-    p.br();
+    // 7) Формируем goodsGroupData (оставляем твою логику 1:1, только без печати)
     QMap<int, int> goodsGroupMap;
     QList<QStringList> goodsGroupData;
 
-    for(int i = 0; i < ui->tblGoods->rowCount(); i++) {
-        QStringList val  = {"", "", "", "0", "", "", "0", ""};
+    for(int i = 0; i < ui->tblGoods->rowCount(); ++i) {
+        QStringList val  = {"", "", "", "0", "", "", "0", ""}; // [NN, code, name, qty, unit, price, total, remain]
 
         if(ui->chLeaveFocusOnBarcode->isChecked()) {
-            if(goodsGroupMap.contains(ui->tblGoods->getInteger(i, 3))) {
-                val = goodsGroupData[goodsGroupMap[ui->tblGoods->getInteger(i, 3)]];
+            int key = ui->tblGoods->getInteger(i, 3);
+
+            if(goodsGroupMap.contains(key)) {
+                val = goodsGroupData[goodsGroupMap[key]];
             } else {
                 val[0] = QString::number(goodsGroupData.count() + 1);
             }
@@ -1455,9 +1479,8 @@ void C5StoreDoc::printV1()
             val[0] = QString::number(i + 1);
         }
 
-        //val <<
-        val[1] = ui->tblGoods->getString(i, 3);
-        val[2] = ui->tblGoods->getString(i, 4);
+        val[1] = ui->tblGoods->getString(i, 3); // material code?
+        val[2] = ui->tblGoods->getString(i, 4); // goods name
 
         if(ui->chLeaveFocusOnBarcode->isChecked()) {
             val[3] = float_str(str_float(val[3]) + ui->tblGoods->lineEdit(i, 5)->getDouble(), 3);
@@ -1465,9 +1488,10 @@ void C5StoreDoc::printV1()
             val[3] = ui->tblGoods->lineEdit(i, 5)->text();
         }
 
-        val[4] = ui->tblGoods->getString(i, 6);
+        val[4] = ui->tblGoods->getString(i, 6); // unit
 
         if(!mUser->check(cp_t11_do_now_show_input_prices)) {
+            // в исходнике: val[5]=price text; val[6]=total (accumulate)
             val[5] = ui->tblGoods->lineEdit(i, 7)->text();
 
             if(ui->chLeaveFocusOnBarcode->isChecked()) {
@@ -1480,545 +1504,288 @@ void C5StoreDoc::printV1()
             val[6] = "0";
         }
 
-        val[5] = float_str(str_float(val[6]) / str_float(val[3]), 2);
+        // !!! у тебя потом price пересчитывается из total/qty:
+        val[5] = float_str(str_float(val[6]) / qMax(0.000001, str_float(val[3])), 2);
         val[7] = float_str(ui->tblGoods->getDouble(i, col_remain), 2);
 
         if(ui->chLeaveFocusOnBarcode->isChecked()) {
-            if(goodsGroupMap.contains(ui->tblGoods->getInteger(i, 3))) {
-                goodsGroupData[goodsGroupMap[ui->tblGoods->getInteger(i, 3)]] = val;
+            int key = ui->tblGoods->getInteger(i, 3);
+
+            if(goodsGroupMap.contains(key)) {
+                goodsGroupData[goodsGroupMap[key]] = val;
             } else {
                 goodsGroupData.append(val);
-                goodsGroupMap[ui->tblGoods->getInteger(i, 3)] = goodsGroupData.count() - 1;
+                goodsGroupMap[key] = goodsGroupData.count() - 1;
             }
         } else {
             goodsGroupData.append(val);
         }
     }
 
+    // 8) Заголовок колонки Goods зависит от типа документа
     QString goodsColName = tr("Goods");
 
     if(fDocType == DOC_TYPE_COMPLECTATION) {
         goodsColName = tr("Output material");
     }
 
-    points.clear();
-    points << 50 << 100 << 200 << 600 << 200 << 200 << 250 << 250 << 100;
-    vals.clear();
-    vals << tr("NN")
-         << tr("Material code")
-         << goodsColName
-         << tr("Qty")
-         << tr("Unit")
-         << tr("Price")
-         << tr("Total")
-         << tr("Remain");
-    p.setFontBold(true);
-    p.tableText(points, vals, p.fLineHeight + 20);
-    p.br(p.fLineHeight + 20);
-    p.setFontBold(false);
+    // 9) Goods table HTML
+    QStringList goodsHdr {
+        tr("NN"),
+        tr("Material code"),
+        goodsColName,
+        tr("Qty"),
+        tr("Unit"),
+        tr("Price"),
+        tr("Total"),
+        tr("Remain")
+    };
+    // right align: Qty(3), Price(5), Total(6), Remain(7)
+    QSet<int> rightCols {3, 5, 6, 7};
+    QString goodsTable = makeGoodsTableHtml(goodsHdr, goodsGroupData, rightCols);
+    // 10) Подписи (в зависимости от типа)
+    QString signLeftTitle, signRightTitle, signLeftName, signRightName;
 
-    for(int i = 0; i < goodsGroupData.count(); i++) {
-        if(p.checkBr(p.fLineHeight + 20)) {
-            p.br(p.fLineHeight + 20);
-            p.br();
-        }
-
-        vals = goodsGroupData[i];
-        //        vals << QString::number(i + 1);
-        //        vals << ui->tblGoods->getString(i, 3);
-        //        vals << ui->tblGoods->getString(i, 4);
-        //        vals << ui->tblGoods->lineEdit(i, 5)->text();
-        //        vals << ui->tblGoods->getString(i, 6);
-        //        vals << ui->tblGoods->lineEdit(i, 7)->text();
-        //        vals << ui->tblGoods->lineEdit(i, 8)->text();
-        p.tableText(points, vals, p.fLineHeight + 20);
-
-        if(p.checkBr(p.fLineHeight + 20)) {
-            p.br(p.fLineHeight + 20);
-        }
-
-        p.br(p.fLineHeight + 20);
+    if(fDocType == DOC_TYPE_STORE_MOVE) {
+        signLeftTitle  = tr("Passed");
+        signRightTitle = tr("Accepted");
+        signLeftName   = ui->lePassedName->text();
+        signRightName  = ui->leAcceptedName->text();
+    } else {
+        signLeftTitle  = tr("Accepted");
+        signRightTitle = tr("Passed");
+        signLeftName   = ui->leAcceptedName->text();
+        signRightName  = ui->lePassedName->text();
     }
 
-    p.setFontBold(true);
-    points.clear();
-    points << 950
-           << 650
-           << 250;
-    vals.clear();
-    vals << tr("Total amount");
-    vals << ui->leTotal->text();
-    p.tableText(points, vals, p.fLineHeight + 20);
-    p.br(p.fLineHeight + 20);
-    p.br(p.fLineHeight + 20);
-    p.br(p.fLineHeight + 20);
-
-    switch(fDocType) {
-    case DOC_TYPE_STORE_MOVE:
-        p.ltext(tr("Passed"), 50);
-        p.ltext(tr("Accepted"), 1000);
-        p.br(p.fLineHeight + 20);
-        p.ltext(ui->lePassedName->text(), 50);
-        p.ltext(ui->leAcceptedName->text(), 1000);
-        break;
-
-    default:
-        p.ltext(tr("Accepted"), 50);
-        p.ltext(tr("Passed"), 1000);
-        p.br(p.fLineHeight + 20);
-        p.ltext(ui->leAcceptedName->text(), 1000);
-        p.ltext(ui->lePassedName->text(), 50);
-        break;
-    }
-
-    p.line(50, p.fTop, 700, p.fTop);
-    p.line(1000, p.fTop, 1650, p.fTop);
-    p.setFontBold(false);
-    C5PrintPreview pp(&p);
-    pp.exec();
+    // 11) Переменные шаблона
+    QMap<QString, QString> v;
+    v["doc_title"] = htmlEscape(QString("%1 N%2").arg(docTypeText, ui->leDocNum->text()));
+    v["reason"] = htmlEscape(ui->leReasonName->text());
+    v["comment_block"] = commentBlock;
+    v["lbl_date"] = htmlEscape(tr("Date"));
+    v["date"] = htmlEscape(ui->deDate->text());
+    v["th_store_in"] = thStoreIn;
+    v["td_store_in"] = tdStoreIn;
+    v["th_store_out"] = thStoreOut;
+    v["td_store_out"] = tdStoreOut;
+    v["supplier_invoice_block"] = supplierInvoiceBlock;
+    v["complectation_block"] = complectationBlock;
+    v["goods_table"] = goodsTable;
+    v["lbl_total_amount"] = htmlEscape(tr("Total amount"));
+    v["total_amount"] = htmlEscape(ui->leTotal->text());
+    v["sign_left_title"] = htmlEscape(signLeftTitle);
+    v["sign_right_title"] = htmlEscape(signRightTitle);
+    v["sign_left_name"] = htmlEscape(signLeftName);
+    v["sign_right_name"] = htmlEscape(signRightName);
+    QString html = applyTemplate(tpl, v);
+    // 12) Preview/Print
+    QTextDocument doc;
+    doc.setHtml(html);
+    QPrinter printer(QPrinter::HighResolution);
+    printer.setPageSize(QPageSize::A4);
+    printer.setFullPage(false);
+    QPrintPreviewDialog preview(&printer, this);
+    connect(&preview, &QPrintPreviewDialog::paintRequested, [&](QPrinter * prn) { doc.print(prn); });
+    preview.exec();
 }
 
 void C5StoreDoc::printV2()
 {
-    C5Printing p;
-    QFont f(qApp->font());
-    C5Database().logEvent(f.family());
-    p.setFont(f);
-    QList<qreal> points;
-    QStringList vals;
-    p.setSceneParams(2700, 2000, QPageLayout::Landscape);
-    int c1 = (2700 / 2) / 2;
-    int c2 = (2700 / 2) + (c1);
-    int c0 = (2700 / 2) + 10;
-    p.setFontSize(25);
-    p.setFontBold(true);
+    const QString tplSheet = loadTemplate("store_doc_v2_two_up.html");
+    const QString tplOne   = loadTemplate("store_doc_v2_one_copy.html");
+
+    if(tplSheet.isEmpty() || tplOne.isEmpty()) {
+        C5Message::error(tr("Template not found"));
+        return;
+    }
+
+    // ---- docTypeText
     QString docTypeText;
 
     switch(fDocType) {
-    case DOC_TYPE_STORE_INPUT:
-        docTypeText = tr("Store input");
-        break;
+    case DOC_TYPE_STORE_INPUT:    docTypeText = tr("Store input"); break;
 
-    case DOC_TYPE_STORE_OUTPUT:
-        docTypeText = tr("Store output");
-        break;
+    case DOC_TYPE_STORE_OUTPUT:   docTypeText = tr("Store output"); break;
 
-    case DOC_TYPE_STORE_MOVE:
-        docTypeText = tr("Store movement");
-        break;
+    case DOC_TYPE_STORE_MOVE:     docTypeText = tr("Store movement"); break;
 
-    case DOC_TYPE_COMPLECTATION:
-        docTypeText = tr("Store complectation");
-        break;
+    case DOC_TYPE_COMPLECTATION:  docTypeText = tr("Store complectation"); break;
+
+    default: docTypeText = tr("Store document"); break;
     }
 
-    p.ctextof(QString("%1 N%2").arg(docTypeText, ui->leDocNum->text()), c1);
-    p.ctextof(QString("%1 N%2").arg(docTypeText, ui->leDocNum->text()), c2);
-    p.br();
-    p.ctextof(ui->leReasonName->text(), c1);
-    p.ctextof(ui->leReasonName->text(), c2);
-    p.br();
-    p.br();
-    p.setFontSize(20);
-    p.setFontBold(false);
+    // ---- stores
     QString storeInName, storeOutName;
 
-    if(ui->leStoreInput->getInteger() > 0) {
-        storeInName = ui->leStoreInputName->text();
-    }
+    if(ui->leStoreInput->getInteger() > 0)
+        storeInName  = ui->leStoreInputName->text();
 
-    if(ui->leStoreOutput->getInteger() > 0) {
+    if(ui->leStoreOutput->getInteger() > 0)
         storeOutName = ui->leStoreOutputName->text();
-    }
+
+    // ---- comment
+    QString commentBlock;
 
     if(!ui->leComment->isEmpty()) {
-        p.ltext(ui->leComment->text(), c1);
-        p.ltext(ui->leComment->text(), c2);
-        p.br();
+        commentBlock = "<div class='note'>" + htmlEscape(ui->leComment->text()) + "</div>";
     }
 
-    p.br();
-    //PART 1 - 1
-    p.setFontBold(true);
-    points.clear();
-    points << 40 << 200;
-    vals << tr("Date");
+    // ---- dynamic store columns
+    QString thStoreIn, tdStoreIn, thStoreOut, tdStoreOut;
 
     if(!storeInName.isEmpty()) {
-        vals << tr("Store, input");
-        points << 400;
+        thStoreIn = "<th>" + htmlEscape(tr("Store, input")) + "</th>";
+        tdStoreIn = "<td>" + htmlEscape(storeInName) + "</td>";
     }
 
     if(!storeOutName.isEmpty()) {
-        vals << tr("Store, output");
-        points << 400;
+        thStoreOut = "<th>" + htmlEscape(tr("Store, output")) + "</th>";
+        tdStoreOut = "<td>" + htmlEscape(storeOutName) + "</td>";
     }
 
-    p.tableText(points, vals, p.fLineHeight + 20);
-    //PART 1 - 2
-    p.setFontBold(true);
-    points.clear();
-    vals.clear();
-    points << 40 + c0 << 200;
-    vals << tr("Date");
+    // ---- supplier/invoice block
+    QString supplierInvoiceBlock;
+    {
+        bool hasSupplier = ui->lePartner->getInteger() > 0;
+        bool hasInvoice  = !ui->leInvoiceNumber->isEmpty();
 
-    if(!storeInName.isEmpty()) {
-        vals << tr("Store, input");
-        points << 400;
+        if(hasSupplier || hasInvoice) {
+            QString t;
+            QTextStream s(&t);
+            s << "<table class='mt6'><tr>";
+
+            if(hasSupplier)
+                s << "<th style='width:55%'>" << htmlEscape(tr("Supplier")) << "</th>";
+
+            if(hasInvoice)
+                s << "<th>" << htmlEscape(tr("Purchase document")) << "</th>";
+
+            s << "</tr><tr>";
+
+            if(hasSupplier)
+                s << "<td>" << htmlEscape(ui->lePartnerName->text()) << "</td>";
+
+            if(hasInvoice)
+                s << "<td>" << htmlEscape(ui->leInvoiceNumber->text() + " / " + ui->deInvoiceDate->text()) << "</td>";
+
+            s << "</tr></table>";
+            supplierInvoiceBlock = t;
+        }
     }
-
-    if(!storeOutName.isEmpty()) {
-        vals << tr("Store, output");
-        points << 400;
-    }
-
-    p.tableText(points, vals, p.fLineHeight + 20);
-    //PART 2 - 1
-    p.br(p.fLineHeight + 20);
-    p.setFontBold(false);
-    vals.clear();
-    points.clear();
-    points << 40 << 200;
-    vals << ui->deDate->text();
-
-    if(!storeInName.isEmpty()) {
-        vals << ui->leStoreInputName->text();
-        points << 400;
-    }
-
-    if(!storeOutName.isEmpty()) {
-        vals << ui->leStoreOutputName->text();
-        points << 400;
-    }
-
-    p.tableText(points, vals, p.fLineHeight + 20);
-    //PART 2 - 2
-    p.setFontBold(false);
-    vals.clear();
-    points.clear();
-    points << 40 + c0 << 200 ;
-    vals << ui->deDate->text();
-
-    if(!storeInName.isEmpty()) {
-        vals << ui->leStoreInputName->text();
-        points << 400;
-    }
-
-    if(!storeOutName.isEmpty()) {
-        vals << ui->leStoreOutputName->text();
-        points << 400;
-    }
-
-    p.tableText(points, vals, p.fLineHeight + 20);
-    p.br(p.fLineHeight + 20);
-    //PART 3 - 1
-    points.clear();
-    vals.clear();
-    p.setFontBold(true);
-    points << 40;
-
-    if(ui->lePartner->getInteger() > 0) {
-        vals << tr("Supplier");
-        points << 600;
-    }
-
-    if(!ui->leInvoiceNumber->isEmpty()) {
-        vals << tr("Purchase document");
-        points << 400;
-    }
-
-    p.tableText(points, vals, p.fLineHeight + 20);
-    //PART 3 - 2
-    points.clear();
-    vals.clear();
-    p.setFontBold(true);
-    points << 40 + c0;
-
-    if(ui->lePartner->getInteger() > 0) {
-        vals << tr("Supplier");
-        points << 600;
-    }
-
-    if(!ui->leInvoiceNumber->isEmpty()) {
-        vals << tr("Purchase document");
-        points << 400;
-    }
-
-    p.tableText(points, vals, p.fLineHeight + 20);
-    p.br(p.fLineHeight + 20);
-    //PART 4 - 1
-    p.setFontBold(false);
-    points.clear();
-    vals.clear();
-    points << 40;
-
-    if(ui->lePartner->getInteger() > 0) {
-        vals << ui->lePartnerName->text();
-        points << 600;
-    }
-
-    if(!ui->leInvoiceNumber->isEmpty()) {
-        vals << ui->leInvoiceNumber->text() + " /    " + ui->deInvoiceDate->text();
-        points << 400;
-    }
-
-    p.tableText(points, vals, p.fLineHeight + 20);
-    //PART 4 - 2
-    points.clear();
-    vals.clear();
-    points << 40 + c0;
-
-    if(ui->lePartner->getInteger() > 0) {
-        vals << ui->lePartnerName->text();
-        points << 600;
-    }
-
-    if(!ui->leInvoiceNumber->isEmpty()) {
-        vals << ui->leInvoiceNumber->text() + " /    " + ui->deInvoiceDate->text();
-        points << 400;
-    }
-
-    p.tableText(points, vals, p.fLineHeight + 20);
-    p.br();
-    p.br();
-    p.br();
+    // ---- complectation block (если надо)
+    QString complectationBlock;
 
     if(fDocType == DOC_TYPE_COMPLECTATION) {
-        //PART 5 - 1
-        points.clear();
-        points << 40 << 100 << 800 << 250;
-        vals.clear();
-        vals.append(tr("NN"));
-        vals.append(tr("Other charges"));
-        vals.append(tr("Amount"));
-        p.tableText(points, vals, p.fLineHeight + 20);
-        //PART 5 - 2
-        points.clear();
-        points << 40 + c0 << 100 << 800 << 250;
-        vals.clear();
-        vals.append(tr("NN"));
-        vals.append(tr("Other charges"));
-        vals.append(tr("Amount"));
-        p.setFontBold(true);
-        p.tableText(points, vals, p.fLineHeight + 20);
-        p.br(p.fLineHeight + 20);
-        p.br(p.fLineHeight + 20);
-
-        for(int i = 0; i < ui->tblAdd->rowCount(); i++) {
-            //PART 6 - 1
-            points.clear();
-            points << 50 << 100 << 800 << 250;
-            vals.clear();
-            vals.append(QString::number(i + 1));
-            vals.append(ui->tblAdd->getString(i, 1));
-            vals.append(float_str(ui->tblAdd->lineEdit(i, 2)->getDouble(), 2));
-            p.tableText(points, vals, p.fLineHeight + 20);
-            //PART 6 - 2
-            points.clear();
-            points << 50 + c0 << 100 << 800 << 250;
-            vals.clear();
-            vals.append(QString::number(i + 1));
-            vals.append(ui->tblAdd->getString(i, 1));
-            vals.append(float_str(ui->tblAdd->lineEdit(i, 2)->getDouble(), 2));
-            p.setFontBold(false);
-            p.tableText(points, vals, p.fLineHeight + 20);
-            p.br(p.fLineHeight + 20);
-        }
-
-        p.br();
-        //PART 7 - 1
-        points.clear();
-        points << 50 << 100 << 200 << 600 << 250 << 250 << 250;
-        vals.clear();
-        vals.append(tr("NN"));
-        vals.append(tr("Code"));
-        vals.append(tr("Input material"));
-        vals.append(tr("Qty"));
-        vals.append(tr("Price"));
-        vals.append(tr("Amount"));
-        p.setFontBold(true);
-        p.tableText(points, vals, p.fLineHeight + 20);
-        //PART 7 - 2
-        points.clear();
-        points << 50 + c0 << 100 << 200 << 600 << 250 << 250 << 250;
-        vals.clear();
-        vals.append(tr("NN"));
-        vals.append(tr("Code"));
-        vals.append(tr("Input material"));
-        vals.append(tr("Qty"));
-        vals.append(tr("Price"));
-        vals.append(tr("Amount"));
-        p.setFontBold(true);
-        p.tableText(points, vals, p.fLineHeight + 20);
-        p.br(p.fLineHeight + 20);
-        //PART 8 - 1
-        points.clear();
-        points << 50 << 100 << 200 << 600 << 250 << 250 << 250;
-        vals.clear();
-        vals.append("1");
-        vals.append(ui->leComplectationCode->text());
-        vals.append(ui->leComplectationName->text());
-        vals.append(ui->leComplectationQty->text());
-        vals.append(float_str(ui->leTotal->getDouble() / ui->leComplectationQty->getDouble(), 2));
-        vals.append(ui->leTotal->text());
-        p.setFontBold(false);
-        p.tableText(points, vals, p.fLineHeight + 20);
-        //PART 8 - 2
-        points.clear();
-        points << 50 + c0 << 100 << 200 << 600 << 250 << 250 << 250;
-        vals.clear();
-        vals.append("1");
-        vals.append(ui->leComplectationCode->text());
-        vals.append(ui->leComplectationName->text());
-        vals.append(ui->leComplectationQty->text());
-        vals.append(float_str(ui->leTotal->getDouble() / ui->leComplectationQty->getDouble(), 2));
-        vals.append(ui->leTotal->text());
-        p.setFontBold(false);
-        p.tableText(points, vals, p.fLineHeight + 20);
-        p.br(p.fLineHeight + 20);
+        QStringList hdrCharges { tr("NN"), tr("Other charges"), tr("Amount") };
+        QString charges = makeOtherChargesHtml(ui->tblAdd, hdrCharges);
+        QStringList hdrInput { tr("NN"), tr("Code"), tr("Input material"), tr("Qty"), tr("Price"), tr("Amount") };
+        QString inputMat = makeComplectationInputHtml(
+                               ui->leComplectationCode,
+                               ui->leComplectationName,
+                               ui->leComplectationQty,
+                               ui->leTotal->getDouble(),
+                               ui->leComplectationQty->getDouble(),
+                               hdrInput
+                           );
+        complectationBlock =
+            "<div class='section-title'>" + htmlEscape(tr("Complectation")) + "</div>" +
+            charges + inputMat;
     }
 
-    p.br();
+    // ---- goods table
     QString goodsColName = tr("Goods");
 
     if(fDocType == DOC_TYPE_COMPLECTATION) {
         goodsColName = tr("Output material");
     }
 
-    //PART 9 - 1
-    points.clear();
-    points << 40 << 60 << 170 << 450 << 130 << 130 << 150 << 170;
-    vals.clear();
-    vals << tr("NN")
-         << tr("Material code")
-         << goodsColName
-         << tr("Qty")
-         << tr("Unit")
-         << tr("Price")
-         << tr("Total");
-    p.setFontBold(true);
-    p.tableText(points, vals, p.fLineHeight + 20);
-    //PART 9 - 2
-    points.clear();
-    points << 40 + c0 << 60 << 170 << 450 << 130 << 130 << 150 << 170;
-    vals.clear();
-    vals << tr("NN")
-         << tr("Material code")
-         << goodsColName
-         << tr("Qty")
-         << tr("Unit")
-         << tr("Price")
-         << tr("Total");
-    p.setFontBold(true);
-    p.tableText(points, vals, p.fLineHeight + 20);
-    p.br(p.fLineHeight + 20);
-    p.setFontBold(false);
+    // ВАЖНО: V2 печатает из ui->tblGoods построчно, без группировки по barcode как V1.
+    // Оставим ту же логику, что была в V2.
+    QList<QStringList> rows;
 
-    for(int i = 0; i < ui->tblGoods->rowCount(); i++) {
-        if(p.checkBr(p.fLineHeight + 20)) {
-            p.br(p.fLineHeight + 20);
-            p.br();
-        }
-
-        //PART 10 - 1
-        points.clear();
-        points << 40 << 60 << 170 << 450 << 130 << 130 << 150 << 170;
-        vals.clear();
-        vals << QString::number(i + 1);
-        vals << ui->tblGoods->getString(i, 3);
-        vals << ui->tblGoods->getString(i, 4);
-        vals << ui->tblGoods->lineEdit(i, 5)->text();
-        vals << ui->tblGoods->getString(i, 6);
+    for(int i = 0; i < ui->tblGoods->rowCount(); ++i) {
+        QStringList r;
+        r << QString::number(i + 1);
+        r << ui->tblGoods->getString(i, 3);
+        r << ui->tblGoods->getString(i, 4);
+        r << ui->tblGoods->lineEdit(i, 5)->text();
+        r << ui->tblGoods->getString(i, 6);
 
         if(!mUser->check(cp_t11_do_now_show_input_prices)) {
-            vals << ui->tblGoods->lineEdit(i, 7)->text();
-            vals << ui->tblGoods->lineEdit(i, 8)->text();
+            r << ui->tblGoods->lineEdit(i, 7)->text();
+            r << ui->tblGoods->lineEdit(i, 8)->text();
         } else {
-            vals << "0";
-            vals << "0";
+            r << "0";
+            r << "0";
         }
 
-        p.tableText(points, vals, p.fLineHeight + 20);
-        //PART 10 - 2
-        points.clear();
-        points << 40 + c0 << 60 << 170 << 450 << 130 << 130 << 150 << 170;
-        vals.clear();
-        vals << QString::number(i + 1);
-        vals << ui->tblGoods->getString(i, 3);
-        vals << ui->tblGoods->getString(i, 4);
-        vals << ui->tblGoods->lineEdit(i, 5)->text();
-        vals << ui->tblGoods->getString(i, 6);
-
-        if(!mUser->check(cp_t11_do_now_show_input_prices)) {
-            vals << ui->tblGoods->lineEdit(i, 7)->text();
-            vals << ui->tblGoods->lineEdit(i, 8)->text();
-        } else {
-            vals << "0";
-            vals << "0";
-        }
-
-        p.tableText(points, vals, p.fLineHeight + 20);
-
-        if(p.checkBr(p.fLineHeight + 20)) {
-            p.br(p.fLineHeight + 20);
-        }
-
-        p.br(p.fLineHeight + 20);
+        rows << r;
     }
 
-    p.setFontBold(true);
-    //PART 11 - 1
-    points.clear();
-    points << 720 << 410 << 170;
-    vals.clear();
-    vals << tr("Total amount");
-    vals << ui->leTotal->text();
-    p.tableText(points, vals, p.fLineHeight + 20);
-    //PART 11 - 1
-    points.clear();
-    points << 720 + c0 << 410 << 170;
-    vals.clear();
-    vals << tr("Total amount");
-    vals << ui->leTotal->text();
-    p.tableText(points, vals, p.fLineHeight + 20);
-    p.br(p.fLineHeight + 20);
-    p.br(p.fLineHeight + 20);
-    p.br(p.fLineHeight + 20);
+    QStringList hdr {
+        tr("NN"),
+        tr("Material code"),
+        goodsColName,
+        tr("Qty"),
+        tr("Unit"),
+        tr("Price"),
+        tr("Total")
+    };
+    // right align: Qty(3), Price(5), Total(6)
+    QSet<int> rightCols {3, 5, 6};
+    QString goodsTable = makeGoodsTableHtml(hdr, rows, rightCols);
+    // ---- signatures
+    QString signLeftTitle, signRightTitle, signLeftName, signRightName;
 
-    switch(fDocType) {
-    case DOC_TYPE_STORE_MOVE:
-        p.ltext(tr("Passed"), 50);
-        p.ltext(tr("Passed"), 50 + c0);
-        p.ltext(tr("Accepted"), 1000);
-        p.ltext(tr("Accepted"), 1000 + c0);
-        p.br(p.fLineHeight + 20);
-        p.ltext(ui->lePassedName->text(), 50);
-        p.ltext(ui->leAcceptedName->text(), 1000);
-        p.ltext(ui->lePassedName->text(), 50 + c0);
-        p.ltext(ui->leAcceptedName->text(), 1000 + c0);
-        break;
-
-    default:
-        p.ltext(tr("Accepted"), 50);
-        p.ltext(tr("Passed"), 1000);
-        p.ltext(tr("Accepted"), 50 + c0);
-        p.ltext(tr("Passed"), 1000 + c0);
-        p.br(p.fLineHeight + 20);
-        p.ltext(ui->leAcceptedName->text(), 1000);
-        p.ltext(ui->lePassedName->text(), 50);
-        p.ltext(ui->leAcceptedName->text(), 1000 + c0);
-        p.ltext(ui->lePassedName->text(), 50 + c0);
-        break;
+    if(fDocType == DOC_TYPE_STORE_MOVE) {
+        signLeftTitle  = tr("Passed");
+        signRightTitle = tr("Accepted");
+        signLeftName   = ui->lePassedName->text();
+        signRightName  = ui->leAcceptedName->text();
+    } else {
+        signLeftTitle  = tr("Accepted");
+        signRightTitle = tr("Passed");
+        signLeftName   = ui->leAcceptedName->text();
+        signRightName  = ui->lePassedName->text();
     }
 
-    p.line(50, p.fTop, 500, p.fTop);
-    p.line(1000, p.fTop, 1500, p.fTop);
-    p.line(50 + c0, p.fTop, 500 + c0, p.fTop);
-    p.line(1000 + c0, p.fTop, 1500 + c0, p.fTop);
-    p.setFontBold(false);
-    p.line(c0, 0, c0, p.fTop);
-    C5PrintPreview pp(&p);
-    pp.exec();
+    // ---- vars for one copy
+    QMap<QString, QString> v;
+    v["doc_title"] = htmlEscape(QString("%1 N%2").arg(docTypeText, ui->leDocNum->text()));
+    v["reason"] = htmlEscape(ui->leReasonName->text());
+    v["comment_block"] = commentBlock;
+    v["lbl_date"] = htmlEscape(tr("Date"));
+    v["date"] = htmlEscape(ui->deDate->text());
+    v["th_store_in"] = thStoreIn;
+    v["td_store_in"] = tdStoreIn;
+    v["th_store_out"] = thStoreOut;
+    v["td_store_out"] = tdStoreOut;
+    v["supplier_invoice_block"] = supplierInvoiceBlock;
+    v["complectation_block"] = complectationBlock;
+    v["goods_table"] = goodsTable;
+    v["lbl_total_amount"] = htmlEscape(tr("Total amount"));
+    v["total_amount"] = htmlEscape(ui->leTotal->text());
+    v["sign_left_title"] = htmlEscape(signLeftTitle);
+    v["sign_right_title"] = htmlEscape(signRightTitle);
+    v["sign_left_name"] = htmlEscape(signLeftName);
+    v["sign_right_name"] = htmlEscape(signRightName);
+    const QString oneCopyHtml = applyTemplate(tplOne, v);
+    // ---- sheet vars
+    QMap<QString, QString> svars;
+    svars["one_copy"] = oneCopyHtml;
+    const QString html = applyTemplate(tplSheet, svars);
+    // ---- preview/print
+    QTextDocument doc;
+    doc.setHtml(html);
+    QPrinter printer(QPrinter::HighResolution);
+    printer.setPageSize(QPageSize::A4);
+    printer.setPageOrientation(QPageLayout::Landscape);
+    printer.setFullPage(false);
+    QPrintPreviewDialog preview(&printer, this);
+    connect(&preview, &QPrintPreviewDialog::paintRequested,
+    [&](QPrinter * p) { doc.print(p); });
+    preview.exec();
 }
 
 double C5StoreDoc::additionalCost()
@@ -2077,7 +1844,7 @@ void C5StoreDoc::lineEditKeyPressed(const QChar &key)
     case '*':
         double v;
 
-        if(Calculator::get(v)) {
+        if(Calculator::get(v, mUser)) {
             C5LineEdit *l = static_cast<C5LineEdit*>(sender());
             l->setDouble(v);
             l->textEdited(float_str(v, 2));
@@ -2275,7 +2042,7 @@ void C5StoreDoc::exportToExcel()
 
 void C5StoreDoc::dirtyEdit()
 {
-    DlgDirtyStoreDoc(fInternalId).exec();
+    DlgDirtyStoreDoc(mUser, fInternalId).exec();
     QString err;
     auto *doc = __mainWindow->createTab<C5StoreDoc>();
 
@@ -2349,7 +2116,7 @@ void C5StoreDoc::getInput()
 {
     QJsonArray vals;
 
-    if(!C5Selector::getValueOfColumn(cache_goods, vals, 3)) {
+    if(!C5Selector::getValueOfColumn(mUser, cache_goods, vals, 3)) {
         return;
     }
 
@@ -2409,7 +2176,7 @@ void C5StoreDoc::getOutput()
     trans["f_amount"] = tr("Amount");
     trans["f_scancode"] = tr("Scancode");
 
-    if(!C5Selector::getValues(query, vals, trans)) {
+    if(!C5Selector::getValues(mUser, query, vals, trans)) {
         return;
     }
 
@@ -2699,7 +2466,7 @@ void C5StoreDoc::on_leStoreOutput_textChanged(const QString &arg1)
 void C5StoreDoc::on_btnNewPartner_clicked()
 {
     CE5Partner *ep = new CE5Partner();
-    C5Editor *e = C5Editor::createEditor(ep, 0);
+    C5Editor *e = C5Editor::createEditor(mUser, ep, 0);
     QList<QMap<QString, QVariant> > data;
 
     if(e->getResult(data)) {
@@ -2712,7 +2479,7 @@ void C5StoreDoc::on_btnNewPartner_clicked()
 void C5StoreDoc::on_btnNewGoods_clicked()
 {
     CE5Goods *ep = new CE5Goods();
-    C5Editor *e = C5Editor::createEditor(ep, 0);
+    C5Editor *e = C5Editor::createEditor(mUser, ep, 0);
     QJsonObject data;
 
     if(e->getJsonObject(data)) {
@@ -2852,7 +2619,7 @@ void C5StoreDoc::on_btnEditGoods_clicked()
     }
 
     CE5Goods *ep = new CE5Goods();
-    C5Editor *e = C5Editor::createEditor(ep, 0);
+    C5Editor *e = C5Editor::createEditor(mUser, ep, 0);
     ep->setId(ui->tblGoods->getInteger(row, 3));
     QJsonObject data;
 
@@ -2876,7 +2643,7 @@ void C5StoreDoc::on_btnEditGoods_clicked()
 void C5StoreDoc::on_btnCalculator_clicked()
 {
     double v;
-    Calculator::get(v);
+    Calculator::get(v, mUser);
 }
 
 void C5StoreDoc::inputOfService()
@@ -2888,7 +2655,7 @@ void C5StoreDoc::inputOfService()
 
     QDate d1, d2;
 
-    if(!C5DateRange::dateRange(d1, d2)) {
+    if(!C5DateRange::dateRange(d1, d2, mUser)) {
         return;
     }
 
@@ -2991,7 +2758,7 @@ void C5StoreDoc::on_btnAddDish_clicked()
 {
     QJsonArray vals;
 
-    if(!C5Selector::getValue(cache_dish, vals)) {
+    if(!C5Selector::getValue(mUser, cache_dish, vals)) {
         return;
     }
 
@@ -3083,7 +2850,7 @@ void C5StoreDoc::on_btnAddPackages_clicked()
 {
     QJsonArray vals;
 
-    if(!C5Selector::getValue(cache_dish_package, vals)) {
+    if(!C5Selector::getValue(mUser, cache_dish_package, vals)) {
         return;
     }
 
@@ -3112,7 +2879,7 @@ void C5StoreDoc::on_btnChangePartner_clicked()
 {
     QJsonArray values;
 
-    if(!C5Selector::getValue(cache_goods_partners, values)) {
+    if(!C5Selector::getValue(mUser, cache_goods_partners, values)) {
         return;
     }
 
@@ -3201,7 +2968,7 @@ void C5StoreDoc::on_btnEditPassed_clicked()
 {
     QJsonArray values;
 
-    if(!C5Selector::getValue(cache_users, values)) {
+    if(!C5Selector::getValue(mUser, cache_users, values)) {
         return;
     }
 
@@ -3227,7 +2994,7 @@ void C5StoreDoc::on_btnEditAccept_clicked()
 {
     QJsonArray values;
 
-    if(!C5Selector::getValue(cache_users, values)) {
+    if(!C5Selector::getValue(mUser, cache_users, values)) {
         return;
     }
 

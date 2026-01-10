@@ -2,8 +2,8 @@
 #include "ui_dlgqty.h"
 #include "c5config.h"
 
-DlgQty::DlgQty() :
-    C5Dialog(),
+DlgQty::DlgQty(C5User *user) :
+    C5Dialog(user),
     ui(new Ui::DlgQty)
 {
     ui->setupUi(this);
@@ -14,14 +14,16 @@ DlgQty::~DlgQty()
     delete ui;
 }
 
-bool DlgQty::getQty(double &qty, const QString &name)
+bool DlgQty::getQty(double& qty, const QString &name, C5User *user)
 {
-    DlgQty d;
+    DlgQty d(user);
     d.ui->label->setText(name);
-    if (d.exec() == QDialog::Accepted) {
+
+    if(d.exec() == QDialog::Accepted) {
         qty = d.ui->leQty->getDouble();
         return true;
     }
+
     return false;
 }
 
@@ -32,20 +34,24 @@ void DlgQty::on_btnClear_clicked()
 
 void DlgQty::click(const QString &c)
 {
-    if (c == "0" && ui->leQty->getDouble() < 0.001) {
+    if(c == "0" && ui->leQty->getDouble() < 0.001) {
         return;
     }
-    if (c == ".") {
-        if (ui->leQty->getDouble() < 0.001) {
+
+    if(c == ".") {
+        if(ui->leQty->getDouble() < 0.001) {
             ui->leQty->setText("0.");
         } else {
-            if (ui->leQty->text().contains(".")) {
+            if(ui->leQty->text().contains(".")) {
                 return;
             }
+
             ui->leQty->setText(ui->leQty->text() + ".");
         }
+
         return;
     }
+
     ui->leQty->setText(ui->leQty->text() + c);
 }
 
@@ -136,7 +142,7 @@ void DlgQty::on_btnCancel_clicked()
 
 void DlgQty::on_btnOk_clicked()
 {
-    if (ui->leQty->getDouble() > 0.001) {
+    if(ui->leQty->getDouble() > 0.001) {
         accept();
     }
 }

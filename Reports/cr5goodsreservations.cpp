@@ -56,7 +56,7 @@ QToolBar* CR5GoodsReservations::toolBar()
 
 int CR5GoodsReservations::newRow()
 {
-    DlgReservGoods d;
+    DlgReservGoods d(mUser);
     d.exec();
     return -1;
 }
@@ -69,7 +69,7 @@ bool CR5GoodsReservations::tblDoubleClicked(int row, int column, const QJsonArra
         return true;
     }
 
-    DlgReservGoods d(values.at(0).toInt());
+    DlgReservGoods d(values.at(0).toInt(), mUser);
     d.exec();
     return true;
 }

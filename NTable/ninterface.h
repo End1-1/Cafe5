@@ -14,27 +14,42 @@ public:
 
     ~NInterface();
 
-    char *fErrorSlot;
+    char* fErrorSlot;
 
-    QObject *fErrorObject;
+    QObject* fErrorObject;
 
-    void createHttpQuery(const QString &route, const QJsonObject &params, const char *slotResponse,
+    void createHttpQuery(const QString &route, const QJsonObject &params, const char* slotResponse,
                          const QVariant &marks = QVariant(), bool progress = true, int timeout = 60000);
 
     void createHttpQueryLambda(const QString &route, const QJsonObject &params,
-                               std::function<void(const QJsonObject &)> callback,
-                               std::function<void (const QJsonObject &)> errCallback,
+                               std::function<void(const QJsonObject&)> callback,
+                               std::function<void (const QJsonObject&)> errCallback,
                                const QVariant &marks = QVariant(), bool progress = true, int timeout = 60000);
+
+    void createHttpQueryLambda2(const QString &route, const QJsonObject &params,
+                                std::function<void(const QJsonObject&)> callback,
+                                std::function<bool (const QJsonObject&)> errCallback,
+                                const QVariant &marks = QVariant(), bool progress = true, int timeout = 60000);
+
+    static void query(const QString &route, const QString &bearer, QObject *context, const QJsonObject &params,
+                      std::function<void(const QJsonObject&)> callback,
+                      std::function<bool (const QJsonObject&)> errCallback,
+                      bool progress = true, int timeout = 5000, bool destroyLoadingAtEnd = true);
+
+    static void query1(const QString &route, const QString &bearer, QObject *context, const QJsonObject &params,
+                       std::function<void(const QJsonObject&)> callback);
 
 public slots:
     void httpQueryStarted();
+
+    void httpQueryStartedWithShowDialog();
 
     void httpQueryFinished(QObject *sender);
 
     void httpQueryError(const QString &err);
 
 private:
-    NLoadingDlg *fLoadingDlg;
+    NLoadingDlg* fLoadingDlg = nullptr;
 
     bool fProgress;
 

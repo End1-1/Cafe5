@@ -2,8 +2,8 @@
 #include "ui_c5filtervalues.h"
 #include <QCheckBox>
 
-C5FilterValues::C5FilterValues() :
-    C5Dialog(),
+C5FilterValues::C5FilterValues(C5User *user) :
+    C5Dialog(user),
     ui(new Ui::C5FilterValues)
 {
     ui->setupUi(this);
@@ -14,9 +14,9 @@ C5FilterValues::~C5FilterValues()
     delete ui;
 }
 
-bool C5FilterValues::filterValues(QStringList &values)
+bool C5FilterValues::filterValues(QStringList &values, C5User *user)
 {
-    C5FilterValues *fv = new C5FilterValues();
+    C5FilterValues *fv = new C5FilterValues(user);
     QListWidget *lv = fv->ui->lst;
 
     for(QStringList::const_iterator it = values.begin(); it != values.end(); it++) {

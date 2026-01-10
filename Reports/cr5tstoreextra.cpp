@@ -4,6 +4,8 @@
 #include "c5gridgilter.h"
 #include "c5user.h"
 #include "c5storedraftwriter.h"
+#include "c5message.h"
+#include "c5config.h"
 #include <QInputDialog>
 
 CR5TStoreExtra::CR5TStoreExtra(QWidget *parent) :
@@ -76,7 +78,7 @@ void CR5TStoreExtra::buildQuery()
     CR5TStoreExtraFilter *f = static_cast<CR5TStoreExtraFilter*>(fFilterWidget);
 
     if(f->store() ==  0) {
-        if(!C5GridGilter::filter(f, fWhereCondition, fColumnsVisible, fTranslation)) {
+        if(!C5GridGilter::filter(mUser, f, fWhereCondition, fColumnsVisible, fTranslation)) {
             return;
         }
     }

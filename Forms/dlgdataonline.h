@@ -28,12 +28,12 @@ public:
             return v;
         }
     };
-
-    explicit DlgDataOnline(const QString &table);
+    
+    explicit DlgDataOnline(C5User *user, const QString &table);
 
     ~DlgDataOnline();
 
-    static bool get(const QString &table, DataResult &result, bool multiselect = false,
+    static bool get(C5User *user, const QString &table, DataResult &result, bool multiselect = false,
                     int searchcolumn = -1);
 
 private slots:

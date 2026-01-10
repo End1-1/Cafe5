@@ -12,11 +12,11 @@ class SelectPrinters : public C5Dialog
     Q_OBJECT
 
 public:
-    explicit SelectPrinters();
+    explicit SelectPrinters(C5User *user);
 
     ~SelectPrinters();
 
-    static bool selectPrinters(bool &p1, bool &p2);
+    static bool selectPrinters(bool &p1, bool &p2, C5User *user);
 
 private slots:
 

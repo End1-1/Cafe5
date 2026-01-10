@@ -1,8 +1,8 @@
 #include "dlgguest.h"
 #include "ui_dlgguest.h"
 
-DlgGuest::DlgGuest() :
-    C5Dialog(),
+DlgGuest::DlgGuest(C5User *user) :
+    C5Dialog(user),
     ui(new Ui::DlgGuest)
 {
     ui->setupUi(this);
@@ -34,9 +34,9 @@ DlgGuest::~DlgGuest()
     delete ui;
 }
 
-bool DlgGuest::getGuest(QString &res, QString &inv, QString &room, QString &guest)
+bool DlgGuest::getGuest(C5User *user, QString &res, QString &inv, QString &room, QString &guest)
 {
-    DlgGuest *d = new DlgGuest();
+    DlgGuest *d = new DlgGuest(user);
     d->ui->kbd->adjustSize();
     qApp->processEvents();
     bool result = d->exec() == QDialog::Accepted;

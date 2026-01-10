@@ -33,7 +33,9 @@
         <location filename="../../Classes/c5cache.cpp" line="139"/>
         <location filename="../../Classes/c5cache.cpp" line="145"/>
         <location filename="../../Classes/c5cache.cpp" line="153"/>
-        <location filename="../../Classes/c5cache.cpp" line="330"/>
+        <location filename="../../Classes/c5cache.cpp" line="168"/>
+        <location filename="../../Classes/c5cache.cpp" line="184"/>
+        <location filename="../../Classes/c5cache.cpp" line="361"/>
         <source>Code</source>
         <translation>Կոդ</translation>
     </message>
@@ -64,7 +66,8 @@
         <location filename="../../Classes/c5cache.cpp" line="115"/>
         <location filename="../../Classes/c5cache.cpp" line="118"/>
         <location filename="../../Classes/c5cache.cpp" line="139"/>
-        <location filename="../../Classes/c5cache.cpp" line="330"/>
+        <location filename="../../Classes/c5cache.cpp" line="170"/>
+        <location filename="../../Classes/c5cache.cpp" line="361"/>
         <source>Name</source>
         <translation>Անվանում</translation>
     </message>
@@ -80,36 +83,43 @@
     </message>
     <message>
         <location filename="../../Classes/c5cache.cpp" line="34"/>
+        <location filename="../../Classes/c5cache.cpp" line="169"/>
         <source>Group</source>
         <translation>Խումբ</translation>
     </message>
     <message>
         <location filename="../../Classes/c5cache.cpp" line="36"/>
+        <location filename="../../Classes/c5cache.cpp" line="171"/>
         <source>Unit</source>
         <translation>ՉՄ</translation>
     </message>
     <message>
         <location filename="../../Classes/c5cache.cpp" line="37"/>
+        <location filename="../../Classes/c5cache.cpp" line="172"/>
         <source>Scancode</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../../Classes/c5cache.cpp" line="39"/>
+        <location filename="../../Classes/c5cache.cpp" line="174"/>
         <source>Complect output</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../../Classes/c5cache.cpp" line="40"/>
+        <location filename="../../Classes/c5cache.cpp" line="175"/>
         <source>Qty in box</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../../Classes/c5cache.cpp" line="41"/>
+        <location filename="../../Classes/c5cache.cpp" line="176"/>
         <source>Retail price</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../../Classes/c5cache.cpp" line="42"/>
+        <location filename="../../Classes/c5cache.cpp" line="177"/>
         <source>Whosale price</source>
         <translation type="unfinished"></translation>
     </message>
@@ -175,6 +185,7 @@
     </message>
     <message>
         <location filename="../../Classes/c5cache.cpp" line="127"/>
+        <location filename="../../Classes/c5cache.cpp" line="187"/>
         <source>Product</source>
         <translation type="unfinished"></translation>
     </message>
@@ -230,9 +241,20 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <location filename="../../Classes/c5cache.cpp" line="185"/>
+        <source>Date</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../Classes/c5cache.cpp" line="186"/>
+        <source>Status</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <location filename="../../Classes/c5cache.cpp" line="38"/>
         <location filename="../../Classes/c5cache.cpp" line="86"/>
         <location filename="../../Classes/c5cache.cpp" line="128"/>
+        <location filename="../../Classes/c5cache.cpp" line="173"/>
         <source>Price</source>
         <translation>Գին</translation>
     </message>
@@ -245,27 +267,27 @@
 <context>
     <name>C5Message</name>
     <message>
-        <location filename="../../Cafe5/c5message.ui" line="185"/>
+        <location filename="../../Cafe5/c5message.ui" line="197"/>
         <source>&lt;html&gt;msg&lt;/html&gt;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Cafe5/c5message.ui" line="257"/>
+        <location filename="../../Cafe5/c5message.ui" line="272"/>
         <source>A1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Cafe5/c5message.ui" line="270"/>
+        <location filename="../../Cafe5/c5message.ui" line="285"/>
         <source>A3</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Cafe5/c5message.ui" line="283"/>
+        <location filename="../../Cafe5/c5message.ui" line="298"/>
         <source>A2</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Cafe5/c5message.ui" line="296"/>
+        <location filename="../../Cafe5/c5message.ui" line="311"/>
         <source>Copy</source>
         <translation type="unfinished"></translation>
     </message>

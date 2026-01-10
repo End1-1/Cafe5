@@ -3,8 +3,8 @@
 #include "c5utils.h"
 #include <QDoubleValidator>
 
-Change::Change() :
-    C5Dialog(),
+Change::Change(C5User *user) :
+    C5Dialog(user),
     ui(new Ui::Change)
 {
     ui->setupUi(this);
@@ -32,9 +32,9 @@ Change::~Change()
     delete ui;
 }
 
-bool Change::getReceived(double& v)
+bool Change::getReceived(double& v, C5User *user)
 {
-    Change c;
+    Change c(user);
     c.ui->leAmount->setDouble(v);
 
     for(int i = 0; i < c.fButtons.count(); i++) {

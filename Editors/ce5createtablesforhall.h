@@ -3,7 +3,8 @@
 
 #include "c5dialog.h"
 
-namespace Ui {
+namespace Ui
+{
 class CE5CreateTablesForHall;
 }
 
@@ -12,11 +13,11 @@ class CE5CreateTablesForHall : public C5Dialog
     Q_OBJECT
 
 public:
-    explicit CE5CreateTablesForHall();
+    explicit CE5CreateTablesForHall(C5User *user);
 
     ~CE5CreateTablesForHall();
 
-    static void createTableForHall();
+    static void createTableForHall(C5User *user);
 
 private slots:
     void on_btnCreate_clicked();
@@ -24,7 +25,7 @@ private slots:
     void on_btnNewHall_clicked();
 
 private:
-    Ui::CE5CreateTablesForHall *ui;
+    Ui::CE5CreateTablesForHall* ui;
 };
 
 #endif // CE5CREATETABLESFORHALL_H

@@ -3,8 +3,8 @@
 #include "c5random.h"
 #include "c5message.h"
 
-C5ChangePriceOfGroup::C5ChangePriceOfGroup() :
-    C5Dialog(),
+C5ChangePriceOfGroup::C5ChangePriceOfGroup(C5User *user) :
+    C5Dialog(user),
     ui(new Ui::C5ChangePriceOfGroup)
 {
     ui->setupUi(this);
@@ -16,10 +16,10 @@ C5ChangePriceOfGroup::~C5ChangePriceOfGroup()
     delete ui;
 }
 
-bool C5ChangePriceOfGroup::groupPrice(double &price1, double &price2, double &price1disc,
-                                      double &price2disc)
+bool C5ChangePriceOfGroup::groupPrice(double& price1, double& price2, double& price1disc,
+                                      double& price2disc, C5User *user)
 {
-    auto *c = new  C5ChangePriceOfGroup();
+    auto *c = new  C5ChangePriceOfGroup(user);
     bool r = c->exec() == QDialog::Accepted;
     price1 = c->ui->lePrice1->getDouble();
     price2 = c->ui->lePrice2->getDouble();
@@ -30,22 +30,27 @@ bool C5ChangePriceOfGroup::groupPrice(double &price1, double &price2, double &pr
 
 void C5ChangePriceOfGroup::on_btnOk_clicked()
 {
-    if (ui->lbCheckcode->text() != ui->leCheckCode->text()) {
+    if(ui->lbCheckcode->text() != ui->leCheckCode->text()) {
         C5Message::error(tr("Check code is not valid"));
         return;
     }
-    if (!ui->chRetail->isChecked()) {
+
+    if(!ui->chRetail->isChecked()) {
         ui->lePrice1->setDouble(-1);
     }
-    if (!ui->chRetailDisc->isChecked()) {
+
+    if(!ui->chRetailDisc->isChecked()) {
         ui->lePrice1disc->setDouble(-1);
     }
-    if (!ui->chWhosale->isChecked()) {
+
+    if(!ui->chWhosale->isChecked()) {
         ui->lePrice2->setDouble(-1);
     }
-    if (!ui->chWhosaleDisc->isChecked()) {
+
+    if(!ui->chWhosaleDisc->isChecked()) {
         ui->lePrice2disc->setDouble(-1);
     }
+
     accept();
 }
 

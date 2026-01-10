@@ -12,11 +12,11 @@ class DlgGuest : public C5Dialog
     Q_OBJECT
 
 public:
-    explicit DlgGuest();
+    explicit DlgGuest(C5User *user);
 
     ~DlgGuest();
 
-    static bool getGuest(QString &res, QString &inv, QString &room, QString &guest);
+    static bool getGuest(C5User *user, QString &res, QString &inv, QString &room, QString &guest);
 
 private:
     Ui::DlgGuest *ui;

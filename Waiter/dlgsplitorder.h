@@ -1,8 +1,8 @@
 #ifndef DLGSPLITORDER_H
 #define DLGSPLITORDER_H
 
-#include "c5dialog.h"
-#include "c5user.h"
+#include "c5waiterdialog.h"
+#include "struct_waiter_order.h"
 
 namespace Ui
 {
@@ -10,19 +10,26 @@ class DlgSplitOrder;
 }
 
 class C5OrderDriver;
+class QVBoxLayout;
 
-class DlgSplitOrder : public C5Dialog
+class DlgSplitOrder : public C5WaiterDialog
 {
     Q_OBJECT
 
 public:
-    explicit DlgSplitOrder(C5User *user);
+    explicit DlgSplitOrder(WaiterOrder wo, C5User *user);
 
     ~DlgSplitOrder();
 
-    void configOrder(int table);
+    virtual void accept() override;
+
+    virtual void reject() override;
 
 private slots:
+
+    void focused1(const QString &id);
+
+    void focused2(const QString &id);
 
     void on_btnChoseTable_clicked();
 
@@ -38,22 +45,24 @@ private slots:
 
     void on_btnSave_clicked();
 
-    void on_btnScrollUp1_clicked();
-
-    void on_btnScrollDown1_clicked();
-
-    void on_btnScrollUp2_clicked();
-
-    void on_btnScrollDown2_clicked();
-
 private:
     Ui::DlgSplitOrder* ui;
 
-    C5User* fUser;
+    WaiterOrder mOrder;
+
+    WaiterOrder mOrder1;
+
+    WaiterOrder mOrder2;
+
+    void restoreLeftSide();
 
     bool moveItem(C5OrderDriver *or1, C5OrderDriver *or2, int row);
 
     QMultiMap<QString, QString> fHistory;
+
+    void overrideAcceptReject(bool isAccept);
+
+    void moveItemLeftRight(int index, WaiterOrder &w1, WaiterOrder &w2, QVBoxLayout *l1, QVBoxLayout *l2);
 };
 
 #endif // DLGSPLITORDER_H

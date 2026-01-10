@@ -1,17 +1,17 @@
-#ifndef C5DIALOG_H
-#define C5DIALOG_H
+#pragma once
 
 #include <QDialog>
 #include <QJsonArray>
 
 class NInterface;
+class C5User;
 
 class C5Dialog : public QDialog
 {
     Q_OBJECT
 
 public:
-    C5Dialog();
+    C5Dialog(C5User *user);
 
     ~C5Dialog();
 
@@ -49,6 +49,8 @@ public:
 
     static int mScreen;
 
+    C5User* mUser;
+
 protected:
 
     virtual void keyPressEvent(QKeyEvent *e) override;
@@ -69,5 +71,3 @@ protected slots:
 signals:
     void escape();
 };
-
-#endif // C5DIALOG_H

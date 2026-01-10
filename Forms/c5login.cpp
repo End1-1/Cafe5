@@ -4,15 +4,15 @@
 #include "c5user.h"
 #include "c5servername.h"
 #include "fileversion.h"
-#include "dlgserverconnection.h"
 #include "c5config.h"
 #include "c5database.h"
-#include "ninterface.h"
+#include "appwebsocket.h"
 #include "c5officewidget.h"
+#include "c5connectiondialog.h"
 #include <QSettings>
 
-C5Login::C5Login() :
-    C5OfficeDialog(),
+C5Login::C5Login(C5User *user) :
+    C5OfficeDialog(user),
     ui(new Ui::C5Login)
 {
     ui->setupUi(this);
@@ -44,8 +44,10 @@ void C5Login::on_btnOk_clicked()
 
     NDataProvider::mFileVersion = ui->leVersion->text();
     mUser->authByUsernamePass(ui->leUsername->currentText(), ui->lePassword->text(), fHttp, [this](const QJsonObject & jo) {
+        QJsonObject js;
+
         for(int i = 0; i < fServers.size(); i++) {
-            QJsonObject js = fServers.at(i).toObject();
+            js = fServers.at(i).toObject();
             js["lastusername"] = "";
             js["lastdb"] = "";
             fServers[i] = js;
@@ -56,7 +58,16 @@ void C5Login::on_btnOk_clicked()
         s.setValue("lastusername", ui->leUsername->currentText());
         s.setValue("lastversion", ui->leVersion->text());
         __c5config.fDBName = ui->cbDatabases->currentText();
-        fHttp->httpQueryFinished(sender());
+        C5Database::fDbParams = {"", "", "", ""};
+        js = fServers.at(ui->cbDatabases->currentIndex()).toObject();
+        C5Database::fUrl = QString("%1://%2").arg(js["settings"].toString(),
+                           js["database"].toString());
+        __c5config.setValues(mUser->fSettings);
+        __c5config.fMainJson = mUser->fConfig;
+        AppWebSocket::reconnect(QString("%1://%2").arg(js["settings"].toString() == "http" ? "ws" : "wss",
+                                js["database"].toString() + "/ws"),
+                                js["fkey"].toString(),
+                                ui->leUsername->currentText(), ui->lePassword->text());
         accept();
     });
 }
@@ -127,5 +138,5 @@ void C5Login::readServers()
 
 void C5Login::on_btnConfig_clicked()
 {
-    DlgServerConnection::showSettings(this);
+    C5ConnectionDialog::showSettings(this);
 }

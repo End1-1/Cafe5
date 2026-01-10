@@ -8,9 +8,9 @@
 #include <QJsonDocument>
 #include <QTimer>
 
-HttpQueryDialog::HttpQueryDialog(const QString &url, const QJsonObject &jo,
+HttpQueryDialog::HttpQueryDialog(C5User *user, const QString &url, const QJsonObject &jo,
                                  QWidget *parent) :
-    C5Dialog(),
+    C5Dialog(user),
     ui(new Ui::HttpQueryDialog),
     fUrl(url),
     jRequest(jo)

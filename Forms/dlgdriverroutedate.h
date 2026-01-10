@@ -12,9 +12,9 @@ class DlgDriverRouteDate : public C5Dialog
     Q_OBJECT
 
 public:
-    explicit DlgDriverRouteDate(QWidget *parent = nullptr);
+    explicit DlgDriverRouteDate(C5User *user = nullptr);
     ~DlgDriverRouteDate();
-    static bool getDate(QDate &date, int &driver, QWidget *parent);
+    static bool getDate(QDate &date, int &driver, C5User *user);
 
 private slots:
     void on_btnCancel_clicked();

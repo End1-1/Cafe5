@@ -128,7 +128,7 @@ bool CR5CommonSalesFilter::notComplimentary()
 
 void CR5CommonSalesFilter::on_btnFlags_clicked()
 {
-    CR5SaleFlags f;
+    CR5SaleFlags f(mUser);
 
     if(f.exec() == QDialog::Accepted) {
         fFlags = f.flagsCond();

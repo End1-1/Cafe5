@@ -5,9 +5,12 @@
 #include "ndataprovider.h"
 #include "logwriter.h"
 #include "c5message.h"
+#include "c5user.h"
+#include "printtaxn.h"
+#include "dlgsplashscreen.h"
+#include <QTimer>
 #include <QApplication>
 #include <QTranslator>
-#include "dlgsplashscreen.h"
 #include <QFile>
 #include <QDir>
 #include <QLockFile>
@@ -17,6 +20,10 @@
 
 int main(int argc, char* argv[])
 {
+#ifdef QT_DEBUG
+    QGuiApplication::setAttribute(Qt::AA_DisableHighDpiScaling);
+    QGuiApplication::setAttribute(Qt::AA_Use96Dpi);
+#endif
     QApplication a(argc, argv);
     LogWriter::write(LogWriterLevel::verbose, "Support SSL", QSslSocket::supportsSsl() ? "true" : "false");
     LogWriter::write(LogWriterLevel::verbose, "Support SSL version", QSslSocket::sslLibraryBuildVersionString());
@@ -47,7 +54,20 @@ int main(int argc, char* argv[])
         return -1;
     }
 
-    auto *dlgsplash = new DlgSplashScreen();
+    for(const QString &s : a.arguments()) {
+        if(s.startsWith("/monitor")) {
+            QList<QScreen*> screens = a.screens();
+            int monitor = 0;
+            QStringList mon = s.split("=");
+
+            if(mon.length() == 2) {
+                monitor = mon.at(1).toInt();
+                C5Dialog::mScreen = monitor;
+            }
+        }
+    }
+
+    auto *dlgsplash = new DlgSplashScreen(nullptr);
     dlgsplash->show();
     emit dlgsplash->messageSignal("Get server name");
 
@@ -61,32 +81,33 @@ int main(int argc, char* argv[])
         a.installTranslator(&t);
     }
 
+    QString fileVersion =  FileVersion::getVersionString(a.applicationFilePath());
+    int build = 0;
+    const QStringList parts = fileVersion.split('.');
+
+    if(parts.size() >= 4) {
+        build = parts.at(3).toInt();
+    }
+
+    PrintTaxN::mDebugRseq = build;
     QFont font(a.font());
     font.setFamily("Arial LatArm Unicode");
     font.setPointSize(11);
     a.setFont(font);
     NDataProvider::mAppName = "waiter";
-    NDataProvider::mFileVersion = FileVersion::getVersionString(qApp->applicationFilePath());
+    NDataProvider::mFileVersion = fileVersion;
     NDataProvider::mProtocol = C5ConnectionDialog::instance()->noneSecure ? "http" : "https";
     NDataProvider::mHost = C5ConnectionDialog::instance()->serverAddress();
     NDataProvider::mDebug = a.arguments().contains("/debug");
-    dlgsplash->deleteLater();
-    DlgScreen w;
-    w.showFullScreen();
-
-    for(const QString &s : a.arguments()) {
-        if(s.startsWith("/monitor")) {
-            QList<QScreen*> screens = a.screens();
-            int monitor = 0;
-            QStringList mon = s.split("=");
-
-            if(mon.length() == 2) {
-                monitor = mon.at(1).toInt();
-            }
-
-            w.move(screens.at(monitor)->geometry().topLeft());
-        }
-    }
-
+    dlgsplash->login(C5ConnectionDialog::instance()->username(),
+                     C5ConnectionDialog::instance()->password(),
+    [dlgsplash](C5User * user) {
+        dlgsplash->deleteLater();
+        C5Dialog::setMainWindow(nullptr);
+        QTimer::singleShot(1, [user]() {
+            auto *w = new DlgScreen(user);
+            w->exec();
+        });
+    });
     return a.exec();
 }

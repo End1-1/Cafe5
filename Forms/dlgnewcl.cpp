@@ -4,8 +4,8 @@
 #include "c5database.h"
 #include "c5config.h"
 
-DlgNewCL::DlgNewCL() :
-    C5Dialog(),
+DlgNewCL::DlgNewCL(C5User *user) :
+    C5Dialog(user),
     ui(new Ui::DlgNewCL)
 {
     ui->setupUi(this);
@@ -16,9 +16,9 @@ DlgNewCL::~DlgNewCL()
     delete ui;
 }
 
-bool DlgNewCL::createCL(QString &code, QString &name)
+bool DlgNewCL::createCL(C5User *user, QString &code, QString &name)
 {
-    DlgNewCL d;
+    DlgNewCL d(user);
 
     if(d.exec() == QDialog::Accepted) {
         code = d.ui->leCode->text();

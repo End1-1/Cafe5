@@ -3,54 +3,21 @@
 #include "c5config.h"
 #include "c5user.h"
 #include "c5message.h"
-#include "ninterface.h"
 #include <QCryptographicHash>
 #include <QDoubleValidator>
 
 DlgPassword::DlgPassword(C5User *u) :
-    C5WaiterDialog(u),
+    C5Dialog(u),
     ui(new Ui::DlgPassword)
 {
     ui->setupUi(this);
     fMax = 0;
-    connect(this, &DlgPassword::rejected, []() {
-        qApp->quit();
-        exit(0);
-    });
+    ui->btnRemoveFromStopList->setVisible(false);
 }
 
 DlgPassword::~DlgPassword()
 {
     delete ui;
-}
-
-bool DlgPassword::getUser(const QString &title, C5User*& user)
-{
-    user = new C5User();
-    DlgPassword *d = new DlgPassword(user);
-    d->ui->label->setText(title);
-    bool result = d->exec() == QDialog::Accepted;
-    delete d;
-
-    if(!result) {
-        delete user;
-    }
-
-    return result;
-}
-
-bool DlgPassword::getUserAndCheck(const QString &title, C5User*& user, int permission)
-{
-    if(!getUser(title, user)) {
-        return false;
-    }
-
-    if(!user->check(permission)) {
-        C5Message::error(tr("You have not permission for this action"));
-        return false;
-    }
-
-    return true;
 }
 
 bool DlgPassword::getQty(const QString &title, int& qty)
@@ -60,6 +27,19 @@ bool DlgPassword::getQty(const QString &title, int& qty)
     d->ui->label->setText(title);
     d->ui->lePassword->setEchoMode(QLineEdit::Normal);
     d->ui->lePassword->setMaxLength(2);
+    bool result = d->exec() == QDialog::Accepted;
+    qty = d->ui->lePassword->getInteger();
+    delete d;
+    return result;
+}
+
+bool DlgPassword::stopList(int& qty)
+{
+    DlgPassword *d = new DlgPassword(nullptr);
+    d->ui->label->setVisible(false);
+    d->ui->btnRemoveFromStopList->setVisible(true);
+    d->ui->lePassword->setEchoMode(QLineEdit::Normal);
+    d->ui->lePassword->setMaxLength(3);
     bool result = d->exec() == QDialog::Accepted;
     qty = d->ui->lePassword->getInteger();
     delete d;
@@ -124,6 +104,12 @@ bool DlgPassword::getPasswordString(const QString &title, QString &pass)
     pass = d->ui->lePassword->text().replace(";", "").replace("?", "");
     delete d;
     return result;
+}
+
+void DlgPassword::showEvent(QShowEvent *e)
+{
+    C5Dialog::showEvent(e);
+    adjustSize();
 }
 
 void DlgPassword::on_pushButton_clicked()
@@ -203,7 +189,9 @@ void DlgPassword::on_pushButton_12_clicked()
 
     if(ui->lePassword->echoMode() == QLineEdit::Password) {
         fUser->authorize(pwd, fHttp, [this](const QJsonObject & jdoc) {
+            Q_UNUSED(jdoc);
             accept();
+        }, []() {
         });
     } else {
         accept();
@@ -233,4 +221,10 @@ void DlgPassword::on_btnClear_clicked()
 void DlgPassword::on_pushButton_13_clicked()
 {
     click(".");
+}
+
+void DlgPassword::on_btnRemoveFromStopList_clicked()
+{
+    ui->lePassword->setText("-999");
+    accept();
 }

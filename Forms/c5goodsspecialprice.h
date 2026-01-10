@@ -13,7 +13,7 @@ class C5GoodsSpecialPrice : public C5Dialog
     Q_OBJECT
 
 public:
-    explicit C5GoodsSpecialPrice(QWidget *parent = nullptr);
+    explicit C5GoodsSpecialPrice(C5User *user = nullptr);
 
     ~C5GoodsSpecialPrice();
 

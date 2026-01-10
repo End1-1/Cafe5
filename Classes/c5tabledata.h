@@ -27,17 +27,11 @@ public:
 
     QJsonObject data;
 
-    void setData(const QJsonObject &d);
-
-    static C5TableData *instance();
+    static C5TableData* instance();
 
     int version();
 
     QStringList ids(const QString &table);
-
-    QJsonArray dishes(int menu, int part2);
-
-    QJsonArray part2(int menu, int part1, int parentid);
 
     QMap<QString, int> cashNames();
 
@@ -45,12 +39,7 @@ public:
 
     QMap<int, double> mStopList;
 private:
-    static C5TableData *mInstance;
-
-    QMap<QString, QJsonArray> mMenuDish;
-
-    QMap<QString, QJsonArray> mPart2List;
-
+    static C5TableData* mInstance;
 };
 
 #endif // C5TABLEDATA_H

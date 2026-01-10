@@ -13,7 +13,7 @@ class DlgViewStopList : public C5Dialog
     Q_OBJECT
 
 public:
-    explicit DlgViewStopList();
+    explicit DlgViewStopList(C5User *user);
     ~DlgViewStopList();
 
 private:

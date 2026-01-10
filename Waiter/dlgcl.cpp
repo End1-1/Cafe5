@@ -2,8 +2,8 @@
 #include "ui_dlgcl.h"
 #include <QSettings>
 
-DlgCL::DlgCL() :
-    C5Dialog(),
+DlgCL::DlgCL(C5User *user) :
+    C5Dialog(user),
     ui(new Ui::DlgCL)
 {
     ui->setupUi(this);
@@ -42,9 +42,9 @@ DlgCL::~DlgCL()
     delete ui;
 }
 
-bool DlgCL::getCL(QString &id, QString &name)
+bool DlgCL::getCL(C5User *user, QString &id, QString &name)
 {
-    DlgCL *d = new DlgCL();
+    DlgCL *d = new DlgCL(user);
     bool result = d->exec() == QDialog::Accepted;
 
     if(result) {

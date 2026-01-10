@@ -2,12 +2,13 @@
 #include "cr5salefromstorefilter.h"
 #include "c5tablemodel.h"
 #include "c5mainwindow.h"
+#include "c5message.h"
 #include "c5saledoc.h"
 #include <QJsonObject>
 #include <QJsonDocument>
 
 CR5SaleFromStore::CR5SaleFromStore(QWidget *parent) :
-    C5ReportWidget( parent)
+    C5ReportWidget(parent)
 {
     fIcon = ":/graph.png";
     fLabel = tr("Sales by goods");
@@ -134,12 +135,12 @@ CR5SaleFromStore::CR5SaleFromStore(QWidget *parent) :
     fColumnsVisible["sum(asd.f_price*og.f_qty*og.f_sign) as f_selfcosttotal"] = false;
     restoreColumnsVisibility();
     fFilterWidget = new CR5SaleFromStoreFilter();
-    fFilter = static_cast<CR5SaleFromStoreFilter *>(fFilterWidget);
+    fFilter = static_cast<CR5SaleFromStoreFilter*>(fFilterWidget);
 }
 
-QToolBar *CR5SaleFromStore::toolBar()
+QToolBar* CR5SaleFromStore::toolBar()
 {
-    if (!fToolBar) {
+    if(!fToolBar) {
         QList<ToolBarButtons> btn;
         btn << ToolBarButtons::tbFilter
             << ToolBarButtons::tbClearFilter
@@ -148,13 +149,15 @@ QToolBar *CR5SaleFromStore::toolBar()
             << ToolBarButtons::tbPrint;
         fToolBar = createStandartToolbar(btn);
     }
+
     return fToolBar;
 }
 
 void CR5SaleFromStore::restoreColumnsWidths()
 {
     C5Grid::restoreColumnsWidths();
-    if (fColumnsVisible["oh.f_id as f_header"]) {
+
+    if(fColumnsVisible["oh.f_id as f_header"]) {
         fTableView->setColumnWidth(fModel->fColumnNameIndex["f_header"], 0);
     }
 }
@@ -163,13 +166,16 @@ bool CR5SaleFromStore::tblDoubleClicked(int row, int column, const QJsonArray &v
 {
     Q_UNUSED(row);
     Q_UNUSED(column);
-    if (!fColumnsVisible["oh.f_id as f_header"]) {
+
+    if(!fColumnsVisible["oh.f_id as f_header"]) {
         C5Message::info(tr("Column 'Header' must be checked in filter"));
         return true;
     }
-    if (values.count() == 0) {
+
+    if(values.count() == 0) {
         return true;
     }
+
     auto *doc = __mainWindow->createTab<C5SaleDoc>();
     doc->openDoc(values.at(fModel->indexForColumnName("f_header")).toString());
     return true;

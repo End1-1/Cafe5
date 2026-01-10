@@ -5,8 +5,8 @@
 #include "c5mainwindow.h"
 #include "c5saledoc.h"
 #include "c5storedraftwriter.h"
-#include "c5waiterorderdoc.h"
-#include "dlgexportsaletoasoptions.h"
+#include "c5message.h"
+#include "c5config.h"
 #include "c5dlgselectreporttemplate.h"
 #include "c5salefromstoreorder.h"
 #include "c5gridgilter.h"
@@ -243,7 +243,7 @@ bool CR5CommonSales::tblDoubleClicked(int row, int column, const QJsonArray &val
                 C5WaiterOrder *wo = __mainWindow->createTab<C5WaiterOrder>();
                 wo->setOrder(values.at(fModel->fColumnNameIndex["f_id"]).toString());
             } else {
-                C5SaleFromStoreOrder::openOrder(values.at(fModel->fColumnNameIndex["f_id"]).toString());
+                C5SaleFromStoreOrder::openOrder(mUser, values.at(fModel->fColumnNameIndex["f_id"]).toString());
             }
 
             break;
@@ -301,14 +301,14 @@ void CR5CommonSales::transferToRoom()
 
 void CR5CommonSales::templates()
 {
-    C5DlgSelectReportTemplate d(reporttemplate_commonsales);
+    C5DlgSelectReportTemplate d(mUser, reporttemplate_commonsales);
 
     if(d.exec() == QDialog::Accepted) {
         QString condition;
         QMap<QString, bool> showColumns = fColumnsVisible;
         fColumnsVisible.clear();
 
-        if(C5GridGilter::filter(fFilterWidget, condition, fColumnsVisible, fTranslation)) {
+        if(C5GridGilter::filter(mUser, fFilterWidget, condition, fColumnsVisible, fTranslation)) {
             QString sql = d.fSelectedTemplate.sql;
             sql.replace("%date1", fFilter->date1().toString(FORMAT_DATE_TO_STR_MYSQL));
             sql.replace("%date2", fFilter->date2().toString(FORMAT_DATE_TO_STR_MYSQL));

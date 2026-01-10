@@ -2,8 +2,8 @@
 #include "ui_dlgguestinfo.h"
 #include "c5message.h"
 
-DlgGuestInfo::DlgGuestInfo() :
-    C5Dialog(),
+DlgGuestInfo::DlgGuestInfo(C5User *user) :
+    C5Dialog(user),
     ui(new Ui::DlgGuestInfo)
 {
     ui->setupUi(this);

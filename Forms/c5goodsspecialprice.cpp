@@ -5,8 +5,8 @@
 #include "c5message.h"
 #include "c5config.h"
 
-C5GoodsSpecialPrice::C5GoodsSpecialPrice(QWidget *parent)
-    : C5Dialog()
+C5GoodsSpecialPrice::C5GoodsSpecialPrice(C5User *user)
+    : C5Dialog(user)
     , ui(new Ui::C5GoodsSpecialPrice)
 {
     ui->setupUi(this);
@@ -36,12 +36,15 @@ void C5GoodsSpecialPrice::on_btnCancel_clicked()
 void C5GoodsSpecialPrice::on_btnSelectPartner_clicked()
 {
     QJsonArray values;
-    if (!C5Selector::getValue(cache_goods_partners, values)) {
+
+    if(!C5Selector::getValue(mUser, cache_goods_partners, values)) {
         return;
     }
-    if (values.count() == 0) {
+
+    if(values.count() == 0) {
         return;
     }
+
     ui->lePartnerID->setInteger(values.at(1).toInteger());
     ui->lePartnerTIN->setText(values.at(9).toString());
     ui->lePartnerName->setText(values.at(2).toString());
@@ -51,13 +54,16 @@ void C5GoodsSpecialPrice::on_btnSelectPartner_clicked()
 void C5GoodsSpecialPrice::on_btnSelectGoods_clicked()
 {
     QJsonArray vals;
-    if (!C5Selector::getValueOfColumn(cache_goods, vals, 3)) {
+
+    if(!C5Selector::getValueOfColumn(mUser, cache_goods, vals, 3)) {
         return;
     }
-    if (vals.at(1).toInt() == 0) {
+
+    if(vals.at(1).toInt() == 0) {
         C5Message::error(tr("Could not add goods without code"));
         return;
     }
+
     ui->leGoodsID->setInteger(vals.at(1).toInt());
     ui->leGoodsGroup->setText(vals.at(2).toString());
     ui->leGoodsName->setText(vals.at(3).toString());

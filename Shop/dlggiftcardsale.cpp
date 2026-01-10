@@ -4,8 +4,8 @@
 #include "c5message.h"
 #include "c5utils.h"
 
-DlgGiftCardSale::DlgGiftCardSale(const QStringList &dbParams) :
-    C5Dialog(),
+DlgGiftCardSale::DlgGiftCardSale(C5User *user) :
+    C5Dialog(user),
     ui(new Ui::DlgGiftCardSale)
 {
     ui->setupUi(this);

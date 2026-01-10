@@ -3,17 +3,20 @@
 #include "c5tablemodel.h"
 #include "c5filtervalues.h"
 #include "c5filterwidget.h"
-#include "c5printing.h"
-#include "c5printpreview.h"
 #include "c5gridgilter.h"
 #include "c5utils.h"
 #include "nloadingdlg.h"
+#include "c5message.h"
+#include "c5htmlprint.h"
 #include <QMenu>
 #include <QScrollBar>
 #include <QClipboard>
 #include <QShortcut>
 #include <QFileDialog>
 #include <QDesktopServices>
+#include <QTextDocument>
+#include <QPrinter>
+#include <QPrintPreviewDialog>
 #include <QXlsx/header/xlsxdocument.h>
 
 C5Grid::C5Grid(QWidget *parent) :
@@ -44,7 +47,7 @@ C5Grid::C5Grid(QWidget *parent) :
     connect(s, SIGNAL(activated()), this, SLOT(ctrlEnter()));
     s = new QShortcut(QKeySequence(Qt::CTRL | Qt::Key_Return), this);
     connect(s, SIGNAL(activated()), this, SLOT(ctrlEnter()));
-    fLoadingDlg = new NLoadingDlg(this);
+    fLoadingDlg = new NLoadingDlg(tr("Query"), this);
     connect(this, &C5Grid::refreshed, fLoadingDlg, &NLoadingDlg::hide);
 }
 
@@ -630,7 +633,7 @@ void C5Grid::filterByColumn()
     QStringList sortedValues = filterValues.values();
     std::sort(sortedValues.begin(), sortedValues.end());
 
-    if(C5FilterValues::filterValues(sortedValues)) {
+    if(C5FilterValues::filterValues(sortedValues, mUser)) {
         if(fModel->fColumnType[fFilterColumn] == QMetaType::Double) {
             for(int i = 0; i < sortedValues.length(); i++) {
                 sortedValues[i] = QVariant(str_float(sortedValues[i])).toString();
@@ -700,188 +703,101 @@ void C5Grid::removeRow(int columnWithId)
     removeWithId(fModel->data(row, columnWithId, Qt::EditRole).toInt(), row);
 }
 
+QString  C5Grid::makeColumns()
+{
+    QString c;
+    QTextStream s(&c);
+
+    for(int i = 0; i < fModel->columnCount(); ++i) {
+        int w = fTableView->columnWidth(i);
+
+        if(w == 0)
+            continue;
+
+        s << "<col style='width:" << w << "px'>";
+    }
+
+    return c;
+}
+
+QString C5Grid::makeHeaders()
+{
+    QString h;
+    QTextStream s(&h);
+
+    for(int c = 0; c < fModel->columnCount(); ++c) {
+        if(fTableView->columnWidth(c) == 0)
+            continue;
+
+        s << "<th>"
+          << fModel->headerData(c, Qt::Horizontal, Qt::DisplayRole).toString()
+          << "</th>";
+    }
+
+    return h;
+}
+
+QString C5Grid::makeRows()
+{
+    QString r;
+    QTextStream s(&r);
+
+    for(int row = 0; row < fModel->rowCount(); ++row) {
+        s << "<tr>";
+
+        for(int col = 0; col < fModel->columnCount(); ++col) {
+            if(fTableView->columnWidth(col) == 0)
+                continue;
+
+            QVariant v = fModel->data(row, col, Qt::EditRole);
+            QFont f = fModel->data(row, col, Qt::FontRole).value<QFont>();
+            s << "<td"
+              << (f.bold() ? " style='font-weight:bold'" : "")
+              << ">"
+              << v.toString()
+              << "</td>";
+        }
+
+        s << "</tr>";
+    }
+
+    return r;
+}
+
 void C5Grid::print()
 {
-    QFont font(qApp->font());
-    font.setPointSize(20);
-    C5Printing p;
-    QSize paperSize(1950, 2800);
-    p.setFont(font);
-    int page = p.currentPageIndex();
-    int startFrom = 0;
-    bool stopped = false;
-    int columnsWidth = 0;
-    qreal scaleFactor = 0.40;
-    qreal rowScaleFactor = 0.79;
-
-    for(int i = 0; i < fModel->columnCount(); i++) {
-        columnsWidth += fTableView->columnWidth(i);
-    }
-
-    columnsWidth /= scaleFactor;
-
-    if(columnsWidth > 1950) {
-        p.setSceneParams(paperSize.height(), paperSize.width(), QPageLayout::Landscape);
-    } else {
-        p.setSceneParams(paperSize.width(), paperSize.height(), QPageLayout::Portrait);
-    }
-
-    do {
-        p.setFontBold(true);
-        p.ltext(fLabel, 0);
-        p.br();
-        QString filterText;
-
-        if(fFilterWidget) {
-            filterText = fFilterWidget->filterText();
-        }
-
-        if(!filterText.isEmpty()) {
-            p.ltext(filterText, 0);
-            p.br();
-        }
-
-        if(reportAdditionalTitle().isEmpty() == false) {
-            p.ltext(reportAdditionalTitle(), 0);
-            p.br();
-        }
-
-        p.setFontBold(false);
-        p.line(0, p.fTop, columnsWidth, p.fTop);
-
-        for(int c = 0; c < fModel->columnCount(); c++) {
-            if(fTableView->columnWidth(c) == 0) {
-                continue;
-            }
-
-            if(c > 0) {
-                p.ltext(fModel->headerData(c, Qt::Horizontal, Qt::DisplayRole).toString(),
-                        (sumOfColumnsWidghtBefore(c) / scaleFactor) + 1);
-                p.line(sumOfColumnsWidghtBefore(c) / scaleFactor, p.fTop, sumOfColumnsWidghtBefore(c) / scaleFactor,
-                       p.fTop + (fTableView->verticalHeader()->defaultSectionSize() / rowScaleFactor));
-            } else {
-                p.ltext(fModel->headerData(c, Qt::Horizontal, Qt::DisplayRole).toString(), 1);
-                p.line(0, p.fTop, 0, p.fTop + (fTableView->verticalHeader()->defaultSectionSize() / rowScaleFactor));
-            }
-        }
-
-        p.line(columnsWidth, p.fTop, columnsWidth,
-               p.fTop + (fTableView->verticalHeader()->defaultSectionSize() / rowScaleFactor));
-        p.br();
-        p.line(0, p.fTop, columnsWidth, p.fTop);
-
-        for(int r = startFrom; r < fModel->rowCount(); r++) {
-            p.line(0, p.fTop, columnsWidth, p.fTop);
-
-            for(int c = 0; c < fModel->columnCount(); c++) {
-                if(fTableView->columnWidth(c) == 0) {
-                    continue;
-                }
-
-                int s = fTableView->columnSpan(r, c) - 1;
-                p.setFontBold(fModel->data(r, c, Qt::FontRole).value<QFont>().bold());
-
-                if(c > 0) {
-                    p.ltext(fModel->data(r, c, Qt::DisplayRole).toString(), (sumOfColumnsWidghtBefore(c) / scaleFactor) + 1);
-                    p.line(sumOfColumnsWidghtBefore(c + s) / scaleFactor, p.fTop, sumOfColumnsWidghtBefore(c + s) / scaleFactor,
-                           p.fTop + (fTableView->rowHeight(r) / rowScaleFactor));
-                } else {
-                    p.ltext(fModel->data(r, c, Qt::DisplayRole).toString(), 1);
-                    p.line(0, p.fTop, 0, p.fTop + (fTableView->rowHeight(r) / rowScaleFactor));
-                }
-
-                c += s;
-            }
-
-            //last vertical line
-            p.line(columnsWidth, p.fTop, columnsWidth, p.fTop + (fTableView->rowHeight(r) / rowScaleFactor));
-
-            if(ui->tblTotal->isVisible() && r == fModel->rowCount() - 1) {
-                p.setFontBold(true);
-
-                if(p.checkBr(ui->tblTotal->rowHeight(0))) {
-                    p.line(0, p.fTop + (ui->tblTotal->rowHeight(0) / rowScaleFactor), columnsWidth,
-                           p.fTop + (ui->tblTotal->rowHeight(0) / rowScaleFactor));
-                    \
-                    p.br();
-                    stopped = startFrom >= fModel->rowCount() - 1;
-                    p.fTop = p.fNormalHeight - p.fLineHeight;
-                    p.ltext(QString("%1 %2, %3 %4, %5/%6")
-                            .arg("Page")
-                            .arg(page + 1)
-                            .arg(tr("Printed"))
-                            .arg(QDateTime::currentDateTime().toString(FORMAT_DATETIME_TO_STR2))
-                            .arg(hostinfo)
-                            .arg(hostusername()), 0);
-                    p.rtext(__c5config.dbParams().at(1));
-                    page++;
-                } else {
-                    p.br();
-                }
-
-                p.line(0, p.fTop, columnsWidth, p.fTop);
-                p.line(0, p.fTop + (ui->tblTotal->rowHeight(0) / rowScaleFactor), columnsWidth,
-                       p.fTop + (ui->tblTotal->rowHeight(0) / rowScaleFactor));
-                \
-
-                for(int c = 0; c < fModel->columnCount(); c++) {
-
-                    if(fTableView->columnWidth(c) == 0) {
-                        continue;
-                    }
-
-                    if(c > 0) {
-                        p.ltext(ui->tblTotal->getString(0, c), (sumOfColumnsWidghtBefore(c) / scaleFactor) + 1);
-                        p.line(sumOfColumnsWidghtBefore(c) / scaleFactor, p.fTop, sumOfColumnsWidghtBefore(c) / scaleFactor,
-                               p.fTop + (fTableView->verticalHeader()->defaultSectionSize() / rowScaleFactor));
-                    } else {
-                        p.ltext(ui->tblTotal->getString(0, c), 1);
-                        p.line(0, p.fTop, 0, p.fTop + (fTableView->verticalHeader()->defaultSectionSize() / rowScaleFactor));
-                    }
-                }
-
-                p.line(columnsWidth, p.fTop, columnsWidth, p.fTop + (ui->tblTotal->rowHeight(0) / rowScaleFactor));
-            }
-
-            if(p.checkBr(p.fLineHeight * 4) || r >= fModel->rowCount() - 1) {
-                p.line(0, p.fTop + (fTableView->rowHeight(r) / rowScaleFactor), columnsWidth,
-                       p.fTop + (fTableView->rowHeight(r) / rowScaleFactor));
-                \
-                p.br();
-                startFrom = r + 1;
-                stopped = startFrom >= fModel->rowCount() - 1;
-                p.fTop = p.fNormalHeight - p.fLineHeight;
-                p.ltext(QString("%1 %2, %3 %4, %5/%6")
-                        .arg("Page")
-                        .arg(page + 1)
-                        .arg(tr("Printed"))
-                        .arg(QDateTime::currentDateTime().toString(FORMAT_DATETIME_TO_STR2))
-                        .arg(hostinfo)
-                        .arg(hostusername()), 0);
-                p.rtext(__c5config.dbParams().at(1));
-
-                if(r < fModel->rowCount() - 1) {
-                    p.br(p.fLineHeight * 4);
-                }
-
-                if(r < fModel->rowCount() - 1) {
-                    page++;
-                }
-
-                break;
-            } else {
-                p.br();
-            }
-        }
-
-        if(fModel->rowCount() == 0) {
-            stopped = true;
-        }
-
-    } while(!stopped);
-
-    C5PrintPreview pp(&p);
-    pp.exec();
+    QString html = loadTemplate("grid_a4.html");
+    QMap<QString, QString> vars;
+    vars["title"] = fLabel;
+    vars["filter"] = fFilterWidget
+                     ? "<div>" + fFilterWidget->filterText() + "</div>"
+                     : "";
+    vars["additional_title"] = reportAdditionalTitle().isEmpty()
+                               ? ""
+                               : "<div>" + reportAdditionalTitle() + "</div>";
+    vars["columns"] = makeColumns();
+    vars["headers"] = makeHeaders();
+    vars["rows"] = makeRows();
+    vars["page_orientation"] = "A4 landscape";
+    // vars["page_orientation"] =
+    //     columnsWidth > paperSize.width()
+    //     ? "A4 landscape"
+    //     : "A4 portrait";
+    vars["footer_left"] =
+        QString("Page %1, %2")
+        .arg(1)
+        .arg(QDateTime::currentDateTime().toString(FORMAT_DATETIME_TO_STR2));
+    vars["footer_right"] =
+        hostinfo + "/" + hostusername();
+    html = applyTemplate(html, vars);
+    QTextDocument doc;
+    doc.setHtml(html);
+    QPrinter printer(QPrinter::HighResolution);
+    printer.setPageSize(QPageSize::A4);
+    printer.setFullPage(false);
+    QPrintPreviewDialog preview(&printer, this);
+    connect(&preview, &QPrintPreviewDialog::paintRequested, [&](QPrinter * p) { doc.print(p); });
+    preview.exec();
 }
 
 void C5Grid::exportToExcel()
@@ -999,7 +915,7 @@ void C5Grid::clearFilter()
 void C5Grid::setSearchParameters()
 {
     if(fFilterWidget) {
-        if(C5GridGilter::filter(fFilterWidget, fWhereCondition, fColumnsVisible, fTranslation)) {
+        if(C5GridGilter::filter(mUser, fFilterWidget, fWhereCondition, fColumnsVisible, fTranslation)) {
             QSettings s(_ORGANIZATION_, QString("%1\\%2\\reports\\%3\\visiblecolumns")
                         .arg(_APPLICATION_)
                         .arg(_MODULE_)

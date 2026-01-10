@@ -1,19 +1,19 @@
 #ifndef C5MESSAGE_H
 #define C5MESSAGE_H
 
-#include <QDialog>
+#include "c5dialog.h"
 
 namespace Ui
 {
 class C5Message;
 }
 
-class C5Message : public QDialog
+class C5Message : public C5Dialog
 {
     Q_OBJECT
 
 public:
-    explicit C5Message(QWidget *parent = nullptr);
+    explicit C5Message();
 
     ~C5Message();
 
@@ -39,7 +39,7 @@ private slots:
     void on_label_linkActivated(const QString &link);
 
 private:
-    Ui::C5Message *ui;
+    Ui::C5Message* ui;
 
     bool fPlaySound;
 

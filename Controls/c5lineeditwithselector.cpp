@@ -166,7 +166,7 @@ void C5LineEditWithSelector::mouseDoubleClickEvent(QMouseEvent *e)
     if(fMultiselection) {
         QVector<QJsonArray > values;
 
-        if(!C5Selector::getMultipleValues(fCache, values)) {
+        if(!C5Selector::getMultipleValues(nullptr, fCache, values)) {
             return;
         }
 
@@ -190,7 +190,7 @@ void C5LineEditWithSelector::mouseDoubleClickEvent(QMouseEvent *e)
     } else {
         QJsonArray values;
 
-        if(!C5Selector::getValue(fCache, values)) {
+        if(!C5Selector::getValue(nullptr, fCache, values)) {
             return;
         }
 

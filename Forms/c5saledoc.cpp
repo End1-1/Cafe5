@@ -142,7 +142,7 @@ QToolBar* C5SaleDoc::toolBar()
 
 bool C5SaleDoc::openDoc(const QString &uuid)
 {
-    NLoadingDlg loadingDlg(this);
+    NLoadingDlg loadingDlg(tr("Opening"), this);
     loadingDlg.setWindowModality(Qt::ApplicationModal);
     loadingDlg.show();
     C5Database db;
@@ -306,7 +306,7 @@ void C5SaleDoc::createStoreDocument()
 
 void C5SaleDoc::printSale()
 {
-    C5PrintReciptA4 p(ui->leUuid->text(), this);
+    C5PrintReciptA4 p(ui->leUuid->text(), mUser, this);
     QString err;
     p.print(err);
 
@@ -541,7 +541,7 @@ void C5SaleDoc::fiscale()
 
 void C5SaleDoc::cancelFiscal()
 {
-    C5FiscalCancel fc(ui->leUuid->text());
+    C5FiscalCancel fc(mUser, ui->leUuid->text());
     fc.exec();
 }
 
@@ -690,7 +690,7 @@ void C5SaleDoc::exportToExcel()
 
 void C5SaleDoc::returnItems()
 {
-    NLoadingDlg loadingDlg(this);
+    NLoadingDlg loadingDlg(tr("Return"), this);
     loadingDlg.setWindowModality(Qt::ApplicationModal);
     loadingDlg.show();
     C5Database db;
@@ -1145,7 +1145,7 @@ void C5SaleDoc::countTotalQty()
 
 bool C5SaleDoc::openDraft(const QString &id)
 {
-    NLoadingDlg loadingDlg(this);
+    NLoadingDlg loadingDlg(tr("Opening"), this);
     loadingDlg.setWindowModality(Qt::ApplicationModal);
     loadingDlg.show();
     C5Database db;
@@ -1449,7 +1449,7 @@ void C5SaleDoc::exportToAs(int doctype)
     jo["command"] = "armsoft";
     jo["handler"] = "armsoft";
     jo["key"] = "asdf7fa8kk49888d!!jjdjmskkak98983mj???m";
-    HttpQueryDialog *qd = new HttpQueryDialog(QString("ws://%1:%2").arg(b->ipAddress,
+    HttpQueryDialog *qd = new HttpQueryDialog(mUser, QString("ws://%1:%2").arg(b->ipAddress,
         QString::number(b->port)), jo, this);
     qd->exec();
     qd->deleteLater();
@@ -1472,7 +1472,7 @@ void C5SaleDoc::on_btnAddGoods_clicked()
 {
     QJsonArray vals;
 
-    if(!C5Selector::getValueOfColumn(cache_goods, vals, 3)) {
+    if(!C5Selector::getValueOfColumn(mUser, cache_goods, vals, 3)) {
         return;
     }
 
@@ -1513,7 +1513,7 @@ void C5SaleDoc::on_btnEditGoods_clicked()
     }
 
     CE5Goods *ep = new CE5Goods();
-    C5Editor *e = C5Editor::createEditor(ep, 0);
+    C5Editor *e = C5Editor::createEditor(mUser, ep, 0);
     ep->setId(ui->tblGoods->getInteger(row, col_goods_code));
     QList<QMap<QString, QVariant> > data;
 
@@ -1535,7 +1535,7 @@ void C5SaleDoc::on_btnEditGoods_clicked()
 void C5SaleDoc::on_btnNewGoods_clicked()
 {
     CE5Goods *ep = new CE5Goods();
-    C5Editor *e = C5Editor::createEditor(ep, 0);
+    C5Editor *e = C5Editor::createEditor(mUser, ep, 0);
     QList<QMap<QString, QVariant> > data;
 
     if(e->getResult(data)) {
@@ -1566,7 +1566,7 @@ void C5SaleDoc::on_btnSearchTaxpayer_clicked()
 {
     QJsonArray values;
 
-    if(!C5Selector::getValue(cache_goods_partners, values)) {
+    if(!C5Selector::getValue(mUser, cache_goods_partners, values)) {
         return;
     }
 
@@ -1588,7 +1588,7 @@ void C5SaleDoc::on_btnDelivery_clicked()
 {
     QDate d;
 
-    if(C5DateRange::date(d)) {
+    if(C5DateRange::date(d, mUser)) {
         ui->leDelivery->setText(d.toString(FORMAT_DATE_TO_STR));
         fDraftSale.deliveryDate = d;
     }
@@ -1598,7 +1598,7 @@ void C5SaleDoc::on_btnEditPartner_clicked()
 {
     if(fPartner.id.toInt() > 0) {
         CE5Partner *ep = new CE5Partner();
-        C5Editor *e = C5Editor::createEditor(ep, 0);
+        C5Editor *e = C5Editor::createEditor(mUser, ep, 0);
         ep->setId(fPartner.id.toInt());
         QList<QMap<QString, QVariant> > data;
 
@@ -1635,7 +1635,7 @@ void C5SaleDoc::on_leCash_textChanged(const QString &arg1)
 void C5SaleDoc::on_btnDeliveryMan_clicked()
 {
     QJsonArray vals;
-    C5Selector::getValue(cache_users, vals);
+    C5Selector::getValue(mUser, cache_users, vals);
 
     if(vals.count() == 0) {
         return;
@@ -1822,7 +1822,7 @@ void C5SaleDoc::saveAsDraft()
 
 void C5SaleDoc::saveCopy()
 {
-    NLoadingDlg loadingDlg(this);
+    NLoadingDlg loadingDlg(tr("Saving"), this);
     loadingDlg.setWindowModality(Qt::ApplicationModal);
     loadingDlg.show();
     QString err;
@@ -1899,7 +1899,7 @@ void C5SaleDoc::on_cbStorage_currentIndexChanged(int index)
 void C5SaleDoc::on_btnCashier_clicked()
 {
     QJsonArray vals;
-    C5Selector::getValue(cache_users, vals);
+    C5Selector::getValue(mUser, cache_users, vals);
 
     if(vals.count() == 0) {
         return;

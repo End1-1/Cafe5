@@ -14,7 +14,7 @@ class C5CustomFilter : public C5Dialog
     Q_OBJECT
 
 public:
-    explicit C5CustomFilter();
+    explicit C5CustomFilter(C5User *user);
 
     ~C5CustomFilter();
 

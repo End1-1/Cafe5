@@ -3,8 +3,8 @@
 #include "working.h"
 #include "userphoto.h"
 
-SelectStaff::SelectStaff(Working *w) :
-    C5Dialog(),
+SelectStaff::SelectStaff(Working *w, C5User *user) :
+    C5Dialog(user),
     ui(new Ui::SelectStaff),
     fWorking(w)
 {

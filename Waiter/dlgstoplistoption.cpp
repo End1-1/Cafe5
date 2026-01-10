@@ -5,15 +5,14 @@
 #include "c5message.h"
 #include "c5printing.h"
 #include "ninterface.h"
+#include "c5user.h"
 #include "c5utils.h"
-#include "c5waiterconfiguration.h"
 #include "c5user.h"
 
 DlgStopListOption::DlgStopListOption(DlgOrder *o, C5User *u) :
-    C5Dialog(),
+    C5Dialog(u),
     ui(new Ui::DlgStopListOption),
-    fDlgOrder(o),
-    fUser(u)
+    fDlgOrder(o)
 {
     ui->setupUi(this);
 
@@ -58,7 +57,10 @@ void DlgStopListOption::printStopListResponse(const QJsonObject &jdoc)
         QFont font(qApp->font());
         font.setPointSize(20);
         C5Printing p;
-        p.setSceneParams(700, 2800, QPageLayout::Portrait);
+        QPrinterInfo pinfo = QPrinterInfo::printerInfo(mUser->fConfig["receipt_printer"].toString());
+        QPrinter printer(pinfo);
+        QRectF pr = printer.pageRect(QPrinter::DevicePixel);
+        p.setSceneParams(pr.width(), pr.height(), printer.logicalDpiX());
         p.setFont(font);
         p.ctext(tr("STOPLIST"));
         p.br();
@@ -86,7 +88,7 @@ void DlgStopListOption::printStopListResponse(const QJsonObject &jdoc)
         p.br();
         p.ltext(".", 0);
         p.br();
-        p.print(C5WaiterConfiguration::instance()->receiptPrinter(),  QPageSize::Custom);
+        p.print(printer);
     }
 }
 

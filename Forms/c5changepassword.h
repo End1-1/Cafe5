@@ -13,11 +13,11 @@ class C5ChangePassword : public C5OfficeDialog
     Q_OBJECT
 
 public:
-    explicit C5ChangePassword();
+    explicit C5ChangePassword(C5User *user);
 
     ~C5ChangePassword();
 
-    static bool changePassword(QString &password);
+    static bool changePassword(QString &password, C5User *user);
 
 private slots:
     void on_btnCancel_clicked();

@@ -4,8 +4,8 @@
 #include "c5database.h"
 #include "c5utils.h"
 
-DlgSemireadyInOut::DlgSemireadyInOut(QWidget *parent) :
-    C5Dialog(),
+DlgSemireadyInOut::DlgSemireadyInOut(C5User *user) :
+    C5Dialog(user),
     ui(new Ui::DlgSemireadyInOut)
 {
     ui->setupUi(this);
@@ -54,11 +54,11 @@ void DlgSemireadyInOut::on_btnSelectGoods_clicked()
     QJsonArray vals;
     QHash<QString, QString> trans;
 
-    if(!C5Selector::getValues(
-                "select distinct(g.f_id), g.f_name, g.f_complectout, u.f_name as f_unitname "
-                "from c_goods_complectation gc "
-                "left join c_goods g on g.f_id=gc.f_base "
-                "left join c_units u on u.f_id=g.f_unit ", vals, trans)) {
+    if(!C5Selector::getValues(mUser,
+                              "select distinct(g.f_id), g.f_name, g.f_complectout, u.f_name as f_unitname "
+                              "from c_goods_complectation gc "
+                              "left join c_goods g on g.f_id=gc.f_base "
+                              "left join c_units u on u.f_id=g.f_unit ", vals, trans)) {
         return;
     }
 

@@ -3,8 +3,8 @@
 #include "c5random.h"
 #include "c5message.h"
 
-C5DbResetOption::C5DbResetOption() :
-    C5Dialog(),
+C5DbResetOption::C5DbResetOption(C5User *user) :
+    C5Dialog(user),
     ui(new Ui::C5DbResetOption)
 {
     ui->setupUi(this);
@@ -34,21 +34,24 @@ void C5DbResetOption::on_btnCancel_clicked()
 
 void C5DbResetOption::on_btnAccept_clicked()
 {
-    if (!ui->chSale->isChecked() && !ui->chFull->isChecked()) {
+    if(!ui->chSale->isChecked() && !ui->chFull->isChecked()) {
         C5Message::error(tr("Select atleast one option"));
         return;
     }
-    if (ui->chSale->isChecked()) {
-        if (ui->lbSale->text() != ui->leSale->text()) {
+
+    if(ui->chSale->isChecked()) {
+        if(ui->lbSale->text() != ui->leSale->text()) {
             C5Message::error(tr("Checking code for sales and buy not correct"));
             return;
         }
     }
-    if (ui->chFull->isChecked()) {
-        if (ui->lbFull->text() != ui->leFull->text()) {
+
+    if(ui->chFull->isChecked()) {
+        if(ui->lbFull->text() != ui->leFull->text()) {
             C5Message::error(tr("Checking code for full reset not correct"));
             return;
         }
     }
+
     accept();
 }

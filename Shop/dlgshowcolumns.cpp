@@ -1,13 +1,12 @@
 #include "dlgshowcolumns.h"
 #include "ui_dlgshowcolumns.h"
-#include "worder.h"
-#include "c5config.h"
+#include "goodscols.h"
 #include <QSettings>
 
 static QSettings s(_ORGANIZATION_, _APPLICATION_ + QString("\\") + _MODULE_);
 
-DlgShowColumns::DlgShowColumns() :
-    C5Dialog(),
+DlgShowColumns::DlgShowColumns(C5User *user) :
+    C5Dialog(user),
     ui(new Ui::DlgShowColumns)
 {
     ui->setupUi(this);

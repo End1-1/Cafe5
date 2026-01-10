@@ -1,7 +1,7 @@
 #ifndef MENUDIALOG_H
 #define MENUDIALOG_H
 
-#include <QDialog>
+#include "c5dialog.h"
 
 namespace Ui
 {
@@ -11,7 +11,7 @@ class MenuDialog;
 class C5User;
 class Workspace;
 
-class MenuDialog : public QDialog
+class MenuDialog : public C5Dialog
 {
     Q_OBJECT
 

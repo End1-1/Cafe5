@@ -251,7 +251,7 @@ void Working::getGoods(int id)
     }
 
     DbGoods g(id);
-    w->addGoods(g.scancode());
+    w->checkGoodsCode(g.scancode());
 }
 
 WOrder* Working::worder()
@@ -434,7 +434,14 @@ void Working::checkMessageResponse(const QJsonObject & jdoc)
     QFont font(qApp->font());
     font.setPointSize(30);
     C5Printing p;
-    p.setSceneParams(650, 2800, QPageLayout::Portrait);
+    QPrinterInfo pi = QPrinterInfo::printerInfo(C5Config::localReceiptPrinter());
+    QPrinter printer(pi);
+    printer.setPageSize(QPageSize::Custom);
+    printer.setFullPage(false);
+    QRectF pr = printer.pageRect(QPrinter::DevicePixel);
+    constexpr qreal SAFE_RIGHT_MM = 2.0;
+    qreal safePx = SAFE_RIGHT_MM * printer.logicalDpiX() / 25.4;
+    p.setSceneParams(pr.width() - safePx, pr.height(), printer.logicalDpiX());
     p.setFont(font);
     p.br(2);
     QPixmap img(":/atention.png");
@@ -510,7 +517,7 @@ void Working::checkMessageResponse(const QJsonObject & jdoc)
                 case 1: {
                     bool p1, p2;
 
-                    if(SelectPrinters::selectPrinters(p1, p2)) {
+                    if(SelectPrinters::selectPrinters(p1, p2, mUser)) {
                         if(p1) {
                             p.print(orderid, db, 1);
                         }
@@ -551,7 +558,7 @@ void Working::checkMessageResponse(const QJsonObject & jdoc)
     p.br();
     p.ltext(tr("Printed"), 0);
     p.rtext(QDateTime::currentDateTime().toString(FORMAT_DATETIME_TO_STR2));
-    p.print(C5Config::localReceiptPrinter(), QPageSize(QPageSize::Custom));
+    p.print(printer);
 }
 void Working::astoresaleResponse(const QJsonObject & jdoc)
 {
@@ -612,16 +619,7 @@ void Working::shortcutF5()
 {
     on_btnGoodsList_clicked();
 }
-void Working::shortcurF6()
-{
-    WOrder *w = static_cast<WOrder*>(ui->tab->currentWidget());
 
-    if(!w) {
-        return;
-    }
-
-    w->focusTaxpayerId();
-}
 void Working::shortcutF7()
 {
 }
@@ -678,9 +676,16 @@ void Working::qtyRemains(const QJsonObject & jdoc)
     QJsonArray ja = jo["qty"].toArray();
     bool print = false;
     C5Printing p;
+    QPrinterInfo pi = QPrinterInfo::printerInfo(C5Config::localReceiptPrinter());
+    QPrinter printer(pi);
+    printer.setPageSize(QPageSize::Custom);
+    printer.setFullPage(false);
+    QRectF pr = printer.pageRect(QPrinter::DevicePixel);
+    constexpr qreal SAFE_RIGHT_MM = 2.0;
+    qreal safePx = SAFE_RIGHT_MM * printer.logicalDpiX() / 25.4;
+    p.setSceneParams(pr.width() - safePx, pr.height(), printer.logicalDpiX());
     QFont font = qApp->font();
     font.setPointSize(28);
-    p.setSceneParams(650, 2800, QPageLayout::Portrait);
     p.setFont(font);
     p.br(2);
     QPixmap img(":/atention.png");
@@ -708,7 +713,7 @@ void Working::qtyRemains(const QJsonObject & jdoc)
     if(print) {
         p.ltext(tr("Printed"), 0);
         p.rtext(QDateTime::currentDateTime().toString(FORMAT_DATETIME_TO_STR2));
-        p.print(C5Config::localReceiptPrinter(), QPageSize::Custom);
+        p.print(printer);
     }
 
     sender()->deleteLater();
@@ -804,6 +809,7 @@ void Working::on_btnGoodsMovement_clicked()
             if(tmp->check(cp_t12_shop_enter_store)) {
                 if(tmp->fConfig["copyfrom"].toInt() != 0) {
                     tmp->copySettings(mUser);
+                    NDataProvider::sessionKey = tmp->mSessionKey;
                 }
 
                 auto *si = new StoreInput(tmp);
@@ -811,6 +817,8 @@ void Working::on_btnGoodsMovement_clicked()
             } else {
                 tmp->deleteLater();
             }
+        }, [tmp]() {
+            tmp->deleteLater();
         });
     } else {
         auto *si = new StoreInput(tmp);
@@ -848,6 +856,8 @@ void Working::on_btnSalesReport_clicked()
             } else {
                 tmp->deleteLater();
             }
+        }, [tmp]() {
+            tmp->deleteLater();
         });
     } else {
         Sales::showSales(this, tmp);
@@ -877,14 +887,7 @@ void Working::on_btnMinimize_clicked()
 {
     showMinimized();
 }
-void Working::on_btnClientConfigQR_clicked()
-{
-    WOrder *wo = static_cast<WOrder*>(ui->tab->currentWidget());
 
-    if(wo) {
-        wo->imageConfig();
-    }
-}
 void Working::on_btnGiftCard_clicked()
 {
     WOrder *wo = static_cast<WOrder*>(ui->tab->currentWidget());
@@ -894,7 +897,7 @@ void Working::on_btnGiftCard_clicked()
         return;
     }
 
-    DlgGiftCardSale d(__c5config.dbParams());
+    DlgGiftCardSale d(mUser);
 
     if(d.exec() == QDialog::Accepted) {
         QString err;
@@ -939,7 +942,7 @@ void Working::on_btnCostumerDisplay_clicked(bool checked)
 }
 void Working::on_btnOpenDraft_clicked()
 {
-    C5TempSale t;
+    C5TempSale t(mUser);
 
     if(t.exec() == QDialog::Accepted) {
         QString id = t.openDraft();
@@ -958,72 +961,23 @@ void Working::on_btnOpenDraft_clicked()
         }
     }
 }
+
 void Working::on_btnColumns_clicked()
 {
-    DlgShowColumns().exec();
+    DlgShowColumns(mUser).exec();
 }
+
 void Working::on_chRegisterCard_clicked()
 {
     DlgRegisterCard().exec();
 }
+
 void Working::on_btnCashout_clicked()
 {
     DlgCashout(mUser).exec();
 }
+
 void Working::on_btnBooking_clicked()
 {
     openSearch();
-}
-void Working::on_btnPrepaidFiscal_clicked()
-{
-    bool ok;
-    double v = QInputDialog::getDouble(this, tr("Prepaid"), "", 0, 0, 99999999, 0, &ok);
-
-    if(v > 0 and ok) {
-        PrintTaxN pt(C5Config::taxIP(), C5Config::taxPort(), C5Config::taxPassword(),
-                     C5Config::taxUseExtPos(), C5Config::taxCashier(), C5Config::taxPin(), this);
-        QString in, out, err;
-        QElapsedTimer et;
-        et.start();
-        auto result = pt.printAdvanceJson(v, 0, in, out, err);
-        C5Database db;
-        db[":f_id"] = db.uuid();
-        db[":f_order"] = db[":f_id"];
-        db[":f_date"] = QDate::currentDate();
-        db[":f_time"] = QTime::currentTime();
-        db[":f_elapsed"] = et.elapsed();
-        db[":f_in"] = in.replace("'", "''");
-        db[":f_out"] = out;
-        db[":f_err"] = err;
-        db[":f_result"] = result;
-        db[":f_state"] = result == pt_err_ok ? 1 : 0;
-        db.insert("o_tax_log");
-
-        if(result != pt_err_ok) {
-            C5Message::error(err);
-        } else {
-            QJsonObject jo = QJsonDocument::fromJson(out.toUtf8()).object();
-            C5Printing p;
-            p.setSceneParams(650, 2800, QPageLayout::Portrait);
-            p.setFont(qApp->font());
-            p.br(2);
-            p.setFontSize(30);
-            p.ctext(tr("Prepaid fiscal"));
-            p.br();
-            p.ltext(tr("Fiscal number"), 0);
-            p.rtext(QString::number(jo["rseq"].toInt()));
-            p.br();
-            p.ltext(tr("Amount"), 0);
-            p.rtext(float_str(v, 1));
-            p.br();
-            p.br();
-            p.ltext(tr("Printed"), 0);
-            p.rtext(QDateTime::currentDateTime().toString(FORMAT_DATETIME_TO_STR));
-            p.br();
-            p.br();
-            p.ltext(".", 0);
-            p.print(__c5config.localReceiptPrinter(), QPageSize::Custom);
-            C5Message::info(tr("Done"));
-        }
-    }
 }

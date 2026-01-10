@@ -37,6 +37,7 @@ void NDataProvider::getData(const QString &route, const QJsonObject &data)
 {
     Q_ASSERT(mAppName.isEmpty() == false);
     Q_ASSERT(mFileVersion.isEmpty() == false);
+    mStartDate = QDateTime::currentDateTime();
     mTimer->restart();
     emit started();
     QString url = QString("%1://%2/%3").arg(mConnectionProtocol, mConnectionHost, route);
@@ -44,13 +45,12 @@ void NDataProvider::getData(const QString &route, const QJsonObject &data)
     rq.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
     rq.setRawHeader("Authorization", "Bearer " + sessionKey.toUtf8());
     QJsonObject jo;
-    jo["sessionkey"] = sessionKey;
+    jo["sessionkey"] = mBearer.isEmpty() ? sessionKey : mBearer;
     jo["hostinfo"] = QHostInfo::localHostName().toLower();
     jo["app"] = mAppName;
     jo["appversion"] = mFileVersion;
 #ifdef QT_DEBUG
     jo["debug"] = true;
-    //jo["appversion"] = "2.5.32.771";
 #endif
     QStringList keys = data.keys();
 
@@ -60,7 +60,7 @@ void NDataProvider::getData(const QString &route, const QJsonObject &data)
 
     if(mDebug) {
         LogWriter::write(LogWriterLevel::verbose, "", url);
-        LogWriter::write(LogWriterLevel::verbose, "", QJsonDocument(data).toJson(QJsonDocument::Compact));
+        LogWriter::write(LogWriterLevel::verbose, "", QJsonDocument(jo).toJson(QJsonDocument::Compact));
     } else {
 #ifdef QT_DEBUG
         LogWriter::write(LogWriterLevel::verbose, "", url);
@@ -74,6 +74,11 @@ void NDataProvider::getData(const QString &route, const QJsonObject &data)
 void NDataProvider::changeTimeout(int value)
 {
     mNetworkAccessManager->setTransferTimeout(value);
+}
+
+void NDataProvider::changeBearer(const QString &bearer)
+{
+    mBearer = bearer;
 }
 
 void NDataProvider::overwriteHost(const QString &protocol, const QString &host, int port)
@@ -99,6 +104,15 @@ void NDataProvider::queryFinished(QNetworkReply *r)
                        je["expected_version"].toString());
         } else if(err.contains("server replied:")) {
             int index = err.indexOf("server replied:") + 15;
+            err = err.mid(index, err.length());
+            index = err.indexOf("Server error");
+
+            if(index > -1) {
+                index += 12;
+            } else {
+                index = 0;
+            }
+
             err = err.mid(index, err.length());
         } else if(err.contains("<html>")) {
             err = err.mid(err.indexOf("<html>"), err.length());
@@ -145,6 +159,7 @@ void NDataProvider::queryFinished(QNetworkReply *r)
     QJsonObject jdoc = QJsonDocument::fromJson(ba, &err).object();
 
     if(err.error == QJsonParseError::NoError) {
+        jdoc["query_start"] = mStartDate.toString("yyyy-MM-dd HH:mm:ss.zzz");
         emit done(jdoc);
     } else {
         LogWriter::write(LogWriterLevel::errors, err.errorString(), ba);

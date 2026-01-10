@@ -35,9 +35,10 @@ C5SalaryDoc::~C5SalaryDoc()
 
 bool C5SalaryDoc::openDoc()
 {
-    if (ui->cbShift->currentData().toInt() == 0) {
+    if(ui->cbShift->currentData().toInt() == 0) {
         return false;
     }
+
     double total = 0;
     C5Database db;
     db[":f_shift"] = ui->cbShift->currentData();
@@ -49,7 +50,8 @@ bool C5SalaryDoc::openDoc()
             "inner join s_user_group g on g.f_id=u.f_group "
             "where b.f_shift=:f_shift");
     ui->tbl->setRowCount(0);
-    while (db.nextRow()) {
+
+    while(db.nextRow()) {
         int row = newRow();
         ui->tbl->setString(row, 0, db.getString("f_id"));
         ui->tbl->lineEditWithSelector(row, 1)->setValue(db.getInt("f_position"));
@@ -61,22 +63,24 @@ bool C5SalaryDoc::openDoc()
         ui->tbl->getWidget<C5DateEdit>(row, 8)->setDate(db.getDate("f_outdate"));
         ui->tbl->lineEdit(row, 9)->setText(db.getTime("f_outtime").toString("HH:mm:ss"));
         qDebug() << db.getString("f_paid").isEmpty() << db.getDateTime("f_paid");
-        ui->tbl->setString(row, 10, db.getString("f_paid").isEmpty()  ? tr("No") : tr("Yes") );
+        ui->tbl->setString(row, 10, db.getString("f_paid").isEmpty()  ? tr("No") : tr("Yes"));
         total += db.getDouble("f_amount");
     }
+
     ui->leTotal->setDouble(total);
     return true;
 }
 
-QToolBar *C5SalaryDoc::toolBar()
+QToolBar* C5SalaryDoc::toolBar()
 {
-    if (!fToolBar) {
+    if(!fToolBar) {
         C5Widget::toolBar();
         fToolBar->addAction(QIcon(":/save.png"), tr("Save"), this, SLOT(save()));
         fToolBar->addAction(QIcon(":/delete.png"), tr("Remove"), this, SLOT(removeDoc()));
         fToolBar->addAction(QIcon(":/cash.png"), tr("Create cash document"), this, SLOT(createCashDocument()));
         fToolBar->addAction(QIcon(":/employee.png"), tr("Get employes list"), this, SLOT(getEmployesInOutList()));
     }
+
     return fToolBar;
 }
 
@@ -84,22 +88,26 @@ void C5SalaryDoc::save()
 {
     removeSalaryOfShift();
     QString error;
-    for (int i = 0; i < ui->tbl->rowCount(); i++) {
-        if (ui->tbl->lineEditWithSelector(i, 1)->getInteger() == 0) {
+
+    for(int i = 0; i < ui->tbl->rowCount(); i++) {
+        if(ui->tbl->lineEditWithSelector(i, 1)->getInteger() == 0) {
             error += tr("Check all positions") + "<br>";
             break;
         }
     }
-    if (!error.isEmpty()) {
+
+    if(!error.isEmpty()) {
         C5Message::error(error);
         return;
     }
+
     C5Database db;
     db[":f_shift"] = ui->cbShift->currentData();
     db.exec("delete from s_salary_attendance where f_shift=:f_shift");
     db[":f_shift"] = ui->cbShift->currentData();
     db.exec("delete from s_salary_payment where f_shift=:f_shift");
-    for (int i = 0; i < ui->tbl->rowCount(); i++) {
+
+    for(int i = 0; i < ui->tbl->rowCount(); i++) {
         db[":f_date"] = ui->tbl->getWidget<C5DateEdit>(i, 6)->date();
         db[":f_shift"] = ui->cbShift->currentData();
         db[":f_worker"] = ui->tbl->getInteger(i, 3);
@@ -111,6 +119,7 @@ void C5SalaryDoc::save()
         db[":f_outtime"] = QTime::fromString(ui->tbl->lineEdit(i, 9)->text(), "HH:mm:ss");
         ui->tbl->setInteger(i, 0, db.insert("s_salary_attendance"));
     }
+
     countSalary();
     db[":f_date"] = ui->cbShift->currentData(Qt::UserRole + 2);
     db[":f_shift"] = ui->cbShift->currentData();
@@ -122,9 +131,11 @@ void C5SalaryDoc::save()
 void C5SalaryDoc::countAmounts(const QString &arg1)
 {
     double total = 0;
-    for (int i = 0; i < ui->tbl->rowCount(); i++) {
+
+    for(int i = 0; i < ui->tbl->rowCount(); i++) {
         total += ui->tbl->lineEdit(i, 5)->getDouble();
     }
+
     ui->leTotal->setDouble(total);
 }
 
@@ -170,7 +181,8 @@ void C5SalaryDoc::getEmployesInOutList()
             "where io.f_datein=:f_date and io.f_dateout is not null ");
     ui->tbl->clearContents();
     ui->tbl->setRowCount(0);
-    while (db.nextRow()) {
+
+    while(db.nextRow()) {
         int r = newRow();
         ui->tbl->lineEditWithSelector(r, 1)->setValue(db.getInt("f_group"));
         ui->tbl->setInteger(r, 3, db.getInt("f_id"));
@@ -181,9 +193,11 @@ void C5SalaryDoc::getEmployesInOutList()
 void C5SalaryDoc::on_btnAddEmployee_clicked()
 {
     QJsonArray vals;
-    if (!C5Selector::getValue(cache_users, vals)) {
+
+    if(!C5Selector::getValue(mUser, cache_users, vals)) {
         return;
     }
+
     C5Database db;
     db[":f_id"] = vals.at(1).toInt();
     db.exec("select g.f_id, concat(u.f_last, ' ', u.f_first) as f_employee, "
@@ -191,13 +205,15 @@ void C5SalaryDoc::on_btnAddEmployee_clicked()
             "from s_user u "
             "inner join s_user_group g on g.f_id=u.f_group "
             "where u.f_id=:f_id");
-    if (db.nextRow()) {
-        for (int i = 0; i < ui->tbl->rowCount(); i++) {
-            if (ui->tbl->getInteger(i, 3) == vals.at(1).toInt()) {
+
+    if(db.nextRow()) {
+        for(int i = 0; i < ui->tbl->rowCount(); i++) {
+            if(ui->tbl->getInteger(i, 3) == vals.at(1).toInt()) {
                 C5Message::error(tr("This employee already in list"));
                 return;
             }
         }
+
         int row = newRow();
         ui->tbl->lineEditWithSelector(row, 1)->setValue(db.getInt(0));
         ui->tbl->setInteger(row, 3, vals.at(1).toInt());
@@ -216,9 +232,11 @@ void C5SalaryDoc::on_btnAddEmployee_clicked()
 void C5SalaryDoc::on_btnRemoveEmploye_clicked()
 {
     QModelIndexList ml = ui->tbl->selectionModel()->selectedRows();
-    if (ml.count() == 0) {
+
+    if(ml.count() == 0) {
         return;
     }
+
     ui->tbl->removeRow(ml.at(0).row());
 }
 
@@ -255,7 +273,8 @@ void C5SalaryDoc::getSessions()
             "where cast(f_close as date) between :date1 and :date2 "
             "order by f_id desc");
     QSet<QDate> dates;
-    while (db.nextRow()) {
+
+    while(db.nextRow()) {
         ui->cbShift->addItem(
             QString("%1, %2 - %3").arg(QString::number(db.getInt("f_id")),
                                        db.getDateTime("f_open").toString(FORMAT_DATETIME_TO_STR),
@@ -266,9 +285,11 @@ void C5SalaryDoc::getSessions()
         ui->cbShift->setItemData(i, db.getDateTime("f_close").date(), Qt::UserRole + 2);
         dates.insert(db.getDateTime("f_close").date());
     }
+
     bool getagain = false;
-    for (QDate d1 = date1; d1 < date2; d1 = d1.addDays(1)) {
-        if (!dates.contains(d1)) {
+
+    for(QDate d1 = date1; d1 < date2; d1 = d1.addDays(1)) {
+        if(!dates.contains(d1)) {
             db[":f_open"] = d1;
             db[":f_close"] = d1;
             db[":f_user"] = 1;
@@ -276,7 +297,8 @@ void C5SalaryDoc::getSessions()
             getagain = true;
         }
     }
-    if (getagain) {
+
+    if(getagain) {
         getSessions();
     }
 }
@@ -294,10 +316,12 @@ void C5SalaryDoc::removeSalaryOfShift()
     db[":f_shift"] = ui->cbShift->currentData();
     db.exec("select f_paid from s_salary_attendance where f_shift=:f_shift");
     QStringList paid;
-    while (db.nextRow()) {
+
+    while(db.nextRow()) {
         paid.append(db.getString("f_paid"));
     }
-    for (const QString &s : paid) {
+
+    for(const QString &s : paid) {
         C5CashDoc::removeDoc(db, s);
     }
 }
@@ -312,16 +336,20 @@ double C5SalaryDoc::salaryOfPosition(C5Database &db, int pos, int worker)
     db[":f_worker"] = worker;
     db[":f_shift"] = ui->cbShift->currentData();
     db.exec("select * from s_salary_attendance where f_shift=:f_shift and f_worker=:f_worker");
-    if (db.nextRow() == false) {
+
+    if(db.nextRow() == false) {
         return 0;
     }
+
     QDate date1 = db.getDate("f_indate"), date2 = db.getDate("f_outdate");
     QTime time1 = db.getTime("f_intime"), time2 = db.getTime("f_outtime");
     db[":f_position"] = pos;
     db.exec("select * from s_salary_rules where f_position=:f_position");
-    if (db.nextRow() == false) {
+
+    if(db.nextRow() == false) {
         return 0;
     }
+
     double total = 0.0;
     double fixed = db.getDouble("f_fixed");
     double min = db.getDouble("f_min");
@@ -329,10 +357,12 @@ double C5SalaryDoc::salaryOfPosition(C5Database &db, int pos, int worker)
     double own = db.getDouble("f_owntotal") / 100;
     int dep = db.getInt("f_dep");
     double totalVal = db.getDouble("f_total");
-    if (fixed < 0) {
+
+    if(fixed < 0) {
         return -1;
     }
-    if (dep > 0) {
+
+    if(dep > 0) {
         db[":f_printtime1"] = QDateTime::fromString(date1.toString("dd/MM/yyyy") + " " + time1.toString("HH:mm:ss"),
                               "dd/MM/yyyy HH:mm:ss");
         db[":f_printtime2"] = QDateTime::fromString(date2.toString("dd/MM/yyyy") + " " + time2.toString("HH:mm:ss"),
@@ -347,7 +377,8 @@ double C5SalaryDoc::salaryOfPosition(C5Database &db, int pos, int worker)
         db.nextRow();
         dep = db.getInt(0);
     }
-    if (totalVal > 0.0) {
+
+    if(totalVal > 0.0) {
         db[":f_state"] = 2;
         db[":f_working_session"] = ui->cbShift->currentData();
         db[":f_totalval"] = totalVal / 100;
@@ -356,7 +387,8 @@ double C5SalaryDoc::salaryOfPosition(C5Database &db, int pos, int worker)
         db.nextRow();
         totalVal = db.getDouble(0);
     }
-    if (own > 0.001) {
+
+    if(own > 0.001) {
         db[":f_state"] = 2;
         db[":f_owntotal"] = own;
         db[":f_staff"] = worker;
@@ -368,6 +400,7 @@ double C5SalaryDoc::salaryOfPosition(C5Database &db, int pos, int worker)
         db.nextRow();
         own = db.getDouble(0);
     }
+
     total += dep + totalVal + own;
     total /= posCount;
     total += fixed;

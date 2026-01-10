@@ -36,11 +36,9 @@ private slots:
     void on_btnPrintStoplist_clicked();
 
 private:
-    Ui::DlgStopListOption *ui;
+    Ui::DlgStopListOption* ui;
 
-    DlgOrder *fDlgOrder;
-
-    C5User *fUser;
+    DlgOrder* fDlgOrder;
 };
 
 #endif // DLGSTOPLISTOPTION_H

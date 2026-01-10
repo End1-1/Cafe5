@@ -3,8 +3,8 @@
 #include "ninterface.h"
 #include "dlgpassword.h"
 
-DlgViewStopList::DlgViewStopList() :
-    C5Dialog(),
+DlgViewStopList::DlgViewStopList(C5User *user) :
+    C5Dialog(user),
     ui(new Ui::DlgViewStopList)
 {
     ui->setupUi(this);

@@ -59,7 +59,7 @@ public:
     bool getId(QString &id)
     {
         T *ep = new T();
-        C5Editor *e = C5Editor::createEditor(ep, 0);
+        C5Editor *e = C5Editor::createEditor(mUser, ep, 0);
         QList<QMap<QString, QVariant> > data;
         bool result = e->getResult(data);
 

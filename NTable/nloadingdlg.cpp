@@ -2,12 +2,13 @@
 #include "ui_nloadingdlg.h"
 #include <QTimer>
 
-NLoadingDlg::NLoadingDlg(QWidget *parent) :
+NLoadingDlg::NLoadingDlg(const QString &title, QWidget *parent) :
     QDialog(parent, Qt::FramelessWindowHint),
     ui(new Ui::NLoadingDlg),
     mSecond(0)
 {
     ui->setupUi(this);
+    ui->lbTitle->setText(title);
     auto *t = new QTimer(this);
     connect(t, &QTimer::timeout, this, &NLoadingDlg::timeout);
     t->start(1000);
@@ -22,7 +23,6 @@ NLoadingDlg::~NLoadingDlg()
 void NLoadingDlg::open()
 {
     mSecond = 0;
-    QDialog::open();
 }
 
 void NLoadingDlg::reject()
@@ -39,8 +39,18 @@ void NLoadingDlg::resetSeconds()
     ui->label->setText(QString("%1 sec").arg(mSecond));
 }
 
+void NLoadingDlg::hide()
+{
+    QWidget::hide();
+    mSecond = -999999999;
+}
+
 void NLoadingDlg::timeout()
 {
     mSecond++;
     ui->label->setText(QString("%1 sec").arg(mSecond));
+
+    if(mSecond == 1) {
+        QDialog::open();
+    }
 }

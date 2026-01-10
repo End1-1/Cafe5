@@ -12,13 +12,13 @@ class C5DateRange : public C5Dialog
     Q_OBJECT
 
 public:
-    explicit C5DateRange();
+    explicit C5DateRange(C5User *user);
 
     ~C5DateRange();
 
-    static bool dateRange(QDate &d1, QDate &d2);
+    static bool dateRange(QDate &d1, QDate &d2, C5User *user);
 
-    static bool date(QDate &d);
+    static bool date(QDate &d, C5User *user);
 
 private slots:
     void on_btnCancel_clicked();

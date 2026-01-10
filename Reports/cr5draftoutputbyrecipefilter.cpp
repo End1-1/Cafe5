@@ -1,6 +1,7 @@
 #include "cr5draftoutputbyrecipefilter.h"
 #include "ui_cr5draftoutputbyrecipefilter.h"
 #include "c5cache.h"
+#include "dict_dish_state.h"
 #include "c5utils.h"
 
 CR5DraftOutputByRecipeFilter::CR5DraftOutputByRecipeFilter(QWidget *parent) :
@@ -23,15 +24,17 @@ CR5DraftOutputByRecipeFilter::~CR5DraftOutputByRecipeFilter()
 QString CR5DraftOutputByRecipeFilter::condition()
 {
     QString cond = QString(" oh.f_datecash between '%1' and '%2'")
-            .arg(ui->deStart->date().toString(FORMAT_DATE_TO_STR_MYSQL))
-            .arg(ui->deEnd->date().toString(FORMAT_DATE_TO_STR_MYSQL));
-    if (ui->leDishState->isEmpty()) {
+                   .arg(ui->deStart->date().toString(FORMAT_DATE_TO_STR_MYSQL))
+                   .arg(ui->deEnd->date().toString(FORMAT_DATE_TO_STR_MYSQL));
+
+    if(ui->leDishState->isEmpty()) {
         cond += QString(" and ob.f_state in(%1,%2)")
                 .arg(DISH_STATE_OK)
                 .arg(DISH_STATE_VOID);
     } else {
         in(cond, "ob.f_state", ui->leDishState);
     }
+
     in(cond, "dp.f_id", ui->lePart2);
     in(cond, "gr.f_id", ui->leGoodsGroup);
     in(cond, "st.f_id", ui->leStore);

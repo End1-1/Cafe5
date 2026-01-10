@@ -105,7 +105,7 @@ void StoreInput::on_btnView_clicked()
     case VM_DOCS: {
         auto *dd = new DlgMovement(mUser);
         dd->openDoc(ui->tbl->getString(l.at(0).row(), 1));
-        dd->show();
+        dd->showMaximized();
         break;
     }
 
@@ -535,7 +535,11 @@ void StoreInput::on_chAll_clicked(bool checked)
     }
 
     for(int i = 0; i < ui->tbl->rowCount(); i++) {
-        ui->tbl->checkBox(i, col)->setChecked(checked);
+        auto *c = ui->tbl->checkBox(i, col);
+
+        if(c) {
+            c->setChecked(checked);
+        }
     }
 
     if(checked) {

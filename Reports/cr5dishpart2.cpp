@@ -2,12 +2,13 @@
 #include "ce5dishpart2.h"
 #include "c5tablemodel.h"
 #include "c5database.h"
+#include "c5message.h"
 #include "cr5menutranslator.h"
 #include "c5mainwindow.h"
 #include <QHeaderView>
 
 CR5DishPart2::CR5DishPart2(QWidget *parent) :
-    C5ReportWidget( parent)
+    C5ReportWidget(parent)
 {
     fIcon = ":/menu.png";
     fLabel = tr("Types of dishes");
@@ -29,9 +30,9 @@ CR5DishPart2::CR5DishPart2(QWidget *parent) :
     fEditor = new CE5DishPart2();
 }
 
-QToolBar *CR5DishPart2::toolBar()
+QToolBar* CR5DishPart2::toolBar()
 {
-    if (!fToolBar) {
+    if(!fToolBar) {
         QList<ToolBarButtons> btn;
         btn << ToolBarButtons::tbNew
             << ToolBarButtons::tbClearFilter
@@ -42,15 +43,17 @@ QToolBar *CR5DishPart2::toolBar()
         fToolBar->addAction(QIcon(":/delete.png"), tr("Remove"), this, SLOT(deletePart2()));
         fToolBar->addAction(QIcon(":/translate.png"), tr("Translator"), this, SLOT(translator()));
     }
+
     return fToolBar;
 }
 
 bool CR5DishPart2::on_tblView_doubleClicked(const QModelIndex &index)
 {
-    if (C5ReportWidget::on_tblView_doubleClicked(index)) {
+    if(C5ReportWidget::on_tblView_doubleClicked(index)) {
         fModel->setRowColor(index.row(), QColor::fromRgb(fModel->data(index.row(), fModel->indexForColumnName("f_color"),
                             Qt::EditRole).toInt()));
     }
+
     return true;
 }
 
@@ -69,7 +72,8 @@ void CR5DishPart2::refreshData()
 void CR5DishPart2::setColors()
 {
     fTableView->setColumnWidth(fModel->indexForColumnName("f_color"), 0);
-    for (int i = 0, count = fModel->rowCount(); i < count; i++) {
+
+    for(int i = 0, count = fModel->rowCount(); i < count; i++) {
         fModel->setRowColor(i, QColor::fromRgb(fModel->data(i, fModel->indexForColumnName("f_color"), Qt::EditRole).toInt()));
     }
 }
@@ -78,29 +82,36 @@ void CR5DishPart2::deletePart2()
 {
     int row = 0;
     int id = rowId(row, 0);
-    if (id == 0) {
+
+    if(id == 0) {
         return;
     }
+
     C5Database db;
     db[":f_part"] = id;
     db.exec("select f_id from d_dish where f_part=:f_part");
     QList<int> ids;
-    while (db.nextRow()) {
+
+    while(db.nextRow()) {
         ids << db.getInt(0);
     }
-    foreach (int dishid, ids) {
+
+    foreach(int dishid, ids) {
         db[":f_dish"] = dishid;
         db.exec("select * from o_body where f_dish=:f_dish");
-        if (db.nextRow()) {
+
+        if(db.nextRow()) {
             C5Message::error(tr("This name in use and cannot be removed"));
             return;
         }
     }
-    if (C5Message::question(tr("Confirm to remove the selected dish part and all dishes that includes this part")) !=
+
+    if(C5Message::question(tr("Confirm to remove the selected dish part and all dishes that includes this part")) !=
             QDialog::Accepted) {
         return;
     }
-    foreach (int dishid, ids) {
+
+    foreach(int dishid, ids) {
         db[":f_dish"] = dishid;
         db.exec("delete from d_recipes where f_dish=:f_dish");
         db[":f_id"] = dishid;
@@ -108,6 +119,7 @@ void CR5DishPart2::deletePart2()
         db[":f_dish"] = dishid;
         db.exec("delete from d_menu where f_dish=:f_dish");
     }
+
     db[":f_part"] = id;
     db.exec("delete from d_dish where f_part=:f_part");
     db[":f_id"] = id;

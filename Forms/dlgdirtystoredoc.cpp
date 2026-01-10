@@ -4,8 +4,8 @@
 #include "c5message.h"
 #include "c5database.h"
 
-DlgDirtyStoreDoc::DlgDirtyStoreDoc(const QString &uuid) :
-    C5Dialog(),
+DlgDirtyStoreDoc::DlgDirtyStoreDoc(C5User *user, const QString &uuid) :
+    C5Dialog(user),
     ui(new Ui::DlgDirtyStoreDoc),
     fUuid(uuid)
 {
@@ -19,24 +19,30 @@ DlgDirtyStoreDoc::DlgDirtyStoreDoc(const QString &uuid) :
     ui->tbl->setRowCount(db.rowCount());
     int r = 0;
     QMap<QString, int> rowsId;
-    while (db.nextRow()) {
-        for (int i = 0; i < db.columnCount(); i++) {
-            if (i == 0) {
+
+    while(db.nextRow()) {
+        for(int i = 0; i < db.columnCount(); i++) {
+            if(i == 0) {
                 rowsId[db.getString(0)] = r;
             }
+
             ui->tbl->setData(r, i, db.getValue(i));
         }
+
         r++;
     }
+
     db[":f_document"] = uuid;
     db.exec("select s.f_base, sum(s.f_qty)*-1 "
             "from a_store s "
             "left join a_store ss on ss.f_id=s.f_base "
             "where ss.f_document=:f_document and s.f_type=-1 "
             "group by 1 ");
-    while (db.nextRow()) {
+
+    while(db.nextRow()) {
         ui->tbl->setDouble(rowsId[db.getString(0)], 5, db.getDouble(1));
     }
+
     countTotal();
     std::vector<int> colswidths;
     colswidths.push_back(0);
@@ -47,7 +53,8 @@ DlgDirtyStoreDoc::DlgDirtyStoreDoc(const QString &uuid) :
     colswidths.push_back(80);
     colswidths.push_back(80);
     colswidths.push_back(80);
-    for (int i = 0; i < colswidths.size(); i++) {
+
+    for(int i = 0; i < colswidths.size(); i++) {
         ui->tbl->setColumnWidth(i, colswidths.at(i));
     }
 }
@@ -60,14 +67,17 @@ DlgDirtyStoreDoc::~DlgDirtyStoreDoc()
 void DlgDirtyStoreDoc::on_btnEdit_clicked()
 {
     int r = ui->tbl->currentRow();
-    if (r < 0) {
+
+    if(r < 0) {
         return;
     }
+
     C5LineEdit *l = ui->tbl->createLineEdit(r, 4);
     l->setDouble(ui->tbl->getDouble(r, 4));
     connect(l, &C5LineEdit::textChanged, this, [this]() {
         int row, col;
-        if (ui->tbl->findWidget(static_cast<QWidget * >(sender()), row, col)) {
+
+        if(ui->tbl->findWidget(static_cast<QWidget* >(sender()), row, col)) {
             ui->tbl->lineEdit(row, 7)->setDouble(ui->tbl->getDouble(row, 4) *ui->tbl->getDouble(row, 6));
             countTotal();
         }
@@ -78,7 +88,8 @@ void DlgDirtyStoreDoc::on_btnEdit_clicked()
     l->setDouble(ui->tbl->getDouble(r, 6));
     connect(l, &C5LineEdit::textChanged, this, [this]() {
         int row, col;
-        if (ui->tbl->findWidget(static_cast<QWidget * >(sender()), row, col)) {
+
+        if(ui->tbl->findWidget(static_cast<QWidget* >(sender()), row, col)) {
             ui->tbl->lineEdit(row, 7)->setDouble(ui->tbl->getDouble(row, 6) *ui->tbl->getDouble(row, 4));
             countTotal();
         }
@@ -87,8 +98,9 @@ void DlgDirtyStoreDoc::on_btnEdit_clicked()
     l->setDouble(ui->tbl->getDouble(r, 7));
     connect(l, &C5LineEdit::textChanged, this, [this, &r]() {
         int row, col;
-        if (ui->tbl->findWidget(static_cast<QWidget * >(sender()), row, col)) {
-            if (ui->tbl->getDouble(row, 4) > 0.001) {
+
+        if(ui->tbl->findWidget(static_cast<QWidget* >(sender()), row, col)) {
+            if(ui->tbl->getDouble(row, 4) > 0.001) {
                 ui->tbl->lineEdit(row, 6)->setDouble(ui->tbl->lineEdit(row, 7)->getDouble() / ui->tbl->lineEdit(row, 4)->getDouble());
                 countTotal();
             }
@@ -100,7 +112,8 @@ void DlgDirtyStoreDoc::on_tbl_currentCellChanged(int currentRow, int currentColu
 {
     Q_UNUSED(previousColumn);
     Q_UNUSED(currentColumn);
-    if (previousRow > -1 && previousRow != currentRow) {
+
+    if(previousRow > -1 && previousRow != currentRow) {
         ui->tbl->removeCellWidget(previousRow, 4);
         ui->tbl->removeCellWidget(previousRow, 6);
         ui->tbl->removeCellWidget(previousRow, 7);
@@ -110,16 +123,20 @@ void DlgDirtyStoreDoc::on_tbl_currentCellChanged(int currentRow, int currentColu
 void DlgDirtyStoreDoc::on_btnRemove_clicked()
 {
     int r = ui->tbl->currentRow();
-    if (r < 0) {
+
+    if(r < 0) {
         return;
     }
-    if (ui->tbl->getDouble(r, 5) < 0.001) {
+
+    if(ui->tbl->getDouble(r, 5) < 0.001) {
         C5Message::error(tr("Cannot remove goods that was used"));
         return;
     }
-    if (C5Message::question(tr("Confirm remove")) != QDialog::Accepted) {
+
+    if(C5Message::question(tr("Confirm remove")) != QDialog::Accepted) {
         return;
     }
+
     C5Database db;
     db[":f_id"] = ui->tbl->getString(r, 0);
     db.exec("delete from a_store where f_id=:f_id");
@@ -132,9 +149,11 @@ void DlgDirtyStoreDoc::on_btnRemove_clicked()
 void DlgDirtyStoreDoc::countTotal()
 {
     double total = 0;
-    for (int i = 0; i < ui->tbl->rowCount(); i++) {
+
+    for(int i = 0; i < ui->tbl->rowCount(); i++) {
         total += ui->tbl->getDouble(i, 7);
     }
+
     ui->leTotal->setDouble(total);
 }
 
@@ -149,7 +168,8 @@ void DlgDirtyStoreDoc::correctDocumentAmount()
     db.update("a_header", "f_id", fUuid);
     db[":f_storedoc"] = fUuid;
     db.exec("select f_id from a_header_cash where f_storedoc=:f_storedoc");
-    if (db.nextRow()) {
+
+    if(db.nextRow()) {
         db[":f_amount"] = total;
         db.update("e_cash", "f_header", db.getString(0));
     }
@@ -158,16 +178,20 @@ void DlgDirtyStoreDoc::correctDocumentAmount()
 void DlgDirtyStoreDoc::on_btnSave_clicked()
 {
     int r = ui->tbl->currentRow();
-    if (r < 0) {
+
+    if(r < 0) {
         return;
     }
-    if (ui->tbl->lineEdit(r, 4) == nullptr) {
+
+    if(ui->tbl->lineEdit(r, 4) == nullptr) {
         return;
     }
-    if (ui->tbl->getDouble(r, 5) > ui->tbl->lineEdit(r, 4)->getDouble()) {
+
+    if(ui->tbl->getDouble(r, 5) > ui->tbl->lineEdit(r, 4)->getDouble()) {
         C5Message::error(tr("New quantity less than used"));
         return;
     }
+
     C5Database db;
     db[":f_qty"] = ui->tbl->lineEdit(r, 4)->getDouble();
     db[":f_price"] = ui->tbl->lineEdit(r, 6)->getDouble();

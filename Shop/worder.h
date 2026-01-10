@@ -11,21 +11,6 @@
 #include <QDate>
 #include <QTime>
 
-#define col_bacode 0
-#define col_group 1
-#define col_name 2
-#define col_qty 3
-#define col_qtybox 4
-#define col_unit 5
-#define col_price 6
-#define col_total 7
-#define col_discamount 8
-#define col_discmode 9
-#define col_discvalue 10
-#define col_stock 11
-#define col_qr 12
-#define col_check_discount 13
-
 namespace Ui
 {
 class WOrder;
@@ -60,10 +45,6 @@ public:
     void keyPlus();
 
     void keyAsterix();
-
-    void focusTaxpayerId();
-
-    void imageConfig();
 
     bool writeOrder();
 
@@ -105,15 +86,11 @@ public:
 
     void openDraft(const QString &draftid);
 
-    void addGoods(const QString &barcode);
+    void checkGoodsCode(const QString &code);
 
     void addGoods2(const QString &barcode, double price);
 
 private slots:
-    void reponseProcessCode(const QJsonObject &jdoc);
-
-    void imageLoaded(const QPixmap &img);
-
     void openDraftResponse(const QJsonObject &jdoc);
 
     void readEmarks();
@@ -125,8 +102,6 @@ private slots:
     void on_leCode_textChanged(const QString &arg1);
 
     void on_leCode_returnPressed();
-
-    void on_leCustomerTaxpayerId_returnPressed();
 
     void on_btnSearchPartner_clicked();
 
@@ -159,7 +134,13 @@ private:
 
     void removeDraft();
 
-    void checkDiscountRight(const QString &code);
+    void processCode(const QString &code, int permission, std::function<void (const QString&)> func);
+
+    void checkDiscountCardCode(const QString &code);
+
+    void processPresentCard(const QString &code);
+
+    void processAccumulateCard(const QString &code);
 
 };
 

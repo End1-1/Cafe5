@@ -21,6 +21,12 @@ CE5DiscountCard::~CE5DiscountCard()
     delete ui;
 }
 
+void CE5DiscountCard::setId(int id)
+{
+    CE5Editor::setId(id);
+    ui->leDaysToEnd->setInteger(QDate::currentDate().daysTo(ui->deDateEnd->date()));
+}
+
 bool CE5DiscountCard::save(QString &err, QList<QMap<QString, QVariant> >& data)
 {
     C5Database db;
@@ -92,4 +98,9 @@ void CE5DiscountCard::on_leFirstName_textChanged(const QString &arg1)
 void CE5DiscountCard::on_leCard_returnPressed()
 {
     ui->leCard->setText(ui->leCard->text().replace("?", "").replace(";", "").replace(":", ""));
+}
+
+void CE5DiscountCard::on_btnSetDays_clicked()
+{
+    ui->deDateEnd->setDate(ui->deStartDate->date().addDays(ui->leDaysToEnd->getInteger()));
 }

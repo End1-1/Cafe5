@@ -12,7 +12,7 @@ class SessionOrders : public C5Dialog
     Q_OBJECT
 
 public:
-    explicit SessionOrders();
+    explicit SessionOrders(C5User *user);
     ~SessionOrders();
 
 private slots:

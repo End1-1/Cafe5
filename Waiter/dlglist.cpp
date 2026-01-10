@@ -1,8 +1,8 @@
 #include "dlglist.h"
 #include "ui_dlglist.h"
 
-DlgList::DlgList() :
-    C5Dialog(),
+DlgList::DlgList(C5User *user) :
+    C5Dialog(user),
     ui(new Ui::DlgList)
 {
     ui->setupUi(this);
@@ -13,9 +13,9 @@ DlgList::~DlgList()
     delete ui;
 }
 
-bool DlgList::getValue(const QStringList &names, int& index)
+bool DlgList::getValue(C5User *user, const QStringList &names, int& index)
 {
-    auto *d = new DlgList();
+    auto *d = new DlgList(user);
 
     for(int i = 0; i < names.count(); i++) {
         QListWidgetItem *item = new QListWidgetItem(d->ui->lst);

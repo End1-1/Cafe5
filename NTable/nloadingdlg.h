@@ -13,7 +13,8 @@ class NLoadingDlg : public QDialog
     Q_OBJECT
 
 public:
-    explicit NLoadingDlg(QWidget *parent = nullptr);
+    explicit NLoadingDlg(const QString &title, QWidget *parent = nullptr);
+
     ~NLoadingDlg();
 
     virtual void open() override;
@@ -24,8 +25,11 @@ public:
 
     void resetSeconds();
 
+public Q_SLOTS:
+    void hide();
+
 private:
-    Ui::NLoadingDlg *ui;
+    Ui::NLoadingDlg* ui;
 
     int mSecond;
 

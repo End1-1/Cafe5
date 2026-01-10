@@ -9,6 +9,7 @@
 #include "c5user.h"
 #include "c5dishwidget.h"
 #include "c5mainwindow.h"
+#include "dict_dish_state.h"
 #include "proxytablewidgetdatabase.h"
 #include "c5message.h"
 #include "c5cashdoc.h"
@@ -331,7 +332,7 @@ void C5WaiterOrder::openMenuItem()
     }
 
     C5DishWidget *ep = new C5DishWidget();
-    C5Editor *e = C5Editor::createEditor(ep, 0);
+    C5Editor *e = C5Editor::createEditor(mUser, ep, 0);
     QList<QMap<QString, QVariant> > d;
     ep->setId(ui->tblDishes->getInteger(ml.at(0).row(), 3));
     e->getResult(d);
@@ -424,7 +425,7 @@ void C5WaiterOrder::on_btnSetCL_clicked()
 
     QString clcode, clname;
 
-    if(DlgSetWaiterOrderCL::getCL(clcode, clname)) {
+    if(DlgSetWaiterOrderCL::getCL(mUser, clcode, clname)) {
         ui->leCityLedger->setText(clcode);
         C5Database db;
         db[":f_code"] = clcode;

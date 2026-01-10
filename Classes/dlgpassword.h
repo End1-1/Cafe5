@@ -1,7 +1,7 @@
 #ifndef DLGPASSWORD_H
 #define DLGPASSWORD_H
 
-#include "c5waiterdialog.h"
+#include "c5dialog.h"
 
 namespace Ui
 {
@@ -10,7 +10,7 @@ class DlgPassword;
 
 class C5User;
 
-class DlgPassword : public C5WaiterDialog
+class DlgPassword : public C5Dialog
 {
     Q_OBJECT
 
@@ -21,11 +21,9 @@ public:
 
     ~DlgPassword();
 
-    static bool getUser(const QString &title, C5User*& user);
-
-    static bool getUserAndCheck(const QString &title, C5User*& user, int permission);
-
     static bool getQty(const QString &title, int& qty);
+
+    static bool stopList(int& qty);
 
     static bool getAmount(const QString &title, double& amount, bool defaultAmount = false);
 
@@ -34,6 +32,9 @@ public:
     static bool getPassword(const QString &title, QString &str);
 
     static bool getPasswordString(const QString &title, QString &pass);
+
+protected:
+    virtual void showEvent(QShowEvent *e) override;
 
 private slots:
     void on_pushButton_clicked();
@@ -67,6 +68,8 @@ private slots:
     void on_btnClear_clicked();
 
     void on_pushButton_13_clicked();
+
+    void on_btnRemoveFromStopList_clicked();
 
 private:
     Ui::DlgPassword* ui;

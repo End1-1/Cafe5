@@ -11,6 +11,7 @@ class NTableWidget;
 class C5MainWindow;
 class NLoadingDlg;
 class NFilterDlg;
+class C5User;
 class NHandler;
 
 class NTableWidget : public C5Widget
@@ -18,7 +19,7 @@ class NTableWidget : public C5Widget
     Q_OBJECT
 
 public:
-    explicit NTableWidget(const QString &route, QWidget *parent = nullptr);
+    explicit NTableWidget(C5User *user, const QString &route, QWidget *parent = nullptr);
     ~NTableWidget();
     C5MainWindow* mMainWindow;
     static QString mHost;
@@ -36,6 +37,7 @@ private:
     NFilterDlg* fFilter;
     NHandler* mHandler;
     QWidget* mToolWidget;
+    C5User* mUser;
     void sum();
 
 private slots:

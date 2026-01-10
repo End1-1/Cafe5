@@ -13,7 +13,6 @@ class Workspace;
 class QTableWidgetItem;
 class QTableWidget;
 class QListWidgetItem;
-class C5User;
 class WCustomerDisplay;
 class NLoadingDlg;
 
@@ -22,11 +21,9 @@ class Workspace : public C5Dialog
     Q_OBJECT
 
 public:
-    explicit Workspace();
+    explicit Workspace(C5User *user);
 
     ~Workspace();
-
-    bool login();
 
     virtual void reject() override;
 
@@ -45,8 +42,6 @@ private slots:
     void httpStop(QObject *sender);
 
     void slotHttpError(const QString &err);
-
-    void loginResponse(const QJsonObject &d);
 
     void initResponse(const QJsonObject &jdoc);
 
@@ -170,8 +165,6 @@ private:
     Ui::Workspace* ui;
 
     NLoadingDlg* fLoadingDlg;
-
-    C5User* fUser;
 
     QJsonArray jMenu;
 

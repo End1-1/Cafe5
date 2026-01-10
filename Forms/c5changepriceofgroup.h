@@ -3,7 +3,8 @@
 
 #include "c5dialog.h"
 
-namespace Ui {
+namespace Ui
+{
 class C5ChangePriceOfGroup;
 }
 
@@ -12,11 +13,11 @@ class C5ChangePriceOfGroup : public C5Dialog
     Q_OBJECT
 
 public:
-    explicit C5ChangePriceOfGroup();
+    explicit C5ChangePriceOfGroup(C5User *user);
 
     ~C5ChangePriceOfGroup();
 
-    static bool groupPrice(double &price1, double &price2, double &price1disc, double &price2disc);
+    static bool groupPrice(double& price1, double& price2, double& price1disc, double& price2disc, C5User *user);
 
 private slots:
     void on_btnOk_clicked();
@@ -24,7 +25,7 @@ private slots:
     void on_btnCancel_clicked();
 
 private:
-    Ui::C5ChangePriceOfGroup *ui;
+    Ui::C5ChangePriceOfGroup* ui;
 };
 
 #endif // C5CHANGEPRICEOFGROUP_H

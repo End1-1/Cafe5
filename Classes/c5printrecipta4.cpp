@@ -1,51 +1,107 @@
 #include "c5printrecipta4.h"
 #include "c5database.h"
-#include "c5printing.h"
 #include "c5utils.h"
 #include "c5config.h"
-#include "c5printpreview.h"
 #include "QRCodeGenerator.h"
+#include <QFile>
+#include <QApplication>
+#include <QPrintPreviewDialog>
+#include <QPrinter>
+#include <QTextDocument>
 
-C5PrintReciptA4::C5PrintReciptA4(const QString &orderid, QObject *parent) :
+C5PrintReciptA4::C5PrintReciptA4(const QString &orderid, C5User *user, QObject *parent) :
     QObject(parent),
-    fOrderUUID(orderid)
+    fOrderUUID(orderid),
+    mUser(user)
 {
+}
+
+QString C5PrintReciptA4::loadTemplate(const QString &name)
+{
+    QString fileName = QCoreApplication::applicationDirPath() + "/templates/" + name;
+    QFile f(fileName);
+
+    if(!f.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        return QString();
+    }
+
+    return QString::fromUtf8(f.readAll());
+}
+
+QString C5PrintReciptA4::applyTemplate(QString html,
+                                       const QMap<QString, QString>& vars)
+{
+    for(auto it = vars.begin(); it != vars.end(); ++it) {
+        html.replace("{{" + it.key() + "}}", it.value());
+    }
+
+    return html;
+}
+
+QString C5PrintReciptA4::makeGoodsTable(const QList<QMap<QString, QVariant>> &body)
+{
+    QString h;
+    QTextStream s(&h);
+    s << "<table>";
+    s << "<tr>"
+      << "<th>NN</th>"
+      << "<th>Material code</th>"
+      << "<th>Goods</th>"
+      << "<th class='right'>Qty</th>"
+      << "<th>Unit</th>"
+      << "<th class='right'>Price</th>"
+      << "<th class='right'>Discount %</th>"
+      << "<th class='right'>Discounted price</th>"
+      << "<th class='right'>Total</th>"
+      << "</tr>";
+    for(int i = 0; i < body.count(); ++i) {
+        const auto &m = body[i];
+        double price = m["f_price"].toDouble();
+        double disc = m["f_discountfactor"].toDouble();
+        double discounted = price - price * disc / 100.0;
+        s << "<tr>";
+        s << "<td class='center'>" << i + 1 << "</td>";
+        s << "<td>" << m["f_scancode"].toString() << "</td>";
+        s << "<td>" << m["f_goodsname"].toString() << "</td>";
+        s << "<td class='right'>" << float_str(m["f_qty"].toDouble(), 2) << "</td>";
+        s << "<td>" << m["f_unitname"].toString() << "</td>";
+        s << "<td class='right'>" << float_str(price, 2) << "</td>";
+        s << "<td class='right'>" << float_str(disc, 2) << "%</td>";
+        s << "<td class='right'>" << float_str(discounted, 2) << "</td>";
+        s << "<td class='right'>" << float_str(discounted * m["f_qty"].toDouble(), 2) << "</td>";
+        s << "</tr>";
+    }
+    s << "</table>";
+    return h;
 }
 
 bool C5PrintReciptA4::print(QString &err)
 {
-    C5Printing p;
-    QFont f(__c5config.getValue(param_app_font_family));
+    QString html = loadTemplate("receipt_a4.html");
+    if(html.isEmpty()) {
+        err = "Template not found";
+        return false;
+    }
     C5Database db;
-    p.setFont(f);
-    QList<qreal> points;
-    QStringList vals;
-    p.setSceneParams(2000, 2700, QPageLayout::Portrait);
     db[":f_id"] = fOrderUUID;
     db.exec("select * from o_draft_sale where f_id=:f_id");
     bool oops = false;
     bool isDraft;
-
     if(db.nextRow() == false) {
         oops = true;
     }
-
     if(oops) {
         db[":f_id"] = fOrderUUID;
         db.exec("select * from o_header where f_id=:f_id");
-
         if(db.nextRow() == false) {
             err = "Order not exists";
             return false;
         }
-
         isDraft = db.getInt("f_state") != 2;
     } else {
         isDraft = db.getInt("f_state") == 1;
     }
-
     db[":f_id"] = fOrderUUID;
-
     if(isDraft) {
         db.exec("select '--' as f_ordernumber, ost.f_name as f_saletypename, "
                 "o.f_amount as f_amounttotal, 0 as f_amountcash, 0 as f_amountcard, 0 as f_amountother, o.f_date, "
@@ -71,7 +127,6 @@ bool C5PrintReciptA4::print(QString &err)
                 "left join c_partners p on p.f_id=o.f_partner "
                 "where o.f_id=:f_id ");
     }
-
     QMap<QString, QVariant> header;
 
     if(db.nextRow()) {
@@ -156,136 +211,27 @@ bool C5PrintReciptA4::print(QString &err)
         }
     }
 
-    QPixmap pix = QPixmap::fromImage(encodeImage);
-    pix = pix.scaled(300, 300);
-    p.image(pix, Qt::AlignLeft);
-    p.setFontSize(25);
-    p.setFontBold(true);
-    QString docTypeText = QString("%1 %2").arg(header["f_saletypename"].toString(), tr("sale"));
-    p.ctext(QString("%1 N%2").arg(docTypeText, header["f_ordernumber"].toString()));
-    p.br();
-    p.fTop = p.fLineHeight + 10;
-    p.setFontSize(20);
-    p.setFontBold(true);
-    points.clear();
-    points << 300 << 200 << 500 << 950;
-    vals << tr("Date");
-    vals << tr("Delivery date");
-    vals << tr("Buyer");
-    p.tableText(points, vals, p.fLineHeight + 20);
-    p.br(p.fLineHeight + 20);
-    p.setFontBold(false);
-    vals.clear();
-    vals << QDate::fromString(header["f_datecash"].toString(), FORMAT_DATE_TO_STR_MYSQL).toString("dd/MM/yyyy");
-    vals << QDate::fromString(header["f_datefor"].toString(), FORMAT_DATE_TO_STR_MYSQL).toString("dd/MM/yyyy");
-    vals << QString("%1, %2 %3, %4 %5").arg(header["f_taxname"].toString(), tr("Taxpayer code"),
-                                            header["f_taxcode"].toString(),
-                                            tr("Address"), header["f_address"].toString());
-    p.tableText(points, vals, p.fLineHeight + 20);
-    p.br(p.fLineHeight + 20);
-    //SALER
-    points.clear();
-    points << 300 << 200 << 1450;
-    vals.clear();
-    vals << tr("Saler");
-    vals << __c5config.fMainJson["firmfullinfo"].toString();
-    p.tableText(points, vals, p.fLineHeight + 20);
-    p.br(p.fLineHeight + 20);
-    p.br(p.fLineHeight + 20);
-    points.clear();
-    vals.clear();
-    p.setFontBold(true);
-    points << 300;
-    p.tableText(points, vals, p.fLineHeight + 20);
-    p.br(p.fLineHeight + 20);
-    p.setFontBold(false);
-    points.clear();
-    vals.clear();
-    points << 300;
-    p.tableText(points, vals, p.fLineHeight + 20);
-    p.br();
-    QString goodsColName = tr("Goods");
-    points.clear();
-    points << 50 << 100 << 250 << 800 << 100 << 100 << 150 << 100 << 150 << 150;
-    vals.clear();
-    vals << tr("NN")
-         << tr("Material code")
-         << goodsColName
-         << tr("Qty")
-         << tr("Unit")
-         << tr("Price")
-         << tr("Discount")
-         << tr("Discounted\r\nprice")
-         << tr("Total");
-    p.setFontBold(true);
-    p.tableText(points, vals, p.fLineHeight + 20);
-    p.br(p.fLineHeight + 20);
-    p.setFontBold(false);
-
-    for(int i = 0; i < body.count(); i++) {
-        const QMap<QString, QVariant>& m = body.at(i);
-
-        if(p.checkBr(p.fLineHeight + 20)) {
-            p.br(p.fLineHeight + 20);
-            p.br();
-        }
-
-        vals.clear();
-        vals << QString::number(i + 1);
-        vals << m["f_scancode"].toString();
-        vals << m["f_goodsname"].toString();
-        vals << float_str(m["f_qty"].toDouble(), 2);
-        vals << m["f_unitname"].toString();
-        double price = m["f_price"].toDouble();
-        vals << float_str(price, 2);
-        vals << float_str(m["f_discountfactor"].toDouble(), 2) + "%";
-        price -= price * (m["f_discountfactor"].toDouble() / 100);
-        vals << float_str(price, 1);
-        vals << float_str(m["f_qty"].toDouble() *price, 2);
-        p.tableText(points, vals, p.fLineHeight + 20);
-
-        if(p.checkBr(p.fLineHeight + 20)) {
-            p.br(p.fLineHeight + 20);
-        }
-
-        p.br(p.fLineHeight + 20);
-    }
-
-    p.setFontBold(true);
-    points.clear();
-    points << 1200
-           << 450
-           << 300;
-    vals.clear();
-    vals << tr("Total amount");
-    vals << float_str(header["f_amounttotal"].toDouble(), 2);
-    p.tableText(points, vals, p.fLineHeight + 20);
-    p.br(p.fLineHeight + 20);
-    p.br(p.fLineHeight + 20);
-    p.br(p.fLineHeight + 20);
-
-    if(abs(debt1["dd"].toDouble()) > 0 || abs(debt2["dd"].toDouble()) > 0) {
-        p.ltext(tr("Debt before"), 50);
-        p.ltext(float_str(debt1["dd"].toDouble(), 1), 400);
-        p.br();
-        p.ltext(tr("Debt changed"), 50);
-        p.ltext(float_str(debt2["dd"].toDouble(), 1), 400);
-        p.br();
-        p.ltext(tr("Total debt"), 50);
-        p.ltext(float_str(debt2["dd"].toDouble() + debt1["dd"].toDouble(), 1), 400);
-        p.br(p.fLineHeight + 20);
-        p.br(p.fLineHeight + 20);
-        p.br(p.fLineHeight + 20);
-    }
-
-    p.ltext(tr("Passed"), 50);
-    p.ltext(tr("Accepted"), 1000);
-    p.br(p.fLineHeight + 20);
-    p.ltext(header["f_staff"].toString(), 50);
-    p.line(50, p.fTop, 700, p.fTop);
-    p.line(1000, p.fTop, 1650, p.fTop);
-    p.setFontBold(false);
-    C5PrintPreview pp(&p);
-    pp.exec();
+    QMap<QString, QString> vars;
+    vars["doc_title"] = "docTypeText  N" + header["f_ordernumber"].toString();
+    vars["date"] = QDate::fromString(header["f_datecash"].toString(), FORMAT_DATE_TO_STR_MYSQL).toString("dd/MM/yyyy");
+    vars["delivery_date"] = QDate::fromString(header["f_datefor"].toString(), FORMAT_DATE_TO_STR_MYSQL).toString("dd/MM/yyyy");
+    vars["buyer"] = QString("%1, %2 %3, %4 %5").arg(header["f_taxname"].toString(), tr("Taxpayer code"),
+                    header["f_taxcode"].toString(),
+                    tr("Address"), header["f_address"].toString());
+    vars["saler"] = __c5config.fMainJson["firmfullinfo"].toString();
+    vars["staff"] = header["f_staff"].toString();
+    vars["total_amount"] = float_str(header["f_amounttotal"].toDouble(), 2);
+    vars["goods_table"] = makeGoodsTable(body);
+    vars["qr_image"] = "data:image/png;base64," + encodeString;
+    html = applyTemplate(html, vars);
+    QTextDocument doc;
+    doc.setHtml(html);
+    QPrinter printer(QPrinter::HighResolution);
+    printer.setPageSize(QPageSize::A4);
+    printer.setFullPage(false);
+    QPrintPreviewDialog preview(&printer);
+    connect(&preview, &QPrintPreviewDialog::paintRequested,
+    [&](QPrinter * p) { doc.print(p); });
+    preview.exec();
     return true;
 }

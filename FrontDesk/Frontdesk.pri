@@ -64,7 +64,6 @@ FORMS += \
     ../Forms/c5waiterorder.ui \
     ../Forms/change.ui \
     ../Forms/cr5routereport.ui \
-    ../Forms/dlgcashinout.ui \
     ../Forms/dlgcashop.ui \
     ../Forms/dlgchangeoutputstore.ui \
     ../Forms/dlgconfigtable.ui \
@@ -126,7 +125,6 @@ FORMS += \
     ../Reports/c5settingswidget.ui \
     ../Reports/cr5materialinstorefilter.ui \
     ../Reports/cr5goodsmovementfilter.ui \
-    ../Classes/c5printpreview.ui \
     ../Reports/cr5tstoreextrafilter.ui \
     ../Reports/cr5documentsfilter.ui \
     ../Reports/cr5consumptionbysalesfilter.ui \
@@ -270,7 +268,6 @@ HEADERS += \
         ../Forms/c5waiterorder.h \
         ../Forms/change.h \
         ../Forms/cr5routereport.h \
-        ../Forms/dlgcashinout.h \
         ../Forms/dlgcashop.h \
         ../Forms/dlgchangeoutputstore.h \
         ../Forms/dlgconfigtable.h \
@@ -410,8 +407,6 @@ HEADERS += \
         ../Reports/cr5materialinstorefilter.h \
         ../Reports/cr5goodsmovement.h \
         ../Reports/cr5goodsmovementfilter.h \
-        ../Classes/c5printpreview.h \
-        ../Classes/c5printing.h \
         ../Controls/c5graphicsview.h \
         ../Reports/cr5tstoreextra.h \
         ../Reports/cr5tstoreextrafilter.h \
@@ -560,7 +555,6 @@ SOURCES += \
         ../Forms/c5waiterorder.cpp \
         ../Forms/change.cpp \
         ../Forms/cr5routereport.cpp \
-        ../Forms/dlgcashinout.cpp \
         ../Forms/dlgcashop.cpp \
         ../Forms/dlgchangeoutputstore.cpp \
         ../Forms/dlgconfigtable.cpp \
@@ -705,8 +699,6 @@ SOURCES += \
         ../Reports/cr5materialinstorefilter.cpp \
         ../Reports/cr5goodsmovement.cpp \
         ../Reports/cr5goodsmovementfilter.cpp \
-        ../Classes/c5printpreview.cpp \
-        ../Classes/c5printing.cpp \
         ../Controls/c5graphicsview.cpp \
         ../Reports/cr5tstoreextra.cpp \
         ../Reports/cr5tstoreextrafilter.cpp \

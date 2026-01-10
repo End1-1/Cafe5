@@ -3,7 +3,8 @@
 
 #include "c5dialog.h"
 
-namespace Ui {
+namespace Ui
+{
 class DlgSetWaiterOrderCL;
 }
 
@@ -12,9 +13,11 @@ class DlgSetWaiterOrderCL : public C5Dialog
     Q_OBJECT
 
 public:
-    explicit DlgSetWaiterOrderCL();
+    explicit DlgSetWaiterOrderCL(C5User *user);
+
     ~DlgSetWaiterOrderCL();
-    static bool getCL(QString &code, QString &name);
+
+    static bool getCL(C5User *user, QString &code, QString &name);
 
 private slots:
     void on_btnNew_clicked();
@@ -24,7 +27,7 @@ private slots:
     void on_tbl_doubleClicked(const QModelIndex &index);
 
 private:
-    Ui::DlgSetWaiterOrderCL *ui;
+    Ui::DlgSetWaiterOrderCL* ui;
 };
 
 #endif // DLGSETWAITERORDERCL_H

@@ -6,8 +6,8 @@
 #include "c5message.h"
 #include <QTableWidgetItem>
 
-C5TempSale::C5TempSale() :
-    C5Dialog(),
+C5TempSale::C5TempSale(C5User *user) :
+    C5Dialog(user),
     ui(new Ui::C5TempSale)
 {
     ui->setupUi(this);

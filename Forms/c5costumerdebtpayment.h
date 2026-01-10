@@ -16,7 +16,7 @@ class C5CostumerDebtPayment : public C5Dialog
     Q_OBJECT
 
 public:
-    explicit C5CostumerDebtPayment(int type);
+    explicit C5CostumerDebtPayment(C5User *user, int type);
 
     ~C5CostumerDebtPayment();
 

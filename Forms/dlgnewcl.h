@@ -3,7 +3,8 @@
 
 #include "c5dialog.h"
 
-namespace Ui {
+namespace Ui
+{
 class DlgNewCL;
 }
 
@@ -12,16 +13,16 @@ class DlgNewCL : public C5Dialog
     Q_OBJECT
 
 public:
-    explicit DlgNewCL();
+    explicit DlgNewCL(C5User *user);
     ~DlgNewCL();
-    static bool createCL(QString &code, QString &name);
+    static bool createCL(C5User *user, QString &code, QString &name);
 
 private slots:
     void on_btnCancel_clicked();
     void on_btnOK_clicked();
 
 private:
-    Ui::DlgNewCL *ui;
+    Ui::DlgNewCL* ui;
 };
 
 #endif // DLGNEWCL_H

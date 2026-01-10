@@ -171,6 +171,19 @@
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>leAddress</tabstop>
+  <tabstop>cbConnection</tabstop>
+  <tabstop>leServerKey</tabstop>
+  <tabstop>leSettingsName</tabstop>
+  <tabstop>leServerUsername</tabstop>
+  <tabstop>leServerPassword</tabstop>
+  <tabstop>leSettingsPassword</tabstop>
+  <tabstop>btnShowPassword</tabstop>
+  <tabstop>btnSave_2</tabstop>
+  <tabstop>btnSave</tabstop>
+  <tabstop>btnCancel</tabstop>
+ </tabstops>
  <resources>
   <include location="../resources/res.qrc"/>
   <include location="../resources/res.qrc"/>

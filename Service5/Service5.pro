@@ -40,6 +40,8 @@ HEADERS += \
     waiter.h \
     worker/socketstruct.h \
     worker/struct_goods_item.h \
+    worker/struct_hall.h \
+    worker/struct_partner.h \
     worker/struct_storage_item.h
 
 FORMS += \

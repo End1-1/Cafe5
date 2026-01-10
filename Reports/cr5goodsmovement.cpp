@@ -6,6 +6,7 @@
 #include "c5tablemodel.h"
 #include "c5dlgselectreporttemplate.h"
 #include "dlgimportfromas.h"
+#include "c5message.h"
 
 CR5GoodsMovement::CR5GoodsMovement(QWidget *parent) :
     C5ReportWidget(parent)
@@ -237,7 +238,7 @@ void CR5GoodsMovement::changePrice()
         return;
     }
 
-    C5ChangeDocInputPrice::changePrice(fModel->data(rows.values().at(0),
+    C5ChangeDocInputPrice::changePrice(mUser, fModel->data(rows.values().at(0),
                                        fModel->indexForColumnName("f_storerec"),
                                        Qt::EditRole).toString());
 }
@@ -249,7 +250,7 @@ void CR5GoodsMovement::importFromAS()
 
 void CR5GoodsMovement::templates()
 {
-    C5DlgSelectReportTemplate d(2);
+    C5DlgSelectReportTemplate d(mUser, 2);
 
     if(d.exec() == QDialog::Accepted) {
         QString sql = d.fSelectedTemplate.sql;

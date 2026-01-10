@@ -3,7 +3,8 @@
 
 #include "c5dialog.h"
 
-namespace Ui {
+namespace Ui
+{
 class DlgViewCashReport;
 }
 
@@ -12,7 +13,7 @@ class DlgViewCashReport : public C5Dialog
     Q_OBJECT
 
 public:
-    explicit DlgViewCashReport();
+    explicit DlgViewCashReport(C5User *user);
     ~DlgViewCashReport();
     void addTotal(double t);
     void addTitle(const QString &t);
@@ -24,7 +25,7 @@ private slots:
     void on_btnPrint_clicked();
 
 private:
-    Ui::DlgViewCashReport *ui;
+    Ui::DlgViewCashReport* ui;
 };
 
 #endif // DLGVIEWCASHREPORT_H

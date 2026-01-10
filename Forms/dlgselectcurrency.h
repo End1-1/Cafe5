@@ -3,7 +3,8 @@
 
 #include "c5dialog.h"
 
-namespace Ui {
+namespace Ui
+{
 class DlgSelectCurrency;
 }
 
@@ -12,9 +13,11 @@ class DlgSelectCurrency : public C5Dialog
     Q_OBJECT
 
 public:
-    explicit DlgSelectCurrency(QWidget *parent = nullptr);
+    explicit DlgSelectCurrency(C5User *user);
+
     ~DlgSelectCurrency();
-    static bool getCurrency(int &id, QString &name, QWidget *parent);
+
+    static bool getCurrency(C5User *user, int& id, QString &name);
 
 private slots:
     void on_btnReject_clicked();
@@ -22,7 +25,7 @@ private slots:
     void on_btnOK_clicked();
 
 private:
-    Ui::DlgSelectCurrency *ui;
+    Ui::DlgSelectCurrency* ui;
 };
 
 #endif // DLGSELECTCURRENCY_H

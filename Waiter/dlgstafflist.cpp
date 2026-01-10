@@ -4,8 +4,8 @@
 #include "c5message.h"
 #include <QScreen>
 
-DlgStaffList::DlgStaffList() :
-    C5Dialog(),
+DlgStaffList::DlgStaffList(C5User *user) :
+    C5Dialog(user),
     ui(new Ui::DlgStaffList)
 {
     ui->setupUi(this);

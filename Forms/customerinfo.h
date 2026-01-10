@@ -13,11 +13,11 @@ class CustomerInfo : public C5Dialog
     Q_OBJECT
 
 public:
-    explicit CustomerInfo();
+    explicit CustomerInfo(C5User *user);
 
     ~CustomerInfo();
-
-    static bool getCustomer(int& id, QString &name, QString &phone, QString &address);
+    
+    static bool getCustomer(int& id, QString &name, QString &phone, QString &address, C5User *user);
 
     virtual bool eventFilter(QObject *o, QEvent *e) override;
 

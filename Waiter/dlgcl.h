@@ -3,7 +3,8 @@
 
 #include "c5dialog.h"
 
-namespace Ui {
+namespace Ui
+{
 class DlgCL;
 }
 
@@ -12,14 +13,14 @@ class DlgCL : public C5Dialog
     Q_OBJECT
 
 public:
-    explicit DlgCL();
+    explicit DlgCL(C5User *user);
 
     ~DlgCL();
 
-    static bool getCL(QString &id, QString &name);
+    static bool getCL(C5User *user, QString &id, QString &name);
 
 private:
-    Ui::DlgCL *ui;
+    Ui::DlgCL* ui;
 
     int fRow;
 

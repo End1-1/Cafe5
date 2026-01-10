@@ -8,8 +8,8 @@
 #include <QJsonDocument>
 #include <QJsonParseError>
 
-C5FiscalCancel::C5FiscalCancel(const QString &id)
-    : C5Dialog(), ui(new Ui::C5FiscalCancel),
+C5FiscalCancel::C5FiscalCancel(C5User *user, const QString &id)
+    : C5Dialog(user), ui(new Ui::C5FiscalCancel),
       fUuid(id)
 {
     ui->setupUi(this);

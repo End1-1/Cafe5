@@ -28,6 +28,8 @@ public:
     int isService = 0;
     int canDiscount = 0;
 
+    bool rowDiscount = false;
+
     QString _groupName;
     QString _goodsName;
     QString _goodsFiscalName;

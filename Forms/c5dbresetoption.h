@@ -12,7 +12,7 @@ class C5DbResetOption : public C5Dialog
     Q_OBJECT
 
 public:
-    explicit C5DbResetOption();
+    explicit C5DbResetOption(C5User *user);
 
     ~C5DbResetOption();
 

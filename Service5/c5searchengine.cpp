@@ -3,6 +3,7 @@
 #include "socketstruct.h"
 #include "struct_storage_item.h"
 #include "struct_goods_item.h"
+#include "struct_partner.h"
 #include <QJsonArray>
 #include <QJsonDocument>
 #include <QJsonObject>
@@ -11,8 +12,10 @@
 
 QReadWriteLock mStoragesLock;
 QReadWriteLock mGoodsLock;
+QReadWriteLock mPartnersLock;
 QHash<QString, QVector<StorageItem>> mStorages;
 QHash<QString, QVector<GoodsItem>> mGoods;
+QHash<QString, QVector<PartnerItem>> mPartners;
 
 struct SearchObject {
     int mode;
@@ -52,7 +55,7 @@ void C5SearchEngine::init(QStringList databases)
         mSearchStrings[dbname] = QStringList();
         mSearchObjects[dbname] = QMap < int, SearchObject > ();
         QStringList &words = mSearchStrings[dbname];
-        QMap < int, SearchObject > & objects = mSearchObjects[dbname];
+        QMap < int, SearchObject >& objects = mSearchObjects[dbname];
         QString sql = QString::fromStdString(R"sql(
         SELECT f_id, f_mode, f_word as f_orig, lower(f_word) as f_word FROM (
         SELECT d.f_id, d.f_mode, d.f_en AS f_word FROM d_part2 p2
@@ -197,6 +200,7 @@ void C5SearchEngine::init(const QString &databaseName, const QString &serverKey)
         return;
     }
 
+    /* STORAGES */
     QVector < StorageItem > tmp1;
     tmp1.reserve(256);
     db.exec("select f_id, f_name from c_storages order by f_name");
@@ -211,6 +215,7 @@ void C5SearchEngine::init(const QString &databaseName, const QString &serverKey)
         });
     }
 
+    /* GOODS */
     QVector < GoodsItem > tmp2;
     tmp2.reserve(4096);
     db.exec(R"(
@@ -220,7 +225,7 @@ void C5SearchEngine::init(const QString &databaseName, const QString &serverKey)
     order by g.f_name
     )");
 
-    while (db.next()) {
+    while(db.next()) {
         QString name = db.string("f_group_name") + " " + db.string("f_name") + " " + db.string("f_scancode");
         tmp2.append({
             db.integer("f_id"),
@@ -232,15 +237,44 @@ void C5SearchEngine::init(const QString &databaseName, const QString &serverKey)
         });
     }
 
+    /* PARTNERS */
+    QVector<PartnerItem> tmp3;
+    tmp3.reserve(256);
+    db.exec(R"(
+    select p.f_id, p.f_taxcode, p.f_taxname, p.f_name, p.f_phone
+    from c_partners p
+    order by p.f_name
+    )");
+
+    while(db.next()) {
+        QString name = QString("%1 %2 %3 %4").arg(
+                           db.string("f_taxcode"),
+                           db.string("f_taxname"),
+                           db.string("f_name"),
+                           db.string("f_phone")).toLower();
+        tmp3.append({
+            db.integer("f_id"),
+            db.string("f_taxcode"),
+            db.string("f_taxname"),
+            db.string("f_name"),
+            db.string("f_phone"),
+            name,
+            name.split(" ", Qt::SkipEmptyParts)
+        });
+    }
+
     {
         QWriteLocker wl1(&mStoragesLock);
         QWriteLocker wl2(&mGoodsLock);
+        QWriteLocker wl3(&mPartnersLock);
         mStorages[serverKey] = std::move(tmp1);
         mGoods[serverKey] = std::move(tmp2);
+        mPartners[serverKey] = std::move(tmp3);
     }
 
     qDebug() << "storages of" << databaseName << mStorages[serverKey].count() << "items";
     qDebug() << "goods of" << databaseName << mGoods[serverKey].count() << "items";
+    qDebug() << "partners of " << databaseName << mPartners[serverKey].count() << "items";
 }
 
 QString C5SearchEngine::search(const QJsonObject &jo)
@@ -289,7 +323,7 @@ QString C5SearchEngine::search(const QJsonObject &jo)
     }
 
     qDebug() << "search completed with" << foundedIndexes.count() << "result";
-    const QMap < int, SearchObject > & objects = mSearchObjects[databaseName];
+    const QMap < int, SearchObject >& objects = mSearchObjects[databaseName];
     QJsonArray ja;
 
     for(int i : foundedIndexes) {
@@ -517,7 +551,7 @@ QString C5SearchEngine::searchStorage(const QJsonObject &jo, const SocketStruct 
     QJsonArray jstorages;
     {
         QReadLocker rl(&mStoragesLock);
-        const QVector < StorageItem > & siv = mStorages.value(ss.tenantId);
+        const QVector < StorageItem >& siv = mStorages.value(ss.tenantId);
         const int limit = 50000;
 
         for(const StorageItem &si : siv) {
@@ -565,7 +599,7 @@ QString C5SearchEngine::searchGoodsItem(const QJsonObject &jo, const SocketStruc
     QJsonArray jstorages;
     {
         QReadLocker rl(&mGoodsLock);
-        const QVector < GoodsItem > & siv = mGoods.value(ss.tenantId);
+        const QVector < GoodsItem >& siv = mGoods.value(ss.tenantId);
         const int limit = 50000;
 
         for(const GoodsItem &si : siv) {
@@ -595,6 +629,57 @@ QString C5SearchEngine::searchGoodsItem(const QJsonObject &jo, const SocketStruc
                 {"f_group_name", si.groupName},
                 {"f_name", si.name},
                 {"f_barcode", si.barcode}
+            });
+
+            if(jstorages.size() >= limit)
+                break;
+        }
+    }
+    jrep["result"] = jstorages;
+    return QJsonDocument(jrep).toJson(QJsonDocument::Compact);
+}
+
+QString C5SearchEngine::searchPartnerItem(const QJsonObject &jo, const SocketStruct &ss)
+{
+    QJsonObject jrep;
+    jrep["errorCode"] = 0;
+    jrep["requestId"] = jo["requestId"];
+    QString needle = jo["lower_name"].toString().trimmed();
+    QStringList qwords = needle.split(' ', Qt::SkipEmptyParts);
+    QJsonArray jstorages;
+    {
+        QReadLocker rl(&mGoodsLock);
+        const QVector <PartnerItem>& siv = mPartners.value(ss.tenantId);
+        const int limit = 50000;
+
+        for(const PartnerItem &si : siv) {
+            bool match = true;
+
+            for(const QString &qw : qwords) {
+                bool found = false;
+
+                for(const QString &w : si.words) {
+                    if(w.startsWith(qw)) {
+                        found = true;
+                        break;
+                    }
+                }
+
+                if(!found) {
+                    match = false;
+                    break;
+                }
+            }
+
+            if(!match)
+                continue;
+
+            jstorages.append(QJsonObject{
+                {"f_id", si.id},
+                {"f_taxcode", si.tin},
+                {"f_taxname", si.taxName},
+                {"f_contact", si.contactName},
+                {"f_phone", si.phone}
             });
 
             if(jstorages.size() >= limit)

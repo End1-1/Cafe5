@@ -7,8 +7,9 @@
 #include "ce5goods.h"
 #include "c5printing.h"
 #include "ce5dishpart2.h"
+#include "c5message.h"
 #include "c5database.h"
-#include "c5printpreview.h"
+#include "c5config.h"
 #include <QColorDialog>
 #include <QKeyEvent>
 #include <QMenu>
@@ -351,15 +352,6 @@ bool C5DishWidget::event(QEvent *e)
 
             break;
 
-        case Qt::Key_P:
-            if(ui->tabWidget->currentIndex() == 1) {
-                if(ke->modifiers() &Qt::ControlModifier) {
-                    on_btnPrintRecipe_clicked();
-                }
-            }
-
-            break;
-
         case Qt::Key_C:
             if(ui->tabWidget->currentIndex() == 1) {
                 if(ke->modifiers() &Qt::ControlModifier) {
@@ -383,51 +375,11 @@ bool C5DishWidget::event(QEvent *e)
     return CE5Editor::event(e);
 }
 
-void C5DishWidget::printPreview(C5Printing &p, bool showPrice)
-{
-    //int page = p.currentPageIndex();
-    p.setFontBold(true);
-    p.ctext(tr("Recipe") + " " + ui->leName->text());
-    p.br();
-    QList<qreal> points;
-    QStringList vals;
-    points << 0 << 600 << 300 << 300 << 300 << 300 ;
-    vals.clear();
-    vals << tr("Goods");
-    vals << tr("Qty");
-    vals << tr("Unit");
-    vals << tr("Price");
-    vals << tr("Cost");
-    p.tableText(points, vals, 60);
-    p.br(60);
-    p.setFontBold(false);
-
-    for(int i = 0; i < ui->tblRecipe->rowCount(); i++) {
-        vals.clear();
-        vals << ui->tblRecipe->getString(i, 2);
-        vals << ui->tblRecipe->lineEdit(i, 3)->text();
-        vals << ui->tblRecipe->getString(i, 4);
-        vals << (showPrice ? ui->tblRecipe->lineEdit(i, 5)->text() : "0");
-        vals << (showPrice ? ui->tblRecipe->lineEdit(i, 6)->text() : "0");
-        p.tableText(points, vals, 60);
-        p.br(60);
-    }
-
-    if(ui->tblRecipe->rowCount() > 0) {
-        vals.clear();
-        points.clear();
-        points << 0 << 1500 << 300;
-        vals << tr("Total") << (showPrice ? ui->tblRecipeTotal->getString(0, 6) : "0");
-        p.tableText(points, vals, 60);
-        p.br(60);
-    }
-}
-
 void C5DishWidget::on_btnAddRecipe_clicked()
 {
     QJsonArray values;
 
-    if(!C5Selector::getValueOfColumn(cache_goods, values, 3)) {
+    if(!C5Selector::getValueOfColumn(mUser, cache_goods, values, 3)) {
         return;
     }
 
@@ -588,7 +540,7 @@ void C5DishWidget::loadImage()
 void C5DishWidget::on_btnNewType_clicked()
 {
     CE5DishPart2 *ep = new CE5DishPart2();
-    C5Editor *e = C5Editor::createEditor(ep, 0);
+    C5Editor *e = C5Editor::createEditor(mUser, ep, 0);
     QList<QMap<QString, QVariant> > data;
 
     if(e->getResult(data)) {
@@ -627,23 +579,10 @@ void C5DishWidget::recipeQtyPriceChanged(const QString &arg)
     countTotalSelfCost();
 }
 
-void C5DishWidget::on_btnPrintRecipe_clicked()
-{
-    C5Printing p;
-    QFont font(qApp->font());
-    font.setPointSize(20);
-    QSize paperSize(2000, 2800);
-    p.setSceneParams(paperSize.width(), paperSize.height(), QPageLayout::Portrait);
-    p.setFont(font);
-    printPreview(p, true);
-    C5PrintPreview pp(&p);
-    pp.exec();
-}
-
 void C5DishWidget::on_btnNewGoods_clicked()
 {
     CE5Goods *ep = new CE5Goods();
-    C5Editor *e = C5Editor::createEditor(ep, 0);
+    C5Editor *e = C5Editor::createEditor(mUser, ep, 0);
     QJsonObject data;
 
     if(e->getJsonObject(data)) {
@@ -816,7 +755,7 @@ void C5DishWidget::on_btnAddDishRecipe_clicked()
 {
     QJsonArray vals;
 
-    if(!C5Selector::getValueOfColumn(cache_dish, vals, 3)) {
+    if(!C5Selector::getValueOfColumn(mUser, cache_dish, vals, 3)) {
         return;
     }
 
@@ -868,7 +807,7 @@ void C5DishWidget::on_btnAddToSet_clicked()
 {
     QJsonArray vals;
 
-    if(!C5Selector::getValue(cache_dish, vals)) {
+    if(!C5Selector::getValue(mUser, cache_dish, vals)) {
         return;
     }
 

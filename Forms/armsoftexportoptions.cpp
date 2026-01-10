@@ -2,8 +2,8 @@
 #include "ui_armsoftexportoptions.h"
 #include "c5config.h"
 
-ArmSoftExportOptions::ArmSoftExportOptions(QWidget *parent) :
-    C5Dialog(),
+ArmSoftExportOptions::ArmSoftExportOptions(C5User *user) :
+    C5Dialog(user),
     ui(new Ui::ArmSoftExportOptions)
 {
     ui->setupUi(this);

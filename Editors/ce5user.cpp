@@ -29,42 +29,52 @@ bool CE5User::checkData(QString &err)
     db[":f_id"] = ui->leCode->text();
     db[":f_login"] = ui->leLogin->text();
     db.exec("select * from s_user where f_login=:f_login and length(f_login)>0 and f_id<>:f_id");
-    if (db.nextRow()) {
+
+    if(db.nextRow()) {
         err += tr("Duplicate login name") + "<br>";
         result = false;
     }
+
     return result;
 }
 
 void CE5User::on_btnNewGroup_clicked()
 {
     CE5UserGroup *ep = new CE5UserGroup();
-    C5Editor *e = C5Editor::createEditor(ep, 0);
+    C5Editor *e = C5Editor::createEditor(mUser, ep, 0);
     QList<QMap<QString, QVariant> > data;
+
     if(e->getResult(data)) {
         ui->leGroup->setValue(data.at(0)["f_id"].toString());
     }
+
     delete e;
 }
 
 void CE5User::on_btnLoadImage_clicked()
 {
-    if (ui->leCode->getInteger() == 0) {
+    if(ui->leCode->getInteger() == 0) {
         C5Message::error(tr("Save first"));
         return;
     }
+
     QString fn = QFileDialog::getOpenFileName(this, tr("Image"), "", "*.jpg;*.png;*.bmp");
-    if (fn.isEmpty()) {
+
+    if(fn.isEmpty()) {
         return;
     }
+
     QPixmap pm;
-    if (!pm.load(fn)) {
+
+    if(!pm.load(fn)) {
         C5Message::error(tr("Could not load image"));
         return;
     }
+
     qApp->processEvents();
     QFile f(fn);
-    if (f.open(QIODevice::ReadOnly)) {
+
+    if(f.open(QIODevice::ReadOnly)) {
         C5Database db;
         db[":f_id"] = ui->leCode->getInteger();
         db.exec("delete from s_user_photo where f_id=:f_id");
@@ -83,14 +93,16 @@ void CE5User::setId(int id)
     db[":f_id"] = ui->leCode->getInteger();
     db.exec("select * from s_user_photo where f_id=:f_id");
     QPixmap p;
-    if (db.nextRow()) {
-        if (p.loadFromData(db.getValue("f_data").toByteArray())) {
+
+    if(db.nextRow()) {
+        if(p.loadFromData(db.getValue("f_data").toByteArray())) {
         } else {
             p = QPixmap(":/staff.png");
         }
     } else {
         p = QPixmap(":/staff.png");
     }
+
     ui->lbPhoto->setPixmap(p.scaled(ui->lbPhoto->size(), Qt::KeepAspectRatio, Qt::SmoothTransformation));
 }
 

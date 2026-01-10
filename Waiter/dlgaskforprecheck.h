@@ -12,11 +12,11 @@ class DlgAskForPrecheck : public C5Dialog
     Q_OBJECT
 
 public:
-    explicit DlgAskForPrecheck();
+    explicit DlgAskForPrecheck(C5User *user);
 
     ~DlgAskForPrecheck();
-
-    static int get();
+    
+    static int get(C5User *user);
 
 private slots:
     void on_btnPrintPrecheck_clicked();

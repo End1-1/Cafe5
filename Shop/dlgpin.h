@@ -18,6 +18,8 @@ public:
 
     ~DlgPin();
 
+    bool mDoNotAutoLogin = false;
+
     static bool getPin(QString &pin, QString &pass, bool donotauth);
 
 protected:

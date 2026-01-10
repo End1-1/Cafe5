@@ -3,7 +3,8 @@
 
 #include "ce5editor.h"
 
-namespace Ui {
+namespace Ui
+{
 class CE5DiscountCard;
 }
 
@@ -16,11 +17,13 @@ public:
 
     ~CE5DiscountCard();
 
-    virtual QString title() {return tr("Discount card");}
+    virtual void setId(int id) override;
 
-    virtual QString table() {return "b_cards_discount";}
+    virtual QString title() override {return tr("Discount card");}
 
-    bool save(QString &err, QList<QMap<QString, QVariant> > &data);
+    virtual QString table() override {return "b_cards_discount";}
+
+    bool save(QString &err, QList<QMap<QString, QVariant> >& data) override;
 
 private slots:
     void on_btnNewClient_clicked();
@@ -29,8 +32,10 @@ private slots:
 
     void on_leCard_returnPressed();
 
+    void on_btnSetDays_clicked();
+
 private:
-    Ui::CE5DiscountCard *ui;
+    Ui::CE5DiscountCard* ui;
 };
 
 #endif // CE5DISCOUNTCARD_H

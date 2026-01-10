@@ -19,7 +19,7 @@
 #include <QScreen>
 
 MenuDialog::MenuDialog(Workspace *w, C5User *u) :
-    QDialog(),
+    C5Dialog(u),
     ui(new Ui::MenuDialog),
     fWorkspace(w)
 {
@@ -39,7 +39,8 @@ MenuDialog::~MenuDialog()
 void MenuDialog::on_btnExit_clicked()
 {
     if(C5Message::question(tr("Confirm to close application"))) {
-        qApp->quit();
+        accept();
+        mUser->setProperty("session_close", true);
     }
 }
 
@@ -48,13 +49,13 @@ void MenuDialog::on_btnFiscalZReport_clicked()
     accept();
     int reporttype;
 
-    if(TouchSelectTaxReport::getReportType(reporttype) == false) {
+    if(TouchSelectTaxReport::getReportType(reporttype, mUser) == false) {
         return;
     }
 
     QDate date1, date2;
 
-    if(!Calendar::getDate2(date1, date2)) {
+    if(!Calendar::getDate2(date1, date2, mUser)) {
         return;
     }
 
@@ -80,7 +81,7 @@ void MenuDialog::on_btnReturnFiscalReceipt_clicked()
     accept();
     QString number;
 
-    if(TouchEnterTaxReceiptNumber::getTaxReceiptNumber(number)) {
+    if(TouchEnterTaxReceiptNumber::getTaxReceiptNumber(number, mUser)) {
         QElapsedTimer et;
         et.start();
         C5Database db;
@@ -142,7 +143,7 @@ void MenuDialog::on_btnReportByOrder_clicked()
     accept();
     QDate date1, date2;
 
-    if(!Calendar::getDate2(date1, date2)) {
+    if(!Calendar::getDate2(date1, date2, mUser)) {
         return;
     }
 
@@ -158,7 +159,16 @@ void MenuDialog::on_btnReportByOrder_clicked()
     QFont font(qApp->font());
     font.setPointSize(28);
     C5Printing p;
-    p.setSceneParams(650, 2800, QPageLayout::Portrait);
+    QPrinterInfo pi = QPrinterInfo::printerInfo(C5Config::localReceiptPrinter());
+    QPrinter printer(pi);
+    printer.setPageSize(QPageSize::Custom);
+    printer.setFullPage(false);
+    QRectF pr = printer.pageRect(QPrinter::DevicePixel);
+    constexpr qreal SAFE_RIGHT_MM = 2.0;
+    qreal safePx = SAFE_RIGHT_MM * printer.logicalDpiX() / 25.4;
+    p.setSceneParams(pr.width() - safePx, pr.height(), printer.logicalDpiX());
+    const int bs = 14;
+    font.setPointSize(bs);
     p.setFont(font);
 
     if(QFile::exists("./logo_receipt.png")) {
@@ -219,9 +229,6 @@ void MenuDialog::on_btnReportByOrder_clicked()
 
     p.line(2);
     p.br();
-    p.line(2);
-    p.br();
-    p.setFontSize(24);
     p.setFontBold(true);
     p.ltext(tr("Total"), 0);
     p.rtext(float_str(total, 2));
@@ -251,12 +258,12 @@ void MenuDialog::on_btnReportByOrder_clicked()
         p.br();
     }
 
-    p.setFontSize(18);
+    p.setFontSize(bs - 4);
     p.setFontBold(false);
     p.ltext(tr("Printed"), 0);
     p.rtext(QDateTime::currentDateTime().toString(FORMAT_DATETIME_TO_STR));
     p.br();
-    p.print(C5Config::localReceiptPrinter(), QPageSize::Custom);
+    p.print(printer);
 }
 
 void MenuDialog::on_btnBack_clicked()
@@ -267,7 +274,7 @@ void MenuDialog::on_btnBack_clicked()
 void MenuDialog::on_btnPrintReport_clicked()
 {
     accept();
-    DlgSmartReports().exec();
+    DlgSmartReports(mUser).exec();
 }
 
 void MenuDialog::on_btnCashin_clicked()
@@ -298,11 +305,11 @@ void MenuDialog::on_btnSessoinMoney_clicked()
     accept();
     QDate d1, d2;
 
-    if(!Calendar::getDate2(d1, d2)) {
+    if(!Calendar::getDate2(d1, d2, mUser)) {
         return;
     }
 
-    SessionsHistory(d1, d2).exec();
+    SessionsHistory(d1, d2, mUser).exec();
 }
 
 void MenuDialog::on_btnCustomerDisplay_clicked()

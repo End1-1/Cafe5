@@ -95,12 +95,13 @@ void DlgPin::on_btnEnter_clicked()
             mUser = new C5User(juser.toVariantMap());
             mUser->fSettings = settings;
             mUser->fConfig = jo["config"].toObject()["f_config"].toObject();
+            mUser->mSessionKey = NDataProvider::sessionKey;
             C5Database::fDbParams = {"", "", "", ""};
             C5Database::fUrl = QString("%1://%2").arg(C5ConnectionDialog::instance()->noneSecure ? "http" : "https",
                                C5ConnectionDialog::instance()->serverAddress());
             __c5config.setValues(settings);
             __c5config.fMainJson = mUser->fConfig;
-            AppWebSocket::reconnect(__c5config.getRegValue("ss_server_address").toString() + "/ws", __c5config.getRegValue("ss_server_key").toString(), ui->leUser->text(), ui->lePin->text());
+            AppWebSocket::reconnect(C5ConnectionDialog::instance()->noneSecure ? "ws://" : "wss://" + __c5config.getRegValue("ss_server_address").toString() + "/ws", __c5config.getRegValue("ss_server_key").toString(), ui->leUser->text(), ui->lePin->text());
             accept();
         }, [](const QJsonObject & jerr) {
         });
@@ -220,7 +221,7 @@ void DlgPin::showEvent(QShowEvent *e)
 {
     C5ShopDialog::showEvent(e);
 
-    if(!fDoNotAuth) {
+    if(!fDoNotAuth && !mDoNotAutoLogin) {
         if(!C5ConnectionDialog::instance()->username().isEmpty()) {
             ui->leUser->setText(C5ConnectionDialog::instance()->username());
             ui->lePin->setText(C5ConnectionDialog::instance()->password());

@@ -7,17 +7,14 @@
 #include "c5message.h"
 #include "c5selector.h"
 #include "barcode.h"
-#include "c5printpreview.h"
-#include "c5printing.h"
 #include "ce5goodsmodel.h"
 #include "c5database.h"
 #include "c5config.h"
 #include "c5user.h"
-#include "c5permissions.h"
 #include "c5storebarcode.h"
-#include "ean8generator.h"
 #include "c5utils.h"
 #include "c5replacecharacter.h"
+#include "c5htmlprint.h"
 #include <QClipboard>
 #include <QFontDatabase>
 #include <QDateTime>
@@ -29,6 +26,8 @@
 #include <QInputDialog>
 #include <QPushButton>
 #include <QPaintEngine>
+#include <QPrinter>
+#include <QPrintPreviewDialog>
 #include <stdexcept>
 
 static int fLastGroup = 0;
@@ -117,6 +116,7 @@ CE5Goods::CE5Goods(QWidget *parent) :
     }
 
     ui->rbGenEAN8->setChecked(__c5config.getRegValue("gen_ean8").toBool());
+    ui->tblMenu->setColumnWidths(ui->tblMenu->columnCount(), 0, 0, 200, 100, 150, 100, 100, 50, 50);
 }
 
 CE5Goods::~CE5Goods()
@@ -182,9 +182,11 @@ void CE5Goods::clear()
     int scancode = ui->leScanCode->getInteger();
     fImage.clear();
     ui->tblBarcodes->setRowCount(0);
-    CE5Editor::clear();
     ui->tblGoods->clearContents();
     ui->tblGoods->setRowCount(0);
+    ui->tblMenu->clearContents();
+    ui->tblMenu->setRowCount(0);
+    CE5Editor::clear();
     ui->leLowLevel->setText("0");
 
     if(ui->tabWidget->currentIndex() > 1) {
@@ -223,6 +225,9 @@ void CE5Goods::clear()
     for(int i = 0; i < ui->tblAs->rowCount(); i++) {
         ui->tblAs->lineEdit(i, 2)->clear();
     }
+
+    ui->chCountDiscount->setChecked(true);
+    ui->chCountService->setChecked(true);
 }
 
 QPushButton* CE5Goods::b1()
@@ -235,6 +240,10 @@ QPushButton* CE5Goods::b1()
 QJsonObject CE5Goods::makeJsonObject()
 {
     fJsonData = QJsonObject();
+    //Miscelanouse data
+    QJsonObject jdata;
+    jdata["f_count_service"] = ui->chCountService->isChecked();
+    jdata["f_count_discount"] = ui->chCountDiscount->isChecked();
     QJsonObject j;
     j["f_id"] = ui->leCode->getInteger();
     j["f_name"] = ui->leName->text();
@@ -245,6 +254,7 @@ QJsonObject CE5Goods::makeJsonObject()
     j["f_qtybox"] = ui->leQtyBox->getDouble();
     j["f_scancode"] = ui->leScanCode->text().isEmpty() ? QJsonValue() : ui->leScanCode->text();
     j["f_fiscalname"] = ui->leFiscalName->text();
+    j["f_data"] = jdata;
     //TODO: option
     //j["f_lastinputprice"] = ui->leTotal->getDouble() > 0 ? ui->leTotal->getDouble() : ui->leCostPrice->getDouble();
     j["f_lastinputprice"] = ui->leCostPrice->getDouble();
@@ -326,6 +336,22 @@ QJsonObject CE5Goods::makeJsonObject()
     }
 
     fJsonData["f_barcodes"] = barcodes;
+    QJsonArray jmenu;
+
+    for(int i = 0; i < ui->tblMenu->rowCount(); i++) {
+        QJsonObject jm;
+        jm["f_menu"] = ui->tblMenu->getInteger(i, 1);
+        jm["f_dish"] = ui->leCode->getInteger();
+        jm["f_price"] = ui->tblMenu->lineEdit(i, 3)->getDouble();
+        jm["f_store"] = (ui->tblMenu->comboBox(i, 4)->currentData().toInt() == 0) ? QJsonValue::Null : QJsonValue(ui->tblMenu->comboBox(i, 4)->currentData().toInt());
+        jm["f_print1"] = ui->tblMenu->comboBox(i, 5)->currentText();
+        jm["f_print2"] = ui->tblMenu->comboBox(i, 6)->currentText();
+        jm["f_state"] = ui->tblMenu->checkBox(i, 7)->isChecked() ? 1 : 0;
+        jm["f_recent"] = ui->tblMenu->checkBox(i, 8)->isChecked() ? 1 : 0;
+        jmenu.append(jm);
+    }
+
+    fJsonData["menu"] = jmenu;
     return fJsonData;
 }
 
@@ -473,82 +499,202 @@ void CE5Goods::openResponse(const QJsonObject &jdoc)
         });
     }
 
+    QJsonArray jmenu = jdoc["menu"].toArray();
+    QJsonArray jstorages = jdoc["storages"].toArray();
+    QJsonArray jprinters = jdoc["printers"].toArray();
+    QList<int> storageId;
+    QStringList storageName;
+    QStringList printers;
+
+    for(int i = 0; i < jstorages.size(); i++) {
+        const QJsonObject &js = jstorages.at(i).toObject();
+        storageId << js["f_id"].toInt();
+        storageName << js["f_name"].toString();
+    }
+
+    for(int i = 0; i < jprinters.size(); i++) {
+        const QJsonObject &js = jprinters.at(i).toObject();
+        printers << js["f_name"].toString();
+    }
+
+    ui->tblMenu->setUpdatesEnabled(false);
+    ui->tblMenu->setRowCount(jmenu.count());
+
+    for(int i = 0; i < jmenu.count(); i++) {
+        for(int c = 0; c < ui->tblMenu->columnCount(); c++) {
+            ui->tblMenu->setItem(i, c, new QTableWidgetItem());
+        }
+
+        const QJsonObject &jm = jmenu.at(i).toObject();
+        ui->tblMenu->setInteger(i, 1, jm["f_id"].toInt());
+        ui->tblMenu->setString(i, 2, jm["f_menu_name"].toString());
+        C5LineEdit *le = ui->tblMenu->createLineEdit(i, 3);
+        le->setValidator(new QDoubleValidator(0, 999999999, 2));
+        le->setDouble(jm["f_price"].toDouble());
+        C5ComboBox *cb = ui->tblMenu->createComboBox(i, 4);
+        cb->setValues(storageId, storageName);
+        cb->setCurrentIndex(cb->findData(jm["f_store"].toInt()));
+        cb = ui->tblMenu->createComboBox(i, 5);
+        cb->insertItems(0, printers);
+        cb->setCurrentIndex(cb->findText(jm["f_print1"].toString()));
+        cb = ui->tblMenu->createComboBox(i, 6);
+        cb->insertItems(0, printers);
+        cb->setCurrentIndex(cb->findText(jm["f_print2"].toString()));
+        C5CheckBox *ch = ui->tblMenu->createCheckbox(i, 7);
+        ch->setChecked(jm["f_state"].toInt());
+        ch = ui->tblMenu->createCheckbox(i, 8);
+        ch->setChecked(jm["f_recent"].toInt());
+    }
+
+    QJsonObject jdata = QJsonDocument::fromJson(jdoc["goods"].toObject()["f_data"].toString().toUtf8()).object();
+    ui->chCountDiscount->setChecked(jdata["f_count_discount"].toBool());
+    ui->chCountService->setChecked(jdata["f_count_service"].toBool());
+    ui->tblMenu->setUpdatesEnabled(true);
     fHttp->httpQueryFinished(sender());
+}
+
+static QString makePriceHeaders(QTableWidget *tbl)
+{
+    QString h;
+    QTextStream s(&h);
+
+    for(int i = 0; i < tbl->columnCount(); ++i) {
+        s << "<th class='right'>" << (i + 1) << "</th>";
+    }
+
+    return h;
+}
+
+static QString makeComplectationTable(C5TableWidget *tbl)
+{
+    QString h;
+    QTextStream s(&h);
+    s << "<div class='section-title'>" << htmlEscape(QObject::tr("Complectation")) << "</div>";
+    s << "<table>";
+    s << "<thead><tr>"
+      << "<th>NN</th>"
+      << "<th>Name</th>"
+      << "<th class='right'>Qty</th>"
+      << "<th>Unit</th>"
+      << "<th class='right'>Price</th>"
+      << "<th class='right'>Total</th>"
+      << "</tr></thead><tbody>";
+
+    for(int i = 0; i < tbl->rowCount(); ++i) {
+        s << "<tr>";
+        s << "<td class='center'>" << (i + 1) << "</td>";
+
+        for(int c = 2; c < tbl->columnCount(); ++c) {
+            const bool isNum = (c >= 4);
+            s << "<td" << (isNum ? " class='right'" : "") << ">"
+              << htmlEscape(tbl->getString(i, c))
+              << "</td>";
+        }
+
+        s << "</tr>";
+    }
+
+    s << "</tbody></table>";
+    return h;
+}
+
+static QString makePriceRow(C5TableWidget *tbl, int row)
+{
+    QString h;
+    QTextStream s(&h);
+
+    for(int i = 0; i < tbl->columnCount(); ++i) {
+        s << "<td class='right'>"
+          << htmlEscape(tbl->lineEdit(row, i)->text())
+          << "</td>";
+    }
+
+    return h;
+}
+
+static QString makeComplectationTable2(C5TableWidget *tbl)
+{
+    QString h;
+    QTextStream s(&h);
+    s << "<div class='section-title'>" << htmlEscape(QObject::tr("Complectation")) << "</div>";
+    s << "<table>";
+    s << "<thead><tr>"
+      << "<th>NN</th>"
+      << "<th>Name</th>"
+      << "<th class='right'>Qty</th>"
+      << "<th>Unit</th>"
+      << "<th class='right'>Price</th>"
+      << "<th class='right'>Total</th>"
+      << "</tr></thead><tbody>";
+
+    for(int i = 0; i < tbl->rowCount(); ++i) {
+        s << "<tr>";
+        s << "<td class='center'>" << (i + 1) << "</td>";
+
+        for(int c = 2; c < tbl->columnCount(); ++c) {
+            const bool isNum = (c >= 4);
+            s << "<td" << (isNum ? " class='right'" : "") << ">"
+              << htmlEscape(tbl->getString(i, c))
+              << "</td>";
+        }
+
+        s << "</tr>";
+    }
+
+    s << "</tbody></table>";
+    return h;
 }
 
 void CE5Goods::printCard()
 {
-    C5Printing p;
-    QList<qreal> points;
-    QStringList vals;
-    p.setSceneParams(2000, 2700, QPageLayout::Portrait);
-    p.setFontSize(16);
-    p.setFontBold(true);
-    p.ltext(QString("%1: %2").arg(tr("Printed"), QDateTime::currentDateTime().toString(FORMAT_DATETIME_TO_STR)), 0);
-    p.setFontSize(25);
-    QString docTypeText = tr("Goods card") + " " + ui->leName->text() + " " + ui->leScanCode->text();
-    p.ctext(QString("%1").arg(docTypeText));
-    p.br();
-    p.ltext(tr("Goods group")  + ": " + ui->leGroupName->text(), 5);
-    p.rtext(tr("Internal code") + ": " + ui->leCode->text());
-    p.br();
-    points << 5 << 300;
+    QString html = loadTemplate("goods_card_a4.html");
 
-    for(int i = 0; i < ui->tblPricing->columnCount(); i++) {
-        points << 300;
+    if(html.isEmpty()) {
+        C5Message::error(tr("Template not found"));
+        return;
     }
 
-    vals << tr("Retail price");
+    QMap<QString, QString> v;
+    v["printed"] =
+        htmlEscape(QString("%1: %2")
+                   .arg(tr("Printed"))
+                   .arg(QDateTime::currentDateTime().toString(FORMAT_DATETIME_TO_STR)));
+    v["title"] =
+        htmlEscape(tr("Goods card") + " " +
+                   ui->leName->text() + " " +
+                   ui->leScanCode->text());
+    v["group"] =
+        htmlEscape(tr("Goods group") + ": " + ui->leGroupName->text());
+    v["internal_code"] =
+        htmlEscape(tr("Internal code") + ": " + ui->leCode->text());
+    v["price_type"] = htmlEscape(tr("Price type"));
+    v["retail_label"] = htmlEscape(tr("Retail price"));
+    v["wholesale_label"] = htmlEscape(tr("Wholesale price"));
+    v["price_headers"] = makePriceHeaders(ui->tblPricing);
+    v["retail_values"] = makePriceRow(ui->tblPricing, 0);
+    v["wholesale_values"] = makePriceRow(ui->tblPricing, 1);
 
-    for(int i = 0; i < ui->tblPricing->columnCount(); i++) {
-        vals << ui->tblPricing->lineEdit(0, i)->text();
-    }
-
-    p.tableText(points, vals, p.fLineHeight);
-    p.br(p.fLineHeight + 20);
-    vals.clear();
-    vals << tr("Whosale price");
-
-    for(int i = 0; i < ui->tblPricing->columnCount(); i++) {
-        vals << ui->tblPricing->lineEdit(1, i)->text();
-    }
-
-    p.tableText(points, vals, p.fLineHeight);
-    p.br(p.fLineHeight + 20);
-    p.br();
-    points.clear();
-    vals.clear();
-
+    // complectation
     if(ui->tblGoods->rowCount() > 0) {
-        p.br();
-        p.ctext(tr("Complecation"));
-        p.br();
-        points << 5 << 100  << 700 << 200 << 200 << 200 << 200;
-        vals << tr("NN")  << tr("Name") << tr("Qty") << tr("Unit") << tr("Price") << tr("Total");
-        p.tableText(points, vals, p.fLineHeight + 20);
-        p.br(p.fLineHeight + 20);
-
-        for(int i = 0; i < ui->tblGoods->rowCount(); i++) {
-            vals.clear();
-            vals << QString::number(i + 1);
-
-            for(int c = 2; c < ui->tblGoods->columnCount(); c++) {
-                vals << ui->tblGoods->getString(i, c);
-            }
-
-            p.tableText(points, vals, p.fLineHeight + 20);
-            p.br(p.fLineHeight + 20);
-        }
-
-        p.br(p.fLineHeight + 20);
-        p.br(p.fLineHeight + 20);
-        p.rtext(QString("%1: %2").arg(tr("Complectation cost"), ui->leTotal->text()));
+        QString block = makeComplectationTable2(ui->tblGoods);
+        block += "<div class='total'>" +
+                 htmlEscape(tr("Complectation cost") + ": " + ui->leTotal->text()) +
+                 "</div>";
+        v["complectation_block"] = block;
+    } else {
+        v["complectation_block"] = "";
     }
 
-    fEditor->close();
-    C5PrintPreview pp(&p);
+    html = applyTemplate(html, v);
+    QTextDocument doc;
+    doc.setHtml(html);
+    QPrinter printer(QPrinter::HighResolution);
+    printer.setPageSize(QPageSize::A4);
+    printer.setFullPage(false);
+    QPrintPreviewDialog pp(&printer, this);
+    connect(&pp, &QPrintPreviewDialog::paintRequested, [&](QPrinter * p) { doc.print(p); });
     pp.setWindowState((windowState() & ~Qt::WindowMinimized) | Qt::WindowActive);
-    pp.raise();  // for MacOS
+    pp.raise();
     pp.activateWindow();
     pp.exec();
 }
@@ -709,7 +855,7 @@ void CE5Goods::genScancode()
 void CE5Goods::on_btnNewGroup_clicked()
 {
     CE5GoodsGroup *ep = new CE5GoodsGroup();
-    C5Editor *e = C5Editor::createEditor(ep, 0);
+    C5Editor *e = C5Editor::createEditor(mUser, ep, 0);
     QList<QMap<QString, QVariant> > data;
 
     if(e->getResult(data)) {
@@ -722,7 +868,7 @@ void CE5Goods::on_btnNewGroup_clicked()
 void CE5Goods::on_btnNewUnit_clicked()
 {
     CE5GoodsUnit *ep = new CE5GoodsUnit();
-    C5Editor *e = C5Editor::createEditor(ep, 0);
+    C5Editor *e = C5Editor::createEditor(mUser, ep, 0);
     QList<QMap<QString, QVariant> > data;
 
     if(e->getResult(data)) {
@@ -736,7 +882,7 @@ void CE5Goods::on_btnAddGoods_clicked()
 {
     QJsonArray vals;
 
-    if(!C5Selector::getValue(cache_goods, vals)) {
+    if(!C5Selector::getValue(mUser, cache_goods, vals)) {
         return;
     }
 
@@ -830,7 +976,7 @@ void CE5Goods::countSalePrice(int r, double margin)
 void CE5Goods::on_btnNewGoods_clicked()
 {
     CE5Goods *ep = new CE5Goods();
-    C5Editor *e = C5Editor::createEditor(ep, 0);
+    C5Editor *e = C5Editor::createEditor(mUser, ep, 0);
     QJsonObject data;
 
     if(e->getJsonObject(data)) {
@@ -849,7 +995,7 @@ void CE5Goods::on_btnNewGoods_clicked()
 void CE5Goods::on_btnNewPartner_clicked()
 {
     CE5Partner *ep = new CE5Partner();
-    C5Editor *e = C5Editor::createEditor(ep, 0);
+    C5Editor *e = C5Editor::createEditor(mUser, ep, 0);
     QList<QMap<QString, QVariant> > data;
 
     if(e->getResult(data)) {
@@ -1013,7 +1159,7 @@ void CE5Goods::on_leMargin2_textEdited(const QString &arg1)
 void CE5Goods::on_btnNewModel_clicked()
 {
     CE5GoodsModel *ep = new CE5GoodsModel();
-    C5Editor *e = C5Editor::createEditor(ep, 0);
+    C5Editor *e = C5Editor::createEditor(mUser, ep, 0);
     QList<QMap<QString, QVariant> > data;
 
     if(e->getResult(data)) {
@@ -1062,7 +1208,7 @@ void CE5Goods::on_btnFromProduct_clicked()
 
     QJsonArray vals;
 
-    if(!C5Selector::getValue(cache_goal_products, vals)) {
+    if(!C5Selector::getValue(mUser, cache_goal_products, vals)) {
         return;
     }
 

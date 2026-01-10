@@ -139,7 +139,7 @@ bool RKeyboard::eventFilter(QObject *o, QEvent *e)
 
 void RKeyboard::btnTextClicked()
 {
-    QPushButton *b = static_cast<QPushButton*>(sender());
+    auto *b = static_cast<QToolButton*>(sender());
     fText.append(b->text());
 
     if(fShiftOn) {
@@ -166,15 +166,15 @@ void RKeyboard::on_btnBackspace_clicked()
     emit textChanged(fText);
 }
 
-void RKeyboard::connectButtons(QList<QPushButton*>& buttons)
+void RKeyboard::connectButtons(QList<QToolButton*>& buttons)
 {
-    for(QList<QPushButton* >::const_iterator it = buttons.begin(); it != buttons.end(); it++) {
+    for(QList<QToolButton* >::const_iterator it = buttons.begin(); it != buttons.end(); it++) {
         connect(*it, SIGNAL(clicked()), this, SLOT(btnTextClicked()));
         (*it)->setStyleSheet(styleSheet());
     }
 }
 
-void RKeyboard::setButtonsText(QList<QPushButton*>& buttons, const QString &text)
+void RKeyboard::setButtonsText(QList<QToolButton*>& buttons, const QString &text)
 {
     for(int i = 0; i < buttons.count(); i++) {
         buttons[i]->setText(text.at(i));

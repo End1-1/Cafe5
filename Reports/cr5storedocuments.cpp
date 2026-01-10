@@ -3,15 +3,16 @@
 #include "c5tablemodel.h"
 #include "c5mainwindow.h"
 #include "c5storedoc.h"
+#include "c5message.h"
 
 CR5StoreDocuments::CR5StoreDocuments(QWidget *parent) :
-    C5ReportWidget( parent)
+    C5ReportWidget(parent)
 {
     fLabel = tr("Document in the store");
     fIcon = ":/documents.png";
     fSimpleQuery = true;
     fFilterWidget = new CR5StoreDocumentsFilter();
-    fFilter = static_cast<CR5StoreDocumentsFilter *>(fFilterWidget);
+    fFilter = static_cast<CR5StoreDocumentsFilter*>(fFilterWidget);
     fTranslation["f_document"] = tr("Document");
     fTranslation["f_docstatename"] = tr("State");
     fTranslation["f_date"] = tr("Date");
@@ -45,9 +46,9 @@ void CR5StoreDocuments::buildQuery()
     sumColumnsData();
 }
 
-QToolBar *CR5StoreDocuments::toolBar()
+QToolBar* CR5StoreDocuments::toolBar()
 {
-    if (!fToolBar) {
+    if(!fToolBar) {
         QList<ToolBarButtons> btn;
         btn << ToolBarButtons::tbFilter
             << ToolBarButtons::tbClearFilter
@@ -56,6 +57,7 @@ QToolBar *CR5StoreDocuments::toolBar()
             << ToolBarButtons::tbPrint;
         createStandartToolbar(btn);
     }
+
     return fToolBar;
 }
 
@@ -63,14 +65,18 @@ bool CR5StoreDocuments::tblDoubleClicked(int row, int column, const QJsonArray &
 {
     Q_UNUSED(row);
     Q_UNUSED(column);
-    if (values.count() == 0) {
+
+    if(values.count() == 0) {
         return true;
     }
+
     QString e;
     C5StoreDoc *sd = __mainWindow->createTab<C5StoreDoc>();
-    if (!sd->openDoc(values.at(0).toString(), e )) {
+
+    if(!sd->openDoc(values.at(0).toString(), e)) {
         __mainWindow->removeTab(sd);
         C5Message::error(e);
     }
+
     return true;
 }

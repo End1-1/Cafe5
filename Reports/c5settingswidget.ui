@@ -59,7 +59,7 @@
           <enum>Qt::FocusPolicy::NoFocus</enum>
          </property>
          <property name="currentIndex">
-          <number>5</number>
+          <number>7</number>
          </property>
          <widget class="QWidget" name="tab">
           <attribute name="title">
@@ -2569,9 +2569,9 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>C5CheckBox</class>
-   <extends>QCheckBox</extends>
-   <header location="global">c5checkbox.h</header>
+   <class>C5LineEditWithSelector</class>
+   <extends>QLineEdit</extends>
+   <header location="global">c5lineeditwithselector.h</header>
   </customwidget>
   <customwidget>
    <class>C5LineEdit</class>
@@ -2579,9 +2579,9 @@
    <header location="global">c5lineedit.h</header>
   </customwidget>
   <customwidget>
-   <class>C5LineEditWithSelector</class>
-   <extends>QLineEdit</extends>
-   <header location="global">c5lineeditwithselector.h</header>
+   <class>C5CheckBox</class>
+   <extends>QCheckBox</extends>
+   <header location="global">c5checkbox.h</header>
   </customwidget>
   <customwidget>
    <class>C5ComboBox</class>

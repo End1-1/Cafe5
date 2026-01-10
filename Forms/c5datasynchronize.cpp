@@ -6,8 +6,8 @@
 #include <QScrollBar>
 #include <QMenu>
 
-C5DataSynchronize::C5DataSynchronize() :
-    C5Dialog(),
+C5DataSynchronize::C5DataSynchronize(C5User *user) :
+    C5Dialog(user),
     ui(new Ui::C5DataSynchronize)
 {
     ui->setupUi(this);
@@ -20,7 +20,7 @@ C5DataSynchronize::~C5DataSynchronize()
 
 void C5DataSynchronize::queryStarted()
 {
-    fLoadingDlg = new NLoadingDlg(this);
+    fLoadingDlg = new NLoadingDlg(tr("Query"), this);
     fLoadingDlg->open();
 }
 

@@ -5,8 +5,8 @@
 #include "c5config.h"
 #include "c5user.h"
 
-C5ChangePassword::C5ChangePassword() :
-    C5OfficeDialog(),
+C5ChangePassword::C5ChangePassword(C5User *user) :
+    C5OfficeDialog(user),
     ui(new Ui::C5ChangePassword)
 {
     ui->setupUi(this);
@@ -17,9 +17,9 @@ C5ChangePassword::~C5ChangePassword()
     delete ui;
 }
 
-bool C5ChangePassword::changePassword(QString &password)
+bool C5ChangePassword::changePassword(QString &password, C5User *user)
 {
-    C5ChangePassword *d = new C5ChangePassword();
+    C5ChangePassword *d = new C5ChangePassword(user);
     bool result = d->exec() == QDialog::Accepted;
     password = d->ui->leNewPassword->text();
     delete d;

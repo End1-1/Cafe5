@@ -5,8 +5,8 @@
 QHash<int, QString> DlgGetIDName::fQueries;
 QHash<int, DlgGetIDName*> DlgGetIDName::fDialogs;
 
-DlgGetIDName::DlgGetIDName(const QStringList &dbParams, QWidget *parent) :
-    C5Dialog(),
+DlgGetIDName::DlgGetIDName(C5User *user) :
+    C5Dialog(user),
     ui(new Ui::DlgGetIDName)
 {
     ui->setupUi(this);
@@ -25,14 +25,14 @@ DlgGetIDName::~DlgGetIDName()
     delete ui;
 }
 
-bool DlgGetIDName::get(const QStringList &dbParams, QString &id, QString &name, int table, QWidget *parent)
+bool DlgGetIDName::get(C5User *user, QString &id, QString &name, int table, QWidget *parent)
 {
     DlgGetIDName *d;
 
     if(fDialogs.contains(table)) {
         d = fDialogs[table];
     } else {
-        d = new DlgGetIDName(dbParams, parent);
+        d = new DlgGetIDName(user);
         d->fTable = table;
         d->getData();
     }

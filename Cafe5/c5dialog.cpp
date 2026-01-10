@@ -10,19 +10,27 @@
 static QWidget* __mainWindow = nullptr;
 int C5Dialog::mScreen = -1;
 
-C5Dialog::C5Dialog() :
-    QDialog(__mainWindow)
+C5Dialog::C5Dialog(C5User *user) :
+    QDialog(__mainWindow),
+    mUser(user)
 {
+#ifdef BORDERLESSDIALOGS
+    setWindowFlags(Qt::Dialog | Qt::FramelessWindowHint);
+#endif
+
     if(__mainWindow == nullptr) {
         __mainWindow = this;
     }
 
-    // if(mScreen > -1) {
-    //     QScreen *screen = qApp->screens().at(mScreen);
-    //     this->create();
-    //     if(windowHandle())
-    //         windowHandle()->setScreen(screen);
-    // }
+    if(mScreen > -1) {
+        QScreen *screen = qApp->screens().at(mScreen);
+        this->create();
+
+        if(windowHandle()) {
+            windowHandle()->setScreen(screen);
+        }
+    }
+
     fHttp = new NInterface(this);
 }
 
@@ -159,11 +167,19 @@ void C5Dialog::keyAlterPlusEnter()
 void C5Dialog::showEvent(QShowEvent *e)
 {
     QWidget::showEvent(e);
-    // if(mScreen > -1) {
-    //     QScreen *screen = qApp->screens().at(mScreen);
-    //     QRect geo = screen->availableGeometry();
-    //     move(geo.topLeft());
-    // }
+
+    if(e->spontaneous()) {
+        return;
+    }
+
+    if(mScreen > -1) {
+        QScreen *screen = qApp->screens().at(mScreen);
+        QRect geo = screen->availableGeometry();
+        QPoint center = geo.center();
+        QSize size = this->size();
+        move(center.x() - size.width() / 2,
+             center.y() - size.height() / 2);
+    }
 }
 
 void C5Dialog::handleError(int err, const QString &msg)

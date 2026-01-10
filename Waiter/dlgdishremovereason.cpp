@@ -1,5 +1,6 @@
 #include "dlgdishremovereason.h"
 #include "ui_dlgdishremovereason.h"
+#include "dict_dish_state.h"
 #include "c5cafecommon.h"
 #include "c5config.h"
 #include "c5utils.h"

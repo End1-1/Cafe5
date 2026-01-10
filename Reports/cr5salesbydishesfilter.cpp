@@ -1,6 +1,7 @@
 #include "cr5salesbydishesfilter.h"
 #include "ui_cr5salesbydishesfilter.h"
 #include "c5cache.h"
+#include "dict_dish_state.h"
 
 CR5SalesByDishesFilter::CR5SalesByDishesFilter(QWidget *parent) :
     C5FilterWidget(parent),
@@ -26,7 +27,8 @@ CR5SalesByDishesFilter::~CR5SalesByDishesFilter()
 QString CR5SalesByDishesFilter::condition()
 {
     QString result;
-    if (ui->chUseCloseDateTime->isChecked()) {
+
+    if(ui->chUseCloseDateTime->isChecked()) {
         result = QString(" cast(concat(oh.f_dateclose, ' ', oh.f_timeclose) as datetime) between '%1' and '%2'")
                  .arg(ui->dt1->dateTime().toString(FORMAT_DATETIME_TO_STR_MYSQL))
                  .arg(ui->dt2->dateTime().toString(FORMAT_DATETIME_TO_STR_MYSQL));
@@ -34,51 +36,65 @@ QString CR5SalesByDishesFilter::condition()
         result = QString(" oh.f_datecash between '%1' and '%2' ").arg(ui->deStart->date().toString(
                      FORMAT_DATE_TO_STR_MYSQL)).arg(ui->deEnd->date().toString(FORMAT_DATE_TO_STR_MYSQL));
     }
-    if (!ui->leOrderState->isEmpty()) {
+
+    if(!ui->leOrderState->isEmpty()) {
         result += QString(" and oh.f_state in (%1)").arg(ui->leOrderState->text());
     }
-    if (!ui->leDishState->isEmpty()) {
+
+    if(!ui->leDishState->isEmpty()) {
         result += QString(" and ob.f_state in (%1) ").arg(ui->leDishState->text());
     }
-    if (!ui->lePart1->isEmpty()) {
+
+    if(!ui->lePart1->isEmpty()) {
         result += QString(" and dpd.f_id in (%1) ").arg(ui->lePart1->text());
     }
-    if (!ui->lePart2->isEmpty()) {
+
+    if(!ui->lePart2->isEmpty()) {
         result += QString(" and d.f_part in (%1) ").arg(ui->lePart2->text());
     }
-    if (!ui->leStore->isEmpty()) {
+
+    if(!ui->leStore->isEmpty()) {
         result += QString(" and ob.f_store in (%1) ").arg(ui->leStore->text());
     }
-    if (ui->rbNoRecipt->isChecked()) {
+
+    if(ui->rbNoRecipt->isChecked()) {
         result += QString(" and d.f_netweight<0.0001 ");
     }
-    if (ui->rbWithRecipe->isChecked()) {
+
+    if(ui->rbWithRecipe->isChecked()) {
         result += QString(" and d.f_netweight>0.0001 ");
     }
-    if (ui->rbTaxNo->isChecked()) {
+
+    if(ui->rbTaxNo->isChecked()) {
         result += " and (ot.f_receiptnumber=0 or ot.f_receiptnumber is null) ";
     }
-    if (ui->rbTaxYes->isChecked()) {
+
+    if(ui->rbTaxYes->isChecked()) {
         result += " and ot.f_receiptnumber>0 ";
     }
+
     return result;
 }
 
 QString CR5SalesByDishesFilter::filterText()
 {
     QString s = QString("%1 %2 - %3").arg(tr("Date range"), ui->deStart->text(), ui->deEnd->text());
-    if (ui->chUseCloseDateTime->isChecked()) {
+
+    if(ui->chUseCloseDateTime->isChecked()) {
         s = QString("%1 %2 - %3").arg(tr("Date range"), ui->dt1->text(), ui->dt2->text());
     }
+
     inFilterText(s, ui->leStateName);
     inFilterText(s, ui->lePart1Name);
     inFilterText(s, ui->lePart2Name);
     inFilterText(s, ui->leStoreName);
-    if (ui->rbNoRecipt->isChecked()) {
+
+    if(ui->rbNoRecipt->isChecked()) {
         s += ", " + tr("No recipe");
-    } else if (ui->rbWithRecipe->isChecked()) {
+    } else if(ui->rbWithRecipe->isChecked()) {
         s += ", " + tr("With recipe");
     }
+
     return s;
 }
 

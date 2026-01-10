@@ -19,7 +19,7 @@ class C5DlgSelectReportTemplate : public C5Dialog
     Q_OBJECT
 
 public:
-    explicit C5DlgSelectReportTemplate(int reportGroup);
+    explicit C5DlgSelectReportTemplate(C5User *user, int reportGroup);
 
     ~C5DlgSelectReportTemplate();
 

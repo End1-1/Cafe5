@@ -2,8 +2,8 @@
 #include "ui_dlglistofmenu.h"
 #include "c5tabledata.h"
 
-DlgListOfMenu::DlgListOfMenu() :
-    C5Dialog(),
+DlgListOfMenu::DlgListOfMenu(C5User *user) :
+    C5Dialog(user),
     ui(new Ui::DlgListOfMenu)
 {
     ui->setupUi(this);
@@ -32,10 +32,10 @@ DlgListOfMenu::~DlgListOfMenu()
     delete ui;
 }
 
-bool DlgListOfMenu::getMenuId(int& id)
+bool DlgListOfMenu::getMenuId(C5User *user, int& id)
 {
     bool result = false;
-    DlgListOfMenu *d = new DlgListOfMenu();
+    DlgListOfMenu *d = new DlgListOfMenu(user);
 
     if(d->exec() == QDialog::Accepted) {
         result = true;

@@ -3,11 +3,13 @@
 #include "c5grid.h"
 #include "c5tablemodel.h"
 #include "dataonline.h"
+#include "c5message.h"
+#include "c5config.h"
 
 QHash<QString, DlgDataOnline*> DlgDataOnline::fInstances;
 
-DlgDataOnline::DlgDataOnline(const QString &table) :
-    C5Dialog(),
+DlgDataOnline::DlgDataOnline(C5User *user, const QString &table) :
+    C5Dialog(user),
     ui(new Ui::DlgDataOnline)
 {
     ui->setupUi(this);
@@ -31,13 +33,13 @@ DlgDataOnline::~DlgDataOnline()
     delete ui;
 }
 
-bool DlgDataOnline::get(const QString &table, DataResult &result, bool multiselect,
+bool DlgDataOnline::get(C5User *user, const QString &table, DataResult &result, bool multiselect,
                         int searchcolumn)
 {
     QString hash = __c5config.dbParams().join(',') + table;
 
     if(!fInstances.contains(hash)) {
-        fInstances.insert(hash, new DlgDataOnline(table));
+        fInstances.insert(hash, new DlgDataOnline(user, table));
     }
 
     auto *d = fInstances[hash];

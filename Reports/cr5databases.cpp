@@ -3,13 +3,15 @@
 #include "c5mainwindow.h"
 #include "c5tablemodel.h"
 #include "c5dbresetoption.h"
+#include "c5message.h"
+#include "c5textdelegate.h"
 #include <QFileDialog>
 #include <QProcess>
 #include <QDesktopServices>
 #include <QApplication>
 
 CR5Databases::CR5Databases(QWidget *parent) :
-    C5ReportWidget( parent)
+    C5ReportWidget(parent)
 {
     fIcon = ":/database.png";
     fLabel = tr("Databases");
@@ -29,9 +31,9 @@ CR5Databases::CR5Databases(QWidget *parent) :
     fTableView->setItemDelegateForColumn(6, new C5TextDelegate(fTableView));
 }
 
-QToolBar *CR5Databases::toolBar()
+QToolBar* CR5Databases::toolBar()
 {
-    if (!fToolBar) {
+    if(!fToolBar) {
         QList<ToolBarButtons> btn;
         btn << ToolBarButtons::tbNew
             << ToolBarButtons::tbClearFilter
@@ -43,6 +45,7 @@ QToolBar *CR5Databases::toolBar()
         fToolBar->addAction(QIcon(":/save-file.png"), tr("Backup\ndatabase"), this, SLOT(backupDatabase()));
         fToolBar->addAction(QIcon(":/reset.png"), tr("Reset\ndatabase"), this, SLOT(resetDatabase()));
     }
+
     return fToolBar;
 }
 
@@ -54,16 +57,21 @@ void CR5Databases::actionAccess()
 void CR5Databases::backupDatabase()
 {
     QJsonArray values = fModel->getRowValues(fTableView->currentIndex().row());
-    if (values.at(0).toString().isEmpty()) {
+
+    if(values.at(0).toString().isEmpty()) {
         return;
     }
+
     QString fileName = QFileDialog::getSaveFileName(this, tr("Select folder for dump"), "", "*.sql");
-    if (fileName.isEmpty()) {
+
+    if(fileName.isEmpty()) {
         return;
     }
-    if (fileName.right(4).toLower() != ".sql") {
+
+    if(fileName.right(4).toLower() != ".sql") {
         fileName += ".sql";
     }
+
     QStringList args;
     args.append("-h");
     args.append(values.at(1).toString());
@@ -76,7 +84,8 @@ void CR5Databases::backupDatabase()
     p.start(qApp->applicationDirPath() + "/mysqldump.exe", args);
     p.waitForStarted(-1);
     p.waitForFinished(-1);
-    if (p.exitCode() != 0) {
+
+    if(p.exitCode() != 0) {
         C5Message::error(tr("Backup with error") + "<br>" + p.readAll());
     } else {
         C5Message::info(tr("Backup completed") + "<br>" + p.readAll());
@@ -85,15 +94,18 @@ void CR5Databases::backupDatabase()
 
 void CR5Databases::resetDatabase()
 {
-    auto *dr = new C5DbResetOption();
-    if (dr->exec() == QDialog::Accepted) {
-        if (dr->saleAndBuy()) {
+    auto *dr = new C5DbResetOption(nullptr);
+
+    if(dr->exec() == QDialog::Accepted) {
+        if(dr->saleAndBuy()) {
             fHttp->createHttpQuery("/engine/worker/cleardb.php", QJsonObject{{"mode", "storeandsale"}}, SLOT(done(QJsonObject)));
         }
-        if (dr->fullReset()) {
+
+        if(dr->fullReset()) {
             fHttp->createHttpQuery("/engine/worker/cleardb.php", QJsonObject{{"mode", "all"}}, SLOT(done(QJsonObject)));
         }
     }
+
     dr->deleteLater();
 }
 

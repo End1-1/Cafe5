@@ -1,7 +1,7 @@
 #ifndef DLGSCREEN_H
 #define DLGSCREEN_H
 
-#include "c5dialog.h"
+#include "c5waiterdialog.h"
 
 namespace Ui
 {
@@ -10,24 +10,21 @@ class DlgScreen;
 
 class C5WaiterServer;
 
-class DlgScreen : public C5Dialog
+class DlgScreen : public C5WaiterDialog
 {
     Q_OBJECT
 
 public:
-    explicit DlgScreen();
+    explicit DlgScreen(C5User *user);
 
     ~DlgScreen();
 
+protected:
+    virtual bool eventFilter(QObject *o, QEvent *e) override;
+
+    virtual void paintEvent(QPaintEvent *e) override;
+
 private slots:
-    void initResponse(const QJsonObject &jdoc);
-
-    void serviceTimeout();
-
-    void timerTimeout();
-
-    void on_btnClear_clicked();
-
     void on_btnCancel_clicked();
 
     void on_btn1_clicked();
@@ -50,13 +47,13 @@ private slots:
 
     void on_btn0_clicked();
 
-    void on_btnP_clicked();
-
     void on_btnAccept_clicked();
 
     void on_lePassword_returnPressed();
 
     void on_btnSettings_clicked();
+
+    void on_btnClose_clicked();
 
 private:
     Ui::DlgScreen* ui;
@@ -64,6 +61,10 @@ private:
     C5WaiterServer* mWaiterServer;
 
     void tryExit();
+
+    void updatePin();
+
+    QString mPin;
 };
 
 #endif // DLGSCREEN_H

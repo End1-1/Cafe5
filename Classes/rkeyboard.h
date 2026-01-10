@@ -3,7 +3,7 @@
 
 #include <QWidget>
 #include <QList>
-#include <QPushButton>
+#include <QToolButton>
 
 namespace Ui
 {
@@ -70,17 +70,17 @@ private:
 
     QString fCurrentLanguage;
 
-    QList<QPushButton*> fLine1b;
+    QList<QToolButton*> fLine1b;
 
-    QList<QPushButton*> fLine2b;
+    QList<QToolButton*> fLine2b;
 
-    QList<QPushButton*> fLine3b;
+    QList<QToolButton*> fLine3b;
 
-    QList<QPushButton*> fLine4b;
+    QList<QToolButton*> fLine4b;
 
-    void connectButtons(QList<QPushButton*>& buttons);
+    void connectButtons(QList<QToolButton*>& buttons);
 
-    void setButtonsText(QList<QPushButton*>& buttons, const QString &text);
+    void setButtonsText(QList<QToolButton*>& buttons, const QString &text);
 
     void setupEnglish();
 

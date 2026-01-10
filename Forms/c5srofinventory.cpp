@@ -3,8 +3,8 @@
 #include "c5database.h"
 #include "c5message.h"
 
-C5SrOfInventory::C5SrOfInventory(QWidget *parent) :
-    C5Dialog(),
+C5SrOfInventory::C5SrOfInventory(C5User *user) :
+    C5Dialog(user),
     ui(new Ui::C5SrOfInventory)
 {
     ui->setupUi(this);

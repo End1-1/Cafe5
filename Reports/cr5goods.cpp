@@ -11,6 +11,8 @@
 #include "c5storebarcode.h"
 #include "c5database.h"
 #include "c5permissions.h"
+#include "c5message.h"
+#include "c5config.h"
 #include "ndataprovider.h"
 #include <math.h>
 #include <QFile>
@@ -187,7 +189,7 @@ void CR5Goods::pricing()
         return;
     }
 
-    C5GoodsPricing *gp = new C5GoodsPricing();
+    C5GoodsPricing *gp = new C5GoodsPricing(mUser);
 
     if(gp->exec() == QDialog::Accepted) {
         C5Database db;
@@ -244,7 +246,7 @@ void CR5Goods::groupPrice()
 {
     double price1, price2, price1disc, price2disc;
 
-    if(C5ChangePriceOfGroup::groupPrice(price1, price2, price1disc, price2disc)) {
+    if(C5ChangePriceOfGroup::groupPrice(price1, price2, price1disc, price2disc, mUser)) {
         QString p1, p2, p1d, p2d;
         //        if (price1 < 0.0001 && price2 < 0.0002 && price1disc < 0.0002 && price2disc < 0.0002) {
         //            return;

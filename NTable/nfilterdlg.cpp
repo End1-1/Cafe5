@@ -252,7 +252,7 @@ void NFilterDlg::openSuggestions()
 
 void NFilterDlg::queryStarted()
 {
-    mLoadingDlg = new NLoadingDlg(this);
+    mLoadingDlg = new NLoadingDlg(tr("Query"), this);
     mLoadingDlg->open();
 }
 

@@ -6,9 +6,7 @@
 #include "ninterface.h"
 #include "c5utils.h"
 #include "c5message.h"
-#include "c5tabledata.h"
-#include "c5waiterconfiguration.h"
-#include "dlgreceiptlanguage.h"
+#include "c5user.h"
 #include <QClipboard>
 #include <QCalendarWidget>
 #include <QDateEdit>
@@ -97,7 +95,7 @@ void DlgPreorder::on_btnEditGuestname_clicked()
 {
     QString txt;
 
-    if(DlgText::getText(tr("Guest name"), txt)) {
+    if(DlgText::getText(mUser, tr("Guest name"), txt)) {
         ui->leGuestName->setText(txt);
         //TODO
         // C5Database db;
@@ -116,14 +114,12 @@ void DlgPreorder::on_btnCancelReserve_clicked()
 
 void DlgPreorder::on_btnSelectTable_clicked()
 {
-    int tableId;
-
-    if(!DlgFace::getTable(tableId, C5WaiterConfiguration::instance()->defaultHall(), mUser)) {
-        return;
-    }
-
-    ui->leTable->setProperty("id", tableId);
-    ui->leTable->setText(tds("h_tables", "f_name", tableId));
+    // int tableId;
+    // if(!DlgFace::getTable(tableId, mUser->fConfig["default_hall"].toInt(), mUser)) {
+    //     return;
+    // }
+    // ui->leTable->setProperty("id", tableId);
+    // ui->leTable->setText(tds("h_tables", "f_name", tableId));
 }
 
 void DlgPreorder::on_btnCheckin_clicked()
@@ -157,15 +153,6 @@ void DlgPreorder::openDoc()
 void DlgPreorder::save(bool withcheckin)
 {
     QJsonObject j = fDoc["header"].toObject();
-
-    if(j.isEmpty()) {
-        fDoc["id"] = "";
-        j["f_state"] = ORDER_STATE_PREORDER_EMPTY;
-        j["f_hall"] = fDoc["f_hall"];
-    } else {
-        fDoc["id"] = j["f_id"].toString();
-    }
-
     j["f_table"] = ui->leTable->property("id").toInt();
     j["f_guests"] = ui->leGuest->value();
     fDoc["header"] = j;

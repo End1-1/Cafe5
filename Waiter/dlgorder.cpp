@@ -2,11 +2,10 @@
 #include "ui_dlgorder.h"
 #include "c5cafecommon.h"
 #include "c5user.h"
-#include "c5tabledata.h"
 #include "dlgsearchinmenu.h"
+#include "dlgtables.h"
 #include "dlgpassword.h"
 #include "dlgqty.h"
-#include "c5logtoserverthread.h"
 #include "dlglistofdishcomments.h"
 #include "customerinfo.h"
 #include "c5permissions.h"
@@ -26,20 +25,28 @@
 #include "dlglist.h"
 #include "dlgtext.h"
 #include "cashboxconfig.h"
+#include "printtaxn.h"
 #include "dlgprecheckoptions.h"
-#include "worderw.h"
+#include "ninterface.h"
 #include "dlgface.h"
+#include "goodsgroupbutton.h"
 #include "dlglistofmenu.h"
-#include "dishitem.h"
+#include "waiterdishwidget.h"
+#include "waitermodificatorwidget.h"
+#include "waiterguestwidget.h"
 #include "change.h"
 #include "idram.h"
-#include "qdishpart2button.h"
+#include "c5printing.h"
 #include "qdishbutton.h"
 #include "c5message.h"
-#include "c5waiterconfiguration.h"
 #include "dlgstoplistoption.h"
 #include "dlgaskforprecheck.h"
 #include "dlgviewstoplist.h"
+#include "dict_goods_types.h"
+#include "dict_payment_type.h"
+#include "dict_currency.h"
+#include "dlgsimleoptions.h"
+#include "nloadingdlg.h"
 #include <QToolButton>
 #include <QCloseEvent>
 #include <QScreen>
@@ -48,49 +55,41 @@
 #include <QPaintEvent>
 #include <QJsonObject>
 #include <QPainter>
-#include <QNetworkAccessManager>
-#include <QNetworkReply>
 #include <QSettings>
-#include <QSslSocket>
+#include <QPointer>
+#include <QFile>
+#include <QThread>
+#include <QPrinterInfo>
 
 #define PART2_COL_WIDTH 150
 #define PART2_ROW_HEIGHT 60
 #define PART3_ROW_HEIGHT 80
 #define PART4_ROW_HEIGHT 80
 
-DlgOrder::DlgOrder(C5User *user) :
+DlgOrder::DlgOrder(C5User *user, HallItem h, TableItem t, const QVector<GoodsGroupItem*>* groups, const QVector<DishAItem*>* dishes) :
     C5WaiterDialog(user),
-    ui(new Ui::DlgOrder)
+    ui(new Ui::DlgOrder),
+    mHall(h),
+    mTable(t),
+    mGroups(groups),
+    mDishes(dishes)
 {
     ui->setupUi(this);
-    ui->leReceived->clear();
-    ui->leChange->clear();
-    fCarNumber = 0;
-    ui->lbVisit->setVisible(false);
+    installEventFilter(this);
+    setFocusPolicy(Qt::StrongFocus);
+    setFocus();
+
+    if(mTable.specialConfigId > 0 && mTable.specialConfigId != mHall.configId) {
+        mHall.data = mTable.data;
+    }
+
     ui->lbStaff->setText(user->fullName());
     ui->wqtypaneldown->setVisible(false);
-    ui->btnBillWithoutService->setEnabled(user->check(cp_t5_bill_without_service));
     fTimerCounter = 0;
     connect(&fTimer, &QTimer::timeout, this, &DlgOrder::timeout);
     fTimer.start(1000);
     ui->wpayment->setVisible(false);
-    ui->btnPayTransferToRoom->setVisible(mUser->check(cp_t5_pay_transfer_to_room));
-    ui->btnPayComplimentary->setVisible(mUser->check(cp_t5_pay_complimentary));
-    ui->btnPayCityLedger->setVisible(mUser->check(cp_t5_pay_cityledger));
-    ui->btnSelfCost->setVisible(mUser->check(cp_t5_pay_breakfast));
-
-    if(!cp_t5_pay_idram) {
-        ui->btnPaymentIdram->setVisible(false);
-        ui->leIDRAM->setVisible(false);
-    }
-
-    if(!cp_t5_pay_payx) {
-        ui->btnPayX->setVisible(false);
-        ui->lePayX->setVisible(false);
-        ui->btnFillPayX->setVisible(false);
-        ui->btnCalcPayX->setVisible(false);
-    }
-
+    ui->wmenua->setVisible(false);
 #ifndef QT_DEBUG
     //ui->btnFillIdram->setVisible(false);
 #endif
@@ -98,43 +97,22 @@ DlgOrder::DlgOrder(C5User *user) :
     setDiscountComment();
     setComplimentary();
     setSelfcost();
-    // switch(C5Config::getRegValue("btn_tax_state").toInt()) {
-    // case 0:
-    // case 1:
-    //     ui->btnTax->setChecked(true);
-    //     break;
-    // case 2:
-    //     ui->btnTax->setChecked(false);
-    //     break;
-    // }
-    // TODO
-    // if(__c5config.getValue(param_tax_print_always_offer).toInt() == 1) {
-    //     ui->btnTax->setChecked(true);
-    //     ui->btnTax->setEnabled(false);
-    // }
-    fMenuID = C5WaiterConfiguration::instance()->defaultMenu();
-    fPart1 = 0;
+    ui->lbAmount->setText("");
+    fMenuID = mUser->fConfig["default_menu"].toInt();
     fPart2Parent = 0;
     fStoplistMode = false;
-    connect(ui->scrollAreaDish->verticalScrollBar(), &QScrollBar::valueChanged, this, [this](int value) {
-        for(QObject *o : ui->scrollAreaWidgetContentsDish->children()) {
-            QWidget *w = dynamic_cast<QWidget*>(o);
-
-            if(w) {
-                w->repaint();
-            }
-        }
-
-        ui->scrollAreaDish->viewport()->update();
+    createScrollButtons();
+    connect(ui->orderScrollArea->verticalScrollBar(), &QScrollBar::valueChanged, this, [this](int value) {
+        updateScrollButtonPositions();
     });
-    connect(ui->leCmd, &C5LineEdit::focusIn, this, [this]() {
-        ui->leCmd->setFocus();
+    connect(ui->groupsScrollArea->verticalScrollBar(), &QScrollBar::valueChanged, this, [this](int value) {
+        updateScrollButtonPositions();
     });
-    auto *t = new QTimer(this);
-    connect(t, &QTimer::timeout, this, [this]() {
-        ui->leCmd->setFocus();
+    connect(ui->dishScrollArea->verticalScrollBar(), &QScrollBar::valueChanged, this, [this](int value) {
+        updateScrollButtonPositions();
     });
-    t->start(1000);
+    createPaymentButtons();
+    configBtnNum();
 }
 
 DlgOrder::~DlgOrder()
@@ -142,318 +120,22 @@ DlgOrder::~DlgOrder()
     delete ui;
 }
 
-DlgOrder* DlgOrder::openTable(int table, C5User *user)
-{
-    auto *d = new DlgOrder(user);
-    d->setModal(true);
-    d->buildMenu(d->fMenuID, 0, 0);
-    d->fHttp->createHttpQueryLambda("/engine/picasso.waiter/",
-    QJsonObject{
-        {"class", "waiter"},
-        {"method", "opentable"},
-        {"f_table", table},
-        {"f_current_staff", user->id()},
-        {"f_current_staff_name", user->fullName()},
-        {"f_locksrc", hostinfo}},
-    [d](const QJsonObject & jdoc) {
-        if(jdoc["status"].toInt() == 0) {
-            C5Message::error(jdoc["message"].toString());
-            emit(d->allDone());
-            return;
-        }
-
-        d->fHeader = jdoc["header"].toObject().toVariantMap();
-
-        for(const QJsonValue& v : jdoc["body"].toArray()) {
-            d->fBody.append(v.toObject().toVariantMap());
-        }
-
-        d->updateData();
-        d->show();
-    }, [d](const QJsonObject & je) {
-        d->accept();
-        emit(d->allDone());
-        Q_UNUSED(je);
-    });
-    return d;
-}
-
-void DlgOrder::accept()
-{
-    //TODO
-    // for(int i = 0; i < ui->vs->count(); i++) {
-    //     WOrder *wo = dynamic_cast<WOrder*>(ui->vs->itemAt(i)->widget());
-    //     if(wo) {
-    //         if(wo->fOrderDriver->isEmpty()
-    //                 && __c5config.getValue(param_waiter_donotclose_empty_order).toInt() == 0
-    //                 && wo->fOrderDriver->headerValue("f_state").toInt() != ORDER_STATE_PREORDER_EMPTY
-    //                 && wo->fOrderDriver->headerValue("f_state").toInt() != ORDER_STATE_PREORDER_WITH_ORDER) {
-    //             wo->fOrderDriver->setCloseHeader();
-    //         }
-    //         for(int i = 0; i < wo->fOrderDriver->dishesCount(); i++) {
-    //             if(wo->fOrderDriver->dishesValue("f_reprint", i).toInt() < 0) {
-    //                 wo->fOrderDriver->setDishesValue("f_reprint", abs(wo->fOrderDriver->dishesValue("f_reprint", i).toInt() - 1), i);
-    //             }
-    //         }
-    //         if(!wo->fOrderDriver->save()) {
-    //             C5Message::error(wo->fOrderDriver->error());
-    //             return;
-    //         }
-    //         logRecord(mUser->fullName(), wo->fOrderDriver->headerValue("f_id").toString(), "", "Close window", "", "");
-    //     }
-    // }
-    // QString err;
-    // if(!dbtable->closeTable(fTable, err)) {
-    //     C5Message::error(err);
-    //     return;
-    // }
-    // if(!ui->btnExit->isEnabled()) {
-    //     return;
-    // }
-    // C5Dialog::accept();
-    // //TODO: CHECK L10
-    // if(!property("reprint").toString().isEmpty()) {
-    //     if(__c5config.getValue(param_waiter_receipt_qty).toInt() > 0 && mUser->check(cp_t5_multiple_receipt)) {
-    //         while(C5Message::question(tr("Print additional receipt for this order?")) == QDialog::Accepted) {
-    //             fHttp->createHttpQueryLambda("/engine/waiter/printreceipt.php", {
-    //                 {"staffid", mUser->id()},
-    //                 {"staffname", mUser->fullName()},
-    //                 {"f_receiptlanguage", C5Config::getRegValue("receipt_language").toInt()},
-    //                 {"order", property("reprint").toString()},
-    //                 {"printtax", false},
-    //                 {"receipt_printer", C5Config::fSettingsName}
-    //             }, [this](const QJsonObject & jo) {
-    //                 auto np = new NDataProvider(this);
-    //                 np->overwriteHost("http", "127.0.0.1", 8080);
-    //                 connect(np, &NDataProvider::done, this, [](const QJsonObject & jjo) {
-    //                 });
-    //                 connect(np, &NDataProvider::error, this, [](const QString & err) {
-    //                 });
-    //                 np->getData("/printjson", jo);
-    //             }, [](const QJsonObject & je) {
-    //                 Q_UNUSED(je);
-    //             });
-    //         }
-    //     }
-    // }
-    // emit allDone();
-    // deleteLater();
-}
-
-void DlgOrder::reject()
-{
-    accept();
-}
-
-QList<WOrder*> DlgOrder::worders()
-{
-    QList<WOrder*> lst;
-
-    for(int i = 0; i < ui->vs->count(); i++) {
-        WOrder *o = dynamic_cast<WOrder*>(ui->vs->itemAt(i)->widget());
-
-        if(o) {
-            lst.append(o);
-        }
-    }
-
-    return lst;
-}
-
-void DlgOrder::updateData()
-{
-    QString selectedId;
-    ui->btnTable->setText(fHeader["f_table_name"].toString());
-    ui->wleft->setVisible(fHeader["f_precheck"].toInt() < 1);
-    ui->wdish->setVisible(fHeader["f_precheck"].toInt() < 1);
-
-    while(ui->vlDishes->count() > 0) {
-        QLayoutItem *item = ui->vlDishes->takeAt(0);
-
-        if(item) {
-            auto *w = static_cast<DishItem*>(item->widget());
-
-            if(w) {
-                if(w->isFocused()) {
-                    selectedId = w->fData["f_id"].toString();
-                }
-
-                delete w;
-            }
-
-            delete item;
-        }
-    }
-
-    for(int i = 0 ; i <  fBody.count(); i++) {
-        auto *dw = new DishItem(fBody.at(i), i);
-        connect(dw, &DishItem::focused, this, &DlgOrder::handleOrderDishClick);
-        connect(this, &DlgOrder::orderDishClicked, dw, &DishItem::checkFocus);
-        ui->vlDishes->addWidget(dw);
-    }
-
-    //TODO CHECK
-    ui->btnService->setText(QString("%1 %2%: %3")
-                            .arg(tr("Service amount"))
-                            .arg(fHeader["f_servicefactor"].toDouble() * 100)
-                            .arg(float_str(fHeader["f_amountservice"].toDouble(), 2)));
-    ui->btnDiscount->setText(QString("%1 %2%: %3")
-                             .arg(tr("Discount"))
-                             .arg(fHeader["f_discountfactor"].toDouble() * 100)
-                             .arg(float_str(fHeader["f_amountdiscount"].toDouble(), 2)));
-    ui->leTaxNumber->setText(fHeader["f_receiptnumber"].toString());
-    ui->lePrepaidAmount->setDouble(fHeader["f_prepaidcash"].toDouble() + fHeader["f_prepaidcard"].toDouble());
-    ui->leGuest->setText(fHeader["f_guestname"].toString());
-
-    if(ui->lePrepaidAmount->getDouble() > 0.01) {
-        ui->wPreorder->setVisible(true);
-    } else {
-        ui->wPreorder->setVisible(false);
-    }
-
-    ui->vlDishes->addStretch();
-}
-
 void DlgOrder::disableForCheckall(bool v)
 {
     ui->wqtypanelup->setEnabled(!v);
     ui->wqtypaneldown->setVisible(v);
     ui->wpaneldown->setEnabled(!v);
-    ui->wleft->setEnabled(!v);
-    ui->wdish->setEnabled(!v);
-    ui->wmenu->setEnabled(!v);
+    ui->wmenua->setEnabled(!v);
+    ui->wappmenu->setEnabled(!v);
 
     for(int i = 0, count = ui->vlDishes->count(); i < count; i++) {
         QLayoutItem *l = ui->vlDishes->itemAt(i);
-        DishItem *d = dynamic_cast<DishItem*>(l->widget());
+        WaiterDishWidget *d = dynamic_cast<WaiterDishWidget*>(l->widget());
 
         if(d) {
             d->setCheckMode(v);
         }
     }
-}
-
-void DlgOrder::buildMenu(int menuid, int part1, int part2)
-{
-    if(menuid == 0) {
-        C5Message::error(tr("Menu is not defined"));
-        return;
-    }
-
-    //TODO
-    //ui->btnChangeMenu->setText(QString("%1\n%2").arg(tr("Menu"), dbmenuname->name(menuid)));
-    fMenuID = menuid;
-    fPart1 = part1;
-
-    while(ui->hlDishPart1->itemAt(0)) {
-        ui->hlDishPart1->itemAt(0)->widget()->deleteLater();
-        ui->hlDishPart1->removeItem(ui->hlDishPart1->itemAt(0));
-    }
-
-    for(const QString &p1 : C5TableData::instance()->ids("d_part1")) {
-        QPushButton *btn = new QPushButton(tds("d_part1", "f_name", p1.toInt()));
-        btn->setProperty("btn_part1", true);
-        connect(btn, &QPushButton::clicked, this, &DlgOrder::dishpart1Clicked);
-        btn->setProperty("id", p1.toInt());
-        ui->hlDishPart1->addWidget(btn);
-    }
-
-    if(fPart1 == 0) {
-        if(!ui->hlDishPart1->itemAt(0)) {
-            C5Message::error(tr("Menu is not defined"));
-            return;
-        }
-
-        fPart1 = static_cast<QPushButton*>(ui->hlDishPart1->itemAt(0)->widget())->property("id").toInt();
-    }
-
-    while(ui->glDishPart2->itemAt(0)) {
-        ui->glDishPart2->itemAt(0)->widget()->deleteLater();
-        ui->glDishPart2->removeItem(ui->glDishPart2->itemAt(0));
-    }
-
-    int colCount = 2;
-    int col = 0;
-    int row = 0;
-    QJsonArray jpart2 = C5TableData::instance()->part2(fMenuID, fPart1, fPart2Parent);
-
-    for(int i = 0; i  <  jpart2.size(); i++) {
-        const QJsonObject &j = jpart2.at(i).toObject();
-        QDishPart2Button *btn = new QDishPart2Button();
-        connect(btn, &QDishPart2Button::clicked, this, &DlgOrder::dishPart2Clicked);
-        btn->setText(j["f_name"].toString());
-        btn->setProperty("bgcolor", j["f_color"].toInt());
-        btn->setProperty("id", j["f_id"].toInt());
-        btn->setProperty("children", j["f_children"].toString());
-        ui->glDishPart2->addWidget(btn, row, col++, 1, 1);
-
-        if(col == colCount) {
-            col = 0;
-            row ++;
-        }
-    }
-
-    ui->glDishPart2->setRowStretch(row + 1, 1);
-    buildDishes(menuid, part2);
-}
-
-void DlgOrder::addDishToOrder(int menuid, const QString &emark)
-{
-    //TODO
-    // int dishid = dbmenu->dishid(menuid);
-    // if(dbdish->isHourlyPayment(dishid)) {
-    //     for(int i = 0; i < fBody.count(); i++) {
-    //         const QMap<QString, QVariant> jb = fBody.at(i);
-    //         if(jb["f_state"].toInt() != DISH_STATE_OK) {
-    //             continue;
-    //         }
-    //         if(dbdish->isHourlyPayment(jb["f_dish"].toInt())) {
-    //             C5Message::error(tr("Hourly payment already exists"));
-    //             return;
-    //         }
-    //     }
-    // }
-    // double price = 0;
-    // if(dbdish->isExtra(dishid)) {
-    //     if(!DlgPassword::getAmount(tr("Extra price"), price)) {
-    //         return;
-    //     }
-    //     if(price < 0.01) {
-    //         C5Message::error(tr("Extra price is not defined"));
-    //         return;
-    //     }
-    // } else {
-    //     price = dbmenu->price(menuid);
-    // }
-    // QString special;
-    // if(!DlgListDishSpecial::getSpecial(dishid, special)) {
-    //     return;
-    // }
-    // double qty = 1;
-    // if(__c5config.getValue(param_rest_qty_before_add_dish).toInt() == 1 && emark.isEmpty()) {
-    //     on_btnAnyqty_clicked();
-    // }
-    // QString comment = "";
-    // comment = special;
-    // fHttp->createHttpQueryLambda("/engine/picasso.waiter/",
-    // QJsonObject{
-    //     {"class", "waiter"},
-    //     {"method", "adddish"},
-    //     {"f_header", fHeader["f_id"].toString()},
-    //     {"f_dish_menu_id", menuid},
-    //     {"f_qty1", qty},
-    //     {"f_price", price},
-    //     {"f_special_comment", special},
-    //     {"f_emarks", QJsonValue::Null},
-    //     {"f_current_staff", mUser->id()},
-    //     {"f_current_staff_name", mUser->fullName()},
-    //     {"f_locksrc", hostinfo}},
-    // [this](const QJsonObject & jdoc) {
-    //     updateData();
-    //     ui->scrollArea->verticalScrollBar()->setValue(ui->scrollArea->verticalScrollBar()->maximum() + 1000);
-    // }, [](const QJsonObject & je) {
-    //     Q_UNUSED(je);
-    // });
 }
 
 void DlgOrder::setStoplistmode()
@@ -468,117 +150,311 @@ bool DlgOrder::stoplistMode()
 
 void DlgOrder::viewStoplist()
 {
-    DlgViewStopList v;
+    DlgViewStopList v(mUser);
     v.exec();
     fHttp->createHttpQuery("/engine/waiter/stoplist.php", QJsonObject{{"action", "get"}}, SLOT(handleStopList(
                 QJsonObject)));
 }
-void DlgOrder::logRecord(const QString & username, const QString & orderid, const QString & rec, const QString & action,
-                         const QString & value1, const QString & value2)
+
+void DlgOrder::accept()
 {
-    C5LogToServerThread::remember(LOG_WAITER, username, rec, orderid, "", action, value1, value2);
+    fHttp->createHttpQueryLambda("/engine/v2/waiter/order/unlock-table", {
+        {"table", mTable.id},
+        {"locksrc", hostinfo},
+        {"id", mOrder.id},
+        {"empty_order", mOrder.isEmpty()}
+    },
+    [this](const QJsonObject & jdoc) {
+        Q_UNUSED(jdoc);
+        C5WaiterDialog::accept();
+    }, [this](const QJsonObject & jerr) {
+        Q_UNUSED(jerr);
+        C5WaiterDialog::accept();
+    });
 }
 
-void DlgOrder::setButtonsState()
+void DlgOrder::reject()
 {
-    bool btnSendToCooking = false;
-    bool btnPayment = true;
-    bool orderEmpty = true;
-    QList<WOrder*> orders = worders();
+    accept();
+}
 
-    //TODO
-    // for(WOrder *o : orders) {
-    //     for(int i = 0; i < o->fOrderDriver->dishesCount(); i++) {
-    //         if(o->fOrderDriver->dishesValue("f_state", i).toInt() != DISH_STATE_OK) {
-    //             continue;
-    //         }
-
-    //         orderEmpty = false;
-
-    //         if(o->fOrderDriver->dishesValue("f_qty1", i).toDouble() > o->fOrderDriver->dishesValue("f_qty2", i).toDouble()) {
-    //             btnSendToCooking = true;
-    //         }
-    //     }
-    // }
-
-    if(btnSendToCooking || orderEmpty) {
-        btnPayment = false;
+bool DlgOrder::eventFilter(QObject *o, QEvent *e)
+{
+    if((e->type() == QEvent::Resize || e->type() == QEvent::Show)) {
+        updateScrollButtonPositions();
     }
 
-    ui->btnPrintService->setEnabled(btnSendToCooking);
-    ui->btnTotal->setEnabled(false);
-    ui->btnTotal->setProperty("stylesheet_button_redalert", false);
-    ui->btnTotal->style()->polish(ui->btnTotal);
-    ui->btnTotal->setText(QString("%1\n%2").arg(tr("Bill"), "-"));
-    ui->wdtOrder->setEnabled(true);
-    setRoomComment();
-    setCLComment();
-    setSelfcost();
-    setDiscountComment();
-    //TODO: CHECK
-    //MOVE ALL LOGIC TO UPDATE DATE
-    // ui->btnSit->setText(QString("%1: %2").arg(tr("Guests count"),
-    //                     wo->fOrderDriver->headerOptionsValue("f_guests").toString()));
-    // headerToLineEdit();
-    // QString orderComment = wo->fOrderDriver->headerValue("f_comment").toString().isEmpty() ?
-    //                        tr("Comment") : wo->fOrderDriver->headerValue("f_comment").toString();
-    // ui->btnOrderComment->setText(orderComment);
-    // auto *cbc = Configs::construct<CashboxConfig> (2);
-    // if(wo->fOrderDriver->headerValue("f_precheck").toInt() > 0) {
-    //     ui->btnTotal->setProperty("stylesheet_button_redalert", true);
-    //     ui->btnTotal->style()->polish(ui->btnTotal);
-    //     ui->btnTotal->setText(QString("%1\n%2")
-    //                           .arg(tr("Bill"), float_str(wo->fOrderDriver->headerValue("f_amounttotal").toDouble(), 2)));
-    //     ui->wpayment->setVisible(mUser->check(cp_t5_print_receipt));
-    //     ui->wdtOrder->setEnabled(false);
-    //     ui->btnService->setEnabled(false);
-    //     ui->btnDiscount->setEnabled(false);
-    //     ui->btnPaymentCash->setText(cbc->cash1Name);
-    //     ui->btnPaymentCard->setText(cbc->cash2Name);
-    //     ui->btnPaymentBank->setText(cbc->cash3Name);
-    //     ui->btnPrepayment->setText(cbc->cash4Name);
-    //     ui->btnPaymentIdram->setText(cbc->cash5Name);
-    //     ui->btnPayX->setText(cbc->cash6Name);
-    //     ui->btnPaymentOther->setText(cbc->cash7Name);
-    //     headerToLineEdit();
-    //     if(ui->wpayment->isVisible()) {
-    //         ui->btnPayCityLedger->setEnabled(ui->leOther->getDouble() > 0.01);
-    //         ui->btnPayComplimentary->setEnabled(ui->leOther->getDouble() > 0.01);
-    //         ui->btnPayTransferToRoom->setEnabled(ui->leOther->getDouble() > 0.01 && cbc->cash6Hotel);
-    //         ui->btnSelfCost->setEnabled(ui->leOther->getDouble() > 0.01);
-    //     }
-    // } else {
-    //     ui->btnTotal->setProperty("stylesheet_button_redalert", false);
-    //     ui->btnTotal->style()->polish(ui->btnTotal);
-    //     ui->btnTotal->setText(QString("%1\n%2").arg(tr("Bill"),
-    //                           float_str(wo->fOrderDriver->headerValue("f_amounttotal").toDouble(), 2)));
-    //     ui->wpayment->setVisible(false);
-    // }
-    // ui->btnTotal->style()->polish(ui->btnTotal);
-    // if(wo->fOrderDriver->headerValue("f_partner").toInt() > 0) {
-    //     CPartners p;
-    //     C5Database db;
-    //     db[":f_id"] = wo->fOrderDriver->headerValue("f_partner");
-    //     db.exec("select * from c_partners where f_id=:f_id");
-    //     p.getRecord(db);
-    //     ui->btnDelivery->setText(QString("%1, %2, %3").arg(p.phone, p.taxName, p.address));
-    // }
-    // ui->btnTotal->setEnabled(btnPayment
-    //                          || wo->fOrderDriver->headerValue("f_state").toInt() == ORDER_STATE_PREORDER_EMPTY
-    //                          || wo->fOrderDriver->headerValue("f_state").toInt() == ORDER_STATE_PREORDER_WITH_ORDER);
-    // ui->wleft->setVisible(wo->fOrderDriver->headerValue("f_precheck").toInt() < 1);
-    // ui->wdish->setVisible(wo->fOrderDriver->headerValue("f_precheck").toInt() < 1);
-}
+    if(e->type() == QEvent::KeyPress) {
+        auto *k = static_cast<QKeyEvent*>(e);
 
-void DlgOrder::removeWOrder(WOrder * wo)
-{
-    for(int i = 0; i < ui->vs->count(); i++) {
-        if(wo == ui->vs->itemAt(i)->widget()) {
-            ui->vs->itemAt(i)->widget()->deleteLater();
-            ui->vs->removeItem(ui->vs->itemAt(i));
-            return;
+        if(k->key() == Qt::Key_Return || k->key() == Qt::Key_Enter) {
+            confirmStringBuffer();
+            return true;
+        }
+
+        if(k->key() == Qt::Key_Backspace && !mStringBuffer.isEmpty()) {
+            mStringBuffer.chop(1);
+            return true;
+        }
+
+        if(!k->text().isEmpty()) {
+            mStringBuffer += k->text();
+            return true;
         }
     }
+
+    return C5WaiterDialog::eventFilter(o, e);
+}
+
+void DlgOrder::showEvent(QShowEvent *e)
+{
+    C5WaiterDialog::showEvent(e);
+    fMenuID = mHall.defaultMenu();
+    makeGroups(0, 0);
+    fHttp->createHttpQueryLambda("/engine/v2/waiter/order/open-table", {
+        {"table", mTable.id},
+        {"locksrc", hostinfo}
+    },
+    [this](const QJsonObject  & jdoc) {
+        parseOrder(jdoc);
+    }, [this](const QJsonObject & jerr) {
+        reject();
+    });
+    ui->vlDishes->addStretch();
+}
+
+void DlgOrder::makeFavorites()
+{
+    makeDishes(0, true);
+}
+
+void DlgOrder::makeGroups(int parent, int dept)
+{
+    while(ui->glGroups->itemAt(0)) {
+        ui->glGroups->itemAt(0)->widget()->deleteLater();
+        ui->glGroups->removeItem(ui->glGroups->itemAt(0));
+    }
+
+    QRect scr = qApp->screens().at(mScreen < 0 ? 0 : mScreen)->geometry();
+    int dcolCount = scr.width() > 1024 ? 5 : 4;
+    int col = 0;
+    int row = 0;
+    const QVector<GoodsGroupItem*>* groups = mGroups;
+    QVector<GoodsGroupItem*> filteredGroups;
+
+    if(parent > 0) {
+        auto findGroup = [&](auto&& self, GoodsGroupItem * node, int id) -> GoodsGroupItem* {
+            if(!node)
+                return nullptr;
+
+            if(node->id == id)
+                return node;
+
+            for(auto* child : node->children) {
+                if(auto* found = self(self, child, id))
+                    return found;
+            }
+
+            return nullptr;
+        };
+        GoodsGroupItem* parentGroup = nullptr;
+
+        for(auto* root : *mGroups) {
+            if(auto* found = findGroup(findGroup, root, parent)) {
+                parentGroup = found;
+                break;
+            }
+        }
+
+        if(parentGroup) {
+            filteredGroups = parentGroup->children;
+            groups = &filteredGroups;
+        }
+    }
+
+    for(auto *group : *groups) {
+        if(parent > 0 && group->parentId != parent) {
+            continue;
+        }
+
+        if(dept > 0 && group->dept != dept) {
+            continue;
+        }
+
+        auto *btn = new GoodsGroupButton(group->name);
+
+        if(group->color < -1) {
+            btn->setColor(group->color);
+        }
+
+        connect(btn, &GoodsGroupButton::clicked, this, [this, group]() {
+            makeDishes(group->id, false);
+
+            if(!group->children.isEmpty()) {
+                mPreviouseParent.push(group->parentId);
+                makeGroups(group->id, false);
+            }
+        });
+        ui->glGroups->addWidget(btn, row, col++, 1, 1);
+
+        if(col == dcolCount) {
+            col = 0;
+            row ++;
+        }
+    }
+
+    ui->glGroups->setRowStretch(row + 1, 1);
+
+    for(int i = 0; i < dcolCount; i++) {
+        ui->glGroups->setColumnStretch(i, 1);
+    }
+
+    makeDishes(parent, false);
+}
+
+void DlgOrder::makeDishes(int group, int favorite)
+{
+    while(ui->glDishes->itemAt(0)) {
+        ui->glDishes->itemAt(0)->widget()->deleteLater();
+        ui->glDishes->removeItem(ui->glDishes->itemAt(0));
+    }
+
+    QRect scr = qApp->screens().at(mScreen < 0 ? 0 : mScreen)->geometry();
+    int dcolCount = scr.width() > 1024 ? 3 : 2;
+    int dcol = 0;
+    int drow = 0;
+
+    for(auto *g : *mDishes) {
+        if(g->menuId != fMenuID) {
+            continue;
+        }
+
+        if(group && g->group != group) {
+            continue;
+        }
+
+        if(favorite && !g->favorite) {
+            continue;
+        }
+
+        int w = (ui->wdishes->width() - 10)  / (scr.width() > 1024 ? 3 : 2);
+        auto *btn = new QDishButton(g, w);
+        connect(btn, &QDishButton::clicked, this, [this, btn, g]() {
+            addDishToOrder(g, btn);
+        });
+        ui->glDishes->addWidget(btn, drow, dcol++, 1, 1);
+
+        if(dcol == dcolCount) {
+            dcol = 0;
+            drow ++;
+        }
+
+        ui->glDishes->setRowStretch(drow + 1, 1);
+    }
+}
+
+void DlgOrder::confirmStringBuffer()
+{
+    if(mStringBuffer.isEmpty()) {
+        return;
+    }
+
+    QString code = mStringBuffer.trimmed();
+    mStringBuffer = code;
+    //Check qr exists
+    fHttp->createHttpQuery("/engine/waiter/check-qr.php", QJsonObject{{"action", "checkQr"},
+        {"qr", code}}, SLOT(checkQrResponse(QJsonObject)));
+}
+
+void DlgOrder::createScrollButtons()
+{
+    return;
+    //ZIZI-PIZI SCROOL ON WIDGETS
+    //GROUPS OF DISHES
+    mBtnGroupsUp = new QToolButton(ui->wgroups);
+    connect(mBtnGroupsUp, &QToolButton::clicked, this, [this]() {
+        ui->groupsScrollArea->verticalScrollBar()->setValue(ui->groupsScrollArea->verticalScrollBar()->value() - 100);
+    });
+    mBtnGroupsUp->setProperty("role", "scrollbutton");
+    mBtnGroupsUp->setAutoRaise(true);
+    mBtnGroupsUp->setFixedSize(36, 36);
+    mBtnGroupsUp->setIconSize(QSize(24, 24));
+    mBtnGroupsUp->setIcon(QIcon(":/up-arrow.png"));
+    mBtnGroupsUp->show();
+    mBtnGroupsDown = new QToolButton(ui->wgroups);
+    connect(mBtnGroupsDown, &QToolButton::clicked, this, [this]() {
+        ui->groupsScrollArea->verticalScrollBar()->setValue(ui->groupsScrollArea->verticalScrollBar()->value() + 100);
+    });
+    mBtnGroupsDown->setProperty("role", "scrollbutton");
+    mBtnGroupsDown->setAutoRaise(true);
+    mBtnGroupsDown->setFixedSize(36, 36);
+    mBtnGroupsDown->setIconSize(QSize(24, 24));
+    mBtnGroupsDown->setIcon(QIcon(":/down-arrow.png"));
+    mBtnGroupsDown->show();
+    //DISHES
+    mBtnDishUp = new QToolButton(ui->wdishes);
+    connect(mBtnDishUp, &QToolButton::clicked, this, [this]() {
+        ui->dishScrollArea->verticalScrollBar()->setValue(ui->dishScrollArea->verticalScrollBar()->value() - 300);
+    });
+    mBtnDishUp->setProperty("role", "scrollbutton");
+    mBtnDishUp->setAutoRaise(true);
+    mBtnDishUp->setFixedSize(36, 36);
+    mBtnDishUp->setIconSize(QSize(24, 24));
+    mBtnDishUp->setIcon(QIcon(":/up-arrow.png"));
+    mBtnDishUp->show();
+    mBtnDishUp->raise();
+    mBtnDishDown = new QToolButton(ui->wdishes);
+    connect(mBtnDishDown, &QToolButton::clicked, this, [this]() {
+        ui->dishScrollArea->verticalScrollBar()->setValue(ui->dishScrollArea->verticalScrollBar()->value() + 300);
+    });
+    mBtnDishDown->setProperty("role", "scrollbutton");
+    mBtnDishDown->setAutoRaise(true);
+    mBtnDishDown->setFixedSize(36, 36);
+    mBtnDishDown->setIconSize(QSize(24, 24));
+    mBtnDishDown->setIcon(QIcon(":/down-arrow.png"));
+    mBtnDishDown->show();
+    //ORDER
+    mBtnOrderUp = new QToolButton(ui->worder);
+    connect(mBtnOrderUp, &QToolButton::clicked, this, [this]() {
+        ui->orderScrollArea->verticalScrollBar()->setValue(ui->orderScrollArea->verticalScrollBar()->value() - 300);
+    });
+    mBtnOrderUp->setProperty("role", "scrollbutton");
+    mBtnOrderUp->setAutoRaise(true);
+    mBtnOrderUp->setFixedSize(36, 36);
+    mBtnOrderUp->setIconSize(QSize(24, 24));
+    mBtnOrderUp->setIcon(QIcon(":/up-arrow.png"));
+    mBtnOrderUp->show();
+    mBtnOrderUp->raise();
+    mBtnOrderDown = new QToolButton(ui->worder);
+    connect(mBtnOrderDown, &QToolButton::clicked, this, [this]() {
+        ui->orderScrollArea->verticalScrollBar()->setValue(ui->orderScrollArea->verticalScrollBar()->value() + 300);
+    });
+    mBtnOrderDown->setProperty("role", "scrollbutton");
+    mBtnOrderDown->setAutoRaise(true);
+    mBtnOrderDown->setFixedSize(36, 36);
+    mBtnOrderDown->setIconSize(QSize(24, 24));
+    mBtnOrderDown->setIcon(QIcon(":/down-arrow.png"));
+    mBtnOrderDown->show();
+}
+
+void DlgOrder::updateScrollButtonPositions()
+{
+    return;
+    QRect r = ui->wgroups->contentsRect();
+    mBtnGroupsUp->move(r.right() - mBtnGroupsUp->width(), r.top() + 2);
+    mBtnGroupsUp->raise();
+    mBtnGroupsDown->move(r.right() - mBtnGroupsDown->width(), r.bottom() - mBtnGroupsDown->height());
+    mBtnGroupsDown->raise();
+    r = ui->wdishes->contentsRect();
+    mBtnDishUp->move(r.right() - mBtnDishUp->width(), r.top() + 2);
+    mBtnDishUp->raise();
+    mBtnDishDown->move(r.right() - mBtnDishDown->width(), r.bottom() - mBtnDishDown->height());
+    mBtnDishDown->raise();
+    r = ui->worder->contentsRect();
+    mBtnOrderUp->move(r.right() - mBtnOrderUp->width(), r.top() + 2 + ui->wqty->height());
+    mBtnOrderUp->raise();
+    mBtnOrderDown->move(r.right() - mBtnOrderDown->width(), r.bottom() - mBtnOrderDown->height() - ui->wpaneldown->height());
+    mBtnOrderDown->raise();
 }
 
 void DlgOrder::restoreStoplistQty(int dish, double qty)
@@ -588,53 +464,571 @@ void DlgOrder::restoreStoplistQty(int dish, double qty)
     SLOT(restoreStoplistQtyResponse(QJsonObject)));
 }
 
-void DlgOrder::timeout()
+void DlgOrder::printPrecheck(const QString &currentStaff)
 {
-    ui->leCmd->setFocus();
-    ui->lbTime->setText(QTime::currentTime().toString(FORMAT_TIME_TO_SHORT_STR));
-    fTimerCounter++;
-    //TODO
-    // if((fTimerCounter % 60) == 0) {
-    //     for(WOrder *o : worders()) {
-    //         o->fOrderDriver->amountTotal();
-    //     }
-    // }
-}
+    int bs = 10;
+    QFont font(qApp->font());
+    font.setPointSize(bs);
+    QString printerName = mUser->fConfig["receipt_printer"].toString();
+    C5Printing p;
+    QPrinterInfo pi = QPrinterInfo::printerInfo(printerName);
+    QPrinter printer(pi);
+    printer.setPageSize(QPageSize::Custom);
+    printer.setFullPage(false);
+    QRectF pr = printer.pageRect(QPrinter::DevicePixel);
+    constexpr qreal SAFE_RIGHT_MM = 2.0;
+    qreal safePx = SAFE_RIGHT_MM * printer.logicalDpiX() / 25.4;
+    p.setSceneParams(pr.width() - safePx, pr.height(), printer.logicalDpiX());
+    p.setFont(font);
+    QString logoFile = qApp->applicationDirPath() + "/logo_receipt.png";
 
-void DlgOrder::worderActivated()
-{
-    WOrder *a = static_cast<WOrder*>(sender());
-    WOrder *o = nullptr;
-
-    for(int i = 0; i < ui->vs->count(); i++) {
-        o = dynamic_cast<WOrder*>(ui->vs->itemAt(i)->widget());
-
-        if(o) {
-            if(o == a) {
-                o->setSelected();
-            } else {
-                o->setSelected(false);
-            }
-        }
+    if(QFile::exists(logoFile)) {
+        p.image(logoFile, Qt::AlignHCenter);
+        p.br();
     }
 
-    setButtonsState();
+    switch(mOrder.state) {
+    case ORDER_STATE_OPEN:
+    case ORDER_STATE_CLOSE:
+        p.ltext(tr("Receipt"));
+        break;
+
+    case ORDER_STATE_PREORDER:
+        p.ltext(tr("Preorder"));
+        break;
+
+    default:
+        p.ltext(QString::number(mOrder.state) + ": " + tr("Error in state"));
+        break;
+    }
+
+    p.rtext(mOrder.receiptNumber);
+    p.br();
+    QJsonObject jtax = mOrder.fiscal();
+
+    if(!jtax.isEmpty()) {
+        p.ltext(jtax["taxpayer"].toString(), 0);
+        p.br();
+        p.ltext(jtax["address"].toString(), 0);
+        p.br();
+        p.ltext(tr("TIN"), 0);
+        p.rtext(jtax["tin"].toString());
+        p.br();
+        p.ltext(tr("Device number"), 0);
+        p.rtext(jtax["crn"].toString());
+        p.br();
+        p.ltext(tr("Serial"), 0);
+        p.rtext(jtax["sn"].toString());
+        p.br();
+        p.ltext(tr("Fiscal"), 0);
+        p.rtext(jtax["fiscal"].toString());
+        p.br();
+        p.ltext(tr("Receipt number"), 0);
+        p.rtext(QString::number(jtax["rseq"].toInt()));
+        p.br();
+        p.ltext(tr("Date"), 0);
+        p.rtext(QDateTime::fromMSecsSinceEpoch(jtax["time"].toDouble()).toString(FORMAT_DATETIME_TO_STR));
+        p.br();
+        p.ltext(tr("(F)"), 0);
+        p.br();
+    }
+
+    p.br(1);
+    p.ltext(tr("Table"), 0);
+    p.rtext(QString("%1/%2").arg(mOrder.hallName, mOrder.tableName));
+    p.br();
+    p.ltext(tr("Staff"), 0);
+    p.rtext(currentStaff);
+    p.br();
+    p.br(2);
+    p.line(2);
+    p.br(2);
+    //p.setFontSize(bs - 4);
+    p.ltext(tr("Name"), 0);
+    p.ltext(tr("Qty"), 33);
+    p.ltext(tr("Price"), 41);
+    p.rtext(tr("Amount"));
+    p.br();
+    p.br(2);
+    p.line();
+    p.br(1);
+    bool noservice = false, nodiscount = false, complimentary = false;
+
+    for(int i = 0; i < mOrder.precheckDishes.size(); i++) {
+        p.setFontSize(bs - 2);
+        auto dish = mOrder.precheckDishes.at(i);
+
+        if(dish.state != DISH_STATE_OK) {
+            continue;
+        }
+
+        if(!dish.adgtCode().isEmpty()) {
+            p.ltext(QString("%1: %2").arg(tr("Class"), dish.adgtCode()), 0);
+            p.br();
+        }
+
+        QString name = dish.translated();
+
+        if(!dish.countService()) {
+            noservice = true;
+            name += "* ";
+        }
+
+        if(!dish.countDiscount()) {
+            nodiscount = true;
+            name += "** ";
+        }
+
+        if(dish.complimentary()) {
+            complimentary = true;
+            name += "*** ";
+        }
+
+        p.ltext(name, 0, 35);
+        p.ltext(float_str(dish.qty, 2), 33, 8);
+        p.ltext(float_str(dish.price, 2), 41, 12);
+        p.rtext(float_str(dish.total(mOrder.state == ORDER_STATE_PREORDER), 2));
+        p.br();
+        p.br(2);
+        p.line();
+        p.br(1);
+    }
+
+    p.setFontSize(bs  - 2);
+
+    if(noservice) {
+        p.ltext(QString("* - %1").arg(tr("No service")).toLower());
+        p.br();
+    }
+
+    if(nodiscount) {
+        p.ltext(QString("** - %1").arg(tr("No discount")).toLower());
+        p.br();
+    }
+
+    if(complimentary) {
+        p.ltext(QString("*** - %1").arg(tr("Complimentary")).toLower());
+        p.br();
+    }
+
+    p.setFontSize(bs + 2);
+    p.ltext(tr("Subtotal"), 0);
+    p.rtext(float_str(mOrder.subTotal(), 2));
+    p.br();
+
+    if(mOrder.serviceFactor() > 0) {
+        //p.ltext(QString("%1 %2%").arg(tr("Service")).arg(mOrder.serviceFactor() * 100), 0);
+        //p.rtext(float_str(mOrder.serviceAmount(), 2));
+        p.ltext(QString("%1").arg(tr("Service")));
+        p.rtext("+" + float_str(mOrder.serviceFactor() * 100, 2) + "%");
+        p.br();
+    }
+
+    if(mOrder.discountFactor() > 0) {
+        // p.ltext(QString("%1 %2%").arg(tr("Discount"), float_str(mOrder.discountFactor() * 100, 2)), 0);
+        // p.rtext(float_str(mOrder.discountAmount(), 2));
+        p.ltext(QString("%1").arg(tr("Discount")));
+        p.rtext("-" + float_str(mOrder.discountFactor() * 100, 2) + "%");
+        p.br();
+    }
+
+    if(mOrder.prepaidAmount() > 0) {
+        p.ltext(tr("Prepaid amount"), 0);
+        p.setFontSize(bs);
+        p.rtext(float_str(mOrder.prepaidAmount() * -1, 2));
+        p.br();
+    }
+
+    p.ltext(tr("Total due"));
+    p.rtext(float_str(mOrder.totalDue, 2));
+    p.br();
+    p.br();
+    auto printPaymentFunc = [this, &p](int id) {
+        if(mOrder.payment(payment_fields[id]) > 0) {
+            p.ltext(QCoreApplication::translate("PaymentType", payment_names[id]), 0);
+            p.rtext(float_str(mOrder.payment(payment_fields[id]), 2));
+            p.br();
+        }
+    };
+
+    for(auto pt : payment_types) {
+        printPaymentFunc(pt);
+    }
+
+    if(mOrder.amountPaid() - mOrder.totalDue > 0) {
+        p.br();
+        p.ltext(tr("Amount paid"), 0);
+        p.rtext(float_str(mOrder.amountPaid(), 2));
+        p.br();
+        p.ltext(tr("Change"), 0);
+        p.rtext(float_str(mOrder.amountPaid() - mOrder.totalDue, 2));
+        p.br();
+    }
+
+    p.br();
+    p.setFontSize(bs - 2);
+    p.ltext(tr("Thank you for visit!"), 0);
+    p.br();
+
+    if(mOrder.state == ORDER_STATE_OPEN || mOrder.state == ORDER_STATE_CLOSE) {
+        p.ltext(QString("%1: %2").arg(tr("Sample")).arg(mOrder.printCount()));
+    }
+
+    p.br();
+    p.ltext(tr("Printed"), 0);
+    p.rtext(QDateTime::currentDateTime().toString(FORMAT_DATETIME_TO_STR));
+    p.br();
+    p.print(printer);
 }
 
-void DlgOrder::handlePrintService(const QJsonObject & obj)
+void DlgOrder::printService(const QJsonObject &jdoc)
 {
-    fHttp->httpQueryFinished(sender());
-    // if(__c5config.getValue(param_waiter_closeorder_after_serviceprint).toInt() == 1) {
-    //     on_btnExit_clicked();
-    //     return;
-    // }
-    //TODO FUCK RELOAD ORDER AFTER PRINT
-    //load(worder()->fOrderDriver->headerValue("f_table").toInt());
+    QJsonObject printData = jdoc["print_data"].toObject();
+    QStringList jp = printData.keys();
+    QJsonObject jh = jdoc["header"].toObject();
+
+    if(jp.isEmpty()) {
+        return;
+    }
+
+    for(auto const &printerName : std::as_const(jp)) {
+        QJsonObject jo = printData[printerName].toObject();
+        QFont font(qApp->font());
+        const int bs = 12;
+        font.setPointSize(bs);
+        C5Printing p;
+        QPrinterInfo pi = QPrinterInfo::printerInfo(printerName);
+        QPrinter printer(pi);
+        printer.setPageSize(QPageSize::Custom);
+        printer.setFullPage(false);
+        QRectF pr = printer.pageRect(QPrinter::DevicePixel);
+        constexpr qreal SAFE_RIGHT_MM = 2.0;
+        qreal safePx = SAFE_RIGHT_MM * printer.logicalDpiX() / 25.4;
+        p.setSceneParams(pr.width() - safePx, pr.height(), printer.logicalDpiX());
+        p.setFont(font);
+        p.setFontBold(true);
+
+        if(jdoc["reprint"].toBool()) {
+            p.ctext(tr("REPRINT"));
+            p.br();
+            p.br();
+        }
+
+        p.ctext(tr("New order").toUpper());
+        p.br();
+        p.br();
+        p.setFontBold(false);
+        p.ltext(tr("Table"), 0);
+        p.rtext(jh["f_table_name"].toString());
+        p.br();
+        p.ltext(tr("Order no"), 0);
+        p.rtext(jh["f_prefix"].toString());
+        p.br();
+        p.ltext(tr("Date"), 0);
+        p.rtext(QDate::currentDate().toString(FORMAT_DATE_TO_STR));
+        p.br();
+        p.ltext(tr("Time"), 0);
+        p.rtext(QTime::currentTime().toString(FORMAT_TIME_TO_STR));
+        p.br();
+        p.ltext(tr("Staff"), 0);
+        p.rtext(mUser->shortFullName());
+        p.br(p.fLineHeight + 2);
+        p.line(0, p.fTop, p.fNormalWidth, p.fTop);
+        p.br(2);
+        QSet<QString> storages;
+
+        for(auto const &jdv : jo["dishes"].toArray()) {
+            p.setFontSize(bs + 2);
+            p.setFontBold(false);
+            QJsonObject jd = jdv.toObject();
+            p.ltext(QString("%1").arg(jd["f_dish_name"].toString()), 0, 650);
+            p.setFontBold(true);
+            p.rtext(QString("%1").arg(float_str(jd["f_qty"].toDouble(), 2)));
+
+            if(jd["f_comment"].toString().length() > 0) {
+                p.br();
+                p.setFontSize(bs - 4);
+                p.setFontBold(true);
+                p.ltext(jd["f_comment"].toString(), 0, 650);
+                p.br();
+                p.setFontSize(bs + 2);
+            }
+
+            p.br();
+            p.line(0, p.fTop, p.fNormalWidth, p.fTop);
+            p.br(1);
+        }
+
+        p.line(0, p.fTop, p.fNormalWidth, p.fTop);
+        p.br(1);
+        p.setFontSize(bs - 6);
+        p.ltext(QString("%1 %2").arg(tr("Printer: "), printerName));
+        p.setFontBold(true);
+        p.rtext(jo["side"].toString());
+        p.br();
+        QString final = "OK";
+
+        if(!p.print(printer)) {
+            final = "FAIL";
+        }
+    }
 }
+
+void DlgOrder::printRemovedDish(const QJsonObject &jdoc)
+{
+    auto printRemoved = [this, jdoc](const QString & printerName) {
+        if(printerName.isEmpty()) {
+            return;
+        }
+
+        int bs = 12;
+        QFont font(qApp->font());
+        font.setPointSize(bs);
+        C5Printing p;
+        QPrinterInfo pi = QPrinterInfo::printerInfo(printerName);
+        QPrinter printer(pi);
+        printer.setPageSize(QPageSize::Custom);
+        printer.setFullPage(false);
+        QRectF pr = printer.pageRect(QPrinter::DevicePixel);
+        constexpr qreal SAFE_RIGHT_MM = 2.0;
+        qreal safePx = SAFE_RIGHT_MM * printer.logicalDpiX() / 25.4;
+        p.setSceneParams(pr.width() - safePx, pr.height(), printer.logicalDpiX());
+        p.setFont(font);
+        p.setFontBold(true);
+        p.ctext(tr("REMOVED").toUpper());
+        p.br();
+        p.br();
+        p.setFontBold(false);
+        p.ltext(tr("Table"), 0);
+        p.rtext(mOrder.tableName);
+        p.br();
+        p.ltext(tr("Order no"), 0);
+        p.rtext(mOrder.receiptNumber);
+        p.br();
+        p.ltext(tr("Date"), 0);
+        p.rtext(QDate::currentDate().toString(FORMAT_DATE_TO_STR));
+        p.br();
+        p.ltext(tr("Time"), 0);
+        p.rtext(QTime::currentTime().toString(FORMAT_TIME_TO_STR));
+        p.br();
+        p.ltext(tr("Staff"), 0);
+        p.rtext(mUser->fullName());
+        p.br(p.fLineHeight + 2);
+        p.line(0, p.fTop, p.fNormalWidth, p.fTop);
+        p.br(2);
+        p.setFontSize(bs + 2);
+        p.ltext(QString("%1").arg(jdoc["f_removed_dish_name"].toString()), 0);
+        p.setFontBold(true);
+        p.rtext(QString("%1").arg(float_str(jdoc["f_removed_qty"].toDouble(), 2)));
+        p.setFontBold(false);
+
+        if(jdoc["f_removed_comment"].toString().length() > 0) {
+            p.br();
+            p.setFontSize(bs - 4);
+            p.setFontBold(true);
+            p.ltext(jdoc["f_removed_comment"].toString(), 0);
+            p.br();
+            p.setFontSize(bs);
+            p.setFontBold(false);
+        }
+
+        p.br();
+        p.line(0, p.fTop, p.fNormalWidth, p.fTop);
+        p.br(1);
+        p.line(0, p.fTop, p.fNormalWidth, p.fTop);
+        p.br(1);
+        p.setFontSize(bs - 6);
+        p.ltext(tr("Printer: ") + printerName, 0);
+        p.br();
+        QString final = "OK";
+
+        if(!p.print(printer)) {
+            final = "FAIL";
+        }
+    };
+    printRemoved(jdoc["print1"].toString());
+    printRemoved(jdoc["print2"].toString());
+}
+
+void DlgOrder::setDishQty(std::function<double(WaiterDish)> getQty)
+{
+    if(mOrder.isPrecheckPrinted()) {
+        C5Message::error(tr("Order is not editable"));
+        return;
+    }
+
+    int index = selectedWaiterDishIndex();
+
+    if(index < 0) {
+        return;
+    }
+
+    WaiterDish d = mOrder.dishes.at(index);
+
+    if(d.type != GOODS_TYPE_GOODS && d.type != GOODS_TYPE_MODIFICATOR) {
+        return;
+    }
+
+    if(d.state != DISH_STATE_OK) {
+        return;
+    }
+
+    if(d.isHourlyPayment()) {
+        C5Message::error(tr("Cannot add comment to hourly payment"));
+        return;
+    }
+
+    double qty = getQty(d);
+
+    if(qty <= 0.01) {
+        return;
+    }
+
+    if(d.isPrinted()) {
+        fHttp->createHttpQueryLambda("/engine/v2/waiter/order/add-dish", {
+            {"dish", d.dishId},
+            {"table", mTable.id},
+            {"qty", qty},
+            {"type", 1},
+            {"row", ((d.row / 100) + 1) * 100},
+            {"price", d.price},
+            {"store", d.store},
+            {"print1", d.printer1()},
+            {"print2", d.printer2()},
+            {"shift_rows", true}
+        },
+        [this, d](const QJsonObject  & jdoc) {
+            if(jdoc.contains("stoplist")) {
+                for(auto *jg : *mDishes) {
+                    if(jg->id == d.dishId) {
+                        jg->stoplist = jdoc["stoplist"].toDouble();
+                    }
+                }
+            }
+
+            parseOrder(jdoc);
+        }, [](const QJsonObject & jerr) {
+        });
+        return;
+    }
+
+    if(!d.emarks.isEmpty()) {
+        C5Message::error(tr("The quantity of dishes with remarks cannot be changed"));
+        return;
+    }
+
+    fHttp->createHttpQueryLambda("/engine/v2/waiter/order/set-dish-qty", {
+        {"id", d.id},
+        {"remove_emarks", false},
+        {"dish", d.dishId},
+        {"new_qty", qty},
+        {"new_state", d.state},
+        {"data", d.data},
+        {"order_id", mOrder.id},
+        {"restore_stoplist", -1}
+    },
+    [this](const QJsonObject & jdoc) {
+        parseOrder(jdoc);
+    }, [](const QJsonObject & jerr) {});
+}
+
+void DlgOrder::addDishToOrder(DishAItem *g, QDishButton *btn)
+{
+    if(g->emarkRequired) {
+        C5Message::error(tr("Append only by QR code"));
+        return;
+    }
+
+    if(fStoplistMode) {
+        int max = 999;
+
+        if(!DlgPassword::stopList(max)) {
+            return;
+        }
+
+        fHttp->createHttpQueryLambda("/engine/v2/waiter/stoplist/set", {{"qty", max}, {"dish", g->id}},
+        [g, max, btn](const QJsonObject  & jdoc) {
+            Q_UNUSED(jdoc);
+            g->stoplist = max;
+
+            if(btn) {
+                btn->update();
+            }
+        }, [](const QJsonObject & jerr) {
+        });
+    } else {
+        fHttp->createHttpQueryLambda("/engine/v2/waiter/order/add-dish", {
+            {"dish", g->id},
+            {"table", mTable.id},
+            {"qty", 1},
+            {"type", 1},
+            {"row", mOrder.dishes.count() * 100},
+            {"price", g->price},
+            {"count_service", g->countService()},
+            {"count_discount", g->countDiscount()},
+            {"store", g->store},
+            {"print1", g->print1},
+            {"print2", g->print2},
+            {"empty_order", mOrder.dishes.empty()},
+            {"service_factor", mHall.serviceFactor()}
+        },
+        [this, g, btn](const QJsonObject  & jdoc) {
+            if(jdoc.contains("stoplist")) {
+                for(auto *jg : *mDishes) {
+                    if(jg->id == g->id) {
+                        jg->stoplist = jdoc["stoplist"].toDouble();
+                    }
+                }
+            } else {
+                g->stoplist = -1;
+            }
+
+            if(btn) {
+                btn->update();
+            }
+
+            parseOrder(jdoc);
+        }, [](const QJsonObject & jerr) {
+        });
+    }
+}
+
+void DlgOrder::funcWithAuth(int permission, const QString &title, std::function<void (C5User*)> function)
+{
+    if(mUser->check(permission)) {
+        function(mUser);
+    } else {
+        QString pin;
+
+        if(!DlgPassword::getPasswordString(title, pin)) {
+            return;
+        }
+
+        auto *user = new C5User();
+        user->authorize(pin, fHttp, [user, function, permission](const QJsonObject & jdoc) {
+            if(user->check(permission)) {
+                function(user);
+            } else {
+                C5Message::error(tr("Permission denied"));
+            }
+
+            user->deleteLater();
+        }, [user]() {
+            user->deleteLater();
+        });
+    }
+}
+
+void DlgOrder::timeout()
+{
+    ui->lbTime->setText(QTime::currentTime().toString(FORMAT_TIME_TO_SHORT_STR));
+    fTimerCounter++;
+}
+
 void DlgOrder::handleStopList(const QJsonObject & obj)
 {
-    C5TableData::instance()->setStopList(obj["stoplist"].toArray());
-
+    //todo
+    //C5TableData::instance()->setStopList(obj["stoplist"].toArray());
     for(QObject *o : ui->wdishes->children()) {
         QWidget *w = dynamic_cast<QWidget*>(o);
 
@@ -645,44 +1039,23 @@ void DlgOrder::handleStopList(const QJsonObject & obj)
 
     fHttp->httpQueryFinished(sender());
 }
+
 void DlgOrder::restoreStoplistQtyResponse(const QJsonObject & jdoc)
 {
+    //todo
     if(jdoc["ok"].toBool()) {
-        C5TableData::instance()->mStopList[jdoc["f_dish"].toInt()] = jdoc["f_qty"].toDouble();
+        //   C5TableData::instance()->mStopList[jdoc["f_dish"].toInt()] = jdoc["f_qty"].toDouble();
     } else {
-        C5TableData::instance()->mStopList.remove(jdoc["f_dish"].toInt());
+        //C5TableData::instance()->mStopList.remove(jdoc["f_dish"].toInt());
     }
 
     fHttp->httpQueryFinished(sender());
 }
+
 void DlgOrder::addStopListResponse(const QJsonObject & jdoc)
 {
-    C5TableData::instance()->mStopList[jdoc["f_dish"].toInt()] = jdoc["f_qty"].toDouble();
+    // C5TableData::instance()->mStopList[jdoc["f_dish"].toInt()] = jdoc["f_qty"].toDouble();
     fHttp->httpQueryFinished(sender());
-}
-void DlgOrder::checkStopListResponse(const QJsonObject & jdoc)
-{
-    if(jdoc["ok"].toBool()) {
-        addDishToOrder(jdoc["f_menu"].toInt(), jdoc["emark"].toString());
-        fHttp->httpQueryFinished(sender());
-        return;
-    }
-
-    C5TableData::instance()->mStopList[jdoc["f_dish"].toInt()] = jdoc["f_newqty"].toDouble();
-    addDishToOrder(jdoc["f_menu"].toInt(), "");
-    fHttp->httpQueryFinished(sender());
-}
-void DlgOrder::handleError(int err, const QString & msg)
-{
-    Q_UNUSED(err);
-    sender()->deleteLater();
-    C5Message::error(msg);
-}
-void DlgOrder::dishpart1Clicked()
-{
-    fPart2Parent = 0;
-    QPushButton *btn = static_cast<QPushButton*>(sender());
-    buildMenu(fMenuID, btn->property("id").toInt(), 0);
 }
 
 void DlgOrder::qrListResponse(const QJsonObject & obj)
@@ -700,206 +1073,235 @@ void DlgOrder::qrListResponse(const QJsonObject & obj)
     if(index > -1) {
         //TODO: CHECK
         //wo->fOrderDriver->setDishesValue("f_emarks", obj["emarks"].toString(), index);
-        updateData();
+        //updateData();
     }
 
     fHttp->httpQueryFinished(sender());
 }
 
-void DlgOrder::dishPart2Clicked()
-{
-    QDishPart2Button *btn = static_cast<QDishPart2Button*>(sender());
-    int part2 = btn->property("id").toInt();
-    QString children = btn->property("children").toString();
-    Q_ASSERT(part2 > 0);
-
-    if(!children.isEmpty()) {
-        fPart2Parent = part2;
-    }
-
-    buildMenu(fMenuID, fPart1, part2);
-}
-
-void DlgOrder::dishClicked()
-{
-    QDishButton *btn = static_cast<QDishButton*>(sender());
-    //TODO:
-    // if(fHeader["f_precheck"].toInt() > 0) {
-    //     C5Message::error(tr("Cannot add new dish if precheck was printed"));
-    //     return;
-    // }
-    // int menuid = btn->property("id").toInt();
-    // int dishid = dbmenu->dishid(menuid);
-    // if(fStoplistMode) {
-    //     if(dbdish->isExtra(dishid)) {
-    //         C5Message::error(tr("Cannot add special dish to stoplist"));
-    //         return;
-    //     }
-    //     double max = 999;
-    //     if(!DlgPassword::getAmount(dbdish->name(dishid), max, false)) {
-    //         return;
-    //     }
-    //     fHttp->createHttpQuery("/engine/waiter/stoplist.php",
-    //     QJsonObject{{"action", "add"}, {"f_dish", dishid}, {"f_qty", max}},
-    //     SLOT(addStopListResponse(QJsonObject)));
-    // } else {
-    //     if(dbdish->get(dishid, "f_addbyqr").toInt() > 0) {
-    //         C5Message::error(tr("Add only with QR code"));
-    //         return;
-    //     }
-    //     double price = 0;
-    //     if(dbdish->isExtra(dishid)) {
-    //         if(!DlgPassword::getAmount(tr("Extra price"), price)) {
-    //             return;
-    //         }
-    //         if(price < 0.01) {
-    //             C5Message::error(tr("Extra price is not defined"));
-    //             return;
-    //         }
-    //     } else {
-    //         price = dbmenu->price(menuid);
-    //     }
-    //     QString special, emarks;
-    //     if(!DlgListDishSpecial::getSpecial(dishid, special)) {
-    //         return;
-    //     }
-    //     double qty = 1;
-    //     if(__c5config.getValue(param_rest_qty_before_add_dish).toInt() == 1 && emarks.isEmpty()) {
-    //         if(!dbdish->isHourlyPayment(dishid)) {
-    //             double max = 999;
-    //             if(!DlgQty::getQty(max, dbdish->name(dishid))) {
-    //                 return;
-    //             }
-    //             qty = max;
-    //         }
-    //     }
-    //     fHttp->createHttpQueryLambda("/engine/v2/waiter/order/adddish",
-    //     QJsonObject{{"action", "check"},
-    //         {"f_header", fHeader["f_id"].toString()},
-    //         {"f_dish_menu_id", menuid},
-    //         {"f_dish", dishid},
-    //         {"f_row", 1},
-    //         {"f_guest", 1},
-    //         {"f_current_staff", __user->id()},
-    //         {"emark", emarks},
-    //         {"f_qty", qty}}, [](const QJsonObject & jdoc) {
-    //     },
-    //     [](const QJsonObject & err) {
-    //     });
-    //     //  checkStopListResponse(QJsonObject{});
-    //     return;
-    // }
-}
-
-void DlgOrder::dishPartClicked()
-{
-    QPushButton *btn = static_cast<QPushButton*>(sender());
-    int id = btn->property("id").toInt();
-    buildMenu(fMenuID, fPart1, id);
-}
-
 void DlgOrder::on_btnExit_clicked()
 {
-    fHttp->createHttpQueryLambda("/engine/picasso.waiter/",
-    QJsonObject{
-        {"class", "waiter"},
-        {"method", "closetable"},
-        {"f_table", fHeader["f_table"].toInt()},
-        {"f_id", fHeader["f_id"].toString()},
-        {"f_current_staff", mUser->id()},
-        {"f_current_staff_name", mUser->fullName()},
-        {"f_locksrc", hostinfo}},
-    [this](const QJsonObject & jdoc) {
-        Q_UNUSED(jdoc);
-        accept();
-        emit(allDone());
-    }, [this](const QJsonObject & je) {
-        accept();
-        emit(allDone());
-        Q_UNUSED(je);
-    }
-                                );
+    accept();
 }
+
 void DlgOrder::on_btnVoid_clicked()
 {
-    C5User *tmp = mUser;
-    int index = -1;
-
-    for(int i = 0; i < ui->vlDishes->count(); i++) {
-        auto dw = dynamic_cast<DishItem*>(ui->vlDishes->itemAt(i)->widget());
-
-        if(!dw)  {
-            continue;
-        }
-
-        if(dw->isFocused()) {
-            index = i;
-            break;
-        }
-    }
+    int index = selectedWaiterDishIndex();
 
     if(index < 0) {
         return;
     }
 
-    //TODO: DELETE *TMP
-    //TODO: OPTIMIZE THIS SAVES
-}
-void DlgOrder::on_btnComment_clicked()
-{
-    //  int index = 0;
-    //  //TODO: FIX MIGRATION
-    //  // if(!wo->currentRow(index)) {
-    //  //     return;
-    //  // }
-    //  if(wo->fOrderDriver->dishesValue("f_state", index).toInt() != DISH_STATE_OK) {
-    //      return;
-    //  }
-    //  if(dbdish->isHourlyPayment(wo->fOrderDriver->dishesValue("f_dish", index).toInt())) {
-    //      C5Message::error(tr("Cannot add comment to hourly payment"));
-    //      return;
-    //  }
-    //  if(wo->fOrderDriver->dishesValue("f_qty2", index).toDouble() > 0.001) {
-    //      C5Message::error(tr("Cannot add comment to dish that already printed"));
-    //      return;
-    //  }
-    //  QString comment = wo->fOrderDriver->dishesValue("f_comment", index).toString();
-    //  if(!DlgListOfDishComments::getComment(dbdish->name(wo->fOrderDriver->dishesValue("f_dish", index).toInt()), comment)) {
-    //      return;
-    //  }
-    //  wo->fOrderDriver->setDishesValue("f_comment", comment, index);
-    //  wo->updateItem(index);
-    //  logRecord(mUser->fullName(), wo->fOrderDriver->headerValue("f_id").toString(),
-    //            wo->fOrderDriver->dishesValue("f_id", index).toString(),
-    //            "Comment for dish",
-    //            dbdish->name(wo->fOrderDriver->dishesValue("f_dish", index).toInt()), comment);
-}
-void DlgOrder::on_btnChangeMenu_clicked()
-{
-    C5User *tmp = mUser;
+    WaiterDish d = mOrder.dishes.at(index);
 
-    if(!tmp->check(cp_t5_change_menu)) {
-        if(!DlgPassword::getUserAndCheck(tr("Change menu"), tmp, cp_t5_change_menu)) {
-            return;
-        }
-    }
-
-    int menuid;
-
-    if(!DlgListOfMenu::getMenuId(menuid)) {
+    if(d.type != GOODS_TYPE_GOODS && d.type != GOODS_TYPE_MODIFICATOR) {
         return;
     }
 
-    fMenuID = menuid;
-    buildMenu(menuid, 0, 0);
+    if(d.state != DISH_STATE_OK) {
+        return;
+    }
+
+    if(d.isHourlyPayment()) {
+        C5Message::error(tr("Cannot add comment to hourly payment"));
+        return;
+    }
+
+    if(C5Message::question(tr("Do you want to remove this item")) != QDialog::Accepted) {
+        return;
+    }
+
+    if(d.isPrinted()) {
+        QString reason;
+
+        if(!DlgListOfDishComments::getText(tr("Reason of remove"), "/engine/v2/waiter/menu/get-remove-reason", reason)) {
+            return;
+        }
+
+        QStringList titles = {tr("Mistake"), tr("With store output"), tr("Cancel")};
+        QList<int> values = {DISH_STATE_MISTAKE, DISH_STATE_VOID, 0};
+        DlgSimleOptions dso(titles, values);
+        int result = dso.exec();
+
+        if(result == 0) {
+            return;
+        }
+
+        QPointer<DlgOrder> self(this);
+        auto removePrintedServiceFunc = [self, d, result, reason](const QString & bearer) {
+            NInterface::query("/engine/v2/waiter/order/set-dish-qty", bearer, self, {
+                {"id", d.id},
+                {"order_id", self->mOrder.id},
+                {"dish", d.dishId},
+                {"new_state", result},
+                {"data", d.data},
+                {"new_qty", d.qty},
+                {"restore_stoplist", d.qty},
+                {"remove_reason", reason}
+            },
+            [self](const QJsonObject & jdoc) {
+                self->printRemovedDish(jdoc);
+                self->parseOrder(jdoc);
+            }, [](const QJsonObject & jerr) {
+                return false;
+            });
+        };
+
+        if(mUser->check(cp_t5_remove_printed_service)) {
+            removePrintedServiceFunc(mUser->mSessionKey);
+            return;
+        } else {
+            QString pin;
+
+            if(!DlgPassword::getPasswordString(tr("Remove printed dish"), pin)) {
+                return;
+            }
+
+            auto *user = new C5User();
+            user->authorize(pin, self->fHttp, [self, removePrintedServiceFunc, user](const QJsonObject & jdoc) {
+                if(user->check(cp_t5_remove_printed_service)) {
+                    removePrintedServiceFunc(user->mSessionKey);
+                } else {
+                    C5Message::error(tr("Permission denied"));
+                }
+
+                user->deleteLater();
+            }, [user]() {
+                user->deleteLater();
+            });
+            return;
+        }
+    } else {
+        d.state = 0;
+        fHttp->createHttpQueryLambda("/engine/v2/waiter/order/set-dish-qty", {
+            {"id", d.id},
+            {"remove_emarks", !d.emarks.isEmpty()},
+            {"dish", d.dishId},
+            {"new_qty", 0},
+            {"new_state", d.state},
+            {"data", d.data},
+            {"order_id", mOrder.id},
+            {"restore_stoplist", d.qty}
+        },
+        [this](const QJsonObject & jdoc) {
+            parseOrder(jdoc);
+        }, [](const QJsonObject & jerr) {});
+    }
 }
+
+void DlgOrder::on_btnComment_clicked()
+{
+    int index = selectedWaiterDishIndex();
+
+    if(index < 0) {
+        return;
+    }
+
+    WaiterDish d = mOrder.dishes.at(index);
+
+    if(d.type != GOODS_TYPE_GOODS) {
+        return;
+    }
+
+    if(d.state != DISH_STATE_OK) {
+        return;
+    }
+
+    if(d.isHourlyPayment()) {
+        C5Message::error(tr("Adding comments to hourly payments is not allowed"));
+        return;
+    }
+
+    if(d.isPrinted()) {
+        C5Message::error(tr("Cannot add modifiers or comments to printed dishes"));
+        return;
+    }
+
+    QStringList titles = {
+        tr("Comment"),
+        tr("Modificator"),
+        tr("Cancel")
+    };
+    QList<int> values = {
+        1, 2, 0
+    };
+    DlgSimleOptions dso(titles, values);
+    int result = dso.exec();
+
+    switch(result) {
+    case 1: {
+        QString comment = d.comment();
+        QPointer<DlgOrder> self(this);
+
+        if(DlgListOfDishComments::getComment(d.dishName, comment)) {
+            NInterface::query("/engine/v2/waiter/order/set-dish-comment", self->mUser->mSessionKey, self, {
+                {"id", d.id},
+                {"comment", comment}
+            },
+            [self](const QJsonObject & jdoc) {
+                self->parseOrder(jdoc);
+            }, [](const QJsonObject & jerr) { return false;});
+        }
+    }
+    break;
+
+    case 2:
+        break;
+
+    default:
+        return;
+    }
+}
+
+void DlgOrder::on_btnChangeMenu_clicked()
+{
+    QPointer<DlgOrder> self(this);
+    NInterface::query("/engine/v2/waiter/menu/get-menu-names", self->mUser->mSessionKey, self,
+                      {},
+    [self](const QJsonObject & jdoc) {
+        QStringList names;
+        QList<int> values;
+
+        for(int i = 0; i < jdoc["names"].toArray().size(); i++) {
+            const QJsonObject &jo = jdoc["names"].toArray().at(i).toObject();
+            names.append(jo["f_name"].toString());
+            values.append(jo["f_id"].toInt());
+        }
+
+        names.append(tr("Cancel"));
+        values.append(0);
+        QTimer::singleShot(0, [names, values, self]() {
+            DlgSimleOptions d(names, values);
+            int result = d.exec();
+
+            if(result == 0) {
+                return;
+            }
+
+            self->fMenuID = result;
+            self->makeDishes(0, 0);
+        });
+    }, [](const QJsonObject & jerr) {
+        return false;
+    });
+}
+
 void DlgOrder::on_btnSearchInMenu_clicked()
 {
-    DlgSearchInMenu *d = new DlgSearchInMenu();
+    auto *d = new DlgSearchInMenu(mDishes, fMenuID, mUser);
     connect(d, SIGNAL(dish(int, QString)), this, SLOT(processMenuID(int, QString)));
-    d->exec();
+
+    if(d->exec() == QDialog::Accepted) {
+        auto *dish = d->mDish;
+
+        if(dish) {
+            addDishToOrder(dish, nullptr);
+        }
+    }
+
     delete d;
 }
+
 void DlgOrder::on_btnPackage_clicked()
 {
     // int id;
@@ -922,47 +1324,13 @@ void DlgOrder::on_btnPackage_clicked()
     // //TODO MIX FIX
     // updateData();
 }
+
 void DlgOrder::on_btnPrintService_clicked()
 {
-    // QList<WOrder*> orders = worders();
-    // for(WOrder *o : orders) {
-    //     for(int i = 0; i < o->fOrderDriver->dishesCount(); i++) {
-    //         if(o->fOrderDriver->dishesValue("f_qty2", i).toDouble() < 0.001) {
-    //             o->fOrderDriver->setDishesValue("f_printtime", QDateTime::currentDateTime(), i);
-    //         }
-    //     }
-    //     if(!o->fOrderDriver->save()) {
-    //         C5Message::error(worder()->fOrderDriver->error());
-    //         return;
-    //     }
-    //     ui->btnPrintService->setEnabled(false);
-    //     fHttp->createHttpQueryLambda("/engine/waiter/printservice.php", {
-    //         {"order", o->fOrderDriver->currentOrderId()},
-    //         {"alias", __c5config.getValue(param_force_use_print_alias).toInt()},
-    //         {"timeorder", __c5config.getValue(param_print_dish_timeorder).toInt()},
-    //         {"isBooking", false}
-    //     }, [this](const QJsonObject & jo) {
-    //         for(int i = 0; i  < jo["print"].toArray().size(); i++) {
-    //             auto np = new NDataProvider(this);
-    //             np->overwriteHost("http", "127.0.0.1", 8080);
-    //             connect(np, &NDataProvider::done, this, [this](const QJsonObject & jjo) {
-    //                 if(__c5config.getValue(param_waiter_closeorder_after_serviceprint).toInt() == 1) {
-    //                     on_btnExit_clicked();
-    //                     return;
-    //                 }
-    //                 //TODO FUCK
-    //                 //load(worder()->fOrderDriver->headerValue("f_table").toInt());
-    //             });
-    //             connect(np, &NDataProvider::error, this, [this](const QString & err) {
-    //                 ui->btnPrintService->setEnabled(true);
-    //             });
-    //             QJsonObject jp = jo["print"].toArray().at(i).toObject();
-    //             np->getData("/printservice", jp);
-    //         }
-    //     }, [this](const QJsonObject & je) {
-    //         ui->btnPrintService->setEnabled(true);
-    //     });
-    // }
+    fHttp->createHttpQueryLambda("/engine/v2/waiter/order/print-service-check", {{"header_id", mOrder.id}}, [this](const QJsonObject & jdoc) {
+        parseOrder(jdoc);
+        printService(jdoc);
+    }, [](const QJsonObject & jerr) {});
 }
 
 void DlgOrder::on_btnSit_clicked()
@@ -970,47 +1338,6 @@ void DlgOrder::on_btnSit_clicked()
     //TODO: CHECK
     // DlgGuests(worder()->fOrderDriver).exec();
     // itemsToTable();
-}
-
-void DlgOrder::on_btnMovement_clicked()
-{
-    C5User *tmp = mUser;
-
-    if(!tmp->check(cp_t5_movetable)) {
-        if(!DlgPassword::getUserAndCheck(tr("Move items"), tmp, cp_t5_movetable)) {
-            return;
-        }
-    }
-
-    DlgSplitOrder d(tmp);
-    d.configOrder(fTable);
-    d.exec();
-    //TODO FUCK
-    //load(fTable);
-}
-
-void DlgOrder::on_btnRecent_clicked()
-{
-    if(fMenuID == 0) {
-        return;
-    }
-
-    while(ui->grDish->itemAt(0)) {
-        ui->grDish->itemAt(0)->widget()->deleteLater();
-        ui->grDish->removeItem(ui->grDish->itemAt(0));
-    }
-
-    QRect scr = qApp->screens().at(0)->geometry();
-    int dcolCount = scr.width() > 1024 ? 3 : 2;
-    int dcol = 0;
-    int drow = 0;
-    // for (DPart1 p1 : menu5->fMenuList.data[fMenuID]) {
-    //     QList<DPart2> dpart2 = p1.data;
-    //     for (const DPart2 &d2 : dpart2) {
-    //         fetchDishes(d2, true, dcolCount, dcol, drow);
-    //     }
-    // }
-    ui->grDish->setRowStretch(drow + 1, 1);
 }
 
 void DlgOrder::on_btnChangeStaff_clicked()
@@ -1047,16 +1374,6 @@ void DlgOrder::on_btnChangeStaff_clicked()
     // }
     // wo->fOrderDriver->setHeader("f_staff", u.id());
     // ui->btnChangeStaff->setText(QString("%1\n%2").arg(tr("Staff")).arg(u.fullName()));
-}
-
-void DlgOrder::on_btnScrollUp_clicked()
-{
-    ui->scrollArea->verticalScrollBar()->setValue(ui->scrollArea->verticalScrollBar()->value() + 300);
-}
-
-void DlgOrder::on_btnScrollDown_clicked()
-{
-    ui->scrollArea->verticalScrollBar()->setValue(ui->scrollArea->verticalScrollBar()->value() - 300);
 }
 
 void DlgOrder::on_btnDiscount_clicked()
@@ -1100,6 +1417,118 @@ void DlgOrder::on_btnDiscount_clicked()
 
 void DlgOrder::on_btnTotal_clicked()
 {
+    QString err;
+
+    if(!mOrder.isReadyForPrecheck()) {
+        C5Message::error(tr("Order not ready for precheck") + "<br>" + err);
+        return;
+    }
+
+    QPointer<DlgOrder> self(this);
+    auto repeatPrecheckFunc = [self](const QString & bearer, const QString & currentUserName) {
+        if(!self) {
+            return;
+        }
+
+        self->fHttp->query("/engine/v2/waiter/order/print-precheck",
+                           bearer, self,
+        {{"id", self->mOrder.id}},
+        [self, currentUserName](const QJsonObject & jdoc) {
+            self->parseOrder(jdoc);
+            self->printPrecheck(currentUserName);
+        }, [](const QJsonObject & jerr) {
+            Q_UNUSED(jerr);
+            return false;
+        });
+    };
+
+    if(mOrder.isPrecheckPrinted()) {
+        int o = DlgPrecheckOptions::precheck(mUser);
+
+        switch(o) {
+        case PRECHECK_CANCEL: {
+            auto cancelPrecheckFunc = [self](const QString & bearer) {
+                if(!self) {
+                    return;
+                }
+
+                if(C5Message::question(QObject::tr("Confirm to cancel bill")) != QDialog::Accepted) {
+                    return;
+                }
+
+                self->fHttp->query("/engine/v2/waiter/order/cancel-precheck",
+                                   bearer, self,
+                {{"id", self->mOrder.id}},
+                [self](const QJsonObject & jdoc) {
+                    self->parseOrder(jdoc);
+                }, [](const QJsonObject & jerr) {
+                    Q_UNUSED(jerr);
+                    return false;
+                });
+            };
+
+            if(mUser->check(cp_t5_cancel_precheck)) {
+                cancelPrecheckFunc(mUser->mSessionKey);
+            } else {
+                QString pin;
+
+                if(!DlgPassword::getPassword(tr("Cancel precheck"), pin)) {
+                    return;
+                }
+
+                auto *user = new C5User();
+                user->authorize(pin, fHttp, [cancelPrecheckFunc, user, self](const QJsonObject & jdoc) {
+                    Q_UNUSED(jdoc);
+
+                    if(user->check(cp_t5_cancel_precheck)) {
+                        cancelPrecheckFunc(user->mSessionKey);
+                    } else {
+                        if(self) {
+                            C5Message::error(QObject::tr("Permission denied"));
+                        }
+                    }
+
+                    user->deleteLater();
+                }, [user]() {
+                    user->deleteLater();
+                });
+            }
+
+            break;
+        }
+
+        case PRECHECK_REPEAT:
+            if(mUser->check(cp_t5_repeat_precheck)) {
+                repeatPrecheckFunc(mUser->mSessionKey, mUser->shortFullName());
+            } else {
+                QString pin;
+
+                if(!DlgPassword::getPassword(tr("Repeat precheck"), pin)) {
+                    return;
+                }
+
+                auto *user = new C5User();
+                user->authorize(pin, fHttp, [repeatPrecheckFunc, user, self](const QJsonObject & jdoc) {
+                    Q_UNUSED(jdoc);
+
+                    if(user->check(cp_t5_cancel_precheck)) {
+                        repeatPrecheckFunc(user->mSessionKey, user->shortFullName());
+                    } else {
+                        if(self) {
+                            C5Message::error(QObject::tr("Permission denied"));
+                        }
+                    }
+
+                    user->deleteLater();
+                }, [user]() {
+                    user->deleteLater();
+                });
+            }
+        }
+    } else {
+        repeatPrecheckFunc(mUser->mSessionKey, mUser->shortFullName());
+    }
+
     // if(wo->fOrderDriver->headerValue("f_precheck").toInt() < 1) {
     //     auto *tmp = mUser;
     //     if(!tmp->check(cp_t5_print_precheck)) {
@@ -1157,74 +1586,19 @@ void DlgOrder::on_btnTotal_clicked()
     //         delete tmp;
     //     }
     // } else {
-    //     int o = DlgPrecheckOptions::precheck();
-    //     C5User *tmp = mUser;
-    //     switch(o) {
-    //     case PRECHECK_CANCEL: {
-    //         if(!tmp->check(cp_t5_cancel_precheck)) {
-    //             if(!DlgPassword::getUserAndCheck(tr("Cancel precheck"), tmp, cp_t5_cancel_precheck)) {
-    //                 return;
-    //             }
-    //         }
-    //         if(C5Message::question(tr("Confirm to cancel bill")) != QDialog::Accepted) {
-    //             return;
-    //         }
-    //         C5Database db;
-    //         db[":f_id"] = wo->fOrderDriver->currentOrderId();
-    //         db[":f_precheck"] = abs(wo->fOrderDriver->headerValue("f_precheck").toInt()) * -1;
-    //         db.exec("update o_header set f_precheck=:f_precheck where f_id=:f_id");
-    //         //TODO FUCK
-    //         //load(fTable);
-    //         break;
-    //     }
-    //     case PRECHECK_REPEAT:
-    //         if(!tmp->check(cp_t5_repeat_precheck)) {
-    //             if(!DlgPassword::getUserAndCheck(tr("Repeat precheck"), tmp, cp_t5_print_precheck)) {
-    //                 return;
-    //             }
-    //         }
-    //         //TODO: CHECK L15
-    //         fHttp->createHttpQueryLambda("/engine/waiter/printreceipt.php", {
-    //             {"station", hostinfo},
-    //             {"printer", C5Config::localReceiptPrinter()},
-    //             {"order", worder()->fOrderDriver->currentOrderId()},
-    //             {"language", C5Config::getRegValue("receipt_language").toInt()},
-    //             {"receipt_printer", C5Config::fSettingsName},
-    //             {"repeath_precheck", true}
-    //         }, [this](const QJsonObject & jo) {
-    //             auto np = new NDataProvider(this);
-    //             np->overwriteHost("http", "127.0.0.1", 8080);
-    //             connect(np, &NDataProvider::done, this, [](const QJsonObject & jjo) {
-    //             });
-    //             connect(np, &NDataProvider::error, this, [](const QString & err) {
-    //             });
-    //             np->getData("/printjson", jo);
-    //         }, [](const QJsonObject & je) {
-    //             Q_UNUSED(je);
-    //         });
-    //         break;
-    //     }
-    //     if(tmp != mUser) {
-    //         delete tmp;
-    //     }
+    //
     // }
 }
 
 void DlgOrder::on_btnReceiptLanguage_clicked()
 {
-    int r = DlgReceiptLanguage::receipLanguage();
+    int r = DlgReceiptLanguage::receipLanguage(mUser);
 
     if(r > -1) {
         ui->btnReceiptLanguage->setProperty("receipt_language", r);
         setLangIcon();
     }
 }
-
-void DlgOrder::on_btnCalcCash_clicked()
-{
-    calcAmount(ui->leCash);
-}
-
 void DlgOrder::setLangIcon()
 {
     switch(ui->btnReceiptLanguage->property("receipt_language").toInt()) {
@@ -1245,7 +1619,6 @@ void DlgOrder::setLangIcon()
         break;
     }
 }
-
 void DlgOrder::calcAmount(C5LineEdit * l)
 {
     //TODO: CHECK L15
@@ -1257,7 +1630,6 @@ void DlgOrder::calcAmount(C5LineEdit * l)
     // l->setDouble(max);
     // lineEditToHeader();
 }
-
 void DlgOrder::lineEditToHeader()
 {
     //TODO: CHECK L15
@@ -1277,7 +1649,6 @@ void DlgOrder::lineEditToHeader()
     //                         - ui->leIDRAM->getDouble()
     //                         - ui->lePayX->getDouble());
 }
-
 void DlgOrder::headerToLineEdit()
 {
     //TODO: CHECK
@@ -1333,7 +1704,6 @@ void DlgOrder::headerToLineEdit()
     //     ui->leChange->setDouble(wo->fOrderDriver->headerValue("f_change").toDouble());
     // }
 }
-
 void DlgOrder::clearOther()
 {
     //TODO: CHECK
@@ -1343,7 +1713,6 @@ void DlgOrder::clearOther()
     // ui->leRoomComment->setVisible(false);
     // ui->lbRoom->setVisible(false);
 }
-
 void DlgOrder::setCLComment()
 {
     //TODO: CHECK
@@ -1364,7 +1733,6 @@ void DlgOrder::setComplimentary()
     //     ui->lbRoom->setVisible(true);
     // }
 }
-
 void DlgOrder::setRoomComment()
 {
     //TODO: CHECK
@@ -1378,7 +1746,6 @@ void DlgOrder::setRoomComment()
     //     }
     // }
 }
-
 void DlgOrder::setSelfcost()
 {
     //TODO: CHECK
@@ -1388,7 +1755,6 @@ void DlgOrder::setSelfcost()
     //     ui->leRoomComment->setText(tr("Prime cost"));
     // }
 }
-
 void DlgOrder::setDiscountComment()
 {
 //TODO: CHECK
@@ -1405,56 +1771,6 @@ void DlgOrder::setDiscountComment()
     //                                       .arg(fOrder->hString("f_bonusholder")));
     //    }
 }
-
-bool DlgOrder::worderPaymentOK()
-{
-    //TODO: CHECK
-    // if(ui->leCash->getDouble()
-    //         + ui->leCard->getDouble()
-    //         + ui->leBank->getDouble()
-    //         + ui->lePrepaid->getDouble()
-    //         + ui->leOther->getDouble() < worder()->fOrderDriver->headerValue("f_amounttotal").toDouble()) {
-    //     return false;
-    // }
-    return true;
-}
-
-bool DlgOrder::buildDishes(int menuid, int part2)
-{
-    while(ui->grDish->itemAt(0)) {
-        ui->grDish->itemAt(0)->widget()->deleteLater();
-        ui->grDish->removeItem(ui->grDish->itemAt(0));
-    }
-
-    QRect scr = qApp->screens().at(0)->geometry();
-    int dcolCount = scr.width() > 1024 ? 3 : 2;
-    int dcol = 0;
-    int drow = 0;
-    QJsonArray jmenu = C5TableData::instance()->dishes(menuid, part2);
-
-    for(int i = 0; i < jmenu.size(); i++) {
-        const QJsonObject &j = jmenu.at(i).toObject();
-        int w = (ui->wdishes->width() - 10)  / (scr.width() > 1024 ? 3 : 2);
-        QDishButton *btn = new QDishButton(w);
-        btn->setProperty("id", j["f_id"].toInt());
-        btn->setProperty("price", j["f_price"].toDouble());
-        btn->setProperty("name", j["f_name"].toString());
-        btn->setProperty("color", j["f_color"].toInt());
-        btn->setProperty("emarkrequired", j["f_addbyqr"].toInt() > 0);
-        connect(btn, &QDishButton::clicked, this, &DlgOrder::dishClicked);
-        ui->grDish->addWidget(btn, drow, dcol++, 1, 1);
-
-        if(dcol == dcolCount) {
-            dcol = 0;
-            drow ++;
-        }
-
-        ui->grDish->setRowStretch(drow + 1, 1);
-    }
-
-    return true;
-}
-
 void DlgOrder::discountOrder(C5User * u, const QString & code)
 {
     // C5Database db;
@@ -1496,23 +1812,294 @@ void DlgOrder::discountOrder(C5User * u, const QString & code)
     //     return;
     // }
 }
+
+void DlgOrder::createPaymentButtons()
+{
+    int row = 0, col = 0;
+    QPointer<DlgOrder> self(this);
+
+    for(auto pt : std::as_const(payment_types)) {
+        auto *btn = new QToolButton(this);
+        btn->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+        btn->setMinimumHeight(50);
+        btn->setText(QCoreApplication::translate("PaymentType", payment_names[pt]));
+        connect(btn, &QToolButton::clicked, this, [self, pt]() {
+            if(self->ui->lbAmount->property("amount").toDouble() < 0.01) {
+                return;
+            }
+
+            NInterface::query("/engine/v2/waiter/order/set_amount", self->mUser->mSessionKey, self, {
+                {"id", self->mOrder.id},
+                {"payment_field", payment_fields[pt]},
+                {"amount", self->ui->lbAmount->property("amount").toDouble()}
+            },
+            [self](const QJsonObject & jdoc) {
+                if(!self) {
+                    return;
+                }
+
+                self->on_btnNumClear_clicked();
+                self->parseOrder(jdoc);
+            }, [](const QJsonObject & jerr) {return false;});
+        });
+        ui->glPaymentType->addWidget(btn, row, col);
+        col++;
+
+        if(col == 2) {
+            col = 0;
+            row++;
+        }
+    }
+
+    ui->glPaymentType->setRowStretch(row + 1, 1);
+}
+
+void DlgOrder::configBtnNum()
+{
+    QVector<QToolButton*> buttons = {
+        ui->btnNum0,
+        ui->btnNum1,
+        ui->btnNum2,
+        ui->btnNum3,
+        ui->btnNum4,
+        ui->btnNum5,
+        ui->btnNum6,
+        ui->btnNum7,
+        ui->btnNum8,
+        ui->btnNum9,
+        ui->btnNumDot
+    };
+
+    for(auto *b : buttons) {
+        connect(b, &QToolButton::clicked, this, [ = ]() {
+            QString strValue = ui->lbAmount->property("str").toString();
+            QString t = b->property("num").toString();
+
+            if(t == "." && strValue.contains(".")) {
+                return;
+            }
+
+            strValue += t;
+            double value = strValue.toDouble();
+
+            if(value > 999999999) {
+                value = 999999999;
+            }
+
+            ui->lbAmount->setProperty("amount", value);
+            ui->lbAmount->setProperty("str", strValue);
+            ui->lbAmount->setText(QString("%1 %2").arg(float_str(value, 2), CURRENCY_SHORT));
+        });
+    }
+}
+
+int DlgOrder::selectedWaiterDishIndex()
+{
+    WaiterDish wd;
+    int index = -1;
+
+    for(int i = 0; i < ui->vlDishes->count(); ++i) {
+        QLayoutItem *item = ui->vlDishes->itemAt(i);
+
+        if(!item) {
+            continue;
+        }
+
+        QWidget *widget = item->widget();
+
+        if(!widget) {
+            continue;
+        }
+
+        if(auto *w = qobject_cast<WaiterDishWidget*>(widget)) {
+            wd = w->mOrderItem;
+
+            if(w->isFocused()) {
+                index = i;
+                break;
+            }
+        }
+    }
+
+    return index;
+}
+WaiterOrderItemWidget* DlgOrder::createOrderItemWidget(WaiterDish d)
+{
+    switch(d.type) {
+    case GOODS_TYPE_GOODS:
+        return new WaiterDishWidget(d, mShowRemoved);
+
+    default:
+        return new WaiterDishWidget(d, mShowRemoved);
+    }
+}
+
+void DlgOrder::parseOrder(const QJsonObject & jdoc)
+{
+    QString selectedId;
+    mOrder = JsonParser<WaiterOrder>::fromJson(jdoc["order"].toObject());
+    ui->lbTableName->setText(mOrder.tableName);
+    ui->lbOrderComment->setVisible(!mOrder.comment().isEmpty());
+    ui->lbOrderComment->setText(mOrder.comment());
+    ui->wgroups->setVisible(!mOrder.isPrecheckPrinted());
+    ui->wdishes->setVisible(!mOrder.isPrecheckPrinted());
+
+    for(int i = 0 ; i <  mOrder.dishes.size(); i++) {
+        WaiterOrderItemWidget *ow = nullptr;
+        WaiterDish w = mOrder.dishes.at(i);
+
+        //2 - becouse we created streach in the showEvent
+        if(i > ui->vlDishes->count() - 2) {
+            ow = createOrderItemWidget(w);
+            ui->vlDishes->insertWidget(i, ow);
+        } else {
+            auto *layout = ui->vlDishes->itemAt(i);
+
+            if(auto *w = qobject_cast<WaiterOrderItemWidget*>(layout->widget())) {
+                if(w->isFocused()) {
+                    selectedId = w->mOrderItem.id;
+                }
+            }
+
+            switch(w.type) {
+            case GOODS_TYPE_GOODS:
+                ow = qobject_cast<WaiterDishWidget*>(layout->widget());
+                qobject_cast<WaiterDishWidget*>(ow)->mShowRemoved = mShowRemoved;
+                break;
+
+            case GOODS_TYPE_MODIFICATOR:
+                ow = qobject_cast<WaiterModificatorWidget*>(layout->widget());
+                break;
+
+            case GOODS_TYPE_GUEST:
+                ow = qobject_cast<WaiterGuestWidget*>(layout->widget());
+                break;
+            }
+
+            if(!ow) {
+                layout->widget()->deleteLater();
+                delete layout;
+                ow = createOrderItemWidget(w);
+                ui->vlDishes->insertWidget(i, ow);
+            } else {
+            }
+        }
+
+        ow->updateDish(w);
+        ow->setFocused(ow->mOrderItem.id == selectedId);
+        connect(ow, &WaiterDishWidget::focused,
+                this, &DlgOrder::handleOrderDishClick,
+                Qt::UniqueConnection);
+        connect(this, &DlgOrder::orderDishClicked,
+                ow, &WaiterDishWidget::checkFocus,
+                Qt::UniqueConnection);
+    }
+
+    /* PAYMENT BUTTON */
+    ui->lbAmountPaid->setText(QString("%1 %2").arg(float_str(mOrder.amountPaid(), 2), CURRENCY_SHORT));
+    ui->lbChange->setText(QString("%1 %2").arg(float_str(mOrder.amountChange(), 2), CURRENCY_SHORT));
+
+    while(auto *l = ui->vlPayment->takeAt(0)) {
+        auto *w = l->widget();
+
+        if(w) {
+            w->deleteLater();
+        }
+
+        delete l;
+    }
+
+    QPointer<DlgOrder> self(this);
+
+    for(auto pt : payment_types) {
+        if(mOrder.payment(payment_fields[pt]) > 0) {
+            auto *b = new QToolButton(self);
+            b->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+            b->setMinimumHeight(50);
+            b->setText(QString("%1 %2 %3").arg(QCoreApplication::translate("PaymentType", payment_names[pt]), float_str(mOrder.payment(payment_fields[pt]), 2), CURRENCY_SHORT));
+            b->setProperty("method", pt);
+            b->setProperty("amount", mOrder.payment(payment_fields[pt]));
+            connect(b, &QToolButton::clicked, self, [ = ]() {
+                NInterface::query("/engine/v2/waiter/order/set_amount", self->mUser->mSessionKey, self,
+                {{"id", self->mOrder.id}, {"payment_field", payment_fields[pt]}, {"amount", 0}},
+                [self](const QJsonObject & jdoc) {
+                    if(!self) {
+                        return;
+                    }
+
+                    self->parseOrder(jdoc);
+                }, [](const QJsonObject & jerr) {return false;});
+                b->deleteLater();
+            });
+            ui->vlPayment->addWidget(b);
+        }
+    }
+
+    if(jdoc.contains("restore_stoplist_qty")) {
+        QVector<DishAItem*> stoplistitems;
+        std::copy_if(mDishes->begin(), mDishes->end(), std::back_inserter(stoplistitems), [jdoc](DishAItem * d) {return d && d->id == jdoc["restore_stoplist_dish"].toInt();});
+
+        for(auto *it : stoplistitems) {
+            it->stoplist = jdoc["restore_stoplist_qty"].toDouble();
+        }
+
+        for(int i = 0; i < ui->glDishes->count(); i++) {
+            auto *l = ui->glDishes->itemAt(i);
+
+            if(auto *w = qobject_cast<QDishButton*>(l->widget())) {
+                w->update();
+            }
+        }
+    }
+
+    ui->wpayment->setVisible(mOrder.isPrecheckPrinted());
+    ui->wmenua->setVisible(!mOrder.isPrecheckPrinted());
+    ui->wappmenu->setEnabled(!mOrder.isPrecheckPrinted());
+    ui->wqty->setEnabled(!mOrder.isPrecheckPrinted());
+    ui->btnService->setEnabled(!mOrder.isPrecheckPrinted());
+    ui->btnDiscount->setEnabled(!mOrder.isPrecheckPrinted());
+    ui->btnService->setText(QString("%1\n%2%").arg(tr("Service"), float_str(mOrder.serviceFactor() * 100, 2)));
+    ui->btnDiscount->setText(QString("%1\n%2%").arg(tr("Discount"), float_str(mOrder.discountFactor() * 100, 2)));
+    ui->btnTotal->setText(QString("%1\n%2 %3").arg(tr("Precheck"), float_str(mOrder.totalDue, 2), "դր․"));
+    updateScrollButtonPositions();
+
+    if(jdoc.contains("focused_dish")) {
+        emit orderDishClicked(jdoc["focused_dish"].toString());
+    }
+
+    ui->lbSubtotal->setText(QString("%1 %2").arg(float_str(mOrder.subTotal(), 2), CURRENCY_SHORT));
+    ui->lbServiceFeeName->setText(QString("%1 %2%").arg(tr("Service fee"), float_str(mOrder.serviceFactor() * 100, 2)));
+    ui->lbServiceFee->setText(QString("%1 %2").arg(float_str(mOrder.serviceAmount(), 2), CURRENCY_SHORT));
+    ui->lbDiscountFeeName->setText(QString("%1 %2%").arg(tr("Discount fee"), float_str(mOrder.discountFactor() * 100, 2)));
+    ui->lbDiscount->setText(QString("%1 %2").arg(float_str(mOrder.discountAmount(), 2), CURRENCY_SHORT));
+    ui->lbTotalDue->setText(QString("%1 %2").arg(float_str(mOrder.totalDue, 2), CURRENCY_SHORT));
+    QDateTime startQuery = QDateTime::fromString(jdoc["query_start"].toString(), "yyyy-MM-dd HH:mm:ss.zzz");
+    qDebug() << "Parse order" << startQuery.msecsTo(QDateTime::currentDateTime());
+}
+
 void DlgOrder::handleOrderDishClick(const QString & id)
 {
     emit(orderDishClicked(id));
 }
-void DlgOrder::openReserveError(const QString & err)
-{
-    fHttp->fErrorSlot = nullptr;
-    fHttp->httpQueryFinished(sender());
 
-    if(err.contains("open reservation")) {
-        emit allDone();
-        reject();
-        deleteLater();
-    } else {
-        C5Message::error(err);
+void DlgOrder::setPaymentButtonChecked(bool checked)
+{
+    auto *btn = qobject_cast<QToolButton*>(sender());
+
+    for(int i = 0; i < ui->lPaymentButtons->count(); i++) {
+        auto *l = ui->lPaymentButtons->itemAt(i);
+        auto *b = qobject_cast<QToolButton*>(l->widget());
+
+        if(b) {
+            if(b == btn) {
+                b->setChecked(checked);
+            } else {
+                b->setChecked(false);
+            }
+        }
     }
 }
+
 void DlgOrder::openReservationResponse(const QJsonObject & jdoc)
 {
     fHttp->httpQueryFinished(sender());
@@ -1526,179 +2113,11 @@ void DlgOrder::openReservationResponse(const QJsonObject & jdoc)
         on_btnExit_clicked();
     }
 }
-void DlgOrder::openTableResponse(const QJsonObject & jdoc)
-{
-    // wo->fOrderDriver->fromJson(jdoc);
-    // C5TableData::instance()->setStopList(jdoc["stopList"].toArray());
-    // fTable = wo->fOrderDriver->headerValue("f_table").toInt();
-    // fMenuID = C5Config::defaultMenu();
-    // buildMenu(fMenuID, 0, 0);
-    // on_btnRecent_clicked();
-    // ui->btnTable->setText(tr("Table") + ": " + dbtable->name(wo->fOrderDriver->headerValue("f_table").toInt()));
-    // ui->btnChangeStaff->setText(QString("%1\n%2").arg(tr("Staff"),
-    //                             mUser->fullName())); //.arg(__c5config.autoDateCash() ? "" : " [" + __c5config.dateCash() + " / " + QString::number(__c5config.dateShift()) + "]"));
-    // ui->lbVisit->clear();
-    // ui->lbVisit->setVisible(false);
-    // if(!__c5config.getValue(param_auto_discount).isEmpty()) {
-    //     discountOrder(mUser, __c5config.getValue(param_auto_discount));
-    // }
-    // if(dbtable->hourlyId(wo->fOrderDriver->headerValue("f_table").toInt()) > 0) {
-    //     addDishToOrder(dbtable->hourlyId(wo->fOrderDriver->headerValue("f_table").toInt()), "");
-    // }
-    // ui->vs->addStretch();
-    // itemsToTable();
-    // fHttp->httpQueryFinished(sender());
-    // if(ex) {
-    //     exec();
-    // }
-}
 void DlgOrder::moveTableResponse(const QJsonObject & jdoc)
 {
     fHttp->httpQueryFinished(sender());
     //TODO FUCK
     //load(jdoc["newTableId"].toInt());
-}
-
-void DlgOrder::on_btnCalcCard_clicked()
-{
-    calcAmount(ui->leCard);
-}
-
-void DlgOrder::on_btnCalcBank_clicked()
-{
-    calcAmount(ui->leBank);
-}
-
-void DlgOrder::on_btnCalcPrepaid_clicked()
-{
-    calcAmount(ui->lePrepaid);
-}
-
-void DlgOrder::on_btnCalcOther_clicked()
-{
-    calcAmount(ui->leOther);
-}
-
-void DlgOrder::on_btnPaymentCash_clicked()
-{
-    //TODO: CHECK
-    // worder()->fOrderDriver->setHeader("f_amountcash", worder()->fOrderDriver->headerValue("f_amounttotal"));
-    // worder()->fOrderDriver->setHeader("f_amountcard", 0);
-    // worder()->fOrderDriver->setHeader("f_amountbank", 0);
-    // worder()->fOrderDriver->setHeader("f_amountprepaid", 0);
-    // worder()->fOrderDriver->setHeader("f_amountother", 0);
-    // worder()->fOrderDriver->setHeader("f_amountpayx", 0);
-    // worder()->fOrderDriver->setHeader("f_amountidram", 0);
-    // worder()->fOrderDriver->setHeader("f_hotel", 0);
-    // worder()->fOrderDriver->setHeader("f_otherid", 0);
-    ui->leRemain->setDouble(0);
-    clearOther();
-    headerToLineEdit();
-    setButtonsState();
-}
-
-void DlgOrder::on_btnPaymentCard_clicked()
-{
-    //TODO: CHECK
-    ui->btnTax->setChecked(true);
-    // worder()->fOrderDriver->setHeader("f_amountcash", 0);
-    // worder()->fOrderDriver->setHeader("f_amountcard", worder()->fOrderDriver->headerValue("f_amounttotal"));
-    // worder()->fOrderDriver->setHeader("f_amountbank", 0);
-    // worder()->fOrderDriver->setHeader("f_amountprepaid", 0);
-    // worder()->fOrderDriver->setHeader("f_amountother", 0);
-    // worder()->fOrderDriver->setHeader("f_amountpayx", 0);
-    // worder()->fOrderDriver->setHeader("f_amountidram", 0);
-    // worder()->fOrderDriver->setHeader("f_hotel", 0);
-    // worder()->fOrderDriver->setHeader("f_otherid", 0);
-    ui->leRemain->setDouble(0);
-    clearOther();
-    headerToLineEdit();
-    setButtonsState();
-}
-
-void DlgOrder::on_btnPaymentBank_clicked()
-{
-    ui->btnTax->setChecked(false);
-    //TODO: CHECK
-    // worder()->fOrderDriver->setHeader("f_amountcash", 0);
-    // worder()->fOrderDriver->setHeader("f_amountcard", 0);
-    // worder()->fOrderDriver->setHeader("f_amountbank", worder()->fOrderDriver->headerValue("f_amounttotal"));
-    // worder()->fOrderDriver->setHeader("f_amountprepaid", 0);
-    // worder()->fOrderDriver->setHeader("f_amountother", 0);
-    // worder()->fOrderDriver->setHeader("f_amountpayx", 0);
-    // worder()->fOrderDriver->setHeader("f_amountidram", 0);
-    // worder()->fOrderDriver->setHeader("f_otherid", 0);
-    // worder()->fOrderDriver->setHeader("f_hotel", 0);
-    ui->leRemain->setDouble(0);
-    clearOther();
-    headerToLineEdit();
-    setButtonsState();
-}
-
-void DlgOrder::on_btnPrepayment_clicked()
-{
-    ui->btnTax->setChecked(true);
-    //TODO: CHECK
-    // worder()->fOrderDriver->setHeader("f_amountcash", 0);
-    // worder()->fOrderDriver->setHeader("f_amountcard", 0);
-    // worder()->fOrderDriver->setHeader("f_amountbank", 0);
-    // worder()->fOrderDriver->setHeader("f_amountprepaid", worder()->fOrderDriver->headerValue("f_amounttotal"));
-    // worder()->fOrderDriver->setHeader("f_amountother", 0);
-    // worder()->fOrderDriver->setHeader("f_amountpayx", 0);
-    // worder()->fOrderDriver->setHeader("f_amountidram", 0);
-    // worder()->fOrderDriver->setHeader("f_otherid", 0);
-    // worder()->fOrderDriver->setHeader("f_hotel", 0);
-    ui->leRemain->setDouble(0);
-    clearOther();
-    headerToLineEdit();
-    setButtonsState();
-}
-
-void DlgOrder::on_btnPaymentOther_clicked()
-{
-    ui->btnTax->setChecked(false);
-    //TODO: CHECK
-    fHeader["f_amountcash"] = 0;
-    fHeader["f_amountcard"] = 0;
-    fHeader["f_amountbank"] = 0;
-    fHeader["f_amountprepaid"] = 0;
-    fHeader["f_amountidram"] = 0;
-    fHeader["f_hotel"] =  0;
-    fHeader["f_amountother"] = fHeader["f_amounttotal"];
-    ui->leRemain->setDouble(0);
-    headerToLineEdit();
-    setButtonsState();
-}
-
-void DlgOrder::on_btnPayCityLedger_clicked()
-{
-    // QString clCode, clName;
-    // if(DlgCL::getCL(clCode, clName)) {
-    //     worder()->fOrderDriver->setHeader("f_otherid", PAYOTHER_CL);
-    //     worder()->fOrderDriver->setCL(clCode, clName);
-    //     setCLComment();
-    // }
-}
-
-void DlgOrder::on_btnPayComplimentary_clicked()
-{
-    // clearOther();
-    // worder()->fOrderDriver->setHeader("f_otherid", PAYOTHER_COMPLIMENTARY);
-    // setComplimentary();
-}
-
-void DlgOrder::on_btnPayTransferToRoom_clicked()
-{
-    // QString res, inv, room, guest;
-    // if(DlgGuest::getGuest(res, inv, room, guest)) {
-    //     if(!wo->fOrderDriver->setRoom(res, inv, room, guest)) {
-    //         C5Message::error(wo->fOrderDriver->error());
-    //         return;
-    //     }
-    //     wo->fOrderDriver->setHeader("f_amountother", 0);
-    //     wo->fOrderDriver->setHeader("f_hotel", wo->fOrderDriver->amountTotal());
-    //     setRoomComment();
-    // }
 }
 void DlgOrder::on_btnReceipt_clicked()
 {
@@ -1857,560 +2276,343 @@ void DlgOrder::on_btnReceipt_clicked()
 
 void DlgOrder::on_btnCloseOrder_clicked()
 {
-    //TODO: CHECK
-    // if(C5Message::question(tr("Confirm to close order")) != QDialog::Accepted) {
-    //     return;
-    // }
-    // WOrder *wo = worder();
-    // QString orderid = wo->fOrderDriver->currentOrderId();
-    // if(!wo->fOrderDriver->closeOrder()) {
-    //     C5Message::error(wo->fOrderDriver->error());
-    //     return;
-    // }
-    // C5LogToServerThread::remember(LOG_WAITER, mUser->fullName(), "", orderid, "", "Close order", "", "");
-    // removeWOrder(wo);
-    // if(!worder()) {
-    //     accept();
-    //     return;
-    // }
-    // updateData();
-    // setButtonsState();
+    if(!mOrder.paymentCompleted()) {
+        C5Message::error(tr("Payment was not completed"));
+        return;
+    }
+
+    QPointer<DlgOrder> self(this);
+    auto closeOrderFunc = [self](const QJsonObject & fiscalInfo) {
+        if(!self) {
+            return;
+        }
+
+        NInterface::query("/engine/v2/waiter/order/close-order", self->mUser->mSessionKey, self, {
+            {"id", self->mOrder.id},
+            {"fiscal", fiscalInfo}
+        },
+        [self](const QJsonObject & jdoc) {
+            self->parseOrder(jdoc);
+            self->printPrecheck(self->mUser->shortFullName());
+            self->accept();
+        },
+        [](const QJsonObject & jerr) {
+            return false;
+        });
+    };
+
+    if(ui->btnPrintFiscal->isChecked()) {
+        auto *loading = new NLoadingDlg(tr("Printing fiscal check"), this);
+        auto *thread  = new QThread();
+        auto *pt = new PrintTaxN(self->mUser->fConfig["tax_ip"].toString(),
+                                 self->mUser->fConfig["tax_port"].toString().toInt(),
+                                 self->mUser->fConfig["tax_password"].toString(),
+                                 self->mUser->fConfig["tax_external_pos"].toString(),
+                                 self->mUser->fConfig["tax_op"].toString(),
+                                 self->mUser->fConfig["tax_pin"].toString());
+        pt->moveToThread(thread);
+        auto order = self->mOrder;
+        connect(thread, &QThread::started, pt, [ = ]() {
+            for(auto d : std::as_const(order.dishes)) {
+                if(d.state != DISH_STATE_OK) {
+                    continue;
+                }
+
+                pt->addGoods(d.fiscalDepartment(),
+                             d.adgtCode(),
+                             QString::number(d.dishId),
+                             d.dishName,
+                             d.price,
+                             d.qty,
+                             d.discountFactor() * 100);
+            }
+
+            pt->makeJsonAndPrint(order.paidCash(), order.paidCard(), order.paidPrepaid());
+        });
+        connect(pt, &PrintTaxN::started, loading, &QDialog::show, Qt::QueuedConnection);
+        connect(pt, &PrintTaxN::finished, self, [ = ](const QString & inJson, const QString & outJson, const QString & err, int result) {
+            loading->close();
+            loading->deleteLater();
+            QJsonObject reply{{"in", inJson},
+                {"out", outJson},
+                {"error", err},
+                {"result", result}};
+
+            if(result == 0) {
+                closeOrderFunc(reply);
+            } else {
+                reply.insert("id", self->mOrder.id);
+                NInterface::query("/engine/v2/waiter/order/fiscal-log", mUser->mSessionKey, self, reply,
+                [](const QJsonObject & jdoc) {},
+                [](const QJsonObject & jerr) {return false;});
+                C5Message::error(err);
+            }
+
+            thread->quit();
+        });
+        connect(thread, &QThread::finished, pt, &QObject::deleteLater);
+        connect(thread, &QThread::finished, thread, &QObject::deleteLater);
+        thread->start();
+    } else {
+        closeOrderFunc({});
+    }
 }
 
 void DlgOrder::on_btnService_clicked()
 {
-    C5User *tmp = mUser;
+    QPointer<DlgOrder> self(this);
+    auto func = [self](C5User * user) {
+        NInterface::query1("/engine/v2/waiter/order/get-service-values", user->mSessionKey, self, {},
+        [self, user](const QJsonObject & jdoc) {
+            QJsonArray jvals = jdoc["values"].toArray();
+            QStringList titles;
+            QList<double> values;
+            QList<int> indexes;
 
-    if(!tmp->check(cp_t5_change_service_value)) {
-        if(!DlgPassword::getUserAndCheck(tr("Change service value"), tmp, cp_t5_change_service_value)) {
-            return;
+            for(int i = 0; i < jvals.size(); i++) {
+                const QJsonObject &jo = jvals.at(i).toObject();
+                titles.append(jo["f_name"].toString());
+                values.append(jo["f_value"].toDouble());
+                indexes.append(i + 1);
+            }
+
+            titles.append(tr("Cancel"));
+            indexes.append(0);
+            DlgSimleOptions dso(titles, indexes);
+            int index = dso.exec();
+
+            if(index == 0) {
+                return;
+            }
+
+            double newServiceFactor = values.at(index - 1);
+            NInterface::query1("/engine/v2/waiter/order/change-service-value", user->mSessionKey, self, {
+                {"id", self->mOrder.id},
+                {"value", newServiceFactor}
+            }, [self](const QJsonObject & jdoc1) {
+                if(!self) {
+                    return;
+                }
+
+                self->parseOrder(jdoc1);
+            });
+        });
+    };
+
+    if(mUser->check(cp_t5_change_service_value)) {
+        func(mUser);
+        return;
+    }
+
+    auto* user = new C5User();
+    QString pin;
+
+    if(!DlgPassword::getPasswordString(tr("Remove printed dish"), pin)) {
+        return;
+    }
+
+    user->authorize(pin, self->fHttp, [self, func, user](const QJsonObject & jdoc) {
+        if(user->check(cp_t5_remove_printed_service)) {
+            func(user);
+        } else {
+            C5Message::error(tr("Permission denied"));
         }
-    }
 
-    //TODO
-    // C5Database db;
-    // db.exec("select * from o_service_values");
-    // QStringList lst;
-    // while(db.nextRow()) {
-    //     lst.append(float_str(db.getDouble("f_value") * 100, 2));
-    // }
-    int index = 0;
-    // if(!DlgList::getValue(lst, index)) {
-    //     return;
-    // }
-    QList<WOrder*> wos = worders();
-
-    //TODO
-    for(WOrder *wo : qAsConst(wos)) {
-        // QString oldValue = wo->fOrderDriver->headerValue("f_servicefactor").toString();
-        // wo->fOrderDriver->setHeader("f_servicefactor", lst.at(index).toDouble() / 100);
-        // wo->fOrderDriver->amountTotal();
-        // wo->fOrderDriver->save();
-        // logRecord(tmp->fullName(), wo->fOrderDriver->headerValue("f_id").toString(), "", "Change service factor", oldValue,
-        //           wo->fOrderDriver->headerValue("f_servicefactor").toString());
-    }
-
-    updateData();
-}
-
-void DlgOrder::on_btnTax_clicked()
-{
-    QSettings _ls(qApp->applicationDirPath() + "/ls.inf", QSettings::IniFormat);
-    bool taxforce = _ls.value("ls/forcetax").toInt() == 1;
-    bool notax = _ls.value("ls/notax").toInt() == 1;
-
-    if(ui->leOther->getDouble() > 0.001) {
-        ui->btnTax->setChecked(false);
-    }
-
-    if(ui->leCard->getDouble() > 0.001) {
-        ui->btnTax->setChecked(true && !taxforce);
-    }
-
-    if(ui->lePrepaid->getDouble() > 0.001) {
-        ui->btnTax->setChecked(true && !taxforce);
-    }
-
-    if(notax) {
-        ui->btnTax->setChecked(false);
-    }
-
-    //TODO
-    //C5Config::setRegValue("btn_tax_state", ui->btnTax->isChecked() ? 1 : 2);
+        user->deleteLater();
+    }, [user]() {
+        user->deleteLater();
+    });
+    return;
 }
 
 void DlgOrder::on_btnStopListMode_clicked()
 {
-    C5User *tmp = mUser;
+    auto func = [this]() {
+        DlgStopListOption d(this, mUser);
+        d.exec();
+    };
 
-    if(tmp->check(cp_t5_stoplist) == false) {
-        if(!DlgPassword::getUserAndCheck(tr("Reprint service check"), tmp, cp_t5_stoplist)) {
-            return;
+    if(mUser->check(cp_t5_stoplist)) {
+        func();
+        return;
+    }
+
+    QString password;
+
+    if(!DlgPassword::getPassword(tr("Raise permissions"), password)) {
+        return;
+    }
+
+    C5User *u = new C5User();
+    u->authorize(password, fHttp, [ u, func](const QJsonObject & jdoc) {
+        if(u->check(cp_t5_stoplist)) {
+            func();
         }
-    }
 
-    DlgStopListOption d(this, tmp);
-    d.exec();
-
-    if(tmp != mUser) {
-        delete tmp;
-    }
+        u->deleteLater();
+    }, [u]() {
+        u->deleteLater();
+    });
 }
 
 void DlgOrder::on_btnOrderComment_clicked()
 {
-    // QString comment = wo->fOrderDriver->headerValue("f_comment").toString();
-    // if(!DlgText::getText(tr("Order comment"), comment)) {
-    //     return;
-    // }
-    // wo->fOrderDriver->setHeader("f_comment", comment);
-    // setButtonsState();
+    QString comment = mOrder.comment();
+
+    if(!DlgText::getText(mUser, tr("Order comment"), comment)) {
+        return;
+    }
+
+    NInterface::query1("/engine/v2/waiter/order/set-header-comment", mUser->mSessionKey, this, {
+        {"id", mOrder.id},
+        {"comment", comment}
+    }, [this](const QJsonObject & jdoc) {
+        parseOrder(jdoc);
+    });
 }
 
 void DlgOrder::on_btnPlus1_clicked()
 {
-    //   int index = 0;
-    //   //TODO: FIX MIGRATION
-    //   // if(!wo->currentRow(index)) {
-    //   //     return;
-    //   // }
-    //   if(wo->fOrderDriver->dishesValue("f_state", index).toInt() != DISH_STATE_OK) {
-    //       return;
-    //   }
-    //   if(dbdish->isHourlyPayment(wo->fOrderDriver->dishesValue("f_dish", index).toInt())) {
-    //       C5Message::error(tr("Cannot add comment to hourly payment"));
-    //       return;
-    //   }
-    //   if(wo->fOrderDriver->dishesValue("f_emarks", index).toString().isEmpty() == false) {
-    //       C5Message::error(tr("Cannot change qty of dishes thats contains emarks"));
-    //       return;
-    //   }
-    //   if(wo->fOrderDriver->dishesValue("f_qty2", index).toDouble() > 0.0001) {
-    //       QString special;
-    //       if(!wo->fOrderDriver->dishesValue("f_comment2", index).toString().isEmpty()) {
-    //           if(!DlgListDishSpecial::getSpecial(wo->fOrderDriver->dishesValue("f_dish", index).toInt(), special)) {
-    //               return;
-    //           }
-    //       }
-    //       int newindex = wo->fOrderDriver->duplicateDish(index);
-    //       wo->fOrderDriver->setDishesValue("f_qty1", 1, newindex);
-    //       wo->fOrderDriver->setDishesValue("f_qty2", 0, newindex);
-    //       wo->fOrderDriver->setDishesValue("f_comment2", special, newindex);
-    //       wo->fOrderDriver->setDishesValue("f_comment", "", newindex);
-    //       logRecord(mUser->fullName(),
-    //                 wo->fOrderDriver->headerValue("f_id").toString(),
-    //                 wo->fOrderDriver->dishesValue("f_id", newindex).toString(),
-    //                 "Copy dish " + dbdish->name(wo->fOrderDriver->dishesValue("f_dish", index).toInt()),
-    //                 "from: " + wo->fOrderDriver->dishesValue("f_id", index).toString(),
-    //                 wo->fOrderDriver->dishesValue("f_qty1", newindex).toString());
-    //       itemsToTable();
-    //       wo->setCurrentRow(newindex);
-    //   } else {
-    //       QString oldQty = wo->fOrderDriver->dishesValue("f_qty1", index).toString();
-    //       wo->fOrderDriver->setDishesValue("f_qty1", wo->fOrderDriver->dishesValue("f_qty1", index).toDouble() + 1, index);
-    //       itemsToTable();
-    //       logRecord(mUser->fullName(), wo->fOrderDriver->headerValue("f_id").toString(),
-    //                 wo->fOrderDriver->dishesValue("f_id", index).toString(),
-    //                 "Qty of " + dbdish->name(wo->fOrderDriver->dishesValue("f_dish", index).toInt()),
-    //                 oldQty,
-    //                 wo->fOrderDriver->dishesValue("f_qty1", index).toString());
-    //   }
+    setDishQty([](WaiterDish d) {return d.isPrinted() ? 1 : d.qty + 1;});
 }
 
 void DlgOrder::on_btnMinus1_clicked()
 {
-    //  int index = 0;
-    //  //TODO: FIX MIGRATION
-    //  // if(!wo->currentRow(index)) {
-    //  //     return;
-    //  // }
-    //  if(wo->fOrderDriver->dishesValue("f_state", index).toInt() != DISH_STATE_OK) {
-    //      return;
-    //  }
-    //  if(dbdish->isHourlyPayment(wo->fOrderDriver->dishesValue("f_dish", index).toInt())) {
-    //      C5Message::error(tr("Cannot add comment to hourly payment"));
-    //      return;
-    //  }
-    //  if(wo->fOrderDriver->dishesValue("f_qty2", index).toDouble() > 0.0001) {
-    //      C5Message::error(tr("Use removal tool"));
-    //      return;
-    //  } else {
-    //      if(wo->fOrderDriver->dishesValue("f_qty1", index).toDouble() - 1 > 0.001) {
-    //          QString oldQty = wo->fOrderDriver->dishesValue("f_qty1", index).toString();
-    //          wo->fOrderDriver->setDishesValue("f_qty1", wo->fOrderDriver->dishesValue("f_qty1", index).toDouble() - 1, index);
-    //          logRecord(mUser->fullName(), wo->fOrderDriver->headerValue("f_id").toString(),
-    //                    wo->fOrderDriver->dishesValue("f_id", index).toString(),
-    //                    "Qty of " + dbdish->name(wo->fOrderDriver->dishesValue("f_dish", index).toInt()),
-    //                    oldQty,
-    //                    wo->fOrderDriver->dishesValue("f_qty1", index).toString());
-    //      } else if(C5Message::question(tr("Do you want to remove this item")) == QDialog::Accepted) {
-    //          wo->fOrderDriver->setDishesValue("f_state", DISH_STATE_NONE, index);
-    //          wo->fOrderDriver->setDishesValue("f_emarks", QVariant(), index);
-    //          wo->fOrderDriver->save();
-    //          logRecord(mUser->fullName(), wo->fOrderDriver->headerValue("f_id").toString(),
-    //                    wo->fOrderDriver->dishesValue("f_id", index).toString(),
-    //                    "Remove not printed " + dbdish->name(wo->fOrderDriver->dishesValue("f_dish", index).toInt()),
-    //                    "-",
-    //                    wo->fOrderDriver->dishesValue("f_qty1", index).toString());
-    //      }
-    //      itemsToTable();
-    //  }
+    int index = selectedWaiterDishIndex();
+
+    if(index < 0) {
+        return;
+    }
+
+    WaiterDish d = mOrder.dishes.at(index);
+
+    if(d.type != GOODS_TYPE_GOODS && d.type != GOODS_TYPE_MODIFICATOR) {
+        return;
+    }
+
+    if(d.state != DISH_STATE_OK) {
+        return;
+    }
+
+    if(d.isHourlyPayment()) {
+        C5Message::error(tr("Cannot add comment to hourly payment"));
+        return;
+    }
+
+    if(d.isPrinted()) {
+        C5Message::error(tr("Use removal tool"));
+        return;
+    } else {
+        double newQty = 0;
+
+        if(d.qty - 1 > 0.001) {
+            newQty = d.qty - 1;
+        } else if(C5Message::question(tr("Do you want to remove this item")) == QDialog::Accepted) {
+            d.state = DISH_STATE_NONE;
+            newQty = 0;
+        }
+
+        fHttp->createHttpQueryLambda("/engine/v2/waiter/order/set-dish-qty", {
+            {"id", d.id},
+            {"remove_emarks", !d.emarks.isEmpty()},
+            {"dish", d.dishId},
+            {"new_qty", newQty},
+            {"new_state", d.state},
+            {"data", d.data},
+            {"order_id", mOrder.id},
+            {"restore_stoplist", d.qty - newQty}
+        },
+        [this](const QJsonObject & jdoc) {
+            parseOrder(jdoc);
+        }, [](const QJsonObject & jerr) {});
+    }
 }
 
 void DlgOrder::on_btnAnyqty_clicked()
 {
-    //  int index = 0;
-    //  //TODO: FIX MIGRATION
-    //  // if(!wo->currentRow(index)) {
-    //  //     return;
-    //  // }
-    //  if(wo->fOrderDriver->dishesValue("f_state", index).toInt() != DISH_STATE_OK) {
-    //      return;
-    //  }
-    //  if(dbdish->isHourlyPayment(wo->fOrderDriver->dishesValue("f_dish", index).toInt())) {
-    //      C5Message::error(tr("Cannot add comment to hourly payment"));
-    //      return;
-    //  }
-    //  if(wo->fOrderDriver->dishesValue("f_qty2", index).toDouble() > 0.0001) {
-    //      C5Message::error(tr("Use removal tool"));
-    //      return;
-    //  }
-    //  if(wo->fOrderDriver->dishesValue("f_emarks", index).toString().isEmpty() == false) {
-    //      C5Message::error(tr("Cannot change qty of dishes thats contains emarks"));
-    //      return;
-    //  }
-    //  if(dbdish->emarks(wo->fOrderDriver->dishesValue("f_dish", index).toInt()).isEmpty() == false) {
-    //      C5Message::error(tr("Cannot change qty of dishes thats contains emarks"));
-    //      return;
-    //  }
-    //  //TODO: PACKAGE HANDLER
-    //  //    if (wo->fOrderDriver->dishesValue("d_package", index).toInt() > 0) {
-    //  //        C5Message::error(tr("You cannot change the quantity of items of package"));
-    //  //        return;
-    //  //    }
-    //  if(dbdish->isHourlyPayment(wo->fOrderDriver->dishesValue("f_dish", index).toInt())) {
-    //      C5Message::error(tr("This is hourly payment item"));
-    //      return;
-    //  }
-    //  double max = 999;
-    //  if(!DlgQty::getQty(max, dbdish->name(wo->fOrderDriver->dishesValue("f_dish", index).toInt()))) {
-    //      return;
-    //  }
-    //  QString oldQty = wo->fOrderDriver->dishesValue("f_qty1", index).toString();
-    //  wo->fOrderDriver->setDishesValue("f_qty1", max, index);
-    //  wo->updateItem(index);
-    //  updateData();
-    //  logRecord(mUser->fullName(), wo->fOrderDriver->headerValue("f_id").toString(),
-    //            wo->fOrderDriver->dishesValue("f_id", index).toString(),
-    //            "Qty of " + dbdish->name(wo->fOrderDriver->dishesValue("f_dish", index).toInt()),
-    //            oldQty,
-    //            wo->fOrderDriver->dishesValue("f_qty1", index).toString());
-}
+    setDishQty([this](WaiterDish d) {
+        double newQty = 999;
 
-void DlgOrder::on_btnDishPart2Down_clicked()
-{
-    ui->scrollAreaPart2->verticalScrollBar()->setValue(ui->scrollAreaPart2->verticalScrollBar()->value() + 300);
-
-    for(QObject *o : ui->scrollAreaWidgetContents->children()) {
-        QWidget *w = dynamic_cast<QWidget*>(o);
-
-        if(w) {
-            w->repaint();
+        if(!DlgQty::getQty(newQty, d.dishName, mUser)) {
+            return 0.0;
         }
-    }
-}
 
-void DlgOrder::on_btnDishPart2Up_clicked()
-{
-    ui->scrollAreaPart2->verticalScrollBar()->setValue(ui->scrollAreaPart2->verticalScrollBar()->value() - 300);
-
-    for(QObject *o : ui->scrollAreaWidgetContents->children()) {
-        QWidget *w = dynamic_cast<QWidget*>(o);
-
-        if(w) {
-            w->repaint();
-        }
-    }
-}
-
-void DlgOrder::on_btnBillWithoutService_clicked()
-{
-    //TODO: CHECK
-    //C5Message::info(QString("%1<br>%2").arg(tr("Counted")).arg(float_str(wo->fOrderDriver->clearAmount(), 2)));
-}
-
-void DlgOrder::on_btnFillCash_clicked()
-{
-    //TODO: CHECK
-    // worder()->fOrderDriver->setHeader("f_amountcash",
-    //                                   worder()->fOrderDriver->headerValue("f_amounttotal").toDouble()
-    //                                   - worder()->fOrderDriver->headerHotel("f_amountbank").toDouble()
-    //                                   - worder()->fOrderDriver->headerValue("f_amountcard").toDouble()
-    //                                   - worder()->fOrderDriver->headerValue("f_amountprepaid").toDouble()
-    //                                   - worder()->fOrderDriver->headerValue("f_amountidram").toDouble()
-    //                                   - worder()->fOrderDriver->headerValue("f_amountpayx").toDouble());
-    // worder()->fOrderDriver->setHeader("f_amountother", 0);
-    ui->leRemain->setDouble(0);
-    clearOther();
-    headerToLineEdit();
-    setButtonsState();
-}
-
-void DlgOrder::on_btnFillCard_clicked()
-{
-    //TODO: CHECK
-    // worder()->fOrderDriver->setHeader("f_amountcard",
-    //                                   worder()->fOrderDriver->headerValue("f_amounttotal").toDouble()
-    //                                   - worder()->fOrderDriver->headerValue("f_amountbank").toDouble()
-    //                                   - worder()->fOrderDriver->headerValue("f_amountcash").toDouble()
-    //                                   - worder()->fOrderDriver->headerValue("f_amountprepaid").toDouble()
-    //                                   - worder()->fOrderDriver->headerValue("f_amountidram").toDouble()
-    //                                   - worder()->fOrderDriver->headerValue("f_amountpayx").toDouble());
-    // worder()->fOrderDriver->setHeader("f_amountother", 0);
-    ui->leRemain->setDouble(0);
-    clearOther();
-    headerToLineEdit();
-    setButtonsState();
-}
-
-void DlgOrder::on_btnFillPrepaiment_clicked()
-{
-    //TODO: CHECK
-    // worder()->fOrderDriver->setHeader("f_amountprepaid",
-    //                                   worder()->fOrderDriver->headerValue("f_amounttotal").toDouble()
-    //                                   - worder()->fOrderDriver->headerValue("f_amountcash").toDouble()
-    //                                   - worder()->fOrderDriver->headerValue("f_amountcard").toDouble()
-    //                                   - worder()->fOrderDriver->headerValue("f_amountbank").toDouble()
-    //                                   - worder()->fOrderDriver->headerValue("f_amountidram").toDouble()
-    //                                   - worder()->fOrderDriver->headerValue("f_amountpayx").toDouble());
-    // worder()->fOrderDriver->setHeader("f_amountother", 0);
-    ui->leRemain->setDouble(0);
-    clearOther();
-    headerToLineEdit();
-    setButtonsState();
-}
-
-void DlgOrder::on_btnDishDown_clicked()
-{
-    ui->scrollAreaDish->verticalScrollBar()->setValue(ui->scrollAreaDish->verticalScrollBar()->value() + 300);
-
-    for(QObject *o : ui->scrollAreaWidgetContentsDish->children()) {
-        QWidget *w = dynamic_cast<QWidget*>(o);
-
-        if(w) {
-            w->repaint();
-        }
-    }
-
-    ui->scrollAreaDish->viewport()->update();
-}
-
-void DlgOrder::on_btnDishUp_clicked()
-{
-    ui->scrollAreaDish->verticalScrollBar()->setValue(ui->scrollAreaDish->verticalScrollBar()->value() - 300);
-
-    for(QObject *o : ui->scrollAreaWidgetContentsDish->children()) {
-        QWidget *w = dynamic_cast<QWidget*>(o);
-
-        if(w) {
-            w->repaint();
-        }
-    }
-
-    ui->scrollAreaDish->viewport()->update();
-}
-
-void DlgOrder::on_btnPreorder_clicked()
-{
-    //TODO: CHECK
-    // fHttp->createHttpQuery("/engine/waiter/reservation-open.php",
-    // QJsonObject{{"id", wo->fOrderDriver->headerValue("f_id").toString()}}, SLOT(openReservationResponse(QJsonObject)));
-}
-
-void DlgOrder::on_btnPaymentIdram_clicked()
-{
-    //TODO: CHECK
-    // auto *wo = worder();
-    // if(!wo) {
-    //     return;
-    // }
-    // QByteArray out;
-    // double v;
-    // if(Idram::check(__c5config.getValue(param_idram_server), __c5config.getValue(param_idram_session_id),
-    //                 wo->fOrderDriver->headerValue("f_id").toString(), v, out)) {
-    //     ui->leIDRAM->setDouble(v);
-    //     //        ui->leCash->setText("0");
-    //     //        ui->leCard->setText("0");
-    //     //        ui->leBank->setText("0");
-    //     //        ui->leOther->setText("0");
-    //     worder()->fOrderDriver->setHeader("f_amountcash", 0);
-    //     worder()->fOrderDriver->setHeader("f_amountcard", 0);
-    //     worder()->fOrderDriver->setHeader("f_amountbank", 0);
-    //     worder()->fOrderDriver->setHeader("f_amountprepaid", 0);
-    //     worder()->fOrderDriver->setHeader("f_amountother", 0);
-    //     worder()->fOrderDriver->setHeader("f_amountpayx", 0);
-    //     worder()->fOrderDriver->setHeader("f_amountidram", v);
-    //     worder()->fOrderDriver->setHeader("f_hotel", 0);
-    //     worder()->fOrderDriver->setHeader("f_otherid", 0);
-    //     ui->leRemain->setDouble(worder()->fOrderDriver->headerValue("f_amounttotal").toDouble() - v);
-    //     clearOther();
-    //     headerToLineEdit();
-    //     setButtonsState();
-    //     return ;
-    //     worder()->fOrderDriver->setHeader("f_otherid", 0);
-    //     lineEditToHeader();
-    // } else {
-    //     QString err = out;
-    //     if(v < 0) {
-    //         err = tr("Idram payment was not received");
-    //     }
-    //     C5Message::error(err);
-    // }
-    // C5LogToServerThread::remember(LOG_WAITER, mUser->fullName(), "",
-    //                               wo->fOrderDriver->currentOrderId(), "",
-    //                               "Idram request: " + __c5config.getValue(param_idram_server),
-    //                               QString(out), "");
-}
-
-void DlgOrder::on_btnFillPayX_clicked()
-{
-    //TODO: CHECK
-    // WOrder *wo = worder();
-    // if(!wo) {
-    //     return;
-    // }
-    // ui->lePayX->setDouble(
-    //     wo->fOrderDriver->headerValue("f_amounttotal").toDouble()
-    //     - wo->fOrderDriver->headerValue("f_amountcash").toDouble()
-    //     - wo->fOrderDriver->headerValue("f_amountcard").toDouble()
-    //     - wo->fOrderDriver->headerValue("f_amountbank").toDouble()
-    //     - wo->fOrderDriver->headerValue("f_amountprepaid").toDouble()
-    //     - wo->fOrderDriver->headerValue("f_amountidram").toDouble());
-    // wo->fOrderDriver->setHeader("f_amountpayx", ui->lePayX->getDouble());
-    // ui->leRemain->setDouble(0);
-    // headerToLineEdit();
-    // setButtonsState();
-}
-
-void DlgOrder::on_btnCalcPayX_clicked()
-{
-    //TODO: CHECK
-    // auto *wo = worder();
-    // if(!wo) {
-    //     return;
-    // }
-    // double max = wo->fOrderDriver->headerValue("f_amounttotal").toDouble();
-    // if(!DlgPassword::getAmount(tr("PayX"), max)) {
-    //     return;
-    // }
-    // ui->lePayX->setDouble(max);
-    // lineEditToHeader();
-    // headerToLineEdit();
-}
-
-void DlgOrder::on_btnPayX_clicked()
-{
-    //TODO: CHECK
-    // auto *wo = worder();
-    // if(!wo) {
-    //     return;
-    // }
-    // worder()->fOrderDriver->setHeader("f_otherid", 0);
-    // ui->lePayX->setDouble(wo->fOrderDriver->headerValue("f_amounttotal").toDouble() - ui->leIDRAM->getDouble());
-    // ui->leCash->setDouble(0);
-    // ui->leCard->setDouble(0);
-    // ui->leBank->setDouble(0);
-    // ui->leOther->setDouble(0);
-    // lineEditToHeader();
-}
-
-void DlgOrder::on_btnFillIdram_clicked()
-{
-    //TODO: CHECK
-    // auto *wo = worder();
-    // if(!wo) {
-    //     return;
-    // }
-    // ui->leIDRAM->setDouble(wo->fOrderDriver->headerValue("f_amounttotal").toDouble()
-    //                        - worder()->fOrderDriver->headerValue("f_amontprepaid").toDouble()
-    //                        - worder()->fOrderDriver->headerValue("f_amountcash").toDouble()
-    //                        - worder()->fOrderDriver->headerValue("f_amountcard").toDouble()
-    //                        - worder()->fOrderDriver->headerValue("f_amountbank").toDouble()
-    //                        - worder()->fOrderDriver->headerValue("f_amountpayx").toDouble());
-    // worder()->fOrderDriver->setHeader("f_amountother", 0);
-    // ui->lePayX->setDouble(0);
-    // ui->leCash->setDouble(0);
-    // ui->leCard->setDouble(0);
-    // ui->leBank->setDouble(0);
-    // ui->leOther->setDouble(0);
-    // lineEditToHeader();
+        return newQty;
+    });
 }
 
 void DlgOrder::on_btnCloseCheckAll_clicked()
 {
     disableForCheckall(false);
 }
-
 void DlgOrder::on_btnCheckAll_clicked()
 {
-    //  if(wo) {
-    //      wo->checkAllItems(true);
-    //  }
+    for(int i = 0, count = ui->vlDishes->count(); i < count; i++) {
+        QLayoutItem *l = ui->vlDishes->itemAt(i);
+        WaiterDishWidget *d = dynamic_cast<WaiterDishWidget*>(l->widget());
+
+        if(d) {
+            d->setChecked(true);
+        }
+    }
 }
 
 void DlgOrder::on_btnUncheckAll_clicked()
 {
-    //   if(wo) {
-    //       wo->checkAllItems(false);
-    //   }
+    for(int i = 0, count = ui->vlDishes->count(); i < count; i++) {
+        QLayoutItem *l = ui->vlDishes->itemAt(i);
+        WaiterDishWidget *d = dynamic_cast<WaiterDishWidget*>(l->widget());
+
+        if(d) {
+            d->setChecked(false);
+        }
+    }
 }
 
 void DlgOrder::on_btnReprintSelected_clicked()
 {
-    //   disableForCheckall(false);
-    //   C5User *tmp = mUser;
-    //   if(!tmp->check(cp_t5_repeat_service)) {
-    //       if(!DlgPassword::getUserAndCheck(tr("Reprint service check"), tmp, cp_t5_repeat_service)) {
-    //           return;
-    //       }
-    //   }
-    //   ui->btnPrintService->setEnabled(true);
-    //   if(tmp != mUser) {
-    //       delete tmp;
-    //   }
-    //   QStringList reprintList;
-    //   for(int i = 0; i < wo->fOrderDriver->dishesCount(); i++) {
-    //       if(wo->dishWidget(i)->isChecked()) {
-    //           wo->fOrderDriver->setDishesValue("f_reprint", i, wo->fOrderDriver->dishesValue("f_reprint", i).toInt() * -1);
-    //           reprintList.append(QString("'%1'").arg(wo->fOrderDriver->dishesValue("f_id", i).toString()));
-    //       }
-    //   }
-    //   for(int i = 0; i < wo->fOrderDriver->dishesCount(); i++) {
-    //       if(wo->fOrderDriver->dishesValue("f_qty2", i).toDouble() < 0.001) {
-    //           wo->fOrderDriver->setDishesValue("f_printtime", QDateTime::currentDateTime(), i);
-    //       }
-    //   }
-    //   if(!wo->fOrderDriver->save()) {
-    //       C5Message::error(worder()->fOrderDriver->error());
-    //       return;
-    //   }
-    //   //TODO: CHECK L9
-    //   //LOG TO AIRLOG
-    //   fHttp->createHttpQueryLambda("/engine/waiter/printservice.php", {
-    //       { "order", wo->fOrderDriver->currentOrderId()},
-    //       {"reprint", reprintList.join(",")}
-    //   }, [this](const QJsonObject & jo) {
-    //       auto np = new NDataProvider(this);
-    //       np->overwriteHost("http", "127.0.0.1", 8080);
-    //       connect(np, &NDataProvider::done, this, [this](const QJsonObject & jjo) {
-    //           fHttp->httpQueryFinished(this);
-    //       });
-    //       connect(np, &NDataProvider::error, this, [](const QString & err) {
-    //       });
-    //       np->getData("/printjson", jo);
-    //   }, [](const QJsonObject & je) {
-    //       Q_UNUSED(je);
-    //   });
+    QPointer<DlgOrder> self(this);
+    auto func = [self](C5User * user) {
+        if(!self) {
+            return;
+        }
+
+        self->disableForCheckall(false);
+        QJsonArray ja;
+
+        for(int i = 0, count = self->ui->vlDishes->count(); i < count; i++) {
+            QLayoutItem *l = self->ui->vlDishes->itemAt(i);
+            WaiterDishWidget *d = dynamic_cast<WaiterDishWidget*>(l->widget());
+
+            if(d) {
+                if(d->isChecked()) {
+                    WaiterDish wd = d->mOrderItem;
+
+                    if(wd.state == DISH_STATE_OK && !wd.isHourlyPayment() && wd.type == GOODS_TYPE_GOODS) {
+                        ja.append(QJsonObject{{"f_id", wd.id}});
+                    }
+                }
+            }
+        }
+
+        if(ja.isEmpty()) {
+            return;
+        } else if(C5Message::question(tr("Do you want to remove this item")) != QDialog::Accepted) {
+            return;
+        }
+
+        NInterface::query1("/engine/v2/waiter/order/print-service-check", user->mSessionKey, self,
+        {{"items", ja}, {"reprint", true}, {"header_id", self->mOrder.id}},
+        [self](const QJsonObject & jdoc) {
+            if(!self) {
+                return;
+            }
+
+            self->printService(jdoc);
+            self->parseOrder(jdoc);
+        });
+    };
+    funcWithAuth(cp_t5_repeat_service, tr("Reprint service"), func);
 }
 
 void DlgOrder::on_btnGroupSelect_clicked()
@@ -2421,321 +2623,322 @@ void DlgOrder::on_btnGroupSelect_clicked()
 void DlgOrder::on_btnRemoveSelected_clicked()
 {
     disableForCheckall(false);
-    //  QList<int> indexes = wo->checkedItems();
-    //  if(indexes.isEmpty()) {
-    //      return;
-    //  }
-    //  QString reasonname;
-    //  int reasonid = 0;
-    //  bool needreason = false;
-    //  for(int i : indexes) {
-    //      if(wo->fOrderDriver->dishesValue("f_qty2", i).toDouble() > 0.001) {
-    //          needreason = true;
-    //          break;
-    //      }
-    //  }
-    //  C5User *tmp = mUser;
-    //  if(needreason) {
-    //      if(!tmp->check(cp_t5_remove_printed_service)) {
-    //          if(!DlgPassword::getUserAndCheck(tr("Void dish"), tmp, cp_t5_remove_printed_service)) {
-    //              return;
-    //          }
-    //      }
-    //      if(!DlgDishRemoveReason::getReason(reasonname, reasonid)) {
-    //          if(tmp != mUser) {
-    //              tmp->deleteLater();
-    //          }
-    //          return;
-    //      }
-    //  }
-    //  if(C5Message::question(tr("Confirm to remove selected dishes")) != QDialog::Accepted) {
-    //      if(tmp != mUser) {
-    //          tmp->deleteLater();
-    //      }
-    //      return;
-    //  }
-    //  for(int in = 0; in < indexes.count(); in++) {
-    //      int i = indexes.at(in);
-    //      if(wo->fOrderDriver->dishesValue("f_qty2", i).toDouble() < 0.001) {
-    //          wo->fOrderDriver->setDishesValue("f_state", DISH_STATE_NONE, i);
-    //          wo->fOrderDriver->setDishesValue("f_emarks", QVariant(), i);
-    //          wo->fOrderDriver->save();
-    //      } else {
-    //          wo->fOrderDriver->setDishesValue("f_state", reasonid, i);
-    //          wo->fOrderDriver->setDishesValue("f_removetime", QDateTime::currentDateTime(), i);
-    //          wo->fOrderDriver->setDishesValue("f_removeuser", tmp->id(), i);
-    //          wo->fOrderDriver->setDishesValue("f_removereason", reasonname, i);
-    //          wo->fOrderDriver->setDishesValue("f_removeprecheck", wo->fOrderDriver->headerValue("f_precheck"), i);
-    //          wo->fOrderDriver->setDishesValue("f_emarks", QVariant(), i);
-    //          wo->fOrderDriver->save();
-    //          //TODO: CHECK L17
-    //          auto np = new NDataProvider(this);
-    //          np->overwriteHost("http", "127.0.0.1", 8080);
-    //          connect(np, &NDataProvider::done, this, [](const QJsonObject & jo) {
-    //          });
-    //          connect(np, &NDataProvider::error, this, [](const QString & err) {
-    //          });
-    //          np->getData("/printremoved", {{"id", wo->fOrderDriver->dishesValue("f_id", i).toString()}});
-    //      }
-    //  }
-    //  if(tmp != mUser) {
-    //      tmp->deleteLater();
-    //  }
-    //  wo->fOrderDriver->save();
-    //  wo->updateDishes();
+    QList<WaiterDish> dishes;
+    bool needReason = false;
+    QJsonArray ja;
+
+    for(int i = 0, count = ui->vlDishes->count(); i < count; i++) {
+        QLayoutItem *l = ui->vlDishes->itemAt(i);
+        WaiterDishWidget *d = dynamic_cast<WaiterDishWidget*>(l->widget());
+
+        if(d) {
+            if(d->isChecked()) {
+                WaiterDish wd = d->mOrderItem;
+
+                if(wd.state == DISH_STATE_OK && !wd.isHourlyPayment() && wd.type == GOODS_TYPE_GOODS) {
+                    dishes.append(d->mOrderItem);
+                    ja.append(wd.toJson());
+
+                    if(wd.isPrinted()) {
+                        needReason = true;
+                    }
+                }
+            }
+        }
+    }
+
+    if(C5Message::question(tr("Do you want to remove this item")) != QDialog::Accepted) {
+        return;
+    }
+
+    QString reason;
+    int newState = 0;
+
+    if(needReason) {
+        if(!DlgListOfDishComments::getText(tr("Reason of remove"), "/engine/v2/waiter/menu/get-remove-reason", reason)) {
+            return;
+        }
+
+        QStringList titles = {tr("Mistake"), tr("With store output"), tr("Cancel")};
+        QList<int> values = {DISH_STATE_MISTAKE, DISH_STATE_VOID, 0};
+        DlgSimleOptions dso(titles, values);
+        newState = dso.exec();
+
+        if(newState == 0) {
+            return;
+        }
+    }
+
+    for(int i = 0; i < ja.size(); i++) {
+        QJsonObject jo = ja.at(i).toObject();
+        QJsonObject jd = jo["f_data"].toObject();
+        jd["f_remove_reason"] = reason;
+
+        if(jd["f_printed"].toBool()) {
+            jo["f_state"] = newState;
+        } else {
+            jo["f_state"] = 0;
+        }
+
+        jo["f_data"] = jd;
+        ja[i] = jo;
+    }
+
+    QPointer<DlgOrder> self(this);
+    auto removePrintedServiceFunc = [self, ja, reason](const QString & bearer) {
+        NInterface::query("/engine/v2/waiter/order/remove-array-of-dishes", bearer, self, {
+            {"order_id", self->mOrder.id},
+            {"dishes", ja}
+        },
+        [self](const QJsonObject & jdoc) {
+            QJsonArray ja = jdoc["removed_dishes"].toArray();
+
+            for(int i = 0; i < ja.size(); i++) {
+                self->printRemovedDish(ja.at(i).toObject());
+            }
+
+            self->parseOrder(jdoc);
+        }, [](const QJsonObject & jerr) {
+            return false;
+        });
+    };
+
+    if(needReason) {
+        if(mUser->check(cp_t5_remove_printed_service)) {
+            removePrintedServiceFunc(mUser->mSessionKey);
+            return;
+        } else {
+            QString pin;
+
+            if(!DlgPassword::getPasswordString(tr("Remove printed dish"), pin)) {
+                return;
+            }
+
+            auto *user = new C5User();
+            user->authorize(pin, self->fHttp, [self, removePrintedServiceFunc, user](const QJsonObject & jdoc) {
+                if(user->check(cp_t5_remove_printed_service)) {
+                    removePrintedServiceFunc(user->mSessionKey);
+                } else {
+                    C5Message::error(tr("Permission denied"));
+                }
+
+                user->deleteLater();
+            }, [user]() {
+                user->deleteLater();
+            });
+            return;
+        }
+    } else {
+        removePrintedServiceFunc(mUser->mSessionKey);
+    }
 }
 
 void DlgOrder::on_btnSetPrecent_clicked()
 {
-    //  disableForCheckall(false);
-    //  C5User *tmp = mUser;
-    //  bool needproceed = false;
-    //  for(int i = 0; i < wo->fOrderDriver->dishesCount(); i++) {
-    //      if(wo->fOrderDriver->dishesValue("f_state", i).toInt() != DISH_STATE_OK) {
-    //          continue;
-    //      }
-    //      if(wo->fOrderDriver->dishesValue("f_price", i).toDouble() < 0.01) {
-    //          continue;
-    //      }
-    //      if(wo->dishWidget(i)->isChecked()) {
-    //          needproceed = true;
-    //          break;
-    //      }
-    //  }
-    //  if(!needproceed) {
-    //      return;
-    //  }
-    //  if(!tmp->check(cp_t5_present)) {
-    //      if(!DlgPassword::getUserAndCheck(tr("Present dish"), tmp, cp_t5_present)) {
-    //          return;
-    //      }
-    //  }
-    //  if(C5Message::question(tr("Are you sure to present selected dish?")) != QDialog::Accepted) {
-    //      return;
-    //  }
-    //  for(int i = 0; i < wo->fOrderDriver->dishesCount(); i++) {
-    //      if(wo->fOrderDriver->dishesValue("f_state", i).toInt() != DISH_STATE_OK) {
-    //          continue;
-    //      }
-    //      if(wo->fOrderDriver->dishesValue("f_price", i).toDouble() < 0.01) {
-    //          continue;
-    //      }
-    //      if(wo->dishWidget(i)->isChecked()) {
-    //          wo->fOrderDriver->setDishesValue("f_price", 0, i);
-    //          logRecord(tmp->fullName(),
-    //                    wo->fOrderDriver->headerValue("f_id").toString(),
-    //                    wo->fOrderDriver->dishesValue("f_id", i).toString(),
-    //                    "Present dish",
-    //                    dbdish->name(wo->fOrderDriver->dishesValue("f_dish", i).toInt()),
-    //                    "");
-    //      }
-    //  }
-    //  updateData();
-    //  if(tmp != mUser) {
-    //      delete tmp;
-    //  }
+    QPointer<DlgOrder> self(this);
+    auto func = [self](C5User * user) {
+        if(!self) {
+            return;
+        }
+
+        QJsonArray ja;
+
+        for(int i = 0, count = self->ui->vlDishes->count(); i < count; i++) {
+            QLayoutItem *l = self->ui->vlDishes->itemAt(i);
+            WaiterDishWidget *d = dynamic_cast<WaiterDishWidget*>(l->widget());
+
+            if(d) {
+                if(d->isChecked()) {
+                    WaiterDish wd = d->mOrderItem;
+
+                    if(!wd.isPrinted()) {
+                        continue;
+                    }
+
+                    if(wd.state == DISH_STATE_OK && !wd.isHourlyPayment() && wd.type == GOODS_TYPE_GOODS) {
+                        ja.append(QJsonObject{{"f_id", wd.id}});
+                    }
+                }
+            }
+        }
+
+        if(ja.isEmpty()) {
+            return;
+        } else {
+            if(C5Message::question(tr("Mark selected items as complimentary")) != QDialog::Accepted) {
+                return;
+            }
+        }
+
+        NInterface::query1("/engine/v2/waiter/order/complimentary-items", user->mSessionKey, self,
+        {{"items", ja}, {"id", self->mOrder.id}},
+        [self](const QJsonObject & jdoc) {
+            if(!self) {
+                return;
+            }
+
+            self->disableForCheckall(false);
+            self->parseOrder(jdoc);
+        });
+    };
+    funcWithAuth(cp_t5_complimentary, tr("Complimentary"), func);
 }
 
-void DlgOrder::on_btnReceived_clicked()
+void DlgOrder::on_btnPartFavorite_clicked()
 {
-    //  double v = wo->fOrderDriver->headerValue("f_amounttotal").toDouble();
-    //  if(Change::getReceived(v)) {
-    //      wo->fOrderDriver->setHeader("f_cash", v);
-    //      headerToLineEdit();
-    //}
+    makeFavorites();
+}
+void DlgOrder::on_btnMenuHome_clicked()
+{
+    makeGroups(0, 0);
+}
+void DlgOrder::on_btnPart1_clicked()
+{
+    makeGroups(0, 1);
+}
+void DlgOrder::on_btnPart2_clicked()
+{
+    makeGroups(0, 2);
+}
+void DlgOrder::on_btnPart3_clicked()
+{
+    makeGroups(0, 3);
+}
+void DlgOrder::on_btnBackGroup_clicked()
+{
+    if(!mPreviouseParent.isEmpty()) {
+        int group = mPreviouseParent.pop();
+        makeGroups(group, 0);
+    }
 }
 
-void DlgOrder::on_btnSelfCost_clicked()
+void DlgOrder::on_btnShowHideRemoved_clicked(bool checked)
 {
-    // w->fOrderDriver->setHeader("f_otherid", PAYOTHER_PRIMECOST);
-    // setSelfcost();
-    // if(w->fOrderDriver->save() == false) {
-    //     C5Message::error(w->fOrderDriver->error());
-    // }
+    mShowRemoved = checked;
+    ui->btnShowHideRemoved->setIcon(mShowRemoved ? QPixmap(":/eye-no.png") : QPixmap(":/eye.png"));
+
+    for(int i = 0 ; i <  mOrder.dishes.size(); i++) {
+        auto *layout = ui->vlDishes->itemAt(i);
+        WaiterDishWidget *ow = qobject_cast<WaiterDishWidget*>(layout->widget());
+        WaiterDish w = mOrder.dishes.at(i);
+        ow->mShowRemoved = mShowRemoved;
+        ow->updateDish(w);
+    }
 }
 
-void DlgOrder::on_btnDelivery_clicked()
+void DlgOrder::on_btnSetWholeAmount_clicked()
 {
-    // QString phone, address, name;
-    // int id;
-    // if(CustomerInfo::getCustomer(id, name, phone, address)) {
-    //     w->fOrderDriver->setHeader("f_partner", id);
-    //     ui->btnDelivery->setText(QString("%1, %2, %3").arg(phone, name, address));
-    // }
+    double remain = mOrder.totalDue;
+
+    while(auto *l = ui->vlPayment->takeAt(0)) {
+        if(auto *b = qobject_cast<QToolButton*>(l->widget())) {
+            remain -= b->property("amount").toDouble();
+        }
+    }
+
+    ui->lbAmount->setProperty("amount", remain);
+    ui->lbAmount->setProperty("str", QString::number(remain, 'f', 2));
+    ui->lbAmount->setText(QString("%1 %2").arg(float_str(remain, 2), CURRENCY_SHORT));
 }
 
-void DlgOrder::on_btnCalcIdram_clicked()
+void DlgOrder::on_btnNumClear_clicked()
 {
-    calcAmount(ui->leIDRAM);
+    ui->lbAmount->setProperty("amount", 0);
+    ui->lbAmount->setProperty("str", "");
+    ui->lbAmount->setText(QString("0 %2").arg(CURRENCY_SHORT));
 }
 
-void DlgOrder::on_btnFillBank_clicked()
+void DlgOrder::on_btnTransferDishes_clicked()
 {
-    // worder()->fOrderDriver->setHeader("f_amountbank",
-    //                                   worder()->fOrderDriver->headerValue("f_amounttotal").toDouble()
-    //                                   - worder()->fOrderDriver->headerValue("f_amountbank").toDouble()
-    //                                   - worder()->fOrderDriver->headerValue("f_amountcash").toDouble()
-    //                                   - worder()->fOrderDriver->headerValue("f_amountprepaid").toDouble()
-    //                                   - worder()->fOrderDriver->headerValue("f_amountidram").toDouble()
-    //                                   - worder()->fOrderDriver->headerValue("f_amountpayx").toDouble());
-    // worder()->fOrderDriver->setHeader("f_amountother", 0);
-    // ui->leRemain->setDouble(0);
-    // clearOther();
-    // headerToLineEdit();
-    // setButtonsState();
-}
+    QPointer<DlgOrder> self(this);
+    auto moveTableFunc = [self](C5User * user) {
+        if(!self) {
+            return;
+        }
 
-void DlgOrder::on_btnCashout_clicked()
-{
-    // double max = wo->fOrderDriver->headerValue("f_amounttotal").toDouble();
-    // if(!DlgPassword::getAmount(tr("Cashout"), max)) {
-    //     return;
-    // }
-    // QString comment;
-    // if(!DlgListOfDishComments::getComment(0, comment)) {
-    //     return;
-    // }
-    // QString purpose = tr("") + " #"
-    //                   + wo->fOrderDriver->headerValue("f_prefix").toString()
-    //                   + QString::number(wo->fOrderDriver->headerValue("f_hallid").toInt()) + " " + comment;
-    // C5Database db;
-    // db[":f_oheader"] = wo->fOrderDriver->headerValue("f_id");
-    // db.exec("select e.f_id as f_idout, a.f_id "
-    //         "from a_header_cash a "
-    //         "left join e_cash e on e.f_header=a.f_id "
-    //         "where f_oheader=:f_oheader");
-    // QString cashUUID;
-    // QString idout;
-    // if(db.nextRow()) {
-    //     cashUUID = db.getString("f_id");
-    //     idout = db.getString("f_idout");
-    // }
-    // C5StoreDraftWriter dw(db);
-    // dw.writeAHeader(cashUUID, tr("Delivery"), DOC_STATE_SAVED, DOC_TYPE_CASH,
-    //                 wo->fOrderDriver->headerValue("f_currentstaff").toInt(),
-    //                 QDate::currentDate(), QDate::currentDate(), QTime::currentTime(), 0, max, purpose, 1, 1);
-    // dw.writeAHeaderCash(cashUUID, 0, 1, 0, "", wo->fOrderDriver->headerValue("f_id").toString());
-    // dw.writeECash(idout, cashUUID, 1, -1, purpose, max, idout, 1);
-    // C5Message::info(purpose);
-}
+        DlgSplitOrder d(self->mOrder, user);
 
-void DlgOrder::on_btnMenuSet_clicked()
-{
-    int index = 0;
-    // //TODO: FIX MIGRATION
-    // if(!wo->currentRow(index)) {
-    //     return;
-    // }
-    // if(wo->fOrderDriver->dishesValue("f_state", index).toInt() != DISH_STATE_OK) {
-    //     return;
-    // }
-    // DlgMenuSet d(wo->fOrderDriver->dishesValue("f_id", index).toString());
-    // d.exec();
-    ////TODO FUCK
-    //load(fTable);
-}
+        if(d.exec() == QDialog::Accepted) {
+            self->accept();
+        }
+    };
 
-void DlgOrder::on_btnQR_clicked()
-{
-    // int index = -1;
-    // WOrder *wo = worder();
-    // if(!wo) {
-    //     return;
-    // }
-    // //TODO: FIX MIGRATION
-    // // if(!wo->currentRow(index)) {
-    // //     return;
-    // // }
-    // if(wo->fOrderDriver->dishesValue("f_state", index).toInt() != DISH_STATE_OK) {
-    //     return;
-    // }
-    // bool ok;
-    // QString qr = QInputDialog::getText(this, tr("Emarks"), tr("Emarks"), QLineEdit::Normal, "", &ok);
-    // if(!ok) {
-    //     return;
-    // }
-    // if(qr.length() < 29 && qr.length() > 0) {
-    //     C5Message::error(tr("Invalid Emarks"));
-    //     return;
-    // }
-    // fHttp->createHttpQuery("/engine/waiter/qr-list.php",
-    // QJsonObject {
-    //     {"action", "add"},
-    //     {"bodyid", wo->fOrderDriver->dishesValue("f_id", index).toString()},
-    //     {"emarks", qr}},
-    // SLOT(qrListResponse(QJsonObject)));
-}
-
-void DlgOrder::on_btnTable_clicked()
-{
-//TODO: CHECK
-    // int newTableId;
-    // if(!DlgFace::getTable(newTableId, wo->fOrderDriver->headerValue("f_hall").toInt(), mUser)) {
-    //     return;
-    // }
-    // if(newTableId == wo->fOrderDriver->headerValue("f_table").toInt()) {
-    //     C5Message::error(tr("Same table"));
-    //     return;
-    // }
-    // fHttp->createHttpQuery("/engine/waiter/move-table.php",
-    // QJsonObject {{"action", "moveTable"}, {"order", wo->fOrderDriver->headerValue("f_id").toString()},
-    //     {"oldtable", wo->fOrderDriver->headerValue("f_table").toInt()},
-    //     {"newtable", newTableId}},
-    // SLOT(moveTableResponse(QJsonObject)));
-}
-
-void DlgOrder::on_leCmd_returnPressed()
-{
-    if(ui->leCmd->text().trimmed().isEmpty()) {
+    if(mUser->check(cp_t5_movetable)) {
+        moveTableFunc(mUser);
         return;
     }
 
-    QString code = ui->leCmd->text().trimmed();
-    ui->leCmd->clear();
-    //Check qr exists
-    fHttp->createHttpQuery("/engine/waiter/check-qr.php", QJsonObject{{"action", "checkQr"},
-        {"qr", code}}, SLOT(checkQrResponse(QJsonObject)));
+    QString pin;
+
+    if(!DlgPassword::getPasswordString(tr("Remove printed dish"), pin)) {
+        return;
+    }
+
+    auto *user = new C5User();
+    user->authorize(pin, self->fHttp, [self, moveTableFunc, user](const QJsonObject & jdoc) {
+        if(user->check(cp_t5_remove_printed_service)) {
+            moveTableFunc(user);
+        } else {
+            C5Message::error(tr("Permission denied"));
+        }
+
+        user->deleteLater();
+    }, [user]() {
+        user->deleteLater();
+    });
 }
 
-void DlgOrder::on_btnSetQr_clicked()
+void DlgOrder::on_btnTransferTable_clicked()
 {
-    //  int index = 0;
-    //  //TODO: FIX MIGRATION
-    //  // if(!wo->currentRow(index)) {
-    //  //     return;
-    //  // }
-    //  if(wo->fOrderDriver->dishesValue("f_state", index).toInt() != DISH_STATE_OK) {
-    //      return;
-    //  }
-    //  if(dbdish->isHourlyPayment(wo->fOrderDriver->dishesValue("f_dish", index).toInt())) {
-    //      C5Message::error(tr("Cannot add comment to hourly payment"));
-    //      return;
-    //  }
-    //  if(wo->fOrderDriver->dishesValue("f_emarks", index).toString().isEmpty() == false) {
-    //      C5Message::error(tr("Emarks already set"));
-    //      return;
-    //  }
-    //  bool ok;
-    //  QString emarks = QInputDialog::getText(this, tr("Emarks"), "", QLineEdit::Normal, "", &ok);
-    //  if(!ok) {
-    //      return;
-    //  }
-    //  if(emarks.length() < 29) {
-    //      C5Message::error(tr("Invalid Emarks"));
-    //      return;
-    //  }
-    //  C5Database db;
-    //  db[":f_emarks"] = emarks;
-    //  db.exec("select * from o_body where f_state=1 and f_emarks=:f_emarks");
-    //  if(db.nextRow()) {
-    //      C5Message::error(tr("Used Emarks"));
-    //      return;
-    //  }
-    //  wo->fOrderDriver->setDishesValue("f_emarks", emarks, index);
-    //  wo->updateItem(index);
-    //  logRecord(mUser->fullName(), wo->fOrderDriver->headerValue("f_id").toString(),
-    //            wo->fOrderDriver->dishesValue("f_id", index).toString(),
-    //            "Emarks for dish",
-    //            dbdish->name(wo->fOrderDriver->dishesValue("f_emarks", index).toInt()), emarks);
-    //  wo->fOrderDriver->save();
+    if(mOrder.isEmpty()) {
+        C5Message::error(tr("Nothing to transfer"));
+        return;
+    }
+
+    DlgTables d(mUser);
+    int tableId = d.exec();
+
+    if(tableId == 0) {
+        return;
+    }
+
+    QPointer<DlgOrder> self(this);
+    auto func = [self](C5User * user, int destinationTableId) {
+        if(!self) {
+            return;
+        }
+
+        NInterface::query1("/engine/v2/waiter/order/transfer-table", user->mSessionKey, self, {
+            {"id", self->mOrder.id},
+            {"locksrc", hostinfo},
+            {"destination", destinationTableId}
+        }, [self](const QJsonObject & jdoc) {
+            C5Message::info(tr("Transfer successfull"));
+            self->parseOrder(jdoc);
+            self->on_btnExit_clicked();
+        });
+    };
+
+    if(mUser->check(cp_t5_movetable)) {
+        func(mUser, tableId);
+    } else {
+        QString pin;
+
+        if(!DlgPassword::getPasswordString(tr("Confirm table transfer"), pin)) {
+            return;
+        }
+
+        auto *user = new C5User();
+        user->authorize(pin, self->fHttp, [self, func, user, tableId](const QJsonObject & jdoc) {
+            if(user->check(cp_t5_remove_printed_service)) {
+                func(user, tableId);
+            } else {
+                C5Message::error(tr("Permission denied"));
+            }
+
+            user->deleteLater();
+        }, [user]() {
+            user->deleteLater();
+        });
+    }
 }

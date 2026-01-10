@@ -183,6 +183,8 @@ bool requestStore(const QJsonObject &jreq, QJsonObject &jret, QString &err)
     years.append(2023);
     years.append(2024);
     years.append(2025);
+    years.append(2026);
+    years.append(2027);
     int year = jreq["year"].toInt();
     year = years.at(year);
     QDate d = QDate::currentDate();

@@ -1,9 +1,9 @@
-#ifndef CE5GOODSGROUP_H
-#define CE5GOODSGROUP_H
+#pragma once
 
 #include "ce5editor.h"
 
-namespace Ui {
+namespace Ui
+{
 class CE5GoodsGroup;
 }
 
@@ -20,11 +20,9 @@ public:
 
     virtual QString table() {return "c_groups"; }
 
-private slots:
-    void on_btnSetStoreReminderQty_clicked();
-
 private:
-    Ui::CE5GoodsGroup *ui;
-};
+    Ui::CE5GoodsGroup* ui;
 
-#endif // CE5GOODSGROUP_H
+private slots:
+    void setColor();
+};

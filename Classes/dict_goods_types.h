@@ -1,0 +1,6 @@
+#pragma once
+
+#define GOODS_TYPE_GOODS 1
+#define GOODS_TYPE_SERVICE 2
+#define GOODS_TYPE_MODIFICATOR 3
+#define GOODS_TYPE_GUEST 4

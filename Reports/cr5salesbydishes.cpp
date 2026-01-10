@@ -164,7 +164,7 @@ void CR5SalesByDishes::actionShowDish()
     }
 
     C5DishWidget *ep = new C5DishWidget();
-    C5Editor *e = C5Editor::createEditor(ep, fModel->data(r, fModel->fColumnNameIndex["f_dishid"],
+    C5Editor *e = C5Editor::createEditor(mUser, ep, fModel->data(r, fModel->fColumnNameIndex["f_dishid"],
                                          Qt::EditRole).toInt());
     QList<QMap<QString, QVariant> > data;
     e->getResult(data);

@@ -34,8 +34,6 @@ public:
 
     bool event(QEvent *e) override;
 
-    void printPreview(C5Printing &p, bool showPrice);
-
 private slots:
     void on_btnAddRecipe_clicked();
 
@@ -54,8 +52,6 @@ private slots:
     void on_btnNewType_clicked();
 
     void recipeQtyPriceChanged(const QString &arg);
-
-    void on_btnPrintRecipe_clicked();
 
     void on_btnNewGoods_clicked();
 

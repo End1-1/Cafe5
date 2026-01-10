@@ -12,9 +12,9 @@ class TouchSelectTaxReport : public C5Dialog
     Q_OBJECT
 
 public:
-    explicit TouchSelectTaxReport();
+    explicit TouchSelectTaxReport(C5User *user);
     ~TouchSelectTaxReport();
-    static bool getReportType(int &r);
+    static bool getReportType(int &r, C5User *user);
 
 private slots:
     void on_btnReject_clicked();

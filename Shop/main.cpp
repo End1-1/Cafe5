@@ -2,7 +2,7 @@
 #include "dlgpin.h"
 #include "ndataprovider.h"
 #include "datadriver.h"
-#include "c5servername.h"
+#include "printtaxn.h"
 #include "c5dialog.h"
 #include "c5systempreference.h"
 #include "c5database.h"
@@ -51,7 +51,7 @@ int main(int argc, char* argv[])
         return -1;
     }
 
-    LogWriter::write(LogWriterLevel::verbose, "", "starting...");
+    // LogWriter::write(LogWriterLevel::verbose, "", "starting...");
     a.setStyle(QStyleFactory::create("fusion"));
     QFile styleSheet(a.applicationDirPath() + "/shop.css");
 
@@ -67,7 +67,16 @@ int main(int argc, char* argv[])
     }
 
     QString fileVersion =  FileVersion::getVersionString(a.applicationFilePath());
+    int build = 0;
+    const QStringList parts = fileVersion.split('.');
+
+    if(parts.size() >= 4) {
+        build = parts.at(3).toInt();
+    }
+
+    PrintTaxN::mDebugRseq = build;
     bool debug = false;
+    bool donotautologin = false;
 
     for(const QString &s : a.arguments()) {
         if(s.startsWith("/monitor")) {
@@ -95,6 +104,10 @@ int main(int argc, char* argv[])
         if(s.startsWith("/debug")) {
             debug = true;
         }
+
+        if(s.startsWith("/noautologin")) {
+            donotautologin = true;
+        }
     }
 
     if(!d.exists(d.homePath() + "/" + _APPLICATION_)) {
@@ -113,13 +126,14 @@ int main(int argc, char* argv[])
     NDataProvider::mFileVersion = fileVersion;
     NDataProvider::mDebug = debug;
     auto *dlgPin = new DlgPin();
+    dlgPin->mDoNotAutoLogin = donotautologin;
 
     if(dlgPin->exec() == QDialog::Rejected) {
         return 0;
     }
 
     auto *user = new C5User(dlgPin->mUser);
-    auto *dlgsplash = new DlgSplashScreen();
+    auto *dlgsplash = new DlgSplashScreen(nullptr);
     dlgsplash->show();
     C5Database db;
     emit dlgsplash->messageSignal("init data driver...");

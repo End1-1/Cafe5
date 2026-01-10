@@ -12,7 +12,7 @@ class DlgImportFromAS : public C5Dialog
 {
     Q_OBJECT
 public:
-    explicit DlgImportFromAS(QWidget *parent = nullptr);
+    explicit DlgImportFromAS(C5User *user = nullptr);
     ~DlgImportFromAS();
 
 private slots:

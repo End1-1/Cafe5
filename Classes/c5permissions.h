@@ -94,15 +94,13 @@
 #define cp_t5_print_receipt 529
 #define cp_t5_repeat_service 530
 #define cp_t5_change_date_of_sale 531
-#define cp_t5_bill_without_service 532
 #define cp_t5_edit_closed_order 533
 #define cp_t5_present 534
 #define cp_t5_edit_booking 535
 #define cp_t5_view_tax_and_no_sales 536
-#define cp_t5_pay_idram 537
-#define cp_t5_pay_payx 538
 #define cp_t5_view_sales_of_all_users 539
 #define cp_t5_shop_can_discount 540
+#define cp_t5_complimentary 541
 
 #define cp_t6_goods_menu 600
 #define cp_t6_units 601
@@ -165,5 +163,7 @@
 #define cp_t12_shop_enter_store 1204
 #define cp_t12_shop_fiscal_report 1205
 #define cp_t12_shop_sale_of_all_users 1206
+#define cp_t12_shop_discount 1207
+#define cp_t12_shop_report_goods 1208
 
 #endif // C5PERMISSIONS_H

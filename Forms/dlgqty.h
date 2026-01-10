@@ -3,7 +3,8 @@
 
 #include "c5dialog.h"
 
-namespace Ui {
+namespace Ui
+{
 class DlgQty;
 }
 
@@ -12,11 +13,11 @@ class DlgQty : public C5Dialog
     Q_OBJECT
 
 public:
-    explicit DlgQty();
+    explicit DlgQty(C5User *user);
 
     ~DlgQty();
-
-    static bool getQty(double &qty, const QString &name);
+    
+    static bool getQty(double& qty, const QString &name, C5User *user);
 
 private slots:
     void on_btnClear_clicked();
@@ -58,7 +59,7 @@ private slots:
     void on_btnOk_clicked();
 
 private:
-    Ui::DlgQty *ui;
+    Ui::DlgQty* ui;
 
     void click(const QString &c);
 };

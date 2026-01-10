@@ -14,7 +14,7 @@ class DlgSmartReports : public C5Dialog
     Q_OBJECT
 
 public:
-    explicit DlgSmartReports();
+    explicit DlgSmartReports(C5User *user);
     ~DlgSmartReports();
 
 private slots:

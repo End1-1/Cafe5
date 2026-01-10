@@ -5,8 +5,8 @@
 #include "c5database.h"
 #include "c5message.h"
 
-CE5PackageList::CE5PackageList(int package) :
-    C5Dialog(),
+CE5PackageList::CE5PackageList(C5User *user, int package) :
+    C5Dialog(user),
     ui(new Ui::CE5PackageList)
 {
     ui->setupUi(this);
@@ -29,18 +29,22 @@ void CE5PackageList::setPackage(int id)
     C5Database db;
     db[":f_id"] = id;
     db.exec("select f_price from d_package where f_id=:f_id");
-    if (db.nextRow()) {
+
+    if(db.nextRow()) {
         ui->lePrice->setDouble(db.getDouble(0));
     }
+
     db[":f_package"] = ui->lePackage->getInteger();
     db.exec("select pl.f_id, t.f_name as type_name, pl.f_dish, d.f_name as dish_name, pl.f_price "
             "from d_package_list pl "
             "left join d_dish d on d.f_id=pl.f_dish "
             "left join d_part2 t on t.f_id=d.f_part "
             "where pl.f_package=:f_package");
-    while (db.nextRow()) {
+
+    while(db.nextRow()) {
         addDish(db.getInt(0), db.getString(1), db.getInt(2), db.getString(3), db.getDouble(4));
     }
+
     countPrices();
 }
 
@@ -59,9 +63,11 @@ void CE5PackageList::addDish(int row, const QString &typeName, int dishCode, con
 void CE5PackageList::countPrices()
 {
     double price = 0;
-    for (int i = 0; i < ui->tbl->rowCount(); i++) {
+
+    for(int i = 0; i < ui->tbl->rowCount(); i++) {
         price += ui->tbl->lineEdit(i, 4)->getDouble();
     }
+
     ui->leSum->setDouble(price);
 }
 
@@ -71,9 +77,9 @@ void CE5PackageList::itemPriceChanged(const QString &str)
     countPrices();
 }
 
-void CE5PackageList::packageChanged(const QVector<QJsonValue> &val)
+void CE5PackageList::packageChanged(const QVector<QJsonValue>& val)
 {
-    if (val.count() > 0) {
+    if(val.count() > 0) {
         setPackage(val.at(0).toInt());
     }
 }
@@ -81,9 +87,11 @@ void CE5PackageList::packageChanged(const QVector<QJsonValue> &val)
 void CE5PackageList::on_btnAdd_clicked()
 {
     QJsonArray values;
-    if (!C5Selector::getValue(cache_dish, values)) {
+
+    if(!C5Selector::getValue(mUser, cache_dish, values)) {
         return;
     }
+
     addDish(0, values.at(2).toString(), values.at(0).toInt(), values.at(1).toString(), 0);
     countPrices();
 }
@@ -93,12 +101,14 @@ void CE5PackageList::on_btnSave_clicked()
     C5Database db;
     db[":f_package"] = ui->lePackage->getInteger();
     db.exec("delete from d_package_list where f_package=:f_package");
-    for (int i = 0; i < ui->tbl->rowCount(); i++) {
+
+    for(int i = 0; i < ui->tbl->rowCount(); i++) {
         db[":f_package"] = ui->lePackage->getInteger();
         db[":f_dish"] = ui->tbl->getInteger(i, 2);
         db[":f_price"] = ui->tbl->lineEdit(i, 4)->getDouble();
         ui->tbl->setInteger(i, 0, db.insert("d_package_list"));
     }
+
     db[":f_id"] = ui->lePackage->getInteger();
     db[":f_price"] = ui->lePrice->getDouble();
     db.exec("update d_package set f_price=:f_price where f_id=:f_id");
@@ -108,8 +118,10 @@ void CE5PackageList::on_btnSave_clicked()
 void CE5PackageList::on_btnRemove_clicked()
 {
     QModelIndexList ml = ui->tbl->selectionModel()->selectedRows();
-    for (int i = ml.count() - 1; i > -1; i--) {
+
+    for(int i = ml.count() - 1; i > -1; i--) {
         ui->tbl->removeRow(ml.at(i).row());
     }
+
     countPrices();
 }

@@ -54,6 +54,7 @@ bool DlgPaymentChoose::getValues(C5User *user, double total, double& cash, doubl
     d.ui->leDebt->setDouble(debt);
     d.ui->leCashIn->setDouble(cashin);
     d.ui->leChange->setDouble(change);
+    d.ui->leChange->setSelection(0, 9);
     d.fFiscal = fiscal;
     d.setFiscalStyle();
     d.fFiscal = fiscal;

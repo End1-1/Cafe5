@@ -214,6 +214,13 @@ bool CE5Editor::save(QString &err, QList<QMap<QString, QVariant> >& data)
 
         case 1:
             value = leField->getInteger();
+
+            if(leField->hasSelector()) {
+                if(leField->getInteger() == 0) {
+                    value = QVariant();
+                }
+            }
+
             break;
 
         case 2:

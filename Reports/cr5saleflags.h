@@ -12,7 +12,7 @@ class CR5SaleFlags : public C5Dialog
     Q_OBJECT
 
 public:
-    explicit CR5SaleFlags();
+    explicit CR5SaleFlags(C5User *user);
 
     ~CR5SaleFlags();
 
