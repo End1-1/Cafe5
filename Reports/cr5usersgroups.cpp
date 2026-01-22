@@ -6,7 +6,7 @@
 CR5UsersGroups::CR5UsersGroups(QWidget *parent) :
     C5ReportWidget( parent)
 {
-    fIcon = ":/users_groups.png";
+    fIconName = ":/users_groups.png";
     fLabel = tr("Users groups");
     fSqlQuery = "select f_id, f_name, f_starttime, f_duration from s_user_group";
     fTranslation["f_id"] = tr("Code");

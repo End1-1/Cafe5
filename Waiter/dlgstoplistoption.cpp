@@ -8,6 +8,7 @@
 #include "c5user.h"
 #include "c5utils.h"
 #include "c5user.h"
+#include "format_date.h"
 
 DlgStopListOption::DlgStopListOption(DlgOrder *o, C5User *u) :
     C5Dialog(u),

@@ -23,29 +23,33 @@ CR5StoreDocumentsFilter::~CR5StoreDocumentsFilter()
 QString CR5StoreDocumentsFilter::condition()
 {
     QString result = "where h.f_date between " + ui->deStart->toMySQLDate() + " and " + ui->deEnd->toMySQLDate();
-    if (!ui->leType->isEmpty()) {
-        result += " and h.f_type in (" + ui->leType->text() + ") ";
+
+    if(!ui->leType->isEmpty()) {
+        in(result, "h.f_type", ui->leType);
     } else {
         result += " and h.f_type in (1,2,3,6)";
     }
-    if (!ui->lePayment->isEmpty()) {
-        result += " and h.f_payment in (" + ui->lePayment->text() + ") ";
-    }
-    if (ui->rbpNo->isChecked()) {
+
+    in(result, "h.f_payment", ui->lePayment);
+
+    if(ui->rbpNo->isChecked()) {
         result += " and h.f_paid<h.f_amount ";
     }
-    if (ui->rbpYes->isChecked()) {
+
+    if(ui->rbpYes->isChecked()) {
         result += " and h.f_paid=h.f_amount ";
     }
-    if (ui->rbpPartial->isChecked()) {
+
+    if(ui->rbpPartial->isChecked()) {
         result += " and (h.f_paid>0 and h.f_paid<h.f_amount) ";
     }
-    if (!ui->lePartner->isEmpty()) {
-        result += " and h.f_partner in (" + ui->lePartner->text() + ") ";
+
+    in(result, "h.f_partner", ui->lePartner);
+
+    if(!ui->leStore->isEmpty()) {
+        result += QString(" and (hs.f_storein in (%1) or hs.f_storeout in (%1)) ").arg(normalizeIntInList(ui->leStore->text()));
     }
-    if (!ui->leStore->isEmpty()) {
-        result += QString (" and (hs.f_storein in (%1) or hs.f_storeout in (%1)) ").arg(ui->leStore->text());
-    }
+
     in(result, "h.f_state", ui->leState);
     in(result, "hs.f_reason", ui->leReason);
     return result;
@@ -69,20 +73,24 @@ void CR5StoreDocumentsFilter::setDateFilter(const QDate &d1, const QDate &d2)
 
 void CR5StoreDocumentsFilter::setPaidFilter(int paid)
 {
-    switch (paid) {
-        case 0 :
-            ui->rbpAll->setChecked(true);
-            break;
-        case 1:
-            ui->rbpNo->setChecked(true);
-            break;
-        case 2:
-            ui->rbpYes->setChecked(true);
-            break;
-        case 4:
-            ui->rbpPartial->setChecked(true);
-            break;
-        default:
-            break;
+    switch(paid) {
+    case 0 :
+        ui->rbpAll->setChecked(true);
+        break;
+
+    case 1:
+        ui->rbpNo->setChecked(true);
+        break;
+
+    case 2:
+        ui->rbpYes->setChecked(true);
+        break;
+
+    case 4:
+        ui->rbpPartial->setChecked(true);
+        break;
+
+    default:
+        break;
     }
 }

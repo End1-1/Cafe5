@@ -10,7 +10,7 @@
 CR5SalesByDishes::CR5SalesByDishes(QWidget *parent) :
     C5ReportWidget(parent)
 {
-    fIcon = ":/delete.png";
+    fIconName = ":/delete.png";
     fLabel = tr("Sales, dishes");
     fSimpleQuery = false;
     fMainTable = "o_body ob";

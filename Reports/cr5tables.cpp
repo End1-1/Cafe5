@@ -5,7 +5,7 @@
 CR5Tables::CR5Tables(QWidget *parent) :
     C5ReportWidget(parent)
 {
-    fIcon = ":/table.png";
+    fIconName = ":/table.png";
     fLabel = tr("Tables");
     fSimpleQuery = false;
     fMainTable = "h_tables t";

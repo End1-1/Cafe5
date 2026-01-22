@@ -47,6 +47,7 @@ void NInterface::createHttpQueryLambda(const QString &route, const QJsonObject &
     auto *np = new NDataProvider();
     np->changeTimeout(timeout);
     connect(np, &NDataProvider::started, this, &NInterface::httpQueryStarted);
+    connect(np, SIGNAL(updateRequired(QString, QString, QString)), this->parent(), SLOT(updateRequired(QString, QString, QString)));
     connect(np, &NDataProvider::error, this->parent(), [this, np, errCallback](const QString & msg) {
         if(fProgress || fLoadingDlg) {
             if(fLoadingDlg) {
@@ -85,6 +86,7 @@ void NInterface::createHttpQueryLambda2(const QString &route, const QJsonObject 
     auto *np = new NDataProvider();
     np->changeTimeout(timeout);
     connect(np, &NDataProvider::started, this, &NInterface::httpQueryStarted);
+    connect(np, SIGNAL(updateRequired(QString, QString, QString)), this->parent(), SLOT(updateRequired(QString, QString, QString)));
     connect(np, &NDataProvider::error, this->parent(), [this, np, errCallback](const QString & msg) {
         if(fProgress || fLoadingDlg) {
             if(fLoadingDlg) {
@@ -182,6 +184,7 @@ void NInterface::query(const QString &route, const QString &bearer, QObject *con
         np->deleteLater();
         iface->deleteLater();
     });
+    connect(np, SIGNAL(updateRequired(QString, QString, QString)), context, SLOT(updateRequired(QString, QString, QString)));
     np->getData(route, params);
 }
 

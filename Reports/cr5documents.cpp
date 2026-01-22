@@ -15,7 +15,7 @@
 CR5Documents::CR5Documents(QWidget *parent) :
     C5ReportWidget(parent)
 {
-    fIcon = ":/documents.png";
+    fIconName = ":/documents.png";
     fLabel = tr("Documents");
     fSimpleQuery = false;
     fMainTable = "a_header h";

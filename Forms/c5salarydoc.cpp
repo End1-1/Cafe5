@@ -18,7 +18,7 @@ C5SalaryDoc::C5SalaryDoc(QWidget *parent) :
     ui(new Ui::C5SalaryDoc)
 {
     ui->setupUi(this);
-    fIcon = ":/employee.png";
+    fIconName = ":/employee.png";
     fLabel = tr("Salary document");
     ui->tbl->setColumnWidths(ui->tbl->columnCount(), 0, 150, 200, 0, 300, 100, 80, 80, 80, 80, 100);
     fDate = QDate::currentDate();

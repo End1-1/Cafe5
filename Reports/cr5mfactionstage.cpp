@@ -4,7 +4,7 @@
 CR5MFActionStage::CR5MFActionStage(QWidget *parent) :
     C5ReportWidget( parent)
 {
-    fIcon = ":/manufacturing.png";
+    fIconName = ":/manufacturing.png";
     fLabel = tr("Stages of actions");
     fSqlQuery = "select f_id, f_name from mf_actions_state";
     fTranslation["f_id"] = tr("Code");

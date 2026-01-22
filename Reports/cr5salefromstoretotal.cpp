@@ -7,7 +7,7 @@
 CR5SaleFromStoreTotal::CR5SaleFromStoreTotal(QWidget *parent) :
     C5ReportWidget( parent)
 {
-    fIcon = ":/graph.png";
+    fIconName = ":/graph.png";
     fLabel = tr("Sales from store total");
     fSimpleQuery = false;
     fFilterWidget = new CR5SaleFromStoreTotalFilter();

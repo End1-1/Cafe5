@@ -1,23 +1,19 @@
 #ifndef C5PRINTJSON_H
 #define C5PRINTJSON_H
 
-#include <QThread>
+#include "c5printing.h"
 #include <QJsonArray>
 
-class C5PrintJson : public QThread
+class C5PrintJson
 {
-    Q_OBJECT
 
 public:
-    C5PrintJson(const QJsonArray &obj, QObject *parent = 0);
+    C5PrintJson();
 
     ~C5PrintJson();
 
-protected:
-    virtual void run();
+    virtual void parse(C5Printing &p, const QJsonArray &cmd);
 
-private:
-    QJsonArray fJson;
 };
 
 #endif // C5PRINTJSON_H

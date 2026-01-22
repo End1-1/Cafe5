@@ -534,6 +534,20 @@ bool WOrder::writeOrder()
 
     /* end fiscal */
 
+    if(fOHeader.partner > 0) {
+        OutputOfHeader ooh;
+        ooh.make(db, fOHeader._id());
+    }
+
+    if(!fDraftSale.id.toString().isEmpty()) {
+        db[":f_id"] = fDraftSale._id();
+        db.exec("update o_draft_sale set f_state=3 where f_id=:f_id");
+        db[":f_header"] = fDraftSale.id;
+        db.exec("update o_draft_sale_body set f_state=3 where f_header=:f_header");
+    }
+
+    qDebug() << "Order writed in" << t.elapsed();
+
     if(!C5Config::localReceiptPrinter().isEmpty()) {
         PrintReceiptGroup p;
 
@@ -565,18 +579,6 @@ bool WOrder::writeOrder()
         default:
             break;
         }
-    }
-
-    if(fOHeader.partner > 0) {
-        OutputOfHeader ooh;
-        ooh.make(db, fOHeader._id());
-    }
-
-    if(!fDraftSale.id.toString().isEmpty()) {
-        db[":f_id"] = fDraftSale._id();
-        db.exec("update o_draft_sale set f_state=3 where f_id=:f_id");
-        db[":f_header"] = fDraftSale.id;
-        db.exec("update o_draft_sale_body set f_state=3 where f_header=:f_header");
     }
 
     return true;
@@ -1263,6 +1265,7 @@ void WOrder::on_btnSearchPartner_clicked()
     fOHeader.partner = pi.id;
     ui->leTIN->setText(pi.tin);
     ui->leCustomer->setText(pi.taxName + ", " + pi.contactName + ", " + pi.phone);
+    ui->btnF5->setVisible(true);
 }
 
 void WOrder::on_leUseAccumulated_textChanged(const QString & arg1)

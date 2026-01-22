@@ -18,7 +18,7 @@ C5CashDoc::C5CashDoc(QWidget *parent) :
     ui(new Ui::C5CashDoc)
 {
     ui->setupUi(this);
-    fIcon = ":/cash.png";
+    fIconName = ":/cash.png";
     fLabel = tr("Cash document");
     ui->tbl->setColumnWidths(ui->tbl->columnCount(), 0, 0, 400, 100, 0);
     ui->leDocNum->setPlaceholderText(QString("%1").arg(genNumber(DOC_TYPE_CASH), C5Config::docNumDigitsInput(), 10,

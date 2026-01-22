@@ -4,7 +4,7 @@
 CR5SalaryByWorkers::CR5SalaryByWorkers(QWidget *parent) :
     C5ReportWidget( parent)
 {
-    fIcon = ":/employee.png";
+    fIconName = ":/employee.png";
     fLabel = tr("Salary by workers");
     fSimpleQuery = true;
     fQuery = "SELECT sp.f_id, sp.f_date AS `Ամսաթիվ`, g.f_name AS `Հաստիկ`, "

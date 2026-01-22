@@ -13,7 +13,7 @@
 CR5Databases::CR5Databases(QWidget *parent) :
     C5ReportWidget(parent)
 {
-    fIcon = ":/database.png";
+    fIconName = ":/database.png";
     fLabel = tr("Databases");
     fSqlQuery = "select f_id, f_host, f_db, f_name, f_description, f_user, f_password from s_db ";
     fTranslation["f_id"] = tr("Code");

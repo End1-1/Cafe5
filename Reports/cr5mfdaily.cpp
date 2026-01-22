@@ -12,7 +12,7 @@ CR5MfDaily::CR5MfDaily(QWidget *parent) :
     ui(new Ui::CR5MfDaily)
 {
     ui->setupUi(this);
-    fIcon = ":/manufacturing.png";
+    fIconName = ":/manufacturing.png";
     fLabel = tr("Daily journal");
     ui->wt->addColumn(tr("Rownum"), 0);
     ui->wt->addColumn(tr("Product"), 180);

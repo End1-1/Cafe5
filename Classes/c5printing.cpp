@@ -15,12 +15,7 @@ C5Printing::C5Printing() :
     QObject()
 {
     fCanvas = new QGraphicsScene();
-    fLinePen.setWidth(1);
-    fLineHeight = 4;
-    fTop = 0;
-    fTempTop = 0;
-    fCurrentPageIndex = 0;
-    fNoNewPage = false;
+    reset();
 }
 
 C5Printing::~C5Printing()
@@ -38,6 +33,21 @@ void C5Printing::setSceneParams(qreal width, qreal height, qreal logicalDpiX)
     o["cmd"] = "scene";
     o["width"] = width;
     o["height"] = height;
+    fJsonData.append(o);
+}
+
+void C5Printing::reset()
+{
+    fLinePen.setWidth(1);
+    fLineHeight = 4;
+    fTop = 0;
+    fTempTop = 0;
+    fCurrentPageIndex = 0;
+    fJsonData = QJsonArray();
+    QJsonObject o;
+    o["cmd"] = "scene";
+    o["width"] = fNormalWidth;
+    o["height"] = fCanvas->height();
     fJsonData.append(o);
 }
 

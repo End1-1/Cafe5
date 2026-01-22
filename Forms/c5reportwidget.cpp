@@ -10,7 +10,7 @@
 C5ReportWidget::C5ReportWidget(QWidget *parent) :
     C5Grid(parent)
 {
-    fIcon = ":/configure.png";
+    fIconName = ":/configure.png";
     fLabel = "C5ReportWidget";
     fToolBar = 0;
     fEditor = nullptr;

@@ -5,7 +5,7 @@ CR5CreditCards::CR5CreditCards(QWidget *parent) :
     C5ReportWidget( parent)
 {
     fLabel = tr("Credit cards");
-    fIcon = ":/credit-card.png";
+    fIconName = ":/credit-card.png";
     fSimpleQuery = true;
     fSqlQuery = "select f_id, f_name from o_credit_card";
     fTranslation["f_id"] = tr("Code");

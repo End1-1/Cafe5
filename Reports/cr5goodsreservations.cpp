@@ -5,7 +5,7 @@
 CR5GoodsReservations::CR5GoodsReservations(QWidget *parent) :
     C5ReportWidget(parent)
 {
-    fIcon = ":/calendar.png";
+    fIconName = ":/calendar.png";
     fLabel = tr("Goods reservation");
     setProperty("sql", "select rs.f_id, arn.f_name as f_statename, rs.f_date, "
                 "ss.f_name as f_sourcestore, sd.f_name as f_storename, "

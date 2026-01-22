@@ -6,7 +6,7 @@ CR5ConsuptionReason::CR5ConsuptionReason(QWidget *parent) :
     C5ReportWidget(parent)
 {
     fLabel = tr("Reason for consuption");
-    fIcon = ":/goods.png";
+    fIconName = ":/goods.png";
 //    fSimpleQuery = false;
 //    fMainTable = "o_body ob";
 //    fLeftJoinTables << "left join o_header oh on oh.f_id=ob.f_header [oh]"

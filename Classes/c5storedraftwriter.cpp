@@ -1,11 +1,10 @@
 #include "c5storedraftwriter.h"
 #include "c5utils.h"
 #include "c5config.h"
-#include "chatmessage.h"
-#include "c5cafecommon.h"
 #include "dict_dish_state.h"
 #include "jsons.h"
 #include "ogoods.h"
+#include "format_date.h"
 #include <QVariant>
 #include <QJsonDocument>
 #include <QJsonObject>
@@ -1021,7 +1020,8 @@ bool C5StoreDraftWriter::transferToHotel(C5Database &db, const QString &uuid, QS
     QString payComment = "CASH";
 
     if(fHeader["f_amountcard"].toDouble() > 0.001) {
-        payComment = C5CafeCommon::creditCardName(fHeader["f_creditcardid"].toInt());
+        //TODO
+        // payComment = C5CafeCommon::creditCardName(fHeader["f_creditcardid"].toInt());
     }
 
     if(!clcode.isEmpty()) {

@@ -6,7 +6,7 @@
 CR5MFGeneralReport::CR5MFGeneralReport(QWidget *parent) :
     C5ReportWidget( parent)
 {
-    fIcon = ":/manufacturing.png";
+    fIconName = ":/manufacturing.png";
     fLabel = tr("Manufacture general report");
     fFilterWidget = new CR5MFGeneralReportFilter();
     fSimpleQuery = false;

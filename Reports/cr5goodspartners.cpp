@@ -6,7 +6,7 @@
 CR5GoodsPartners::CR5GoodsPartners(QWidget *parent) :
     C5ReportWidget( parent)
 {
-    fIcon = ":/goods.png";
+    fIconName = ":/goods.png";
     fLabel = tr("Partners");
     fSqlQuery = "select p.f_id, c.f_name as f_category, s.f_name as f_state, g.f_name as f_group, "
                 "p.f_name, p.f_taxname, p.f_taxcode, p.f_contact, p.f_phone, p.f_email, "

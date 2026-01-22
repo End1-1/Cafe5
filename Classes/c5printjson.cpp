@@ -1,13 +1,9 @@
 #include "c5printjson.h"
-#include "c5printing.h"
 #include <QJsonObject>
 #include <QDebug>
 
-C5PrintJson::C5PrintJson(const QJsonArray &obj, QObject *parent) :
-    QThread(parent)
+C5PrintJson::C5PrintJson()
 {
-    fJson = obj;
-    connect(this, SIGNAL(finished()), this, SLOT(deleteLater()));
 }
 
 C5PrintJson::~C5PrintJson()
@@ -15,12 +11,10 @@ C5PrintJson::~C5PrintJson()
     qDebug() << "C5PRINTJSON DESCTRUCTOR";
 }
 
-void C5PrintJson::run()
+void C5PrintJson::parse(C5Printing &p, const QJsonArray &cmd)
 {
-    C5Printing p;
-
-    for(int i = 0; i < fJson.count(); i++) {
-        QJsonObject jo = fJson.at(i).toObject();
+    for(int i = 0; i < cmd.size(); i++) {
+        QJsonObject jo = cmd.at(i).toObject();
 
         if(jo["cmd"].toString() == "line") {
             p.line(jo["x1"].toDouble(), jo["y1"].toDouble(), jo["x2"].toDouble(), jo["y2"].toDouble());
@@ -32,6 +26,8 @@ void C5PrintJson::run()
             p.ctext(jo["text"].toString());
         } else if(jo["cmd"].toString() == "rtext") {
             p.rtext(jo["text"].toString());
+        } else if(jo.value("cmd").toString() == "lrtext") {
+            p.lrtext(jo.value("left").toString(), jo.value("right").toString());
         } else if(jo["cmd"].toString() == "fontsize") {
             p.setFontSize(jo["size"].toInt());
         } else if(jo["cmd"].toString() == "fontbold") {

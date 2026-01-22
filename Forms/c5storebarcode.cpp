@@ -22,7 +22,7 @@ C5StoreBarcode::C5StoreBarcode(QWidget *parent) :
     ui(new Ui::C5StoreBarcode)
 {
     ui->setupUi(this);
-    fIcon = ":/barcode.png";
+    fIconName = ":/barcode.png";
     fLabel = tr("Barcode print");
     ui->tbl->setColumnWidths(ui->tbl->columnCount(), 300, 300, 80, 30, 80, 200, 100);
 }

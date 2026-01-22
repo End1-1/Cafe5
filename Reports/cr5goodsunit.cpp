@@ -4,7 +4,7 @@
 CR5GoodsUnit::CR5GoodsUnit(QWidget *parent) :
     C5ReportWidget( parent)
 {
-    fIcon = ":/goods.png";
+    fIconName = ":/goods.png";
     fLabel = tr("Units");
 
     fSqlQuery = "select f_id, f_name, f_fullname, f_defaultqty from c_units ";

@@ -11,7 +11,7 @@
 CR5CostumerDebts::CR5CostumerDebts(QWidget *parent) :
     C5ReportWidget(parent)
 {
-    fIcon = ":/cash.png";
+    fIconName = ":/cash.png";
     fLabel = tr("Customers debts");
     fColumnsSum << "f_amount";
     fColumnsSum << "f_amountmin";

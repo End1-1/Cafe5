@@ -19,7 +19,11 @@ C5Widget::~C5Widget()
 
 QIcon C5Widget::icon()
 {
-    return QIcon(fIcon);
+    if(!fIconName.isEmpty()) {
+        fIcon = QIcon(fIconName);
+    }
+
+    return fIcon;
 }
 
 QString C5Widget::label()

@@ -45,12 +45,14 @@ public:
 
     QString fWindowUuid;
 
-    C5User* mUser;
+    C5User* mUser = nullptr;
 
 protected:
     QToolBar* fToolBar;
 
-    QString fIcon;
+    QString fIconName;
+
+    QIcon fIcon;
 
     QString fLabel;
 

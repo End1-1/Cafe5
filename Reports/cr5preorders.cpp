@@ -5,7 +5,7 @@ CR5Preorders::CR5Preorders(QWidget *parent) :
     C5ReportWidget( parent)
 {
     fLabel = tr("Preorders history");
-    fIcon = ":/customers.png";
+    fIconName = ":/customers.png";
     fSimpleQuery = true;
     fSqlQuery = "select o.f_id, os.f_name as f_statename, o.f_datecreate, o.f_timecreate, o.f_datefor, o.f_timefor, "
                  "c.f_contact, c.f_phone, o.f_total, o.f_advance "

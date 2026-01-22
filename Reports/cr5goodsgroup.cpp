@@ -4,7 +4,7 @@
 CR5GoodsGroup::CR5GoodsGroup(QWidget *parent) :
     C5ReportWidget(parent)
 {
-    fIcon = ":/goods.png";
+    fIconName = ":/goods.png";
     fLabel = tr("Group of goods");
     fSqlQuery = R"(
     select gr.f_id, grp.f_name as f_parent, gr.f_name, gr.f_class, gr.f_taxdept, gr.f_adgcode, gr.f_chargevalue,

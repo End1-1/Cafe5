@@ -4,7 +4,7 @@
 CR5StoreReason::CR5StoreReason(QWidget *parent) :
     C5ReportWidget( parent)
 {
-    fIcon = ":/graph.png";
+    fIconName = ":/graph.png";
     fLabel = tr("Store move reason");
     fSqlQuery = "select f_id, f_name from a_reason";
     fTranslation["f_id"] = tr("Code");

@@ -8,6 +8,7 @@
 #include "nloadingdlg.h"
 #include "c5message.h"
 #include "c5htmlprint.h"
+#include "format_date.h"
 #include <QMenu>
 #include <QScrollBar>
 #include <QClipboard>

@@ -67,7 +67,7 @@ public:
     bool openDraft(const QString &id, QString &err);
 
     int addGoods(int goods, const QString &name, double qty, const QString &unit, double price, double total,
-                 const QString &comment);
+                 const QString &comment, const QString &adgt);
 
 public slots:
     void saveDoc();
@@ -201,10 +201,6 @@ private slots:
 
     void on_btnCalculator_clicked();
 
-    void inputOfService();
-
-    void outputOfService();
-
     void duplicateOutput();
 
     void duplicateAsInput();
@@ -230,8 +226,6 @@ private slots:
     void on_btnFixPartner_clicked(bool checked);
 
     void on_btnCopyLastAdd_clicked();
-
-    void on_btnCompressRow_clicked();
 
     void on_cbCurrency_currentIndexChanged(int index);
 

@@ -4,7 +4,7 @@
 CR5Currencies::CR5Currencies(QWidget *parent) :
     C5ReportWidget( parent)
 {
-    fIcon = ":/cash.png";
+    fIconName = ":/cash.png";
     fLabel = tr("Currencies");
     fSqlQuery = "select f_id, f_name, f_rate, f_symbol from e_currency";
     fTranslation["f_id"] = tr("Code");

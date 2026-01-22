@@ -116,6 +116,7 @@ CE5Goods::CE5Goods(QWidget *parent) :
     }
 
     ui->rbGenEAN8->setChecked(__c5config.getRegValue("gen_ean8").toBool());
+    ui->tblMenu->setVisible(mUser->fConfig["officen_mode"].toInt() != 2);
     ui->tblMenu->setColumnWidths(ui->tblMenu->columnCount(), 0, 0, 200, 100, 150, 100, 100, 50, 50);
 }
 

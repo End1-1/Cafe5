@@ -8,7 +8,7 @@
 CR5Settings::CR5Settings(QWidget *parent) :
     C5ReportWidget(parent)
 {
-    fIcon = ":/configure.png";
+    fIconName = ":/configure.png";
     fLabel = tr("Settings");
     fSqlQuery = "select f_id, f_name, f_description from s_settings_names ";
     fTranslation["f_id"] = tr("Code");

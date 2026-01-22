@@ -1,0 +1,6 @@
+#pragma once
+
+#define WORKSTATION_WAITER 1
+#define WORKSTATION_SMART 2
+#define WORKSTATION_OFFICEN 3
+#define WORKSTATION_SHOP 4

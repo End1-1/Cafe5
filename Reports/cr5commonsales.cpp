@@ -18,7 +18,7 @@
 CR5CommonSales::CR5CommonSales(QWidget *parent) :
     C5ReportWidget(parent)
 {
-    fIcon = ":/graph.png";
+    fIconName = ":/graph.png";
     fLabel = tr("Sales by tickets");
     fSimpleQuery = false;
     fMainTable = "o_header oh";

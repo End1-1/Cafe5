@@ -10,7 +10,7 @@
 CR5CarVisits::CR5CarVisits(QWidget *parent) :
     C5ReportWidget(parent)
 {
-    fIcon = ":/graph.png";
+    fIconName = ":/graph.png";
     fLabel = tr("Car visits");
     fSimpleQuery = false;
     fMainTable = "o_header oh";

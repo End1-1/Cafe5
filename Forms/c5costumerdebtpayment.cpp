@@ -33,7 +33,12 @@ void C5CostumerDebtPayment::setId(const QString &id)
     C5Database db;
     db[":f_cash"] = id;
     db.exec("select * from b_clients_debts where f_cash=:f_cash");
-    fBClientDebt.getRecord(db);
+
+    if(!fBClientDebt.getRecord(db)) {
+        C5Message::error(QString("Program error. Cant get debt record for '%1'").arg(id));
+        return;
+    }
+
     db[":f_id"] = fBClientDebt.cash;
     db.exec("select * from a_header where f_id=:f_id");
     fAHeader.getRecord(db);

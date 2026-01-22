@@ -174,18 +174,28 @@
 <context>
     <name>NDataProvider</name>
     <message>
-        <location filename="../NTable/ndataprovider.cpp" line="97"/>
-        <location filename="../NTable/ndataprovider.cpp" line="120"/>
+        <location filename="../NTable/ndataprovider.cpp" line="104"/>
+        <source>Application update required</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../NTable/ndataprovider.cpp" line="107"/>
+        <source>Click to launch updater</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../NTable/ndataprovider.cpp" line="113"/>
+        <location filename="../NTable/ndataprovider.cpp" line="136"/>
         <source>Access denied</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../NTable/ndataprovider.cpp" line="102"/>
+        <location filename="../NTable/ndataprovider.cpp" line="118"/>
         <source>You must upgrade the application to continue using it</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../NTable/ndataprovider.cpp" line="103"/>
+        <location filename="../NTable/ndataprovider.cpp" line="119"/>
         <source>Click here to launch updater</source>
         <translation type="unfinished"></translation>
     </message>
@@ -193,13 +203,13 @@
 <context>
     <name>NInterface</name>
     <message>
-        <location filename="../NTable/ninterface.cpp" line="197"/>
-        <location filename="../NTable/ninterface.cpp" line="211"/>
+        <location filename="../NTable/ninterface.cpp" line="204"/>
+        <location filename="../NTable/ninterface.cpp" line="218"/>
         <source>Query</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../NTable/ninterface.cpp" line="237"/>
+        <location filename="../NTable/ninterface.cpp" line="244"/>
         <source>Unauthorized</source>
         <translation type="unfinished"></translation>
     </message>

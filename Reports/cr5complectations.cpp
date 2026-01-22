@@ -6,7 +6,7 @@ CR5Complectations::CR5Complectations(QWidget *parent) :
     C5ReportWidget( parent)
 {
     fLabel = tr("Complectations");
-    fIcon = ":/goods.png";
+    fIconName = ":/goods.png";
 }
 
 QToolBar *CR5Complectations::toolBar()

@@ -24,7 +24,7 @@ QMap <QString, QString> l;
 CR5Goods::CR5Goods(QWidget *parent) :
     C5ReportWidget(parent)
 {
-    fIcon = ":/goods.png";
+    fIconName = ":/goods.png";
     fLabel = tr("Goods");
     l["ա"] = "a";
     l["բ"] = "b";

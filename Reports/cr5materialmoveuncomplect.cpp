@@ -6,7 +6,7 @@
 CR5MaterialMoveUncomplect::CR5MaterialMoveUncomplect(QWidget *parent) :
     C5ReportWidget(parent)
 {
-    fIcon = ":/goods.png";
+    fIconName = ":/goods.png";
     fLabel = tr("Storage movement, uncomplect");
     fSimpleQuery = true;
     fFilter = new CR5MaterialmoveUncomplectFilter();

@@ -8,8 +8,6 @@ namespace Ui
 class DlgScreen;
 }
 
-class C5WaiterServer;
-
 class DlgScreen : public C5WaiterDialog
 {
     Q_OBJECT
@@ -23,6 +21,8 @@ protected:
     virtual bool eventFilter(QObject *o, QEvent *e) override;
 
     virtual void paintEvent(QPaintEvent *e) override;
+
+    virtual void showEvent(QShowEvent *e) override;
 
 private slots:
     void on_btnCancel_clicked();
@@ -57,8 +57,6 @@ private slots:
 
 private:
     Ui::DlgScreen* ui;
-
-    C5WaiterServer* mWaiterServer;
 
     void tryExit();
 

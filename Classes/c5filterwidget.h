@@ -38,6 +38,8 @@ protected:
 
     QString inFilterText(QString &text, C5LineEdit *l);
 
+    QString normalizeIntInList(const QString &text);
+
 private:
     QWidget* getWidget(const QString &key, QWidget *parent);
 };

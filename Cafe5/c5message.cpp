@@ -5,7 +5,10 @@
 #include <QMediaPlayer>
 #include <QProcess>
 #include <QUrlQuery>
+#include <QDir>
+#include <QThread>
 #include <QAudioOutput>
+#include <Windows.h>
 
 C5Message::C5Message() :
     C5Dialog(nullptr),
@@ -127,14 +130,47 @@ void C5Message::on_label_linkActivated(const QString &link)
 
     if(url.path() == "launch-updater") {
         QUrlQuery urlQuery(url);
-        QString updaterPath = QCoreApplication::applicationDirPath() + "/updater.exe";
+        QString updaterPath = QDir::toNativeSeparators(QCoreApplication::applicationDirPath() + "/updater.exe");
         QStringList params;
 
         if(urlQuery.hasQueryItem("version")) {
-            params.append("--app=officen");
+            params.append(QString("%1%2").arg("--app=", _MODULE_).toLower());
             params.append("--version=" +  urlQuery.queryItemValue("version"));
         }
 
-        QProcess::startDetached(updaterPath, params);
+        bool ok = QProcess::startDetached(updaterPath, params);
+
+        if(!ok) {
+            C5Message::error("Process " + updaterPath + " could not run");
+            return;
+        }
+
+        qApp->exit(0);
+    }
+}
+
+void C5Message::launchUpdater(const QString &path, const QStringList &args)
+{
+    QString cmd = "\"" + path + "\" " + args.join(" ");
+    STARTUPINFO si = { sizeof(si) };
+    PROCESS_INFORMATION pi;
+    BOOL ok = CreateProcessW(
+                  nullptr,
+                  (LPWSTR)cmd.utf16(),
+                  nullptr,
+                  nullptr,
+                  FALSE,
+                  CREATE_BREAKAWAY_FROM_JOB | DETACHED_PROCESS,
+                  nullptr,
+                  nullptr,
+                  &si,
+                  &pi
+              );
+
+    if(ok) {
+        CloseHandle(pi.hProcess);
+        CloseHandle(pi.hThread);
+    } else {
+        qDebug() << "CreateProcess failed:" << GetLastError();
     }
 }

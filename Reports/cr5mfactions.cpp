@@ -4,7 +4,7 @@
 CR5MfActions::CR5MfActions(QWidget *parent) :
     C5ReportWidget( parent)
 {
-    fIcon = ":/manufacturing.png";
+    fIconName = ":/manufacturing.png";
     fLabel = tr("Manufacture actions");
     fSqlQuery = "select a.f_id, a.f_name, a.f_state, s.f_name as f_statename "
                 "from mf_actions a "

@@ -5,7 +5,7 @@ CR5OrderMarks::CR5OrderMarks(QWidget *parent) :
     C5ReportWidget( parent)
 {
     fLabel = tr("Orders marks");
-    fIcon = ":/flag.png";
+    fIconName = ":/flag.png";
     fSimpleQuery = true;
     fSqlQuery = "select f_id, f_active, f_name from b_marks";
     fTranslation["f_id"] = tr("ID");

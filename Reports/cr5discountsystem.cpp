@@ -5,7 +5,7 @@ CR5DiscountSystem::CR5DiscountSystem(QWidget *parent) :
     C5ReportWidget(parent)
 {
     fLabel = tr("Dicount system");
-    fIcon = ":/discount.png";
+    fIconName = ":/discount.png";
     fSimpleQuery = false;
     fMainTable = "b_cards_discount d";
     fLeftJoinTables << "left join c_partners c on c.f_id=d.f_client [c]";

@@ -4,7 +4,7 @@
 CR5DishPart1::CR5DishPart1(QWidget *parent) :
     C5ReportWidget( parent)
 {
-    fIcon = ":/menu.png";
+    fIconName = ":/menu.png";
     fLabel = tr("Dish depts");
     fSqlQuery = "select f_id, f_name from d_part1";
     fTranslation["f_id"] = tr("Code");

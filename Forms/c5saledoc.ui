@@ -754,6 +754,11 @@
        <string>Emarks</string>
       </property>
      </column>
+     <column>
+      <property name="text">
+       <string>Adgt</string>
+      </property>
+     </column>
     </widget>
    </item>
    <item>
@@ -1006,11 +1011,6 @@
    <header location="global">c5lineedit.h</header>
   </customwidget>
   <customwidget>
-   <class>C5ComboBox</class>
-   <extends>QComboBox</extends>
-   <header location="global">c5combobox.h</header>
-  </customwidget>
-  <customwidget>
    <class>C5TableWidget</class>
    <extends>QTableWidget</extends>
    <header location="global">c5tablewidget.h</header>
@@ -1019,6 +1019,11 @@
    <class>C5DateEdit</class>
    <extends>QLineEdit</extends>
    <header location="global">c5dateedit.h</header>
+  </customwidget>
+  <customwidget>
+   <class>C5ComboBox</class>
+   <extends>QComboBox</extends>
+   <header location="global">c5combobox.h</header>
   </customwidget>
  </customwidgets>
  <tabstops>

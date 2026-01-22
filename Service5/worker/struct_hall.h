@@ -5,8 +5,8 @@
 #include <QJsonDocument>
 
 struct HallItem {
-    int id;
-    int configId;
+    int id = 0;
+    int configId = 0;
     QString name;
     QString nameLower;
     QStringList words;
@@ -30,7 +30,7 @@ struct JsonParser<HallItem> {
     static HallItem fromJson(const QJsonObject &jo)
     {
         HallItem hi;
-        hi.id = jo["f_id"].toInt(),
+        hi.id = jo["f_id"].toInt();
         hi.configId = jo["f_settings"].toInt();
         hi.name = jo["f_name"].toString();
 

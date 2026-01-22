@@ -6,6 +6,7 @@
 #include "c5storedoc.h"
 #include "ntablemodel.h"
 #include "c5saledoc.h"
+#include "c5user.h"
 #include "c5message.h"
 #include <QToolButton>
 #include <QGridLayout>
@@ -154,8 +155,6 @@ void NHandler::toolWidget(QWidget *w)
         return;
     }
 
-    int row = mTableView->currentIndex().row();
-
     if(mHandlers.size() > 0) {
         if(mHandlers.contains(hDebt)) {
             auto *b = new QToolButton(w);
@@ -179,19 +178,27 @@ void NHandler::toolWidget(QWidget *w)
         } else if(mHandlers.contains(hShortDebt)) {
             auto *b = new QToolButton(w);
             b->setIcon(QIcon(":/new.png"));
-            b->setText(tr("Spent accumulated"));
+            b->setText(tr("Pay off a debt"));
             b->setAutoRaise(true);
             b->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
-            connect(b, &QAbstractButton::clicked, this, [this, m, row]() {
+            connect(b, &QAbstractButton::clicked, this, [this, m]() {
+                int row = -1;
+
+                if(!mTableView->selectionModel()->selectedIndexes().isEmpty()) {
+                    row = mTableView->selectionModel()->selectedIndexes().first().row();
+                }
+
                 if(row < 0) {
                     return;
                 }
 
-                C5CostumerDebtPayment cb(mUser, BCLIENTDEBTS_SOURCE_SALE);
-                cb.setProperty("uuid", m->data(row, 0).toString());
-                cb.setPartnerAndAmount(m->data(row, 1, Qt::EditRole).toInt(), m->data(row, 6, Qt::EditRole).toDouble(),
-                                       m->data(row, 0).toString());
-                cb.exec();
+                if(C5Message::question(tr("Pay off a debt?")) == QDialog::Accepted) {
+                    NInterface::query1("/engine/v2/officen/short-debt/pay-off-debt", mUser->mSessionKey, this,
+                    {{"payoffdebt",  m->data(row, 0).toString()}},
+                    [](const QJsonObject & jdoc) {
+                        C5Message::info(tr("Done"));
+                    });
+                }
             });
             gl->addWidget(b, 0, 0, Qt::AlignLeft);
         } else if(mHandlers.contains(hDraftSale)) {
@@ -200,8 +207,13 @@ void NHandler::toolWidget(QWidget *w)
             b->setIcon(QIcon(":/new.png"));
             b->setText(tr("Redeem accumulated"));
             b->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
-            connect(b, &QToolButton::clicked, this, [this, m, row]() {
+            connect(b, &QToolButton::clicked, this, [this, m]() {
                 int partner = 0;
+                int row = -1;
+
+                if(!mTableView->selectionModel()->selectedIndexes().isEmpty()) {
+                    row = mTableView->selectionModel()->selectedIndexes().first().row();
+                }
 
                 if(row > -1) {
                     partner = m->data(row, 2).toInt();

@@ -31,7 +31,7 @@ struct WaiterDish {
     }
     QString fromTable() const
     {
-        return data["f_from_table"].toString();
+        return data.value("f_from_table").toString();
     };
     bool isPrinted()
     {

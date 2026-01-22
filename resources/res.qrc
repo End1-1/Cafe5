@@ -257,5 +257,8 @@
         <file>move-table.png</file>
         <file>remove-cart.png</file>
         <file>reprint.png</file>
+        <file>workstation.png</file>
+        <file>new-file.png</file>
+        <file>details.png</file>
     </qresource>
 </RCC>

@@ -18,7 +18,7 @@ static const int col_balance = 6;
 CR5CashDetailed::CR5CashDetailed(QWidget *parent) :
     C5ReportWidget(parent)
 {
-    fIcon = ":/cash.png";
+    fIconName = ":/cash.png";
     fLabel = tr("Cash movement");
     fFilterWidget = new CR5CashDetailedFilter();
     fFilter = static_cast<CR5CashDetailedFilter*>(fFilterWidget);

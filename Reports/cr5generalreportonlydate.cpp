@@ -5,7 +5,7 @@
 CR5GeneralReportOnlyDate::CR5GeneralReportOnlyDate() :
     C5ReportWidget()
 {
-    fIcon = ":/manufacturing.png";
+    fIconName = ":/manufacturing.png";
     fLabel = tr("Manufacture general report only date");
     fFilterWidget = new CR5MFGeneralReportFilter();
     fFilter = static_cast<CR5MFGeneralReportFilter *>(fFilterWidget);

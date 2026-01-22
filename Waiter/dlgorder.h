@@ -32,6 +32,8 @@ public:
 
     ~DlgOrder();
 
+    void setOrderId(const QString &id);
+
     void setStoplistmode();
 
     bool stoplistMode();
@@ -131,6 +133,8 @@ private:
 
     void configBtnNum();
 
+    void configOtherButtons();
+
     int selectedWaiterDishIndex();
 
     WaiterOrderItemWidget* createOrderItemWidget(WaiterDish d);
@@ -153,10 +157,6 @@ private slots:
     void handleOrderDishClick(const QString &id);
 
     void setPaymentButtonChecked(bool checked);
-
-    void openReservationResponse(const QJsonObject &jdoc);
-
-    void moveTableResponse(const QJsonObject &jdoc);
 
     void timeout();
 
@@ -243,6 +243,10 @@ private slots:
     void on_btnTransferDishes_clicked();
 
     void on_btnTransferTable_clicked();
+
+    void on_btnReopenTable_clicked();
+
+    void on_btnPrintClosedFiscal_clicked();
 
 signals:
 

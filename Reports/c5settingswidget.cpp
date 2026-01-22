@@ -17,9 +17,6 @@ C5SettingsWidget::C5SettingsWidget(QWidget *parent) :
     ui->cbShopHall->setDBValues("select f_id, f_name from h_halls order by 2");
     ui->cbWaiterHall->setDBValues("select f_id, f_name from h_halls order by 2");
     ui->cbTaxUseExtPos->addItem(tr("Yes"), "true");
-    ui->cbTaxUseExtPos->addItem(tr("No"), "false");
-    ui->cbFronDeskMode->addItem(tr("Waiter"), 0);
-    ui->cbFronDeskMode->addItem(tr("Shop"), 1);
     ui->cbDefaultCurrency->setDBValues("select f_id, f_name from e_currency");
 }
 
@@ -180,7 +177,6 @@ bool C5SettingsWidget::save(QString &err, QList<QMap<QString, QVariant> >& data)
     fTags[ui->chAlwaysOfferTax->getTag()] = ui->chAlwaysOfferTax->isChecked() ? "1" : "0";
     fTags[ui->leFDFontSize->getTag()] = ui->leFDFontSize->text();
     fTags[ui->chCarMode->getTag()] = ui->chCarMode->isChecked() ? "1" : "0";
-    fTags[ui->cbFronDeskMode->getTag()] = ui->cbFronDeskMode->currentData().toString();
     fTags[ui->chAutoCash->getTag()] = ui->chAutoCash->isChecked() ? "1" : "0";
     fTags[ui->leCashId->getTag()] = ui->leCashId->text();
     fTags[ui->leCardId->getTag()] = ui->leCardId->text();
@@ -357,6 +353,8 @@ bool C5SettingsWidget::save(QString &err, QList<QMap<QString, QVariant> >& data)
     jc["change_qty_return_items"] = ui->chDenyChangeQtyReturnItems->isChecked();
     jc["smart_pictures"] = ui->chSmartPictures->isChecked();
     jc["shop_autodiscount_card_number"] =  ui->leShopAutodiscountCardNumber->text();
+    //officen config
+    jc["officen_mode"] = ui->cbFronDeskMode->currentIndex();
     //waiter config
     jc["default_hall"] = ui->cbWaiterHall->currentData().toInt();
     jc["default_hall_name"] = ui->cbWaiterHall->currentText();

@@ -167,7 +167,6 @@ HEADERS += \
         ../NTable/ntablemodel.h \
         ../NTable/ndataprovider.h \
         ../NTable/ntablewidget.h \
-        ../Cafe5/c5cafecommon.h \
         ../NTable/nloadingdlg.h \
         ../Reports/cr5consuptionbysalesqty.h \
         ../../NewTax/Src/printtaxn.h \
@@ -468,7 +467,6 @@ SOURCES += \
         ../NTable/ntablewidget.cpp \
         ../NTable/nloadingdlg.cpp \
         ../Reports/cr5consuptionbysalesqty.cpp \
-        ../Cafe5/c5cafecommon.cpp \
         ../../NewTax/Src/printtaxn.cpp \
         ../Cafe5/c5double.cpp \
         ../Cafe5/c5systempreference.cpp \
@@ -756,6 +754,7 @@ INCLUDEPATH += ../NTable
 INCLUDEPATH += ../RESOURCES
 INCLUDEPATH += ../Service
 INCLUDEPATH += ../Service5Working/utils
+INCLUDEPATH += ../StructModel
 INCLUDEPATH += ../Forms
 INCLUDEPATH += ../Configs
 INCLUDEPATH += ../../NewTax/Src
@@ -771,3 +770,5 @@ LIBS += -lVersion
 LIBS += -lwsock32
 LIBS += -lopenssl
 LIBS += -llibcrypto
+LIBS += -lgdi32 -luser32
+

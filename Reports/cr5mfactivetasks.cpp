@@ -7,7 +7,7 @@
 CR5MFActiveTasks::CR5MFActiveTasks(QWidget *parent) :
     C5ReportWidget(parent)
 {
-    fIcon = ":/manufacturing.png";
+    fIconName = ":/manufacturing.png";
     fLabel = tr("Tasks");
     fSimpleQuery = true;
     fSqlQuery = "select t.f_id, t.f_datecreate , tm.f_name as f_statename, "

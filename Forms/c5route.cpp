@@ -10,7 +10,7 @@ C5Route::C5Route(QWidget *parent) :
 {
     ui->setupUi(this);
     fLabel = tr("Route");
-    fIcon = ":/route.png";
+    fIconName = ":/route.png";
     ui->tbl->setColumnWidths(ui->tbl->columnCount(), 0, 0, 80, 200, 300, 300, 100, 40, 40, 40, 40, 40, 40, 40);
     ui->cbDriver->disconnect(this, SLOT(on_cbDriver_currentIndexChanged(int)));
     ui->cbPartnerStatus->disconnect(this, SLOT(on_cbPartnerStatus_currentIndexChanged(int)));

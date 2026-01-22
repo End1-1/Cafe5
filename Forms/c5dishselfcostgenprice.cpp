@@ -10,7 +10,7 @@ C5DishSelfCostGenPrice::C5DishSelfCostGenPrice(QWidget *parent) :
 {
     ui->setupUi(this);
     fLabel = tr("Calculation of the cost of dishes");
-    fIcon = ":/menu.png";
+    fIconName = ":/menu.png";
     ui->tbl->setColumnWidths(ui->tbl->columnCount(), 100, 200, 300, 100, 100, 100);
 }
 

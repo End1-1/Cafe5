@@ -11,7 +11,7 @@ C5TranslatorForm::C5TranslatorForm(QWidget *parent) :
 {
     ui->setupUi(this);
     fLabel = tr("Translator");
-    fIcon = ":/translate.png";
+    fIconName = ":/translate.png";
     refreshData();
 }
 

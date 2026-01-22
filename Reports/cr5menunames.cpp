@@ -4,7 +4,7 @@
 CR5MenuNames::CR5MenuNames(QWidget *parent) :
     C5ReportWidget( parent)
 {
-    fIcon = ":/menu.png";
+    fIconName = ":/menu.png";
     fLabel = tr("Menu names");
     fSqlQuery = "select f_id, f_name, f_datestart, f_dateend, f_enabled, f_comment from d_menu_names";
     fTranslation["f_id"] = tr("Code");

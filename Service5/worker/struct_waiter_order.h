@@ -50,7 +50,7 @@ struct WaiterOrder {
     }
     QJsonObject fiscal() const
     {
-        return data["f_fiscal"].toObject();
+        return data.value("f_fiscal").toObject();
     }
     QString comment() const
     {
@@ -91,7 +91,7 @@ struct WaiterOrder {
     }
     double payment(const QString &name) const
     {
-        return data[name].toDouble();
+        return data.value(name).toDouble();
     }
     int printCount() const
     {

@@ -1,6 +1,5 @@
 #include "dlgorder.h"
 #include "ui_dlgorder.h"
-#include "c5cafecommon.h"
 #include "c5user.h"
 #include "dlgsearchinmenu.h"
 #include "dlgtables.h"
@@ -9,38 +8,31 @@
 #include "dlglistofdishcomments.h"
 #include "customerinfo.h"
 #include "c5permissions.h"
-#include "ndataprovider.h"
 #include "dlgreceiptlanguage.h"
 #include "c5utils.h"
 #include "c5translator.h"
-#include "dlgpreorderw.h"
+#include "struct_workstationitem.h"
 #include "dlgsplitorder.h"
-#include "dlgpreorderw.h"
 #include "dlglistdishspecial.h"
 #include "dlgdishremovereason.h"
-#include "dlglistofpackages.h"
 #include "dlgcl.h"
 #include "dlgguest.h"
 #include "dlgguests.h"
 #include "dlglist.h"
 #include "dlgtext.h"
-#include "cashboxconfig.h"
 #include "printtaxn.h"
 #include "dlgprecheckoptions.h"
 #include "ninterface.h"
-#include "dlgface.h"
+#include "format_date.h"
 #include "goodsgroupbutton.h"
-#include "dlglistofmenu.h"
 #include "waiterdishwidget.h"
 #include "waitermodificatorwidget.h"
 #include "waiterguestwidget.h"
-#include "change.h"
 #include "idram.h"
 #include "c5printing.h"
 #include "qdishbutton.h"
 #include "c5message.h"
 #include "dlgstoplistoption.h"
-#include "dlgaskforprecheck.h"
 #include "dlgviewstoplist.h"
 #include "dict_goods_types.h"
 #include "dict_payment_type.h"
@@ -113,11 +105,20 @@ DlgOrder::DlgOrder(C5User *user, HallItem h, TableItem t, const QVector<GoodsGro
     });
     createPaymentButtons();
     configBtnNum();
+    configOtherButtons();
 }
 
 DlgOrder::~DlgOrder()
 {
     delete ui;
+}
+
+void DlgOrder::setOrderId(const QString &id)
+{
+    NInterface::query1("/engine/v2/waiter/order/open-order", mUser->mSessionKey, this,
+    {{"id", id}}, [this](const QJsonObject & jdoc) {
+        parseOrder(jdoc);
+    });
 }
 
 void DlgOrder::disableForCheckall(bool v)
@@ -209,17 +210,21 @@ bool DlgOrder::eventFilter(QObject *o, QEvent *e)
 void DlgOrder::showEvent(QShowEvent *e)
 {
     C5WaiterDialog::showEvent(e);
-    fMenuID = mHall.defaultMenu();
-    makeGroups(0, 0);
-    fHttp->createHttpQueryLambda("/engine/v2/waiter/order/open-table", {
-        {"table", mTable.id},
-        {"locksrc", hostinfo}
-    },
-    [this](const QJsonObject  & jdoc) {
-        parseOrder(jdoc);
-    }, [this](const QJsonObject & jerr) {
-        reject();
-    });
+
+    if(mTable.id > 0) {
+        fMenuID = mHall.defaultMenu();
+        makeGroups(0, 0);
+        fHttp->createHttpQueryLambda("/engine/v2/waiter/order/open-table", {
+            {"table", mTable.id},
+            {"locksrc", hostinfo}
+        },
+        [this](const QJsonObject  & jdoc) {
+            parseOrder(jdoc);
+        }, [this](const QJsonObject & jerr) {
+            reject();
+        });
+    }
+
     ui->vlDishes->addStretch();
 }
 
@@ -270,6 +275,10 @@ void DlgOrder::makeGroups(int parent, int dept)
             filteredGroups = parentGroup->children;
             groups = &filteredGroups;
         }
+    }
+
+    if(!groups) {
+        return;
     }
 
     for(auto *group : *groups) {
@@ -476,7 +485,7 @@ void DlgOrder::printPrecheck(const QString &currentStaff)
     printer.setPageSize(QPageSize::Custom);
     printer.setFullPage(false);
     QRectF pr = printer.pageRect(QPrinter::DevicePixel);
-    constexpr qreal SAFE_RIGHT_MM = 2.0;
+    constexpr qreal SAFE_RIGHT_MM = 4.0;
     qreal safePx = SAFE_RIGHT_MM * printer.logicalDpiX() / 25.4;
     p.setSceneParams(pr.width() - safePx, pr.height(), printer.logicalDpiX());
     p.setFont(font);
@@ -506,7 +515,8 @@ void DlgOrder::printPrecheck(const QString &currentStaff)
     p.br();
     QJsonObject jtax = mOrder.fiscal();
 
-    if(!jtax.isEmpty()) {
+    if(!jtax.isEmpty() && jtax.value("result") == 0) {
+        jtax = QJsonDocument::fromJson(jtax.value("out").toString().toUtf8()).object();
         p.ltext(jtax["taxpayer"].toString(), 0);
         p.br();
         p.ltext(jtax["address"].toString(), 0);
@@ -702,7 +712,7 @@ void DlgOrder::printService(const QJsonObject &jdoc)
         printer.setPageSize(QPageSize::Custom);
         printer.setFullPage(false);
         QRectF pr = printer.pageRect(QPrinter::DevicePixel);
-        constexpr qreal SAFE_RIGHT_MM = 2.0;
+        constexpr qreal SAFE_RIGHT_MM = 4.0;
         qreal safePx = SAFE_RIGHT_MM * printer.logicalDpiX() / 25.4;
         p.setSceneParams(pr.width() - safePx, pr.height(), printer.logicalDpiX());
         p.setFont(font);
@@ -1147,7 +1157,7 @@ void DlgOrder::on_btnVoid_clicked()
             });
         };
 
-        if(mUser->check(cp_t5_remove_printed_service)) {
+        if(mUser->check(cp_t5_waiter_remove_printed_goods)) {
             removePrintedServiceFunc(mUser->mSessionKey);
             return;
         } else {
@@ -1159,7 +1169,7 @@ void DlgOrder::on_btnVoid_clicked()
 
             auto *user = new C5User();
             user->authorize(pin, self->fHttp, [self, removePrintedServiceFunc, user](const QJsonObject & jdoc) {
-                if(user->check(cp_t5_remove_printed_service)) {
+                if(user->check(cp_t5_waiter_remove_printed_goods)) {
                     removePrintedServiceFunc(user->mSessionKey);
                 } else {
                     C5Message::error(tr("Permission denied"));
@@ -1467,7 +1477,7 @@ void DlgOrder::on_btnTotal_clicked()
                 });
             };
 
-            if(mUser->check(cp_t5_cancel_precheck)) {
+            if(mUser->check(cp_t5_waiter_cancel_precheck)) {
                 cancelPrecheckFunc(mUser->mSessionKey);
             } else {
                 QString pin;
@@ -1480,7 +1490,7 @@ void DlgOrder::on_btnTotal_clicked()
                 user->authorize(pin, fHttp, [cancelPrecheckFunc, user, self](const QJsonObject & jdoc) {
                     Q_UNUSED(jdoc);
 
-                    if(user->check(cp_t5_cancel_precheck)) {
+                    if(user->check(cp_t5_waiter_cancel_precheck)) {
                         cancelPrecheckFunc(user->mSessionKey);
                     } else {
                         if(self) {
@@ -1498,7 +1508,7 @@ void DlgOrder::on_btnTotal_clicked()
         }
 
         case PRECHECK_REPEAT:
-            if(mUser->check(cp_t5_repeat_precheck)) {
+            if(mUser->check(cp_t5_waiter_reprint_prechek)) {
                 repeatPrecheckFunc(mUser->mSessionKey, mUser->shortFullName());
             } else {
                 QString pin;
@@ -1511,7 +1521,7 @@ void DlgOrder::on_btnTotal_clicked()
                 user->authorize(pin, fHttp, [repeatPrecheckFunc, user, self](const QJsonObject & jdoc) {
                     Q_UNUSED(jdoc);
 
-                    if(user->check(cp_t5_cancel_precheck)) {
+                    if(user->check(cp_t5_waiter_reprint_prechek)) {
                         repeatPrecheckFunc(user->mSessionKey, user->shortFullName());
                     } else {
                         if(self) {
@@ -1823,6 +1833,7 @@ void DlgOrder::createPaymentButtons()
         btn->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
         btn->setMinimumHeight(50);
         btn->setText(QCoreApplication::translate("PaymentType", payment_names[pt]));
+        btn->setEnabled(payment_special[pt] ? mUser->check(cp_t5_waiter_special_payment_types) : true);
         connect(btn, &QToolButton::clicked, this, [self, pt]() {
             if(self->ui->lbAmount->property("amount").toDouble() < 0.01) {
                 return;
@@ -1891,6 +1902,12 @@ void DlgOrder::configBtnNum()
             ui->lbAmount->setText(QString("%1 %2").arg(float_str(value, 2), CURRENCY_SHORT));
         });
     }
+}
+
+void DlgOrder::configOtherButtons()
+{
+    ui->btnTotal->setEnabled(mUser->check(cp_t5_waiter_print_precheck));
+    ui->btnCloseOrder->setEnabled(mUser->check(cp_t5_waiter_close_order));
 }
 
 int DlgOrder::selectedWaiterDishIndex()
@@ -1996,42 +2013,44 @@ void DlgOrder::parseOrder(const QJsonObject & jdoc)
     }
 
     /* PAYMENT BUTTON */
-    ui->lbAmountPaid->setText(QString("%1 %2").arg(float_str(mOrder.amountPaid(), 2), CURRENCY_SHORT));
-    ui->lbChange->setText(QString("%1 %2").arg(float_str(mOrder.amountChange(), 2), CURRENCY_SHORT));
+    if(mOrder.state == ORDER_STATE_OPEN) {
+        ui->lbAmountPaid->setText(QString("%1 %2").arg(float_str(mOrder.amountPaid(), 2), CURRENCY_SHORT));
+        ui->lbChange->setText(QString("%1 %2").arg(float_str(mOrder.amountChange(), 2), CURRENCY_SHORT));
 
-    while(auto *l = ui->vlPayment->takeAt(0)) {
-        auto *w = l->widget();
+        while(auto *l = ui->vlPayment->takeAt(0)) {
+            auto *w = l->widget();
 
-        if(w) {
-            w->deleteLater();
+            if(w) {
+                w->deleteLater();
+            }
+
+            delete l;
         }
 
-        delete l;
-    }
+        QPointer<DlgOrder> self(this);
 
-    QPointer<DlgOrder> self(this);
+        for(auto pt : payment_types) {
+            if(mOrder.payment(payment_fields[pt]) > 0) {
+                auto *b = new QToolButton(self);
+                b->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+                b->setMinimumHeight(50);
+                b->setText(QString("%1 %2 %3").arg(QCoreApplication::translate("PaymentType", payment_names[pt]), float_str(mOrder.payment(payment_fields[pt]), 2), CURRENCY_SHORT));
+                b->setProperty("method", pt);
+                b->setProperty("amount", mOrder.payment(payment_fields[pt]));
+                connect(b, &QToolButton::clicked, self, [ = ]() {
+                    NInterface::query("/engine/v2/waiter/order/set_amount", self->mUser->mSessionKey, self,
+                    {{"id", self->mOrder.id}, {"payment_field", payment_fields[pt]}, {"amount", 0}},
+                    [self](const QJsonObject & jdoc) {
+                        if(!self) {
+                            return;
+                        }
 
-    for(auto pt : payment_types) {
-        if(mOrder.payment(payment_fields[pt]) > 0) {
-            auto *b = new QToolButton(self);
-            b->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
-            b->setMinimumHeight(50);
-            b->setText(QString("%1 %2 %3").arg(QCoreApplication::translate("PaymentType", payment_names[pt]), float_str(mOrder.payment(payment_fields[pt]), 2), CURRENCY_SHORT));
-            b->setProperty("method", pt);
-            b->setProperty("amount", mOrder.payment(payment_fields[pt]));
-            connect(b, &QToolButton::clicked, self, [ = ]() {
-                NInterface::query("/engine/v2/waiter/order/set_amount", self->mUser->mSessionKey, self,
-                {{"id", self->mOrder.id}, {"payment_field", payment_fields[pt]}, {"amount", 0}},
-                [self](const QJsonObject & jdoc) {
-                    if(!self) {
-                        return;
-                    }
-
-                    self->parseOrder(jdoc);
-                }, [](const QJsonObject & jerr) {return false;});
-                b->deleteLater();
-            });
-            ui->vlPayment->addWidget(b);
+                        self->parseOrder(jdoc);
+                    }, [](const QJsonObject & jerr) {return false;});
+                    b->deleteLater();
+                });
+                ui->vlPayment->addWidget(b);
+            }
         }
     }
 
@@ -2052,12 +2071,13 @@ void DlgOrder::parseOrder(const QJsonObject & jdoc)
         }
     }
 
-    ui->wpayment->setVisible(mOrder.isPrecheckPrinted());
-    ui->wmenua->setVisible(!mOrder.isPrecheckPrinted());
+    ui->wclosedorder->setVisible(mOrder.state == ORDER_STATE_CLOSE);
+    ui->wpayment->setVisible(mOrder.isPrecheckPrinted() && mOrder.state < ORDER_STATE_CLOSE);
+    ui->wmenua->setVisible(!mOrder.isPrecheckPrinted() && mOrder.state < ORDER_STATE_CLOSE);
     ui->wappmenu->setEnabled(!mOrder.isPrecheckPrinted());
-    ui->wqty->setEnabled(!mOrder.isPrecheckPrinted());
-    ui->btnService->setEnabled(!mOrder.isPrecheckPrinted());
-    ui->btnDiscount->setEnabled(!mOrder.isPrecheckPrinted());
+    ui->wqty->setEnabled(!mOrder.isPrecheckPrinted() && mOrder.state < ORDER_STATE_CLOSE);
+    ui->btnService->setEnabled(!mOrder.isPrecheckPrinted() && mOrder.state < ORDER_STATE_CLOSE);
+    ui->btnDiscount->setEnabled(!mOrder.isPrecheckPrinted() && mOrder.state < ORDER_STATE_CLOSE);
     ui->btnService->setText(QString("%1\n%2%").arg(tr("Service"), float_str(mOrder.serviceFactor() * 100, 2)));
     ui->btnDiscount->setText(QString("%1\n%2%").arg(tr("Discount"), float_str(mOrder.discountFactor() * 100, 2)));
     ui->btnTotal->setText(QString("%1\n%2 %3").arg(tr("Precheck"), float_str(mOrder.totalDue, 2), "դր․"));
@@ -2074,6 +2094,12 @@ void DlgOrder::parseOrder(const QJsonObject & jdoc)
     ui->lbDiscount->setText(QString("%1 %2").arg(float_str(mOrder.discountAmount(), 2), CURRENCY_SHORT));
     ui->lbTotalDue->setText(QString("%1 %2").arg(float_str(mOrder.totalDue, 2), CURRENCY_SHORT));
     QDateTime startQuery = QDateTime::fromString(jdoc["query_start"].toString(), "yyyy-MM-dd HH:mm:ss.zzz");
+    QJsonObject jtax = mOrder.fiscal();
+
+    if(mOrder.state == ORDER_STATE_CLOSE) {
+        ui->btnPrintClosedFiscal->setEnabled(jtax.isEmpty());
+    }
+
     qDebug() << "Parse order" << startQuery.msecsTo(QDateTime::currentDateTime());
 }
 
@@ -2100,25 +2126,6 @@ void DlgOrder::setPaymentButtonChecked(bool checked)
     }
 }
 
-void DlgOrder::openReservationResponse(const QJsonObject & jdoc)
-{
-    fHttp->httpQueryFinished(sender());
-    DlgPreorder d(mUser, jdoc);
-
-    if(d.exec()  == QDialog::Accepted) {
-        //TODO::: update info, guest name and
-    }
-
-    if(d.property("canceled").toBool()) {
-        on_btnExit_clicked();
-    }
-}
-void DlgOrder::moveTableResponse(const QJsonObject & jdoc)
-{
-    fHttp->httpQueryFinished(sender());
-    //TODO FUCK
-    //load(jdoc["newTableId"].toInt());
-}
 void DlgOrder::on_btnReceipt_clicked()
 {
     // C5User *tmp = mUser;
@@ -2281,6 +2288,27 @@ void DlgOrder::on_btnCloseOrder_clicked()
         return;
     }
 
+    bool hasMixed = false;
+    bool hasNoMixed = false;
+    int paymentsCount = 0;
+
+    for(auto pt : payment_types) {
+        if(mOrder.payment(payment_fields[pt]) > 0.01) {
+            paymentsCount++;
+
+            if(payment_mix[pt]) {
+                hasMixed = true;
+            } else {
+                hasNoMixed = true;
+            }
+        }
+    }
+
+    if(paymentsCount > 1 && hasMixed && hasNoMixed) {
+        C5Message::error(tr("Combining payment types is not allowed."));
+        return;
+    }
+
     QPointer<DlgOrder> self(this);
     auto closeOrderFunc = [self](const QJsonObject & fiscalInfo) {
         if(!self) {
@@ -2289,7 +2317,8 @@ void DlgOrder::on_btnCloseOrder_clicked()
 
         NInterface::query("/engine/v2/waiter/order/close-order", self->mUser->mSessionKey, self, {
             {"id", self->mOrder.id},
-            {"fiscal", fiscalInfo}
+            {"fiscal", fiscalInfo},
+            {"cashbox_id", mWorkStation.cashboxId()}
         },
         [self](const QJsonObject & jdoc) {
             self->parseOrder(jdoc);
@@ -2399,7 +2428,7 @@ void DlgOrder::on_btnService_clicked()
         });
     };
 
-    if(mUser->check(cp_t5_change_service_value)) {
+    if(mUser->check(cp_t5_waiter_change_service_factor)) {
         func(mUser);
         return;
     }
@@ -2412,7 +2441,7 @@ void DlgOrder::on_btnService_clicked()
     }
 
     user->authorize(pin, self->fHttp, [self, func, user](const QJsonObject & jdoc) {
-        if(user->check(cp_t5_remove_printed_service)) {
+        if(user->check(cp_t5_waiter_change_service_factor)) {
             func(user);
         } else {
             C5Message::error(tr("Permission denied"));
@@ -2432,7 +2461,7 @@ void DlgOrder::on_btnStopListMode_clicked()
         d.exec();
     };
 
-    if(mUser->check(cp_t5_stoplist)) {
+    if(mUser->check(cp_t5_waiter_edit_stoplist)) {
         func();
         return;
     }
@@ -2445,7 +2474,7 @@ void DlgOrder::on_btnStopListMode_clicked()
 
     C5User *u = new C5User();
     u->authorize(password, fHttp, [ u, func](const QJsonObject & jdoc) {
-        if(u->check(cp_t5_stoplist)) {
+        if(u->check(cp_t5_waiter_edit_stoplist)) {
             func();
         }
 
@@ -2597,7 +2626,7 @@ void DlgOrder::on_btnReprintSelected_clicked()
 
         if(ja.isEmpty()) {
             return;
-        } else if(C5Message::question(tr("Do you want to remove this item")) != QDialog::Accepted) {
+        } else if(C5Message::question(tr("Reprint selected items?")) != QDialog::Accepted) {
             return;
         }
 
@@ -2612,7 +2641,7 @@ void DlgOrder::on_btnReprintSelected_clicked()
             self->parseOrder(jdoc);
         });
     };
-    funcWithAuth(cp_t5_repeat_service, tr("Reprint service"), func);
+    funcWithAuth(cp_t5_waiter_reprint_goods, tr("Reprint service"), func);
 }
 
 void DlgOrder::on_btnGroupSelect_clicked()
@@ -2704,7 +2733,7 @@ void DlgOrder::on_btnRemoveSelected_clicked()
     };
 
     if(needReason) {
-        if(mUser->check(cp_t5_remove_printed_service)) {
+        if(mUser->check(cp_t5_waiter_remove_printed_goods)) {
             removePrintedServiceFunc(mUser->mSessionKey);
             return;
         } else {
@@ -2716,7 +2745,7 @@ void DlgOrder::on_btnRemoveSelected_clicked()
 
             auto *user = new C5User();
             user->authorize(pin, self->fHttp, [self, removePrintedServiceFunc, user](const QJsonObject & jdoc) {
-                if(user->check(cp_t5_remove_printed_service)) {
+                if(user->check(cp_t5_waiter_remove_printed_goods)) {
                     removePrintedServiceFunc(user->mSessionKey);
                 } else {
                     C5Message::error(tr("Permission denied"));
@@ -2781,7 +2810,7 @@ void DlgOrder::on_btnSetPrecent_clicked()
             self->parseOrder(jdoc);
         });
     };
-    funcWithAuth(cp_t5_complimentary, tr("Complimentary"), func);
+    funcWithAuth(cp_t5_waiter_special_payment_types, tr("Complimentary"), func);
 }
 
 void DlgOrder::on_btnPartFavorite_clicked()
@@ -2863,7 +2892,7 @@ void DlgOrder::on_btnTransferDishes_clicked()
         }
     };
 
-    if(mUser->check(cp_t5_movetable)) {
+    if(mUser->check(cp_t5_waiter_transfer_items)) {
         moveTableFunc(mUser);
         return;
     }
@@ -2876,7 +2905,7 @@ void DlgOrder::on_btnTransferDishes_clicked()
 
     auto *user = new C5User();
     user->authorize(pin, self->fHttp, [self, moveTableFunc, user](const QJsonObject & jdoc) {
-        if(user->check(cp_t5_remove_printed_service)) {
+        if(user->check(cp_t5_waiter_transfer_items)) {
             moveTableFunc(user);
         } else {
             C5Message::error(tr("Permission denied"));
@@ -2919,7 +2948,7 @@ void DlgOrder::on_btnTransferTable_clicked()
         });
     };
 
-    if(mUser->check(cp_t5_movetable)) {
+    if(mUser->check(cp_t5_waiter_transfer_items)) {
         func(mUser, tableId);
     } else {
         QString pin;
@@ -2930,7 +2959,7 @@ void DlgOrder::on_btnTransferTable_clicked()
 
         auto *user = new C5User();
         user->authorize(pin, self->fHttp, [self, func, user, tableId](const QJsonObject & jdoc) {
-            if(user->check(cp_t5_remove_printed_service)) {
+            if(user->check(cp_t5_waiter_transfer_items)) {
                 func(user, tableId);
             } else {
                 C5Message::error(tr("Permission denied"));
@@ -2941,4 +2970,99 @@ void DlgOrder::on_btnTransferTable_clicked()
             user->deleteLater();
         });
     }
+}
+
+void DlgOrder::on_btnReopenTable_clicked()
+{
+    if(C5Message::question(tr("Do you want to reopen order?")) != QDialog::Accepted) {
+        return;
+    }
+
+    NInterface::query1("/engine/v2/waiter/order/reopen-order", mUser->mSessionKey, this,
+    {{"id", mOrder.id}},
+    [this](const QJsonObject & jdoc) {
+        parseOrder(jdoc);
+    });
+}
+
+void DlgOrder::on_btnPrintClosedFiscal_clicked()
+{
+    if(C5Message::question(tr("Do you want to print the fiscal receipt?")) != QDialog::Accepted) {
+        return;
+    }
+
+    QPointer<DlgOrder> self(this);
+    auto *loading = new NLoadingDlg(tr("Printing fiscal check"), this);
+    auto *thread  = new QThread();
+    auto *pt = new PrintTaxN(self->mUser->fConfig["tax_ip"].toString(),
+                             self->mUser->fConfig["tax_port"].toString().toInt(),
+                             self->mUser->fConfig["tax_password"].toString(),
+                             self->mUser->fConfig["tax_external_pos"].toString(),
+                             self->mUser->fConfig["tax_op"].toString(),
+                             self->mUser->fConfig["tax_pin"].toString());
+    pt->moveToThread(thread);
+    auto order = self->mOrder;
+    connect(thread, &QThread::started, pt, [ = ]() {
+        for(auto d : std::as_const(order.dishes)) {
+            if(d.state != DISH_STATE_OK) {
+                continue;
+            }
+
+            pt->addGoods(d.fiscalDepartment(),
+                         d.adgtCode(),
+                         QString::number(d.dishId),
+                         d.dishName,
+                         d.price,
+                         d.qty,
+                         d.discountFactor() * 100);
+        }
+
+        pt->makeJsonAndPrint(order.paidCash(), order.paidCard(), order.paidPrepaid());
+    });
+    connect(pt, &PrintTaxN::started, loading, &QDialog::show, Qt::QueuedConnection);
+    connect(pt, &PrintTaxN::finished, self, [ = ](const QString & inJson, const QString & outJson, const QString & err, int result) {
+        loading->close();
+        loading->deleteLater();
+        QJsonObject reply{{"id", mOrder.id},
+            {
+                "fiscal", QJsonObject{
+                    {"in", inJson},
+                    {"out", outJson},
+                    {"error", err},
+                    {"result", result}}
+            }};
+
+        if(result == 0) {
+            QJsonObject reply{{"id", mOrder.id},
+                {
+                    "fiscal", QJsonObject{
+                        {"in", inJson},
+                        {"out", outJson},
+                        {"error", err},
+                        {"result", result}}
+                }};
+            NInterface::query("/engine/v2/waiter/order/fiscal-printed", mUser->mSessionKey, self, reply,
+            [self](const QJsonObject & jdoc) {
+                self->parseOrder(jdoc);
+                self->printPrecheck(self->mUser->shortFullName());
+            },
+            [](const QJsonObject & jerr) {return false;});
+        } else {
+            QJsonObject reply{{"id", mOrder.id},
+                {"in", inJson},
+                {"out", outJson},
+                {"error", err},
+                {"result", result}
+            };
+            NInterface::query("/engine/v2/waiter/order/fiscal-log", mUser->mSessionKey, self, reply,
+            [](const QJsonObject & jdoc) {},
+            [](const QJsonObject & jerr) {return false;});
+            C5Message::error(err);
+        }
+
+        thread->quit();
+    });
+    connect(thread, &QThread::finished, pt, &QObject::deleteLater);
+    connect(thread, &QThread::finished, thread, &QObject::deleteLater);
+    thread->start();
 }

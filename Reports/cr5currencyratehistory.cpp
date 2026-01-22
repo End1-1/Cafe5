@@ -5,7 +5,7 @@
 CR5CurrencyRateHistory::CR5CurrencyRateHistory(QWidget *parent) :
     C5ReportWidget( parent)
 {
-    fIcon = ":/cash.png";
+    fIconName = ":/cash.png";
     fLabel = tr("Currency rates history");
     fMainTable = "e_currency_rate_history h";
     fLeftJoinTables << "left join e_currency c on c.f_id=h.f_currency [c]";

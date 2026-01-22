@@ -11,7 +11,7 @@
 CR5GoodsMovement::CR5GoodsMovement(QWidget *parent) :
     C5ReportWidget(parent)
 {
-    fIcon = ":/goods.png";
+    fIconName = ":/goods.png";
     fLabel = tr("Movements in the store");
     fSimpleQuery = false;
     fMainTable = "a_store_draft s";

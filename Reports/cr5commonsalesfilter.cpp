@@ -2,6 +2,7 @@
 #include "ui_cr5commonsalesfilter.h"
 #include "c5cache.h"
 #include "cr5saleflags.h"
+#include "format_date.h"
 
 CR5CommonSalesFilter::CR5CommonSalesFilter(QWidget *parent) :
     C5FilterWidget(parent),

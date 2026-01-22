@@ -187,18 +187,42 @@ void C5FilterWidget::setFixDate(bool v)
     s.setValue("fixdate", v);
 }
 
+QString C5FilterWidget::normalizeIntInList(const QString &text)
+{
+    QStringList parts = text.split(',', Qt::SkipEmptyParts);
+    QStringList out;
+
+    for(const QString &p : parts) {
+        bool ok = false;
+        int v = p.trimmed().toInt(&ok);
+
+        if(ok) {
+            out << QString::number(v);
+        }
+    }
+
+    return out.join(',');
+}
+
 QString C5FilterWidget::in(QString &cond, const QString &field, C5LineEditWithSelector *l)
 {
     if(l->isEmpty()) {
         return cond;
     }
 
-    if(cond.isEmpty()) {
-        cond += QString(" %1 in (%2)").arg(field, l->text());
-    } else {
-        cond += QString(" and %1 in (%2)").arg(field, l->text());
+    QString list = normalizeIntInList(l->text());
+
+    if(list.isEmpty()) {
+        return cond;
     }
 
+    if(cond.isEmpty()) {
+        cond += QString(" %1 IN (%2)").arg(field, list);
+    } else {
+        cond += QString(" AND %1 IN (%2)").arg(field, list);
+    }
+
+    return cond;
     return cond;
 }
 

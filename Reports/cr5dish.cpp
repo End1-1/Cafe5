@@ -12,7 +12,7 @@
 CR5Dish::CR5Dish(QWidget *parent) :
     C5ReportWidget(parent)
 {
-    fIcon = ":/menu.png";
+    fIconName = ":/menu.png";
     fLabel = tr("Dishes");
     fSqlQuery = "select d.f_id, p1.f_name as f_part1, p2.f_name as f_part2, d.f_name, \
                 f_remind, d.f_barcode, f_service, f_discount, d.f_queue, d.f_color, f_netweight, f_cost \

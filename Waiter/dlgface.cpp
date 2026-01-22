@@ -2,12 +2,13 @@
 #include "ui_dlgface.h"
 #include "c5user.h"
 #include "dlgorder.h"
-#include "dlgreports.h"
 #include "dlgguest.h"
 #include "tablewidget.h"
 #include "c5permissions.h"
 #include "ninterface.h"
 #include "format_date.h"
+#include "dlgdashboard.h"
+#include "struct_workstationitem.h"
 #include <QToolButton>
 #include <QCloseEvent>
 #include <QScreen>
@@ -30,15 +31,20 @@ DlgFace::DlgFace(C5User *user) :
     ui->lbTime->setText(QTime::currentTime().toString(FORMAT_TIME_TO_SHORT_STR));
     connect(&fTimer, &QTimer::timeout, this, &DlgFace::timeout);
     fTimer.start(TIMER_TIMEOUT_INTERVAL);
-    ui->btnGuests->setVisible(mUser->check(cp_t5_pay_transfer_to_room));
-    ui->btnOrders->setVisible(mUser->check(cp_t5_reports));
-    ui->btnReports->setVisible(mUser->check(cp_t5_reports));
-    mSelectedHall = mUser->fConfig["default_hall"].toInt();
+    //TODO
+    ui->btnGuests->setVisible(false);
+    mSelectedHall = mWorkStation.defaultHallId();
 }
 
 DlgFace::~DlgFace()
 {
     delete ui;
+}
+
+int DlgFace::exec()
+{
+    C5WaiterDialog::exec();
+    return mRoute;
 }
 
 void DlgFace::timeout()
@@ -205,7 +211,16 @@ void DlgFace::showEvent(QShowEvent *e)
         return;
     }
 
-    initData();
+    NInterface::query1("/engine/v2/waiter/cashbox/check-status", mUser->mSessionKey, this,
+    {{"cashbox_id", mWorkStation.cashboxId()}},
+    [ = ](const QJsonObject & jdoc) {
+        if(jdoc["cashbox_session_id"].toInt() == 0) {
+            mRoute = 2;
+            accept();
+        } else {
+            initData();
+        }
+    });
 }
 
 void DlgFace::filterStaffClicked()
@@ -271,11 +286,8 @@ void DlgFace::initData()
     }, QVariant(), false);
 }
 
-void DlgFace::on_btnReports_clicked()
+void DlgFace::on_btnDashboard_clicked()
 {
-}
-
-void DlgFace::on_btnOrders_clicked()
-{
-    DlgReports::openReports(mUser);
+    mRoute = 2;
+    accept();
 }

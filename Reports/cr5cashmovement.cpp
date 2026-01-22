@@ -5,7 +5,7 @@
 CR5CashMovement::CR5CashMovement(QWidget *parent) :
     C5ReportWidget( parent)
 {
-    fIcon = ":/cash.png";
+    fIconName = ":/cash.png";
     fLabel = tr("Cash movement");
 
     fSimpleQuery = false;

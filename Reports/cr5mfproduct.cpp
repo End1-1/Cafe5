@@ -4,7 +4,7 @@
 CR5MFProduct::CR5MFProduct(QWidget *parent) :
     C5ReportWidget( parent)
 {
-    fIcon = ":/manufacturing.png";
+    fIconName = ":/manufacturing.png";
     fLabel = tr("Products");
     fSqlQuery = "select f_id, f_name from mf_actions_group";
     fTranslation["f_id"] = tr("Code");

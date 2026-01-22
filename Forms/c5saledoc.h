@@ -128,7 +128,7 @@ private:
     void saveReturnItems();
     int addGoods(int goodsId, C5Database &db);
     int addGoods(const QString &uuid, int store, int goodsId, const QString &barcode, const QString &name,
-                 const QString &unitname, double qty, double price, double discount, int isService, const QString &returnFrom);
+                 const QString &unitname, double qty, double price, double discount, int isService, const QString &returnFrom, const QString &adgt);
     void countGrandTotal();
     void countTotalQty();
     void setPartner();

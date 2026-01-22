@@ -4,7 +4,7 @@
 CR5CurrencyCrossRate::CR5CurrencyCrossRate(QWidget *parent) :
     C5ReportWidget( parent)
 {
-    fIcon = ":/cash.png";
+    fIconName = ":/cash.png";
     fLabel = tr("Cross rates");
     fSqlQuery = "select cr.f_id, cr.f_currency1, c1.f_name as f_currname1, cr.f_currency2, c2.f_name as f_currname2,"
                 "cr.f_rate from e_currency_cross_rate cr "

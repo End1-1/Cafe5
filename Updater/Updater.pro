@@ -11,7 +11,10 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 TARGET = Updater
 TEMPLATE = app
 
-RC_FILE = res.rc
+win32 {
+    RC_FILE = res.rc
+}
+
 
 ICON = time.ico
 
@@ -30,20 +33,30 @@ CONFIG += c++11
 
 SOURCES += \
         main.cpp \
-        maindialog.cpp \
-    updatethread.cpp \
-    install.cpp
+    updatemanger.cpp
 
 HEADERS += \
-        maindialog.h \
-    updatethread.h \
-    install.h
+    updatemanger.h \
+    version.h
 
-FORMS += \
-        maindialog.ui \
-    install.ui
+FORMS +=
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
+
+win32 {
+    version_inc.target = version_inc
+    version_inc.commands = powershell -NoProfile -ExecutionPolicy Bypass -File $$shell_path($$PWD/increase_version.ps1)
+    QMAKE_EXTRA_TARGETS += version_inc
+    PRE_TARGETDEPS += version_inc
+}
+
+
+win32 {
+    res_rc.depends += $$PWD/version.h
+}
+
+DISTFILES += \
+    increase_version.ps1

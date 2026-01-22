@@ -43,6 +43,7 @@ void DlgSplashScreen::login(const QString &username, const QString &password, st
         }
 
         user->fUserData = jdoc["userdata"].toObject().toVariantMap();
+        user->mSessionKey = jdoc["token"].toString();
         callback(user);
     }, [callback](const QJsonObject & jerr) {
         Q_UNUSED(jerr);

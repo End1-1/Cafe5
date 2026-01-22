@@ -2,6 +2,7 @@
 #include "ui_cr5salesbydishesfilter.h"
 #include "c5cache.h"
 #include "dict_dish_state.h"
+#include "format_date.h"
 
 CR5SalesByDishesFilter::CR5SalesByDishesFilter(QWidget *parent) :
     C5FilterWidget(parent),

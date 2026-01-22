@@ -2,6 +2,7 @@
 #include "ui_cr5draftoutputbyrecipefilter.h"
 #include "c5cache.h"
 #include "dict_dish_state.h"
+#include "format_date.h"
 #include "c5utils.h"
 
 CR5DraftOutputByRecipeFilter::CR5DraftOutputByRecipeFilter(QWidget *parent) :

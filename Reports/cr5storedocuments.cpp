@@ -1,6 +1,5 @@
 #include "cr5storedocuments.h"
 #include "cr5storedocumentsfilter.h"
-#include "c5tablemodel.h"
 #include "c5mainwindow.h"
 #include "c5storedoc.h"
 #include "c5message.h"
@@ -9,7 +8,7 @@ CR5StoreDocuments::CR5StoreDocuments(QWidget *parent) :
     C5ReportWidget(parent)
 {
     fLabel = tr("Document in the store");
-    fIcon = ":/documents.png";
+    fIconName = ":/documents.png";
     fSimpleQuery = true;
     fFilterWidget = new CR5StoreDocumentsFilter();
     fFilter = static_cast<CR5StoreDocumentsFilter*>(fFilterWidget);

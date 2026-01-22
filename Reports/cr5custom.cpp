@@ -10,7 +10,7 @@ CR5Custom::CR5Custom(QWidget *parent) :
     C5ReportWidget(parent)
 {
     fLabel = tr("Custom reports");
-    fIcon = ":/constructor.png";
+    fIconName = ":/constructor.png";
     rnames.clear();
     rsqls.clear();
     C5Database db;

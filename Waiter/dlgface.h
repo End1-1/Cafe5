@@ -25,6 +25,8 @@ public:
 
     ~DlgFace();
 
+    virtual int exec() override;
+
 private slots:
 
     void timeout();
@@ -41,12 +43,15 @@ private slots:
 
     void on_btnGuests_clicked();
 
-    void on_btnReports_clicked();
+    void on_btnDashboard_clicked();
 
-    void on_btnOrders_clicked();
+protected:
+    virtual void showEvent(QShowEvent *e) override;
 
 private:
     Ui::DlgFace* ui;
+
+    int mRoute = 0;
 
     QTimer fTimer;
 
@@ -63,8 +68,6 @@ private:
     int mTablesOfStaff = 0;
 
     void initData();
-
-    virtual void showEvent(QShowEvent *e) override;
 
     void filterHall();
 

@@ -48,6 +48,20 @@ int main(int argc, char* argv[])
     auto c5sn  = new C5ServerName(QString("%1://%2").arg(C5ConnectionDialog::instance()->connectionType() == C5ConnectionDialog::noneSecure ? "ws" : "wss",
                                   C5ConnectionDialog::instance()->serverAddress() + "/ws"));
 
+    for(const QString &s : a.arguments()) {
+        if(s.startsWith("/monitor")) {
+            QList<QScreen*> screens = a.screens();
+            int monitor = 0;
+            QStringList mon = s.split("=");
+
+            if(mon.length() == 2) {
+                monitor = mon.at(1).toInt();
+                C5Dialog::mScreen = monitor;
+                C5MainWindow::mScreen = monitor;
+            }
+        }
+    }
+
     if(!c5sn->getServers()) {
         C5ConnectionDialog::showSettings(nullptr);
         C5Message::error(c5sn->mErrorString);

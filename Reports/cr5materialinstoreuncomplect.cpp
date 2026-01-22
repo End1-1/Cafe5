@@ -1,11 +1,12 @@
 #include "cr5materialinstoreuncomplect.h"
 #include "cr5materialinstoreuncomplectfilter.h"
+#include "format_date.h"
 #include "c5message.h"
 
 CR5MaterialInStoreUncomplect::CR5MaterialInStoreUncomplect(QWidget *parent) :
     C5ReportWidget(parent)
 {
-    fIcon = ":/goods.png";
+    fIconName = ":/goods.png";
     fLabel = tr("Materials in the store without complects");
     fSimpleQuery = true;
     fFilter = new CR5MaterialInStoreUncomplectFilter();

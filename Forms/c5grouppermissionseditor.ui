@@ -20,7 +20,7 @@
       <enum>QTabWidget::TabPosition::West</enum>
      </property>
      <property name="currentIndex">
-      <number>0</number>
+      <number>1</number>
      </property>
      <widget class="QWidget" name="tab_2">
       <attribute name="title">
@@ -197,8 +197,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>886</width>
-            <height>849</height>
+            <width>900</width>
+            <height>764</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_4">
@@ -215,207 +215,7 @@
            <item>
             <widget class="C5CheckBox" name="checkBox_77">
              <property name="text">
-              <string>Enter working area</string>
-             </property>
-             <property name="Tag" stdset="0">
-              <number>515</number>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="C5CheckBox" name="checkBox_89">
-             <property name="text">
-              <string>Manger tools</string>
-             </property>
-             <property name="Tag" stdset="0">
-              <number>528</number>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="C5CheckBox" name="checkBox_78">
-             <property name="text">
-              <string>Edit table order</string>
-             </property>
-             <property name="Tag" stdset="0">
-              <number>526</number>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="C5CheckBox" name="checkBox_91">
-             <property name="text">
-              <string>Move table</string>
-             </property>
-             <property name="Tag" stdset="0">
-              <number>514</number>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="C5CheckBox" name="checkBox_79">
-             <property name="text">
-              <string>Change staff of table</string>
-             </property>
-             <property name="Tag" stdset="0">
-              <number>516</number>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="C5CheckBox" name="checkBox_80">
-             <property name="text">
-              <string>Change menu of table</string>
-             </property>
-             <property name="Tag" stdset="0">
-              <number>517</number>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="C5CheckBox" name="checkBox_179">
-             <property name="text">
-              <string>Split guests</string>
-             </property>
-             <property name="Tag" stdset="0">
-              <number>527</number>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="C5CheckBox" name="checkBox_81">
-             <property name="text">
-              <string>Edit stoplist</string>
-             </property>
-             <property name="Tag" stdset="0">
-              <number>518</number>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="C5CheckBox" name="checkBox_95">
-             <property name="text">
-              <string>Present dish</string>
-             </property>
-             <property name="Tag" stdset="0">
-              <number>534</number>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="C5CheckBox" name="checkBox_87">
-             <property name="text">
-              <string>Edit preorder</string>
-             </property>
-             <property name="Tag" stdset="0">
-              <number>519</number>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="C5CheckBox" name="checkBox_94">
-             <property name="text">
-              <string>Edit closed order</string>
-             </property>
-             <property name="Tag" stdset="0">
-              <number>533</number>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="C5CheckBox" name="checkBox_82">
-             <property name="text">
-              <string>Discount order</string>
-             </property>
-             <property name="Tag" stdset="0">
-              <number>520</number>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="C5CheckBox" name="checkBox_83">
-             <property name="text">
-              <string>Cancel discount of order</string>
-             </property>
-             <property name="Tag" stdset="0">
-              <number>521</number>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="C5CheckBox" name="checkBox_93">
-             <property name="text">
-              <string>Bill without service</string>
-             </property>
-             <property name="Tag" stdset="0">
-              <number>532</number>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="C5CheckBox" name="checkBox_84">
-             <property name="text">
-              <string>Print precheck</string>
-             </property>
-             <property name="Tag" stdset="0">
-              <number>522</number>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="C5CheckBox" name="checkBox_90">
-             <property name="text">
-              <string>Print receipt</string>
-             </property>
-             <property name="Tag" stdset="0">
-              <number>529</number>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="C5CheckBox" name="checkBox_85">
-             <property name="text">
-              <string>Repeat precheck</string>
-             </property>
-             <property name="Tag" stdset="0">
-              <number>524</number>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="C5CheckBox" name="checkBox_86">
-             <property name="text">
-              <string>Cancel prechek</string>
-             </property>
-             <property name="Tag" stdset="0">
-              <number>523</number>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="C5CheckBox" name="checkBox_88">
-             <property name="text">
-              <string>Final bill</string>
-             </property>
-             <property name="Tag" stdset="0">
-              <number>525</number>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="C5CheckBox" name="checkBox_10">
-             <property name="text">
-              <string>Remove printed service</string>
-             </property>
-             <property name="Tag" stdset="0">
-              <number>502</number>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="C5CheckBox" name="checkBox_9">
-             <property name="text">
-              <string>Mutliple receipt</string>
+              <string>Edit orders</string>
              </property>
              <property name="Tag" stdset="0">
               <number>501</number>
@@ -423,19 +223,19 @@
             </widget>
            </item>
            <item>
-            <widget class="C5CheckBox" name="checkBox_92">
+            <widget class="C5CheckBox" name="checkBox_89">
              <property name="text">
-              <string>Change date of sale</string>
+              <string>Print precheck</string>
              </property>
              <property name="Tag" stdset="0">
-              <number>531</number>
+              <number>502</number>
              </property>
             </widget>
            </item>
            <item>
-            <widget class="C5CheckBox" name="checkBox_39">
+            <widget class="C5CheckBox" name="checkBox_78">
              <property name="text">
-              <string>Change value of service fee</string>
+              <string>Reprint precheck</string>
              </property>
              <property name="Tag" stdset="0">
               <number>503</number>
@@ -443,29 +243,9 @@
             </widget>
            </item>
            <item>
-            <widget class="C5CheckBox" name="checkBox_102">
+            <widget class="C5CheckBox" name="checkBox_91">
              <property name="text">
-              <string>Payment, Idram</string>
-             </property>
-             <property name="Tag" stdset="0">
-              <number>537</number>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="C5CheckBox" name="checkBox_103">
-             <property name="text">
-              <string>Payment, PayX</string>
-             </property>
-             <property name="Tag" stdset="0">
-              <number>538</number>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="C5CheckBox" name="checkBox_41">
-             <property name="text">
-              <string>Payment, transfer to room</string>
+              <string>Cancel precheck</string>
              </property>
              <property name="Tag" stdset="0">
               <number>504</number>
@@ -473,9 +253,19 @@
             </widget>
            </item>
            <item>
-            <widget class="C5CheckBox" name="checkBox_42">
+            <widget class="C5CheckBox" name="checkBox_81">
              <property name="text">
-              <string>Payment, complimentary</string>
+              <string>Special payment types</string>
+             </property>
+             <property name="Tag" stdset="0">
+              <number>508</number>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="C5CheckBox" name="checkBox_79">
+             <property name="text">
+              <string>Close order</string>
              </property>
              <property name="Tag" stdset="0">
               <number>505</number>
@@ -483,9 +273,9 @@
             </widget>
            </item>
            <item>
-            <widget class="C5CheckBox" name="checkBox_43">
+            <widget class="C5CheckBox" name="checkBox_80">
              <property name="text">
-              <string>Payment, breakfast</string>
+              <string>Remove printed goods</string>
              </property>
              <property name="Tag" stdset="0">
               <number>506</number>
@@ -493,9 +283,19 @@
             </widget>
            </item>
            <item>
-            <widget class="C5CheckBox" name="checkBox_44">
+            <widget class="C5CheckBox" name="checkBox_217">
              <property name="text">
-              <string>Payment, dept</string>
+              <string>Reprint printed goods</string>
+             </property>
+             <property name="Tag" stdset="0">
+              <number>514</number>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="C5CheckBox" name="checkBox_179">
+             <property name="text">
+              <string>Transfer items</string>
              </property>
              <property name="Tag" stdset="0">
               <number>507</number>
@@ -503,14 +303,67 @@
             </widget>
            </item>
            <item>
-            <widget class="C5CheckBox" name="checkBox_60">
+            <widget class="C5CheckBox" name="checkBox_87">
              <property name="text">
-              <string>Shift rotation</string>
+              <string>Change service factor</string>
              </property>
              <property name="Tag" stdset="0">
               <number>509</number>
              </property>
             </widget>
+           </item>
+           <item>
+            <widget class="C5CheckBox" name="checkBox_94">
+             <property name="text">
+              <string>Remove discount</string>
+             </property>
+             <property name="Tag" stdset="0">
+              <number>510</number>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="C5CheckBox" name="checkBox_82">
+             <property name="text">
+              <string>Open close shift</string>
+             </property>
+             <property name="Tag" stdset="0">
+              <number>511</number>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="C5CheckBox" name="checkBox_83">
+             <property name="text">
+              <string>Reports</string>
+             </property>
+             <property name="Tag" stdset="0">
+              <number>512</number>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="C5CheckBox" name="checkBox_93">
+             <property name="text">
+              <string>Edit stoplist</string>
+             </property>
+             <property name="Tag" stdset="0">
+              <number>513</number>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <spacer name="verticalSpacer_12">
+             <property name="orientation">
+              <enum>Qt::Orientation::Vertical</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>20</width>
+               <height>40</height>
+              </size>
+             </property>
+            </spacer>
            </item>
           </layout>
          </widget>
@@ -1781,16 +1634,6 @@
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_8">
            <item>
-            <widget class="C5CheckBox" name="chREportsAllItems_2">
-             <property name="text">
-              <string>Hide goods store cost</string>
-             </property>
-             <property name="Tag" stdset="0">
-              <number>1101</number>
-             </property>
-            </widget>
-           </item>
-           <item>
             <spacer name="verticalSpacer_10">
              <property name="orientation">
               <enum>Qt::Orientation::Vertical</enum>
@@ -1828,34 +1671,21 @@
   </customwidget>
  </customwidgets>
  <tabstops>
-  <tabstop>scrollArea_5</tabstop>
-  <tabstop>checkBox_68</tabstop>
-  <tabstop>checkBox_59</tabstop>
-  <tabstop>checkBox_51</tabstop>
-  <tabstop>checkBox_52</tabstop>
-  <tabstop>checkBox_117</tabstop>
-  <tabstop>checkBox_118</tabstop>
-  <tabstop>checkBox_97</tabstop>
-  <tabstop>checkBox_112</tabstop>
-  <tabstop>checkBox_106</tabstop>
-  <tabstop>checkBox_119</tabstop>
-  <tabstop>checkBox_120</tabstop>
-  <tabstop>checkBox_54</tabstop>
-  <tabstop>checkBox_74</tabstop>
-  <tabstop>checkBox_90</tabstop>
+  <tabstop>chWaiterAllItems</tabstop>
+  <tabstop>checkBox_77</tabstop>
+  <tabstop>checkBox_89</tabstop>
+  <tabstop>checkBox_78</tabstop>
+  <tabstop>checkBox_91</tabstop>
+  <tabstop>checkBox_81</tabstop>
+  <tabstop>checkBox_79</tabstop>
+  <tabstop>checkBox_80</tabstop>
+  <tabstop>checkBox_179</tabstop>
+  <tabstop>checkBox_87</tabstop>
+  <tabstop>checkBox_94</tabstop>
+  <tabstop>checkBox_82</tabstop>
+  <tabstop>checkBox_83</tabstop>
+  <tabstop>checkBox_93</tabstop>
   <tabstop>checkBox_116</tabstop>
-  <tabstop>checkBox_85</tabstop>
-  <tabstop>checkBox_86</tabstop>
-  <tabstop>checkBox_88</tabstop>
-  <tabstop>checkBox_10</tabstop>
-  <tabstop>checkBox_9</tabstop>
-  <tabstop>checkBox_92</tabstop>
-  <tabstop>checkBox_39</tabstop>
-  <tabstop>checkBox_41</tabstop>
-  <tabstop>checkBox_42</tabstop>
-  <tabstop>checkBox_43</tabstop>
-  <tabstop>checkBox_44</tabstop>
-  <tabstop>checkBox_60</tabstop>
   <tabstop>chActions</tabstop>
   <tabstop>checkBox_16</tabstop>
   <tabstop>checkBox_21</tabstop>
@@ -1899,12 +1729,11 @@
   <tabstop>checkBox_100</tabstop>
   <tabstop>checkBox_98</tabstop>
   <tabstop>checkBox_99</tabstop>
-  <tabstop>checkBox_79</tabstop>
-  <tabstop>checkBox_91</tabstop>
-  <tabstop>checkBox_179</tabstop>
-  <tabstop>checkBox_81</tabstop>
-  <tabstop>checkBox_87</tabstop>
-  <tabstop>checkBox_94</tabstop>
+  <tabstop>checkBox_118</tabstop>
+  <tabstop>checkBox_52</tabstop>
+  <tabstop>checkBox_112</tabstop>
+  <tabstop>checkBox_106</tabstop>
+  <tabstop>checkBox_119</tabstop>
   <tabstop>tw</tabstop>
   <tabstop>chOtherAllItems</tabstop>
   <tabstop>checkBox_38</tabstop>
@@ -1913,18 +1742,15 @@
   <tabstop>checkBox_34</tabstop>
   <tabstop>chDisch</tabstop>
   <tabstop>chGoods</tabstop>
-  <tabstop>checkBox_80</tabstop>
+  <tabstop>checkBox_97</tabstop>
   <tabstop>lbGroup</tabstop>
-  <tabstop>chWaiterAllItems</tabstop>
-  <tabstop>checkBox_95</tabstop>
+  <tabstop>scrollArea_5</tabstop>
   <tabstop>scrollArea_2</tabstop>
   <tabstop>scrollArea</tabstop>
-  <tabstop>checkBox_89</tabstop>
-  <tabstop>checkBox_78</tabstop>
-  <tabstop>checkBox_77</tabstop>
+  <tabstop>checkBox_59</tabstop>
+  <tabstop>checkBox_51</tabstop>
+  <tabstop>checkBox_68</tabstop>
   <tabstop>checkBox_104</tabstop>
-  <tabstop>checkBox_102</tabstop>
-  <tabstop>checkBox_103</tabstop>
   <tabstop>checkBox_211</tabstop>
   <tabstop>checkBox_213</tabstop>
   <tabstop>checkBox_105</tabstop>
@@ -1948,9 +1774,8 @@
   <tabstop>checkBox_49</tabstop>
   <tabstop>checkBox_115</tabstop>
   <tabstop>checkBox_62</tabstop>
-  <tabstop>checkBox_83</tabstop>
-  <tabstop>checkBox_93</tabstop>
-  <tabstop>checkBox_84</tabstop>
+  <tabstop>checkBox_54</tabstop>
+  <tabstop>checkBox_74</tabstop>
   <tabstop>scrollArea_3</tabstop>
   <tabstop>chREportsAllItems</tabstop>
   <tabstop>checkBox_20</tabstop>
@@ -1974,9 +1799,9 @@
   <tabstop>checkBox_70</tabstop>
   <tabstop>checkBox_76</tabstop>
   <tabstop>scrollArea_4</tabstop>
-  <tabstop>chREportsAllItems_2</tabstop>
   <tabstop>checkBox_113</tabstop>
-  <tabstop>checkBox_82</tabstop>
+  <tabstop>checkBox_120</tabstop>
+  <tabstop>checkBox_117</tabstop>
  </tabstops>
  <resources/>
  <connections/>

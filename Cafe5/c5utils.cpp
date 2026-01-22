@@ -1,5 +1,6 @@
 #include "c5utils.h"
 #include <QDateTime>
+#include <QProcessEnvironment>
 
 C5Utils __c5utils;
 
@@ -14,20 +15,23 @@ QString password(const QString &value)
 
 QString hostusername()
 {
-    QString name = qEnvironmentVariable("USER");  // Linux/macOS
-    if (name.isEmpty()) {
-        name = qEnvironmentVariable("USERNAME");  // Windows
-    }
-    return name;
+    QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
+#ifdef Q_OS_WIN
+    return env.value("USERNAME");
+#else
+    return env.value("USER");
+#endif
 }
 
 QString columnNumberToLetter(int n)
 {
     QString letter = "";
-    while (n > 0) {
+
+    while(n > 0) {
         n--;  // Уменьшаем на 1, чтобы учитывать нумерацию с A
         letter = char(n % 26 + 'A') + letter;
         n /= 26;
     }
+
     return letter;
 }

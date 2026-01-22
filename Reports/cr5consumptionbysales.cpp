@@ -36,7 +36,7 @@ static const int col_qty_sr = 13;
 CR5ConsumptionBySales::CR5ConsumptionBySales(QWidget *parent) :
     C5ReportWidget(parent)
 {
-    fIcon = ":/goods.png";
+    fIconName = ":/goods.png";
     fLabel = tr("Consumption of goods base on sales");
     fColumnNameIndex["f_goods"] = col_goods;
     fColumnNameIndex["f_goodsgroup"] = col_goodsgroup;

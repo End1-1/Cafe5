@@ -20,7 +20,7 @@ C5StoreInventory::C5StoreInventory(QWidget *parent) :
     ui(new Ui::C5StoreInventory)
 {
     ui->setupUi(this);
-    fIcon = ":/goods.png";
+    fIconName = ":/goods.png";
     fLabel = tr("Store inventory");
     ui->leStore->setSelector(ui->leStoreName, cache_goods_store);
     ui->tblGoods->setColumnWidths(7, 0, 0, 300, 80, 80, 80, 80);

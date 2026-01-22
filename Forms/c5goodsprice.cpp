@@ -30,7 +30,7 @@ C5GoodsPriceOrder::C5GoodsPriceOrder()
     , ui(new Ui::C5GoodsPriceOrder)
 {
     ui->setupUi(this);
-    fIcon = ":/pricing.png";
+    fIconName = ":/pricing.png";
     fLabel = tr("Group discount");
     fHttp->createHttpQuery("/engine/goods/create-group-discount.php", QJsonObject{{"action", "getAll"}}, SLOT(
         getAllResponse(QJsonObject)));

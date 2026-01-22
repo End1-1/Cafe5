@@ -43,7 +43,9 @@ void NDataProvider::getData(const QString &route, const QJsonObject &data)
     QString url = QString("%1://%2/%3").arg(mConnectionProtocol, mConnectionHost, route);
     QNetworkRequest rq(url);
     rq.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
-    rq.setRawHeader("Authorization", "Bearer " + sessionKey.toUtf8());
+    rq.setRawHeader("Authorization", "Bearer " + (mBearer.isEmpty() ? sessionKey.toUtf8() : mBearer.toUtf8()));
+    rq.setRawHeader("X-Application-Name", mAppName.toUtf8());
+    rq.setRawHeader("X-Application-Version", mFileVersion.toUtf8());
     QJsonObject jo;
     jo["sessionkey"] = mBearer.isEmpty() ? sessionKey : mBearer;
     jo["hostinfo"] = QHostInfo::localHostName().toLower();
@@ -90,12 +92,26 @@ void NDataProvider::overwriteHost(const QString &protocol, const QString &host, 
 
 void NDataProvider::queryFinished(QNetworkReply *r)
 {
+    int httpCode = r->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
+    QByteArray ba = r->readAll();
+
     if(r->error() != QNetworkReply::NoError) {
         QString err = r->errorString() + r->readAll();
 
+        if(httpCode == 426) {
+            QJsonObject jmsg = QJsonDocument::fromJson(ba).object();
+            QString msg = QString("%1<br>%2 > %3<br><p><a href=\"launch-updater?version=%3\">%4</a></p>")
+                          .arg(tr("Application update required"),
+                               jmsg.value("old_version").toString(),
+                               jmsg.value("new_version").toString(),
+                               tr("Click to launch updater"));
+            emit updateRequired(msg, mAppName, jmsg.value("new_version").toString());
+            return;
+        }
+
         if(err.contains("access denied", Qt::CaseInsensitive)) {
             err = tr("Access denied");
-        } else if(err.contains("Application version must be", Qt::CaseInsensitive)) {
+        } else if(err.contains("Application version must be", Qt::CaseInsensitive) || err.contains("Application update required", Qt::CaseInsensitive)) {
             LogWriter::write(LogWriterLevel::errors, "", err);
             QJsonObject  je = QJsonDocument::fromJson(err.toUtf8()).object();
             err = QString("<p>%1</p><p><a href=\"launch-updater?version=%3\">%2</a></p>")
@@ -136,7 +152,6 @@ void NDataProvider::queryFinished(QNetworkReply *r)
         return;
     }
 
-    QByteArray ba = r->readAll();
     r->deleteLater();
 
     if(mDebug) {

@@ -5,7 +5,7 @@ CR5DishComment::CR5DishComment(QWidget *parent) :
     C5ReportWidget( parent)
 {
     fLabel = tr("Dish comment");
-    fIcon = ":/menu.png";
+    fIconName = ":/menu.png";
     fSqlQuery = "select f_id, f_name from d_dish_comment ";
     fTranslation["f_id"] = tr("Code");
     fTranslation["f_name"] = tr("Name");

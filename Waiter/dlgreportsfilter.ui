@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>418</width>
-    <height>202</height>
+    <height>151</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -31,6 +31,12 @@
    </property>
    <item>
     <widget class="QWidget" name="wheader" native="true">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
      <layout class="QHBoxLayout" name="horizontalLayout_2">
       <property name="spacing">
        <number>1</number>
@@ -72,6 +78,12 @@
    </item>
    <item>
     <widget class="QWidget" name="wfilter" native="true">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+       <horstretch>0</horstretch>
+       <verstretch>1</verstretch>
+      </sizepolicy>
+     </property>
      <layout class="QGridLayout" name="gridLayout_3">
       <property name="leftMargin">
        <number>1</number>
@@ -88,46 +100,32 @@
       <property name="spacing">
        <number>1</number>
       </property>
-      <item row="0" column="2">
-       <widget class="QLabel" name="label">
+      <item row="1" column="2">
+       <widget class="QLabel" name="label_2">
         <property name="text">
-         <string>Date start</string>
+         <string>Date end</string>
         </property>
        </widget>
       </item>
-      <item row="2" column="3" colspan="3">
-       <widget class="QToolButton" name="btnHall">
-        <property name="minimumSize">
-         <size>
-          <width>50</width>
-          <height>50</height>
-         </size>
+      <item row="0" column="3">
+       <widget class="QDateEdit" name="date1">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
         </property>
-        <property name="maximumSize">
-         <size>
-          <width>16277712</width>
-          <height>50</height>
-         </size>
+        <property name="font">
+         <font>
+          <pointsize>12</pointsize>
+         </font>
         </property>
-        <property name="text">
-         <string>ALL</string>
-        </property>
-        <property name="iconSize">
-         <size>
-          <width>32</width>
-          <height>32</height>
-         </size>
+        <property name="calendarPopup">
+         <bool>true</bool>
         </property>
        </widget>
       </item>
-      <item row="2" column="2">
-       <widget class="QLabel" name="label_3">
-        <property name="text">
-         <string>Hall</string>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="4">
+      <item row="1" column="3">
        <widget class="QDateEdit" name="date2">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
@@ -145,28 +143,10 @@
         </property>
        </widget>
       </item>
-      <item row="1" column="2">
-       <widget class="QLabel" name="label_2">
+      <item row="0" column="2">
+       <widget class="QLabel" name="label">
         <property name="text">
-         <string>Date end</string>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="4">
-       <widget class="QDateEdit" name="date1">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="font">
-         <font>
-          <pointsize>12</pointsize>
-         </font>
-        </property>
-        <property name="calendarPopup">
-         <bool>true</bool>
+         <string>Date start</string>
         </property>
        </widget>
       </item>

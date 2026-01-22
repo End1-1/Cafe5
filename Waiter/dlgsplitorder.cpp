@@ -66,6 +66,10 @@ void DlgSplitOrder::on_btnChoseTable_clicked()
     DlgTables d(self->mUser);
     int tableId = d.exec();
 
+    if(tableId == 0) {
+        return;
+    }
+
     if(tableId == self->mOrder1.table) {
         C5Message::error(tr("Same tables"));
         return;

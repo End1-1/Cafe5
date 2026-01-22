@@ -11,7 +11,7 @@
 CR5MaterialsInStore::CR5MaterialsInStore(QWidget *parent) :
     C5ReportWidget(parent)
 {
-    fIcon = ":/goods.png";
+    fIconName = ":/goods.png";
     fLabel = tr("Materials in the store");
     fSimpleQuery = false;
     fFilterWidget = new CR5MaterialInStoreFilter();

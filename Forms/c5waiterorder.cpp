@@ -24,7 +24,7 @@ C5WaiterOrder::C5WaiterOrder(QWidget *parent) :
 {
     ui->setupUi(this);
     fLabel = tr("Order");
-    fIcon = ":/order.png";
+    fIconName = ":/order.png";
     ui->tblLog->setColumnWidths(ui->tblLog->columnCount(), 100, 80, 200, 200, 200, 200);
     ui->tblStore->setColumnWidths(ui->tblStore->columnCount(), 80, 300, 200, 300, 80, 80, 80, 80);
     ui->rbDraft->setChecked(__c5config.getRegValue("sale_selfcost_mode").toBool());
@@ -148,18 +148,18 @@ QToolBar* C5WaiterOrder::toolBar()
         fToolBar->addAction(QIcon(":/eye.png"), tr("Show all"), this, SLOT(showAll()));
         fToolBar->addAction(QIcon(":/eye-no.png"), tr("Hide removed"), this, SLOT(hideRemoved()));
         fToolBar->addAction(QIcon(":/delete.png"), tr("Remove"), this, SLOT(removeOrder()));
-
-        if(mUser->check(cp_t5_edit_closed_order)) {
-            fToolBar->addAction(QIcon(":/save.png"), tr("Save"), this, SLOT(saveOrder()));
-            fToolBar->addAction(QIcon(":/storeinput.png"), tr("Store output"), this, SLOT(storeOutput()));
-        } else {
-            ui->deDateCash->setReadOnly(true);
-            ui->leCard->setReadOnly(true);
-            ui->leCash->setReadOnly(true);
-            ui->leBank->setReadOnly(true);
-            ui->leOther->setReadOnly(true);
-            ui->btnClearTax->setEnabled(false);
-        }
+        //TODO
+        // if(mUser->check(cp_t5_edit_closed_order)) {
+        //     fToolBar->addAction(QIcon(":/save.png"), tr("Save"), this, SLOT(saveOrder()));
+        //     fToolBar->addAction(QIcon(":/storeinput.png"), tr("Store output"), this, SLOT(storeOutput()));
+        // } else {
+        //     ui->deDateCash->setReadOnly(true);
+        //     ui->leCard->setReadOnly(true);
+        //     ui->leCash->setReadOnly(true);
+        //     ui->leBank->setReadOnly(true);
+        //     ui->leOther->setReadOnly(true);
+        //     ui->btnClearTax->setEnabled(false);
+        // }
     }
 
     return fToolBar;
@@ -384,37 +384,6 @@ void C5WaiterOrder::on_btnClearTax_clicked()
                         ui->leTax->text(), "");
         ui->leTax->clear();
     }
-}
-
-void C5WaiterOrder::on_btnOpenTable_clicked()
-{
-    if(C5Message::question(tr("Open order?")) != QDialog::Accepted) {
-        return;
-    }
-
-    C5Database db;
-    db[":f_table"] = ui->leTable->property("table_id");
-    db[":f_state"] = ORDER_STATE_OPEN;
-    db.exec("select f_id from o_header where f_table=:f_table and f_state=:f_state");
-
-    if(db.nextRow()) {
-        C5Message::error(tr("An opened order exists on table, cannot continue"));
-        return;
-    }
-
-    db[":f_oheader"] = ui->leUuid->text();
-    db.exec("select f_id from a_header_Cash where f_oheader=:f_oheader");
-
-    while(db.nextRow()) {
-        C5CashDoc ::removeDoc(db.getString("f_id"));
-    }
-
-    db[":f_order"] = ui->leUuid->text();
-    db.exec("delete from b_clients_debts where f_order=:f_order");
-    db[":f_id"] = ui->leUuid->text();
-    db[":f_state"] = ORDER_STATE_OPEN;
-    db.exec("update o_header set f_state=:f_state where f_id=:f_id");
-    C5Airlog::write(hostinfo, mUser->fullName(), LOG_WAITER, "", ui->leUuid->text(), "", "Open order from cash", "", "");
 }
 
 void C5WaiterOrder::on_btnSetCL_clicked()

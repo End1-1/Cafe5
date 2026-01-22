@@ -2,6 +2,7 @@
 #include "ui_waiterdishwidget.h"
 #include "dict_dish_state.h"
 #include "c5utils.h"
+#include "format_date.h"
 #include <QPaintEvent>
 #include <QPainter>
 #include <QPushButton>
@@ -51,11 +52,23 @@ void WaiterDishWidget::updateDish(WaiterDish value)
 {
     WaiterOrderItemWidget::updateDish(value);
     QString name = mOrderItem.dishName;
-    ui->btnDish->setText(name);
 
     if(!mOrderItem.fromTable().isEmpty()) {
         name = QString("(%1) %2").arg(mOrderItem.fromTable(), name);
     }
+
+    ui->btnDish->setText(name);
+    QDateTime dt = mOrderItem.isPrinted() ?
+                   str_to_datetime(mOrderItem.appendedTime()) :
+                   str_to_datetime(mOrderItem.appendedTime());
+    QString dd = dt.date() == QDate::currentDate() ? dt.toString(FORMAT_TIME_TO_SHORT_STR) :
+                 QString("<html><body><p align=\"center\" "
+            "style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"> "
+            "<span style=\" font-size:8pt;\">%1</span></p>\n<p align=\"center\" "
+            "style=\" margin-top:0px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"> "
+            "<span style=\" font-size:8pt;\">%2</span></p></body></html>")
+                 .arg(dt.date().toString(FORMAT_DATE_TO_STR), dt.time().toString(FORMAT_TIME_TO_STR));
+    ui->lbTimeOfDish->setText(mOrderItem.state == DISH_STATE_OK ? dd : "-");
 
     if(mOrderItem.state == DISH_STATE_NONE) {
         setVisible(false);
@@ -70,17 +83,6 @@ void WaiterDishWidget::updateDish(WaiterDish value)
         if(mOrderItem.state == DISH_STATE_OK) {
             ui->lbQty1->setProperty("state", mOrderItem.isPrinted() ? "1" : "0");
             ui->lbQty1->style()->polish(ui->lbQty1);
-            QDateTime dt = mOrderItem.isPrinted() ?
-                           str_to_datetime(mOrderItem.printedTime()) :
-                           str_to_datetime(mOrderItem.appendedTime());
-            QString dd = dt.date() == QDate::currentDate() ? dt.toString(FORMAT_TIME_TO_SHORT_STR) :
-                         QString("<html><body><p align=\"center\" "
-                    "style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"> "
-                    "<span style=\" font-size:6pt;\">%1</span></p>\n<p align=\"center\" "
-                    "style=\" margin-top:0px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"> "
-                    "<span style=\" font-size:8pt;\">%2</span></p></body></html>")
-                         .arg(dt.toString(FORMAT_DATE_TO_STR), dt.toString(FORMAT_TIME_TO_STR));
-            ui->lbTimeOfDish->setText(mOrderItem.state == DISH_STATE_OK ? dd : "-");
             pulish();
         } else if(mOrderItem.state == DISH_STATE_SET) {
             ui->orderDishFrame->setProperty("state", "4");

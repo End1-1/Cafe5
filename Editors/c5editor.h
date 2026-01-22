@@ -19,10 +19,10 @@ public:
     explicit C5Editor(C5User *user);
 
     ~C5Editor();
-    
-    static C5Editor *createEditor(C5User *user, CE5Editor *e, int id);
 
-    bool getResult(QList<QMap<QString, QVariant> > &data);
+    static C5Editor* createEditor(C5User *user, CE5Editor *e, int id);
+
+    bool getResult(QList<QMap<QString, QVariant> >& data);
 
     bool getJsonObject(QJsonObject &j);
 
@@ -33,7 +33,7 @@ public:
     bool event(QEvent *e) override;
 
 protected:
-    virtual void closeEvent(QCloseEvent *e);
+    virtual void closeEvent(QCloseEvent *e) override;
 
 private slots:
     void EditorAccepted();
@@ -47,11 +47,11 @@ private slots:
     void on_btnCopy_clicked();
 
 private:
-    Ui::C5Editor *ui;
+    Ui::C5Editor* ui;
 
-    QVBoxLayout *fVerticalLayout;
+    QVBoxLayout* fVerticalLayout;
 
-    CE5Editor *fEditor;
+    CE5Editor* fEditor;
 
     QList<QMap<QString, QVariant> > fData;
 };

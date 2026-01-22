@@ -48,6 +48,7 @@
 #define col_isservice 12
 #define col_returnfrom 13
 #define col_emarks 14
+#define col_adgt 15
 
 #define float_str_(value, f) QString::number(value, 'f', f)
 
@@ -56,9 +57,9 @@ C5SaleDoc::C5SaleDoc(QWidget *parent) :
     ui(new Ui::C5SaleDoc)
 {
     ui->setupUi(this);
-    fIcon = ":/pricing.png";
+    fIconName = ":/pricing.png";
     fLabel = tr("Sale");
-    ui->tblGoods->setColumnWidths(ui->tblGoods->columnCount(), 0, 50, 0, 150, 200, 300, 80, 80, 80, 80, 80, 80, 0, 0);
+    ui->tblGoods->setColumnWidths(ui->tblGoods->columnCount(), 0, 50, 0, 150, 200, 300, 80, 80, 80, 80, 80, 80, 0, 0, 0, 50);
     ui->cbCurrency->setDBValues("select f_id, f_name from e_currency");
     ui->cbCurrency->setCurrentIndex(ui->cbCurrency->findData(__c5config.getValue(param_default_currency)));
     ui->cbStorage->setDBValues("select f_id, f_name from c_storages order by 2");
@@ -150,10 +151,11 @@ bool C5SaleDoc::openDoc(const QString &uuid)
     db[":f_header"] = uuid;
     db.exec(QString("select dsb.f_id as ogoodsid, dsb.f_store, dsb.f_qty, g.*, "
                     "gu.f_name as f_unitname, dsb.f_price, dsb.f_discountfactor,  "
-                    "dsb.f_returnfrom, dsb.f_store "
+                    "dsb.f_returnfrom, dsb.f_store, if (length(coalesce(g.f_adg, '')) > 0, g.f_adg, gr.f_adgcode) as f_adgcode "
                     "from o_goods dsb "
                     "left join c_goods g on g.f_id=dsb.f_goods "
                     "left join c_units gu on gu.f_id=g.f_unit "
+                    "left join c_groups gr on gr.f_id=g.f_group "
                     "where dsb.f_header=:f_header  "
                     "order by dsb.f_row "));
 
@@ -167,7 +169,8 @@ bool C5SaleDoc::openDoc(const QString &uuid)
                  db.getDouble("f_qty"),
                  db.getDouble("f_price"),
                  db.getDouble("f_discountfactor") * 100, 0,
-                 db.getString("f_returnfrom"));
+                 db.getString("f_returnfrom"),
+                 db.getString("f_adgcode"));
         ui->cbStorage->setCurrentIndex(ui->cbStorage->findData(db.getInt("f_store")));
     }
 
@@ -300,7 +303,8 @@ void C5SaleDoc::createStoreDocument()
                      ui->tblGoods->getString(i, col_name),
                      ui->tblGoods->lineEdit(i, col_qty)->getDouble(),
                      ui->tblGoods->getString(i, col_unit),
-                     0, 0, "");
+                     0, 0, "",
+                     ui->tblGoods->getString(i, col_adgt));
     }
 }
 
@@ -443,6 +447,7 @@ void C5SaleDoc::exportXML()
         //     .appendChild(doc.createTextNode(QString::number(ui->tblGoods->getInteger(i, col_goods_code))));
         good.appendChild(doc.createElement("Description"))
             .appendChild(doc.createTextNode(ui->tblGoods->getString(i, col_name)));
+        good.appendChild(doc.createElement("ClassifierCode")).appendChild(doc.createTextNode(ui->tblGoods->getString(i, col_adgt)));
         good.appendChild(doc.createElement("Unit"))
             .appendChild(doc.createTextNode(ui->tblGoods->getString(i, col_unit)));
         good.appendChild(doc.createElement("Amount")).appendChild(doc.createTextNode(QString::number(qty)));
@@ -575,13 +580,14 @@ void C5SaleDoc::exportToExcel()
     headerFormat.setBorderStyle(QXlsx::Format::BorderThin);
     d.setColumnWidth(1, 10);
     d.setColumnWidth(2, 15);
-    d.setColumnWidth(3, 50);
-    d.setColumnWidth(4, 20);
+    d.setColumnWidth(3, 10);
+    d.setColumnWidth(4, 50);
     d.setColumnWidth(5, 20);
     d.setColumnWidth(6, 20);
     d.setColumnWidth(7, 20);
     d.setColumnWidth(8, 20);
     d.setColumnWidth(9, 20);
+    d.setColumnWidth(10, 20);
     int col = 1, row = 1;
     d.write(row, col, QString("%1 N%2").arg(tr("Order"), ui->leDocnumber->text()),
             headerFormat);
@@ -623,6 +629,7 @@ void C5SaleDoc::exportToExcel()
     vals.clear();
     vals << tr("NN")
          << tr("Material code")
+         << tr("Adgt")
          << tr("Goods")
          << tr("Qty")
          << tr("Unit")
@@ -647,6 +654,7 @@ void C5SaleDoc::exportToExcel()
         vals.clear();
         vals << QString::number(i + 1);
         vals << ui->tblGoods->getString(i, 4);
+        vals << ui->tblGoods->getString(i, col_adgt);
         vals << ui->tblGoods->getString(i, 5);
         vals << ui->tblGoods->lineEdit(i, 6)->text();
         vals << ui->tblGoods->getString(i, 7);
@@ -1056,17 +1064,19 @@ int C5SaleDoc::addGoods(int goodsId, C5Database &db)
     db[":f_partner"] = fPartner.id;
     db.exec(QString(R"(
                     select g.*, gu.f_name as f_unitname,
-                    if((coalesce(sp.f_price, 0)>0), sp.f_price, if (gpr.%1>0, gpr.%1, gpr.%2)) as f_price
+                    if((coalesce(sp.f_price, 0)>0), sp.f_price, if (gpr.%1>0, gpr.%1, gpr.%2)) as f_price,
+                    if(length(coalesce(g.f_adg, ''))>0, g.f_adg, gr.f_adgcode) as f_adgt
                     from c_goods g
                     left join c_goods_prices gpr on gpr.f_goods=g.f_id
                     left join c_goods_special_prices sp on sp.f_goods=g.f_id and sp.f_partner=:f_partner
                     left join c_units gu on gu.f_id=g.f_unit
+                    left join c_groups gr on gr.f_id=g.f_group
                     where g.f_id=:f_id and gpr.f_currency=:f_currency
     )").arg(priceDiscount, priceField));
 
     if(db.nextRow()) {
         return addGoods("", ui->cbStorage->currentData().toInt(), goodsId, db.getString("f_scancode"), db.getString("f_name"),
-                        db.getString("f_unitname"), 0, db.getDouble("f_price"), 0, db.getInt("f_service"), db.getString("f_returnfrom"));
+                        db.getString("f_unitname"), 0, db.getDouble("f_price"), 0, db.getInt("f_service"), db.getString("f_returnfrom"), db.getString("f_adgt"));
     } else {
         C5Message::error(tr("Invalid goods id"));
         return false;
@@ -1075,7 +1085,8 @@ int C5SaleDoc::addGoods(int goodsId, C5Database &db)
 
 int C5SaleDoc::addGoods(const QString &uuid, int store, int goodsId, const QString &barcode, const QString &name,
                         const QString &unitname,
-                        double qty, double price, double discount, int isService, const QString &returnFrom)
+                        double qty, double price, double discount, int isService, const QString &returnFrom,
+                        const QString &adgt)
 {
     int r = ui->tblGoods->addEmptyRow();
     ui->tblGoods->setString(r, col_uuid, uuid);
@@ -1111,6 +1122,7 @@ int C5SaleDoc::addGoods(const QString &uuid, int store, int goodsId, const QStri
 
     ui->tblGoods->setInteger(r, col_isservice, isService);
     ui->tblGoods->setString(r, col_returnfrom, returnFrom);
+    ui->tblGoods->setString(r, col_adgt, adgt);
     countGrandTotal();
     return r;
 }
@@ -1199,11 +1211,13 @@ bool C5SaleDoc::openDraft(const QString &id)
     db[":f_state"] = 1;
     db[":f_currency"] = ui->cbCurrency->currentData();
     db.exec(QString("select dsb.f_store, dsb.f_qty, g.*, "
-                    "gu.f_name as f_unitname, dsb.f_price, dsb.f_discount "
+                    "gu.f_name as f_unitname, dsb.f_price, dsb.f_discount, "
+                    "if(length(coalesce(g.f_adg, ''))>0, g.f_adg, gr.f_adgcode) as f_adgt "
                     "from o_draft_sale_body dsb "
                     "left join c_goods g on g.f_id=dsb.f_goods "
                     "left join c_goods_prices gpr on gpr.f_goods=g.f_id "
                     "left join c_units gu on gu.f_id=g.f_unit "
+                    "left join c_groups gr on gr.f_id=g.f_group "
                     "where dsb.f_header=:f_header and gpr.f_currency=:f_currency "
                     "and dsb.f_state=:f_state and dsb.f_qty>0 ").arg(priceField));
     ui->tblGoods->setRowCount(0);
@@ -1211,7 +1225,7 @@ bool C5SaleDoc::openDraft(const QString &id)
     while(db.nextRow()) {
         ui->cbStorage->setCurrentIndex(ui->cbStorage->findData(db.getInt("f_store")));
         addGoods("", db.getInt("f_store"), db.getInt("f_id"), db.getString("f_scancode"), db.getString("f_name"),
-                 db.getString("f_unitname"), db.getDouble("f_qty"), db.getDouble("f_price"), db.getDouble("f_discount"), 0, "");
+                 db.getString("f_unitname"), db.getDouble("f_qty"), db.getDouble("f_price"), db.getDouble("f_discount"), 0, "", db.getString("f_adgt"));
     }
 
     fOpenedFromDraft = true;

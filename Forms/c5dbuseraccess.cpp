@@ -10,7 +10,7 @@ C5DbUserAccess::C5DbUserAccess(QWidget *parent) :
     ui(new Ui::C5DbUserAccess)
 {
     ui->setupUi(this);
-    fIcon = ":/access.png";
+    fIconName = ":/access.png";
     fLabel = tr("Database access");
     refreshData();
 }

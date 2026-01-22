@@ -62,45 +62,20 @@
 #define cp_t4_dishes_packages 409
 
 #define cp_t5_waiter 500
-#define cp_t5_multiple_receipt 501
-#define cp_t5_remove_printed_service 502
-#define cp_t5_change_service_value 503
-#define cp_t5_pay_transfer_to_room 504
-#define cp_t5_pay_complimentary 505
-#define cp_t5_pay_breakfast 506
-#define cp_t5_pay_cityledger 507
-#define cp_t5_refund_goods 508
-#define cp_t5_shift_rotation 509
-#define cp_t5_remove_row_from_shop 510
-#define cp_t5_reports 511
-#define cp_t5_view_reserved_tables 512
-#define cp_t5_edit_reserve 513
-#define cp_t5_movetable 514
-
-#define cp_t5_enter_dlgface 515
-#define cp_t5_change_staff_of_table 516
-#define cp_t5_change_menu 517
-#define cp_t5_stoplist 518
-#define cp_t5_preorder 519
-#define cp_t5_discount 520
-#define cp_t5_cancel_discount 521
-#define cp_t5_print_precheck 522
-#define cp_t5_cancel_precheck 523
-#define cp_t5_repeat_precheck 524
-#define cp_t5_final_check 525
-#define cp_t5_edit_table 526
-#define cp_t5_splitguest 527
-#define cp_t5_manager_tools 528
-#define cp_t5_print_receipt 529
-#define cp_t5_repeat_service 530
-#define cp_t5_change_date_of_sale 531
-#define cp_t5_edit_closed_order 533
-#define cp_t5_present 534
-#define cp_t5_edit_booking 535
-#define cp_t5_view_tax_and_no_sales 536
-#define cp_t5_view_sales_of_all_users 539
-#define cp_t5_shop_can_discount 540
-#define cp_t5_complimentary 541
+#define cp_t5_waiter_edit_order 501
+#define cp_t5_waiter_print_precheck 502
+#define cp_t5_waiter_reprint_prechek 503
+#define cp_t5_waiter_cancel_precheck 504
+#define cp_t5_waiter_close_order 505
+#define cp_t5_waiter_remove_printed_goods 506
+#define cp_t5_waiter_transfer_items 507
+#define cp_t5_waiter_special_payment_types 508
+#define cp_t5_waiter_change_service_factor 509
+#define cp_t5_waiter_remove_discount 510
+#define cp_t5_waiter_open_close_shift 511
+#define cp_t5_waiter_reports 512
+#define cp_t5_waiter_edit_stoplist 513
+#define cp_t5_waiter_reprint_goods 514
 
 #define cp_t6_goods_menu 600
 #define cp_t6_units 601
@@ -155,9 +130,6 @@
 #define cp_t10_actions_stages 1007
 #define cp_t10_active_tasks 1008
 #define cp_t10_create_task 1009
-
-#define cp_t11_miscelanous 1100
-#define cp_t11_do_now_show_input_prices 1101
 
 #define cp_t12_shop_enter_sale 1203
 #define cp_t12_shop_enter_store 1204

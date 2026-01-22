@@ -18,6 +18,8 @@ public:
 
     void setSceneParams(qreal width,  qreal height, qreal logicalDpiX);
 
+    void reset();
+
     void setFont(const QFont &font);
 
     void setFontBold(bool bold);
@@ -48,6 +50,8 @@ public:
 
     bool br(qreal height = 0);
 
+    QGraphicsScene* fCanvas;
+
     int currentPageIndex();
 
     bool print(QPrinter &prn);
@@ -60,8 +64,6 @@ public:
 
     QJsonArray jsonData();
 
-    bool fNoNewPage;
-
     QString fErrorString;
 
 private:
@@ -71,8 +73,6 @@ private:
     qreal fMM;
 
     qreal fTempTop;
-
-    QGraphicsScene* fCanvas;
 
     QPen fLinePen;
 

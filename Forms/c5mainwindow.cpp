@@ -21,6 +21,7 @@
 #include "cr5breezeservice.h"
 #include "cr5reports.h"
 #include "cr5mfgeneralreport.h"
+#include "wdashboard.h"
 #include "c5config.h"
 #include "c5saledoc.h"
 #include "c5salarypayment.h"
@@ -99,9 +100,11 @@
 #include <QMediaPlayer>
 #include <QToolButton>
 #include <QParallelAnimationGroup>
+#include <QWindow>
 
 C5MainWindow* __mainWindow;
 QStringList mainDbParams;
+int C5MainWindow::mScreen = -1;
 
 #define MENU_HEIGHT  (qApp->font().pointSize() * 3) + 8 + 4
 
@@ -111,6 +114,16 @@ C5MainWindow::C5MainWindow(QWidget *parent) :
     ui(new Ui::C5MainWindow)
 {
     ui->setupUi(this);
+
+    if(mScreen > -1) {
+        QScreen *screen = qApp->screens().at(mScreen);
+        this->create();
+
+        if(windowHandle()) {
+            windowHandle()->setScreen(screen);
+        }
+    }
+
     mainDbParams = __c5config.dbParams();
     ui->splitter->setStretchFactor(0, 0);
     ui->splitter->setStretchFactor(1, 1);
@@ -177,6 +190,13 @@ void C5MainWindow::closeEvent(QCloseEvent *event)
     }
 
     QMainWindow::closeEvent(event);
+}
+
+void C5MainWindow::addWidget(C5Widget *w)
+{
+    w->mUser = mUser;
+    fTab->addTab(w, w->icon(), w->label());
+    fTab->setCurrentIndex(fTab->count() - 1);
 }
 
 NTableWidget* C5MainWindow::createNTab(const QString &route, const QString &image,
@@ -266,22 +286,17 @@ void C5MainWindow::postLoginSetup()
     C5ReportTemplateDriver::init(mUser->group());
     fStatusLabel->setText(mUser->fullName());
     fConnectionLabel->setText(__c5config.fDBName);
-    C5Database db(C5Config::fDBHost, C5Config::fDBPath, C5Config::fDBUser, C5Config::fDBPassword);
-    db[":f_user"] = mUser->id();
-    db.exec("select f_name, f_description, f_host, f_db, f_user, f_password, f_main from s_db "
-            "where f_id in (select f_db from s_db_access where f_user=:f_user and f_permit=1)");
-
-    if(!db.nextRow()) {
-        C5Message::info(tr("No access to this database"));
-        qApp->quit();
-        return;
-    }
+    //createTab<WDashboard>();
 }
 
 void C5MainWindow::tabCloseRequested(int index)
 {
     auto *w = static_cast<C5Widget*>(fTab->widget(index));
-    QString prevWindow, currWindow;
+
+    if(w->property("dashboard").toBool()) {
+        return;
+    }
+
     fTab->removeTab(index);
     delete w;
 }
@@ -329,6 +344,21 @@ void C5MainWindow::on_actionLogin_triggered()
     }
 
     postLoginSetup();
+}
+
+void C5MainWindow::showEvent(QShowEvent *e)
+{
+    QMainWindow::showEvent(e);
+
+    if(e->spontaneous()) {
+        return;
+    }
+
+    if(mScreen > -1) {
+        QScreen *screen = qApp->screens().at(mScreen);
+        QRect geo = screen->availableGeometry();
+        move(geo.topLeft());
+    }
 }
 
 void C5MainWindow::menuListReponse(const QJsonObject &jdoc)

@@ -105,6 +105,14 @@ int main(int argc, char* argv[])
         dlgsplash->deleteLater();
         C5Dialog::setMainWindow(nullptr);
         QTimer::singleShot(1, [user]() {
+            if(!user) {
+                if(C5Message::error("Program account could not log in. Would you like to open settings?", QObject::tr("Yes"), QObject::tr("No")) == QDialog::Accepted) {
+                    C5ConnectionDialog::showSettings(nullptr);
+                }
+
+                return 0;
+            }
+
             auto *w = new DlgScreen(user);
             w->exec();
         });

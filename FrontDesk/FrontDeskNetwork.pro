@@ -66,7 +66,12 @@ FORMS += \
     ../Forms/dlgimportfromas.ui \
     c5discountredeem.ui \
     dlgemarks.ui \
-    storedecomplectation.ui
+    dwaiterworkstationconfig.ui \
+    rabstracteditordialog.ui \
+    rabstracteditorreport.ui \
+    rwaiterstationconfig.ui \
+    storedecomplectation.ui \
+    wdashboard.ui
 
 HEADERS += \
     ../Classes/appwebsocket.h \
@@ -77,12 +82,19 @@ HEADERS += \
     ../Forms/c5goodsspecialprice.h \
     ../Forms/c5menu.h \
     ../Forms/dlgimportfromas.h \
+    ../StructModel/c5structmodel.h \
     c5discountredeem.h \
     c5officedialog.h \
     c5officewidget.h \
     dlgemarks.h \
+    dwaiterworkstationconfig.h \
+    rabstracteditordialog.h \
+    rabstracteditorreport.h \
+    rabstractspecialwidget.h \
+    rwaiterstationconfig.h \
     storedecomplectation.h \
-    version.h
+    version.h \
+    wdashboard.h
 
 SOURCES += \
     ../Classes/appwebsocket.cpp \
@@ -96,7 +108,13 @@ SOURCES += \
     c5officedialog.cpp \
     c5officewidget.cpp \
     dlgemarks.cpp \
-    storedecomplectation.cpp
+    dwaiterworkstationconfig.cpp \
+    rabstracteditordialog.cpp \
+    rabstracteditorreport.cpp \
+    rabstractspecialwidget.cpp \
+    rwaiterstationconfig.cpp \
+    storedecomplectation.cpp \
+    wdashboard.cpp
 
 win32 {
     version_inc.target = version_inc

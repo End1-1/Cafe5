@@ -3,10 +3,14 @@
 #include "c5user.h"
 #include "dlgface.h"
 #include "ndataprovider.h"
-#include "c5waiterserver.h"
 #include "c5permissions.h"
 #include "c5message.h"
 #include "c5connectiondialog.h"
+#include "dict_workstation.h"
+#include "ninterface.h"
+#include "c5utils.h"
+#include "struct_workstationitem.h"
+#include "dlgdashboard.h"
 #include <QKeyEvent>
 #include <QPainter>
 
@@ -16,7 +20,6 @@ DlgScreen::DlgScreen(C5User *user) :
 {
     ui->setupUi(this);
     ui->lbVersion->setText(NDataProvider::mFileVersion);
-    mWaiterServer = new C5WaiterServer();
     updatePin();
     installEventFilter(this);
     setFocusPolicy(Qt::StrongFocus);
@@ -26,7 +29,6 @@ DlgScreen::DlgScreen(C5User *user) :
 DlgScreen::~DlgScreen()
 {
     delete ui;
-    mWaiterServer->deleteLater();
 }
 
 bool DlgScreen::eventFilter(QObject *o, QEvent *e)
@@ -76,6 +78,16 @@ void DlgScreen::paintEvent(QPaintEvent *e)
         QPoint topLeft((width() - scaled.width()) / 2, (height() - scaled.height()) / 2);
         p.drawPixmap(topLeft, scaled);
     }
+}
+
+void DlgScreen::showEvent(QShowEvent *e)
+{
+    C5WaiterDialog::showEvent(e);
+    NInterface::query1("/engine/v2/waiter/workstation/get-config", mUser->mSessionKey, this,
+    {{"type", WORKSTATION_WAITER}, {"station_account", hostusername()}, {"workstation", hostinfo}},
+    [](const QJsonObject & jdoc) {
+        mWorkStation = JsonParser<WorkstationItem>::fromJson(jdoc);
+    });
 }
 
 void DlgScreen::on_btnCancel_clicked()
@@ -149,21 +161,38 @@ void DlgScreen::on_btnAccept_clicked()
     QString pin = mPin;
     mPin.clear();
     updatePin();
-    user->authorize(pin, fHttp, [user](const  QJsonObject & jdoc) {
+    user->authorize(pin, fHttp, [ = ](const  QJsonObject & jdoc) {
         QJsonObject jo = jdoc["data"].toObject();
         NDataProvider::sessionKey = jo["sessionkey"].toString();
 
-        if(!user->check(cp_t5_enter_dlgface)) {
+        if(!user->check(cp_t5_waiter_edit_order)) {
             user->deleteLater();
             C5Message::error(tr("You have not permission to enter the working area"));
             return;
         }
 
-        QTimer::singleShot(1, user, [user]() {
-            auto *dlg = new DlgFace(user);
-            dlg->exec();
-            dlg->deleteLater();
-            user->deleteLater();
+        QTimer::singleShot(1, user, [ = ]() {
+            int finish = 0;
+
+            do {
+                QDialog *dlg;
+
+                switch(finish) {
+                case 2:
+                    dlg = new DlgDashboard(QJsonObject(), user);
+                    break;
+
+                case 3:
+                    dlg = new DlgFace(user);
+                    break;
+
+                default:
+                    dlg = new DlgFace(user);
+                }
+
+                finish = dlg->exec();
+                delete dlg;
+            } while(finish > 1);
         });
     }, [user]() {
         user->deleteLater();

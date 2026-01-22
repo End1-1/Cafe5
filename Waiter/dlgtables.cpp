@@ -3,6 +3,7 @@
 #include "ninterface.h"
 #include "c5utils.h"
 #include "c5user.h"
+#include "struct_workstationitem.h"
 #include <QScrollBar>
 #include <QStyledItemDelegate>
 #include <QPainter>
@@ -56,16 +57,26 @@ public:
         const int pad = 6;
         // --- имя стола (лево-верх) ---
         QFont f = opt.font;
-        f.setPointSize(14);
         f.setBold(true);
+        QRect nameRect(r.left() + pad, r.top() + pad, r.width() / 2, 18);
+        // начальный размер
+        int fontSize = 14;
+        const int minFontSize = 8;
+        QFontMetrics fm(f);
+
+        while(fontSize >= minFontSize) {
+            f.setPointSize(fontSize);
+            fm = QFontMetrics(f);
+
+            if(fm.horizontalAdvance(name) <= nameRect.width())
+                break;
+
+            fontSize--;
+        }
+
         p->setFont(f);
         p->setPen(Qt::black);
-        p->drawText(
-            QRect(r.left() + pad, r.top() + pad,
-                  r.width() / 2, 18),
-            Qt::AlignLeft | Qt::AlignVCenter,
-            name
-        );
+        p->drawText(nameRect, Qt::AlignCenter | Qt::AlignVCenter, name);
         f.setPointSize(10);
         f.setBold(true);
         p->setFont(f);
@@ -163,7 +174,7 @@ void DlgTables::showEvent(QShowEvent *e)
 void DlgTables::hallClicked()
 {
     auto* btn = qobject_cast<QToolButton*>(sender());
-    int hall = btn ? btn->property("id").toInt() : 0;
+    int hall = btn ? btn->property("id").toInt() : mWorkStation.defaultHallId();
     QVector<TableItem> copy;
 
     for(auto t : mTables) {

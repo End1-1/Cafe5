@@ -10,7 +10,7 @@
 CR5SaleFromStore::CR5SaleFromStore(QWidget *parent) :
     C5ReportWidget(parent)
 {
-    fIcon = ":/graph.png";
+    fIconName = ":/graph.png";
     fLabel = tr("Sales by goods");
     fSimpleQuery = false;
     fMainTable = "o_goods og";

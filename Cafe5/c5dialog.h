@@ -51,7 +51,13 @@ public:
 
     C5User* mUser;
 
+public slots:
+    void updateRequired(const QString &msg, const QString &appName, const QString &newVersion);
+
 protected:
+    virtual void resizeEvent(QResizeEvent *e) override;
+
+    virtual void moveEvent(QMoveEvent *e) override;
 
     virtual void keyPressEvent(QKeyEvent *e) override;
 
@@ -63,11 +69,31 @@ protected:
 
     virtual void showEvent(QShowEvent *e) override;
 
+    virtual void paintEvent(QPaintEvent *e) override;
+
     NInterface* fHttp;
 
 protected slots:
     void handleError(int err, const QString &msg);
 
+private:
+    QVector<QColor> mTopBorder;
+
+    QVector<QColor> mBottomBorder;
+
+    QVector<QColor> mLeftBorder;
+
+    QVector<QColor> mRightBorder;
+
+    QImage mBgCache;
+
+    void updateBackgroundCache();
+
+    QImage grabDesktopArea(const QRect &r);
+
+    void buildAdaptiveBorder();
+
+    QColor contrast(const QColor &c);
 signals:
     void escape();
 };

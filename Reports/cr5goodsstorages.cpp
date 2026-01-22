@@ -4,7 +4,7 @@
 CR5GoodsStorages::CR5GoodsStorages(QWidget *parent) :
     C5ReportWidget( parent)
 {
-    fIcon = ":/goods.png";
+    fIconName = ":/goods.png";
     fLabel = tr("Storages");
 
     fSqlQuery = "select f_id, f_name, f_inputcounter, f_outcounter, f_movecounter, f_complectcounter, f_partner from c_storages ";

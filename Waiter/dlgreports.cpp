@@ -1,24 +1,46 @@
 #include "dlgreports.h"
 #include "ui_dlgreports.h"
-#include "dlgreportslist.h"
 #include "dlgreportsfilter.h"
-#include "c5printjson.h"
 #include "c5user.h"
 #include "dlgreceiptlanguage.h"
-#include "dlglistofhall.h"
-#include "printtaxn.h"
+#include "dlgorder.h"
 #include "c5message.h"
 #include "c5printing.h"
 #include "c5utils.h"
+#include "format_date.h"
 #include "ninterface.h"
 #include <QSettings>
+#include <QStyledItemDelegate>
+#include <QPainter>
 #include <QFile>
+
+class GridDelegate : public QStyledItemDelegate
+{
+public:
+    using QStyledItemDelegate::QStyledItemDelegate;
+
+    void paint(QPainter *p, const QStyleOptionViewItem &opt,
+               const QModelIndex &idx) const override
+    {
+        QStyledItemDelegate::paint(p, opt, idx);
+        p->save();
+        p->setPen(QPen(QColor("#6b7a84"), 1));
+        const QRect r = opt.rect;
+        // правая граница
+        p->drawLine(r.topRight(), r.bottomRight());
+        // нижняя граница
+        p->drawLine(r.bottomLeft(), r.bottomRight());
+        p->restore();
+    }
+};
 
 DlgReports::DlgReports(C5User *user) :
     C5WaiterDialog(user),
     ui(new Ui::DlgReports)
 {
     ui->setupUi(this);
+    ui->tbl->setItemDelegate(new GridDelegate(ui->tbl));
+    ui->tblTotal->setItemDelegate(new GridDelegate(ui->tblTotal));
     fCurrentHall = 0;
     setLangIcon();
     mDate1 = QDate::currentDate();
@@ -33,9 +55,14 @@ DlgReports::~DlgReports()
 void DlgReports::openReports(C5User *user)
 {
     DlgReports *d = new DlgReports(user);
-    d->getDailyCommon();
     d->exec();
     delete d;
+}
+
+void DlgReports::showEvent(QShowEvent *e)
+{
+    C5WaiterDialog::showEvent(e);
+    getDailyCommon();
 }
 
 void DlgReports::getDailyCommon()
@@ -48,32 +75,33 @@ void DlgReports::getDailyCommon()
         QJsonArray jorders = jdoc["orders"].toArray();
         ui->tbl->clearContents();
         ui->tbl->setRowCount(0);
-        double total = 0;
 
         for(int i = 0; i < jorders.count(); i++) {
             QJsonObject o = jorders.at(i).toObject();
             int r = ui->tbl->addEmptyRow();
-            ui->tbl->setString(r, 0, o["f_id"].toString());
-            ui->tbl->setString(r, 1, o["f_prefix"].toString());
-            ui->tbl->setString(r, 2, o["f_date_close"].toString());
-            ui->tbl->setString(r, 3, o["f_time_close"].toString());
-            ui->tbl->setString(r, 4, o["f_hall_name"].toString());
-            ui->tbl->setString(r, 5, o["f_table_name"].toString());
-            ui->tbl->setString(r, 6, o["f_staff_name"].toString());
-            ui->tbl->setString(r, 7, float_str(o["f_amount_total"].toDouble(), 2));
-            ui->tbl->setString(r, 8, o["f_fiscal"].toString());
-            total += o["f_amount_total"].toDouble();
+            int c = 0;
+            ui->tbl->setString(r, c++, o["f_id"].toString());
+            ui->tbl->setString(r, c++, o["f_prefix"].toString());
+            ui->tbl->setString(r, c++, o["f_date_open"].toString());
+            ui->tbl->setString(r, c++, o["f_time_open"].toString());
+            ui->tbl->setString(r, c++, o["f_date_close"].toString());
+            ui->tbl->setString(r, c++, o["f_time_close"].toString());
+            ui->tbl->setString(r, c++, o["f_hall_name"].toString());
+            ui->tbl->setString(r, c++, o["f_table_name"].toString());
+            ui->tbl->setString(r, c++, o["f_staff_name"].toString());
+            ui->tbl->setString(r, c++, o["f_amount_total"].toString());
+            ui->tbl->setString(r, c++, o["f_fiscal"].toString());
         }
 
-        ui->tblTotal->setColumnCount(ui->tbl->columnCount());
         ui->tbl->resizeColumnsToContents();
         ui->tbl->setColumnWidth(0, 0);
+        ui->tblTotal->setColumnCount(ui->tbl->columnCount());
 
         for(int i = 0; i < ui->tbl->columnCount(); i++) {
             ui->tblTotal->setColumnWidth(i, ui->tbl->columnWidth(i));
         }
 
-        ui->tblTotal->setString(0, 7, float_str(total, 2));
+        ui->tblTotal->setString(0, 9, jdoc["total"].toString());
         QStringList l;
         l.append(QString::number(ui->tbl->rowCount()));
         ui->tblTotal->setVerticalHeaderLabels(l);
@@ -142,47 +170,6 @@ void DlgReports::handleDailyCommon(const QJsonObject &obj)
     QStringList l;
     l.append(QString::number(ui->tbl->rowCount()));
     ui->tblTotal->setVerticalHeaderLabels(l);
-}
-
-void DlgReports::printReportResponse(const QJsonObject &obj)
-{
-    if(obj["reply"].toInt() != 0) {
-        C5Message::error(obj["msg"].toString());
-        return;
-    }
-
-    QJsonArray ja = obj["report"].toArray();
-    ja.append(QJsonObject{{"cmd", "print"}, {"printer", mUser->fConfig["receipt_printer"].toString()}, {"pagesize", QPageSize::Custom}});
-    C5PrintJson *pj = new C5PrintJson(ja);
-    pj->start();
-    fHttp->httpQueryFinished(sender());
-}
-
-void DlgReports::handleReceipt(const QJsonObject &obj)
-{
-    if(obj["reply"].toInt() == 0) {
-        C5Message::error(obj["msg"].toString());
-    }
-}
-
-void DlgReports::handleTaxback(const QJsonObject &obj)
-{
-    if(obj["reply"].toInt() == 0) {
-        C5Message::error(obj["msg"].toString());
-        return;
-    }
-
-    C5Message::info(obj["msg"].toString());
-}
-
-void DlgReports::handleTaxReport(const QJsonObject &obj)
-{
-    if(obj["reply"].toInt() == 0) {
-        C5Message::error(obj["msg"].toString());
-        return;
-    } else {
-        C5Message::info(tr("Printed"));
-    }
 }
 
 void DlgReports::on_btnRefresh_clicked()
@@ -278,132 +265,6 @@ void DlgReports::on_btnReports_clicked()
     });
 }
 
-void DlgReports::on_btnPrintOrderReceipt_clicked()
-{
-    QModelIndexList l = ui->tbl->selectionModel()->selectedRows();
-
-    if(l.count() == 0) {
-        return;
-    }
-
-    //TODO
-    // QString orderid = ui->tbl->getString(l.at(0).row(), 0);
-    // C5Database db;
-    // db[":f_id"] = orderid;
-    // db.exec("select * from o_header where f_id=:f_id");
-    // if(!db.nextRow()) {
-    //     C5Message::error(tr("Invalid order id"));
-    //     return;
-    // }
-    // int tax = 0;
-    // if(db.getDouble("f_amounttotal") - db.getDouble("f_amountcash") < 0.001) {
-    //     db[":f_id"] = orderid;
-    //     db.exec("select f_receiptnumber from o_tax where f_id=:f_id");
-    //     if(db.nextRow()) {
-    //         if(db.getInt("f_receiptnumber") == 0) {
-    //             tax = C5Message::question(tr("Do you want to print fiscal receipt?")) == QDialog::Accepted ? 1 : 0;
-    //         }
-    //     } else {
-    //         tax = C5Message::question(tr("Do you want to print fiscal receipt?")) == QDialog::Accepted ? 1 : 0;
-    //     }
-    // } else if(db.getDouble("f_amountcard") > 0.001) {
-    //     tax = 1;
-    // }
-    // //TODO: CHECK L3
-    // fHttp->createHttpQueryLambda("/engine/waiter/printreceipt.php", {
-    //     {"staffid", fUser->id()},
-    //     {"f_receiptlanguage", C5Config::getRegValue("receipt_language").toInt()},
-    //     {"order", orderid},
-    //     {"printtax", tax},
-    //     {"receipt_printer", C5Config::fSettingsName}
-    // }, [this](const QJsonObject & jo) {
-    //     auto np = new NDataProvider(this);
-    //     np->overwriteHost("http", "127.0.0.1", 8080);
-    //     connect(np, &NDataProvider::done, this, [](const QJsonObject & jjo) {
-    //     });
-    //     connect(np, &NDataProvider::error, this, [](const QString & err) {
-    //     });
-    //     np->getData("/printjson", jo);
-    // }, [](const QJsonObject & je) {
-    //     Q_UNUSED(je);
-    // });
-}
-
-void DlgReports::on_btnReceiptLanguage_clicked()
-{
-    int r = DlgReceiptLanguage::receipLanguage(mUser);
-
-    if(r > -1) {
-        //ui->btnReceiptLanguage->setProperty("receipt_language", r);
-        setLangIcon();
-    }
-}
-
-void DlgReports::on_btnHall_clicked()
-{
-    int hall;
-
-    if(!DlgListOfHall::getHall(hall)) {
-        return;
-    }
-
-    fCurrentHall = hall;
-    //TODO
-    //ui->btnHall->setText(fCurrentHall == 0 ? tr("All") : dbhall->name(fCurrentHall));
-}
-
-void DlgReports::on_btnReturnTaxReceipt_clicked()
-{
-    QModelIndexList l = ui->tbl->selectionModel()->selectedRows();
-
-    if(l.count() == 0) {
-        return;
-    }
-
-    //TODO: CHECK L7
-    // auto np = new NDataProvider(this);
-    // np->overwriteHost("http", "127.0.0.1", 8080);
-    // connect(np, &NDataProvider::done, this, [](const QJsonObject & jo) {
-    // });
-    // connect(np, &NDataProvider::error, this, [](const QString & err) {
-    // });
-    // np->getData("/taxreturn", {
-    //     {"order",  ui->tbl->getString(l.at(0).row(), 0)}
-    // });
-}
-
-void DlgReports::on_btnPrintTaxX_clicked()
-{
-    //TODO: CHECK L6
-    // auto np = new NDataProvider(this);
-    // np->overwriteHost("http", "127.0.0.1", 8080);
-    // connect(np, &NDataProvider::done, this, [](const QJsonObject & jo) {
-    // });
-    // connect(np, &NDataProvider::error, this, [](const QString & err) {
-    // });
-    // np->getData("/taxreport", {
-    //     {"d1", ui->date1->date().toString(FORMAT_DATE_TO_STR_MYSQL)},
-    //     {"d2", ui->date2->date().toString(FORMAT_DATE_TO_STR_MYSQL)},
-    //     {"type", report_x}
-    // });
-}
-
-void DlgReports::on_btnPrintTaxZ_clicked()
-{
-    //TODO: CHECK L5
-    // auto np = new NDataProvider(this);
-    // np->overwriteHost("http", "127.0.0.1", 8080);
-    // connect(np, &NDataProvider::done, this, [](const QJsonObject & jo) {
-    // });
-    // connect(np, &NDataProvider::error, this, [](const QString & err) {
-    // });
-    // np->getData("/taxreport", {
-    //     {"d1", ui->date1->date().toString(FORMAT_DATE_TO_STR_MYSQL)},
-    //     {"d2", ui->date2->date().toString(FORMAT_DATE_TO_STR_MYSQL)},
-    //     {"type", report_z}
-    // });
-}
-
 void DlgReports::on_btnParams_clicked()
 {
     DlgReportsFilter d(mDate1, mDate2, mUser);
@@ -413,4 +274,18 @@ void DlgReports::on_btnParams_clicked()
         mDate2 = d.date2();
         on_btnRefresh_clicked();
     }
+}
+
+void DlgReports::on_btnOpenReport_clicked()
+{
+    int row = ui->tbl->currentRow();
+
+    if(row < 0) {
+        return;
+    }
+
+    QString orderId = ui->tbl->getString(row, 0);
+    DlgOrder d(mUser, {}, {}, {}, {});
+    d.setOrderId(orderId);
+    d.exec();
 }

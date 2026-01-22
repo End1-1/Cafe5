@@ -75,6 +75,11 @@ void QDishButton::paintEvent(QPaintEvent *pe)
 
 void QDishButton::mouseReleaseEvent(QMouseEvent *e)
 {
-    emit clicked();
+    const int noClickZone = 50;
+
+    if(e->pos().x() < width() - noClickZone) {
+        emit clicked();
+    }
+
     QFrame::mouseReleaseEvent(e);
 }

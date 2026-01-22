@@ -4,7 +4,7 @@
 CR5Hall::CR5Hall(QWidget *parent) :
     C5ReportWidget( parent)
 {
-    fIcon = ":/hall.png";
+    fIconName = ":/hall.png";
     fLabel = tr("Halls");
     fSimpleQuery = false;
 

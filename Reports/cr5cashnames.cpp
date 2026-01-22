@@ -4,7 +4,7 @@
 CR5CashNames::CR5CashNames(QWidget *parent) :
     C5ReportWidget( parent)
 {
-    fIcon = ":/cash.png";
+    fIconName = ":/cash.png";
     fLabel = tr("Cash names");
     fSqlQuery = "select c.f_id, c.f_name, c.f_currency, cr.f_name  as f_currencyname "
                 "from e_cash_names c "

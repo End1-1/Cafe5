@@ -12,7 +12,7 @@
 CR5DraftOutputByRecipe::CR5DraftOutputByRecipe(QWidget *parent) :
     C5ReportWidget(parent)
 {
-    fIcon = ":/goods.png";
+    fIconName = ":/goods.png";
     fLabel = tr("Draft output by receipes");
     fSimpleQuery = false;
     fLeftJoinTables << "inner join o_header oh on oh.f_id=ob.f_header [oh]"

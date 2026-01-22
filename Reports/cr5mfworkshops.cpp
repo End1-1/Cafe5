@@ -4,7 +4,7 @@
 CR5MFWorkshops::CR5MFWorkshops(QWidget *parent) :
     C5ReportWidget( parent)
 {
-    fIcon = ":/manufacturing.png";
+    fIconName = ":/manufacturing.png";
     fLabel = tr("Workshops");
     fSqlQuery = "select f_id, f_name from mf_stage";
     fTranslation["f_id"] = tr("Code");

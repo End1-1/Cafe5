@@ -3,6 +3,7 @@
 #include "c5utils.h"
 #include "c5config.h"
 #include "QRCodeGenerator.h"
+#include "logwriter.h"
 #include <QFile>
 #include <QApplication>
 #include <QPrintPreviewDialog>
@@ -22,6 +23,7 @@ QString C5PrintReciptA4::loadTemplate(const QString &name)
     QFile f(fileName);
 
     if(!f.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        LogWriter::write(LogWriterLevel::errors, "Printing template not found", fileName);
         return QString();
     }
 
@@ -45,14 +47,14 @@ QString C5PrintReciptA4::makeGoodsTable(const QList<QMap<QString, QVariant>> &bo
     s << "<table>";
     s << "<tr>"
       << "<th>NN</th>"
-      << "<th>Material code</th>"
-      << "<th>Goods</th>"
-      << "<th class='right'>Qty</th>"
-      << "<th>Unit</th>"
-      << "<th class='right'>Price</th>"
-      << "<th class='right'>Discount %</th>"
-      << "<th class='right'>Discounted price</th>"
-      << "<th class='right'>Total</th>"
+      << "<th>Կոդ</th>"
+      << "<th>Ապրանք</th>"
+      << "<th class='right'>Քանակ</th>"
+      << "<th>Չափ․մ․</th>"
+      << "<th class='right'>Գին</th>"
+      << "<th class='right'>Զեղչ %</th>"
+      << "<th class='right'>Զեղչված գին</th>"
+      << "<th class='right'>Ընդամենը</th>"
       << "</tr>";
     for(int i = 0; i < body.count(); ++i) {
         const auto &m = body[i];
@@ -79,7 +81,7 @@ bool C5PrintReciptA4::print(QString &err)
 {
     QString html = loadTemplate("receipt_a4.html");
     if(html.isEmpty()) {
-        err = "Template not found";
+        err =  "Template not found";
         return false;
     }
     C5Database db;
@@ -212,7 +214,7 @@ bool C5PrintReciptA4::print(QString &err)
     }
 
     QMap<QString, QString> vars;
-    vars["doc_title"] = "docTypeText  N" + header["f_ordernumber"].toString();
+    vars["doc_title"] = tr("Sale") + " " + header["f_ordernumber"].toString();
     vars["date"] = QDate::fromString(header["f_datecash"].toString(), FORMAT_DATE_TO_STR_MYSQL).toString("dd/MM/yyyy");
     vars["delivery_date"] = QDate::fromString(header["f_datefor"].toString(), FORMAT_DATE_TO_STR_MYSQL).toString("dd/MM/yyyy");
     vars["buyer"] = QString("%1, %2 %3, %4 %5").arg(header["f_taxname"].toString(), tr("Taxpayer code"),

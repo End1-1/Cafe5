@@ -11,7 +11,7 @@ CR5MenuTranslator::CR5MenuTranslator( QWidget *parent) :
 {
     ui->setupUi(this);
     fLabel = tr("Translator");
-    fIcon = ":/translate.png";
+    fIconName = ":/translate.png";
     ui->tbl->setColumnWidths(ui->tbl->columnCount(), 100, 150, 300, 300, 300);
     //ui->tbl->setEditTriggers(QTableWidget::AnyKeyPressed);
 }

@@ -11,7 +11,7 @@
 CR5TStoreExtra::CR5TStoreExtra(QWidget *parent) :
     C5ReportWidget(parent)
 {
-    fIcon = ":/documents.png";
+    fIconName = ":/documents.png";
     fLabel = tr("T-account, extra");
     fSimpleQuery = false;
     fColumnNameIndex["f_goodsid"] = 0;

@@ -8,7 +8,7 @@ CR5RouteDaily::CR5RouteDaily(QWidget *parent) :
     C5ReportWidget( parent)
 {
     fLabel = tr("Edit route");
-    fIcon = ":/route.png";
+    fIconName = ":/route.png";
     fFilterWidget = new CR5RouteDailyFilter();
     fSimpleQuery = true;
     fSqlQuery = "SELECT ro.f_id, p.f_address, p.f_taxname, ro.f_date, "

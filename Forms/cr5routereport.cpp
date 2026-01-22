@@ -9,7 +9,7 @@ CR5RouteReport::CR5RouteReport(QWidget *parent) :
 {
     ui->setupUi(this);
     fLabel = tr("Edit route");
-    fIcon = ":/route.png";
+    fIconName = ":/route.png";
 }
 
 CR5RouteReport::~CR5RouteReport()

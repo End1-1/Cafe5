@@ -20,7 +20,7 @@ ICON = cup.ico
 DEFINES += _DBDRIVER_=\\\"QMARIADB\\\"
 DEFINES += _ORGANIZATION_=\\\"Jazzve\\\"
 DEFINES += _APPLICATION_=\\\"Cafe5\\\"
-DEFINES += _MODULE_=\\\"WAITER\\\"
+DEFINES += _MODULE_=\\\"waiter\\\"
 DEFINES += WAITER
 DEFINES += _CRYPT_KEY_=\\\"shop2022!!!\\\"
 DEFINES += BORDERLESSDIALOGS
@@ -39,7 +39,6 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 
 SOURCES += \
-    ../Cafe5/c5cafecommon.cpp \
     ../Cafe5/c5double.cpp \
     ../Cafe5/c5systempreference.cpp \
     ../Cafe5/calendar.cpp \
@@ -58,7 +57,6 @@ SOURCES += \
     ../Classes/logwriter.cpp \
     ../Classes/notificationwidget.cpp \
     ../Configs/breezeconfig.cpp \
-    ../Configs/cashboxconfig.cpp \
     ../Configs/configs.cpp \
     ../Controls/c5guicontrols.cpp \
     ../Controls/combosearchview.cpp \
@@ -71,7 +69,6 @@ SOURCES += \
     ../Forms/c5progressdialog.cpp \
     ../Forms/c5storedocselectprinttemplate.cpp \
     ../Forms/c5toolbarwidget.cpp \
-    ../Forms/change.cpp \
     ../Forms/dlgconfigtable.cpp \
     ../Forms/dlgguestinfo.cpp \
     ../Forms/dlglist2.cpp \
@@ -92,17 +89,18 @@ SOURCES += \
     ../NTable/nsearchdlg.cpp \
     ../NTable/ntablemodel.cpp \
     ../Printing/selectprinters.cpp \
+    ../Service5/worker/struct_workstationitem.cpp \
     ../Service5Working/utils/configini.cpp \
     c5waiterdialog.cpp \
     dishitembutton.cpp \
-    dlgaskforprecheck.cpp \
+    dlgdashboard.cpp \
     dlgeditphone.cpp \
     dlgguests.cpp \
     dlglist.cpp \
     dlglistdishspecial.cpp \
-    dlglistofpackages.cpp \
     dlgprecheckoptions.cpp \
-    dlgpreorderw.cpp \
+    dlgrealreports.cpp \
+    dlgreportparams.cpp \
     dlgreportsfilter.cpp \
     dlgscreen.cpp \
     dlgsearchinmenu.cpp \
@@ -124,7 +122,6 @@ SOURCES += \
     ../Classes/c5user.cpp \
     ../Classes/c5menu.cpp \
     ../Classes/c5witerconf.cpp \
-    ../Classes/c5waiterserver.cpp \
     ../Classes/c5printing.cpp \
     ../Classes/QRCodeGenerator.cpp \
     ../Controls/c5lineedit.cpp \
@@ -140,13 +137,9 @@ SOURCES += \
     waiterorderitemwidget.cpp \
     waiterordermodel.cpp \
     waitertablewidget.cpp \
-    dlgcreditcardlist.cpp \
     dlgdishremovereason.cpp \
-    dlglistofhall.cpp \
     ../Classes/c5printjson.cpp \
     dlgreports.cpp \
-    dlgreportslist.cpp \
-    dlglistofmenu.cpp \
     dlgguest.cpp \
     ../Classes/rkeyboard.cpp \
     dlgreceiptlanguage.cpp \
@@ -155,10 +148,11 @@ SOURCES += \
     dlgexitwithmessage.cpp \
     ../Classes/c5translator.cpp \
     ../Cafe5/dlgexitbyversion.cpp \
-    ../Classes/fileversion.cpp
+    ../Classes/fileversion.cpp \
+    wplast30sessions.cpp \
+    wpwidget.cpp
 
 HEADERS += \
-    ../Cafe5/c5cafecommon.h \
     ../Cafe5/c5double.h \
     ../Cafe5/c5systempreference.h \
     ../Cafe5/calendar.h \
@@ -177,13 +171,13 @@ HEADERS += \
     ../Classes/dict_dish_state.h \
     ../Classes/dict_goods_types.h \
     ../Classes/dict_payment_type.h \
+    ../Classes/dict_workstation.h \
     ../Classes/dlgpassword.h \
     ../Classes/goodsreserve.h \
     ../Classes/idram.h \
     ../Classes/logwriter.h \
     ../Classes/notificationwidget.h \
     ../Configs/breezeconfig.h \
-    ../Configs/cashboxconfig.h \
     ../Configs/configs.h \
     ../Controls/c5guicontrols.h \
     ../Controls/combosearchview.h \
@@ -196,7 +190,6 @@ HEADERS += \
     ../Forms/c5progressdialog.h \
     ../Forms/c5storedocselectprinttemplate.h \
     ../Forms/c5toolbarwidget.h \
-    ../Forms/change.h \
     ../Forms/dlgconfigtable.h \
     ../Forms/dlgguestinfo.h \
     ../Forms/dlglist2.h \
@@ -220,13 +213,15 @@ HEADERS += \
     ../Service5/worker/struct_dish.h \
     ../Service5/worker/struct_goods_group.h \
     ../Service5/worker/struct_hall.h \
+    ../Service5/worker/struct_parent.h \
     ../Service5/worker/struct_table.h \
     ../Service5/worker/struct_waiter_dish.h \
     ../Service5/worker/struct_waiter_order.h \
+    ../Service5/worker/struct_workstationitem.h \
     ../Service5Working/utils/configini.h \
     ../Service5Working/utils/servicecommands.h \
     c5waiterdialog.h \
-    dlgaskforprecheck.h \
+    dlgdashboard.h \
     dlgeditphone.h \
         dlgface.h \
     ../Cafe5/c5dialog.h \
@@ -235,17 +230,16 @@ HEADERS += \
     dlgguests.h \
     dlglist.h \
     dlglistdishspecial.h \
-    dlglistofpackages.h \
     dlgorder.h \
     ../Classes/c5user.h \
     ../Classes/c5menu.h \
     ../Classes/c5witerconf.h \
-    ../Classes/c5waiterserver.h \
     ../Classes/c5printing.h \
     ../Classes/QRCodeGenerator.h \
     ../Controls/c5lineedit.h \
     dlgprecheckoptions.h \
-    dlgpreorderw.h \
+    dlgrealreports.h \
+    dlgreportparams.h \
     dlgreportsfilter.h \
     dlgscreen.h \
     dlgsearchinmenu.h \
@@ -271,13 +265,9 @@ HEADERS += \
     waiterorderitemwidget.h \
     waiterordermodel.h \
     waitertablewidget.h \
-    dlgcreditcardlist.h \
     dlgdishremovereason.h \
-    dlglistofhall.h \
     ../Classes/c5printjson.h \
     dlgreports.h \
-    dlgreportslist.h \
-    dlglistofmenu.h \
     dlgguest.h \
     ../Classes/rkeyboard.h \
     dlgreceiptlanguage.h \
@@ -286,7 +276,9 @@ HEADERS += \
     dlgexitwithmessage.h \
     ../Classes/c5translator.h \
     ../Cafe5/dlgexitbyversion.h \
-    ../Classes/fileversion.h
+    ../Classes/fileversion.h \
+    wplast30sessions.h \
+    wpwidget.h
 
 FORMS += \
     ../Cafe5/calendar.ui \
@@ -303,7 +295,6 @@ FORMS += \
     ../Forms/c5progressdialog.ui \
     ../Forms/c5storedocselectprinttemplate.ui \
     ../Forms/c5toolbarwidget.ui \
-    ../Forms/change.ui \
     ../Forms/dlgconfigtable.ui \
     ../Forms/dlgguestinfo.ui \
     ../Forms/dlglist2.ui \
@@ -322,17 +313,17 @@ FORMS += \
     ../NTable/nsearchdlg.ui \
     ../Printing/preorders.ui \
     ../Printing/selectprinters.ui \
-    dlgaskforprecheck.ui \
+    dlgdashboard.ui \
     dlgeditphone.ui \
         dlgface.ui \
     ../Cafe5/c5message.ui \
     dlgguests.ui \
     dlglist.ui \
     dlglistdishspecial.ui \
-    dlglistofpackages.ui \
     dlgorder.ui \
     dlgprecheckoptions.ui \
-    dlgpreorderw.ui \
+    dlgrealreports.ui \
+    dlgreportparams.ui \
     dlgreportsfilter.ui \
     dlgscreen.ui \
     dlgsearchinmenu.ui \
@@ -346,18 +337,15 @@ FORMS += \
     dlgviewstoplist.ui \
     tablewidget.ui \
     waiterdishwidget.ui \
-    dlgcreditcardlist.ui \
     dlgdishremovereason.ui \
-    dlglistofhall.ui \
     dlgreports.ui \
-    dlgreportslist.ui \
-    dlglistofmenu.ui \
     dlgguest.ui \
     ../Classes/rkeyboard.ui \
     dlgreceiptlanguage.ui \
     dlgcl.ui \
     dlgexitwithmessage.ui \
-    ../Cafe5/dlgexitbyversion.ui
+    ../Cafe5/dlgexitbyversion.ui \
+    wplast30sessions.ui
 
     INCLUDEPATH += ../Cafe5
     INCLUDEPATH += ../Classes

@@ -5,7 +5,7 @@
 CR5CurrencyCrossRateHistory::CR5CurrencyCrossRateHistory(QWidget *parent) :
     C5ReportWidget(parent)
 {
-    fIcon = ":/cash.png";
+    fIconName = ":/cash.png";
     fLabel = tr("Cross rates history");
     fMainTable = "e_currency_cross_rate_history cr";
     fLeftJoinTables << "left join e_currency ca on ca.f_id=cr.f_currency1 [ca]";

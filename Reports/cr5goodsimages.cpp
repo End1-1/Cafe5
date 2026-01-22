@@ -9,7 +9,7 @@ CR5GoodsImages::CR5GoodsImages(QWidget *parent) :
 {
     ui->setupUi(this);
     fLabel = tr("Images");
-    fIcon = ":/images.png";
+    fIconName = ":/images.png";
 }
 
 CR5GoodsImages::~CR5GoodsImages()

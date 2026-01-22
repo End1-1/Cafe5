@@ -5,18 +5,26 @@
 #include <QJsonDocument>
 
 struct TableItem {
-    int id;
-    int tableState;
-    int hall;
-    int staff;
-    int specialConfigId;
-    double amount;
+    int id = 0;
+    int tableState = 0;
+    int hall = 0;
+    int staff = 0;
+    int specialConfigId = 0;
+    double amount = 0;
     QString staffName;
     QString name;
     QString comment;
     QString nameLower;
     QStringList words;
     QJsonObject data;
+    QString dateOpen() const
+    {
+        return data["f_date_open"].toString();
+    }
+    QString timeOpen() const
+    {
+        return data["f_time_open"].toString().left(5);
+    }
 };
 
 template<>

@@ -6,7 +6,7 @@
 CR5Users::CR5Users(QWidget *parent) :
     C5ReportWidget(parent)
 {
-    fIcon = ":/users_groups.png";
+    fIconName = ":/users_groups.png";
     fLabel = tr("Users");
     fSqlQuery = R"(
         select u.f_id, g.f_name as f_groupname, concat(t.f_last, ' ', t.f_first) as f_teamleadname,

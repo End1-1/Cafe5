@@ -5,7 +5,7 @@ CR5DishRemoveReason::CR5DishRemoveReason(QWidget *parent) :
     C5ReportWidget( parent)
 {
     fLabel = tr("Dish remove reason");
-    fIcon = ":/menu.png";
+    fIconName = ":/menu.png";
     fSqlQuery = "select f_id, f_name from o_dish_remove_reason";
     fSimpleQuery = true;
     fTranslation["f_id"] = tr("Code");

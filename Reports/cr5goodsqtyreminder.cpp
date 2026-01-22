@@ -4,7 +4,7 @@
 CR5GoodsQtyReminder::CR5GoodsQtyReminder(QWidget *parent) :
     C5ReportWidget( parent)
 {
-    fIcon = ":/goods.png";
+    fIconName = ":/goods.png";
     fLabel = tr("Low quantity");
     fSqlQuery = R"(select s.f_name as f_storename, p.f_taxname as f_partner, gr.f_name as f_groupname,
                 g.f_name as f_goodsname, g.f_scancode,

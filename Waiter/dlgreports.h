@@ -21,6 +21,9 @@ public:
 
     static void openReports(C5User *user);
 
+protected:
+    virtual void showEvent(QShowEvent *e) override;
+
 private:
     Ui::DlgReports* ui;
 
@@ -38,32 +41,15 @@ private slots:
 
     void handleDailyCommon(const QJsonObject &obj);
 
-    void printReportResponse(const QJsonObject &obj);
-
-    void handleReceipt(const QJsonObject &obj);
-
-    void handleTaxback(const QJsonObject &obj);
-
-    void handleTaxReport(const QJsonObject &obj);
-
     void on_btnRefresh_clicked();
 
     void on_btnExit_clicked();
 
     void on_btnReports_clicked();
 
-    void on_btnPrintOrderReceipt_clicked();
-
-    void on_btnReceiptLanguage_clicked();
-
-    void on_btnHall_clicked();
-
-    void on_btnReturnTaxReceipt_clicked();
-
-    void on_btnPrintTaxX_clicked();
-
-    void on_btnPrintTaxZ_clicked();
     void on_btnParams_clicked();
+
+    void on_btnOpenReport_clicked();
 };
 
 #endif // DLGREPORTS_H

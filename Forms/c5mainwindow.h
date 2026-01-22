@@ -32,7 +32,7 @@ public:
 
     ~C5MainWindow();
 
-    virtual void closeEvent(QCloseEvent *event);
+    virtual void closeEvent(QCloseEvent *event) override;
 
     template<typename T>
     T* createTab()
@@ -43,6 +43,8 @@ public:
         t->postProcess();
         return t;
     }
+
+    void addWidget(C5Widget *w);
 
     NTableWidget* createNTab(const QString &route, const QString &image, const QJsonObject &initParams = QJsonObject{});
 
@@ -62,8 +64,13 @@ public:
 
     void postLoginSetup();
 
+    static int mScreen;
+
 public slots:
     void on_actionLogin_triggered();
+
+protected:
+    virtual void showEvent(QShowEvent *e) override;
 
 private slots:
     void menuListReponse(const QJsonObject &jdoc);

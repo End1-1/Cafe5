@@ -1,7 +1,6 @@
 #ifndef C5UTILS_H
 #define C5UTILS_H
 
-#include "format_date.h"
 #include <QString>
 #include <QHostInfo>
 #include <QDateTime>
@@ -12,14 +11,11 @@
 const QRegularExpression float_expr1("(?!\\d[\\.\\,][1-9]+)0+$");
 const QRegularExpression float_expr2("[\\.\\,]$");
 
-#define current_date QDate::currentDate().toString(FORMAT_DATE_TO_STR)
-#define current_time QTime::currentTime().toString(FORMAT_TIME_TO_STR)
 #define hostinfo QHostInfo::localHostName().toLower()
 #define float_str(value, f) QLocale().toString(value, 'f', f).remove(float_expr1).remove(float_expr2)
 #define str_float(value) QLocale().toDouble(value)
 #define json_str(value) QString(QJsonDocument(value).toJson(QJsonDocument::Compact))
 #define str_json(value) QJsonDocument::fromJson(value.toUtf8()).object()
-#define  str_to_datetime(value) QDateTime::fromString(value, FORMAT_DATETIME_TO_STR_MYSQL)
 
 #define ORDER_STATE_NONE 0
 #define ORDER_STATE_OPEN 1

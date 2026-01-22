@@ -45,6 +45,7 @@ private:
 
     static int showMessage(const QString &text, int tp, const QString &yes, const QString &no, const QString &a3,
                            bool playsound = false);
+    void launchUpdater(const QString &path, const QStringList &args);
 };
 
 #endif // C5MESSAGE_H

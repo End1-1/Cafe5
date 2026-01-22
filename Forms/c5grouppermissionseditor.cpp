@@ -42,7 +42,7 @@ C5GroupPermissionsEditor::C5GroupPermissionsEditor(QWidget *parent) :
     ui(new Ui::C5GroupPermissionsEditor)
 {
     ui->setupUi(this);
-    fIcon = ":/permissions.png";
+    fIconName = ":/permissions.png";
     fLabel = tr("Permissions");
     ui->tw->tabBar()->setStyle(new CustomTabStyle());
     getCheckBoxes(this);
