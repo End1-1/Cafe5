@@ -1,7 +1,6 @@
 SOURCES += \
     $$PWD/../Classes/c5servername.cpp \
     $$PWD/../Forms/dlgsplashscreen.cpp \
-    ../Cafe5/c5cafecommon.cpp \
     ../Cafe5/c5double.cpp \
     ../Cafe5/c5systempreference.cpp \
     ../Cafe5/calendar.cpp \
@@ -81,7 +80,6 @@ HEADERS += \
     $$PWD/../Classes/dict_dish_state.h \
     $$PWD/../Forms/dlgsplashscreen.h \
     ../../NewTax/Src/printtaxn.h \
-    ../Cafe5/c5cafecommon.h \
     ../Cafe5/c5double.h \
     ../Cafe5/c5systempreference.h \
     ../Cafe5/calendar.h \

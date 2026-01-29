@@ -712,7 +712,7 @@ void DlgOrder::printService(const QJsonObject &jdoc)
         printer.setPageSize(QPageSize::Custom);
         printer.setFullPage(false);
         QRectF pr = printer.pageRect(QPrinter::DevicePixel);
-        constexpr qreal SAFE_RIGHT_MM = 4.0;
+        constexpr qreal SAFE_RIGHT_MM = 10.0;
         qreal safePx = SAFE_RIGHT_MM * printer.logicalDpiX() / 25.4;
         p.setSceneParams(pr.width() - safePx, pr.height(), printer.logicalDpiX());
         p.setFont(font);
@@ -897,6 +897,7 @@ void DlgOrder::setDishQty(std::function<double(WaiterDish)> getQty)
     if(d.isPrinted()) {
         fHttp->createHttpQueryLambda("/engine/v2/waiter/order/add-dish", {
             {"dish", d.dishId},
+            {"dish_name", d.dishName},
             {"table", mTable.id},
             {"qty", qty},
             {"type", 1},
@@ -931,6 +932,7 @@ void DlgOrder::setDishQty(std::function<double(WaiterDish)> getQty)
         {"id", d.id},
         {"remove_emarks", false},
         {"dish", d.dishId},
+        {"dish_name", d.dishName},
         {"new_qty", qty},
         {"new_state", d.state},
         {"data", d.data},
@@ -969,6 +971,7 @@ void DlgOrder::addDishToOrder(DishAItem *g, QDishButton *btn)
     } else {
         fHttp->createHttpQueryLambda("/engine/v2/waiter/order/add-dish", {
             {"dish", g->id},
+            {"dish_name", g->name},
             {"table", mTable.id},
             {"qty", 1},
             {"type", 1},
@@ -1143,6 +1146,7 @@ void DlgOrder::on_btnVoid_clicked()
                 {"id", d.id},
                 {"order_id", self->mOrder.id},
                 {"dish", d.dishId},
+                {"dish_name", d.dishName},
                 {"new_state", result},
                 {"data", d.data},
                 {"new_qty", d.qty},
@@ -1187,6 +1191,7 @@ void DlgOrder::on_btnVoid_clicked()
             {"id", d.id},
             {"remove_emarks", !d.emarks.isEmpty()},
             {"dish", d.dishId},
+            {"dish_name", d.dishName},
             {"new_qty", 0},
             {"new_state", d.state},
             {"data", d.data},
@@ -1337,6 +1342,10 @@ void DlgOrder::on_btnPackage_clicked()
 
 void DlgOrder::on_btnPrintService_clicked()
 {
+    if(mOrder.id.isEmpty()) {
+        return;
+    }
+
     fHttp->createHttpQueryLambda("/engine/v2/waiter/order/print-service-check", {{"header_id", mOrder.id}}, [this](const QJsonObject & jdoc) {
         parseOrder(jdoc);
         printService(jdoc);
@@ -2100,6 +2109,9 @@ void DlgOrder::parseOrder(const QJsonObject & jdoc)
         ui->btnPrintClosedFiscal->setEnabled(jtax.isEmpty());
     }
 
+    ui->btnPrintService->setEnabled(!mOrder.id.isEmpty());
+    ui->btnTransferDishes->setEnabled(!mOrder.id.isEmpty());
+    ui->btnTransferTable->setEnabled(!mOrder.id.isEmpty());
     qDebug() << "Parse order" << startQuery.msecsTo(QDateTime::currentDateTime());
 }
 
@@ -2926,19 +2938,22 @@ void DlgOrder::on_btnTransferTable_clicked()
 
     DlgTables d(mUser);
     int tableId = d.exec();
+    QString tableName = d.mTableName;
 
     if(tableId == 0) {
         return;
     }
 
     QPointer<DlgOrder> self(this);
-    auto func = [self](C5User * user, int destinationTableId) {
+    auto func = [self](C5User * user, int destinationTableId, const QString & destinationTableName) {
         if(!self) {
             return;
         }
 
         NInterface::query1("/engine/v2/waiter/order/transfer-table", user->mSessionKey, self, {
             {"id", self->mOrder.id},
+            {"source_table_name", self->mOrder.tableName},
+            {"destination_table_name", destinationTableName},
             {"locksrc", hostinfo},
             {"destination", destinationTableId}
         }, [self](const QJsonObject & jdoc) {
@@ -2949,7 +2964,7 @@ void DlgOrder::on_btnTransferTable_clicked()
     };
 
     if(mUser->check(cp_t5_waiter_transfer_items)) {
-        func(mUser, tableId);
+        func(mUser, tableId, tableName);
     } else {
         QString pin;
 
@@ -2958,9 +2973,9 @@ void DlgOrder::on_btnTransferTable_clicked()
         }
 
         auto *user = new C5User();
-        user->authorize(pin, self->fHttp, [self, func, user, tableId](const QJsonObject & jdoc) {
+        user->authorize(pin, self->fHttp, [self, func, user, tableId, tableName](const QJsonObject & jdoc) {
             if(user->check(cp_t5_waiter_transfer_items)) {
-                func(user, tableId);
+                func(user, tableId, tableName);
             } else {
                 C5Message::error(tr("Permission denied"));
             }

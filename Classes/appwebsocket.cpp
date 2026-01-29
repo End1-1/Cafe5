@@ -68,6 +68,8 @@ void AppWebSocket::sendMessage(const QJsonObject &json)
 
 void AppWebSocket::connectToServer()
 {
+    qDebug() << "connecting to server" << mHost;
+
     if(mHost.isEmpty()) {
         qDebug() << "Host is empty";
         return;
@@ -81,7 +83,6 @@ void AppWebSocket::connectToServer()
     emit socketConnecting();
     QUrl url(mHost);
     mSocket->open(url);
-    qDebug() << "connecting to server";
 }
 
 void AppWebSocket::pingServer()

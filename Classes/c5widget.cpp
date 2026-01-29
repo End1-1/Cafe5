@@ -1,4 +1,5 @@
 #include "c5widget.h"
+#include "c5message.h"
 #include <QEvent>
 #include <QKeyEvent>
 #include <QUuid>
@@ -164,4 +165,12 @@ bool C5Widget::reportHandler(const QString &handleId, const QVariant &data)
     Q_UNUSED(handleId);
     Q_UNUSED(data);
     return true;
+}
+
+void C5Widget::updateRequired(const QString &msg, const QString &appName, const QString &newVersion)
+{
+    Q_UNUSED(appName);
+    Q_UNUSED(newVersion);
+    C5Message::info(msg);
+    qApp->exit(0);
 }

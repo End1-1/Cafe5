@@ -260,5 +260,9 @@
         <file>workstation.png</file>
         <file>new-file.png</file>
         <file>details.png</file>
+        <file>assembly.png</file>
+        <file>disassembly.png</file>
+        <file>sales-reports.png</file>
+        <file>filter.png</file>
     </qresource>
 </RCC>

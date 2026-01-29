@@ -558,50 +558,50 @@
 <context>
     <name>C5Widget</name>
     <message>
-        <location filename="../Classes/c5widget.cpp" line="59"/>
+        <location filename="../Classes/c5widget.cpp" line="60"/>
         <source>New</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Classes/c5widget.cpp" line="63"/>
+        <location filename="../Classes/c5widget.cpp" line="64"/>
         <source>Edit</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Classes/c5widget.cpp" line="67"/>
+        <location filename="../Classes/c5widget.cpp" line="68"/>
         <source>Remove</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Classes/c5widget.cpp" line="71"/>
+        <location filename="../Classes/c5widget.cpp" line="72"/>
         <source>Save
 changes</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Classes/c5widget.cpp" line="75"/>
+        <location filename="../Classes/c5widget.cpp" line="76"/>
         <source>Search by
 parameters</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Classes/c5widget.cpp" line="81"/>
+        <location filename="../Classes/c5widget.cpp" line="82"/>
         <source>Clear
 filter</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Classes/c5widget.cpp" line="85"/>
+        <location filename="../Classes/c5widget.cpp" line="86"/>
         <source>Refresh</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Classes/c5widget.cpp" line="89"/>
+        <location filename="../Classes/c5widget.cpp" line="90"/>
         <source>Print</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Classes/c5widget.cpp" line="93"/>
+        <location filename="../Classes/c5widget.cpp" line="94"/>
         <source>Export to
 MS Excel</source>
         <translation></translation>
@@ -1442,8 +1442,8 @@ MS Excel</source>
     </message>
     <message>
         <location filename="../Forms/dlgreservgoods.ui" line="124"/>
-        <location filename="../Forms/dlgreservgoods.cpp" line="29"/>
-        <location filename="../Forms/dlgreservgoods.cpp" line="55"/>
+        <location filename="../Forms/dlgreservgoods.cpp" line="30"/>
+        <location filename="../Forms/dlgreservgoods.cpp" line="56"/>
         <source>Scancode</source>
         <translation>Շտրիխ կոդ</translation>
     </message>
@@ -1464,10 +1464,10 @@ MS Excel</source>
     </message>
     <message>
         <location filename="../Forms/dlgreservgoods.ui" line="61"/>
-        <location filename="../Forms/dlgreservgoods.cpp" line="28"/>
-        <location filename="../Forms/dlgreservgoods.cpp" line="30"/>
-        <location filename="../Forms/dlgreservgoods.cpp" line="54"/>
-        <location filename="../Forms/dlgreservgoods.cpp" line="56"/>
+        <location filename="../Forms/dlgreservgoods.cpp" line="29"/>
+        <location filename="../Forms/dlgreservgoods.cpp" line="31"/>
+        <location filename="../Forms/dlgreservgoods.cpp" line="55"/>
+        <location filename="../Forms/dlgreservgoods.cpp" line="57"/>
         <source>Name</source>
         <translation>Անվանում</translation>
     </message>
@@ -1529,42 +1529,42 @@ MS Excel</source>
         <translation>Ամսաթիվ</translation>
     </message>
     <message>
-        <location filename="../Forms/dlgreservgoods.cpp" line="45"/>
+        <location filename="../Forms/dlgreservgoods.cpp" line="46"/>
         <source>Invalid reservation code</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Forms/dlgreservgoods.cpp" line="103"/>
+        <location filename="../Forms/dlgreservgoods.cpp" line="104"/>
         <source>Goods is not specified</source>
         <translation>Ապրանքը նշված չէ</translation>
     </message>
     <message>
-        <location filename="../Forms/dlgreservgoods.cpp" line="107"/>
+        <location filename="../Forms/dlgreservgoods.cpp" line="108"/>
         <source>Store is not specified</source>
         <translation>Պահեստը նշված չէ</translation>
     </message>
     <message>
-        <location filename="../Forms/dlgreservgoods.cpp" line="111"/>
+        <location filename="../Forms/dlgreservgoods.cpp" line="112"/>
         <source>The end date is not valid</source>
         <translation>ՎԵրջնաժամկետը սխալ է</translation>
     </message>
     <message>
-        <location filename="../Forms/dlgreservgoods.cpp" line="115"/>
+        <location filename="../Forms/dlgreservgoods.cpp" line="116"/>
         <source>The end date can be tomorrow</source>
         <translation>Մաքսիմալ ամսաթիվը - վաղն է</translation>
     </message>
     <message>
-        <location filename="../Forms/dlgreservgoods.cpp" line="119"/>
+        <location filename="../Forms/dlgreservgoods.cpp" line="120"/>
         <source>Incorrect quantity</source>
         <translation>Սխալ քանակ</translation>
     </message>
     <message>
-        <location filename="../Forms/dlgreservgoods.cpp" line="138"/>
+        <location filename="../Forms/dlgreservgoods.cpp" line="139"/>
         <source>Unit</source>
         <translation>ՉՄ</translation>
     </message>
     <message>
-        <location filename="../Forms/dlgreservgoods.cpp" line="213"/>
+        <location filename="../Forms/dlgreservgoods.cpp" line="214"/>
         <source>Insufficient quantity</source>
         <translation>Անբավարար քանակ</translation>
     </message>
@@ -1857,30 +1857,19 @@ MS Excel</source>
 <context>
     <name>NDataProvider</name>
     <message>
-        <location filename="../NTable/ndataprovider.cpp" line="104"/>
+        <location filename="../NTable/ndataprovider.cpp" line="103"/>
+        <source>Authorization error</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../NTable/ndataprovider.cpp" line="115"/>
         <source>Application update required</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../NTable/ndataprovider.cpp" line="107"/>
+        <location filename="../NTable/ndataprovider.cpp" line="118"/>
         <source>Click to launch updater</source>
         <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../NTable/ndataprovider.cpp" line="113"/>
-        <location filename="../NTable/ndataprovider.cpp" line="136"/>
-        <source>Access denied</source>
-        <translation>Մուտքը արգելված է</translation>
-    </message>
-    <message>
-        <location filename="../NTable/ndataprovider.cpp" line="118"/>
-        <source>You must upgrade the application to continue using it</source>
-        <translation>Արկա է նոր տարբերակ։ Ծրագիրը անհրաժեշտ է թարմացնել աշխատանքը շարունակելու համար։</translation>
-    </message>
-    <message>
-        <location filename="../NTable/ndataprovider.cpp" line="119"/>
-        <source>Click here to launch updater</source>
-        <translation>Սեղմեք հղումը՝ թարմացումը սկսելու համար</translation>
     </message>
 </context>
 <context>
@@ -2338,6 +2327,21 @@ MS Excel</source>
         <location filename="../Cafe5/c5message.h" line="26"/>
         <source>No</source>
         <translation>Ոչ</translation>
+    </message>
+    <message>
+        <location filename="../StructModel/c5structtableview.cpp" line="53"/>
+        <source>Goods</source>
+        <translation type="unfinished">Ապրանքի անվանում</translation>
+    </message>
+    <message>
+        <location filename="../StructModel/c5structtableview.cpp" line="54"/>
+        <source>Storage</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../StructModel/c5structtableview.cpp" line="55"/>
+        <source>Partner</source>
+        <translation type="unfinished">Գործընկեր</translation>
     </message>
 </context>
 <context>

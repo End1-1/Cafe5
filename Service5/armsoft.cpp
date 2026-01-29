@@ -16,10 +16,12 @@ bool ArmSoft::exportToAS(QString &err)
 {
     LogWriter::write(LogWriterLevel::verbose, "DATA OF MAGNIT PAYLOAD", QJsonDocument(fData).toJson());
     Database dbas("QODBC");
-    if(!dbas.open("", fData["asconnectionstring"].toString(), "sa", "SaSa111")) {
+
+    if(!dbas.open("", fData["asconnectionstring"].toString(), "sa", "SaSa111", 0)) {
         err = dbas.lastDbError();
         return false;
     }
+
     getIndexes(err, dbas.fSqlDatabase);
     //NOW EXPORT
     QJsonObject jh = fData["header"].toObject();
@@ -36,6 +38,7 @@ bool ArmSoft::exportToAS(QString &err)
     QString partnerTaxCode = jh["f_taxcode"].toString();
     double total = 0, vatamount = 0;
     QList<QMap<QString, QVariant> > items;
+
     for(int i = 0; i < jb.size(); i++) {
         QJsonObject jt = jb.at(i).toObject();
         QMap<QString, QVariant> tmp;
@@ -56,13 +59,16 @@ bool ArmSoft::exportToAS(QString &err)
         //vatamount += doctype == 5 ? ltotal * 0.2 : ltotal * 0.1667 ;
         vatamount += ltotal * fData["vatpercent"].toDouble();
     }
+
     if(!err.isEmpty()) {
         return false;
     }
+
     if(items.count() == 0) {
         err = tr("Empty invoice");
         return false;
     }
+
     dbas.startTransaction();
     dbas[":fISN"] = docid;
     dbas[":fDOCTYPE"] = fData["doctype"].toInt();
@@ -104,6 +110,7 @@ bool ArmSoft::exportToAS(QString &err)
     dbas[":fEMPLIDRESPOUT"] = -1;
     dbas[":fVATTYPE"] = fData["vattype"].toString();// doctype == 5 ? "1" : "3";
     dbas[":fSPEC"] = "                    00"; // <--- Tax receipt id
+
     //        if (card > 0.001) {
     //            dbas[":fBODY"] = dbas[":fBODY"].toString() +
     //                    QString("BANKACQUIRINGACCOUNT:%1\r\nSUMMPLCARD:%2\r\n")
@@ -122,7 +129,9 @@ bool ArmSoft::exportToAS(QString &err)
         err = dbas.lastDbError();
         return false;
     }
+
     int rowid = 1;
+
     for(QList<QMap<QString, QVariant> >::const_iterator bi = items.constBegin(); bi != items.constEnd(); bi++) {
         LogWriter::write(LogWriterLevel::special, (*bi)["f_service"].toString(),
                          (*bi)["f_service"].toInt() == 1 ?
@@ -159,6 +168,7 @@ bool ArmSoft::exportToAS(QString &err)
         dbas[":fROWID"] = rowid++;
         //LogWriter::write(LogWriterLevel::errors, "EEEEEEEEEEEEEEEE", ( *bi));
         dbas[":fDEALTYPE"] = (*bi)["f_dealtype"].toString().isEmpty() ? "" : (*bi)["f_dealtype"].toString();
+
         if(!dbas.exec("insert into MTINVOICELIST (fISN, fROWNUM, fITEMTYPE, fITEMID, fITEMNAME, "
                       "fUNITBRIEF, fSTORAGE, fQUANTITY, fINITPRICE, fDISCOUNT, fPRICE, fSUMMA, fSUMMA1, "
                       "fENVFEEPERCENT, fENVFEESUMMA, fVAT, fEXPMETHOD, fACCEXPENSE, fACCINCOME, fPARTYMETHOD, fROWID, "
@@ -172,6 +182,7 @@ bool ArmSoft::exportToAS(QString &err)
             return false;
         }
     }
+
     dbas.commit();
     return true;
 }
@@ -183,43 +194,54 @@ bool ArmSoft::getIndexes(QString &err, QSqlDatabase &dbas)
     q.exec("select fMTCODE, fMTID, fCAPTION, fUNIT from MATERIALS");
     QSqlRecord r = q.record();
     QStringList fields;
+
     for(int i = 0; i < r.count(); i++) {
         fields.append(r.fieldName(i).toLower());
     }
+
     while(q.next()) {
         QMap<QString, QVariant> temp;
         recordToMap(temp, q, fields);
         goodsMap[q.value(0).toString()] = temp;
     }
+
     fields.clear();
     q.exec("select fSERVID, fSERVCODE, fCAPTION, fFULLCAPTION, fUNIT from SERVICES");
     r = q.record();
+
     for(int i = 0; i < r.count(); i++) {
         fields.append(r.fieldName(i).toLower());
     }
+
     while(q.next()) {
         QMap<QString, QVariant> temp;
         recordToMap(temp, q, fields);
         servicesMap[q.value(1).toString()] = temp;
     }
+
     fields.clear();
     q.exec("select fCODE, fBRIEF from QNTUNIT");
+
     while(q.next()) {
         QMap<QString, QVariant> temp;
         recordToMap(temp, q, fields);
         unitsMap[q.value(0).toString()] = temp;
     }
+
     fields.clear();
     q.exec("select fPARTID, fPARTCODE, fCAPTION, fFULLCAPTION, fADDRESS, fBUSINESSADDRESS, fTAXCODE from PARTNERS");
     r = q.record();
+
     for(int i = 0; i < r.count(); i++) {
         fields.append(r.fieldName(i).toLower());
     }
+
     while(q.next()) {
         QMap<QString, QVariant> temp;
         recordToMap(temp, q, fields);
         partnersMap[q.value(1).toString()] = temp;
     }
+
     return true;
 }
 

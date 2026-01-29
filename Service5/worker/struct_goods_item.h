@@ -8,8 +8,18 @@ struct GoodsItem {
     QString groupName;
     QString name;
     QString barcode;
+    QString unitName;
+    double lastInputPrice;
+    double price1;
+    double price1disc;
+    double price2;
+    double price2disc;
     QString nameLower;
     QStringList words;
+};
+
+template<> struct SelectorName<GoodsItem> {
+    static constexpr const char* value = "search_goods_item";
 };
 
 template<>
@@ -20,7 +30,13 @@ struct JsonParser<GoodsItem> {
         g.id        = jo["f_id"].toInt();
         g.groupName = jo["f_group_name"].toString();
         g.name      = jo["f_name"].toString();
+        g.unitName  = jo["f_unit_name"].toString();
         g.barcode   = jo["f_barcode"].toString();
+        g.lastInputPrice = jo["f_lastinput"].toDouble();
+        g.price1    = jo["f_price1"].toDouble();
+        g.price1disc = jo["f_price1disc"].toDouble();
+        g.price2    = jo["f_price2"].toDouble();
+        g.price2disc = jo["f_price2disc"].toDouble();
         return g;
     }
 };
@@ -31,12 +47,14 @@ struct StructTraits<GoodsItem> {
     static QVariant groupName(const GoodsItem &s) {return s.groupName;}
     static QVariant name(const GoodsItem &s)   { return s.name; }
     static QVariant barcode(const GoodsItem &s) {return s.barcode;}
+    static QVariant unitName(const GoodsItem &s) {return s.unitName;}
 
     static constexpr ColumnDef<GoodsItem> columns[] = {
-        { "ID", &id },
-        { "Group name", &groupName},
-        { "Name", &name },
-        { "Barcode", &barcode}
+        {"ID", &id },
+        {"Group name", &groupName},
+        {"Name", &name},
+        {"Unit", &unitName},
+        {"Barcode", &barcode}
     };
 
     static constexpr int columnCount()

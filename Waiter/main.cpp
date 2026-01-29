@@ -96,7 +96,7 @@ int main(int argc, char* argv[])
     a.setFont(font);
     NDataProvider::mAppName = "waiter";
     NDataProvider::mFileVersion = fileVersion;
-    NDataProvider::mProtocol = C5ConnectionDialog::instance()->noneSecure ? "http" : "https";
+    NDataProvider::mProtocol = C5ConnectionDialog::instance()->connectionType() == C5ConnectionDialog::noneSecure ? "http" : "https";
     NDataProvider::mHost = C5ConnectionDialog::instance()->serverAddress();
     NDataProvider::mDebug = a.arguments().contains("/debug");
     dlgsplash->login(C5ConnectionDialog::instance()->username(),

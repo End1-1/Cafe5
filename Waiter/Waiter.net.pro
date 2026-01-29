@@ -73,7 +73,6 @@ SOURCES += \
     ../Forms/dlgguestinfo.cpp \
     ../Forms/dlglist2.cpp \
     ../Forms/dlglistofdishcomments.cpp \
-    ../Forms/dlgprintrecipesoptions.cpp \
     ../Forms/dlgqty.cpp \
     ../Forms/dlgsplashscreen.cpp \
     ../Forms/dlgviewcashreport.cpp \
@@ -173,6 +172,7 @@ HEADERS += \
     ../Classes/dict_payment_type.h \
     ../Classes/dict_workstation.h \
     ../Classes/dlgpassword.h \
+    ../Classes/format_bytes.h \
     ../Classes/goodsreserve.h \
     ../Classes/idram.h \
     ../Classes/logwriter.h \
@@ -194,7 +194,6 @@ HEADERS += \
     ../Forms/dlgguestinfo.h \
     ../Forms/dlglist2.h \
     ../Forms/dlglistofdishcomments.h \
-    ../Forms/dlgprintrecipesoptions.h \
     ../Forms/dlgqty.h \
     ../Forms/dlgsplashscreen.h \
     ../Forms/dlgviewcashreport.h \
@@ -299,7 +298,6 @@ FORMS += \
     ../Forms/dlgguestinfo.ui \
     ../Forms/dlglist2.ui \
     ../Forms/dlglistofdishcomments.ui \
-    ../Forms/dlgprintrecipesoptions.ui \
     ../Forms/dlgqty.ui \
     ../Forms/dlgsplashscreen.ui \
     ../Forms/dlgviewcashreport.ui \

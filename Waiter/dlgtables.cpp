@@ -221,5 +221,6 @@ void DlgTables::on_tblTables_itemClicked(QTableWidgetItem *item)
     }
 
     mResult = item->data(RoleId).toInt();
+    mTableName = item->data(RoleName).toString();
     accept();
 }

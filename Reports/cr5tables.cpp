@@ -10,15 +10,18 @@ CR5Tables::CR5Tables(QWidget *parent) :
     fSimpleQuery = false;
     fMainTable = "h_tables t";
     fLeftJoinTables << "left join h_halls h on h.f_id=t.f_hall [h]";
+    fLeftJoinTables << "left join s_settings_names sn on sn.f_id=t.f_special_config [sn]";
     fColumnsFields << "t.f_id"
                    << "h.f_name as f_hallname"
-                   << "t.f_name";
+                   << "t.f_name"
+                   << "sn.f_name as f_config_name";
     fTranslation["f_id"] = tr("Code");
     fTranslation["f_hallname"] = tr("Hall");
     fTranslation["f_name"] = tr("Name");
     fColumnsVisible["t.f_id"] = true;
     fColumnsVisible["h.f_name as f_hallname"] = true;
     fColumnsVisible["t.f_name"] = true;
+    fColumnsVisible["sn.f_name as f_config_name"] = true;
     restoreColumnsVisibility();
     fEditor = new CE5Table();
 }

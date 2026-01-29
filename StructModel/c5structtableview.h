@@ -8,10 +8,6 @@
 #include <QJsonDocument>
 #include <QJsonArray>
 
-static const QString search_storage = "search_storage";
-static const QString search_goods = "search_goods_item";
-static const QString search_partner = "search_partner_item";
-
 namespace Ui
 {
 class C5StructTableView;
@@ -25,7 +21,7 @@ public:
     ~C5StructTableView();
 
     template<typename T>
-    static QVector<T> get(const QString &searchEngine, bool getAllListFirst, bool multiSelect);;
+    static QVector<T> get(const QString &searchEngine, bool getAllListFirst, bool multiSelect, QPoint point);;
 
     template<typename T>
     void handleSearchResult(const QJsonArray &jarr, C5StructModel<T>* model)
@@ -57,12 +53,16 @@ private:
 
     bool mEmptySearch = true;
 
+    QMap<QString, QString> selectorTitles();
+
 };
 
 template<typename T>
-inline QVector<T> C5StructTableView::get(const QString &searchEngine, bool getAllListFirst, bool multiSelect)
+inline QVector<T> C5StructTableView::get(const QString &searchEngine, bool getAllListFirst, bool multiSelect, QPoint point)
 {
     C5StructTableView tv;
+    tv.mInitialPos = point;
+    tv.setWindowTitle(tv.selectorTitles().value(searchEngine));
     tv.mSearchEngine = searchEngine;
     tv.mEmptySearch = getAllListFirst;
     auto *model = new C5StructModel<T>(&tv);

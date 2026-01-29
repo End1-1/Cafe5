@@ -40,6 +40,7 @@ public:
         T *t = new T();
         fTab->addTab(t, t->icon(), QString("%1").arg(t->label()));
         fTab->setCurrentIndex(fTab->count() - 1);
+        t->mUser = mUser;
         t->postProcess();
         return t;
     }
@@ -73,6 +74,8 @@ protected:
     virtual void showEvent(QShowEvent *e) override;
 
 private slots:
+    void showDashboard();
+
     void menuListReponse(const QJsonObject &jdoc);
 
     void updateTimeout();

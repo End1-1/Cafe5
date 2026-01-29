@@ -26,11 +26,11 @@ C5StructTableView::C5StructTableView(C5User *user)
 
         QJsonArray arr = jo["result"].toArray();
 
-        if(mSearchEngine == search_storage) {
+        if(mSearchEngine == SelectorName<StorageItem>::value) {
             handleSearchResult<StorageItem>(arr, static_cast<C5StructModel<StorageItem>*>(ui->tbl->model()));
-        } else if(mSearchEngine == search_goods) {
+        } else if(mSearchEngine == SelectorName<GoodsItem>::value) {
             handleSearchResult<GoodsItem>(arr, static_cast<C5StructModel<GoodsItem>*>(ui->tbl->model()));
-        } else if(mSearchEngine == search_partner) {
+        } else if(mSearchEngine == SelectorName<PartnerItem>::value) {
             handleSearchResult<PartnerItem>(arr, static_cast<C5StructModel<PartnerItem>*>(ui->tbl->model()));
         } else {
             Q_ASSERT_X(false, Q_FUNC_INFO, qPrintable(QString("Unknown search engine: %1").arg(mSearchEngine)));
@@ -45,6 +45,15 @@ C5StructTableView::~C5StructTableView() { delete ui; }
 QTableView* C5StructTableView::tableView()
 {
     return ui->tbl;
+}
+
+QMap<QString, QString> C5StructTableView::selectorTitles()
+{
+    return {
+        { SelectorName<GoodsItem>::value,   QObject::tr("Goods") },
+        { SelectorName<StorageItem>::value, QObject::tr("Storage") },
+        { SelectorName<PartnerItem>::value, QObject::tr("Partner") }
+    };
 }
 
 void C5StructTableView::on_leSearchText_textChanged(const QString &arg1)
@@ -65,6 +74,7 @@ void C5StructTableView::sendSearchRequest()
     jo["command"] = mSearchEngine;
     jo["lower_name"] = text.toLower();
     jo["requestId"] = QUuid::createUuid().toString(QUuid::WithoutBraces);
+    qDebug() << "Sending request" << jo;
     AppWebSocket::instance->sendBinaryMessage(QJsonDocument(jo).toJson());
 }
 
@@ -72,15 +82,15 @@ void C5StructTableView::on_btnSelect_clicked()
 {
     bool isAcceptable = false;
 
-    if(mSearchEngine == search_storage) {
+    if(mSearchEngine == SelectorName<StorageItem>::value) {
         if(static_cast<C5StructModel<StorageItem>*>(ui->tbl->model())->hasSelectedData()) {
             isAcceptable = true;
         }
-    } else if(mSearchEngine == search_goods) {
+    } else if(mSearchEngine == SelectorName<GoodsItem>::value) {
         if(static_cast<C5StructModel<GoodsItem>*>(ui->tbl->model())->hasSelectedData()) {
             isAcceptable = true;
         }
-    } else if(mSearchEngine == search_partner) {
+    } else if(mSearchEngine == SelectorName<PartnerItem>::value) {
         if(static_cast<C5StructModel<GoodsItem>*>(ui->tbl->model())->hasSelectedData()) {
             isAcceptable = true;
         }
@@ -97,15 +107,19 @@ void C5StructTableView::on_tbl_doubleClicked(const QModelIndex &index)
         return;
     }
 
-    if(mSearchEngine == search_storage) {
-        static_cast<C5StructModel<StorageItem>*>(ui->tbl->model())->setData(index, Qt::Checked, Qt::CheckStateRole);
-    } else if(mSearchEngine == search_goods) {
-        static_cast<C5StructModel<GoodsItem>*>(ui->tbl->model())->setData(index, Qt::Checked, Qt::CheckStateRole);
-    } else if(mSearchEngine == search_partner) {
-        static_cast<C5StructModel<PartnerItem>*>(ui->tbl->model())->setData(index, Qt::Checked, Qt::CheckStateRole);
+    QModelIndex checkIndex = ui->tbl->model()->index(index.row(), 0);
+
+    if(mSearchEngine == SelectorName<StorageItem>::value) {
+        static_cast<C5StructModel<StorageItem>*>(ui->tbl->model())->setData(checkIndex, Qt::Checked, Qt::CheckStateRole);
+    } else if(mSearchEngine == SelectorName<GoodsItem>::value) {
+        static_cast<C5StructModel<GoodsItem>*>(ui->tbl->model())->setData(checkIndex, Qt::Checked, Qt::CheckStateRole);
+    } else if(mSearchEngine == SelectorName<PartnerItem>::value) {
+        static_cast<C5StructModel<PartnerItem>*>(ui->tbl->model())->setData(checkIndex, Qt::Checked, Qt::CheckStateRole);
     } else {
         Q_ASSERT_X(false, Q_FUNC_INFO, qPrintable(QString("Unknown search engine: %1").arg(mSearchEngine)));
     }
+
+    on_btnSelect_clicked();
 }
 
 void C5StructTableView::on_btnCancel_clicked()

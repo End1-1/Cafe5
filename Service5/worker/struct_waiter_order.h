@@ -4,14 +4,20 @@
 #include "struct_waiter_dish.h"
 #include "dict_dish_state.h"
 #include "dict_payment_type.h"
+#include "format_date.h"
 #include <QStringList>
 
 struct WaiterOrder {
     QString id;
     int state = 0;
+    int cashSessionId = 0;
     double totalDue = 0;
     QString receiptNumber;
     int table = 0;
+    int cashierId;
+    QString cashierName;
+    int staffId;
+    QString staffName;
     QString hallName;
     QString tableName;
     QJsonObject data;
@@ -119,6 +125,18 @@ struct WaiterOrder {
 
         return totalPaid >= totalDue;
     }
+    QDateTime dateOpen()const
+    {
+        return QDateTime::fromString(data.value("f_date_open").toString() + " " + data.value("f_time_open").toString(), FORMAT_DATETIME_TO_STR_MYSQL);
+    }
+    QDateTime dateClose()const
+    {
+        return QDateTime::fromString(data.value("f_date_close").toString() + " " + data.value("f_time_close").toString(), FORMAT_DATETIME_TO_STR_MYSQL);
+    }
+    QJsonValue dataValue(const QString &key) const
+    {
+        return data.value(key);
+    }
 };
 
 template<>
@@ -127,9 +145,14 @@ struct JsonParser<WaiterOrder> {
     {
         WaiterOrder wo;
         wo.id = jo["f_id"].toString();
+        wo.cashSessionId = jo["f_cash_session_id"].toInt();
         wo.state = jo["f_state"].toInt();
         wo.receiptNumber = jo["f_prefix"].toString();
         wo.table = jo["f_table"].toInt();
+        wo.cashierId = jo["f_cashier"].toInt();
+        wo.cashierName = jo["f_cashier_name"].toString();
+        wo.staffId = jo["f_staff"].toInt();
+        wo.staffName = jo["f_staff_name"].toString();
         wo.hallName = jo["f_hall_name"].toString();
         wo.tableName = jo["f_table_name"].toString();
         wo.totalDue = jo["f_amounttotal"].toDouble();

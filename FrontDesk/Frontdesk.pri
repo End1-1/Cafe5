@@ -1,6 +1,7 @@
 FORMS += \
     $$PWD/../NTable/nsearchdlg.ui \
     $$PWD/../NTable/ntreewidget.ui \
+    $$PWD/rwaiterorder.ui \
     ../Reports/cr5consuptionbysalesqty.ui \
     ../Classes/calculator.ui \
     ../Classes/notificationwidget.ui \
@@ -74,7 +75,6 @@ FORMS += \
     ../Forms/dlgguestinfo.ui \
     ../Forms/dlglist2.ui \
     ../Forms/dlgnewcl.ui \
-    ../Forms/dlgprintrecipesoptions.ui \
     ../Forms/dlgqty.ui \
     ../Forms/dlgreservgoods.ui \
     ../NTable/ntablewidget.ui \
@@ -143,7 +143,6 @@ FORMS += \
     ../Editors/ce5creditcard.ui \
     ../Editors/ce5dishremovereason.ui \
     ../Editors/ce5discountcard.ui \
-    ../Editors/ce5dishcomment.ui \
     ../Reports/cr5salefromstorefilter.ui \
     ../Editors/ce5halls.ui \
     ../Editors/ce5table.ui \
@@ -151,12 +150,29 @@ FORMS += \
     ../Reports/cr5menutranslator.ui \
     ../Reports/cr5storedocumentsfilter.ui \
     ../NTable/nloadingdlg.ui \
-    ../NTable/nfilterdlg.ui
+    ../NTable/nfilterdlg.ui \
+    ../Forms/c5codenameselector.ui \
+    ../Forms/c5connectiondialog.ui \
+    ../Forms/c5fiscalcancel.ui \
+    ../Forms/c5goodsspecialprice.ui \
+    ../Forms/c5menu.ui \
+    ../Forms/dlgimportfromas.ui \
+    ../StructModel/c5structtableview.ui \
+    c5discountredeem.ui \
+    c5storedecompilation.ui \
+    dlgemarks.ui \
+    dwaiterworkstationconfig.ui \
+    rabstracteditordialog.ui \
+    rabstracteditorreport.ui \
+    rwaiterstationconfig.ui \
+    wdashboard.ui \
+    rfilterdialog.ui
 
 
 HEADERS += \
         $$PWD/../Classes/QProgressIndicator.h \
         $$PWD/../Classes/c5servername.h \
+        $$PWD/../Classes/dict_payment_type.h \
         $$PWD/../Classes/ean8generator.h \
         $$PWD/../NTable/nhandler.h \
         $$PWD/../NTable/nsearchdlg.h \
@@ -164,6 +180,9 @@ HEADERS += \
         $$PWD/../NTable/ntreenode.h \
         $$PWD/../NTable/ntreewidget.h \
         $$PWD/../NTable/treemodel.h \
+        $$PWD/c5codenameselectorfunctions.h \
+        $$PWD/rfilterproxymodel.h \
+        $$PWD/rwaiterorder.h \
         ../NTable/ntablemodel.h \
         ../NTable/ndataprovider.h \
         ../NTable/ntablewidget.h \
@@ -277,7 +296,6 @@ HEADERS += \
         ../Forms/dlgguestinfo.h \
         ../Forms/dlglist2.h \
         ../Forms/dlgnewcl.h \
-        ../Forms/dlgprintrecipesoptions.h \
         ../Forms/dlgqty.h \
         ../Forms/dlgreservgoods.h \
         ../Forms/dlgselectcurrency.h \
@@ -391,7 +409,6 @@ HEADERS += \
         ../Reports/cr5databases.h \
         ../Reports/cr5dishpart1.h \
         ../Reports/cr5dishpart2.h \
-        ../Reports/cr5dish.h \
         ../Reports/cr5settings.h \
         ../Reports/c5settingswidget.h \
         ../Reports/cr5goodsunit.h \
@@ -435,8 +452,6 @@ HEADERS += \
         ../Editors/ce5dishremovereason.h \
         ../Reports/cr5discountsystem.h \
         ../Editors/ce5discountcard.h \
-        ../Editors/ce5dishcomment.h \
-        ../Reports/cr5dishcomment.h \
         ../Reports/cr5salefromstore.h \
         ../Reports/cr5salefromstorefilter.h \
         ../Reports/cr5hall.h \
@@ -449,12 +464,52 @@ HEADERS += \
         ../Reports/cr5storedocumentsfilter.h \
         ../Classes/fileversion.h \
         ../Classes/c5waiterorderdoc.h \
-        ../NTable/nfilterdlg.h
+        ../NTable/nfilterdlg.h \
+        ../Classes/appwebsocket.h \
+        ../Classes/c5htmlprint.h \
+        ../Classes/dict_dish_state.h \
+        ../Forms/c5codenameselector.h \
+        ../Forms/c5connectiondialog.h \
+        ../Forms/c5fiscalcancel.h \
+        ../Forms/c5goodsspecialprice.h \
+        ../Forms/c5menu.h \
+        ../Forms/dlgimportfromas.h \
+        ../Service5/worker/c5jsonparser.h \
+        ../Service5/worker/c5structtraits.h \
+        ../Service5/worker/socketstruct.h \
+        ../Service5/worker/struct_dish.h \
+        ../Service5/worker/struct_goods_group.h \
+        ../Service5/worker/struct_goods_item.h \
+        ../Service5/worker/struct_hall.h \
+        ../Service5/worker/struct_parent.h \
+        ../Service5/worker/struct_partner.h \
+        ../Service5/worker/struct_storage_item.h \
+        ../Service5/worker/struct_table.h \
+        ../Service5/worker/struct_waiter_dish.h \
+        ../Service5/worker/struct_waiter_order.h \
+        ../Service5/worker/struct_workstationitem.h \
+        ../StructModel/c5structmodel.h \
+        ../StructModel/c5structtableview.h \
+        c5discountredeem.h \
+        c5officedialog.h \
+        c5officewidget.h \
+        c5storedecompilation.h \
+        dlgemarks.h \
+        dwaiterworkstationconfig.h \
+        rabstracteditordialog.h \
+        rabstracteditorreport.h \
+        rabstractspecialwidget.h \
+        rwaiterstationconfig.h \
+        version.h \
+        wdashboard.h \
+        ../Classes/dict_doc_reason.h \
+        rfilterdialog.h
 
 
 SOURCES += \
     $$PWD/../Classes/QProgressIndicator.cpp \
     $$PWD/../Classes/c5servername.cpp \
+    $$PWD/../Classes/dict_payment_type.cpp \
     $$PWD/../Classes/ean8generator.cpp \
     $$PWD/../NTable/nhandler.cpp \
     $$PWD/../NTable/nsearchdlg.cpp \
@@ -462,6 +517,9 @@ SOURCES += \
     $$PWD/../NTable/ntreenode.cpp \
     $$PWD/../NTable/ntreewidget.cpp \
     $$PWD/../NTable/treemodel.cpp \
+    $$PWD/dict_dish_state.cpp \
+    $$PWD/rfilterproxymodel.cpp \
+    $$PWD/rwaiterorder.cpp \
         ../NTable/ntablemodel.cpp \
         ../NTable/ndataprovider.cpp \
         ../NTable/ntablewidget.cpp \
@@ -563,7 +621,6 @@ SOURCES += \
         ../Forms/dlgguestinfo.cpp \
         ../Forms/dlglist2.cpp \
         ../Forms/dlgnewcl.cpp \
-        ../Forms/dlgprintrecipesoptions.cpp \
         ../Forms/dlgqty.cpp \
         ../Forms/dlgreservgoods.cpp \
         ../Forms/dlgselectcurrency.cpp \
@@ -682,7 +739,6 @@ SOURCES += \
         ../Reports/cr5databases.cpp \
         ../Reports/cr5dishpart1.cpp \
         ../Reports/cr5dishpart2.cpp \
-        ../Reports/cr5dish.cpp \
         ../Reports/cr5settings.cpp \
         ../Reports/c5settingswidget.cpp \
         ../Reports/cr5goodsunit.cpp \
@@ -724,8 +780,6 @@ SOURCES += \
         ../Editors/ce5dishremovereason.cpp \
         ../Reports/cr5discountsystem.cpp \
         ../Editors/ce5discountcard.cpp \
-        ../Editors/ce5dishcomment.cpp \
-        ../Reports/cr5dishcomment.cpp \
         ../Reports/cr5salefromstore.cpp \
         ../Reports/cr5salefromstorefilter.cpp \
         ../Reports/cr5hall.cpp \
@@ -738,7 +792,30 @@ SOURCES += \
         ../Reports/cr5storedocumentsfilter.cpp \
         ../Classes/fileversion.cpp \
         ../Classes/c5waiterorderdoc.cpp \
-        ../NTable/nfilterdlg.cpp
+        ../NTable/nfilterdlg.cpp \
+        ../Classes/appwebsocket.cpp \
+        ../Classes/c5htmlprint.cpp \
+        ../Forms/c5codenameselector.cpp \
+        ../Forms/c5connectiondialog.cpp \
+        ../Forms/c5fiscalcancel.cpp \
+        ../Forms/c5goodsspecialprice.cpp \
+        ../Forms/c5menu.cpp \
+        ../Forms/dlgimportfromas.cpp \
+        ../Service5/worker/socketstruct.cpp \
+        ../Service5/worker/struct_workstationitem.cpp \
+        ../StructModel/c5structtableview.cpp \
+        c5discountredeem.cpp \
+        c5officedialog.cpp \
+        c5officewidget.cpp \
+        c5storedecompilation.cpp \
+        dlgemarks.cpp \
+        dwaiterworkstationconfig.cpp \
+        rabstracteditordialog.cpp \
+        rabstracteditorreport.cpp \
+        rabstractspecialwidget.cpp \
+        rwaiterstationconfig.cpp \
+        wdashboard.cpp \
+        rfilterdialog.cpp
 
 include(C:/projects/QXlsx/QXlsx.pri)
 
@@ -755,6 +832,7 @@ INCLUDEPATH += ../RESOURCES
 INCLUDEPATH += ../Service
 INCLUDEPATH += ../Service5Working/utils
 INCLUDEPATH += ../StructModel
+INCLUDEPATH += ../Service5/worker
 INCLUDEPATH += ../Forms
 INCLUDEPATH += ../Configs
 INCLUDEPATH += ../../NewTax/Src

@@ -58,63 +58,6 @@ win32: QMAKE_CXXFLAGS -= -Zc:strictStrings
  #    QMAKE_CXXFLAGS += /WX
  # }
 
-FORMS += \
-    ../Forms/c5connectiondialog.ui \
-    ../Forms/c5fiscalcancel.ui \
-    ../Forms/c5goodsspecialprice.ui \
-    ../Forms/c5menu.ui \
-    ../Forms/dlgimportfromas.ui \
-    c5discountredeem.ui \
-    dlgemarks.ui \
-    dwaiterworkstationconfig.ui \
-    rabstracteditordialog.ui \
-    rabstracteditorreport.ui \
-    rwaiterstationconfig.ui \
-    storedecomplectation.ui \
-    wdashboard.ui
-
-HEADERS += \
-    ../Classes/appwebsocket.h \
-    ../Classes/c5htmlprint.h \
-    ../Classes/dict_dish_state.h \
-    ../Forms/c5connectiondialog.h \
-    ../Forms/c5fiscalcancel.h \
-    ../Forms/c5goodsspecialprice.h \
-    ../Forms/c5menu.h \
-    ../Forms/dlgimportfromas.h \
-    ../StructModel/c5structmodel.h \
-    c5discountredeem.h \
-    c5officedialog.h \
-    c5officewidget.h \
-    dlgemarks.h \
-    dwaiterworkstationconfig.h \
-    rabstracteditordialog.h \
-    rabstracteditorreport.h \
-    rabstractspecialwidget.h \
-    rwaiterstationconfig.h \
-    storedecomplectation.h \
-    version.h \
-    wdashboard.h
-
-SOURCES += \
-    ../Classes/appwebsocket.cpp \
-    ../Classes/c5htmlprint.cpp \
-    ../Forms/c5connectiondialog.cpp \
-    ../Forms/c5fiscalcancel.cpp \
-    ../Forms/c5goodsspecialprice.cpp \
-    ../Forms/c5menu.cpp \
-    ../Forms/dlgimportfromas.cpp \
-    c5discountredeem.cpp \
-    c5officedialog.cpp \
-    c5officewidget.cpp \
-    dlgemarks.cpp \
-    dwaiterworkstationconfig.cpp \
-    rabstracteditordialog.cpp \
-    rabstracteditorreport.cpp \
-    rabstractspecialwidget.cpp \
-    rwaiterstationconfig.cpp \
-    storedecomplectation.cpp \
-    wdashboard.cpp
 
 win32 {
     version_inc.target = version_inc
@@ -127,3 +70,4 @@ win32 {
 win32 {
     res_rc.depends += $$PWD/version.h
 }
+

@@ -47,6 +47,9 @@ public:
 
     C5User* mUser = nullptr;
 
+public slots:
+    void updateRequired(const QString &msg, const QString &appName, const QString &newVersion);
+
 protected:
     QToolBar* fToolBar;
 

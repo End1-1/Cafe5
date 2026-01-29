@@ -348,50 +348,50 @@
 <context>
     <name>C5Widget</name>
     <message>
-        <location filename="../Classes/c5widget.cpp" line="59"/>
+        <location filename="../Classes/c5widget.cpp" line="60"/>
         <source>New</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Classes/c5widget.cpp" line="63"/>
+        <location filename="../Classes/c5widget.cpp" line="64"/>
         <source>Edit</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Classes/c5widget.cpp" line="67"/>
+        <location filename="../Classes/c5widget.cpp" line="68"/>
         <source>Remove</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Classes/c5widget.cpp" line="71"/>
+        <location filename="../Classes/c5widget.cpp" line="72"/>
         <source>Save
 changes</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Classes/c5widget.cpp" line="75"/>
+        <location filename="../Classes/c5widget.cpp" line="76"/>
         <source>Search by
 parameters</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Classes/c5widget.cpp" line="81"/>
+        <location filename="../Classes/c5widget.cpp" line="82"/>
         <source>Clear
 filter</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Classes/c5widget.cpp" line="85"/>
+        <location filename="../Classes/c5widget.cpp" line="86"/>
         <source>Refresh</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Classes/c5widget.cpp" line="89"/>
+        <location filename="../Classes/c5widget.cpp" line="90"/>
         <source>Print</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Classes/c5widget.cpp" line="93"/>
+        <location filename="../Classes/c5widget.cpp" line="94"/>
         <source>Export to
 MS Excel</source>
         <translation></translation>
@@ -997,7 +997,7 @@ MS Excel</source>
     </message>
     <message>
         <location filename="dlgorder.ui" line="191"/>
-        <location filename="dlgorder.cpp" line="1231"/>
+        <location filename="dlgorder.cpp" line="1236"/>
         <source>Comment</source>
         <translation>Լրացուցիչ</translation>
     </message>
@@ -1041,7 +1041,7 @@ MS Excel</source>
     </message>
     <message>
         <location filename="dlgorder.ui" line="2525"/>
-        <location filename="dlgorder.cpp" line="2091"/>
+        <location filename="dlgorder.cpp" line="2100"/>
         <source>Service fee</source>
         <translation>Սպասարկում</translation>
     </message>
@@ -1180,7 +1180,7 @@ MS Excel</source>
     <message>
         <location filename="dlgorder.ui" line="2595"/>
         <location filename="dlgorder.cpp" line="640"/>
-        <location filename="dlgorder.cpp" line="2082"/>
+        <location filename="dlgorder.cpp" line="2091"/>
         <source>Discount</source>
         <translation>Զեղչ</translation>
     </message>
@@ -1265,7 +1265,7 @@ MS Excel</source>
     </message>
     <message>
         <location filename="dlgorder.cpp" line="632"/>
-        <location filename="dlgorder.cpp" line="2081"/>
+        <location filename="dlgorder.cpp" line="2090"/>
         <source>Service</source>
         <translation>Սպասարկում</translation>
     </message>
@@ -1275,47 +1275,47 @@ MS Excel</source>
         <translation>Կանխավճար</translation>
     </message>
     <message>
-        <location filename="dlgorder.cpp" line="2308"/>
+        <location filename="dlgorder.cpp" line="2320"/>
         <source>Combining payment types is not allowed.</source>
         <translation>Նշված վճարման եղանակները չի կարելի խարնել</translation>
     </message>
     <message>
-        <location filename="dlgorder.cpp" line="2629"/>
+        <location filename="dlgorder.cpp" line="2641"/>
         <source>Reprint selected items?</source>
         <translation>Կրկնակի տպել նշված տողերը՞</translation>
     </message>
     <message>
-        <location filename="dlgorder.cpp" line="2644"/>
+        <location filename="dlgorder.cpp" line="2656"/>
         <source>Reprint service</source>
         <translation>Կրկնակի տպել</translation>
     </message>
     <message>
-        <location filename="dlgorder.cpp" line="2797"/>
+        <location filename="dlgorder.cpp" line="2809"/>
         <source>Mark selected items as complimentary</source>
         <translation>Նշել ընտրված տողերը որպես հյուրասիրություն</translation>
     </message>
     <message>
-        <location filename="dlgorder.cpp" line="2923"/>
+        <location filename="dlgorder.cpp" line="2935"/>
         <source>Nothing to transfer</source>
         <translation>Ոչինչ չկա տեղափոխելու համար</translation>
     </message>
     <message>
-        <location filename="dlgorder.cpp" line="2945"/>
+        <location filename="dlgorder.cpp" line="2960"/>
         <source>Transfer successfull</source>
         <translation>Տեղափոխությունը կատարված է</translation>
     </message>
     <message>
-        <location filename="dlgorder.cpp" line="2956"/>
+        <location filename="dlgorder.cpp" line="2971"/>
         <source>Confirm table transfer</source>
         <translation>Հատատեք սեղանի տեղափոխությունը</translation>
     </message>
     <message>
-        <location filename="dlgorder.cpp" line="2977"/>
+        <location filename="dlgorder.cpp" line="2992"/>
         <source>Do you want to reopen order?</source>
         <translation>Դուք ցանկանում եք վերաբացել պատվերը՞</translation>
     </message>
     <message>
-        <location filename="dlgorder.cpp" line="2990"/>
+        <location filename="dlgorder.cpp" line="3005"/>
         <source>Do you want to print the fiscal receipt?</source>
         <translation>Ցանկանում եք տպել ՀԴՄ՞</translation>
     </message>
@@ -1331,7 +1331,7 @@ MS Excel</source>
     </message>
     <message>
         <location filename="dlgorder.cpp" line="620"/>
-        <location filename="dlgorder.cpp" line="2813"/>
+        <location filename="dlgorder.cpp" line="2825"/>
         <source>Complimentary</source>
         <translation>Հյուրասիրություն</translation>
     </message>
@@ -1380,85 +1380,85 @@ MS Excel</source>
     </message>
     <message>
         <location filename="dlgorder.cpp" line="887"/>
-        <location filename="dlgorder.cpp" line="1116"/>
-        <location filename="dlgorder.cpp" line="2527"/>
+        <location filename="dlgorder.cpp" line="1119"/>
+        <location filename="dlgorder.cpp" line="2539"/>
         <source>Cannot add comment to hourly payment</source>
         <translation>Ժամավարձը խմբագրման ենթակա չէ</translation>
     </message>
     <message>
-        <location filename="dlgorder.cpp" line="926"/>
+        <location filename="dlgorder.cpp" line="927"/>
         <source>The quantity of dishes with remarks cannot be changed</source>
         <translation>Հատուկ ապրանքանիշով ապրանքի քանակը փոփոխել հնարավոր չէ</translation>
     </message>
     <message>
-        <location filename="dlgorder.cpp" line="948"/>
+        <location filename="dlgorder.cpp" line="950"/>
         <source>Append only by QR code</source>
         <translation>Սկանավորեք QR կոդը</translation>
     </message>
     <message>
-        <location filename="dlgorder.cpp" line="1120"/>
-        <location filename="dlgorder.cpp" line="2539"/>
-        <location filename="dlgorder.cpp" line="2679"/>
+        <location filename="dlgorder.cpp" line="1123"/>
+        <location filename="dlgorder.cpp" line="2551"/>
+        <location filename="dlgorder.cpp" line="2691"/>
         <source>Do you want to remove this item</source>
         <translation>Հաստատեք հեռացումը</translation>
     </message>
     <message>
-        <location filename="dlgorder.cpp" line="1127"/>
-        <location filename="dlgorder.cpp" line="2687"/>
+        <location filename="dlgorder.cpp" line="1130"/>
+        <location filename="dlgorder.cpp" line="2699"/>
         <source>Reason of remove</source>
         <translation>Հեռացման պատճառը</translation>
     </message>
     <message>
-        <location filename="dlgorder.cpp" line="1131"/>
-        <location filename="dlgorder.cpp" line="2691"/>
+        <location filename="dlgorder.cpp" line="1134"/>
+        <location filename="dlgorder.cpp" line="2703"/>
         <source>Mistake</source>
         <translation>Սխալ</translation>
     </message>
     <message>
-        <location filename="dlgorder.cpp" line="1131"/>
-        <location filename="dlgorder.cpp" line="2691"/>
+        <location filename="dlgorder.cpp" line="1134"/>
+        <location filename="dlgorder.cpp" line="2703"/>
         <source>With store output</source>
         <translation>Դուրսգրումով</translation>
     </message>
     <message>
-        <location filename="dlgorder.cpp" line="1131"/>
-        <location filename="dlgorder.cpp" line="1233"/>
-        <location filename="dlgorder.cpp" line="1281"/>
-        <location filename="dlgorder.cpp" line="2408"/>
-        <location filename="dlgorder.cpp" line="2691"/>
+        <location filename="dlgorder.cpp" line="1134"/>
+        <location filename="dlgorder.cpp" line="1238"/>
+        <location filename="dlgorder.cpp" line="1286"/>
+        <location filename="dlgorder.cpp" line="2420"/>
+        <location filename="dlgorder.cpp" line="2703"/>
         <source>Cancel</source>
         <translation>Հրաժարվել</translation>
     </message>
     <message>
-        <location filename="dlgorder.cpp" line="1166"/>
-        <location filename="dlgorder.cpp" line="2439"/>
-        <location filename="dlgorder.cpp" line="2742"/>
-        <location filename="dlgorder.cpp" line="2902"/>
+        <location filename="dlgorder.cpp" line="1170"/>
+        <location filename="dlgorder.cpp" line="2451"/>
+        <location filename="dlgorder.cpp" line="2754"/>
+        <location filename="dlgorder.cpp" line="2914"/>
         <source>Remove printed dish</source>
         <translation>Մենեջերի գախտնաբառ</translation>
     </message>
     <message>
-        <location filename="dlgorder.cpp" line="1022"/>
-        <location filename="dlgorder.cpp" line="1175"/>
-        <location filename="dlgorder.cpp" line="2447"/>
-        <location filename="dlgorder.cpp" line="2751"/>
-        <location filename="dlgorder.cpp" line="2911"/>
-        <location filename="dlgorder.cpp" line="2965"/>
+        <location filename="dlgorder.cpp" line="1025"/>
+        <location filename="dlgorder.cpp" line="1179"/>
+        <location filename="dlgorder.cpp" line="2459"/>
+        <location filename="dlgorder.cpp" line="2763"/>
+        <location filename="dlgorder.cpp" line="2923"/>
+        <location filename="dlgorder.cpp" line="2980"/>
         <source>Permission denied</source>
         <translation>Արգելված է</translation>
     </message>
     <message>
-        <location filename="dlgorder.cpp" line="1221"/>
+        <location filename="dlgorder.cpp" line="1226"/>
         <source>Adding comments to hourly payments is not allowed</source>
         <translation>Ժամավարձը խմբագրման ենթակա չէ</translation>
     </message>
     <message>
-        <location filename="dlgorder.cpp" line="1226"/>
+        <location filename="dlgorder.cpp" line="1231"/>
         <source>Cannot add modifiers or comments to printed dishes</source>
         <translation>Տպված ուտեստների փոփոխությունը հնարավեր չէ</translation>
     </message>
     <message>
-        <location filename="dlgorder.cpp" line="1232"/>
+        <location filename="dlgorder.cpp" line="1237"/>
         <source>Modificator</source>
         <translation>Մոդիֆիկատոր</translation>
     </message>
@@ -1473,53 +1473,53 @@ MS Excel</source>
         <translation>ՆՈՐ ՊԱՏՎԵՐ</translation>
     </message>
     <message>
-        <location filename="dlgorder.cpp" line="1433"/>
+        <location filename="dlgorder.cpp" line="1442"/>
         <source>Order not ready for precheck</source>
         <translation>Նախահաշիվը հնարավոր չէ տպել անավարտ գործողությունների պատճառով</translation>
     </message>
     <message>
-        <location filename="dlgorder.cpp" line="1485"/>
+        <location filename="dlgorder.cpp" line="1494"/>
         <source>Cancel precheck</source>
         <translation>Չեղարկել նախահաշիվը</translation>
     </message>
     <message>
-        <location filename="dlgorder.cpp" line="1516"/>
+        <location filename="dlgorder.cpp" line="1525"/>
         <source>Repeat precheck</source>
         <translation>Կրկնել նախահաշիվ</translation>
     </message>
     <message>
-        <location filename="dlgorder.cpp" line="2083"/>
+        <location filename="dlgorder.cpp" line="2092"/>
         <source>Precheck</source>
         <translation>Նախահաշիվ</translation>
     </message>
     <message>
-        <location filename="dlgorder.cpp" line="2093"/>
+        <location filename="dlgorder.cpp" line="2102"/>
         <source>Discount fee</source>
         <translation>Զեղչի գումար</translation>
     </message>
     <message>
-        <location filename="dlgorder.cpp" line="2287"/>
+        <location filename="dlgorder.cpp" line="2299"/>
         <source>Payment was not completed</source>
         <translation>Վճարումը լիարժեք չէ</translation>
     </message>
     <message>
-        <location filename="dlgorder.cpp" line="2334"/>
-        <location filename="dlgorder.cpp" line="2995"/>
+        <location filename="dlgorder.cpp" line="2346"/>
+        <location filename="dlgorder.cpp" line="3010"/>
         <source>Printing fiscal check</source>
         <translation>ՀԴՄ կտրոնի տպում</translation>
     </message>
     <message>
-        <location filename="dlgorder.cpp" line="2471"/>
+        <location filename="dlgorder.cpp" line="2483"/>
         <source>Raise permissions</source>
         <translation>Ստանալ իրավասություն</translation>
     </message>
     <message>
-        <location filename="dlgorder.cpp" line="2491"/>
+        <location filename="dlgorder.cpp" line="2503"/>
         <source>Order comment</source>
         <translation>Պատվերի մեկնաբանություն</translation>
     </message>
     <message>
-        <location filename="dlgorder.cpp" line="2532"/>
+        <location filename="dlgorder.cpp" line="2544"/>
         <source>Use removal tool</source>
         <translation>Օգտագործեք հեռացման կոճակը</translation>
     </message>
@@ -1617,29 +1617,6 @@ STOPLIST-ից</translation>
     </message>
     <message>
         <location filename="dlgprecheckoptions.ui" line="95"/>
-        <source>Cancel</source>
-        <translation>Հրաժարվել</translation>
-    </message>
-</context>
-<context>
-    <name>DlgPrintRecipesOptions</name>
-    <message>
-        <location filename="../Forms/dlgprintrecipesoptions.ui" line="14"/>
-        <source>Options</source>
-        <translation>Տարբերակներ</translation>
-    </message>
-    <message>
-        <location filename="../Forms/dlgprintrecipesoptions.ui" line="20"/>
-        <source>Print with prices</source>
-        <translation>Տպել գներով</translation>
-    </message>
-    <message>
-        <location filename="../Forms/dlgprintrecipesoptions.ui" line="27"/>
-        <source>Print without prices</source>
-        <translation>Տպել արանձ գին</translation>
-    </message>
-    <message>
-        <location filename="../Forms/dlgprintrecipesoptions.ui" line="34"/>
         <source>Cancel</source>
         <translation>Հրաժարվել</translation>
     </message>
@@ -2164,12 +2141,12 @@ STOPLIST-ից</translation>
         <translation>Ընտրեկ առաջին սեղանը</translation>
     </message>
     <message>
-        <location filename="dlgsplitorder.cpp" line="307"/>
+        <location filename="dlgsplitorder.cpp" line="311"/>
         <source>No items to transfer</source>
         <translation>Ոչինչ չկա տեղափոխելու</translation>
     </message>
     <message>
-        <location filename="dlgsplitorder.cpp" line="318"/>
+        <location filename="dlgsplitorder.cpp" line="324"/>
         <source>Transfer completed</source>
         <translation>Տեղափոխությունը կատարված է</translation>
     </message>
@@ -2403,29 +2380,18 @@ STOPLIST-ից</translation>
 <context>
     <name>NDataProvider</name>
     <message>
-        <location filename="../NTable/ndataprovider.cpp" line="104"/>
+        <location filename="../NTable/ndataprovider.cpp" line="103"/>
+        <source>Authorization error</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../NTable/ndataprovider.cpp" line="115"/>
         <source>Application update required</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../NTable/ndataprovider.cpp" line="107"/>
-        <source>Click to launch updater</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../NTable/ndataprovider.cpp" line="113"/>
-        <location filename="../NTable/ndataprovider.cpp" line="136"/>
-        <source>Access denied</source>
-        <translation>Մուտքը արգելված է</translation>
-    </message>
-    <message>
         <location filename="../NTable/ndataprovider.cpp" line="118"/>
-        <source>You must upgrade the application to continue using it</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../NTable/ndataprovider.cpp" line="119"/>
-        <source>Click here to launch updater</source>
+        <source>Click to launch updater</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2684,13 +2650,13 @@ STOPLIST-ից</translation>
         <translation>Ոչ</translation>
     </message>
     <message>
-        <location filename="dlgorder.cpp" line="1465"/>
+        <location filename="dlgorder.cpp" line="1474"/>
         <source>Confirm to cancel bill</source>
         <translation>Հաստատեք նախահաշվի չեղարկումը</translation>
     </message>
     <message>
-        <location filename="dlgorder.cpp" line="1497"/>
-        <location filename="dlgorder.cpp" line="1528"/>
+        <location filename="dlgorder.cpp" line="1506"/>
+        <location filename="dlgorder.cpp" line="1537"/>
         <source>Permission denied</source>
         <translation>Արգելված է</translation>
     </message>

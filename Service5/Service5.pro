@@ -82,7 +82,7 @@ QMAKE_LFLAGS_WINDOWS += /MANIFESTUAC:"level='requireAdministrator'"
 }
 
 linux {
-    VERSION = 1.4.5.53
+    VERSION = 1.4.6.55
     QMAKE_LFLAGS += -Wl,--build-id
     DEFINES += APP_VERSION=\\\"$$VERSION\\\"
 }

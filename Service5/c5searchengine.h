@@ -16,13 +16,13 @@ public:
     QString search(const QJsonObject &jo);
     QString searchPartner(const QJsonObject &jo);
     QString searchGoodsGroups(const QJsonObject &jo);
-    QString searchGoods(const QJsonObject &jo);
     QString searchStore(const QJsonObject &jo);
     QString searchUpdatePartnerCache(const QJsonObject &jo);
     //New version of search
     QString searchStorage(const QJsonObject &jo, const SocketStruct &ss);
     QString searchGoodsItem(const QJsonObject &jo, const SocketStruct &ss);
     QString searchPartnerItem(const QJsonObject &jo, const SocketStruct &ss);
+    QString updateDictionary(const QJsonObject &jo, const SocketStruct &ss);
 
 private:
 

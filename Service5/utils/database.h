@@ -19,7 +19,7 @@ public:
     ~Database();
     QSqlDatabase fSqlDatabase;
     bool open(const QString &configFile);
-    bool open(const QString &host, const QString &schema, const QString &username, const QString &password);
+    bool open(const QString &host, const QString &schema, const QString &username, const QString &password, int port);
     bool open(const QJsonObject &o);
     bool startTransaction();
     bool commit();
@@ -27,7 +27,7 @@ public:
     bool exec(const QString &query);
     bool execDirect(const QString &query);
     bool insert(const QString &table);
-    bool insert(const QString &table, int &id);
+    bool insert(const QString &table, int& id);
     bool update(const QString &table);
     bool update(const QString &table, const QString &field, const QVariant &value);
     bool deleteFromTable(const QString &table, const QString &field, const QVariant &value);
@@ -92,12 +92,12 @@ public:
         return value(columnName).toDateTime();
     }
     static QString uuid();
-    void setBindValues(const QMap<QString, QVariant> &v);
+    void setBindValues(const QMap<QString, QVariant>& v);
     QMap<QString, QVariant> getBindValues();
     void close();
-    QSqlQuery *fQuery;
-    QVariant &operator [](const QString &name);
-    inline const QVariant operator ()(const QString &name)
+    QSqlQuery* fQuery;
+    QVariant& operator [](const QString &name);
+    inline const QVariant operator()(const QString &name)
     {
         return fQuery->value(fColumnsNames[name]);
     }
@@ -106,7 +106,7 @@ public:
     QString fDatabaseNumber;
 
     int genFBID(const QString &name);
-    void rowToMap(QMap<QString, QVariant> &map);
+    void rowToMap(QMap<QString, QVariant>& map);
     QStringList params();
     QJsonObject columnsData();
 

@@ -296,7 +296,11 @@ void DlgSplitOrder::on_btnSave_clicked()
             }
 
             if(d.header != wo1.id) {
-                jd.append(QJsonObject{{"f_header", wo1.id}, {"f_id", d.id}, {"f_from_table", wo2.tableName}});
+                jd.append(QJsonObject{{"f_header", wo1.id},
+                    {"f_id", d.id},
+                    {"f_dish_name", d.dishName},
+                    {"f_qty", d.qty},
+                    {"f_from_table", wo2.tableName}});
             }
         }
     };
@@ -311,7 +315,9 @@ void DlgSplitOrder::on_btnSave_clicked()
     NInterface::query1("/engine/v2/waiter/order/transfer-items", mUser->mSessionKey, this, {
         {"data", jd},
         {"id1", mOrder1.id},
-        {"id2", mOrder2.id}
+        {"id2", mOrder2.id},
+        {"source_table_name", mOrder1.tableName},
+        {"destination_table_name", mOrder2.tableName},
     },
     [this](const QJsonObject & jdoc) {
         Q_UNUSED(jdoc);

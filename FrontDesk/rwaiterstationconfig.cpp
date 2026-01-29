@@ -8,4 +8,7 @@ RWaiterStationConfig::RWaiterStationConfig(QWidget *parent)
     ui->setupUi(this);
 }
 
-RWaiterStationConfig::~RWaiterStationConfig() { delete ui; }
+RWaiterStationConfig::~RWaiterStationConfig()
+{
+    delete ui;
+}

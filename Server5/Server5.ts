@@ -174,29 +174,18 @@
 <context>
     <name>NDataProvider</name>
     <message>
-        <location filename="../NTable/ndataprovider.cpp" line="104"/>
+        <location filename="../NTable/ndataprovider.cpp" line="103"/>
+        <source>Authorization error</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../NTable/ndataprovider.cpp" line="115"/>
         <source>Application update required</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../NTable/ndataprovider.cpp" line="107"/>
-        <source>Click to launch updater</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../NTable/ndataprovider.cpp" line="113"/>
-        <location filename="../NTable/ndataprovider.cpp" line="136"/>
-        <source>Access denied</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <location filename="../NTable/ndataprovider.cpp" line="118"/>
-        <source>You must upgrade the application to continue using it</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../NTable/ndataprovider.cpp" line="119"/>
-        <source>Click here to launch updater</source>
+        <source>Click to launch updater</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

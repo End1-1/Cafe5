@@ -6,6 +6,7 @@
 #include "c5printing.h"
 #include "ninterface.h"
 #include "c5user.h"
+#include "format_date.h"
 
 dlgvisit::dlgvisit(const QString &code, C5User *user) :
     C5Dialog(user),

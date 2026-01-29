@@ -47,6 +47,7 @@ bool C5ServerName::getServers()
 
     QEventLoop l2;
     connect(s, &QWebSocket::textMessageReceived, this, [this](const QString & s) {
+        qDebug() << "Database list response" << s;
         fLastTextMessage = s;
         QJsonObject jrep = QJsonDocument::fromJson(s.toUtf8()).object();
         mServers = jrep["result"].toArray();
@@ -59,6 +60,7 @@ bool C5ServerName::getServers()
     jo["command"] = "get_db_list";
     jo["server_key"] = __c5config.getRegValue("ss_server_key").toString();
     jo["handler"] = "office";
+    qDebug() << "Getting databases list" << jo;
     s->sendTextMessage(QJsonDocument(jo).toJson(QJsonDocument::Compact));
     l2.exec();
     s->deleteLater();

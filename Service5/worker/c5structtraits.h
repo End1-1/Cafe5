@@ -9,3 +9,5 @@ struct ColumnDef {
     const char* header;
     QVariant(*getter)(const T&);
 };
+
+template<typename T> struct SelectorName;

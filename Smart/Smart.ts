@@ -450,50 +450,50 @@
 <context>
     <name>C5Widget</name>
     <message>
-        <location filename="../Classes/c5widget.cpp" line="59"/>
+        <location filename="../Classes/c5widget.cpp" line="60"/>
         <source>New</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Classes/c5widget.cpp" line="63"/>
+        <location filename="../Classes/c5widget.cpp" line="64"/>
         <source>Edit</source>
         <translation type="unfinished">Խմբագրել</translation>
     </message>
     <message>
-        <location filename="../Classes/c5widget.cpp" line="67"/>
+        <location filename="../Classes/c5widget.cpp" line="68"/>
         <source>Remove</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Classes/c5widget.cpp" line="71"/>
+        <location filename="../Classes/c5widget.cpp" line="72"/>
         <source>Save
 changes</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Classes/c5widget.cpp" line="75"/>
+        <location filename="../Classes/c5widget.cpp" line="76"/>
         <source>Search by
 parameters</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Classes/c5widget.cpp" line="81"/>
+        <location filename="../Classes/c5widget.cpp" line="82"/>
         <source>Clear
 filter</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Classes/c5widget.cpp" line="85"/>
+        <location filename="../Classes/c5widget.cpp" line="86"/>
         <source>Refresh</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Classes/c5widget.cpp" line="89"/>
+        <location filename="../Classes/c5widget.cpp" line="90"/>
         <source>Print</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Classes/c5widget.cpp" line="93"/>
+        <location filename="../Classes/c5widget.cpp" line="94"/>
         <source>Export to
 MS Excel</source>
         <translation type="unfinished"></translation>
@@ -1599,29 +1599,18 @@ MS Excel</source>
 <context>
     <name>NDataProvider</name>
     <message>
-        <location filename="../NTable/ndataprovider.cpp" line="104"/>
+        <location filename="../NTable/ndataprovider.cpp" line="103"/>
+        <source>Authorization error</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../NTable/ndataprovider.cpp" line="115"/>
         <source>Application update required</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../NTable/ndataprovider.cpp" line="107"/>
-        <source>Click to launch updater</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../NTable/ndataprovider.cpp" line="113"/>
-        <location filename="../NTable/ndataprovider.cpp" line="136"/>
-        <source>Access denied</source>
-        <translation type="unfinished">Մուտքը արգելված է</translation>
-    </message>
-    <message>
         <location filename="../NTable/ndataprovider.cpp" line="118"/>
-        <source>You must upgrade the application to continue using it</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../NTable/ndataprovider.cpp" line="119"/>
-        <source>Click here to launch updater</source>
+        <source>Click to launch updater</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2612,27 +2601,27 @@ POS</translation>
         <translation></translation>
     </message>
     <message>
-        <location filename="dlgvisit.cpp" line="51"/>
+        <location filename="dlgvisit.cpp" line="52"/>
         <source>Recharge the card</source>
         <translation>Լիցքավորեք քարտը</translation>
     </message>
     <message>
-        <location filename="dlgvisit.cpp" line="73"/>
+        <location filename="dlgvisit.cpp" line="74"/>
         <source>Date</source>
         <translation>Ամսաթիվ</translation>
     </message>
     <message>
-        <location filename="dlgvisit.cpp" line="75"/>
+        <location filename="dlgvisit.cpp" line="76"/>
         <source>Time</source>
         <translation>Ժամ</translation>
     </message>
     <message>
-        <location filename="dlgvisit.cpp" line="83"/>
+        <location filename="dlgvisit.cpp" line="84"/>
         <source>Remain</source>
         <translation>Մնացորդ</translation>
     </message>
     <message>
-        <location filename="dlgvisit.cpp" line="88"/>
+        <location filename="dlgvisit.cpp" line="89"/>
         <source>[1] Printed:</source>
         <translation>Տպված</translation>
     </message>

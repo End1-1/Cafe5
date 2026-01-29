@@ -59,6 +59,8 @@ signals:
 
     void error(const QString&);
 
+    void transportError(const QString&);
+
     void done(const QJsonObject&);
 
     void updateRequired(const QString&, const QString&, const QString&);

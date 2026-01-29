@@ -1,6 +1,5 @@
 #include "dlgguestinfo.h"
 #include "ui_dlgguestinfo.h"
-#include "c5message.h"
 
 DlgGuestInfo::DlgGuestInfo(C5User *user) :
     C5Dialog(user),

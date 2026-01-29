@@ -3,6 +3,7 @@
 
 #include "c5lineedit.h"
 #include <QDate>
+#include <QCalendarWidget>
 
 class C5DateEdit : public C5LineEdit
 {
@@ -49,9 +50,17 @@ private:
 
     QString fField;
 
+    QAction* calAction = nullptr;
+
+    QCalendarWidget* calendar;
+
     void setBgColor(const QColor &color);
 
 private slots:
+    void showCalendar();
+
+    void dateSelected(const QDate &d);
+
     void newText(const QString &arg1);
 
 signals:
@@ -60,6 +69,6 @@ signals:
     void timeChanged(const QTime &time);
 };
 
-C5DateEdit *isDateEdit(QObject *o);
+C5DateEdit* isDateEdit(QObject *o);
 
 #endif // EDATEEDIT_H

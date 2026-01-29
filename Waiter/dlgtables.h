@@ -22,6 +22,8 @@ public:
 
     virtual int exec() override;
 
+    QString mTableName;
+
 protected:
     virtual void showEvent(QShowEvent *e) override;
 

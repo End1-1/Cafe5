@@ -10,7 +10,7 @@ class C5LineEdit : public QLineEdit
     Q_PROPERTY(int Tag READ getTag WRITE setTag)
 
 public:
-    C5LineEdit(QWidget *parent);
+    C5LineEdit(QWidget *parent = nullptr);
 
     QString fOldValue;
 
@@ -80,6 +80,6 @@ signals:
 
 };
 
-C5LineEdit *isLineEdit(QObject *o);
+C5LineEdit* isLineEdit(QObject *o);
 
 #endif // C5LINEEDIT_H

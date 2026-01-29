@@ -51,6 +51,8 @@ public:
 
     C5User* mUser;
 
+    QPoint mInitialPos = QPoint(-1, -1);
+
 public slots:
     void updateRequired(const QString &msg, const QString &appName, const QString &newVersion);
 

@@ -64,6 +64,7 @@ LIBS += -lwsock32
 LIBS += -LC:/soft/OpenSSLWin64/lib/VC/x64/MD
 LIBS += -lopenssl
 LIBS += -llibcrypto
+LIBS += -lgdi32 -luser32
 
 RESOURCES += \
     ../resources/resources.qrc \

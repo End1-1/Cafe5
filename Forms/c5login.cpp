@@ -64,10 +64,12 @@ void C5Login::on_btnOk_clicked()
                            js["database"].toString());
         __c5config.setValues(mUser->fSettings);
         __c5config.fMainJson = mUser->fConfig;
-        AppWebSocket::reconnect(QString("%1://%2").arg(js["settings"].toString() == "http" ? "ws" : "wss",
-                                js["database"].toString() + "/ws"),
-                                js["fkey"].toString(),
-                                ui->leUsername->currentText(), ui->lePassword->text());
+        // AppWebSocket::reconnect(C5ConnectionDialog::instance()->noneSecure ? "ws://" : "wss://" + __c5config.getRegValue("ss_server_address").toString() + "/ws", __c5config.getRegValue("ss_server_key").toString(), ui->leUser->text(), ui->lePin->text());
+        AppWebSocket::reconnect(QString("%1://%2").arg(js.value("settings").toString() == "http" ? "ws" : "wss",
+                                js.value("database").toString() + "/ws"),
+                                QString("%1.%2").arg(js.value("key").toString(), js.value("db").toString()),
+                                ui->leUsername->currentText(),
+                                ui->lePassword->text());
         accept();
     });
 }
@@ -116,7 +118,7 @@ void C5Login::readServers()
 
     for(int i = 0; i < fServers.count(); i++) {
         const QJsonObject &js = fServers.at(i).toObject();
-        ui->cbDatabases->addItem(js["name"].toString());
+        ui->cbDatabases->addItem(js["name"].toString(), js["db"].toString());
     }
 
     QSettings s(_ORGANIZATION_, _APPLICATION_ + QString("\\") + _MODULE_);

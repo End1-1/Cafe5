@@ -4,7 +4,7 @@
 <context>
     <name>ArmSoft</name>
     <message>
-        <location filename="armsoft.cpp" line="63"/>
+        <location filename="armsoft.cpp" line="68"/>
         <source>Empty invoice</source>
         <translation type="unfinished"></translation>
     </message>

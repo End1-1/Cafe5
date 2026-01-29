@@ -3,8 +3,13 @@
 #include "c5user.h"
 #include "dict_workstation.h"
 #include "rabstracteditordialog.h"
+#include "rfilterdialog.h"
+#include "rfilterproxymodel.h"
+#include "c5config.h"
 #include <QAbstractTableModel>
+#include <QSortFilterProxyModel>
 #include <QDialog>
+#include <QJsonDocument>
 #include <QJsonArray>
 
 class RAbstractEditorTableModel: public QAbstractTableModel
@@ -64,7 +69,23 @@ RAbstractEditorReport::RAbstractEditorReport(const QString &title, QIcon icon, c
     fIcon = icon;
     mEditorName = editorName;
     mModel = new RAbstractEditorTableModel();
-    ui->tbl->setModel(mModel);
+    mProxyModel = new RFilterProxyModel();
+    mProxyModel->setSourceModel(mModel);
+    ui->tbl->setModel(mProxyModel);
+    connect(mProxyModel, &RFilterProxyModel::sumsChanged, this, [this](const QHash<int, double>& values) {
+        for(auto it = values.begin(); it != values.end(); ++it) {
+            int col = it.key();
+            double sum = it.value();
+            ui->tblTotal->setDouble(0, col, sum);
+        }
+    });
+    auto *h1 = ui->tbl->horizontalHeader();
+    auto *h2 = ui->tblTotal->horizontalHeader();
+    connect(h1, &QHeaderView::sectionResized,
+    this, [this](int logical, int, int newSize) {
+        ui->tblTotal->setColumnWidth(logical, newSize);
+    });
+    mFilterValues =  QJsonDocument::fromJson(__c5config.getRegValue("filter_values_" + mEditorName, "").toString().toUtf8()).array();
 }
 
 RAbstractEditorReport::~RAbstractEditorReport()
@@ -87,6 +108,10 @@ QToolBar* RAbstractEditorReport::toolBar()
 
         });
         action->setProperty("name", "delete");
+        action = fToolBar->addAction(QIcon(":/filter.png"), tr("Parameters"), this, [this] {
+            applyFilter();
+        });
+        action->setProperty("name", "filter");
     }
 
     return fToolBar;
@@ -108,7 +133,7 @@ void RAbstractEditorReport::on_tbl_doubleClicked(const QModelIndex &index)
         return;
     }
 
-    QDialog *dialog = nullptr;
+    RAbstractEditorDialog *dialog = nullptr;
 
     if(mEditorName == "Workstations") {
         int type = mModel->data(mModel->index(index.row(), 1), Qt::DisplayRole).toInt();
@@ -124,7 +149,14 @@ void RAbstractEditorReport::on_tbl_doubleClicked(const QModelIndex &index)
         }
     }
 
+    if(mEditorName == "CashSessions") {
+        dialog = createEditorDialog("CashSessions");
+    }
+
     if(dialog) {
+        QJsonValue id = mModel->data(mModel->index(index.row(), 0), Qt::DisplayRole).toJsonValue();
+        dialog->setId(id);
+
         if(dialog->exec() == QDialog::Accepted) {
         }
 
@@ -134,9 +166,23 @@ void RAbstractEditorReport::on_tbl_doubleClicked(const QModelIndex &index)
 
 void RAbstractEditorReport::getData()
 {
-    NInterface::query1("/engine/v2/officen/editors/get-all", mUser->mSessionKey, this, {{"editor", mEditorName}},
+    NInterface::query1("/engine/v2/officen/editors/get-all", mUser->mSessionKey, this, {
+        {"editor", mEditorName},
+        {"filter", mFilterValues}
+    },
     [this](const QJsonObject & jdoc) {
+        mFilterWidget = jdoc["filter"].toArray();
+        mProxyModel->columnSums.clear();
+        QJsonArray jsums = jdoc["sum"].toArray();
+
+        for(int i = 0; i < jsums.size(); i++) {
+            mProxyModel->columnSums[jsums.at(i).toInt()] = 0;
+        }
+
+        mProxyModel->numericCols = mProxyModel->columnSums.keys();
         mModel->setJson(jdoc);
+        ui->tbl->resizeColumnsToContents();
+        ui->tblTotal->setColumnCount(mProxyModel->columnCount(QModelIndex()));
 
         for(auto column : jdoc["hidden_columns"].toArray()) {
             ui->tbl->setColumnHidden(column.toInt(), true);
@@ -149,11 +195,37 @@ void RAbstractEditorReport::getData()
                 a->setVisible(jtoolBar[a->property("name").toString()].toBool());
             }
         }
+
+        for(int c = 0; c < mModel->columnCount(QModelIndex()); c++) {
+            ui->tblTotal->setColumnWidth(c, ui->tbl->columnWidth(c));
+        }
+
+        QStringList header = {QString::number(mModel->rowCount(QModelIndex()))};
+        ui->tblTotal->setVerticalHeaderLabels(header);
+        mProxyModel->recalcSums();
+        emit mProxyModel->sumsChanged(mProxyModel->columnSums);
     });
+}
+
+void RAbstractEditorReport::applyFilter()
+{
+    RFilterDialog df(mUser);
+    df.buildWidget(mEditorName, mFilterWidget);
+
+    if(df.exec() == QDialog::Accepted) {
+        mFilterValues = df.filterValues();
+        getData();
+        __c5config.setRegValue("filter_values_" + mEditorName, QJsonDocument(mFilterValues).toJson(QJsonDocument::Compact));
+    }
 }
 
 RAbstractEditorDialog* RAbstractEditorReport::createEditorDialog(const QString &editorName)
 {
     auto *d = new RAbstractEditorDialog(mUser, editorName);
     return d;
+}
+
+void RAbstractEditorReport::on_leFilter_textChanged(const QString &arg1)
+{
+    mProxyModel->setGlobalFilter(arg1);
 }

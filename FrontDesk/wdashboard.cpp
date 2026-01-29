@@ -51,6 +51,10 @@ QWidget* WDashboard::createForm(const QString &name, QIcon icon)
         return new RAbstractEditorReport(tr("Workstations"), icon, name);
     }
 
+    if(name == "CashSessions") {
+        return new RAbstractEditorReport(tr("Cash sessions"), icon, name);
+    }
+
     Q_ASSERT_X(false, "check name", QString("NO WIDGET NAMED %1 ").arg(name).toLatin1());
     return nullptr;
 }

@@ -127,7 +127,7 @@ void CashCollection::collectCash()
 
     if(!dw.writeAHeader(cashdocid, QString::number(counter), DOC_STATE_SAVED, DOC_TYPE_CASH, mUser->id(),
                         QDate::currentDate(), QDate::currentDate(), QTime::currentTime(), 0,
-                        ui->leAmount->getDouble() - ui->leAmountCoin->getDouble(),
+                        ui->leAmount->getDouble(),
                         ui->lePurpose->text(), 1, __c5config.getValue(param_default_currency).toInt())) {
         C5Message::error(dw.fErrorMsg);
         return;
@@ -141,7 +141,7 @@ void CashCollection::collectCash()
     QString cashUUID;
 
     if(!dw.writeECash(cashUUID, cashdocid, __c5config.cashId(), -1, ui->lePurpose->text(),
-                      ui->leAmount->getDouble() - ui->leAmountCoin->getDouble(),
+                      ui->leAmount->getDouble(),
                       cashUUID, 1)) {
         C5Message::error(dw.fErrorMsg);
         return;

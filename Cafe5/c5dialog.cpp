@@ -138,6 +138,8 @@ QString C5Dialog::getFieldStringValue(const QString &name)
 
 void C5Dialog::updateRequired(const QString &msg, const QString &appName, const QString &newVersion)
 {
+    Q_UNUSED(appName);
+    Q_UNUSED(newVersion);
     C5Message::info(msg);
     qApp->exit(0);
 }
@@ -198,14 +200,21 @@ void C5Dialog::showEvent(QShowEvent *e)
         return;
     }
 
+    QScreen *screen = qApp->screens().first();
+
     if(mScreen > -1) {
-        QScreen *screen = qApp->screens().at(mScreen);
-        QRect geo = screen->availableGeometry();
-        QPoint center = geo.center();
-        QSize size = this->size();
-        move(center.x() - size.width() / 2,
-             center.y() - size.height() / 2);
+        screen = qApp->screens().at(mScreen);
     }
+
+    QRect geo = screen->availableGeometry();
+    QPoint center = geo.center();
+    QSize size = this->size();
+
+    if(mInitialPos == QPoint(-1, -1)) {
+        mInitialPos = QPoint(center.x() - size.width() / 2, center.y() - size.height() / 2);
+    }
+
+    move(mInitialPos);
 }
 
 QImage C5Dialog::grabDesktopArea(const QRect &r)

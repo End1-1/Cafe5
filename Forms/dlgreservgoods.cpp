@@ -8,6 +8,7 @@
 #include "c5config.h"
 #include "printtaxn.h"
 #include "ninterface.h"
+#include "c5codenameselectorfunctions.h"
 
 #include "c5user.h"
 #if(!defined FRONTDESK && !defined WAITER)
@@ -218,7 +219,7 @@ void DlgReservGoods::on_leReservedQty_textEdited(const QString &arg1)
 void DlgReservGoods::on_btnGoods_clicked()
 {
 #if(!defined FRONTDESK && !defined WAITER)
-    QVector<GoodsItem> result = C5StructTableView::get<GoodsItem>(search_goods, false, false);
+    QVector<GoodsItem> result = selectItem<GoodsItem>();
 
     if(result.isEmpty()) {
         return;

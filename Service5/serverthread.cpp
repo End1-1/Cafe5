@@ -6,6 +6,9 @@
 #include "armsoft.h"
 #include "waiter.h"
 #include "fileversion.h"
+#include "struct_goods_item.h"
+#include "struct_storage_item.h"
+#include "struct_partner.h"
 #include <QWebSocketServer>
 #include <QWebSocket>
 #include <QJsonObject>
@@ -25,14 +28,18 @@ ServerThread::ServerThread(const QString &configPath) :
     fConfigPath(configPath)
 {
     Database db;
+    int port = 3306;
+#ifdef QT_DEBUG
+    port = 3306;
+#endif
 
-    if(db.open("127.0.0.1", "service5", "root", "root5")) {
-        db.exec("select fkey, fname from dblist");
+    if(db.open("127.0.0.1", "service5", "root", "root5", port)) {
+        db.exec("select fkey, fname, concat(fkey, '.', fdb) as fuid from dblist");
 
         while(db.next()) {
             fDbList.append(db.string("fname"));
-            mDatabases[db.string("fkey")] = db.string("fname");
-            C5SearchEngine::init(db.string("fname"), db.string("fkey"));
+            mDatabases[db.string("fuid")] = db.string("fname");
+            C5SearchEngine::init(db.string("fname"), db.string("fuid"));
         }
 
         C5SearchEngine::init(fDbList);
@@ -74,8 +81,12 @@ QString ServerThread::getDbList(const QJsonObject &jdoc)
 {
     Database db;
     QJsonObject jrep;
+    int port = 3306;
+#ifdef QT_DEBUG
+    port = 3306;
+#endif
 
-    if(!db.open("127.0.0.1", "service5", "root", "root5")) {
+    if(!db.open("127.0.0.1", "service5", "root", "root5", port)) {
         jrep["errorCode"] = 1;
         jrep["errorMessage"] = db.lastDbError();
         return QJsonDocument(jrep).toJson(QJsonDocument::Compact);
@@ -90,6 +101,8 @@ QString ServerThread::getDbList(const QJsonObject &jdoc)
         jt["name"] = db.string("fcomment");
         jt["database"] = db.string("fpath");
         jt["settings"] = db.string("fsettings");
+        jt["key"] = db.string("fkey");
+        jt["db"] = db.string("fdb");
         ja.append(jt);
     }
 
@@ -103,8 +116,12 @@ QString ServerThread::getConnection(const QJsonObject &jdoc)
     Database db;
     QString repMsg;
     QJsonObject jrep;
+    int port = 3306;
+#ifdef QT_DEBUG
+    port = 3306;
+#endif
 
-    if(!db.open("127.0.0.1", "service5", "root", "root5")) {
+    if(!db.open("127.0.0.1", "service5", "root", "root5", port)) {
         jrep["errorCode"] = 1;
         jrep["errorMessage"] = db.lastDbError();
         repMsg = QJsonDocument(jrep).toJson(QJsonDocument::Compact);
@@ -181,8 +198,12 @@ void ServerThread::registerSocket(const QJsonObject &jdoc, QWebSocket *ws)
     }
 
     Database db;
+    int port = 3306;
+#ifdef QT_DEBUG
+    port = 3306;
+#endif
 
-    if(!db.open("localhost", dbk.value(), "root", "root5")) {
+    if(!db.open("localhost", dbk.value(), "root", "root5", port)) {
         ws->close();
         return;
     }
@@ -304,6 +325,7 @@ void ServerThread::onTextMessage(const QString &msg)
         wsCopy->sendTextMessage("pong");
     } else {
         QJsonObject jdoc = QJsonDocument::fromJson(messageCopy.toUtf8()).object();
+        LogWriterVerbose("REQUEST " + uuid, msg);
 
         if(jdoc["command"].toString() == "register_socket") {
             registerSocket(jdoc, ws);
@@ -312,7 +334,6 @@ void ServerThread::onTextMessage(const QString &msg)
             unregisterSocket(jdoc, ws);
             return;
         } else {
-            LogWriter::write(LogWriterLevel::verbose, "REQUEST " + uuid, msg);
             QThreadPool::globalInstance()->start(QRunnable::create([this, jdoc, wsCopy, uuid, ws]() {
                 if(!wsCopy)
                     return;
@@ -326,7 +347,7 @@ void ServerThread::onTextMessage(const QString &msg)
 
                 QMetaObject::invokeMethod(wsCopy, [wsCopy, repMsg, uuid]() {
                     if(wsCopy) {
-                        LogWriter::write(LogWriterLevel::verbose, "REPLY " + uuid, repMsg);
+                        LogWriterVerbose("REPLY " + uuid, repMsg);
                         wsCopy->sendTextMessage(repMsg);
                     }
                 }, Qt::QueuedConnection);
@@ -438,24 +459,24 @@ void ServerThread::handleCommand(SocketStruct ws, const QJsonObject &jdoc, QStri
             LogWriter::write(LogWriterLevel::verbose, "Initialized databases", fDbList.join(","));
         } else if(command == "search_text") {
             repMsg = C5SearchEngine::mInstance->search(jdoc);
-        } else if(command == "search_storage") {
+        } else if(command == SelectorName<StorageItem>::value) {
             repMsg = C5SearchEngine::mInstance->searchStorage(jdoc, ss);
-        } else if(command == "search_goods_item") {
+        } else if(command == SelectorName<GoodsItem>::value) {
             repMsg = C5SearchEngine::mInstance->searchGoodsItem(jdoc, ss);
-        } else if(command == "search_partner_item") {
+        } else if(command == SelectorName<PartnerItem>::value) {
             repMsg = C5SearchEngine::mInstance->searchPartnerItem(jdoc, ss);
         } else if(command == "search_partner") {
             repMsg = C5SearchEngine::mInstance->searchPartner(jdoc);
         } else if(command == "search_goods_groups") {
             repMsg = C5SearchEngine::mInstance->searchGoodsGroups(jdoc);
-        } else if(command == "search_goods") {
-            repMsg = C5SearchEngine::mInstance->searchGoods(jdoc);
         } else if(command == "search_store") {
             repMsg = C5SearchEngine::mInstance->searchStore(jdoc);
         } else if(command == "search_update_partner_cache") {
             repMsg = C5SearchEngine::mInstance->searchUpdatePartnerCache(jdoc);
         } else if(command == "armsoft") {
             repMsg = armsoft(jdoc);
+        } else if(command == "dict_event") {
+            repMsg = C5SearchEngine::mInstance->updateDictionary(jdoc, ss);
         } else {
             repMsg = handleDll(jdoc, command);
         }

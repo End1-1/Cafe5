@@ -37,6 +37,7 @@ void NLoadingDlg::resetSeconds()
 {
     mSecond = 0;
     ui->label->setText(QString("%1 sec").arg(mSecond));
+    open();
 }
 
 void NLoadingDlg::hide()
@@ -51,6 +52,6 @@ void NLoadingDlg::timeout()
     ui->label->setText(QString("%1 sec").arg(mSecond));
 
     if(mSecond == 1) {
-        QDialog::open();
+        //   QDialog::open();
     }
 }

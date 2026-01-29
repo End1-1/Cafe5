@@ -1,5 +1,6 @@
 #include "ndataprovider.h"
 #include "logwriter.h"
+#include "format_bytes.h"
 #include <QHostInfo>
 #include <QNetworkAccessManager>
 #include <QNetworkRequest>
@@ -46,6 +47,7 @@ void NDataProvider::getData(const QString &route, const QJsonObject &data)
     rq.setRawHeader("Authorization", "Bearer " + (mBearer.isEmpty() ? sessionKey.toUtf8() : mBearer.toUtf8()));
     rq.setRawHeader("X-Application-Name", mAppName.toUtf8());
     rq.setRawHeader("X-Application-Version", mFileVersion.toUtf8());
+    rq.setRawHeader("X-Application-Host", QHostInfo::localHostName().toLower().toUtf8());
     QJsonObject jo;
     jo["sessionkey"] = mBearer.isEmpty() ? sessionKey : mBearer;
     jo["hostinfo"] = QHostInfo::localHostName().toLower();
@@ -94,80 +96,36 @@ void NDataProvider::queryFinished(QNetworkReply *r)
 {
     int httpCode = r->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
     QByteArray ba = r->readAll();
+    LogWriter::write(LogWriterLevel::verbose, QString("Data size %1, elapsed %2 ms").arg(formatBytes(ba.size()), QString::number(mTimer->elapsed())), ba);
+    r->deleteLater();
 
-    if(r->error() != QNetworkReply::NoError) {
-        QString err = r->errorString() + r->readAll();
-
-        if(httpCode == 426) {
-            QJsonObject jmsg = QJsonDocument::fromJson(ba).object();
-            QString msg = QString("%1<br>%2 > %3<br><p><a href=\"launch-updater?version=%3\">%4</a></p>")
-                          .arg(tr("Application update required"),
-                               jmsg.value("old_version").toString(),
-                               jmsg.value("new_version").toString(),
-                               tr("Click to launch updater"));
-            emit updateRequired(msg, mAppName, jmsg.value("new_version").toString());
-            return;
-        }
-
-        if(err.contains("access denied", Qt::CaseInsensitive)) {
-            err = tr("Access denied");
-        } else if(err.contains("Application version must be", Qt::CaseInsensitive) || err.contains("Application update required", Qt::CaseInsensitive)) {
-            LogWriter::write(LogWriterLevel::errors, "", err);
-            QJsonObject  je = QJsonDocument::fromJson(err.toUtf8()).object();
-            err = QString("<p>%1</p><p><a href=\"launch-updater?version=%3\">%2</a></p>")
-                  .arg(tr("You must upgrade the application to continue using it"),
-                       tr("Click here to launch updater"),
-                       je["expected_version"].toString());
-        } else if(err.contains("server replied:")) {
-            int index = err.indexOf("server replied:") + 15;
-            err = err.mid(index, err.length());
-            index = err.indexOf("Server error");
-
-            if(index > -1) {
-                index += 12;
-            } else {
-                index = 0;
-            }
-
-            err = err.mid(index, err.length());
-        } else if(err.contains("<html>")) {
-            err = err.mid(err.indexOf("<html>"), err.length());
-        } else  if(err.contains("Unauthorized", Qt::CaseInsensitive)) {
-            err = tr("Access denied");
-        } else {
-            int index = err.indexOf("Server error");
-
-            if(index > -1) {
-                index += 12;
-            } else {
-                index = 0;
-            }
-
-            err = err.mid(index, err.length());
-        }
-
-        LogWriter::write(LogWriterLevel::errors, "Error", err);
-        emit error(err);
-        r->deleteLater();
+    if(httpCode == 401) {
+        emit error(tr("Authorization error"));
         return;
     }
 
-    r->deleteLater();
+    if(httpCode == 500) {
+        emit error(ba);
+        return;
+    }
 
-    if(mDebug) {
-        LogWriter::write(LogWriterLevel::verbose, "Data size", (ba.size() < 1000 ? QString("%1 bytes").arg(ba.size())
-                         : (ba.size() < 1000000 ? QString("%1 kb").arg(ba.size() / 1000) : QString("%1 mb").arg(
-                                ba.size() / 1000000))));
-        LogWriter::write(LogWriterLevel::verbose, "Elapsed", QString::number(mTimer->elapsed()));
-        LogWriter::write(LogWriterLevel::verbose, "", ba);
-    } else {
-#ifdef QT_DEBUG
-        LogWriter::write(LogWriterLevel::verbose, "Data size", (ba.size() < 1000 ? QString("%1 bytes").arg(ba.size())
-                         : (ba.size() < 1000000 ? QString("%1 kb").arg(ba.size() / 1000) : QString("%1 mb").arg(
-                                ba.size() / 1000000))));
-        LogWriter::write(LogWriterLevel::verbose, "Elapsed", QString::number(mTimer->elapsed()));
-        LogWriter::write(LogWriterLevel::verbose, "", ba);
-#endif
+    if(httpCode == 426) {
+        QJsonObject jmsg = QJsonDocument::fromJson(ba).object();
+        QString msg = QString("%1<br>%2 > %3<br><p><a href=\"launch-updater?version=%3\">%4</a></p>")
+                      .arg(tr("Application update required"),
+                           jmsg.value("old_version").toString(),
+                           jmsg.value("new_version").toString(),
+                           tr("Click to launch updater"));
+        emit updateRequired(msg, mAppName, jmsg.value("new_version").toString());
+        return;
+    }
+
+    if(r->error() != QNetworkReply::NoError) {
+        QString err = r->errorString() ;
+        LogWriter::write(LogWriterLevel::errors, "Transport error:", err);
+        emit transportError(err);
+        emit error(err);
+        return;
     }
 
     QJsonParseError err;

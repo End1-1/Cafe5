@@ -33,11 +33,11 @@ struct WaiterDish {
     {
         return data.value("f_from_table").toString();
     };
-    bool isPrinted()
+    bool isPrinted() const
     {
-        return data["f_printed"].toBool();
+        return data.value("f_printed").toBool();
     }
-    double total(bool isPreorder)
+    double total(bool isPreorder) const
     {
         if(!isPrinted() && !isPreorder) {
             return 0;
@@ -98,6 +98,10 @@ struct WaiterDish {
     double discountFactor() const
     {
         return data["f_discount_factor"].toDouble();
+    }
+    QJsonValue dataValue(const QString &key) const
+    {
+        return data.value(key);
     }
     QJsonObject toJson() const
     {

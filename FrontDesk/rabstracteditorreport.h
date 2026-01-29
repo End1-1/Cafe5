@@ -1,6 +1,7 @@
 #pragma once
 
 #include "c5widget.h"
+#include <QJsonArray>
 
 namespace Ui
 {
@@ -8,6 +9,7 @@ class RAbstractEditorReport;
 }
 
 class RAbstractEditorTableModel;
+class RFilterProxyModel;
 class RAbstractEditorDialog;
 
 class RAbstractEditorReport : public C5Widget
@@ -26,6 +28,8 @@ protected:
 private slots:
     void on_tbl_doubleClicked(const QModelIndex &index);
 
+    void on_leFilter_textChanged(const QString &arg1);
+
 private:
     Ui::RAbstractEditorReport* ui;
 
@@ -33,9 +37,17 @@ private:
 
     QString mEditorName;
 
+    QJsonArray mFilterWidget;
+
+    QJsonArray mFilterValues;
+
     RAbstractEditorTableModel* mModel;
 
+    RFilterProxyModel* mProxyModel;
+
     void getData();
+
+    void applyFilter();
 
     RAbstractEditorDialog* createEditorDialog(const QString &editorName);
 };

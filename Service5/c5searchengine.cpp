@@ -4,17 +4,29 @@
 #include "struct_storage_item.h"
 #include "struct_goods_item.h"
 #include "struct_partner.h"
+#include "logwriter.h"
 #include <QJsonArray>
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QWriteLocker>
 #include <QTimer>
 
+static const QString mSqlGoods = R"(
+    select g.f_id,  gr.f_name as f_group_name, g.f_name, g.f_scancode,
+    u.f_name as f_unit_name
+    from c_goods g
+    left join c_groups gr on gr.f_id=g.f_group
+    left join c_units u on u.f_id=g.f_unit
+    %where%
+    order by g.f_name
+    )";
+
 QReadWriteLock mStoragesLock;
 QReadWriteLock mGoodsLock;
 QReadWriteLock mPartnersLock;
 QHash<QString, QVector<StorageItem>> mStorages;
 QHash<QString, QVector<GoodsItem>> mGoods;
+QHash<QString, QHash<int, int>> mGoodsIndex;
 QHash<QString, QVector<PartnerItem>> mPartners;
 
 struct SearchObject {
@@ -47,15 +59,19 @@ void C5SearchEngine::init(QStringList databases)
 
     for(const QString &dbname : databases) {
         int dbitemscount = 0;
+        int port = 3306;
+#ifdef QT_DEBUG
+        port = 3306;
+#endif
 
-        if(!db.open("127.0.0.1", dbname, "root", "root5")) {
+        if(!db.open("127.0.0.1", dbname, "root", "root5", port)) {
             continue;
         }
 
         mSearchStrings[dbname] = QStringList();
         mSearchObjects[dbname] = QMap < int, SearchObject > ();
         QStringList &words = mSearchStrings[dbname];
-        QMap < int, SearchObject >& objects = mSearchObjects[dbname];
+        QMap < int, SearchObject > & objects = mSearchObjects[dbname];
         QString sql = QString::fromStdString(R"sql(
         SELECT f_id, f_mode, f_word as f_orig, lower(f_word) as f_word FROM (
         SELECT d.f_id, d.f_mode, d.f_en AS f_word FROM d_part2 p2
@@ -195,8 +211,12 @@ void C5SearchEngine::init(QStringList databases)
 void C5SearchEngine::init(const QString &databaseName, const QString &serverKey)
 {
     Database db;
+    int port = 3306;
+#ifdef QT_DEBUG
+    port = 3306;
+#endif
 
-    if(!db.open("127.0.0.1", databaseName, "root", "root5")) {
+    if(!db.open("127.0.0.1", databaseName, "root", "root5", port)) {
         return;
     }
 
@@ -217,28 +237,31 @@ void C5SearchEngine::init(const QString &databaseName, const QString &serverKey)
 
     /* GOODS */
     QVector < GoodsItem > tmp2;
+    QHash < int, int > tmplIndex2;
     tmp2.reserve(4096);
-    db.exec(R"(
-    select g.f_id,  gr.f_name as f_group_name, g.f_name, g.f_scancode
-    from c_goods g
-    left join c_groups gr on gr.f_id=g.f_group
-    order by g.f_name
-    )");
+    db.exec(QString(mSqlGoods).replace("%where%", ""));
 
     while(db.next()) {
         QString name = db.string("f_group_name") + " " + db.string("f_name") + " " + db.string("f_scancode");
-        tmp2.append({
-            db.integer("f_id"),
-            db.string("f_group_name"),
-            db.string("f_name"),
-            db.string("f_scancode"),
-            name.toLower(),
-            name.toLower().split(" ", Qt::SkipEmptyParts)
-        });
+        GoodsItem g;
+        g.id        = db.integer("f_id");
+        g.groupName = db.string("f_group_name");
+        g.name      = db.string("f_name");
+        g.unitName  = db.string("f_unit_name");
+        g.barcode   = db.string("f_barcode");
+        g.lastInputPrice = db.doubleValue("f_lastinput");
+        g.price1    = db.doubleValue("f_price1");
+        g.price1disc = db.doubleValue("f_price1disc");
+        g.price2    = db.doubleValue("f_price2");
+        g.price2disc = db.doubleValue("f_price2disc");
+        g.name = name;
+        g.words = name.toLower().split(" ", Qt::SkipEmptyParts);
+        tmp2.append(g);
+        tmplIndex2[tmp2.last().id] = tmp2.size() - 1;
     }
 
     /* PARTNERS */
-    QVector<PartnerItem> tmp3;
+    QVector < PartnerItem > tmp3;
     tmp3.reserve(256);
     db.exec(R"(
     select p.f_id, p.f_taxcode, p.f_taxname, p.f_name, p.f_phone
@@ -269,6 +292,7 @@ void C5SearchEngine::init(const QString &databaseName, const QString &serverKey)
         QWriteLocker wl3(&mPartnersLock);
         mStorages[serverKey] = std::move(tmp1);
         mGoods[serverKey] = std::move(tmp2);
+        mGoodsIndex[serverKey] = tmplIndex2;
         mPartners[serverKey] = std::move(tmp3);
     }
 
@@ -282,6 +306,7 @@ QString C5SearchEngine::search(const QJsonObject &jo)
     QJsonObject jrep;
     jrep["errorCode"] = 0;
     jrep["requestId"] = jo["requestId"];
+    jrep["actionId"] = jo["actionId"];
 
     if(jo["template"].toString().isEmpty()) {
         jrep["result_count"] = 0;
@@ -323,7 +348,7 @@ QString C5SearchEngine::search(const QJsonObject &jo)
     }
 
     qDebug() << "search completed with" << foundedIndexes.count() << "result";
-    const QMap < int, SearchObject >& objects = mSearchObjects[databaseName];
+    const QMap < int, SearchObject > & objects = mSearchObjects[databaseName];
     QJsonArray ja;
 
     for(int i : foundedIndexes) {
@@ -341,6 +366,7 @@ QString C5SearchEngine::searchPartner(const QJsonObject &jo)
     QJsonObject jrep;
     jrep["errorCode"] = 0;
     jrep["requestId"] = jo["requestId"];
+    jrep["actionId"] = jo["actionId"];
     const QJsonArray &src = mSearchPartners[jo["database"].toString()];
     int page = jo["page"].toInt();
     int limit = jo["limit"].toInt();
@@ -390,6 +416,7 @@ QString C5SearchEngine::searchGoodsGroups(const QJsonObject &jo)
     QJsonObject jrep;
     jrep["errorCode"] = 0;
     jrep["requestId"] = jo["requestId"];
+    jrep["actionId"] = jo["actionId"];
     const QJsonArray &src = mSearchGoodsGroups[jo["database"].toString()];
     QJsonArray result;
     QString searchString = jo["template"].toString();
@@ -409,71 +436,21 @@ QString C5SearchEngine::searchGoodsGroups(const QJsonObject &jo)
     return QJsonDocument(jrep).toJson(QJsonDocument::Compact);
 }
 
-QString C5SearchEngine::searchGoods(const QJsonObject &jo)
-{
-    QJsonObject jrep;
-    jrep["errorCode"] = 0;
-    jrep["requestId"] = jo["requestId"];
-    const QJsonArray &src = mSearchGoods[jo["database"].toString()];
-    QJsonArray result;
-    QString searchString = jo["template"].toString();
-    QJsonArray jsrc;
-
-    if(jo["groupid"].toInt() > 0) {
-        for(int i = 0; i < src.size(); i++) {
-            const QJsonObject &jt = src.at(i).toObject();
-
-            if(jt["groupid"].toInt() == jo["groupid"].toInt()) {
-                jsrc.append(jt);
-            }
-        }
-    } else {
-        jsrc = src;
-    }
-
-    int page = jo["page"].toInt();
-    int limit = jo["limit"].toInt();
-    int skip = page * limit;
-    bool noResult = true;
-
-    for(int i = 0; i < jsrc.size(); i++) {
-        const QJsonObject &jt = jsrc.at(i).toObject();
-
-        if(jt["name"].toString().contains(searchString, Qt::CaseInsensitive) ||
-                jt["sku"].toString().contains(searchString)) {
-            noResult = false;
-
-            if(skip > 0) {
-                skip--;
-                continue;
-            }
-
-            result.append(jt);
-        }
-
-        if(result.size() == limit) {
-            break;
-        }
-    }
-
-    jrep["result_count"] = result.size();
-    jrep["result"] = result;
-    jrep["page"] = jo["page"];
-    jrep["limit"] = jo["limit"];
-    jrep["noresult"] = noResult;
-    return QJsonDocument(jrep).toJson(QJsonDocument::Compact);
-}
-
 QString C5SearchEngine::searchStore(const QJsonObject &jo)
 {
     QString repMsg;
     QJsonObject jrep;
     jrep["errorCode"] = 0;
     jrep["requestId"] = jo["requestId"];
+    jrep["actionId"] = jo["actionId"];
     QJsonArray result;
     Database db;
+    int port = 3306;
+#ifdef QT_DEBUG
+    port = 3306;
+#endif
 
-    if(!db.open("127.0.0.1", jo["database"].toString(), "root", "root5")) {
+    if(!db.open("127.0.0.1", jo["database"].toString(), "root", "root5", port)) {
         jrep["errorCode"] = 1;
         jrep["errorMessage"] = db.lastDbError();
         return QJsonDocument(jrep).toJson(QJsonDocument::Compact);
@@ -487,6 +464,7 @@ QString C5SearchEngine::searchUpdatePartnerCache(const QJsonObject &jo)
     QJsonObject jrep;
     jrep["errorCode"] = 0;
     jrep["requestId"] = jo["requestId"];
+    jrep["actionId"] = jo["actionId"];
     QString repMsg;
     QString sql = QString::fromStdString(R"sql(
         select f_id, f_taxname, coalesce(f_taxcode, '') as f_taxcode, f_price_politic,
@@ -496,8 +474,12 @@ QString C5SearchEngine::searchUpdatePartnerCache(const QJsonObject &jo)
         order by 2
         )sql");
     Database db;
+    int port = 3306;
+#ifdef QT_DEBUG
+    port = 3306;
+#endif
 
-    if(!db.open("127.0.0.1", jo["database"].toString(), "root", "root5")) {
+    if(!db.open("127.0.0.1", jo["database"].toString(), "root", "root5", port)) {
         jrep["errorCode"] = 1;
         jrep["errorMessage"] = db.lastDbError();
         return QJsonDocument(jrep).toJson(QJsonDocument::Compact);
@@ -546,12 +528,13 @@ QString C5SearchEngine::searchStorage(const QJsonObject &jo, const SocketStruct 
     QJsonObject jrep;
     jrep["errorCode"] = 0;
     jrep["requestId"] = jo["requestId"];
+    jrep["actionId"] = jo["actionId"];
     QString needle = jo["lower_name"].toString().trimmed();
     QStringList qwords = needle.split(' ', Qt::SkipEmptyParts);
     QJsonArray jstorages;
     {
         QReadLocker rl(&mStoragesLock);
-        const QVector < StorageItem >& siv = mStorages.value(ss.tenantId);
+        const QVector < StorageItem > & siv = mStorages.value(ss.tenantId);
         const int limit = 50000;
 
         for(const StorageItem &si : siv) {
@@ -594,45 +577,60 @@ QString C5SearchEngine::searchGoodsItem(const QJsonObject &jo, const SocketStruc
     QJsonObject jrep;
     jrep["errorCode"] = 0;
     jrep["requestId"] = jo["requestId"];
+    jrep["actionId"] = jo["actionId"];
     QString needle = jo["lower_name"].toString().trimmed();
     QStringList qwords = needle.split(' ', Qt::SkipEmptyParts);
     QJsonArray jstorages;
     {
         QReadLocker rl(&mGoodsLock);
-        const QVector < GoodsItem >& siv = mGoods.value(ss.tenantId);
+        const QVector < GoodsItem > & siv = mGoods.value(ss.tenantId);
         const int limit = 50000;
 
         for(const GoodsItem &si : siv) {
             bool match = true;
 
-            for(const QString &qw : qwords) {
-                bool found = false;
+            if(jo.contains("barcode")) {
+                match = si.barcode == jo.value("barcode").toString();
 
-                for(const QString &w : si.words) {
-                    if(w.startsWith(qw)) {
-                        found = true;
+                if(!match) {
+                    continue;
+                }
+            } else {
+                for(const QString &qw : qwords) {
+                    bool found = false;
+
+                    for(const QString &w : si.words) {
+                        if(w.startsWith(qw, Qt::CaseInsensitive)) {
+                            found = true;
+                            break;
+                        }
+                    }
+
+                    if(!found) {
+                        match = false;
                         break;
                     }
                 }
 
-                if(!found) {
-                    match = false;
-                    break;
-                }
+                if(!match)
+                    continue;
             }
-
-            if(!match)
-                continue;
 
             jstorages.append(QJsonObject{
                 {"f_id", si.id},
                 {"f_group_name", si.groupName},
                 {"f_name", si.name},
-                {"f_barcode", si.barcode}
+                {"f_barcode", si.barcode},
+                {"f_unit_name", si.unitName}
             });
 
-            if(jstorages.size() >= limit)
+            if(jstorages.size() >= limit) {
                 break;
+            }
+
+            if(jo.contains("barcode")) {
+                break;
+            }
         }
     }
     jrep["result"] = jstorages;
@@ -644,12 +642,13 @@ QString C5SearchEngine::searchPartnerItem(const QJsonObject &jo, const SocketStr
     QJsonObject jrep;
     jrep["errorCode"] = 0;
     jrep["requestId"] = jo["requestId"];
+    jrep["actionId"] = jo["actionId"];
     QString needle = jo["lower_name"].toString().trimmed();
     QStringList qwords = needle.split(' ', Qt::SkipEmptyParts);
     QJsonArray jstorages;
     {
-        QReadLocker rl(&mGoodsLock);
-        const QVector <PartnerItem>& siv = mPartners.value(ss.tenantId);
+        QReadLocker rl(&mPartnersLock);
+        const QVector < PartnerItem > & siv = mPartners.value(ss.tenantId);
         const int limit = 50000;
 
         for(const PartnerItem &si : siv) {
@@ -687,5 +686,85 @@ QString C5SearchEngine::searchPartnerItem(const QJsonObject &jo, const SocketStr
         }
     }
     jrep["result"] = jstorages;
+    return QJsonDocument(jrep).toJson(QJsonDocument::Compact);
+}
+
+QString C5SearchEngine::updateDictionary(const QJsonObject &jo, const SocketStruct &ss)
+{
+    QJsonObject jrep;
+    jrep["errorCode"] = 0;
+    jrep["requestId"] = jo["requestId"];
+    jrep["actionId"] = jo["actionId"];
+    QString entity = jo.value("entity").toString();
+
+    if(!jo.contains("op")) {
+        jrep["errorCode"] = 1;
+        jrep["errorMessage"] = "What do you want to do with dictionary?";
+        return QJsonDocument(jrep).toJson(QJsonDocument::Compact);
+    }
+
+    QString op = jo.value("op").toString();
+
+    if (op != "i" && op != "u") {
+        jrep["errorCode"] = 1;
+        jrep["errorMessage"] = "Invalid operation";
+        return QJsonDocument(jrep).toJson(QJsonDocument::Compact);
+    }
+
+    Database db;
+
+    if(!db.open("127.0.0.1", ss.databaseName, "root", "root5", 3306)) {
+        LogWriterError(db.lastDbError());
+        jrep["errorCode"] = 1;
+        jrep["errorMessage"] = "Database error";
+        return QJsonDocument(jrep).toJson(QJsonDocument::Compact);
+    }
+
+    if(entity == "goods") {
+        QWriteLocker wl(&mGoodsLock);
+        db[":f_id"] = jo.value("id").toInt();
+        db.exec(QString(mSqlGoods).replace("%where%", "where g.f_id=:f_id"));
+        GoodsItem gi;
+
+        if(db.next()) {
+            QString name = db.string("f_group_name") + " " + db.string("f_name") + " " + db.string("f_scancode");
+            gi.id = db.integer("f_id");
+            gi.groupName = db.string("f_group_name");
+            gi.name = db.string("f_name");
+            gi.barcode = db.string("f_scancode");
+            gi.unitName = db.string("f_unit_name");
+            gi.nameLower = name.toLower();
+            gi.words = name.toLower().split(" ", Qt::SkipEmptyParts);
+        } else {
+            QString err = QString("Invalid record with id=%1").arg(jo.value("id").toInt());
+            LogWriterError(err);
+            jrep["errorCode"] = 1;
+            jrep["errorMessage"] = err;
+            return QJsonDocument(jrep).toJson(QJsonDocument::Compact);
+        }
+
+        QVector < GoodsItem > & siv = mGoods[ss.tenantId];
+        QHash < int, int > &sin = mGoodsIndex[ss.tenantId];
+
+        if (op == "i") {
+            if (sin.contains(gi.id)) {
+                siv[sin.value(gi.id)] = gi;
+            } else {
+                siv.append(gi);
+                sin[gi.id] = siv.size() - 1;
+            }
+        } else {
+            auto it = sin.find(gi.id);
+
+            if (it == sin.end()) {
+                siv.append(gi);
+                sin[gi.id] = siv.size() - 1;
+            } else {
+                siv[*it] = gi;
+            }
+        }
+    }
+
+    jrep["status"] = 1;
     return QJsonDocument(jrep).toJson(QJsonDocument::Compact);
 }

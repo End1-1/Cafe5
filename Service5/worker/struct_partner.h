@@ -13,6 +13,10 @@ struct PartnerItem {
     QStringList words;
 };
 
+template<> struct SelectorName<PartnerItem> {
+    static constexpr const char* value = "search_partner_item";
+};
+
 template<>
 struct JsonParser<PartnerItem> {
     static PartnerItem fromJson(const QJsonObject &jo)

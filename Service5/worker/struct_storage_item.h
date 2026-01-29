@@ -10,6 +10,10 @@ struct StorageItem {
     QStringList words;
 };
 
+template<> struct SelectorName<StorageItem> {
+    static constexpr const char* value = "search_storage_item";
+};
+
 template<>
 struct JsonParser<StorageItem> {
     static StorageItem fromJson(const QJsonObject &jo)

@@ -33,8 +33,7 @@
 #include "cr5currencycrossrate.h"
 #include "cr5currencycrossratehistory.h"
 #include "cr5cashnames.h"
-#include "cr5dish.h"
-#include "storedecomplectation.h"
+#include "c5storedecompilation.h"
 #include "cr5settings.h"
 #include "cr5complectations.h"
 #include "cr5goodsmovement.h"
@@ -53,7 +52,6 @@
 #include "cr5custom.h"
 #include "cr5salefromstoretotal.h"
 #include "cr5materialmoveuncomplect.h"
-#include "cr5dishcomment.h"
 #include "cr5salesbydishes.h"
 #include "cr5tstoreextra.h"
 #include "cr5goodsimages.h"
@@ -153,6 +151,8 @@ C5MainWindow::C5MainWindow(QWidget *parent) :
     connect(esc, SIGNAL(activated()), this, SLOT(hotKey()));
     QShortcut *ctrlPlush = new QShortcut(QKeySequence(Qt::CTRL + Qt::Key_Plus), this);
     connect(ctrlPlush, SIGNAL(activated()), this, SLOT(hotKey()));
+    QShortcut *ctrlDashboard = new QShortcut(Qt::CTRL + Qt::Key_F11, this);
+    connect(ctrlDashboard, SIGNAL(activated()), this, SLOT(showDashboard()));
     C5Dialog::setMainWindow(this);
     __mainWindow = this;
     QVariant menuPanelIsVisible = C5Config::getRegValue("menupanel");
@@ -361,6 +361,33 @@ void C5MainWindow::showEvent(QShowEvent *e)
     }
 }
 
+void C5MainWindow::showDashboard()
+{
+    if(!fLogin) {
+        return;
+    }
+
+    WDashboard *wd = nullptr;
+    bool create = false;
+
+    if(ui->tabWidget->count() == 0) {
+        create = true;
+    } else {
+        wd = qobject_cast<WDashboard*>(ui->tabWidget->widget(0));
+        create = !wd;
+    }
+
+    if(create) {
+        wd = new WDashboard();
+        ui->tabWidget->insertTab(0, wd, tr("Dashboard"));
+    } else {
+        wd->deleteLater();
+        ui->tabWidget->removeTab(0);
+    }
+
+    __c5config.setRegValue("wdashboard", create);
+}
+
 void C5MainWindow::menuListReponse(const QJsonObject &jdoc)
 {
     QListWidget *lw = nullptr;
@@ -445,6 +472,14 @@ void C5MainWindow::enableMenu(bool v)
     }
 
     fLogin = v;
+
+    if(v) {
+        if(__c5config.getRegValue("wdashboard", false).toBool()) {
+            auto *wd = new WDashboard();
+            ui->tabWidget->insertTab(0, wd, tr("Dashboard"));
+        }
+    } else {
+    }
 }
 
 QListWidgetItem* C5MainWindow::
@@ -630,7 +665,7 @@ void C5MainWindow::on_listWidgetItemClicked(const QModelIndex &index)
     }
 
     case cp_t2_store_decomplectation: {
-        createTab<StoreDecomplectation>();
+        createTab<C5StoreDecompilation>();
         break;
     }
 
@@ -734,10 +769,6 @@ void C5MainWindow::on_listWidgetItemClicked(const QModelIndex &index)
         createTab<CR5DishPart2>();
         break;
 
-    case cp_t4_dishes:
-        createTab<CR5Dish>();
-        break;
-
     case cp_t4_dishes_packages:
         createTab<CR5DishPackage>();
         break;
@@ -748,10 +779,6 @@ void C5MainWindow::on_listWidgetItemClicked(const QModelIndex &index)
 
     case cp_t4_dish_remove_reason:
         createTab<CR5DishRemoveReason>();
-        break;
-
-    case cp_t4_dish_comments:
-        createTab<CR5DishComment>();
         break;
 
     case cp_t4_menu_review:
@@ -956,6 +983,7 @@ void C5MainWindow::on_actionLogout_triggered()
     fMenuLists.clear();
     ui->actionLogout->setVisible(false);
     ui->actionChange_password->setVisible(false);
+    enableMenu(false);
     C5Login l(mUser);
 
     if(l.exec() == QDialog::Accepted) {
@@ -1110,11 +1138,9 @@ void C5MainWindow::setDB()
             l->setProperty("reportlevel", 5);
             addTreeL3Item(l, cp_t4_part1, tr("Dish depts"), ":/menu.png");
             addTreeL3Item(l, cp_t4_part2, tr("Types of dishes"), ":/menu.png");
-            addTreeL3Item(l, cp_t4_dishes, tr("Dishes list"), ":/menu.png");
             addTreeL3Item(l, cp_t4_dishes_packages, tr("Dishes packages"), ":/menu.png");
             addTreeL3Item(l, cp_t4_menu_names, tr("Menu names"), ":/menu.png");
             addTreeL3Item(l, cp_t4_dish_remove_reason, tr("Dish remove reasons"), ":/menu.png");
-            addTreeL3Item(l, cp_t4_dish_comments, tr("Dish comments"), ":/menu.png");
             addTreeL3Item(l, cp_t4_menu_review, tr("Review menu"), ":/menu.png");
         }
     }
