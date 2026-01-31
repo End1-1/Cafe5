@@ -139,6 +139,8 @@ private:
 
     WaiterOrderItemWidget* createOrderItemWidget(WaiterDish d);
 
+    void scrollOrderToBottom();
+
     void printPrecheck(const QString &currentStaff);
 
     void printService(const QJsonObject &jdoc);

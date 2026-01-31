@@ -19,10 +19,12 @@ public:
     QList<int> numericCols;
 
 signals:
-    void sumsChanged(QHash<int, double>);
+    void sumsChanged(const QHash<int, double>&);
 
 protected:
     bool filterAcceptsRow(int row, const QModelIndex &parent) const override;
+
+    bool lessThan(const QModelIndex &left, const QModelIndex &right) const override;
 
 private:
 

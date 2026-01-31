@@ -107,8 +107,6 @@ void WaiterDishWidget::updateDish(WaiterDish value)
             pulish();
         }
     }
-
-    adjustSize();
 }
 
 void WaiterDishWidget::setCheckMode(bool v)

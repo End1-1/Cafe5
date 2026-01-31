@@ -172,6 +172,7 @@ FORMS += \
 HEADERS += \
         $$PWD/../Classes/QProgressIndicator.h \
         $$PWD/../Classes/c5servername.h \
+        $$PWD/../Classes/c5tableview.h \
         $$PWD/../Classes/dict_payment_type.h \
         $$PWD/../Classes/ean8generator.h \
         $$PWD/../NTable/nhandler.h \
@@ -396,7 +397,6 @@ HEADERS += \
         ../Classes/c5tablemodel.h \
         ../Classes/c5textdelegate.h \
         ../Classes/c5combodelegate.h \
-        ../Classes/c5tableview.h \
         ../Classes/c5cache.h \
         ../Controls/c5lineedit.h \
         ../Controls/c5combobox.h \
@@ -509,6 +509,7 @@ HEADERS += \
 SOURCES += \
     $$PWD/../Classes/QProgressIndicator.cpp \
     $$PWD/../Classes/c5servername.cpp \
+    $$PWD/../Classes/c5tableview.cpp \
     $$PWD/../Classes/dict_payment_type.cpp \
     $$PWD/../Classes/ean8generator.cpp \
     $$PWD/../NTable/nhandler.cpp \
@@ -726,7 +727,6 @@ SOURCES += \
         ../Classes/c5tablemodel.cpp \
         ../Classes/c5textdelegate.cpp \
         ../Classes/c5combodelegate.cpp \
-        ../Classes/c5tableview.cpp \
         ../Classes/c5cache.cpp \
         ../Controls/c5lineedit.cpp \
         ../Controls/c5combobox.cpp \

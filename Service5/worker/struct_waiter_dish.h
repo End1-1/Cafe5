@@ -71,13 +71,13 @@ struct WaiterDish {
     {
         return dishName;
     }
-    bool countService()
+    bool countService() const
     {
-        return data["f_count_service"].toBool();
+        return data.value("f_count_service").toBool();
     }
-    bool countDiscount()
+    bool countDiscount() const
     {
-        return data["f_count_discount"].toBool();
+        return data.value("f_count_discount").toBool();
     }
     bool complimentary()
     {

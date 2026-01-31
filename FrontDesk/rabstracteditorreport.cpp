@@ -6,9 +6,11 @@
 #include "rfilterdialog.h"
 #include "rfilterproxymodel.h"
 #include "c5config.h"
+#include "c5utils.h"
 #include <QAbstractTableModel>
 #include <QSortFilterProxyModel>
 #include <QDialog>
+#include <QScrollBar>
 #include <QJsonDocument>
 #include <QJsonArray>
 
@@ -73,17 +75,29 @@ RAbstractEditorReport::RAbstractEditorReport(const QString &title, QIcon icon, c
     mProxyModel->setSourceModel(mModel);
     ui->tbl->setModel(mProxyModel);
     connect(mProxyModel, &RFilterProxyModel::sumsChanged, this, [this](const QHash<int, double>& values) {
-        for(auto it = values.begin(); it != values.end(); ++it) {
+        ui->tblTotal->setRowCount(1);
+        ui->tblTotal->setColumnCount(mProxyModel->columnCount());
+        ui->tblTotal->setVerticalHeaderLabels({ QString::number(mProxyModel->rowCount()) });
+
+        for(auto it = values.constBegin(); it != values.constEnd(); ++it) {
             int col = it.key();
-            double sum = it.value();
-            ui->tblTotal->setDouble(0, col, sum);
+            double v = it.value();
+            ui->tblTotal->setString(0, col, float_str(v, 2));
         }
     });
-    auto *h1 = ui->tbl->horizontalHeader();
-    auto *h2 = ui->tblTotal->horizontalHeader();
-    connect(h1, &QHeaderView::sectionResized,
-    this, [this](int logical, int, int newSize) {
-        ui->tblTotal->setColumnWidth(logical, newSize);
+    //connect(ui->tbl->horizontalHeader(), SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(tableViewHeaderContextMenuRequested(QPoint)));
+    connect(ui->tbl->horizontalHeader(), &QHeaderView::sectionClicked, this, [this](int index) {
+        mProxyModel->sort(index, mProxyModel->sortOrder() == Qt::AscendingOrder ? Qt::DescendingOrder : Qt::AscendingOrder);
+    });
+    connect(ui->tbl->horizontalHeader(), &QHeaderView::sectionResized, this, [this](int index, int oldSize, int newSize) {
+        ui->tblTotal->setColumnWidth(index, newSize);
+    });
+    // connect(ui->tbl->selectionModel(), SIGNAL(selectionChanged(QItemSelection, QItemSelection)), this, SLOT(selectionChanged(QItemSelection, QItemSelection)));
+    // connect(ui->tbl, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(tableViewContextMenuRequested(QPoint)));
+    ui->tbl->horizontalScrollBar()->setSingleStep(1);
+    ui->tblTotal->horizontalScrollBar()->setSingleStep(1);
+    connect(ui->tblTotal->horizontalScrollBar(), &QScrollBar::valueChanged, this, [this](int value) {
+        ui->tbl->horizontalScrollBar()->setValue(value);
     });
     mFilterValues =  QJsonDocument::fromJson(__c5config.getRegValue("filter_values_" + mEditorName, "").toString().toUtf8()).array();
 }
@@ -182,7 +196,6 @@ void RAbstractEditorReport::getData()
         mProxyModel->numericCols = mProxyModel->columnSums.keys();
         mModel->setJson(jdoc);
         ui->tbl->resizeColumnsToContents();
-        ui->tblTotal->setColumnCount(mProxyModel->columnCount(QModelIndex()));
 
         for(auto column : jdoc["hidden_columns"].toArray()) {
             ui->tbl->setColumnHidden(column.toInt(), true);
@@ -196,12 +209,12 @@ void RAbstractEditorReport::getData()
             }
         }
 
-        for(int c = 0; c < mModel->columnCount(QModelIndex()); c++) {
-            ui->tblTotal->setColumnWidth(c, ui->tbl->columnWidth(c));
+        ui->tblTotal->setColumnCount(mProxyModel->columnCount());
+
+        for(int i = 0; i < mProxyModel->columnCount(); i++) {
+            ui->tblTotal->setColumnWidth(i, ui->tbl->columnWidth(i));
         }
 
-        QStringList header = {QString::number(mModel->rowCount(QModelIndex()))};
-        ui->tblTotal->setVerticalHeaderLabels(header);
         mProxyModel->recalcSums();
         emit mProxyModel->sumsChanged(mProxyModel->columnSums);
     });

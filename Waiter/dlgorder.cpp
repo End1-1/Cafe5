@@ -906,7 +906,11 @@ void DlgOrder::setDishQty(std::function<double(WaiterDish)> getQty)
             {"store", d.store},
             {"print1", d.printer1()},
             {"print2", d.printer2()},
-            {"shift_rows", true}
+            {"shift_rows", true},
+            {"count_service", d.countService()},
+            {"count_discount", d.countDiscount()},
+            {"empty_order", mOrder.dishes.empty()},
+            {"service_factor", mHall.serviceFactor()}
         },
         [this, d](const QJsonObject  & jdoc) {
             if(jdoc.contains("stoplist")) {
@@ -1001,6 +1005,7 @@ void DlgOrder::addDishToOrder(DishAItem *g, QDishButton *btn)
             }
 
             parseOrder(jdoc);
+            scrollOrderToBottom();
         }, [](const QJsonObject & jerr) {
         });
     }
@@ -1207,6 +1212,7 @@ void DlgOrder::on_btnVoid_clicked()
 void DlgOrder::on_btnComment_clicked()
 {
     int index = selectedWaiterDishIndex();
+    bool lastItem = index == mOrder.dishes.size() - 1;
 
     if(index < 0) {
         return;
@@ -1253,8 +1259,12 @@ void DlgOrder::on_btnComment_clicked()
                 {"id", d.id},
                 {"comment", comment}
             },
-            [self](const QJsonObject & jdoc) {
+            [self, lastItem](const QJsonObject & jdoc) {
                 self->parseOrder(jdoc);
+
+                if(lastItem) {
+                    self->scrollOrderToBottom();
+                }
             }, [](const QJsonObject & jerr) { return false;});
         }
     }
@@ -1960,16 +1970,31 @@ WaiterOrderItemWidget* DlgOrder::createOrderItemWidget(WaiterDish d)
     }
 }
 
+void DlgOrder::scrollOrderToBottom()
+{
+    QTimer::singleShot(0, this, [this]() {
+        auto sb = ui->orderScrollArea->verticalScrollBar();
+        sb->setValue(sb->maximum());
+    });
+}
+
 void DlgOrder::parseOrder(const QJsonObject & jdoc)
 {
+    ui->orderScrollArea->setUpdatesEnabled(false);
     QString selectedId;
     mOrder = JsonParser<WaiterOrder>::fromJson(jdoc["order"].toObject());
     ui->lbTableName->setText(mOrder.tableName);
     ui->lbOrderComment->setVisible(!mOrder.comment().isEmpty());
     ui->lbOrderComment->setText(mOrder.comment());
     ui->wgroups->setVisible(!mOrder.isPrecheckPrinted());
-    ui->wdishes->setVisible(!mOrder.isPrecheckPrinted());
+    bool dishesVisible = ui->wdishes->isVisible();
+    bool newDishesVisible = !mOrder.isPrecheckPrinted();
 
+    if(dishesVisible != newDishesVisible) {
+        ui->wdishes->setVisible(newDishesVisible);
+    }
+
+    //dishes
     for(int i = 0 ; i <  mOrder.dishes.size(); i++) {
         WaiterOrderItemWidget *ow = nullptr;
         WaiterDish w = mOrder.dishes.at(i);
@@ -2113,6 +2138,8 @@ void DlgOrder::parseOrder(const QJsonObject & jdoc)
     ui->btnTransferDishes->setEnabled(!mOrder.id.isEmpty());
     ui->btnTransferTable->setEnabled(!mOrder.id.isEmpty());
     qDebug() << "Parse order" << startQuery.msecsTo(QDateTime::currentDateTime());
+    ui->orderScrollArea->setUpdatesEnabled(true);
+    qApp->processEvents();
 }
 
 void DlgOrder::handleOrderDishClick(const QString & id)
@@ -2514,7 +2541,9 @@ void DlgOrder::on_btnOrderComment_clicked()
 
 void DlgOrder::on_btnPlus1_clicked()
 {
-    setDishQty([](WaiterDish d) {return d.isPrinted() ? 1 : d.qty + 1;});
+    setDishQty([](WaiterDish d) {
+        return d.isPrinted() ? 1 : d.qty + 1;
+    });
 }
 
 void DlgOrder::on_btnMinus1_clicked()

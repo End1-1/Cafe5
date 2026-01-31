@@ -663,32 +663,32 @@ MS Excel</source>
     <message>
         <location filename="dlgdashboard.cpp" line="99"/>
         <source>Do you want to close active session?</source>
-        <translation type="unfinished"></translation>
+        <translation>Ցանկանում եք փակել ընդացիկ հերթափոխը՞</translation>
     </message>
     <message>
         <location filename="dlgdashboard.cpp" line="125"/>
         <source>Closing session</source>
-        <translation type="unfinished"></translation>
+        <translation>Հերթափոխի փակում</translation>
     </message>
     <message>
         <location filename="dlgdashboard.cpp" line="129"/>
         <source>Open</source>
-        <translation type="unfinished"></translation>
+        <translation>Բացվեց</translation>
     </message>
     <message>
         <location filename="dlgdashboard.cpp" line="131"/>
         <source>Close</source>
-        <translation type="unfinished">Փակել</translation>
+        <translation>Փակվեց</translation>
     </message>
     <message>
         <location filename="dlgdashboard.cpp" line="133"/>
         <source>Operations</source>
-        <translation type="unfinished"></translation>
+        <translation>Գործարքներ</translation>
     </message>
     <message>
         <location filename="dlgdashboard.cpp" line="135"/>
         <source>Expected amount</source>
-        <translation type="unfinished"></translation>
+        <translation>Ակնկալիք գումար</translation>
     </message>
 </context>
 <context>
@@ -2382,17 +2382,17 @@ STOPLIST-ից</translation>
     <message>
         <location filename="../NTable/ndataprovider.cpp" line="103"/>
         <source>Authorization error</source>
-        <translation type="unfinished"></translation>
+        <translation>Մուտքի սխալ</translation>
     </message>
     <message>
         <location filename="../NTable/ndataprovider.cpp" line="115"/>
         <source>Application update required</source>
-        <translation type="unfinished"></translation>
+        <translation>Առկա է ծրագրի նոր տարբերակ, անհրաժեշտ է թարմացնել</translation>
     </message>
     <message>
         <location filename="../NTable/ndataprovider.cpp" line="118"/>
         <source>Click to launch updater</source>
-        <translation type="unfinished"></translation>
+        <translation>Սեղմեք թարմացման համար</translation>
     </message>
 </context>
 <context>

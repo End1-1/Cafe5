@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1024</width>
-    <height>749</height>
+    <height>811</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -1254,6 +1254,9 @@
         <property name="frameShape">
          <enum>QFrame::Shape::NoFrame</enum>
         </property>
+        <property name="verticalScrollBarPolicy">
+         <enum>Qt::ScrollBarPolicy::ScrollBarAlwaysOn</enum>
+        </property>
         <property name="horizontalScrollBarPolicy">
          <enum>Qt::ScrollBarPolicy::ScrollBarAlwaysOff</enum>
         </property>
@@ -1265,8 +1268,8 @@
           <rect>
            <x>0</x>
            <y>0</y>
-           <width>400</width>
-           <height>594</height>
+           <width>383</width>
+           <height>656</height>
           </rect>
          </property>
          <layout class="QVBoxLayout" name="vs">
@@ -1963,8 +1966,8 @@
                 <rect>
                  <x>0</x>
                  <y>0</y>
-                 <width>464</width>
-                 <height>68</height>
+                 <width>461</width>
+                 <height>83</height>
                 </rect>
                </property>
                <layout class="QVBoxLayout" name="verticalLayout_3">
@@ -2046,8 +2049,8 @@
                 <rect>
                  <x>0</x>
                  <y>0</y>
-                 <width>464</width>
-                 <height>68</height>
+                 <width>461</width>
+                 <height>83</height>
                 </rect>
                </property>
                <layout class="QVBoxLayout" name="verticalLayout_4">

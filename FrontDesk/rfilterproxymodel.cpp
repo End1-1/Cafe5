@@ -92,6 +92,30 @@ bool RFilterProxyModel::filterAcceptsRow(int row, const QModelIndex &parent) con
     return true;
 }
 
+bool RFilterProxyModel::lessThan(const QModelIndex &left, const QModelIndex &right) const
+{
+    int col = left.column();
+    QString l = sourceModel()->data(left).toString();
+    QString r = sourceModel()->data(right).toString();
+
+    // Numeric sorting for selected columns
+    if(numericCols.contains(col)) {
+        QString ln = normalizeDecimal(l);
+        QString rn = normalizeDecimal(r);
+        bool ok1, ok2;
+        double dl = ln.toDouble(&ok1);
+        double dr = rn.toDouble(&ok2);
+
+        // If both parsed → numeric compare
+        if(ok1 && ok2)
+            return dl < dr;
+
+        // fallback to string
+    }
+
+    return QString::localeAwareCompare(l, r) < 0;
+}
+
 void RFilterProxyModel::recalcSums()
 {
     int rows = rowCount();
