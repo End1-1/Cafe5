@@ -18,7 +18,7 @@
 #include <QTextDocument>
 #include <QPrinter>
 #include <QPrintPreviewDialog>
-#include <QXlsx/header/xlsxdocument.h>
+#include <xlsxdocument.h>
 
 C5Grid::C5Grid(QWidget *parent) :
     C5OfficeWidget(parent),

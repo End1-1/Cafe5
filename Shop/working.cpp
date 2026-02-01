@@ -63,7 +63,7 @@ Working::Working(C5User *user, QWidget *parent) :
     QShortcut *sF7 = new QShortcut(QKeySequence(Qt::Key_F7), this);
     QShortcut *sF8 = new QShortcut(QKeySequence(Qt::Key_F8), this);
     QShortcut *sF9 = new QShortcut(QKeySequence(Qt::Key_F9), this);
-    QShortcut *sF10 = new QShortcut(QKeySequence(Qt::Key_F10), this);
+
     QShortcut *sF11 = new QShortcut(QKeySequence(Qt::Key_F11), this);
     QShortcut *sF12 = new QShortcut(QKeySequence(Qt::Key_F12), this);
     QShortcut *sDown = new QShortcut(QKeySequence(Qt::Key_Down), this);
@@ -88,7 +88,6 @@ Working::Working(C5User *user, QWidget *parent) :
     connect(sF7, SIGNAL(activated()), this, SLOT(shortcutF7()));
     connect(sF8, SIGNAL(activated()), this, SLOT(shortcutF8()));
     connect(sF9, SIGNAL(activated()), this, SLOT(shortcutF9()));
-    connect(sF10, SIGNAL(activated()), this, SLOT(shortcutF10()));
     connect(sF11, SIGNAL(activated()), this, SLOT(shortcutF11()));
     connect(sF12, SIGNAL(activated()), this, SLOT(shortcutF12()));
     connect(sDown, SIGNAL(activated()), this, SLOT(shortcutDown()));
@@ -629,10 +628,7 @@ void Working::shortcutF8()
 void Working::shortcutF9()
 {
 }
-void Working::shortcutF10()
-{
-    on_btnItemBack_clicked();
-}
+
 void Working::shortcutF11()
 {
     on_btnGoodsMovement_clicked();
@@ -744,14 +740,8 @@ void Working::on_tab_tabCloseRequested(int index)
         newSale(SALE_RETAIL);
     }
 }
-void Working::on_btnItemBack_clicked()
-{
-    if(!mUser->check(cp_t5_refund_goods)) {
-        return;
-    }
 
-    Sales::showSales(this, mUser);
-}
+
 void Working::on_tab_currentChanged(int index)
 {
     Q_UNUSED(index)

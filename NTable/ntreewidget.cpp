@@ -18,7 +18,7 @@
 #include <QMenu>
 #include <QFileDialog>
 #include <QDesktopServices>
-#include <QXlsx/header/xlsxdocument.h>
+#include <xlsxdocument.h>
 
 #define xls_page_size_a4 9
 #define xls_page_orientation_landscape "landscape"

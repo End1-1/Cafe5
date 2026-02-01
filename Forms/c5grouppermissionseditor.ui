@@ -20,7 +20,7 @@
       <enum>QTabWidget::TabPosition::West</enum>
      </property>
      <property name="currentIndex">
-      <number>0</number>
+      <number>2</number>
      </property>
      <widget class="QWidget" name="tab_2">
       <attribute name="title">
@@ -197,8 +197,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>900</width>
-            <height>764</height>
+            <width>901</width>
+            <height>761</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_4">
@@ -386,8 +386,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>900</width>
-            <height>764</height>
+            <width>901</width>
+            <height>761</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_10">
@@ -464,10 +464,10 @@
            <item>
             <widget class="C5CheckBox" name="checkBox_74">
              <property name="text">
-              <string>Delete row from shop</string>
+              <string>Delete row from order</string>
              </property>
              <property name="Tag" stdset="0">
-              <number>510</number>
+              <number>1209</number>
              </property>
             </widget>
            </item>
@@ -657,8 +657,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>918</width>
-            <height>782</height>
+            <width>919</width>
+            <height>779</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_6">
@@ -1454,8 +1454,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>918</width>
-            <height>782</height>
+            <width>919</width>
+            <height>779</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_5">
@@ -1608,8 +1608,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>918</width>
-            <height>782</height>
+            <width>919</width>
+            <height>779</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_8">

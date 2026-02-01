@@ -32,7 +32,7 @@
 #include <QSqlQuery>
 #include <QFileDialog>
 #include <QDesktopServices>
-#include <QXlsx/header/xlsxdocument.h>
+#include <xlsxdocument.h>
 #include <QPrinter>
 
 #define col_rec_in_id 0

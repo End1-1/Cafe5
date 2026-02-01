@@ -818,7 +818,7 @@ void WOrder::removeRow()
 
     C5User *tmp = fUser;
 
-    if(!tmp->check(cp_t5_remove_row_from_shop)) {
+    if(!tmp->check(cp_t12_remove_order_row)) {
         QString password = QInputDialog::getText(this, tr("Password"), tr("Password"), QLineEdit::Password);
         C5User *tmp = new C5User;
 
@@ -1254,7 +1254,7 @@ void WOrder::on_leCode_returnPressed()
 
 void WOrder::on_btnSearchPartner_clicked()
 {
-    QVector<PartnerItem> result = C5StructTableView::get<PartnerItem>(search_partner, false, false);
+    QVector<PartnerItem> result = C5StructTableView::get<PartnerItem>(SelectorName<PartnerItem>::value, false, false, ui->btnSearchPartner->mapToGlobal(QPoint(0, ui->btnSearchPartner->height())));
 
     if(result.isEmpty()) {
         return;

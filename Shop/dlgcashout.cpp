@@ -5,7 +5,7 @@
 #include "ninterface.h"
 #include "c5message.h"
 #include "ninterface.h"
-#include "c5utils.h"
+#include "format_date.h"
 #include <QValidator>
 
 DlgCashout::DlgCashout(C5User *user)

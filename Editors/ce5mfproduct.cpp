@@ -14,7 +14,7 @@
 #include <QFileDialog>
 #include <QDesktopServices>
 #include <QPrintPreviewDialog>
-#include <QXlsx/header/xlsxdocument.h>
+#include <xlsxdocument.h>
 #include <QClipboard>
 #include <QMimeData>
 #include <QBuffer>

@@ -7,12 +7,12 @@
 #include "c5utils.h"
 #include "c5message.h"
 #include "printtaxn.h"
-#include "datadriver.h"
 #include "vieworder.h"
+#include "c5permissions.h"
 #include "cashcollection.h"
 #include "c5permissions.h"
 #include "c5user.h"
-#include "c5printing.h"
+#include "c5permissions.h"
 #include "dlgreturnitem.h"
 #include "dlgdate.h"
 #include <QPropertyAnimation>
@@ -28,7 +28,7 @@ Sales::Sales(C5User *user) :
     ui->setupUi(this);
     fUser = user;
     setWindowTitle(__c5config.getRegValue("windowtitle").toString());
-    ui->btnChangeDate->setVisible(fUser->check(cp_t5_change_date_of_sale));
+    //TODO ui->btnChangeDate->setVisible(fUser->check(cp_t12_change_date_of_sale));
     ui->btnModeItems->setVisible(fUser->check(cp_t12_shop_report_goods));
     ui->btnTotalByItems->setVisible(fUser->check(cp_t12_shop_report_goods));
     fViewMode = VM_TOTAL;
@@ -313,11 +313,11 @@ void Sales::refreshItems()
     db[":f_state"] = ORDER_STATE_CLOSE;
     QString sqlCond = "";
 
-    if(!fUser->check(cp_t5_view_tax_and_no_sales)) {
+    if(!fUser->check(cp_t12_shop_fiscal_report)) {
         sqlCond += " and length(ot.f_receiptnumber)>0 ";
     }
 
-    if(!fUser->check(cp_t5_view_sales_of_all_users)) {
+    if(!fUser->check(cp_t12_shop_sale_of_all_users)) {
         sqlCond += QString(" and oh.f_staff=%1 ").arg(fUser->id());
     }
 
@@ -367,11 +367,11 @@ void Sales::refreshTotalItems()
     db[":f_state"] = ORDER_STATE_CLOSE;
     QString sqlCond = "";
 
-    if(!fUser->check(cp_t5_view_tax_and_no_sales)) {
+    if(!fUser->check(cp_t12_shop_fiscal_report)) {
         sqlCond += " and length(ot.f_receiptnumber)>0 ";
     }
 
-    if(!fUser->check(cp_t5_view_sales_of_all_users)) {
+    if(!fUser->check(cp_t12_shop_sale_of_all_users)) {
         sqlCond += QString(" and oh.f_staff=%1 ").arg(fUser->id());
     }
 

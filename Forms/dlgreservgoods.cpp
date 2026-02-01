@@ -244,7 +244,7 @@ void DlgReservGoods::on_btnGoods_clicked()
 void DlgReservGoods::on_btnStore_clicked()
 {
 #if(!defined FRONTDESK && !defined WAITER)
-    QVector<StorageItem> result = C5StructTableView::get<StorageItem>(search_storage, true, false);
+    QVector<StorageItem> result = C5StructTableView::get<StorageItem>(SelectorName<StorageItem>::value, true, false,  mapPointToGlobal(ui->btnStore));
 
     if(result.isEmpty()) {
         return;

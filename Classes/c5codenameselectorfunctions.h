@@ -48,3 +48,7 @@ inline auto storeItemSelector = [](C5CodeNameSelector *s)
     const auto &g = r.first();
     s->setCodeAndName(g.id, g.name);
 };
+
+inline auto mapPointToGlobal(QWidget *w) {
+    return w->mapToGlobal(QPoint(0, w->height()));
+}

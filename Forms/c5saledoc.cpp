@@ -21,11 +21,11 @@
 #include "nloadingdlg.h"
 #include "ce5partner.h"
 #include "outputofheader.h"
-#include "../../NewTax/Src/printtaxn.h"
+#include "printtaxn.h"
 #include "oheader.h"
 #include "c5storedoc.h"
 #include "c5fiscalcancel.h"
-#include <QXlsx/header/xlsxdocument.h>
+#include <xlsxdocument.h>
 #include <QClipboard>
 #include <QSqlQuery>
 #include <QInputDialog>

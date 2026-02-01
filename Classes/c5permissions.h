@@ -135,5 +135,6 @@
 #define cp_t12_shop_sale_of_all_users 1206
 #define cp_t12_shop_discount 1207
 #define cp_t12_shop_report_goods 1208
+#define cp_t12_remove_order_row 1209
 
 #endif // C5PERMISSIONS_H

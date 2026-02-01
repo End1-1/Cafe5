@@ -8,7 +8,7 @@
 #include <QElapsedTimer>
 #include <QFileDialog>
 #include <QDesktopServices>
-#include <QXlsx/header/xlsxdocument.h>
+#include <xlsxdocument.h>
 
 C5TableWithTotal::C5TableWithTotal(QWidget *parent) :
     QWidget(parent),

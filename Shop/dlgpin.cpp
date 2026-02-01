@@ -72,7 +72,7 @@ void DlgPin::on_btnEnter_clicked()
     }
 
     fLastError = false;
-    NDataProvider::mProtocol = C5ConnectionDialog::instance()->noneSecure ? "http" : "https";
+    NDataProvider::mProtocol = C5ConnectionDialog().instance()->connectionType() == C5ConnectionDialog::noneSecure ? "http" : "https";
     NDataProvider::mHost = C5ConnectionDialog::instance()->serverAddress();
     fHttp->fErrorObject = this;
     fHttp->fErrorSlot = const_cast<char*>(SLOT(errorResponse(QString)));
@@ -97,7 +97,7 @@ void DlgPin::on_btnEnter_clicked()
             mUser->fConfig = jo["config"].toObject()["f_config"].toObject();
             mUser->mSessionKey = NDataProvider::sessionKey;
             C5Database::fDbParams = {"", "", "", ""};
-            C5Database::fUrl = QString("%1://%2").arg(C5ConnectionDialog::instance()->noneSecure ? "http" : "https",
+            C5Database::fUrl = QString("%1://%2").arg(C5ConnectionDialog::instance()->connectionType()== C5ConnectionDialog::noneSecure ? "http" : "https",
                                C5ConnectionDialog::instance()->serverAddress());
             __c5config.setValues(settings);
             __c5config.fMainJson = mUser->fConfig;

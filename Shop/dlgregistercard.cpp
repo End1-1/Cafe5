@@ -20,7 +20,7 @@ DlgRegisterCard::~DlgRegisterCard()
 
 void DlgRegisterCard::on_toolButton_clicked()
 {
-    QVector<PartnerItem> result = C5StructTableView::get<PartnerItem>(search_partner, true, false);
+    QVector<PartnerItem> result = C5StructTableView::get<PartnerItem>(SelectorName<PartnerItem>::value, true, false, ui->toolButton->mapToGlobal(QPoint(0, ui->toolButton->height())));
 
     if(result.isEmpty()) {
         return;

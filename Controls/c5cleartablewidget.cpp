@@ -8,7 +8,7 @@
 #include <QFileDialog>
 #include <QDesktopServices>
 #include <QApplication>
-#include <QXlsx/header/xlsxdocument.h>
+#include <xlsxdocument.h>
 
 C5TableWidgetItem::C5TableWidgetItem(int type) :
     QTableWidgetItem(type)

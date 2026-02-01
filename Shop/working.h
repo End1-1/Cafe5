@@ -135,8 +135,6 @@ private slots:
 
     void shortcutF9();
 
-    void shortcutF10();
-
     void shortcutF11();
 
     void shortcutF12();
@@ -152,8 +150,6 @@ private slots:
     void haveChanges(bool v);
 
     void on_tab_tabCloseRequested(int index);
-
-    void on_btnItemBack_clicked();
 
     void on_tab_currentChanged(int index);
 

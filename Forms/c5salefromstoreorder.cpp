@@ -1,7 +1,7 @@
 #include "c5salefromstoreorder.h"
 #include "ui_c5salefromstoreorder.h"
 #include "c5mainwindow.h"
-#include "../../NewTax/Src/printtaxn.h"
+#include "printtaxn.h"
 #include "breezeconfig.h"
 #include "../Forms/dlglist2.h"
 #include "httpquerydialog.h"
@@ -16,7 +16,7 @@
 #include <QClipboard>
 #include <QFileDialog>
 #include <QDesktopServices>
-#include <QXlsx/header/xlsxdocument.h>
+#include <xlsxdocument.h>
 
 C5SaleFromStoreOrder::C5SaleFromStoreOrder(C5User *user) :
     C5Dialog(user),
