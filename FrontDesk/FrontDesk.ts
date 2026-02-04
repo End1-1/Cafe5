@@ -312,7 +312,7 @@
     <message>
         <location filename="../Classes/c5cache.cpp" line="190"/>
         <source>Status</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Վիճակ</translation>
     </message>
     <message>
         <location filename="../Classes/c5cache.cpp" line="41"/>
@@ -2544,11 +2544,6 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Forms/c5grouppermissionseditor.ui" line="467"/>
-        <source>Delete row from shop</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <location filename="../Forms/c5grouppermissionseditor.ui" line="505"/>
         <location filename="../Forms/c5grouppermissionseditor.ui" line="511"/>
         <source>Goods</source>
@@ -2913,6 +2908,11 @@
     <message>
         <location filename="../Forms/c5grouppermissionseditor.ui" line="457"/>
         <source>Refund goods</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Forms/c5grouppermissionseditor.ui" line="467"/>
+        <source>Delete row from order</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -9666,7 +9666,7 @@ MS Excel</translation>
     <message>
         <location filename="../Editors/ce5mfproduct.ui" line="930"/>
         <source>Status</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Վիճակ</translation>
     </message>
     <message>
         <location filename="../Editors/ce5mfproduct.cpp" line="32"/>
@@ -17924,14 +17924,6 @@ permissions</source>
     </message>
 </context>
 <context>
-    <name>DlgDataOnline</name>
-    <message>
-        <location filename="../Forms/dlgdataonline.ui" line="20"/>
-        <source>Dialog</source>
-        <translation></translation>
-    </message>
-</context>
-<context>
     <name>DlgDirtyStoreDoc</name>
     <message>
         <location filename="../Forms/dlgdirtystoredoc.ui" line="14"/>
@@ -18339,17 +18331,11 @@ permissions</source>
     </message>
     <message>
         <location filename="../Forms/dlgreservgoods.ui" line="61"/>
-        <location filename="../Forms/dlgreservgoods.cpp" line="29"/>
-        <location filename="../Forms/dlgreservgoods.cpp" line="31"/>
-        <location filename="../Forms/dlgreservgoods.cpp" line="55"/>
-        <location filename="../Forms/dlgreservgoods.cpp" line="57"/>
         <source>Name</source>
         <translation>Անվանում</translation>
     </message>
     <message>
         <location filename="../Forms/dlgreservgoods.ui" line="124"/>
-        <location filename="../Forms/dlgreservgoods.cpp" line="30"/>
-        <location filename="../Forms/dlgreservgoods.cpp" line="56"/>
         <source>Scancode</source>
         <translation>Շտրիխ կոդ</translation>
     </message>
@@ -18411,11 +18397,6 @@ permissions</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Forms/dlgreservgoods.cpp" line="46"/>
-        <source>Invalid reservation code</source>
-        <translation></translation>
-    </message>
-    <message>
         <location filename="../Forms/dlgreservgoods.cpp" line="104"/>
         <source>Goods is not specified</source>
         <translation>Ապրանքը նշված չէ</translation>
@@ -18441,12 +18422,7 @@ permissions</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../Forms/dlgreservgoods.cpp" line="139"/>
-        <source>Unit</source>
-        <translation>ՉՄ</translation>
-    </message>
-    <message>
-        <location filename="../Forms/dlgreservgoods.cpp" line="214"/>
+        <location filename="../Forms/dlgreservgoods.cpp" line="219"/>
         <source>Insufficient quantity</source>
         <translation>Անբավարար քանակ</translation>
     </message>
@@ -18918,34 +18894,6 @@ permissions</source>
     </message>
 </context>
 <context>
-    <name>PrintTaxN</name>
-    <message>
-        <location filename="../../NewTax/Src/printtaxn.cpp" line="36"/>
-        <location filename="../../NewTax/Src/printtaxn.cpp" line="99"/>
-        <location filename="../../NewTax/Src/printtaxn.cpp" line="108"/>
-        <location filename="../../NewTax/Src/printtaxn.cpp" line="359"/>
-        <location filename="../../NewTax/Src/printtaxn.cpp" line="398"/>
-        <source>Connection error</source>
-        <translation>Կապի սխալ</translation>
-    </message>
-    <message>
-        <location filename="../../NewTax/Src/printtaxn.cpp" line="99"/>
-        <source>Socket read error</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../../NewTax/Src/printtaxn.cpp" line="108"/>
-        <source>Data read timeout</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../../NewTax/Src/printtaxn.cpp" line="357"/>
-        <location filename="../../NewTax/Src/printtaxn.cpp" line="396"/>
-        <source>Tax error code</source>
-        <translation>ՀԴՄ-ի սխալի կոդ</translation>
-    </message>
-</context>
-<context>
     <name>QObject</name>
     <message>
         <location filename="../Cafe5/c5message.h" line="20"/>
@@ -19010,27 +18958,27 @@ permissions</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="rabstracteditorreport.ui" line="64"/>
+        <location filename="rabstracteditorreport.ui" line="85"/>
         <source>New Row</source>
         <translation>Նոր տող</translation>
     </message>
     <message>
-        <location filename="rabstracteditorreport.cpp" line="100"/>
+        <location filename="rabstracteditorreport.cpp" line="114"/>
         <source>New</source>
         <translation>Նոր</translation>
     </message>
     <message>
-        <location filename="rabstracteditorreport.cpp" line="103"/>
+        <location filename="rabstracteditorreport.cpp" line="117"/>
         <source>Reload</source>
         <translation>Թարմացնել</translation>
     </message>
     <message>
-        <location filename="rabstracteditorreport.cpp" line="107"/>
+        <location filename="rabstracteditorreport.cpp" line="121"/>
         <source>Delete</source>
         <translation>Հեռացնել</translation>
     </message>
     <message>
-        <location filename="rabstracteditorreport.cpp" line="111"/>
+        <location filename="rabstracteditorreport.cpp" line="125"/>
         <source>Parameters</source>
         <translation>Պարամետրեր</translation>
     </message>
@@ -19107,7 +19055,7 @@ permissions</source>
     </message>
     <message>
         <location filename="rwaiterorder.ui" line="137"/>
-        <location filename="rwaiterorder.ui" line="242"/>
+        <location filename="rwaiterorder.ui" line="290"/>
         <source>Total</source>
         <translation>Ընդամենը</translation>
     </message>
@@ -19172,22 +19120,22 @@ permissions</source>
         <translation>Կարևոր</translation>
     </message>
     <message>
-        <location filename="rwaiterorder.ui" line="275"/>
+        <location filename="rwaiterorder.ui" line="317"/>
         <source>Selfcost</source>
         <translation>Ինքնառժեք</translation>
     </message>
     <message>
-        <location filename="rwaiterorder.ui" line="323"/>
+        <location filename="rwaiterorder.ui" line="262"/>
         <source>Table</source>
         <translation>Սեղան</translation>
     </message>
     <message>
-        <location filename="rwaiterorder.cpp" line="15"/>
+        <location filename="rwaiterorder.cpp" line="17"/>
         <source>Cashier</source>
         <translation>Գանձապահ</translation>
     </message>
     <message>
-        <location filename="rwaiterorder.cpp" line="16"/>
+        <location filename="rwaiterorder.cpp" line="18"/>
         <source>Staff</source>
         <translation>Սպասարկող</translation>
     </message>

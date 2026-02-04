@@ -969,29 +969,6 @@ MS Excel</source>
     </message>
 </context>
 <context>
-    <name>DlgExitByVersion</name>
-    <message>
-        <location filename="../Cafe5/dlgexitbyversion.ui" line="14"/>
-        <source>Exit</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../Cafe5/dlgexitbyversion.ui" line="36"/>
-        <source>Message</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../Cafe5/dlgexitbyversion.ui" line="53"/>
-        <source>Time</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../Cafe5/dlgexitbyversion.ui" line="79"/>
-        <source>Close</source>
-        <translation>Փակել</translation>
-    </message>
-</context>
-<context>
     <name>DlgListOfDishComments</name>
     <message>
         <location filename="../Forms/dlglistofdishcomments.ui" line="14"/>
@@ -1657,34 +1634,6 @@ MS Excel</source>
         <location filename="../Classes/notificationwidget.ui" line="179"/>
         <source>The message!</source>
         <translation></translation>
-    </message>
-</context>
-<context>
-    <name>PrintTaxN</name>
-    <message>
-        <location filename="../../NewTax/Src/printtaxn.cpp" line="36"/>
-        <location filename="../../NewTax/Src/printtaxn.cpp" line="99"/>
-        <location filename="../../NewTax/Src/printtaxn.cpp" line="108"/>
-        <location filename="../../NewTax/Src/printtaxn.cpp" line="359"/>
-        <location filename="../../NewTax/Src/printtaxn.cpp" line="398"/>
-        <source>Connection error</source>
-        <translation>Կապի սխալ</translation>
-    </message>
-    <message>
-        <location filename="../../NewTax/Src/printtaxn.cpp" line="99"/>
-        <source>Socket read error</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../../NewTax/Src/printtaxn.cpp" line="108"/>
-        <source>Data read timeout</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location filename="../../NewTax/Src/printtaxn.cpp" line="357"/>
-        <location filename="../../NewTax/Src/printtaxn.cpp" line="396"/>
-        <source>Tax error code</source>
-        <translation>ՀԴՄ -ի սխալի կոդ</translation>
     </message>
 </context>
 <context>

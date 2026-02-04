@@ -4,16 +4,16 @@
 #include <QStringList>
 
 struct GoodsItem {
-    int id;
+    int id = 0;
     QString groupName;
     QString name;
     QString barcode;
     QString unitName;
-    double lastInputPrice;
-    double price1;
-    double price1disc;
-    double price2;
-    double price2disc;
+    double lastInputPrice = 0;
+    double price1 = 0;
+    double price1disc = 0;
+    double price2 = 0;
+    double price2disc = 0;
     QString nameLower;
     QStringList words;
 };

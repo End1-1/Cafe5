@@ -1,4 +1,4 @@
-set path=%PATH%;C:\Soft\Qt\5.15.0\msvc2019\bin;C:\Qt\5.15.0\msvc2019_64\bin
+set path=%PATH%;C:\Development\Qt\6.10.2\msvc2022_64\bin;C:\Program Files\Microsoft Visual Studio\18\Community\VC\Tools\MSVC\14.50.35717\bin\Hostx64\x64\
 lupdate -noobsolete FrontDesk\FrontDeskNetwork.pro -ts FrontDesk\FrontDesk.ts
 lupdate -noobsolete Waiter\Waiter.net.pro -ts Waiter\Waiter.ts
 lupdate -noobsolete Smart\Smart.net.pro -ts Smart\Smart.ts

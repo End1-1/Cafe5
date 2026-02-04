@@ -107,85 +107,95 @@ void DlgReturnItem::on_tblOrder_cellClicked(int row, int column)
         return;
     }
 
-    fHttp->createHttpQueryLambda("/engine/v2/shop/shop-order/get",
-    QJsonObject{{"id", ui->tblOrder->getString(row, 0)}}, [this](const QJsonObject & jdoc) {
-        QJsonArray jbody = jdoc["body"].toArray();
-        QJsonObject jheader = jdoc["header"].toObject();
+    fHttp->createHttpQueryLambda(
+        "/engine/v2/shop/shop-order/get",
+        QJsonObject{{"id", ui->tblOrder->getString(row, 0)}},
+        [this](const QJsonObject &jdoc) {
+            QJsonArray jbody = jdoc["body"].toArray();
+            QJsonObject jheader = jdoc["header"].toObject();
 
-        for(int i = 0; i < jbody.size(); i++) {
-            const QJsonObject jt = jbody.at(i).toObject();
-            int r = ui->tblBody->addEmptyRow();
-            ui->tblBody->setData(r, 0, jt["f_id"].toString());
-            ui->tblBody->setData(r, 1, jt["f_x"].toInt());
-            ui->tblBody->setData(r, 2, jt["f_scancode"].toString());
-            ui->tblBody->setData(r, 3, jt["f_name"].toString());
-            ui->tblBody->setData(r, 4, jt["f_qty"].toDouble());
-            ui->tblBody->setData(r, 5, jt["f_unit"].toString());
-            ui->tblBody->setData(r, 6, jt["f_price"].toDouble());
-            ui->tblBody->setData(r, 7, jt["f_total"].toDouble());
-            ui->tblBody->setData(r, 8, jt["f_goods"].toInt());
-            ui->tblBody->setData(r, 9, jt["f_return"].toInt());
-            ui->tblBody->setData(r, 9, jt["f_returnedqty"].toDouble());
-            ui->tblBody->setData(r, 11, jt["f_discountfactor"].toDouble());
-            auto *l = ui->tblBody->createLineEdit(r, 10);
-            l->setEnabled(__c5config.fMainJson["change_qty_return_items"].toBool());
-            l->setDouble(0);
-            connect(l, &C5LineEdit::textChanged, this, [this, l](const QString & arg) {
-                int r, c;
+            for (int i = 0; i < jbody.size(); i++) {
+                const QJsonObject jt = jbody.at(i).toObject();
+                int r = ui->tblBody->addEmptyRow();
+                ui->tblBody->setData(r, 0, jt["f_id"].toString());
+                ui->tblBody->setData(r, 1, jt["f_x"].toInt());
+                ui->tblBody->setData(r, 2, jt["f_scancode"].toString());
+                ui->tblBody->setData(r, 3, jt["f_name"].toString());
+                ui->tblBody->setData(r, 4, jt["f_qty"].toDouble());
+                ui->tblBody->setData(r, 5, jt["f_unit"].toString());
+                ui->tblBody->setData(r, 6, jt["f_price"].toDouble());
+                ui->tblBody->setData(r, 7, jt["f_total"].toDouble());
+                ui->tblBody->setData(r, 8, jt["f_goods"].toInt());
+                ui->tblBody->setData(r, 9, jt["f_return"].toInt());
+                ui->tblBody->setData(r, 9, jt["f_returnedqty"].toDouble());
+                ui->tblBody->setData(r, 11, jt["f_discountfactor"].toDouble());
+                auto *l = ui->tblBody->createLineEdit(r, 10);
+                l->setEnabled(__c5config.fMainJson["change_qty_return_items"].toBool());
+                l->setDouble(0);
+                connect(l, &C5LineEdit::textChanged, this, [this, l](const QString &arg) {
+                    int r, c;
 
-                if(ui->tblBody->findWidget(l, r, c)) {
-                    if(l->getDouble() > ui->tblBody->getDouble(r, 4) - ui->tblBody->getDouble(r, 9)) {
-                        l->setDouble(ui->tblBody->getDouble(r, 4) - ui->tblBody->getDouble(r, 9));
+                    if (ui->tblBody->findWidget(l, r, c)) {
+                        if (l->getDouble()
+                            > ui->tblBody->getDouble(r, 4) - ui->tblBody->getDouble(r, 9)) {
+                            l->setDouble(ui->tblBody->getDouble(r, 4)
+                                         - ui->tblBody->getDouble(r, 9));
+                        }
+                    }
+
+                    countReturnAmount();
+                });
+                auto *cb = ui->tblBody->createCheckbox(r, 1);
+                connect(cb, &C5CheckBox::clicked, this, [this, cb](bool checked) {
+                    int r, c;
+
+                    if (ui->tblBody->findWidget(cb, r, c)) {
+                        C5LineEdit *l = ui->tblBody->lineEdit(r, 10);
+                        l->setDouble(checked ? ui->tblBody->getDouble(r, 4)
+                                                   - ui->tblBody->getDouble(r, 9)
+                                             : 0);
+                    }
+
+                    countReturnAmount();
+                });
+
+                if (jt["f_returnedqty"].toDouble() - jt["f_qty"].toDouble() < 0.001
+                    && jt["f_returnedqty"].toDouble() > 0.001) {
+                    ui->tblBody->checkBox(r, 1)->setChecked(true);
+                    ui->tblBody->checkBox(r, 1)->setEnabled(false);
+                }
+
+                if (ui->leBarcode->text().isEmpty() == false) {
+                    if (ui->leBarcode->text() != jt["f_scancode"].toString()) {
+                        cb->setEnabled(false);
                     }
                 }
-
-                countReturnAmount();
-            });
-            auto *cb = ui->tblBody->createCheckbox(r, 1);
-            connect(cb, &C5CheckBox::clicked, this, [this, cb](bool checked) {
-                int r, c;
-
-                if(ui->tblBody->findWidget(cb, r, c)) {
-                    C5LineEdit *l = ui->tblBody->lineEdit(r, 10);
-                    l->setDouble(checked ? ui->tblBody->getDouble(r, 4) - ui->tblBody->getDouble(r, 9) : 0);
-                }
-
-                countReturnAmount();
-            });
-
-            if(jt["f_returnedqty"].toDouble() - jt["f_qty"].toDouble() <  0.001 && jt["f_returnedqty"].toDouble() > 0.001) {
-                ui->tblBody->checkBox(r, 1)->setChecked(true);
-                ui->tblBody->checkBox(r, 1)->setEnabled(false);
             }
 
-            if(ui->leBarcode->text().isEmpty() == false) {
-                if(ui->leBarcode->text() != jt["f_scancode"].toString()) {
-                    cb->setEnabled(false);
-                }
+            ui->cbPaymentType->setEnabled(__c5config.fMainJson["change_qty_return_items"].toBool());
+
+            if (jheader["f_amountcash"].toDouble() > 0.01) {
+                ui->cbPaymentType->setCurrentIndex(0);
+            } else {
+                ui->cbPaymentType->setCurrentIndex(1);
             }
-        }
 
-        ui->cbPaymentType->setEnabled(__c5config.fMainJson["change_qty_return_items"].toBool());
+            QJsonObject jpartner = jdoc["partner"].toObject();
+            ui->lbPartner->setProperty("id", jpartner["f_id"].toInt());
+            ui->lbPartner->setProperty("debt", jpartner["f_amountdebt"].toDouble());
 
-        if(jheader["f_amountcash"].toDouble() > 0.01) {
-            ui->cbPaymentType->setCurrentIndex(0);
-        } else {
-            ui->cbPaymentType->setCurrentIndex(1);
-        }
+            if (ui->lbPartner->property("debt").toDouble() > 0.001) {
+                ui->cbPaymentType->setCurrentIndex(2);
+            }
 
-        QJsonObject jpartner = jdoc["partner"].toObject();
-        ui->lbPartner->setProperty("id", jpartner["f_id"].toInt());
-        ui->lbPartner->setProperty("debt", jpartner["f_amountdebt"].toDouble());
-
-        if(ui->lbPartner->property("debt").toDouble() > 0.001) {
-            ui->cbPaymentType->setCurrentIndex(2);
-        }
-
-        if(!jpartner.isEmpty()) {
-            ui->lbPartner->setText(QString("%1 (%2)").arg(jpartner["f_taxname"].toString(), float_str(jpartner["debt"].toDouble(), 2)));
-            ui->lbPartner->setVisible(true);
-        }
-    }, [](const QJsonObject & jerr) {});
+            if (!jpartner.isEmpty()) {
+                ui->lbPartner->setText(
+                    QString("%1 (%2)").arg(jpartner["f_taxname"].toString(),
+                                           float_str(jpartner["debt"].toDouble(), 2)));
+                ui->lbPartner->setVisible(true);
+            }
+        },
+        [](const QJsonObject &jerr) {});
 }
 
 void DlgReturnItem::on_btnSearchTax_clicked()
@@ -542,4 +552,9 @@ void DlgReturnItem::countReturnAmount()
 void DlgReturnItem::on_btnClose_clicked()
 {
     accept();
+}
+
+void DlgReturnItem::on_leReceiptNumber_returnPressed()
+{
+    on_btnSearchReceiptNumber_clicked();
 }

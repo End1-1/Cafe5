@@ -2,6 +2,8 @@
 #define DLGRESERVGOODS_H
 
 #include "c5dialog.h"
+#include "struct_storage_item.h"
+#include "struct_goods_item.h"
 
 namespace Ui
 {
@@ -13,7 +15,7 @@ class DlgReservGoods : public C5Dialog
     Q_OBJECT
 
 public:
-    explicit DlgReservGoods(C5User *user, int store, int goods, double qty);
+    explicit DlgReservGoods(C5User *user, StorageItem store, GoodsItem goods, double qty);
 
     explicit DlgReservGoods(int id, C5User *user);
     
@@ -44,9 +46,9 @@ private slots:
 private:
     Ui::DlgReservGoods *ui;
 
-    int fStore;
+    StorageItem fStore;
 
-    int fGoods;
+    GoodsItem fGoods;
 
     void getAvailableGoods();
 

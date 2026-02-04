@@ -1429,7 +1429,7 @@ void WOrder::checkDiscountCardCode(const QString &code)
     });
 }
 
-void WOrder::checkGoodsCode(const QString &code)
+void WOrder::checkGoodsCode(const QString &code, std::function<void()> postProcess)
 {
     if(fOHeader.saleType == -1) {
         if(fOGoods.count() > 0) {
@@ -1438,89 +1438,93 @@ void WOrder::checkGoodsCode(const QString &code)
         }
     }
 
-    fHttp->createHttpQueryLambda("/engine/v2/shop/process-barcode/get", {
-        {"barcode", code},
-        {"store", __c5config.defaultStore()},
-        {"draft_header", fDraftSale._id()},
-        {"retail", fOHeader.saleType == SALE_RETAIL}
-    },
-    [this, code](const QJsonObject & jdoc) {
-        QJsonObject goods = jdoc["goods"].toObject();
-        QJsonObject store = jdoc["store"].toObject();
-        double price = 0;
+    fHttp->createHttpQueryLambda(
+        "/engine/v2/shop/process-barcode/get",
+        {{"barcode", code},
+         {"store", __c5config.defaultStore()},
+         {"draft_header", fDraftSale._id()},
+         {"retail", fOHeader.saleType == SALE_RETAIL}},
+        [this, code, postProcess](const QJsonObject &jdoc) {
+            QJsonObject goods = jdoc["goods"].toObject();
+            QJsonObject store = jdoc["store"].toObject();
+            double price = 0;
 
-        if(ui->tblData->rowCount() > 0) {
-            if(!goods["f_autodiscount"].toString().isEmpty() && !__c5config.fMainJson["shop_autodiscount_card_number"].toString().isEmpty()) {
-                fHttp->httpQueryFinished(sender());
-                C5Message::error(tr("Only one item can be added to the special sale"));
-                return;
-            } else {
+            if (ui->tblData->rowCount() > 0) {
+                if (!goods["f_autodiscount"].toString().isEmpty()
+                    && !__c5config.fMainJson["shop_autodiscount_card_number"].toString().isEmpty()) {
+                    fHttp->httpQueryFinished(sender());
+                    C5Message::error(tr("Only one item can be added to the special sale"));
+                    return;
+                } else {
+                }
             }
-        }
 
-        switch(fOHeader.saleType) {
-        case SALE_RETAIL:
-            price = goods["f_price1"].toDouble();
-            break;
+            switch (fOHeader.saleType) {
+            case SALE_RETAIL:
+                price = goods["f_price1"].toDouble();
+                break;
 
-        case SALE_WHOSALE:
-            price = goods["f_price2"].toDouble();;
-            break;
+            case SALE_WHOSALE:
+                price = goods["f_price2"].toDouble();
+                ;
+                break;
 
-        default:
-            price = goods["f_price1"].toDouble();
-            break;
-        }
+            default:
+                price = goods["f_price1"].toDouble();
+                break;
+            }
 
-        QJsonObject jm = sender()->property("marks").toJsonObject();
+            QJsonObject jm = sender()->property("marks").toJsonObject();
 
-        if(jm.contains("price")) {
-            price = jm["price"].toDouble();
-        }
+            if (jm.contains("price")) {
+                price = jm["price"].toDouble();
+            }
 
-        int row = ui->tblData->addEmptyRow();
-        auto *ch = new C5CheckBox();
-        ch->setCheckable(s.value("learnaccumulate").toBool());
-        ch->setChecked(goods["f_candiscount"].toInt() == 1);
-        connect(ch, &C5CheckBox::clicked, this, &WOrder::checkCardClicked);
-        ui->tblData->setCellWidget(row, col_check_discount, ch);
-        OGoods og;
-        double qty = goods["f_defaultqty"].toDouble();
+            int row = ui->tblData->addEmptyRow();
+            auto *ch = new C5CheckBox();
+            ch->setCheckable(s.value("learnaccumulate").toBool());
+            ch->setChecked(goods["f_candiscount"].toInt() == 1);
+            connect(ch, &C5CheckBox::clicked, this, &WOrder::checkCardClicked);
+            ui->tblData->setCellWidget(row, col_check_discount, ch);
+            OGoods og;
+            double qty = goods["f_defaultqty"].toDouble();
 
-        if(jdoc.contains("23")) {
-            auto qtyStr = code.right(6);
-            qtyStr.removeLast();
-            qty = qtyStr.toDouble() / 1000;
-        }
+            if (jdoc.contains("23")) {
+                auto qtyStr = code.right(6);
+                qtyStr.removeLast();
+                qty = qtyStr.toDouble() / 1000;
+            }
 
-        og._groupName = goods["f_groupname"].toString();
-        og._goodsName = goods["f_name"].toString();
-        og._goodsFiscalName = goods["f_fiscalname"].toString();
-        og._unitName = goods["f_unitname"].toString();
-        og._barcode = goods["f_scancode"].toString();
-        og.header = fOHeader._id();
-        og.goods = goods["f_id"].toInt();
-        og.taxDept = goods["f_taxdept"].toInt();
-        og.adgCode = goods["f_adgcode"].toString();
-        og.isService = goods["f_service"].toInt();
-        og.qty = qty;
-        og.price = price;
-        og.store = __c5config.defaultStore();
-        og.total = og.qty * og.price;
-        og.discountFactor = fBHistory.value / 100;
-        og.discountMode = fBHistory.type;
-        og.discountAmount = 0;
-        og.emarks = jdoc["emarks"].toString();
-        og.canDiscount = goods["f_candiscount"].toInt();
-        fOGoods.append(og);
-        ui->tblData->setDouble(row, col_stock, store["f_qty"].toDouble());
-        ui->tblData->item(row, 0)->setData(Qt::UserRole + 101, jdoc["draftid"].toString());
-        ui->tblData->setCurrentCell(row, 0);
-        countTotal();
-        ui->leCode->setFocus();
-    }, [this](const QJsonObject jerr) {
-        ui->leCode->setFocus();
-    });
+            og._groupName = goods["f_groupname"].toString();
+            og._goodsName = goods["f_name"].toString();
+            og._goodsFiscalName = goods["f_fiscalname"].toString();
+            og._unitName = goods["f_unitname"].toString();
+            og._barcode = goods["f_scancode"].toString();
+            og.header = fOHeader._id();
+            og.goods = goods["f_id"].toInt();
+            og.taxDept = goods["f_taxdept"].toInt();
+            og.adgCode = goods["f_adgcode"].toString();
+            og.isService = goods["f_service"].toInt();
+            og.qty = qty;
+            og.price = price;
+            og.store = __c5config.defaultStore();
+            og.total = og.qty * og.price;
+            og.discountFactor = fBHistory.value / 100;
+            og.discountMode = fBHistory.type;
+            og.discountAmount = 0;
+            og.emarks = jdoc["emarks"].toString();
+            og.canDiscount = goods["f_candiscount"].toInt();
+            fOGoods.append(og);
+            ui->tblData->setDouble(row, col_stock, store["f_qty"].toDouble());
+            ui->tblData->item(row, 0)->setData(Qt::UserRole + 101, jdoc["draftid"].toString());
+            ui->tblData->setCurrentCell(row, 0);
+            if (postProcess) {
+                postProcess();
+            }
+            countTotal();
+            ui->leCode->setFocus();
+        },
+        [this](const QJsonObject jerr) { ui->leCode->setFocus(); });
 }
 
 void WOrder::processPresentCard(const QString & code)
@@ -1624,3 +1628,4 @@ void WOrder::processAccumulateCard(const QString & code)
     //     ui->leUseAccumulated->setVisible(true);
     // }
 }
+

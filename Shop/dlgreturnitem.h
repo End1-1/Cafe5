@@ -35,6 +35,8 @@ private slots:
 
     void on_btnClose_clicked();
 
+    void on_leReceiptNumber_returnPressed();
+
 private:
     Ui::DlgReturnItem* ui;
 

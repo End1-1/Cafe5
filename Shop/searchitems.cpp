@@ -1,11 +1,13 @@
 #include "searchitems.h"
-#include "ui_searchitems.h"
-#include "c5database.h"
-#include "c5config.h"
-#include "dlgreservgoods.h"
-#include "datadriver.h"
-#include "goodsreserve.h"
 #include <QDebug>
+#include "c5config.h"
+#include "c5database.h"
+#include "c5user.h"
+#include "datadriver.h"
+#include "dlgreservgoods.h"
+#include "goodsreserve.h"
+#include "ninterface.h"
+#include "ui_searchitems.h"
 
 SearchItems::SearchItems(C5User *user) :
     C5ShopDialog(user),
@@ -102,11 +104,21 @@ void SearchItems::on_btnReserve_clicked()
         return;
     }
 
-    DlgReservGoods r(mUser,
-                     ui->tbl->getInteger(row, tr("Store code")),
-                     ui->tbl->getInteger(row, tr("Goods code")),
-                     ui->tbl->getDouble(row, tr("Qty")) - ui->tbl->getDouble(row, tr("Reserved")));
-    r.exec();
+    double qty = ui->tbl->getDouble(row, tr("Qty")) - ui->tbl->getDouble(row, tr("Reserved"));
+
+    NInterface::query1("/engine/v2/shop/shop-reserve/get-store-goods",
+                       mUser->mSessionKey,
+                       this,
+                       {{"store_id", ui->tbl->getInteger(row, tr("Store code"))},
+                        {"goods_id", ui->tbl->getInteger(row, tr("Goods code"))}},
+                       [this, qty](const QJsonObject &jo) {
+                           StorageItem si = JsonParser<StorageItem>::fromJson(
+                               jo.value("store_json").toObject());
+                           GoodsItem gi = JsonParser<GoodsItem>::fromJson(
+                               jo.value("goods_json").toObject());
+                           DlgReservGoods r(mUser, si, gi, qty);
+                           r.exec();
+                       });
 }
 
 void SearchItems::on_btnViewReservations_clicked()

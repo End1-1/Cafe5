@@ -47,7 +47,7 @@ void PrintReceiptGroup::print(const QString &id, C5Database &db, int rw)
     db[":f_id"] = id;
     db.exec("select * from o_header where f_id=:f_id");
     db.nextRow();
-    QString saletype;
+    QString saletype = tr("Sale");
     QMap<QString, QVariant> returnFrom;
 
     if(db.getDouble("f_amounttotal") < 0) {
@@ -394,7 +394,7 @@ void PrintReceiptGroup::print2(const QString &id, C5Database &db)
         return;
     }
 
-    QString saletype;
+    QString saletype = tr("Sale");
 
     if(oh.amountTotal < 0) {
         saletype = tr("Return");
@@ -769,7 +769,7 @@ void PrintReceiptGroup::print3(const QString &id, C5Database &db)
         jtax = QJsonDocument::fromJson(db.getString("f_out").toUtf8()).object();
     }
 
-    QString saletype;
+    QString saletype = tr("Sale");
     QMap<QString, QVariant> returnFrom;
 
     if(oheader["f_amounttotal"].toDouble() < 0) {

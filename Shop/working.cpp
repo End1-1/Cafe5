@@ -431,7 +431,7 @@ void Working::checkMessageResponse(const QJsonObject & jdoc)
     }
 
     QFont font(qApp->font());
-    font.setPointSize(30);
+    font.setPointSize(12);
     C5Printing p;
     QPrinterInfo pi = QPrinterInfo::printerInfo(C5Config::localReceiptPrinter());
     QPrinter printer(pi);
@@ -444,7 +444,7 @@ void Working::checkMessageResponse(const QJsonObject & jdoc)
     p.setFont(font);
     p.br(2);
     QPixmap img(":/atention.png");
-    img = img.scaled(400, 400);
+    img = img.scaled(100, 100);
     p.image(img, Qt::AlignCenter);
     p.br(img.height() / 2);
     p.br(img.height() / 2);
@@ -454,10 +454,6 @@ void Working::checkMessageResponse(const QJsonObject & jdoc)
         qDebug() << jom;
         QJsonParseError jerr;
         QJsonDocument jdocmsg = QJsonDocument::fromJson(jom["f_body"].toString().toUtf8(), &jerr);
-        p.ctext(tr("Message date and time"));
-        p.br();
-        p.ctext(jom["msgdate"].toString());
-        p.br();
 
         if(jerr.error == QJsonParseError::NoError) {
             QJsonObject jjm = jdocmsg.object();

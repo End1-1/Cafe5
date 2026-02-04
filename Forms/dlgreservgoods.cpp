@@ -1,71 +1,73 @@
 #include "dlgreservgoods.h"
-#include "ui_dlgreservgoods.h"
+#include "c5codenameselectorfunctions.h"
+#include "c5config.h"
 #include "c5database.h"
-#include "goodsreserve.h"
 #include "c5message.h"
 #include "chatmessage.h"
-#include "dataonline.h"
-#include "c5config.h"
-#include "printtaxn.h"
+#include "goodsreserve.h"
 #include "ninterface.h"
-#include "c5codenameselectorfunctions.h"
+#include "printtaxn.h"
+#include "ui_dlgreservgoods.h"
 
 #include "c5user.h"
 #if(!defined FRONTDESK && !defined WAITER)
 #include "worder.h"
 #include "working.h"
 #include "c5structtableview.h"
-#include "struct_storage_item.h"
-#include "struct_goods_item.h"
 #endif
 #include <QJsonDocument>
 #include <QJsonObject>
 
-DlgReservGoods::DlgReservGoods(C5User *user, int store, int goods, double qty) :
-    C5Dialog(user)
+DlgReservGoods::DlgReservGoods(C5User *user, StorageItem store, GoodsItem goods, double qty)
+    : C5Dialog(user)
+    , ui(new Ui::DlgReservGoods)
 {
+    ui->setupUi(this);
     fStore = store;
     fGoods = goods;
-    ui->leName->setText(dbo_str("c_goods", tr("Name"), fGoods));
-    ui->leScancode->setText(dbo_str("c_goods", tr("Scancode"), fGoods));
-    ui->leStore->setText(dbo_str("c_storages", tr("Name"), fStore));
+    ui->leName->setText(fGoods.name);
+    ui->leScancode->setText(fGoods.barcode);
+    ui->leStore->setText(fStore.name);
     ui->leTotalQty->setDouble(qty);
     ui->btnCancelReserve->setVisible(false);
     ui->btnCompleteReserve->setVisible(false);
     ui->leEndDay->setDate(QDate::currentDate().addDays(1));
 }
 
-DlgReservGoods::DlgReservGoods(int id, C5User *user) :
-    C5Dialog(user)
+DlgReservGoods::DlgReservGoods(int id, C5User *user)
+    : C5Dialog(user)
+    , ui(new Ui::DlgReservGoods)
 {
-    C5Database db;
-    db[":f_id"] = id;
-    db.exec("select * from a_store_reserve where f_id=:f_id");
-
-    if(!db.nextRow()) {
-        C5Message::error(tr("Invalid reservation code"));
-        return;
-    }
-
-    fGoods = db.getInt("f_goods");
-    fStore = db.getInt("f_store");
-    ui->leCode->setInteger(db.getInt("f_id"));
-    ui->leDate->setDate(db.getDate("f_date"));
-    ui->leEndDay->setDate(db.getDate("f_enddate"));
-    ui->leName->setText(dbo_str("c_goods", tr("Name"), db.getInt("f_goods")));
-    ui->leScancode->setText(dbo_str("c_goods", tr("Scancode"), db.getInt("f_goods")));
-    ui->leStore->setText(dbo_str("c_storages", tr("Name"), db.getInt("f_store")));
-    ui->leTotalQty->setText("-");
-    ui->leReservedQty->setDouble(db.getDouble("f_qty"));
-    ui->leMessage->setText(db.getString("f_message"));
-    ui->btnSave->setVisible(false);
-    ui->btnCancelReserve->setVisible(db.getInt("f_state") == GR_RESERVED);
-    ui->btnCompleteReserve->setVisible(db.getInt("f_state") == GR_RESERVED);
-    ui->leReservedQty->setReadOnly(true);
-    ui->lePrepaid->setDouble(db.getDouble("f_prepaid"));
-    ui->lePrepaidCard->setDouble(db.getDouble("f_prepaidcard"));
-    ui->leFiscal->setInteger(db.getInt("f_fiscal"));
-    ui->btnPrintFiscal->setEnabled(ui->leFiscal->getInteger() == 0);
+    ui->setupUi(this);
+    NInterface::query1("/engine/v2/shop/shop-reserve/get",
+                       mUser->mSessionKey,
+                       this,
+                       {{"id", id}},
+                       [this](const QJsonObject &jo) {
+                           fGoods = JsonParser<GoodsItem>::fromJson(
+                               jo.value("goods_json").toObject());
+                           fStore = JsonParser<StorageItem>::fromJson(
+                               jo.value("store_json").toObject());
+                           ui->leCode->setInteger(jo.value("f_id").toInt());
+                           ui->leDate->setDate(QDate::fromString(jo.value("f_date").toString(),
+                                                                 FORMAT_DATE_TO_STR_MYSQL));
+                           ui->leEndDay->setDate(QDate::fromString(jo.value("f_enddate").toString(),
+                                                                   FORMAT_DATE_TO_STR_MYSQL));
+                           ui->leName->setText(fGoods.name);
+                           ui->leScancode->setText(fGoods.barcode);
+                           ui->leStore->setText(fStore.name);
+                           ui->leTotalQty->setText("-");
+                           ui->leReservedQty->setDouble(jo.value("f_qty").toDouble());
+                           ui->leMessage->setText(jo.value("f_message").toString());
+                           ui->btnSave->setVisible(false);
+                           ui->btnCancelReserve->setVisible(jo.value("f_state") == GR_RESERVED);
+                           ui->btnCompleteReserve->setVisible(jo.value("f_state") == GR_RESERVED);
+                           ui->leReservedQty->setReadOnly(true);
+                           ui->lePrepaid->setDouble(jo.value("f_prepaid").toDouble());
+                           ui->lePrepaidCard->setDouble(jo.value("f_prepaidcard").toDouble());
+                           ui->leFiscal->setInteger(jo.value("f_fiscal").toInteger());
+                           ui->btnPrintFiscal->setEnabled(ui->leFiscal->getInteger() == 0);
+                       });
 }
 
 DlgReservGoods::DlgReservGoods(C5User *user) :
@@ -73,8 +75,6 @@ DlgReservGoods::DlgReservGoods(C5User *user) :
     ui(new Ui::DlgReservGoods)
 {
     ui->setupUi(this);
-    fGoods = 0;
-    fStore = 0;
 }
 
 DlgReservGoods::~DlgReservGoods()
@@ -100,11 +100,11 @@ void DlgReservGoods::on_btnSave_clicked()
 {
     QString err;
 
-    if(fGoods == 0) {
+    if (fGoods.id == 0) {
         err += tr("Goods is not specified") + "<br>";
     }
 
-    if(fStore == 0) {
+    if (fStore.id == 0) {
         err += tr("Store is not specified") + "<br>";
     }
 
@@ -130,18 +130,18 @@ void DlgReservGoods::on_btnSave_clicked()
     ui->btnCompleteReserve->setVisible(true);
     QJsonObject jo;
     jo["action"] = MSG_GOODS_RESERVE;
-    jo["goods"] = fGoods;
+    jo["goods"] = fGoods.id;
     jo["userfrom"] = __c5config.defaultStore();
-    jo["userto"] = fStore;
+    jo["userto"] = fStore.id;
     jo["qty"] = ui->leReservedQty->getDouble();
     jo["goodsname"] = ui->leName->text();
     jo["scancode"] = ui->leScancode->text();
-    jo["unit"] = dbo_str("c_goods", tr("Unit"), fGoods);
+    jo["unit"] = fGoods.unitName;
     jo["usermessage"] = ui->leMessage->text();
     jo["enddate"] = ui->leEndDay->text();
     jo["f_id"] = ui->leCode->getInteger();
     jo["f_enddate"] = ui->leEndDay->date().toString(FORMAT_DATE_TO_STR_MYSQL);
-    jo["f_goods"] = fGoods;
+    jo["f_goods"] = fGoods.id;
     jo["f_qty"] = ui->leReservedQty->getDouble();
     jo["f_message"] = ui->leMessage->text();
     jo["f_prepaid"] = ui->lePrepaid->getDouble();
@@ -165,11 +165,16 @@ void DlgReservGoods::setState(int state)
     ui->btnCancelReserve->setVisible(false);
     ui->btnCompleteReserve->setVisible(false);
 #if(!defined FRONTDESK && !defined WAITER)
-    WOrder *wo = Working::working()->newSale(SALE_RETAIL);
+
     //TODO UPDATE
-    //wo->addGoods(fGoods);
-    wo->setQtyOfRow(0, ui->leReservedQty->getDouble());
-    wo->fOHeader.amountPrepaid = ui->lePrepaid->getDouble() + ui->lePrepaidCard->getDouble();
+    if (state == GR_COMPLETED) {
+        WOrder *wo = Working::working()->newSale(SALE_RETAIL);
+        wo->checkGoodsCode(fGoods.barcode, [=]() {
+            wo->setQtyOfRow(0, ui->leReservedQty->getDouble());
+            wo->fOHeader.amountPrepaid = ui->lePrepaid->getDouble()
+                                         + ui->lePrepaidCard->getDouble();
+        });
+    }
 #endif
 }
 
@@ -194,8 +199,8 @@ void DlgReservGoods::updateState(int state)
 
     db.update("a_store_reserve", "f_id", ui->leCode->getInteger());
     db[":f_qty"] = ui->leReservedQty->getDouble();
-    db[":f_goods"] = fGoods;
-    db[":f_store"] = fStore;
+    db[":f_goods"] = fGoods.id;
+    db[":f_store"] = fStore.id;
     db.exec("update a_store_sale set f_qtyreserve=f_qtyreserve-:f_qty "
             "where f_store=:f_store and f_goods=:f_goods");
 }
@@ -228,7 +233,7 @@ void DlgReservGoods::on_btnGoods_clicked()
     GoodsItem si = result.at(0);
     ui->leName->setText(si.name);
     ui->leScancode->setText(si.barcode);
-    fGoods = si.id;
+    fGoods = si;
     getAvailableGoods();
     //TODO
     // DlgDataOnline::DataResult r;
@@ -252,7 +257,7 @@ void DlgReservGoods::on_btnStore_clicked()
 
     StorageItem si = result.at(0);
     ui->leStore->setText(si.name);
-    fStore = si.id;
+    fStore = si;
     getAvailableGoods();
 #endif
 }
@@ -261,18 +266,18 @@ void DlgReservGoods::getAvailableGoods()
 {
     ui->leTotalQty->setDouble(0);
 
-    if(fGoods > 0 && fStore > 0) {
+    if (fGoods.id > 0 && fStore.id > 0) {
         C5Database db;
-        db[":f_store"] = fStore;
-        db[":f_goods"] = fGoods;
+        db[":f_store"] = fStore.id;
+        db[":f_goods"] = fGoods.id;
         db.exec("select sum(f_qty*f_type) from a_store where f_store=:f_store and f_goods=:f_goods");
 
         if(db.nextRow()) {
             ui->leTotalQty->setDouble(db.getDouble(0));
         }
 
-        db[":f_store"] = fStore;
-        db[":f_goods"] = fGoods;
+        db[":f_store"] = fStore.id;
+        db[":f_goods"] = fGoods.id;
         db[":f_state"] = GR_RESERVED;
         db.exec("select sum(f_qty) from a_store_reserve where f_store=:f_store and f_goods=:f_goods and f_state=:f_state");
 

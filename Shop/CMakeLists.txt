@@ -50,7 +50,6 @@ add_executable(${PROJECT_NAME}
     ../Cafe5/c5double.cpp
     ../Cafe5/c5systempreference.cpp
     ../Cafe5/calendar.cpp
-    ../Cafe5/dlgexitbyversion.cpp
     ../Classes/QProgressIndicator.cpp
     ../Classes/QRCodeGenerator.cpp
     ../Classes/appwebsocket.cpp
@@ -75,12 +74,11 @@ add_executable(${PROJECT_NAME}
     ../Classes/c5tableview.cpp
     ../Classes/c5textdelegate.cpp
     ../Classes/c5threadobject.cpp
-    ../Classes/c5translator.cpp
     ../Classes/c5user.cpp
     ../Classes/c5widget.cpp
     ../Classes/c5witerconf.cpp
     ../Classes/calculator.cpp
-    ../Classes/dataonline.cpp
+
     ../Classes/fileversion.cpp
     ../Classes/idram.cpp
     ../Classes/logwriter.cpp
@@ -162,7 +160,6 @@ add_executable(${PROJECT_NAME}
     ../Cafe5/c5double.h
     ../Cafe5/c5systempreference.h
     ../Cafe5/calendar.h
-    ../Cafe5/dlgexitbyversion.h
     ../Classes/QProgressIndicator.h
     ../Classes/QRCodeGenerator.h
     ../Classes/appwebsocket.h
@@ -188,13 +185,12 @@ add_executable(${PROJECT_NAME}
     ../Classes/c5tableview.h
     ../Classes/c5textdelegate.h
     ../Classes/c5threadobject.h
-    ../Classes/c5translator.h
     ../Classes/c5user.h
     ../Classes/c5widget.h
     ../Classes/c5witerconf.h
     ../Classes/calculator.h
     ../Classes/chatmessage.h
-    ../Classes/dataonline.h
+
     ../Classes/fileversion.h
     ../Classes/goodsreserve.h
     ../Classes/idram.h
@@ -284,7 +280,6 @@ add_executable(${PROJECT_NAME}
     dqty.h
     ../Controls/c5checkbox.h
     ../Cafe5/calendar.ui
-    ../Cafe5/dlgexitbyversion.ui
     ../Classes/calculator.ui
     ../Classes/notificationwidget.ui
     ../Controls/c5tablewithtotal.ui

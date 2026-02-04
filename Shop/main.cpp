@@ -56,8 +56,9 @@ int main(int argc, char* argv[])
     QFile styleSheet(a.applicationDirPath() + "/shop.css");
 
     if(styleSheet.exists()) {
-        styleSheet.open(QIODevice::ReadOnly);
-        a.setStyleSheet(styleSheet.readAll());
+        if (styleSheet.open(QIODevice::ReadOnly)) {
+            a.setStyleSheet(styleSheet.readAll());
+        }
     }
 
     QTranslator t;

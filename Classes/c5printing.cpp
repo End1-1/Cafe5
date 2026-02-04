@@ -139,6 +139,7 @@ void C5Printing::ltext(const QString &text, qreal x, qreal textWidth)
     QGraphicsTextItem *item = fCanvas->addText(text, fFont);
     item->moveBy(x * fMM, fTop);
     setTemptop(item, textWidth * fMM);
+
     QJsonObject o;
     o["cmd"] = "ltext";
     o["text"] = text;
@@ -155,12 +156,38 @@ void C5Printing::lrtext(const QString &leftText, const QString &rightText, qreal
 
 void C5Printing::ctext(const QString &text)
 {
+    QGraphicsTextItem *item = fCanvas->addText(text, fFont);
+
+    setTemptop(item, fNormalWidth);
+
+    auto *doc = item->document();
     QFontMetrics fm(fFont);
-    const int w = fm.horizontalAdvance(text);
-    auto *item = fCanvas->addText(text, fFont);
-    item->setTextWidth(-1);
-    item->moveBy((fNormalWidth - w) / 2, fTop);
-    fTempTop = qMax<qreal>(fTempTop, fm.height());
+
+    qreal y = fTop;
+    qreal totalHeight = 0;
+
+    for (QTextBlock block = doc->begin(); block.isValid(); block = block.next()) {
+        QTextLayout *layout = block.layout();
+
+        for (int i = 0; i < layout->lineCount(); ++i) {
+            QTextLine line = layout->lineAt(i);
+            QString lineText = block.text().mid(line.textStart(), line.textLength());
+
+            int w = fm.horizontalAdvance(lineText);
+
+            QGraphicsTextItem *lineItem = fCanvas->addText(lineText, fFont);
+
+            lineItem->moveBy((fNormalWidth - w) / 2, y);
+
+            y += line.height();
+            totalHeight += line.height();
+        }
+    }
+
+    fTempTop = qMax(fTempTop, totalHeight);
+
+    item->setVisible(false);
+
     QJsonObject o;
     o["cmd"] = "ctext";
     o["text"] = text;
@@ -171,10 +198,13 @@ void C5Printing::rtext(const QString text)
 {
     QFontMetrics fm(fFont);
     const int w = fm.horizontalAdvance(text);
+
     QGraphicsTextItem *item = fCanvas->addText(text, fFont);
     item->setTextWidth(-1);
     item->moveBy(qMax<qreal>(0, fNormalWidth - w), fTop);
+
     setTemptop(item, -1);
+
     QJsonObject o;
     o["cmd"] = "rtext";
     o["text"] = text;
@@ -263,11 +293,14 @@ void C5Printing::setLineHeight()
 void C5Printing::setTemptop(QGraphicsTextItem *item, qreal textwidth)
 {
     item->setTextWidth(textwidth == -1 ? fNormalWidth : textwidth);
+
     QTextOption opt;
     opt.setWrapMode(QTextOption::WordWrap);
     item->document()->setDefaultTextOption(opt);
-    // ВАЖНО: корректный расчёт высоты документа
+
+    // корректный расчёт высоты документа
     item->document()->adjustSize();
+
     qreal h = item->document()->size().height();
     fTempTop = qMax(fTempTop, h);
 }

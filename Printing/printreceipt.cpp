@@ -15,7 +15,7 @@ void PrintReceipt::print(const QString &id, C5Database &db)
     db[":f_id"] = id;
     db.exec("select * from o_header where f_id=:f_id");
     db.nextRow();
-    QString saletype;
+    QString saletype = tr("Sale");
 
     if(db.getDouble("f_amounttotal") < 0) {
         saletype = tr("Return");
@@ -119,7 +119,8 @@ void PrintReceipt::print(const QString &id, C5Database &db)
 
     if(!C5Config::localReceiptPrinter().isEmpty()) {
         QFont font(qApp->font());
-        font.setPointSize(20);
+        int bs = 12;
+        font.setPointSize(bs);
         C5Printing p;
         QPrinterInfo pi = QPrinterInfo::printerInfo(C5Config::localReceiptPrinter());
         QPrinter printer(pi);
@@ -164,10 +165,10 @@ void PrintReceipt::print(const QString &id, C5Database &db)
         p.br(2);
 
         if(!saletype.isEmpty()) {
-            p.setFontSize(22);
+            p.setFontSize(bs + 2);
             p.ctext(saletype);
             p.br();
-            p.setFontSize(20);
+            p.setFontSize(bs);
         }
 
         if(!partnerName.isEmpty()) {
@@ -180,27 +181,24 @@ void PrintReceipt::print(const QString &id, C5Database &db)
 
         p.setFontBold(true);
 
-        if(fModeRefund) {
-            p.setFontSize(30);
-            p.ctext(tr("Refund"));
-            p.br();
-        }
-
+        p.setFontSize(bs);
         p.ctext(QString("#%1%2").arg(pref).arg(hallid));
         p.br();
 
         if(returnFrom.count() > 0) {
+            p.setFontSize(bs);
             p.ctext(QString("(%1 %2%3)").arg(tr("Return from"))
                     .arg(returnFrom["f_prefix"].toString())
                     .arg(returnFrom["f_hallid"].toInt()));
             p.br();
         }
 
-        p.setFontSize(20);
+        p.setFontSize(bs);
         p.ctext(tr("Class | Name | Qty | Price | Total"));
         p.setFontBold(false);
         p.br();
-        p.line(3);
+        p.br();
+        p.line();
         p.br(3);
 
         for(int i = 0; i < data.count(); i++) {
@@ -236,7 +234,7 @@ void PrintReceipt::print(const QString &id, C5Database &db)
             p.br(2);
         }
 
-        p.line(4);
+        p.line();
         p.br(3);
         p.setFontBold(true);
 
@@ -264,7 +262,7 @@ void PrintReceipt::print(const QString &id, C5Database &db)
                 p.br();
             }
 
-            p.setFontSize(20);
+            p.setFontSize(bs);
             p.setFontBold(true);
             p.br(p.fLineHeight * 3);
             p.ltext(tr("Thank you for visit!"), 0);

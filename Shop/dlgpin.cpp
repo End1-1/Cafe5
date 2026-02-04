@@ -101,7 +101,14 @@ void DlgPin::on_btnEnter_clicked()
                                C5ConnectionDialog::instance()->serverAddress());
             __c5config.setValues(settings);
             __c5config.fMainJson = mUser->fConfig;
-            AppWebSocket::reconnect(C5ConnectionDialog::instance()->noneSecure ? "ws://" : "wss://" + __c5config.getRegValue("ss_server_address").toString() + "/ws", __c5config.getRegValue("ss_server_key").toString(), ui->leUser->text(), ui->lePin->text());
+            AppWebSocket::reconnect((C5ConnectionDialog::instance()->connectionType()
+                                             == C5ConnectionDialog::instance()->noneSecure
+                                         ? "ws://"
+                                         : "wss://")
+                                        + C5ConnectionDialog::instance()->serverAddress() + "/ws",
+                                    C5ConnectionDialog::instance()->serverKey(),
+                                    ui->leUser->text(),
+                                    ui->lePin->text());
             accept();
         }, [](const QJsonObject & jerr) {
         });

@@ -130,7 +130,7 @@ add_executable(OfficeN
     ../Forms/dlgcashop.ui
     ../Forms/dlgchangeoutputstore.ui
     ../Forms/dlgconfigtable.ui
-    ../Forms/dlgdataonline.ui
+
     ../Forms/dlgdirtystoredoc.ui
     ../Forms/dlgdriverroutedate.ui
     ../Forms/dlgexportsaletoasoptions.ui
@@ -264,7 +264,6 @@ add_executable(OfficeN
     ../Classes/c5user.h
     ../Classes/calculator.h
     ../Classes/chatmessage.h
-    ../Classes/dataonline.h
     ../Classes/goodsreserve.h
     ../Classes/notificationwidget.h
     ../Classes/outputofheader.h
@@ -347,7 +346,7 @@ add_executable(OfficeN
     ../Forms/dlgcashop.h
     ../Forms/dlgchangeoutputstore.h
     ../Forms/dlgconfigtable.h
-    ../Forms/dlgdataonline.h
+
     ../Forms/dlgdirtystoredoc.h
     ../Forms/dlgdriverroutedate.h
     ../Forms/dlgexportsaletoasoptions.h
@@ -594,7 +593,6 @@ add_executable(OfficeN
     ../Classes/c5threadobject.cpp
     ../Classes/c5user.cpp
     ../Classes/calculator.cpp
-    ../Classes/dataonline.cpp
     ../Classes/notificationwidget.cpp
     ../Classes/outputofheader.cpp
     ../Classes/proxytablewidgetdatabase.cpp
@@ -668,7 +666,7 @@ add_executable(OfficeN
     ../Forms/dlgcashop.cpp
     ../Forms/dlgchangeoutputstore.cpp
     ../Forms/dlgconfigtable.cpp
-    ../Forms/dlgdataonline.cpp
+
     ../Forms/dlgdirtystoredoc.cpp
     ../Forms/dlgdriverroutedate.cpp
     ../Forms/dlgexportsaletoasoptions.cpp

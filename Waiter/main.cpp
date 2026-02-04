@@ -21,7 +21,6 @@
 int main(int argc, char* argv[])
 {
 #ifdef QT_DEBUG
-    QGuiApplication::setAttribute(Qt::AA_DisableHighDpiScaling);
     QGuiApplication::setAttribute(Qt::AA_Use96Dpi);
 #endif
     QApplication a(argc, argv);

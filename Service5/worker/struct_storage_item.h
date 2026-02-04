@@ -4,7 +4,7 @@
 #include <QStringList>
 
 struct StorageItem {
-    int id;
+    int id = 0;
     QString name;
     QString nameLower;
     QStringList words;

@@ -86,7 +86,7 @@ public:
 
     void openDraft(const QString &draftid);
 
-    void checkGoodsCode(const QString &code);
+    void checkGoodsCode(const QString &code, std::function<void()> postProcess = nullptr);
 
     void addGoods2(const QString &barcode, double price);
 
@@ -110,6 +110,7 @@ private slots:
     void on_btnRemovePartner_clicked();
 
     void on_tblData_doubleClicked(const QModelIndex &index);
+
 
 private:
     Ui::WOrder* ui;
