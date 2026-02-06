@@ -1,15 +1,16 @@
 #ifndef WORDER_H
 #define WORDER_H
 
-#include "c5database.h"
-#include "bhistory.h"
-#include "oheader.h"
-#include "ogoods.h"
-#include "odraftsale.h"
-#include "ninterface.h"
-#include <QWidget>
 #include <QDate>
 #include <QTime>
+#include <QWidget>
+#include "bhistory.h"
+#include "c5database.h"
+#include "ninterface.h"
+#include "odraftsale.h"
+#include "ogoods.h"
+#include "oheader.h"
+#include "struct_partner.h"
 
 namespace Ui
 {
@@ -111,6 +112,7 @@ private slots:
 
     void on_tblData_doubleClicked(const QModelIndex &index);
 
+    void on_btnAddPartner_clicked();
 
 private:
     Ui::WOrder* ui;
@@ -134,6 +136,8 @@ private:
     bool getDiscountValue(int discountType, double& v);
 
     void removeDraft();
+
+    void setPartner(PartnerItem pi);
 
     void processCode(const QString &code, int permission, std::function<void (const QString&)> func);
 

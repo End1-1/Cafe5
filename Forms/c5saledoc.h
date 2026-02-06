@@ -33,6 +33,9 @@ public:
 
     bool openDraft(const QString &id);
 
+private:
+    void checkStock(int store, int goods);
+
 private slots:
     void makeDraftResponse(const QJsonObject &jdoc);
 

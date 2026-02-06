@@ -319,6 +319,7 @@ add_executable(${PROJECT_NAME}
     ../Classes/c5codenameselectorfunctions.h
     ../Classes/fileversion.cpp ../Classes/fileversion.h
     ../Controls/c5cleartablewidget.cpp ../Controls/c5cleartablewidget.h
+    dlgshopcustomer.h dlgshopcustomer.cpp dlgshopcustomer.ui
 
 
 )

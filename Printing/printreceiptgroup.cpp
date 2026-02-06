@@ -739,7 +739,7 @@ void PrintReceiptGroup::print2(const QString &id, C5Database &db)
         }
 
         QPixmap pix = QPixmap::fromImage(encodeImage);
-        pix = pix.scaled(300, 300);
+        pix = pix.scaled(150, 150);
         p.image(pix, Qt::AlignHCenter);
         p.br();
         /* End QRCode */

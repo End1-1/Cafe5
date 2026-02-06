@@ -1,31 +1,31 @@
 #include "worder.h"
-#include "outputofheader.h"
-#include "ui_worder.h"
-#include "c5database.h"
-#include "c5config.h"
-#include "printtaxn.h"
-#include "dqty.h"
-#include "c5message.h"
-#include "c5permissions.h"
-#include "printreceiptgroup.h"
-#include "selectstaff.h"
-#include "c5shoporder.h"
-#include "c5replacecharacter.h"
-#include "struct_partner.h"
-#include "c5structtableview.h"
-#include "working.h"
-#include "selectprinters.h"
-#include "dlgpaymentchoose.h"
-#include "c5user.h"
-#include "datadriver.h"
-#include "wcustomerdisplay.h"
-#include "c5utils.h"
-#include "c5checkbox.h"
-#include "goodscols.h"
-#include <QInputDialog>
-#include <QSettings>
 #include <QDir>
 #include <QFile>
+#include <QInputDialog>
+#include <QSettings>
+#include "c5checkbox.h"
+#include "c5config.h"
+#include "c5database.h"
+#include "c5message.h"
+#include "c5permissions.h"
+#include "c5replacecharacter.h"
+#include "c5shoporder.h"
+#include "c5structtableview.h"
+#include "c5user.h"
+#include "c5utils.h"
+#include "datadriver.h"
+#include "dlgpaymentchoose.h"
+#include "dlgshopcustomer.h"
+#include "dqty.h"
+#include "goodscols.h"
+#include "outputofheader.h"
+#include "printreceiptgroup.h"
+#include "printtaxn.h"
+#include "selectprinters.h"
+#include "selectstaff.h"
+#include "ui_worder.h"
+#include "wcustomerdisplay.h"
+#include "working.h"
 
 static QSettings s(_ORGANIZATION_, _APPLICATION_ + QString("\\") + _MODULE_);
 
@@ -1006,6 +1006,14 @@ void WOrder::removeDraft()
     }
 }
 
+void WOrder::setPartner(PartnerItem pi)
+{
+    fOHeader.partner = pi.id;
+    ui->leTIN->setText(pi.tin);
+    ui->leCustomer->setText(pi.taxName + ", " + pi.contactName + ", " + pi.phone);
+    ui->btnF5->setVisible(true);
+}
+
 bool WOrder::setQtyOfRow(int row, double qty)
 {
     OGoods &og = fOGoods[row];
@@ -1254,18 +1262,18 @@ void WOrder::on_leCode_returnPressed()
 
 void WOrder::on_btnSearchPartner_clicked()
 {
-    QVector<PartnerItem> result = C5StructTableView::get<PartnerItem>(SelectorName<PartnerItem>::value, false, false, ui->btnSearchPartner->mapToGlobal(QPoint(0, ui->btnSearchPartner->height())));
+    QVector<PartnerItem> result
+        = C5StructTableView::get<PartnerItem>(SelectorName<PartnerItem>::value,
+                                              false,
+                                              false,
+                                              QPoint(-1, -1));
 
     if(result.isEmpty()) {
         return;
     }
 
     on_btnRemovePartner_clicked();
-    PartnerItem pi = result.at(0);
-    fOHeader.partner = pi.id;
-    ui->leTIN->setText(pi.tin);
-    ui->leCustomer->setText(pi.taxName + ", " + pi.contactName + ", " + pi.phone);
-    ui->btnF5->setVisible(true);
+    setPartner(result.at(0));
 }
 
 void WOrder::on_leUseAccumulated_textChanged(const QString & arg1)
@@ -1629,3 +1637,11 @@ void WOrder::processAccumulateCard(const QString & code)
     // }
 }
 
+void WOrder::on_btnAddPartner_clicked()
+{
+    DlgShopCustomer d(fUser);
+    d.setTin(ui->leTIN->text());
+    if (d.exec() == QDialog::Accepted) {
+        setPartner(d.mPartner);
+    }
+}

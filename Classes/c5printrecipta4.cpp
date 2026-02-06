@@ -48,6 +48,7 @@ QString C5PrintReciptA4::makeGoodsTable(const QList<QMap<QString, QVariant>> &bo
     s << "<tr>"
       << "<th>NN</th>"
       << "<th>Կոդ</th>"
+      << "<th>ԱԴԳՏ</th>"
       << "<th>Ապրանք</th>"
       << "<th class='right'>Քանակ</th>"
       << "<th>Չափ․մ․</th>"
@@ -64,6 +65,7 @@ QString C5PrintReciptA4::makeGoodsTable(const QList<QMap<QString, QVariant>> &bo
         s << "<tr>";
         s << "<td class='center'>" << i + 1 << "</td>";
         s << "<td>" << m["f_scancode"].toString() << "</td>";
+        s << "<td>" << m["f_adgt"].toString() << "</td>";
         s << "<td>" << m["f_goodsname"].toString() << "</td>";
         s << "<td class='right'>" << float_str(m["f_qty"].toDouble(), 2) << "</td>";
         s << "<td>" << m["f_unitname"].toString() << "</td>";
@@ -159,20 +161,26 @@ bool C5PrintReciptA4::print(QString &err)
     db[":f_header"] = fOrderUUID;
 
     if(isDraft) {
-        db.exec("select g.f_scancode, g.f_name as f_goodsname, "
-                "ob.f_qty, ob.f_price, ob.f_qty*ob.f_price as f_total, "
-                "s.f_name as f_storename, gu.f_name as f_unitname, ob.f_discount as f_discountfactor "
-                "from o_draft_sale_body ob "
-                "left join c_goods g on g.f_id=ob.f_goods "
-                "left join c_storages s on s.f_id=ob.f_store "
-                "left join c_units gu on gu.f_id=g.f_unit "
-                "where ob.f_header=:f_header "
-                "order by ob.f_row ");
+        db.exec(
+            "select g.f_scancode, g.f_name as f_goodsname, "
+            "ob.f_qty, ob.f_price, ob.f_qty*ob.f_price as f_total, "
+            "s.f_name as f_storename, gu.f_name as f_unitname, ob.f_discount as f_discountfactor, "
+            "if(length(coalesce(g.f_adg, ''))>0, g.f_adg, gg.f_adgcode) as f_adgt "
+            "from o_draft_sale_body ob "
+            "left join c_goods g on g.f_id=ob.f_goods "
+            "left join c_groups gg on gg.f_id=g.f_group "
+            "left join c_storages s on s.f_id=ob.f_store "
+            "left join c_units gu on gu.f_id=g.f_unit "
+            "where ob.f_header=:f_header "
+            "order by ob.f_row ");
     } else {
         db.exec("select g.f_scancode, g.f_name as f_goodsname, ob.f_qty, ob.f_price, ob.f_total, "
-                "s.f_name as f_storename, gu.f_name as f_unitname, ob.f_discountfactor * 100 as f_discountfactor "
+                "s.f_name as f_storename, gu.f_name as f_unitname, ob.f_discountfactor * 100 as "
+                "f_discountfactor, "
+                "if(length(coalesce(g.f_adg, ''))>0, g.f_adg, gg.f_adgcode) as f_adgt "
                 "from o_goods ob "
                 "left join c_goods g on g.f_id=ob.f_goods "
+                "left join c_groups gg on gg.f_id=g.f_group "
                 "left join c_storages s on s.f_id=ob.f_store "
                 "left join c_units gu on gu.f_id=g.f_unit "
                 "where ob.f_header=:f_header "

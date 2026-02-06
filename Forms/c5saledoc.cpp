@@ -49,6 +49,7 @@
 #define col_returnfrom 13
 #define col_emarks 14
 #define col_adgt 15
+#define col_stock 16
 
 #define float_str_(value, f) QString::number(value, 'f', f)
 
@@ -1278,6 +1279,21 @@ bool C5SaleDoc::openDraft(const QString &id)
     return true;
 }
 
+void C5SaleDoc::checkStock(int store, int goods)
+{
+    NInterface::query1("/engine/v2/common/stock/quick-check",
+                       mUser->mSessionKey,
+                       this,
+                       {{"goods_id", goods}, {"store_id", store}},
+                       [this, goods](const QJsonObject &jo) {
+                           for (int i = 0; i < ui->tblGoods->rowCount(); i++) {
+                               if (ui->tblGoods->getInteger(i, col_goods_code) == goods) {
+                                   ui->tblGoods->setDouble(i, col_goods_code, jo["qty"].toDouble());
+                               }
+                           }
+                       });
+}
+
 void C5SaleDoc::setPartner()
 {
     ui->leTaxpayerName->setText(QString("%1, %2, %3").arg(fPartner.categoryName, fPartner.groupName, fPartner.taxName));
@@ -1497,6 +1513,9 @@ void C5SaleDoc::on_btnAddGoods_clicked()
 
     C5Database db;
     addGoods(vals.at(1).toInt(), db);
+    if (true) {
+        checkStock(ui->cbStorage->currentData().toInt(), vals.at(1).toInt());
+    }
 }
 
 void C5SaleDoc::on_btnRemoveGoods_clicked()

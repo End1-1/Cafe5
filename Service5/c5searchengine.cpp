@@ -12,11 +12,14 @@
 #include <QTimer>
 
 static const QString mSqlGoods = R"(
-    select g.f_id,  gr.f_name as f_group_name, g.f_name, g.f_scancode,
-    u.f_name as f_unit_name
+    select g.f_id,  g.f_group as f_group_id, gr.f_name as f_group_name,
+    g.f_name, g.f_scancode,
+    u.f_name as f_unit_name,
+    gp.f_price1, gp.f_price1disc, gp.f_price2, gp.f_price2disc
     from c_goods g
     left join c_groups gr on gr.f_id=g.f_group
     left join c_units u on u.f_id=g.f_unit
+    left join c_goods_prices gp on gp.f_goods=g.f_id and gp.f_currency=1
     %where%
     order by g.f_name
     )";
@@ -245,6 +248,7 @@ void C5SearchEngine::init(const QString &databaseName, const QString &serverKey)
         QString name = db.string("f_group_name") + " " + db.string("f_name") + " " + db.string("f_scancode");
         GoodsItem g;
         g.id        = db.integer("f_id");
+        g.groupId = db.integer("f_group_id");
         g.groupName = db.string("f_group_name");
         g.name      = db.string("f_name");
         g.unitName  = db.string("f_unit_name");
@@ -580,7 +584,7 @@ QString C5SearchEngine::searchGoodsItem(const QJsonObject &jo, const SocketStruc
     jrep["actionId"] = jo["actionId"];
     QString needle = jo["lower_name"].toString().trimmed();
     QStringList qwords = needle.split(' ', Qt::SkipEmptyParts);
-    QJsonArray jstorages;
+    QJsonArray jgoods;
     {
         QReadLocker rl(&mGoodsLock);
         const QVector < GoodsItem > & siv = mGoods.value(ss.tenantId);
@@ -596,6 +600,11 @@ QString C5SearchEngine::searchGoodsItem(const QJsonObject &jo, const SocketStruc
                     continue;
                 }
             } else {
+                if (jo.contains("group_id") && jo.value("group_id").toInt() > 0) {
+                    if (si.groupId != jo.value("group_id").toInt()) {
+                        continue;
+                    }
+                }
                 for(const QString &qw : qwords) {
                     bool found = false;
 
@@ -616,15 +625,9 @@ QString C5SearchEngine::searchGoodsItem(const QJsonObject &jo, const SocketStruc
                     continue;
             }
 
-            jstorages.append(QJsonObject{
-                {"f_id", si.id},
-                {"f_group_name", si.groupName},
-                {"f_name", si.name},
-                {"f_barcode", si.barcode},
-                {"f_unit_name", si.unitName}
-            });
+            jgoods.append(si.toJson());
 
-            if(jstorages.size() >= limit) {
+            if (jgoods.size() >= limit) {
                 break;
             }
 
@@ -633,7 +636,7 @@ QString C5SearchEngine::searchGoodsItem(const QJsonObject &jo, const SocketStruc
             }
         }
     }
-    jrep["result"] = jstorages;
+    jrep["result"] = jgoods;
     return QJsonDocument(jrep).toJson(QJsonDocument::Compact);
 }
 

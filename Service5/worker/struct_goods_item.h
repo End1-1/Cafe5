@@ -5,6 +5,7 @@
 
 struct GoodsItem {
     int id = 0;
+    int groupId = 0;
     QString groupName;
     QString name;
     QString barcode;
@@ -14,8 +15,24 @@ struct GoodsItem {
     double price1disc = 0;
     double price2 = 0;
     double price2disc = 0;
+    double qty = 0;
     QString nameLower;
     QStringList words;
+
+    QJsonObject toJson() const
+    {
+        return QJsonObject{{"f_id", id},
+                           {"f_group_id", groupId},
+                           {"f_group_name", groupName},
+                           {"f_name", name},
+                           {"f_barcode", barcode},
+                           {"f_unit_name", unitName},
+                           {"f_price1", price1},
+                           {"f_price1disc", price1disc},
+                           {"f_price2", price2},
+                           {"f_price2disc", price2disc},
+                           {"f_qty", qty}};
+    }
 };
 
 template<> struct SelectorName<GoodsItem> {
@@ -28,6 +45,7 @@ struct JsonParser<GoodsItem> {
     {
         GoodsItem g;
         g.id        = jo["f_id"].toInt();
+        g.groupId = jo["f_group_id"].toInt();
         g.groupName = jo["f_group_name"].toString();
         g.name      = jo["f_name"].toString();
         g.unitName  = jo["f_unit_name"].toString();
@@ -37,6 +55,7 @@ struct JsonParser<GoodsItem> {
         g.price1disc = jo["f_price1disc"].toDouble();
         g.price2    = jo["f_price2"].toDouble();
         g.price2disc = jo["f_price2disc"].toDouble();
+        g.qty = jo["f_qty"].toDouble();
         return g;
     }
 };
@@ -44,6 +63,7 @@ struct JsonParser<GoodsItem> {
 template<>
 struct StructTraits<GoodsItem> {
     static QVariant id(const GoodsItem &s)     { return s.id; }
+    static QVariant groupId(const GoodsItem &s) { return s.groupId; };
     static QVariant groupName(const GoodsItem &s) {return s.groupName;}
     static QVariant name(const GoodsItem &s)   { return s.name; }
     static QVariant barcode(const GoodsItem &s) {return s.barcode;}
