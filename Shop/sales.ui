@@ -346,35 +346,6 @@
          </widget>
         </item>
         <item>
-         <widget class="QPushButton" name="btnTotalByItems">
-          <property name="minimumSize">
-           <size>
-            <width>0</width>
-            <height>40</height>
-           </size>
-          </property>
-          <property name="styleSheet">
-           <string notr="true">                QPushButton:checked{
-                    background-color: rgb(0, 150, 0);
-					font-weight:bold;
-                }</string>
-          </property>
-          <property name="text">
-           <string>Total items</string>
-          </property>
-          <property name="icon">
-           <iconset resource="../resources/res.qrc">
-            <normaloff>:/print.png</normaloff>:/print.png</iconset>
-          </property>
-          <property name="checkable">
-           <bool>true</bool>
-          </property>
-          <property name="checked">
-           <bool>false</bool>
-          </property>
-         </widget>
-        </item>
-        <item>
          <widget class="Line" name="line">
           <property name="orientation">
            <enum>Qt::Orientation::Horizontal</enum>
@@ -578,7 +549,7 @@
         <bool>true</bool>
        </property>
        <attribute name="verticalHeaderDefaultSectionSize">
-        <number>25</number>
+        <number>26</number>
        </attribute>
        <column>
         <property name="text">
@@ -706,7 +677,7 @@
   <customwidget>
    <class>C5LineEdit</class>
    <extends>QLineEdit</extends>
-   <header location="global">c5lineedit.h</header>
+   <header>c5lineedit.h</header>
   </customwidget>
   <customwidget>
    <class>C5ClearTableWidget</class>

@@ -39,12 +39,12 @@ void C5Printing::setSceneParams(qreal width, qreal height, qreal logicalDpiX)
 void C5Printing::reset()
 {
     fLinePen.setWidth(1);
-    fLineHeight = 4;
     fTop = 0;
     fTempTop = 0;
     fCurrentPageIndex = 0;
     fJsonData = QJsonArray();
     QJsonObject o;
+    setLineHeight();
     o["cmd"] = "scene";
     o["width"] = fNormalWidth;
     o["height"] = fCanvas->height();
@@ -253,10 +253,12 @@ bool C5Printing::br(qreal height)
     o["height"] = height;
     fJsonData.append(o);
 
-    if(height <= 0)
+    if (height <= 0) {
         height = fLineHeight;
-
-    fTop += qMax(height, fTempTop);
+        fTop += qMax(height, fTempTop);
+    } else {
+        fTop += height;
+    }
     fTempTop = 0;
     return false;
 }
@@ -287,7 +289,7 @@ QJsonArray C5Printing::jsonData()
 void C5Printing::setLineHeight()
 {
     QFontMetrics fm(fFont);
-    fLineHeight = (fm.height());
+    fLineHeight = fm.height() / fMM;
 }
 
 void C5Printing::setTemptop(QGraphicsTextItem *item, qreal textwidth)
@@ -297,8 +299,6 @@ void C5Printing::setTemptop(QGraphicsTextItem *item, qreal textwidth)
     QTextOption opt;
     opt.setWrapMode(QTextOption::WordWrap);
     item->document()->setDefaultTextOption(opt);
-
-    // корректный расчёт высоты документа
     item->document()->adjustSize();
 
     qreal h = item->document()->size().height();

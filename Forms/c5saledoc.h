@@ -115,6 +115,8 @@ private slots:
 
     void on_btnCopyUUID_clicked();
 
+    void on_btnStock_clicked();
+
 private:
     Ui::C5SaleDoc* ui;
     CPartners fPartner;

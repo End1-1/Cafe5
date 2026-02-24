@@ -311,7 +311,6 @@ void ViewOrder::on_btnEditBuyer_clicked()
 void ViewOrder::on_btnPrintReceipt_clicked()
 {
     if(!C5Config::localReceiptPrinter().isEmpty()) {
-        C5Database db;
         PrintReceiptGroup p;
 
         switch(C5Config::shopPrintVersion()) {
@@ -320,11 +319,11 @@ void ViewOrder::on_btnPrintReceipt_clicked()
 
             if(SelectPrinters::selectPrinters(p1, p2, mUser)) {
                 if(p1) {
-                    p.print(ui->leUUID->text(), db, 1);
+                    p.print(ui->leUUID->text(), 1);
                 }
 
                 if(p2) {
-                    p.print(ui->leUUID->text(), db, 2);
+                    p.print(ui->leUUID->text(), 2);
                 }
             }
 
@@ -332,7 +331,7 @@ void ViewOrder::on_btnPrintReceipt_clicked()
         }
 
         case 2:
-            p.print2(ui->leUUID->text(), db);
+            p.print2(ui->leUUID->text());
             break;
 
         default:

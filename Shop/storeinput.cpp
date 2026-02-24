@@ -24,14 +24,11 @@ StoreInput::StoreInput(C5User *user) :
 {
     ui->setupUi(this);
     ui->tbl->setColumnWidths(ui->tbl->columnCount(), 0, 30, 100, 0, 300, 140, 100, 100);
-    fViewMode = VM_ACCEPT;
-    refresh();
 }
 
 StoreInput::~StoreInput()
 {
     delete ui;
-    delete mUser;
 }
 
 void StoreInput::checkboxCheck(bool v)
@@ -226,8 +223,6 @@ void StoreInput::getList()
         ui->tbl->setDouble(r, 7, db.getDouble("f_price1"));
         ui->leTotal->setDouble(ui->leTotal->getDouble() + (db.getDouble("f_qty") *db.getDouble("f_price1")));
     }
-
-    ui->tbl->fitColumnsToWidth();
 }
 
 void StoreInput::history()
@@ -438,6 +433,15 @@ void StoreInput::changeDate(int d)
 
 void StoreInput::refresh()
 {
+    int md = mUser->fConfig["shop_max_days_of_history"].toInt();
+
+    if (md > 0) {
+        if (QDate::currentDate().addDays(-md) > ui->deStart->date()) {
+            ui->deStart->setDate(QDate::currentDate().addDays(-md));
+            ui->deEnd->setDate(ui->deStart->date());
+        }
+    }
+
     switch(fViewMode) {
     case VM_ACCEPT:
         getList();
@@ -587,6 +591,13 @@ void StoreInput::on_btnNewMovement_clicked()
 {
     auto *d = new DlgMovement(mUser);
     d->showMaximized();
+}
+
+void StoreInput::showEvent(QShowEvent *e)
+{
+    C5ShopDialog::showEvent(e);
+    fViewMode = VM_ACCEPT;
+    refresh();
 }
 
 void StoreInput::checkBoxAcceptResponse(const QJsonObject &jdoc)

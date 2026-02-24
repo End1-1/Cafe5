@@ -378,7 +378,7 @@ void C5MainWindow::showDashboard()
     }
 
     if(create) {
-        wd = new WDashboard();
+        wd = new WDashboard(mUser);
         ui->tabWidget->insertTab(0, wd, tr("Dashboard"));
     } else {
         wd->deleteLater();
@@ -475,7 +475,7 @@ void C5MainWindow::enableMenu(bool v)
 
     if(v) {
         if(__c5config.getRegValue("wdashboard", false).toBool()) {
-            auto *wd = new WDashboard();
+            auto *wd = new WDashboard(mUser);
             ui->tabWidget->insertTab(0, wd, tr("Dashboard"));
         }
     } else {

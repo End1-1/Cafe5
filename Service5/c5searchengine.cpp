@@ -258,7 +258,7 @@ void C5SearchEngine::init(const QString &databaseName, const QString &serverKey)
         g.price1disc = db.doubleValue("f_price1disc");
         g.price2    = db.doubleValue("f_price2");
         g.price2disc = db.doubleValue("f_price2disc");
-        g.name = name;
+        g.nameLower = name;
         g.words = name.toLower().split(" ", Qt::SkipEmptyParts);
         tmp2.append(g);
         tmplIndex2[tmp2.last().id] = tmp2.size() - 1;

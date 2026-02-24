@@ -1,14 +1,25 @@
 #include "c5printrecipta4.h"
+#include <QApplication>
+#include <QBuffer>
+#include <QFile>
+#include <QPrinter>
+#include <QStandardPaths>
+#include <QTextDocument>
+#include "QRCodeGenerator.h"
+#include "c5config.h"
 #include "c5database.h"
 #include "c5utils.h"
-#include "c5config.h"
-#include "QRCodeGenerator.h"
 #include "logwriter.h"
-#include <QFile>
-#include <QApplication>
-#include <QPrintPreviewDialog>
-#include <QPrinter>
-#include <QTextDocument>
+#include "previewdialog.h"
+
+QString safeFileName(QString s)
+{
+    s.replace(QRegularExpression(R"([\\/:*?"<>|;])"), "_");
+    s.replace(' ', '_');
+    s.replace('\n', '_');
+    s.replace('\r', '_');
+    return s;
+}
 
 C5PrintReciptA4::C5PrintReciptA4(const QString &orderid, C5User *user, QObject *parent) :
     QObject(parent),
@@ -40,11 +51,12 @@ QString C5PrintReciptA4::applyTemplate(QString html,
     return html;
 }
 
-QString C5PrintReciptA4::makeGoodsTable(const QList<QMap<QString, QVariant>> &body)
+QString C5PrintReciptA4::makeGoodsTable(const QList<QMap<QString, QVariant>> &body, double total)
 {
     QString h;
     QTextStream s(&h);
     s << "<table>";
+
     s << "<tr>"
       << "<th>NN</th>"
       << "<th>Կոդ</th>"
@@ -66,7 +78,7 @@ QString C5PrintReciptA4::makeGoodsTable(const QList<QMap<QString, QVariant>> &bo
         s << "<td class='center'>" << i + 1 << "</td>";
         s << "<td>" << m["f_scancode"].toString() << "</td>";
         s << "<td>" << m["f_adgt"].toString() << "</td>";
-        s << "<td>" << m["f_goodsname"].toString() << "</td>";
+        s << "<td width=250>" << m["f_goodsname"].toString() << "</td>";
         s << "<td class='right'>" << float_str(m["f_qty"].toDouble(), 2) << "</td>";
         s << "<td>" << m["f_unitname"].toString() << "</td>";
         s << "<td class='right'>" << float_str(price, 2) << "</td>";
@@ -75,6 +87,12 @@ QString C5PrintReciptA4::makeGoodsTable(const QList<QMap<QString, QVariant>> &bo
         s << "<td class='right'>" << float_str(discounted * m["f_qty"].toDouble(), 2) << "</td>";
         s << "</tr>";
     }
+
+    s << "<tr>";
+    s << "<td colspan='9' class='right'><b>Ընդամենը</b></td>";
+    s << "<td class='right'><b>" << float_str(total, 2) << "</b></td>";
+    s << "</tr>";
+
     s << "</table>";
     return h;
 }
@@ -108,7 +126,8 @@ bool C5PrintReciptA4::print(QString &err)
     db[":f_id"] = fOrderUUID;
     if(isDraft) {
         db.exec("select '--' as f_ordernumber, ost.f_name as f_saletypename, "
-                "o.f_amount as f_amounttotal, 0 as f_amountcash, 0 as f_amountcard, 0 as f_amountother, o.f_date, "
+                "o.f_amount as f_amounttotal, 0 as f_amountcash, 0 as f_amountcard, 0 as "
+                "f_amountother, 0 as f_amountbank, o.f_date, o.f_debt as f_amountdebt, "
                 "p.f_taxcode, p.f_taxname, p.f_address, o.f_datefor, "
                 "concat_ws(' ', u.f_last, u.f_first) as f_staff, "
                 "CONCAT(DATE(o.f_date), ' ', TIME(o.f_time)) AS lu, o.f_id, "
@@ -119,17 +138,19 @@ bool C5PrintReciptA4::print(QString &err)
                 "left join c_partners p on p.f_id=o.f_partner "
                 "where o.f_id=:f_id ");
     } else {
-        db.exec("select concat(o.f_prefix, o.f_hallid) as f_ordernumber, ost.f_name as f_saletypename, "
-                "o.f_amounttotal, o.f_amountcash, o.f_amountcard, o.f_amountother, o.f_datecash, "
-                "p.f_taxcode, p.f_taxname, p.f_address, ds.f_datefor, "
-                "concat_ws(' ', u.f_last, u.f_first) as f_staff, "
-                "o.lu, o.f_id, o.f_partner  "
-                "from o_header o "
-                "left join o_draft_sale ds on ds.f_id=o.f_id "
-                "left join o_sale_type ost on ost.f_id=o.f_saletype "
-                "left join s_user u on u.f_id=o.f_staff "
-                "left join c_partners p on p.f_id=o.f_partner "
-                "where o.f_id=:f_id ");
+        db.exec(
+            "select concat(o.f_prefix, o.f_hallid) as f_ordernumber, ost.f_name as f_saletypename, "
+            "o.f_amounttotal, o.f_amountcash, o.f_amountcard, o.f_amountother, o.f_datecash, "
+            "o.f_amountbank, o.f_amountdebt, "
+            "p.f_taxcode, p.f_taxname, p.f_address, ds.f_datefor, "
+            "concat_ws(' ', u.f_last, u.f_first) as f_staff, "
+            "o.lu, o.f_id, o.f_partner  "
+            "from o_header o "
+            "left join o_draft_sale ds on ds.f_id=o.f_id "
+            "left join o_sale_type ost on ost.f_id=o.f_saletype "
+            "left join s_user u on u.f_id=o.f_staff "
+            "left join c_partners p on p.f_id=o.f_partner "
+            "where o.f_id=:f_id ");
     }
     QMap<QString, QVariant> header;
 
@@ -156,6 +177,13 @@ bool C5PrintReciptA4::print(QString &err)
         db.nextRow();
         db.rowToMap(debt2);
     }
+    QMap<QString, QString> vars;
+    vars["debt_start"] = float_str(debt1["dd"].toDouble(), 2);
+    vars["debt_change"] = float_str(-1
+                                        * (header["f_amountdebt"].toDouble()
+                                           + header["f_amountbank"].toDouble()),
+                                    2);
+    vars["debt_current"] = float_str(debt1["dd"].toDouble() + debt2["dd"].toDouble(), 2);
 
     QList<QMap<QString, QVariant> > body;
     db[":f_header"] = fOrderUUID;
@@ -220,8 +248,11 @@ bool C5PrintReciptA4::print(QString &err)
             }
         }
     }
+    QByteArray ba;
+    QBuffer buffer(&ba);
+    buffer.open(QIODevice::WriteOnly);
+    encodeImage.save(&buffer, "PNG");
 
-    QMap<QString, QString> vars;
     vars["doc_title"] = tr("Sale") + " " + header["f_ordernumber"].toString();
     vars["date"] = QDate::fromString(header["f_datecash"].toString(), FORMAT_DATE_TO_STR_MYSQL).toString("dd/MM/yyyy");
     vars["delivery_date"] = QDate::fromString(header["f_datefor"].toString(), FORMAT_DATE_TO_STR_MYSQL).toString("dd/MM/yyyy");
@@ -230,18 +261,38 @@ bool C5PrintReciptA4::print(QString &err)
                     tr("Address"), header["f_address"].toString());
     vars["saler"] = __c5config.fMainJson["firmfullinfo"].toString();
     vars["staff"] = header["f_staff"].toString();
-    vars["total_amount"] = float_str(header["f_amounttotal"].toDouble(), 2);
-    vars["goods_table"] = makeGoodsTable(body);
-    vars["qr_image"] = "data:image/png;base64," + encodeString;
+    vars["goods_table"] = makeGoodsTable(body, header["f_amounttotal"].toDouble());
+    vars["qr_visible"] = encodeString.isEmpty() ? "style=\"display:none\"" : "";
+    vars["qr_image"] = "data:image/png;base64," + ba.toBase64();
     html = applyTemplate(html, vars);
+
+    QString tempDir = QStandardPaths::writableLocation(QStandardPaths::TempLocation) + "/officen";
+    QString name = QString("doc;%1;%2;%3")
+                       .arg(header["f_id"].toString(),
+                            isDraft ? tr("Draft") : header["f_ordernumber"].toString(),
+                            header["lu"].toString());
+
+    name = safeFileName(name);
+    QString htmlPath = tempDir + "/" + name + ".html";
+
+    QFile f(htmlPath);
+    if (f.open(QIODevice::WriteOnly | QIODevice::Truncate)) {
+        f.write(html.toUtf8());
+        f.close();
+    }
     QTextDocument doc;
     doc.setHtml(html);
     QPrinter printer(QPrinter::HighResolution);
     printer.setPageSize(QPageSize::A4);
-    printer.setFullPage(false);
-    QPrintPreviewDialog preview(&printer);
-    connect(&preview, &QPrintPreviewDialog::paintRequested,
-    [&](QPrinter * p) { doc.print(p); });
-    preview.exec();
+    printer.setFullPage(true);
+    printer.setPageMargins(QMarginsF(0, 5, 0, 5), QPageLayout::Millimeter);
+    QPageLayout layout(QPageSize(QPageSize::A4),
+                       QPageLayout::Portrait,
+                       QMarginsF(0, 5, 0, 5),
+                       QPageLayout::Millimeter);
+    printer.setPageLayout(layout);
+    printer.setPageOrientation(QPageLayout::Portrait);
+    PrintPreviewDialog dlg(&doc, &printer);
+    dlg.exec();
     return true;
 }

@@ -2,7 +2,6 @@
 #define OUTPUTOFHEADER_H
 
 #include <QObject>
-#include "c5database.h"
 
 class OutputOfHeader : public QObject
 {
@@ -10,7 +9,7 @@ class OutputOfHeader : public QObject
 public:
     explicit OutputOfHeader(QObject *parent = nullptr);
 
-    bool make(C5Database &db, const QString &id);
+    bool make(const QString &id);
 
 signals:
 

@@ -22,7 +22,7 @@ private:
 
     QString applyTemplate(QString html, const QMap<QString, QString>& vars);
 
-    QString makeGoodsTable(const QList<QMap<QString, QVariant> >& body);
+    QString makeGoodsTable(const QList<QMap<QString, QVariant> > &body, double total);
 signals:
 
 };

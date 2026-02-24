@@ -1,7 +1,8 @@
 #include "c5lineedit.h"
-#include "c5utils.h"
-#include <QValidator>
 #include <QKeyEvent>
+#include <QTimer>
+#include <QValidator>
+#include "c5utils.h"
 
 static QLocale mLocale;
 
@@ -183,12 +184,21 @@ void C5LineEdit::keyReleaseEvent(QKeyEvent *event)
 void C5LineEdit::focusOutEvent(QFocusEvent *event)
 {
     QLineEdit::focusOutEvent(event);
+    auto *v = qobject_cast<const QDoubleValidator *>(validator());
+    if (v) {
+        QTimer::singleShot(0, this, &QLineEdit::deselect);
+    }
     emit focusOut();
 }
 
 void C5LineEdit::focusInEvent(QFocusEvent *event)
 {
     QLineEdit::focusInEvent(event);
+    auto *v = qobject_cast<const QDoubleValidator *>(validator());
+    if (v) {
+        QTimer::singleShot(0, this, &QLineEdit::selectAll);
+    }
+
     emit focusIn();
 }
 

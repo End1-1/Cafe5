@@ -28,6 +28,8 @@ public:
 
     C5TableWidgetItem *item(int row, int column) const;
 
+    void setColumnWidth(int column, int width);
+
     void setColumnWidths(int count, ...);
 
     void fitColumnsToWidth(int dec = 5);

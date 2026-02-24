@@ -11,8 +11,6 @@ public:
 
     ~C5ShopDialog();
 
-protected:
-
 };
 
 #endif // C5SHOPDIALOG_H

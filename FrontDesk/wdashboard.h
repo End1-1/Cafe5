@@ -11,7 +11,7 @@ class WDashboard : public C5Widget
 {
     Q_OBJECT
 public:
-    explicit WDashboard(QWidget *parent = nullptr);
+    explicit WDashboard(C5User *user, QWidget *parent = nullptr);
 
     ~WDashboard();
 

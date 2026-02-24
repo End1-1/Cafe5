@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.20)
-project(service5 VERSION 1.4.6.55 LANGUAGES CXX)
+project(service5 VERSION 1.4.8.57 LANGUAGES CXX)
 
 # Используем C++20
 set(CMAKE_CXX_STANDARD 20)
@@ -11,8 +11,7 @@ set(CMAKE_AUTORCC ON)       # Автоматическая генерация и
 
 
 # Определяем Qt модули
-find_package(Qt6 REQUIRED COMPONENTS Core Gui Network Sql WebSockets Widgets)
-# Если используешь Qt5, замени Qt6 на Qt5 и Widgets убери/добавь через if
+find_package(Qt6 REQUIRED COMPONENTS Core Network Sql WebSockets)
 
 # Источники
 set(SOURCES
@@ -23,7 +22,7 @@ set(SOURCES
     utils/configini.cpp
     utils/database.cpp
     datadriver/datadriver.cpp
-    dlglicenses.cpp
+
     firebase.cpp
     handlers/httpheader.cpp
     serverthread.cpp
@@ -42,7 +41,7 @@ set(HEADERS
     utils/configini.h
     utils/database.h
     datadriver/datadriver.h
-    dlglicenses.h
+
     firebase.h
     handlers/httpheader.h
     rc.h
@@ -56,10 +55,6 @@ set(HEADERS
     worker/struct_storage_item.h
 )
 
-# Генерация кода Qt (moc, uic)
-qt_wrap_ui(UI_HEADERS ${FORMS})
-qt_wrap_cpp(MOC_HEADERS ${HEADERS})
-
 # Основной исполняемый файл
 if(WIN32)
     list(APPEND SOURCES main.cpp)
@@ -67,7 +62,7 @@ elseif(UNIX)
     list(APPEND SOURCES main_linux.cpp)
 endif()
 
-add_executable(${PROJECT_NAME} ${SOURCES} ${HEADERS} ${UI_HEADERS} ${MOC_HEADERS} dlglicenses.ui)
+add_executable(${PROJECT_NAME} ${SOURCES} ${HEADERS} ${UI_HEADERS} ${MOC_HEADERS} )
 
 # Добавляем include пути
 target_include_directories(${PROJECT_NAME} PRIVATE
@@ -85,11 +80,9 @@ target_include_directories(${PROJECT_NAME} PRIVATE
 # Связываем Qt библиотеки
 target_link_libraries(${PROJECT_NAME} PRIVATE
     Qt6::Core
-    Qt6::Gui
     Qt6::Network
     Qt6::Sql
     Qt6::WebSockets
-    Qt6::Widgets
 )
 
 # Платформенные зависимости

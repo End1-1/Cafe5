@@ -18,6 +18,15 @@ C5User::C5User(C5User *other)
     mSessionKey = other->mSessionKey;
 }
 
+void C5User::copy(C5User *other)
+{
+    fUserData = other->fUserData;
+    fPermissions = other->fPermissions;
+    fConfig = other->fConfig;
+    fSettings = other->fSettings;
+    mSessionKey = other->mSessionKey;
+}
+
 void C5User::copySettings(C5User *other)
 {
     fConfig = other->fConfig;

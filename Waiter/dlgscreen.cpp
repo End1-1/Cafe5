@@ -19,6 +19,11 @@ DlgScreen::DlgScreen(C5User *user) :
     ui(new Ui::DlgScreen)
 {
     ui->setupUi(this);
+    QPalette pal = palette();
+    pal.setBrush(QPalette::Window, QBrush(QPixmap(":/waiterbg.jpg")));
+    setAutoFillBackground(true);
+    setPalette(pal);
+
     ui->lbVersion->setText(NDataProvider::mFileVersion);
     updatePin();
     installEventFilter(this);
@@ -69,7 +74,6 @@ void DlgScreen::paintEvent(QPaintEvent *e)
 {
     Q_UNUSED(e);
     QPainter p(this);
-    p.setRenderHint(QPainter::SmoothPixmapTransform, true);
     QPixmap mBg(":/waiterbg.jpg");
 
     if(!mBg.isNull()) {
@@ -83,11 +87,15 @@ void DlgScreen::paintEvent(QPaintEvent *e)
 void DlgScreen::showEvent(QShowEvent *e)
 {
     C5WaiterDialog::showEvent(e);
-    NInterface::query1("/engine/v2/waiter/workstation/get-config", mUser->mSessionKey, this,
-    {{"type", WORKSTATION_WAITER}, {"station_account", hostusername()}, {"workstation", hostinfo}},
-    [](const QJsonObject & jdoc) {
-        mWorkStation = JsonParser<WorkstationItem>::fromJson(jdoc);
-    });
+    NInterface::query1("/engine/v2/common/workstation/get-config",
+                       mUser->mSessionKey,
+                       this,
+                       {{"type", WORKSTATION_WAITER},
+                        {"station_account", hostusername()},
+                        {"workstation", hostinfo}},
+                       [](const QJsonObject &jdoc) {
+                           mWorkStation = JsonParser<WorkstationItem>::fromJson(jdoc);
+                       });
 }
 
 void DlgScreen::on_btnCancel_clicked()

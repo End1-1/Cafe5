@@ -1,22 +1,21 @@
 #include "c5waiterorder.h"
-#include "ui_c5waiterorder.h"
+#include <QClipboard>
+#include <QMenu>
+#include "c5cashdoc.h"
+#include "c5config.h"
+#include "c5dishwidget.h"
+#include "c5mainwindow.h"
+#include "c5message.h"
+#include "c5permissions.h"
+#include "c5storedraftwriter.h"
+#include "c5user.h"
 #include "c5utils.h"
 #include "c5waiterorder.h"
 #include "c5waiterorderdoc.h"
-#include "c5storedraftwriter.h"
-#include "c5config.h"
-#include "c5permissions.h"
-#include "c5user.h"
-#include "c5dishwidget.h"
-#include "c5mainwindow.h"
 #include "dict_dish_state.h"
-#include "proxytablewidgetdatabase.h"
-#include "c5message.h"
-#include "c5cashdoc.h"
-#include "c5airlog.h"
 #include "dlgsetwaiterordercl.h"
-#include <QMenu>
-#include <QClipboard>
+#include "proxytablewidgetdatabase.h"
+#include "ui_c5waiterorder.h"
 
 C5WaiterOrder::C5WaiterOrder(QWidget *parent) :
     C5OfficeWidget(parent),
@@ -264,8 +263,7 @@ void C5WaiterOrder::removeOrder()
     db[":f_id"] = ui->leUuid->text();
     db.exec("update o_header set f_state=:f_state where f_id=:f_id");
     C5WaiterOrderDoc::removeDocument(db, ui->leUuid->text());
-    C5Airlog::write(hostinfo, mUser->fullName(), LOG_WAITER, "", ui->leUuid->text(), "", tr("Order removed from cash"),
-                    ui->leTax->text(), "");
+
     __mainWindow->removeTab(this);
     C5Message::info(tr("Removed"));
 }
@@ -380,8 +378,7 @@ void C5WaiterOrder::on_btnClearTax_clicked()
         }
 
         db.update("o_tax", "f_id", ui->leUuid->text());
-        C5Airlog::write(hostinfo, mUser->fullName(), LOG_WAITER, "", ui->leUuid->text(), "", "Clear tax info",
-                        ui->leTax->text(), "");
+
         ui->leTax->clear();
     }
 }

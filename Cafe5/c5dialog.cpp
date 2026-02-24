@@ -1,14 +1,14 @@
 #include "c5dialog.h"
-#include "c5message.h"
-#include "c5lineedit.h"
-#include "ninterface.h"
+#include <QAbstractButton>
+#include <QApplication>
 #include <QKeyEvent>
-#include <QApplication>
-#include <QScreen>
-#include <QWindow>
-#include <QApplication>
 #include <QPainter>
+#include <QScreen>
 #include <QTimer>
+#include <QWindow>
+#include "c5lineedit.h"
+#include "c5message.h"
+#include "ninterface.h"
 
 #ifdef Q_OS_WIN
 #include <Windows.h>
@@ -22,7 +22,7 @@ C5Dialog::C5Dialog(C5User *user) :
     mUser(user)
 {
 #ifdef BORDERLESSDIALOGS
-    setWindowFlags(Qt::Dialog | Qt::FramelessWindowHint);
+    setWindowFlags(Qt::Dialog | Qt::FramelessWindowHint | Qt::Window);
 #endif
 
     if(__mainWindow == nullptr) {
@@ -158,21 +158,37 @@ void C5Dialog::moveEvent(QMoveEvent *e)
 
 void C5Dialog::keyPressEvent(QKeyEvent *e)
 {
-    switch(e->key()) {
+    switch (e->key()) {
     case Qt::Key_Enter:
     case Qt::Key_Return:
-        if(e->modifiers() &Qt::ControlModifier) {
+        if (e->modifiers() & Qt::ControlModifier) {
             keyControlPlusEnter();
+            e->accept();
+            return;
         }
 
-        if(e->modifiers() &Qt::AltModifier) {
+        if (e->modifiers() & Qt::AltModifier) {
             keyAlterPlusEnter();
-        } else {
-            focusNextChild();
-            keyEnter();
+            e->accept();
+            return;
         }
 
-        e->ignore();
+        QWidget *fw = focusWidget();
+
+        if (auto *btn = qobject_cast<QAbstractButton *>(fw)) {
+            btn->click();
+            e->accept();
+            return;
+        }
+
+        if (qobject_cast<QLineEdit *>(fw)) {
+            focusNextChild();
+            e->accept();
+            return;
+        }
+
+        keyEnter();
+        e->accept();
         return;
     }
 
@@ -193,28 +209,26 @@ void C5Dialog::keyAlterPlusEnter()
 
 void C5Dialog::showEvent(QShowEvent *e)
 {
-    QWidget::showEvent(e);
     QTimer::singleShot(0, this, &C5Dialog::updateBackgroundCache);
 
-    if(e->spontaneous()) {
-        return;
+    if (!e->spontaneous()) {
+        QScreen *screen = qApp->screens().first();
+
+        if (mScreen > -1) {
+            screen = qApp->screens().at(mScreen);
+        }
+
+        QRect geo = screen->availableGeometry();
+        QPoint center = geo.center();
+        QSize size = this->size();
+
+        if (mInitialPos == QPoint(-1, -1)) {
+            mInitialPos = QPoint(center.x() - size.width() / 2, center.y() - size.height() / 2);
+        }
+
+        move(mInitialPos);
     }
-
-    QScreen *screen = qApp->screens().first();
-
-    if(mScreen > -1) {
-        screen = qApp->screens().at(mScreen);
-    }
-
-    QRect geo = screen->availableGeometry();
-    QPoint center = geo.center();
-    QSize size = this->size();
-
-    if(mInitialPos == QPoint(-1, -1)) {
-        mInitialPos = QPoint(center.x() - size.width() / 2, center.y() - size.height() / 2);
-    }
-
-    move(mInitialPos);
+    QWidget::showEvent(e);
 }
 
 QImage C5Dialog::grabDesktopArea(const QRect &r)

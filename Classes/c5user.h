@@ -22,6 +22,8 @@ public:
 
     C5User(C5User *other);
 
+    void copy(C5User *other);
+
     void copySettings(C5User *other);
 
     QString error();

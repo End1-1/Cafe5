@@ -636,6 +636,23 @@
        </widget>
       </item>
       <item>
+       <widget class="QPushButton" name="btnStock">
+        <property name="focusPolicy">
+         <enum>Qt::FocusPolicy::NoFocus</enum>
+        </property>
+        <property name="toolTip">
+         <string>New goods</string>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+        <property name="icon">
+         <iconset resource="../resources/res.qrc">
+          <normaloff>:/storeinput.png</normaloff>:/storeinput.png</iconset>
+        </property>
+       </widget>
+      </item>
+      <item>
        <widget class="QLabel" name="label_13">
         <property name="text">
          <string>Barcode</string>
@@ -655,6 +672,13 @@
           <width>200</width>
           <height>16777215</height>
          </size>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QCheckBox" name="chKeepBarcodeFocus">
+        <property name="text">
+         <string>Keep barocode focus</string>
         </property>
        </widget>
       </item>

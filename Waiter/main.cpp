@@ -1,22 +1,23 @@
-#include "dlgscreen.h"
-#include "c5systempreference.h"
-#include "fileversion.h"
-#include "c5connectiondialog.h"
-#include "ndataprovider.h"
-#include "logwriter.h"
-#include "c5message.h"
-#include "c5user.h"
-#include "printtaxn.h"
-#include "dlgsplashscreen.h"
-#include <QTimer>
 #include <QApplication>
-#include <QTranslator>
-#include <QFile>
 #include <QDir>
+#include <QFile>
 #include <QLockFile>
 #include <QMessageBox>
-#include <QSettings>
 #include <QScreen>
+#include <QSettings>
+#include <QTimer>
+#include <QTranslator>
+#include "c5connectiondialog.h"
+#include "c5message.h"
+#include "c5systempreference.h"
+#include "c5user.h"
+#include "dict_workstation.h"
+#include "dlgscreen.h"
+#include "dlgsplashscreen.h"
+#include "fileversion.h"
+#include "logwriter.h"
+#include "ndataprovider.h"
+#include "printtaxn.h"
 
 int main(int argc, char* argv[])
 {
@@ -66,13 +67,15 @@ int main(int argc, char* argv[])
         }
     }
 
-    auto *dlgsplash = new DlgSplashScreen(nullptr);
+    auto *dlgsplash = new DlgSplashScreen(WORKSTATION_WAITER, nullptr);
     dlgsplash->show();
     emit dlgsplash->messageSignal("Get server name");
 
     if(!C5SystemPreference::checkDecimalPointAndSeparator()) {
         return 0;
     }
+
+    qDebug() << QDir(":/").entryList();
 
     QTranslator t;
 

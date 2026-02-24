@@ -3,12 +3,6 @@
 #include <algorithm>
 #include <cstring>
 
-#ifdef _DEBUG
-    #define new DEBUG_NEW
-    #undef THIS_FILE
-    static char THIS_FILE[] = __FILE__;
-#endif
-
 /////////////////////////////////////////////////////////////////////////////
 static QR_VERSIONINFO QR_VersonInfo[] = {{
         0, // Ver.0 - unused

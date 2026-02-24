@@ -49,7 +49,7 @@ public:
 
     static int mScreen;
 
-    C5User* mUser;
+    C5User *mUser = nullptr;
 
     QPoint mInitialPos = QPoint(-1, -1);
 

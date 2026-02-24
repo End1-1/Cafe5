@@ -1,4 +1,5 @@
 #include "dlgorder.h"
+#include <QClipboard>
 #include <QCloseEvent>
 #include <QFile>
 #include <QInputDialog>
@@ -102,6 +103,9 @@ DlgOrder::DlgOrder(C5User *user, HallItem h, TableItem t, const QVector<GoodsGro
     connect(ui->dishScrollArea->verticalScrollBar(), &QScrollBar::valueChanged, this, [this](int value) {
         updateScrollButtonPositions();
     });
+#ifndef QT_DEBUG
+    ui->btnCopyUUID->setVisible(false);
+#endif
     createPaymentButtons();
     configBtnNum();
     configOtherButtons();
@@ -2581,19 +2585,19 @@ void DlgOrder::on_btnMinus1_clicked()
             newQty = 0;
         }
 
-        fHttp->createHttpQueryLambda("/engine/v2/waiter/order/set-dish-qty", {
-            {"id", d.id},
-            {"remove_emarks", !d.emarks.isEmpty()},
-            {"dish", d.dishId},
-            {"new_qty", newQty},
-            {"new_state", d.state},
-            {"data", d.data},
-            {"order_id", mOrder.id},
-            {"restore_stoplist", d.qty - newQty}
-        },
-        [this](const QJsonObject & jdoc) {
-            parseOrder(jdoc);
-        }, [](const QJsonObject & jerr) {});
+        fHttp->createHttpQueryLambda(
+            "/engine/v2/waiter/order/set-dish-qty",
+            {{"id", d.id},
+             {"remove_emarks", !d.emarks.isEmpty()},
+             {"dish", d.dishId},
+             {"dish_name", d.dishName},
+             {"new_qty", newQty},
+             {"new_state", d.state},
+             {"data", d.data},
+             {"order_id", mOrder.id},
+             {"restore_stoplist", d.qty - newQty}},
+            [this](const QJsonObject &jdoc) { parseOrder(jdoc); },
+            [](const QJsonObject &jerr) {});
     }
 }
 
@@ -3108,4 +3112,10 @@ void DlgOrder::on_btnPrintClosedFiscal_clicked()
     connect(thread, &QThread::finished, pt, &QObject::deleteLater);
     connect(thread, &QThread::finished, thread, &QObject::deleteLater);
     thread->start();
+}
+
+void DlgOrder::on_btnCopyUUID_clicked()
+{
+    auto *cl = qApp->clipboard();
+    cl->setText(mOrder.id);
 }

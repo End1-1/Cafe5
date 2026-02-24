@@ -14,9 +14,13 @@ class DlgShopCustomer : public C5ShopDialog
 
 public:
     explicit DlgShopCustomer(C5User *user);
-    void setTin(const QString &tin);
+
     ~DlgShopCustomer();
+
+    void setTin(const QString &tin);
+
     PartnerItem mPartner;
+
 private slots:
     void on_btnSave_clicked();
 

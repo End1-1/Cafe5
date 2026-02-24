@@ -41,6 +41,7 @@ void DlgGiftCardSale::on_leCode_returnPressed()
         return;
     }
 
+    ui->lstPrices->clear();
     fGiftGoodsId = db.getInt("f_id");
     db.exec("select * from b_gift_card_sale_options");
 
@@ -68,7 +69,7 @@ void DlgGiftCardSale::on_btnRegister_clicked()
 
     C5Database db;
     db[":f_code"] = ui->leCode->text();
-    db.exec("select * from b_gift_card where f_code=:f_code for update");
+    db.exec("select * from b_gift_card where f_code=:f_code");
 
     if(db.nextRow() == false) {
         C5Message::error(tr("Invalid code"));

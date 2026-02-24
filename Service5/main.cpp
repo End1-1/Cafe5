@@ -1,14 +1,14 @@
-#include "logwriter.h"
-#include "serverthread.h"
-#include "configini.h"
-#include <QFileInfo>
+#include <QCoreApplication>
 #include <QDir>
-#include <windows.h>
-#include <tchar.h>
-#include <strsafe.h>
-#include <QApplication>
+#include <QFileInfo>
 #include <QSqlDatabase>
 #include <QTranslator>
+#include "configini.h"
+#include "logwriter.h"
+#include "serverthread.h"
+#include <strsafe.h>
+#include <tchar.h>
+#include <windows.h>
 #define SVCNAME TEXT("Breeze")
 
 int ARGC;
@@ -29,7 +29,7 @@ VOID SvcReportEvent(LPTSTR);
 
 DWORD WINAPI ThreadProc(CONST LPVOID lpParam)
 {
-    QApplication app(ARGC, ARGV);
+    QCoreApplication app(ARGC, ARGV);
     LogWriter::write(LogWriterLevel::verbose, "", "Start service thread");
     LogWriter::write(LogWriterLevel::verbose, "Database drivers", QSqlDatabase::drivers().join(","));
     QTranslator t;

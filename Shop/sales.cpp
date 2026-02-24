@@ -1,25 +1,24 @@
 #include "sales.h"
-#include "ui_sales.h"
+#include <QInputDialog>
+#include <QPropertyAnimation>
+#include <QShortcut>
 #include "c5config.h"
-#include "printreceiptgroup.h"
 #include "c5database.h"
-#include "selectprinters.h"
-#include "c5utils.h"
 #include "c5message.h"
-#include "printtaxn.h"
-#include "vieworder.h"
-#include "c5permissions.h"
-#include "cashcollection.h"
 #include "c5permissions.h"
 #include "c5user.h"
-#include "c5permissions.h"
-#include "dlgreturnitem.h"
+#include "c5utils.h"
+#include "cashcollection.h"
 #include "dlgdate.h"
-#include <QPropertyAnimation>
+#include "dlgreturnitem.h"
+#include "printreceiptgroup.h"
+#include "printtaxn.h"
+#include "selectprinters.h"
+#include "ui_sales.h"
+#include "vieworder.h"
 
 #define VM_TOTAL 0
 #define VM_ITEMS 1
-#define VM_TOTAL_ITEMS 2
 
 Sales::Sales(C5User *user) :
     C5ShopDialog(user),
@@ -30,7 +29,6 @@ Sales::Sales(C5User *user) :
     setWindowTitle(__c5config.getRegValue("windowtitle").toString());
     //TODO ui->btnChangeDate->setVisible(fUser->check(cp_t12_change_date_of_sale));
     ui->btnModeItems->setVisible(fUser->check(cp_t12_shop_report_goods));
-    ui->btnTotalByItems->setVisible(fUser->check(cp_t12_shop_report_goods));
     fViewMode = VM_TOTAL;
     ui->lbTotalQty->setVisible(false);
     ui->leTotal->setVisible(__c5config.fMainJson["hide_revenue"].toBool() == false);
@@ -44,6 +42,33 @@ Sales::Sales(C5User *user) :
     mPanelAnim->setDuration(220);
     mPanelAnim->setEasingCurve(QEasingCurve::OutCubic);
     refresh();
+    auto *sh = new QShortcut(QKeySequence(Qt::Key_F3), this);
+    connect(sh, &QShortcut::activated, this, [this]() {
+        C5User *tmp = new C5User(mUser);
+
+        QString password = QInputDialog::getText(this,
+                                                 tr("Password"),
+                                                 tr("Password"),
+                                                 QLineEdit::Password);
+        tmp->authorize(
+            password,
+            fHttp,
+            [this, tmp](const QJsonObject &jo) {
+                Q_UNUSED(jo)
+
+                if (tmp->check(cp_t12_shop_enter_sale)) {
+                    if (tmp->fConfig["copyfrom"].toInt() != 0) {
+                        tmp->copySettings(mUser);
+                    }
+
+                    showAll = true;
+                    refresh();
+                } else {
+                    tmp->deleteLater();
+                }
+            },
+            [tmp]() { tmp->deleteLater(); });
+    });
 }
 
 Sales::~Sales()
@@ -141,7 +166,6 @@ bool Sales::printCheckWithTax(C5Database &db, const QString &id)
 bool Sales::printReceipt(const QString &id, C5User *user)
 {
     if(!C5Config::localReceiptPrinter().isEmpty()) {
-        C5Database db;
         PrintReceiptGroup p;
 
         switch(C5Config::shopPrintVersion()) {
@@ -150,11 +174,11 @@ bool Sales::printReceipt(const QString &id, C5User *user)
 
             if(SelectPrinters::selectPrinters(p1, p2, user)) {
                 if(p1) {
-                    p.print(id, db, 1);
+                    p.print(id, 1);
                 }
 
                 if(p2) {
-                    p.print(id, db, 2);
+                    p.print(id, 2);
                 }
             }
 
@@ -162,7 +186,7 @@ bool Sales::printReceipt(const QString &id, C5User *user)
         }
 
         case 2:
-            p.print2(id, db);
+            p.print2(id);
             break;
 
         default:
@@ -204,10 +228,6 @@ void Sales::refresh()
     case VM_ITEMS:
         refreshItems();
         break;
-
-    case VM_TOTAL_ITEMS:
-        refreshTotalItems();
-        break;
     }
 }
 
@@ -237,11 +257,11 @@ void Sales::refreshTotal()
     db[":f_state"] = ORDER_STATE_CLOSE;
     QString sqlCond = "";
 
-    if(!fUser->check(cp_t12_shop_fiscal_report)) {
+    if (!fUser->check(cp_t12_shop_fiscal_report) || !showAll) {
         sqlCond += " and length(ot.f_receiptnumber)>0 ";
     }
 
-    if(!fUser->check(cp_t12_shop_sale_of_all_users)) {
+    if (!fUser->check(cp_t12_shop_sale_of_all_users)) {
         sqlCond += QString(" and oh.f_staff=%1 ").arg(fUser->id());
     }
 
@@ -313,7 +333,7 @@ void Sales::refreshItems()
     db[":f_state"] = ORDER_STATE_CLOSE;
     QString sqlCond = "";
 
-    if(!fUser->check(cp_t12_shop_fiscal_report)) {
+    if (!fUser->check(cp_t12_shop_fiscal_report) || !showAll) {
         sqlCond += " and length(ot.f_receiptnumber)>0 ";
     }
 
@@ -347,56 +367,6 @@ void Sales::refreshItems()
     }
 
     int acol = 12;
-    ui->leTotal->setDouble(ui->tbl->sumOfColumn(acol));
-}
-
-void Sales::refreshTotalItems()
-{
-    QStringList h;
-    h.append(tr("Scancode"));
-    h.append(tr("Goods"));
-    h.append(tr("Qty"));
-    h.append(tr("Total"));
-    ui->tbl->setColumnCount(h.count());
-    ui->tbl->setHorizontalHeaderLabels(h);
-    ui->tbl->setColumnWidths(ui->tbl->columnCount(), 150, 250, 80, 80);
-    C5Database db;
-    db[":f_hall"] = __c5config.defaultHall();
-    db[":f_start"] = ui->deStart->date();
-    db[":f_end"] = ui->deEnd->date();
-    db[":f_state"] = ORDER_STATE_CLOSE;
-    QString sqlCond = "";
-
-    if(!fUser->check(cp_t12_shop_fiscal_report)) {
-        sqlCond += " and length(ot.f_receiptnumber)>0 ";
-    }
-
-    if(!fUser->check(cp_t12_shop_sale_of_all_users)) {
-        sqlCond += QString(" and oh.f_staff=%1 ").arg(fUser->id());
-    }
-
-    db.exec("select g.f_scancode, g.f_name as f_goodsname, sum(og.f_qty), sum(og.f_total) "
-            "from o_goods og "
-            "inner join o_header oh on oh.f_id=og.f_header "
-            "inner join c_goods g on g.f_id=og.f_goods "
-            "left join s_user u on u.f_id=oh.f_staff "
-            "left join o_tax ot on ot.f_id=oh.f_id "
-            "where oh.f_datecash between :f_start and :f_end and oh.f_state=:f_state " + sqlCond +
-            "and oh.f_hall=:f_hall "
-            "group by 1, 2 "
-            "order by oh.f_datecash, oh.f_timeclose ");
-    ui->tbl->setRowCount(db.rowCount());
-    int row = 0;
-
-    while(db.nextRow()) {
-        for(int i = 0; i < ui->tbl->columnCount(); i++) {
-            ui->tbl->setData(row, i, db.getValue(i));
-        }
-
-        row++;
-    }
-
-    int acol = 3;
     ui->leTotal->setDouble(ui->tbl->sumOfColumn(acol));
 }
 
@@ -463,7 +433,6 @@ void Sales::on_btnModeTotal_clicked()
     toggleMenu(false);
     ui->btnModeItems->setChecked(false);
     ui->btnModeTotal->setChecked(true);
-    ui->btnTotalByItems->setChecked(false);
     ui->btnViewOrder->setEnabled(true);
     ui->btnItemBack->setEnabled(true);
     fViewMode = VM_TOTAL;
@@ -475,22 +444,9 @@ void Sales::on_btnModeItems_clicked()
     toggleMenu(false);
     ui->btnModeItems->setChecked(true);
     ui->btnModeTotal->setChecked(false);
-    ui->btnTotalByItems->setChecked(false);
     ui->btnViewOrder->setEnabled(true);
     ui->btnItemBack->setEnabled(true);
     fViewMode = VM_ITEMS;
-    refresh();
-}
-
-void Sales::on_btnTotalByItems_clicked()
-{
-    toggleMenu(false);
-    ui->btnModeItems->setChecked(false);
-    ui->btnModeTotal->setChecked(false);
-    ui->btnTotalByItems->setChecked(true);
-    ui->btnViewOrder->setEnabled(false);
-    ui->btnItemBack->setEnabled(false);
-    fViewMode = VM_TOTAL_ITEMS;
     refresh();
 }
 

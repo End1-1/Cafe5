@@ -7,8 +7,9 @@ OutputOfHeader::OutputOfHeader(QObject *parent) : QObject(parent)
 {
 }
 
-bool OutputOfHeader::make(C5Database &db, const QString &id)
+bool OutputOfHeader::make(const QString &id)
 {
+    C5Database db;
     C5StoreDraftWriter dw(db);
     db[":f_saleuuid"] = id;
     db.exec("select f_id from a_header_store where f_saleuuid=:f_saleuuid");

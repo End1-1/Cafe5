@@ -1,21 +1,23 @@
 #include "printreceiptgroup.h"
-#include "c5printing.h"
-#include "c5config.h"
-#include "c5utils.h"
-#include "oheader.h"
-#include "cpartners.h"
-#include "QRCodeGenerator.h"
 #include <QApplication>
 #include <QJsonDocument>
 #include <QJsonObject>
+#include "QRCodeGenerator.h"
+#include "c5config.h"
+#include "c5database.h"
+#include "c5printing.h"
+#include "c5utils.h"
+#include "cpartners.h"
+#include "oheader.h"
 
 PrintReceiptGroup::PrintReceiptGroup(QObject *parent) :
     QObject(parent)
 {
 }
 
-void PrintReceiptGroup::print(const QString &id, C5Database &db, int rw)
+void PrintReceiptGroup::print(const QString &id, int rw)
 {
+    C5Database db;
     double cash = 0;
     double change = 0;
     double totalQty = 0;
@@ -368,8 +370,9 @@ void PrintReceiptGroup::print(const QString &id, C5Database &db, int rw)
     p.print(printer);
 }
 
-void PrintReceiptGroup::print2(const QString &id, C5Database &db)
+void PrintReceiptGroup::print2(const QString &id)
 {
+    C5Database db;
     QMap<QString, QVariant> returnFrom;
     OHeader oh;
     db[":f_id"] = id;
@@ -545,10 +548,10 @@ void PrintReceiptGroup::print2(const QString &id, C5Database &db)
     qreal safePx = SAFE_RIGHT_MM * printer.logicalDpiX() / 25.4;
     p.setSceneParams(pr.width() - safePx, pr.height(), printer.logicalDpiX());
     p.image("./logo_receipt.png", Qt::AlignHCenter);
-    p.br();
-    p.br();
-    p.br();
     p.setFont(font);
+    p.br();
+    p.br();
+    p.br();
     p.br(2);
 
     if(!saletype.isEmpty()) {
@@ -580,14 +583,15 @@ void PrintReceiptGroup::print2(const QString &id, C5Database &db)
         p.rtext(oh.dateCash.toString(FORMAT_DATE_TO_STR) + " " + oh.timeClose.toString(FORMAT_TIME_TO_SHORT_STR));
         p.br();
         p.ltext(tr("(F)"), 0);
+        p.br();
     }
 
     if(partner.id.toInt() > 0) {
         p.ltext(tr("Buyer taxcode"), 0);
         p.rtext(partner.taxCode);
-        p.br();
+        p.br(2);
         p.ltext(partner.taxName, 0);
-        p.br();
+        p.br(2);
     }
 
     p.setFontBold(true);
@@ -739,7 +743,7 @@ void PrintReceiptGroup::print2(const QString &id, C5Database &db)
         }
 
         QPixmap pix = QPixmap::fromImage(encodeImage);
-        pix = pix.scaled(150, 150);
+        pix = pix.scaled(100, 100);
         p.image(pix, Qt::AlignHCenter);
         p.br();
         /* End QRCode */
@@ -754,8 +758,9 @@ void PrintReceiptGroup::print2(const QString &id, C5Database &db)
     p.print(printer);
 }
 
-void PrintReceiptGroup::print3(const QString &id, C5Database &db)
+void PrintReceiptGroup::print3(const QString &id)
 {
+    C5Database db;
     QMap<QString, QVariant> oheader;
     db[":f_id"] = id;
     db.exec("select * from o_header where f_id=:f_id");
@@ -990,7 +995,7 @@ void PrintReceiptGroup::print3(const QString &id, C5Database &db)
         }
 
         QPixmap pix = QPixmap::fromImage(encodeImage);
-        pix = pix.scaled(300, 300);
+        pix = pix.scaled(100, 100);
         p.image(pix, Qt::AlignHCenter);
         p.br();
         /* End QRCode */

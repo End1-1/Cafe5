@@ -13,18 +13,23 @@ C5DateEdit::C5DateEdit(QWidget *parent) :
     setDate(QDate::currentDate());
     connect(this, SIGNAL(textChanged(QString)), this, SLOT(newText(QString)));
 
-    if(maximumWidth() == 0) {
-        setMaximumWidth(100);
-    }
+    QFontMetrics fm(font());
+
+    int w = fm.horizontalAdvance("00/00/0000");
+
+    w += 24;
+    w += 8;
+
+    setMaximumWidth(w);
+    setMinimumWidth(w);
 
     fRow = 0;
     fColumn = 0;
     fDoNoCheckMinDate = false;
-    // Иконка справа внутри lineedit (ровно и красиво)
+
     QIcon ico = QIcon(":/calendar.png");
     calAction = addAction(ico, QLineEdit::TrailingPosition);
     calAction->setToolTip("Open calendar");
-    // Чуть-чуть сдвинем текст, чтобы не залезал под иконку
     setTextMargins(2, 0, 2, 0);
     connect(calAction, &QAction::triggered, this, &C5DateEdit::showCalendar);
     calendar = new QCalendarWidget();

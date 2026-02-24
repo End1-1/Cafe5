@@ -49,6 +49,7 @@ include_directories(
     ../Configs
     ../Printing
     ../NTable
+    ../resources
     ../Service5Working/raw
     ../Service5Working/socket
     ../Service5/worker
@@ -62,16 +63,16 @@ file(GLOB_RECURSE APP_SOURCES
     *.cpp
     *.h
     *.ui
-    *.qrc
 )
 
 set(APP_RESOURCES
     res.rc
 )
 
-qt_add_executable(Waiter
+qt_add_executable(Waiter WIN32
     ${APP_SOURCES}
     ${APP_RESOURCES}
+    resources/res.qrc
     ../Cafe5/c5double.cpp
     ../Cafe5/c5systempreference.cpp
     ../Cafe5/calendar.cpp

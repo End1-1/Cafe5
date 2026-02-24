@@ -70,8 +70,6 @@ public:
 
     Flag flag(int id);
 
-    void startStoreUpdate();
-
 public slots:
     void getGoods(int id);
 
@@ -109,10 +107,6 @@ private slots:
 
     void checkMessageResponse(const QJsonObject &jdoc);
 
-    void astoresaleResponse(const QJsonObject &jdoc);
-
-    void checkStoreResponse(const QJsonObject &jdoc);
-
     void uploadDataFinished();
 
     void shortcutEscape();
@@ -127,15 +121,11 @@ private slots:
 
     void shortcutF2();
 
-    void shortcutF5();
-
     void shortcutF7();
 
     void shortcutF8();
 
     void shortcutF9();
-
-    void shortcutF11();
 
     void shortcutF12();
 
@@ -157,13 +147,9 @@ private slots:
 
     void on_btnWriteOrder_clicked();
 
-    void on_btnGoodsMovement_clicked();
-
     void on_btnNewRetail_clicked();
 
     void on_btnNewWhosale_clicked();
-
-    void on_btnGoodsList_clicked();
 
     void on_btnSalesReport_clicked();
 

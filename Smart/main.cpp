@@ -21,7 +21,6 @@
 
 int main(int argc, char* argv[])
 {
-    qputenv("QT_OPENGL", "angle");
     QApplication a(argc, argv);
     a.setQuitOnLastWindowClosed(false);
 #ifndef QT_DEBUG

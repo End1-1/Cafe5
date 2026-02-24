@@ -53,14 +53,37 @@
 
 #define float_str_(value, f) QString::number(value, 'f', f)
 
-C5SaleDoc::C5SaleDoc(QWidget *parent) :
-    C5OfficeWidget(parent),
-    ui(new Ui::C5SaleDoc)
+C5SaleDoc::C5SaleDoc(QWidget *parent)
+    : C5OfficeWidget(parent)
+    , ui(new Ui::C5SaleDoc)
 {
     ui->setupUi(this);
     fIconName = ":/pricing.png";
     fLabel = tr("Sale");
-    ui->tblGoods->setColumnWidths(ui->tblGoods->columnCount(), 0, 50, 0, 150, 200, 300, 80, 80, 80, 80, 80, 80, 0, 0, 0, 50);
+    QMap<int, int> widths = {{col_uuid, 0},
+                             {col_checkbox, 50},
+                             {col_goods_code, 0},
+                             {col_none, 150},
+                             {col_barcode, 200},
+                             {col_name, 300},
+                             {col_qty, 80},
+                             {col_unit, 80},
+                             {col_price, 80},
+                             {col_discount_value, 80},
+                             {col_discount_amount, 80},
+                             {col_grandtotal, 80},
+                             {col_isservice, 0},
+                             {col_returnfrom, 0},
+                             {col_emarks, 0},
+                             {col_adgt, 50},
+                             {col_stock, 80}};
+
+    for (auto it = widths.begin(); it != widths.end(); ++it) {
+        ui->tblGoods->setColumnWidth(it.key(), it.value());
+    }
+    for (int i = 0; i < ui->tblGoods->columnCount(); i++) {
+        ui->tblGoods->setColumnHidden(i, ui->tblGoods->columnWidth(i) == 0);
+    }
     ui->cbCurrency->setDBValues("select f_id, f_name from e_currency");
     ui->cbCurrency->setCurrentIndex(ui->cbCurrency->findData(__c5config.getValue(param_default_currency)));
     ui->cbStorage->setDBValues("select f_id, f_name from c_storages order by 2");
@@ -563,9 +586,8 @@ void C5SaleDoc::createRetailAS()
 
 void C5SaleDoc::makeStoreOutput()
 {
-    C5Database db;
     OutputOfHeader ooh;
-    ooh.make(db, ui->leUuid->text());
+    ooh.make(ui->leUuid->text());
 }
 
 void C5SaleDoc::exportToExcel()
@@ -1045,7 +1067,15 @@ void C5SaleDoc::on_leCmd_returnPressed()
     db.exec("select f_id from c_goods where f_scancode=:f_scancode");
 
     if(db.nextRow()) {
-        addGoods(db.getInt(0), db);
+        int row = addGoods(db.getInt(0), db);
+        if (true && ui->cbStorage->currentIndex() > -1) {
+            checkStock(ui->cbStorage->currentData().toInt(), db.getInt(0));
+        }
+        if (ui->chKeepBarcodeFocus->isChecked()) {
+            ui->leCmd->setFocus();
+        } else {
+            ui->tblGoods->lineEdit(row, col_qty)->setFocus();
+        }
         return;
     }
 }
@@ -1288,7 +1318,7 @@ void C5SaleDoc::checkStock(int store, int goods)
                        [this, goods](const QJsonObject &jo) {
                            for (int i = 0; i < ui->tblGoods->rowCount(); i++) {
                                if (ui->tblGoods->getInteger(i, col_goods_code) == goods) {
-                                   ui->tblGoods->setDouble(i, col_goods_code, jo["qty"].toDouble());
+                                   ui->tblGoods->setDouble(i, col_stock, jo.value("qty").toDouble());
                                }
                            }
                        });
@@ -1439,7 +1469,7 @@ void C5SaleDoc::exportToAs(int doctype)
     if(db.nextRow()) {
         jh["f_price_politic"] = db.getInt("f_price_politic");
         jh["f_address"] = db.getString("f_address");
-        jh["f_legaladdress"] = db.getString("f_legaladdress");
+        jh["f_legal_address"] = db.getString("f_legal_address");
         jh["f_taxcode"] = db.getString("f_taxcode");
     } else {
         C5Message::error("Cannot find partner price politic");
@@ -1512,10 +1542,11 @@ void C5SaleDoc::on_btnAddGoods_clicked()
     }
 
     C5Database db;
-    addGoods(vals.at(1).toInt(), db);
-    if (true) {
+    int row = addGoods(vals.at(1).toInt(), db);
+    if (true && ui->cbStorage->currentIndex() > -1) {
         checkStock(ui->cbStorage->currentData().toInt(), vals.at(1).toInt());
     }
+    ui->tblGoods->lineEdit(row, col_qty)->setFocus();
 }
 
 void C5SaleDoc::on_btnRemoveGoods_clicked()
@@ -1953,4 +1984,15 @@ void C5SaleDoc::on_btnCashier_clicked()
 void C5SaleDoc::on_btnCopyUUID_clicked()
 {
     qApp->clipboard()->setText(ui->leUuid->text());
+}
+
+void C5SaleDoc::on_btnStock_clicked()
+{
+    if (ui->cbStorage->currentIndex() < 0) {
+        return;
+    }
+    for (int i = 0; i < ui->tblGoods->rowCount(); i++) {
+        checkStock(ui->cbStorage->currentData().toInt(),
+                   ui->tblGoods->getInteger(i, col_goods_code));
+    }
 }

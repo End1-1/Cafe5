@@ -33,6 +33,18 @@ struct WorkstationItem : public ParentItem {
         QString printerName = data.value("f_default_printer").toString();
         return printerName.isEmpty() ? "local" : printerName;
     }
+    const QString presentCardPattern() const
+    {
+        return data.value("f_present_card_pattern").toString();
+    }
+    const QString accumulateCardPatter() const
+    {
+        return data.value("f_accumulate_card_pattern").toString();
+    }
+    const QString discountCardPattern() const
+    {
+        return data.value("f_discount_card_pattern").toString();
+    }
 };
 
 template<>

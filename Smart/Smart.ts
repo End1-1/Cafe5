@@ -442,7 +442,7 @@
 <context>
     <name>C5User</name>
     <message>
-        <location filename="../Classes/c5user.cpp" line="100"/>
+        <location filename="../Classes/c5user.cpp" line="109"/>
         <source>You have not permission</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1456,7 +1456,7 @@ MS Excel</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../Forms/dlgsplashscreen.cpp" line="13"/>
+        <location filename="../Forms/dlgsplashscreen.cpp" line="16"/>
         <source>Prepare to work</source>
         <translation>Պատրաստում</translation>
     </message>

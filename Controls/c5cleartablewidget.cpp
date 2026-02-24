@@ -40,6 +40,14 @@ C5TableWidgetItem* C5ClearTableWidget::item(int row, int column) const
     return static_cast<C5TableWidgetItem*>(QTableWidget::item(row, column));
 }
 
+void C5ClearTableWidget::setColumnWidth(int column, int width)
+{
+    setColumnHidden(column, width <= 0);
+    if (width > 0) {
+        QTableWidget::setColumnWidth(column, width);
+    }
+}
+
 void C5ClearTableWidget::setColumnWidths(int count, ...)
 {
     setColumnCount(count);

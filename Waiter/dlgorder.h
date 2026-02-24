@@ -250,6 +250,8 @@ private slots:
 
     void on_btnPrintClosedFiscal_clicked();
 
+    void on_btnCopyUUID_clicked();
+
 signals:
 
     void orderDishClicked(QString);

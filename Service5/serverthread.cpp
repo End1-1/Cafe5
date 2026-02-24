@@ -1,24 +1,24 @@
 #include "serverthread.h"
-#include "logwriter.h"
-#include "configini.h"
-#include "c5searchengine.h"
-#include "database.h"
-#include "armsoft.h"
-#include "waiter.h"
-#include "fileversion.h"
-#include "struct_goods_item.h"
-#include "struct_storage_item.h"
-#include "struct_partner.h"
-#include <QWebSocketServer>
-#include <QWebSocket>
-#include <QJsonObject>
-#include <QJsonDocument>
+#include <QCoreApplication>
 #include <QJsonArray>
-#include <QApplication>
+#include <QJsonDocument>
+#include <QJsonObject>
 #include <QLibrary>
 #include <QMutex>
 #include <QPointer>
 #include <QThreadPool>
+#include <QWebSocket>
+#include <QWebSocketServer>
+#include "armsoft.h"
+#include "c5searchengine.h"
+#include "configini.h"
+#include "database.h"
+#include "fileversion.h"
+#include "logwriter.h"
+#include "struct_goods_item.h"
+#include "struct_partner.h"
+#include "struct_storage_item.h"
+#include "waiter.h"
 
 QMutex mSocketMutex;
 
@@ -64,6 +64,13 @@ void ServerThread::run()
     }
 
     fServer = new QWebSocketServer("BreezeServer", QWebSocketServer::NonSecureMode, this);
+    int cores = QThread::idealThreadCount();
+    int threads = qMax(4, cores * 2);
+    QThreadPool::globalInstance()->setMaxThreadCount(threads);
+
+    LogWriter::write(LogWriterLevel::verbose,
+                     "",
+                     QString("ThreadPool size: %1 (cores %2)").arg(threads).arg(cores));
 
     // fServer->setMaxPendingConnections(10000);
     if(!fServer->listen(QHostAddress::Any, port)) {
@@ -202,9 +209,16 @@ void ServerThread::registerSocket(const QJsonObject &jdoc, QWebSocket *ws)
 #ifdef QT_DEBUG
     port = 3306;
 #endif
-
-    if(!db.open("localhost", dbk.value(), "root", "root5", port)) {
+    auto fail = [&](int code, const QString &msg) {
+        LogWriter::write(LogWriterLevel::errors, "register_socket", msg);
+        ws->sendTextMessage(QJsonDocument(QJsonObject{{"errorCode", code}, {"errorMessage", msg}})
+                                .toJson(QJsonDocument::Compact));
         ws->close();
+    };
+    if(!db.open("localhost", dbk.value(), "root", "root5", port)) {
+        LogWriter::write(LogWriterLevel::errors, "register_socket", db.lastDbError());
+
+        fail(0, "Code 110");
         return;
     }
 
@@ -213,7 +227,7 @@ void ServerThread::registerSocket(const QJsonObject &jdoc, QWebSocket *ws)
     db.exec("select f_id from s_user where f_login=:f_username and f_password=md5(:f_password)");
 
     if(!db.next()) {
-        ws->close();
+        fail(0, "user with used credentials not found");
         return;
     }
 
@@ -221,14 +235,14 @@ void ServerThread::registerSocket(const QJsonObject &jdoc, QWebSocket *ws)
     auto it = fSockets.find(ws);
 
     if(it == fSockets.end()) {
-        ws->close();
+        fail(0, "Code 111");
         return;
     }
 
     SocketStruct &ss = it.value();
 
     if(!ss.tenantId.isEmpty()) {
-        ws->close();
+        fail(0, "Code 112");
         return;
     }
 
@@ -281,10 +295,8 @@ void ServerThread::onNewConnection()
                      .arg(ws->origin()));
     connect(ws, &QWebSocket::textMessageReceived, this, &ServerThread::onTextMessage);
     connect(ws, &QWebSocket::binaryMessageReceived, this, &ServerThread::onBinaryMessage);
-    connect(ws, &QWebSocket::disconnected, this, [ws]() {
-        LogWriter::write(LogWriterLevel::verbose, "", "disconnected" + ws->peerName() + " " + ws->origin());
-    });
-    fSockets[ws] = SocketStruct{ws,  "",  "", 0};
+    connect(ws, &QWebSocket::disconnected, this, &ServerThread::onDisconnected);
+    fSockets[ws] = SocketStruct{ws, "", "", 0};
 }
 
 void ServerThread::onDisconnected()
@@ -321,10 +333,15 @@ void ServerThread::onTextMessage(const QString &msg)
     QPointer<QWebSocket> wsCopy(ws);
     auto uuid = Database::uuid();
 
-    if(msg == "ping") {
+    if (msg == "ping") {
         wsCopy->sendTextMessage("pong");
     } else {
-        QJsonObject jdoc = QJsonDocument::fromJson(messageCopy.toUtf8()).object();
+        auto doc = QJsonDocument::fromJson(messageCopy.toUtf8());
+        if (!doc.isObject()) {
+            ws->sendTextMessage(R"({"errorCode":1,"errorMessage":"Invalid JSON"})");
+            return;
+        }
+        QJsonObject jdoc = doc.object();
         LogWriterVerbose("REQUEST " + uuid, msg);
 
         if(jdoc["command"].toString() == "register_socket") {
@@ -338,9 +355,18 @@ void ServerThread::onTextMessage(const QString &msg)
                 if(!wsCopy)
                     return;
 
+                SocketStruct ss;
+                {
+                    QMutexLocker ml(&mSocketMutex);
+                    auto it = fSockets.find(ws);
+                    if (it == fSockets.end())
+                        return;
+                    ss = it.value();
+                }
+
                 QJsonObject jresponse;
                 QString repMsg;
-                handleCommand(fSockets[ws], jdoc, repMsg);
+                handleCommand(ss, jdoc, repMsg);
 
                 if(!wsCopy)
                     return;
@@ -363,11 +389,15 @@ void ServerThread::onBinaryMessage(const QByteArray &msg)
     QPointer<QWebSocket> wsCopy(ws);
     auto uuid = Database::uuid();
 
-    if(msg == "ping") {
-        wsCopy->sendTextMessage("pong");
+    if (msg == QByteArray("ping")) {
+        wsCopy->sendBinaryMessage(QByteArray("pong"));
     } else {
-        QJsonObject jdoc = QJsonDocument::fromJson(messageCopy.toUtf8()).object();
-
+        auto doc = QJsonDocument::fromJson(msg);
+        if (!doc.isObject()) {
+            ws->sendBinaryMessage(R"({"errorCode":1,"errorMessage":"Invalid JSON"})");
+            return;
+        }
+        QJsonObject jdoc = doc.object();
         if(jdoc["command"].toString() == "register_socket") {
             registerSocket(jdoc, ws);
             return;
@@ -380,9 +410,18 @@ void ServerThread::onBinaryMessage(const QByteArray &msg)
                 if(!wsCopy)
                     return;
 
+                SocketStruct ss;
+                {
+                    QMutexLocker ml(&mSocketMutex);
+                    auto it = fSockets.find(ws);
+                    if (it == fSockets.end())
+                        return;
+                    ss = it.value();
+                }
+
                 QJsonObject jresponse;
                 QString repMsg;
-                handleCommand(fSockets[ws], jdoc, repMsg);
+                handleCommand(ss, jdoc, repMsg);
 
                 if(!wsCopy)
                     return;
@@ -414,29 +453,24 @@ void ServerThread::handleCommand(SocketStruct ws, const QJsonObject &jdoc, QStri
         command == "who?" ||
         command == "get_db_list" ||
         command == "get_connection";
-    SocketStruct ss;
-    {
-        QMutexLocker ml(&mSocketMutex);
-        auto it = fSockets.find(ws.socket);
 
-        if(!allowAnonymous) {
-            if(it == fSockets.end() || it->tenantId.isEmpty()) {
-                jrep["errorCode"] = 401;
-                jrep["errorMessage"] = "Unauthorized";
-                repMsg = QJsonDocument(jrep).toJson(QJsonDocument::Compact);
-                auto wsSafe = QPointer<QWebSocket>(ws.socket);
-                QMetaObject::invokeMethod(ws.socket, [wsSafe]() {
-                    if(wsSafe)
-                        wsSafe->close();
-                }, Qt::QueuedConnection);
-                return;
-            }
-
-            ss = it.value();
-        }
+    if (!allowAnonymous && ws.tenantId.isEmpty()) {
+        jrep["errorCode"] = 401;
+        jrep["errorMessage"] = "Unauthorized";
+        repMsg = QJsonDocument(jrep).toJson(QJsonDocument::Compact);
+        LogWriterError(repMsg);
+        auto wsSafe = QPointer<QWebSocket>(ws.socket);
+        QMetaObject::invokeMethod(
+            ws.socket,
+            [wsSafe]() {
+                if (wsSafe)
+                    wsSafe->close();
+            },
+            Qt::QueuedConnection);
+        return;
     }
 
-    if(jdoc.isEmpty()) {
+    if (jdoc.isEmpty()) {
         jrep["errorCode"] = 1;
         jrep["errorMessage"] = "Empty or invalid JSON";
         repMsg = QJsonDocument(jrep).toJson(QJsonDocument::Compact);
@@ -460,11 +494,11 @@ void ServerThread::handleCommand(SocketStruct ws, const QJsonObject &jdoc, QStri
         } else if(command == "search_text") {
             repMsg = C5SearchEngine::mInstance->search(jdoc);
         } else if(command == SelectorName<StorageItem>::value) {
-            repMsg = C5SearchEngine::mInstance->searchStorage(jdoc, ss);
+            repMsg = C5SearchEngine::mInstance->searchStorage(jdoc, ws);
         } else if(command == SelectorName<GoodsItem>::value) {
-            repMsg = C5SearchEngine::mInstance->searchGoodsItem(jdoc, ss);
+            repMsg = C5SearchEngine::mInstance->searchGoodsItem(jdoc, ws);
         } else if(command == SelectorName<PartnerItem>::value) {
-            repMsg = C5SearchEngine::mInstance->searchPartnerItem(jdoc, ss);
+            repMsg = C5SearchEngine::mInstance->searchPartnerItem(jdoc, ws);
         } else if(command == "search_partner") {
             repMsg = C5SearchEngine::mInstance->searchPartner(jdoc);
         } else if(command == "search_goods_groups") {
@@ -476,7 +510,7 @@ void ServerThread::handleCommand(SocketStruct ws, const QJsonObject &jdoc, QStri
         } else if(command == "armsoft") {
             repMsg = armsoft(jdoc);
         } else if(command == "dict_event") {
-            repMsg = C5SearchEngine::mInstance->updateDictionary(jdoc, ss);
+            repMsg = C5SearchEngine::mInstance->updateDictionary(jdoc, ws);
         } else {
             repMsg = handleDll(jdoc, command);
         }

@@ -47,7 +47,7 @@ public:
 
     void keyAsterix();
 
-    bool writeOrder();
+    void writeOrder(std::function<void()> nextStep);
 
     void fixCostumer(const QString &code);
 
@@ -88,8 +88,6 @@ public:
     void openDraft(const QString &draftid);
 
     void checkGoodsCode(const QString &code, std::function<void()> postProcess = nullptr);
-
-    void addGoods2(const QString &barcode, double price);
 
 private slots:
     void openDraftResponse(const QJsonObject &jdoc);
@@ -147,6 +145,7 @@ private:
 
     void processAccumulateCard(const QString &code);
 
+    void printFiscal(std::function<void(const QJsonObject &)> nextStep);
 };
 
 #endif // WORDER_H

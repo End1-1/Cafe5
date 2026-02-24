@@ -1,40 +1,40 @@
 #include "working.h"
-#include "ui_working.h"
-#include "c5permissions.h"
-#include "worder.h"
-#include "c5database.h"
-#include "datadriver.h"
-#include "sales.h"
-#include "c5config.h"
-#include "ndataprovider.h"
-#include "c5user.h"
-#include "c5utils.h"
-#include "dlggoodslist.h"
-#include "dlgpin.h"
-#include "c5cleartablewidget.h"
-#include "searchitems.h"
-#include "wcustomerdisplay.h"
-#include "storeinput.h"
-#include "chatmessage.h"
-#include "c5message.h"
-#include "selectprinters.h"
-#include "c5printing.h"
-#include "dlggiftcardsale.h"
-#include "printtaxn.h"
-#include "dlgregistercard.h"
-#include "printreceiptgroup.h"
-#include "dlgshowcolumns.h"
-#include "dlgcashout.h"
-#include "c5tempsale.h"
-#include <QShortcut>
 #include <QInputDialog>
 #include <QKeyEvent>
-#include <QTimer>
 #include <QMessageBox>
-#include <QProcess>
-#include <QSettings>
-#include <QScreen>
 #include <QMovie>
+#include <QProcess>
+#include <QScreen>
+#include <QSettings>
+#include <QShortcut>
+#include <QTimer>
+#include "c5cleartablewidget.h"
+#include "c5config.h"
+#include "c5database.h"
+#include "c5message.h"
+#include "c5permissions.h"
+#include "c5printing.h"
+#include "c5tempsale.h"
+#include "c5user.h"
+#include "c5utils.h"
+#include "chatmessage.h"
+#include "datadriver.h"
+#include "dlgcashout.h"
+#include "dlggiftcardsale.h"
+#include "dlggoodslist.h"
+#include "dlgpin.h"
+#include "dlgregistercard.h"
+#include "dlgshowcolumns.h"
+#include "ndataprovider.h"
+#include "ninterface.h"
+#include "printreceiptgroup.h"
+#include "sales.h"
+#include "searchitems.h"
+#include "selectprinters.h"
+#include "storeinput.h"
+#include "ui_working.h"
+#include "wcustomerdisplay.h"
+#include "worder.h"
 
 QHash<QString, int> Working::fGoodsRows;
 QHash<QString, QString> Working::fMultiscancode;
@@ -56,7 +56,7 @@ Working::Working(C5User *user, QWidget *parent) :
     mUser = user;
     QShortcut *sF1 = new QShortcut(QKeySequence(Qt::Key_F1), this);
     QShortcut *sF2 = new QShortcut(QKeySequence(Qt::Key_F2), this);
-    //    QShortcut *sF3 = new QShortcut(QKeySequence(Qt::Key_F3), this);
+    //QShortcut *sF3 = new QShortcut(QKeySequence(Qt::Key_F3), this);
     //    QShortcut *sF4 = new QShortcut(QKeySequence(Qt::Key_F4), this);
     QShortcut *sF5 = new QShortcut(QKeySequence(Qt::Key_F5), this);
     QShortcut *sF6 = new QShortcut(QKeySequence(Qt::Key_F6), this);
@@ -81,14 +81,72 @@ Working::Working(C5User *user, QWidget *parent) :
     connect(scl, &QShortcut::activated, this, &Working::onCtrlL);
     connect(sF1, SIGNAL(activated()), this, SLOT(shortcutF1()));
     connect(sF2, SIGNAL(activated()), this, SLOT(shortcutF2()));
-    //    connect(sF3, SIGNAL(activated()), this, SLOT(shortcutF3()));
+    connect(sF5, &QShortcut::activated, this, [this]() {
+        auto user = new C5User(mUser);
+        auto openGoodsList = [this, user]() {
+            auto *dg = new DlgGoodsList(user, C5Config::getValue(param_default_currency).toInt());
+            connect(dg, &DlgGoodsList::getGoods, this, &Working::getGoods);
+            dg->showMaximized();
+            connect(dg, &DlgGoodsList::destroyed, this, [user]() { user->deleteLater(); });
+        };
+        if (user->check(cp_t12_shop_enter_store)) {
+            openGoodsList();
+        } else {
+            bool ok = false;
+            const QString password = QInputDialog::getText(this,
+                                                           tr("Password"),
+                                                           tr("Password"),
+                                                           QLineEdit::Password,
+                                                           QString(),
+                                                           &ok);
+
+            if (!ok || password.isEmpty()) {
+                user->deleteLater();
+                return;
+            }
+
+            user->authorize(
+                password,
+                fHttp,
+                [openGoodsList](const QJsonObject &) { openGoodsList(); },
+                [user]() { user->deleteLater(); });
+        }
+    });
     //    connect(sF4, SIGNAL(activated()), this, SLOT(shortcutF4()));
-    connect(sF5, SIGNAL(activated()), this, SLOT(shortcutF5()));
     connect(sF6, SIGNAL(activated()), this, SLOT(shortcurF6()));
     connect(sF7, SIGNAL(activated()), this, SLOT(shortcutF7()));
     connect(sF8, SIGNAL(activated()), this, SLOT(shortcutF8()));
     connect(sF9, SIGNAL(activated()), this, SLOT(shortcutF9()));
-    connect(sF11, SIGNAL(activated()), this, SLOT(shortcutF11()));
+    connect(sF11, &QShortcut::activated, this, [this]() {
+        auto user = new C5User(mUser);
+        auto openGoodsList = [this, user]() {
+            auto *dg = new StoreInput(user);
+            dg->showMaximized();
+            connect(dg, &StoreInput::destroyed, this, [user]() { user->deleteLater(); });
+        };
+        if (user->check(cp_t12_shop_enter_store)) {
+            openGoodsList();
+        } else {
+            bool ok = false;
+            const QString password = QInputDialog::getText(this,
+                                                           tr("Password"),
+                                                           tr("Password"),
+                                                           QLineEdit::Password,
+                                                           QString(),
+                                                           &ok);
+
+            if (!ok || password.isEmpty()) {
+                user->deleteLater();
+                return;
+            }
+
+            user->authorize(
+                password,
+                fHttp,
+                [openGoodsList](const QJsonObject &) { openGoodsList(); },
+                [user]() { user->deleteLater(); });
+        }
+    });
     connect(sF12, SIGNAL(activated()), this, SLOT(shortcutF12()));
     connect(sDown, SIGNAL(activated()), this, SLOT(shortcutDown()));
     connect(sUp, SIGNAL(activated()), this, SLOT(shortcutUp()));
@@ -132,10 +190,8 @@ Working::Working(C5User *user, QWidget *parent) :
     ui->lbStore->setText(dbstore->name(__c5config.defaultStore()));
     ui->lbCashier->setText(mUser->fullName());
     fHttp = new NInterface(this);
-    fHttp->createHttpQuery("/engine/shop/create-a-store-sale.php",
-    QJsonObject{{"store", __c5config.defaultStore()}, {"forceupdate", true}},
-    SLOT(astoresaleResponse(QJsonObject)));
     mMovie = new QMovie(":/progressbar.gif");
+    newSale(SALE_RETAIL);
 }
 
 Working::~Working()
@@ -229,15 +285,6 @@ Flag Working::flag(int id)
     } else {
         return Flag();
     }
-}
-
-void Working::startStoreUpdate()
-{
-    ui->lbStatus->setMovie(mMovie);
-    mMovie->start();
-    fHttp->createHttpQuery("/engine/shop/create-a-store-sale.php",
-    QJsonObject{{"store", __c5config.defaultStore()}, {"forceupdate", true}},
-    SLOT(astoresaleResponse(QJsonObject)), "nosale", false);
 }
 
 void Working::getGoods(int id)
@@ -514,11 +561,11 @@ void Working::checkMessageResponse(const QJsonObject & jdoc)
 
                     if(SelectPrinters::selectPrinters(p1, p2, mUser)) {
                         if(p1) {
-                            p.print(orderid, db, 1);
+                            p.print(orderid, 1);
                         }
 
                         if(p2) {
-                            p.print(orderid, db, 2);
+                            p.print(orderid, 2);
                         }
                     }
 
@@ -526,7 +573,7 @@ void Working::checkMessageResponse(const QJsonObject & jdoc)
                 }
 
                 case 2:
-                    p.print2(orderid, db);
+                    p.print2(orderid);
                     break;
 
                 default:
@@ -555,25 +602,7 @@ void Working::checkMessageResponse(const QJsonObject & jdoc)
     p.rtext(QDateTime::currentDateTime().toString(FORMAT_DATETIME_TO_STR2));
     p.print(printer);
 }
-void Working::astoresaleResponse(const QJsonObject & jdoc)
-{
-    Q_UNUSED(jdoc);
 
-    if(sender()->property("marks").toString() != "nosale") {
-        newSale(SALE_RETAIL);
-    }
-
-    fHttp->httpQueryFinished(sender());
-    ui->lbStatus->setPixmap(QPixmap(":/checked.png"));
-}
-void Working::checkStoreResponse(const QJsonObject & jdoc)
-{
-    Q_UNUSED(jdoc);
-    fHttp->httpQueryFinished(sender());
-    auto *dg = new DlgGoodsList(mUser, C5Config::getValue(param_default_currency).toInt());
-    connect(dg, &DlgGoodsList::getGoods, this, &Working::getGoods);
-    dg->showMaximized();
-}
 void Working::uploadDataFinished()
 {
     fUpFinished = true;
@@ -610,10 +639,6 @@ void Working::shortcutF2()
 
     newSale(SALE_WHOSALE);
 }
-void Working::shortcutF5()
-{
-    on_btnGoodsList_clicked();
-}
 
 void Working::shortcutF7()
 {
@@ -625,10 +650,6 @@ void Working::shortcutF9()
 {
 }
 
-void Working::shortcutF11()
-{
-    on_btnGoodsMovement_clicked();
-}
 void Working::shortcutF12()
 {
     on_btnWriteOrder_clicked();
@@ -761,56 +782,25 @@ void Working::on_btnWriteOrder_clicked()
         return;
     }
 
-    if(!w->writeOrder()) {
-        return;
-    }
+    w->writeOrder([this, w]() {
+        QString id = w->fOHeader._id();
+        w->table()->setRowCount(0);
+        ui->tab->removeTab(ui->tab->currentIndex());
 
-    QString id = w->fOHeader._id();
-    w->table()->setRowCount(0);
-    ui->tab->removeTab(ui->tab->currentIndex());
+        if (ui->tab->count() == 0) {
+            newSale(SALE_RETAIL);
+        }
 
-    if(ui->tab->count() == 0) {
-        newSale(SALE_RETAIL);
-    }
+        w->deleteLater();
 
-    w->deleteLater();
-    startStoreUpdate();
-
-    if(C5Config::fMainJson["remind_out_of_stock"].toBool()) {
-        auto *dp = new NDataProvider(this);
-        connect(dp, &NDataProvider::done, this, &Working::qtyRemains);
-        dp->getData("/engine/shop/check-qty-remain.php", QJsonObject{{"header", id}});
-    }
+        if (C5Config::fMainJson["remind_out_of_stock"].toBool()) {
+            auto *dp = new NDataProvider(this);
+            connect(dp, &NDataProvider::done, this, &Working::qtyRemains);
+            dp->getData("/engine/shop/check-qty-remain.php", QJsonObject{{"header", id}});
+        }
+    });
 }
-void Working::on_btnGoodsMovement_clicked()
-{
-    C5User *tmp = new C5User(mUser);
 
-    if(!tmp->check(cp_t12_shop_enter_store)) {
-        QString password = QInputDialog::getText(this, tr("Password"), tr("Password"), QLineEdit::Password);
-        C5User *tmp = new C5User();
-        tmp->authorize(password, fHttp, [this, tmp](const QJsonObject & jo) {
-            Q_UNUSED(jo);
-
-            if(tmp->check(cp_t12_shop_enter_store)) {
-                if(tmp->fConfig["copyfrom"].toInt() != 0) {
-                    tmp->copySettings(mUser);
-                    NDataProvider::sessionKey = tmp->mSessionKey;
-                }
-
-                auto *si = new StoreInput(tmp);
-                si->showMaximized();
-            } else {
-                tmp->deleteLater();
-            }
-        }, [tmp]() {
-            tmp->deleteLater();
-        });
-    } else {
-        auto *si = new StoreInput(tmp);
-        si->showMaximized();
-    }
-}
 void Working::on_btnNewRetail_clicked()
 {
     newSale(SALE_RETAIL);
@@ -819,11 +809,7 @@ void Working::on_btnNewWhosale_clicked()
 {
     newSale(SALE_WHOSALE);
 }
-void Working::on_btnGoodsList_clicked()
-{
-    fHttp->createHttpQuery("/engine/shop/create-a-store-sale.php", QJsonObject{{"store", __c5config.defaultStore()}}, SLOT(
-        checkStoreResponse(QJsonObject)));
-}
+
 void Working::on_btnSalesReport_clicked()
 {
     C5User *tmp = new C5User(mUser);
@@ -894,8 +880,11 @@ void Working::on_btnGiftCard_clicked()
         }
 
         DbGoods dd(d.fGiftGoodsId);
-        wo->addGoods2(d.fGiftScancode, d.fGiftPrice);
-        wo->fOHeader.saleType = -1;
+        double price = d.fGiftPrice;
+        wo->checkGoodsCode(d.fGiftScancode, [wo, price]() {
+            wo->fOHeader.saleType = -1;
+            wo->setPriceOfRow(0, price);
+        });
     }
 }
 void Working::on_btnCostumerDisplay_clicked(bool checked)

@@ -1,8 +1,8 @@
 #include "fileversion.h"
+#include <QCoreApplication>
 #include <QFile>
 #include <QProcess>
 #include <QRegularExpression>
-#include <QApplication>
 
 #ifdef Q_OS_WIN
 #include <windows.h>

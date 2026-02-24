@@ -1,7 +1,5 @@
 #ifndef PRINTRECEIPTGROUP_H
 #define PRINTRECEIPTGROUP_H
-
-#include "c5database.h"
 #include <QObject>
 
 class PrintReceiptGroup : public QObject
@@ -10,11 +8,11 @@ class PrintReceiptGroup : public QObject
 public:
     explicit PrintReceiptGroup(QObject *parent = nullptr);
 
-    void print(const QString &id, C5Database &db, int rw);
+    void print(const QString &id, int rw);
 
-    void print2(const QString &id, C5Database &db);
+    void print2(const QString &id);
 
-    void print3(const QString &id, C5Database &db);
+    void print3(const QString &id);
 
 signals:
 

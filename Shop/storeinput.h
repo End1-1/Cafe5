@@ -55,6 +55,8 @@ private slots:
 private:
     Ui::StoreInput* ui;
 
+    virtual void showEvent(QShowEvent *e) override;
+
     int fViewMode;
 
     void getList();

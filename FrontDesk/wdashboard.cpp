@@ -1,14 +1,16 @@
 #include "wdashboard.h"
-#include "c5mainwindow.h"
-#include "ui_wdashboard.h"
-#include "rabstracteditorreport.h"
 #include <QDialog>
+#include "C5StoreInput.h"
+#include "c5mainwindow.h"
+#include "rabstracteditorreport.h"
+#include "ui_wdashboard.h"
 
-WDashboard::WDashboard(QWidget *parent)
-    : C5Widget(parent),
-      ui(new Ui::WDashboard)
+WDashboard::WDashboard(C5User *user, QWidget *parent)
+    : C5Widget(parent)
+    , ui(new Ui::WDashboard)
 {
     ui->setupUi(this);
+    mUser = user;
     fLabel = tr("Dashboard");
     auto buttons = findChildren<QAbstractButton*>();
 
@@ -47,12 +49,16 @@ void WDashboard::onCommandButtonClicked()
 
 QWidget* WDashboard::createForm(const QString &name, QIcon icon)
 {
-    if(name == "Workstations") {
+    if (name == "form_workstations") {
         return new RAbstractEditorReport(tr("Workstations"), icon, name);
     }
 
-    if(name == "CashSessions") {
+    if (name == "form_cashsessions") {
         return new RAbstractEditorReport(tr("Cash sessions"), icon, name);
+    }
+
+    if (name == "form_newstoreinput") {
+        return new C5StoreInput(mUser, tr("Store input"), icon);
     }
 
     Q_ASSERT_X(false, "check name", QString("NO WIDGET NAMED %1 ").arg(name).toLatin1());

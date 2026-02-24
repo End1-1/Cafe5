@@ -1,0 +1,40 @@
+QDialog {
+border: 1px solid black;
+color: #000000;
+}
+
+QFrame#frame {
+border: 1px solid black;
+color: #000000;
+}
+
+QPushButton {
+background: #aaaaaa;
+color: #000000;
+padding: 10px;
+border: 1px solid #eeeeee;
+}
+
+QPushButton:checked {
+background: #00ff00;
+color: #000000;
+padding: 10px;
+border: 1px solid #eeeeee;
+}
+
+QPushButton:pressed {
+background: #ffffff;
+color: #000000
+padding: 10px;
+border: 1px solid #eeeeee;
+}
+
+QToolButton {
+background: #aaaaaa;
+padding: 10px;
+border: 1px solid #eeeeee;
+}
+
+QLineEdit {
+background: #ffffff;
+}

@@ -15,14 +15,24 @@ class DlgSplashScreen : public C5Dialog
     Q_OBJECT
 
 public:
-    explicit DlgSplashScreen(C5User *user);
+    explicit DlgSplashScreen(int workstationType, C5User *user);
 
     ~DlgSplashScreen();
 
-    void login(const QString &username, const QString &password, std::function<void (C5User *user)> callback);
+    void prepare();
+
+    std::function<void(C5User *user)> mOnFinish;
+
+    void login(const QString &username,
+               const QString &password,
+               std::function<void(C5User *user)> onFinish);
+
+    void loadWorkstationConfig(std::function<void()> nextStep);
 
 private:
     Ui::DlgSplashScreen* ui;
+
+    int mWorkstationType;
 
 private slots:
     void message(const QString &text);

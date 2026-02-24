@@ -41,8 +41,6 @@ private slots:
 
     void on_btnModeItems_clicked();
 
-    void on_btnTotalByItems_clicked();
-
     void on_btnCashColletion_clicked();
 
     void on_leFilter_textChanged(const QString &arg1);
@@ -66,6 +64,8 @@ private slots:
 private:
     Ui::Sales* ui;
 
+    bool showAll = false;
+
     C5User* fUser;
 
     Working* fWorking;
@@ -79,8 +79,6 @@ private:
     void refreshTotal();
 
     void refreshItems();
-
-    void refreshTotalItems();
 
     int fViewMode;
 

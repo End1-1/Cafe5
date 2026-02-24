@@ -1,39 +1,38 @@
 #include "c5storedoc.h"
-#include "ui_c5storedoc.h"
-#include "c5selector.h"
-#include "c5cache.h"
-#include "c5cashdoc.h"
-#include "c5editor.h"
-#include "c5mainwindow.h"
-#include "c5daterange.h"
-#include "ce5partner.h"
-#include "dlgdirtystoredoc.h"
-#include "ce5goods.h"
-#include "c5storebarcode.h"
-#include "c5config.h"
-#include "c5user.h"
-#include "c5message.h"
-#include "c5storedraftwriter.h"
-#include "calculator.h"
-#include "c5utils.h"
-#include "bclientdebts.h"
-#include "c5storedocselectprinttemplate.h"
-#include "c5permissions.h"
-#include "c5htmlprint.h"
-#include <QMenu>
-#include <QHash>
 #include <QClipboard>
+#include <QDesktopServices>
+#include <QFileDialog>
+#include <QHash>
 #include <QInputDialog>
-#include <QJsonParseError>
 #include <QJsonDocument>
 #include <QJsonObject>
+#include <QJsonParseError>
+#include <QMenu>
 #include <QPrintPreviewDialog>
+#include <QPrinter>
 #include <QShortcut>
 #include <QSqlQuery>
-#include <QFileDialog>
-#include <QDesktopServices>
+#include "bclientdebts.h"
+#include "c5cache.h"
+#include "c5cashdoc.h"
+#include "c5config.h"
+#include "c5editor.h"
+#include "c5htmlprint.h"
+#include "c5mainwindow.h"
+#include "c5message.h"
+#include "c5permissions.h"
+#include "c5selector.h"
+#include "c5storebarcode.h"
+#include "c5storedocselectprinttemplate.h"
+#include "c5storedraftwriter.h"
+#include "c5user.h"
+#include "c5utils.h"
+#include "calculator.h"
+#include "ce5goods.h"
+#include "ce5partner.h"
+#include "dlgdirtystoredoc.h"
+#include "ui_c5storedoc.h"
 #include <xlsxdocument.h>
-#include <QPrinter>
 
 #define col_rec_in_id 0
 #define col_rec_out_id 1
@@ -297,12 +296,13 @@ bool C5StoreDoc::openDoc(QString id, QString &err)
     if(fDocType == DOC_TYPE_COMPLECTATION) {
         db[":f_document"] = id;
         db[":f_type"] = 1;
-        db.exec("select d.f_id, d.f_goods, concat(g.f_name, if(g.f_scancode is null, '', concat(' ', g.f_scancode))) as f_goodsname, \
+        db.exec(
+            "select d.f_id, d.f_goods, concat(g.f_name, if(g.f_scancode is null, '', concat(' ', g.f_scancode))) as f_goodsname, \
                 d.f_qty, u.f_name, d.f_price, d.f_total, d.f_reason, g.f_scancode \
                 from a_store_draft d \
                 left join c_goods g on g.f_id=d.f_goods \
                 left join c_units u on u.f_id=g.f_unit \
-                where d.f_document=:f_document and f_type=:f_type");
+                where d.f_document=:f_document and d.f_type=:f_type");
 
         if(db.nextRow()) {
             fComplectationId = db.getString("f_id");

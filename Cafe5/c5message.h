@@ -43,6 +43,8 @@ private:
 
     bool fPlaySound;
 
+    virtual void showEvent(QShowEvent *e) override;
+
     static int showMessage(const QString &text, int tp, const QString &yes, const QString &no, const QString &a3,
                            bool playsound = false);
     void launchUpdater(const QString &path, const QStringList &args);

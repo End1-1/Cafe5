@@ -46,10 +46,7 @@ int C5Message::question(const QString &questionStr, const QString &yes, const QS
 
 void C5Message::timeout()
 {
-#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
-#else
-
-    if(fPlaySound) {
+    if (fPlaySound) {
         QMediaPlayer *mp = new QMediaPlayer();
         auto *ao = new QAudioOutput();
         mp->setAudioOutput(ao);
@@ -57,8 +54,6 @@ void C5Message::timeout()
         ao->setVolume(0.5);
         mp->play();
     }
-
-#endif
 }
 
 int C5Message::showMessage(const QString &text, int tp, const QString &yes, const QString &no, const QString &a3,
@@ -147,6 +142,12 @@ void C5Message::on_label_linkActivated(const QString &link)
 
         qApp->exit(0);
     }
+}
+
+void C5Message::showEvent(QShowEvent *e)
+{
+    C5Dialog::showEvent(e);
+    QTimer::singleShot(100, [this]() { ui->btnYes->setFocus(); });
 }
 
 void C5Message::launchUpdater(const QString &path, const QStringList &args)

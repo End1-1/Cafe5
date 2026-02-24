@@ -1,5 +1,7 @@
 cmake_minimum_required(VERSION 3.16)
 
+set(CMAKE_UNITY_BUILD ON)
+
 project(OfficeN LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 11)
@@ -8,11 +10,9 @@ set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
 
-
 # -----------------------
-# Qt6
+# Qt6 Components
 # -----------------------
-
 find_package(Qt6 REQUIRED COMPONENTS
     Core
     Gui
@@ -20,47 +20,42 @@ find_package(Qt6 REQUIRED COMPONENTS
     Network
     PrintSupport
     Sql
+    Pdf
+    PdfWidgets
     Multimedia
     Concurrent
     Xml
     WebSockets
+    LinguistTools
 )
 
 qt_standard_project_setup()
 
 # -----------------------
-# OpenSSL
+# OpenSSL Configuration
 # -----------------------
-
 set(OPENSSL_ROOT_DIR "C:/Development/OpenSSL-Win64")
-
 find_package(OpenSSL REQUIRED)
 
 # -----------------------
 # Resources (Qt6)
 # -----------------------
-
-qt_add_resources(APP_RESOURCES
+qt_add_resources(QT_RESOURCES
     ../resources/res.qrc
     lang.qrc
 )
 
 # -----------------------
-# Windows RC
+# All Sources, Headers and UI
 # -----------------------
-
-if(WIN32)
-    list(APPEND APP_SOURCES res.rc)
-endif()
-
-# -----------------------
-# Executable
-# -----------------------
-
-add_executable(OfficeN
-    ${APP_RESOURCES}
-    res.rc
+set(APP_SOURCES
+    ${QT_RESOURCES}
     main.cpp
+    res.rc
+    rc.h
+    version.h
+
+    # UI Files
     ../NTable/nsearchdlg.ui
     ../NTable/ntreewidget.ui
     rwaiterorder.ui
@@ -130,7 +125,6 @@ add_executable(OfficeN
     ../Forms/dlgcashop.ui
     ../Forms/dlgchangeoutputstore.ui
     ../Forms/dlgconfigtable.ui
-
     ../Forms/dlgdirtystoredoc.ui
     ../Forms/dlgdriverroutedate.ui
     ../Forms/dlgexportsaletoasoptions.ui
@@ -148,7 +142,6 @@ add_executable(OfficeN
     ../Forms/httpquerydialog.ui
     ../Forms/mfprocessproductpriceupdate.ui
     ../Forms/partnersasmap.ui
-    ../Forms/storeinputdocument.ui
     ../Forms/touchdlgphonenumber.ui
     ../Forms/touchentertaxreceiptnumber.ui
     ../Forms/touchselecttaxreport.ui
@@ -229,6 +222,9 @@ add_executable(OfficeN
     rwaiterstationconfig.ui
     wdashboard.ui
     rfilterdialog.ui
+    c5storeinput.ui
+
+    # Headers
     ../Classes/QProgressIndicator.h
     ../Classes/c5servername.h
     ../Classes/c5tableview.h
@@ -245,14 +241,12 @@ add_executable(OfficeN
     rwaiterorder.h
     ../NTable/ntablemodel.h
     ../NTable/ndataprovider.h
-    ../NTable/ntablewidget.h
     ../NTable/nloadingdlg.h
     ../Reports/cr5consuptionbysalesqty.h
     ../Cafe5/c5double.h
     ../Cafe5/c5systempreference.h
     ../Classes/QRCodeGenerator.h
     ../Classes/barcode5.h
-    ../Classes/c5airlog.h
     ../Classes/c5document.h
     ../Classes/c5filterwidget.h
     ../Classes/c5printrecipta4.h
@@ -330,8 +324,6 @@ add_executable(OfficeN
     ../Forms/c5salefromstoreorder.h
     ../Forms/c5selector.h
     ../Forms/c5srofinventory.h
-    ../NTable/ndataprovider.h
-    ../NTable/ntablewidget.h
     ../Forms/c5storebarcode.h
     ../Forms/c5storebarcodelist.h
     ../Forms/c5storedoc.h
@@ -346,7 +338,6 @@ add_executable(OfficeN
     ../Forms/dlgcashop.h
     ../Forms/dlgchangeoutputstore.h
     ../Forms/dlgconfigtable.h
-
     ../Forms/dlgdirtystoredoc.h
     ../Forms/dlgdriverroutedate.h
     ../Forms/dlgexportsaletoasoptions.h
@@ -363,7 +354,6 @@ add_executable(OfficeN
     ../Forms/httpquerydialog.h
     ../Forms/mfprocessproductpriceupdate.h
     ../Forms/partnersasmap.h
-    ../Forms/storeinputdocument.h
     ../Forms/touchdlgphonenumber.h
     ../Forms/touchentertaxreceiptnumber.h
     ../Forms/touchselecttaxreport.h
@@ -487,8 +477,6 @@ add_executable(OfficeN
     ../Reports/cr5documentsfilter.h
     ../Reports/cr5consumptionbysales.h
     ../Reports/cr5consumptionbysalesfilter.h
-    rc.h
-    res.rc
     ../Editors/ce5partner.h
     ../Editors/c5editor.h
     ../Editors/ce5editor.h
@@ -556,10 +544,14 @@ add_executable(OfficeN
     rabstracteditorreport.h
     rabstractspecialwidget.h
     rwaiterstationconfig.h
-    version.h
     wdashboard.h
     ../Classes/dict_doc_reason.h
     rfilterdialog.h
+    ../../desktop.newtax/Src/printtaxn.h
+    ../Forms/previewdialog.h
+    c5storeinput.h
+
+    # Sources
     ../Classes/QProgressIndicator.cpp
     ../Classes/c5servername.cpp
     ../Classes/c5tableview.cpp
@@ -582,7 +574,6 @@ add_executable(OfficeN
     ../Cafe5/c5double.cpp
     ../Cafe5/c5systempreference.cpp
     ../Classes/QRCodeGenerator.cpp
-    ../Classes/c5airlog.cpp
     ../Classes/c5document.cpp
     ../Classes/c5filterwidget.cpp
     ../Classes/c5printrecipta4.cpp
@@ -666,7 +657,6 @@ add_executable(OfficeN
     ../Forms/dlgcashop.cpp
     ../Forms/dlgchangeoutputstore.cpp
     ../Forms/dlgconfigtable.cpp
-
     ../Forms/dlgdirtystoredoc.cpp
     ../Forms/dlgdriverroutedate.cpp
     ../Forms/dlgexportsaletoasoptions.cpp
@@ -683,7 +673,6 @@ add_executable(OfficeN
     ../Forms/httpquerydialog.cpp
     ../Forms/mfprocessproductpriceupdate.cpp
     ../Forms/partnersasmap.cpp
-    ../Forms/storeinputdocument.cpp
     ../Forms/touchdlgphonenumber.cpp
     ../Forms/touchentertaxreceiptnumber.cpp
     ../Forms/touchselecttaxreport.cpp
@@ -765,7 +754,6 @@ add_executable(OfficeN
     ../TableRecord/odraftsalebody.cpp
     ../TableRecord/ogoods.cpp
     ../TableRecord/oheader.cpp
-    main.cpp
     ../Cafe5/c5config.cpp
     ../Cafe5/c5database.cpp
     ../Cafe5/c5dialog.cpp
@@ -867,11 +855,42 @@ add_executable(OfficeN
     rwaiterstationconfig.cpp
     wdashboard.cpp
     rfilterdialog.cpp
-    ../../desktop.newtax/Src/printtaxn.cpp ../../desktop.newtax/Src/printtaxn.h
-    ../Classes/fileversion.cpp ../Classes/fileversion.h
-
+    ../../desktop.newtax/Src/printtaxn.cpp
+    ../Forms/previewdialog.cpp
+    c5storeinput.cpp
 )
 
+
+
+# -----------------------
+# Executable Creation
+# -----------------------
+add_executable(OfficeN ${APP_SOURCES})
+
+set_target_properties(OfficeN PROPERTIES
+    UNITY_BUILD ON
+    # Это заставит CMake не склеивать файлы, в которых есть UI
+    UNITY_BUILD_BATCH_SIZE 16
+)
+
+# Если конкретные файлы все равно бесят ошибками, исключаем их:
+set_source_files_properties(
+    ../Forms/c5saledoc.cpp
+    ../Classes/QRCodeGenerator.cpp
+    PROPERTIES SKIP_UNITY_BUILD_INCLUSION ON
+)
+
+# -----------------------
+# Translations (Linguist)
+# -----------------------
+# Создает таргет OfficeN_lupdate для обновления .ts файлов
+qt_add_lupdate(OfficeN
+    TS_FILES "OfficeN.ts"
+)
+
+# -----------------------
+# Include Directories
+# -----------------------
 target_include_directories(OfficeN PRIVATE
     ./
     ../Editors
@@ -886,16 +905,12 @@ target_include_directories(OfficeN PRIVATE
     ../Configs
     ../StructModel
     ../../desktop.newtax/src
-    C:/Development/OpenSSL-Win64/include
-    C:/Development/OpenSSL-Win64/include/openssl
+    ${OPENSSL_INCLUDE_DIR}
 )
 
-
-
 # -----------------------
-# Defines
+# Target Definitions
 # -----------------------
-
 target_compile_definitions(OfficeN PRIVATE
     QT_DEPRECATED_WARNINGS
     _DBDRIVER_="QMARIADB"
@@ -907,8 +922,12 @@ target_compile_definitions(OfficeN PRIVATE
 )
 
 # -----------------------
-# Qt link
+# Link Libraries
 # -----------------------
+# Указываем директории для линковки OpenSSL
+target_link_directories(OfficeN PRIVATE
+    C:/Development/OpenSSL-Win64/lib/VC/x64/MD
+)
 
 target_link_libraries(OfficeN PRIVATE
     Qt6::Core
@@ -921,53 +940,28 @@ target_link_libraries(OfficeN PRIVATE
     Qt6::Concurrent
     Qt6::Xml
     Qt6::WebSockets
+    Qt6::Pdf
+    Qt6::PdfWidgets
     OpenSSL::SSL
     OpenSSL::Crypto
-)
-
-# Отключаем CPack внутри QXlsx
-set(CPACK_GENERATOR "" CACHE STRING "Disable CPack in QXlsx" FORCE)
-set(CPACK_RESOURCE_FILE_README "" CACHE STRING "" FORCE)
-
-# Подключаем QXlsx
-add_subdirectory(C:/Development/projects/qxlsx qxlsx_build)
-
-# Линкуем к твоему проекту
-target_link_libraries(OfficeN PRIVATE QXlsx)
-
-
-
-set(APP_SOURCES
-    ${SOURCES}
-    ${HEADERS}
-    ${FORMS}
-)
-
-# Указываем путь к OpenSSL (если find_package не используем)
-target_include_directories(OfficeN PRIVATE
-    C:/Development/OpenSSL-Win64/include
-    C:/Development/OpenSSL-Win64/include/openssl
-)
-
-# Линковка библиотек
-target_link_directories(OfficeN PRIVATE
-    C:/Development/OpenSSL-Win64/lib/VC/x64/MD
-)
-
-target_link_libraries(OfficeN PRIVATE
     Version.lib
     Ws2_32.lib
-    libssl.lib
-    libcrypto.lib
     Gdi32.lib
     User32.lib
 )
 
+# -----------------------
+# QXlsx Integration
+# -----------------------
+set(CPACK_GENERATOR "" CACHE STRING "Disable CPack in QXlsx" FORCE)
+set(CPACK_RESOURCE_FILE_README "" CACHE STRING "" FORCE)
+
+add_subdirectory(C:/Development/projects/qxlsx qxlsx_build)
+target_link_libraries(OfficeN PRIVATE QXlsx)
 
 # -----------------------
-# MSVC flags (strictStrings disable)
+# MSVC Specific Options
 # -----------------------
-
 if (MSVC)
     target_compile_options(OfficeN PRIVATE
         /Zc:strictStrings-
@@ -975,26 +969,17 @@ if (MSVC)
 endif()
 
 # -----------------------
-# Version increment script (PRE BUILD)
+# Version Increment (Pre-build)
 # -----------------------
-
 if (WIN32)
+    add_custom_target(version_inc
+        COMMAND powershell -NoProfile -ExecutionPolicy Bypass
+                -File ${CMAKE_CURRENT_SOURCE_DIR}/increase_version.ps1
+        WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+    )
+    add_dependencies(OfficeN version_inc)
 
-add_custom_target(version_inc
-    COMMAND powershell -NoProfile -ExecutionPolicy Bypass
-            -File ${CMAKE_CURRENT_SOURCE_DIR}/increase_version.ps1
-    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-)
-
-add_dependencies(OfficeN version_inc)
-
-endif()
-
-# -----------------------
-# Windows GUI app + icon
-# -----------------------
-
-if (WIN32)
+    # Make it a GUI application (no console window)
     set_target_properties(OfficeN PROPERTIES
         WIN32_EXECUTABLE TRUE
     )

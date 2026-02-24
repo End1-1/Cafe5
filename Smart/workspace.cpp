@@ -1,43 +1,41 @@
 #include "workspace.h"
-#include "ui_workspace.h"
-#include "dlgpassword.h"
-#include "menudish.h"
-#include "c5user.h"
-#include "dishpackage.h"
-#include "c5printing.h"
-#include "logwriter.h"
-#include "printtaxn.h"
-#include "bhistory.h"
-#include "dict_dish_state.h"
-#include "c5utils.h"
-#include "c5airlog.h"
-#include "nloadingdlg.h"
-#include "dlgqty.h"
-#include "dlgservicevalues.h"
-#include "change.h"
-#include "menudialog.h"
-#include "dlglistofdishcomments.h"
-#include "c5config.h"
-#include "customerinfo.h"
-#include "dlgmemoryread.h"
-#include "ndataprovider.h"
-#include "wcustomerdisplay.h"
-#include "c5message.h"
-#include "dlgvisit.h"
-#include "scopeguarde.h"
-#include "ninterface.h"
+#include <QColor>
+#include <QFile>
+#include <QInputDialog>
+#include <QJsonParseError>
+#include <QPainter>
+#include <QParallelAnimationGroup>
+#include <QPropertyAnimation>
 #include <QScreen>
 #include <QScrollBar>
-#include <QInputDialog>
-#include <QScreen>
-#include <QPropertyAnimation>
-#include <QParallelAnimationGroup>
-#include <QColor>
-#include <QTimer>
 #include <QSettings>
-#include <QPainter>
-#include <QFile>
-#include <QJsonParseError>
+#include <QTimer>
+#include "bhistory.h"
+#include "c5config.h"
+#include "c5message.h"
+#include "c5printing.h"
+#include "c5user.h"
+#include "c5utils.h"
+#include "change.h"
+#include "customerinfo.h"
+#include "dict_dish_state.h"
+#include "dishpackage.h"
+#include "dlglistofdishcomments.h"
+#include "dlgmemoryread.h"
+#include "dlgpassword.h"
+#include "dlgqty.h"
+#include "dlgservicevalues.h"
+#include "dlgvisit.h"
+#include "logwriter.h"
+#include "menudialog.h"
+#include "menudish.h"
+#include "ndataprovider.h"
+#include "ninterface.h"
+#include "nloadingdlg.h"
+#include "printtaxn.h"
+#include "scopeguarde.h"
+#include "ui_workspace.h"
+#include "wcustomerdisplay.h"
 
 QHash<QString, QString> fPrinterAliases;
 Workspace* Workspace::fWorkspace;
@@ -102,9 +100,7 @@ Workspace::Workspace(C5User *user) :
     ui->tblTables->setItemDelegate(new TableItemDelegate());
     resetOrder();
     fTimer = new QTimer(this);
-    connect(fTimer, &QTimer::timeout, this, [ = ]() {
-        ui->leReadCode->setFocus();
-    });
+    connect(fTimer, &QTimer::timeout, this, [this]() { ui->leReadCode->setFocus(); });
     fTimer->start(1000);
     ui->tblOrder->setColumnWidth(0, 135);
     ui->tblOrder->setColumnWidth(1, 70);
@@ -700,7 +696,6 @@ void Workspace::on_btnCheckout_clicked()
     }
 
     saveOrder(ORDER_STATE_CLOSE, true);
-    C5Airlog::write(hostinfo, mUser->fullName(), 1, "", fOrderUuid, "", tr("Order saved"), "", "");
 
     if(ui->btnSetIdram->isChecked()) {
     }
@@ -1474,15 +1469,15 @@ int Workspace::printTax(double cardAmount, double idramAmount)
     if(result != pt_err_ok) {
         switch(C5Message::question(err, tr("Try again"), tr("Do not print fiscal"), tr("Return to editing"))) {
         case QDialog::Rejected:
-            C5Airlog::write(hostinfo, mUser->fullName(), 1, "", fOrderUuid, "", tr("Fiscal fail, continue without fiscal"), "", "");
+            //C5Airlog::write(hostinfo, mUser->fullName(), 1, "", fOrderUuid, "", tr("Fiscal fail, continue without fiscal"), "", "");
             return 1;
 
         case QDialog::Accepted:
-            C5Airlog::write(hostinfo, mUser->fullName(), 1, "", fOrderUuid, "", tr("Fiscal fail, try again"), "", "");
+            //C5Airlog::write(hostinfo, mUser->fullName(), 1, "", fOrderUuid, "", tr("Fiscal fail, try again"), "", "");
             return 0;
 
         case 2:
-            C5Airlog::write(hostinfo, mUser->fullName(), 1, "", fOrderUuid, "", tr("Return to edit"), "", "");
+            //C5Airlog::write(hostinfo, mUser->fullName(), 1, "", fOrderUuid, "", tr("Return to edit"), "", "");
             return 2;
         }
     }
@@ -2621,9 +2616,6 @@ void Workspace::on_btnSaveAndPrecheck_clicked()
     if(ui->tblOrder->rowCount() == 0) {
         return;
     }
-
-    C5Airlog::write(hostinfo, mUser->fullName(), 1, "", fOrderUuid, "", tr("Print precheck"),
-                    QString::number(fTable),  "");
     printReceipt(fOrderUuid, false, true);
 }
 

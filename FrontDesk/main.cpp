@@ -1,21 +1,23 @@
-#include "c5mainwindow.h"
-#include "c5systempreference.h"
-#include "c5login.h"
-#include "logwriter.h"
-#include "c5servername.h"
+#include <QApplication>
+#include <QDir>
+#include <QFile>
+#include <QFontDatabase>
+#include <QMessageBox>
+#include <QSettings>
+#include <QSslSocket>
+#include <QStandardPaths>
+#include <QStyleFactory>
+#include <QTranslator>
 #include "c5config.h"
+#include "c5connectiondialog.h"
+#include "c5login.h"
+#include "c5mainwindow.h"
 #include "c5message.h"
 #include "c5officewidget.h"
-#include "c5connectiondialog.h"
-#include <QMessageBox>
-#include <QApplication>
-#include <QTranslator>
-#include <QStyleFactory>
-#include <QFontDatabase>
-#include <QFile>
-#include <QSslSocket>
+#include "c5servername.h"
+#include "c5systempreference.h"
+#include "logwriter.h"
 #include <ctime>
-#include <QSettings>
 
 bool isDarkModeEnabled()
 {
@@ -37,6 +39,17 @@ int main(int argc, char* argv[])
 #endif
     QApplication a(argc, argv);
     qputenv("QT_ASSUME_UTF8", "1");
+
+    /*working temp directory*/
+    QString tempDir = QStandardPaths::writableLocation(QStandardPaths::TempLocation) + "/officen";
+
+    QDir dir(tempDir);
+
+    if (dir.exists())
+        dir.removeRecursively();
+
+    QDir().mkpath(tempDir);
+
     QTranslator t;
 
     if(t.load(":/lang/FrontDesk.qm")) {
