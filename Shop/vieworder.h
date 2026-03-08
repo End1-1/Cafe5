@@ -21,6 +21,8 @@ public:
 
     ~ViewOrder();
 
+    void printCheckWithTax(const QString &id, std::function<void(const QString &)> funcSuccess);
+
 private slots:
     void removeOrderResponse(const QJsonObject &jdoc);
 
@@ -43,8 +45,6 @@ private slots:
     void on_btnPrintReceipt_clicked();
 
     void on_btnPrintFiscal_clicked();
-
-    bool printCheckWithTax(C5Database &db, const QString &id, QString &rseq);
 
     void on_btnPrintReceiptA4_clicked();
 

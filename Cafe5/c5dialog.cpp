@@ -161,6 +161,10 @@ void C5Dialog::keyPressEvent(QKeyEvent *e)
     switch (e->key()) {
     case Qt::Key_Enter:
     case Qt::Key_Return:
+        if (keyEnter()) {
+            e->accept();
+            return;
+        }
         if (e->modifiers() & Qt::ControlModifier) {
             keyControlPlusEnter();
             e->accept();
@@ -195,8 +199,9 @@ void C5Dialog::keyPressEvent(QKeyEvent *e)
     QDialog::keyPressEvent(e);
 }
 
-void C5Dialog::keyEnter()
+bool C5Dialog::keyEnter()
 {
+    return false;
 }
 
 void C5Dialog::keyControlPlusEnter()

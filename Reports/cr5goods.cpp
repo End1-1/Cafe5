@@ -337,26 +337,27 @@ void CR5Goods::exportToScales()
 
     if(__c5config.getValue(param_frontdesk_scale_dir).isEmpty() == false) {
         QFile f(__c5config.getValue(param_frontdesk_scale_dir) + "/export.xml");
-        f.open(QIODevice::WriteOnly);
-        f.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n");
-        f.write("<NewDataSet>\r\n");
+        if (f.open(QIODevice::WriteOnly)) {
+            f.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n");
+            f.write("<NewDataSet>\r\n");
 
-        while(db.nextRow()) {
-            f.write("<Report>\r\n");
-            f.write(QString("<CodeSort>%1</CodeSort>").arg(db.getString(0)).toUtf8());
-            f.write(QString("<Code>%1</Code>").arg(db.getString(0)).toUtf8());
-            f.write(QString("<GoodName>%1</GoodName>").arg(db.getString(1)).toUtf8());
-            f.write(QString("<PriceOut2>%1</PriceOut2>").arg(db.getDouble(2)).toUtf8());
+            while (db.nextRow()) {
+                f.write("<Report>\r\n");
+                f.write(QString("<CodeSort>%1</CodeSort>").arg(db.getString(0)).toUtf8());
+                f.write(QString("<Code>%1</Code>").arg(db.getString(0)).toUtf8());
+                f.write(QString("<GoodName>%1</GoodName>").arg(db.getString(1)).toUtf8());
+                f.write(QString("<PriceOut2>%1</PriceOut2>").arg(db.getDouble(2)).toUtf8());
 
-            if(db.getInt("f_wholenumber") > 0) {
-                f.write(QString("<IsPiece>1</IsPiece>").toUtf8());
+                if (db.getInt("f_wholenumber") > 0) {
+                    f.write(QString("<IsPiece>1</IsPiece>").toUtf8());
+                }
+
+                f.write("</Report>\r\n");
             }
 
-            f.write("</Report>\r\n");
+            f.write("</NewDataSet>");
+            f.close();
         }
-
-        f.write("</NewDataSet>");
-        f.close();
         C5Message::info(tr("Done"));
     }
 }
@@ -441,9 +442,11 @@ void CR5Goods::printBarCodes()
     b->fCurrencyName = s;
 
     for(int i = 0; i < fModel->rowCount(); i++) {
-        b->addRow(fModel->data(i, fModel->indexForColumnName("f_goods"), Qt::EditRole).toString(),
+        b->addRow(fModel->data(i, fModel->indexForColumnName("f_name"), Qt::EditRole).toString(),
                   fModel->data(i, fModel->indexForColumnName("f_scancode"), Qt::EditRole).toString(),
-                  1, fFilter->currency(), "");
+                  1,
+                  fFilter->currency(),
+                  "");
     }
 }
 

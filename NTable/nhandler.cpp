@@ -1,16 +1,17 @@
 #include "nhandler.h"
-#include "nfilterdlg.h"
-#include "c5database.h"
-#include "c5waiterorder.h"
-#include "c5mainwindow.h"
-#include "c5storedoc.h"
-#include "ntablemodel.h"
-#include "c5saledoc.h"
-#include "c5user.h"
-#include "c5message.h"
-#include <QToolButton>
 #include <QGridLayout>
 #include <QTableView>
+#include <QToolButton>
+#include "c5database.h"
+#include "c5mainwindow.h"
+#include "c5message.h"
+#include "c5saledoc.h"
+#include "c5storedoc.h"
+#include "c5user.h"
+#include "c5waiterorder.h"
+#include "ce5goods.h"
+#include "nfilterdlg.h"
+#include "ntablemodel.h"
 
 #include "c5discountredeem.h"
 #include "c5salefromstoreorder.h"
@@ -22,6 +23,7 @@ static const QString hShortDebt = "ec26fd1c-2391-11ef-a99a-7c10c9bcac82";
 static const QString hDraftSale  = "39617ca7-8fa4-11ed-8ad3-1078d2d2b808";
 static const QString hDiscountReturnAmount = "d563c585-aeb9-11f0-a2cb-8a884be02f31";
 static const QString hMenuReview = "65a0e1d4-c843-11f0-9ee3-0a002700000e";
+static const QString hGoods = "78dd7b1e-12d5-11f1-9245-8a884be02f31";
 
 NHandler::NHandler(C5User *user, QObject *parent)
     : QObject{parent},
@@ -118,6 +120,23 @@ void NHandler::handle(const QJsonArray &ja)
         QList<QMap<QString, QVariant> > data;
 
         if(e->getResult(data)) {
+        }
+
+        delete e;
+    } else if (mHandlers.at(0).toString() == hGoods) {
+        if (row < 0) {
+            return;
+        }
+        CE5Goods *ep = new CE5Goods();
+        C5Editor *e = C5Editor::createEditor(mUser, ep, 0);
+        ep->setId(ja.at(0).toInt());
+        QList<QMap<QString, QVariant> > data;
+
+        if (e->getResult(data)) {
+            if (data.at(0)["f_id"].toInt() == 0) {
+                C5Message::error(tr("Cannot change goods without code"));
+                return;
+            }
         }
 
         delete e;

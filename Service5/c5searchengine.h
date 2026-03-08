@@ -23,6 +23,8 @@ public:
     QString searchGoodsItem(const QJsonObject &jo, const SocketStruct &ss);
     QString searchPartnerItem(const QJsonObject &jo, const SocketStruct &ss);
     QString updateDictionary(const QJsonObject &jo, const SocketStruct &ss);
+    QString searchStoreDocStatus(const QJsonObject &jo, const SocketStruct &ss);
+    QString searchStoreDocType(const QJsonObject &jo, const SocketStruct &ss);
 
 private:
 

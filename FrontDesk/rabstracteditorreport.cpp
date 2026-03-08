@@ -1,18 +1,21 @@
 #include "rabstracteditorreport.h"
-#include "ui_rabstracteditorreport.h"
+#include <QAbstractTableModel>
+#include <QDialog>
+#include <QJsonArray>
+#include <QJsonDocument>
+#include <QScrollBar>
+#include <QSortFilterProxyModel>
+#include "c5config.h"
+#include "c5mainwindow.h"
+#include "c5storeinput.h"
 #include "c5user.h"
+#include "c5utils.h"
 #include "dict_workstation.h"
 #include "rabstracteditordialog.h"
 #include "rfilterdialog.h"
 #include "rfilterproxymodel.h"
-#include "c5config.h"
-#include "c5utils.h"
-#include <QAbstractTableModel>
-#include <QSortFilterProxyModel>
-#include <QDialog>
-#include <QScrollBar>
-#include <QJsonDocument>
-#include <QJsonArray>
+#include "struct_doc_store_input.h"
+#include "ui_rabstracteditorreport.h"
 
 class RAbstractEditorTableModel: public QAbstractTableModel
 {
@@ -165,6 +168,24 @@ void RAbstractEditorReport::on_tbl_doubleClicked(const QModelIndex &index)
 
     if(mEditorName == "CashSessions") {
         dialog = createEditorDialog("CashSessions");
+    }
+
+    if (mEditorName == "form_store_documents") {
+        NInterface::query1("/engine/v2/common/store-move/open",
+                           mUser->mSessionKey,
+                           this,
+                           {{"id", mModel->data(mModel->index(index.row(), 0), Qt::DisplayRole).toString()}},
+                           [this](const QJsonObject &jo) {
+                               StoreInputDocument sid = JsonParser<StoreInputDocument>::fromJson(jo.value("doc").toObject());
+                               switch (sid.type) {
+                               case DOC_TYPE_STORE_INPUT: {
+                                   auto *sw = new C5StoreInput(mUser, tr("Store input"), QIcon());
+                                   __mainWindow->addWidget(sw);
+                                   sw->setDocument(sid);
+                               }
+                               }
+                           });
+        return;
     }
 
     if(dialog) {

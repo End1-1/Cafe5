@@ -138,4 +138,5 @@ void NDataProvider::queryFinished(QNetworkReply *r)
         LogWriter::write(LogWriterLevel::errors, err.errorString(), ba);
         emit error(ba);
     }
+    deleteLater();
 }

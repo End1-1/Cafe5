@@ -16,7 +16,6 @@ C5SettingsWidget::C5SettingsWidget(QWidget *parent) :
     ui->cbDefaultStore->setDBValues("select f_id, f_name from c_storages order by 2");
     ui->cbShopHall->setDBValues("select f_id, f_name from h_halls order by 2");
     ui->cbWaiterHall->setDBValues("select f_id, f_name from h_halls order by 2");
-    ui->cbTaxUseExtPos->addItem(tr("Yes"), "true");
     ui->cbDefaultCurrency->setDBValues("select f_id, f_name from e_currency");
 }
 
@@ -155,10 +154,6 @@ bool C5SettingsWidget::save(QString &err, QList<QMap<QString, QVariant> >& data)
     fTags[ui->leServiceFactor->getTag()] = ui->leServiceFactor->text();
     fTags[ui->leIDRAMID->getTag()] = ui->leIDRAMID->text();
     fTags[ui->leIDRAMPhone->getTag()] = ui->leIDRAMPhone->text();
-    fTags[ui->leTaxIP->getTag()] = ui->leTaxIP->text();
-    fTags[ui->leTaxPort->getTag()] = ui->leTaxPort->text();
-    fTags[ui->leTaxPassword->getTag()] = ui->leTaxPassword->text();
-    fTags[ui->leTaxDept->getTag()] = ui->leTaxDept->text();
     fTags[ui->cbMenu->getTag()] = ui->cbMenu->currentData().toString();
     fTags[param_default_menu_name] = ui->cbMenu->currentText();
     fTags[ui->leOrderPrefix->getTag()] = ui->leOrderPrefix->text();
@@ -168,7 +163,6 @@ bool C5SettingsWidget::save(QString &err, QList<QMap<QString, QVariant> >& data)
     fTags[ui->leMoveDocNumDigits->getTag()] = ui->leMoveDocNumDigits->text();
     fTags[ui->leOutDocNumDigits->getTag()] = ui->leOutDocNumDigits->text();
     fTags[ui->cbDefaultStore->getTag()] = ui->cbDefaultStore->currentData().toString();
-    fTags[ui->cbTaxUseExtPos->getTag()] = ui->cbTaxUseExtPos->currentData().toString();
     fTags[ui->leHotelDatabase->getTag()] = ui->leHotelDatabase->text();
     fTags[ui->leItemCodeForHotel->getTag()] = ui->leItemCodeForHotel->text();
     fTags[ui->chNoCashDoc->getTag()] = ui->chNoCashDoc->isChecked() ? "1" : "0";
@@ -182,8 +176,6 @@ bool C5SettingsWidget::save(QString &err, QList<QMap<QString, QVariant> >& data)
     fTags[ui->leCardId->getTag()] = ui->leCardId->text();
     fTags[ui->leCashIdPrefix->getTag()] = ui->leCashIdPrefix->text();
     fTags[ui->leCardIdPrefix->getTag()] = ui->leCardIdPrefix->text();
-    fTags[ui->leCashierLogin->getTag()] = ui->leCashierLogin->text();
-    fTags[ui->leCashierPin->getTag()] = ui->leCashierPin->text();
     fTags[ui->chDenyPriceChange->getTag()] = ui->chDenyPriceChange->isChecked() ? "1" : "0";
     fTags[ui->chDenyReatail->getTag()] = ui->chDenyReatail->isChecked() ? "1" : "0";
     fTags[ui->chDenyWhosale->getTag()] = ui->chDenyWhosale->isChecked() ? "1" : "0";
@@ -192,7 +184,6 @@ bool C5SettingsWidget::save(QString &err, QList<QMap<QString, QVariant> >& data)
     fTags[ui->rbPrintV1->property("tag").toInt()] = ui->rbPrintV1->isChecked() ? "1" : "0";
     fTags[ui->rbPrintV2->property("tag").toInt()] = ui->rbPrintV2->isChecked() ? "1" : "0";
     fTags[ui->rbPrintV3->property("tag").toInt()] = ui->rbPrintV3->isChecked() ? "1" : "0";
-    fTags[ui->chFixAutoenterInputDocPrice->getTag()] = ui->chFixAutoenterInputDocPrice->isChecked() ? "1" : "0";
     fTags[ui->leReceiptFooterText->getTag()] = ui->leReceiptFooterText->text();
     fTags[ui->rbPrintDown->property("tag").toInt()] = ui->rbPrintDown->isChecked() ? "1" : "0";
     fTags[ui->rbPrintLeft->property("tag").toInt()] = ui->rbPrintLeft->isChecked() ? "1" : "0";
@@ -242,7 +233,6 @@ bool C5SettingsWidget::save(QString &err, QList<QMap<QString, QVariant> >& data)
     fTags[ui->leServiceFontSize->getTag()] = ui->leServiceFontSize->text();
     fTags[ui->lereceiptFontSize->getTag()] = ui->lereceiptFontSize->text();
     fTags[ui->leSystemThouthandSeparator->getTag()] = ui->leSystemThouthandSeparator->text();
-    fTags[ui->leTaxAlwaysPrintIfAmountLess->getTag()] = ui->leTaxAlwaysPrintIfAmountLess->text();
     fTags[ui->chPrintModOnReceipt->getTag()] = ui->chPrintModOnReceipt->isChecked() ? "1" : "0";
     fTags[ui->chDontCloseEmtpyOrder->getTag()] = ui->chDontCloseEmtpyOrder->isChecked() ? "1" : "0";
     fTags[ui->chDontPrintFinalReceipt->getTag()] = ui->chDontPrintFinalReceipt->isChecked() ? "1" : "0";
@@ -342,13 +332,6 @@ bool C5SettingsWidget::save(QString &err, QList<QMap<QString, QVariant> >& data)
     jc["remind_out_of_stock"] = ui->chRemindOutOfStock->isChecked();
     jc["service_item_code"] = ui->leServiceItemCode->getInteger();
     jc["discount_item_code"] = ui->leDiscountItemCode->getInteger();
-    jc["tax_ip"] = ui->leTaxIP->text();
-    jc["tax_port"] = ui->leTaxPort->text();
-    jc["tax_password"] = ui->leTaxPassword->text();
-    jc["tax_external_pos"] = ui->cbTaxUseExtPos->currentIndex() == 1 ? "true" : "false";
-    jc["tax_dept"] = ui->leTaxDept->text();
-    jc["tax_op"] = ui->leCashierLogin->text();
-    jc["tax_pin"] = ui->leCashierPin->text();
     jc["print_total_qty_goods"] = ui->chPrintTotyalQntOfGoods->isChecked();
     jc["change_qty_return_items"] = ui->chDenyChangeQtyReturnItems->isChecked();
     jc["smart_pictures"] = ui->chSmartPictures->isChecked();

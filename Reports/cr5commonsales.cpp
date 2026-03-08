@@ -49,7 +49,7 @@ CR5CommonSales::CR5CommonSales(QWidget *parent) :
                    << "concat_ws(', ', cpb.f_name, cpb.f_taxname, cpb.f_address) as f_buyer"
                    << "cpb.f_taxcode as f_buyertaxcode"
                    << "count(oh.f_id) as f_count"
-                   << "ot.f_receiptnumber"
+                   << "json_value(f_data, '$.f_fiscal.rseq') as f_fiscal"
                    << "sum(oh.f_amounttotal) as f_amounttotal"
                    << "sum(oh.f_amountcash) as f_amountcash"
                    << "sum(oh.f_amountcard) as f_amountcard"
@@ -65,8 +65,7 @@ CR5CommonSales::CR5CommonSales(QWidget *parent) :
                    << "sum(ec.f_amount) as f_amountout"
                    << "oh.f_amountservice"
                    << "oh.f_amountdiscount"
-                   << "oh.f_comment"
-                   ;
+                   << "oh.f_comment";
     fColumnsGroup << "concat(oh.f_prefix, oh.f_hallid) as f_prefix"
                   << "oh.f_id"
                   << "oh.f_datecash"
@@ -121,7 +120,7 @@ CR5CommonSales::CR5CommonSales(QWidget *parent) :
     fTranslation["f_amountdebt"] = tr("Debt");
     fTranslation["f_amounttelcell"] = tr("Telcell");
     fTranslation["f_buyer"] = tr("Buyer");
-    fTranslation["f_receiptnumber"] = tr("Tax");
+    fTranslation["f_fiscal"] = tr("Fiscal");
     fTranslation["f_buyertaxcode"] = tr("Buyer taxcode");
 
     if(__c5config.frontDeskMode() == FRONTDESK_SHOP) {

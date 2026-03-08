@@ -293,18 +293,17 @@ bool C5StoreDoc::openDoc(QString id, QString &err)
         on_chPaid_clicked(false);
     }
 
-    if(fDocType == DOC_TYPE_COMPLECTATION) {
+    if (fDocType == DOC_TYPE_COMPLECTATION) {
         db[":f_document"] = id;
         db[":f_type"] = 1;
-        db.exec(
-            "select d.f_id, d.f_goods, concat(g.f_name, if(g.f_scancode is null, '', concat(' ', g.f_scancode))) as f_goodsname, \
+        db.exec("select d.f_id, d.f_goods, concat(g.f_name, if(g.f_scancode is null, '', concat(' ', g.f_scancode))) as f_goodsname, \
                 d.f_qty, u.f_name, d.f_price, d.f_total, d.f_reason, g.f_scancode \
                 from a_store_draft d \
                 left join c_goods g on g.f_id=d.f_goods \
                 left join c_units u on u.f_id=g.f_unit \
                 where d.f_document=:f_document and d.f_type=:f_type");
 
-        if(db.nextRow()) {
+        if (db.nextRow()) {
             fComplectationId = db.getString("f_id");
             ui->leComplectationCode->setValue(db.getInt("f_goods"));
             ui->leComplectationScancodeCode->setText(db.getString("f_scancode"));
@@ -674,15 +673,6 @@ void C5StoreDoc::addByScancode(const QString &code, const QString &qty, QString 
         ui->tblGoods->lineEdit(row, col_price)->setText(price);
         ui->tblGoods->lineEdit(row, col_price)->setPlaceholderText(float_str(db.getDouble("f_lastinputprice"), 2));
 
-        if(__c5config.getValue(param_input_doc_fix_price).toInt() > 0) {
-            if(price.toDouble() < 0.001) {
-                if(db.getDouble("f_lastinputprice") > 0.001) {
-                    ui->tblGoods->lineEdit(row, col_price)->setDouble(db.getDouble("f_lastinputprice"));
-                    price = db.getString("f_lastinputprice");
-                }
-            }
-        }
-
         emit ui->tblGoods->lineEdit(row, col_price)->textEdited(price);
 
         if(fDocType == DOC_TYPE_STORE_INPUT) {
@@ -710,15 +700,6 @@ void C5StoreDoc::addByScancode(const QString &code, const QString &qty, QString 
             ui->tblGoods->lineEdit(row, col_goods_qty)->setFocus();
             ui->tblGoods->lineEdit(row, col_price)->setText(price);
             ui->tblGoods->lineEdit(row, col_price)->setPlaceholderText(float_str(db.getDouble("f_lastinputprice"), 2));
-
-            if(__c5config.getValue(param_input_doc_fix_price).toInt() > 0) {
-                if(price.toDouble() < 0.001) {
-                    if(db.getDouble("f_lastinputprice") > 0.001) {
-                        ui->tblGoods->lineEdit(row, col_price)->setDouble(db.getDouble("f_lastinputprice"));
-                        price = db.getString("f_lastinputprice");
-                    }
-                }
-            }
 
             emit ui->tblGoods->lineEdit(row, col_price)->textEdited(price);
 
@@ -796,11 +777,11 @@ void C5StoreDoc::nextChild()
 
 bool C5StoreDoc::writeDocument(int state, QString &err)
 {
-    if(!docCheck(err, state)) {
+    if (!docCheck(err, state)) {
         return false;
     }
 
-    if(ui->leDocNum->isEmpty() || (!ui->leDocNum->text().isEmpty() && ui->leDocNum->text().toInt() < 1)) {
+    if (ui->leDocNum->isEmpty() || (!ui->leDocNum->text().isEmpty() && ui->leDocNum->text().toInt() < 1)) {
         setUserId(true, 0);
         ui->leDocNum->setText(ui->leDocNum->placeholderText());
     } else {
@@ -822,7 +803,7 @@ bool C5StoreDoc::writeDocument(int state, QString &err)
     jheader["f_storeout"] = ui->leStoreOutput->getInteger();
     jheader["f_reason"] = ui->leReason->getInteger();
     jheader["f_comment"] = ui->leComment->text();
-    jheader["f_payment"] = state == DOC_STATE_SAVED ?  QJsonValue(fCashDocUuid) : QJsonValue::Null;
+    jheader["f_payment"] = state == DOC_STATE_SAVED ? QJsonValue(fCashDocUuid) : QJsonValue::Null;
     jheader["f_paid"] = ui->chPaid->isChecked() ? 1 : 0;
     jdoc["header"] = jheader;
     QJsonObject jbody;
@@ -839,7 +820,7 @@ bool C5StoreDoc::writeDocument(int state, QString &err)
     jbody["f_basedonsale"] = fBasedOnSale;
     QJsonArray jadd;
 
-    for(int i = 0; i < ui->tblAdd->rowCount(); i++) {
+    for (int i = 0; i < ui->tblAdd->rowCount(); i++) {
         QJsonObject jo;
         jo["f_name"] = ui->tblAdd->lineEdit(i, 1)->text();
         jo["f_amount"] = ui->tblAdd->lineEdit(i, 2)->getDouble();
@@ -855,7 +836,7 @@ bool C5StoreDoc::writeDocument(int state, QString &err)
     QJsonArray jgoods;
     QJsonObject jremains;
 
-    for(int i = 0; i < ui->tblGoods->rowCount(); i++) {
+    for (int i = 0; i < ui->tblGoods->rowCount(); i++) {
         QJsonObject jitem;
         jitem["f_goods"] = ui->tblGoods->getInteger(i, col_goods_id);
         jitem["f_qty"] = ui->tblGoods->lineEdit(i, col_goods_qty)->getDouble();
@@ -880,7 +861,7 @@ bool C5StoreDoc::writeDocument(int state, QString &err)
     QJsonDocument json(jdoc);
     C5Database db;
 
-    if(!db.execNetwork(QString("call sf_create_store_document('%1')").arg(QString(json.toJson(QJsonDocument::Compact))))) {
+    if (!db.execNetwork(QString("call sf_create_store_document('%1')").arg(QString(json.toJson(QJsonDocument::Compact))))) {
         err = db.fLastError;
         return false;
     }
@@ -888,10 +869,10 @@ bool C5StoreDoc::writeDocument(int state, QString &err)
     db[":f_session"] = session;
     db.exec("select f_result from a_result where f_session=:f_session");
 
-    if(db.nextRow()) {
+    if (db.nextRow()) {
         QJsonObject js = QJsonDocument::fromJson(db.getString(0).toUtf8()).object();
 
-        if(js["status"].toInt() == 0) {
+        if (js["status"].toInt() == 0) {
             err = js["message"].toString();
             return false;
         }
@@ -1089,7 +1070,7 @@ void C5StoreDoc::writeDocumentWithState(int state)
     QString err;
     writeDocument(state, err);
 
-    if(!err.isEmpty()) {
+    if (!err.isEmpty()) {
         C5Message::error(err);
         return;
     }
@@ -1103,12 +1084,12 @@ void C5StoreDoc::writeDocumentWithState(int state)
             db.exec("update o_draft_sale set f_state=:f_state where f_id=:f_id");
         }
 
-#pragma message( " DONT FORGET DO THIS FOR STORE UPDATE IN SHOP")
-#pragma message( " DONT FORGET DO THIS FOR STORE UPDATE IN SHOP")
-#pragma message( " DONT FORGET DO THIS FOR STORE UPDATE IN SHOP")
-#pragma message( " DONT FORGET DO THIS FOR STORE UPDATE IN SHOP")
-#pragma message( " DONT FORGET DO THIS FOR STORE UPDATE IN SHOP")
-#pragma message( " DONT FORGET DO THIS FOR STORE UPDATE IN SHOP")
+#pragma message(" DONT FORGET DO THIS FOR STORE UPDATE IN SHOP")
+#pragma message(" DONT FORGET DO THIS FOR STORE UPDATE IN SHOP")
+#pragma message(" DONT FORGET DO THIS FOR STORE UPDATE IN SHOP")
+#pragma message(" DONT FORGET DO THIS FOR STORE UPDATE IN SHOP")
+#pragma message(" DONT FORGET DO THIS FOR STORE UPDATE IN SHOP")
+#pragma message(" DONT FORGET DO THIS FOR STORE UPDATE IN SHOP")
         C5Message::info(tr("Saved"));
 
         if(fDocType == DOC_TYPE_STORE_OUTPUT
@@ -1548,13 +1529,13 @@ void C5StoreDoc::printV1()
     // 10) Подписи (в зависимости от типа)
     QString signLeftTitle, signRightTitle, signLeftName, signRightName;
 
-    if(fDocType == DOC_TYPE_STORE_MOVE) {
-        signLeftTitle  = tr("Passed");
+    if (fDocType == DOC_TYPE_STORE_MOVE) {
+        signLeftTitle = tr("Passed");
         signRightTitle = tr("Accepted");
-        signLeftName   = ui->lePassedName->text();
-        signRightName  = ui->leAcceptedName->text();
+        signLeftName = ui->lePassedName->text();
+        signRightName = ui->leAcceptedName->text();
     } else {
-        signLeftTitle  = tr("Accepted");
+        signLeftTitle = tr("Accepted");
         signRightTitle = tr("Passed");
         signLeftName   = ui->leAcceptedName->text();
         signRightName  = ui->lePassedName->text();
@@ -1605,16 +1586,26 @@ void C5StoreDoc::printV2()
     // ---- docTypeText
     QString docTypeText;
 
-    switch(fDocType) {
-    case DOC_TYPE_STORE_INPUT:    docTypeText = tr("Store input"); break;
+    switch (fDocType) {
+    case DOC_TYPE_STORE_INPUT:
+        docTypeText = tr("Store input");
+        break;
 
-    case DOC_TYPE_STORE_OUTPUT:   docTypeText = tr("Store output"); break;
+    case DOC_TYPE_STORE_OUTPUT:
+        docTypeText = tr("Store output");
+        break;
 
-    case DOC_TYPE_STORE_MOVE:     docTypeText = tr("Store movement"); break;
+    case DOC_TYPE_STORE_MOVE:
+        docTypeText = tr("Store movement");
+        break;
 
-    case DOC_TYPE_COMPLECTATION:  docTypeText = tr("Store complectation"); break;
+    case DOC_TYPE_COMPLECTATION:
+        docTypeText = tr("Store complectation");
+        break;
 
-    default: docTypeText = tr("Store document"); break;
+    default:
+        docTypeText = tr("Store document");
+        break;
     }
 
     // ---- stores
@@ -2124,10 +2115,6 @@ void C5StoreDoc::getInput()
     }
 
     int row = addGoods(vals.at(1).toInt(), vals.at(3).toString(), -1, vals.at(4).toString(), -1, -1, "", vals.at(11).toString());
-
-    if(__c5config.getValue(param_input_doc_fix_price).toInt() > 0) {
-        ui->tblGoods->lineEdit(row, col_price)->setDouble(vals.at(6).toDouble());
-    }
 
     ui->tblGoods->lineEdit(row, col_price)->setPlaceholderText(float_str(vals.at(6).toDouble(), 2));
     ui->tblGoods->lineEdit(row, col_goods_qty)->setFocus();

@@ -52,32 +52,6 @@ QString C5Config::idramPhone()
     return getValue(param_idram_phone);
 }
 
-QString C5Config::taxIP()
-{
-    return getValue(param_tax_ip);
-}
-
-int C5Config::taxPort()
-{
-    return getValue(param_tax_port).toInt();
-}
-
-QString C5Config::taxPassword()
-{
-    return getValue(param_tax_password);
-}
-
-QString C5Config::taxDept()
-{
-    return getValue(param_tax_dept);
-}
-
-QString C5Config::taxUseExtPos()
-{
-    QString value = getValue(param_tax_use_ext_pos).toLower();
-    return  value;
-}
-
 QString C5Config::serviceFactor()
 {
     return getValue(param_service_factor);
@@ -286,16 +260,6 @@ QString C5Config::nocashPrefix()
 int C5Config::frontDeskMode()
 {
     return getValue(param_frondesk_mode).toInt();
-}
-
-QString C5Config::taxCashier()
-{
-    return getValue(param_tax_cashier_login);
-}
-
-QString C5Config::taxPin()
-{
-    return getValue(param_tax_cashier_pin);
 }
 
 bool C5Config::shopDenyF1()

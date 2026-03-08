@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>667</width>
-    <height>811</height>
+    <height>813</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -20,118 +20,15 @@
    <property name="verticalSpacing">
     <number>12</number>
    </property>
-   <item row="9" column="2">
-    <widget class="C5LineEdit" name="leCashIn">
+   <item row="10" column="2">
+    <widget class="C5LineEdit" name="leChange">
      <property name="font">
       <font>
        <pointsize>26</pointsize>
       </font>
      </property>
      <property name="focusPolicy">
-      <enum>Qt::FocusPolicy::StrongFocus</enum>
-     </property>
-     <property name="text">
-      <string>999999999</string>
-     </property>
-    </widget>
-   </item>
-   <item row="2" column="0">
-    <widget class="QPushButton" name="btnCard">
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
-     </property>
-     <property name="font">
-      <font>
-       <pointsize>26</pointsize>
-      </font>
-     </property>
-     <property name="focusPolicy">
-      <enum>Qt::FocusPolicy::NoFocus</enum>
-     </property>
-     <property name="text">
-      <string>Card</string>
-     </property>
-    </widget>
-   </item>
-   <item row="3" column="0">
-    <widget class="QPushButton" name="btnBankTransfer">
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
-     </property>
-     <property name="font">
-      <font>
-       <pointsize>26</pointsize>
-      </font>
-     </property>
-     <property name="focusPolicy">
-      <enum>Qt::FocusPolicy::NoFocus</enum>
-     </property>
-     <property name="text">
-      <string>Bank transfer</string>
-     </property>
-    </widget>
-   </item>
-   <item row="10" column="0">
-    <widget class="QPushButton" name="btnChange">
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
-     </property>
-     <property name="font">
-      <font>
-       <pointsize>26</pointsize>
-      </font>
-     </property>
-     <property name="focusPolicy">
-      <enum>Qt::FocusPolicy::NoFocus</enum>
-     </property>
-     <property name="text">
-      <string>Change</string>
-     </property>
-    </widget>
-   </item>
-   <item row="7" column="0">
-    <widget class="QPushButton" name="btnPrepaid">
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
-     </property>
-     <property name="font">
-      <font>
-       <pointsize>26</pointsize>
-      </font>
-     </property>
-     <property name="focusPolicy">
-      <enum>Qt::FocusPolicy::NoFocus</enum>
-     </property>
-     <property name="text">
-      <string>Prepaid</string>
-     </property>
-    </widget>
-   </item>
-   <item row="0" column="2">
-    <widget class="C5LineEdit" name="leTotal">
-     <property name="font">
-      <font>
-       <pointsize>30</pointsize>
-       <bold>true</bold>
-      </font>
-     </property>
-     <property name="focusPolicy">
-      <enum>Qt::FocusPolicy::NoFocus</enum>
-     </property>
-     <property name="styleSheet">
-      <string notr="true">color: red</string>
+      <enum>Qt::FocusPolicy::ClickFocus</enum>
      </property>
      <property name="text">
       <string>999999999</string>
@@ -141,74 +38,8 @@
      </property>
     </widget>
    </item>
-   <item row="9" column="0">
-    <widget class="QPushButton" name="btnCashin">
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
-     </property>
-     <property name="font">
-      <font>
-       <pointsize>26</pointsize>
-      </font>
-     </property>
-     <property name="focusPolicy">
-      <enum>Qt::FocusPolicy::NoFocus</enum>
-     </property>
-     <property name="text">
-      <string>Cash in</string>
-     </property>
-    </widget>
-   </item>
-   <item row="7" column="2">
-    <widget class="C5LineEdit" name="lePrepaid">
-     <property name="font">
-      <font>
-       <pointsize>26</pointsize>
-      </font>
-     </property>
-     <property name="focusPolicy">
-      <enum>Qt::FocusPolicy::ClickFocus</enum>
-     </property>
-     <property name="text">
-      <string>999999999</string>
-     </property>
-    </widget>
-   </item>
    <item row="3" column="2">
     <widget class="C5LineEdit" name="leBankTransfer">
-     <property name="font">
-      <font>
-       <pointsize>26</pointsize>
-      </font>
-     </property>
-     <property name="focusPolicy">
-      <enum>Qt::FocusPolicy::ClickFocus</enum>
-     </property>
-     <property name="text">
-      <string>999999999</string>
-     </property>
-    </widget>
-   </item>
-   <item row="5" column="2">
-    <widget class="C5LineEdit" name="leIdram">
-     <property name="font">
-      <font>
-       <pointsize>26</pointsize>
-      </font>
-     </property>
-     <property name="focusPolicy">
-      <enum>Qt::FocusPolicy::ClickFocus</enum>
-     </property>
-     <property name="text">
-      <string>999999999</string>
-     </property>
-    </widget>
-   </item>
-   <item row="8" column="2">
-    <widget class="C5LineEdit" name="leDebt">
      <property name="font">
       <font>
        <pointsize>26</pointsize>
@@ -243,21 +74,108 @@
      </property>
     </widget>
    </item>
-   <item row="10" column="2">
-    <widget class="C5LineEdit" name="leChange">
+   <item row="2" column="0">
+    <widget class="QPushButton" name="btnCard">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
      <property name="font">
       <font>
        <pointsize>26</pointsize>
       </font>
      </property>
      <property name="focusPolicy">
-      <enum>Qt::FocusPolicy::ClickFocus</enum>
+      <enum>Qt::FocusPolicy::NoFocus</enum>
      </property>
      <property name="text">
-      <string>999999999</string>
+      <string>Card</string>
      </property>
-     <property name="readOnly">
-      <bool>true</bool>
+    </widget>
+   </item>
+   <item row="5" column="0">
+    <widget class="QPushButton" name="btnIdram">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>26</pointsize>
+      </font>
+     </property>
+     <property name="focusPolicy">
+      <enum>Qt::FocusPolicy::NoFocus</enum>
+     </property>
+     <property name="text">
+      <string>Idram</string>
+     </property>
+    </widget>
+   </item>
+   <item row="7" column="0">
+    <widget class="QPushButton" name="btnPrepaid">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>26</pointsize>
+      </font>
+     </property>
+     <property name="focusPolicy">
+      <enum>Qt::FocusPolicy::NoFocus</enum>
+     </property>
+     <property name="text">
+      <string>Prepaid</string>
+     </property>
+    </widget>
+   </item>
+   <item row="8" column="0">
+    <widget class="QPushButton" name="btnDebt">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>26</pointsize>
+      </font>
+     </property>
+     <property name="focusPolicy">
+      <enum>Qt::FocusPolicy::NoFocus</enum>
+     </property>
+     <property name="text">
+      <string>Debt</string>
+     </property>
+    </widget>
+   </item>
+   <item row="10" column="0">
+    <widget class="QPushButton" name="btnChange">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>26</pointsize>
+      </font>
+     </property>
+     <property name="focusPolicy">
+      <enum>Qt::FocusPolicy::NoFocus</enum>
+     </property>
+     <property name="text">
+      <string>Change</string>
      </property>
     </widget>
    </item>
@@ -291,7 +209,236 @@
      </property>
     </widget>
    </item>
-   <item row="12" column="0" colspan="3">
+   <item row="9" column="2">
+    <widget class="C5LineEdit" name="leCashIn">
+     <property name="font">
+      <font>
+       <pointsize>26</pointsize>
+      </font>
+     </property>
+     <property name="focusPolicy">
+      <enum>Qt::FocusPolicy::StrongFocus</enum>
+     </property>
+     <property name="text">
+      <string>999999999</string>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="0">
+    <widget class="QLabel" name="label">
+     <property name="font">
+      <font>
+       <pointsize>30</pointsize>
+      </font>
+     </property>
+     <property name="text">
+      <string>Total</string>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="0">
+    <widget class="QPushButton" name="btnBankTransfer">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>26</pointsize>
+      </font>
+     </property>
+     <property name="focusPolicy">
+      <enum>Qt::FocusPolicy::NoFocus</enum>
+     </property>
+     <property name="text">
+      <string>Bank transfer</string>
+     </property>
+    </widget>
+   </item>
+   <item row="9" column="0">
+    <widget class="QPushButton" name="btnCashin">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>26</pointsize>
+      </font>
+     </property>
+     <property name="focusPolicy">
+      <enum>Qt::FocusPolicy::NoFocus</enum>
+     </property>
+     <property name="text">
+      <string>Cash in</string>
+     </property>
+    </widget>
+   </item>
+   <item row="5" column="2">
+    <widget class="C5LineEdit" name="leIdram">
+     <property name="font">
+      <font>
+       <pointsize>26</pointsize>
+      </font>
+     </property>
+     <property name="focusPolicy">
+      <enum>Qt::FocusPolicy::ClickFocus</enum>
+     </property>
+     <property name="text">
+      <string>999999999</string>
+     </property>
+    </widget>
+   </item>
+   <item row="6" column="2">
+    <widget class="C5LineEdit" name="leTelcell">
+     <property name="font">
+      <font>
+       <pointsize>26</pointsize>
+      </font>
+     </property>
+     <property name="focusPolicy">
+      <enum>Qt::FocusPolicy::ClickFocus</enum>
+     </property>
+     <property name="text">
+      <string>999999999</string>
+     </property>
+    </widget>
+   </item>
+   <item row="7" column="2">
+    <widget class="C5LineEdit" name="lePrepaid">
+     <property name="font">
+      <font>
+       <pointsize>26</pointsize>
+      </font>
+     </property>
+     <property name="focusPolicy">
+      <enum>Qt::FocusPolicy::ClickFocus</enum>
+     </property>
+     <property name="text">
+      <string>999999999</string>
+     </property>
+    </widget>
+   </item>
+   <item row="4" column="0">
+    <widget class="QPushButton" name="btnCredit">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>26</pointsize>
+      </font>
+     </property>
+     <property name="focusPolicy">
+      <enum>Qt::FocusPolicy::NoFocus</enum>
+     </property>
+     <property name="text">
+      <string>Credit</string>
+     </property>
+    </widget>
+   </item>
+   <item row="8" column="2">
+    <widget class="C5LineEdit" name="leDebt">
+     <property name="font">
+      <font>
+       <pointsize>26</pointsize>
+      </font>
+     </property>
+     <property name="focusPolicy">
+      <enum>Qt::FocusPolicy::ClickFocus</enum>
+     </property>
+     <property name="text">
+      <string>999999999</string>
+     </property>
+    </widget>
+   </item>
+   <item row="6" column="0">
+    <widget class="QPushButton" name="btnTelcell">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>26</pointsize>
+      </font>
+     </property>
+     <property name="focusPolicy">
+      <enum>Qt::FocusPolicy::NoFocus</enum>
+     </property>
+     <property name="text">
+      <string>Telcell</string>
+     </property>
+    </widget>
+   </item>
+   <item row="4" column="2">
+    <widget class="C5LineEdit" name="leCredit">
+     <property name="font">
+      <font>
+       <pointsize>26</pointsize>
+      </font>
+     </property>
+     <property name="focusPolicy">
+      <enum>Qt::FocusPolicy::ClickFocus</enum>
+     </property>
+     <property name="text">
+      <string>999999999</string>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="2">
+    <widget class="C5LineEdit" name="leTotal">
+     <property name="font">
+      <font>
+       <pointsize>30</pointsize>
+       <bold>true</bold>
+      </font>
+     </property>
+     <property name="focusPolicy">
+      <enum>Qt::FocusPolicy::NoFocus</enum>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">color: red</string>
+     </property>
+     <property name="text">
+      <string>999999999</string>
+     </property>
+     <property name="readOnly">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="3">
+    <widget class="QPushButton" name="btnCashRemain">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>26</pointsize>
+      </font>
+     </property>
+     <property name="focusPolicy">
+      <enum>Qt::FocusPolicy::NoFocus</enum>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+    </widget>
+   </item>
+   <item row="12" column="0" colspan="4">
     <widget class="QWidget" name="widget" native="true">
      <layout class="QHBoxLayout" name="horizontalLayout">
       <property name="leftMargin">
@@ -387,132 +534,6 @@
        </spacer>
       </item>
      </layout>
-    </widget>
-   </item>
-   <item row="0" column="0">
-    <widget class="QLabel" name="label">
-     <property name="font">
-      <font>
-       <pointsize>30</pointsize>
-      </font>
-     </property>
-     <property name="text">
-      <string>Total</string>
-     </property>
-    </widget>
-   </item>
-   <item row="6" column="2">
-    <widget class="C5LineEdit" name="leTelcell">
-     <property name="font">
-      <font>
-       <pointsize>26</pointsize>
-      </font>
-     </property>
-     <property name="focusPolicy">
-      <enum>Qt::FocusPolicy::ClickFocus</enum>
-     </property>
-     <property name="text">
-      <string>999999999</string>
-     </property>
-    </widget>
-   </item>
-   <item row="5" column="0">
-    <widget class="QPushButton" name="btnIdram">
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
-     </property>
-     <property name="font">
-      <font>
-       <pointsize>26</pointsize>
-      </font>
-     </property>
-     <property name="focusPolicy">
-      <enum>Qt::FocusPolicy::NoFocus</enum>
-     </property>
-     <property name="text">
-      <string>Idram</string>
-     </property>
-    </widget>
-   </item>
-   <item row="6" column="0">
-    <widget class="QPushButton" name="btnTelcell">
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
-     </property>
-     <property name="font">
-      <font>
-       <pointsize>26</pointsize>
-      </font>
-     </property>
-     <property name="focusPolicy">
-      <enum>Qt::FocusPolicy::NoFocus</enum>
-     </property>
-     <property name="text">
-      <string>Telcell</string>
-     </property>
-    </widget>
-   </item>
-   <item row="8" column="0">
-    <widget class="QPushButton" name="btnDebt">
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
-     </property>
-     <property name="font">
-      <font>
-       <pointsize>26</pointsize>
-      </font>
-     </property>
-     <property name="focusPolicy">
-      <enum>Qt::FocusPolicy::NoFocus</enum>
-     </property>
-     <property name="text">
-      <string>Debt</string>
-     </property>
-    </widget>
-   </item>
-   <item row="4" column="0">
-    <widget class="QPushButton" name="btnCredit">
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
-     </property>
-     <property name="font">
-      <font>
-       <pointsize>26</pointsize>
-      </font>
-     </property>
-     <property name="focusPolicy">
-      <enum>Qt::FocusPolicy::NoFocus</enum>
-     </property>
-     <property name="text">
-      <string>Credit</string>
-     </property>
-    </widget>
-   </item>
-   <item row="4" column="2">
-    <widget class="C5LineEdit" name="leCredit">
-     <property name="font">
-      <font>
-       <pointsize>26</pointsize>
-      </font>
-     </property>
-     <property name="focusPolicy">
-      <enum>Qt::FocusPolicy::ClickFocus</enum>
-     </property>
-     <property name="text">
-      <string>999999999</string>
-     </property>
     </widget>
    </item>
   </layout>

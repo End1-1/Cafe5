@@ -62,10 +62,10 @@ int main(int argc, char* argv[])
         }
     }
 
-    QTranslator t;
+    auto *t = new QTranslator();
 
-    if(t.load(":/lang/Shop.qm")) {
-        a.installTranslator(&t);
+    if (t->load(":/lang/Shop.qm")) {
+        a.installTranslator(t);
     }
 
     QString fileVersion =  FileVersion::getVersionString(a.applicationFilePath());

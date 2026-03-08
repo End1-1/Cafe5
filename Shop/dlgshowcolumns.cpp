@@ -14,6 +14,7 @@ DlgShowColumns::DlgShowColumns(C5User *user) :
     ui->chUnit->setChecked(s.value("col" + QString::number(col_unit)).toBool());
     ui->chBox->setChecked(s.value("col" + QString::number(col_qtybox)).toBool());
     ui->chCheckDiscount->setChecked(s.value("col" + QString::number(col_check_discount)).toBool());
+    ui->chLearnDiscount->setChecked(s.value("learnaccumulate", false).toBool());
 }
 
 DlgShowColumns::~DlgShowColumns()

@@ -2,6 +2,9 @@
 <ui version="4.0">
  <class>ViewOrder</class>
  <widget class="QDialog" name="ViewOrder">
+  <property name="windowModality">
+   <enum>Qt::WindowModality::WindowModal</enum>
+  </property>
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -811,6 +814,16 @@
         </property>
        </widget>
       </item>
+      <item row="2" column="4">
+       <widget class="QPushButton" name="btnPrintPartnerTIN">
+        <property name="text">
+         <string>Print partner TIN</string>
+        </property>
+        <property name="checkable">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
      </layout>
     </widget>
    </item>
@@ -820,7 +833,7 @@
   <customwidget>
    <class>C5LineEdit</class>
    <extends>QLineEdit</extends>
-   <header>c5lineedit.h</header>
+   <header location="global">c5lineedit.h</header>
   </customwidget>
   <customwidget>
    <class>C5ClearTableWidget</class>

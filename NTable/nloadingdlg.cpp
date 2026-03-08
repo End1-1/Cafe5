@@ -23,6 +23,13 @@ NLoadingDlg::~NLoadingDlg()
 void NLoadingDlg::open()
 {
     mSecond = 0;
+    setWindowModality(Qt::ApplicationModal);
+
+    setWindowFlags(windowFlags() | Qt::WindowStaysOnTopHint);
+
+    show();
+    raise();
+    activateWindow();
 }
 
 void NLoadingDlg::reject()
@@ -43,7 +50,7 @@ void NLoadingDlg::resetSeconds()
 void NLoadingDlg::hide()
 {
     QWidget::hide();
-    mSecond = -999999999;
+    mSecond = 0;
 }
 
 void NLoadingDlg::timeout()

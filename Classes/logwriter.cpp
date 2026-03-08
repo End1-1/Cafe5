@@ -32,7 +32,7 @@ void LogWriter::write(const QString &file, const QString &title, const QString &
 void LogWriter::writeToFile(const QString &fileName, const QString &title, const QString &message)
 {
 #ifdef Q_OS_WIN
-    QString tempPath = "C:/Windows/Temp";
+    QString tempPath = QDir::tempPath();
 #else
     QString tempPath = QStandardPaths::writableLocation(QStandardPaths::TempLocation);
 #endif

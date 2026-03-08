@@ -1,13 +1,15 @@
 #include "rfilterdialog.h"
-#include "ui_rfilterdialog.h"
-#include "format_date.h"
+#include <QIntValidator>
+#include <QJsonObject>
+#include <QLabel>
+#include <QShowEvent>
+#include "c5codenameselector.h"
+#include "c5codenameselectorfunctions.h"
+#include "c5config.h"
 #include "c5dateedit.h"
 #include "c5lineedit.h"
-#include "c5config.h"
-#include <QShowEvent>
-#include <QJsonObject>
-#include <QIntValidator>
-#include <QLabel>
+#include "format_date.h"
+#include "ui_rfilterdialog.h"
 
 RFilterDialog::RFilterDialog(C5User *user)
     : C5Dialog(user),
@@ -52,6 +54,22 @@ void RFilterDialog::buildWidget(const QString &settingsPrefix, const QJsonArray 
             ui->gl->addWidget(en, row, 1);
         }
 
+        if (jo.value("type").toString() == "keyvalue") {
+            auto *cn = new C5CodeNameSelector();
+            cn->setProperty("name", jo.value("name").toString());
+            cn->setSelectorName(jo.value("label").toString());
+            if (jo.value("function").toString() == "store") {
+                cn->selectorCallback = storeItemSelector;
+            } else if (jo.value("function").toString() == "store_doc_status") {
+                cn->selectorCallback = storeDocStatusItemSelector;
+            } else if (jo.value("function").toString() == "store_doc_type") {
+                cn->selectorCallback = storeDocTypeItemSelector;
+            } else if (jo.value("function").toString() == "partner") {
+                cn->selectorCallback = partnerItemSelector;
+            }
+            ui->gl->addWidget(cn, row, 0, 1, 3);
+        }
+
         row++;
     }
 
@@ -86,6 +104,13 @@ QJsonArray RFilterDialog::filterValues()
             if(en) {
                 addparam(w->property("name").toString(), en->getInteger());
                 __c5config.setRegValue(QString("rfilter_%1_%2").arg(mSettingsPrefix, w->property("name").toString()), en->getInteger());
+                continue;
+            }
+
+            auto *kv = qobject_cast<C5CodeNameSelector *>(w);
+            if (kv) {
+                addparam(w->property("name").toString(), kv->value());
+                __c5config.setRegValue(QString("rfilter_%1_%2").arg(mSettingsPrefix, w->property("name").toString()), kv->value());
                 continue;
             }
         }

@@ -54,10 +54,7 @@ struct WaiterOrder {
     {
         return data["f_precheck"].toInt() > 0;
     }
-    QJsonObject fiscal() const
-    {
-        return data.value("f_fiscal").toObject();
-    }
+    QJsonObject fiscal() const { return data.value("f_fiscal").toObject(); }
     QString comment() const
     {
         return data["f_comment"].toString();

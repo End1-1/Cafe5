@@ -42,8 +42,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>1022</width>
-        <height>727</height>
+        <width>1018</width>
+        <height>723</height>
        </rect>
       </property>
       <layout class="QHBoxLayout" name="horizontalLayout_2">
@@ -59,7 +59,7 @@
           <enum>Qt::FocusPolicy::NoFocus</enum>
          </property>
          <property name="currentIndex">
-          <number>0</number>
+          <number>1</number>
          </property>
          <widget class="QWidget" name="tab">
           <attribute name="title">
@@ -323,24 +323,10 @@
            <string>Store</string>
           </attribute>
           <layout class="QGridLayout" name="gridLayout_2">
-           <item row="2" column="2">
-            <widget class="C5LineEdit" name="leOutDocNumDigits">
+           <item row="1" column="2">
+            <widget class="C5LineEdit" name="leMoveDocNumDigits">
              <property name="Tag" stdset="0">
-              <number>23</number>
-             </property>
-            </widget>
-           </item>
-           <item row="1" column="0">
-            <widget class="QLabel" name="label_26">
-             <property name="text">
-              <string>Movement document number digits</string>
-             </property>
-            </widget>
-           </item>
-           <item row="0" column="2">
-            <widget class="C5LineEdit" name="leInputDocNumDigits">
-             <property name="Tag" stdset="0">
-              <number>13</number>
+              <number>22</number>
              </property>
             </widget>
            </item>
@@ -351,51 +337,44 @@
              </property>
             </widget>
            </item>
-           <item row="8" column="2">
-            <widget class="C5CheckBox" name="chNoScanCode">
+           <item row="9" column="2">
+            <widget class="C5CheckBox" name="chUpdateTempStorageForShop">
              <property name="text">
               <string/>
              </property>
              <property name="Tag" stdset="0">
-              <number>25</number>
+              <number>94</number>
              </property>
             </widget>
+           </item>
+           <item row="9" column="0">
+            <widget class="QLabel" name="label_88">
+             <property name="text">
+              <string>Update temp storage for shop</string>
+             </property>
+            </widget>
+           </item>
+           <item row="2" column="0">
+            <widget class="QLabel" name="label_27">
+             <property name="text">
+              <string>Output document number digits</string>
+             </property>
+            </widget>
+           </item>
+           <item row="5" column="0">
+            <widget class="QLabel" name="label_22">
+             <property name="text">
+              <string>Output document counter*</string>
+             </property>
+            </widget>
+           </item>
+           <item row="3" column="2">
+            <widget class="C5LineEdit" name="leInputDocCounter"/>
            </item>
            <item row="6" column="0">
             <widget class="QLabel" name="label_17">
              <property name="text">
               <string>Default store</string>
-             </property>
-            </widget>
-           </item>
-           <item row="9" column="2">
-            <widget class="C5CheckBox" name="chFixAutoenterInputDocPrice">
-             <property name="text">
-              <string/>
-             </property>
-             <property name="Tag" stdset="0">
-              <number>57</number>
-             </property>
-            </widget>
-           </item>
-           <item row="11" column="0">
-            <widget class="QLabel" name="label_89">
-             <property name="text">
-              <string>Automatically store output after sale</string>
-             </property>
-            </widget>
-           </item>
-           <item row="8" column="0">
-            <widget class="QLabel" name="label_29">
-             <property name="text">
-              <string>No scancode in store doc</string>
-             </property>
-            </widget>
-           </item>
-           <item row="9" column="0">
-            <widget class="QLabel" name="label_56">
-             <property name="text">
-              <string>Autoenter last input price for store document</string>
              </property>
             </widget>
            </item>
@@ -409,7 +388,106 @@
              </property>
             </widget>
            </item>
-           <item row="13" column="2">
+           <item row="6" column="2">
+            <widget class="C5ComboBox" name="cbDefaultStore">
+             <property name="Tag" stdset="0">
+              <number>14</number>
+             </property>
+            </widget>
+           </item>
+           <item row="4" column="2">
+            <widget class="C5LineEdit" name="leMoveDocCounter"/>
+           </item>
+           <item row="13" column="0" colspan="3">
+            <widget class="QLabel" name="label_23">
+             <property name="text">
+              <string>*This settings common for all cases</string>
+             </property>
+            </widget>
+           </item>
+           <item row="7" column="0">
+            <widget class="QLabel" name="label_28">
+             <property name="text">
+              <string>No cash doc option in store doc</string>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="0">
+            <widget class="QLabel" name="label_26">
+             <property name="text">
+              <string>Movement document number digits</string>
+             </property>
+            </widget>
+           </item>
+           <item row="5" column="2">
+            <widget class="C5LineEdit" name="leOutDocCounter"/>
+           </item>
+           <item row="8" column="0">
+            <widget class="QLabel" name="label_29">
+             <property name="text">
+              <string>No scancode in store doc</string>
+             </property>
+            </widget>
+           </item>
+           <item row="4" column="0">
+            <widget class="QLabel" name="label_21">
+             <property name="text">
+              <string>Movement document counter*</string>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="2">
+            <widget class="C5LineEdit" name="leInputDocNumDigits">
+             <property name="Tag" stdset="0">
+              <number>13</number>
+             </property>
+            </widget>
+           </item>
+           <item row="11" column="2">
+            <widget class="C5CheckBox" name="chRemindOutOfStock">
+             <property name="text">
+              <string/>
+             </property>
+             <property name="Tag" stdset="0">
+              <number>95</number>
+             </property>
+            </widget>
+           </item>
+           <item row="8" column="2">
+            <widget class="C5CheckBox" name="chNoScanCode">
+             <property name="text">
+              <string/>
+             </property>
+             <property name="Tag" stdset="0">
+              <number>25</number>
+             </property>
+            </widget>
+           </item>
+           <item row="10" column="0">
+            <widget class="QLabel" name="label_89">
+             <property name="text">
+              <string>Automatically store output after sale</string>
+             </property>
+            </widget>
+           </item>
+           <item row="11" column="0">
+            <widget class="QLabel" name="label_112">
+             <property name="text">
+              <string>Remind about out of stock</string>
+             </property>
+            </widget>
+           </item>
+           <item row="10" column="2">
+            <widget class="C5CheckBox" name="chAutomaticallyStoreOutWaiter">
+             <property name="text">
+              <string/>
+             </property>
+             <property name="Tag" stdset="0">
+              <number>95</number>
+             </property>
+            </widget>
+           </item>
+           <item row="12" column="2">
             <spacer name="verticalSpacer">
              <property name="orientation">
               <enum>Qt::Orientation::Vertical</enum>
@@ -429,105 +507,10 @@
              </property>
             </widget>
            </item>
-           <item row="5" column="2">
-            <widget class="C5LineEdit" name="leOutDocCounter"/>
-           </item>
-           <item row="4" column="2">
-            <widget class="C5LineEdit" name="leMoveDocCounter"/>
-           </item>
-           <item row="7" column="0">
-            <widget class="QLabel" name="label_28">
-             <property name="text">
-              <string>No cash doc option in store doc</string>
-             </property>
-            </widget>
-           </item>
-           <item row="3" column="2">
-            <widget class="C5LineEdit" name="leInputDocCounter"/>
-           </item>
-           <item row="4" column="0">
-            <widget class="QLabel" name="label_21">
-             <property name="text">
-              <string>Movement document counter*</string>
-             </property>
-            </widget>
-           </item>
-           <item row="6" column="2">
-            <widget class="C5ComboBox" name="cbDefaultStore">
+           <item row="2" column="2">
+            <widget class="C5LineEdit" name="leOutDocNumDigits">
              <property name="Tag" stdset="0">
-              <number>14</number>
-             </property>
-            </widget>
-           </item>
-           <item row="10" column="2">
-            <widget class="C5CheckBox" name="chUpdateTempStorageForShop">
-             <property name="text">
-              <string/>
-             </property>
-             <property name="Tag" stdset="0">
-              <number>94</number>
-             </property>
-            </widget>
-           </item>
-           <item row="14" column="0" colspan="3">
-            <widget class="QLabel" name="label_23">
-             <property name="text">
-              <string>*This settings common for all cases</string>
-             </property>
-            </widget>
-           </item>
-           <item row="10" column="0">
-            <widget class="QLabel" name="label_88">
-             <property name="text">
-              <string>Update temp storage for shop</string>
-             </property>
-            </widget>
-           </item>
-           <item row="2" column="0">
-            <widget class="QLabel" name="label_27">
-             <property name="text">
-              <string>Output document number digits</string>
-             </property>
-            </widget>
-           </item>
-           <item row="11" column="2">
-            <widget class="C5CheckBox" name="chAutomaticallyStoreOutWaiter">
-             <property name="text">
-              <string/>
-             </property>
-             <property name="Tag" stdset="0">
-              <number>95</number>
-             </property>
-            </widget>
-           </item>
-           <item row="1" column="2">
-            <widget class="C5LineEdit" name="leMoveDocNumDigits">
-             <property name="Tag" stdset="0">
-              <number>22</number>
-             </property>
-            </widget>
-           </item>
-           <item row="5" column="0">
-            <widget class="QLabel" name="label_22">
-             <property name="text">
-              <string>Output document counter*</string>
-             </property>
-            </widget>
-           </item>
-           <item row="12" column="0">
-            <widget class="QLabel" name="label_112">
-             <property name="text">
-              <string>Remind about out of stock</string>
-             </property>
-            </widget>
-           </item>
-           <item row="12" column="2">
-            <widget class="C5CheckBox" name="chRemindOutOfStock">
-             <property name="text">
-              <string/>
-             </property>
-             <property name="Tag" stdset="0">
-              <number>95</number>
+              <number>23</number>
              </property>
             </widget>
            </item>
@@ -1158,8 +1141,8 @@
                <rect>
                 <x>0</x>
                 <y>0</y>
-                <width>980</width>
-                <height>659</height>
+                <width>966</width>
+                <height>648</height>
                </rect>
               </property>
               <layout class="QGridLayout" name="gridLayout">
@@ -1592,80 +1575,31 @@
            <string>Tax options</string>
           </attribute>
           <layout class="QGridLayout" name="gridLayout_4">
-           <item row="4" column="2">
-            <widget class="C5LineEdit" name="leCashierLogin">
-             <property name="Tag" stdset="0">
-              <number>39</number>
-             </property>
-            </widget>
-           </item>
            <item row="3" column="2">
-            <widget class="C5LineEdit" name="leTaxDept">
-             <property name="Tag" stdset="0">
-              <number>8</number>
-             </property>
-            </widget>
-           </item>
-           <item row="12" column="2">
-            <widget class="C5CheckBox" name="chChoosePos">
+            <widget class="C5CheckBox" name="chAlwaysOfferTax">
              <property name="text">
               <string/>
              </property>
              <property name="Tag" stdset="0">
-              <number>113</number>
-             </property>
-            </widget>
-           </item>
-           <item row="13" column="2">
-            <widget class="C5LineEdit" name="leTaxAlwaysPrintIfAmountLess">
-             <property name="Tag" stdset="0">
-              <number>107</number>
-             </property>
-            </widget>
-           </item>
-           <item row="6" column="0">
-            <widget class="QLabel" name="label_18">
-             <property name="text">
-              <string>Tax use external POS</string>
-             </property>
-            </widget>
-           </item>
-           <item row="9" column="0">
-            <widget class="QLabel" name="label_74">
-             <property name="text">
-              <string>External tax</string>
-             </property>
-            </widget>
-           </item>
-           <item row="0" column="2">
-            <widget class="C5LineEdit" name="leTaxIP">
-             <property name="Tag" stdset="0">
-              <number>5</number>
-             </property>
-            </widget>
-           </item>
-           <item row="1" column="0">
-            <widget class="QLabel" name="label_6">
-             <property name="text">
-              <string>Tax port</string>
-             </property>
-            </widget>
-           </item>
-           <item row="7" column="2">
-            <widget class="C5LineEdit" name="leVAT">
-             <property name="Tag" stdset="0">
-              <number>87</number>
+              <number>27</number>
              </property>
             </widget>
            </item>
            <item row="0" column="0">
-            <widget class="QLabel" name="label_5">
+            <widget class="QLabel" name="label_83">
              <property name="text">
-              <string>Tax IP</string>
+              <string>VAT included</string>
              </property>
             </widget>
            </item>
-           <item row="11" column="2">
+           <item row="3" column="0">
+            <widget class="QLabel" name="label_31">
+             <property name="text">
+              <string>Always offer tax</string>
+             </property>
+            </widget>
+           </item>
+           <item row="4" column="2">
             <widget class="C5CheckBox" name="chNeverOfferTax">
              <property name="text">
               <string/>
@@ -1675,42 +1609,31 @@
              </property>
             </widget>
            </item>
-           <item row="10" column="0">
-            <widget class="QLabel" name="label_31">
-             <property name="text">
-              <string>Always offer tax</string>
-             </property>
-            </widget>
-           </item>
-           <item row="3" column="0">
-            <widget class="QLabel" name="label_8">
-             <property name="text">
-              <string>Tax department</string>
-             </property>
-            </widget>
-           </item>
-           <item row="12" column="0">
+           <item row="5" column="0">
             <widget class="QLabel" name="label_106">
              <property name="text">
               <string>Choose pos</string>
              </property>
             </widget>
            </item>
-           <item row="5" column="0">
-            <widget class="QLabel" name="label_42">
+           <item row="2" column="2">
+            <widget class="C5CheckBox" name="chExternalTax">
              <property name="text">
-              <string>Cashier pin</string>
+              <string/>
+             </property>
+             <property name="Tag" stdset="0">
+              <number>78</number>
              </property>
             </widget>
            </item>
-           <item row="2" column="0">
-            <widget class="QLabel" name="label_7">
+           <item row="1" column="0">
+            <widget class="QLabel" name="label_117">
              <property name="text">
-              <string>Tax password</string>
+              <string>Simple fiscal</string>
              </property>
             </widget>
            </item>
-           <item row="14" column="2">
+           <item row="6" column="2">
             <spacer name="verticalSpacer_4">
              <property name="orientation">
               <enum>Qt::Orientation::Vertical</enum>
@@ -1723,83 +1646,31 @@
              </property>
             </spacer>
            </item>
-           <item row="1" column="2">
-            <widget class="C5LineEdit" name="leTaxPort">
-             <property name="Tag" stdset="0">
-              <number>6</number>
-             </property>
-            </widget>
-           </item>
-           <item row="13" column="0">
-            <widget class="QLabel" name="label_100">
-             <property name="text">
-              <string>Always print if amount less then</string>
-             </property>
-            </widget>
-           </item>
            <item row="5" column="2">
-            <widget class="C5LineEdit" name="leCashierPin">
-             <property name="Tag" stdset="0">
-              <number>40</number>
-             </property>
-            </widget>
-           </item>
-           <item row="9" column="2">
-            <widget class="C5CheckBox" name="chExternalTax">
+            <widget class="C5CheckBox" name="chChoosePos">
              <property name="text">
               <string/>
              </property>
              <property name="Tag" stdset="0">
-              <number>78</number>
+              <number>113</number>
+             </property>
+            </widget>
+           </item>
+           <item row="2" column="0">
+            <widget class="QLabel" name="label_74">
+             <property name="text">
+              <string>External tax</string>
              </property>
             </widget>
            </item>
            <item row="4" column="0">
-            <widget class="QLabel" name="label_41">
-             <property name="text">
-              <string>Cashier login</string>
-             </property>
-            </widget>
-           </item>
-           <item row="2" column="2">
-            <widget class="C5LineEdit" name="leTaxPassword">
-             <property name="Tag" stdset="0">
-              <number>7</number>
-             </property>
-            </widget>
-           </item>
-           <item row="6" column="2">
-            <widget class="C5ComboBox" name="cbTaxUseExtPos">
-             <property name="Tag" stdset="0">
-              <number>15</number>
-             </property>
-            </widget>
-           </item>
-           <item row="11" column="0">
             <widget class="QLabel" name="label_87">
              <property name="text">
               <string>Never offer tax</string>
              </property>
             </widget>
            </item>
-           <item row="7" column="0">
-            <widget class="QLabel" name="label_83">
-             <property name="text">
-              <string>VAT included</string>
-             </property>
-            </widget>
-           </item>
-           <item row="10" column="2">
-            <widget class="C5CheckBox" name="chAlwaysOfferTax">
-             <property name="text">
-              <string/>
-             </property>
-             <property name="Tag" stdset="0">
-              <number>27</number>
-             </property>
-            </widget>
-           </item>
-           <item row="8" column="2">
+           <item row="1" column="2">
             <widget class="C5CheckBox" name="chSimpleFiscal">
              <property name="text">
               <string/>
@@ -1809,10 +1680,10 @@
              </property>
             </widget>
            </item>
-           <item row="8" column="0">
-            <widget class="QLabel" name="label_117">
-             <property name="text">
-              <string>Simple fiscal</string>
+           <item row="0" column="2">
+            <widget class="C5LineEdit" name="leVAT">
+             <property name="Tag" stdset="0">
+              <number>87</number>
              </property>
             </widget>
            </item>
@@ -2584,9 +2455,9 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>C5CheckBox</class>
-   <extends>QCheckBox</extends>
-   <header location="global">c5checkbox.h</header>
+   <class>C5LineEdit</class>
+   <extends>QLineEdit</extends>
+   <header location="global">c5lineedit.h</header>
   </customwidget>
   <customwidget>
    <class>C5LineEditWithSelector</class>
@@ -2594,9 +2465,9 @@
    <header location="global">c5lineeditwithselector.h</header>
   </customwidget>
   <customwidget>
-   <class>C5LineEdit</class>
-   <extends>QLineEdit</extends>
-   <header location="global">c5lineedit.h</header>
+   <class>C5CheckBox</class>
+   <extends>QCheckBox</extends>
+   <header location="global">c5checkbox.h</header>
   </customwidget>
   <customwidget>
    <class>C5ComboBox</class>
@@ -2659,19 +2530,11 @@
   <tabstop>rbPrint80</tabstop>
   <tabstop>rbPrintLeft</tabstop>
   <tabstop>rbPrintDown</tabstop>
-  <tabstop>leTaxIP</tabstop>
-  <tabstop>leTaxPort</tabstop>
-  <tabstop>leTaxPassword</tabstop>
-  <tabstop>leTaxDept</tabstop>
-  <tabstop>leCashierLogin</tabstop>
-  <tabstop>leCashierPin</tabstop>
-  <tabstop>cbTaxUseExtPos</tabstop>
   <tabstop>leVAT</tabstop>
   <tabstop>chExternalTax</tabstop>
   <tabstop>chAlwaysOfferTax</tabstop>
   <tabstop>chNeverOfferTax</tabstop>
   <tabstop>chChoosePos</tabstop>
-  <tabstop>leTaxAlwaysPrintIfAmountLess</tabstop>
   <tabstop>leChatOperatorUserId</tabstop>
   <tabstop>chmLoadingGoods</tabstop>
   <tabstop>chmOrders</tabstop>
@@ -2741,7 +2604,6 @@
   <tabstop>chNoInvoiceRecordForHotel</tabstop>
   <tabstop>chAutomaticallyStoreOutWaiter</tabstop>
   <tabstop>chRemindOutOfStock</tabstop>
-  <tabstop>chFixAutoenterInputDocPrice</tabstop>
   <tabstop>chNoCashDoc</tabstop>
   <tabstop>leOutDocNumDigits</tabstop>
   <tabstop>leSettingsName</tabstop>

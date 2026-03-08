@@ -10,6 +10,7 @@ struct GoodsItem {
     QString name;
     QString barcode;
     QString unitName;
+    QString adgt;
     double lastInputPrice = 0;
     double price1 = 0;
     double price1disc = 0;
@@ -31,7 +32,8 @@ struct GoodsItem {
                            {"f_price1disc", price1disc},
                            {"f_price2", price2},
                            {"f_price2disc", price2disc},
-                           {"f_qty", qty}};
+                           {"f_qty", qty},
+                           {"f_adgt", adgt}};
     }
 };
 
@@ -44,18 +46,19 @@ struct JsonParser<GoodsItem> {
     static GoodsItem fromJson(const QJsonObject &jo)
     {
         GoodsItem g;
-        g.id        = jo["f_id"].toInt();
-        g.groupId = jo["f_group_id"].toInt();
-        g.groupName = jo["f_group_name"].toString();
-        g.name      = jo["f_name"].toString();
-        g.unitName  = jo["f_unit_name"].toString();
-        g.barcode   = jo["f_barcode"].toString();
-        g.lastInputPrice = jo["f_lastinput"].toDouble();
-        g.price1    = jo["f_price1"].toDouble();
-        g.price1disc = jo["f_price1disc"].toDouble();
-        g.price2    = jo["f_price2"].toDouble();
-        g.price2disc = jo["f_price2disc"].toDouble();
-        g.qty = jo["f_qty"].toDouble();
+        g.id = jo.value("f_id").toInt();
+        g.groupId = jo.value("f_group_id").toInt();
+        g.groupName = jo.value("f_group_name").toString();
+        g.name = jo.value("f_name").toString();
+        g.unitName = jo.value("f_unit_name").toString();
+        g.barcode = jo.value("f_barcode").toString();
+        g.lastInputPrice = jo.value("f_lastinput").toDouble();
+        g.price1 = jo.value("f_price1").toDouble();
+        g.price1disc = jo.value("f_price1disc").toDouble();
+        g.price2 = jo.value("f_price2").toDouble();
+        g.price2disc = jo.value("f_price2disc").toDouble();
+        g.qty = jo.value("f_qty").toDouble();
+        g.adgt = jo.value("f_adgt").toString();
         return g;
     }
 };

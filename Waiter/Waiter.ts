@@ -2398,13 +2398,13 @@ STOPLIST-ից</translation>
 <context>
     <name>NInterface</name>
     <message>
-        <location filename="../NTable/ninterface.cpp" line="204"/>
-        <location filename="../NTable/ninterface.cpp" line="218"/>
+        <location filename="../NTable/ninterface.cpp" line="231"/>
+        <location filename="../NTable/ninterface.cpp" line="250"/>
         <source>Query</source>
         <translation>Հարցում</translation>
     </message>
     <message>
-        <location filename="../NTable/ninterface.cpp" line="244"/>
+        <location filename="../NTable/ninterface.cpp" line="276"/>
         <source>Unauthorized</source>
         <translation>Մուտքի սխալ</translation>
     </message>

@@ -1,12 +1,13 @@
 #include "c5fiscalcancel.h"
-#include "ui_c5fiscalcancel.h"
-#include "c5message.h"
-#include "printtaxn.h"
-#include "c5config.h"
-#include "c5database.h"
-#include "ninterface.h"
 #include <QJsonDocument>
 #include <QJsonParseError>
+#include "c5config.h"
+#include "c5database.h"
+#include "c5message.h"
+#include "ninterface.h"
+#include "printtaxn.h"
+#include "struct_workstationitem.h"
+#include "ui_c5fiscalcancel.h"
 
 C5FiscalCancel::C5FiscalCancel(C5User *user, const QString &id)
     : C5Dialog(user), ui(new Ui::C5FiscalCancel),
@@ -42,8 +43,10 @@ void C5FiscalCancel::on_btnRequestCancel_clicked()
         return;
     }
 
-    PrintTaxN pt(C5Config::taxIP(), C5Config::taxPort(), C5Config::taxPassword(), C5Config::taxUseExtPos(),
-                 C5Config::taxCashier(), C5Config::taxPin(), this);
+    C5Message::error(tr("Config fiscal machine select not implemented"));
+    FiscalMachine fm = getFiscalMachine(0);
+    PrintTaxN pt(fm.ip, fm.port, fm.machinePassword, fm.externalPosString(), fm.opPin, fm.opPassword, this);
+
     QString jsnin, jsnout, err;
     int result;
     QJsonArray emarks = jb["emarks"].toArray();

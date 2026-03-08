@@ -20,7 +20,7 @@
       <enum>Qt::FocusPolicy::NoFocus</enum>
      </property>
      <property name="currentIndex">
-      <number>0</number>
+      <number>2</number>
      </property>
      <widget class="QWidget" name="tab">
       <attribute name="title">
@@ -226,7 +226,7 @@
           <string/>
          </property>
          <property name="icon">
-          <iconset resource="../resources/res.qrc">
+          <iconset>
            <normaloff>:/new.png</normaloff>:/new.png</iconset>
          </property>
         </widget>
@@ -267,7 +267,7 @@
           <string/>
          </property>
          <property name="icon">
-          <iconset resource="../resources/res.qrc">
+          <iconset>
            <normaloff>:/pushpin.png</normaloff>:/pushpin.png</iconset>
          </property>
          <property name="checkable">
@@ -498,7 +498,7 @@
              <string/>
             </property>
             <property name="icon">
-             <iconset resource="../resources/res.qrc">
+             <iconset>
               <normaloff>:/new.png</normaloff>:/new.png</iconset>
             </property>
            </widget>
@@ -524,7 +524,7 @@
              <string/>
             </property>
             <property name="icon">
-             <iconset resource="../resources/res.qrc">
+             <iconset>
               <normaloff>:/barcode.png</normaloff>:/barcode.png</iconset>
             </property>
            </widget>
@@ -567,7 +567,7 @@
           <string/>
          </property>
          <property name="icon">
-          <iconset resource="../resources/res.qrc">
+          <iconset>
            <normaloff>:/new.png</normaloff>:/new.png</iconset>
          </property>
         </widget>
@@ -679,7 +679,7 @@
           <string/>
          </property>
          <property name="icon">
-          <iconset resource="../resources/res.qrc">
+          <iconset>
            <normaloff>:/new.png</normaloff>:/new.png</iconset>
          </property>
         </widget>
@@ -1083,7 +1083,7 @@
                 <string/>
                </property>
                <property name="icon">
-                <iconset resource="../resources/res.qrc">
+                <iconset>
                  <normaloff>:/add.png</normaloff>:/add.png</iconset>
                </property>
               </widget>
@@ -1097,7 +1097,7 @@
                 <string/>
                </property>
                <property name="icon">
-                <iconset resource="../resources/res.qrc">
+                <iconset>
                  <normaloff>:/remove.png</normaloff>:/remove.png</iconset>
                </property>
               </widget>
@@ -1111,7 +1111,7 @@
                 <string/>
                </property>
                <property name="icon">
-                <iconset resource="../resources/res.qrc">
+                <iconset>
                  <normaloff>:/new.png</normaloff>:/new.png</iconset>
                </property>
               </widget>
@@ -1125,7 +1125,7 @@
                 <string/>
                </property>
                <property name="icon">
-                <iconset resource="../resources/res.qrc">
+                <iconset>
                  <normaloff>:/copy.png</normaloff>:/copy.png</iconset>
                </property>
               </widget>
@@ -1139,7 +1139,7 @@
                 <string/>
                </property>
                <property name="icon">
-                <iconset resource="../resources/res.qrc">
+                <iconset>
                  <normaloff>:/paste.png</normaloff>:/paste.png</iconset>
                </property>
               </widget>
@@ -1153,7 +1153,7 @@
                 <string/>
                </property>
                <property name="icon">
-                <iconset resource="../resources/res.qrc">
+                <iconset>
                  <normaloff>:/draft.png</normaloff>:/draft.png</iconset>
                </property>
               </widget>
@@ -1599,9 +1599,9 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>C5CheckBox</class>
-   <extends>QCheckBox</extends>
-   <header location="global">c5checkbox.h</header>
+   <class>C5LineEdit</class>
+   <extends>QLineEdit</extends>
+   <header location="global">c5lineedit.h</header>
   </customwidget>
   <customwidget>
    <class>C5LineEditWithSelector</class>
@@ -1609,14 +1609,14 @@
    <header location="global">c5lineeditwithselector.h</header>
   </customwidget>
   <customwidget>
-   <class>C5LineEdit</class>
-   <extends>QLineEdit</extends>
-   <header location="global">c5lineedit.h</header>
-  </customwidget>
-  <customwidget>
    <class>C5TableWidget</class>
    <extends>QTableWidget</extends>
    <header location="global">c5tablewidget.h</header>
+  </customwidget>
+  <customwidget>
+   <class>C5CheckBox</class>
+   <extends>QCheckBox</extends>
+   <header location="global">c5checkbox.h</header>
   </customwidget>
   <customwidget>
    <class>C5ComboBox</class>
@@ -1656,9 +1656,6 @@
   <tabstop>tblBarcodes</tabstop>
   <tabstop>chOnlyWholeNumber</tabstop>
  </tabstops>
- <resources>
-  <include location="../resources/res.qrc"/>
-  <include location="../resources/res.qrc"/>
- </resources>
+ <resources/>
  <connections/>
 </ui>

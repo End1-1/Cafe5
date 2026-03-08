@@ -10,16 +10,11 @@
 #define param_service_factor 2
 #define param_idram_id 3
 #define param_idram_phone 4
-#define param_tax_ip 5
-#define param_tax_port 6
-#define param_tax_password 7
-#define param_tax_dept 8
 #define param_default_menu 9
 #define param_default_hall 11
 #define param_default_table 12
 #define param_doc_num_digits_input 13
 #define param_default_store 14
-#define param_tax_use_ext_pos 15
 #define param_default_menu_name 16
 #define param_hotel_database 17
 #define param_cafe_service_mode 18
@@ -41,8 +36,6 @@
 #define param_autocash_prefix 36
 #define param_autonocash_prefix 37
 #define param_autoinput_salecash 38
-#define param_tax_cashier_login 39
-#define param_tax_cashier_pin 40
 #define param_shop_noF1 47
 #define param_shop_noF2 48
 #define param_shop_noPriceChange 49
@@ -50,7 +43,6 @@
 #define param_shop_print_v1 52
 #define param_shop_print_v2 53
 #define param_recipe_footer_text 56
-#define param_input_doc_fix_price 57
 #define param_shop_print_goods_qty_side_left 58
 #define param_shop_print_goods_qty_side_down 59
 #define param_print_scancode_with_name 60
@@ -98,7 +90,6 @@
 #define param_service_print_font_size 104
 #define param_receipt_print_font_size 105
 #define param_system_thouthand_separator 106
-#define param_tax_print_if_amount_less 107
 #define param_print_modificators_on_receipt 108
 #define param_waiter_donotclose_empty_order 109
 #define param_waiter_dontprint_final_receipt 110
@@ -160,16 +151,6 @@ public:
     static QString idramID();
 
     static QString idramPhone();
-
-    static QString taxIP();
-
-    static int taxPort();
-
-    static QString taxPassword();
-
-    static QString taxDept();
-
-    static QString taxUseExtPos();
 
     static QStringList dbParams();
 
@@ -234,10 +215,6 @@ public:
     static QString nocashPrefix();
 
     static int frontDeskMode();
-
-    static QString taxCashier();
-
-    static QString taxPin();
 
     static bool shopDenyF1();
 

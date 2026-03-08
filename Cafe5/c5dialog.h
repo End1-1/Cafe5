@@ -63,7 +63,7 @@ protected:
 
     virtual void keyPressEvent(QKeyEvent *e) override;
 
-    virtual void keyEnter();
+    virtual bool keyEnter();
 
     virtual void keyControlPlusEnter();
 

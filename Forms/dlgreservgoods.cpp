@@ -7,6 +7,8 @@
 #include "goodsreserve.h"
 #include "ninterface.h"
 #include "printtaxn.h"
+#include "struct_fiscal_machine.h"
+#include "struct_workstationitem.h"
 #include "ui_dlgreservgoods.h"
 
 #include "c5user.h"
@@ -289,8 +291,8 @@ void DlgReservGoods::getAvailableGoods()
 
 void DlgReservGoods::on_btnPrintFiscal_clicked()
 {
-    PrintTaxN pt(C5Config::taxIP(), C5Config::taxPort(), C5Config::taxPassword(),
-                 C5Config::taxUseExtPos(), C5Config::taxCashier(), C5Config::taxPin(), this);
+    FiscalMachine fm = getFiscalMachine(mWorkStation.fiscalMachineId());
+    PrintTaxN pt(fm.ip, fm.port, fm.machinePassword, fm.externalPosString(), fm.opPin, fm.opPassword, this);
     QString jsonIn, jsonOut, err;
 
     if(pt.printAdvanceJson(ui->lePrepaid->getDouble(), ui->lePrepaidCard->getDouble(), jsonIn, jsonOut,

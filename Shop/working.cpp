@@ -56,7 +56,6 @@ Working::Working(C5User *user, QWidget *parent) :
     mUser = user;
     QShortcut *sF1 = new QShortcut(QKeySequence(Qt::Key_F1), this);
     QShortcut *sF2 = new QShortcut(QKeySequence(Qt::Key_F2), this);
-    //QShortcut *sF3 = new QShortcut(QKeySequence(Qt::Key_F3), this);
     //    QShortcut *sF4 = new QShortcut(QKeySequence(Qt::Key_F4), this);
     QShortcut *sF5 = new QShortcut(QKeySequence(Qt::Key_F5), this);
     QShortcut *sF6 = new QShortcut(QKeySequence(Qt::Key_F6), this);
@@ -531,25 +530,6 @@ void Working::checkMessageResponse(const QJsonObject & jdoc)
                                 .arg(QString("%1 %2").arg(tr("End date")).arg(jjm["enddate"].toString())));
                 break;
 
-            case MSG_PRINT_TAX: {
-                C5Database db;
-                QJsonObject jord = jjm["usermessage"].toObject();
-                QString id = jord["id"].toString();
-                QString rseq;
-                p.br();
-                p.br();
-
-                if(Sales::printCheckWithTax(db, id)) {
-                    p.ctext(QString("%1: %2").arg(tr("Fiscal printed"), jord["ordernum"].toString()));
-                    p.br();
-                    p.ctext(jord["orderamount"].toString());
-                } else {
-                    p.ctext(QString("%1: %2").arg(tr("Fiscal not printed"), jord["ordernum"].toString()));
-                }
-
-                break;
-            }
-
             case MSG_PRINT_RECEIPT: {
                 QString orderid = jjm["usermessage"].toString();
                 PrintReceiptGroup p;
@@ -698,11 +678,11 @@ void Working::qtyRemains(const QJsonObject & jdoc)
     qreal safePx = SAFE_RIGHT_MM * printer.logicalDpiX() / 25.4;
     p.setSceneParams(pr.width() - safePx, pr.height(), printer.logicalDpiX());
     QFont font = qApp->font();
-    font.setPointSize(28);
+    font.setPointSize(10);
     p.setFont(font);
     p.br(2);
     QPixmap img(":/atention.png");
-    img = img.scaled(400, 400);
+    img = img.scaled(100, 100);
     p.image(img, Qt::AlignCenter);
     p.br(img.height() / 2);
     p.br(img.height() / 2);
@@ -863,7 +843,9 @@ void Working::on_btnMinimize_clicked()
 void Working::on_btnGiftCard_clicked()
 {
     WOrder *wo = static_cast<WOrder*>(ui->tab->currentWidget());
-
+    if (wo->rowCount() > 0) {
+        wo->removeRowForce();
+    }
     if(wo->rowCount() > 0) {
         C5Message::error(tr("The gift card must saled separately"));
         return;
@@ -874,7 +856,7 @@ void Working::on_btnGiftCard_clicked()
     if(d.exec() == QDialog::Accepted) {
         QString err;
 
-        if(!wo->checkQty(d.fGiftGoodsId, 1, err, 0)) {
+        if (!wo->checkQty(d.fGiftGoodsId, 1, err, 0)) {
             C5Message::error(err);
             return;
         }
@@ -885,6 +867,10 @@ void Working::on_btnGiftCard_clicked()
             wo->fOHeader.saleType = -1;
             wo->setPriceOfRow(0, price);
         });
+    } else {
+        ui->tab->removeTab(ui->tab->currentIndex());
+        wo->deleteLater();
+        newSale(SALE_RETAIL);
     }
 }
 void Working::on_btnCostumerDisplay_clicked(bool checked)

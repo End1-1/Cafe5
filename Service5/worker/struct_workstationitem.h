@@ -1,8 +1,9 @@
 #pragma once
 
-#include "c5jsonparser.h"
-#include "struct_parent.h"
 #include <QStringList>
+#include "c5jsonparser.h"
+#include "struct_fiscal_machine.h"
+#include "struct_parent.h"
 
 struct WorkstationItem : public ParentItem {
     int id = 0;
@@ -45,6 +46,14 @@ struct WorkstationItem : public ParentItem {
     {
         return data.value("f_discount_card_pattern").toString();
     }
+    const bool shopShowAll() const
+    {
+        if (!data.contains("f_showall")) {
+            return true;
+        }
+        return data.value("f_showall").toBool();
+    }
+    const int fiscalMachineId() const { return data.value("f_fiscal_machine_id").toInt(); }
 };
 
 template<>
@@ -58,6 +67,13 @@ struct JsonParser<WorkstationItem> {
         hi.name = jo["f_name"].toString();
         hi.parseData(jo, "f_config");
         hi.validate();
+
+        QJsonArray jfm = jo.value("fiscal").toArray();
+        for (int i = 0; i < jfm.size(); i++) {
+            const QJsonObject &jf = jfm.at(i).toObject();
+            FiscalMachine fm = JsonParser<FiscalMachine>::fromJson(jf);
+            fiscalMachines.append(fm);
+        }
         return hi;
     }
 };

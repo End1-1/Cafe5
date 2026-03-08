@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.20)
-project(service5 VERSION 1.4.8.57 LANGUAGES CXX)
+project(service5 VERSION 1.5.8.57 LANGUAGES CXX)
 
 # Используем C++20
 set(CMAKE_CXX_STANDARD 20)

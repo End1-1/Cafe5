@@ -15,6 +15,8 @@
 #include "database.h"
 #include "fileversion.h"
 #include "logwriter.h"
+#include "store_doc_status.h"
+#include "store_doc_type.h"
 #include "struct_goods_item.h"
 #include "struct_partner.h"
 #include "struct_storage_item.h"
@@ -39,7 +41,7 @@ ServerThread::ServerThread(const QString &configPath) :
         while(db.next()) {
             fDbList.append(db.string("fname"));
             mDatabases[db.string("fuid")] = db.string("fname");
-            C5SearchEngine::init(db.string("fname"), db.string("fuid"));
+            C5SearchEngine ::init(db.string("fname"), db.string("fuid"));
         }
 
         C5SearchEngine::init(fDbList);
@@ -499,17 +501,21 @@ void ServerThread::handleCommand(SocketStruct ws, const QJsonObject &jdoc, QStri
             repMsg = C5SearchEngine::mInstance->searchGoodsItem(jdoc, ws);
         } else if(command == SelectorName<PartnerItem>::value) {
             repMsg = C5SearchEngine::mInstance->searchPartnerItem(jdoc, ws);
-        } else if(command == "search_partner") {
+        } else if (command == SelectorName<StoreDocStatusItem>::value) {
+            repMsg = C5SearchEngine::mInstance->searchStoreDocStatus(jdoc, ws);
+        } else if (command == SelectorName<StoreDocTypeItem>::value) {
+            repMsg = C5SearchEngine::mInstance->searchStoreDocType(jdoc, ws);
+        } else if (command == "search_partner") {
             repMsg = C5SearchEngine::mInstance->searchPartner(jdoc);
-        } else if(command == "search_goods_groups") {
+        } else if (command == "search_goods_groups") {
             repMsg = C5SearchEngine::mInstance->searchGoodsGroups(jdoc);
-        } else if(command == "search_store") {
+        } else if (command == "search_store") {
             repMsg = C5SearchEngine::mInstance->searchStore(jdoc);
-        } else if(command == "search_update_partner_cache") {
+        } else if (command == "search_update_partner_cache") {
             repMsg = C5SearchEngine::mInstance->searchUpdatePartnerCache(jdoc);
-        } else if(command == "armsoft") {
+        } else if (command == "armsoft") {
             repMsg = armsoft(jdoc);
-        } else if(command == "dict_event") {
+        } else if (command == "dict_event") {
             repMsg = C5SearchEngine::mInstance->updateDictionary(jdoc, ws);
         } else {
             repMsg = handleDll(jdoc, command);

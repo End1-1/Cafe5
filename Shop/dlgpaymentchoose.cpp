@@ -85,9 +85,10 @@ bool DlgPaymentChoose::getValues(C5User *user, double total, double& cash, doubl
     return false;
 }
 
-void DlgPaymentChoose::keyEnter()
+bool DlgPaymentChoose::keyEnter()
 {
     on_btnPay_clicked();
+    return true;
 }
 
 void DlgPaymentChoose::setFiscalStyle()
@@ -342,4 +343,9 @@ void DlgPaymentChoose::on_btnCredit_clicked()
 void DlgPaymentChoose::on_leCredit_returnPressed()
 {
     focusNextChild();
+}
+
+void DlgPaymentChoose::on_btnCashRemain_clicked()
+{
+    ui->leCash->setDouble(ui->leTotal->getDouble() - ui->leCard->getDouble() - ui->lePrepaid->getDouble());
 }

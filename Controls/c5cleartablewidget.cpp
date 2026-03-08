@@ -37,7 +37,8 @@ C5ClearTableWidget::C5ClearTableWidget(QWidget *parent) :
 
 C5TableWidgetItem* C5ClearTableWidget::item(int row, int column) const
 {
-    return static_cast<C5TableWidgetItem*>(QTableWidget::item(row, column));
+    auto *item = static_cast<C5TableWidgetItem *>(QTableWidget::item(row, column));
+    return item;
 }
 
 void C5ClearTableWidget::setColumnWidth(int column, int width)
@@ -340,6 +341,7 @@ C5LineEdit* C5ClearTableWidget::createLineEdit(int row, int column)
     l->setProperty("column", column);
     l->setFrame(false);
     l->setStyleSheet("border: none;outline: none;");
+    setItem(row, column, new C5TableWidgetItem());
     setCellWidget(row, column, l);
     connect(l, SIGNAL(textChanged(QString)), this, SLOT(lineEditTextChanged(QString)));
     connect(l, &C5LineEdit::focusIn, [this, l, column]() {

@@ -2,6 +2,7 @@
 #define DLGPAYMENTCHOOSE_H
 
 #include "c5shopdialog.h"
+#include <qcoreapplication.h>
 
 namespace Ui
 {
@@ -24,7 +25,10 @@ public:
                           double& prepaid, double& debt, double& cashin, double& change,
                           bool &fiscal, bool readOnlyPrepaid, double maxPrepaid);
 
-    virtual void keyEnter() override;
+    virtual bool keyEnter() override;
+
+private slots:
+    void on_btnCashRemain_clicked();
 
 private:
     bool fFiscal;

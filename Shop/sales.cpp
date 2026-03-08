@@ -14,6 +14,7 @@
 #include "printreceiptgroup.h"
 #include "printtaxn.h"
 #include "selectprinters.h"
+#include "struct_workstationitem.h"
 #include "ui_sales.h"
 #include "vieworder.h"
 
@@ -41,8 +42,10 @@ Sales::Sales(C5User *user) :
     mPanelAnim = new QPropertyAnimation(ui->wMenuPanel, "maximumWidth", this);
     mPanelAnim->setDuration(220);
     mPanelAnim->setEasingCurve(QEasingCurve::OutCubic);
+    showAll = mWorkStation.shopShowAll();
     refresh();
     auto *sh = new QShortcut(QKeySequence(Qt::Key_F3), this);
+    sh->setContext(Qt::WindowShortcut);
     connect(sh, &QShortcut::activated, this, [this]() {
         C5User *tmp = new C5User(mUser);
 
@@ -81,7 +84,9 @@ void Sales::showSales(Working *w, C5User *u)
 {
     Sales *s = new Sales(u);
     s->fWorking = w;
+    s->setWindowModality(Qt::WindowModal);
     s->showMaximized();
+    s->setFocus();
 }
 
 bool Sales::printCheckWithTax(C5Database &db, const QString &id)
@@ -106,7 +111,8 @@ bool Sales::printCheckWithTax(C5Database &db, const QString &id)
     double prepaid = db.getDouble("f_amountprepaid");
     double idram = db.getDouble("f_idram");
     int partner = db.getInt("f_partner");
-    QString useExtPos = idram > 0.01 ? "true" : C5Config::taxUseExtPos();
+    FiscalMachine fm = getFiscalMachine(mWorkStation.fiscalMachineId());
+    QString useExtPos = idram > 0.01 ? "true" : fm.externalPosString();
     QString partnerHvhh;
 
     if(partner > 0) {
@@ -127,8 +133,7 @@ bool Sales::printCheckWithTax(C5Database &db, const QString &id)
             "left join c_units gu on gu.f_id=g.f_unit "
             "left join c_groups t on t.f_id=g.f_group "
             "where og.f_header=:f_id");
-    PrintTaxN pt(C5Config::taxIP(), C5Config::taxPort(), C5Config::taxPassword(), useExtPos, C5Config::taxCashier(),
-                 C5Config::taxPin(), 0);
+    PrintTaxN pt(fm.ip, fm.port, fm.machinePassword, useExtPos, fm.opPin, fm.opPassword, 0);
     pt.fPartnerTin = partnerHvhh;
 
     while(db.nextRow()) {
@@ -258,34 +263,33 @@ void Sales::refreshTotal()
     QString sqlCond = "";
 
     if (!fUser->check(cp_t12_shop_fiscal_report) || !showAll) {
-        sqlCond += " and length(ot.f_receiptnumber)>0 ";
+        sqlCond += " and length(json_value(oh.f_data, '$.f_fiscal.rseq'))>0 ";
     }
 
     if (!fUser->check(cp_t12_shop_sale_of_all_users)) {
         sqlCond += QString(" and oh.f_staff=%1 ").arg(fUser->id());
     }
 
-    QString sql =
-        QString("select '', oh.f_id, oh.f_saletype, u.f_login, os.f_name, "
-            "concat(oh.f_prefix, oh.f_hallid) as f_number, "
-            "ot.f_receiptnumber, "
-            "oh.f_datecash, oh.f_timeclose, oh.f_amounttotal, "
-            "concat(c.f_taxname, ' ', c.f_contact) as f_client, "
-            "concat_ws(' ', dm.f_last, dm.f_first) as f_deliverman, "
-            "oh.f_comment "
-            "from o_header oh "
-            "left join o_header_options oo on oo.f_id=oh.f_id "
-            "left join b_history h on h.f_id=oh.f_id "
-            "left join b_cards_discount d on d.f_id=h.f_card "
-            "left join c_partners c on c.f_id=oh.f_partner "
-            "left join o_tax ot on ot.f_id=oh.f_id "
-            "left join o_sale_type os on os.f_id=oh.f_saletype "
-            "left join s_user u on u.f_id=oh.f_staff "
-            "left join s_user dm on dm.f_id=oo.f_deliveryman "
-            "where oh.f_datecash between :f_start and :f_end "
-            "and oh.f_state=:f_state " + sqlCond +
-            "and oh.f_hall=:f_hall "
-            "order by oh.f_datecash, oh.f_timeclose ");
+    QString sql = QString("select '', oh.f_id, oh.f_saletype, u.f_login, os.f_name, "
+                          "concat(oh.f_prefix, oh.f_hallid) as f_number, "
+                          "json_value(oh.f_data, '$.f_fiscal.rseq'), "
+                          "oh.f_datecash, oh.f_timeclose, oh.f_amounttotal, "
+                          "concat(c.f_taxname, ' ', c.f_contact) as f_client, "
+                          "concat_ws(' ', dm.f_last, dm.f_first) as f_deliverman, "
+                          "oh.f_comment "
+                          "from o_header oh "
+                          "left join o_header_options oo on oo.f_id=oh.f_id "
+                          "left join b_history h on h.f_id=oh.f_id "
+                          "left join b_cards_discount d on d.f_id=h.f_card "
+                          "left join c_partners c on c.f_id=oh.f_partner "
+                          "left join o_sale_type os on os.f_id=oh.f_saletype "
+                          "left join s_user u on u.f_id=oh.f_staff "
+                          "left join s_user dm on dm.f_id=oo.f_deliveryman "
+                          "where oh.f_datecash between :f_start and :f_end "
+                          "and oh.f_state=:f_state "
+                          + sqlCond
+                          + "and oh.f_hall=:f_hall "
+                            "order by oh.f_datecash, oh.f_timeclose ");
     db.exec(sql);
     ui->tbl->setRowCount(db.rowCount());
     int row = 0;
@@ -334,14 +338,15 @@ void Sales::refreshItems()
     QString sqlCond = "";
 
     if (!fUser->check(cp_t12_shop_fiscal_report) || !showAll) {
-        sqlCond += " and length(ot.f_receiptnumber)>0 ";
+        sqlCond += " and length(json_value(oh.f_data, '$.f_fiscal.rseq'))>0 ";
     }
 
     if(!fUser->check(cp_t12_shop_sale_of_all_users)) {
         sqlCond += QString(" and oh.f_staff=%1 ").arg(fUser->id());
     }
 
-    db.exec("select oh.f_id, oh.f_saletype, u.f_login, os.f_name, concat(oh.f_prefix, oh.f_hallid) as f_number, ot.f_receiptnumber, "
+    db.exec("select oh.f_id, oh.f_saletype, u.f_login, os.f_name, concat(oh.f_prefix, oh.f_hallid) as f_number, json_value(oh.f_data, "
+            "'$.f_fiscal.rseq'),  "
             "oh.f_datecash, oh.f_timeclose, g.f_scancode, g.f_name as f_goodsname, og.f_qty, og.f_price, og.f_total "
             "from o_goods og "
             "inner join o_header oh on oh.f_id=og.f_header "
@@ -349,12 +354,12 @@ void Sales::refreshItems()
             "left join b_history h on h.f_id=oh.f_id "
             "left join b_cards_discount d on d.f_id=h.f_card "
             "left join c_partners c on c.f_id=d.f_client "
-            "left join o_tax ot on ot.f_id=oh.f_id "
             "left join o_sale_type os on os.f_id=oh.f_saletype "
             "left join s_user u on u.f_id=oh.f_staff "
-            "where oh.f_datecash between :f_start and :f_end and oh.f_state=:f_state " + sqlCond +
-            "and oh.f_hall=:f_hall "
-            "order by oh.f_datecash, oh.f_timeclose ");
+            "where oh.f_datecash between :f_start and :f_end and oh.f_state=:f_state "
+            + sqlCond
+            + "and oh.f_hall=:f_hall "
+              "order by oh.f_datecash, oh.f_timeclose ");
     ui->tbl->setRowCount(db.rowCount());
     int row = 0;
 
@@ -372,8 +377,8 @@ void Sales::refreshItems()
 
 void Sales::printTaxReport(int report_type)
 {
-    PrintTaxN pt(C5Config::taxIP(), C5Config::taxPort(), C5Config::taxPassword(), C5Config::taxUseExtPos(),
-                 C5Config::taxCashier(), C5Config::taxPin(), this);
+    FiscalMachine fm = getFiscalMachine(mWorkStation.fiscalMachineId());
+    PrintTaxN pt(fm.ip, fm.port, fm.machinePassword, fm.externalPosString(), fm.opPin, fm.opPassword, this);
     QString jsnin, jsnout, err;
     int result;
     result = pt.printReport(ui->deStart->date(), ui->deEnd->date(),
@@ -420,7 +425,10 @@ void Sales::on_btnItemBack_clicked()
     toggleMenu(false);
     //todo: memory leak
     DlgReturnItem *i = new DlgReturnItem(mUser);
+    i->showMaximized();
+    i->setFocus();
     i->exec();
+    i->deleteLater();
 }
 
 void Sales::on_btnRefresh_clicked()
@@ -502,7 +510,11 @@ void Sales::on_btnViewOrder_clicked()
     }
 
     int col = fViewMode == VM_TOTAL ? 1 : 0;
-    ViewOrder(fWorking, ui->tbl->getString(ml.at(0).row(), col), mUser).exec();
+    auto *a = new ViewOrder(fWorking, ui->tbl->getString(ml.at(0).row(), col), mUser);
+    a->showMaximized();
+    a->setFocus();
+    a->exec();
+    a->deleteLater();
 }
 
 void Sales::on_btnChangeDate_clicked()
@@ -545,9 +557,12 @@ void Sales::on_btnItemChange_clicked()
 {
     toggleMenu(false);
     //todo: memory leak
-    DlgReturnItem *i = new DlgReturnItem(mUser);;
+    DlgReturnItem *i = new DlgReturnItem(mUser);
     i->setMode(2);
     i->showMaximized();
+    i->setFocus();
+    i->exec();
+    i->deleteLater();
 }
 
 void Sales::on_btnShowMenu_clicked()

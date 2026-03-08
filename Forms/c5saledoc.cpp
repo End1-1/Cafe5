@@ -1,37 +1,38 @@
 #include "c5saledoc.h"
-#include "c5checkbox.h"
-#include "ui_c5saledoc.h"
-#include "c5message.h"
-#include "c5utils.h"
-#include "c5cache.h"
-#include "c5config.h"
-#include "c5selector.h"
-#include "c5user.h"
-#include "jsons.h"
-#include "c5printrecipta4.h"
-#include "ce5goods.h"
-#include "c5storedraftwriter.h"
-#include "c5daterange.h"
-#include "breezeconfig.h"
-#include "armsoftexportoptions.h"
-#include "dlglist2.h"
-#include "chatmessage.h"
-#include "httpquerydialog.h"
-#include "c5mainwindow.h"
-#include "nloadingdlg.h"
-#include "ce5partner.h"
-#include "outputofheader.h"
-#include "printtaxn.h"
-#include "oheader.h"
-#include "c5storedoc.h"
-#include "c5fiscalcancel.h"
-#include <xlsxdocument.h>
 #include <QClipboard>
-#include <QSqlQuery>
-#include <QInputDialog>
-#include <QFileDialog>
 #include <QDesktopServices>
 #include <QDomDocument>
+#include <QFileDialog>
+#include <QInputDialog>
+#include <QSqlQuery>
+#include "armsoftexportoptions.h"
+#include "breezeconfig.h"
+#include "c5cache.h"
+#include "c5checkbox.h"
+#include "c5config.h"
+#include "c5daterange.h"
+#include "c5fiscalcancel.h"
+#include "c5mainwindow.h"
+#include "c5message.h"
+#include "c5printrecipta4.h"
+#include "c5selector.h"
+#include "c5storedoc.h"
+#include "c5storedraftwriter.h"
+#include "c5user.h"
+#include "c5utils.h"
+#include "ce5goods.h"
+#include "ce5partner.h"
+#include "chatmessage.h"
+#include "dlglist2.h"
+#include "httpquerydialog.h"
+#include "jsons.h"
+#include "nloadingdlg.h"
+#include "oheader.h"
+#include "outputofheader.h"
+#include "printtaxn.h"
+#include "struct_workstationitem.h"
+#include "ui_c5saledoc.h"
+#include <xlsxdocument.h>
 
 #define col_uuid 0
 #define col_checkbox 1
@@ -527,9 +528,10 @@ void C5SaleDoc::fiscale()
             "left join c_goods gn on gn.f_id=og.f_goods "
             "left join c_groups gr on gr.f_id=gn.f_group "
             "where og.f_header=:f_header");
-    PrintTaxN pt(C5Config::taxIP(), C5Config::taxPort(), C5Config::taxPassword(),
-                 C5Config::taxUseExtPos().isEmpty() ? "false" : C5Config::taxUseExtPos(), C5Config::taxCashier(), C5Config::taxPin(),
-                 this);
+
+    C5Message::error(tr("Config fiscal machine select not implemented"));
+    FiscalMachine fm = getFiscalMachine(0);
+    PrintTaxN pt(fm.ip, fm.port, fm.machinePassword, fm.externalPosString(), fm.opPin, fm.opPassword, this);
 
     while(db.nextRow()) {
         pt.addGoods(1, //dep

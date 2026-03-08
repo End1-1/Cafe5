@@ -2,6 +2,7 @@
 
 #include <QLabel>
 #include "c5widget.h"
+#include "struct_doc_store_input.h"
 
 namespace Ui
 {
@@ -21,13 +22,9 @@ public:
 
     ~C5StoreInput() override;
 
-    bool openDoc(QString id, QString &err);
-
-    void correctDebt();
+    void setDocument(StoreInputDocument doc);
 
     virtual QToolBar* toolBar() override;
-
-    bool writeDocument(int state, QString &err);
 
     static bool removeDoc(QString id, bool showmessage = true);
 
@@ -43,10 +40,6 @@ public:
 
     int addGoods(int goods, const QString &name, double qty, const QString &unit, double price, double total,
                  const QString &comment, const QString &adgt);
-
-public slots:
-    void saveDoc();
-
 protected:
 
     virtual void nextChild() override;
@@ -54,15 +47,17 @@ protected:
 private:
     Ui::C5StoreInput *ui;
 
-    int fDocState;
+    StoreInputDocument mDocData;
 
     bool fCanChangeFocus;
 
-    QString fInternalId;
+    QAction *mActionSave;
 
-    QString fCashDocUuid;
+    QAction *mActionDraft;
 
-    int fBasedOnSale;
+    bool buildDoc();
+
+    void setState();
 
     void correctDishesRows(int row, int count);
 
@@ -75,10 +70,6 @@ private:
     int addGoodsRow();
 
     void setDocEnabled(bool v);
-
-    void printV1();
-
-    void printV2();
 
     double additionalCost();
 
@@ -95,23 +86,19 @@ private:
                                        double qtyVal,
                                        const QStringList &hdr);
 private slots:
+    void saveDocument();
+
+    void draftDocument();
+
     void focusNextChildren();
 
     void changeCurrencyResponse(const QJsonObject &jdoc);
 
     void slotCheckQtyResponse(const QJsonObject &jdoc);
 
-    void exportToExcel();
-
     void getInput();
 
     void removeDocument();
-
-    void printDoc();
-
-    void printBarcode();
-
-    void checkInvoiceDuplicate();
 
     void tblAddChanged(const QString &arg1);
 
@@ -129,8 +116,6 @@ private slots:
 
     void on_leScancode_returnPressed();
 
-    void on_chPaid_clicked(bool checked);
-
     void on_btnAddAdd_clicked();
 
     void on_btnRemoveAdd_clicked();
@@ -147,19 +132,12 @@ private slots:
 
     void on_btnCloseSearch_clicked();
 
-    void on_btnFillRemote_clicked(bool checked);
-
     void on_btnChangePartner_clicked();
 
     void on_btnFixPartner_clicked(bool checked);
 
     void on_btnCopyLastAdd_clicked();
 
-    void on_btnEditPassed_clicked();
-
-    void on_btnEditAccept_clicked();
-
     void on_btnSaveComment_clicked();
-
-    void on_btnSavePayment_clicked();
+    void on_btnRemoveGoods_clicked();
 };

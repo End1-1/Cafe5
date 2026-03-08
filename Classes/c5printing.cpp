@@ -289,17 +289,18 @@ QJsonArray C5Printing::jsonData()
 void C5Printing::setLineHeight()
 {
     QFontMetrics fm(fFont);
-    fLineHeight = fm.height() / fMM;
+    fLineHeight = (fm.ascent() + fm.descent()) / fMM;
 }
 
 void C5Printing::setTemptop(QGraphicsTextItem *item, qreal textwidth)
 {
     item->setTextWidth(textwidth == -1 ? fNormalWidth : textwidth);
+    item->document()->setDocumentMargin(0);
 
     QTextOption opt;
     opt.setWrapMode(QTextOption::WordWrap);
     item->document()->setDefaultTextOption(opt);
-    item->document()->adjustSize();
+    //item->document()->adjustSize();
 
     qreal h = item->document()->size().height();
     fTempTop = qMax(fTempTop, h);

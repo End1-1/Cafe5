@@ -93,7 +93,7 @@ int main(int argc, char* argv[])
 
     PrintTaxN::mDebugRseq = build;
     QFont font(a.font());
-    font.setFamily("Arial LatArm Unicode");
+    // font.setFamily("Arial LatArm Unicode");
     font.setPointSize(11);
     a.setFont(font);
     NDataProvider::mAppName = "waiter";

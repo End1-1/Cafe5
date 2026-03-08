@@ -47,14 +47,25 @@ void NInterface::createHttpQueryLambda(const QString &route, const QJsonObject &
     auto *np = new NDataProvider();
     np->changeTimeout(timeout);
     connect(np, &NDataProvider::started, this, &NInterface::httpQueryStarted);
-    connect(np, SIGNAL(updateRequired(QString, QString, QString)), this->parent(), SLOT(updateRequired(QString, QString, QString)));
-    connect(np, &NDataProvider::error, this->parent(), [this, np, errCallback](const QString & msg) {
-        if(fProgress || fLoadingDlg) {
-            if(fLoadingDlg) {
+    connect(np,
+            SIGNAL(updateRequired(QString, QString, QString)),
+            this->parent(),
+            SLOT(updateRequired(QString, QString, QString)),
+            Qt::QueuedConnection);
+    auto finish = [this]() {
+        if (fProgress || fLoadingDlg) {
+            if (fLoadingDlg) {
                 fLoadingDlg->hide();
             }
         }
-
+    };
+    connect(np, &NDataProvider::updateRequired, this, [this, np, finish](const QString &a, const QString &b, const QString &c) {
+        finish();
+        np->deleteLater();
+        deleteLater();
+    });
+    connect(np, &NDataProvider::error, this->parent(), [this, np, errCallback, finish](const QString &msg) {
+        finish();
         if(fProgress) {
             C5Message::error(msg);
         }
@@ -62,15 +73,9 @@ void NInterface::createHttpQueryLambda(const QString &route, const QJsonObject &
         errCallback({{"status", 1}, {"errorMessage", msg}});
         np->deleteLater();
     });
-    connect(np, &NDataProvider::done, this->parent(), [this, np, callback](const QJsonObject & data) {
+    connect(np, &NDataProvider::done, this->parent(), [this, np, callback, finish](const QJsonObject &data) {
+        finish();
         callback(data);
-
-        if(fProgress || fLoadingDlg) {
-            if(fLoadingDlg) {
-                fLoadingDlg->hide();
-            }
-        }
-
         np->deleteLater();
     });
     np->setProperty("marks", marks);
@@ -146,6 +151,19 @@ void NInterface::query(const QString &route, const QString &bearer, QObject *con
             }
         }
     };
+    connect(
+        np,
+        &NDataProvider::updateRequired,
+        i,
+        [iface, np, finish](const QString &a, const QString &b, const QString &c) {
+            if (!iface) {
+                return;
+            }
+            finish();
+            np->deleteLater();
+            iface->deleteLater();
+        },
+        Qt::QueuedConnection);
     connect(np, &NDataProvider::started, i, &NInterface::httpQueryStarted);
     connect(np, &NDataProvider::error, context, [np, errCallback, finish, iface](const QString & msg) {
         if(!iface) {
@@ -190,24 +208,38 @@ void NInterface::query(const QString &route, const QString &bearer, QObject *con
 
 void NInterface::query1(const QString &route, const QString &bearer, QObject *context, const QJsonObject &params, std::function<void (const QJsonObject&)> callback)
 {
-    query(route, bearer, context, params, callback,
-    [](const QJsonObject & jerr) {
-        Q_UNUSED(jerr);
-        return false;
-    }, true, 5000, false);
+    query(
+        route,
+        bearer,
+        context,
+        params,
+        callback,
+        [](const QJsonObject &jerr) {
+            Q_UNUSED(jerr);
+            return false;
+        },
+        true,
+        5000,
+        false);
 }
 
 void NInterface::httpQueryStarted()
 {
     if(!fLoadingDlg) {
         if(fProgress) {
-            fLoadingDlg = new NLoadingDlg(tr("Query"), static_cast<QWidget*>(this->parent()));
+            QWidget *parentWidget = qobject_cast<QWidget *>(parent());
+            fLoadingDlg = new NLoadingDlg(tr("Query"), parentWidget);
         }
     }
 
     if(fProgress) {
-        fLoadingDlg->resetSeconds();
-        // fLoadingDlg->open();
+        if (fLoadingDlg->parentWidget()) {
+            fLoadingDlg->move(fLoadingDlg->parentWidget()->window()->geometry().center() - fLoadingDlg->rect().center());
+        }
+
+        fLoadingDlg->open();
+        fLoadingDlg->raise();
+        fLoadingDlg->activateWindow();
     }
 }
 

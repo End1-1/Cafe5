@@ -518,8 +518,8 @@ void DlgOrder::printPrecheck(const QString &currentStaff)
     p.br();
     QJsonObject jtax = mOrder.fiscal();
 
-    if(!jtax.isEmpty() && jtax.value("result") == 0) {
-        jtax = QJsonDocument::fromJson(jtax.value("out").toString().toUtf8()).object();
+    if (!jtax.isEmpty()) {
+        // jtax = QJsonDocument::fromJson(jtax.value("out").toString().toUtf8()).object();
         p.ltext(jtax["taxpayer"].toString(), 0);
         p.br();
         p.ltext(jtax["address"].toString(), 0);
@@ -2357,19 +2357,19 @@ void DlgOrder::on_btnCloseOrder_clicked()
             return;
         }
 
-        NInterface::query("/engine/v2/waiter/order/close-order", self->mUser->mSessionKey, self, {
-            {"id", self->mOrder.id},
-            {"fiscal", fiscalInfo},
-            {"cashbox_id", mWorkStation.cashboxId()}
-        },
-        [self](const QJsonObject & jdoc) {
-            self->parseOrder(jdoc);
-            self->printPrecheck(self->mUser->shortFullName());
-            self->accept();
-        },
-        [](const QJsonObject & jerr) {
-            return false;
-        });
+        NInterface::query(
+            "/engine/v2/waiter/order/close-order",
+            self->mUser->mSessionKey,
+            self,
+            {{"id", self->mOrder.id},
+             {"fiscal", fiscalInfo},
+             {"cashbox_id", mWorkStation.cashboxId()}},
+            [self](const QJsonObject &jdoc) {
+                self->parseOrder(jdoc);
+                self->printPrecheck(self->mUser->shortFullName());
+                self->accept();
+            },
+            [](const QJsonObject &jerr) { return false; });
     };
 
     if(ui->btnPrintFiscal->isChecked()) {
@@ -2404,10 +2404,10 @@ void DlgOrder::on_btnCloseOrder_clicked()
         connect(pt, &PrintTaxN::finished, self, [ = ](const QString & inJson, const QString & outJson, const QString & err, int result) {
             loading->close();
             loading->deleteLater();
-            QJsonObject reply{{"in", inJson},
-                {"out", outJson},
-                {"error", err},
-                {"result", result}};
+            QJsonObject reply{{"in", QJsonDocument::fromJson(inJson.toUtf8()).object()},
+                              {"out", QJsonDocument::fromJson(outJson.toUtf8()).object()},
+                              {"error", err},
+                              {"result", result}};
 
             if(result == 0) {
                 closeOrderFunc(reply);

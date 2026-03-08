@@ -10,6 +10,8 @@ public:
     QString body;
     int store = 0;
     int goods = 0;
+    double lowLevel = 0.0;
+    double stock = 0.0;
     double qty = 0.0;
     double price = 0.0;
     double total = 0.0;

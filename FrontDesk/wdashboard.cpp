@@ -61,6 +61,18 @@ QWidget* WDashboard::createForm(const QString &name, QIcon icon)
         return new C5StoreInput(mUser, tr("Store input"), icon);
     }
 
+    if (name == "form_store_documents") {
+        return new RAbstractEditorReport(tr("Store documents"), icon, name);
+    }
+
+    if (name == "form_store_moves") {
+        return new RAbstractEditorReport(tr("Store documents"), icon, name);
+    }
+
+    if (name == "form_stock") {
+        return new RAbstractEditorReport(tr("Stock"), icon, name);
+    }
+
     Q_ASSERT_X(false, "check name", QString("NO WIDGET NAMED %1 ").arg(name).toLatin1());
     return nullptr;
 }

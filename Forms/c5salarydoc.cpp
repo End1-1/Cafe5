@@ -20,7 +20,8 @@ C5SalaryDoc::C5SalaryDoc(QWidget *parent) :
     ui->setupUi(this);
     fIconName = ":/employee.png";
     fLabel = tr("Salary document");
-    ui->tbl->setColumnWidths(ui->tbl->columnCount(), 0, 150, 200, 0, 300, 100, 80, 80, 80, 80, 100);
+    ui->tbl
+        ->setColumnWidths(ui->tbl->columnCount(), 0, 150, 200, 0, 300, 100, 80, 80, 80, 80, 100, 300);
     fDate = QDate::currentDate();
     fDate = fDate.addDays((fDate.day() - 1) * -1);
     ui->deDate->setText(fDate.toString("MMMM-yyyy"));
@@ -44,7 +45,8 @@ bool C5SalaryDoc::openDoc()
     db[":f_shift"] = ui->cbShift->currentData();
     db.exec("select b.f_id, b.f_worker, b.f_position, g.f_name,"
             "concat(u.f_last, ' ', u.f_first) as f_employee, b.f_amount, "
-            "b.f_indate, b.f_intime, b.f_outdate, b.f_outtime, b.f_paid "
+            "b.f_indate, b.f_intime, b.f_outdate, b.f_outtime, b.f_paid, "
+            "b.f_comment "
             "from s_salary_attendance b "
             "left join s_user u on u.f_id=b.f_worker "
             "inner join s_user_group g on g.f_id=u.f_group "
@@ -62,6 +64,7 @@ bool C5SalaryDoc::openDoc()
         ui->tbl->lineEdit(row, 7)->setText(db.getTime("f_intime").toString("HH:mm:ss"));
         ui->tbl->getWidget<C5DateEdit>(row, 8)->setDate(db.getDate("f_outdate"));
         ui->tbl->lineEdit(row, 9)->setText(db.getTime("f_outtime").toString("HH:mm:ss"));
+        ui->tbl->lineEditWithSelector(row, 11)->setText(db.getString("f_comment"));
         qDebug() << db.getString("f_paid").isEmpty() << db.getDateTime("f_paid");
         ui->tbl->setString(row, 10, db.getString("f_paid").isEmpty()  ? tr("No") : tr("Yes"));
         total += db.getDouble("f_amount");
@@ -117,6 +120,7 @@ void C5SalaryDoc::save()
         db[":f_intime"] = QTime::fromString(ui->tbl->lineEdit(i, 7)->text(), "HH:mm:ss");
         db[":f_outdate"] = ui->tbl->getWidget<C5DateEdit>(i, 8)->date();
         db[":f_outtime"] = QTime::fromString(ui->tbl->lineEdit(i, 9)->text(), "HH:mm:ss");
+        db[":f_comment"] = ui->tbl->lineEditWithSelector(i, 11)->text();
         ui->tbl->setInteger(i, 0, db.insert("s_salary_attendance"));
     }
 
@@ -255,6 +259,7 @@ int C5SalaryDoc::newRow()
     ui->tbl->createLineEdit(row, 7);
     ui->tbl->createWidget<C5DateEdit>(row, 8);
     ui->tbl->createLineEdit(row, 9);
+    ui->tbl->createLineEdit(row, 11);
     return row;
 }
 

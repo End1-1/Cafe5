@@ -123,6 +123,7 @@ qt_add_executable(Waiter WIN32
     ../NTable/ntablemodel.cpp
     ../Printing/selectprinters.cpp
     ../Service5/worker/struct_workstationitem.cpp
+    ../Service5/worker/struct_fiscal_machine.cpp
     ../Service5Working/utils/configini.cpp
     c5waiterdialog.cpp
     dishitembutton.cpp
@@ -249,6 +250,7 @@ qt_add_executable(Waiter WIN32
     ../Service5/worker/struct_waiter_dish.h
     ../Service5/worker/struct_waiter_order.h
     ../Service5/worker/struct_workstationitem.h
+    ../Service5/worker/struct_fiscal_machine.h
     ../Service5Working/utils/configini.h
     ../Service5Working/utils/servicecommands.h
     c5waiterdialog.h

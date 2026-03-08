@@ -2,6 +2,7 @@
 #define WORDER_H
 
 #include <QDate>
+#include <QStyledItemDelegate>
 #include <QTime>
 #include <QWidget>
 #include "bhistory.h"
@@ -21,6 +22,12 @@ class Working;
 class C5ClearTableWidget;
 class C5User;
 class WCustomerDisplay;
+
+class CustomDelegate : public QStyledItemDelegate
+{
+public:
+    void paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const override;
+};
 
 class WOrder : public QWidget
 {
@@ -64,6 +71,8 @@ public:
     int rowCount();
 
     void removeRow();
+
+    void removeRowForce();
 
     void nextRow();
 
@@ -146,6 +155,10 @@ private:
     void processAccumulateCard(const QString &code);
 
     void printFiscal(std::function<void(const QJsonObject &)> nextStep);
+
+    virtual void showEvent(QShowEvent *e) override;
+
+    void setDiscinfoVisibility(bool v);
 };
 
 #endif // WORDER_H

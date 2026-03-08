@@ -210,7 +210,7 @@ bool C5StoreBarcode::printOneBarcode(const QString &code, const QString &price, 
     f.setPointSize(7);
     f.setBold(true);
     p.setFont(f);
-    p.drawText(QRectF(10, 10, 350, 80), name, to);
+    p.drawText(QRectF(10, 10, 300, 80), name, to);
     //b.DrawBarcode(p, 5, 85, 70, 130, plen);
     f.setPointSize(8);
     p.setFont(f);

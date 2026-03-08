@@ -1,18 +1,19 @@
 #include "dlgreturnitem.h"
-#include "ui_dlgreturnitem.h"
+#include <QJsonArray>
 #include "c5checkbox.h"
-#include "c5storedraftwriter.h"
-#include "oheader.h"
 #include "c5config.h"
-#include "c5utils.h"
 #include "c5lineedit.h"
-#include "ogoods.h"
-#include "printreceipt.h"
-#include "printtaxn.h"
 #include "c5message.h"
+#include "c5storedraftwriter.h"
+#include "c5utils.h"
 #include "jsons.h"
 #include "ninterface.h"
-#include <QJsonArray>
+#include "ogoods.h"
+#include "oheader.h"
+#include "printreceipt.h"
+#include "printtaxn.h"
+#include "struct_workstationitem.h"
+#include "ui_dlgreturnitem.h"
 
 DlgReturnItem::DlgReturnItem(C5User *u) :
     C5ShopDialog(u),
@@ -246,8 +247,8 @@ void DlgReturnItem::on_btnReturn_clicked()
         QJsonObject jout = __strjson(db.getString("f_out"));
         QString crn = jout["crn"].toString();
         int rseq = jout["rseq"].toInt();
-        PrintTaxN pt(C5Config::taxIP(), C5Config::taxPort(), C5Config::taxPassword(), C5Config::taxUseExtPos(),
-                     C5Config::taxCashier(), C5Config::taxPin(), this);
+        FiscalMachine fm = getFiscalMachine(mWorkStation.fiscalMachineId());
+        PrintTaxN pt(fm.ip, fm.port, fm.machinePassword, fm.externalPosString(), fm.opPin, fm.opPassword, this);
 
         for(int i = 0; i < ui->tblBody->rowCount(); i++) {
             auto *l = ui->tblBody->lineEdit(i, 10);

@@ -1,21 +1,22 @@
 #include "c5salefromstoreorder.h"
-#include "ui_c5salefromstoreorder.h"
-#include "c5mainwindow.h"
-#include "printtaxn.h"
-#include "breezeconfig.h"
-#include "../Forms/dlglist2.h"
-#include "httpquerydialog.h"
-#include "c5cache.h"
-#include "c5message.h"
-#include "c5database.h"
-#include "c5utils.h"
-#include "ninterface.h"
-#include "c5config.h"
-#include "c5printrecipta4.h"
-#include <QMenu>
 #include <QClipboard>
-#include <QFileDialog>
 #include <QDesktopServices>
+#include <QFileDialog>
+#include <QMenu>
+#include "../Forms/dlglist2.h"
+#include "breezeconfig.h"
+#include "c5cache.h"
+#include "c5config.h"
+#include "c5database.h"
+#include "c5mainwindow.h"
+#include "c5message.h"
+#include "c5printrecipta4.h"
+#include "c5utils.h"
+#include "httpquerydialog.h"
+#include "ninterface.h"
+#include "printtaxn.h"
+#include "struct_workstationitem.h"
+#include "ui_c5salefromstoreorder.h"
 #include <xlsxdocument.h>
 
 C5SaleFromStoreOrder::C5SaleFromStoreOrder(C5User *user) :
@@ -186,8 +187,9 @@ void C5SaleFromStoreOrder::on_btnPrintTax_clicked()
     QElapsedTimer t;
     t.start();
     C5Database db;
-    PrintTaxN pt(C5Config::taxIP(), C5Config::taxPort(), C5Config::taxPassword(), C5Config::taxUseExtPos(),
-                 C5Config::taxCashier(), C5Config::taxPin(), this);
+    C5Message::error(tr("Config fiscal machine select not implemented"));
+    FiscalMachine fm = getFiscalMachine(0);
+    PrintTaxN pt(fm.ip, fm.port, fm.machinePassword, fm.externalPosString(), fm.opPin, fm.opPassword, this);
 
     for(int i = 0; i < ui->tblData->rowCount(); i++) {
         pt.addGoods(ui->tblData->getString(i, 8).toInt(), //dep

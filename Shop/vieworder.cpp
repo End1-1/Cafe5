@@ -1,35 +1,38 @@
 #include "vieworder.h"
-#include "ui_vieworder.h"
-#include "jsons.h"
-#include "c5config.h"
-#include "c5message.h"
-#include "goodsreturnreason.h"
-#include "c5database.h"
-#include "c5utils.h"
-#include "c5user.h"
-#include "c5checkbox.h"
-#include "c5storedraftwriter.h"
-#include "printreceipt.h"
-#include "printtaxn.h"
-#include "printreceiptgroup.h"
-#include "worder.h"
-#include "selectprinters.h"
-#include "dlggetidname.h"
-#include "dqty.h"
 #include <QClipboard>
 #include <QJsonObject>
-#include "c5printrecipta4.h"
-#include "dlgdate.h"
-#include "working.h"
-#include "c5printing.h"
-#include "ogoods.h"
-#include <QPrinter>
 #include <QPrintDialog>
+#include <QPrinter>
+#include "c5checkbox.h"
+#include "c5config.h"
+#include "c5database.h"
+#include "c5message.h"
+#include "c5printing.h"
+#include "c5printrecipta4.h"
+#include "c5storedraftwriter.h"
+#include "c5user.h"
+#include "c5utils.h"
+#include "dlgdate.h"
+#include "dlggetidname.h"
+#include "dqty.h"
+#include "goodsreturnreason.h"
+#include "jsons.h"
+#include "ogoods.h"
+#include "printreceipt.h"
+#include "printreceiptgroup.h"
+#include "printtaxn.h"
+#include "selectprinters.h"
+#include "struct_workstationitem.h"
+#include "ui_vieworder.h"
+#include "worder.h"
+#include "working.h"
 
-ViewOrder::ViewOrder(Working *w, const QString &order, C5User *user) :
-    C5ShopDialog(user),
-    ui(new Ui::ViewOrder),
-    fWorking(w)
+using std::function;
+
+ViewOrder::ViewOrder(Working *w, const QString &order, C5User *user)
+    : C5ShopDialog(user)
+    , ui(new Ui::ViewOrder)
+    , fWorking(w)
 {
     ui->setupUi(this);
     showMaximized();
@@ -38,20 +41,23 @@ ViewOrder::ViewOrder(Working *w, const QString &order, C5User *user) :
     C5Database db;
     db[":f_id"] = order;
     db.exec("select o.*, concat(' ', u.f_last, u.f_first) as f_saler, "
-            "concat_ws(' ', p.f_taxcode, p.f_taxname, p.f_contact, p.f_phone) as f_buyer "
+            "concat_ws(' ', p.f_taxcode, p.f_taxname, p.f_contact, p.f_phone) as "
+            "f_buyer "
             "from o_header o "
             "left join s_user u on u.f_id=o.f_staff "
             "left join c_partners p on p.f_id=o.f_partner "
             "where o.f_id=:f_id");
 
-    if(db.nextRow()) {
-        ui->leOrderNum->setText(QString("%1%2").arg(db.getString("f_prefix")).arg(db.getInt("f_hallid")));
+    if (db.nextRow()) {
+        ui->leOrderNum->setText(
+            QString("%1%2").arg(db.getString("f_prefix")).arg(db.getInt("f_hallid")));
         ui->leAmount->setDouble(db.getDouble("f_amounttotal"));
         fOHeader.saleType = db.getInt("f_saletype");
         fOHeader.partner = db.getInt("f_partner");
-        fSaleDoc = QString("%1%2, %3").arg(db.getString("f_prefix"),
-                                           db.getString("f_hallid"),
-                                           db.getDate("f_datecash").toString(FORMAT_DATE_TO_STR));
+        fSaleDoc = QString("%1%2, %3")
+                       .arg(db.getString("f_prefix"),
+                            db.getString("f_hallid"),
+                            db.getDate("f_datecash").toString(FORMAT_DATE_TO_STR));
         ui->leDate->setDate(db.getDate("f_datecash"));
         ui->leTime->setText(db.getTime("f_timeclose").toString("HH:mm"));
         ui->leUUID->setText(db.getString("f_id"));
@@ -74,12 +80,13 @@ ViewOrder::ViewOrder(Working *w, const QString &order, C5User *user) :
             "left join s_user u on u.f_id=o.f_deliveryman "
             "where o.f_id=:f_id");
 
-    if(db.nextRow()) {
+    if (db.nextRow()) {
         ui->leDeliveryMan->setText(db.getString("f_deliveryman"));
     }
 
     db[":f_header"] = order;
-    db.exec("select b.f_id, g.f_name, g.f_id as f_goodsid, b.f_qty, b.f_price, b.f_total, f_scancode,  "
+    db.exec("select b.f_id, g.f_name, g.f_id as f_goodsid, b.f_qty, b.f_price, "
+            "b.f_total, f_scancode,  "
             "g.f_service, b.f_return, t.f_receiptnumber as f_tax, b.f_store "
             "from o_goods b "
             "left join o_header h on h.f_id=b.f_header "
@@ -88,7 +95,7 @@ ViewOrder::ViewOrder(Working *w, const QString &order, C5User *user) :
             "where b.f_header=:f_header "
             "order by b.f_row ");
 
-    while(db.nextRow()) {
+    while (db.nextRow()) {
         int r = ui->tbl->addEmptyRow();
         ui->tbl->setString(r, 0, db.getString("f_id"));
         ui->tbl->createCheckbox(r, 1);
@@ -102,7 +109,7 @@ ViewOrder::ViewOrder(Working *w, const QString &order, C5User *user) :
         ui->tbl->setInteger(r, 9, db.getInt("f_return"));
         ui->tbl->setInteger(r, 10, db.getInt("f_store"));
 
-        if(db.getInt("f_return") > 0 || db.getDouble("f_price") < 0) {
+        if (db.getInt("f_return") > 0 || db.getDouble("f_price") < 0) {
             ui->tbl->checkBox(r, 1)->setEnabled(false);
         }
 
@@ -111,7 +118,7 @@ ViewOrder::ViewOrder(Working *w, const QString &order, C5User *user) :
         ui->btnTaxReturn->setVisible(!ui->btnPrintFiscal->isVisible());
     }
 
-    if(ui->leAmount->getDouble() < 0) {
+    if (ui->leAmount->getDouble() < 0) {
         ui->btnReturn->setVisible(false);
     }
 
@@ -194,8 +201,8 @@ void ViewOrder::on_btnTaxReturn_clicked()
     QJsonObject jout = __strjson(db.getString("f_out"));
     QString crn = jout["crn"].toString();
     QString rseq = ui->leTaxNumber->text();
-    PrintTaxN pt(C5Config::taxIP(), C5Config::taxPort(), C5Config::taxPassword(), C5Config::taxUseExtPos(),
-                 C5Config::taxCashier(), C5Config::taxPin(), this);
+    FiscalMachine fm = getFiscalMachine(mWorkStation.fiscalMachineId());
+    PrintTaxN pt(fm.ip, fm.port, fm.machinePassword, fm.externalPosString(), fm.opPin, fm.opPassword, this);
     QString jsnin, jsnout, err;
     int result;
     result = pt.printTaxback(rseq.toInt(), crn, jsnin, jsnout, err);
@@ -346,94 +353,73 @@ void ViewOrder::on_btnPrintFiscal_clicked()
         return;
     }
 
-    QString rseq;
-    C5Database db;
-
-    if(printCheckWithTax(db, ui->leUUID->text(), rseq)) {
-        ui->leTaxNumber->setText(rseq);
-    }
+    printCheckWithTax(ui->leUUID->text(), [this](auto rseq) { ui->leTaxNumber->setText(rseq); });
 }
 
-bool ViewOrder::printCheckWithTax(C5Database &db, const QString &id, QString &rseq)
+void ViewOrder::printCheckWithTax(const QString &id,
+                                  std::function<void(const QString &)> funcSuccess)
 {
-    QElapsedTimer et;
-    et.start();
-    bool resultb = true;
-    db[":f_id"] = id;
-    db.exec("select * from o_tax where f_id=:f_id");
+    NInterface::query1("/engine/v2/common/fiscal/get",
+                       mUser->mSessionKey,
+                       this,
+                       {{"id", id}},
+                       [this, id, funcSuccess](const QJsonObject &jo) {
+                           if (jo.value("fiscal").toInt() > 0) {
+                               C5Message::error(tr("Cannot print tax twice"));
+                               return;
+                           }
+                           QJsonObject jheader = jo.value("header").toObject();
+                           QJsonObject jpartner = jo.value("partner").toObject();
+                           QJsonArray jgoods = jo.value("goods").toArray();
+                           double card = jheader.value("f_amountcard").toDouble();
+                           double idram = jheader.value("f_idram").toDouble();
+                           int partner = jheader.value("f_partner").toInt();
+                           FiscalMachine fm = getFiscalMachine(mWorkStation.fiscalMachineId());
+                           QString useExtPos = idram > 0.01 ? "true" : fm.externalPosString();
+                           QString partnerTIN = jpartner.value("f_taxcode").toString();
 
-    if(db.nextRow()) {
-        if(db.getInt("f_receiptnumber") > 0) {
-            C5Message::error(tr("Cannot print tax twice"));
-            return resultb;
-        }
-    }
+                           PrintTaxN pt(fm.ip, fm.port, fm.machinePassword, useExtPos, fm.opPin, fm.opPassword, this);
+                           if (partnerTIN.length() == 8 && ui->btnPrintPartnerTIN->isChecked()) {
+                               pt.fPartnerTin = partnerTIN;
+                           }
 
-    db[":f_id"] = id;
-    db.exec("select * from o_header where f_id=:f_id");
-    db.nextRow();
-    double card = db.getDouble("f_amountcard");
-    double idram = db.getDouble("f_idram");
-    int partner = db.getInt("f_partner");
-    QString useExtPos = idram > 0.01 ? "true" : C5Config::taxUseExtPos();
-    QString partnerHvhh;
+                           for (int i = 0; i < jgoods.size(); i++) {
+                               const QJsonObject &jg = jgoods.at(i).toObject();
+                               pt.addGoods(jg.value("f_taxdept").toInt(),    // dep
+                                           jg.value("f_adgcode").toString(), // adg
+                                           jg.value("f_goods").toString(),   // goods id
+                                           jg.value("f_name").toString(),    // name
+                                           jg.value("f_price").toDouble(),   // price
+                                           jg.value("f_qty").toDouble(),     // qty
+                                           jg.value("f_discountfactor").toDouble()
+                                               * 100); // discount
+                           }
 
-    if(partner > 0) {
-        db[":f_id"] = partner;
-        db.exec("select f_taxcode from c_partners where f_id=:f_id");
+                           QString jsonIn, jsonOut, err;
+                           int result = 0;
+                           result = pt.makeJsonAndPrint(card, 0, jsonIn, jsonOut, err);
+                           QJsonObject reply{{"f_id", QUuid::createUuid().toString(QUuid::WithoutBraces)},
+                                             {"f_order", id},
+                                             {"in", QJsonDocument::fromJson(jsonIn.toUtf8()).object()},
+                                             {"out", QJsonDocument::fromJson(jsonOut.toUtf8()).object()},
+                                             {"error", err},
+                                             {"result", result}};
 
-        if(db.nextRow()) {
-            partnerHvhh = db.getString(0);
-        }
-    }
-
-    db[":f_id"] = id;
-    db.exec("select og.f_id, og.f_goods, g.f_name, og.f_qty, "
-            "gu.f_name as f_unitname, og.f_price, og.f_total,"
-            "t.f_taxdept, t.f_adgcode, "
-            "og.f_store "
-            "from o_goods og "
-            "left join c_goods g on g.f_id=og.f_goods "
-            "left join c_units gu on gu.f_id=g.f_unit "
-            "left join c_groups t on t.f_id=g.f_group "
-            "where og.f_header=:f_id "
-            "order by og.f_row ");
-    PrintTaxN pt(C5Config::taxIP(), C5Config::taxPort(), C5Config::taxPassword(), useExtPos, C5Config::taxCashier(),
-                 C5Config::taxPin(), 0);
-    pt.fPartnerTin = partnerHvhh;
-
-    while(db.nextRow()) {
-        pt.addGoods(db.getInt("f_taxdept"), //dep
-                    db.getString("f_adgcode"), //adg
-                    db.getString("f_goods"), //goods id
-                    db.getString("f_name"), //name
-                    db.getDouble("f_price"), //price
-                    db.getDouble("f_qty"), //qty
-                    db.getDouble("f_discountfactor") * 100); //discount
-    }
-
-    QString jsonIn, jsonOut, err;
-    int result = 0;
-    result = pt.makeJsonAndPrint(card, 0, jsonIn, jsonOut, err);
-    QJsonObject jtax;
-    jtax["f_order"] = id;
-    jtax["f_elapsed"] = et.elapsed();
-    jtax["f_in"] = QJsonDocument::fromJson(jsonIn.toUtf8()).object();
-    jtax["f_out"] = QJsonDocument::fromJson(jsonOut.toUtf8()).object();
-    jtax["f_err"] = err;
-    jtax["f_result"] = result;
-    jtax["f_state"] = result == pt_err_ok ? 1 : 0;
-    db.exec(QString("call sf_create_shop_tax('%1')").arg(QString(QJsonDocument(jtax).toJson(QJsonDocument::Compact))));
-
-    if(result == pt_err_ok) {
-        jtax = QJsonDocument::fromJson(jsonOut.toUtf8()).object();
-        rseq = QString::number(jtax["rseq"].toInt());
-        C5Message::info(tr("Printed"));
-    } else {
-        C5Message::error(err);
-    }
-
-    return resultb;
+                           NInterface::query(
+                               "/engine/v2/common/fiscal/log",
+                               mUser->mSessionKey,
+                               this,
+                               reply,
+                               [](const QJsonObject &jdoc) {},
+                               [](const QJsonObject &jerr) { return true; });
+                           if (result == pt_err_ok) {
+                               QJsonObject jtax = QJsonDocument::fromJson(jsonOut.toUtf8()).object();
+                               funcSuccess(QString::number(jtax["rseq"].toInt()));
+                               C5Message::info(tr("Printed"));
+                           } else {
+                               C5Message::error(err);
+                           }
+                       });
 }
 
 void ViewOrder::on_btnPrintReceiptA4_clicked()

@@ -109,8 +109,7 @@ void SearchItems::on_btnReserve_clicked()
     NInterface::query1("/engine/v2/shop/shop-reserve/get-store-goods",
                        mUser->mSessionKey,
                        this,
-                       {{"store_id", ui->tbl->getInteger(row, tr("Store code"))},
-                        {"goods_id", ui->tbl->getInteger(row, tr("Goods code"))}},
+                       {{"store_id", ui->tbl->getInteger(row, 8)}, {"goods_id", ui->tbl->getInteger(row, 9)}},
                        [this, qty](const QJsonObject &jo) {
                            StorageItem si = JsonParser<StorageItem>::fromJson(
                                jo.value("store_json").toObject());
