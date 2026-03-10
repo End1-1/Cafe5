@@ -101,8 +101,6 @@ public:
 private slots:
     void openDraftResponse(const QJsonObject &jdoc);
 
-    void readEmarks();
-
     void noImage();
 
     void checkCardClicked(bool v);

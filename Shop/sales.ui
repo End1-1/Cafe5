@@ -414,23 +414,6 @@
          </widget>
         </item>
         <item>
-         <widget class="QPushButton" name="btnItemChange">
-          <property name="minimumSize">
-           <size>
-            <width>0</width>
-            <height>40</height>
-           </size>
-          </property>
-          <property name="text">
-           <string>Item change</string>
-          </property>
-          <property name="icon">
-           <iconset resource="../resources/res.qrc">
-            <normaloff>:/restart.png</normaloff>:/restart.png</iconset>
-          </property>
-         </widget>
-        </item>
-        <item>
          <widget class="QPushButton" name="btnChangeDate">
           <property name="minimumSize">
            <size>
@@ -663,7 +646,7 @@
   <customwidget>
    <class>C5LineEdit</class>
    <extends>QLineEdit</extends>
-   <header>c5lineedit.h</header>
+   <header location="global">c5lineedit.h</header>
   </customwidget>
   <customwidget>
    <class>C5ClearTableWidget</class>

@@ -207,15 +207,14 @@ void PrintReceiptGroup::print(const QString &id, int rw)
         //        p.br();
         p.ltext(tr("(F)"), 0);
 
-        if(__c5config.getValue(param_vat).toDouble() > 0.01) {
-            p.ltext(QString("%1 %2%").arg(tr("Including VAT"), float_str(__c5config.getValue(param_vat).toDouble() * 100, 2)), 0);
-            p.rtext(float_str(amountTotal * __c5config.getValue(param_vat).toDouble(), 2));
+        if (!jtax.value("partnerTin").toString().isEmpty()) {
+            p.lrtext(tr("Partner TIN"), jtax.value("partnerTin").toString());
             p.br();
         }
     }
 
     if(!partnerName.isEmpty() || !partnerTaxcode.isEmpty()) {
-        p.ltext(tr("Buyer taxcode"), 0);
+        p.ltext(tr("Partner"), 0);
         p.rtext(partnerTaxcode);
         p.br();
         p.ltext(partnerName, 0);
@@ -382,12 +381,13 @@ void PrintReceiptGroup::print2(const QString &id)
         throw std::exception(QString("No order for %1").arg(id).toStdString().data());
     }
 
-    QJsonObject jtax;
+    QJsonObject jtax, jtaxin;
     db[":f_order"] = id;
     db.exec("select * from o_tax_log where f_order=:f_order and f_state=1");
 
     if(db.nextRow()) {
         jtax = QJsonDocument::fromJson(db.getString("f_out").toUtf8()).object();
+        jtaxin = QJsonDocument::fromJson(db.getString("f_in").toUtf8()).object();
     }
 
     db[":f_id"] = id;
@@ -583,10 +583,14 @@ void PrintReceiptGroup::print2(const QString &id)
         p.br();
         p.ltext(tr("(F)"), 0);
         p.br();
+        if (!jtaxin.value("partnerTin").toString().isEmpty()) {
+            p.lrtext(tr("Partner TIN"), jtaxin.value("partnerTin").toString());
+            p.br();
+        }
     }
 
-    if(partner.id.toInt() > 0) {
-        p.ltext(tr("Buyer taxcode"), 0);
+    if (partner.id.toInt() > 0) {
+        p.ltext(tr("Partner"), 0);
         p.rtext(partner.taxCode);
         p.br();
         p.ltext(partner.taxName, 0);

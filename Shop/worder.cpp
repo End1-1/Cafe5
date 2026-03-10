@@ -4,6 +4,7 @@
 #include <QInputDialog>
 #include <QPainter>
 #include <QPointer>
+#include <QScrollBar>
 #include <QSettings>
 #include <QThread>
 #include "c5checkbox.h"
@@ -227,7 +228,7 @@ void WOrder::writeOrder(std::function<void()> nextStep)
         fOHeader.amountCash = fOHeader.amountTotal;
     }
 
-    fOHeader._printFiscal = __c5config.alwaysOfferTaxPrint();
+    fOHeader._printFiscal = __c5config.alwaysOfferTaxPrint() || ui->btnF4->isChecked();
 
     if (ui->btnF5->isChecked()) {
         fOHeader.amountCash = 0;
@@ -830,21 +831,6 @@ void WOrder::countTotal()
         ui->tblData->setData(i, col_discvalue, og.discountFactor);
         ui->tblData->setData(i, col_discmode, og.discountMode);
         ui->tblData->setData(i, col_stock, og.stock);
-        QPushButton *btn = static_cast<QPushButton *>(ui->tblData->cellWidget(i, col_qr));
-
-        if (btn == nullptr) {
-            btn = new QPushButton();
-            btn->setFocusPolicy(Qt::NoFocus);
-        }
-
-        if (og.emarks.isEmpty()) {
-            btn->setIcon(QPixmap(""));
-        } else {
-            btn->setIcon(QPixmap(":/qr_code.png").scaled(30, 30));
-        }
-
-        connect(btn, &QPushButton::clicked, this, &WOrder::readEmarks);
-        ui->tblData->setCellWidget(i, col_qr, btn);
 
         if (fBHistory.card > 0 && fBHistory.type == CARD_TYPE_ACCUMULATIVE) {
             auto *ch = static_cast<C5CheckBox *>(ui->tblData->cellWidget(i, col_check_discount));
@@ -858,14 +844,38 @@ void WOrder::countTotal()
     }
 
     ui->leCurrentAccumulated->setDouble(accAmount);
-
     ui->leTotal->setDouble(fOHeader.amountTotal);
     C5Database db;
     QString err;
+
     fDraftSale.amount = fOHeader.amountTotal;
+    // 1. Запоминаем всё: строку, колонку и положение скролла
+    int savedRow = ui->tblData->currentRow();
+    int savedCol = ui->tblData->currentColumn();
+    int scrollValue = ui->tblData->verticalScrollBar()->value();
+
+    // 2. Полностью отключаем перерисовку и сигналы
+    ui->tblData->setUpdatesEnabled(false);
+    ui->tblData->blockSignals(true);
+
+    // 3. Выполняем запись (пусть там внутри хоть 200мс крутится processEvents)
     fDraftSale.write(db, err);
-    updateCustomerDisplay(fCustomerDisplay);
+
+    // 4. СРАЗУ возвращаем фокус на место, пока обновления еще выключены
+    if (savedRow >= 0) {
+        ui->tblData->setCurrentCell(savedRow, savedCol);
+        ui->tblData->verticalScrollBar()->setValue(scrollValue);
+    }
+
+    // 5. Включаем всё обратно
+    ui->tblData->blockSignals(false);
+    ui->tblData->setUpdatesEnabled(true);
+
+    // 6. Сносим нафиг эту строку, если она не критична (она главный враг плавности)
+    // ui->tblData->resizeRowsToContents();
+
     ui->tblData->resizeRowsToContents();
+    updateCustomerDisplay(fCustomerDisplay);
 
 #ifdef _MART8_
     if (fOGoods.size() < 1 || fOHeader.saleType == -1) {
@@ -1064,30 +1074,6 @@ void WOrder::openDraftResponse(const QJsonObject &jdoc)
     fHttp->httpQueryFinished(sender());
 }
 
-void WOrder::readEmarks()
-{
-    int row = ui->tblData->currentRow();
-
-    if (row < 0) {
-        return;
-    }
-
-    bool ok = false;
-    QString qr = QInputDialog::getText(this, tr("Emark"), tr("Emark"), QLineEdit::Normal, fOGoods[row].emarks, &ok);
-
-    if (!ok) {
-        return;
-    }
-
-    if (qr.length() > 0 && qr.length() < 20) {
-        C5Message::error(tr("Incorrect eMarks"));
-        ui->leCode->setFocus();
-        return;
-    }
-
-    fOGoods[row].emarks = qr;
-    countTotal();
-}
 void WOrder::noImage()
 {
     //ui->wimage->setVisible(false);

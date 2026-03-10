@@ -9075,7 +9075,7 @@ MS Excel</translation>
     <message>
         <location filename="../Editors/ce5goods.cpp" line="671"/>
         <source>Price type</source>
-        <translation type="unfinished"></translation>
+        <translation>Գնի տեսակ</translation>
     </message>
     <message>
         <location filename="../Editors/ce5goods.cpp" line="672"/>
@@ -10276,7 +10276,7 @@ MS Excel</translation>
     <message>
         <location filename="../Editors/ce5partner.ui" line="186"/>
         <source>f_legal_address</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../Editors/ce5partner.ui" line="303"/>
@@ -19310,7 +19310,7 @@ permissions</source>
     <message>
         <location filename="wdashboard.ui" line="125"/>
         <source>form_workstations</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="wdashboard.ui" line="237"/>
@@ -19327,63 +19327,63 @@ permissions</source>
         <location filename="wdashboard.ui" line="263"/>
         <source>form_cashsessions</source>
         <oldsource>CashSessions</oldsource>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="wdashboard.ui" line="362"/>
         <source>Store</source>
-        <translation type="unfinished">Պահեստ</translation>
+        <translation>Պահեստ</translation>
     </message>
     <message>
         <location filename="wdashboard.ui" line="381"/>
         <source>New store input</source>
-        <translation type="unfinished">Պահեստի մուտք</translation>
+        <translation>Նոր պահեստի մուտք</translation>
     </message>
     <message>
         <location filename="wdashboard.ui" line="388"/>
         <source>form_newstoreinput</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="wdashboard.ui" line="404"/>
         <source>New store output</source>
-        <translation type="unfinished">Պահեստի ելք</translation>
+        <translation>Նոր պահեստի ելք</translation>
     </message>
     <message>
         <location filename="wdashboard.ui" line="411"/>
         <source>form_new_store_output</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="wdashboard.ui" line="427"/>
         <source>Documents</source>
-        <translation type="unfinished">Փաստաթղթերի մատյան</translation>
+        <translation>Փաստաթղթերի մատյան</translation>
     </message>
     <message>
         <location filename="wdashboard.ui" line="434"/>
         <source>form_store_documents</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="wdashboard.ui" line="450"/>
         <source>Store moves</source>
-        <translation type="unfinished"></translation>
+        <translation>Ապրանքների տեղաշարժ</translation>
     </message>
     <message>
         <location filename="wdashboard.ui" line="457"/>
         <source>form_store_moves</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="wdashboard.ui" line="473"/>
         <location filename="wdashboard.cpp" line="73"/>
         <source>Stock</source>
-        <translation type="unfinished">Պահեստ</translation>
+        <translation>Պահեստ</translation>
     </message>
     <message>
         <location filename="wdashboard.ui" line="480"/>
         <source>form_stock</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="wdashboard.cpp" line="14"/>
@@ -19393,13 +19393,13 @@ permissions</source>
     <message>
         <location filename="wdashboard.cpp" line="61"/>
         <source>Store input</source>
-        <translation type="unfinished">Պահեստի մուտք</translation>
+        <translation>Պահեստի մուտք</translation>
     </message>
     <message>
         <location filename="wdashboard.cpp" line="65"/>
         <location filename="wdashboard.cpp" line="69"/>
         <source>Store documents</source>
-        <translation type="unfinished"></translation>
+        <translation>Փաստաթղթերի մատյան</translation>
     </message>
 </context>
 <context>

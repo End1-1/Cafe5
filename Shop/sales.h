@@ -55,8 +55,6 @@ private slots:
 
     void on_btnChangeDate_clicked();
 
-    void on_btnItemChange_clicked();
-
     void on_btnShowMenu_clicked();
 
     void on_btnCloseMenu_clicked();

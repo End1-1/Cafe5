@@ -553,18 +553,6 @@ void Sales::on_btnChangeDate_clicked()
     }
 }
 
-void Sales::on_btnItemChange_clicked()
-{
-    toggleMenu(false);
-    //todo: memory leak
-    DlgReturnItem *i = new DlgReturnItem(mUser);
-    i->setMode(2);
-    i->showMaximized();
-    i->setFocus();
-    i->exec();
-    i->deleteLater();
-}
-
 void Sales::on_btnShowMenu_clicked()
 {
     toggleMenu(true);
