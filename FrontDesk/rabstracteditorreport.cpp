@@ -8,6 +8,7 @@
 #include "c5config.h"
 #include "c5mainwindow.h"
 #include "c5storeinput.h"
+#include "c5storeoutput.h"
 #include "c5user.h"
 #include "c5utils.h"
 #include "dict_workstation.h"
@@ -182,6 +183,13 @@ void RAbstractEditorReport::on_tbl_doubleClicked(const QModelIndex &index)
                                    auto *sw = new C5StoreInput(mUser, tr("Store input"), QIcon());
                                    __mainWindow->addWidget(sw);
                                    sw->setDocument(sid);
+                                   return;
+                               }
+                               case DOC_TYPE_STORE_OUTPUT: {
+                                   auto *sw = new C5StoreOutput(mUser, tr("Store output"), QIcon());
+                                   __mainWindow->addWidget(sw);
+                                   sw->setDocument(sid);
+                                   return;
                                }
                                }
                            });

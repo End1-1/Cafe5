@@ -286,6 +286,7 @@ bool C5StoreInput::buildDoc()
         st.price = ui->tblGoods->lineEdit(i, col_price)->getDouble();
         st.expire_date = ui->tblGoods->getWidget<C5DateEdit>(i, col_valid_date)->toMySQLDate(false);
         st.comment = ui->tblGoods->lineEdit(i, col_comment)->text();
+        st.row = i;
         mDocData.items.append(st);
         if (st.qty < 0.001) {
             err += tr("Quantity not valid on row #") + QString::number(i + 1) + "<br>";

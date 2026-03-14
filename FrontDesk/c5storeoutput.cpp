@@ -25,7 +25,6 @@
 #include "c5utils.h"
 #include "calculator.h"
 #include "ce5goods.h"
-#include "ce5partner.h"
 #include "format_date.h"
 #include "ui_c5storeoutput.h"
 #include <xlsxdocument.h>
@@ -50,7 +49,7 @@ C5StoreOutput::C5StoreOutput(C5User *user, const QString &title, QIcon icon, QWi
     ui->setupUi(this);
     fLabel = title;
     fIcon = icon;
-    ui->wInputStore->selectorCallback = storeItemSelector;
+    ui->wOutputStore->selectorCallback = storeItemSelector;
     ui->wSearchInDocs->setVisible(false);
     QMap<int, int> colwidths = {{col_rec_in_id, 0},
                                 {col_goods_id, 0},
@@ -77,9 +76,8 @@ C5StoreOutput::C5StoreOutput(C5User *user, const QString &title, QIcon icon, QWi
     ui->deDate->setEnabled(mUser->check(cp_t1_allow_change_store_doc_date));
 
     if (__c5config.getRegValue("storedoc_storeinput").toBool()) {
-        ui->wInputStore
-            ->setCodeAndName(__c5config.getRegValue("storedoc_storeinput_id").toInt(),
-                             __c5config.getRegValue("storedoc_storeinput_name").toString());
+        ui->wOutputStore->setCodeAndName(__c5config.getRegValue("storedoc_storeinput_id").toInt(),
+                                         __c5config.getRegValue("storedoc_storeinput_name").toString());
     }
 
     adjustSize();
@@ -96,7 +94,7 @@ void C5StoreOutput::setDocument(StoreInputDocument doc)
     mDocData = doc;
     ui->deDate->setDate(QDateTime::fromString(doc.date, FORMAT_DATETIME_TO_STR_MYSQL).date());
     ui->leDocNum->setText(doc.user_id);
-    ui->wInputStore->setCodeAndName(doc.store_in, doc.store_in_name);
+    ui->wOutputStore->setCodeAndName(doc.store_out, doc.store_out_name);
     ui->leComment->setText(doc.comment());
     for (int i = 0; i < doc.items.size(); i++) {
         auto const su = doc.items.at(i);
@@ -256,7 +254,7 @@ bool C5StoreOutput::buildDoc()
     if (ui->tblGoods->rowCount() == 0) {
         err += tr("Empty document") + "<br>";
     }
-    if (ui->wInputStore->value() == 0) {
+    if (ui->wOutputStore->value() == 0) {
         err += tr("Input store not selected") + "<br>";
     }
 
@@ -265,9 +263,9 @@ bool C5StoreOutput::buildDoc()
     }
     mDocData.user_id = ui->leDocNum->text();
     mDocData.date = ui->deDate->toMySQLDate(false);
-    mDocData.type = DOC_TYPE_STORE_INPUT;
+    mDocData.type = DOC_TYPE_STORE_OUTPUT;
     mDocData.create_user = mUser->id();
-    mDocData.store_in = ui->wInputStore->value();
+    mDocData.store_out = ui->wOutputStore->value();
     mDocData.data = {{"comment", ui->leComment->text()},
                      {"create_user", mUser->fullName()},
                      {"create_date", QDateTime::currentDateTime().toString(FORMAT_DATETIME_TO_STR)}};
@@ -281,6 +279,7 @@ bool C5StoreOutput::buildDoc()
         st.price = ui->tblGoods->lineEdit(i, col_price)->getDouble();
         st.expire_date = ui->tblGoods->getWidget<C5DateEdit>(i, col_valid_date)->toMySQLDate(false);
         st.comment = ui->tblGoods->lineEdit(i, col_comment)->text();
+        st.row = i;
         mDocData.items.append(st);
         if (st.qty < 0.001) {
             err += tr("Quantity not valid on row #") + QString::number(i + 1) + "<br>";
@@ -316,7 +315,7 @@ bool C5StoreOutput::docCheck(QString &err, int state)
 {
     rowsCheck(err);
 
-    if (ui->wInputStore->value() == 0) {
+    if (ui->wOutputStore->value() == 0) {
         err += tr("Input store is not defined") + "<br>";
     }
 
@@ -404,7 +403,7 @@ int C5StoreOutput::addGoods(int goods,
 void C5StoreOutput::setDocEnabled(bool v)
 {
     ui->deDate->setEnabled(v && mUser->check(cp_t1_allow_change_store_doc_date));
-    ui->wInputStore->setEnabled(v);
+    ui->wOutputStore->setEnabled(v);
     ui->wtoolbar->setEnabled(v);
 
     for (int r = 0; r < ui->tblGoods->rowCount(); r++) {
@@ -516,7 +515,7 @@ void C5StoreOutput::saveDocument()
     }
     mDocData.status = 1;
     QJsonObject jdoc = mDocData.toJson();
-    NInterface::query1("/engine/v2/common/store-move/input", mUser->mSessionKey, this, {{"doc", jdoc}}, [this](const QJsonObject) {
+    NInterface::query1("/engine/v2/common/store-move/output", mUser->mSessionKey, this, {{"doc", jdoc}}, [this](const QJsonObject) {
         mDocData.version++;
         setState();
         C5Message::info(tr("Saved"));
@@ -530,7 +529,7 @@ void C5StoreOutput::draftDocument()
     }
     mDocData.status = 0;
     QJsonObject jdoc = mDocData.toJson();
-    NInterface::query1("/engine/v2/common/store-move/input", mUser->mSessionKey, this, {{"doc", jdoc}}, [this](const QJsonObject) {
+    NInterface::query1("/engine/v2/common/store-move/output", mUser->mSessionKey, this, {{"doc", jdoc}}, [this](const QJsonObject) {
         mDocData.version++;
         mActionSave->setEnabled(true);
         mActionDraft->setEnabled(true);

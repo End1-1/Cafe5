@@ -392,20 +392,77 @@ void DlgOrder::makeDishes(int group, int favorite)
 
 void DlgOrder::confirmStringBuffer()
 {
+    if (fStoplistMode) {
+        mStringBuffer.clear();
+        return;
+    }
     if(mStringBuffer.isEmpty()) {
         return;
     }
+#ifdef QT_DEBUG
+    //mStringBuffer = "0104850001011187211mIpTe<Q:m_dj93b2zi";
+    //mStringBuffer = "0104850001011187211MAmKY;Y'KhvJ93htBY";
+    mStringBuffer = "0104850001011187211Xwde\"LOm!w!O93YrOz";
+    // mStringBuffer = "0104850001011187211amYts/>Vjuhl93wbM6";
+    // mStringBuffer = "0104850001011187211MAmKY;Y'KhvJ93htBY";
+#endif
 
-    QString code = mStringBuffer.trimmed();
-    mStringBuffer = code;
-    //Check qr exists
-    NInterface::query1("/engine/waiter/check-qr.php",
-                       mUser->mSessionKey,
-                       this,
-                       {{"action", "checkQr"}, {"qr", code}},
-                       [this](const QJsonObject &jdoc) {
+    mStringBuffer = mStringBuffer.trimmed();
+    QString hya("էթփձջւևրչճԷԹՓՁՋՒևՐՉՃ");
+    QString num("12345678901234567890");
+    QString newcode;
 
-                       });
+    for (int i = 0; i < mStringBuffer.length(); i++) {
+        if (hya.contains(mStringBuffer.at(i))) {
+            newcode += num.at(hya.indexOf(mStringBuffer.at(i)));
+        } else {
+            newcode += mStringBuffer.at(i);
+        }
+    }
+
+    mStringBuffer.clear();
+    if (newcode.isEmpty()) {
+        return;
+    }
+
+    QString emarks;
+    QString barcode;
+    if (newcode.length() >= 29) {
+        if (newcode.mid(0, 6) == "000000") {
+            barcode = newcode.mid(6, 8);
+        } else if (newcode.mid(0, 8) == "01000000") {
+            barcode = newcode.mid(8, 8);
+        } else if (newcode.mid(0, 3) == "010") {
+            barcode = newcode.mid(3, 13);
+        } else {
+            barcode = newcode.mid(1, 8);
+            if (barcode.isEmpty()) {
+                barcode = newcode.mid(1, 13);
+            }
+        }
+
+        emarks = newcode;
+
+        if (barcode.isEmpty()) {
+            C5Message::error(tr("Invalid emarks"));
+            return;
+        }
+    } else if (newcode.length() == 13 || newcode.length() == 8) {
+        barcode = newcode;
+    }
+
+    if (barcode.isEmpty()) {
+        return;
+    }
+
+    for (auto *g : *mDishes) {
+        if (g->barcodes.contains(barcode)) {
+            QJsonObject od = g->data;
+            g->data["f_emarks"] = emarks;
+            addDishToOrder(g, nullptr);
+            g->data = od;
+        }
+    }
 }
 
 void DlgOrder::createScrollButtons()
@@ -966,7 +1023,7 @@ void DlgOrder::setDishQty(std::function<double(WaiterDish)> getQty)
         return;
     }
 
-    if(!d.emarks.isEmpty()) {
+    if (!d.emarks().isEmpty()) {
         C5Message::error(tr("The quantity of dishes with remarks cannot be changed"));
         return;
     }
@@ -1084,6 +1141,19 @@ void DlgOrder::timeout()
     if (!(fTimerCounter % 60)) {
         QPointer<DlgOrder> self(this);
         auto updateAmounts = [self](const QString &bearer) {
+            if (self->mOrder.id.isEmpty()) {
+                return;
+            }
+            bool doNotCheck = true;
+            for (auto a : self->mOrder.dishes) {
+                if (a.isHourlyPayment()) {
+                    doNotCheck = false;
+                    break;
+                }
+            }
+            if (doNotCheck) {
+                return;
+            }
             NInterface::query(
                 "/engine/v2/waiter/order/update-amounts",
                 bearer,
@@ -1094,6 +1164,7 @@ void DlgOrder::timeout()
                 [self](const QJsonObject &jdoc) { self->parseOrder(jdoc); },
                 [](const QJsonObject &jerr) { return false; });
         };
+
         updateAmounts(self->mUser->mSessionKey);
     }
 }
@@ -1242,20 +1313,19 @@ void DlgOrder::on_btnVoid_clicked()
         }
     } else {
         d.state = 0;
-        fHttp->createHttpQueryLambda("/engine/v2/waiter/order/set-dish-qty", {
-            {"id", d.id},
-            {"remove_emarks", !d.emarks.isEmpty()},
-            {"dish", d.dishId},
-            {"dish_name", d.dishName},
-            {"new_qty", 0},
-            {"new_state", d.state},
-            {"data", d.data},
-            {"order_id", mOrder.id},
-            {"restore_stoplist", d.qty}
-        },
-        [this](const QJsonObject & jdoc) {
-            parseOrder(jdoc);
-        }, [](const QJsonObject & jerr) {});
+        fHttp->createHttpQueryLambda(
+            "/engine/v2/waiter/order/set-dish-qty",
+            {{"id", d.id},
+             {"remove_emarks", !d.emarks().isEmpty()},
+             {"dish", d.dishId},
+             {"dish_name", d.dishName},
+             {"new_qty", 0},
+             {"new_state", d.state},
+             {"data", d.data},
+             {"order_id", mOrder.id},
+             {"restore_stoplist", d.qty}},
+            [this](const QJsonObject &jdoc) { parseOrder(jdoc); },
+            [](const QJsonObject &jerr) {});
     }
 }
 
@@ -2634,7 +2704,7 @@ void DlgOrder::on_btnMinus1_clicked()
         fHttp->createHttpQueryLambda(
             "/engine/v2/waiter/order/set-dish-qty",
             {{"id", d.id},
-             {"remove_emarks", !d.emarks.isEmpty()},
+             {"remove_emarks", !d.emarks().isEmpty()},
              {"dish", d.dishId},
              {"dish_name", d.dishName},
              {"new_qty", newQty},

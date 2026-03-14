@@ -16,7 +16,7 @@ struct WaiterDish {
     double qty;
     double price;
     int row;
-    QString emarks;
+    QString emarks() const { return data.value("f_emarks").toString(); }
     QJsonObject data;
     QString nameLower;
     QStringList words;
@@ -60,10 +60,7 @@ struct WaiterDish {
         return data["f_remove_time"].toString();
     }
 
-    QString adgtCode()
-    {
-        return data["f_adgt_code"].toString();
-    }
+    QString adgtCode() { return data["f_adgt_code"].toString(); }
     QString translated()
     {
         return dishName;
@@ -116,7 +113,7 @@ struct WaiterDish {
         j["f_qty"] = qty;
         j["f_price"] = price;
         j["f_row"] = row;
-        j["f_emarks"] = emarks;
+        j["f_emarks"] = emarks();
         j["f_data"] = data;
         return j;
     }
@@ -138,7 +135,6 @@ struct JsonParser<WaiterDish> {
         wd.row = jo["f_row"].toInt();
         wd.qty = jo["f_qty"].toDouble();
         wd.price = jo["f_price"].toDouble();
-        wd.emarks = jo["f_emarks"].toString();
         wd.data = {};
 
         if(jo.contains("f_data") && jo["f_data"].isString()) {

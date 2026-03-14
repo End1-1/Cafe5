@@ -26,6 +26,7 @@ WaiterDishWidget::WaiterDishWidget(const WaiterDish &d, bool showRemoved, QWidge
     ui->lbTimeOfDish->installEventFilter(this);
     ui->lbTotal->installEventFilter(this);
     ui->lbComplimentary->setVisible(false);
+    ui->lbEmarks->setVisible(!d.emarks().isEmpty());
     installEventFilter(this);
 }
 
@@ -73,7 +74,7 @@ void WaiterDishWidget::updateDish(WaiterDish value)
     if(mOrderItem.state == DISH_STATE_NONE) {
         setVisible(false);
     } else {
-        ui->lbEmarks->setVisible(!mOrderItem.emarks.isEmpty());
+        ui->lbEmarks->setVisible(!mOrderItem.emarks().isEmpty());
         ui->lbComplimentary->setVisible(mOrderItem.complimentary());
         ui->lbQty1->setText(float_str(mOrderItem.qty, 2));
         ui->lbTotal->setText(float_str(mOrderItem.total(false), 2));

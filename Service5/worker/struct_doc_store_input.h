@@ -17,9 +17,16 @@ struct StoreUser
     double total() { return qty * price; }
     QString expire_date;
     QString comment;
+    int row;
     QJsonObject toJson()
     {
-        return {{"id", uuid}, {"item_id", item_id}, {"qty", qty}, {"price", price}, {"expire_date", expire_date}, {"comment", comment}};
+        return {{"id", uuid},
+                {"item_id", item_id},
+                {"qty", qty},
+                {"price", price},
+                {"expire_date", expire_date},
+                {"comment", comment},
+                {"row", row}};
     }
 };
 

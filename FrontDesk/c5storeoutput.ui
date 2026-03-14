@@ -688,7 +688,7 @@
        </widget>
       </item>
       <item row="2" column="0" colspan="6">
-       <widget class="C5CodeNameSelector" name="wInputStore">
+       <widget class="C5CodeNameSelector" name="wOutputStore">
         <property name="minimumSize">
          <size>
           <width>0</width>
@@ -702,7 +702,7 @@
          <enum>QFrame::Shadow::Plain</enum>
         </property>
         <property name="selectorName" stdset="0">
-         <string>Input store</string>
+         <string>Output store</string>
         </property>
        </widget>
       </item>
@@ -749,6 +749,11 @@
  </widget>
  <customwidgets>
   <customwidget>
+   <class>C5LineEdit</class>
+   <extends>QLineEdit</extends>
+   <header location="global">c5lineedit.h</header>
+  </customwidget>
+  <customwidget>
    <class>C5LineEditWithSelector</class>
    <extends>QLineEdit</extends>
    <header location="global">c5lineeditwithselector.h</header>
@@ -757,11 +762,6 @@
    <class>C5TableWidget</class>
    <extends>QTableWidget</extends>
    <header location="global">c5tablewidget.h</header>
-  </customwidget>
-  <customwidget>
-   <class>C5LineEdit</class>
-   <extends>QLineEdit</extends>
-   <header location="global">c5lineedit.h</header>
   </customwidget>
   <customwidget>
    <class>C5DateEdit</class>
