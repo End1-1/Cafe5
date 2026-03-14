@@ -59,10 +59,7 @@ struct WaiterDish {
     {
         return data["f_remove_time"].toString();
     }
-    bool isHourlyPayment()
-    {
-        return data["f_hourly"].toBool();
-    }
+
     QString adgtCode()
     {
         return data["f_adgt_code"].toString();
@@ -99,6 +96,8 @@ struct WaiterDish {
     {
         return data["f_discount_factor"].toDouble();
     }
+    bool isHourlyPayment() const { return data.value("f_hourly_payment").toBool(); }
+    QString hourlyRule() const { return data.value("f_hourly_rule").toString(); }
     QJsonValue dataValue(const QString &key) const
     {
         return data.value(key);

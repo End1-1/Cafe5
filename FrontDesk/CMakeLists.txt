@@ -868,7 +868,8 @@ set(APP_SOURCES
 add_executable(OfficeN ${APP_SOURCES}
     ../Service5/worker/struct_fiscal_machine.cpp ../Service5/worker/struct_fiscal_machine.h
     ../Service5/worker/struct_doc_store_input.h
-    ../Service5/worker/store_doc_status.h ../Service5/worker/store_doc_type.h)
+    ../Service5/worker/store_doc_status.h ../Service5/worker/store_doc_type.h
+    c5storeoutput.cpp c5storeoutput.h c5storeoutput.ui)
 
 set_target_properties(OfficeN PROPERTIES
     UNITY_BUILD ON

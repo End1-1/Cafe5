@@ -2,6 +2,8 @@
 #include <QDialog>
 #include "C5StoreInput.h"
 #include "c5mainwindow.h"
+#include "c5storeoutput.h"
+#include "cr5goods.h"
 #include "rabstracteditorreport.h"
 #include "ui_wdashboard.h"
 
@@ -61,16 +63,25 @@ QWidget* WDashboard::createForm(const QString &name, QIcon icon)
         return new C5StoreInput(mUser, tr("Store input"), icon);
     }
 
+    if (name == "form_newstoreoutput") {
+        return new C5StoreOutput(mUser, tr("Store output"), icon);
+    }
+
     if (name == "form_store_documents") {
         return new RAbstractEditorReport(tr("Store documents"), icon, name);
     }
 
     if (name == "form_store_moves") {
-        return new RAbstractEditorReport(tr("Store documents"), icon, name);
+        return new RAbstractEditorReport(tr("Store moves"), icon, name);
     }
 
     if (name == "form_stock") {
         return new RAbstractEditorReport(tr("Stock"), icon, name);
+    }
+
+    if (name == "form_goods") {
+        auto *a = __mainWindow->createTab<CR5Goods>();
+        return a;
     }
 
     Q_ASSERT_X(false, "check name", QString("NO WIDGET NAMED %1 ").arg(name).toLatin1());

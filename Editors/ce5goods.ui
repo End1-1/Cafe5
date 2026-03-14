@@ -20,7 +20,7 @@
       <enum>Qt::FocusPolicy::NoFocus</enum>
      </property>
      <property name="currentIndex">
-      <number>2</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="tab">
       <attribute name="title">
@@ -226,7 +226,7 @@
           <string/>
          </property>
          <property name="icon">
-          <iconset>
+          <iconset resource="../resources/res.qrc">
            <normaloff>:/new.png</normaloff>:/new.png</iconset>
          </property>
         </widget>
@@ -267,7 +267,7 @@
           <string/>
          </property>
          <property name="icon">
-          <iconset>
+          <iconset resource="../resources/res.qrc">
            <normaloff>:/pushpin.png</normaloff>:/pushpin.png</iconset>
          </property>
          <property name="checkable">
@@ -498,7 +498,7 @@
              <string/>
             </property>
             <property name="icon">
-             <iconset>
+             <iconset resource="../resources/res.qrc">
               <normaloff>:/new.png</normaloff>:/new.png</iconset>
             </property>
            </widget>
@@ -524,7 +524,7 @@
              <string/>
             </property>
             <property name="icon">
-             <iconset>
+             <iconset resource="../resources/res.qrc">
               <normaloff>:/barcode.png</normaloff>:/barcode.png</iconset>
             </property>
            </widget>
@@ -567,7 +567,7 @@
           <string/>
          </property>
          <property name="icon">
-          <iconset>
+          <iconset resource="../resources/res.qrc">
            <normaloff>:/new.png</normaloff>:/new.png</iconset>
          </property>
         </widget>
@@ -679,7 +679,7 @@
           <string/>
          </property>
          <property name="icon">
-          <iconset>
+          <iconset resource="../resources/res.qrc">
            <normaloff>:/new.png</normaloff>:/new.png</iconset>
          </property>
         </widget>
@@ -866,17 +866,28 @@
        <string>Additional</string>
       </attribute>
       <layout class="QGridLayout" name="gridLayout_4">
-       <item row="4" column="0">
-        <widget class="QLabel" name="lbLastinputprice_3">
-         <property name="text">
-          <string>Account</string>
+       <item row="11" column="2" colspan="2">
+        <widget class="QPlainTextEdit" name="plainTextEdit">
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>60</height>
+          </size>
          </property>
-        </widget>
-       </item>
-       <item row="9" column="0">
-        <widget class="QLabel" name="lbLowLevel_5">
-         <property name="text">
-          <string>Count service</string>
+         <property name="maximumSize">
+          <size>
+           <width>16777215</width>
+           <height>60</height>
+          </size>
+         </property>
+         <property name="plainText">
+          <string/>
+         </property>
+         <property name="maximumBlockCount">
+          <number>0</number>
+         </property>
+         <property name="Field" stdset="0">
+          <string>f_description</string>
          </property>
         </widget>
        </item>
@@ -902,6 +913,91 @@
          </property>
         </widget>
        </item>
+       <item row="6" column="2">
+        <widget class="QCheckBox" name="chCountDiscount">
+         <property name="text">
+          <string/>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="0" rowspan="2" colspan="2">
+        <widget class="QLabel" name="lbLowLevel_2">
+         <property name="text">
+          <string>Weight</string>
+         </property>
+        </widget>
+       </item>
+       <item row="4" column="3">
+        <spacer name="horizontalSpacer_6">
+         <property name="orientation">
+          <enum>Qt::Orientation::Horizontal</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>40</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item row="4" column="0">
+        <widget class="QLabel" name="lbLastinputprice_3">
+         <property name="text">
+          <string>Account</string>
+         </property>
+        </widget>
+       </item>
+       <item row="11" column="0" colspan="2">
+        <widget class="QLabel" name="label">
+         <property name="text">
+          <string>Description</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignmentFlag::AlignLeading|Qt::AlignmentFlag::AlignLeft|Qt::AlignmentFlag::AlignTop</set>
+         </property>
+        </widget>
+       </item>
+       <item row="12" column="2">
+        <spacer name="verticalSpacer_2">
+         <property name="orientation">
+          <enum>Qt::Orientation::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>40</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item row="6" column="0">
+        <widget class="QLabel" name="lbLowLevel_6">
+         <property name="text">
+          <string>Count discount</string>
+         </property>
+        </widget>
+       </item>
+       <item row="9" column="0">
+        <widget class="QLabel" name="lbLowLevel_5">
+         <property name="text">
+          <string>Count service</string>
+         </property>
+        </widget>
+       </item>
+       <item row="10" column="0">
+        <widget class="QLabel" name="lbLowLevel_7">
+         <property name="text">
+          <string>Hourly payment</string>
+         </property>
+        </widget>
+       </item>
+       <item row="9" column="2">
+        <widget class="QCheckBox" name="chCountService">
+         <property name="text">
+          <string/>
+         </property>
+        </widget>
+       </item>
        <item row="4" column="2">
         <widget class="C5LineEditWithSelector" name="leAcc">
          <property name="minimumSize">
@@ -924,90 +1020,30 @@
          </property>
         </widget>
        </item>
-       <item row="6" column="0">
-        <widget class="QLabel" name="lbLowLevel_6">
-         <property name="text">
-          <string>Count discount</string>
-         </property>
-        </widget>
-       </item>
-       <item row="4" column="3">
-        <spacer name="horizontalSpacer_6">
-         <property name="orientation">
-          <enum>Qt::Orientation::Horizontal</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>40</width>
-           <height>20</height>
-          </size>
-         </property>
-        </spacer>
-       </item>
-       <item row="9" column="2">
-        <widget class="QCheckBox" name="chCountService">
-         <property name="text">
-          <string/>
-         </property>
-        </widget>
-       </item>
-       <item row="11" column="2">
-        <spacer name="verticalSpacer_2">
-         <property name="orientation">
-          <enum>Qt::Orientation::Vertical</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>20</width>
-           <height>40</height>
-          </size>
-         </property>
-        </spacer>
-       </item>
-       <item row="10" column="0" colspan="2">
-        <widget class="QLabel" name="label">
-         <property name="text">
-          <string>Description</string>
-         </property>
-         <property name="alignment">
-          <set>Qt::AlignmentFlag::AlignLeading|Qt::AlignmentFlag::AlignLeft|Qt::AlignmentFlag::AlignTop</set>
-         </property>
-        </widget>
-       </item>
-       <item row="0" column="0" rowspan="2" colspan="2">
-        <widget class="QLabel" name="lbLowLevel_2">
-         <property name="text">
-          <string>Weight</string>
-         </property>
-        </widget>
-       </item>
-       <item row="10" column="2" colspan="2">
-        <widget class="QPlainTextEdit" name="plainTextEdit">
+       <item row="10" column="3">
+        <widget class="C5LineEditWithSelector" name="leHourlyRole">
          <property name="minimumSize">
           <size>
            <width>0</width>
-           <height>60</height>
+           <height>0</height>
           </size>
          </property>
          <property name="maximumSize">
           <size>
            <width>16777215</width>
-           <height>60</height>
+           <height>16777215</height>
           </size>
          </property>
-         <property name="plainText">
-          <string/>
-         </property>
-         <property name="maximumBlockCount">
-          <number>0</number>
-         </property>
          <property name="Field" stdset="0">
-          <string>f_description</string>
+          <string>f_acc</string>
+         </property>
+         <property name="Type" stdset="0">
+          <string>0</string>
          </property>
         </widget>
        </item>
-       <item row="6" column="2">
-        <widget class="QCheckBox" name="chCountDiscount">
+       <item row="10" column="2">
+        <widget class="QCheckBox" name="chHourlyPayment">
          <property name="text">
           <string/>
          </property>
@@ -1083,7 +1119,7 @@
                 <string/>
                </property>
                <property name="icon">
-                <iconset>
+                <iconset resource="../resources/res.qrc">
                  <normaloff>:/add.png</normaloff>:/add.png</iconset>
                </property>
               </widget>
@@ -1097,7 +1133,7 @@
                 <string/>
                </property>
                <property name="icon">
-                <iconset>
+                <iconset resource="../resources/res.qrc">
                  <normaloff>:/remove.png</normaloff>:/remove.png</iconset>
                </property>
               </widget>
@@ -1111,7 +1147,7 @@
                 <string/>
                </property>
                <property name="icon">
-                <iconset>
+                <iconset resource="../resources/res.qrc">
                  <normaloff>:/new.png</normaloff>:/new.png</iconset>
                </property>
               </widget>
@@ -1125,7 +1161,7 @@
                 <string/>
                </property>
                <property name="icon">
-                <iconset>
+                <iconset resource="../resources/res.qrc">
                  <normaloff>:/copy.png</normaloff>:/copy.png</iconset>
                </property>
               </widget>
@@ -1139,7 +1175,7 @@
                 <string/>
                </property>
                <property name="icon">
-                <iconset>
+                <iconset resource="../resources/res.qrc">
                  <normaloff>:/paste.png</normaloff>:/paste.png</iconset>
                </property>
               </widget>
@@ -1153,7 +1189,7 @@
                 <string/>
                </property>
                <property name="icon">
-                <iconset>
+                <iconset resource="../resources/res.qrc">
                  <normaloff>:/draft.png</normaloff>:/draft.png</iconset>
                </property>
               </widget>
@@ -1656,6 +1692,9 @@
   <tabstop>tblBarcodes</tabstop>
   <tabstop>chOnlyWholeNumber</tabstop>
  </tabstops>
- <resources/>
+ <resources>
+  <include location="../resources/res.qrc"/>
+  <include location="../resources/res.qrc"/>
+ </resources>
  <connections/>
 </ui>

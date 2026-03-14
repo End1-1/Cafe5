@@ -36,7 +36,7 @@ void RFilterDialog::buildWidget(const QString &settingsPrefix, const QJsonArray 
             auto  *ed = new C5DateEdit();
             QDate defaultDate = __c5config.getRegValue(QString("rfilter_%1_%2").arg(mSettingsPrefix, jo.value("name").toString()), QDate::currentDate()).toDate();
             ed->setDate(defaultDate);
-            ui->gl->addWidget(ed, row, 1);
+            ui->gl->addWidget(ed, row, 1, 1, 2);
             ed->setProperty("name", jo.value("name").toString());
         }
 
@@ -66,6 +66,8 @@ void RFilterDialog::buildWidget(const QString &settingsPrefix, const QJsonArray 
                 cn->selectorCallback = storeDocTypeItemSelector;
             } else if (jo.value("function").toString() == "partner") {
                 cn->selectorCallback = partnerItemSelector;
+            } else if (jo.value("function").toString() == "goods") {
+                cn->selectorCallback = goodsItemSelector;
             }
             ui->gl->addWidget(cn, row, 0, 1, 3);
         }

@@ -179,7 +179,6 @@ qt_add_executable(Waiter WIN32
     dlgreceiptlanguage.cpp
     dlgcl.cpp
     ../Classes/c5permissions.cpp
-    dlgexitwithmessage.cpp
 
 
     ../Classes/fileversion.cpp
@@ -306,7 +305,6 @@ qt_add_executable(Waiter WIN32
     dlgreceiptlanguage.h
     dlgcl.h
     ../Classes/c5permissions.h
-    dlgexitwithmessage.h
 
 
     ../Classes/fileversion.h
@@ -373,7 +371,6 @@ qt_add_executable(Waiter WIN32
     ../Classes/rkeyboard.ui
     dlgreceiptlanguage.ui
     dlgcl.ui
-    dlgexitwithmessage.ui
 
     wplast30sessions.ui
     ../../desktop.newTax/Src/printtaxn.cpp

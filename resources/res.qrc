@@ -263,5 +263,6 @@
         <file>disassembly.png</file>
         <file>sales-reports.png</file>
         <file>filter.png</file>
+        <file>grapes.png</file>
     </qresource>
 </RCC>

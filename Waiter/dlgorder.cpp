@@ -223,6 +223,31 @@ void DlgOrder::showEvent(QShowEvent *e)
         },
         [this](const QJsonObject  & jdoc) {
             parseOrder(jdoc);
+            for (int i = 0, count = ui->vlDishes->count(); i < count; i++) {
+                QLayoutItem *l = ui->vlDishes->itemAt(i);
+                WaiterDishWidget *d = dynamic_cast<WaiterDishWidget *>(l->widget());
+
+                if (d) {
+                    WaiterDish wd = d->mOrderItem;
+
+                    if (wd.state == DISH_STATE_OK && wd.isHourlyPayment()) {
+                        QPointer<DlgOrder> self(this);
+                        auto updateAmounts = [self](const QString &bearer) {
+                            NInterface::query(
+                                "/engine/v2/waiter/order/update-amounts",
+                                bearer,
+                                self,
+                                {
+                                    {"id", self->mOrder.id},
+                                },
+                                [self](const QJsonObject &jdoc) { self->parseOrder(jdoc); },
+                                [](const QJsonObject &jerr) { return false; });
+                        };
+                        updateAmounts(self->mUser->mSessionKey);
+                        break;
+                    }
+                }
+            }
         }, [this](const QJsonObject & jerr) {
             reject();
         });
@@ -374,8 +399,13 @@ void DlgOrder::confirmStringBuffer()
     QString code = mStringBuffer.trimmed();
     mStringBuffer = code;
     //Check qr exists
-    fHttp->createHttpQuery("/engine/waiter/check-qr.php", QJsonObject{{"action", "checkQr"},
-        {"qr", code}}, SLOT(checkQrResponse(QJsonObject)));
+    NInterface::query1("/engine/waiter/check-qr.php",
+                       mUser->mSessionKey,
+                       this,
+                       {{"action", "checkQr"}, {"qr", code}},
+                       [this](const QJsonObject &jdoc) {
+
+                       });
 }
 
 void DlgOrder::createScrollButtons()
@@ -745,6 +775,7 @@ void DlgOrder::printService(const QJsonObject &jdoc)
         p.br();
         p.ltext(tr("Staff"), 0);
         p.rtext(mUser->shortFullName());
+        p.br();
         p.br(p.fLineHeight + 2);
         p.line(0, p.fTop, p.fNormalWidth, p.fTop);
         p.br(2);
@@ -878,6 +909,11 @@ void DlgOrder::setDishQty(std::function<double(WaiterDish)> getQty)
 
     WaiterDish d = mOrder.dishes.at(index);
 
+    if (d.isHourlyPayment()) {
+        C5Message::error(tr("Hourly payment"));
+        return;
+    }
+
     if(d.type != GOODS_TYPE_GOODS && d.type != GOODS_TYPE_MODIFICATOR) {
         return;
     }
@@ -976,41 +1012,42 @@ void DlgOrder::addDishToOrder(DishAItem *g, QDishButton *btn)
         }, [](const QJsonObject & jerr) {
         });
     } else {
-        fHttp->createHttpQueryLambda("/engine/v2/waiter/order/add-dish", {
-            {"dish", g->id},
-            {"dish_name", g->name},
-            {"table", mTable.id},
-            {"qty", 1},
-            {"type", 1},
-            {"row", mOrder.dishes.count() * 100},
-            {"price", g->price},
-            {"count_service", g->countService()},
-            {"count_discount", g->countDiscount()},
-            {"store", g->store},
-            {"print1", g->print1},
-            {"print2", g->print2},
-            {"empty_order", mOrder.dishes.empty()},
-            {"service_factor", mHall.serviceFactor()}
-        },
-        [this, g, btn](const QJsonObject  & jdoc) {
-            if(jdoc.contains("stoplist")) {
-                for(auto *jg : *mDishes) {
-                    if(jg->id == g->id) {
-                        jg->stoplist = jdoc["stoplist"].toDouble();
+        fHttp->createHttpQueryLambda(
+            "/engine/v2/waiter/order/add-dish",
+            {{"dish", g->id},
+             {"dish_name", g->name},
+             {"table", mTable.id},
+             {"qty", 1},
+             {"type", 1},
+             {"row", mOrder.dishes.count() * 100},
+             {"price", g->price},
+             {"count_service", g->countService()},
+             {"count_discount", g->countDiscount()},
+             {"f_data", g->data},
+             {"store", g->store},
+             {"print1", g->print1},
+             {"print2", g->print2},
+             {"empty_order", mOrder.dishes.empty()},
+             {"service_factor", mHall.serviceFactor()}},
+            [this, g, btn](const QJsonObject &jdoc) {
+                if (jdoc.contains("stoplist")) {
+                    for (auto *jg : *mDishes) {
+                        if (jg->id == g->id) {
+                            jg->stoplist = jdoc["stoplist"].toDouble();
+                        }
                     }
+                } else {
+                    g->stoplist = -1;
                 }
-            } else {
-                g->stoplist = -1;
-            }
 
-            if(btn) {
-                btn->update();
-            }
+                if (btn) {
+                    btn->update();
+                }
 
-            parseOrder(jdoc);
-            scrollOrderToBottom();
-        }, [](const QJsonObject & jerr) {
-        });
+                parseOrder(jdoc);
+                scrollOrderToBottom();
+            },
+            [](const QJsonObject &jerr) {});
     }
 }
 
@@ -1044,6 +1081,21 @@ void DlgOrder::timeout()
 {
     ui->lbTime->setText(QTime::currentTime().toString(FORMAT_TIME_TO_SHORT_STR));
     fTimerCounter++;
+    if (!(fTimerCounter % 60)) {
+        QPointer<DlgOrder> self(this);
+        auto updateAmounts = [self](const QString &bearer) {
+            NInterface::query(
+                "/engine/v2/waiter/order/update-amounts",
+                bearer,
+                self,
+                {
+                    {"id", self->mOrder.id},
+                },
+                [self](const QJsonObject &jdoc) { self->parseOrder(jdoc); },
+                [](const QJsonObject &jerr) { return false; });
+        };
+        updateAmounts(self->mUser->mSessionKey);
+    }
 }
 
 void DlgOrder::handleStopList(const QJsonObject & obj)
@@ -1123,12 +1175,7 @@ void DlgOrder::on_btnVoid_clicked()
         return;
     }
 
-    if(d.isHourlyPayment()) {
-        C5Message::error(tr("Cannot add comment to hourly payment"));
-        return;
-    }
-
-    if(C5Message::question(tr("Do you want to remove this item")) != QDialog::Accepted) {
+    if (C5Message::question(tr("Do you want to remove this item")) != QDialog::Accepted) {
         return;
     }
 
@@ -2475,13 +2522,12 @@ void DlgOrder::on_btnService_clicked()
         return;
     }
 
-    auto* user = new C5User();
     QString pin;
 
     if(!DlgPassword::getPasswordString(tr("Remove printed dish"), pin)) {
         return;
     }
-
+    auto *user = new C5User();
     user->authorize(pin, self->fHttp, [self, func, user](const QJsonObject & jdoc) {
         if(user->check(cp_t5_waiter_change_service_factor)) {
             func(user);

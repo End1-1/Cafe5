@@ -170,7 +170,7 @@ void RAbstractEditorReport::on_tbl_doubleClicked(const QModelIndex &index)
         dialog = createEditorDialog("CashSessions");
     }
 
-    if (mEditorName == "form_store_documents") {
+    if (mEditorName == "form_store_documents" || mEditorName == "form_store_moves") {
         NInterface::query1("/engine/v2/common/store-move/open",
                            mUser->mSessionKey,
                            this,

@@ -118,6 +118,54 @@ CE5Goods::CE5Goods(QWidget *parent) :
     ui->rbGenEAN8->setChecked(__c5config.getRegValue("gen_ean8").toBool());
     ui->tblMenu->setVisible(mUser->fConfig["officen_mode"].toInt() != 2);
     ui->tblMenu->setColumnWidths(ui->tblMenu->columnCount(), 0, 0, 200, 100, 150, 100, 100, 50, 50);
+    if (mUser->fConfig["officen_mode"].toInt() != 2) {
+        if (ui->tblMenu->rowCount() == 0) {
+            NInterface::query1("/engine/v2/officen/menu/list", mUser->mSessionKey, this, {}, [this](const QJsonObject &jdoc) {
+                QJsonArray jmenu = jdoc["menu"].toArray();
+                QJsonArray jstorages = jdoc["storages"].toArray();
+                QJsonArray jprinters = jdoc["printers"].toArray();
+                QList<int> storageId;
+                QStringList storageName;
+                QStringList printers;
+
+                for (int i = 0; i < jstorages.size(); i++) {
+                    const QJsonObject &js = jstorages.at(i).toObject();
+                    storageId << js["f_id"].toInt();
+                    storageName << js["f_name"].toString();
+                }
+
+                for (int i = 0; i < jprinters.size(); i++) {
+                    const QJsonObject &js = jprinters.at(i).toObject();
+                    printers << js["f_name"].toString();
+                }
+
+                ui->tblMenu->setUpdatesEnabled(false);
+                ui->tblMenu->setRowCount(jmenu.count());
+
+                for (int i = 0; i < jmenu.count(); i++) {
+                    for (int c = 0; c < ui->tblMenu->columnCount(); c++) {
+                        ui->tblMenu->setItem(i, c, new QTableWidgetItem());
+                    }
+
+                    const QJsonObject &jm = jmenu.at(i).toObject();
+                    ui->tblMenu->setInteger(i, 1, jm["f_id"].toInt());
+                    ui->tblMenu->setString(i, 2, jm["f_menu_name"].toString());
+                    C5LineEdit *le = ui->tblMenu->createLineEdit(i, 3);
+                    le->setValidator(new QDoubleValidator(0, 999999999, 2));
+
+                    C5ComboBox *cb = ui->tblMenu->createComboBox(i, 4);
+                    cb->setValues(storageId, storageName);
+                    cb = ui->tblMenu->createComboBox(i, 5);
+                    cb->insertItems(0, printers);
+                    cb = ui->tblMenu->createComboBox(i, 6);
+                    cb->insertItems(0, printers);
+                    C5CheckBox *ch = ui->tblMenu->createCheckbox(i, 7);
+                    ch = ui->tblMenu->createCheckbox(i, 8);
+                }
+                ui->tblMenu->setUpdatesEnabled(true);
+            });
+        }
+    }
 }
 
 CE5Goods::~CE5Goods()
@@ -185,8 +233,9 @@ void CE5Goods::clear()
     ui->tblBarcodes->setRowCount(0);
     ui->tblGoods->clearContents();
     ui->tblGoods->setRowCount(0);
-    ui->tblMenu->clearContents();
-    ui->tblMenu->setRowCount(0);
+    for (int i = 0; i < ui->tblMenu->rowCount(); i++) {
+        ui->tblMenu->lineEdit(i, 3)->clear();
+    }
     CE5Editor::clear();
     ui->leLowLevel->setText("0");
 
@@ -245,6 +294,8 @@ QJsonObject CE5Goods::makeJsonObject()
     QJsonObject jdata;
     jdata["f_count_service"] = ui->chCountService->isChecked();
     jdata["f_count_discount"] = ui->chCountDiscount->isChecked();
+    jdata["f_hourly_payment"] = ui->chHourlyPayment->isChecked();
+    jdata["f_hourly_rule"] = ui->leHourlyRole->text();
     QJsonObject j;
     j["f_id"] = ui->leCode->getInteger();
     j["f_name"] = ui->leName->text();
@@ -550,6 +601,8 @@ void CE5Goods::openResponse(const QJsonObject &jdoc)
     QJsonObject jdata = QJsonDocument::fromJson(jdoc["goods"].toObject()["f_data"].toString().toUtf8()).object();
     ui->chCountDiscount->setChecked(jdata["f_count_discount"].toBool());
     ui->chCountService->setChecked(jdata["f_count_service"].toBool());
+    ui->chHourlyPayment->setChecked(jdata["f_hourly_payment"].toBool());
+    ui->leHourlyRole->setText(jdata["f_hourly_rule"].toString());
     ui->tblMenu->setUpdatesEnabled(true);
     fHttp->httpQueryFinished(sender());
 }

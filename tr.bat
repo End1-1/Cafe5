@@ -13,3 +13,7 @@ lupdate -noobsolete Shop\Shop.net.pro -ts Shop\Shop.ts
 lupdate -noobsolete Server5\Server5.pro -ts Server5\Server5.ts
 lupdate -noobsolete Service5\Service5.pro -ts Service5\Service5.ts
 pause
+
+
+jamket armpet service talon
+24 300

@@ -457,6 +457,11 @@ void CE5Editor::getLineEdit(QObject *parent)
     C5ComboBox *cb = nullptr;
     QPlainTextEdit *pt = nullptr;
     QObjectList ol = parent->children();
+    // fCombos.clear();
+    // fLines.clear();
+    // fChecks.clear();
+    // fDates.clear();
+    // fPlainText.clear();
 
     foreach(QObject *o, ol) {
         if(o->property("nouse").toBool()) {
@@ -464,6 +469,9 @@ void CE5Editor::getLineEdit(QObject *parent)
         }
 
         if(o->children().count() > 0) {
+            if (qobject_cast<QTableWidget *>(o)) {
+                continue;
+            }
             getLineEdit(o);
         }
 
