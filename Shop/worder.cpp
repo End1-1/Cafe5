@@ -802,6 +802,13 @@ void WOrder::setDiscount(const QString &label, const QString &value)
 void WOrder::countTotal()
 {
     double accAmount = 0;
+    for (int i = 0; i < fOGoods.count(); i++) {
+        if (fBHistory.type == CARD_TYPE_DISCOUNT) {
+            auto *ch = static_cast<C5CheckBox *>(ui->tblData->cellWidget(i, col_check_discount));
+            OGoods &og = fOGoods[i];
+            og.discountMode = ch->isChecked() ? CARD_TYPE_DISCOUNT : 0;
+        }
+    }
     fOHeader.countAmount(fOGoods, fBHistory);
     ui->leTotal->setDouble(fOHeader.amountTotal);
 
@@ -810,6 +817,7 @@ void WOrder::countTotal()
     }
 
     for (int i = 0; i < fOGoods.count(); i++) {
+        auto *ch = static_cast<C5CheckBox *>(ui->tblData->cellWidget(i, col_check_discount));
         OGoods &og = fOGoods[i];
         ui->tblData->setData(i, col_action, QVariant());
         if (og.lowLevel > 0.001) {
@@ -833,7 +841,6 @@ void WOrder::countTotal()
         ui->tblData->setData(i, col_stock, og.stock);
 
         if (fBHistory.card > 0 && fBHistory.type == CARD_TYPE_ACCUMULATIVE) {
-            auto *ch = static_cast<C5CheckBox *>(ui->tblData->cellWidget(i, col_check_discount));
             ch->setFocusPolicy(Qt::NoFocus);
 
             if (ch->isChecked()) {
@@ -957,6 +964,10 @@ void WOrder::setPartner(PartnerItem pi)
 
     ui->leCustomer->setText(parts.join(", "));
     ui->btnF5->setVisible(true);
+
+    if (mWorkStation.quickDebtPartnerId() == pi.id) {
+        ui->btnF5->setChecked(true);
+    }
 }
 
 bool WOrder::setQtyOfRow(int row, double qty)
@@ -1515,30 +1526,28 @@ void WOrder::processAccumulateCard(const QString &code)
 
 void WOrder::printFiscal(std::function<void(const QJsonObject &)> nextStep)
 {
+    // 1. Проверка: нужно ли вообще печатать фискал
     if (!fOHeader._printFiscal) {
         nextStep({});
         return;
     }
 
-    // --- 1. ПРОВЕРКИ В ГЛАВНОМ ПОТОКЕ ---
+    // 2. Валидация настроек (простой фискал)
     if (__c5config.getValue(param_simple_fiscal).toInt() == 1) {
         if (__c5config.fMainJson["tax_dept"].toString().toInt() == 0) {
-            C5Message::error(tr("Tax department is not set") + "<br>" + __c5config.fMainJson["tax_dept"].toString());
+            C5Message::error(tr("Tax department is not set"));
             return;
         }
     }
 
-    // --- 2. ПОДГОТОВКА ДАННЫХ (Deep Copy) ---
-    // Собираем всё в структуру, чтобы поток не лез в память WOrder
+    // 3. Подготовка данных (Deep Copy для потока)
     struct FiscalJobData
     {
-        QString ip, password, cashier, pin, extPos;
-        QString partnerTin;
-        int saleType, port;
+        QString ip, password, cashier, pin, extPos, partnerTin;
+        int saleType, port, taxDept;
         double amountCard, amountPrepaid, amountCash;
         bool simpleFiscal;
-        int taxDept;
-        QList<OGoods> goods; // OGoods должен иметь конструктор копирования
+        QList<OGoods> goods;
     };
 
     FiscalMachine fm = getFiscalMachine(mWorkStation.fiscalMachineId());
@@ -1556,29 +1565,26 @@ void WOrder::printFiscal(std::function<void(const QJsonObject &)> nextStep)
     job.amountCash = fOHeader.amountCash;
     job.simpleFiscal = (__c5config.getValue(param_simple_fiscal).toInt() == 1);
     job.taxDept = __c5config.fMainJson["tax_dept"].toString().toInt();
-    job.goods = fOGoods; // Копируем список товаров
+    job.goods = fOGoods;
 
-    // Блокируем UI кнопки или всё окно, чтобы не нажали дважды
+    // Блокируем интерфейс
     this->setEnabled(false);
-
     auto *loading = new NLoadingDlg(tr("Printing fiscal check"), this);
-    auto *thread = new QThread();
-    auto *pt = new PrintTaxN(job.ip, job.port, job.password, job.extPos, job.cashier, job.pin);
 
+    // Создаем поток и объект печати (БЕЗ родителя для moveToThread)
+    auto *thread = new QThread();
+    auto *pt = new PrintTaxN(job.ip, job.port, job.password, job.extPos, job.cashier, job.pin, nullptr);
     pt->moveToThread(thread);
 
-    // --- 3. ЛОГИКА В ПОТОКЕ (БЕЗ UI!) ---
-    connect(pt, &PrintTaxN::started, loading, &QDialog::show, Qt::QueuedConnection);
+    // --- ЛОГИКА В ФОНОВОМ ПОТОКЕ ---
     connect(thread, &QThread::started, pt, [=]() mutable {
-        QString jsonIn, jsonOut, err;
-        int result = 0;
         pt->fPartnerTin = job.partnerTin;
 
+        // Если это обычная продажа (не возврат и т.д.)
         if (job.saleType != -1) {
             for (const auto &g : job.goods) {
-                if (!g.emarks.isEmpty()) {
+                if (!g.emarks.isEmpty())
                     pt->fEmarks.append(g.emarks);
-                }
                 if (g.discountFactor > 0.999)
                     continue;
 
@@ -1592,83 +1598,76 @@ void WOrder::printFiscal(std::function<void(const QJsonObject &)> nextStep)
             }
 
             if (job.simpleFiscal) {
-                result = pt->makeJsonAndPrintSimple(job.taxDept, job.amountCard, 0, jsonIn, jsonOut, err);
+                pt->makeJsonAndPrintSimple(job.taxDept, job.amountCard, job.amountPrepaid);
             } else {
-                result = pt->makeJsonAndPrint(job.amountCard, job.amountPrepaid, jsonIn, jsonOut, err);
+                pt->makeJsonAndPrint(job.amountCard, job.amountPrepaid);
             }
         } else {
+            // Режим аванса или спец. продажи
             if (job.simpleFiscal) {
-                result = pt->makeJsonAndPrintSimple(job.taxDept, job.amountCard, 0, jsonIn, jsonOut, err);
+                pt->makeJsonAndPrintSimple(job.taxDept, job.amountCard, job.amountPrepaid);
             } else {
-                result = pt->printAdvanceJson(job.amountCash, job.amountCard, jsonIn, jsonOut, err);
+                pt->printAdvanceJson(job.amountCash, job.amountCard);
+            }
+        }
+        // ВАЖНО: Методы pt выше сами вызовут emit finished(...), когда закончат работу с сетью
+    });
+
+    // --- ОБРАБОТКА РЕЗУЛЬТАТА В ГЛАВНОМ ПОТОКЕ ---
+    QPointer<WOrder> self(this);
+    connect(pt, &PrintTaxN::finished, this, [=](const QString &inJson, const QString &outJson, const QString &err, int result) {
+        if (!self)
+            return;
+
+        self->setEnabled(true);
+        loading->close();
+        loading->deleteLater();
+
+        QJsonObject reply{{"f_id", QUuid::createUuid().toString(QUuid::WithoutBraces)},
+                          {"f_order", self->fOHeader.id.toString()},
+                          {"in", QJsonDocument::fromJson(inJson.toUtf8()).object()},
+                          {"out", QJsonDocument::fromJson(outJson.toUtf8()).object()},
+                          {"error", err},
+                          {"result", result}};
+
+        // Логируем попытку печати на сервер
+        NInterface::query(
+            "/engine/v2/common/fiscal/log",
+            fUser->mSessionKey,
+            self,
+            reply,
+            [](const QJsonObject &) {},
+            [](const QJsonObject &) { return true; });
+
+        // Обработка ошибок
+        if (result != 0) {
+            QString finalErr = err;
+            if (finalErr.contains("-5"))
+                finalErr = tr("Connection with fiscal machine lost");
+
+            auto res = C5Message::question(finalErr, tr("Try again"), tr("Do not print fiscal"));
+            if (res == QDialog::Accepted) {
+                thread->quit();
+                thread->wait();
+                self->printFiscal(nextStep); // Рекурсивный повтор
+                return;
             }
         }
 
-        // Вместо вызова диалогов — просто шлем сигнал финиша
-        emit pt->finished(jsonIn, jsonOut, err, result);
+        // Если всё ок, идем дальше
+        if (result == 0) {
+            nextStep(reply);
+        }
+
+        // Завершаем и очищаем поток
+        thread->quit();
     });
 
-    // --- 4. ОБРАБОТКА РЕЗУЛЬТАТА В ГЛАВНОМ ПОТОКЕ ---
-    QPointer<WOrder> self(this);
-    connect(pt,
-            &PrintTaxN::finished,
-            this,
-            [=](const QString &inJson, const QString &outJson, const QString &err, int result) {
-                if (!self)
-                    return;
-                self->setEnabled(true); // Разблокируем UI
-                loading->close();
-                loading->deleteLater();
-
-                QJsonObject reply{{"f_id", QUuid::createUuid().toString(QUuid::WithoutBraces)},
-                                  {"f_order", self->fOHeader.id.toString()},
-                                  {"in", QJsonDocument::fromJson(inJson.toUtf8()).object()},
-                                  {"out", QJsonDocument::fromJson(outJson.toUtf8()).object()},
-                                  {"error", err},
-                                  {"result", result}};
-
-                NInterface::query(
-                    "/engine/v2/common/fiscal/log",
-                    fUser->mSessionKey,
-                    self,
-                    reply,
-                    [](const QJsonObject &jdoc) {},
-                    [](const QJsonObject &jerr) { return true; });
-
-                if (result != 0) {
-                    // Вот теперь можно безопасно показывать мессаджи, мы в GUI потоке
-                    QString finalErr = err;
-                    if (finalErr.contains("-5"))
-                        finalErr = tr("Connection with fiscal machine lost");
-
-                    auto res = C5Message::question(finalErr,
-                                                   tr("Try again"),
-                                                   tr("Do not print fiscal"));
-                    if (res == QDialog::Accepted) {
-                        thread->quit();
-                        thread->wait();
-                        self->printFiscal(nextStep); // Рекурсия на повтор
-                        return;
-                    }
-                }
-
-                // Логирование и прочее
-                QJsonParseError jerr;
-                QJsonDocument jod = QJsonDocument::fromJson(outJson.toUtf8(), &jerr);
-
-                if (result == 0) {
-                    nextStep(reply);
-                } else {
-                    C5Message::error(err);
-                }
-
-                thread->quit();
-            });
-
-    // Очистка
-    connect(thread, &QThread::finished, pt, &QObject::deleteLater);
+    // Очистка ресурсов после завершения потока
     connect(thread, &QThread::finished, thread, &QObject::deleteLater);
+    connect(thread, &QThread::finished, pt, &QObject::deleteLater);
 
+    loading->show();
     thread->start();
 }
 

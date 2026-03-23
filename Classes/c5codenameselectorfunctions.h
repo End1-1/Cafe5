@@ -3,6 +3,7 @@
 #include "c5structtableview.h"
 #include "store_doc_status.h"
 #include "store_doc_type.h"
+#include "struct_goods_group.h"
 #include "struct_goods_item.h"
 #include "struct_partner.h"
 #include "struct_storage_item.h"
@@ -35,6 +36,16 @@ inline auto goodsItemSelector = [](C5CodeNameSelector *s)
     const auto r = selectItem<GoodsItem>(false, false, s->getPosition());
 
     if(r.isEmpty())
+        return;
+
+    const auto &g = r.first();
+    s->setCodeAndName(g.id, g.name);
+};
+
+inline auto goodsGroupSelector = [](C5CodeNameSelector *s) {
+    const auto r = selectItem<GoodsGroupItem>(false, false, s->getPosition());
+
+    if (r.isEmpty())
         return;
 
     const auto &g = r.first();

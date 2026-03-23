@@ -1,18 +1,19 @@
 #include "dlgreports.h"
-#include "ui_dlgreports.h"
-#include "dlgreportsfilter.h"
-#include "c5user.h"
-#include "dlgreceiptlanguage.h"
-#include "dlgorder.h"
-#include "c5message.h"
-#include "c5printing.h"
-#include "c5utils.h"
-#include "format_date.h"
-#include "ninterface.h"
+#include <QFile>
+#include <QPainter>
+#include <QPrinterInfo>
 #include <QSettings>
 #include <QStyledItemDelegate>
-#include <QPainter>
-#include <QFile>
+#include "c5message.h"
+#include "c5printing.h"
+#include "c5user.h"
+#include "c5utils.h"
+#include "dlgorder.h"
+#include "dlgreceiptlanguage.h"
+#include "dlgreportsfilter.h"
+#include "format_date.h"
+#include "ninterface.h"
+#include "ui_dlgreports.h"
 
 class GridDelegate : public QStyledItemDelegate
 {

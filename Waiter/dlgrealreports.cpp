@@ -1,17 +1,18 @@
 #include "dlgrealreports.h"
-#include "ui_dlgrealreports.h"
-#include "ninterface.h"
-#include "c5user.h"
+#include <QFile>
+#include <QListWidgetItem>
+#include <QPrinterInfo>
+#include <QScrollBar>
+#include <QShowEvent>
+#include "c5message.h"
 #include "c5printing.h"
 #include "c5printjson.h"
-#include "struct_workstationitem.h"
-#include "format_date.h"
-#include "c5message.h"
+#include "c5user.h"
 #include "dlgreportparams.h"
-#include <QListWidgetItem>
-#include <QScrollBar>
-#include <QFile>
-#include <QShowEvent>
+#include "format_date.h"
+#include "ninterface.h"
+#include "struct_workstationitem.h"
+#include "ui_dlgrealreports.h"
 
 DlgRealReports::DlgRealReports(C5User *user)
     : C5WaiterDialog(user), ui(new Ui::DlgRealReports)

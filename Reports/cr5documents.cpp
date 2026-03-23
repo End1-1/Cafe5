@@ -174,16 +174,6 @@ void CR5Documents::openDoc(QString id)
         break;
     }
 
-    case DOC_TYPE_STORE_INVENTORY: {
-        auto *si = __mainWindow->createTab<C5StoreInventory>();
-
-        if(!si->openDoc(id)) {
-            __mainWindow->removeTab(si);
-        }
-
-        break;
-    }
-
     case DOC_TYPE_CASH: {
         auto *cd = __mainWindow->createTab<C5CashDoc>();
 
@@ -435,15 +425,6 @@ void CR5Documents::removeDocs()
         case DOC_TYPE_STORE_MOVE:
         case DOC_TYPE_COMPLECTATION:
             if(C5StoreDoc::removeDoc(id, false)) {
-                fModel->removeRow(r);
-            } else {
-                return;
-            }
-
-            break;
-
-        case DOC_TYPE_STORE_INVENTORY:
-            if(C5StoreInventory::removeDoc(id)) {
                 fModel->removeRow(r);
             } else {
                 return;

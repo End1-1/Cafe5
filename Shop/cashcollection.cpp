@@ -58,16 +58,15 @@ void CashCollection::on_btnSave_clicked()
     // }
     if(ui->leAmountCoin->getDouble() > 0.001 && fCoinCashId > 0) {
         fHttp->createHttpQuery("/engine/cashdesk/create.php",
-        QJsonObject {
-            {"date", QDate::currentDate().toString(FORMAT_DATE_TO_STR_MYSQL)},
-            {"operator", mUser->id() },
-            {"cashin", fCoinCashId},
-            {"cashout", 0},
-            {"remarks", tr("Amount coin")},
-            {"amount", ui->leAmountCoin->text()},
-            {"config", C5Config::fMainJson["id"].toInt()},
-            {"daily_check", ui->leRCheck->getDouble()}
-        }, SLOT(responseOfCreate(QJsonObject)));
+                               QJsonObject{{"date", QDate::currentDate().toString(FORMAT_DATE_TO_STR_MYSQL)},
+                                           {"operator", mUser->id()},
+                                           {"cashin", fCoinCashId},
+                                           {"cashout", __c5config.cashId()},
+                                           {"remarks", tr("Amount coin")},
+                                           {"amount", ui->leAmountCoin->text()},
+                                           {"config", C5Config::fMainJson["id"].toInt()},
+                                           {"daily_check", ui->leRCheck->getDouble()}},
+                               SLOT(responseOfCreate(QJsonObject)));
     } else {
         collectCash();
     }

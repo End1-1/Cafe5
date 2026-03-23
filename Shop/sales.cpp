@@ -94,75 +94,98 @@ bool Sales::printCheckWithTax(C5Database &db, const QString &id)
     QElapsedTimer et;
     et.start();
     bool resultb = true;
-    db[":f_id"] = id;
-    db.exec("select * from o_tax where f_id=:f_id");
 
-    if(db.nextRow()) {
-        if(db.getInt("f_receiptnumber") > 0) {
+    // Проверка повторной печати
+    db[":f_id"] = id;
+    db.exec("select f_receiptnumber from o_tax where f_id=:f_id");
+    if (db.nextRow()) {
+        if (db.getInt("f_receiptnumber") > 0) {
             C5Message::error(tr("Cannot print tax twice"));
-            return resultb;
+            return true;
         }
     }
 
+    // Получаем данные заголовка
     db[":f_id"] = id;
-    db.exec("select * from o_header where f_id=:f_id");
-    db.nextRow();
+    db.exec("select f_amountcard, f_amountprepaid, f_idram, f_partner from o_header where f_id=:f_id");
+    if (!db.nextRow())
+        return false;
+
     double card = db.getDouble("f_amountcard");
     double prepaid = db.getDouble("f_amountprepaid");
     double idram = db.getDouble("f_idram");
     int partner = db.getInt("f_partner");
+
     FiscalMachine fm = getFiscalMachine(mWorkStation.fiscalMachineId());
     QString useExtPos = idram > 0.01 ? "true" : fm.externalPosString();
     QString partnerHvhh;
 
-    if(partner > 0) {
+    if (partner > 0) {
         db[":f_id"] = partner;
         db.exec("select f_taxcode from c_partners where f_id=:f_id");
-
-        if(db.nextRow()) {
+        if (db.nextRow()) {
             partnerHvhh = db.getString(0);
         }
     }
 
+    // Собираем товары
     db[":f_id"] = id;
-    db.exec("select og.f_id, og.f_goods, g.f_name, og.f_qty, gu.f_name as f_unitname, og.f_price, og.f_total,"
-            "t.f_taxdept, t.f_adgcode, "
-            "og.f_store "
+    db.exec("select og.f_id, og.f_goods, g.f_name, og.f_qty, gu.f_name as f_unitname, og.f_price, og.f_total, "
+            "t.f_taxdept, t.f_adgcode, og.f_discountfactor "
             "from o_goods og "
             "left join c_goods g on g.f_id=og.f_goods "
             "left join c_units gu on gu.f_id=g.f_unit "
             "left join c_groups t on t.f_id=g.f_group "
             "where og.f_header=:f_id");
+
     PrintTaxN pt(fm.ip, fm.port, fm.machinePassword, useExtPos, fm.opPin, fm.opPassword, 0);
     pt.fPartnerTin = partnerHvhh;
 
-    while(db.nextRow()) {
-        pt.addGoods(db.getString("f_taxdept").toInt(), //dep
-                    db.getString("f_adgcode"), //adg
-                    db.getString("f_goods"), //goods id
-                    db.getString("f_name"), //name
-                    db.getDouble("f_price"), //price
-                    db.getDouble("f_qty"), //qty
-                    db.getDouble("f_discountfactor") * 100); //discount
+    while (db.nextRow()) {
+        pt.addGoods(db.getString("f_taxdept").toInt(),
+                    db.getString("f_adgcode"),
+                    db.getString("f_goods"),
+                    db.getString("f_name"),
+                    db.getDouble("f_price"),
+                    db.getDouble("f_qty"),
+                    db.getDouble("f_discountfactor") * 100);
     }
 
-    QString jsonIn, jsonOut, err;
-    int result = 0;
-    result = pt.makeJsonAndPrint(card, prepaid, jsonIn, jsonOut, err);
+    // --- КЛЮЧЕВОЙ МОМЕНТ ДЛЯ АСИНХРОННОСТИ ---
+    QString resJsonIn, resJsonOut, resErr;
+    int resResult = -1;
+
+    QEventLoop loop;
+    // Соединяем сигнал finished с лямбдой, которая сохранит результат и выйдет из цикла
+    QObject::connect(&pt, &PrintTaxN::finished, [&](const QString &jin, const QString &jout, const QString &err, int result) {
+        resJsonIn = jin;
+        resJsonOut = jout;
+        resErr = err;
+        resResult = result;
+        loop.quit();
+    });
+
+    pt.makeJsonAndPrint(card, prepaid);
+    loop.exec(); // Замираем тут, пока не придет сигнал finished
+    // ------------------------------------------
+
     QJsonObject jtax;
     jtax["f_order"] = id;
-    jtax["f_elapsed"] = et.elapsed();
-    jtax["f_in"] = jsonIn;
-    jtax["f_out"] = jsonOut;
-    jtax["f_err"] = err;
-    jtax["f_result"] = result;
-    jtax["f_state"] = result == pt_err_ok ? 1 : 0;
-    db.exec(QString("call sf_create_shop_tax('%1')").arg(QString(QJsonDocument(jtax).toJson(QJsonDocument::Compact))));
+    jtax["f_elapsed"] = (int) et.elapsed();
+    jtax["f_in"] = QJsonDocument::fromJson(resJsonIn.toUtf8()).object();
+    jtax["f_out"] = QJsonDocument::fromJson(resJsonOut.toUtf8()).object();
+    jtax["f_err"] = resErr;
+    jtax["f_result"] = resResult;
+    jtax["f_state"] = (resResult == pt_err_ok ? 1 : 0);
 
-    if(result == pt_err_ok) {
+    QString jtaxStr = QString(QJsonDocument(jtax).toJson(QJsonDocument::Compact));
+    db.exec(QString("call sf_create_shop_tax('%1')").arg(jtaxStr.replace("'", "''")));
+
+    if (resResult == pt_err_ok) {
         C5Message::info(tr("Printed"));
     } else {
-        C5Message::error(err);
+        C5Message::error(resErr.isEmpty() ? tr("Unknown fiscal error") : resErr);
+        resultb = false;
     }
 
     return resultb;

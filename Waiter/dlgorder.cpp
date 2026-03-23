@@ -799,12 +799,15 @@ void DlgOrder::printService(const QJsonObject &jdoc)
         C5Printing p;
         QPrinterInfo pi = QPrinterInfo::printerInfo(printerName);
         QPrinter printer(pi);
-        printer.setPageSize(QPageSize::Custom);
-        printer.setFullPage(false);
-        QRectF pr = printer.pageRect(QPrinter::DevicePixel);
         constexpr qreal SAFE_RIGHT_MM = 10.0;
-        qreal safePx = SAFE_RIGHT_MM * printer.logicalDpiX() / 25.4;
-        p.setSceneParams(pr.width() - safePx, pr.height(), printer.logicalDpiX());
+        QRectF pr = printer.pageRect(QPrinter::DevicePixel);
+
+        // Вместо printer.logicalDpiX() используем жестко 96
+        qreal fixedDpi = 96.0;
+        qreal safePx = SAFE_RIGHT_MM * fixedDpi / 25.4;
+
+        // Передаем fixedDpi в параметры сцены
+        p.setSceneParams(pr.width(), pr.height(), fixedDpi);
         p.setFont(font);
         p.setFontBold(true);
 
@@ -833,7 +836,6 @@ void DlgOrder::printService(const QJsonObject &jdoc)
         p.ltext(tr("Staff"), 0);
         p.rtext(mUser->shortFullName());
         p.br();
-        p.br(p.fLineHeight + 2);
         p.line(0, p.fTop, p.fNormalWidth, p.fTop);
         p.br(2);
         QSet<QString> storages;
@@ -1978,19 +1980,22 @@ void DlgOrder::createPaymentButtons()
                 return;
             }
 
-            NInterface::query("/engine/v2/waiter/order/set_amount", self->mUser->mSessionKey, self, {
-                {"id", self->mOrder.id},
-                {"payment_field", payment_fields[pt]},
-                {"amount", self->ui->lbAmount->property("amount").toDouble()}
-            },
-            [self](const QJsonObject & jdoc) {
-                if(!self) {
-                    return;
-                }
+            NInterface::query(
+                "/engine/v2/waiter/order/set_amount",
+                self->mUser->mSessionKey,
+                self,
+                {{"id", self->mOrder.id},
+                 {"payment_field", payment_fields[pt]},
+                 {"amount", self->ui->lbAmount->property("amount").toDouble()}},
+                [self](const QJsonObject &jdoc) {
+                    if (!self) {
+                        return;
+                    }
 
-                self->on_btnNumClear_clicked();
-                self->parseOrder(jdoc);
-            }, [](const QJsonObject & jerr) {return false;});
+                    self->on_btnNumClear_clicked();
+                    self->parseOrder(jdoc);
+                },
+                [](const QJsonObject &jerr) { return false; });
         });
         ui->glPaymentType->addWidget(btn, row, col);
         col++;
@@ -2185,6 +2190,9 @@ void DlgOrder::parseOrder(const QJsonObject & jdoc)
 
         for(auto pt : payment_types) {
             if(mOrder.payment(payment_fields[pt]) > 0) {
+                if (pt == 2) {
+                    ui->btnPrintFiscal->setChecked(true);
+                }
                 auto *b = new QToolButton(self);
                 b->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
                 b->setMinimumHeight(50);
@@ -2492,12 +2500,7 @@ void DlgOrder::on_btnCloseOrder_clicked()
     if(ui->btnPrintFiscal->isChecked()) {
         auto *loading = new NLoadingDlg(tr("Printing fiscal check"), this);
         auto *thread  = new QThread();
-        auto *pt = new PrintTaxN(self->mUser->fConfig["tax_ip"].toString(),
-                                 self->mUser->fConfig["tax_port"].toString().toInt(),
-                                 self->mUser->fConfig["tax_password"].toString(),
-                                 self->mUser->fConfig["tax_external_pos"].toString(),
-                                 self->mUser->fConfig["tax_op"].toString(),
-                                 self->mUser->fConfig["tax_pin"].toString());
+        auto *pt = new PrintTaxN("192.168.100.207", 1025, "a5tW1rph", "true", "3", "3");
         pt->moveToThread(thread);
         auto order = self->mOrder;
         connect(thread, &QThread::started, pt, [ = ]() {
@@ -2515,7 +2518,9 @@ void DlgOrder::on_btnCloseOrder_clicked()
                              d.discountFactor() * 100);
             }
 
-            pt->makeJsonAndPrint(order.paidCash(), order.paidCard(), order.paidPrepaid());
+            //pt->makeJsonAndPrint(order.paidCash(), order.paidCard(), order.paidPrepaid());
+
+            pt->makeJsonAndPrintSimple(1, order.paidCard(), order.paidPrepaid());
         });
         connect(pt, &PrintTaxN::started, loading, &QDialog::show, Qt::QueuedConnection);
         connect(pt, &PrintTaxN::finished, self, [ = ](const QString & inJson, const QString & outJson, const QString & err, int result) {

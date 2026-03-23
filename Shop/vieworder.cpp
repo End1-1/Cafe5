@@ -3,6 +3,7 @@
 #include <QJsonObject>
 #include <QPrintDialog>
 #include <QPrinter>
+#include <QPrinterInfo>
 #include "c5checkbox.h"
 #include "c5config.h"
 #include "c5database.h"
@@ -356,70 +357,79 @@ void ViewOrder::on_btnPrintFiscal_clicked()
     printCheckWithTax(ui->leUUID->text(), [this](auto rseq) { ui->leTaxNumber->setText(rseq); });
 }
 
-void ViewOrder::printCheckWithTax(const QString &id,
-                                  std::function<void(const QString &)> funcSuccess)
+void ViewOrder::printCheckWithTax(const QString &id, std::function<void(const QString &)> funcSuccess)
 {
-    NInterface::query1("/engine/v2/common/fiscal/get",
-                       mUser->mSessionKey,
-                       this,
-                       {{"id", id}},
-                       [this, id, funcSuccess](const QJsonObject &jo) {
-                           if (jo.value("fiscal").toInt() > 0) {
-                               C5Message::error(tr("Cannot print tax twice"));
-                               return;
-                           }
-                           QJsonObject jheader = jo.value("header").toObject();
-                           QJsonObject jpartner = jo.value("partner").toObject();
-                           QJsonArray jgoods = jo.value("goods").toArray();
-                           double card = jheader.value("f_amountcard").toDouble();
-                           double idram = jheader.value("f_idram").toDouble();
-                           int partner = jheader.value("f_partner").toInt();
-                           FiscalMachine fm = getFiscalMachine(mWorkStation.fiscalMachineId());
-                           QString useExtPos = idram > 0.01 ? "true" : fm.externalPosString();
-                           QString partnerTIN = jpartner.value("f_taxcode").toString();
+    NInterface::query1("/engine/v2/common/fiscal/get", mUser->mSessionKey, this, {{"id", id}}, [this, id, funcSuccess](const QJsonObject &jo) {
+        if (jo.value("fiscal").toInt() > 0) {
+            C5Message::error(tr("Cannot print tax twice"));
+            return;
+        }
 
-                           PrintTaxN pt(fm.ip, fm.port, fm.machinePassword, useExtPos, fm.opPin, fm.opPassword, this);
-                           if (partnerTIN.length() == 8 && ui->btnPrintPartnerTIN->isChecked()) {
-                               pt.fPartnerTin = partnerTIN;
-                           }
+        QJsonObject jheader = jo.value("header").toObject();
+        QJsonObject jpartner = jo.value("partner").toObject();
+        QJsonArray jgoods = jo.value("goods").toArray();
+        double card = jheader.value("f_amountcard").toDouble();
+        double idram = jheader.value("f_idram").toDouble();
 
-                           for (int i = 0; i < jgoods.size(); i++) {
-                               const QJsonObject &jg = jgoods.at(i).toObject();
-                               pt.addGoods(jg.value("f_taxdept").toInt(),    // dep
-                                           jg.value("f_adgcode").toString(), // adg
-                                           jg.value("f_goods").toString(),   // goods id
-                                           jg.value("f_name").toString(),    // name
-                                           jg.value("f_price").toDouble(),   // price
-                                           jg.value("f_qty").toDouble(),     // qty
-                                           jg.value("f_discountfactor").toDouble()
-                                               * 100); // discount
-                           }
+        FiscalMachine fm = getFiscalMachine(mWorkStation.fiscalMachineId());
+        QString useExtPos = idram > 0.01 ? "true" : fm.externalPosString();
+        QString partnerTIN = jpartner.value("f_taxcode").toString();
 
-                           QString jsonIn, jsonOut, err;
-                           int result = 0;
-                           result = pt.makeJsonAndPrint(card, 0, jsonIn, jsonOut, err);
-                           QJsonObject reply{{"f_id", QUuid::createUuid().toString(QUuid::WithoutBraces)},
-                                             {"f_order", id},
-                                             {"in", QJsonDocument::fromJson(jsonIn.toUtf8()).object()},
-                                             {"out", QJsonDocument::fromJson(jsonOut.toUtf8()).object()},
-                                             {"error", err},
-                                             {"result", result}};
+        // Создаем pt в куче (new), так как функция закончится раньше, чем придет ответ от фискалки
+        // Указываем 'this' как родителя для автоматической очистки при закрытии окна
+        PrintTaxN *pt = new PrintTaxN(fm.ip, fm.port, fm.machinePassword, useExtPos, fm.opPin, fm.opPassword, this);
 
-                           NInterface::query(
-                               "/engine/v2/common/fiscal/log",
-                               mUser->mSessionKey,
-                               this,
-                               reply,
-                               [](const QJsonObject &jdoc) {},
-                               [](const QJsonObject &jerr) { return true; });
-                           if (result == pt_err_ok) {
-                               QJsonObject jtax = QJsonDocument::fromJson(jsonOut.toUtf8()).object();
-                               funcSuccess(QString::number(jtax["rseq"].toInt()));
-                               C5Message::info(tr("Printed"));
-                           } else {
-                               C5Message::error(err);
-                           }
-                       });
+        if (partnerTIN.length() == 8 && ui->btnPrintPartnerTIN->isChecked()) {
+            pt->fPartnerTin = partnerTIN;
+        }
+
+        for (int i = 0; i < jgoods.size(); i++) {
+            const QJsonObject &jg = jgoods.at(i).toObject();
+            pt->addGoods(jg.value("f_taxdept").toInt(),
+                         jg.value("f_adgcode").toString(),
+                         jg.value("f_goods").toString(),
+                         jg.value("f_name").toString(),
+                         jg.value("f_price").toDouble(),
+                         jg.value("f_qty").toDouble(),
+                         jg.value("f_discountfactor").toDouble() * 100);
+        }
+
+        // Подписываемся на результат
+        connect(pt,
+                &PrintTaxN::finished,
+                this,
+                [this, id, funcSuccess, pt](const QString &jsonIn, const QString &jsonOut, const QString &err, int result) {
+                    QJsonObject reply{{"f_id", QUuid::createUuid().toString(QUuid::WithoutBraces)},
+                                      {"f_order", id},
+                                      {"in", QJsonDocument::fromJson(jsonIn.toUtf8()).object()},
+                                      {"out", QJsonDocument::fromJson(jsonOut.toUtf8()).object()},
+                                      {"error", err},
+                                      {"result", result}};
+
+                    // Логируем результат на сервер
+                    NInterface::query(
+                        "/engine/v2/common/fiscal/log",
+                        mUser->mSessionKey,
+                        this,
+                        reply,
+                        [](const QJsonObject &) {},
+                        [](const QJsonObject &) { return true; });
+
+                    if (result == pt_err_ok) {
+                        QJsonObject joutObj = QJsonDocument::fromJson(jsonOut.toUtf8()).object();
+                        funcSuccess(QString::number(joutObj["rseq"].toInt()));
+                        C5Message::info(tr("Printed"));
+                    } else {
+                        C5Message::error(err.isEmpty() ? tr("Fiscal error") : err);
+                    }
+
+                    // Удаляем объект pt после завершения работы
+                    pt->deleteLater();
+                });
+
+        // Запускаем печать
+        pt->makeJsonAndPrint(card, 0);
+    });
 }
 
 void ViewOrder::on_btnPrintReceiptA4_clicked()

@@ -54,6 +54,7 @@ struct WorkstationItem : public ParentItem {
         return data.value("f_showall").toBool();
     }
     const int fiscalMachineId() const { return data.value("f_fiscal_machine_id").toInt(); }
+    const int quickDebtPartnerId() const { return data.value("f_quick_debt_partner_id").toInt(); }
 };
 
 template<>

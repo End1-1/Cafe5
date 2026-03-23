@@ -116,7 +116,7 @@ set(APP_SOURCES
     ../Forms/c5storebarcodelist.ui
     ../Forms/c5storedoc.ui
     ../Forms/c5storedocselectprinttemplate.ui
-    ../Forms/c5storeinventory.ui
+    c5storeinventory.ui
     ../Forms/c5toolbarwidget.ui
     ../Forms/c5translatorform.ui
     ../Forms/c5waiterorder.ui
@@ -328,7 +328,7 @@ set(APP_SOURCES
     ../Forms/c5storebarcodelist.h
     ../Forms/c5storedoc.h
     ../Forms/c5storedocselectprinttemplate.h
-    ../Forms/c5storeinventory.h
+    c5storeinventory.h
     ../Forms/c5tablewidgetwithselector.h
     ../Forms/c5toolbarwidget.h
     ../Forms/c5translatorform.h
@@ -475,7 +475,7 @@ set(APP_SOURCES
     ../Reports/cr5menunames.h
     ../Classes/c5datedelegate.h
     ../Reports/cr5documentsfilter.h
-    ../Reports/cr5consumptionbysales.h
+
     ../Reports/cr5consumptionbysalesfilter.h
     ../Editors/ce5partner.h
     ../Editors/c5editor.h
@@ -647,7 +647,7 @@ set(APP_SOURCES
     ../Forms/c5storebarcodelist.cpp
     ../Forms/c5storedoc.cpp
     ../Forms/c5storedocselectprinttemplate.cpp
-    ../Forms/c5storeinventory.cpp
+    c5storeinventory.cpp
     ../Forms/c5tablewidgetwithselector.cpp
     ../Forms/c5toolbarwidget.cpp
     ../Forms/c5translatorform.cpp
@@ -798,7 +798,7 @@ set(APP_SOURCES
     ../Reports/cr5menunames.cpp
     ../Classes/c5datedelegate.cpp
     ../Reports/cr5documentsfilter.cpp
-    ../Reports/cr5consumptionbysales.cpp
+
     ../Reports/cr5consumptionbysalesfilter.cpp
     ../Editors/ce5partner.cpp
     ../Editors/c5editor.cpp
@@ -869,7 +869,9 @@ add_executable(OfficeN ${APP_SOURCES}
     ../Service5/worker/struct_fiscal_machine.cpp ../Service5/worker/struct_fiscal_machine.h
     ../Service5/worker/struct_doc_store_input.h
     ../Service5/worker/store_doc_status.h ../Service5/worker/store_doc_type.h
-    c5storeoutput.cpp c5storeoutput.h c5storeoutput.ui)
+    c5storeoutput.cpp c5storeoutput.h c5storeoutput.ui
+    office_structs.h
+    ../Service5/worker/store_inventory_document.h)
 
 set_target_properties(OfficeN PROPERTIES
     UNITY_BUILD ON

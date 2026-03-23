@@ -519,55 +519,56 @@ void C5SaleDoc::fiscale()
     //    d->exec();
     //    d->deleteLater();
     //    return;
-    QElapsedTimer t;
-    t.start();
-    C5Database db;
-    db[":f_header"] = ui->leUuid->text();
-    db.exec("select gr.f_adgcode, og.f_goods, gn.f_name, og.f_price, og.f_qty, og.f_discountfactor*100 as f_discount "
-            "from o_goods og "
-            "left join c_goods gn on gn.f_id=og.f_goods "
-            "left join c_groups gr on gr.f_id=gn.f_group "
-            "where og.f_header=:f_header");
+
+    auto *db = new C5Database();
+    (*db)[":f_header"] = ui->leUuid->text();
+    db->exec("select gr.f_adgcode, og.f_goods, gn.f_name, og.f_price, og.f_qty, og.f_discountfactor*100 as f_discount "
+             "from o_goods og "
+             "left join c_goods gn on gn.f_id=og.f_goods "
+             "left join c_groups gr on gr.f_id=gn.f_group "
+             "where og.f_header=:f_header");
 
     C5Message::error(tr("Config fiscal machine select not implemented"));
     FiscalMachine fm = getFiscalMachine(0);
-    PrintTaxN pt(fm.ip, fm.port, fm.machinePassword, fm.externalPosString(), fm.opPin, fm.opPassword, this);
+    auto *pt = new PrintTaxN(fm.ip, fm.port, fm.machinePassword, fm.externalPosString(), fm.opPin, fm.opPassword, this);
 
-    while(db.nextRow()) {
-        pt.addGoods(1, //dep
-                    db.getString("f_adgcode"), //adg
-                    QString::number(db.getInt("f_goods")), //goods id
-                    db.getString("f_name"), //name
-                    db.getDouble("f_price"), //price
-                    db.getDouble("f_qty"), //qty
-                    db.getDouble("f_discount")); //discount
+    while (db->nextRow()) {
+        pt->addGoods(1,                                      //dep
+                     db->getString("f_adgcode"),             //adg
+                     QString::number(db->getInt("f_goods")), //goods id
+                     db->getString("f_name"),                //name
+                     db->getDouble("f_price"),               //price
+                     db->getDouble("f_qty"),                 //qty
+                     db->getDouble("f_discount"));           //discount
     }
 
     QString jsonIn, jsonOut, err;
     QString sn, firm, address, fiscal, hvhh, rseq, devnum, time;
     int result = 0;
-    pt.fEmarks = fEmarks;
-    result = pt.makeJsonAndPrint(ui->leCard->getDouble()
-                                 + ui->leDebt->getDouble()
-                                 + ui->leBankTransfer->getDouble(), 0, jsonIn, jsonOut, err);
-    QJsonObject jtax;
-    jtax["f_order"] = ui->leUuid->text();
-    jtax["f_elapsed"] = t.elapsed();
-    jtax["f_in"] = QJsonDocument::fromJson(jsonIn.toUtf8()).object();
-    jtax["f_out"] = QJsonDocument::fromJson(jsonOut.toUtf8()).object();;
-    jtax["f_err"] = err;
-    jtax["f_result"] = result;
-    jtax["f_state"] = result == pt_err_ok ? 1 : 0;
-    QString jtaxStr = QString(QJsonDocument(jtax).toJson(QJsonDocument::Compact));
-    jtaxStr = jtaxStr.replace("\'", "\\\'");
-    db.exec(QString("call sf_create_shop_tax('%1')")
-            .arg(jtaxStr));
+    pt->fEmarks = fEmarks;
+    pt->makeJsonAndPrint(ui->leCard->getDouble() + ui->leDebt->getDouble() + ui->leBankTransfer->getDouble(), 0);
+    connect(pt, &PrintTaxN::finished, this, [this, db](const QString &jsonIn, const QString &jsonOut, const QString &err, int result) {
+        QJsonObject jtax;
+        jtax["f_order"] = ui->leUuid->text();
+        jtax["f_elapsed"] = -1;
+        jtax["f_in"] = QJsonDocument::fromJson(jsonIn.toUtf8()).object();
+        jtax["f_out"] = QJsonDocument::fromJson(jsonOut.toUtf8()).object();
+        ;
+        jtax["f_err"] = err;
+        jtax["f_result"] = result;
+        jtax["f_state"] = result == pt_err_ok ? 1 : 0;
+        QString jtaxStr = QString(QJsonDocument(jtax).toJson(QJsonDocument::Compact));
+        jtaxStr = jtaxStr.replace("\'", "\\\'");
+        db->exec(QString("call sf_create_shop_tax('%1')").arg(jtaxStr));
 
-    if(result != pt_err_ok) {
-        C5Message::error(err);;
-    } else {
-        getFiscalNum();
-    }
+        if (result != pt_err_ok) {
+            C5Message::error(err);
+        } else {
+            getFiscalNum();
+        }
+        db->deleteLater();
+        sender()->deleteLater();
+    });
 }
 
 void C5SaleDoc::cancelFiscal()

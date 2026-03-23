@@ -62,9 +62,8 @@ void CR5MaterialsInStore::prepareDrafts()
                     << "inner join c_groups gg on gg.f_id=g.f_group [gg]"
                     << "left join c_goods g on g.f_id=s.f_goods [g]"
                     << "LEFT JOin c_goods_prices gpr on gpr.f_goods=g.f_id [gpr]"
-                    << "left join c_partners p on p.f_id=h.f_partner [p]"
-                    << "left join a_store_valid v on v.f_id=s.f_id [v]"
-                    ;
+                    << "left join c_partners p on p.f_id=g.f_supplier [p]"
+                    << "left join a_store_valid v on v.f_id=s.f_id [v]";
     fColumnsFields << "g.f_id as f_code"
                    << "ss.f_name as f_storage"
                    << "gg.f_name as f_group"

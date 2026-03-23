@@ -2,6 +2,7 @@
 #include <QDialog>
 #include "C5StoreInput.h"
 #include "c5mainwindow.h"
+#include "c5storeinventory.h"
 #include "c5storeoutput.h"
 #include "cr5goods.h"
 #include "rabstracteditorreport.h"
@@ -79,9 +80,35 @@ QWidget* WDashboard::createForm(const QString &name, QIcon icon)
         return new RAbstractEditorReport(tr("Stock"), icon, name);
     }
 
+    if (name == "form_inventory") {
+        auto *a = new C5StoreInventory(mUser, tr("Store inventory"), icon);
+        return a;
+    }
+
     if (name == "form_goods") {
         auto *a = __mainWindow->createTab<CR5Goods>();
         return a;
+    }
+
+    if (name == "form_inventory") {
+        auto *a = __mainWindow->createTab<CR5Goods>();
+        return a;
+    }
+
+    if (name == "form_inventory_documents") {
+        return new RAbstractEditorReport(tr("Inventory"), icon, name);
+    }
+
+    if (name == "form_inventory_documents") {
+        return new RAbstractEditorReport(tr("Inventory"), icon, name);
+    }
+
+    if (name == "form_sold_items") {
+        return new RAbstractEditorReport(tr("Sold items"), icon, name);
+    }
+
+    if (name == "form_consumed_goods") {
+        return new RAbstractEditorReport(tr("Consumed goods"), icon, name);
     }
 
     Q_ASSERT_X(false, "check name", QString("NO WIDGET NAMED %1 ").arg(name).toLatin1());

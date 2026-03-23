@@ -1,0 +1,197 @@
+/* Office — airy cool theme (FrontDesk) */
+* {
+    font-size: %font-size%px;
+    font-family: %font-family%;
+}
+
+/* ─── Dashboard (WDashboard) ─── */
+#WDashboard {
+    background: qlineargradient(x1:0, y1:0, x2:1, y2:1,
+            stop:0 #eef3f9, stop:0.45 #e8eef6, stop:1 #e2eaf4);
+}
+
+QFrame#frame,
+QFrame#frame_3,
+QFrame#frame_4,
+QFrame#frame_5 {
+    background-color: rgba(255, 255, 255, 0.92);
+    border: 1px solid rgba(255, 255, 255, 0.98);
+    border-radius: 0px;
+}
+
+QFrame#frame QLabel,
+QFrame#frame_3 QLabel,
+QFrame#frame_4 QLabel,
+QFrame#frame_5 QLabel {
+    color: #1e2a3a;
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+}
+
+#WDashboard QCommandLinkButton {
+    background-color: rgba(255, 255, 255, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.75);
+    border-radius: 0px;
+    padding: 14px 20px;
+    color: #1a2533;
+    font-size: 14px;
+    text-align: left;
+}
+
+#WDashboard QCommandLinkButton:hover {
+    background-color: rgba(255, 255, 255, 0.98);
+    border: 1px solid rgba(99, 132, 232, 0.35);
+}
+
+#WDashboard QCommandLinkButton:pressed {
+    background-color: rgba(232, 240, 255, 0.95);
+    border: 1px solid rgba(99, 132, 232, 0.5);
+}
+
+/* ─── Shell / menu ─── */
+QGroupBox#grMenu {
+    border: none;
+}
+
+QPushButton[menu="1"] {
+    border-top: 1px solid #d0dae6;
+    padding: 8px 10px;
+    background-color: transparent;
+    color: #1e2a3a;
+}
+
+QPushButton[menu="1"]:hover {
+    background-color: rgba(99, 132, 232, 0.08);
+}
+
+QPushButton[menu="2"] {
+    border: none;
+    padding: 8px 10px;
+    background-color: transparent;
+    color: #1e2a3a;
+}
+
+QPushButton[menu="2"]:hover {
+    background-color: rgba(99, 132, 232, 0.06);
+}
+
+QPushButton#btnChangeDB {
+    border: none;
+    padding: 6px;
+    color: #2c3d52;
+}
+
+QPushButton#btnChangeDB:hover {
+    color: #6384e8;
+}
+
+QCheckBox {
+    border-radius: 0px;
+}
+
+QListWidget[menu="1"] {
+    border-top: 1px solid #d0dae6;
+    background-color: #f7f9fc;
+    outline: none;
+}
+
+QListWidget[menu="1"]::item {
+    padding: 6px 8px;
+    border-radius: 0px;
+}
+
+QListWidget[menu="1"]::item:selected {
+    background-color: rgba(99, 132, 232, 0.18);
+    color: #1a2533;
+}
+
+QListWidget[menu="1"]::item:hover: !selected {
+    background-color: rgba(99, 132, 232, 0.08);
+}
+
+/* ─── Tables ─── */
+C5TableView#tblView {
+    border: none;
+    background-color: #fafcfe;
+    gridline-color: #e2eaf4;
+}
+
+C5TableWidget#tblTotal {
+    border-top: 1px solid #d0dae6;
+    background-color: #f4f7fb;
+}
+
+/* ─── Inputs (aligned with dashboard accent) ─── */
+QLineEdit {
+    border: 1px solid #c5d0dc;
+    border-radius: 0px;
+    padding: 4px 10px;
+    background-color: #fafcfe;
+    color: #1a2533;
+    selection-background-color: rgba(99, 132, 232, 0.35);
+}
+
+QLineEdit:focus {
+    border: 1px solid #6384e8;
+    background-color: #ffffff;
+    outline: none;
+}
+
+QLineEdit:disabled {
+    background-color: #eceff4;
+    color: #8a96a8;
+    border: 1px solid #dde4ec;
+}
+
+QComboBox {
+    border: 1px solid #c5d0dc;
+    border-radius: 0px;
+    padding: 4px 10px;
+    padding-right: 28px;
+    background-color: #fafcfe;
+    color: #1a2533;
+    min-height: 22px;
+}
+
+QComboBox:focus {
+    border: 1px solid #6384e8;
+    background-color: #ffffff;
+    outline: none;
+}
+
+QComboBox:disabled {
+    background-color: #eceff4;
+    color: #8a96a8;
+    border: 1px solid #dde4ec;
+}
+
+QComboBox::drop-down {
+    subcontrol-origin: padding;
+    subcontrol-position: top right;
+    width: 28px;
+    border-left: 1px solid #d0dae6;
+    border-top-right-radius: 0px;
+    border-bottom-right-radius: 0px;
+    background-color: #eef2f8;
+}
+
+QComboBox::drop-down:hover {
+    background-color: #e2eaf4;
+}
+
+QComboBox::down-arrow {
+    image: url(":/drop-down.png");
+    width: 12px;
+    height: 12px;
+}
+
+QComboBox QAbstractItemView {
+    border: 1px solid #d0dae6;
+    border-radius: 0px;
+    background-color: #ffffff;
+    selection-background-color: rgba(99, 132, 232, 0.22);
+    selection-color: #1a2533;
+    outline: none;
+    padding: 4px;
+}

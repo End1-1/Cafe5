@@ -1,15 +1,18 @@
 #include "ce5editor.h"
-#include "c5lineeditwithselector.h"
-#include "c5checkbox.h"
-#include "c5dateedit.h"
-#include "c5cache.h"
-#include "c5combobox.h"
-#include "c5selector.h"
-#include "c5message.h"
-#include "c5database.h"
-#include <QValidator>
-#include <QPushButton>
 #include <QPlainTextEdit>
+#include <QPushButton>
+#include <QTableWidget>
+#include <QValidator>
+#include "c5cache.h"
+#include "c5checkbox.h"
+#include "c5combobox.h"
+#include "c5database.h"
+#include "c5dateedit.h"
+#include "c5lineeditwithselector.h"
+#include "c5mainwindow.h"
+#include "c5message.h"
+#include "c5selector.h"
+#include "c5user.h"
 
 CE5Editor::CE5Editor(QWidget *parent) :
     C5OfficeWidget(parent)
@@ -165,6 +168,15 @@ QString CE5Editor::dbError(QString err)
 
 bool CE5Editor::save(QString &err, QList<QMap<QString, QVariant> >& data)
 {
+    QString v2Path = savePathV2();
+    if (!v2Path.isEmpty()) {
+        NInterface::query1("/engine/v2/common/" + v2Path + "/save",
+                           __mainWindow->mUser->mSessionKey,
+                           this,
+                           toJson(),
+                           [this](const QJsonObject &jo) { emit Accept(); });
+        return false;
+    }
     C5Database db;
     C5LineEditWithSelector *leId = findLineEditWithId();
 
@@ -577,4 +589,74 @@ QJsonObject CE5Editor::makeJsonObject()
 bool CE5Editor::acceptOnSave() const
 {
     return false;
+}
+
+QString CE5Editor::savePathV2() const
+{
+    return "";
+}
+
+QJsonObject CE5Editor::toJson() const
+{
+    QJsonObject res;
+    const QList<QWidget *> widgets = this->findChildren<QWidget *>();
+
+    for (QWidget *w : widgets) {
+        QString key;
+        // Проверяем все динамические свойства виджета
+        const auto props = w->dynamicPropertyNames();
+        for (const QByteArray &p : props) {
+            if (p.toLower() == "field") {
+                key = w->property(p).toString();
+                break;
+            }
+        }
+
+        if (key.isEmpty()) {
+            continue;
+        }
+
+        // Вытаскиваем остальные свойства (тоже желательно с проверкой регистра)
+        auto getProp = [&](const char *name) -> QVariant {
+            for (const QByteArray &p : props) {
+                if (p.toLower() == name)
+                    return w->property(p);
+            }
+            return QVariant();
+        };
+
+        QString type = getProp("type").toString().toLower();
+        bool zeroNull = getProp("zeronull").toBool();
+        QJsonValue val = QJsonValue::Null;
+
+        // Дальше твоя логика по типам виджетов...
+        if (QLineEdit *le = qobject_cast<QLineEdit *>(w)) {
+            if (type == "int") {
+                int v = le->text().toInt();
+                val = (zeroNull && v == 0) ? QJsonValue::Null : QJsonValue(v);
+            } else if (type == "double") {
+                val = le->text().toDouble();
+            } else {
+                val = le->text();
+            }
+        } else if (C5DateEdit *de = qobject_cast<C5DateEdit *>(w)) {
+            val = de->date().toString("yyyy-MM-dd");
+        } else if (QCheckBox *cb = qobject_cast<QCheckBox *>(w)) {
+            val = cb->isChecked() ? 1 : 0;
+        } else if (QComboBox *cmb = qobject_cast<QComboBox *>(w)) {
+            QVariant data = cmb->currentData();
+            if (type == "int") {
+                int v = data.toInt();
+                val = (zeroNull && v == 0) ? QJsonValue::Null : QJsonValue(v);
+            } else if (type == "double") {
+                val = data.toDouble();
+            } else {
+                val = data.toString();
+            }
+        }
+
+        res.insert(key, val);
+    }
+
+    return res;
 }

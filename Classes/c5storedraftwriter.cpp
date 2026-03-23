@@ -1286,32 +1286,6 @@ bool C5StoreDraftWriter::writeACalcPrice(const QString &id, const QString &docId
     return returnResult(fDb.insert("a_calc_price", false));
 }
 
-bool C5StoreDraftWriter::writeAStoreInventory(QString &id, const QString &docId, int store, int goods, double qty,
-        double price, double total)
-{
-    fDb[":f_id"] = id;
-    fDb.exec("select * from a_store_inventory where f_id=:f_id");
-    bool u = fDb.nextRow();
-
-    if(!u) {
-        id = fDb.uuid();
-    }
-
-    fDb[":f_id"] = id;
-    fDb[":f_document"] = docId;
-    fDb[":f_store"] = store;
-    fDb[":f_goods"] = goods;
-    fDb[":f_qty"] = qty;
-    fDb[":f_price"] = price;
-    fDb[":f_total"] = total;
-
-    if(u) {
-        return returnResult(fDb.update("a_store_inventory", "f_id", id));
-    } else {
-        return returnResult(fDb.insert("a_store_inventory", true));
-    }
-}
-
 bool C5StoreDraftWriter::writeAStoreDishWaste(QString &id, const QString &docId, int dish, double qty,
         const QString &data)
 {

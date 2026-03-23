@@ -25,13 +25,13 @@ public:
 
     virtual bool save(QString &err, QList<QMap<QString, QVariant> > &data) override;
 
-    virtual void clear() override;
-
     virtual bool checkData(QString &err) override;
 
     virtual bool canCopy() override;
 
     virtual void copyObject() override;
+
+    virtual QString savePathV2() const override;
 
 private slots:
     void on_btnClearManager_clicked();

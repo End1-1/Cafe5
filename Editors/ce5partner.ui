@@ -91,6 +91,9 @@
          <property name="Manual" stdset="0">
           <bool>true</bool>
          </property>
+         <property name="type" stdset="0">
+          <string>int</string>
+         </property>
         </widget>
        </item>
        <item row="13" column="0">
@@ -137,6 +140,9 @@
          </property>
          <property name="default" stdset="0">
           <number>1</number>
+         </property>
+         <property name="type" stdset="0">
+          <string>int</string>
          </property>
         </widget>
        </item>
@@ -205,6 +211,9 @@
          <property name="Type" stdset="0">
           <string>2</string>
          </property>
+         <property name="type" stdset="0">
+          <string>double</string>
+         </property>
         </widget>
        </item>
        <item row="9" column="0">
@@ -242,6 +251,9 @@
          <property name="default" stdset="0">
           <number>1</number>
          </property>
+         <property name="type" stdset="0">
+          <string>int</string>
+         </property>
         </widget>
        </item>
        <item row="1" column="1">
@@ -257,6 +269,9 @@
          </property>
          <property name="default" stdset="0">
           <number>1</number>
+         </property>
+         <property name="type" stdset="0">
+          <string>int</string>
          </property>
         </widget>
        </item>
@@ -302,6 +317,9 @@
          <property name="Check" stdset="0">
           <string>empty=Type of sale</string>
          </property>
+         <property name="type" stdset="0">
+          <string>int</string>
+         </property>
         </widget>
        </item>
        <item row="7" column="1">
@@ -342,6 +360,9 @@
          <property name="default" stdset="0">
           <number>1</number>
          </property>
+         <property name="type" stdset="0">
+          <string>int</string>
+         </property>
         </widget>
        </item>
        <item row="11" column="0">
@@ -364,38 +385,6 @@
        </item>
       </layout>
      </widget>
-     <widget class="QWidget" name="tab_2">
-      <attribute name="title">
-       <string>ArmSoft</string>
-      </attribute>
-      <layout class="QHBoxLayout" name="horizontalLayout">
-       <item>
-        <widget class="C5TableWidget" name="tblAs">
-         <property name="editTriggers">
-          <set>QAbstractItemView::EditTrigger::NoEditTriggers</set>
-         </property>
-         <property name="selectionMode">
-          <enum>QAbstractItemView::SelectionMode::NoSelection</enum>
-         </property>
-         <column>
-          <property name="text">
-           <string>ID</string>
-          </property>
-         </column>
-         <column>
-          <property name="text">
-           <string>Database</string>
-          </property>
-         </column>
-         <column>
-          <property name="text">
-           <string>Code</string>
-          </property>
-         </column>
-        </widget>
-       </item>
-      </layout>
-     </widget>
     </widget>
    </item>
   </layout>
@@ -405,11 +394,6 @@
    <class>C5LineEditWithSelector</class>
    <extends>QLineEdit</extends>
    <header location="global">c5lineeditwithselector.h</header>
-  </customwidget>
-  <customwidget>
-   <class>C5TableWidget</class>
-   <extends>QTableWidget</extends>
-   <header location="global">c5tablewidget.h</header>
   </customwidget>
   <customwidget>
    <class>C5ComboBox</class>
@@ -436,7 +420,6 @@
   <tabstop>cbManager</tabstop>
   <tabstop>btnClearManager</tabstop>
   <tabstop>tabWidget</tabstop>
-  <tabstop>tblAs</tabstop>
  </tabstops>
  <resources>
   <include location="../resources/res.qrc"/>

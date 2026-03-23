@@ -1,4 +1,5 @@
 #include "rfilterdialog.h"
+#include <QComboBox>
 #include <QIntValidator>
 #include <QJsonObject>
 #include <QLabel>
@@ -68,8 +69,26 @@ void RFilterDialog::buildWidget(const QString &settingsPrefix, const QJsonArray 
                 cn->selectorCallback = partnerItemSelector;
             } else if (jo.value("function").toString() == "goods") {
                 cn->selectorCallback = goodsItemSelector;
+            } else if (jo.value("function").toString() == "goods_group") {
+                cn->selectorCallback = goodsGroupSelector;
             }
             ui->gl->addWidget(cn, row, 0, 1, 3);
+        }
+
+        if (jo.value("type").toString() == "combobox") {
+            QJsonArray jv = jo.value("values").toArray();
+            ui->gl->addWidget(new QLabel(jo.value("label").toString()), row, 0);
+            auto *cb = new QComboBox();
+            cb->setProperty("name", jo.value("name").toString());
+
+            for (int ji = 0; ji < jv.size(); ji++) {
+                const QJsonObject &jvv = jv.at(ji).toObject();
+                cb->addItem(jvv.value("label").toString(), jvv.value("value").toInt());
+            }
+
+            cb->setCurrentIndex(cb->findData(jo.value("default").toInt()));
+
+            ui->gl->addWidget(cb, row, 1);
         }
 
         row++;
@@ -113,6 +132,12 @@ QJsonArray RFilterDialog::filterValues()
             if (kv) {
                 addparam(w->property("name").toString(), kv->value());
                 __c5config.setRegValue(QString("rfilter_%1_%2").arg(mSettingsPrefix, w->property("name").toString()), kv->value());
+                continue;
+            }
+
+            auto *cb = qobject_cast<QComboBox *>(w);
+            if (cb) {
+                addparam(w->property("name").toString(), cb->currentData().toInt());
                 continue;
             }
         }

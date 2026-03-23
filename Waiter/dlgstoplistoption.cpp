@@ -1,14 +1,14 @@
 #include "dlgstoplistoption.h"
-#include "ui_dlgstoplistoption.h"
-#include "dlgorder.h"
-#include "c5tabledata.h"
+#include <QPrinterInfo>
 #include "c5message.h"
 #include "c5printing.h"
-#include "ninterface.h"
+#include "c5tabledata.h"
 #include "c5user.h"
 #include "c5utils.h"
-#include "c5user.h"
+#include "dlgorder.h"
 #include "format_date.h"
+#include "ninterface.h"
+#include "ui_dlgstoplistoption.h"
 
 DlgStopListOption::DlgStopListOption(DlgOrder *o, C5User *u) :
     C5Dialog(u),

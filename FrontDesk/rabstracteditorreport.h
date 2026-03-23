@@ -49,5 +49,9 @@ private:
 
     void applyFilter();
 
+    void removeAction();
+
+    void exportToExcel();
+
     RAbstractEditorDialog* createEditorDialog(const QString &editorName);
 };

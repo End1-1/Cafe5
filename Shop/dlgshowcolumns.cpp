@@ -47,6 +47,7 @@ void DlgShowColumns::on_chDiscount_clicked(bool checked)
     s.setValue("col" + QString::number(col_discamount), checked);
     s.setValue("col" + QString::number(col_discmode), checked);
     s.setValue("col" + QString::number(col_discvalue), checked);
+    s.setValue("col" + QString::number(col_check_discount), checked);
 }
 
 void DlgShowColumns::on_chEmarks_clicked(bool checked)

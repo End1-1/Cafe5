@@ -15,8 +15,8 @@ OHeader::OHeader()
     dateClose = QDate::currentDate();
     dateCash = QDate::currentDate();
     cashier = 0;
-    staff = 0,
-        comment = "";
+    staff = 0;
+    comment = "";
     print = 0;
     amountTotal = 0;
     amountCash = 0;

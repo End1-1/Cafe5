@@ -1,104 +1,102 @@
 #include "c5mainwindow.h"
-#include "ui_c5mainwindow.h"
-#include "c5message.h"
+#include <QCloseEvent>
+#include <QListWidget>
+#include <QMediaPlayer>
+#include <QMenu>
+#include <QParallelAnimationGroup>
+#include <QProcess>
+#include <QPropertyAnimation>
+#include <QPushButton>
+#include <QShortcut>
+#include <QSpacerItem>
+#include <QToolButton>
+#include <QWindow>
+#include "c5aboutdlg.h"
 #include "c5cashdoc.h"
-#include "cr5cashdetailed.h"
-#include "c5permissions.h"
-#include "c5widget.h"
-#include "cr5commonsales.h"
 #include "c5changepassword.h"
-#include "cr5usersgroups.h"
-#include "cr5materialinstoreuncomplect.h"
-#include "cr5consumptionbysales.h"
-#include "cr5storereason.h"
-#include "cr5documents.h"
+#include "c5config.h"
+#include "c5dishselfcostgenprice.h"
 #include "c5goodsprice.h"
-#include "c5translatorform.h"
-#include "ntablewidget.h"
-#include "ntreewidget.h"
 #include "c5goodsspecialprices.h"
 #include "c5login.h"
-#include "cr5breezeservice.h"
-#include "cr5reports.h"
-#include "cr5mfgeneralreport.h"
-#include "wdashboard.h"
-#include "c5config.h"
-#include "c5saledoc.h"
+#include "c5message.h"
+#include "c5permissions.h"
+#include "c5reporttemplatedriver.h"
+#include "c5route.h"
+#include "c5salarydoc.h"
 #include "c5salarypayment.h"
-#include "cr5saleremoveddishes.h"
-#include "cr5goodsreservations.h"
-#include "cr5goodsqtyreminder.h"
+#include "c5saledoc.h"
+#include "c5storedecompilation.h"
+#include "c5storedoc.h"
+#include "c5storeinventory.h"
+#include "c5toolbarwidget.h"
+#include "c5translatorform.h"
+#include "c5user.h"
+#include "c5widget.h"
+#include "cr5breezeservice.h"
+#include "cr5cashdetailed.h"
 #include "cr5cashmovement.h"
+#include "cr5cashnames.h"
+#include "cr5commonsales.h"
+#include "cr5complectations.h"
+#include "cr5consuptionreason.h"
+#include "cr5creditcards.h"
 #include "cr5currencies.h"
 #include "cr5currencycrossrate.h"
 #include "cr5currencycrossratehistory.h"
-#include "cr5cashnames.h"
-#include "c5storedecompilation.h"
-#include "cr5settings.h"
-#include "cr5complectations.h"
-#include "cr5goodsmovement.h"
-#include "c5salarydoc.h"
-#include "c5reporttemplatedriver.h"
-#include "cr5creditcards.h"
-#include "cr5dishpart1.h"
-#include "c5toolbarwidget.h"
-#include "ninterface.h"
-#include "cr5generalreportonlydate.h"
-#include "cr5mfactions.h"
-#include "cr5mfdaily.h"
-#include "cr5preorders.h"
 #include "cr5currencyratehistory.h"
-#include "c5dishselfcostgenprice.h"
 #include "cr5custom.h"
-#include "cr5salefromstoretotal.h"
-#include "cr5materialmoveuncomplect.h"
-#include "cr5salesbydishes.h"
-#include "cr5tstoreextra.h"
-#include "cr5goodsimages.h"
-#include "cr5storedocuments.h"
-#include "cr5dishpart2.h"
-#include "cr5ordermarks.h"
-#include "cr5draftoutputbyrecipe.h"
-#include "c5storeinventory.h"
+#include "cr5databases.h"
 #include "cr5discountsystem.h"
 #include "cr5dishpackage.h"
+#include "cr5dishpart1.h"
+#include "cr5dishpart2.h"
+#include "cr5dishremovereason.h"
+#include "cr5documents.h"
+#include "cr5draftoutputbyrecipe.h"
+#include "cr5generalreportonlydate.h"
+#include "cr5goods.h"
 #include "cr5goodsgroup.h"
-#include "cr5mfproduct.h"
-#include "cr5databases.h"
-#include "cr5routedaily.h"
-#include "cr5consuptionreason.h"
-#include "cr5storereason.h"
-#include "cr5salarybyworkers.h"
+#include "cr5goodsimages.h"
+#include "cr5goodsmovement.h"
 #include "cr5goodspartners.h"
-#include "cr5salefromstore.h"
+#include "cr5goodsqtyreminder.h"
+#include "cr5goodsreservations.h"
+#include "cr5goodsstorages.h"
 #include "cr5goodsunit.h"
+#include "cr5hall.h"
+#include "cr5materialinstoreuncomplect.h"
+#include "cr5materialmoveuncomplect.h"
+#include "cr5materialsinstore.h"
 #include "cr5menunames.h"
+#include "cr5mfactions.h"
 #include "cr5mfactionstage.h"
 #include "cr5mfactivetasks.h"
+#include "cr5mfdaily.h"
+#include "cr5mfgeneralreport.h"
+#include "cr5mfproduct.h"
 #include "cr5mfworkshops.h"
+#include "cr5ordermarks.h"
+#include "cr5preorders.h"
+#include "cr5reports.h"
+#include "cr5routedaily.h"
+#include "cr5salarybyworkers.h"
+#include "cr5salefromstore.h"
+#include "cr5salefromstoretotal.h"
+#include "cr5saleremoveddishes.h"
+#include "cr5salesbydishes.h"
+#include "cr5settings.h"
+#include "cr5storedocuments.h"
+#include "cr5storereason.h"
 #include "cr5tables.h"
-#include "cr5hall.h"
-#include "cr5materialsinstore.h"
-#include "c5route.h"
-#include "cr5dishremovereason.h"
-#include "cr5goods.h"
-#include "c5user.h"
+#include "cr5tstoreextra.h"
 #include "cr5users.h"
-#include "cr5goodsstorages.h"
-#include "c5aboutdlg.h"
-#include "c5storedoc.h"
-#include <QCloseEvent>
-#include <QShortcut>
-#include <QProcess>
-#include <QMenu>
-#include <QPushButton>
-#include <QSpacerItem>
-#include <QListWidget>
-#include <QPropertyAnimation>
-#include <QMediaPlayer>
-#include <QToolButton>
-#include <QParallelAnimationGroup>
-#include <QWindow>
+#include "cr5usersgroups.h"
+#include "ninterface.h"
+#include "ntablewidget.h"
+#include "ntreewidget.h"
+#include "ui_c5mainwindow.h"
+#include "wdashboard.h"
 
 C5MainWindow* __mainWindow;
 QStringList mainDbParams;
@@ -650,14 +648,6 @@ void C5MainWindow::on_listWidgetItemClicked(const QModelIndex &index)
         break;
     }
 
-    case cp_t2_store_inventory:
-        createTab<C5StoreInventory>();
-        break;
-
-    case cp_t2_count_output_of_sale:
-        createTab<CR5ConsumptionBySales>();
-        break;
-
     case cp_t2_store_complectation: {
         C5StoreDoc *sd = createTab<C5StoreDoc>();
         sd->setMode(C5StoreDoc::sdComplectation);
@@ -1097,7 +1087,7 @@ void C5MainWindow::setDB()
         addTreeL3Item(l, cp_t3_storage_uncomplected, tr("Storage uncomplected"), ":/goods.png");
         addTreeL3Item(l, cp_t3_sale_from_store_total, tr("Detailed movement in the storage"), ":/graph.png");
         addTreeL3Item(l, cp_t3_tstore_extra, tr("T-account, extra"), ":/documents.png");
-        addTreeL3Item(l, cp_t2_count_output_of_sale, tr("Consumption of goods based on sales"), ":/goods.png");
+
         addTreeL3Item(l, cp_t3_draft_output_recipes, tr("Draft output by recipes"), ":/goods.png");
         addTreeL3Item(l, cp_t3_consuption_reason, tr("Reason for consuption"), ":/goods.png");
         addTreeL3Item(l, cp_t3_sales_common, tr("Sales by tickets"), ":/graph.png");

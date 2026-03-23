@@ -2,6 +2,7 @@
 
 #include <QLabel>
 #include "c5widget.h"
+#include "office_structs.h"
 #include "struct_doc_store_input.h"
 
 namespace Ui
@@ -34,17 +35,36 @@ public:
 
     double total();
 
+    void setStore(int id, const QString &name);
+
     virtual void hotKey(const QString &key) override;
 
     bool openDraft(const QString &id, QString &err);
 
     int addGoods(int goods, const QString &name, double qty, const QString &unit, double price, double total,
                  const QString &comment, const QString &adgt);
+
+    void fillFromInventory(const QList<InventoryDiff> &surpluses);
+
 protected:
 
     virtual void nextChild() override;
 
 private:
+    enum Columns {
+        col_rec_in_id = 0,
+        col_goods_id,   // будет 1
+        col_goods_name, // будет 2
+        col_adgt,       // будет 3
+        col_goods_qty,  // будет 4
+        col_goods_unit, // будет 5
+        col_price,      // будет 6
+        col_total,      // будет 7
+        col_valid_date, // будет 8
+        col_comment,    // будет 9
+        col_remain      // будет 10
+    };
+
     Ui::C5StoreOutput *ui;
 
     StoreInputDocument mDocData;

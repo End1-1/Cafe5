@@ -2,6 +2,7 @@
 #include <QApplication>
 #include <QJsonDocument>
 #include <QJsonObject>
+#include <QPrinterInfo>
 #include "QRCodeGenerator.h"
 #include "c5config.h"
 #include "c5database.h"

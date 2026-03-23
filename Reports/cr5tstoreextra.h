@@ -19,12 +19,8 @@ protected:
 
     virtual void refreshData() override;
 
-    virtual bool tblDoubleClicked(int row, int column, const QJsonArray &values) override;
-
 private:
     QHash<QString, int> fColumnNameIndex;
-
-    QString documentForInventory();
 
     CR5TStoreExtraFilter *fFilter;
 };

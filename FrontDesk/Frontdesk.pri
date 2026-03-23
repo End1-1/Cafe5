@@ -59,7 +59,7 @@ FORMS += \
     ../Forms/c5storebarcodelist.ui \
     ../Forms/c5storedoc.ui \
     ../Forms/c5storedocselectprinttemplate.ui \
-    ../Forms/c5storeinventory.ui \
+    c5storeinventory.ui \
     ../Forms/c5toolbarwidget.ui \
     ../Forms/c5translatorform.ui \
     ../Forms/c5waiterorder.ui \

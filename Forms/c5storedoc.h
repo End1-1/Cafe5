@@ -25,6 +25,22 @@ class C5StoreDoc : public C5Document
 {
     Q_OBJECT
 
+    enum Columns {
+        col_rec_in_id = 0,
+        col_rec_out_id,  // 1
+        col_rec_base_id, // 2
+        col_goods_id,    // 3
+        col_goods_name,  // 4
+        col_adgt,        // 5
+        col_goods_qty,   // 6
+        col_goods_unit,  // 7
+        col_price,       // 8
+        col_total,       // 9
+        col_valid_date,  // 10
+        col_comment,     // 11
+        col_remain       // 12
+    };
+
 public:
     enum STORE_DOC {sdInput = 1, sdOutput, sdMovement, sdInventory, sdCash, sdComplectation, sdSalary, sdDeComplectation};
 

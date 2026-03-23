@@ -100,44 +100,46 @@ void DlgDashboard::on_btnCloseCashbox_clicked()
         return ;
     }
 
-    NInterface::query1("/engine/v2/waiter/cashbox/close", mUser->mSessionKey, this,
-    {{"cashbox_id", mWorkStation.cashboxId()}},
-    [this](const QJsonObject & jdoc) {
-        mCashboxData = QJsonObject();
-        setup();
-        C5Printing p;
-        QPrinterInfo pi = QPrinterInfo::printerInfo(mWorkStation.defaultPrinter());
-        QPrinter printer(pi);
-        printer.setPageSize(QPageSize::Custom);
-        printer.setFullPage(false);
-        QRectF pr = printer.pageRect(QPrinter::DevicePixel);
-        constexpr qreal SAFE_RIGHT_MM = 4.0;
-        qreal safePx = SAFE_RIGHT_MM * printer.logicalDpiX() / 25.4;
-        p.setSceneParams(pr.width() - safePx, pr.height(), printer.logicalDpiX());
-        p.setFont(qApp->font());
-        QString logoFile = qApp->applicationDirPath() + "/logo_receipt.png";
+    NInterface::query1("/engine/v2/waiter/cashbox/close",
+                       mUser->mSessionKey,
+                       this,
+                       {{"cashbox_id", mWorkStation.cashboxId()}},
+                       [this](const QJsonObject &jdoc) {
+                           mCashboxData = jdoc.value("cashbox").toObject();
+                           setup();
+                           C5Printing p;
+                           QPrinterInfo pi = QPrinterInfo::printerInfo(mWorkStation.defaultPrinter());
+                           QPrinter printer(pi);
+                           printer.setPageSize(QPageSize::Custom);
+                           printer.setFullPage(false);
+                           QRectF pr = printer.pageRect(QPrinter::DevicePixel);
+                           constexpr qreal SAFE_RIGHT_MM = 4.0;
+                           qreal safePx = SAFE_RIGHT_MM * printer.logicalDpiX() / 25.4;
+                           p.setSceneParams(pr.width() - safePx, pr.height(), printer.logicalDpiX());
+                           p.setFont(qApp->font());
+                           QString logoFile = qApp->applicationDirPath() + "/logo_receipt.png";
 
-        if(QFile::exists(logoFile)) {
-            p.image(logoFile, Qt::AlignHCenter);
-            p.br();
-        }
+                           if (QFile::exists(logoFile)) {
+                               p.image(logoFile, Qt::AlignHCenter);
+                               p.br();
+                           }
 
-        p.ctext(tr("Closing session") + " " + QString::number(mCashboxData.value("f_id").toInt()));
-        p.br();
-        p.ctext(mCashboxData["f_date_close"].toString());
-        p.br();
-        p.lrtext(tr("Open"), mCashboxData["f_user_open_name"].toString());
-        p.br();
-        p.lrtext(tr("Close"), mCashboxData["f_user_close_name"].toString());
-        p.br();
-        p.lrtext(tr("Operations"), mCashboxData["f_orders_count"].toString());
-        p.br();
-        p.lrtext(tr("Expected amount"), mCashboxData["f_amount_expected"].toString());
-        p.br();
-        p.line();
-        p.br();
-        p.print(printer);
-    });
+                           p.ctext(tr("Closing session") + " " + QString::number(mCashboxData.value("f_id").toInt()));
+                           p.br();
+                           p.ctext(mCashboxData["f_date_close"].toString());
+                           p.br();
+                           p.lrtext(tr("Open"), mCashboxData["f_user_open_name"].toString());
+                           p.br();
+                           p.lrtext(tr("Close"), mCashboxData["f_user_close_name"].toString());
+                           p.br();
+                           p.lrtext(tr("Operations"), QString::number(mCashboxData.value("f_orders_count").toInt()));
+                           p.br();
+                           p.lrtext(tr("Expected amount"), mCashboxData["f_amount_expected"].toString());
+                           p.br();
+                           p.line();
+                           p.br();
+                           p.print(printer);
+                       });
 }
 
 void DlgDashboard::on_btnGoHall_clicked()

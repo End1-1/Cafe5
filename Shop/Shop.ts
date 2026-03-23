@@ -5907,7 +5907,7 @@ MS Excel</translation>
         <location filename="cashcollection.ui" line="19"/>
         <location filename="cashcollection.cpp" line="17"/>
         <source>Cash collection</source>
-        <translation>Կանխիկի հավաքագրում</translation>
+        <translation>Կանխիկի հանձնում</translation>
     </message>
     <message>
         <location filename="cashcollection.ui" line="64"/>
@@ -7914,7 +7914,7 @@ MS Excel</translation>
     <message>
         <location filename="dlgshopcustomer.ui" line="23"/>
         <source>TIN</source>
-        <translation>TIN</translation>
+        <translation>ՀՎՀՀ</translation>
     </message>
     <message>
         <location filename="dlgshopcustomer.ui" line="46"/>

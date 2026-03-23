@@ -39,9 +39,6 @@ public:
 
     bool writeACalcPrice(const QString &id, const QString &docId, double price2, double margin);
 
-    bool writeAStoreInventory(QString &id, const QString &docId, int store, int goods, double qty, double price,
-                              double total);
-
     bool writeAStoreDishWaste(QString &id, const QString &docId, int dish, double qty, const QString &data);
 
     bool writeECash(QString &id, const QString &header, int cash, int sign, const QString &purpose, double amount,

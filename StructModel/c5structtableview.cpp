@@ -4,6 +4,7 @@
 #include "appwebsocket.h"
 #include "store_doc_status.h"
 #include "store_doc_type.h"
+#include "struct_goods_group.h"
 #include "struct_goods_item.h"
 #include "struct_partner.h"
 #include "struct_storage_item.h"
@@ -38,6 +39,8 @@ C5StructTableView::C5StructTableView(C5User *user)
             handleSearchResult<StoreDocStatusItem>(arr, static_cast<C5StructModel<StoreDocStatusItem> *>(ui->tbl->model()));
         } else if (mSearchEngine == SelectorName<StoreDocTypeItem>::value) {
             handleSearchResult<StoreDocTypeItem>(arr, static_cast<C5StructModel<StoreDocTypeItem> *>(ui->tbl->model()));
+        } else if (mSearchEngine == SelectorName<StoreDocTypeItem>::value) {
+            handleSearchResult<GoodsGroupItem>(arr, static_cast<C5StructModel<GoodsGroupItem> *>(ui->tbl->model()));
         } else {
             Q_ASSERT_X(false, Q_FUNC_INFO, qPrintable(QString("Unknown search engine: %1").arg(mSearchEngine)));
         }
@@ -55,11 +58,10 @@ QTableView* C5StructTableView::tableView()
 
 QMap<QString, QString> C5StructTableView::selectorTitles()
 {
-    return {
-        { SelectorName<GoodsItem>::value,   QObject::tr("Goods") },
-        { SelectorName<StorageItem>::value, QObject::tr("Storage") },
-        { SelectorName<PartnerItem>::value, QObject::tr("Partner") }
-    };
+    return {{SelectorName<GoodsItem>::value, QObject::tr("Goods")},
+            {SelectorName<GoodsGroupItem>::value, QObject::tr("Group")},
+            {SelectorName<StorageItem>::value, QObject::tr("Storage")},
+            {SelectorName<PartnerItem>::value, QObject::tr("Partner")}};
 }
 
 void C5StructTableView::on_leSearchText_textChanged(const QString &arg1)
@@ -108,6 +110,10 @@ void C5StructTableView::on_btnSelect_clicked()
         if (static_cast<C5StructModel<StoreDocTypeItem> *>(ui->tbl->model())->hasSelectedData()) {
             isAcceptable = true;
         }
+    } else if (mSearchEngine == SelectorName<GoodsGroupItem>::value) {
+        if (static_cast<C5StructModel<GoodsGroupItem> *>(ui->tbl->model())->hasSelectedData()) {
+            isAcceptable = true;
+        }
     }
 
     if (isAcceptable) {
@@ -131,8 +137,8 @@ void C5StructTableView::on_tbl_doubleClicked(const QModelIndex &index)
         static_cast<C5StructModel<PartnerItem>*>(ui->tbl->model())->setData(checkIndex, Qt::Checked, Qt::CheckStateRole);
     } else if (mSearchEngine == SelectorName<StoreDocStatusItem>::value) {
         static_cast<C5StructModel<StoreDocStatusItem> *>(ui->tbl->model())->setData(checkIndex, Qt::Checked, Qt::CheckStateRole);
-    } else if (mSearchEngine == SelectorName<StoreDocTypeItem>::value) {
-        static_cast<C5StructModel<StoreDocTypeItem> *>(ui->tbl->model())->setData(checkIndex, Qt::Checked, Qt::CheckStateRole);
+    } else if (mSearchEngine == SelectorName<GoodsGroupItem>::value) {
+        static_cast<C5StructModel<GoodsGroupItem> *>(ui->tbl->model())->setData(checkIndex, Qt::Checked, Qt::CheckStateRole);
     } else {
         Q_ASSERT_X(false, Q_FUNC_INFO, qPrintable(QString("Unknown search engine: %1").arg(mSearchEngine)));
     }

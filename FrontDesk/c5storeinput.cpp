@@ -30,18 +30,6 @@
 #include "ui_c5storeinput.h"
 #include <xlsxdocument.h>
 
-#define col_rec_in_id 0
-#define col_goods_id 1
-#define col_goods_name 2
-#define col_adgt 3
-#define col_goods_qty 4
-#define col_goods_unit 5
-#define col_price 6
-#define col_total 7
-#define col_valid_date 8
-#define col_comment 9
-#define col_remain 10
-
 C5StoreInput::C5StoreInput(C5User *user, const QString &title, QIcon icon, QWidget *parent)
     : C5Widget(parent)
     , ui(new Ui::C5StoreInput)
@@ -227,6 +215,11 @@ void C5StoreInput::addByScancode(const QString &code, const QString &qty, QStrin
 double C5StoreInput::total()
 {
     return ui->leTotal->getDouble();
+}
+
+void C5StoreInput::setStore(int id, const QString &name)
+{
+    ui->wInputStore->setCodeAndName(id, name);
 }
 
 void C5StoreInput::hotKey(const QString &key)
@@ -848,4 +841,22 @@ void C5StoreInput::on_btnRemoveGoods_clicked()
 {
     int r = ui->tblGoods->currentRow();
     ui->tblGoods->removeRow(r);
+}
+
+void C5StoreInput::fillFromInventory(const QList<InventoryDiff> &surpluses)
+{
+    // Очищаем таблицу перед импортом
+    ui->tblGoods->setRowCount(0);
+
+    for (const auto &s : surpluses) {
+        // Добавляем строку товара
+        // addGoods вернет индекс созданной строки
+        int row = addGoods(s.goodsId, s.goodsName, s.qty, s.unitName, s.price, s.qty * s.price, "Inventory surplus", "");
+
+        // Дополнительно можно подкрасить эти строки или поставить фокус
+        ui->tblGoods->lineEdit(row, col_comment)->setReadOnly(true);
+    }
+
+    countTotal(); // Пересчитываем итоги документа
+    ui->leComment->setText(tr("Imported from inventory surplus ") + QDate::currentDate().toString(FORMAT_DATE_TO_STR));
 }

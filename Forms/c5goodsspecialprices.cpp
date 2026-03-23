@@ -5,21 +5,6 @@
 #include "c5goodsspecialprice.h"
 #include <QTableWidgetItem>
 
-#define col_id 0
-#define col_partner_id 1
-#define col_partner_tin 2
-#define col_partner_name 3
-#define col_partner_address 4
-#define col_goods_id 5
-#define col_goods_group 6
-#define col_goods_barcode 7
-#define col_goods_name 8
-#define col_goods_special_price 9
-#define col_goods_retail 10
-#define col_goods_whosale 11
-#define col_goods_retail_diff 12
-#define col_goods_whosale_diff 13
-
 C5GoodsSpecialPrices::C5GoodsSpecialPrices(QWidget *parent) :
     C5Widget(parent),
     ui(new Ui::C5GoodsSpecialPrices)

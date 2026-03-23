@@ -46,7 +46,7 @@ QString CR5MaterialInStoreFilter::condition()
     }
     in(cond, "h.f_currency", ui->leCurrency);
     in(cond, "gpr.f_currency", ui->leCurrency);
-    in(cond, "h.f_partner", ui->lePartner);
+    in(cond, "g.f_supplier", ui->lePartner);
     return cond;
 }
 

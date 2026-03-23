@@ -2008,7 +2008,7 @@
                  <x>0</x>
                  <y>0</y>
                  <width>461</width>
-                 <height>73</height>
+                 <height>69</height>
                 </rect>
                </property>
                <layout class="QVBoxLayout" name="verticalLayout_3">
@@ -2091,7 +2091,7 @@
                  <x>0</x>
                  <y>0</y>
                  <width>461</width>
-                 <height>73</height>
+                 <height>69</height>
                 </rect>
                </property>
                <layout class="QVBoxLayout" name="verticalLayout_4">
@@ -2675,6 +2675,9 @@
            </property>
            <property name="checkable">
             <bool>true</bool>
+           </property>
+           <property name="fiscal" stdset="0">
+            <string>1</string>
            </property>
           </widget>
          </item>

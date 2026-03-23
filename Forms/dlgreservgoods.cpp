@@ -292,16 +292,25 @@ void DlgReservGoods::getAvailableGoods()
 void DlgReservGoods::on_btnPrintFiscal_clicked()
 {
     FiscalMachine fm = getFiscalMachine(mWorkStation.fiscalMachineId());
-    PrintTaxN pt(fm.ip, fm.port, fm.machinePassword, fm.externalPosString(), fm.opPin, fm.opPassword, this);
-    QString jsonIn, jsonOut, err;
 
-    if(pt.printAdvanceJson(ui->lePrepaid->getDouble(), ui->lePrepaidCard->getDouble(), jsonIn, jsonOut,
-                           err) != pt_err_ok) {
-        C5Message::error(err);
-    } else {
-        QJsonObject jdoc = QJsonDocument::fromJson(jsonOut.toUtf8()).object();
-        ui->leFiscal->setInteger(jdoc["rseq"].toInt());
-        on_btnSave_clicked();
-        ui->btnPrintFiscal->setEnabled(false);
-    }
+    PrintTaxN *pt = new PrintTaxN(fm.ip, fm.port, fm.machinePassword, fm.externalPosString(), fm.opPin, fm.opPassword, this);
+
+    ui->btnPrintFiscal->setEnabled(false);
+
+    connect(pt, &PrintTaxN::finished, this, [this, pt](const QString &jsonIn, const QString &jsonOut, const QString &err, int result) {
+        if (result != pt_err_ok) {
+            C5Message::error(err);
+            ui->btnPrintFiscal->setEnabled(true);
+        } else {
+            QJsonObject jdoc = QJsonDocument::fromJson(jsonOut.toUtf8()).object();
+            ui->leFiscal->setInteger(jdoc["rseq"].toInt());
+            on_btnSave_clicked();
+
+            C5Message::info(tr("Fiscal check printed successfully"));
+        }
+
+        pt->deleteLater();
+    });
+
+    pt->printAdvanceJson(ui->lePrepaid->getDouble(), ui->lePrepaidCard->getDouble());
 }

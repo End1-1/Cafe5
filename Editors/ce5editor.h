@@ -71,6 +71,10 @@ public:
         return result;
     }
 
+    virtual QString savePathV2() const;
+
+    virtual QJsonObject toJson() const;
+
 protected:
     bool fRememberFields;
 

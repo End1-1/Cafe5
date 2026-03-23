@@ -22,7 +22,6 @@
 #define cp_t2_store_output 202
 #define cp_t2_store_move 203
 #define cp_t2_store_inventory 204
-#define cp_t2_count_output_of_sale 205
 #define cp_t2_calculate_self_cost 206
 #define cp_t2_store_complectation 207
 #define cp_t2_store_decomplectation 208

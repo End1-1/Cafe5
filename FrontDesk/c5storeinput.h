@@ -2,6 +2,7 @@
 
 #include <QLabel>
 #include "c5widget.h"
+#include "office_structs.h"
 #include "struct_doc_store_input.h"
 
 namespace Ui
@@ -16,6 +17,20 @@ class C5LineEdit;
 class C5StoreInput : public C5Widget
 {
     Q_OBJECT
+
+    enum Columns {
+        col_rec_in_id = 0,
+        col_goods_id,   // 1
+        col_goods_name, // 2
+        col_adgt,       // 3
+        col_goods_qty,  // 4
+        col_goods_unit, // 5
+        col_price,      // 6
+        col_total,      // 7
+        col_valid_date, // 8
+        col_comment,    // 9
+        col_remain      // 10
+    };
 
 public:
     explicit C5StoreInput(C5User *user, const QString &title, QIcon icon, QWidget *parent = nullptr);
@@ -34,14 +49,18 @@ public:
 
     double total();
 
+    void setStore(int id, const QString &name);
+
     virtual void hotKey(const QString &key) override;
 
     bool openDraft(const QString &id, QString &err);
 
     int addGoods(int goods, const QString &name, double qty, const QString &unit, double price, double total,
                  const QString &comment, const QString &adgt);
-protected:
 
+    void fillFromInventory(const QList<InventoryDiff> &surpluses);
+
+protected:
     virtual void nextChild() override;
 
 private:

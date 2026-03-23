@@ -34,20 +34,6 @@
 #include "ui_c5storedoc.h"
 #include <xlsxdocument.h>
 
-#define col_rec_in_id 0
-#define col_rec_out_id 1
-#define col_rec_base_id 2
-#define col_goods_id 3
-#define col_goods_name 4
-#define col_adgt 5
-#define col_goods_qty 6
-#define col_goods_unit 7
-#define col_price 8
-#define col_total 9
-#define col_valid_date 10
-#define col_comment 11
-#define col_remain 12
-
 C5StoreDoc::C5StoreDoc(QWidget *parent) :
     C5Document(parent),
     ui(new Ui::C5StoreDoc)

@@ -16,7 +16,7 @@ public:
 
     ~CR5MaterialInStoreFilter();
 
-    virtual QString condition();
+    virtual QString condition() override;
 
     virtual QString filterText() override;
 

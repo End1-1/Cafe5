@@ -29,18 +29,6 @@
 #include "ui_c5storeoutput.h"
 #include <xlsxdocument.h>
 
-#define col_rec_in_id 0
-#define col_goods_id 1
-#define col_goods_name 2
-#define col_adgt 3
-#define col_goods_qty 4
-#define col_goods_unit 5
-#define col_price 6
-#define col_total 7
-#define col_valid_date 8
-#define col_comment 9
-#define col_remain 10
-
 C5StoreOutput::C5StoreOutput(C5User *user, const QString &title, QIcon icon, QWidget *parent)
     : C5Widget(parent)
     , ui(new Ui::C5StoreOutput)
@@ -225,6 +213,11 @@ double C5StoreOutput::total()
     return ui->leTotal->getDouble();
 }
 
+void C5StoreOutput::setStore(int id, const QString &name)
+{
+    ui->wOutputStore->setCodeAndName(id, name);
+}
+
 void C5StoreOutput::hotKey(const QString &key)
 {
     if (key.toLower() == "ctrl+f") {
@@ -398,6 +391,23 @@ int C5StoreOutput::addGoods(int goods,
     ui->tblGoods->setString(row, col_adgt, adgt);
     ui->tblGoods->setCurrentCell(row, 0);
     return row;
+}
+
+void C5StoreOutput::fillFromInventory(const QList<InventoryDiff> &surpluses)
+{
+    ui->tblGoods->setRowCount(0);
+
+    for (const auto &s : surpluses) {
+        // Добавляем строку товара
+        // addGoods вернет индекс созданной строки
+        int row = addGoods(s.goodsId, s.goodsName, s.qty, s.unitName, s.price, s.qty * s.price, "Inventory deficit", "");
+
+        // Дополнительно можно подкрасить эти строки или поставить фокус
+        ui->tblGoods->lineEdit(row, col_comment)->setReadOnly(true);
+    }
+
+    countTotal(); // Пересчитываем итоги документа
+    ui->leComment->setText(tr("Imported from inventory deficit ") + QDate::currentDate().toString(FORMAT_DATE_TO_STR));
 }
 
 void C5StoreOutput::setDocEnabled(bool v)

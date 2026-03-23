@@ -184,43 +184,44 @@ void C5SaleFromStoreOrder::on_btnRemove_clicked()
 
 void C5SaleFromStoreOrder::on_btnPrintTax_clicked()
 {
-    QElapsedTimer t;
-    t.start();
-    C5Database db;
+    auto *db = new C5Database();
     C5Message::error(tr("Config fiscal machine select not implemented"));
     FiscalMachine fm = getFiscalMachine(0);
-    PrintTaxN pt(fm.ip, fm.port, fm.machinePassword, fm.externalPosString(), fm.opPin, fm.opPassword, this);
+    auto *pt = new PrintTaxN(fm.ip, fm.port, fm.machinePassword, fm.externalPosString(), fm.opPin, fm.opPassword, this);
 
     for(int i = 0; i < ui->tblData->rowCount(); i++) {
-        pt.addGoods(ui->tblData->getString(i, 8).toInt(), //dep
-                    ui->tblData->getString(i, 9), //adg
-                    ui->tblData->getString(i, 1), //goods id
-                    ui->tblData->getString(i, 2), //name
-                    ui->tblData->getDouble(i, 5), //price
-                    ui->tblData->getDouble(i, 3), //qty
-                    0); //discount
+        pt->addGoods(ui->tblData->getString(i, 8).toInt(), //dep
+                     ui->tblData->getString(i, 9),         //adg
+                     ui->tblData->getString(i, 1),         //goods id
+                     ui->tblData->getString(i, 2),         //name
+                     ui->tblData->getDouble(i, 5),         //price
+                     ui->tblData->getDouble(i, 3),         //qty
+                     0);                                   //discount
     }
 
     QString jsonIn, jsonOut, err;
     QString sn, firm, address, fiscal, hvhh, rseq, devnum, time;
     int result = 0;
-    result = pt.makeJsonAndPrint(ui->leTotalCard->getDouble(), 0, jsonIn, jsonOut, err);
+    connect(pt, &PrintTaxN::finished, this, [this, db, pt](const QString &jsonIn, const QString &jsonOut, const QString &err, int result) {
+        if (result == pt_err_ok) {
+            QJsonObject jtax;
+            jtax["f_order"] = ui->leID->text();
+            jtax["f_elapsed"] = -1;
+            jtax["f_in"] = jsonIn;
+            jtax["f_out"] = jsonOut;
+            jtax["f_err"] = err;
+            jtax["f_result"] = result;
+            jtax["f_state"] = result == pt_err_ok ? 1 : 0;
+            db->exec(QString("call sf_create_shop_tax('%1')").arg(QString(QJsonDocument(jtax).toJson(QJsonDocument::Compact))));
 
-    if(result == pt_err_ok) {
-        QJsonObject jtax;
-        jtax["f_order"] = ui->leID->text();
-        jtax["f_elapsed"] = t.elapsed();
-        jtax["f_in"] = jsonIn;
-        jtax["f_out"] = jsonOut;
-        jtax["f_err"] = err;
-        jtax["f_result"] = result;
-        jtax["f_state"] = result == pt_err_ok ? 1 : 0;
-        db.exec(QString("call sf_create_shop_tax('%1')").arg(QString(QJsonDocument(jtax).toJson(QJsonDocument::Compact))));
-
-        if(result != pt_err_ok) {
-            C5Message::error(err);
+            if (result != pt_err_ok) {
+                C5Message::error(err);
+            }
+            pt->deleteLater();
+            db->deleteLater();
         }
-    }
+    });
+    pt->makeJsonAndPrint(ui->leTotalCard->getDouble(), 0);
 }
 
 void C5SaleFromStoreOrder::on_btnSave_clicked()
