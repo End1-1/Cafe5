@@ -17,7 +17,7 @@ void C5PrintJson::parse(C5Printing &p, const QJsonArray &cmd)
         QJsonObject jo = cmd.at(i).toObject();
 
         if(jo["cmd"].toString() == "line") {
-            p.line(jo["x1"].toDouble(), jo["y1"].toDouble(), jo["x2"].toDouble(), jo["y2"].toDouble());
+            p.line();
         } else if(jo["cmd"].toString() == "simpleline") {
             p.line();
         } else if(jo["cmd"].toString() == "ltext") {
@@ -34,19 +34,17 @@ void C5PrintJson::parse(C5Printing &p, const QJsonArray &cmd)
             p.setFontBold(jo["bold"].toBool());
         } else if(jo["cmd"].toString() == "br") {
             p.br(jo["height"].toDouble());
-        } else if(jo["cmd"].toString() == "fontstrikeout") {
-            p.setFontStrike(jo["strike"].toBool());
-        } else if(jo["cmd"].toString() == "scene") {
+        } else if (jo["cmd"].toString() == "scene") {
             p.setSceneParams(jo["width"].toDouble(), jo["height"].toDouble(), jo["mm"].toDouble());
-        } else if(jo["cmd"].toString() == "font") {
+        } else if (jo["cmd"].toString() == "font") {
             QFont font(jo["family"].toString(), jo["size"].toInt());
             font.setBold(jo["bold"].toBool());
             p.setFont(font);
-        } else if(jo["cmd"].toString() == "print") {
+        } else if (jo["cmd"].toString() == "print") {
             //   p.print(jo["printer"].toString(), QPageSize(static_cast<QPageSize::PageSizeId>(jo["pagesize"].toInt())));
-        } else if(jo["cmd"].toString() == "line1") {
-            p.line(jo["x1"].toDouble(), jo["y1"].toDouble(), jo["x2"].toDouble(), jo["y2"].toDouble(), jo["width"].toInt());
-        } else if(jo["cmd"].toString() == "line2") {
+        } else if (jo["cmd"].toString() == "line1") {
+            p.line();
+        } else if (jo["cmd"].toString() == "line2") {
             p.line(jo["width"].toInt());
         }
     }

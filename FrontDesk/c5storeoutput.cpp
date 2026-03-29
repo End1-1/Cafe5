@@ -100,7 +100,9 @@ QToolBar *C5StoreOutput::toolBar()
         fToolBar = createStandartToolbar(QList<ToolBarButtons>());
         mActionSave = fToolBar->addAction(QIcon(":/save.png"), tr("Save"), this, SLOT(saveDocument()));
         mActionDraft = fToolBar->addAction(QIcon(":/draft.png"), tr("Draft"), this, SLOT(draftDocument()));
-        fToolBar->addAction(QIcon(":/new.png"), tr("New\ndocument"), this, SLOT(newDoc()));
+        fToolBar->addAction(QIcon(":/new.png"), tr("New\ndocument"), this, [this]() {
+            __mainWindow->addWidget(new C5StoreOutput(mUser, tr("Store output"), QIcon(":/storage.png")));
+        });
         fToolBar->addAction(QIcon(":/recycle.png"), tr("Remove"), this, SLOT(removeDocument()));
         fToolBar->addAction(QIcon(":/print.png"), tr("Print"), this, SLOT(printDoc()));
         fToolBar->addAction(QIcon(":/excel.png"),

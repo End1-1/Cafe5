@@ -21,8 +21,7 @@ DlgRealReports::DlgRealReports(C5User *user)
     ui->lbReportName->setText("");
     mPrinting = new C5Printing();
     mPrinting->setSceneParams(380, 3700, 96);
-    ui->gv->setScene(mPrinting->fCanvas);
-    ui->gv->setAlignment(Qt::AlignTop | Qt::AlignHCenter);
+
     ui->lbDate->setText(QDate::currentDate().toString(FORMAT_DATE_TO_STR));
 }
 
@@ -110,19 +109,32 @@ void DlgRealReports::on_btnParams_clicked()
 void DlgRealReports::loadReport(QListWidgetItem *item)
 {
     ui->lbReportName->setText(item->text());
-    NInterface::query1("/engine/v2/waiter/reports/get-report", mUser->mSessionKey, this, {
-        {"report_id", item->data(Qt::UserRole).toInt()},
-        {"report_name", item->text()},
-        {"params", mLastParams}
-    },
-    [this](const QJsonObject & jdoc) {
-        mLastReport = jdoc["printing"].toArray();
-        C5PrintJson pj;
-        mPrinting->reset();
-        mPrinting->fCanvas->clear();
-        pj.parse(*mPrinting, jdoc["printing"].toArray());
-        ui->gv->verticalScrollBar()->setValue(0);
-    });
+    NInterface::query1("/engine/v2/waiter/reports/get-report",
+                       mUser->mSessionKey,
+                       this,
+                       {{"report_id", item->data(Qt::UserRole).toInt()}, {"report_name", item->text()}, {"params", mLastParams}},
+                       [this](const QJsonObject &jdoc) {
+                           mLastReport = jdoc["printing"].toArray();
+                           C5PrintJson pj;
+
+                           mPrinting->reset();
+                           // Устанавливаем параметры холста для превью
+                           mPrinting->setSceneParams(380, 20000, 96);
+
+                           // Наполняем картинку данными
+                           pj.parse(*mPrinting, mLastReport);
+
+                           // ПОЛУЧАЕМ РЕЗУЛЬТАТ:
+                           // Берем только ту часть картинки, на которой реально что-то нарисовано (fTop)
+                           QImage result = mPrinting->resultImage();
+                           // Если в C5Printing нет метода resultImage, добавь его (возвращает fImage)
+
+                           // Обрезаем лишнюю пустоту снизу и ставим в лейбл
+                           ui->lbPreview->setPixmap(QPixmap::fromImage(result.copy(0, 0, 380, mPrinting->fTop)));
+
+                           // Скарролим в начало
+                           ui->scrollArea2->verticalScrollBar()->setValue(0);
+                       });
 }
 
 void DlgRealReports::on_btnReload_clicked()

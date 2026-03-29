@@ -252,6 +252,8 @@ private slots:
 
     void on_btnCopyUUID_clicked();
 
+    void on_btnGuest_clicked();
+
 signals:
 
     void orderDishClicked(QString);

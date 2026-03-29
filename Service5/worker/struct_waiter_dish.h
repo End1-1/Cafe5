@@ -44,6 +44,14 @@ struct WaiterDish {
         }
 
         double total = qty * price;
+        double delta = 0;
+        if (countService()) {
+            delta += serviceFactor();
+        }
+        if (countDiscount()) {
+            delta -= discountFactor();
+        }
+        total += total * delta;
         return total;
     }
     QString appendedTime()
@@ -89,11 +97,13 @@ struct WaiterDish {
     {
         return data["f_fiscal_department"].toInt();
     }
+    double serviceFactor() const { return data.value("f_service_factor").toDouble(); }
     double discountFactor() const
     {
         return data["f_discount_factor"].toDouble();
     }
     bool isHourlyPayment() const { return data.value("f_hourly_payment").toBool(); }
+    bool isPlaying() const { return !data.value("f_stopped").toBool(); }
     QString hourlyRule() const { return data.value("f_hourly_rule").toString(); }
     QJsonValue dataValue(const QString &key) const
     {

@@ -15,6 +15,7 @@
 #include "database.h"
 #include "fileversion.h"
 #include "logwriter.h"
+#include "serverprinting.h"
 #include "store_doc_status.h"
 #include "store_doc_type.h"
 #include "struct_goods_item.h"
@@ -447,6 +448,22 @@ void ServerThread::handleCommand(SocketStruct ws, const QJsonObject &jdoc, QStri
     if(command == "register_socket" || command == "unregister_socket") {
         jrep["errorCode"] = 400;
         jrep["errorMessage"] = "Invalid command context";
+        repMsg = QJsonDocument(jrep).toJson(QJsonDocument::Compact);
+        return;
+    }
+
+    if (command == "print") {
+        if (jdoc.value("key") != "ABC123456789") {
+            jrep["errorCode"] = 401;
+            jrep["errorMessage"] = "Unauthorized";
+            repMsg = QJsonDocument(jrep).toJson(QJsonDocument::Compact);
+            return;
+        }
+        jrep["errorCode"] = 0;
+        jrep["errorMessage"] = "";
+        jrep["printed"] = "yes";
+        ServerPrinting sp(jdoc);
+        sp.print();
         repMsg = QJsonDocument(jrep).toJson(QJsonDocument::Compact);
         return;
     }

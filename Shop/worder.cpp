@@ -890,15 +890,19 @@ void WOrder::countTotal()
     }
     OGoods &og = fOGoods[0];
     if (fOHeader.amountTotal < 20000) {
-        og.goods = 26418;
-        og._barcode = "104";
+        og.goods = 14391;
+        og._barcode = "101";
         og._goodsName = "Մազակալ";
         og._goodsFiscalName = "Մազակալ";
     } else {
-        og.goods = 26358;
-        og._barcode = "1";
-        og._goodsName = "Շարֆ";
-        og._goodsFiscalName = "Շարֆ";
+        // og.goods = 26358;
+        // og._barcode = "1";
+        // og._goodsName = "Շարֆ";
+        // og._goodsFiscalName = "Շարֆ";
+        og.goods = 14391;
+        og._barcode = "101";
+        og._goodsName = "Մազակալ";
+        og._goodsFiscalName = "Մազակալ";
     }
     ui->tblData->setData(0, col_bacode, og._barcode);
     ui->tblData->setData(0, col_name, og._goodsName);
@@ -1598,14 +1602,14 @@ void WOrder::printFiscal(std::function<void(const QJsonObject &)> nextStep)
             }
 
             if (job.simpleFiscal) {
-                pt->makeJsonAndPrintSimple(job.taxDept, job.amountCard, job.amountPrepaid);
+                pt->makeJsonAndPrintSimple(job.taxDept, job.amountCard, job.amountPrepaid, "false");
             } else {
                 pt->makeJsonAndPrint(job.amountCard, job.amountPrepaid);
             }
         } else {
             // Режим аванса или спец. продажи
             if (job.simpleFiscal) {
-                pt->makeJsonAndPrintSimple(job.taxDept, job.amountCard, job.amountPrepaid);
+                pt->makeJsonAndPrintSimple(job.taxDept, job.amountCard, job.amountPrepaid, "false");
             } else {
                 pt->printAdvanceJson(job.amountCash, job.amountCard);
             }
@@ -1675,7 +1679,7 @@ void WOrder::showEvent(QShowEvent *e)
 {
     QWidget::showEvent(e);
 #ifdef _MART8_
-    checkGoodsCode("104", [=]() { setPriceOfRow(0, 1); });
+    checkGoodsCode("101", [=]() { setPriceOfRow(0, 1); });
 #endif
 }
 

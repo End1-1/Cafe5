@@ -37,7 +37,11 @@ protected:
 private slots:
     void on_btnDish_clicked();
 
+    void on_btnPause_clicked();
+
 private:
     Ui::WaiterDishWidget* ui;
 
+signals:
+    void stopPlay();
 };

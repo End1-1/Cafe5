@@ -2,5 +2,7 @@
     <qresource prefix="/lang">
         <file>FrontDesk.qm</file>
     </qresource>
-    <qresource prefix="/"/>
+    <qresource prefix="/">
+        <file>../resources/storage.png</file>
+    </qresource>
 </RCC>

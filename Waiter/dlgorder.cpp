@@ -25,6 +25,7 @@
 #include "dlgcl.h"
 #include "dlgdishremovereason.h"
 #include "dlgguest.h"
+#include "dlgguestinfo.h"
 #include "dlgguests.h"
 #include "dlglist.h"
 #include "dlglistdishspecial.h"
@@ -351,39 +352,43 @@ void DlgOrder::makeGroups(int parent, int dept)
 
 void DlgOrder::makeDishes(int group, int favorite)
 {
-    while(ui->glDishes->itemAt(0)) {
+    int scrollBarWidth = ui->dishScrollArea->verticalScrollBar()->isVisible() ? ui->dishScrollArea->verticalScrollBar()->width() : 0;
+    if (ui->dishScrollArea->verticalScrollBarPolicy() == Qt::ScrollBarAlwaysOn) {
+        scrollBarWidth = ui->dishScrollArea->verticalScrollBar()->width();
+    }
+    int availableWidth = ui->dishScrollArea->viewport()->width();
+
+    while (ui->glDishes->itemAt(0)) {
         ui->glDishes->itemAt(0)->widget()->deleteLater();
         ui->glDishes->removeItem(ui->glDishes->itemAt(0));
     }
 
     QRect scr = qApp->screens().at(mScreen < 0 ? 0 : mScreen)->geometry();
-    int dcolCount = scr.width() > 1024 ? 3 : 2;
+    int dcolCount = scr.width() > 1024 ? 4 : 3;
     int dcol = 0;
     int drow = 0;
 
-    for(auto *g : *mDishes) {
-        if(g->menuId != fMenuID) {
+    for (auto *g : *mDishes) {
+        if (g->menuId != fMenuID) {
             continue;
         }
 
-        if(group && g->group != group) {
+        if (group && g->group != group) {
             continue;
         }
 
-        if(favorite && !g->favorite) {
+        if (favorite && !g->favorite) {
             continue;
         }
 
-        int w = (ui->wdishes->width() - 10)  / (scr.width() > 1024 ? 3 : 2);
+        int w = (availableWidth - (ui->glDishes->spacing() * (dcolCount + 1))) / dcolCount;
         auto *btn = new QDishButton(g, w);
-        connect(btn, &QDishButton::clicked, this, [this, btn, g]() {
-            addDishToOrder(g, btn);
-        });
+        connect(btn, &QDishButton::clicked, this, [this, btn, g]() { addDishToOrder(g, btn); });
         ui->glDishes->addWidget(btn, drow, dcol++, 1, 1);
 
-        if(dcol == dcolCount) {
+        if (dcol == dcolCount) {
             dcol = 0;
-            drow ++;
+            drow++;
         }
 
         ui->glDishes->setRowStretch(drow + 1, 1);
@@ -836,7 +841,7 @@ void DlgOrder::printService(const QJsonObject &jdoc)
         p.ltext(tr("Staff"), 0);
         p.rtext(mUser->shortFullName());
         p.br();
-        p.line(0, p.fTop, p.fNormalWidth, p.fTop);
+        p.line();
         p.br(2);
         QSet<QString> storages;
 
@@ -858,11 +863,11 @@ void DlgOrder::printService(const QJsonObject &jdoc)
             }
 
             p.br();
-            p.line(0, p.fTop, p.fNormalWidth, p.fTop);
+            p.line();
             p.br(1);
         }
 
-        p.line(0, p.fTop, p.fNormalWidth, p.fTop);
+        p.line();
         p.br(1);
         p.setFontSize(bs - 6);
         p.ltext(QString("%1 %2").arg(tr("Printer: "), printerName));
@@ -871,9 +876,17 @@ void DlgOrder::printService(const QJsonObject &jdoc)
         p.br();
         QString final = "OK";
 
-        if(!p.print(printer)) {
-            final = "FAIL";
-        }
+        // if(!p.print(printer)) {
+        //     final = "FAIL";
+        // }
+
+        NInterface::query1(mWorkStation.printServer(),
+                           mUser->mSessionKey,
+                           this,
+                           {{"printer_name", printerName}, {"print_data", p.jsonData()}},
+                           [this](const QJsonObject &jdoc) {
+
+                           });
     }
 }
 
@@ -917,7 +930,7 @@ void DlgOrder::printRemovedDish(const QJsonObject &jdoc)
         p.ltext(tr("Staff"), 0);
         p.rtext(mUser->fullName());
         p.br(p.fLineHeight + 2);
-        p.line(0, p.fTop, p.fNormalWidth, p.fTop);
+        p.line();
         p.br(2);
         p.setFontSize(bs + 2);
         p.ltext(QString("%1").arg(jdoc["f_removed_dish_name"].toString()), 0);
@@ -936,9 +949,9 @@ void DlgOrder::printRemovedDish(const QJsonObject &jdoc)
         }
 
         p.br();
-        p.line(0, p.fTop, p.fNormalWidth, p.fTop);
+        p.line();
         p.br(1);
-        p.line(0, p.fTop, p.fNormalWidth, p.fTop);
+        p.line();
         p.br(1);
         p.setFontSize(bs - 6);
         p.ltext(tr("Printer: ") + printerName, 0);
@@ -993,35 +1006,43 @@ void DlgOrder::setDishQty(std::function<double(WaiterDish)> getQty)
     }
 
     if(d.isPrinted()) {
-        fHttp->createHttpQueryLambda("/engine/v2/waiter/order/add-dish", {
-            {"dish", d.dishId},
-            {"dish_name", d.dishName},
-            {"table", mTable.id},
-            {"qty", qty},
-            {"type", 1},
-            {"row", ((d.row / 100) + 1) * 100},
-            {"price", d.price},
-            {"store", d.store},
-            {"print1", d.printer1()},
-            {"print2", d.printer2()},
-            {"shift_rows", true},
-            {"count_service", d.countService()},
-            {"count_discount", d.countDiscount()},
-            {"empty_order", mOrder.dishes.empty()},
-            {"service_factor", mHall.serviceFactor()}
-        },
-        [this, d](const QJsonObject  & jdoc) {
-            if(jdoc.contains("stoplist")) {
-                for(auto *jg : *mDishes) {
-                    if(jg->id == d.dishId) {
-                        jg->stoplist = jdoc["stoplist"].toDouble();
+        int targetId = d.dishId;
+        auto it = std::find_if(mDishes->begin(), mDishes->end(), [targetId](DishAItem *item) { return item && item->id == targetId; });
+        QJsonObject newData;
+        if (it != mDishes->end()) {
+            DishAItem *foundItem = *it;
+            newData = foundItem->data;
+        }
+        fHttp->createHttpQueryLambda(
+            "/engine/v2/waiter/order/add-dish",
+            {{"dish", d.dishId},
+             {"dish_name", d.dishName},
+             {"table", mTable.id},
+             {"qty", qty},
+             {"type", 1},
+             {"row", ((d.row / 100) + 1) * 100},
+             {"price", d.price},
+             {"store", d.store},
+             {"f_data", d.data},
+             {"print1", d.printer1()},
+             {"print2", d.printer2()},
+             {"shift_rows", true},
+             {"count_service", d.countService()},
+             {"count_discount", d.countDiscount()},
+             {"empty_order", mOrder.dishes.empty()},
+             {"service_factor", mHall.serviceFactor()}},
+            [this, d](const QJsonObject &jdoc) {
+                if (jdoc.contains("stoplist")) {
+                    for (auto *jg : *mDishes) {
+                        if (jg->id == d.dishId) {
+                            jg->stoplist = jdoc["stoplist"].toDouble();
+                        }
                     }
                 }
-            }
 
-            parseOrder(jdoc);
-        }, [](const QJsonObject & jerr) {
-        });
+                parseOrder(jdoc);
+            },
+            [](const QJsonObject &jerr) {});
         return;
     }
 
@@ -2169,6 +2190,17 @@ void DlgOrder::parseOrder(const QJsonObject & jdoc)
         connect(this, &DlgOrder::orderDishClicked,
                 ow, &WaiterDishWidget::checkFocus,
                 Qt::UniqueConnection);
+        if (w.isHourlyPayment() && w.isPlaying()) {
+            if (auto *dishWidget = qobject_cast<WaiterDishWidget *>(ow)) {
+                connect(dishWidget, &WaiterDishWidget::stopPlay, this, [=]() {
+                    NInterface::query1("/engine/v2/waiter/order/stop-play",
+                                       mUser->mSessionKey,
+                                       this,
+                                       {{"id", dishWidget->mOrderItem.id}},
+                                       [=](const QJsonObject &jdoc) { parseOrder(jdoc); });
+                });
+            }
+        }
     }
 
     /* PAYMENT BUTTON */
@@ -2265,6 +2297,9 @@ void DlgOrder::parseOrder(const QJsonObject & jdoc)
     ui->btnPrintService->setEnabled(!mOrder.id.isEmpty());
     ui->btnTransferDishes->setEnabled(!mOrder.id.isEmpty());
     ui->btnTransferTable->setEnabled(!mOrder.id.isEmpty());
+    const QJsonObject &jg = mOrder.data.value("f_guest").toObject();
+    QString guestName = jg.value("f_guest_name").toString();
+    ui->btnGuest->setText(guestName.isEmpty() ? tr("Guest info") : guestName);
     qDebug() << "Parse order" << startQuery.msecsTo(QDateTime::currentDateTime());
     ui->orderScrollArea->setUpdatesEnabled(true);
     qApp->processEvents();
@@ -2500,7 +2535,7 @@ void DlgOrder::on_btnCloseOrder_clicked()
     if(ui->btnPrintFiscal->isChecked()) {
         auto *loading = new NLoadingDlg(tr("Printing fiscal check"), this);
         auto *thread  = new QThread();
-        auto *pt = new PrintTaxN("192.168.100.207", 1025, "a5tW1rph", "true", "3", "3");
+        auto *pt = new PrintTaxN("192.168.100.207", 1025, "a5tW1rph", "false", "3", "3");
         pt->moveToThread(thread);
         auto order = self->mOrder;
         connect(thread, &QThread::started, pt, [ = ]() {
@@ -2509,18 +2544,19 @@ void DlgOrder::on_btnCloseOrder_clicked()
                     continue;
                 }
 
+                d.data["f_service_factor"] = mOrder.serviceFactor();
                 pt->addGoods(d.fiscalDepartment(),
                              d.adgtCode(),
                              QString::number(d.dishId),
                              d.dishName,
-                             d.price,
+                             d.total(false) / d.qty,
                              d.qty,
                              d.discountFactor() * 100);
             }
 
-            //pt->makeJsonAndPrint(order.paidCash(), order.paidCard(), order.paidPrepaid());
+            pt->makeJsonAndPrint(order.paidCash(), order.paidCard(), order.paidPrepaid());
 
-            pt->makeJsonAndPrintSimple(1, order.paidCard(), order.paidPrepaid());
+            //pt->makeJsonAndPrintSimple(1, order.paidCard(), order.paidPrepaid(), "false");
         });
         connect(pt, &PrintTaxN::started, loading, &QDialog::show, Qt::QueuedConnection);
         connect(pt, &PrintTaxN::finished, self, [ = ](const QString & inJson, const QString & outJson, const QString & err, int result) {
@@ -3239,4 +3275,22 @@ void DlgOrder::on_btnCopyUUID_clicked()
 {
     auto *cl = qApp->clipboard();
     cl->setText(mOrder.id);
+}
+
+void DlgOrder::on_btnGuest_clicked()
+{
+    if (mOrder.id.isEmpty()) {
+        C5Message::error(tr("Empty order"));
+        return;
+    }
+    DlgGuestInfo dg(mUser);
+    dg.setInfo(mOrder.data.value("f_guest").toObject());
+    if (dg.exec() == QDialog::Accepted) {
+        mOrder.data["f_guest"] = dg.getInfo();
+        NInterface::query1("/engine/v2/waiter/order/save-data",
+                           mUser->mSessionKey,
+                           this,
+                           {{"id", mOrder.id}, {"data", mOrder.data}},
+                           [this](const QJsonObject &jdoc) { parseOrder(jdoc); });
+    }
 }

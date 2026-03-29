@@ -1,4 +1,5 @@
 #include "dlgguestinfo.h"
+#include "dlgtext.h"
 #include "ui_dlgguestinfo.h"
 
 DlgGuestInfo::DlgGuestInfo(C5User *user) :
@@ -6,12 +7,25 @@ DlgGuestInfo::DlgGuestInfo(C5User *user) :
     ui(new Ui::DlgGuestInfo)
 {
     ui->setupUi(this);
-    fCode = 0;
 }
 
 DlgGuestInfo::~DlgGuestInfo()
 {
     delete ui;
+}
+
+void DlgGuestInfo::setInfo(const QJsonObject &g)
+{
+    ui->leContactName->setText(g.value("f_guest_name").toString());
+    ui->lePhoneNumber->setText(g.value("f_guest_phone").toString());
+    ui->leAddress->setText(g.value("f_guest_address").toString());
+}
+
+QJsonObject DlgGuestInfo::getInfo() const
+{
+    return {{"f_guest_name", ui->leContactName->text()},
+            {"f_guest_phone", ui->lePhoneNumber->text()},
+            {"f_guest_address", ui->leAddress->text()}};
 }
 
 void DlgGuestInfo::on_btnCancel_clicked()
@@ -21,15 +35,32 @@ void DlgGuestInfo::on_btnCancel_clicked()
 
 void DlgGuestInfo::on_btnSave_clicked()
 {
-    //TODO
-    // C5Database db;
-    // db[":f_contactname"] = ui->leContactName->text();
-    // db[":f_phone"] = ui->lePhoneNumber->text();
-    // if (fCode == 0) {
-    //     fCode = db.insert("c_partners");
-    // } else {
-    //     db.update("c_partners", "f_id", fCode);
-    // }
-    // C5Message::info(tr("Saved"));
-    // accept();
+    accept();
+}
+
+void DlgGuestInfo::on_btnEditAddress_clicked()
+{
+    QString txt;
+    if (!DlgText::getText(mUser, tr("Address"), txt)) {
+        return;
+    }
+    ui->leAddress->setText(txt);
+}
+
+void DlgGuestInfo::on_btnEditPhone_clicked()
+{
+    QString txt;
+    if (!DlgText::getText(mUser, tr("Phone"), txt)) {
+        return;
+    }
+    ui->lePhoneNumber->setText(txt);
+}
+
+void DlgGuestInfo::on_btnEditContact_clicked()
+{
+    QString txt;
+    if (!DlgText::getText(mUser, tr("Contact"), txt)) {
+        return;
+    }
+    ui->leContactName->setText(txt);
 }

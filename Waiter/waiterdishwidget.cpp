@@ -1,12 +1,13 @@
 #include "waiterdishwidget.h"
-#include "ui_waiterdishwidget.h"
-#include "dict_dish_state.h"
-#include "c5utils.h"
-#include "format_date.h"
 #include <QPaintEvent>
 #include <QPainter>
 #include <QPushButton>
 #include <QStyle>
+#include "c5utils.h"
+#include "dict_dish_state.h"
+#include "dlgstartstophourly.h"
+#include "format_date.h"
+#include "ui_waiterdishwidget.h"
 
 WaiterDishWidget::WaiterDishWidget(const WaiterDish &d, bool showRemoved, QWidget *parent) :
     WaiterOrderItemWidget(d, parent),
@@ -16,6 +17,7 @@ WaiterDishWidget::WaiterDishWidget(const WaiterDish &d, bool showRemoved, QWidge
     ui->setupUi(this);
     ui->wmodificators->setVisible(false);
     ui->btnChecked->setVisible(false);
+    ui->btnPause->setVisible(false);
     updateDish(d);
     adjustSize();
     QFont f(font());
@@ -59,6 +61,7 @@ void WaiterDishWidget::updateDish(WaiterDish value)
     }
 
     ui->btnDish->setText(name);
+    ui->btnPause->setVisible(value.isHourlyPayment() && value.isPlaying());
     QDateTime dt = mOrderItem.isPrinted() ?
                    str_to_datetime(mOrderItem.appendedTime()) :
                    str_to_datetime(mOrderItem.appendedTime());
@@ -158,4 +161,12 @@ void WaiterDishWidget::on_btnDish_clicked()
     setFocused(true);
     updateDish(mOrderItem);
     emit focused(mOrderItem.id);
+}
+
+void WaiterDishWidget::on_btnPause_clicked()
+{
+    DlgStartStopHourly d(this);
+    if (d.exec() == QDialog::Accepted) {
+        emit stopPlay();
+    }
 }

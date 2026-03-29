@@ -266,5 +266,6 @@
         <file>grapes.png</file>
         <file>checklists.png</file>
         <file>diffs.png</file>
+        <file>storage.png</file>
     </qresource>
 </RCC>

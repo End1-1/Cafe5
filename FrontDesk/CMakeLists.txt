@@ -128,7 +128,6 @@ set(APP_SOURCES
     ../Forms/dlgdirtystoredoc.ui
     ../Forms/dlgdriverroutedate.ui
     ../Forms/dlgexportsaletoasoptions.ui
-    ../Forms/dlgguestinfo.ui
     ../Forms/dlglist2.ui
     ../Forms/dlgnewcl.ui
     ../Forms/dlgqty.ui
@@ -341,7 +340,6 @@ set(APP_SOURCES
     ../Forms/dlgdirtystoredoc.h
     ../Forms/dlgdriverroutedate.h
     ../Forms/dlgexportsaletoasoptions.h
-    ../Forms/dlgguestinfo.h
     ../Forms/dlglist2.h
     ../Forms/dlgnewcl.h
     ../Forms/dlgqty.h
@@ -660,7 +658,6 @@ set(APP_SOURCES
     ../Forms/dlgdirtystoredoc.cpp
     ../Forms/dlgdriverroutedate.cpp
     ../Forms/dlgexportsaletoasoptions.cpp
-    ../Forms/dlgguestinfo.cpp
     ../Forms/dlglist2.cpp
     ../Forms/dlgnewcl.cpp
     ../Forms/dlgqty.cpp

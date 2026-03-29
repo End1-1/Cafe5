@@ -41,7 +41,12 @@ void NDataProvider::getData(const QString &route, const QJsonObject &data)
     mStartDate = QDateTime::currentDateTime();
     mTimer->restart();
     emit started();
-    QString url = QString("%1://%2/%3").arg(mConnectionProtocol, mConnectionHost, route);
+    QString url;
+    if (route.startsWith("http", Qt::CaseInsensitive)) {
+        url = route;
+    } else {
+        url = QString("%1://%2/%3").arg(mConnectionProtocol, mConnectionHost, route);
+    }
     QNetworkRequest rq(url);
     rq.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
     rq.setRawHeader("Authorization", "Bearer " + (mBearer.isEmpty() ? sessionKey.toUtf8() : mBearer.toUtf8()));

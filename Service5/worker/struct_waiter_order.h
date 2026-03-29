@@ -100,14 +100,8 @@ struct WaiterOrder {
     {
         return data["f_print_count"].toInt();
     }
-    double paidCash() const
-    {
-        return data["f_paid_cash"].toDouble();
-    }
-    double paidCard() const
-    {
-        return data["f_paid_card"].toDouble();
-    }
+    double paidCash() const { return data["f_amount_cash"].toDouble(); }
+    double paidCard() const { return data["f_amount_card"].toDouble(); }
     double paidPrepaid() const
     {
         return data["f_paid_prepaid"].toDouble();

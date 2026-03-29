@@ -114,6 +114,12 @@
         <height>672</height>
        </rect>
       </property>
+      <property name="autoFillBackground">
+       <bool>false</bool>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">background:white</string>
+      </property>
       <layout class="QVBoxLayout" name="verticalLayout">
        <property name="spacing">
         <number>0</number>
@@ -131,9 +137,12 @@
         <number>0</number>
        </property>
        <item>
-        <widget class="QGraphicsView" name="gv">
-         <property name="frameShape">
-          <enum>QFrame::Shape::NoFrame</enum>
+        <widget class="QLabel" name="lbPreview">
+         <property name="text">
+          <string>Preview</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignmentFlag::AlignHCenter|Qt::AlignmentFlag::AlignTop</set>
          </property>
         </widget>
        </item>
@@ -183,7 +192,7 @@
          <string>Back</string>
         </property>
         <property name="icon">
-         <iconset resource="../resources/res.qrc">
+         <iconset resource="resources/res.qrc">
           <normaloff>:/left-chevron.png</normaloff>:/left-chevron.png</iconset>
         </property>
         <property name="iconSize">
@@ -237,7 +246,7 @@
          <string>Parameters</string>
         </property>
         <property name="icon">
-         <iconset resource="../resources/res.qrc">
+         <iconset resource="resources/res.qrc">
           <normaloff>:/printer.png</normaloff>:/printer.png</iconset>
         </property>
         <property name="iconSize">
@@ -275,7 +284,7 @@
          <string>Reload</string>
         </property>
         <property name="icon">
-         <iconset resource="../resources/res.qrc">
+         <iconset resource="resources/res.qrc">
           <normaloff>:/reload.png</normaloff>:/reload.png</iconset>
         </property>
         <property name="iconSize">
@@ -313,7 +322,7 @@
          <string>Print</string>
         </property>
         <property name="icon">
-         <iconset resource="../resources/res.qrc">
+         <iconset resource="resources/res.qrc">
           <normaloff>:/printer.png</normaloff>:/printer.png</iconset>
         </property>
         <property name="iconSize">
@@ -333,8 +342,8 @@
   </layout>
  </widget>
  <resources>
-  <include location="../resources/res.qrc"/>
-  <include location="../resources/res.qrc"/>
+  <include location="resources/res.qrc"/>
+  <include location="resources/res.qrc"/>
  </resources>
  <connections/>
 </ui>

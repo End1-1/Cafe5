@@ -11,7 +11,7 @@ set(CMAKE_AUTORCC ON)       # Автоматическая генерация и
 
 
 # Определяем Qt модули
-find_package(Qt6 REQUIRED COMPONENTS Core Network Sql WebSockets)
+find_package(Qt6 REQUIRED COMPONENTS Core Network Sql WebSockets PrintSupport Gui)
 
 # Источники
 set(SOURCES
@@ -62,7 +62,10 @@ elseif(UNIX)
     list(APPEND SOURCES main_linux.cpp)
 endif()
 
-add_executable(${PROJECT_NAME} ${SOURCES} ${HEADERS} ${UI_HEADERS} ${MOC_HEADERS} )
+add_executable(${PROJECT_NAME} ${SOURCES} ${HEADERS} ${UI_HEADERS} ${MOC_HEADERS}
+    ../Classes/c5printing.cpp ../Classes/c5printing.h
+    serverprinting.h serverprinting.cpp
+    ../Classes/c5printjson.cpp ../Classes/c5printjson.h )
 
 # Добавляем include пути
 target_include_directories(${PROJECT_NAME} PRIVATE
@@ -83,6 +86,8 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
     Qt6::Network
     Qt6::Sql
     Qt6::WebSockets
+    Qt6::PrintSupport
+    Qt6::Gui
 )
 
 # Платформенные зависимости

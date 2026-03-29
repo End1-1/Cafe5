@@ -262,5 +262,8 @@
         <file>sales-reports.png</file>
         <file>filter.png</file>
         <file>Waiter.qm</file>
+        <file>guests.png</file>
+        <file>view.png</file>
+        <file>pause.png</file>
     </qresource>
 </RCC>

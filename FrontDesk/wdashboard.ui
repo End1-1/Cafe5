@@ -491,7 +491,7 @@
         </property>
         <property name="icon">
          <iconset resource="../resources/res.qrc">
-          <normaloff>:/workstation.png</normaloff>:/workstation.png</iconset>
+          <normaloff>:/storage.png</normaloff>:/storage.png</iconset>
         </property>
         <property name="form" stdset="0">
          <string>form_newstoreinput</string>
@@ -514,7 +514,7 @@
         </property>
         <property name="icon">
          <iconset resource="../resources/res.qrc">
-          <normaloff>:/workstation.png</normaloff>:/workstation.png</iconset>
+          <normaloff>:/storage.png</normaloff>:/storage.png</iconset>
         </property>
         <property name="form" stdset="0">
          <string>form_newstoreoutput</string>
