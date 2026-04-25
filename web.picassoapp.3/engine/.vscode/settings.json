@@ -1,0 +1,8 @@
+{
+    "intelephense.files.associations": [
+        "**/*.php"
+    ],
+    "intelephense.environment.includePaths": [
+        "."
+    ]
+}

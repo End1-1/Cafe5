@@ -1,0 +1,182 @@
+<?php
+# (C) 2026 Kudryashov Vasili
+# Created - 2026-02-10 11:33:35
+# Last modified - 2026-02-10 11:33:38
+
+define('CP_APPEND_DATABASE', 1);
+
+define('CP_T1_PREFERENCE', 100);
+define('CP_T1_USERGROUPS', 101);
+define('CP_T1_USERS', 102);
+define('CP_T1_DATABASES', 103);
+define('CP_T1_SETTIGNS', 104);
+define('CP_T1_LOGIN_TO_MANAGER', 105);
+define('CP_T1_LOGIN_TO_WAITER', 106);
+define('CP_T1_ALLOW_CHANGE_CASH_DOC_DATE', 107);
+define('CP_T1_ALLOW_CHANGE_STORE_DOC_DATE', 108);
+define('CP_T1_GOODS_PRICING', 109);
+define('CP_T1_BREEZE', 110);
+
+define('CP_T2_ACTION', 200);
+define('CP_T2_STORE_INPUT', 201);
+define('CP_T2_STORE_OUTPUT', 202);
+define('CP_T2_STORE_MOVE', 203);
+define('CP_T2_STORE_INVENTORY', 204);
+define('CP_T2_COUNT_OUTPUT_OF_SALE', 205);
+define('CP_T2_CALCULATE_SELF_COST', 206);
+define('CP_T2_STORE_COMPLECTATION', 207);
+define('CP_T2_STORE_DECOMPLECTATION', 208);
+define('CP_T2_GOODS_RESERVATIONS', 209);
+define('CP_T2_REATAIL_TRADE', 210);
+define('CP_T2_WHOSALE_TRADE', 211);
+
+define('CP_T3_REPORTS', 300);
+define('CP_T3_SALES_COMMON', 301);
+define('CP_T3_DOCUMENTS', 302);
+define('CP_T3_STORE', 303);
+define('CP_T3_STORE_MOVEMENT', 304);
+define('CP_T3_TSTORE_EXTRA', 305);
+define('CP_T3_STORE_SALE', 306);
+define('CP_T3_DOCUMENTS_STORE', 307);
+define('CP_T3_SALE_REMOVED_DISHES', 308);
+define('CP_T3_SALE_DISHES', 309);
+define('CP_T3_SALE_FROM_STORE_TOTAL', 310);
+define('CP_T3_DISCOUNT_STATISTICS', 311);
+define('CP_T3_DEBTS_PARTNER', 312);
+define('CP_T3_CONSUPTION_REASON', 313);
+define('CP_T3_PREORDERS', 315);
+define('CP_T3_STORAGE_UNCOMPLECTED', 317);
+define('CP_T3_MOVE_UNCOMPLECTED', 318);
+define('CP_T3_CUSTOM_REPORTS', 320);
+define('CP_T3_DRAFT_OUTPUT_RECIPES', 321);
+define('CP_T3_DEBTS_CUSTOMER', 322);
+
+define('CP_T4_MENU', 400);
+define('CP_T4_MENU_NAMES', 401);
+define('CP_T4_PART1', 402);
+define('CP_T4_PART2', 403);
+define('CP_T4_DISHES', 404);
+define('CP_T4_DISH_REMOVE_REASON', 405);
+define('CP_T4_DISH_COMMENTS', 406);
+define('CP_T4_MENU_REVIEW', 408);
+define('CP_T4_DISHES_PACKAGES', 409);
+
+define('CP_T5_WAITER', 500);
+define('CP_T5_MULTIPLE_RECEIPT', 501);
+define('CP_T5_REMOVE_PRINTED_SERVICE', 502);
+define('CP_T5_CHANGE_SERVICE_VALUE', 503);
+define('CP_T5_PAY_TRANSFER_TO_ROOM', 504);
+define('CP_T5_PAY_COMPLIMENTARY', 505);
+define('CP_T5_PAY_BREAKFAST', 506);
+define('CP_T5_PAY_CITYLEDGER', 507);
+define('CP_T5_REFUND_GOODS', 508);
+define('CP_T5_SHIFT_ROTATION', 509);
+define('CP_T5_REMOVE_ROW_FROM_SHOP', 510);
+define('CP_T5_REPORTS', 511);
+define('CP_T5_VIEW_RESERVED_TABLES', 512);
+define('CP_T5_EDIT_RESERVE', 513);
+define('CP_T5_MOVETABLE', 514);
+
+define('CP_T5_ENTER_DLGFACE', 515);
+define('CP_T5_CHANGE_STAFF_OF_TABLE', 516);
+define('CP_T5_CHANGE_MENU', 517);
+define('CP_T5_STOPLIST', 518);
+define('CP_T5_PREORDER', 519);
+define('CP_T5_DISCOUNT', 520);
+define('CP_T5_CANCEL_DISCOUNT', 521);
+define('CP_T5_PRINT_PRECHECK', 522);
+define('CP_T5_CANCEL_PRECHECK', 523);
+define('CP_T5_REPEAT_PRECHECK', 524);
+define('CP_T5_FINAL_CHECK', 525);
+define('CP_T5_EDIT_TABLE', 526);
+define('CP_T5_SPLITGUEST', 527);
+define('CP_T5_MANAGER_TOOLS', 528);
+define('CP_T5_PRINT_RECEIPT', 529);
+define('CP_T5_REPEAT_SERVICE', 530);
+define('CP_T5_CHANGE_DATE_OF_SALE', 531);
+define('CP_T5_BILL_WITHOUT_SERVICE', 532);
+define('CP_T5_EDIT_CLOSED_ORDER', 533);
+define('CP_T5_PRESENT', 534);
+define('CP_T5_EDIT_BOOKING', 535);
+define('CP_T5_VIEW_TAX_AND_NO_SALES', 536);
+define('CP_T5_PAY_IDRAM', 537);
+define('CP_T5_PAY_PAYX', 538);
+define('CP_T5_VIEW_SALES_OF_ALL_USERS', 539);
+define('CP_T5_SHOP_CAN_DISCOUNT', 540);
+
+define('CP_T6_GOODS_MENU', 600);
+define('CP_T6_UNITS', 601);
+define('CP_T6_GROUPS', 602);
+define('CP_T6_GOODS', 603);
+define('CP_T6_STORAGE', 605);
+define('CP_T6_GOODS_IMAGES', 608);
+define('CP_T6_QTY_REMINDER', 609);
+define('CP_T6_COMPLECTATIONS', 610);
+define('CP_T6_GOODS_ONLY_PRICE_EDIT', 611);
+define('CP_T6_GOODS_SPECIAL_PRICES', 612);
+define('CP_T6_GOODS_PRICE', 613);
+
+define('CP_T7_OTHER', 700);
+define('CP_T7_CREDIT_CARD', 701);
+define('CP_T7_DISCOUNT_SYSTEM', 702);
+define('CP_T7_UPLOAD_DATA_TO_OTHER_SERVER', 703);
+define('CP_T7_HALLS', 704);
+define('CP_T7_TABLES', 705);
+define('CP_T7_UPLOAD_DATE_SETTINGS', 706);
+define('CP_T7_TRANSLATOR', 707);
+define('CP_T7_STORE_REASON', 708);
+define('CP_T7_PARTNERS', 709);
+define('CP_T7_ORDER_MARKS', 710);
+define('CP_T7_ROUTE', 711);
+define('CP_T7_ROUTE_EXEC', 712);
+
+define('CP_T8_CASH', 800);
+define('CP_T8_CASH_DOC', 801);
+define('CP_T8_CASH_COMMON_REPORT', 802);
+define('CP_T8_CASH_DETAILED_REPORT', 803);
+define('CP_T8_CASH_NAMES', 804);
+define('CP_T8_CASH_MOVEMENT', 807);
+define('CP_T8_CURRENCY', 808);
+define('CP_T8_EDIT_CURRENCY', 809);
+define('CP_T8_CURRENCY_CROSS_RATE', 810);
+define('CP_T8_CURRENCY_CROSS_RATE_HISTORY', 811);
+define('CP_T8_SHIFTS', 812);
+
+define('CP_T9_SALARY', 900);
+define('CP_T9_SALARY_DOC', 901);
+define('CP_T9_REPORT', 902);
+define('CP_T9_PAYMENT', 903);
+
+define('CP_T10_MANUFACTURE', 1000);
+define('CP_T10_ACTION_LIST', 1001);
+define('CP_T10_DAILY', 1002);
+define('CP_T10_PRODUCT_LIST', 1003);
+define('CP_T10_GENERAL_REPORT', 1004);
+define('CP_T10_GENERAL_REPORT_ONLY_DATE', 1005);
+define('CP_T10_WORKSHOPS', 1006);
+define('CP_T10_ACTIONS_STAGES', 1007);
+define('CP_T10_ACTIVE_TASKS', 1008);
+define('CP_T10_CREATE_TASK', 1009);
+
+define('CP_T11_MISCELANOUS', 1100);
+define('CP_T11_DO_NOT_SHOW_INPUT_PRICES', 1101);
+
+define('CP_T12_SHOP_ENTER_SALE', 1203);
+define('CP_T12_SHOP_ENTER_STORE', 1204);
+define('CP_T12_SHOP_FISCAL_REPORT', 1205);
+define('CP_T12_SHOP_SALE_OF_ALL_USERS', 1206);
+
+
+class Permissions
+{
+    private $permissions;
+    public function __construct($source)
+    {
+        $this->permissions = $source;
+    }
+
+    public function check($permission)
+    {
+        return in_array($permission, $this->permissions, true);
+    }
+}
