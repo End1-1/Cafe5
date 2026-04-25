@@ -267,5 +267,7 @@
         <file>checklists.png</file>
         <file>diffs.png</file>
         <file>storage.png</file>
+        <file>cashbox.png</file>
+        <file>sales.png</file>
     </qresource>
 </RCC>

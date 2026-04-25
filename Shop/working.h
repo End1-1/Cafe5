@@ -44,15 +44,9 @@ public:
 
     WOrder* newSale(int type);
 
-    bool eventFilter(QObject *watched, QEvent *event);
+    bool eventFilter(QObject* watched, QEvent* event);
 
-    void decQty(int id, double qty);
-
-    void setActiveWidget(WOrder *w);
-
-    WOrder* findDraft(const QString &draftid);
-
-    void openDraft(const QString &draftid);
+    void setActiveWidget(WOrder* w);
 
     static Working* working();
 
@@ -97,6 +91,8 @@ private:
     void openSearch();
 
 private slots:
+    void orderSaved(QWidget* w);
+
     void timeout();
 
     void onCtrlI();
@@ -160,8 +156,6 @@ private slots:
     void on_btnGiftCard_clicked();
 
     void on_btnCostumerDisplay_clicked(bool checked);
-
-    void on_btnOpenDraft_clicked();
 
     void on_btnColumns_clicked();
 

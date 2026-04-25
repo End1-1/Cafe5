@@ -2,7 +2,6 @@
 #define VIEWORDER_H
 
 #include "c5shopdialog.h"
-#include "oheader.h"
 
 namespace Ui
 {
@@ -24,15 +23,11 @@ public:
     void printCheckWithTax(const QString &id, std::function<void(const QString &)> funcSuccess);
 
 private slots:
-    void removeOrderResponse(const QJsonObject &jdoc);
-
     void on_btnReturn_clicked();
 
     void on_btnTaxReturn_clicked();
 
     void on_btnClose_clicked();
-
-    void on_btnEditDate_clicked();
 
     void on_btnCopyUUID_clicked();
 
@@ -59,17 +54,13 @@ private slots:
     void on_btnPrintPrices_clicked();
 
 private:
-    Ui::ViewOrder* ui;
-
-    OHeader fOHeader;
+    Ui::ViewOrder *ui;
 
     QString fSaleDoc;
 
     QString fUuid;
 
     Working* fWorking;
-
-    void returnFalse(const QString &msg, C5Database *db);
 
     void countOrder();
 };

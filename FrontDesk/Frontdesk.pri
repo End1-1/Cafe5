@@ -166,6 +166,7 @@ FORMS += \
     rabstracteditorreport.ui \
     rwaiterstationconfig.ui \
     wdashboard.ui \
+    worderinspector.ui \
     rfilterdialog.ui
 
 
@@ -502,6 +503,7 @@ HEADERS += \
         rwaiterstationconfig.h \
         version.h \
         wdashboard.h \
+        worderinspector.h \
         ../Classes/dict_doc_reason.h \
         rfilterdialog.h
 
@@ -815,6 +817,7 @@ SOURCES += \
         rabstractspecialwidget.cpp \
         rwaiterstationconfig.cpp \
         wdashboard.cpp \
+        worderinspector.cpp \
         rfilterdialog.cpp
 
 include(C:/projects/QXlsx/QXlsx.pri)

@@ -1,11 +1,9 @@
 #ifndef C5SALEDOC_H
 #define C5SALEDOC_H
 
+#include <QJsonObject>
 #include "c5officewidget.h"
 #include "cpartners.h"
-#include "odraftsale.h"
-#include "odraftsalebody.h"
-#include <QJsonObject>
 
 namespace Ui
 {
@@ -56,8 +54,6 @@ private slots:
     void createInvoiceAS();
 
     void createRetailAS();
-
-    void makeStoreOutput();
 
     void exportToExcel();
 
@@ -120,8 +116,6 @@ private slots:
 private:
     Ui::C5SaleDoc* ui;
     CPartners fPartner;
-    ODraftSale fDraftSale;
-    ODraftSaleBody fDraftSaleBody;
     int fMode;
     QAction* fActionSave;
     QAction* fActionDraft;

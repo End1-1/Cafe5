@@ -5,12 +5,21 @@
 #include <QSettings>
 
 C5ConnectionDialog* C5ConnectionDialog::mInstance = nullptr;
+QString C5ConnectionDialog::mSettingsPath;
 
 C5ConnectionDialog::C5ConnectionDialog(QWidget *parent)
     : QDialog(parent), ui(new Ui::C5ConnectionDialog)
 {
     ui->setupUi(this);
-    QSettings s(_ORGANIZATION_, _APPLICATION_ + QString("\\") + _MODULE_);
+    QStringList pathParts;
+    pathParts << _APPLICATION_ << _MODULE_;
+
+    if (!mSettingsPath.isEmpty()) {
+        pathParts << mSettingsPath;
+    }
+
+    QString fullPath = pathParts.join("\\");
+    QSettings s(_ORGANIZATION_, fullPath);
     ui->leAddress->setText(s.value("ss_server_address").toString());
     ui->leServerKey->setText(s.value("ss_server_key").toString());
     ui->leSettingsPassword->setText(s.value("ss_settings_password").toString());
@@ -87,7 +96,15 @@ int C5ConnectionDialog::connectionType()
 
 void C5ConnectionDialog::on_btnSave_clicked()
 {
-    QSettings s(_ORGANIZATION_, _APPLICATION_ + QString("\\") + _MODULE_);
+    QStringList pathParts;
+    pathParts << _APPLICATION_ << _MODULE_;
+
+    if (!mSettingsPath.isEmpty()) {
+        pathParts << mSettingsPath;
+    }
+
+    QString fullPath = pathParts.join("\\");
+    QSettings s(_ORGANIZATION_, fullPath);
     s.setValue("ss_server_address", ui->leAddress->text());
     s.setValue("ss_server_key", ui->leServerKey->text());
     s.setValue("ss_settings_password", ui->leSettingsPassword->text());

@@ -24,11 +24,4 @@ MenuDish::~MenuDish()
     delete ui;
 }
 
-void MenuDish::setImage()
-{
-    if(!fDish->pixmap.isNull()) {
-        ui->lbImage->setPixmap(fDish->pixmap.scaled(ui->lbImage->size(), Qt::KeepAspectRatio, Qt::SmoothTransformation));
-    } else {
-        ui->lbImage->setPixmap(QPixmap(":/help.png"));
-    }
-}
+void MenuDish::setImage() {}

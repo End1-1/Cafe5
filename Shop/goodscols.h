@@ -1,6 +1,6 @@
 #pragma once
 #define col_action 0
-#define col_bacode 1
+#define col_barcode 1
 #define col_group 2
 #define col_name 3
 #define col_qty 4

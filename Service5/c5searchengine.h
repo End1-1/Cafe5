@@ -25,6 +25,12 @@ public:
     QString updateDictionary(const QJsonObject &jo, const SocketStruct &ss);
     QString searchStoreDocStatus(const QJsonObject &jo, const SocketStruct &ss);
     QString searchStoreDocType(const QJsonObject &jo, const SocketStruct &ss);
+    QString searchCurrency(const QJsonObject &jo, const SocketStruct &ss);
+    QString searchCashbox(const QJsonObject &jo, const SocketStruct &ss);
+    QString searchPaymentType(const QJsonObject &jo, const SocketStruct &ss);
+    QString searchEmployee(const QJsonObject &jo, const SocketStruct &ss);
+    QString searchEmployeeGroup(const QJsonObject &jo, const SocketStruct &ss);
+    QString searchUpdateGoodsLastInputPrices(const QJsonObject &jo, const SocketStruct &ss);
 
 private:
 

@@ -2,7 +2,6 @@
 #define SALES_H
 
 #include "c5shopdialog.h"
-#include "c5database.h"
 
 namespace Ui
 {
@@ -24,8 +23,6 @@ public:
 
     static void showSales(Working *w, C5User *u);
 
-    static bool printCheckWithTax(C5Database &db, const QString &id);
-
     static bool printReceipt(const QString &id, C5User *user);
 
 private slots:
@@ -41,8 +38,6 @@ private slots:
 
     void on_btnModeItems_clicked();
 
-    void on_btnCashColletion_clicked();
-
     void on_leFilter_textChanged(const QString &arg1);
 
     void on_btnPrintTaxZ_clicked();
@@ -52,8 +47,6 @@ private slots:
     void on_btnExit_clicked();
 
     void on_btnViewOrder_clicked();
-
-    void on_btnChangeDate_clicked();
 
     void on_btnShowMenu_clicked();
 

@@ -42,6 +42,8 @@ HEADERS += \
     worker/struct_goods_item.h \
     worker/struct_hall.h \
     worker/struct_partner.h \
+    worker/struct_employee.h \
+    worker/struct_employee_group.h \
     worker/struct_storage_item.h
 
 FORMS += \

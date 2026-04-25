@@ -1,5 +1,6 @@
 #include "dlgstartstophourly.h"
 #include "c5message.h"
+#include "dlgdatetimepicker.h"
 #include "ui_dlgstartstophourly.h"
 
 DlgStartStopHourly::DlgStartStopHourly(QWidget *parent)
@@ -25,4 +26,15 @@ void DlgStartStopHourly::on_btnStop_clicked()
 void DlgStartStopHourly::on_btnCancel_clicked()
 {
     reject();
+}
+
+void DlgStartStopHourly::on_btnSetEnd_clicked()
+{
+    DlgDateTimePicker d(this);
+    d.setDateTime(mDateTime);
+    if (d.exec() == QDialog::Accepted) {
+        mDateTime = d.dateTime();
+        mOption = 1;
+        accept();
+    }
 }

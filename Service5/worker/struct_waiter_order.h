@@ -25,6 +25,7 @@ struct WaiterOrder {
     QList<WaiterDish> precheckDishes;
     QString nameLower;
     QStringList words;
+    QJsonObject rawBody;
     bool isEmpty()
     {
         for(auto d : dishes) {
@@ -128,6 +129,16 @@ struct WaiterOrder {
     {
         return data.value(key);
     }
+    int normalDishesCount() const
+    {
+        int c = 0;
+        for (auto const &d : dishes) {
+            if (d.state == 1) {
+                c++;
+            }
+        }
+        return c;
+    }
 };
 
 template<>
@@ -135,6 +146,7 @@ struct JsonParser<WaiterOrder> {
     static WaiterOrder fromJson(const QJsonObject &jo)
     {
         WaiterOrder wo;
+        wo.rawBody = jo;
         wo.id = jo["f_id"].toString();
         wo.cashSessionId = jo["f_cash_session_id"].toInt();
         wo.state = jo["f_state"].toInt();

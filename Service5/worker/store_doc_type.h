@@ -1,6 +1,4 @@
 #pragma once
-
-#pragma once
 #include <QStringList>
 #include "c5jsonparser.h"
 #include "c5structtraits.h"

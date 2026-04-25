@@ -137,7 +137,7 @@ void C5User::getState(NInterface * n)
 {
     Q_UNUSED(n);
     //TODO
-    // C5Database db;
+    // TODO db;
     // db[":f_user"] = id();
     // db.exec("select * from s_salary_inout where f_user=:f_user and f_dateout is null");
     // fState = db.nextRow() ? usAtWork : usNotAtWork;

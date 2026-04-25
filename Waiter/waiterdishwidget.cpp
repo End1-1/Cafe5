@@ -61,7 +61,7 @@ void WaiterDishWidget::updateDish(WaiterDish value)
     }
 
     ui->btnDish->setText(name);
-    ui->btnPause->setVisible(value.isHourlyPayment() && value.isPlaying());
+    ui->btnPause->setVisible(value.isHourlyPayment());
     QDateTime dt = mOrderItem.isPrinted() ?
                    str_to_datetime(mOrderItem.appendedTime()) :
                    str_to_datetime(mOrderItem.appendedTime());
@@ -166,7 +166,12 @@ void WaiterDishWidget::on_btnDish_clicked()
 void WaiterDishWidget::on_btnPause_clicked()
 {
     DlgStartStopHourly d(this);
+    d.mDateTime = QDateTime::fromString(mOrderItem.data.value("f_play_time").toString(), FORMAT_DATETIME_TO_STR_MYSQL);
     if (d.exec() == QDialog::Accepted) {
-        emit stopPlay();
+        if (d.mOption == 0) {
+            emit stopPlay();
+        } else if (d.mOption == 1) {
+            emit setEndDate(d.mDateTime);
+        }
     }
 }

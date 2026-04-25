@@ -147,6 +147,7 @@ SOURCES += \
     ../Classes/c5translator.cpp \
     ../Cafe5/dlgexitbyversion.cpp \
     ../Classes/fileversion.cpp \
+    dlgmovemoney.cpp \
     wplast30sessions.cpp \
     wpwidget.cpp
 
@@ -275,6 +276,7 @@ HEADERS += \
     ../Classes/c5translator.h \
     ../Cafe5/dlgexitbyversion.h \
     ../Classes/fileversion.h \
+    dlgmovemoney.h \
     wplast30sessions.h \
     wpwidget.h
 
@@ -342,6 +344,7 @@ FORMS += \
     dlgcl.ui \
     dlgexitwithmessage.ui \
     ../Cafe5/dlgexitbyversion.ui \
+    dlgmovemoney.ui \
     wplast30sessions.ui
 
     INCLUDEPATH += ../Cafe5

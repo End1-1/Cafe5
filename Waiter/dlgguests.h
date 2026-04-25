@@ -8,30 +8,30 @@ namespace Ui
 class DlgGuests;
 }
 
-class C5OrderDriver;
-
 class DlgGuests : public C5Dialog
 {
     Q_OBJECT
 
 public:
-    explicit DlgGuests(C5User *user, C5OrderDriver *order);
+    explicit DlgGuests(C5User *user);
 
     ~DlgGuests();
+
+    void setGuests(int value);
+
+    int guests();
 
 private slots:
     void on_btnGuestUp_clicked();
 
     void on_btnGuestDown_clicked();
 
-    void on_btnSplitOrder_clicked();
+    void on_btnAccept_clicked();
 
-    void on_btnClose_clicked();
+    void on_btnCancel_clicked();
 
 private:
     Ui::DlgGuests* ui;
-
-    C5OrderDriver* fOrder;
 };
 
 #endif // DLGGUESTS_H

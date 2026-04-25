@@ -1,74 +1,72 @@
 #include "dlggoodslist.h"
-#include "ui_dlggoodslist.h"
-#include "c5database.h"
-#include "c5config.h"
 #include <QKeyEvent>
+#include "ui_dlggoodslist.h"
 
-DlgGoodsList::DlgGoodsList(C5User *user, int currency) :
-    C5ShopDialog(user),
-    ui(new Ui::DlgGoodsList)
+DlgGoodsList::DlgGoodsList(C5User *user)
+    : C5ShopDialog(user)
+    , ui(new Ui::DlgGoodsList)
 {
     ui->setupUi(this);
     setWindowState(windowState() | Qt::WindowMaximized);
-    C5Database db;
-    db[":f_store"] = __c5config.defaultStore();
-    db[":f_currency"] = currency;
-    db.exec("select ss.f_goods, "
-            "gg.f_name as f_groupname, "
-            "g.f_scancode, "
-            "g.f_name, "
-            "sum(ss.f_qty * ss.f_type) as f_qty, "
-            "if (coalesce(gp.f_price1disc, 0)>0, gp.f_price1disc, gp.f_price1) as f_price1, "
-            "gp.f_price2, "
-            "ods.f_draftqty, "
-            "rs.f_qty as f_reserve "
-            "from a_store ss "
-            "left join c_goods g on g.f_id=ss.f_goods "
-            "left join c_groups gg on gg.f_id=g.f_group "
-            "left join c_goods_prices gp on gp.f_goods=ss.f_goods "
-            "left join (select b.f_goods, sum(f_qty) as f_draftqty "
-            "   from o_draft_sale_body b "
-            "   left join o_draft_sale s on s.f_id=b.f_header "
-            "   where s.f_state=1 and b.f_state=1 group by 1) ods on ods.f_goods=ss.f_goods "
-            "left join (select f_goods, sum(f_qty) as f_qty "
-            " from a_store_reserve "
-            " where f_store=:f_store and f_state=1 "
-            " group by 1) rs on rs.f_goods=ss.f_goods "
-            "where g.f_enabled=1 and ss.f_store=:f_store and gp.f_currency=:f_currency "
-            "group by 1 "
-            "having sum(ss.f_qty * ss.f_type)>0 "
-            "union "
-            "select g.f_id, gg.f_name as f_groupname, g.f_scancode, g.f_name, "
-            "0, if (coalesce(gpr.f_price1disc, 0)>0, gpr.f_price1disc, gpr.f_price1) as f_price1, "
-            "gpr.f_price2, 0, 0 "
-            "from c_goods g "
-            "left join c_groups gg on gg.f_id=g.f_group "
-            "left join c_goods_prices gpr on gpr.f_goods=g.f_id "
-            "left join c_goods_prices gp on gp.f_goods=g.f_id "
-            "where g.f_service=1 and g.f_enabled=1  and gp.f_currency=:f_currency ");
-    ui->tbl->setRowCount(db.rowCount());
-    int row = 0;
-    double totalRetail = 0, totalWholesale = 0;
+    // TODO db;
+    // db[":f_store"] = __c5config.defaultStore();
+    // db[":f_currency"] = currency;
+    // db.exec("select ss.f_goods, "
+    //         "gg.f_name as f_groupname, "
+    //         "g.f_scancode, "
+    //         "g.f_name, "
+    //         "sum(ss.f_qty * ss.f_type) as f_qty, "
+    //         "if (coalesce(gp.f_price1disc, 0)>0, gp.f_price1disc, gp.f_price1) as f_price1, "
+    //         "gp.f_price2, "
+    //         "ods.f_draftqty, "
+    //         "rs.f_qty as f_reserve "
+    //         "from a_store ss "
+    //         "left join c_goods g on g.f_id=ss.f_goods "
+    //         "left join c_groups gg on gg.f_id=g.f_group "
+    //         "left join c_goods_prices gp on gp.f_goods=ss.f_goods "
+    //         "left join (select b.f_goods, sum(f_qty) as f_draftqty "
+    //         "   from o_draft_sale_body b "
+    //         "   left join o_draft_sale s on s.f_id=b.f_header "
+    //         "   where s.f_state=1 and b.f_state=1 group by 1) ods on ods.f_goods=ss.f_goods "
+    //         "left join (select f_goods, sum(f_qty) as f_qty "
+    //         " from a_store_reserve "
+    //         " where f_store=:f_store and f_state=1 "
+    //         " group by 1) rs on rs.f_goods=ss.f_goods "
+    //         "where g.f_enabled=1 and ss.f_store=:f_store and gp.f_currency=:f_currency "
+    //         "group by 1 "
+    //         "having sum(ss.f_qty * ss.f_type)>0 "
+    //         "union "
+    //         "select g.f_id, gg.f_name as f_groupname, g.f_scancode, g.f_name, "
+    //         "0, if (coalesce(gpr.f_price1disc, 0)>0, gpr.f_price1disc, gpr.f_price1) as f_price1, "
+    //         "gpr.f_price2, 0, 0 "
+    //         "from c_goods g "
+    //         "left join c_groups gg on gg.f_id=g.f_group "
+    //         "left join c_goods_prices gpr on gpr.f_goods=g.f_id "
+    //         "left join c_goods_prices gp on gp.f_goods=g.f_id "
+    //         "where g.f_service=1 and g.f_enabled=1  and gp.f_currency=:f_currency ");
+    // ui->tbl->setRowCount(db.rowCount());
+    // int row = 0;
+    // double totalRetail = 0, totalWholesale = 0;
 
-    while(db.nextRow()) {
-        ui->tbl->setData(row, 0, db.getInt("f_goods"));
-        ui->tbl->setData(row, 1, db.getString("f_groupname"));
-        ui->tbl->setData(row, 2, db.getString("f_scancode"));
-        ui->tbl->setData(row, 3, db.getString("f_name"));
-        ui->tbl->setData(row, 4, db.getDouble("f_qty"));
-        ui->tbl->setData(row, 5, db.getDouble("f_price1"));
-        ui->tbl->setData(row, 6, db.getDouble("f_price2"));
-        ui->tbl->setData(row, 7, db.getDouble("f_draftqty"));
-        ui->tbl->setData(row, 8, db.getDouble("f_reserve"));
-        totalRetail += db.getDouble("f_price1") * db.getDouble("f_qty");
-        totalWholesale += db.getDouble("f_price2") * db.getDouble("f_qty");
-        row++;
-    }
+    // while(db.nextRow()) {
+    //     ui->tbl->setData(row, 0, db.getInt("f_goods"));
+    //     ui->tbl->setData(row, 1, db.getString("f_groupname"));
+    //     ui->tbl->setData(row, 2, db.getString("f_scancode"));
+    //     ui->tbl->setData(row, 3, db.getString("f_name"));
+    //     ui->tbl->setData(row, 4, db.getDouble("f_qty"));
+    //     ui->tbl->setData(row, 5, db.getDouble("f_price1"));
+    //     ui->tbl->setData(row, 6, db.getDouble("f_price2"));
+    //     ui->tbl->setData(row, 7, db.getDouble("f_draftqty"));
+    //     ui->tbl->setData(row, 8, db.getDouble("f_reserve"));
+    //     totalRetail += db.getDouble("f_price1") * db.getDouble("f_qty");
+    //     totalWholesale += db.getDouble("f_price2") * db.getDouble("f_qty");
+    //     row++;
+    // }
 
-    ui->leTotalRetail->setDouble(totalRetail);
+    //ui->leTotalRetail->setDouble(totalRetail);
     // ui->leTotalRetail->setVisible(__c5config.getValue(param_shop_hide_store_qty).toInt() == 1);
     // ui->lbTotalRetail->setVisible(ui->leTotalRetail->isVisible());
-    ui->tbl->setColumnHidden(6, !__c5config.fMainJson["show_whosale_price"].toBool());
+    //ui->tbl->setColumnHidden(6, !__c5config.fMainJson["show_whosale_price"].toBool());
     ui->leSearch->installEventFilter(this);
     ui->tbl->resizeColumnsToContents();
 }

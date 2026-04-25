@@ -1355,6 +1355,35 @@
                  </spacer>
                 </item>
                 <item>
+                 <widget class="QLabel" name="label_15">
+                  <property name="text">
+                   <string>Cooking time</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="C5LineEdit" name="leCookingTime">
+                  <property name="minimumSize">
+                   <size>
+                    <width>100</width>
+                    <height>0</height>
+                   </size>
+                  </property>
+                  <property name="maximumSize">
+                   <size>
+                    <width>100</width>
+                    <height>16777215</height>
+                   </size>
+                  </property>
+                  <property name="focusPolicy">
+                   <enum>Qt::FocusPolicy::StrongFocus</enum>
+                  </property>
+                  <property name="readOnly">
+                   <bool>false</bool>
+                  </property>
+                 </widget>
+                </item>
+                <item>
                  <widget class="QLabel" name="label_8">
                   <property name="text">
                    <string>Total</string>

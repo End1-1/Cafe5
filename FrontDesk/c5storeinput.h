@@ -45,8 +45,6 @@ public:
 
     virtual bool allowChangeDatabase() override;
 
-    void addByScancode(const QString &code, const QString &qty, QString price);
-
     double total();
 
     void setStore(int id, const QString &name);
@@ -73,6 +71,8 @@ private:
     QAction *mActionSave;
 
     QAction *mActionDraft;
+
+    QString mWebSocketRequestId;
 
     bool buildDoc();
 
@@ -158,5 +158,6 @@ private slots:
     void on_btnCopyLastAdd_clicked();
 
     void on_btnSaveComment_clicked();
+
     void on_btnRemoveGoods_clicked();
 };

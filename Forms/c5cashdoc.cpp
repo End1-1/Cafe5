@@ -1,17 +1,15 @@
 #include "c5cashdoc.h"
-#include "ui_c5cashdoc.h"
-#include "c5storedoc.h"
-#include "c5utils.h"
-#include "c5double.h"
-#include "c5cache.h"
-#include "c5mainwindow.h"
-#include "c5inputdate.h"
 #include "bclientdebts.h"
+#include "c5cache.h"
 #include "c5config.h"
+#include "c5double.h"
+#include "c5inputdate.h"
+#include "c5mainwindow.h"
+#include "c5message.h"
 #include "c5permissions.h"
 #include "c5user.h"
-#include "c5storedraftwriter.h"
-#include "c5message.h"
+#include "c5utils.h"
+#include "ui_c5cashdoc.h"
 
 C5CashDoc::C5CashDoc(QWidget *parent) :
     C5Document(parent),
@@ -143,79 +141,79 @@ bool C5CashDoc::openDoc(const QString &uuid)
     }
 
     fUuid = uuid;
-    C5Database db;
-    C5StoreDraftWriter dw(db);
+    //TODO C5Database db;
+    // C5StoreDraftWriter dw(db);
 
-    if(!dw.readAHeader(uuid)) {
-        C5Message::error(dw.fErrorMsg);
-        return false;
-    }
+    // if(!dw.readAHeader(uuid)) {
+    //     C5Message::error(dw.fErrorMsg);
+    //     return false;
+    // }
 
-    if(fActionDraft) {
-        fActionDraft->setEnabled(dw.value(container_aheader, 0, "f_state").toInt() == DOC_STATE_SAVED);
-    }
+    // if(fActionDraft) {
+    //     fActionDraft->setEnabled(dw.value(container_aheader, 0, "f_state").toInt() == DOC_STATE_SAVED);
+    // }
 
-    ui->deDate->setDate(QDate::fromString(dw.value(container_aheader, 0, "f_date").toString(), FORMAT_DATE_TO_STR_MYSQL));
-    ui->leDocNum->setText(dw.value(container_aheader, 0, "f_userid").toString());
-    ui->lePartner->setValue(dw.value(container_aheader, 0, "f_partner").toInt());
-    fRelation = dw.value(container_aheadercash, 0, "f_related").toInt();
-    ui->leInput->setValue(dw.value(container_aheadercash, 0, "f_cashin").toInt());
-    ui->leOutput->setValue(dw.value(container_aheadercash, 0, "f_cashout").toInt());
-    ui->cbComment->setCurrentText(dw.value(container_aheader, 0, "f_comment").toString());
-    fStoreUuid = dw.value(container_aheadercash, 0, "f_storedoc").toString();
-    ui->lePartner->setValue(dw.value(container_aheader, 0, "f_partner").toInt());
-    ui->cbCurrency->setCurrentIndex(ui->cbCurrency->findData(dw.value(container_aheader, 0, "f_currency").toInt()));
+    // ui->deDate->setDate(QDate::fromString(dw.value(container_aheader, 0, "f_date").toString(), FORMAT_DATE_TO_STR_MYSQL));
+    // ui->leDocNum->setText(dw.value(container_aheader, 0, "f_userid").toString());
+    // ui->lePartner->setValue(dw.value(container_aheader, 0, "f_partner").toInt());
+    // fRelation = dw.value(container_aheadercash, 0, "f_related").toInt();
+    // ui->leInput->setValue(dw.value(container_aheadercash, 0, "f_cashin").toInt());
+    // ui->leOutput->setValue(dw.value(container_aheadercash, 0, "f_cashout").toInt());
+    // ui->cbComment->setCurrentText(dw.value(container_aheader, 0, "f_comment").toString());
+    // fStoreUuid = dw.value(container_aheadercash, 0, "f_storedoc").toString();
+    // ui->lePartner->setValue(dw.value(container_aheader, 0, "f_partner").toInt());
+    // ui->cbCurrency->setCurrentIndex(ui->cbCurrency->findData(dw.value(container_aheader, 0, "f_currency").toInt()));
 
-    for(int i = 0; i < dw.rowCount(container_ecash); i++) {
-        int row = -1;
+    // for(int i = 0; i < dw.rowCount(container_ecash); i++) {
+    //     int row = -1;
 
-        for(int j = 0; j < ui->tbl->rowCount(); j++) {
-            if(ui->tbl->getString(j, 4) == dw.value(container_ecash, i, "f_base").toString()) {
-                row = j;
-                break;
-            }
-        }
+    //     for(int j = 0; j < ui->tbl->rowCount(); j++) {
+    //         if(ui->tbl->getString(j, 4) == dw.value(container_ecash, i, "f_base").toString()) {
+    //             row = j;
+    //             break;
+    //         }
+    //     }
 
-        if(row == -1) {
-            row = ui->tbl->addEmptyRow();
-        }
+    //     if(row == -1) {
+    //         row = ui->tbl->addEmptyRow();
+    //     }
 
-        if(dw.value(container_ecash, i, "f_sign").toInt() == 1) {
-            ui->tbl->setString(row, 0, dw.value(container_ecash, i, "f_id").toString());
-        } else {
-            ui->tbl->setString(row, 1, dw.value(container_ecash, i, "f_id").toString());
-        }
+    //     if(dw.value(container_ecash, i, "f_sign").toInt() == 1) {
+    //         ui->tbl->setString(row, 0, dw.value(container_ecash, i, "f_id").toString());
+    //     } else {
+    //         ui->tbl->setString(row, 1, dw.value(container_ecash, i, "f_id").toString());
+    //     }
 
-        ui->tbl->createLineEdit(row, 2)->setText(dw.value(container_ecash, i, "f_remarks").toString());
-        C5LineEdit *l = ui->tbl->createLineEdit(row, 3);
-        l->setDouble(dw.value(container_ecash, i, "f_amount").toDouble());
-        l->setValidator(new QDoubleValidator(0, 999999999, 2));
-        connect(l, SIGNAL(textChanged(QString)), this, SLOT(amountChanged(QString)));
-        ui->tbl->setData(row, 4, dw.value(container_ecash, i, "f_base"));
-    }
+    //     ui->tbl->createLineEdit(row, 2)->setText(dw.value(container_ecash, i, "f_remarks").toString());
+    //     C5LineEdit *l = ui->tbl->createLineEdit(row, 3);
+    //     l->setDouble(dw.value(container_ecash, i, "f_amount").toDouble());
+    //     l->setValidator(new QDoubleValidator(0, 999999999, 2));
+    //     connect(l, SIGNAL(textChanged(QString)), this, SLOT(amountChanged(QString)));
+    //     ui->tbl->setData(row, 4, dw.value(container_ecash, i, "f_base"));
+    // }
 
-    amountChanged("0");
+    // amountChanged("0");
 
-    if(!fStoreUuid.isEmpty()) {
-        db[":f_id"] = fStoreUuid;
-        db.exec("select f_userid from a_header where f_id=:f_id");
+    // if(!fStoreUuid.isEmpty()) {
+    //     db[":f_id"] = fStoreUuid;
+    //     db.exec("select f_userid from a_header where f_id=:f_id");
 
-        if(db.nextRow()) {
-            ui->lbStoreDoc->setEnabled(true);
-            ui->leStoreDoc->setEnabled(true);
-            ui->btnOpenStoreDoc->setEnabled(true);
-            ui->leStoreDoc->setText(db.getString("f_userid"));
-        }
-    }
+    //     if(db.nextRow()) {
+    //         ui->lbStoreDoc->setEnabled(true);
+    //         ui->leStoreDoc->setEnabled(true);
+    //         ui->btnOpenStoreDoc->setEnabled(true);
+    //         ui->leStoreDoc->setText(db.getString("f_userid"));
+    //     }
+    // }
 
-    if(fRelation) {
-        ui->witems->setEnabled(false);
-        ui->leInput->setEnabled(false);
-        ui->leOutput->setEnabled(false);
-        ui->tbl->setEnabled(false);
-        ui->cbComment->setEnabled(false);
-        ui->lePartner->setEnabled(false);
-    }
+    // if(fRelation) {
+    //     ui->witems->setEnabled(false);
+    //     ui->leInput->setEnabled(false);
+    //     ui->leOutput->setEnabled(false);
+    //     ui->tbl->setEnabled(false);
+    //     ui->cbComment->setEnabled(false);
+    //     ui->lePartner->setEnabled(false);
+    // }
 
     return true;
 }
@@ -302,124 +300,125 @@ void C5CashDoc::amountChanged(const QString &arg1)
 
 void C5CashDoc::draft()
 {
-    C5Database db;
-    C5StoreDraftWriter dw(db);
-    dw.updateField("a_header", "f_state", DOC_STATE_DRAFT, "f_id", fUuid);
-    C5Message::info(tr("Draft created"));
-    fActionDraft->setEnabled(false);
+    // TODO db;
+    // C5StoreDraftWriter dw(db);
+    // dw.updateField("a_header", "f_state", DOC_STATE_DRAFT, "f_id", fUuid);
+    // C5Message::info(tr("Draft created"));
+    // fActionDraft->setEnabled(false);
 
-    if(fRelation) {
-        ui->witems->setEnabled(true);
-        ui->leInput->setEnabled(true);
-        ui->leOutput->setEnabled(true);
-        ui->tbl->setEnabled(true);
-        ui->cbComment->setEnabled(true);
-        ui->lePartner->setEnabled(true);
-    }
+    // if(fRelation) {
+    //     ui->witems->setEnabled(true);
+    //     ui->leInput->setEnabled(true);
+    //     ui->leOutput->setEnabled(true);
+    //     ui->tbl->setEnabled(true);
+    //     ui->cbComment->setEnabled(true);
+    //     ui->lePartner->setEnabled(true);
+    // }
 }
 
 bool C5CashDoc::save(bool writedebt, bool fromrelation)
 {
-    if(fRelation && !fromrelation && !writedebt) {
-        C5Message::info(tr("The document cannot be edited directly"));
-        return false;
-    }
+    //TODO
+    // if(fRelation && !fromrelation && !writedebt) {
+    //     C5Message::info(tr("The document cannot be edited directly"));
+    //     return false;
+    // }
 
-    QString err;
+    // QString err;
 
-    if(ui->leInput->getInteger() == 0 && ui->leOutput->getInteger() == 0) {
-        err += tr("No cash name selected") + "<br>";
-    }
+    // if(ui->leInput->getInteger() == 0 && ui->leOutput->getInteger() == 0) {
+    //     err += tr("No cash name selected") + "<br>";
+    // }
 
-    if(ui->leInput->getInteger() == ui->leOutput->getInteger() && ui->leInput->getInteger() > 0) {
-        err += tr("Input and output cash desks are identical");
-    }
+    // if(ui->leInput->getInteger() == ui->leOutput->getInteger() && ui->leInput->getInteger() > 0) {
+    //     err += tr("Input and output cash desks are identical");
+    // }
 
-    if(zerodouble(ui->leTotal->getDouble())) {
-        err += tr("Empty document") + "<br>";
-    }
+    // if(zerodouble(ui->leTotal->getDouble())) {
+    //     err += tr("Empty document") + "<br>";
+    // }
 
-    if(!err.isEmpty()) {
-        C5Message::error(err);
-        return false;
-    }
+    // if(!err.isEmpty()) {
+    //     C5Message::error(err);
+    //     return false;
+    // }
 
-    C5Database db;
-    C5StoreDraftWriter dw(db);
+    // C5Database db;
+    // C5StoreDraftWriter dw(db);
 
-    if(ui->leDocNum->text().isEmpty()) {
-        ui->leDocNum->setInteger(genNumber(DOC_TYPE_CASH));
-        updateGenNumber(ui->leDocNum->getInteger(), DOC_TYPE_CASH);
-    }
+    // if(ui->leDocNum->text().isEmpty()) {
+    //     ui->leDocNum->setInteger(genNumber(DOC_TYPE_CASH));
+    //     updateGenNumber(ui->leDocNum->getInteger(), DOC_TYPE_CASH);
+    // }
 
-    dw.writeAHeader(fUuid, ui->leDocNum->text(), DOC_STATE_SAVED, DOC_TYPE_CASH, mUser->id(), ui->deDate->date(),
-                    QDate::currentDate(), QTime::currentTime(), ui->lePartner->getInteger(), ui->leTotal->getDouble(),
-                    ui->cbComment->currentText(), 1, ui->cbCurrency->currentData().toInt(), ui->cbShift->currentData().toInt());
-    dw.writeAHeaderCash(fUuid, ui->leInput->getInteger(), ui->leOutput->getInteger(), fRelation, fStoreUuid, "");
+    // dw.writeAHeader(fUuid, ui->leDocNum->text(), DOC_STATE_SAVED, DOC_TYPE_CASH, mUser->id(), ui->deDate->date(),
+    //                 QDate::currentDate(), QTime::currentTime(), ui->lePartner->getInteger(), ui->leTotal->getDouble(),
+    //                 ui->cbComment->currentText(), 1, ui->cbCurrency->currentData().toInt(), ui->cbShift->currentData().toInt());
+    // dw.writeAHeaderCash(fUuid, ui->leInput->getInteger(), ui->leOutput->getInteger(), fRelation, fStoreUuid, "");
 
-    for(int i = 0; i < ui->tbl->rowCount(); i++) {
-        QString idin = ui->tbl->getString(i, 0);
-        QString idout = ui->tbl->getString(i, 1);
-        QString base = ui->tbl->getString(i, 4);
+    // for(int i = 0; i < ui->tbl->rowCount(); i++) {
+    //     QString idin = ui->tbl->getString(i, 0);
+    //     QString idout = ui->tbl->getString(i, 1);
+    //     QString base = ui->tbl->getString(i, 4);
 
-        if(ui->leInput->getInteger() > 0) {
-            dw.writeECash(idin, fUuid, ui->leInput->getInteger(), 1, ui->tbl->getString(i, 2), ui->tbl->lineEdit(i, 3)->getDouble(),
-                          base, i);
-            ui->tbl->setString(i, 0, idin);
-        }
+    //     if(ui->leInput->getInteger() > 0) {
+    //         dw.writeECash(idin, fUuid, ui->leInput->getInteger(), 1, ui->tbl->getString(i, 2), ui->tbl->lineEdit(i, 3)->getDouble(),
+    //                       base, i);
+    //         ui->tbl->setString(i, 0, idin);
+    //     }
 
-        if(ui->leOutput->getInteger() > 0) {
-            dw.writeECash(idout, fUuid, ui->leOutput->getInteger(), -1, ui->tbl->getString(i, 2), ui->tbl->lineEdit(i,
-                          3)->getDouble(), base, i);
-            ui->tbl->setString(i, 1, idout);
-        }
+    //     if(ui->leOutput->getInteger() > 0) {
+    //         dw.writeECash(idout, fUuid, ui->leOutput->getInteger(), -1, ui->tbl->getString(i, 2), ui->tbl->lineEdit(i,
+    //                       3)->getDouble(), base, i);
+    //         ui->tbl->setString(i, 1, idout);
+    //     }
 
-        ui->tbl->setString(i, 4, base);
-    }
+    //     ui->tbl->setString(i, 4, base);
+    // }
 
-    db[":f_cash"] = fUuid;
-    db.exec("delete from b_clients_debts where f_cash=:f_cash");
+    // db[":f_cash"] = fUuid;
+    // db.exec("delete from b_clients_debts where f_cash=:f_cash");
 
-    if(writedebt && ui->lePartner->getInteger() > 0) {
-        BClientDebts bcd;
-        bcd.source = fDebtSource;
-        bcd.date = ui->deDate->date();
-        bcd.amount = ui->leTotal->getDouble();
-        bcd.costumer = ui->lePartner->getInteger();
-        bcd.cash = fUuid;
-        bcd.flag = fDebtFlag;
-        bcd.currency = ui->cbCurrency->currentData().toInt();
-        bcd.comment = ui->cbComment->currentText();
+    // if(writedebt && ui->lePartner->getInteger() > 0) {
+    //     BClientDebts bcd;
+    //     bcd.source = fDebtSource;
+    //     bcd.date = ui->deDate->date();
+    //     bcd.amount = ui->leTotal->getDouble();
+    //     bcd.costumer = ui->lePartner->getInteger();
+    //     bcd.cash = fUuid;
+    //     bcd.flag = fDebtFlag;
+    //     bcd.currency = ui->cbCurrency->currentData().toInt();
+    //     bcd.comment = ui->cbComment->currentText();
 
-        if(ui->leOutput->getInteger() > 0) {
-            bcd.source = BCLIENTDEBTS_SOURCE_INPUT;
-        }
+    //     if(ui->leOutput->getInteger() > 0) {
+    //         bcd.source = BCLIENTDEBTS_SOURCE_INPUT;
+    //     }
 
-        if(ui->leInput->getInteger() > 0) {
-            bcd.source = BCLIENTDEBTS_SOURCE_SALE;
-        }
+    //     if(ui->leInput->getInteger() > 0) {
+    //         bcd.source = BCLIENTDEBTS_SOURCE_SALE;
+    //     }
 
-        bcd.write(db, err);
-        fBClientDebtId = bcd.id;
-    }
+    //     bcd.write(db, err);
+    //     fBClientDebtId = bcd.id;
+    // }
 
-    foreach(const QString &s, fRemovedRows) {
-        db[":f_base"] = s;
-        db.exec("delete from e_cash where f_base=:f_base");
-    }
+    // foreach(const QString &s, fRemovedRows) {
+    //     db[":f_base"] = s;
+    //     db.exec("delete from e_cash where f_base=:f_base");
+    // }
 
-    fRemovedRows.clear();
+    // fRemovedRows.clear();
 
-    if(!fNoSavedMessage) {
-        C5Message::info(tr("Saved"));
-    }
+    // if(!fNoSavedMessage) {
+    //     C5Message::info(tr("Saved"));
+    // }
 
-    if(fActionDraft) {
-        fActionDraft->setEnabled(true);
-    }
+    // if(fActionDraft) {
+    //     fActionDraft->setEnabled(true);
+    // }
 
-    setProperty("amount", ui->leTotal->getDouble());
-    emit saved(fUuid);
+    // setProperty("amount", ui->leTotal->getDouble());
+    // emit saved(fUuid);
     return true;
 }
 
@@ -499,13 +498,13 @@ void C5CashDoc::on_btnOpenStoreDoc_clicked()
         return;
     }
 
-    QString e;
-    auto *sd = __mainWindow->createTab<C5StoreDoc>();
+    // TODO QString e;
+    // auto *sd = __mainWindow->createTab<C5StoreDoc>();
 
-    if(!sd->openDoc(fStoreUuid, e)) {
-        __mainWindow->removeTab(sd);
-        C5Message::error(e);
-    }
+    // if(!sd->openDoc(fStoreUuid, e)) {
+    //     __mainWindow->removeTab(sd);
+    //     C5Message::error(e);
+    // }
 }
 
 void C5CashDoc::on_btnRemoveRow_clicked()

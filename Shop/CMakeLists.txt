@@ -32,48 +32,45 @@ set(WIN_RC res.rc)
 # ЧИСТЫЙ список исходников без дубликатов
 set(APP_SOURCES
     # Внешние папки
-    ../Cafe5/c5double.cpp ../Cafe5/c5systempreference.cpp ../Cafe5/calendar.cpp
-    ../Cafe5/c5config.cpp ../Cafe5/c5database.cpp ../Cafe5/c5message.cpp
+    ../Cafe5/c5double.cpp ../Cafe5/c5systempreference.cpp ../Cafe5/calendar.cpp ../Cafe5/c5message.cpp
     ../Cafe5/c5utils.cpp ../Cafe5/c5dialog.cpp
     ../Classes/QProgressIndicator.cpp ../Classes/QRCodeGenerator.cpp ../Classes/appwebsocket.cpp
-    ../Classes/c5combodelegate.cpp ../Classes/c5datedelegate.cpp ../Classes/c5jsondb.cpp
+
     ../Classes/c5logtoserverthread.cpp ../Classes/c5menu.cpp ../Classes/c5permissions.cpp
     ../Classes/c5printing.cpp ../Classes/c5printjson.cpp ../Classes/c5printrecipta4.cpp
-    ../Classes/c5random.cpp ../Classes/c5replacecharacter.cpp ../Classes/c5reporttemplatedriver.cpp
-    ../Classes/c5servername.cpp ../Classes/c5shoporder.cpp ../Classes/c5storedraftwriter.cpp
-    ../Classes/c5tablemodel.cpp ../Classes/c5tablerec.cpp ../Classes/c5tableview.cpp
-    ../Classes/c5textdelegate.cpp ../Classes/c5threadobject.cpp ../Classes/c5user.cpp
+    ../Classes/c5random.cpp ../Classes/c5replacecharacter.cpp
+ ../Classes/c5threadobject.cpp ../Classes/c5user.cpp
     ../Classes/c5widget.cpp ../Classes/c5witerconf.cpp ../Classes/calculator.cpp
     ../Classes/fileversion.cpp ../Classes/idram.cpp ../Classes/logwriter.cpp
-    ../Classes/notificationwidget.cpp ../Classes/outputofheader.cpp ../Classes/proxytablewidgetdatabase.cpp
-    ../Classes/c5cache.cpp
-    ../Configs/breezeconfig.cpp ../Configs/configs.cpp
+    ../Classes/notificationwidget.cpp
+
+
     ../Controls/c5graphicsview.cpp ../Controls/c5guicontrols.cpp ../Controls/c5lineedit.cpp
-    ../Controls/c5combobox.cpp ../Controls/c5dateedit.cpp ../Controls/c5checkbox.cpp
+  ../Controls/c5dateedit.cpp ../Controls/c5checkbox.cpp
     ../Controls/c5cleartablewidget.cpp
-    ../DbData/datadriver.cpp ../DbData/dbdata.cpp ../DbData/dbgoods.cpp
-    ../DbData/dbgoodsgroup.cpp ../DbData/dbstore.cpp ../DbData/dbstoredoctype.cpp ../DbData/dbunit.cpp
     ../Forms/c5connectiondialog.cpp ../Forms/dlgreservgoods.cpp ../Forms/dlgsplashscreen.cpp ../Forms/previewdialog.cpp
     ../NTable/ndataprovider.cpp ../NTable/ninterface.cpp ../NTable/nloadingdlg.cpp
     ../Printing/selectprinters.cpp
     ../StructModel/c5structtableview.cpp
-    ../TableRecord/aheader.cpp ../TableRecord/bclientdebts.cpp ../TableRecord/bhistory.cpp
-    ../TableRecord/c5dbrecord.cpp ../TableRecord/cpartners.cpp ../TableRecord/ecash.cpp
-    ../TableRecord/odraftsale.cpp ../TableRecord/ogoods.cpp ../TableRecord/oheader.cpp ../TableRecord/otax.cpp
     ../Service5/worker/struct_workstationitem.cpp ../Service5/worker/struct_fiscal_machine.cpp
     ../../desktop.newTax/Src/printtaxn.cpp
+    ../Service5/worker/struct_waiter_order.h
+
+    ../Http/httplite.h
+    ../Http/httplite.cpp
+
 
     # Файлы в корне проекта (по одному разу!)
-    c5shopdialog.cpp c5tempsale.cpp cashcollection.cpp dlgcashout.cpp dlgdate.cpp
-    dlggetidname.cpp dlggetvalue.cpp dlggiftcardsale.cpp dlggoodslist.cpp dlgmovement.cpp
-    dlgpin.cpp dlgregistercard.cpp dlgreturnitem.cpp dlgshopcustomer.cpp dlgshowcolumns.cpp
+    c5shopdialog.cpp dlgcashout.cpp dlgdate.cpp
+    dlggetvalue.cpp dlggiftcardsale.cpp dlggoodslist.cpp
+    dlgpin.cpp dlgregistercard.cpp dlgshopcustomer.cpp dlgshowcolumns.cpp
     dqty.cpp goodsreturnreason.cpp main.cpp sales.cpp searchitems.cpp selectstaff.cpp
-    storeinput.cpp threadworker.cpp userphoto.cpp viewinputitem.cpp vieworder.cpp
+    threadworker.cpp userphoto.cpp  vieworder.cpp
     wcustomerdisplay.cpp working.cpp worder.cpp
     dlgpaymentchoose.cpp dlgpaymentchoose.h dlgpaymentchoose.ui
     printreceiptgroup.cpp printreceiptgroup.h
     version.h
-    printreceipt.h printreceipt.cpp
+
     # Ресурсы
     ${RESOURCES} ${WIN_RC}
 )
@@ -81,7 +78,8 @@ set(APP_SOURCES
 # -------------------------
 # Executable
 # -------------------------
-add_executable(${PROJECT_NAME} ${APP_SOURCES})
+add_executable(${PROJECT_NAME} ${APP_SOURCES}
+    ../Classes/dict_payment_type.cpp ../Classes/dict_payment_type.h)
 
 # -------------------------
 # Настройки Unity Build и исключения
@@ -102,9 +100,9 @@ set_target_properties(${PROJECT_NAME} PROPERTIES
 # Include paths
 # -------------------------
 target_include_directories(${PROJECT_NAME} PRIVATE
-    . ../Cafe5 ../DBData ../TableRecord ../NTable ../Classes ../Cache ../Configs
-    ../Controls ../DbData ../Forms ../Service ../Service5/worker ../StructModel
-    ../Printing ../RESOURCES
+    . ../Cafe5  ../TableRecord ../NTable ../Classes ../Cache
+    ../Controls ../Forms ../Service ../Service5/worker ../StructModel
+    ../Printing ../RESOURCES ../Http
     C:/Development/projects/desktop.newtax/Src
     C:/Development/OpenSSL-Win64/include
 )
@@ -116,7 +114,6 @@ target_compile_definitions(${PROJECT_NAME} PRIVATE
     QT_DEPRECATED_WARNINGS NETWORKDB SHOP BORDERLESSDIALOGS NOMINMAX
     _DBDRIVER_="QMARIADB" _ORGANIZATION_="BreezeDevs" _APPLICATION_="Shop"
     _MODULE_="Shop" _CRYPT_KEY_="shop2022!!!"
-    _MART8_
 )
 
 if (MSVC)

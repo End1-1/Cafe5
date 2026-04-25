@@ -29,11 +29,15 @@ struct WorkstationItem : public ParentItem {
     {
         return data.value("f_default_hall_id").toInt();
     }
+    const QString defaultHallName() const { return data.value("f_default_hall_name").toString(); }
+    int defaultStoreId() const { return data.value("f_default_store_id").toInt(); }
+    const QString defaultStoreName() const { return data.value("f_default_store_name").toString(); }
     const QString defaultPrinter() const
     {
         QString printerName = data.value("f_default_printer").toString();
         return printerName.isEmpty() ? "local" : printerName;
     }
+    const QString scalePattern() const { return data.value("f_scale_pattern").toString(); }
     const QString presentCardPattern() const
     {
         return data.value("f_present_card_pattern").toString();

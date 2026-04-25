@@ -39,6 +39,12 @@ struct StoreInputDocument : public ParentItem
     int type = 0;
     int create_user = 0;
     int store_in = 0;
+    int cashbox_id = 0;
+    QString cashbox_name;
+    int payment_type_id = 0;
+    QString payment_type_id_name;
+    int currency_id = 0;
+    QString currency_name;
     QString store_in_name;
     int store_out = 0;
     QString store_out_name;
@@ -68,6 +74,9 @@ struct StoreInputDocument : public ParentItem
                 {"doc_create_user", create_user},
                 {"doc_version", version},
                 {"doc_data", data},
+                {"payment_type_id", payment_type_id},
+                {"cashbox_id", cashbox_id},
+                {"currency_id", currency_id},
                 {"items", jitems}};
     }
 };
@@ -111,6 +120,12 @@ struct JsonParser<StoreInputDocument>
         sid.sum = jo.value("f_sum").toString().toDouble();
         sid.version = jo.value("f_version").toInt();
         sid.partner = jo.value("f_partner").toInt();
+        sid.cashbox_id = jo.value("f_cashbox_id").toInt();
+        sid.payment_type_id = jo.value("f_payment_type_id").toInt();
+        sid.payment_type_id_name = jo.value("f_payment_type_name").toString();
+        sid.currency_id = jo.value("f_currency_id").toInt();
+        sid.cashbox_name = jo.value("f_cashbox_name").toString();
+        sid.currency_name = jo.value("f_currency_name").toString();
         sid.parseData(jo);
         QJsonArray ji = jo.value("items").toArray();
         for (int i = 0; i < ji.size(); i++) {

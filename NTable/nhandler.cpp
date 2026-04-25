@@ -6,7 +6,6 @@
 #include "c5mainwindow.h"
 #include "c5message.h"
 #include "c5saledoc.h"
-#include "c5storedoc.h"
 #include "c5user.h"
 #include "c5waiterorder.h"
 #include "ce5goods.h"
@@ -76,13 +75,14 @@ void NHandler::handle(const QJsonArray &ja)
                 d.setId(ja.at(4).toString());
                 d.exec();
             } else if(!ja.at(5).toString().isEmpty()) {
-                C5StoreDoc *sd = __mainWindow->createTab<C5StoreDoc>();
-                QString err;
-                sd->openDoc(ja.at(5).toString(), err);
+                //TODO
+                // C5StoreDoc *sd = __mainWindow->createTab<C5StoreDoc>();
+                // QString err;
+                // sd->openDoc(ja.at(5).toString(), err);
 
-                if(!err.isEmpty()) {
-                    C5Message::error(err);
-                }
+                // if(!err.isEmpty()) {
+                //     C5Message::error(err);
+                // }
             }
 
             break;

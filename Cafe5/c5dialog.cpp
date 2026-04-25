@@ -8,28 +8,46 @@
 #include <QWindow>
 #include "c5lineedit.h"
 #include "c5message.h"
+#ifdef FRONDESK
+#include "mainwindow.h"
+#endif
 #include "ninterface.h"
 
 #ifdef Q_OS_WIN
 #include <Windows.h>
 #endif
 
-static QWidget* __mainWindow = nullptr;
 int C5Dialog::mScreen = -1;
 
-C5Dialog::C5Dialog(C5User *user) :
-    QDialog(__mainWindow),
-    mUser(user)
+C5Dialog::C5Dialog(C5User *user, QWidget *parent)
+    : QDialog(parent)
+    , mUser(user)
 {
 #ifdef BORDERLESSDIALOGS
     setWindowFlags(Qt::Dialog | Qt::FramelessWindowHint | Qt::Window);
 #endif
 
-    if(__mainWindow == nullptr) {
-        __mainWindow = this;
+    if (mScreen > -1) {
+        QScreen *screen = qApp->screens().at(mScreen);
+        this->create();
+
+        if (windowHandle()) {
+            windowHandle()->setScreen(screen);
+        }
     }
 
-    if(mScreen > -1) {
+    fHttp = new NInterface(this);
+}
+
+C5Dialog::C5Dialog(C5User *user)
+    : QDialog(nullptr)
+    , mUser(user)
+{
+#ifdef BORDERLESSDIALOGS
+    setWindowFlags(Qt::Dialog | Qt::FramelessWindowHint | Qt::Window);
+#endif
+
+    if (mScreen > -1) {
         QScreen *screen = qApp->screens().at(mScreen);
         this->create();
 
@@ -41,17 +59,9 @@ C5Dialog::C5Dialog(C5User *user) :
     fHttp = new NInterface(this);
 }
 
-C5Dialog::~C5Dialog()
-{
-    if(__mainWindow == this) {
-        __mainWindow = nullptr;
-    }
-}
+C5Dialog::~C5Dialog() {}
 
-void C5Dialog::setMainWindow(QWidget *widget)
-{
-    __mainWindow = widget;
-}
+void C5Dialog::setMainWindow(QWidget *widget) {}
 
 bool C5Dialog::preambule()
 {

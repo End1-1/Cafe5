@@ -1,13 +1,14 @@
 #ifndef C5MAINWINDOW_H
 #define C5MAINWINDOW_H
 
-#include <QMainWindow>
-#include <QLabel>
-#include <QTreeWidgetItem>
-#include <QTimer>
-#include <QListWidgetItem>
-#include <QUdpSocket>
 #include <QJsonObject>
+#include <QLabel>
+#include <QListWidgetItem>
+#include <QMainWindow>
+#include <QTimer>
+#include <QTreeWidgetItem>
+#include <QUdpSocket>
+#include "mainwindow.h"
 
 namespace Ui
 {
@@ -147,7 +148,5 @@ private:
 
     void removeFromFavorite(int permission);
 };
-
-extern C5MainWindow* __mainWindow;
 
 #endif // C5MAINWINDOW_H

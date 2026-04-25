@@ -4,7 +4,6 @@
 #include <QFileDialog>
 #include <QMenu>
 #include "../Forms/dlglist2.h"
-#include "breezeconfig.h"
 #include "c5cache.h"
 #include "c5config.h"
 #include "c5database.h"
@@ -107,70 +106,70 @@ void C5SaleFromStoreOrder::loadOrder(const QString &id)
     ui->btnPrintTax->setVisible(!db.nextRow());
 }
 
-void C5SaleFromStoreOrder::exportToAS(int doctype)
-{
-    C5Database db;
-    db.exec("select * from as_list");
+// void C5SaleFromStoreOrder::exportToAS(int doctype)
+// {
+//     C5Database db;
+//     db.exec("select * from as_list");
 
-    if(db.rowCount() == 0) {
-        C5Message::error(tr("ArmSoft is not configure"));
-        return;
-    }
+//     if(db.rowCount() == 0) {
+//         C5Message::error(tr("ArmSoft is not configure"));
+//         return;
+//     }
 
-    int dbid;
-    int index = 0;
-    QString connStr;
+//     int dbid;
+//     int index = 0;
+//     QString connStr;
 
-    if(db.rowCount() > 0) {
-        QStringList dbNames;
+//     if(db.rowCount() > 0) {
+//         QStringList dbNames;
 
-        while(db.nextRow()) {
-            dbNames.append(db.getString("f_name"));
-        }
+//         while(db.nextRow()) {
+//             dbNames.append(db.getString("f_name"));
+//         }
 
-        index = DlgList2::indexOfList(tr("Armsoft database"), dbNames);
+//         index = DlgList2::indexOfList(tr("Armsoft database"), dbNames);
 
-        if(index < 0) {
-            return;
-        }
+//         if(index < 0) {
+//             return;
+//         }
 
-        dbid = db.getInt(index, "f_id");
-        connStr = db.getString(index, "f_connectionstring");
-    } else {
-        dbid = db.getInt(0, "f_id");
-        connStr = db.getString(0, "f_connectionstring");
-    }
+//         dbid = db.getInt(index, "f_id");
+//         connStr = db.getString(index, "f_connectionstring");
+//     } else {
+//         dbid = db.getInt(0, "f_id");
+//         connStr = db.getString(0, "f_connectionstring");
+//     }
 
-    BreezeConfig *b = Configs::construct<BreezeConfig>(1);
-    QJsonObject jo;
-    jo["pkServerAPIKey"] = b->apiKey;
-    jo["pkFcmToken"] = "0123456789";
-    jo["pkUsername"] = b->username;
-    jo["pkPassword"] = b->password;
-    jo["pkAction"] = 14;
-    jo["asconnectionstring"] = connStr;
-    jo["asdbid"] = dbid;
-    jo["draftid"] = ui->leUUID->text();
-    jo["doctype"] = doctype;
-    jo["lesexpenseacc"] = __c5config.getRegValue("lesexpenseacc", "").toString();
-    jo["lesincomeacc"] = __c5config.getRegValue("lesincomeacc", "").toString();
-    jo["lemexpenseacc"] = __c5config.getRegValue("lemexpenseacc", "").toString();
-    jo["lemincomeacc"] = __c5config.getRegValue("lemincomeacc", "").toString();
-    QJsonObject jdb;
-    jdb["host"] = __c5config.dbParams().at(0);
-    jdb["schema"] = __c5config.dbParams().at(1);
-    jdb["username"] = __c5config.dbParams().at(2);
-    jdb["password"] = __c5config.dbParams().at(3);
-    jo["database"] = jdb;
-    jo["vatpercent"] = index == 0 ? (doctype == 5 ? 0.2 : 0.1667) : 0;
-    jo["vattype"] = index == 0 ? (doctype == 5 ? "1" : "5") : "3";
-    jo["pricewithoutvat"] = index == 0 ? (doctype == 5 ? 1.2 : 1) : 1;
-    jo["withvat"] = index == 0 ? (doctype == 5 ? 0.2 : 0) : 0;
-    HttpQueryDialog *qd = new HttpQueryDialog(mUser, QString("https://%1:%2/magnit").arg(b->ipAddress,
-        QString::number(b->port)), jo, this);
-    qd->exec();
-    qd->deleteLater();
-}
+//     BreezeConfig *b = Configs::construct<BreezeConfig>(1);
+//     QJsonObject jo;
+//     jo["pkServerAPIKey"] = b->apiKey;
+//     jo["pkFcmToken"] = "0123456789";
+//     jo["pkUsername"] = b->username;
+//     jo["pkPassword"] = b->password;
+//     jo["pkAction"] = 14;
+//     jo["asconnectionstring"] = connStr;
+//     jo["asdbid"] = dbid;
+//     jo["draftid"] = ui->leUUID->text();
+//     jo["doctype"] = doctype;
+//     jo["lesexpenseacc"] = __c5config.getRegValue("lesexpenseacc", "").toString();
+//     jo["lesincomeacc"] = __c5config.getRegValue("lesincomeacc", "").toString();
+//     jo["lemexpenseacc"] = __c5config.getRegValue("lemexpenseacc", "").toString();
+//     jo["lemincomeacc"] = __c5config.getRegValue("lemincomeacc", "").toString();
+//     QJsonObject jdb;
+//     jdb["host"] = __c5config.dbParams().at(0);
+//     jdb["schema"] = __c5config.dbParams().at(1);
+//     jdb["username"] = __c5config.dbParams().at(2);
+//     jdb["password"] = __c5config.dbParams().at(3);
+//     jo["database"] = jdb;
+//     jo["vatpercent"] = index == 0 ? (doctype == 5 ? 0.2 : 0.1667) : 0;
+//     jo["vattype"] = index == 0 ? (doctype == 5 ? "1" : "5") : "3";
+//     jo["pricewithoutvat"] = index == 0 ? (doctype == 5 ? 1.2 : 1) : 1;
+//     jo["withvat"] = index == 0 ? (doctype == 5 ? 0.2 : 0) : 0;
+//     HttpQueryDialog *qd = new HttpQueryDialog(mUser, QString("https://%1:%2/magnit").arg(b->ipAddress,
+//         QString::number(b->port)), jo, this);
+//     qd->exec();
+//     qd->deleteLater();
+// }
 
 void C5SaleFromStoreOrder::on_btnRemove_clicked()
 {
@@ -400,14 +399,4 @@ void C5SaleFromStoreOrder::on_btnExportToExcel_clicked()
 
     d.saveAs(filename);
     QDesktopServices::openUrl(filename);
-}
-
-void C5SaleFromStoreOrder::on_btnPrintA4_3_clicked()
-{
-    exportToAS(20);
-}
-
-void C5SaleFromStoreOrder::on_btnPrintA4_2_clicked()
-{
-    exportToAS(5);
 }

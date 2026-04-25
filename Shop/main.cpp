@@ -12,13 +12,11 @@
 #include <QSettings>
 #include <QStyleFactory>
 #include <QTranslator>
-#include "c5config.h"
-#include "c5database.h"
+#include "c5connectiondialog.h"
 #include "c5dialog.h"
 #include "c5message.h"
 #include "c5systempreference.h"
 #include "c5user.h"
-#include "datadriver.h"
 #include "dict_workstation.h"
 #include "dlgpin.h"
 #include "dlgsplashscreen.h"
@@ -26,6 +24,7 @@
 #include "logwriter.h"
 #include "ndataprovider.h"
 #include "printtaxn.h"
+#include "struct_workstationitem.h"
 #include "working.h"
 
 int main(int argc, char* argv[])
@@ -45,14 +44,7 @@ int main(int argc, char* argv[])
     LogWriter::write(LogWriterLevel::verbose, "Support SSL", QSslSocket::supportsSsl() ? "true" : "false");
     LogWriter::write(LogWriterLevel::verbose, "Support SSL version", QSslSocket::sslLibraryBuildVersionString());
     QDir d;
-    QLockFile lockFile(d.homePath() + "/" + _APPLICATION_ + "/lock.pid");
 
-    if(!lockFile.tryLock()) {
-        C5Message::error(QObject::tr("An instance of application already running"));
-        return -1;
-    }
-
-    // LogWriter::write(LogWriterLevel::verbose, "", "starting...");
     a.setStyle(QStyleFactory::create("fusion"));
     QFile styleSheet(a.applicationDirPath() + "/shop.css");
 
@@ -79,6 +71,7 @@ int main(int argc, char* argv[])
     PrintTaxN::mDebugRseq = build;
     bool debug = false;
     bool donotautologin = false;
+    bool multicopy = false;
 
     for(const QString &s : a.arguments()) {
         if(s.startsWith("/monitor")) {
@@ -110,6 +103,27 @@ int main(int argc, char* argv[])
         if(s.startsWith("/noautologin")) {
             donotautologin = true;
         }
+
+        if (s.startsWith("/multicopy")) {
+            multicopy = true;
+        }
+
+        if (s.startsWith("/settingspath")) {
+            QStringList ver = s.split("=");
+
+            if (ver.length() == 2) {
+                C5ConnectionDialog::mSettingsPath = ver.at(1);
+            }
+        }
+    }
+
+    if (!multicopy) {
+        QLockFile lockFile(d.homePath() + "/" + _APPLICATION_ + "/lock.pid");
+
+        if (!lockFile.tryLock()) {
+            C5Message::error(QObject::tr("An instance of application already running"));
+            return -1;
+        }
     }
 
     if(!d.exists(d.homePath() + "/" + _APPLICATION_)) {
@@ -137,36 +151,22 @@ int main(int argc, char* argv[])
     auto *user = new C5User(dlgPin->mUser);
     auto *dlgsplash = new DlgSplashScreen(WORKSTATION_SHOP, user);
     dlgsplash->mOnFinish = [dlgsplash](C5User *user) {
-        C5Database db;
         emit dlgsplash->messageSignal("init data driver...");
-        DataDriver::init(__c5config.dbParams(), dlgsplash);
         C5Dialog::setMainWindow(nullptr);
 
-        if (__c5config.fMainJson["clear_sale_draft"].toBool()) {
-            emit dlgsplash->messageSignal("clear drafts...");
-            db[":f_hall"] = C5Config::defaultHall();
-            db.exec("update o_draft_sale_body set f_state=10 where f_state=1 "
-                    "and f_header in (select f_id from o_draft_sale where f_hall=:f_hall and "
-                    "f_state=1)");
-            db[":f_hall"] = C5Config::defaultHall();
-            db.exec("update o_draft_sale set f_state=10 where f_hall=:f_hall and f_state=1");
-        }
         auto *w = new Working(user);
         w->setWindowTitle("");
 
-        if (__c5config.defaultHall() > 0) {
-            w->setWindowTitle(w->windowTitle() + "["
-                              + __c5config.fMainJson["shop_hall_name"].toString() + "]");
+        if (mWorkStation.defaultHallId() > 0) {
+            w->setWindowTitle(w->windowTitle() + "[" + mWorkStation.defaultHallName() + "]");
         }
 
-        if (__c5config.defaultStore() > 0) {
-            w->setWindowTitle(w->windowTitle() + "[" + dbstore->name(__c5config.defaultStore())
-                              + "]");
+        if (mWorkStation.defaultStoreId() > 0) {
+            w->setWindowTitle(w->windowTitle() + "[" + mWorkStation.defaultStoreName() + "]");
         } else {
             C5Message::error(QObject::tr("Store is not defined."));
             qApp->quit();
         }
-        __c5config.setRegValue("windowtitle", w->windowTitle());
         dlgsplash->hide();
         dlgsplash->deleteLater();
         w->showMaximized();

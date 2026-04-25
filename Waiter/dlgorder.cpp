@@ -43,6 +43,7 @@
 #include "dlgviewstoplist.h"
 #include "format_date.h"
 #include "goodsgroupbutton.h"
+#include "httplite.h"
 #include "idram.h"
 #include "ninterface.h"
 #include "nloadingdlg.h"
@@ -570,7 +571,7 @@ void DlgOrder::restoreStoplistQty(int dish, double qty)
 
 void DlgOrder::printPrecheck(const QString &currentStaff)
 {
-    int bs = 10;
+    int bs = 20;
     QFont font(qApp->font());
     font.setPointSize(bs);
     QString printerName = mUser->fConfig["receipt_printer"].toString();
@@ -584,6 +585,7 @@ void DlgOrder::printPrecheck(const QString &currentStaff)
     qreal safePx = SAFE_RIGHT_MM * printer.logicalDpiX() / 25.4;
     p.setSceneParams(pr.width() - safePx, pr.height(), printer.logicalDpiX());
     p.setFont(font);
+    p.setFontSize(bs);
     QString logoFile = qApp->applicationDirPath() + "/logo_receipt.png";
 
     if(QFile::exists(logoFile)) {
@@ -770,6 +772,17 @@ void DlgOrder::printPrecheck(const QString &currentStaff)
         p.br();
     }
 
+    if (mOrder.data.contains("f_guest")) {
+        p.ltext(tr("Client"));
+        p.br();
+        p.ltext(mOrder.dataValue("f_guest").toObject().value("f_guest_name").toString());
+        p.br();
+        p.ltext(mOrder.dataValue("f_guest").toObject().value("f_guest_phone").toString());
+        p.br();
+        p.ltext(mOrder.dataValue("f_guest").toObject().value("f_guest_address").toString());
+        p.br();
+    }
+
     p.br();
     p.setFontSize(bs - 2);
     p.ltext(tr("Thank you for visit!"), 0);
@@ -783,7 +796,17 @@ void DlgOrder::printPrecheck(const QString &currentStaff)
     p.ltext(tr("Printed"), 0);
     p.rtext(QDateTime::currentDateTime().toString(FORMAT_DATETIME_TO_STR));
     p.br();
-    p.print(printer);
+
+    if (mWorkStation.printServer().isEmpty() == false) {
+        HttpLite *http = new HttpLite(this);
+        QJsonObject json;
+        json["print_data"] = p.jsonData();
+        json["printer_name"] = printerName;
+
+        http->post(mWorkStation.printServer(), json);
+    } else {
+        p.print(printer);
+    }
 }
 
 void DlgOrder::printService(const QJsonObject &jdoc)
@@ -799,7 +822,7 @@ void DlgOrder::printService(const QJsonObject &jdoc)
     for(auto const &printerName : std::as_const(jp)) {
         QJsonObject jo = printData[printerName].toObject();
         QFont font(qApp->font());
-        const int bs = 12;
+        const int bs = 22;
         font.setPointSize(bs);
         C5Printing p;
         QPrinterInfo pi = QPrinterInfo::printerInfo(printerName);
@@ -815,7 +838,7 @@ void DlgOrder::printService(const QJsonObject &jdoc)
         p.setSceneParams(pr.width(), pr.height(), fixedDpi);
         p.setFont(font);
         p.setFontBold(true);
-
+        p.setFontSize(bs);
         if(jdoc["reprint"].toBool()) {
             p.ctext(tr("REPRINT"));
             p.br();
@@ -849,7 +872,7 @@ void DlgOrder::printService(const QJsonObject &jdoc)
             p.setFontSize(bs + 2);
             p.setFontBold(false);
             QJsonObject jd = jdv.toObject();
-            p.ltext(QString("%1").arg(jd["f_dish_name"].toString()), 0, 650);
+            p.ltext(QString("%1").arg(jd["f_dish_name"].toString()), 0, 65);
             p.setFontBold(true);
             p.rtext(QString("%1").arg(float_str(jd["f_qty"].toDouble(), 2)));
 
@@ -876,7 +899,7 @@ void DlgOrder::printService(const QJsonObject &jdoc)
         p.br();
         QString final = "OK";
 
-        // if(!p.print(printer)) {
+        // if (!p.print(printer)) {
         //     final = "FAIL";
         // }
 
@@ -1026,6 +1049,7 @@ void DlgOrder::setDishQty(std::function<double(WaiterDish)> getQty)
              {"f_data", d.data},
              {"print1", d.printer1()},
              {"print2", d.printer2()},
+             {"cashbox_id", mWorkStation.cashboxId()},
              {"shift_rows", true},
              {"count_service", d.countService()},
              {"count_discount", d.countDiscount()},
@@ -1099,6 +1123,7 @@ void DlgOrder::addDishToOrder(DishAItem *g, QDishButton *btn)
              {"table", mTable.id},
              {"qty", 1},
              {"type", 1},
+             {"cashbox_id", mWorkStation.cashboxId()},
              {"row", mOrder.dishes.count() * 100},
              {"price", g->price},
              {"count_service", g->countService()},
@@ -1507,9 +1532,15 @@ void DlgOrder::on_btnPrintService_clicked()
 
 void DlgOrder::on_btnSit_clicked()
 {
-    //TODO: CHECK
-    // DlgGuests(worder()->fOrderDriver).exec();
-    // itemsToTable();
+    DlgGuests dg(mUser);
+    dg.setGuests(mOrder.data.value("f_guests_count").toInt());
+    if (dg.exec() == QDialog::Accepted) {
+        NInterface::query1("/engine/v2/waiter/order/set-data-value",
+                           mUser->mSessionKey,
+                           this,
+                           {{"id", mOrder.id}, {"key", "f_guests_count"}, {"value", dg.guests()}},
+                           [this](const QJsonObject &jdoc) { parseOrder(jdoc); });
+    }
 }
 
 void DlgOrder::on_btnChangeStaff_clicked()
@@ -2002,7 +2033,7 @@ void DlgOrder::createPaymentButtons()
             }
 
             NInterface::query(
-                "/engine/v2/waiter/order/set_amount",
+                "/engine/v2/waiter/order/set-amount",
                 self->mUser->mSessionKey,
                 self,
                 {{"id", self->mOrder.id},
@@ -2190,13 +2221,22 @@ void DlgOrder::parseOrder(const QJsonObject & jdoc)
         connect(this, &DlgOrder::orderDishClicked,
                 ow, &WaiterDishWidget::checkFocus,
                 Qt::UniqueConnection);
-        if (w.isHourlyPayment() && w.isPlaying()) {
+        if (w.isHourlyPayment()) {
             if (auto *dishWidget = qobject_cast<WaiterDishWidget *>(ow)) {
-                connect(dishWidget, &WaiterDishWidget::stopPlay, this, [=]() {
-                    NInterface::query1("/engine/v2/waiter/order/stop-play",
+                if (w.isPlaying()) {
+                    connect(dishWidget, &WaiterDishWidget::stopPlay, this, [=]() {
+                        NInterface::query1("/engine/v2/waiter/order/stop-play",
+                                           mUser->mSessionKey,
+                                           this,
+                                           {{"id", dishWidget->mOrderItem.id}},
+                                           [=](const QJsonObject &jdoc) { parseOrder(jdoc); });
+                    });
+                }
+                connect(dishWidget, &WaiterDishWidget::setEndDate, this, [=](QDateTime dt) {
+                    NInterface::query1("/engine/v2/waiter/order/set-end-datetime",
                                        mUser->mSessionKey,
                                        this,
-                                       {{"id", dishWidget->mOrderItem.id}},
+                                       {{"id", dishWidget->mOrderItem.id}, {"datetime", dt.toString(FORMAT_DATETIME_TO_STR_MYSQL)}},
                                        [=](const QJsonObject &jdoc) { parseOrder(jdoc); });
                 });
             }
@@ -2275,6 +2315,7 @@ void DlgOrder::parseOrder(const QJsonObject & jdoc)
     ui->btnService->setText(QString("%1\n%2%").arg(tr("Service"), float_str(mOrder.serviceFactor() * 100, 2)));
     ui->btnDiscount->setText(QString("%1\n%2%").arg(tr("Discount"), float_str(mOrder.discountFactor() * 100, 2)));
     ui->btnTotal->setText(QString("%1\n%2 %3").arg(tr("Precheck"), float_str(mOrder.totalDue, 2), "դր․"));
+    ui->btnSit->setText(QString::number(mOrder.data.value("f_guests_count").toInt()));
     updateScrollButtonPositions();
 
     if(jdoc.contains("focused_dish")) {
@@ -2328,160 +2369,6 @@ void DlgOrder::setPaymentButtonChecked(bool checked)
     }
 }
 
-void DlgOrder::on_btnReceipt_clicked()
-{
-    // C5User *tmp = mUser;
-    // if(!tmp->check(cp_t5_print_receipt)) {
-    //     if(!DlgPassword::getUserAndCheck(tr("Print receipt"), tmp, cp_t5_print_receipt)) {
-    //         return;
-    //     }
-    // }
-    // if(C5Message::question(tr("Confirm to close order")) != QDialog::Accepted) {
-    //     return;
-    // }
-    // if(wo->fOrderDriver->headerValue("f_amountother").toDouble() > 0.001) {
-    //     if(wo->fOrderDriver->headerValue("f_otherid").toInt() == 0) {
-    //         C5Message::error(tr("Other method is not selected"));
-    //         return;
-    //     }
-    // }
-    // if(wo->fOrderDriver->headerValue("f_amountcash").toDouble()
-    //         + wo->fOrderDriver->headerValue("f_amountcard").toDouble()
-    //         + wo->fOrderDriver->headerValue("f_amountother").toDouble()
-    //         + wo->fOrderDriver->headerValue("f_amountprepaid").toDouble()
-    //         + wo->fOrderDriver->headerValue("f_amountbank").toDouble()
-    //         + wo->fOrderDriver->headerValue("f_amountidram").toDouble()
-    //         + wo->fOrderDriver->headerValue("f_hotel").toDouble()
-    //         + wo->fOrderDriver->headerValue("f_amountpayx").toDouble() <
-    //         wo->fOrderDriver->headerValue("f_amounttotal").toDouble()) {
-    //     C5Message::error(tr("Check the all payment methods"));
-    //     return;
-    // }
-    // double a = wo->fOrderDriver->headerValue("f_amountcash").toDouble()
-    //            + wo->fOrderDriver->headerValue("f_amountcard").toDouble()
-    //            + wo->fOrderDriver->headerValue("f_amountother").toDouble()
-    //            + wo->fOrderDriver->headerValue("f_hotel").toDouble()
-    //            + wo->fOrderDriver->headerValue("f_amountprepaid").toDouble()
-    //            + wo->fOrderDriver->headerValue("f_amountbank").toDouble()
-    //            + wo->fOrderDriver->headerValue("f_amountidram").toDouble()
-    //            + wo->fOrderDriver->headerValue("f_amountpayx").toDouble();
-    // if(a > wo->fOrderDriver->headerValue("f_amounttotal").toDouble()) {
-    //     C5Message::error(QString("%1, %2/%3").arg(tr("Total amount of payments methods greater than total amount"))
-    //                      .arg(a)
-    //                      .arg(wo->fOrderDriver->headerValue("f_amounttotal").toDouble()));
-    //     return;
-    // }
-    // if(!wo->fOrderDriver->save()) {
-    //     C5Message::error(wo->fOrderDriver->error());
-    //     return;
-    // }
-    // ui->btnExit->setEnabled(false);
-    // //LOG
-    // QString payMethods;
-    // QString amounts;
-    // if(wo->fOrderDriver->headerValue("f_amountcash").toDouble() > 0.001) {
-    //     payMethods += payMethods.isEmpty() ? "Cash" : payMethods + " / Cash";
-    //     amounts += amounts.isEmpty() ? float_str(wo->fOrderDriver->headerValue("f_amountcash").toDouble(),
-    //                2) : amounts + " / " + float_str(wo->fOrderDriver->headerValue("f_amountcash").toDouble(), 2);
-    // }
-    // if(wo->fOrderDriver->headerValue("f_amountcard").toDouble() > 0.001) {
-    //     payMethods += payMethods.isEmpty() ? "Cash" : payMethods + " / Card";
-    //     //amounts += amounts.isEmpty() ? fOrder->hString("f_amountcard") : amounts + " / " + fOrder->hString("f_amountcard");
-    //     amounts += amounts.isEmpty() ? float_str(wo->fOrderDriver->headerValue("f_amountcard").toDouble(),
-    //                2) : amounts + " / " + float_str(wo->fOrderDriver->headerValue("f_amountcard").toDouble(), 2);
-    // }
-    // if(wo->fOrderDriver->headerValue("f_amountbank").toDouble() > 0.001) {
-    //     payMethods = "Bank";
-    //     amounts = float_str(wo->fOrderDriver->headerValue("f_amountbank").toDouble(), 2);
-    // }
-    // if(wo->fOrderDriver->headerValue("f_amountother").toDouble() > 0.001) {
-    //     switch(wo->fOrderDriver->headerValue("f_otherid").toInt()) {
-    //     case PAYOTHER_TRANSFER_TO_ROOM:
-    //         payMethods = wo->fOrderDriver->payRoomValue("f_room").toString() + ","
-    //                      + wo->fOrderDriver->payRoomValue("f_inv").toString() + ","
-    //                      + wo->fOrderDriver->payRoomValue("f_guest").toString();
-    //         break;
-    //     case PAYOTHER_CL:
-    //         payMethods = wo->fOrderDriver->clValue("f_code").toString() + "," + wo->fOrderDriver->clValue("f_name").toString();
-    //         break;
-    //     case PAYOTHER_COMPLIMENTARY:
-    //         payMethods = "Complimentary";
-    //         break;
-    //     case PAYOTHER_PRIMECOST:
-    //         payMethods = "Selfcost";
-    //         break;
-    //     default:
-    //         payMethods = QString("%1 (%2)").arg("Unknown").arg(wo->fOrderDriver->headerValue("f_otherid").toInt());
-    //         break;
-    //     }
-    //     amounts = float_str(wo->fOrderDriver->headerValue("f_amountother").toDouble(), 2);
-    // }
-    // amounts += ui->btnTax->isChecked() ? " Fiscal: yes" : " Fiscal: no";
-    // C5LogToServerThread::remember(LOG_WAITER, tmp->fullName(), "", wo->fOrderDriver->currentOrderId(), "", "Receipt",
-    //                               payMethods, amounts);
-    // C5Database db;
-    // db[":f_id"] = wo->fOrderDriver->headerValue("f_id");
-    // db.exec("select f_type, f_value, f_card from b_history where f_id=:f_id");
-    // if(db.nextRow()) {
-    //     int mode = db.getInt("f_mode");
-    //     int card = db.getInt("f_card");
-    //     double value = db.getDouble("f_value") / 100;
-    //     switch(mode) {
-    //     case CARD_TYPE_ACCUMULATIVE:
-    //         value = value * wo->fOrderDriver->headerValue("f_amounttotal").toDouble();
-    //         db[":f_card"] = card;
-    //         db[":f_trsale"] = wo->fOrderDriver->headerValue("f_id");
-    //         db[":f_amount"] = value;
-    //         db.insert("b_gift_card_history", false);
-    //         db[":f_data"] = value;
-    //         db.update("b_history", "f_id", wo->fOrderDriver->headerValue("f_id"));
-    //     }
-    // }
-    // //TODO: CHECK L16
-    // fHttp->createHttpQueryLambda("/engine/waiter/printreceipt", {
-    //     { "station", hostinfo},
-    //     {"printer", C5Config::localReceiptPrinter()},
-    //     {"order", wo->fOrderDriver->currentOrderId()},
-    //     {"language", C5Config::getRegValue("receipt_language").toInt()},
-    //     {"printtax", ui->btnTax->isChecked() ? 1 : 0},
-    //     {"receipt_printer", C5Config::fSettingsName},
-    //     {"alias", __c5config.getValue(param_force_use_print_alias).toInt()},
-    //     {"close", 1},
-    //     {"nofinalreceipt", __c5config.getValue(param_waiter_dontprint_final_receipt).toInt()}
-    // },
-    // [this](const QJsonObject & jo) {
-    //     ui->btnExit->setEnabled(true);
-    //     fHttp->httpQueryFinished(sender());
-    //     if(jo["reply"].toInt() == 0) {
-    //         C5Message::error(jo["msg"].toString());
-    //         return;
-    //     }
-    //     auto *wo = worder();
-    //     if(jo["close"].toInt() == 1) {
-    //         C5LogToServerThread::remember(LOG_WAITER, mUser->fullName(), "", wo->fOrderDriver->currentOrderId(), "", "Close order",
-    //                                       "", "");
-    //         if(!wo->fOrderDriver->closeOrder()) {
-    //             C5Message::error(wo->fOrderDriver->error());
-    //             return;
-    //         }
-    //         removeWOrder(wo);
-    //         if(!worder()) {
-    //             setProperty("reprint", jo["order"].toString());
-    //             accept();
-    //             return;
-    //         }
-    //     } else {
-    //         if(__c5config.getValue(param_waiter_close_order_after_precheck).toInt() == 1) {
-    //             ui->btnExit->click();
-    //             return;
-    //         }
-    //         //TODO FUCK
-    //         //load(wo->fOrderDriver->headerValue("f_table").toInt());
-    //     }
-    // }, [](const QJsonObject & je) {
-    //     Q_UNUSED(je);
-    // });
-}
 
 void DlgOrder::on_btnCloseOrder_clicked()
 {
@@ -2556,7 +2443,7 @@ void DlgOrder::on_btnCloseOrder_clicked()
 
             pt->makeJsonAndPrint(order.paidCash(), order.paidCard(), order.paidPrepaid());
 
-            //pt->makeJsonAndPrintSimple(1, order.paidCard(), order.paidPrepaid(), "false");
+            pt->makeJsonAndPrintSimple(1, order.paidCard(), order.paidPrepaid(), "false");
         });
         connect(pt, &PrintTaxN::started, loading, &QDialog::show, Qt::QueuedConnection);
         connect(pt, &PrintTaxN::finished, self, [ = ](const QString & inJson, const QString & outJson, const QString & err, int result) {
@@ -3290,7 +3177,7 @@ void DlgOrder::on_btnGuest_clicked()
         NInterface::query1("/engine/v2/waiter/order/save-data",
                            mUser->mSessionKey,
                            this,
-                           {{"id", mOrder.id}, {"data", mOrder.data}},
+                           {{"id", mOrder.id}, {"data", mOrder.data}, {"create_guest", true}},
                            [this](const QJsonObject &jdoc) { parseOrder(jdoc); });
     }
 }

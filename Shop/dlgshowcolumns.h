@@ -16,6 +16,9 @@ public:
     ~DlgShowColumns();
 
 private slots:
+    void on_chLearnDiscount_clicked(bool checked);
+
+private slots:
     void on_chGroup_clicked(bool checked);
 
     void on_chUnit_clicked(bool checked);
@@ -29,8 +32,6 @@ private slots:
     void on_chEmarks_clicked(bool checked);
 
     void on_chCheckDiscount_clicked(bool checked);
-
-    void on_chCheckDiscount_2_clicked(bool checked);
 
 private:
     Ui::DlgShowColumns *ui;

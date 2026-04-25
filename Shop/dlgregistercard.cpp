@@ -1,9 +1,8 @@
 #include "dlgregistercard.h"
-#include "ui_dlgregistercard.h"
-#include "struct_partner.h"
-#include "c5structtableview.h"
 #include "c5message.h"
-#include "c5database.h"
+#include "c5structtableview.h"
+#include "struct_partner.h"
+#include "ui_dlgregistercard.h"
 
 DlgRegisterCard::DlgRegisterCard(QWidget *parent) :
     QDialog(parent),
@@ -54,31 +53,31 @@ void DlgRegisterCard::on_btnRegister_clicked()
         return;
     }
 
-    C5Database db;
+    // TODO db;
 
-    if(ui->lePartnerCode->getInteger() == 0) {
-        db[":f_name"] = ui->lePartner->text();
-        db[":f_taxname"] = ui->lePartner->text();
-        db[":f_phone"] = ui->lePhone->text();
-        ui->lePartnerCode->setInteger(db.insert("c_partners"));
-    }
+    // if(ui->lePartnerCode->getInteger() == 0) {
+    //     db[":f_name"] = ui->lePartner->text();
+    //     db[":f_taxname"] = ui->lePartner->text();
+    //     db[":f_phone"] = ui->lePhone->text();
+    //     ui->lePartnerCode->setInteger(db.insert("c_partners"));
+    // }
 
-    db[":f_code"] = ui->leCode->text();
-    db.exec("select * from b_cards_discount where f_code=:f_code");
+    // db[":f_code"] = ui->leCode->text();
+    // db.exec("select * from b_cards_discount where f_code=:f_code");
 
-    if(db.nextRow()) {
-        C5Message::error(tr("This card already registered"));
-        return;
-    }
+    // if(db.nextRow()) {
+    //     C5Message::error(tr("This card already registered"));
+    //     return;
+    // }
 
-    db[":f_value"] = ui->lePercent->getDouble() / 100;
-    db[":f_mode"] = 4;
-    db[":f_code"] = ui->leCode->text();
-    db[":f_datestart"] = QDate::currentDate();
-    db[":f_dateend"] = QDate::currentDate().addDays(1000);
-    db[":f_active"] = 1;
-    db[":f_client"] = ui->lePartnerCode->getInteger();
-    db.insert("b_cards_discount", false);
+    // db[":f_value"] = ui->lePercent->getDouble() / 100;
+    // db[":f_mode"] = 4;
+    // db[":f_code"] = ui->leCode->text();
+    // db[":f_datestart"] = QDate::currentDate();
+    // db[":f_dateend"] = QDate::currentDate().addDays(1000);
+    // db[":f_active"] = 1;
+    // db[":f_client"] = ui->lePartnerCode->getInteger();
+    // db.insert("b_cards_discount", false);
     accept();
     C5Message::info(tr("Card registered"));
 }

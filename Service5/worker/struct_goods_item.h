@@ -28,6 +28,7 @@ struct GoodsItem {
                            {"f_name", name},
                            {"f_barcode", barcode},
                            {"f_unit_name", unitName},
+                           {"f_lastinputprice", lastInputPrice},
                            {"f_price1", price1},
                            {"f_price1disc", price1disc},
                            {"f_price2", price2},
@@ -52,7 +53,7 @@ struct JsonParser<GoodsItem> {
         g.name = jo.value("f_name").toString();
         g.unitName = jo.value("f_unit_name").toString();
         g.barcode = jo.value("f_barcode").toString();
-        g.lastInputPrice = jo.value("f_lastinput").toDouble();
+        g.lastInputPrice = jo.value("f_lastinputprice").toDouble();
         g.price1 = jo.value("f_price1").toDouble();
         g.price1disc = jo.value("f_price1disc").toDouble();
         g.price2 = jo.value("f_price2").toDouble();

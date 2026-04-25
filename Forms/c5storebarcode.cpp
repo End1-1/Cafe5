@@ -269,7 +269,7 @@ bool C5StoreBarcode::printOneBarcode2(const QString &code, const QString &price,
     Barcode128 b;
     qreal plen = 3;
     bool r = b.Encode128C(code.toLatin1().data());
-    b.DrawBarcodeGS(gs, 200 - (b.DrawBarcodeGSLength(0, 150, plen) / 2), 280, 150, 150, plen);
+    // b.DrawBarcodeGS(gs, 200 - (b.DrawBarcodeGSLength(0, 150, plen) / 2), 280, 150, 150, plen);
     QFont font = painter.font();
     font.setPointSize(font.pointSize() + 8);
     painter.setFont(font);

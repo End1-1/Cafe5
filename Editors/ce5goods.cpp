@@ -296,6 +296,7 @@ QJsonObject CE5Goods::makeJsonObject()
     jdata["f_count_discount"] = ui->chCountDiscount->isChecked();
     jdata["f_hourly_payment"] = ui->chHourlyPayment->isChecked();
     jdata["f_hourly_rule"] = ui->leHourlyRole->text();
+    jdata["f_cooking_time"] = ui->leCookingTime->getInteger();
     QJsonObject j;
     j["f_id"] = ui->leCode->getInteger();
     j["f_name"] = ui->leName->text();
@@ -382,9 +383,25 @@ QJsonObject CE5Goods::makeJsonObject()
 
     fJsonData["f_unitname"] = ui->leUnitName->text();
     QJsonArray barcodes;
+    QSet<QString> uniqueBarcodes;
 
-    for(int i = 0; i < ui->tblBarcodes->rowCount(); i++) {
-        barcodes.append(ui->tblBarcodes->getString(i, 0));
+    // 1. Пытаемся добавить код из поля ввода
+    QString scanCode = ui->leScanCode->text().trimmed();
+    if (!scanCode.isEmpty()) {
+        uniqueBarcodes.insert(scanCode);
+    }
+
+    // 2. Добавляем коды из таблицы
+    for (int i = 0; i < ui->tblBarcodes->rowCount(); i++) {
+        QString tableCode = ui->tblBarcodes->getString(i, 0).trimmed();
+        if (!tableCode.isEmpty()) {
+            uniqueBarcodes.insert(tableCode);
+        }
+    }
+
+    // 3. Переносим уникальные значения в QJsonArray
+    for (const QString &code : uniqueBarcodes) {
+        barcodes.append(code);
     }
 
     fJsonData["f_barcodes"] = barcodes;
@@ -603,6 +620,7 @@ void CE5Goods::openResponse(const QJsonObject &jdoc)
     ui->chCountService->setChecked(jdata["f_count_service"].toBool());
     ui->chHourlyPayment->setChecked(jdata["f_hourly_payment"].toBool());
     ui->leHourlyRole->setText(jdata["f_hourly_rule"].toString());
+    ui->leCookingTime->setInteger(jdata["f_cooking_time"].toInt());
     ui->tblMenu->setUpdatesEnabled(true);
     fHttp->httpQueryFinished(sender());
 }

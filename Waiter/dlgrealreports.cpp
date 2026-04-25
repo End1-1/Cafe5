@@ -118,8 +118,8 @@ void DlgRealReports::loadReport(QListWidgetItem *item)
                            C5PrintJson pj;
 
                            mPrinting->reset();
-                           // Устанавливаем параметры холста для превью
-                           mPrinting->setSceneParams(380, 20000, 96);
+                           int screenDpi = QGuiApplication::primaryScreen()->logicalDotsPerInch();
+                           mPrinting->setSceneParams(380, 20000, screenDpi);
 
                            // Наполняем картинку данными
                            pj.parse(*mPrinting, mLastReport);
@@ -130,7 +130,8 @@ void DlgRealReports::loadReport(QListWidgetItem *item)
                            // Если в C5Printing нет метода resultImage, добавь его (возвращает fImage)
 
                            // Обрезаем лишнюю пустоту снизу и ставим в лейбл
-                           ui->lbPreview->setPixmap(QPixmap::fromImage(result.copy(0, 0, 380, mPrinting->fTop)));
+                           ui->lbPreview->setPixmap(
+                               QPixmap::fromImage(result).scaledToWidth(ui->lbPreview->width() * 0.7, Qt::SmoothTransformation));
 
                            // Скарролим в начало
                            ui->scrollArea2->verticalScrollBar()->setValue(0);

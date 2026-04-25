@@ -5,13 +5,8 @@
 #include <QStyledItemDelegate>
 #include <QTime>
 #include <QWidget>
-#include "bhistory.h"
-#include "c5database.h"
-#include "ninterface.h"
-#include "odraftsale.h"
-#include "ogoods.h"
-#include "oheader.h"
 #include "struct_partner.h"
+#include "struct_waiter_order.h"
 
 namespace Ui
 {
@@ -38,12 +33,6 @@ public:
 
     ~WOrder();
 
-    ODraftSale fDraftSale;
-
-    OHeader fOHeader;
-
-    void setPrepaidAmount(double amountPrepaid);
-
     void updateCustomerDisplay(WCustomerDisplay *cd);
 
     void clearCode();
@@ -62,8 +51,6 @@ public:
 
     void changeQty(double qty);
 
-    void discountRow(const QString &code);
-
     void changePrice();
 
     void changePrice(double price);
@@ -71,8 +58,6 @@ public:
     int rowCount();
 
     void removeRow();
-
-    void removeRowForce();
 
     void nextRow();
 
@@ -82,7 +67,7 @@ public:
 
     void comma();
 
-    void countTotal();
+    void printPrecheck();
 
     void setDiscount(const QString &label, const QString &value);
 
@@ -92,18 +77,13 @@ public:
 
     C5ClearTableWidget* table();
 
-    bool checkQty(int goods, double qty, QString &err, double oldqty);
-
-    void openDraft(const QString &draftid);
-
     void checkGoodsCode(const QString &code, std::function<void()> postProcess = nullptr);
 
+    int mSaleTypeMode = 1;
+
 private slots:
-    void openDraftResponse(const QJsonObject &jdoc);
 
     void noImage();
-
-    void checkCardClicked(bool v);
 
     void on_leCode_textChanged(const QString &arg1);
 
@@ -114,8 +94,6 @@ private slots:
     void on_leUseAccumulated_textChanged(const QString &arg1);
 
     void on_btnRemovePartner_clicked();
-
-    void on_tblData_doubleClicked(const QModelIndex &index);
 
     void on_btnAddPartner_clicked();
 
@@ -130,17 +108,15 @@ private:
 
     int fGiftCard;
 
-    BHistory fBHistory;
+    //BHistory fBHistory;
 
-    QVector<OGoods> fOGoods;
+    WaiterOrder mOrder;
 
-    NInterface* fHttp;
+    void parseOrder(const QJsonObject &jdoc);
 
-    bool returnFalse(const QString &msg, C5Database &db);
+    void scrollOrderToBottom();
 
-    bool getDiscountValue(int discountType, double& v);
-
-    void removeDraft();
+    bool getDiscountValue(int discountType, double &v);
 
     void setPartner(PartnerItem pi);
 
@@ -157,6 +133,9 @@ private:
     virtual void showEvent(QShowEvent *e) override;
 
     void setDiscinfoVisibility(bool v);
+
+signals:
+    void orderSaved(QWidget *);
 };
 
 #endif // WORDER_H

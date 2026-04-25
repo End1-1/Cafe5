@@ -307,9 +307,10 @@ add_executable(Smart ${EXE_TYPE}
     ${RESOURCES}
     ${RC_SOURCES}
     ../Classes/format_date.h
-    ../../desktop.newtax/Src/printtaxn.cpp ../../desktop.newtax/Src/printtaxn.h
     ../Classes/logwriter.cpp ../Classes/logwriter.h
     ../Service5/worker/c5jsonparser.h ../Service5/worker/c5structtraits.h ../Service5/worker/socketstruct.cpp ../Service5/worker/socketstruct.h ../Service5/worker/struct_dish.h ../Service5/worker/struct_goods_group.h ../Service5/worker/struct_goods_item.h ../Service5/worker/struct_hall.h ../Service5/worker/struct_parent.h ../Service5/worker/struct_partner.h ../Service5/worker/struct_storage_item.h ../Service5/worker/struct_table.h ../Service5/worker/struct_waiter_dish.h ../Service5/worker/struct_waiter_order.h ../Service5/worker/struct_workstationitem.cpp ../Service5/worker/struct_workstationitem.h
+    printtaxno.cpp printtaxno.h
+    ../Service5/worker/struct_fiscal_machine.cpp ../Service5/worker/struct_fiscal_machine.h ../Service5/worker/struct_workstationitem.cpp ../Service5/worker/struct_workstationitem.h
 )
 
 # Настройки Unity Build для конкретной цели

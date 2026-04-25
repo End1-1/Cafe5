@@ -194,8 +194,6 @@ private slots:
 
     void on_btnReceiptLanguage_clicked();
 
-    void on_btnReceipt_clicked();
-
     void on_btnCloseOrder_clicked();
 
     void on_btnService_clicked();

@@ -1,12 +1,13 @@
 #include "dlgvisit.h"
-#include "ui_dlgvisit.h"
+#include <QPrinterInfo>
 #include "c5config.h"
-#include "c5utils.h"
 #include "c5message.h"
 #include "c5printing.h"
-#include "ninterface.h"
 #include "c5user.h"
+#include "c5utils.h"
 #include "format_date.h"
+#include "ninterface.h"
+#include "ui_dlgvisit.h"
 
 dlgvisit::dlgvisit(const QString &code, C5User *user) :
     C5Dialog(user),
@@ -83,7 +84,6 @@ void dlgvisit::on_btnVisit_clicked()
         p.br();
         p.lrtext(tr("Remain"), QString::number(jdoc["f_remain"].toInt()));
         p.br();
-        p.setFontStrike(false);
         p.setFontSize(basesize - 4);
         // p.setFontBold(false);
         p.ltext(QString("%1 %2").arg(tr("[1] Printed:"), QDateTime::currentDateTime().toString(FORMAT_DATETIME_TO_STR)), 0);

@@ -39,8 +39,6 @@ private slots:
 
     void hideRemoved();
 
-    void transferToHotel();
-
     void recountSelfCost();
 
     void storeOutput();

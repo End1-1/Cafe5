@@ -1,11 +1,10 @@
 #include "dlgpaymentchoose.h"
-#include "ui_dlgpaymentchoose.h"
-#include "c5message.h"
-#include "c5config.h"
-#include "c5utils.h"
 #include <QDoubleValidator>
 #include <QShortcut>
 #include <QStyle>
+#include "c5message.h"
+#include "c5utils.h"
+#include "ui_dlgpaymentchoose.h"
 
 DlgPaymentChoose::DlgPaymentChoose(C5User *user) :
     C5ShopDialog(user),
@@ -17,7 +16,6 @@ DlgPaymentChoose::DlgPaymentChoose(C5User *user) :
     ui->leIdram->setValidator(new QDoubleValidator(0, 1000000000, 2));
     ui->leTelcell->setValidator(new QDoubleValidator(0, 1000000000, 2));
     ui->leBankTransfer->setValidator(new QDoubleValidator(0, 1000000000, 2));
-    ui->leCredit->setValidator(new QDoubleValidator(0, 1000000000, 2));
     ui->leDebt->setValidator(new QDoubleValidator(0, 1000000000, 2));
     ui->leCashIn->setValidator(new QDoubleValidator(0, 1000000000, 2));
     ui->leChange->setValidator(new QDoubleValidator(0, 1000000000, 2));
@@ -37,17 +35,26 @@ DlgPaymentChoose::~DlgPaymentChoose()
     delete ui;
 }
 
-bool DlgPaymentChoose::getValues(C5User *user, double total, double& cash, double& card, double& idram, double& telcell, double& bank,
-                                 double& credit,
-                                 double& prepaid, double& debt, double& cashin, double& change, bool &fiscal,
-                                 bool readOnlyPrepaid, double maxPrepaid)
+bool DlgPaymentChoose::getValues(C5User *user,
+                                 double total,
+                                 double &cash,
+                                 double &card,
+                                 double &idram,
+                                 double &telcell,
+                                 double &bank,
+                                 double &prepaid,
+                                 double &debt,
+                                 double &cashin,
+                                 double &change,
+                                 bool &fiscal,
+                                 bool readOnlyPrepaid,
+                                 double maxPrepaid)
 {
     DlgPaymentChoose d(user);
     d.ui->leTotal->setDouble(total);
     d.ui->leCash->setDouble(cash);
     d.ui->leCard->setDouble(card);
     d.ui->leBankTransfer->setDouble(bank);
-    d.ui->leCredit->setDouble(credit);
     d.ui->leIdram->setDouble(idram);
     d.ui->leTelcell->setDouble(telcell);
     d.ui->lePrepaid->setDouble(prepaid);
@@ -60,16 +67,15 @@ bool DlgPaymentChoose::getValues(C5User *user, double total, double& cash, doubl
     d.fFiscal = fiscal;
     d.fMaxPrepaid = maxPrepaid;
 
-    if(maxPrepaid < 1 && __c5config.fMainJson["prepaid_only_by_gift"].toBool()) {
-        d.ui->lePrepaid->setEnabled(false);
-        d.ui->btnPrepaid->setEnabled(false);
-    }
+    // if(maxPrepaid < 1 && __c5config.fMainJson["prepaid_only_by_gift"].toBool()) {
+    //     d.ui->lePrepaid->setEnabled(false);
+    //     d.ui->btnPrepaid->setEnabled(false);
+    // }
 
     if(d.exec() == QDialog::Accepted) {
         cash = d.ui->leCash->getDouble();
         card = d.ui->leCard->getDouble();
         bank = d.ui->leBankTransfer->getDouble();
-        credit = d.ui->leCredit->getDouble();
         idram = d.ui->leIdram->getDouble();
         telcell = d.ui->leTelcell->getDouble();
         prepaid = d.ui->lePrepaid->getDouble();
@@ -132,7 +138,6 @@ void DlgPaymentChoose::clearAll(QLineEdit *le)
     ui->leTelcell->clear();
     ui->lePrepaid->clear();
     ui->leDebt->clear();
-    ui->leCredit->clear();
     le->setText(ui->leTotal->text());
 
     if(ui->lePrepaid == le) {
@@ -204,15 +209,8 @@ void DlgPaymentChoose::on_btnBankTransfer_clicked()
 
 void DlgPaymentChoose::on_btnPay_clicked()
 {
-    double value =
-        ui->leCash->getDouble()
-        + ui->leCard->getDouble()
-        + ui->leIdram->getDouble()
-        + ui->leTelcell->getDouble()
-        + ui->leBankTransfer->getDouble()
-        + ui->lePrepaid->getDouble()
-        + ui->leDebt->getDouble()
-        + ui->leCredit->getDouble();
+    double value = ui->leCash->getDouble() + ui->leCard->getDouble() + ui->leIdram->getDouble() + ui->leTelcell->getDouble()
+                   + ui->leBankTransfer->getDouble() + ui->lePrepaid->getDouble() + ui->leDebt->getDouble();
 
     if(value > ui->leTotal->getDouble() || value < ui->leTotal->getDouble()) {
         C5Message::error(tr("Check amounts"));
@@ -333,11 +331,6 @@ void DlgPaymentChoose::on_leCashIn_returnPressed()
 void DlgPaymentChoose::on_leChange_returnPressed()
 {
     focusNextChild();
-}
-
-void DlgPaymentChoose::on_btnCredit_clicked()
-{
-    clearAll(ui->leCredit);
 }
 
 void DlgPaymentChoose::on_leCredit_returnPressed()

@@ -4,10 +4,15 @@
 #include "appwebsocket.h"
 #include "store_doc_status.h"
 #include "store_doc_type.h"
+#include "struct_cashbox.h"
+#include "struct_currency.h"
 #include "struct_goods_group.h"
 #include "struct_goods_item.h"
 #include "struct_partner.h"
+#include "struct_payment_type.h"
 #include "struct_storage_item.h"
+#include "struct_employee.h"
+#include "struct_employee_group.h"
 #include "ui_c5structtableview.h"
 
 C5StructTableView::C5StructTableView(C5User *user)
@@ -41,6 +46,16 @@ C5StructTableView::C5StructTableView(C5User *user)
             handleSearchResult<StoreDocTypeItem>(arr, static_cast<C5StructModel<StoreDocTypeItem> *>(ui->tbl->model()));
         } else if (mSearchEngine == SelectorName<StoreDocTypeItem>::value) {
             handleSearchResult<GoodsGroupItem>(arr, static_cast<C5StructModel<GoodsGroupItem> *>(ui->tbl->model()));
+        } else if (mSearchEngine == SelectorName<StructCurrency>::value) {
+            handleSearchResult<StructCurrency>(arr, static_cast<C5StructModel<StructCurrency> *>(ui->tbl->model()));
+        } else if (mSearchEngine == SelectorName<StructCashbox>::value) {
+            handleSearchResult<StructCashbox>(arr, static_cast<C5StructModel<StructCashbox> *>(ui->tbl->model()));
+        } else if (mSearchEngine == SelectorName<StructPaymentType>::value) {
+            handleSearchResult<StructPaymentType>(arr, static_cast<C5StructModel<StructPaymentType> *>(ui->tbl->model()));
+        } else if (mSearchEngine == SelectorName<StructEmployee>::value) {
+            handleSearchResult<StructEmployee>(arr, static_cast<C5StructModel<StructEmployee> *>(ui->tbl->model()));
+        } else if (mSearchEngine == SelectorName<StructEmployeeGroup>::value) {
+            handleSearchResult<StructEmployeeGroup>(arr, static_cast<C5StructModel<StructEmployeeGroup> *>(ui->tbl->model()));
         } else {
             Q_ASSERT_X(false, Q_FUNC_INFO, qPrintable(QString("Unknown search engine: %1").arg(mSearchEngine)));
         }
@@ -61,7 +76,14 @@ QMap<QString, QString> C5StructTableView::selectorTitles()
     return {{SelectorName<GoodsItem>::value, QObject::tr("Goods")},
             {SelectorName<GoodsGroupItem>::value, QObject::tr("Group")},
             {SelectorName<StorageItem>::value, QObject::tr("Storage")},
-            {SelectorName<PartnerItem>::value, QObject::tr("Partner")}};
+            {SelectorName<PartnerItem>::value, QObject::tr("Partner")},
+            {SelectorName<StoreDocTypeItem>::value, QObject::tr("Document type")},
+            {SelectorName<StoreDocStatusItem>::value, QObject::tr("Document status")},
+            {SelectorName<StructCurrency>::value, QObject::tr("Currency")},
+            {SelectorName<StructPaymentType>::value, QObject::tr("Payment type")},
+            {SelectorName<StructCashbox>::value, QObject::tr("Cashbox")},
+            {SelectorName<StructEmployee>::value, QObject::tr("Employee")},
+            {SelectorName<StructEmployeeGroup>::value, QObject::tr("Employee group")}};
 }
 
 void C5StructTableView::on_leSearchText_textChanged(const QString &arg1)
@@ -110,6 +132,26 @@ void C5StructTableView::on_btnSelect_clicked()
         if (static_cast<C5StructModel<StoreDocTypeItem> *>(ui->tbl->model())->hasSelectedData()) {
             isAcceptable = true;
         }
+    } else if (mSearchEngine == SelectorName<StructCurrency>::value) {
+        if (static_cast<C5StructModel<StructCurrency> *>(ui->tbl->model())->hasSelectedData()) {
+            isAcceptable = true;
+        }
+    } else if (mSearchEngine == SelectorName<StructCashbox>::value) {
+        if (static_cast<C5StructModel<StructCashbox> *>(ui->tbl->model())->hasSelectedData()) {
+            isAcceptable = true;
+        }
+    } else if (mSearchEngine == SelectorName<StructPaymentType>::value) {
+        if (static_cast<C5StructModel<StructPaymentType> *>(ui->tbl->model())->hasSelectedData()) {
+            isAcceptable = true;
+        }
+    } else if (mSearchEngine == SelectorName<StructEmployee>::value) {
+        if (static_cast<C5StructModel<StructEmployee> *>(ui->tbl->model())->hasSelectedData()) {
+            isAcceptable = true;
+        }
+    } else if (mSearchEngine == SelectorName<StructEmployeeGroup>::value) {
+        if (static_cast<C5StructModel<StructEmployeeGroup> *>(ui->tbl->model())->hasSelectedData()) {
+            isAcceptable = true;
+        }
     } else if (mSearchEngine == SelectorName<GoodsGroupItem>::value) {
         if (static_cast<C5StructModel<GoodsGroupItem> *>(ui->tbl->model())->hasSelectedData()) {
             isAcceptable = true;
@@ -139,6 +181,18 @@ void C5StructTableView::on_tbl_doubleClicked(const QModelIndex &index)
         static_cast<C5StructModel<StoreDocStatusItem> *>(ui->tbl->model())->setData(checkIndex, Qt::Checked, Qt::CheckStateRole);
     } else if (mSearchEngine == SelectorName<GoodsGroupItem>::value) {
         static_cast<C5StructModel<GoodsGroupItem> *>(ui->tbl->model())->setData(checkIndex, Qt::Checked, Qt::CheckStateRole);
+    } else if (mSearchEngine == SelectorName<StoreDocTypeItem>::value) {
+        static_cast<C5StructModel<StoreDocTypeItem> *>(ui->tbl->model())->setData(checkIndex, Qt::Checked, Qt::CheckStateRole);
+    } else if (mSearchEngine == SelectorName<StructCurrency>::value) {
+        static_cast<C5StructModel<StructCurrency> *>(ui->tbl->model())->setData(checkIndex, Qt::Checked, Qt::CheckStateRole);
+    } else if (mSearchEngine == SelectorName<StructCashbox>::value) {
+        static_cast<C5StructModel<StructCashbox> *>(ui->tbl->model())->setData(checkIndex, Qt::Checked, Qt::CheckStateRole);
+    } else if (mSearchEngine == SelectorName<StructPaymentType>::value) {
+        static_cast<C5StructModel<StructPaymentType> *>(ui->tbl->model())->setData(checkIndex, Qt::Checked, Qt::CheckStateRole);
+    } else if (mSearchEngine == SelectorName<StructEmployee>::value) {
+        static_cast<C5StructModel<StructEmployee> *>(ui->tbl->model())->setData(checkIndex, Qt::Checked, Qt::CheckStateRole);
+    } else if (mSearchEngine == SelectorName<StructEmployeeGroup>::value) {
+        static_cast<C5StructModel<StructEmployeeGroup> *>(ui->tbl->model())->setData(checkIndex, Qt::Checked, Qt::CheckStateRole);
     } else {
         Q_ASSERT_X(false, Q_FUNC_INFO, qPrintable(QString("Unknown search engine: %1").arg(mSearchEngine)));
     }

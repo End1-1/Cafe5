@@ -44,4 +44,6 @@ private:
 
 signals:
     void stopPlay();
+
+    void setEndDate(QDateTime);
 };

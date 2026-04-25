@@ -60,7 +60,7 @@ void DlgShowColumns::on_chCheckDiscount_clicked(bool checked)
     s.setValue("col" + QString::number(col_check_discount), checked);
 }
 
-void DlgShowColumns::on_chCheckDiscount_2_clicked(bool checked)
+void DlgShowColumns::on_chLearnDiscount_clicked(bool checked)
 {
     s.setValue("learnaccumulate", checked);
 }

@@ -84,7 +84,7 @@ set(APP_SOURCES
     ../Forms/c5changedocinputprice.ui
     ../Forms/c5changepassword.ui
     ../Forms/c5changepriceofgroup.ui
-    ../Forms/c5checkdatabase.ui
+
     ../Forms/c5costumerdebtpayment.ui
     ../Forms/c5datasynchronize.ui
     ../Forms/c5daterange.ui
@@ -114,7 +114,7 @@ set(APP_SOURCES
     ../Forms/c5srofinventory.ui
     ../Forms/c5storebarcode.ui
     ../Forms/c5storebarcodelist.ui
-    ../Forms/c5storedoc.ui
+
     ../Forms/c5storedocselectprinttemplate.ui
     c5storeinventory.ui
     ../Forms/c5toolbarwidget.ui
@@ -122,7 +122,7 @@ set(APP_SOURCES
     ../Forms/c5waiterorder.ui
     ../Forms/change.ui
     ../Forms/cr5routereport.ui
-    ../Forms/dlgcashop.ui
+
     ../Forms/dlgchangeoutputstore.ui
     ../Forms/dlgconfigtable.ui
     ../Forms/dlgdirtystoredoc.ui
@@ -136,14 +136,14 @@ set(APP_SOURCES
     ../Forms/dlgselectcurrency.ui
     ../Forms/dlgsemireadyinout.ui
     ../Forms/dlgsetwaiterordercl.ui
-    ../Forms/dlgstoreutils.ui
+
     ../Forms/goodsasmap.ui
     ../Forms/httpquerydialog.ui
     ../Forms/mfprocessproductpriceupdate.ui
     ../Forms/partnersasmap.ui
     ../Forms/touchdlgphonenumber.ui
     ../Forms/touchentertaxreceiptnumber.ui
-    ../Forms/touchselecttaxreport.ui
+
     ../Reports/c5customfilter.ui
     ../Reports/cr5breezeservice.ui
     ../Reports/cr5carvisitsfilter.ui
@@ -220,6 +220,7 @@ set(APP_SOURCES
     rabstracteditorreport.ui
     rwaiterstationconfig.ui
     wdashboard.ui
+    worderinspector.ui
     rfilterdialog.ui
     c5storeinput.ui
 
@@ -252,17 +253,13 @@ set(APP_SOURCES
     ../Classes/c5random.h
     ../Classes/c5replacecharacter.h
     ../Classes/c5reporttemplatedriver.h
-    ../Classes/c5storedraftwriter.h
     ../Classes/c5threadobject.h
     ../Classes/c5user.h
     ../Classes/calculator.h
     ../Classes/chatmessage.h
     ../Classes/goodsreserve.h
     ../Classes/notificationwidget.h
-    ../Classes/outputofheader.h
     ../Classes/proxytablewidgetdatabase.h
-    ../Configs/breezeconfig.h
-    ../Configs/configs.h
     ../Controls/c5cleartablewidget.h
     ../Controls/c5combotable.h
     ../Controls/c5guicontrols.h
@@ -296,7 +293,7 @@ set(APP_SOURCES
     ../Forms/c5changedocinputprice.h
     ../Forms/c5changepassword.h
     ../Forms/c5changepriceofgroup.h
-    ../Forms/c5checkdatabase.h
+
     ../Forms/c5costumerdebtpayment.h
     ../Forms/c5datasynchronize.h
     ../Forms/c5daterange.h
@@ -325,7 +322,7 @@ set(APP_SOURCES
     ../Forms/c5srofinventory.h
     ../Forms/c5storebarcode.h
     ../Forms/c5storebarcodelist.h
-    ../Forms/c5storedoc.h
+
     ../Forms/c5storedocselectprinttemplate.h
     c5storeinventory.h
     ../Forms/c5tablewidgetwithselector.h
@@ -334,7 +331,7 @@ set(APP_SOURCES
     ../Forms/c5waiterorder.h
     ../Forms/change.h
     ../Forms/cr5routereport.h
-    ../Forms/dlgcashop.h
+
     ../Forms/dlgchangeoutputstore.h
     ../Forms/dlgconfigtable.h
     ../Forms/dlgdirtystoredoc.h
@@ -347,14 +344,14 @@ set(APP_SOURCES
     ../Forms/dlgselectcurrency.h
     ../Forms/dlgsemireadyinout.h
     ../Forms/dlgsetwaiterordercl.h
-    ../Forms/dlgstoreutils.h
+
     ../Forms/goodsasmap.h
     ../Forms/httpquerydialog.h
     ../Forms/mfprocessproductpriceupdate.h
     ../Forms/partnersasmap.h
     ../Forms/touchdlgphonenumber.h
     ../Forms/touchentertaxreceiptnumber.h
-    ../Forms/touchselecttaxreport.h
+
     ../Reports/c5customfilter.h
     ../Reports/cr5breezeservice.h
     ../Reports/cr5carvisits.h
@@ -377,7 +374,7 @@ set(APP_SOURCES
     ../Reports/cr5currencyratehistoryfilter.h
     ../Reports/cr5custom.h
     ../Reports/cr5dishpackage.h
-    ../Reports/cr5draftoutputbyrecipe.h
+
     ../Reports/cr5draftoutputbyrecipefilter.h
     ../Reports/cr5generalreportonlydate.h
     ../Reports/cr5goodsfilter.h
@@ -425,10 +422,6 @@ set(APP_SOURCES
     ../TableRecord/c5dbrecord.h
     ../TableRecord/cpartners.h
     ../TableRecord/ecash.h
-    ../TableRecord/odraftsale.h
-    ../TableRecord/odraftsalebody.h
-    ../TableRecord/ogoods.h
-    ../TableRecord/oheader.h
     ../Cafe5/c5config.h
     ../Cafe5/c5database.h
     ../Cafe5/c5dialog.h
@@ -444,7 +437,7 @@ set(APP_SOURCES
     ../Classes/c5cache.h
     ../Controls/c5lineedit.h
     ../Controls/c5combobox.h
-    ../Reports/cr5commonsales.h
+
     ../Classes/c5gridgilter.h
     ../Reports/cr5commonsalesfilter.h
     ../Controls/c5dateedit.h
@@ -462,13 +455,13 @@ set(APP_SOURCES
     ../Reports/cr5goodsstorages.h
     ../Reports/cr5goodspartners.h
     ../Controls/c5tablewidget.h
-    ../Reports/cr5documents.h
+
     ../Reports/cr5materialsinstore.h
     ../Reports/cr5materialinstorefilter.h
-    ../Reports/cr5goodsmovement.h
+
     ../Reports/cr5goodsmovementfilter.h
     ../Controls/c5graphicsview.h
-    ../Reports/cr5tstoreextra.h
+
     ../Reports/cr5tstoreextrafilter.h
     ../Reports/cr5menunames.h
     ../Classes/c5datedelegate.h
@@ -502,10 +495,10 @@ set(APP_SOURCES
     ../Editors/ce5table.h
     ../Editors/ce5createtablesforhall.h
     ../Reports/cr5menutranslator.h
-    ../Reports/cr5storedocuments.h
+
     ../Reports/cr5storedocumentsfilter.h
     ../Classes/fileversion.h
-    ../Classes/c5waiterorderdoc.h
+
     ../NTable/nfilterdlg.h
     ../Classes/appwebsocket.h
     ../Classes/c5htmlprint.h
@@ -543,6 +536,7 @@ set(APP_SOURCES
     rabstractspecialwidget.h
     rwaiterstationconfig.h
     wdashboard.h
+    worderinspector.h
     ../Classes/dict_doc_reason.h
     rfilterdialog.h
     ../../desktop.newtax/Src/printtaxn.h
@@ -578,15 +572,11 @@ set(APP_SOURCES
     ../Classes/c5random.cpp
     ../Classes/c5replacecharacter.cpp
     ../Classes/c5reporttemplatedriver.cpp
-    ../Classes/c5storedraftwriter.cpp
     ../Classes/c5threadobject.cpp
     ../Classes/c5user.cpp
     ../Classes/calculator.cpp
     ../Classes/notificationwidget.cpp
-    ../Classes/outputofheader.cpp
     ../Classes/proxytablewidgetdatabase.cpp
-    ../Configs/breezeconfig.cpp
-    ../Configs/configs.cpp
     ../Controls/c5cleartablewidget.cpp
     ../Controls/c5combotable.cpp
     ../Controls/c5guicontrols.cpp
@@ -614,7 +604,7 @@ set(APP_SOURCES
     ../Forms/c5changedocinputprice.cpp
     ../Forms/c5changepassword.cpp
     ../Forms/c5changepriceofgroup.cpp
-    ../Forms/c5checkdatabase.cpp
+
     ../Forms/c5costumerdebtpayment.cpp
     ../Forms/c5datasynchronize.cpp
     ../Forms/c5daterange.cpp
@@ -643,7 +633,7 @@ set(APP_SOURCES
     ../Forms/c5srofinventory.cpp
     ../Forms/c5storebarcode.cpp
     ../Forms/c5storebarcodelist.cpp
-    ../Forms/c5storedoc.cpp
+
     ../Forms/c5storedocselectprinttemplate.cpp
     c5storeinventory.cpp
     ../Forms/c5tablewidgetwithselector.cpp
@@ -652,7 +642,7 @@ set(APP_SOURCES
     ../Forms/c5waiterorder.cpp
     ../Forms/change.cpp
     ../Forms/cr5routereport.cpp
-    ../Forms/dlgcashop.cpp
+
     ../Forms/dlgchangeoutputstore.cpp
     ../Forms/dlgconfigtable.cpp
     ../Forms/dlgdirtystoredoc.cpp
@@ -665,14 +655,14 @@ set(APP_SOURCES
     ../Forms/dlgselectcurrency.cpp
     ../Forms/dlgsemireadyinout.cpp
     ../Forms/dlgsetwaiterordercl.cpp
-    ../Forms/dlgstoreutils.cpp
+
     ../Forms/goodsasmap.cpp
     ../Forms/httpquerydialog.cpp
     ../Forms/mfprocessproductpriceupdate.cpp
     ../Forms/partnersasmap.cpp
     ../Forms/touchdlgphonenumber.cpp
     ../Forms/touchentertaxreceiptnumber.cpp
-    ../Forms/touchselecttaxreport.cpp
+
     ../Reports/c5customfilter.cpp
     ../Reports/cr5breezeservice.cpp
     ../Reports/cr5carvisits.cpp
@@ -700,7 +690,7 @@ set(APP_SOURCES
     ../NTable/ninterface.cpp
     c5aboutdlg.cpp
     ../Reports/cr5dishpackage.cpp
-    ../Reports/cr5draftoutputbyrecipe.cpp
+
     ../Reports/cr5draftoutputbyrecipefilter.cpp
     ../Reports/cr5generalreportonlydate.cpp
     ../Reports/cr5goodsfilter.cpp
@@ -747,10 +737,6 @@ set(APP_SOURCES
     ../TableRecord/c5dbrecord.cpp
     ../TableRecord/cpartners.cpp
     ../TableRecord/ecash.cpp
-    ../TableRecord/odraftsale.cpp
-    ../TableRecord/odraftsalebody.cpp
-    ../TableRecord/ogoods.cpp
-    ../TableRecord/oheader.cpp
     ../Cafe5/c5config.cpp
     ../Cafe5/c5database.cpp
     ../Cafe5/c5dialog.cpp
@@ -766,7 +752,7 @@ set(APP_SOURCES
     ../Classes/c5cache.cpp
     ../Controls/c5lineedit.cpp
     ../Controls/c5combobox.cpp
-    ../Reports/cr5commonsales.cpp
+
     ../Classes/c5gridgilter.cpp
     ../Reports/cr5commonsalesfilter.cpp
     ../Controls/c5dateedit.cpp
@@ -784,13 +770,13 @@ set(APP_SOURCES
     ../Reports/cr5goodsstorages.cpp
     ../Reports/cr5goodspartners.cpp
     ../Controls/c5tablewidget.cpp
-    ../Reports/cr5documents.cpp
+
     ../Reports/cr5materialsinstore.cpp
     ../Reports/cr5materialinstorefilter.cpp
-    ../Reports/cr5goodsmovement.cpp
+
     ../Reports/cr5goodsmovementfilter.cpp
     ../Controls/c5graphicsview.cpp
-    ../Reports/cr5tstoreextra.cpp
+
     ../Reports/cr5tstoreextrafilter.cpp
     ../Reports/cr5menunames.cpp
     ../Classes/c5datedelegate.cpp
@@ -824,10 +810,10 @@ set(APP_SOURCES
     ../Editors/ce5table.cpp
     ../Editors/ce5createtablesforhall.cpp
     ../Reports/cr5menutranslator.cpp
-    ../Reports/cr5storedocuments.cpp
+
     ../Reports/cr5storedocumentsfilter.cpp
     ../Classes/fileversion.cpp
-    ../Classes/c5waiterorderdoc.cpp
+
     ../NTable/nfilterdlg.cpp
     ../Classes/appwebsocket.cpp
     ../Classes/c5htmlprint.cpp
@@ -851,6 +837,7 @@ set(APP_SOURCES
     rabstractspecialwidget.cpp
     rwaiterstationconfig.cpp
     wdashboard.cpp
+    worderinspector.cpp
     rfilterdialog.cpp
     ../../desktop.newtax/Src/printtaxn.cpp
     ../Forms/previewdialog.cpp
@@ -868,7 +855,12 @@ add_executable(OfficeN ${APP_SOURCES}
     ../Service5/worker/store_doc_status.h ../Service5/worker/store_doc_type.h
     c5storeoutput.cpp c5storeoutput.h c5storeoutput.ui
     office_structs.h
-    ../Service5/worker/store_inventory_document.h)
+    ../Service5/worker/store_inventory_document.h
+    mainwindow.h
+    mainwindow.cpp
+    ../Service5/worker/struct_currency.h
+    ../Service5/worker/struct_cashbox.h
+    ../Service5/worker/struct_payment_type.h)
 
 set_target_properties(OfficeN PROPERTIES
     UNITY_BUILD ON
@@ -900,12 +892,12 @@ target_include_directories(OfficeN PRIVATE
     ../Forms
     ../Controls
     ../Cafe5
+    ../Data
     ../Classes
     ../NTable
     ../Reports
     ../TableRecord
     ../Service5/worker
-    ../Configs
     ../StructModel
     ../../desktop.newtax/src
     ${OPENSSL_INCLUDE_DIR}

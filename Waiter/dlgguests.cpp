@@ -1,13 +1,11 @@
 #include "dlgguests.h"
 #include "ui_dlgguests.h"
 
-DlgGuests::DlgGuests(C5User *user, C5OrderDriver *order) :
-    C5Dialog(user),
-    ui(new Ui::DlgGuests),
-    fOrder(order)
+DlgGuests::DlgGuests(C5User *user)
+    : C5Dialog(user)
+    , ui(new Ui::DlgGuests)
 {
     ui->setupUi(this);
-//   ui->spGuest->setValue(order->headerOptionsValue("f_guests").toInt());
 }
 
 DlgGuests::~DlgGuests()
@@ -15,10 +13,19 @@ DlgGuests::~DlgGuests()
     delete ui;
 }
 
+void DlgGuests::setGuests(int value)
+{
+    ui->spGuest->setValue(value);
+}
+
+int DlgGuests::guests()
+{
+    return ui->spGuest->value();
+}
+
 void DlgGuests::on_btnGuestUp_clicked()
 {
     ui->spGuest->setValue(ui->spGuest->value() + 1);
-    // fOrder->setHeaderOption("f_guests", ui->spGuest->value());
 }
 
 void DlgGuests::on_btnGuestDown_clicked()
@@ -28,13 +35,14 @@ void DlgGuests::on_btnGuestDown_clicked()
     }
 
     ui->spGuest->setValue(ui->spGuest->value() - 1);
-    //  fOrder->setHeaderOption("f_guests", ui->spGuest->value());
 }
 
-void DlgGuests::on_btnSplitOrder_clicked()
-{
-}
-void DlgGuests::on_btnClose_clicked()
+void DlgGuests::on_btnAccept_clicked()
 {
     accept();
+}
+
+void DlgGuests::on_btnCancel_clicked()
+{
+    reject();
 }

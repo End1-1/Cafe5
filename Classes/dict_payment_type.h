@@ -8,7 +8,10 @@
 #define PAYMENT_TYPE_BANK 3
 #define PAYMENT_TYPE_IDRAM 4
 #define PAYMENT_TYPE_COMPLIMENTARY 5
-#define PAYMENT_OTHER 6
+#define PAYMENT_TYPE_OTHER 6
+#define PAYMENT_TYPE_TELCELL 7
+#define PAYMENT_TYPE_DEBT 8
+#define PAYMENT_TYPE_PREPAID 9
 
 extern const QVector<int> payment_types;
 extern const QMap<int, const char*> payment_names;

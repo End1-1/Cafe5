@@ -48,6 +48,9 @@ void C5CodeNameSelector::setSelectorName(const QString &s)
 
 QPoint C5CodeNameSelector::getPosition() const
 {
+    if (property("center").toBool()) {
+        return {-1, -1};
+    }
     QPoint p = ui->leCode->mapToGlobal(QPoint(0, ui->leCode->height()));
     return p;
 }

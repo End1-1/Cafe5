@@ -35,6 +35,10 @@ private slots:
 private:
     Ui::DlgGuestInfo *ui;
 
+    static QString normalizePhone(const QString &phone);
+
+    static QString displayPhone(const QString &phone);
+
 };
 
 #endif // DLGGUESTINFO_H

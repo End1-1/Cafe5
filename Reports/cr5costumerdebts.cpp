@@ -1,12 +1,11 @@
 #include "cr5costumerdebts.h"
-#include "cr5costumerdebtsfilter.h"
-#include "c5tablemodel.h"
 #include "c5costumerdebtpayment.h"
-#include "c5salefromstoreorder.h"
-#include "c5waiterorder.h"
 #include "c5mainwindow.h"
 #include "c5message.h"
-#include "c5storedoc.h"
+#include "c5salefromstoreorder.h"
+#include "c5tablemodel.h"
+#include "c5waiterorder.h"
+#include "cr5costumerdebtsfilter.h"
 
 CR5CostumerDebts::CR5CostumerDebts(QWidget *parent) :
     C5ReportWidget(parent)
@@ -258,13 +257,13 @@ bool CR5CostumerDebts::tblDoubleClicked(int row, int column, const QJsonArray &v
         d.setId(vals.at(4).toString());
         d.exec();
     } else if(!vals.at(5).toString().isEmpty()) {
-        C5StoreDoc *sd = __mainWindow->createTab<C5StoreDoc>();
-        QString err;
-        sd->openDoc(vals.at(5).toString(), err);
+        //TODO C5StoreDoc *sd = __mainWindow->createTab<C5StoreDoc>();
+        // QString err;
+        // sd->openDoc(vals.at(5).toString(), err);
 
-        if(!err.isEmpty()) {
-            C5Message::error(err);
-        }
+        // if(!err.isEmpty()) {
+        //     C5Message::error(err);
+        // }
     }
 
     return true;

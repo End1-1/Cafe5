@@ -1,13 +1,13 @@
 #include "c5printing.h"
 #include <QBuffer>
-#include <QJsonObject>
+#include <QFontMetrics>
+#include <QPrinter>
 
 C5Printing::C5Printing()
     : QObject()
 {
-    fNormalWidth = 500;
     fLogicalDpiX = 96;
-    fMM = fLogicalDpiX / 25.4;
+    fNormalWidth = 500;
     reset();
 }
 
@@ -21,107 +21,108 @@ void C5Printing::reset()
 {
     fTop = 0;
     fTempTop = 0;
-    fJsonData = QJsonArray(); // Очищаем JSON
+    fJsonData = QJsonArray();
     setSceneParams(fNormalWidth, 20000, fLogicalDpiX);
+
+    fFont = QFont("Arial", 10);
+    fLineHeight = QFontMetrics(fFont).height();
+}
+
+void C5Printing::setSceneParams(qreal width, qreal height, qreal logicalDpiX)
+{
+    // Устанавливаем 203 или 300 для плотности, близкой к физической головке принтера
+    fLogicalDpiX = 203;
+    fMM = fLogicalDpiX / 25.4;
+    // Ширина теперь должна соответствовать новому DPI
+    // Если раньше было 500 при 96dpi, то для 203dpi это ~1050 пикселей
+    fNormalWidth = qRound(width * (fLogicalDpiX / 96.0));
+
+    if (fPainter.isActive())
+        fPainter.end();
+
+    // Оставляем Format_RGB32, но холст стал в 2-3 раза плотнее
+    fImage = QImage(fNormalWidth, qRound(height * (fLogicalDpiX / 96.0)), QImage::Format_RGB32);
+    fImage.fill(Qt::white);
+
+    fPainter.begin(&fImage);
+
+    // ВКЛЮЧАЕМ сглаживание, иначе на мелком шрифте будут "лесенки"
+    fPainter.setRenderHint(QPainter::Antialiasing, true);
+    fPainter.setRenderHint(QPainter::TextAntialiasing, true);
+    fPainter.setRenderHint(QPainter::SmoothPixmapTransform, true);
+}
+
+void C5Printing::addToJson(const QString &type, const QVariantMap &params)
+{
+    QJsonObject obj;
+    obj["cmd"] = type;
+
+    // Делаем плоский JSON как в Dart: {'cmd': '...', 'param1': 'val'}
+    QMapIterator<QString, QVariant> i(params);
+    while (i.hasNext()) {
+        i.next();
+        obj[i.key()] = QJsonValue::fromVariant(i.value());
+    }
+    fJsonData.append(obj);
 }
 
 void C5Printing::setFont(const QFont &font)
 {
     fFont = font;
-
-    fFont.setStyleStrategy(QFont::NoAntialias);
-    fFont.setHintingPreference(QFont::PreferFullHinting);
-    fFont.setFixedPitch(true);
-
-    addToJson("font", {{"family", fFont.family()}, {"size", fFont.pointSize()}});
-}
-
-void C5Printing::setFontBold(bool bold)
-{
-    fFont.setBold(bold);
-    addToJson("fontbold", {{"bold", fFont.bold()}});
+    fLineHeight = QFontMetrics(fFont).height();
 }
 
 void C5Printing::setFontSize(int size)
 {
     fFont.setPointSize(size);
-    addToJson("fontsize", {{"size", fFont.pointSize()}});
+    fLineHeight = QFontMetrics(fFont).height();
+    addToJson("fontsize", {{"size", size}});
 }
 
-void C5Printing::setSceneParams(qreal width, qreal height, qreal logicalDpiX)
+void C5Printing::setFontBold(bool bold)
 {
-    fLogicalDpiX = logicalDpiX;
-    fMM = fLogicalDpiX / 25.4;
-    fNormalWidth = qRound(width);
-
-    if (fPainter.isActive())
-        fPainter.end();
-
-    // Используем RGB32 (без прозрачности), он чуть быстрее и стабильнее для текста
-    fImage = QImage(fNormalWidth, qRound(height), QImage::Format_RGB32);
-    fImage.fill(Qt::white);
-
-    fPainter.begin(&fImage);
-
-    // ВЫКЛЮЧАЕМ все "улучшайзеры", которые делают текст "грязным"
-    fPainter.setRenderHint(QPainter::Antialiasing, false);
-    fPainter.setRenderHint(QPainter::TextAntialiasing, false);
-}
-
-// Вспомогательный метод для упаковки команд в JSON
-void C5Printing::addToJson(const QString &type, const QVariantMap &params)
-{
-    QJsonObject obj;
-    obj["type"] = type;
-    obj["params"] = QJsonObject::fromVariantMap(params);
-    fJsonData.append(obj);
-}
-
-QImage C5Printing::resultImage() const
-{
-    return fImage;
+    fFont.setBold(bold);
+    // В Dart нет отдельной команды bold, обычно это часть стилей,
+    // но добавим для синхронизации, если нужно
+    addToJson("fontbold", {{"bold", bold}});
 }
 
 void C5Printing::ltext(const QString &text, qreal x, qreal textWidth)
 {
     fPainter.setFont(fFont);
     int posX = qRound(x * fMM);
+
+    // Считаем ширину в пикселях
     int width = (textWidth > 0) ? qRound(textWidth * fMM) : (fNormalWidth - posX);
 
-    QRect rect(posX, fTop, width, 1000);
+    // Отрисовка с переносом
+    // Используем высоту 10000, чтобы тексту было куда расти вниз
+    QRect rect(posX, fTop, width, 10000);
     QRect bound = fPainter.boundingRect(rect, Qt::AlignLeft | Qt::TextWordWrap, text);
     fPainter.drawText(rect, Qt::AlignLeft | Qt::TextWordWrap, text);
 
+    // Запоминаем высоту самой высокой колонки в строке
     fTempTop = qMax(fTempTop, bound.height());
 
-    // JSON часть
+    // --- JSON ЧАСТЬ (синхронизируем с Dart классом PosPrint) ---
     QVariantMap p;
     p["text"] = text;
-    p["x"] = x;
-    p["align"] = "left";
-    p["bold"] = fFont.bold();
-    addToJson("text", p);
+    p["x"] = (int) x;
+    p["textwidth"] = (int) textWidth;
+    // В Dart классе нет поля 'align' и 'bold' в ltext,
+    // там просто 'cmd': 'ltext'. Оставляем только нужное:
+    addToJson("ltext", p);
 }
 
 void C5Printing::ctext(const QString &text)
 {
     fPainter.setFont(fFont);
-    // Ограничиваем прямоугольник по ширине, но разрешаем ему быть "бесконечным" вниз
     QRect rect(0, fTop, fNormalWidth, 10000);
-
-    // Используем AlignTop, чтобы текст прилип к fTop
-    // boundingRect поможет узнать реальную высоту, которую занял текст
     QRect bound = fPainter.boundingRect(rect, Qt::AlignHCenter | Qt::AlignTop | Qt::TextWordWrap, text);
     fPainter.drawText(rect, Qt::AlignHCenter | Qt::AlignTop | Qt::TextWordWrap, text);
 
-    // Сохраняем высоту контента, чтобы потом в br() прибавить её к fTop
     fTempTop = qMax(fTempTop, bound.height());
-
-    QVariantMap p;
-    p["text"] = text;
-    p["align"] = "center";
-    p["bold"] = fFont.bold();
-    addToJson("text", p);
+    addToJson("ctext", {{"text", text}});
 }
 
 void C5Printing::rtext(const QString text)
@@ -132,66 +133,21 @@ void C5Printing::rtext(const QString text)
     fPainter.drawText(posX, fTop + QFontMetrics(fFont).ascent(), text);
 
     fTempTop = qMax(fTempTop, fLineHeight);
-
-    QVariantMap p;
-    p["text"] = text;
-    p["align"] = "right";
-    p["bold"] = fFont.bold();
-    addToJson("text", p);
+    addToJson("rtext", {{"text", text}});
 }
 
 void C5Printing::lrtext(const QString &leftText, const QString &rightText, qreal textWidth)
 {
+    // Рисуем визуально
     ltext(leftText, 0, textWidth);
     rtext(rightText);
-}
 
-void C5Printing::image(const QPixmap &img, Qt::Alignment align)
-{
-    if (img.isNull()) {
-        return;
+    // Удаляем два последних входа JSON (ltext и rtext), заменяем на один lrtext
+    if (fJsonData.size() >= 2) {
+        fJsonData.removeAt(fJsonData.size() - 1);
+        fJsonData.removeAt(fJsonData.size() - 1);
     }
-
-    int x = 0;
-    int safetyMargin = 5;
-
-    // Считаем позицию X в зависимости от выравнивания
-    if (align == Qt::AlignRight) {
-        x = fNormalWidth - img.width() - safetyMargin;
-    } else if (align == Qt::AlignHCenter) {
-        x = (fNormalWidth - img.width()) / 2;
-    } else {
-        x = safetyMargin; // По умолчанию слева с небольшим отступом
-    }
-
-    // Рисуем картинку на нашем холсте
-    fPainter.drawPixmap(qMax(0, x), fTop, img);
-
-    // Обновляем временную высоту строки
-    fTempTop = qMax(fTempTop, img.height());
-
-    // Добавляем в JSON (конвертируем в Base64, чтобы передать данные)
-    QByteArray ba;
-    QBuffer bu(&ba);
-    bu.open(QIODevice::WriteOnly);
-    img.save(&bu, "PNG");
-
-    QVariantMap p;
-    p["data"] = QString::fromLatin1(ba.toBase64());
-    p["align"] = (int) align;
-    p["width"] = img.width();
-    p["height"] = img.height();
-    addToJson("image", p);
-}
-
-void C5Printing::image(const QString &fileName, Qt::Alignment align)
-{
-    QPixmap pix(fileName);
-    if (pix.isNull()) {
-        return;
-    }
-    // Масштабируем, если нужно, как в твоем старом коде
-    image(pix.scaled(100, 100, Qt::KeepAspectRatio, Qt::SmoothTransformation), align);
+    addToJson("lrtext", {{"left", leftText}, {"right", rightText}});
 }
 
 void C5Printing::line(int lineWidth)
@@ -200,9 +156,11 @@ void C5Printing::line(int lineWidth)
     fPainter.setPen(fLinePen);
     fPainter.drawLine(0, fTop, fNormalWidth, fTop);
 
-    QVariantMap p;
-    p["width"] = lineWidth;
-    addToJson("line", p);
+    if (lineWidth > 1) {
+        addToJson("line2", {{"width", lineWidth}});
+    } else {
+        addToJson("line", {});
+    }
 }
 
 bool C5Printing::br(qreal height)
@@ -211,11 +169,48 @@ bool C5Printing::br(qreal height)
     fTop += step;
     fTempTop = 0;
 
-    QVariantMap p;
-    p["height"] = step;
-    addToJson("br", p);
-
+    addToJson("br", {{"height", (int) height}});
     return (fTop > 19000);
+}
+
+void C5Printing::image(const QPixmap &img, Qt::Alignment align)
+{
+    if (img.isNull())
+        return;
+
+    int x = 0;
+    if (align == Qt::AlignRight)
+        x = fNormalWidth - img.width();
+    else if (align == Qt::AlignHCenter)
+        x = (fNormalWidth - img.width()) / 2;
+
+    fPainter.drawPixmap(x, fTop, img);
+    fTempTop = qMax(fTempTop, img.height());
+
+    QByteArray ba;
+    QBuffer bu(&ba);
+    bu.open(QIODevice::WriteOnly);
+    img.save(&bu, "PNG");
+
+    addToJson("image",
+              {{"data", QString::fromLatin1(ba.toBase64())}, {"align", (int) align}, {"width", img.width()}, {"height", img.height()}});
+}
+
+void C5Printing::image(const QString &fileName, Qt::Alignment align)
+{
+    QPixmap pix(fileName);
+    if (!pix.isNull())
+        image(pix, align);
+}
+
+QJsonArray C5Printing::jsonData() const
+{
+    return fJsonData;
+}
+
+QImage C5Printing::resultImage() const
+{
+    return fImage.copy(0, 0, fNormalWidth, fTop + 20);
 }
 
 bool C5Printing::print(QPrinter &prn)
@@ -223,31 +218,14 @@ bool C5Printing::print(QPrinter &prn)
     if (fPainter.isActive())
         fPainter.end();
 
-    // 1. Берем только нарисованную часть чека
-    QImage finalImage = fImage.copy(0, 0, fNormalWidth, fTop + 20);
-
-    // 2. Превращаем в жесткий ЧЕРНО-БЕЛЫЙ (1 бит)
-    // Это уберет все "газетные" полутона и сделает буквы острыми
-    finalImage = finalImage.convertToFormat(QImage::Format_Mono, Qt::ThresholdDither | Qt::AvoidDither);
+    QImage finalImage = resultImage().convertToFormat(QImage::Format_Mono, Qt::ThresholdDither | Qt::AvoidDither);
 
     prn.setFullPage(true);
     QPainter p(&prn);
-
-    // Сбрасываем все трансформации
-    p.setWorldTransform(QTransform());
-
     QRect targetPageRect = prn.pageRect(QPrinter::DevicePixel).toRect();
     qreal scale = (qreal) targetPageRect.width() / (qreal) fNormalWidth;
-    int targetHeight = qRound((fTop + 20) * scale);
 
-    // Рисуем 1-битную картинку. Теперь она будет как на кассовом аппарате - без серости.
-    p.drawImage(QRect(0, 0, targetPageRect.width(), targetHeight), finalImage);
-
+    p.drawImage(QRect(0, 0, targetPageRect.width(), qRound(finalImage.height() * scale)), finalImage);
     p.end();
     return true;
-}
-
-QJsonArray C5Printing::jsonData()
-{
-    return fJsonData;
 }

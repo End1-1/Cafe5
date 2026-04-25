@@ -34,6 +34,14 @@ private slots:
 
     void on_btnReports_clicked();
 
+    void on_btnCheckin_clicked();
+
+    void on_btnCheckout_clicked();
+
+    void on_btnCashIn_clicked();
+
+    void on_btnCashOut_clicked();
+
 private:
     Ui::DlgDashboard* ui;
 

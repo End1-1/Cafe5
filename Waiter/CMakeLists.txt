@@ -46,14 +46,13 @@ include_directories(
     ../Editors
     ../Forms
     ../Service
-    ../Configs
     ../Printing
     ../NTable
+    ../Http
     ../resources
     ../Service5Working/raw
     ../Service5Working/socket
     ../Service5/worker
-    ../DbData
     C:/Development/OpenSSL-Win64/include
     C:/Development/projects/desktop.newtax/Src
 )
@@ -90,8 +89,6 @@ qt_add_executable(Waiter WIN32
     ../Classes/idram.cpp
     ../Classes/logwriter.cpp
     ../Classes/notificationwidget.cpp
-    ../Configs/breezeconfig.cpp
-    ../Configs/configs.cpp
     ../Controls/c5guicontrols.cpp
     ../Controls/combosearchview.cpp
     ../Forms/barcode.cpp
@@ -114,7 +111,7 @@ qt_add_executable(Waiter WIN32
     ../Forms/mfprocessproductpriceupdate.cpp
     ../Forms/touchdlgphonenumber.cpp
     ../Forms/touchentertaxreceiptnumber.cpp
-    ../Forms/touchselecttaxreport.cpp
+
     ../NTable/ndataprovider.cpp
     ../NTable/nfilterdlg.cpp
     ../NTable/ninterface.cpp
@@ -209,8 +206,6 @@ qt_add_executable(Waiter WIN32
     ../Classes/idram.h
     ../Classes/logwriter.h
     ../Classes/notificationwidget.h
-    ../Configs/breezeconfig.h
-    ../Configs/configs.h
     ../Controls/c5guicontrols.h
     ../Controls/combosearchview.h
     ../Forms/barcode.h
@@ -233,7 +228,7 @@ qt_add_executable(Waiter WIN32
     ../Forms/mfprocessproductpriceupdate.h
     ../Forms/touchdlgphonenumber.h
     ../Forms/touchentertaxreceiptnumber.h
-    ../Forms/touchselecttaxreport.h
+
     ../NTable/ndataprovider.h
     ../NTable/nfilterdlg.h
     ../NTable/ninterface.h
@@ -305,6 +300,8 @@ qt_add_executable(Waiter WIN32
     dlgreceiptlanguage.h
     dlgcl.h
     ../Classes/c5permissions.h
+    ../Http/httplite.h
+    ../Http/httplite.cpp
 
 
     ../Classes/fileversion.h
@@ -335,7 +332,7 @@ qt_add_executable(Waiter WIN32
     ../Forms/mfprocessproductpriceupdate.ui
     ../Forms/touchdlgphonenumber.ui
     ../Forms/touchentertaxreceiptnumber.ui
-    ../Forms/touchselecttaxreport.ui
+
     ../NTable/nfilterdlg.ui
     ../NTable/nloadingdlg.ui
     ../NTable/nsearchdlg.ui
@@ -374,6 +371,7 @@ qt_add_executable(Waiter WIN32
 
     wplast30sessions.ui
     ../../desktop.newTax/Src/printtaxn.cpp
+    dlgmovemoney.h dlgmovemoney.cpp dlgmovemoney.ui
 )
 
 # ---------- Qt link ----------

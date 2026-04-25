@@ -1,13 +1,12 @@
 #include "cr5reports.h"
+#include <QJsonObject>
+#include "c5mainwindow.h"
+#include "c5message.h"
+#include "c5saledoc.h"
 #include "c5tablemodel.h"
 #include "c5tablewidget.h"
-#include "c5mainwindow.h"
-#include "c5storedoc.h"
-#include "c5saledoc.h"
 #include "cr5reportsfilter.h"
-#include "c5message.h"
 #include "ntablewidget.h"
-#include <QJsonObject>
 
 #define REPORT_HANDLER_GIFT_CARD_TOTAL "ff64e987-a0b2-11ef-b479-022165c6dab1"
 
@@ -126,15 +125,15 @@ bool CR5Reports::tblDoubleClicked(int row, int column, const QJsonArray &values)
         int type = db.getInt("f_saletype");
 
         if(type == 3) {
-            QString err;
-            auto *storedoc = __mainWindow->createTab<C5StoreDoc>();
-            storedoc->setProperty("fromdraft", values.at(0).toString());
-            storedoc->setMode(C5StoreDoc::sdInput);
+            //todo QString err;
+            // auto *storedoc = __mainWindow->createTab<C5StoreDoc>();
+            // storedoc->setProperty("fromdraft", values.at(0).toString());
+            // storedoc->setMode(C5StoreDoc::sdInput);
 
-            if(!storedoc->openDraft(values.at(0).toString(), err))  {
-                C5Message::error(err);
-                return false;
-            }
+            // if(!storedoc->openDraft(values.at(0).toString(), err))  {
+            //     C5Message::error(err);
+            //     return false;
+            // }
         } else {
             auto *retaildoc = __mainWindow->createTab<C5SaleDoc>();
             retaildoc->setMode(1);

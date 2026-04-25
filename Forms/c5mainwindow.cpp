@@ -27,7 +27,6 @@
 #include "c5salarypayment.h"
 #include "c5saledoc.h"
 #include "c5storedecompilation.h"
-#include "c5storedoc.h"
 #include "c5storeinventory.h"
 #include "c5toolbarwidget.h"
 #include "c5translatorform.h"
@@ -37,7 +36,6 @@
 #include "cr5cashdetailed.h"
 #include "cr5cashmovement.h"
 #include "cr5cashnames.h"
-#include "cr5commonsales.h"
 #include "cr5complectations.h"
 #include "cr5consuptionreason.h"
 #include "cr5creditcards.h"
@@ -52,13 +50,10 @@
 #include "cr5dishpart1.h"
 #include "cr5dishpart2.h"
 #include "cr5dishremovereason.h"
-#include "cr5documents.h"
-#include "cr5draftoutputbyrecipe.h"
 #include "cr5generalreportonlydate.h"
 #include "cr5goods.h"
 #include "cr5goodsgroup.h"
 #include "cr5goodsimages.h"
-#include "cr5goodsmovement.h"
 #include "cr5goodspartners.h"
 #include "cr5goodsqtyreminder.h"
 #include "cr5goodsreservations.h"
@@ -86,10 +81,8 @@
 #include "cr5saleremoveddishes.h"
 #include "cr5salesbydishes.h"
 #include "cr5settings.h"
-#include "cr5storedocuments.h"
 #include "cr5storereason.h"
 #include "cr5tables.h"
-#include "cr5tstoreextra.h"
 #include "cr5users.h"
 #include "cr5usersgroups.h"
 #include "ninterface.h"
@@ -98,7 +91,6 @@
 #include "ui_c5mainwindow.h"
 #include "wdashboard.h"
 
-C5MainWindow* __mainWindow;
 QStringList mainDbParams;
 int C5MainWindow::mScreen = -1;
 
@@ -621,41 +613,8 @@ void C5MainWindow::on_listWidgetItemClicked(const QModelIndex &index)
         createTab<CR5BreezeService>();
         break;
 
-    case cp_t2_store_input: {
-#ifdef NEWVERSION
-        createTab<StoreInputDocument>();
-#else
-        C5StoreDoc *sd = createTab<C5StoreDoc>();
-        sd->setMode(C5StoreDoc::sdInput);
-#endif
-        break;
-    }
-
-    case cp_t2_store_output: {
-        C5StoreDoc *sd = createTab<C5StoreDoc>();
-        sd->setMode(C5StoreDoc::sdOutput);
-        break;
-    }
-
-    case cp_t2_store_move: {
-        C5StoreDoc *sd = createTab<C5StoreDoc>();
-        sd->setMode(C5StoreDoc::sdMovement);
-        break;
-    }
-
     case cp_t2_calculate_self_cost: {
         createTab<C5DishSelfCostGenPrice>();
-        break;
-    }
-
-    case cp_t2_store_complectation: {
-        C5StoreDoc *sd = createTab<C5StoreDoc>();
-        sd->setMode(C5StoreDoc::sdComplectation);
-        break;
-    }
-
-    case cp_t2_store_decomplectation: {
-        createTab<C5StoreDecompilation>();
         break;
     }
 
@@ -675,28 +634,8 @@ void C5MainWindow::on_listWidgetItemClicked(const QModelIndex &index)
         break;
     }
 
-    case cp_t3_sales_common:
-        createTab<CR5CommonSales>();
-        break;
-
-    case cp_t3_documents:
-        createTab<CR5Documents>();
-        break;
-
-    case cp_t3_documents_store:
-        createTab<CR5StoreDocuments>();
-        break;
-
     case cp_t3_store:
         createTab<CR5MaterialsInStore>();
-        break;
-
-    case cp_t3_store_movement:
-        createTab<CR5GoodsMovement>();
-        break;
-
-    case cp_t3_tstore_extra:
-        createTab<CR5TStoreExtra>();
         break;
 
     case cp_t3_store_sale:
@@ -745,10 +684,6 @@ void C5MainWindow::on_listWidgetItemClicked(const QModelIndex &index)
 
     case cp_t3_custom_reports:
         createTab<CR5Custom>();
-        break;
-
-    case cp_t3_draft_output_recipes:
-        createTab<CR5DraftOutputByRecipe>();
         break;
 
     case cp_t4_part1:
@@ -1059,11 +994,7 @@ void C5MainWindow::setDB()
 
     if(addMainLevel(db.at(1), cp_t2_action, tr("Actions"), ":/edit.png", l)) {
         l->setProperty("reportlevel", 1);
-        addTreeL3Item(l, cp_t2_store_input, tr("New store input"), ":/goods.png");
-        addTreeL3Item(l, cp_t2_store_output, tr("New store output"), ":/goods.png");
-        addTreeL3Item(l, cp_t2_store_move, tr("New store movement"), ":/goods.png");
-        addTreeL3Item(l, cp_t2_store_complectation, tr("New store complecation"), ":/goods.png");
-        addTreeL3Item(l, cp_t2_store_decomplectation, tr("New store decomplecation"), ":/goods.png");
+
         addTreeL3Item(l, cp_t2_store_inventory, tr("New store inventory"), ":/goods.png");
 
         if(__c5config.frontDeskMode() == FRONTDESK_WAITER) {
@@ -1077,20 +1008,15 @@ void C5MainWindow::setDB()
 
     if(addMainLevel(db.at(1), cp_t3_reports, tr("Reports"), ":/reports.png", l)) {
         l->setProperty("reportlevel", 2);
-        addTreeL3Item(l, cp_t3_documents, tr("Documents"), ":/documents.png");
-        addTreeL3Item(l, cp_t3_documents_store, tr("Documents in the store"), ":/documents.png");
+
         addTreeL3Item(l, cp_t3_store, tr("Storage"), ":/goods.png");
-        addTreeL3Item(l, cp_t3_store_movement, tr("Storages movements"), ":/goods.png");
         addTreeL3Item(l, cp_t3_debts_partner, tr("Debts journal"), ":/cash.png");
         //addTreeL3Item(l, cp_t3_debts_customer, tr("Debts journal"), ":/cash.png");
         addTreeL3Item(l, cp_t3_move_uncomplected, tr("Storage movement, uncomplected"), ":/goods.png");
         addTreeL3Item(l, cp_t3_storage_uncomplected, tr("Storage uncomplected"), ":/goods.png");
         addTreeL3Item(l, cp_t3_sale_from_store_total, tr("Detailed movement in the storage"), ":/graph.png");
-        addTreeL3Item(l, cp_t3_tstore_extra, tr("T-account, extra"), ":/documents.png");
 
-        addTreeL3Item(l, cp_t3_draft_output_recipes, tr("Draft output by recipes"), ":/goods.png");
         addTreeL3Item(l, cp_t3_consuption_reason, tr("Reason for consuption"), ":/goods.png");
-        addTreeL3Item(l, cp_t3_sales_common, tr("Sales by tickets"), ":/graph.png");
 
         if(__c5config.frontDeskMode() == FRONTDESK_WAITER) {
             addTreeL3Item(l, cp_t3_sale_dishes, tr("Sales, dishes"), ":/graph.png");

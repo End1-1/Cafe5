@@ -136,41 +136,6 @@
           </widget>
          </item>
          <item>
-          <widget class="QPushButton" name="btnOpenDraft">
-           <property name="minimumSize">
-            <size>
-             <width>36</width>
-             <height>36</height>
-            </size>
-           </property>
-           <property name="maximumSize">
-            <size>
-             <width>36</width>
-             <height>36</height>
-            </size>
-           </property>
-           <property name="focusPolicy">
-            <enum>Qt::FocusPolicy::NoFocus</enum>
-           </property>
-           <property name="toolTip">
-            <string>Open draft</string>
-           </property>
-           <property name="text">
-            <string/>
-           </property>
-           <property name="icon">
-            <iconset resource="../resources/res.qrc">
-             <normaloff>:/draft.png</normaloff>:/draft.png</iconset>
-           </property>
-           <property name="iconSize">
-            <size>
-             <width>30</width>
-             <height>30</height>
-            </size>
-           </property>
-          </widget>
-         </item>
-         <item>
           <widget class="QPushButton" name="btnWriteOrder">
            <property name="minimumSize">
             <size>
@@ -575,7 +540,6 @@
         <zorder>btnSalesReport</zorder>
         <zorder>btnNewRetail</zorder>
         <zorder>btnNewWhosale</zorder>
-        <zorder>btnOpenDraft</zorder>
         <zorder>btnWriteOrder</zorder>
         <zorder>btnHelp</zorder>
         <zorder>btnCostumerDisplay</zorder>
@@ -676,6 +640,13 @@
        <widget class="Line" name="line_2">
         <property name="orientation">
          <enum>Qt::Orientation::Vertical</enum>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="lbHost">
+        <property name="text">
+         <string>Host</string>
         </property>
        </widget>
       </item>

@@ -62,7 +62,9 @@ int main(int argc, char* argv[])
 
             if(mon.length() == 2) {
                 monitor = mon.at(1).toInt();
-                C5Dialog::mScreen = monitor;
+                if (monitor < screens.length()) {
+                    C5Dialog::mScreen = monitor;
+                }
             }
         }
     }

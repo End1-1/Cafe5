@@ -1,22 +1,25 @@
 #include "menudialog.h"
-#include "ui_menudialog.h"
-#include "touchselecttaxreport.h"
-#include "touchentertaxreceiptnumber.h"
-#include "printtaxn.h"
-#include "calendar.h"
-#include "dlgcashinout.h"
-#include "c5printing.h"
-#include "c5user.h"
-#include "dlgcashop.h"
-#include "dlgsmartreports.h"
-#include "sessionshistory.h"
+#include <QFile>
+#include <QPrinterInfo>
+#include <QScreen>
 #include "c5config.h"
 #include "c5database.h"
 #include "c5message.h"
+#include "c5printing.h"
+#include "c5user.h"
 #include "c5utils.h"
+#include "calendar.h"
+#include "dlgcashinout.h"
+#include "dlgcashop.h"
+#include "dlgsmartreports.h"
+#include "printtaxno.h"
+#include "sessionshistory.h"
+#include "struct_fiscal_machine.h"
+#include "struct_workstationitem.h"
+#include "touchentertaxreceiptnumber.h"
+#include "touchselecttaxreport.h"
+#include "ui_menudialog.h"
 #include "workspace.h"
-#include <QFile>
-#include <QScreen>
 
 MenuDialog::MenuDialog(Workspace *w, C5User *u) :
     C5Dialog(u),
@@ -59,8 +62,9 @@ void MenuDialog::on_btnFiscalZReport_clicked()
         return;
     }
 
-    PrintTaxN pt(C5Config::taxIP(), C5Config::taxPort(), C5Config::taxPassword(), C5Config::taxUseExtPos(),
-                 C5Config::taxCashier(), C5Config::taxPin(), this);
+    auto fm = getFiscalMachine(mWorkStation.fiscalMachineId());
+    PrintTaxNO pt(fm.ip, fm.port, fm.machinePassword, fm.externalPosString(), fm.opPin, fm.opPassword, this);
+
     QString jsnin, jsnout, err;
     int result;
     result = pt.printReport(date1, date2, reporttype, jsnin, jsnout, err);
@@ -98,8 +102,8 @@ void MenuDialog::on_btnReturnFiscalReceipt_clicked()
             return;
         }
 
-        PrintTaxN pt(C5Config::taxIP(), C5Config::taxPort(), C5Config::taxPassword(), C5Config::taxUseExtPos(),
-                     C5Config::taxCashier(), C5Config::taxPin(), this);
+        auto fm = getFiscalMachine(mWorkStation.fiscalMachineId());
+        PrintTaxNO pt(fm.ip, fm.port, fm.machinePassword, fm.externalPosString(), fm.opPin, fm.opPassword, this);
         int result;
         result = pt.printTaxback(number.toInt(), crn, jsnin, jsnout, err);
         //        db[":f_id"] = db.uuid();

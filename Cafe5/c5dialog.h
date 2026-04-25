@@ -11,6 +11,8 @@ class C5Dialog : public QDialog
     Q_OBJECT
 
 public:
+    C5Dialog(C5User *user, QWidget *parent);
+
     C5Dialog(C5User *user);
 
     ~C5Dialog();

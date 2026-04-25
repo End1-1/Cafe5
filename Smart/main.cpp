@@ -1,23 +1,22 @@
-#include "workspace.h"
-#include "c5config.h"
-#include "c5systempreference.h"
-#include "ndataprovider.h"
-#include "dlgpin.h"
-#include "ndataprovider.h"
-#include "fileversion.h"
-#include "logwriter.h"
-#include "c5message.h"
-#include "printtaxn.h"
-#include "c5database.h"
-#include <QFile>
-#include <QLockFile>
-#include <QSslSocket>
 #include <QApplication>
-#include <QSettings>
-#include <QTranslator>
-#include <QScreen>
 #include <QDesktopServices>
 #include <QDir>
+#include <QFile>
+#include <QLockFile>
+#include <QScreen>
+#include <QSettings>
+#include <QSslSocket>
+#include <QTranslator>
+#include "c5config.h"
+#include "c5database.h"
+#include "c5message.h"
+#include "c5systempreference.h"
+#include "dlgpin.h"
+#include "fileversion.h"
+#include "logwriter.h"
+#include "ndataprovider.h"
+#include "printtaxno.h"
+#include "workspace.h"
 
 int main(int argc, char* argv[])
 {
@@ -88,7 +87,7 @@ int main(int argc, char* argv[])
         build = parts.at(3).toInt();
     }
 
-    PrintTaxN::mDebugRseq = build;
+    PrintTaxNO::mDebugRseq = build;
     NDataProvider::mAppName = "smart";
     NDataProvider::mFileVersion = fileVersion;
     auto *dlgPin = new DlgPin();

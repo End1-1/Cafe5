@@ -94,6 +94,9 @@
          <property name="type" stdset="0">
           <string>int</string>
          </property>
+         <property name="zeronull" stdset="0">
+          <bool>true</bool>
+         </property>
         </widget>
        </item>
        <item row="13" column="0">

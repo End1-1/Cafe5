@@ -2,15 +2,11 @@
 #include <QInputDialog>
 #include <QPropertyAnimation>
 #include <QShortcut>
-#include "c5config.h"
-#include "c5database.h"
 #include "c5message.h"
 #include "c5permissions.h"
 #include "c5user.h"
 #include "c5utils.h"
-#include "cashcollection.h"
 #include "dlgdate.h"
-#include "dlgreturnitem.h"
 #include "printreceiptgroup.h"
 #include "printtaxn.h"
 #include "selectprinters.h"
@@ -27,14 +23,11 @@ Sales::Sales(C5User *user) :
 {
     ui->setupUi(this);
     fUser = user;
-    setWindowTitle(__c5config.getRegValue("windowtitle").toString());
     //TODO ui->btnChangeDate->setVisible(fUser->check(cp_t12_change_date_of_sale));
     ui->btnModeItems->setVisible(fUser->check(cp_t12_shop_report_goods));
     fViewMode = VM_TOTAL;
     ui->lbTotalQty->setVisible(false);
-    ui->leTotal->setVisible(__c5config.fMainJson["hide_revenue"].toBool() == false);
     ui->lbTotalAmount->setVisible(ui->leTotal->isVisible());
-    ui->leTotalQty->setVisible(__c5config.fMainJson["hide_reenue"].toBool() == false);
     ui->lbTotalQty->setVisible(ui->leTotalQty->isVisible());
     ui->wMenuPanel->setMinimumWidth(0);
     ui->wMenuPanel->setMaximumWidth(0);
@@ -89,139 +82,12 @@ void Sales::showSales(Working *w, C5User *u)
     s->setFocus();
 }
 
-bool Sales::printCheckWithTax(C5Database &db, const QString &id)
-{
-    QElapsedTimer et;
-    et.start();
-    bool resultb = true;
-
-    // Проверка повторной печати
-    db[":f_id"] = id;
-    db.exec("select f_receiptnumber from o_tax where f_id=:f_id");
-    if (db.nextRow()) {
-        if (db.getInt("f_receiptnumber") > 0) {
-            C5Message::error(tr("Cannot print tax twice"));
-            return true;
-        }
-    }
-
-    // Получаем данные заголовка
-    db[":f_id"] = id;
-    db.exec("select f_amountcard, f_amountprepaid, f_idram, f_partner from o_header where f_id=:f_id");
-    if (!db.nextRow())
-        return false;
-
-    double card = db.getDouble("f_amountcard");
-    double prepaid = db.getDouble("f_amountprepaid");
-    double idram = db.getDouble("f_idram");
-    int partner = db.getInt("f_partner");
-
-    FiscalMachine fm = getFiscalMachine(mWorkStation.fiscalMachineId());
-    QString useExtPos = idram > 0.01 ? "true" : fm.externalPosString();
-    QString partnerHvhh;
-
-    if (partner > 0) {
-        db[":f_id"] = partner;
-        db.exec("select f_taxcode from c_partners where f_id=:f_id");
-        if (db.nextRow()) {
-            partnerHvhh = db.getString(0);
-        }
-    }
-
-    // Собираем товары
-    db[":f_id"] = id;
-    db.exec("select og.f_id, og.f_goods, g.f_name, og.f_qty, gu.f_name as f_unitname, og.f_price, og.f_total, "
-            "t.f_taxdept, t.f_adgcode, og.f_discountfactor "
-            "from o_goods og "
-            "left join c_goods g on g.f_id=og.f_goods "
-            "left join c_units gu on gu.f_id=g.f_unit "
-            "left join c_groups t on t.f_id=g.f_group "
-            "where og.f_header=:f_id");
-
-    PrintTaxN pt(fm.ip, fm.port, fm.machinePassword, useExtPos, fm.opPin, fm.opPassword, 0);
-    pt.fPartnerTin = partnerHvhh;
-
-    while (db.nextRow()) {
-        pt.addGoods(db.getString("f_taxdept").toInt(),
-                    db.getString("f_adgcode"),
-                    db.getString("f_goods"),
-                    db.getString("f_name"),
-                    db.getDouble("f_price"),
-                    db.getDouble("f_qty"),
-                    db.getDouble("f_discountfactor") * 100);
-    }
-
-    // --- КЛЮЧЕВОЙ МОМЕНТ ДЛЯ АСИНХРОННОСТИ ---
-    QString resJsonIn, resJsonOut, resErr;
-    int resResult = -1;
-
-    QEventLoop loop;
-    // Соединяем сигнал finished с лямбдой, которая сохранит результат и выйдет из цикла
-    QObject::connect(&pt, &PrintTaxN::finished, [&](const QString &jin, const QString &jout, const QString &err, int result) {
-        resJsonIn = jin;
-        resJsonOut = jout;
-        resErr = err;
-        resResult = result;
-        loop.quit();
-    });
-
-    pt.makeJsonAndPrint(card, prepaid);
-    loop.exec(); // Замираем тут, пока не придет сигнал finished
-    // ------------------------------------------
-
-    QJsonObject jtax;
-    jtax["f_order"] = id;
-    jtax["f_elapsed"] = (int) et.elapsed();
-    jtax["f_in"] = QJsonDocument::fromJson(resJsonIn.toUtf8()).object();
-    jtax["f_out"] = QJsonDocument::fromJson(resJsonOut.toUtf8()).object();
-    jtax["f_err"] = resErr;
-    jtax["f_result"] = resResult;
-    jtax["f_state"] = (resResult == pt_err_ok ? 1 : 0);
-
-    QString jtaxStr = QString(QJsonDocument(jtax).toJson(QJsonDocument::Compact));
-    db.exec(QString("call sf_create_shop_tax('%1')").arg(jtaxStr.replace("'", "''")));
-
-    if (resResult == pt_err_ok) {
-        C5Message::info(tr("Printed"));
-    } else {
-        C5Message::error(resErr.isEmpty() ? tr("Unknown fiscal error") : resErr);
-        resultb = false;
-    }
-
-    return resultb;
-}
-
 bool Sales::printReceipt(const QString &id, C5User *user)
 {
-    if(!C5Config::localReceiptPrinter().isEmpty()) {
+    if (!mWorkStation.defaultPrinter().isEmpty()) {
         PrintReceiptGroup p;
-
-        switch(C5Config::shopPrintVersion()) {
-        case 1: {
-            bool p1, p2;
-
-            if(SelectPrinters::selectPrinters(p1, p2, user)) {
-                if(p1) {
-                    p.print(id, 1);
-                }
-
-                if(p2) {
-                    p.print(id, 2);
-                }
-            }
-
-            break;
-        }
-
-        case 2:
             p.print2(id);
-            break;
-
-        default:
-            break;
-        }
     }
-
     return true;
 }
 
@@ -261,141 +127,72 @@ void Sales::refresh()
 
 void Sales::refreshTotal()
 {
-    QStringList h;
-    h.append("X");
-    h.append(tr("UUID"));
-    h.append(tr("Sale type code"));
-    h.append(tr("Seller"));
-    h.append(tr("Sale type"));
-    h.append(tr("Number"));
-    h.append(tr("##"));
-    h.append(tr("Date"));
-    h.append(tr("Time"));
-    h.append(tr("Amount"));
-    h.append(tr("Customer"));
-    h.append(tr("Deliverman"));
-    h.append(tr("Address"));
-    ui->tbl->setColumnCount(h.count());
-    ui->tbl->setHorizontalHeaderLabels(h);
-    ui->tbl->setColumnWidths(ui->tbl->columnCount(), 40, 0, 0, 0, 120, 0, 100, 120, 120, 150, 100, 100, 300);
-    C5Database db;
-    db[":f_hall"] = __c5config.defaultHall();
-    db[":f_start"] = ui->deStart->date();
-    db[":f_end"] = ui->deEnd->date();
-    db[":f_state"] = ORDER_STATE_CLOSE;
-    QString sqlCond = "";
-
-    if (!fUser->check(cp_t12_shop_fiscal_report) || !showAll) {
-        sqlCond += " and length(json_value(oh.f_data, '$.f_fiscal.rseq'))>0 ";
-    }
-
-    if (!fUser->check(cp_t12_shop_sale_of_all_users)) {
-        sqlCond += QString(" and oh.f_staff=%1 ").arg(fUser->id());
-    }
-
-    QString sql = QString("select '', oh.f_id, oh.f_saletype, u.f_login, os.f_name, "
-                          "concat(oh.f_prefix, oh.f_hallid) as f_number, "
-                          "json_value(oh.f_data, '$.f_fiscal.rseq'), "
-                          "oh.f_datecash, oh.f_timeclose, oh.f_amounttotal, "
-                          "concat(c.f_taxname, ' ', c.f_contact) as f_client, "
-                          "concat_ws(' ', dm.f_last, dm.f_first) as f_deliverman, "
-                          "oh.f_comment "
-                          "from o_header oh "
-                          "left join o_header_options oo on oo.f_id=oh.f_id "
-                          "left join b_history h on h.f_id=oh.f_id "
-                          "left join b_cards_discount d on d.f_id=h.f_card "
-                          "left join c_partners c on c.f_id=oh.f_partner "
-                          "left join o_sale_type os on os.f_id=oh.f_saletype "
-                          "left join s_user u on u.f_id=oh.f_staff "
-                          "left join s_user dm on dm.f_id=oo.f_deliveryman "
-                          "where oh.f_datecash between :f_start and :f_end "
-                          "and oh.f_state=:f_state "
-                          + sqlCond
-                          + "and oh.f_hall=:f_hall "
-                            "order by oh.f_datecash, oh.f_timeclose ");
-    db.exec(sql);
-    ui->tbl->setRowCount(db.rowCount());
-    int row = 0;
-
-    while(db.nextRow()) {
-        for(int i = 0; i < ui->tbl->columnCount(); i++) {
-            ui->tbl->setData(row, i, db.getValue(i));
-        }
-
-        qDebug() << db.getInt("f_saletype") << db.getDouble("f_amounttotal");
-        ui->tbl->setInteger(row, 2, db.getInt("f_saletype"));
-        ui->tbl->setDouble(row, 9, db.getDouble("f_amounttotal"));
-        qDebug() << ui->tbl->getDouble(row, 9) << ui->tbl->getData(row, 9);
-        ui->tbl->item(row, 0)->setCheckState(Qt::Unchecked);
-        row++;
-    }
-
-    int acol = 9;
-    ui->leTotal->setDouble(ui->tbl->sumOfColumn(acol));
+    //TODO
 }
 
 void Sales::refreshItems()
 {
-    QStringList h;
-    h.append(tr("UUID"));
-    h.append(tr("Sale type code"));
-    h.append(tr("Seller"));
-    h.append(tr("Sale type"));
-    h.append(tr("Number"));
-    h.append(tr("##"));
-    h.append(tr("Date"));
-    h.append(tr("Time"));
-    h.append(tr("Scancode"));
-    h.append(tr("Goods"));
-    h.append(tr("Qty"));
-    h.append(tr("Price"));
-    h.append(tr("Total"));
-    ui->tbl->setColumnCount(h.count());
-    ui->tbl->setHorizontalHeaderLabels(h);
-    ui->tbl->setColumnWidths(ui->tbl->columnCount(), 0, 0, 0, 120, 0, 100, 120, 100, 150, 250, 80, 80, 80);
-    C5Database db;
-    db[":f_hall"] = __c5config.defaultHall();
-    db[":f_start"] = ui->deStart->date();
-    db[":f_end"] = ui->deEnd->date();
-    db[":f_state"] = ORDER_STATE_CLOSE;
-    QString sqlCond = "";
+    //TODO
+    // QStringList h;
+    // h.append(tr("UUID"));
+    // h.append(tr("Sale type code"));
+    // h.append(tr("Seller"));
+    // h.append(tr("Sale type"));
+    // h.append(tr("Number"));
+    // h.append(tr("##"));
+    // h.append(tr("Date"));
+    // h.append(tr("Time"));
+    // h.append(tr("Scancode"));
+    // h.append(tr("Goods"));
+    // h.append(tr("Qty"));
+    // h.append(tr("Price"));
+    // h.append(tr("Total"));
+    // ui->tbl->setColumnCount(h.count());
+    // ui->tbl->setHorizontalHeaderLabels(h);
+    // ui->tbl->setColumnWidths(ui->tbl->columnCount(), 0, 0, 0, 120, 0, 100, 120, 100, 150, 250, 80, 80, 80);
+    //  db;
+    // db[":f_hall"] = __c5config.defaultHall();
+    // db[":f_start"] = ui->deStart->date();
+    // db[":f_end"] = ui->deEnd->date();
+    // db[":f_state"] = ORDER_STATE_CLOSE;
+    // QString sqlCond = "";
 
-    if (!fUser->check(cp_t12_shop_fiscal_report) || !showAll) {
-        sqlCond += " and length(json_value(oh.f_data, '$.f_fiscal.rseq'))>0 ";
-    }
+    // if (!fUser->check(cp_t12_shop_fiscal_report) || !showAll) {
+    //     sqlCond += " and length(json_value(oh.f_data, '$.f_fiscal.rseq'))>0 ";
+    // }
 
-    if(!fUser->check(cp_t12_shop_sale_of_all_users)) {
-        sqlCond += QString(" and oh.f_staff=%1 ").arg(fUser->id());
-    }
+    // if(!fUser->check(cp_t12_shop_sale_of_all_users)) {
+    //     sqlCond += QString(" and oh.f_staff=%1 ").arg(fUser->id());
+    // }
 
-    db.exec("select oh.f_id, oh.f_saletype, u.f_login, os.f_name, concat(oh.f_prefix, oh.f_hallid) as f_number, json_value(oh.f_data, "
-            "'$.f_fiscal.rseq'),  "
-            "oh.f_datecash, oh.f_timeclose, g.f_scancode, g.f_name as f_goodsname, og.f_qty, og.f_price, og.f_total "
-            "from o_goods og "
-            "inner join o_header oh on oh.f_id=og.f_header "
-            "inner join c_goods g on g.f_id=og.f_goods "
-            "left join b_history h on h.f_id=oh.f_id "
-            "left join b_cards_discount d on d.f_id=h.f_card "
-            "left join c_partners c on c.f_id=d.f_client "
-            "left join o_sale_type os on os.f_id=oh.f_saletype "
-            "left join s_user u on u.f_id=oh.f_staff "
-            "where oh.f_datecash between :f_start and :f_end and oh.f_state=:f_state "
-            + sqlCond
-            + "and oh.f_hall=:f_hall "
-              "order by oh.f_datecash, oh.f_timeclose ");
-    ui->tbl->setRowCount(db.rowCount());
-    int row = 0;
+    // db.exec("select oh.f_id, oh.f_saletype, u.f_login, os.f_name, concat(oh.f_prefix, oh.f_hallid) as f_number, json_value(oh.f_data, "
+    //         "'$.f_fiscal.rseq'),  "
+    //         "oh.f_datecash, oh.f_timeclose, g.f_scancode, g.f_name as f_goodsname, og.f_qty, og.f_price, og.f_total "
+    //         "from o_goods og "
+    //         "inner join o_header oh on oh.f_id=og.f_header "
+    //         "inner join c_goods g on g.f_id=og.f_goods "
+    //         "left join b_history h on h.f_id=oh.f_id "
+    //         "left join b_cards_discount d on d.f_id=h.f_card "
+    //         "left join c_partners c on c.f_id=d.f_client "
+    //         "left join o_sale_type os on os.f_id=oh.f_saletype "
+    //         "left join s_user u on u.f_id=oh.f_staff "
+    //         "where oh.f_datecash between :f_start and :f_end and oh.f_state=:f_state "
+    //         + sqlCond
+    //         + "and oh.f_hall=:f_hall "
+    //           "order by oh.f_datecash, oh.f_timeclose ");
+    // ui->tbl->setRowCount(db.rowCount());
+    // int row = 0;
 
-    while(db.nextRow()) {
-        for(int i = 0; i < ui->tbl->columnCount(); i++) {
-            ui->tbl->setData(row, i, db.getValue(i));
-        }
+    // while(db.nextRow()) {
+    //     for(int i = 0; i < ui->tbl->columnCount(); i++) {
+    //         ui->tbl->setData(row, i, db.getValue(i));
+    //     }
 
-        row++;
-    }
+    //     row++;
+    // }
 
-    int acol = 12;
-    ui->leTotal->setDouble(ui->tbl->sumOfColumn(acol));
+    // int acol = 12;
+    // ui->leTotal->setDouble(ui->tbl->sumOfColumn(acol));
 }
 
 void Sales::printTaxReport(int report_type)
@@ -406,16 +203,17 @@ void Sales::printTaxReport(int report_type)
     int result;
     result = pt.printReport(ui->deStart->date(), ui->deEnd->date(),
                             report_type, jsnin, jsnout, err);
-    C5Database db;
-    db[":f_id"] = db.uuid();
-    db[":f_order"] = QString("Report %1").arg(report_type == report_x ? "X" : "Z");
-    db[":f_date"] = QDate::currentDate();
-    db[":f_time"] = QTime::currentTime();
-    db[":f_in"] = jsnin;
-    db[":f_out"] = jsnout;
-    db[":f_err"] = err;
-    db[":f_result"] = result;
-    db.insert("o_tax_log", false);
+    //TODO
+    //  db;
+    // db[":f_id"] = db.uuid();
+    // db[":f_order"] = QString("Report %1").arg(report_type == report_x ? "X" : "Z");
+    // db[":f_date"] = QDate::currentDate();
+    // db[":f_time"] = QTime::currentTime();
+    // db[":f_in"] = jsnin;
+    // db[":f_out"] = jsnout;
+    // db[":f_err"] = err;
+    // db[":f_result"] = result;
+    // db.insert("o_tax_log", false);
 }
 
 int Sales::sumOfColumnsWidghtBefore(int column)
@@ -446,12 +244,13 @@ void Sales::on_btnDateRight_clicked()
 void Sales::on_btnItemBack_clicked()
 {
     toggleMenu(false);
+    //TODO
     //todo: memory leak
-    DlgReturnItem *i = new DlgReturnItem(mUser);
-    i->showMaximized();
-    i->setFocus();
-    i->exec();
-    i->deleteLater();
+    // DlgReturnItem *i = new DlgReturnItem(mUser);
+    // i->showMaximized();
+    // i->setFocus();
+    // i->exec();
+    // i->deleteLater();
 }
 
 void Sales::on_btnRefresh_clicked()
@@ -479,14 +278,6 @@ void Sales::on_btnModeItems_clicked()
     ui->btnItemBack->setEnabled(true);
     fViewMode = VM_ITEMS;
     refresh();
-}
-
-void Sales::on_btnCashColletion_clicked()
-{
-    toggleMenu(false);
-    auto *cc = new CashCollection(mUser);
-    cc->exec();
-    delete cc;
 }
 
 void Sales::on_leFilter_textChanged(const QString &arg1)
@@ -538,42 +329,6 @@ void Sales::on_btnViewOrder_clicked()
     a->setFocus();
     a->exec();
     a->deleteLater();
-}
-
-void Sales::on_btnChangeDate_clicked()
-{
-    toggleMenu(false);
-
-    if(fViewMode != VM_TOTAL) {
-        return;
-    }
-
-    QDate d;
-    C5Database db;
-
-    for(int  i = 0; i < ui->tbl->rowCount(); i++) {
-        if(ui->tbl->item(i, 0)->checkState() == Qt::Checked) {
-            if(!d.isValid()) {
-                if(!DlgDate::getDate(d, mUser)) {
-                    return;
-                }
-            }
-
-            db[":f_datecash"] = d;
-            db[":f_id"] = ui->tbl->getString(i, 1);
-
-            if(!db.exec("update o_header set f_datecash=:f_datecash where f_id=:f_id")) {
-                C5Message::error(db.fLastError);
-                return;
-            }
-        }
-    }
-
-    if(d.isValid()) {
-        refresh();
-    } else {
-        C5Message::info(tr("Nothing was selected"));
-    }
 }
 
 void Sales::on_btnShowMenu_clicked()

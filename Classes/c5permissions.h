@@ -18,25 +18,15 @@
 #define cp_t1_breeze 110
 
 #define cp_t2_action 200
-#define cp_t2_store_input 201
-#define cp_t2_store_output 202
-#define cp_t2_store_move 203
 #define cp_t2_store_inventory 204
 #define cp_t2_calculate_self_cost 206
-#define cp_t2_store_complectation 207
-#define cp_t2_store_decomplectation 208
 #define cp_t2_goods_reservations 209
 #define cp_t2_reatail_trade 210
 #define cp_t2_whosale_trade 211
 
 #define cp_t3_reports 300
-#define cp_t3_sales_common 301
-#define cp_t3_documents 302
 #define cp_t3_store 303
-#define cp_t3_store_movement 304
-#define cp_t3_tstore_extra 305
 #define cp_t3_store_sale 306
-#define cp_t3_documents_store 307
 #define cp_t3_sale_removed_dishes 308
 #define cp_t3_sale_dishes 309
 #define cp_t3_sale_from_store_total 310
@@ -47,7 +37,6 @@
 #define cp_t3_storage_uncomplected 317
 #define cp_t3_move_uncomplected 318
 #define cp_t3_custom_reports 320
-#define cp_t3_draft_output_recipes 321
 #define cp_t3_debts_customer 322
 
 #define cp_t4_menu 400

@@ -5,6 +5,7 @@
 #include <QJsonParseError>
 #include <QPainter>
 #include <QParallelAnimationGroup>
+#include <QPrinterInfo>
 #include <QPropertyAnimation>
 #include <QScreen>
 #include <QScrollBar>
@@ -32,7 +33,7 @@
 #include "ndataprovider.h"
 #include "ninterface.h"
 #include "nloadingdlg.h"
-#include "printtaxn.h"
+#include "printtaxno.h"
 #include "scopeguarde.h"
 #include "ui_workspace.h"
 #include "wcustomerdisplay.h"
@@ -636,12 +637,6 @@ void Workspace::on_btnCheckout_clicked()
 
     if(ui->btnSetCard->isChecked() || ui->btnSetCardExternal->isChecked()) {
         ui->btnFiscal->setChecked(true);
-    }
-
-    if(__c5config.getValue(param_tax_print_if_amount_less).toInt() > 0) {
-        if(!ui->btnFiscal->isChecked()) {
-            ui->btnFiscal->setChecked(ordcount % __c5config.getValue(param_tax_print_if_amount_less).toInt()  == 0);
-        }
     }
 
     for(int i = 0; i < ui->tblOrder->rowCount(); i++) {
@@ -1347,7 +1342,7 @@ int Workspace::printTax(double cardAmount, double idramAmount)
             "left join d_dish d on d.f_id=b.f_dish "
             "left join d_part2 p2 on p2.f_id=d.f_part "
             "where b.f_header=:f_header and b.f_state=:f_state");
-    QString useExtPos = C5Config::taxUseExtPos();
+    QString useExtPos = "false";
 
     if(idramAmount > 0.01) {
         cardAmount = idramAmount;
@@ -1366,11 +1361,13 @@ int Workspace::printTax(double cardAmount, double idramAmount)
     }
 
     QJsonObject jc = citem->data(Qt::UserRole + 5).toJsonObject();
-    PrintTaxN pt(jc["tax_ip"].toString(),
-                 jc["tax_port"].toString().toInt(),
-                 jc["tax_password"].toString(), useExtPos,
-                 jc["tax_op"].toString(),
-                 jc["tax_pin"].toString(), this);
+    PrintTaxNO pt(jc["tax_ip"].toString(),
+                  jc["tax_port"].toString().toInt(),
+                  jc["tax_password"].toString(),
+                  useExtPos,
+                  jc["tax_op"].toString(),
+                  jc["tax_pin"].toString(),
+                  this);
 
     if(ui->leTaxpayerId->text().isEmpty() == false) {
         pt.fPartnerTin = ui->leTaxpayerId->text();
@@ -1383,10 +1380,6 @@ int Workspace::printTax(double cardAmount, double idramAmount)
 
         if(!db.getString("f_emarks").isEmpty()) {
             pt.fEmarks.append(db.getString("f_emarks"));
-        }
-
-        if(__c5config.getValue(param_simple_fiscal).toInt() > 0) {
-            continue;
         }
 
         switch(fDiscountMode) {
@@ -1422,31 +1415,13 @@ int Workspace::printTax(double cardAmount, double idramAmount)
     QString jsonIn, jsonOut, err;
     int result = 0;
 
-    if(__c5config.getValue(param_simple_fiscal).toInt() == 0) {
         result = pt.makeJsonAndPrint(cardAmount, 0, jsonIn, jsonOut, err);
-    } else {
-        pt.fJsonHeader["paidAmount"] = ui->leTotal->getDouble();
-        result = pt.makeJsonAndPrintSimple(jc["tax_dept"].toString().toInt(), cardAmount, 0, jsonIn, jsonOut, err);
-    }
 
-#ifdef QT_DEBUG
+        if (result != 0) {
+            LogWriter::write(LogWriterLevel::errors, "Fiscal request", jsonIn);
+            LogWriter::write(LogWriterLevel::errors, "Fiscal response", jsonOut);
+        }
 
-    if(result != 0) {
-        result = 0;
-        jsonOut = "{\"address\": \"ԿԵՆՏՐՈՆ ԹԱՂԱՄԱՍ Հյուսիսային պողոտա 1/1 \", "
-                  "\"change\": 0, \"crn\": \"53241359\", \"fiscal\": \"81326142\", "
-                  "\"lottery\": \"\", \"prize\": 0, \"rseq\": 7174, \"sn\": \"00022164315\", "
-                  "\"taxpayer\": \"«ՍՄԱՐՏ ՊԱՐԿԻՆԳ»\", \"time\": 1733052744891, \"tin\": \"02853428\", \"total\": 1}";
-    }
-
-#else
-
-    if(result != 0) {
-        LogWriter::write(LogWriterLevel::errors, "Fiscal request", jsonIn);
-        LogWriter::write(LogWriterLevel::errors, "Fiscal response", jsonOut);
-    }
-
-#endif
     QJsonObject jtax;
     QJsonParseError jsonErr;
     jtax["f_order"] = fOrderUuid;
@@ -1491,6 +1466,7 @@ bool Workspace::printReceipt(const QString &id, bool printSecond, bool precheck)
     QFont font(qApp->font());
     font.setFamily(__c5config.getValue(param_receipt_print_font_family));
     int basefont = __c5config.getValue(param_receipt_print_font_size).toInt();
+    basefont = 10;
     font.setPointSize(basefont);
     font.setBold(true);
     C5Printing p;
@@ -1852,7 +1828,6 @@ void Workspace::printService(const QString &printerName, const QJsonObject &h, c
         const QJsonObject &j = d.at(i).toObject();
         p.setFontBold(false);
         p.setFontSize(bs);
-        p.setFontStrike(j["f_state"].toInt() != 1);
         p.ltext(j["f_name"].toString(), 0);
         p.setFontBold(true);
         p.rtext(float_str(j["f_qty1"].toDouble(), 2));
@@ -1868,7 +1843,6 @@ void Workspace::printService(const QString &printerName, const QJsonObject &h, c
         p.br();
     }
 
-    p.setFontStrike(false);
     p.setFontSize(bs - 2);
     // p.setFontBold(false);
     p.ltext(QString("%1 %2 [%3]").arg(tr("[1] Printed:"), QDateTime::currentDateTime().toString(FORMAT_DATETIME_TO_STR),
@@ -2064,7 +2038,7 @@ void Workspace::initResponse(const QJsonObject &jdoc)
     }
 
     if(__c5config.fMainJson["smart_pictures"].toBool()) {
-        ui->tblDishes->verticalHeader()->setDefaultSectionSize(300);
+        //ui->tblDishes->verticalHeader()->setDefaultSectionSize(300);
     }
 
     if(ui->tblTables->columnCount() > 0) {

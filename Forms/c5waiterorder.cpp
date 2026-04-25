@@ -7,11 +7,9 @@
 #include "c5mainwindow.h"
 #include "c5message.h"
 #include "c5permissions.h"
-#include "c5storedraftwriter.h"
 #include "c5user.h"
 #include "c5utils.h"
 #include "c5waiterorder.h"
-#include "c5waiterorderdoc.h"
 #include "dict_dish_state.h"
 #include "dlgsetwaiterordercl.h"
 #include "proxytablewidgetdatabase.h"
@@ -242,27 +240,27 @@ void C5WaiterOrder::removeOrder()
         return;
     }
 
-    C5Database db;
-    C5StoreDraftWriter dw(db);
-    db[":f_header"] = ui->leUuid->text();
-    db.exec("select f_id from o_goods where f_header=:f_header");
-    QStringList idList;
+    // TODO db;
+    // C5StoreDraftWriter dw(db);
+    // db[":f_header"] = ui->leUuid->text();
+    // db.exec("select f_id from o_goods where f_header=:f_header");
+    // QStringList idList;
 
-    while(db.nextRow()) {
-        idList.append(db.getString("f_id"));
-    }
+    // while(db.nextRow()) {
+    //     idList.append(db.getString("f_id"));
+    // }
 
-    for(const QString &id : idList) {
-        if(!dw.rollbackOutput(db, id)) {
-            C5Message::error(dw.fErrorMsg);
-            return;
-        }
-    }
+    // for(const QString &id : idList) {
+    //     if(!dw.rollbackOutput(db, id)) {
+    //         C5Message::error(dw.fErrorMsg);
+    //         return;
+    //     }
+    // }
 
-    db[":f_state"] = ORDER_STATE_VOID;
-    db[":f_id"] = ui->leUuid->text();
-    db.exec("update o_header set f_state=:f_state where f_id=:f_id");
-    C5WaiterOrderDoc::removeDocument(db, ui->leUuid->text());
+    // db[":f_state"] = ORDER_STATE_VOID;
+    // db[":f_id"] = ui->leUuid->text();
+    // db.exec("update o_header set f_state=:f_state where f_id=:f_id");
+    // C5WaiterOrderDoc::removeDocument(db, ui->leUuid->text());
 
     __mainWindow->removeTab(this);
     C5Message::info(tr("Removed"));
@@ -284,41 +282,27 @@ void C5WaiterOrder::hideRemoved()
     }
 }
 
-void C5WaiterOrder::transferToHotel()
-{
-    C5Database db;
-    C5StoreDraftWriter d(db);
-    QString err;
-    d.transferToHotel(db, ui->leUuid->text(), err);
-
-    if(err.isEmpty()) {
-        C5Message::info(tr("Done"));
-    } else {
-        C5Message::error(err);
-    }
-}
-
 void C5WaiterOrder::recountSelfCost()
 {
-    C5Database db;
-    C5WaiterOrderDoc d(ui->leUuid->text(), db);
-    d.calculateSelfCost(db);
-    ui->leTotal->setDouble(d.hDouble("f_amounttotal"));
-    C5Message::info(tr("Done"));
+    // TODO db;
+    // C5WaiterOrderDoc d(ui->leUuid->text(), db);
+    // d.calculateSelfCost(db);
+    // ui->leTotal->setDouble(d.hDouble("f_amounttotal"));
+    // C5Message::info(tr("Done"));
 }
 
 void C5WaiterOrder::storeOutput()
 {
-    C5Database db;
-    QString err;
-    C5StoreDraftWriter d(db);
-    d.writeStoreOfSale(ui->leUuid->text(),  err, DOC_STATE_SAVED);
+    // TODO db;
+    // QString err;
+    // C5StoreDraftWriter d(db);
+    // d.writeStoreOfSale(ui->leUuid->text(),  err, DOC_STATE_SAVED);
 
-    if(err.isEmpty()) {
-        C5Message::info(tr("Done"));
-    } else {
-        C5Message::error(err);
-    }
+    // if(err.isEmpty()) {
+    //     C5Message::info(tr("Done"));
+    // } else {
+    //     C5Message::error(err);
+    // }
 }
 
 void C5WaiterOrder::openMenuItem()

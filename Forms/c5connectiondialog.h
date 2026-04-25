@@ -32,6 +32,8 @@ public:
 
     int  connectionType();
 
+    static QString mSettingsPath;
+
 private slots:
     void on_btnSave_clicked();
 

@@ -1,7 +1,5 @@
 #include "dlgreservgoods.h"
 #include "c5codenameselectorfunctions.h"
-#include "c5config.h"
-#include "c5database.h"
 #include "c5message.h"
 #include "chatmessage.h"
 #include "goodsreserve.h"
@@ -133,7 +131,7 @@ void DlgReservGoods::on_btnSave_clicked()
     QJsonObject jo;
     jo["action"] = MSG_GOODS_RESERVE;
     jo["goods"] = fGoods.id;
-    jo["userfrom"] = __c5config.defaultStore();
+    jo["userfrom"] = mWorkStation.defaultStoreId();
     jo["userto"] = fStore.id;
     jo["qty"] = ui->leReservedQty->getDouble();
     jo["goodsname"] = ui->leName->text();
@@ -169,42 +167,42 @@ void DlgReservGoods::setState(int state)
 #if(!defined FRONTDESK && !defined WAITER)
 
     //TODO UPDATE
-    if (state == GR_COMPLETED) {
-        WOrder *wo = Working::working()->newSale(SALE_RETAIL);
-        wo->checkGoodsCode(fGoods.barcode, [=]() {
-            wo->setQtyOfRow(0, ui->leReservedQty->getDouble());
-            wo->fOHeader.amountPrepaid = ui->lePrepaid->getDouble()
-                                         + ui->lePrepaidCard->getDouble();
-        });
-    }
+    // if (state == GR_COMPLETED) {
+    //     WOrder *wo = Working::working()->newSale(SALE_RETAIL);
+    //     wo->checkGoodsCode(fGoods.barcode, [=]() {
+    //         wo->setQtyOfRow(0, ui->leReservedQty->getDouble());
+    //         wo->fOHeader.amountPrepaid = ui->lePrepaid->getDouble()
+    //                                      + ui->lePrepaidCard->getDouble();
+    //     });
+    // }
 #endif
 }
 
 void DlgReservGoods::updateState(int state)
 {
-    C5Database db;
-    db[":f_state"] = state;
+    // todo db;
+    // db[":f_state"] = state;
 
-    switch(state) {
-    case GR_COMPLETED:
-        db[":f_completed"] = __c5config.defaultStore();
-        db[":f_completeddate"] = QDate::currentDate();
-        db[":f_completedtime"] = QTime::currentTime();
-        break;
+    // switch(state) {
+    // case GR_COMPLETED:
+    //     db[":f_completed"] = __c5config.defaultStore();
+    //     db[":f_completeddate"] = QDate::currentDate();
+    //     db[":f_completedtime"] = QTime::currentTime();
+    //     break;
 
-    case GR_REMOVED:
-        db[":f_canceled"] = __c5config.defaultStore();
-        db[":f_canceleddate"] = QDate::currentDate();
-        db[":f_canceledtime"] = QTime::currentTime();
-        break;
-    }
+    // case GR_REMOVED:
+    //     db[":f_canceled"] = __c5config.defaultStore();
+    //     db[":f_canceleddate"] = QDate::currentDate();
+    //     db[":f_canceledtime"] = QTime::currentTime();
+    //     break;
+    // }
 
-    db.update("a_store_reserve", "f_id", ui->leCode->getInteger());
-    db[":f_qty"] = ui->leReservedQty->getDouble();
-    db[":f_goods"] = fGoods.id;
-    db[":f_store"] = fStore.id;
-    db.exec("update a_store_sale set f_qtyreserve=f_qtyreserve-:f_qty "
-            "where f_store=:f_store and f_goods=:f_goods");
+    // db.update("a_store_reserve", "f_id", ui->leCode->getInteger());
+    // db[":f_qty"] = ui->leReservedQty->getDouble();
+    // db[":f_goods"] = fGoods.id;
+    // db[":f_store"] = fStore.id;
+    // db.exec("update a_store_sale set f_qtyreserve=f_qtyreserve-:f_qty "
+    //         "where f_store=:f_store and f_goods=:f_goods");
 }
 
 void DlgReservGoods::on_btnCompleteReserve_clicked()
@@ -268,25 +266,25 @@ void DlgReservGoods::getAvailableGoods()
 {
     ui->leTotalQty->setDouble(0);
 
-    if (fGoods.id > 0 && fStore.id > 0) {
-        C5Database db;
-        db[":f_store"] = fStore.id;
-        db[":f_goods"] = fGoods.id;
-        db.exec("select sum(f_qty*f_type) from a_store where f_store=:f_store and f_goods=:f_goods");
+    // if (fGoods.id > 0 && fStore.id > 0) {
+    //     TOdO db;
+    //     db[":f_store"] = fStore.id;
+    //     db[":f_goods"] = fGoods.id;
+    //     db.exec("select sum(f_qty*f_type) from a_store where f_store=:f_store and f_goods=:f_goods");
 
-        if(db.nextRow()) {
-            ui->leTotalQty->setDouble(db.getDouble(0));
-        }
+    //     if(db.nextRow()) {
+    //         ui->leTotalQty->setDouble(db.getDouble(0));
+    //     }
 
-        db[":f_store"] = fStore.id;
-        db[":f_goods"] = fGoods.id;
-        db[":f_state"] = GR_RESERVED;
-        db.exec("select sum(f_qty) from a_store_reserve where f_store=:f_store and f_goods=:f_goods and f_state=:f_state");
+    //     db[":f_store"] = fStore.id;
+    //     db[":f_goods"] = fGoods.id;
+    //     db[":f_state"] = GR_RESERVED;
+    //     db.exec("select sum(f_qty) from a_store_reserve where f_store=:f_store and f_goods=:f_goods and f_state=:f_state");
 
-        if(db.nextRow()) {
-            ui->leTotalQty->setDouble(ui->leTotalQty->getDouble() - db.getDouble(0));
-        }
-    }
+    //     if(db.nextRow()) {
+    //         ui->leTotalQty->setDouble(ui->leTotalQty->getDouble() - db.getDouble(0));
+    //     }
+    // }
 }
 
 void DlgReservGoods::on_btnPrintFiscal_clicked()

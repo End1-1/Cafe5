@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.20)
-project(service5 VERSION 1.5.8.57 LANGUAGES CXX)
+project(service5 VERSION 1.5.10.59 LANGUAGES CXX)
 
 # Используем C++20
 set(CMAKE_CXX_STANDARD 20)
@@ -11,7 +11,7 @@ set(CMAKE_AUTORCC ON)       # Автоматическая генерация и
 
 
 # Определяем Qt модули
-find_package(Qt6 REQUIRED COMPONENTS Core Network Sql WebSockets PrintSupport Gui)
+find_package(Qt6 REQUIRED COMPONENTS Core Network Sql WebSockets)
 
 # Источники
 set(SOURCES
@@ -27,7 +27,7 @@ set(SOURCES
     handlers/httpheader.cpp
     serverthread.cpp
     utils/sqlqueries.cpp
-    waiter.cpp
+
     worker/socketstruct.cpp
 )
 
@@ -47,11 +47,13 @@ set(HEADERS
     rc.h
     serverthread.h
     utils/sqlqueries.h
-    waiter.h
+
     worker/socketstruct.h
     worker/struct_goods_item.h
     worker/struct_hall.h
     worker/struct_partner.h
+    worker/struct_employee.h
+    worker/struct_employee_group.h
     worker/struct_storage_item.h
 )
 
@@ -63,9 +65,7 @@ elseif(UNIX)
 endif()
 
 add_executable(${PROJECT_NAME} ${SOURCES} ${HEADERS} ${UI_HEADERS} ${MOC_HEADERS}
-    ../Classes/c5printing.cpp ../Classes/c5printing.h
-    serverprinting.h serverprinting.cpp
-    ../Classes/c5printjson.cpp ../Classes/c5printjson.h )
+    worker/struct_currency.h )
 
 # Добавляем include пути
 target_include_directories(${PROJECT_NAME} PRIVATE
@@ -86,8 +86,6 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
     Qt6::Network
     Qt6::Sql
     Qt6::WebSockets
-    Qt6::PrintSupport
-    Qt6::Gui
 )
 
 # Платформенные зависимости

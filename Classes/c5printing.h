@@ -5,6 +5,7 @@
 #include <QFontMetrics>
 #include <QImage>
 #include <QJsonArray>
+#include <QJsonObject>
 #include <QObject>
 #include <QPainter>
 #include <QPen>
@@ -38,7 +39,7 @@ public:
     int fTop;
     int fLineHeight;
 
-    QJsonArray jsonData();
+    QJsonArray jsonData() const;
 
     void addToJson(const QString &type, const QVariantMap &params);
 

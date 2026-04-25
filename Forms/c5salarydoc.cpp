@@ -1,17 +1,15 @@
 #include "c5salarydoc.h"
-#include "ui_c5salarydoc.h"
-#include "c5selector.h"
 #include "c5cache.h"
 #include "c5cashdoc.h"
-#include "c5storedraftwriter.h"
-#include "c5mainwindow.h"
-#include "c5dateedit.h"
-#include "c5cashdoc.h"
-#include "c5utils.h"
 #include "c5config.h"
-#include "c5user.h"
-#include "c5message.h"
+#include "c5dateedit.h"
 #include "c5lineeditwithselector.h"
+#include "c5mainwindow.h"
+#include "c5message.h"
+#include "c5selector.h"
+#include "c5user.h"
+#include "c5utils.h"
+#include "ui_c5salarydoc.h"
 
 C5SalaryDoc::C5SalaryDoc(QWidget *parent) :
     C5Document(parent),
@@ -145,26 +143,27 @@ void C5SalaryDoc::countAmounts(const QString &arg1)
 
 void C5SalaryDoc::createCashDocument()
 {
-    removeSalaryOfShift();
-    C5Database db;
-    C5StoreDraftWriter dw(db);
-    int docnum = genNumber(DOC_TYPE_CASH);
-    updateGenNumber(docnum, DOC_TYPE_CASH);
-    QString fUuid;
-    dw.writeAHeader(fUuid, QString::number(docnum), DOC_STATE_SAVED, DOC_TYPE_CASH, mUser->id(),
-                    QDate::currentDate(),
-                    QDate::currentDate(), QTime::currentTime(),
-                    0, ui->leTotal->getDouble(),
-                    QString("%1 %2").arg("Salary").arg(ui->cbShift->currentText()), 1, 1,
-                    ui->cbShift->currentData().toInt());
-    dw.writeAHeaderCash(fUuid, 0, 1, 0, "", "");
-    QString idout;
-    dw.writeECash(idout, fUuid, 1, -1, QString("%1 %2").arg("Salary").arg(ui->cbShift->currentText()),
-                  ui->leTotal->getDouble(), idout, 0);
-    db[":f_shift"] = ui->cbShift->currentData();
-    db[":f_paid"] = fUuid;
-    db.exec("update s_salary_attendance set f_paid=:f_paid where f_shift=:f_shift");
-    openDoc();
+    //TODO
+    // removeSalaryOfShift();
+    // C5Database db;
+    // C5StoreDraftWriter dw(db);
+    // int docnum = genNumber(DOC_TYPE_CASH);
+    // updateGenNumber(docnum, DOC_TYPE_CASH);
+    // QString fUuid;
+    // dw.writeAHeader(fUuid, QString::number(docnum), DOC_STATE_SAVED, DOC_TYPE_CASH, mUser->id(),
+    //                 QDate::currentDate(),
+    //                 QDate::currentDate(), QTime::currentTime(),
+    //                 0, ui->leTotal->getDouble(),
+    //                 QString("%1 %2").arg("Salary").arg(ui->cbShift->currentText()), 1, 1,
+    //                 ui->cbShift->currentData().toInt());
+    // dw.writeAHeaderCash(fUuid, 0, 1, 0, "", "");
+    // QString idout;
+    // dw.writeECash(idout, fUuid, 1, -1, QString("%1 %2").arg("Salary").arg(ui->cbShift->currentText()),
+    //               ui->leTotal->getDouble(), idout, 0);
+    // db[":f_shift"] = ui->cbShift->currentData();
+    // db[":f_paid"] = fUuid;
+    // db.exec("update s_salary_attendance set f_paid=:f_paid where f_shift=:f_shift");
+    // openDoc();
 }
 
 void C5SalaryDoc::countSalaryResponse(const QJsonObject &jdoc)

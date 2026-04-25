@@ -37,7 +37,7 @@ void RFilterDialog::buildWidget(const QString &settingsPrefix, const QJsonArray 
             auto  *ed = new C5DateEdit();
             QDate defaultDate = __c5config.getRegValue(QString("rfilter_%1_%2").arg(mSettingsPrefix, jo.value("name").toString()), QDate::currentDate()).toDate();
             ed->setDate(defaultDate);
-            ui->gl->addWidget(ed, row, 1, 1, 2);
+            ui->gl->addWidget(ed, row, 1, 1, 3);
             ed->setProperty("name", jo.value("name").toString());
         }
 
@@ -71,6 +71,16 @@ void RFilterDialog::buildWidget(const QString &settingsPrefix, const QJsonArray 
                 cn->selectorCallback = goodsItemSelector;
             } else if (jo.value("function").toString() == "goods_group") {
                 cn->selectorCallback = goodsGroupSelector;
+            } else if (jo.value("function").toString() == "currency") {
+                cn->selectorCallback = currencyItemSelector;
+            } else if (jo.value("function").toString() == "cashbox") {
+                cn->selectorCallback = cashboxItemSelector;
+            }
+            int storedValue = __c5config.getRegValue(QString("rfilter_%1_%2").arg(mSettingsPrefix, jo.value("name").toString())).toInt();
+            QString storedName = __c5config.getRegValue(QString("rfilter_%1_%2_name").arg(mSettingsPrefix, jo.value("name").toString()))
+                                     .toString();
+            if (storedValue > 0) {
+                cn->setCodeAndName(storedValue, storedName);
             }
             ui->gl->addWidget(cn, row, 0, 1, 3);
         }
@@ -132,6 +142,7 @@ QJsonArray RFilterDialog::filterValues()
             if (kv) {
                 addparam(w->property("name").toString(), kv->value());
                 __c5config.setRegValue(QString("rfilter_%1_%2").arg(mSettingsPrefix, w->property("name").toString()), kv->value());
+                __c5config.setRegValue(QString("rfilter_%1_%2_name").arg(mSettingsPrefix, w->property("name").toString()), kv->name());
                 continue;
             }
 

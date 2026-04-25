@@ -13,6 +13,7 @@ struct WaiterDish {
     int dishId;
     int store;
     QString dishName;
+    QString unitName;
     double qty;
     double price;
     int row;
@@ -20,6 +21,12 @@ struct WaiterDish {
     QJsonObject data;
     QString nameLower;
     QStringList words;
+
+    bool isService() const { return data.value("f_is_service").toBool(); }
+
+    bool isPiece() const { return data.value("f_is_piece").toBool(); }
+
+    QString barcode() const { return data.value("f_barcode").toString(); }
 
     QString comment()const
     {
@@ -97,6 +104,8 @@ struct WaiterDish {
     {
         return data["f_fiscal_department"].toInt();
     }
+    QString fiscalName() const { return data.value("f_fiscal_name").toString(); }
+    QString adgt() const { return data.value("f_adgt").toString(); }
     double serviceFactor() const { return data.value("f_service_factor").toDouble(); }
     double discountFactor() const
     {
@@ -142,6 +151,7 @@ struct JsonParser<WaiterDish> {
         wd.store = jo["f_store"].toInt();
         wd.dishId = jo["f_dish"].toInt();
         wd.dishName = jo["f_dish_name"].toString();
+        wd.unitName = jo["f_unit_name"].toString();
         wd.row = jo["f_row"].toInt();
         wd.qty = jo["f_qty"].toDouble();
         wd.price = jo["f_price"].toDouble();

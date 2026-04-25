@@ -12,6 +12,7 @@
 #include <QPrinter>
 #include <QShortcut>
 #include <QSqlQuery>
+#include "appwebsocket.h"
 #include "c5codenameselector.h"
 #include "c5codenameselectorfunctions.h"
 #include "c5config.h"
@@ -40,6 +41,9 @@ C5StoreInput::C5StoreInput(C5User *user, const QString &title, QIcon icon, QWidg
     fIcon = icon;
     ui->wInputStore->selectorCallback = storeItemSelector;
     ui->wPartner->selectorCallback = partnerItemSelector;
+    ui->wCurrency->selectorCallback = currencyItemSelector;
+    ui->wCashbox->selectorCallback = cashboxItemSelector;
+    ui->wPaymentType->selectorCallback = paymentTypeItemSelector;
     ui->wSearchInDocs->setVisible(false);
     QMap<int, int> colwidths = {{col_rec_in_id, 0},
                                 {col_goods_id, 0},
@@ -70,8 +74,36 @@ C5StoreInput::C5StoreInput(C5User *user, const QString &title, QIcon icon, QWidg
             ->setCodeAndName(__c5config.getRegValue("storedoc_storeinput_id").toInt(),
                              __c5config.getRegValue("storedoc_storeinput_name").toString());
     }
+    ui->btnPinCurrency->setChecked(__c5config.getRegValue("storedoc_pin_currency", false).toBool());
+    if (ui->btnPinCurrency->isChecked()) {
+        ui->wCurrency->setCodeAndName(__c5config.getRegValue("storedoc_pinned_currency_id").toInt(),
+                                      __c5config.getRegValue("storedoc_pinned_currency_name").toString());
+    }
 
     adjustSize();
+
+    connect(AppWebSocket::instance, &AppWebSocket::bMessageReceived, this, [this](const QJsonObject &jdoc) {
+        if (jdoc.value("requestId").toString() != mWebSocketRequestId) {
+            return;
+        }
+        if (!jdoc.contains("result"))
+            return;
+
+        QJsonArray arr = jdoc.value("result").toArray();
+        if (arr.size() > 0) {
+            auto const &jo = arr.at(0).toObject();
+            GoodsItem g = JsonParser<GoodsItem>::fromJson(jo);
+            int row = addGoods(g.id, g.name, 0, g.unitName, 0, 0, "", g.adgt);
+
+            ui->tblGoods->lineEdit(row, col_price)->setPlaceholderText(float_str(g.lastInputPrice, 2));
+            ui->tblGoods->lineEdit(row, col_goods_qty)->setFocus();
+        }
+    });
+    connect(ui->btnPinCurrency, &QPushButton::clicked, this, [=](bool clicked) {
+        __c5config.setRegValue("storedoc_pin_currency", clicked);
+        __c5config.setRegValue("storedoc_pinned_currency_id", ui->wCurrency->value());
+        __c5config.setRegValue("storedoc_pinned_currency_name", ui->wCurrency->name());
+    });
 }
 
 C5StoreInput::~C5StoreInput()
@@ -88,13 +120,26 @@ void C5StoreInput::setDocument(StoreInputDocument doc)
     ui->wInputStore->setCodeAndName(doc.store_in, doc.store_in_name);
     ui->wPartner->setCodeAndName(doc.partner, doc.partnerName());
     ui->leComment->setText(doc.comment());
+    if (doc.cashbox_id) {
+        ui->wCashbox->setCodeAndName(doc.cashbox_id, doc.cashbox_name);
+    }
+    if (doc.currency_id) {
+        ui->wCurrency->setCodeAndName(doc.currency_id, doc.currency_name);
+    }
+    if (doc.payment_type_id) {
+        ui->wPaymentType->setCodeAndName(doc.payment_type_id, doc.payment_type_id_name);
+    }
+    double totalQty = 0;
     for (int i = 0; i < doc.items.size(); i++) {
         auto const su = doc.items.at(i);
         int r = addGoods(su.item_id, su.item_name, su.qty, su.unit_name, su.price, su.price * su.qty, su.comment, su.adgt);
+        totalQty += su.qty;
         ui->tblGoods->setString(r, col_rec_in_id, su.uuid);
         auto *d = ui->tblGoods->getWidget<C5DateEdit>(r, col_valid_date);
         d->setDate(QDateTime::fromString(su.expire_date, FORMAT_DATETIME_TO_STR_MYSQL).date());
     }
+    ui->leTotal->setData(doc.sum);
+    ui->leTotalQty->setDouble(totalQty);
     setState();
 }
 
@@ -147,72 +192,6 @@ bool C5StoreInput::allowChangeDatabase()
     return false;
 }
 
-void C5StoreInput::addByScancode(const QString &code, const QString &qty, QString price)
-{
-    //       int row = addGoodsRow();
-    //       ui->tblGoods->setInteger(row, col_goods_id, db.getInt("f_id"));
-    //       ui->tblGoods->setString(row, col_goods_name, db.getString("f_name"));
-    //       ui->tblGoods->setString(row, col_goods_unit, db.getString("f_unitname"));
-    //       ui->tblGoods->item(row, col_goods_name)->setSelected(true);
-    //       fCanChangeFocus = false;
-    //       ui->tblGoods->lineEdit(row, col_goods_qty)->setText(qty);
-    //       ui->tblGoods->lineEdit(row, col_goods_qty)->setFocus();
-    //       ui->tblGoods->lineEdit(row, col_price)->setText(price);
-    //       ui->tblGoods->lineEdit(row, col_price)->setPlaceholderText(float_str(db.getDouble("f_lastinputprice"), 2));
-
-    //       if(__c5config.getValue(param_input_doc_fix_price).toInt() > 0) {
-    //           if(price.toDouble() < 0.001) {
-    //               if(db.getDouble("f_lastinputprice") > 0.001) {
-    //                   ui->tblGoods->lineEdit(row, col_price)->setDouble(db.getDouble("f_lastinputprice"));
-    //                   price = db.getString("f_lastinputprice");
-    //               }
-    //           }
-    //       }
-
-    //       emit ui->tblGoods->lineEdit(row, col_price)->textEdited(price);
-
-    //       if(fDocType == DOC_TYPE_STORE_INPUT) {
-    //           fHttp->createHttpQuery("/engine/worker/check-qty.php", QJsonObject{
-    //               {"method", "checkStore"}, {"goodsid", ui->tblGoods->getInteger(row, col_goods_id)}
-    //           }, SLOT(slotCheckQtyResponse(QJsonObject)), QVariant(), false);
-    //       }
-    //   } else {
-    //       db[":f_scancode"] = code;
-    //       db.exec("select gg.f_scancode, gg.f_id, concat(gg.f_name, ' ', gg.f_scancode) as f_name, gu.f_name as f_unitname, gg.f_saleprice, "
-    //               "gr.f_taxdept, gr.f_adgcode, gg.f_lastinputprice "
-    //               "from c_goods gg  "
-    //               "left join c_groups gr on gr.f_id=gg.f_group "
-    //               "left join c_units gu on gu.f_id=gg.f_unit "
-    //               "where gg.f_id in (select f_goods from c_goods_multiscancode where f_id=:f_scancode)");
-
-    //       if(db.nextRow()) {
-    //           int row = addGoodsRow();
-    //           ui->tblGoods->setInteger(row, col_goods_id, db.getInt("f_id"));
-    //           ui->tblGoods->setString(row, col_goods_name, db.getString("f_name"));
-    //           ui->tblGoods->setString(row, col_goods_unit, db.getString("f_unitname"));
-    //           ui->tblGoods->item(row, col_goods_name)->setSelected(true);
-    //           fCanChangeFocus = false;
-    //           ui->tblGoods->lineEdit(row, col_goods_qty)->setText(qty);
-    //           ui->tblGoods->lineEdit(row, col_goods_qty)->setFocus();
-    //           ui->tblGoods->lineEdit(row, col_price)->setText(price);
-    //           ui->tblGoods->lineEdit(row, col_price)->setPlaceholderText(float_str(db.getDouble("f_lastinputprice"), 2));
-
-    //           if(__c5config.getValue(param_input_doc_fix_price).toInt() > 0) {
-    //               if(price.toDouble() < 0.001) {
-    //                   if(db.getDouble("f_lastinputprice") > 0.001) {
-    //                       ui->tblGoods->lineEdit(row, col_price)->setDouble(db.getDouble("f_lastinputprice"));
-    //                       price = db.getString("f_lastinputprice");
-    //                   }
-    //               }
-    //           }
-
-    //           emit ui->tblGoods->lineEdit(row, col_price)->textEdited(price);
-
-    //               fHttp->createHttpQuery("/engine/worker/check-qty.php", QJsonObject{
-    //                   {"method", "checkStore"}, {"goodsid", ui->tblGoods->getInteger(row, col_goods_id)}
-    //               }, SLOT(slotCheckQtyResponse(QJsonObject)), QVariant(), false);
-    //           }
-}
 
 double C5StoreInput::total()
 {
@@ -266,6 +245,9 @@ bool C5StoreInput::buildDoc()
     mDocData.date = ui->deDate->toMySQLDate(false);
     mDocData.type = DOC_TYPE_STORE_INPUT;
     mDocData.create_user = mUser->id();
+    mDocData.cashbox_id = ui->wCashbox->value();
+    mDocData.payment_type_id = ui->wPaymentType->value();
+    mDocData.currency_id = ui->wCurrency->value();
     mDocData.store_in = ui->wInputStore->value();
     mDocData.partner = ui->wPartner->value();
     mDocData.data = {{"comment", ui->leComment->text()},
@@ -283,6 +265,27 @@ bool C5StoreInput::buildDoc()
         st.comment = ui->tblGoods->lineEdit(i, col_comment)->text();
         st.row = i;
         mDocData.items.append(st);
+
+        //TODO MAKE COMPARE WITH LASTINPUT PRICE OPTIONAL
+        double oldPrice = str_float(ui->tblGoods->lineEdit(i, col_price)->placeholderText());
+        double diff = qAbs(st.price - oldPrice);
+        double threshold = oldPrice * 0.15;
+
+        // Проверяем, что старая цена вообще была (чтобы не срабатывало на новые товары с ценой 0)
+        if (oldPrice > 0.001 && diff > threshold) {
+            // Текст вопроса: "Price difference is more than 15%. Accept?"
+            QString msg = tr("Price difference for %1 is more than %2%. Current: %3, Old: %4. Accept?")
+                              .arg(ui->tblGoods->getString(i, col_goods_name))
+                              .arg(15)
+                              .arg(st.price)
+                              .arg(oldPrice);
+
+            if (C5Message::question(msg) != QDialog::Accepted) {
+                // Текст ошибки: "Significant price difference for [Name] on row [N]"
+                err += tr("Significant price difference for ") + ui->tblGoods->getString(i, col_goods_name) + tr(" on row ")
+                       + QString::number(i + 1) + "\n";
+            }
+        }
         if (st.qty < 0.001) {
             err += tr("Quantity not valid on row #") + QString::number(i + 1) + "<br>";
         }
@@ -719,11 +722,20 @@ void C5StoreInput::on_btnNewGoods_clicked()
 void C5StoreInput::on_leScancode_returnPressed()
 {
     QString qty = ui->chLeaveFocusOnBarcode->isChecked() ? "1" : "";
-    addByScancode(ui->leScancode->text(), qty, "");
-
     if (ui->chLeaveFocusOnBarcode->isChecked()) {
         ui->leScancode->setFocus();
     }
+
+    QString text = ui->leScancode->text().trimmed();
+    mWebSocketRequestId = QUuid::createUuid().toString(QUuid::WithoutBraces);
+    ui->leScancode->clear();
+    QJsonObject jo;
+    jo["command"] = SelectorName<GoodsItem>::value;
+    jo["lower_name"] = "";
+    jo["barcode"] = text;
+    jo["requestId"] = mWebSocketRequestId;
+    qDebug() << "Sending request" << jo;
+    AppWebSocket::instance->sendBinaryMessage(QJsonDocument(jo).toJson());
 }
 
 void C5StoreInput::on_btnAddAdd_clicked()

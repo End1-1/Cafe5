@@ -7,7 +7,7 @@
 class C5ShopDialog : public C5Dialog
 {
 public:
-    C5ShopDialog(C5User *user);
+    C5ShopDialog(C5User *user, QWidget *parent = nullptr);
 
     ~C5ShopDialog();
 

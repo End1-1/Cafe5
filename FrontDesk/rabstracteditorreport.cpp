@@ -11,7 +11,6 @@
 #include <QScrollBar>
 #include <QSortFilterProxyModel>
 #include <QUrl>
-#include <xlsxdocument.h>
 #include "c5config.h"
 #include "c5mainwindow.h"
 #include "c5message.h"
@@ -25,7 +24,10 @@
 #include "rfilterdialog.h"
 #include "rfilterproxymodel.h"
 #include "struct_doc_store_input.h"
+#include "struct_waiter_order.h"
 #include "ui_rabstracteditorreport.h"
+#include "worderinspector.h"
+#include <xlsxdocument.h>
 
 class RAbstractEditorTableModel: public QAbstractTableModel
 {
@@ -203,6 +205,19 @@ void RAbstractEditorReport::on_tbl_doubleClicked(const QModelIndex &index)
                                }
                                }
                            });
+        return;
+    }
+
+    if (mEditorName == "form_cashsessions") {
+        QString id = mModel->data(mModel->index(index.row(), 0), Qt::DisplayRole).toString();
+        NInterface::query1("/engine/v2/waiter/order/query-order", mUser->mSessionKey, this, {{"id", id}}, [this](const QJsonObject &jo) {
+            WaiterOrder order = JsonParser<WaiterOrder>::fromJson(jo.value("order").toObject());
+
+            auto *sw = new WOrderInspector(mUser, tr("Order"), QIcon());
+
+            __mainWindow->addWidget(sw);
+            sw->setOrder(order);
+        });
         return;
     }
 

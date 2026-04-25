@@ -8,9 +8,11 @@
 #include "dlgreports.h"
 #include "dlgface.h"
 #include "dlgrealreports.h"
+#include "dlgmovemoney.h"
 #include "format_date.h"
 #include "format_date.h"
 #include "c5printing.h"
+#include "dict_payment_type.h"
 #include <QShowEvent>
 #include <QPrinter>
 #include <QPrinterInfo>
@@ -77,6 +79,8 @@ void DlgDashboard::setup()
         ui->wsessionstatus->setVisible(true);
         ui->btnOpenCashbox->setEnabled(mUser->check(cp_t5_waiter_open_close_shift));
         ui->btnCloseCashbox->setEnabled(mUser->check(cp_t5_waiter_open_close_shift));
+        ui->btnCashIn->setEnabled(false);
+        ui->btnCashOut->setEnabled(false);
     } else {
         ui->lbShiftNumber->setText(QString::number(mCashboxData["f_id"].toInt()));
         QDateTime shiftOpenDatetime = QDateTime::fromString(mCashboxData["f_date_open"].toString(), FORMAT_DATETIME_TO_STR_MYSQL);
@@ -88,6 +92,8 @@ void DlgDashboard::setup()
         ui->wsessionstatus->setVisible(false);
         ui->btnOpenCashbox->setEnabled(false);
         ui->btnCloseCashbox->setEnabled(true);
+        ui->btnCashIn->setEnabled(true);
+        ui->btnCashOut->setEnabled(true);
     }
 
     ui->btnOrders->setEnabled(mUser->check(cp_t5_waiter_reports));
@@ -106,7 +112,6 @@ void DlgDashboard::on_btnCloseCashbox_clicked()
                        {{"cashbox_id", mWorkStation.cashboxId()}},
                        [this](const QJsonObject &jdoc) {
                            mCashboxData = jdoc.value("cashbox").toObject();
-                           setup();
                            C5Printing p;
                            QPrinterInfo pi = QPrinterInfo::printerInfo(mWorkStation.defaultPrinter());
                            QPrinter printer(pi);
@@ -117,6 +122,8 @@ void DlgDashboard::on_btnCloseCashbox_clicked()
                            qreal safePx = SAFE_RIGHT_MM * printer.logicalDpiX() / 25.4;
                            p.setSceneParams(pr.width() - safePx, pr.height(), printer.logicalDpiX());
                            p.setFont(qApp->font());
+                           int bs = 22;
+                           p.setFontSize(bs);
                            QString logoFile = qApp->applicationDirPath() + "/logo_receipt.png";
 
                            if (QFile::exists(logoFile)) {
@@ -126,11 +133,16 @@ void DlgDashboard::on_btnCloseCashbox_clicked()
 
                            p.ctext(tr("Closing session") + " " + QString::number(mCashboxData.value("f_id").toInt()));
                            p.br();
-                           p.ctext(mCashboxData["f_date_close"].toString());
                            p.br();
-                           p.lrtext(tr("Open"), mCashboxData["f_user_open_name"].toString());
+                           p.lrtext(tr("Open"), mCashboxData.value("f_date_open").toString());
                            p.br();
-                           p.lrtext(tr("Close"), mCashboxData["f_user_close_name"].toString());
+                           p.rtext(mCashboxData["f_user_open_name"].toString());
+                           p.br();
+                           p.br();
+                           p.lrtext(tr("Close"), mCashboxData.value("f_date_close").toString());
+                           p.br();
+                           p.rtext(mCashboxData["f_user_close_name"].toString());
+                           p.br();
                            p.br();
                            p.lrtext(tr("Operations"), QString::number(mCashboxData.value("f_orders_count").toInt()));
                            p.br();
@@ -139,6 +151,8 @@ void DlgDashboard::on_btnCloseCashbox_clicked()
                            p.line();
                            p.br();
                            p.print(printer);
+                           mCashboxData["f_id"] = 0;
+                           setup();
                        });
 }
 
@@ -163,4 +177,76 @@ void DlgDashboard::on_btnReports_clicked()
 {
     DlgRealReports d(mUser);
     d.exec();
+}
+
+void DlgDashboard::on_btnCheckin_clicked() {}
+
+void DlgDashboard::on_btnCheckout_clicked() {}
+
+void DlgDashboard::on_btnCashIn_clicked()
+{
+    if(mCashboxData.value("f_id").toInt() == 0) {
+        C5Message::error(tr("No active cashbox session"));
+        return;
+    }
+
+    DlgMoveMoney d(mUser);
+    d.setMode(true);
+
+    if(d.exec() != QDialog::Accepted) {
+        return;
+    }
+
+    NInterface::query1("/engine/v2/waiter/cashbox/move-money",
+                       mUser->mSessionKey,
+                       this,
+                       {{"cashbox_id", mWorkStation.cashboxId()},
+                        {"f_order_id", ""},
+                        {"f_payment_type_id", PAYMENT_TYPE_CASH},
+                        {"f_debit", d.amount()},
+                        {"f_credit", 0},
+                        {"f_currency_id", 1},
+                        {"f_comment", d.comment()}},
+                       [this](const QJsonObject &) {
+                           NInterface::query1("/engine/v2/waiter/cashbox/check-status", mUser->mSessionKey, this,
+                           {{"cashbox_id", mWorkStation.cashboxId()}},
+                           [this](const QJsonObject &jdoc) {
+                               mCashboxData = jdoc["cashbox_session"].toObject();
+                               setup();
+                           });
+                       });
+}
+
+void DlgDashboard::on_btnCashOut_clicked()
+{
+    if(mCashboxData.value("f_id").toInt() == 0) {
+        C5Message::error(tr("No active cashbox session"));
+        return;
+    }
+
+    DlgMoveMoney d(mUser);
+    d.setMode(false);
+
+    if(d.exec() != QDialog::Accepted) {
+        return;
+    }
+
+    NInterface::query1("/engine/v2/waiter/cashbox/move-money",
+                       mUser->mSessionKey,
+                       this,
+                       {{"cashbox_id", mWorkStation.cashboxId()},
+                        {"f_order_id", ""},
+                        {"f_payment_type_id", PAYMENT_TYPE_CASH},
+                        {"f_debit", 0},
+                        {"f_credit", d.amount()},
+                        {"f_currency_id", 1},
+                        {"f_comment", d.comment()}},
+                       [this](const QJsonObject &) {
+                           NInterface::query1("/engine/v2/waiter/cashbox/check-status", mUser->mSessionKey, this,
+                           {{"cashbox_id", mWorkStation.cashboxId()}},
+                           [this](const QJsonObject &jdoc) {
+                               mCashboxData = jdoc["cashbox_session"].toObject();
+                               setup();
+                           });
+                       });
 }

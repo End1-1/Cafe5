@@ -1,15 +1,13 @@
 #include "dlgpin.h"
-#include "ui_dlgpin.h"
-#include "ndataprovider.h"
-#include "c5config.h"
-#include "ninterface.h"
-#include "working.h"
-#include "c5user.h"
-#include "c5database.h"
+#include <QJsonObject>
+#include <QKeyEvent>
 #include "appwebsocket.h"
 #include "c5connectiondialog.h"
-#include <QKeyEvent>
-#include <QJsonObject>
+#include "c5user.h"
+#include "ndataprovider.h"
+#include "ninterface.h"
+#include "ui_dlgpin.h"
+#include "working.h"
 
 DlgPin::DlgPin(QWidget *parent) :
     C5ShopDialog(nullptr),
@@ -96,11 +94,7 @@ void DlgPin::on_btnEnter_clicked()
             mUser->fSettings = settings;
             mUser->fConfig = jo["config"].toObject()["f_config"].toObject();
             mUser->mSessionKey = NDataProvider::sessionKey;
-            C5Database::fDbParams = {"", "", "", ""};
-            C5Database::fUrl = QString("%1://%2").arg(C5ConnectionDialog::instance()->connectionType()== C5ConnectionDialog::noneSecure ? "http" : "https",
-                               C5ConnectionDialog::instance()->serverAddress());
-            __c5config.setValues(settings);
-            __c5config.fMainJson = mUser->fConfig;
+
             AppWebSocket::reconnect((C5ConnectionDialog::instance()->connectionType()
                                              == C5ConnectionDialog::instance()->noneSecure
                                          ? "ws://"
