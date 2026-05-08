@@ -1,5 +1,7 @@
 #include "wdashboard.h"
 #include <QDialog>
+#include <QJsonDocument>
+#include <QJsonObject>
 #include "C5StoreInput.h"
 #include "c5config.h"
 #include "c5mainwindow.h"
@@ -15,6 +17,7 @@
 #include "cr5usersgroups.h"
 #include "ntablewidget.h"
 #include "rabstracteditorreport.h"
+#include "wdashboardsettings.h"
 #include "ui_wdashboard.h"
 
 WDashboard::WDashboard(C5User *user, QWidget *parent)
@@ -31,9 +34,73 @@ WDashboard::WDashboard(C5User *user, QWidget *parent)
             connect(btn, &QAbstractButton::clicked, this, &WDashboard::onCommandButtonClicked);
         }
     }
+
+    applyButtonVisibility();
 }
 
 WDashboard::~WDashboard() { delete ui; }
+
+QToolBar *WDashboard::toolBar()
+{
+    if (!fToolBar) {
+        C5Widget::createToolBar();
+
+        QWidget *spacer = new QWidget(this);
+        spacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
+        fToolBar->addWidget(spacer);
+
+        auto *a = fToolBar->addAction(QIcon(":/setting.png"), tr("Settings"));
+        connect(a, &QAction::triggered, this, &WDashboard::openDashboardSettings);
+    }
+
+    return fToolBar;
+}
+
+void WDashboard::openDashboardSettings()
+{
+    const QList<QAbstractButton*> buttons = findChildren<QAbstractButton*>();
+    const QString key = QStringLiteral("dashboard_buttons_visibility");
+    const QString raw = __c5config.getRegValue(key, "").toString();
+    const QJsonObject saved = QJsonDocument::fromJson(raw.toUtf8()).object();
+    QVariantMap vm;
+    for (auto it = saved.constBegin(); it != saved.constEnd(); ++it) {
+        vm.insert(it.key(), it.value().toBool());
+    }
+
+    WDashboardSettings dlg(buttons, vm, this);
+    if (dlg.exec() != QDialog::Accepted) {
+        return;
+    }
+
+    const QVariantMap result = dlg.visibilityMap();
+    QJsonObject out;
+    for (auto it = result.constBegin(); it != result.constEnd(); ++it) {
+        out.insert(it.key(), it.value().toBool());
+    }
+    __c5config.setRegValue(key, QJsonDocument(out).toJson(QJsonDocument::Compact));
+    applyButtonVisibility();
+}
+
+void WDashboard::applyButtonVisibility()
+{
+    const QString key = QStringLiteral("dashboard_buttons_visibility");
+    const QString raw = __c5config.getRegValue(key, "").toString();
+    const QJsonObject vm = QJsonDocument::fromJson(raw.toUtf8()).object();
+    if (vm.isEmpty()) {
+        return;
+    }
+
+    const QList<QAbstractButton*> buttons = findChildren<QAbstractButton*>();
+    for (QAbstractButton *btn : buttons) {
+        if (!btn || !btn->property("form").isValid()) {
+            continue;
+        }
+        const QString key = btn->objectName();
+        if (vm.contains(key) && vm.value(key).isBool()) {
+            btn->setVisible(vm.value(key).toBool());
+        }
+    }
+}
 
 void WDashboard::onCommandButtonClicked()
 {
@@ -79,6 +146,10 @@ QWidget* WDashboard::createForm(const QString &name, QIcon icon)
 
     if (name == "form_store_documents") {
         return new RAbstractEditorReport(tr("Store documents"), icon, name);
+    }
+
+    if (name == "form_salary") {
+        return new RAbstractEditorReport(tr("Salary"), icon, name);
     }
 
     if (name == "form_store_moves") {

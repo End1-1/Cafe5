@@ -2,12 +2,15 @@
 #include <QPaintEvent>
 #include <QPainter>
 #include <QPushButton>
+#include <QSignalBlocker>
 #include <QStyle>
 #include "c5utils.h"
 #include "dict_dish_state.h"
+#include "dict_goods_types.h"
 #include "dlgstartstophourly.h"
 #include "format_date.h"
 #include "ui_waiterdishwidget.h"
+#include <QMouseEvent>
 
 WaiterDishWidget::WaiterDishWidget(const WaiterDish &d, bool showRemoved, QWidget *parent) :
     WaiterOrderItemWidget(d, parent),
@@ -18,6 +21,8 @@ WaiterDishWidget::WaiterDishWidget(const WaiterDish &d, bool showRemoved, QWidge
     ui->wmodificators->setVisible(false);
     ui->btnChecked->setVisible(false);
     ui->btnPause->setVisible(false);
+    ui->btnEditPackage->setVisible(d.type == GOODS_TYPE_PACKAGE);
+    ui->wMargin->setVisible(!d.parent.isEmpty());
     updateDish(d);
     adjustSize();
     QFont f(font());
@@ -29,6 +34,7 @@ WaiterDishWidget::WaiterDishWidget(const WaiterDish &d, bool showRemoved, QWidge
     ui->lbTotal->installEventFilter(this);
     ui->lbComplimentary->setVisible(false);
     ui->lbEmarks->setVisible(!d.emarks().isEmpty());
+    ui->lbPackageDelta->setVisible(d.type == GOODS_TYPE_PACKAGE);
     installEventFilter(this);
 }
 
@@ -54,6 +60,7 @@ void WaiterDishWidget::pulish()
 void WaiterDishWidget::updateDish(WaiterDish value)
 {
     WaiterOrderItemWidget::updateDish(value);
+    ui->wMargin->setVisible(!mOrderItem.parent.isEmpty());
     QString name = mOrderItem.dishName;
 
     if(!mOrderItem.fromTable().isEmpty()) {
@@ -87,6 +94,7 @@ void WaiterDishWidget::updateDish(WaiterDish value)
         if(mOrderItem.state == DISH_STATE_OK) {
             ui->lbQty1->setProperty("state", mOrderItem.isPrinted() ? "1" : "0");
             ui->lbQty1->style()->polish(ui->lbQty1);
+            ui->lbPackageDelta->setText(float_str(mOrderItem.packageNominalDelta, 2));
             pulish();
         } else if(mOrderItem.state == DISH_STATE_SET) {
             ui->orderDishFrame->setProperty("state", "4");
@@ -111,6 +119,33 @@ void WaiterDishWidget::updateDish(WaiterDish value)
             pulish();
         }
     }
+
+    if(mOrderItem.type == GOODS_TYPE_PACKAGE && mOrderItem.state == DISH_STATE_OK) {
+        ui->orderDishFrame->setProperty("package", "1");
+    } else {
+        ui->orderDishFrame->setProperty("package", QVariant());
+    }
+
+    ui->orderDishFrame->style()->unpolish(ui->orderDishFrame);
+    ui->orderDishFrame->style()->polish(ui->orderDishFrame);
+
+    /* Widget slots are reused in parseOrder when row order changes — hide package toggle on non-package lines. */
+    const bool pkgRow = mOrderItem.type == GOODS_TYPE_PACKAGE;
+    if(!pkgRow) {
+        QSignalBlocker b(ui->btnEditPackage);
+        ui->btnEditPackage->setChecked(false);
+    }
+
+    ui->btnEditPackage->setVisible(pkgRow);
+    if(pkgRow) {
+        ui->btnEditPackage->setEnabled(mOrderItem.state == DISH_STATE_OK);
+    }
+}
+
+void WaiterDishWidget::setPackageParentButtonChecked(bool checked)
+{
+    QSignalBlocker b(ui->btnEditPackage);
+    ui->btnEditPackage->setChecked(checked);
 }
 
 void WaiterDishWidget::setCheckMode(bool v)
@@ -136,9 +171,15 @@ bool WaiterDishWidget::isChecked()
 bool WaiterDishWidget::event(QEvent *event)
 {
     switch(event->type()) {
-    case QEvent::MouseButtonRelease:
+    case QEvent::MouseButtonRelease: {
+        auto *me = static_cast<QMouseEvent *>(event);
+        QWidget *hit = childAt(me->position().toPoint());
+        if(hit == ui->btnEditPackage || hit == ui->btnPause || hit == ui->btnChecked) {
+            break;
+        }
         ui->btnDish->click();
         break;
+    }
 
     default:
         break;
@@ -174,4 +215,15 @@ void WaiterDishWidget::on_btnPause_clicked()
             emit setEndDate(d.mDateTime);
         }
     }
+}
+
+void WaiterDishWidget::on_btnEditPackage_clicked()
+{
+    if(mOrderItem.type != GOODS_TYPE_PACKAGE || mOrderItem.state != DISH_STATE_OK) {
+        QSignalBlocker b(ui->btnEditPackage);
+        ui->btnEditPackage->setChecked(false);
+        return;
+    }
+
+    emit packageParentToggled(mOrderItem.id, ui->btnEditPackage->isChecked());
 }

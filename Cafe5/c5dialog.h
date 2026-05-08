@@ -5,6 +5,7 @@
 
 class NInterface;
 class C5User;
+class QAbstractButton;
 
 class C5Dialog : public QDialog
 {
@@ -76,6 +77,10 @@ protected:
     virtual void paintEvent(QPaintEvent *e) override;
 
     NInterface* fHttp;
+
+    void setupButton(QAbstractButton *btn);
+
+    virtual void setupButtons();
 
 protected slots:
     void handleError(int err, const QString &msg);

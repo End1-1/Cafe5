@@ -15,6 +15,7 @@ class DlgFace;
 }
 
 class C5User;
+class TableWidget;
 
 class DlgFace : public C5WaiterDialog
 {
@@ -37,13 +38,19 @@ private slots:
 
     void filterStaffClicked();
 
-    void updateHall();
+    void updateHall(const QJsonObject &filter = {});
 
     void on_btnExit_clicked();
 
     void on_btnGuests_clicked();
 
     void on_btnDashboard_clicked();
+
+    void on_btnPreorders_clicked();
+
+    void on_btnInProgress_clicked();
+
+    void on_btnNormalView_clicked();
 
 protected:
     virtual void showEvent(QShowEvent *e) override;
@@ -67,10 +74,11 @@ private:
 
     int mTablesOfStaff = 0;
 
+    QVector<TableWidget *> mTableWidgetsPool;
+
     void initData();
 
     void filterHall();
 
     void colorizeHall();
-
 };

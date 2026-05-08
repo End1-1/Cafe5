@@ -9,7 +9,7 @@ struct WaiterDish {
     QString header;
     int state;
     int type;
-    int parent;
+    QString parent;
     int dishId;
     int store;
     QString dishName;
@@ -17,6 +17,8 @@ struct WaiterDish {
     double qty;
     double price;
     int row;
+    /** Только для PACKAGE (тип 5): Σ(qty×price) состава − qty×price строки пакета; считается на клиенте. */
+    double packageNominalDelta = 0;
     QString emarks() const { return data.value("f_emarks").toString(); }
     QJsonObject data;
     QString nameLower;
@@ -146,7 +148,7 @@ struct JsonParser<WaiterDish> {
         wd.id = jo["f_id"].toString();
         wd.header = jo["f_header"].toString();
         wd.type = jo["f_type"].toInt();
-        wd.parent = jo["f_parent"].toInt();
+        wd.parent = jo.value("f_parent").toString();
         wd.state = jo["f_state"].toInt();
         wd.store = jo["f_store"].toInt();
         wd.dishId = jo["f_dish"].toInt();

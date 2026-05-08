@@ -8,6 +8,7 @@
 #include <QWindow>
 #include "c5lineedit.h"
 #include "c5message.h"
+#include "struct_workstationitem.h"
 #ifdef FRONDESK
 #include "mainwindow.h"
 #endif
@@ -300,6 +301,32 @@ void C5Dialog::paintEvent(QPaintEvent *e)
     for(int i = 0; i < mRightBorder.size(); i++) {
         p.setPen(mRightBorder[i]);
         p.drawLine(width() - 1, i * step, width() - 1, i * step + step);
+    }
+}
+
+void C5Dialog::setupButton(QAbstractButton *btn)
+{
+    bool enabled = !mWorkStation.data.value("setup_buttons").toObject().value(btn->property("setup_key").toString()).toBool();
+    btn->setEnabled(btn->isEnabled() && enabled);
+    if (!enabled) {
+        btn->setText("X");
+        btn->setIcon(QIcon());
+    }
+}
+
+void C5Dialog::setupButtons()
+{
+    const QList<QAbstractButton *> buttons = findChildren<QAbstractButton *>();
+    QStringList list;
+    list.reserve(buttons.count());
+
+    for (QAbstractButton *btn : buttons) {
+        const QString key = btn->property("setup_key").toString().trimmed();
+        if (key.isEmpty()) {
+            continue;
+        }
+
+        setupButton(btn);
     }
 }
 

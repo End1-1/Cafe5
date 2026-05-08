@@ -16,9 +16,27 @@ DlgMoveMoney::~DlgMoveMoney()
     delete ui;
 }
 
-void DlgMoveMoney::setMode(bool isCashIn)
+void DlgMoveMoney::setAmount(double value)
 {
-    ui->lbTitle->setText(isCashIn ? tr("Cash in") : tr("Cash out"));
+    ui->leAmount->setDouble(value);
+}
+
+void DlgMoveMoney::setMode(int mode)
+{
+    switch (mode) {
+    case 0:
+        ui->lbTitle->setText(tr("Cash out"));
+        break;
+    case 1:
+        ui->lbTitle->setText(tr("Cash in"));
+        break;
+    case 2:
+        ui->lbTitle->setText(tr("Cash in drawer"));
+        break;
+    case 3:
+        ui->lbTitle->setText(tr("Prepaid"));
+        break;
+    }
 }
 
 double DlgMoveMoney::amount() const

@@ -103,7 +103,7 @@
          <string>Lock</string>
         </property>
         <property name="icon">
-         <iconset resource="../resources/res.qrc">
+         <iconset resource="resources/res.qrc">
           <normaloff>:/lock.png</normaloff>:/lock.png</iconset>
         </property>
         <property name="iconSize">
@@ -190,7 +190,7 @@
              <rect>
               <x>0</x>
               <y>0</y>
-              <width>949</width>
+              <width>946</width>
               <height>692</height>
              </rect>
             </property>
@@ -258,6 +258,9 @@
         <property name="text">
          <string>Normal view</string>
         </property>
+        <property name="setup_key" stdset="0">
+         <string>dlgface_disable_btnnormalview</string>
+        </property>
        </widget>
       </item>
       <item>
@@ -277,6 +280,9 @@
         <property name="text">
          <string>By waiters</string>
         </property>
+        <property name="setup_key" stdset="0">
+         <string>dlgface_disable_btnmyorders</string>
+        </property>
        </widget>
       </item>
       <item>
@@ -295,6 +301,53 @@
         </property>
         <property name="text">
          <string>Guests</string>
+        </property>
+        <property name="setup_key" stdset="0">
+         <string>dlgface_disable_btnguests</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QToolButton" name="btnPreorders">
+        <property name="minimumSize">
+         <size>
+          <width>140</width>
+          <height>50</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>16777215</width>
+          <height>50</height>
+         </size>
+        </property>
+        <property name="text">
+         <string>Preorders</string>
+        </property>
+        <property name="setup_key" stdset="0">
+         <string>dlgface_disable_preorders</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QToolButton" name="btnInProgress">
+        <property name="minimumSize">
+         <size>
+          <width>140</width>
+          <height>50</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>16777215</width>
+          <height>50</height>
+         </size>
+        </property>
+        <property name="text">
+         <string>In progress</string>
+        </property>
+        <property name="setup_key" stdset="0">
+         <string>dlgface_disable_btninprogress</string>
         </property>
        </widget>
       </item>
@@ -410,8 +463,8 @@
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <resources>
-  <include location="../resources/res.qrc"/>
-  <include location="../resources/res.qrc"/>
+  <include location="resources/res.qrc"/>
+  <include location="resources/res.qrc"/>
  </resources>
  <connections/>
 </ui>

@@ -53,6 +53,8 @@ private:
 
     bool mEmptySearch = true;
 
+    QString mLastRequestId;
+
     QMap<QString, QString> selectorTitles();
 
 };

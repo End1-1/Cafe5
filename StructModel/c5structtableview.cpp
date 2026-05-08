@@ -2,6 +2,7 @@
 #include <QHeaderView>
 #include <QJsonDocument>
 #include "appwebsocket.h"
+#include "c5message.h"
 #include "store_doc_status.h"
 #include "store_doc_type.h"
 #include "struct_cashbox.h"
@@ -13,6 +14,7 @@
 #include "struct_storage_item.h"
 #include "struct_employee.h"
 #include "struct_employee_group.h"
+#include "struct_goods_type.h"
 #include "ui_c5structtableview.h"
 
 C5StructTableView::C5StructTableView(C5User *user)
@@ -29,8 +31,21 @@ C5StructTableView::C5StructTableView(C5User *user)
             this, &C5StructTableView::sendSearchRequest);
     connect(AppWebSocket::instance, &AppWebSocket::bMessageReceived,
     this, [this](const QJsonObject & jo) {
-        if(!jo.contains("result"))
+        if(!jo.contains("result")) {
+            if(jo.contains(QStringLiteral("error")) || jo.contains(QStringLiteral("errorMessage"))
+               || jo.contains(QStringLiteral("errorCode"))) {
+                if(jo.contains(QStringLiteral("requestId")) && !mLastRequestId.isEmpty()
+                    && jo.value(QStringLiteral("requestId")).toString() != mLastRequestId) {
+                    return;
+                }
+                const QString err = jo.value(QStringLiteral("errorMessage")).toString();
+                C5Message::error(
+                    !err.isEmpty() ? err
+                    : (jo.value(QStringLiteral("error")).isString() ? jo.value(QStringLiteral("error")).toString()
+                        : C5StructTableView::tr("Server error while loading the list.")));
+            }
             return;
+        }
 
         QJsonArray arr = jo["result"].toArray();
 
@@ -52,6 +67,8 @@ C5StructTableView::C5StructTableView(C5User *user)
             handleSearchResult<StructCashbox>(arr, static_cast<C5StructModel<StructCashbox> *>(ui->tbl->model()));
         } else if (mSearchEngine == SelectorName<StructPaymentType>::value) {
             handleSearchResult<StructPaymentType>(arr, static_cast<C5StructModel<StructPaymentType> *>(ui->tbl->model()));
+        } else if (mSearchEngine == SelectorName<StructGoodsType>::value) {
+            handleSearchResult<StructGoodsType>(arr, static_cast<C5StructModel<StructGoodsType> *>(ui->tbl->model()));
         } else if (mSearchEngine == SelectorName<StructEmployee>::value) {
             handleSearchResult<StructEmployee>(arr, static_cast<C5StructModel<StructEmployee> *>(ui->tbl->model()));
         } else if (mSearchEngine == SelectorName<StructEmployeeGroup>::value) {
@@ -81,6 +98,7 @@ QMap<QString, QString> C5StructTableView::selectorTitles()
             {SelectorName<StoreDocStatusItem>::value, QObject::tr("Document status")},
             {SelectorName<StructCurrency>::value, QObject::tr("Currency")},
             {SelectorName<StructPaymentType>::value, QObject::tr("Payment type")},
+            {SelectorName<StructGoodsType>::value, QObject::tr("Goods type")},
             {SelectorName<StructCashbox>::value, QObject::tr("Cashbox")},
             {SelectorName<StructEmployee>::value, QObject::tr("Employee")},
             {SelectorName<StructEmployeeGroup>::value, QObject::tr("Employee group")}};
@@ -99,13 +117,24 @@ void C5StructTableView::on_leSearchText_textChanged(const QString &arg1)
 
 void C5StructTableView::sendSearchRequest()
 {
+    if(!AppWebSocket::instance) {
+        C5Message::error(tr("WebSocket is not initialized. Restart the application."));
+        return;
+    }
+    if(!AppWebSocket::instance->isConnected()) {
+        C5Message::error(tr("No connection to the server. Check the network and try again."));
+        return;
+    }
     QString text = ui->leSearchText->text().trimmed();
     QJsonObject jo;
     jo["command"] = mSearchEngine;
     jo["lower_name"] = text.toLower();
     jo["requestId"] = QUuid::createUuid().toString(QUuid::WithoutBraces);
+    mLastRequestId = jo["requestId"].toString();
     qDebug() << "Sending request" << jo;
-    AppWebSocket::instance->sendBinaryMessage(QJsonDocument(jo).toJson());
+    if(!AppWebSocket::instance->sendBinaryMessage(QJsonDocument(jo).toJson())) {
+        C5Message::error(tr("Failed to send the search request. Check the connection to the server."));
+    }
 }
 
 void C5StructTableView::on_btnSelect_clicked()
@@ -142,6 +171,10 @@ void C5StructTableView::on_btnSelect_clicked()
         }
     } else if (mSearchEngine == SelectorName<StructPaymentType>::value) {
         if (static_cast<C5StructModel<StructPaymentType> *>(ui->tbl->model())->hasSelectedData()) {
+            isAcceptable = true;
+        }
+    } else if (mSearchEngine == SelectorName<StructGoodsType>::value) {
+        if (static_cast<C5StructModel<StructGoodsType> *>(ui->tbl->model())->hasSelectedData()) {
             isAcceptable = true;
         }
     } else if (mSearchEngine == SelectorName<StructEmployee>::value) {
@@ -189,6 +222,8 @@ void C5StructTableView::on_tbl_doubleClicked(const QModelIndex &index)
         static_cast<C5StructModel<StructCashbox> *>(ui->tbl->model())->setData(checkIndex, Qt::Checked, Qt::CheckStateRole);
     } else if (mSearchEngine == SelectorName<StructPaymentType>::value) {
         static_cast<C5StructModel<StructPaymentType> *>(ui->tbl->model())->setData(checkIndex, Qt::Checked, Qt::CheckStateRole);
+    } else if (mSearchEngine == SelectorName<StructGoodsType>::value) {
+        static_cast<C5StructModel<StructGoodsType> *>(ui->tbl->model())->setData(checkIndex, Qt::Checked, Qt::CheckStateRole);
     } else if (mSearchEngine == SelectorName<StructEmployee>::value) {
         static_cast<C5StructModel<StructEmployee> *>(ui->tbl->model())->setData(checkIndex, Qt::Checked, Qt::CheckStateRole);
     } else if (mSearchEngine == SelectorName<StructEmployeeGroup>::value) {

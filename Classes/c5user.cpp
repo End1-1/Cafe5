@@ -151,6 +151,7 @@ void C5User::setUserData(const QJsonObject &jdoc)
     QMap<int, QString> settings;
     QJsonArray jsettings = jdata["settings"].toArray();
 
+    active = jdata.value("active").toBool();
     for(int i = 0; i < jsettings.count(); i++) {
         const QJsonObject &js = jsettings.at(i).toObject();
         settings[js["f_key"].toInt()] = js["f_value"].toString();

@@ -15,11 +15,14 @@ public:
 
     ~WDashboard();
 
+    virtual QToolBar *toolBar() override;
+
 private slots:
     void onCommandButtonClicked();
+    void openDashboardSettings();
 
 private:
     Ui::WDashboard* ui;
-    
+    void applyButtonVisibility();
     QWidget* createForm(const QString &name, QIcon icon);
 };

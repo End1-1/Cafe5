@@ -269,5 +269,6 @@
         <file>storage.png</file>
         <file>cashbox.png</file>
         <file>sales.png</file>
+        <file>columns.png</file>
     </qresource>
 </RCC>

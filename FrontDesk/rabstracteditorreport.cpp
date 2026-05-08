@@ -4,16 +4,25 @@
 #include <QColor>
 #include <QDesktopServices>
 #include <QDialog>
+#include <QDialogButtonBox>
 #include <QFileDialog>
 #include <QFont>
+#include <QHBoxLayout>
+#include <QHeaderView>
 #include <QJsonArray>
 #include <QJsonDocument>
+#include <QListWidget>
+#include <QPushButton>
 #include <QScrollBar>
+#include <QSet>
 #include <QSortFilterProxyModel>
 #include <QUrl>
+#include <QVBoxLayout>
 #include "c5config.h"
 #include "c5mainwindow.h"
 #include "c5message.h"
+#include "c5revenuecashop.h"
+#include "c5salaryeditor.h"
 #include "c5storeinput.h"
 #include "c5storeinventory.h"
 #include "c5storeoutput.h"
@@ -27,6 +36,7 @@
 #include "struct_waiter_order.h"
 #include "ui_rabstracteditorreport.h"
 #include "worderinspector.h"
+#include <algorithm>
 #include <xlsxdocument.h>
 
 class RAbstractEditorTableModel: public QAbstractTableModel
@@ -107,6 +117,17 @@ RAbstractEditorReport::RAbstractEditorReport(const QString &title, QIcon icon, c
     connect(ui->tbl->horizontalHeader(), &QHeaderView::sectionResized, this, [this](int index, int oldSize, int newSize) {
         ui->tblTotal->setColumnWidth(index, newSize);
     });
+    {
+        QHeaderView *header = ui->tbl->horizontalHeader();
+        header->setContextMenuPolicy(Qt::CustomContextMenu);
+        connect(header, &QHeaderView::customContextMenuRequested, this, [this](const QPoint &pos) {
+            const int col = ui->tbl->horizontalHeader()->logicalIndexAt(pos);
+            if(col < 0) {
+                return;
+            }
+            showColumnValueFilterDialog(col);
+        });
+    }
     // connect(ui->tbl->selectionModel(), SIGNAL(selectionChanged(QItemSelection, QItemSelection)), this, SLOT(selectionChanged(QItemSelection, QItemSelection)));
     // connect(ui->tbl, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(tableViewContextMenuRequested(QPoint)));
     ui->tbl->horizontalScrollBar()->setSingleStep(1);
@@ -126,8 +147,7 @@ QToolBar* RAbstractEditorReport::toolBar()
 {
     if(!fToolBar) {
         C5Widget::toolBar();
-        auto *action = fToolBar->addAction(QIcon(":/new-file.png"), tr("New"), this, []() {
-        });
+        auto *action = fToolBar->addAction(QIcon(":/new-file.png"), tr("New"), this, [this]() { newData(); });
         action->setProperty("name", "new");
         action = fToolBar->addAction(QIcon(":/reload.png"), tr("Reload"), this, [this] {
             getData();
@@ -139,6 +159,8 @@ QToolBar* RAbstractEditorReport::toolBar()
             applyFilter();
         });
         action->setProperty("name", "filter");
+        action = fToolBar->addAction(QIcon(":/columns.png"), tr("Columns"), this, [this] { showColumnVisibilityDialog(); });
+        action->setProperty("name", "columns");
         fToolBar->addAction(QIcon(":/excel.png"), tr("Export\nto Excel"), this, [this] {
             exportToExcel();
         });
@@ -177,6 +199,42 @@ void RAbstractEditorReport::on_tbl_doubleClicked(const QModelIndex &index)
             Q_ASSERT_X(false, "check editor type", QString("Invalid type of editor %1").arg(type).toLatin1());
             break;
         }
+    }
+
+    if (mEditorName == "form_salary") {
+        auto obj = filterObject("viewmode");
+        if (!obj.isEmpty()) {
+            int reportType = obj.value("viewmode").toInt();
+            if (reportType < 2) {
+                return;
+            }
+
+            int type = 0;
+            if (reportType == 2) {
+                if (index.column() == 1) {
+                    type = 1;
+                }
+                if (index.column() == 2) {
+                    type = 2;
+                }
+            }
+            if (reportType == 3) {
+                if (index.column() == 2) {
+                    type = 1;
+                }
+                if (index.column() == 3) {
+                    type = 2;
+                }
+            }
+            if (type == 0) {
+                return;
+            }
+            auto *sdoc = new C5SalaryEditor();
+            QDate date = QDate::fromString(mModel->data(mModel->index(index.row(), 0), Qt::DisplayRole).toString(), FORMAT_DATE_TO_STR);
+            sdoc->open(date, type);
+            __mainWindow->addWidget(sdoc);
+        }
+        return;
     }
 
     if(mEditorName == "CashSessions") {
@@ -264,14 +322,9 @@ void RAbstractEditorReport::getData()
 
         mProxyModel->numericCols = mProxyModel->columnSums.keys();
         mModel->setJson(jdoc);
+        mProxyModel->clearAllColumnValueFilters();
         ui->tbl->resizeColumnsToContents();
-
-        for (int i = 0; i < mProxyModel->columnCount(); i++) {
-            ui->tbl->setColumnHidden(i, false);
-        }
-        for(auto column : jdoc["hidden_columns"].toArray()) {
-            ui->tbl->setColumnHidden(column.toInt(), true);
-        }
+        applySavedColumnVisibility();
 
         QJsonArray colWidths = jdoc.value("col_widths").toArray();
 
@@ -290,6 +343,9 @@ void RAbstractEditorReport::getData()
 
         for(auto *a : fToolBar->actions()) {
             if(a->property("name").isValid()) {
+                if (a->property("name").toString() == "columns") {
+                    continue;
+                }
                 a->setVisible(jtoolBar[a->property("name").toString()].toBool());
             }
         }
@@ -303,6 +359,103 @@ void RAbstractEditorReport::getData()
         mProxyModel->recalcSums();
         emit mProxyModel->sumsChanged(mProxyModel->columnSums);
     });
+}
+
+void RAbstractEditorReport::applySavedColumnVisibility()
+{
+    const QString key = QStringLiteral("report_columns_visible_%1").arg(mEditorName);
+    const QString raw = __c5config.getRegValue(key, "").toString();
+    const QJsonObject jvis = QJsonDocument::fromJson(raw.toUtf8()).object();
+
+    for(int i = 0; i < mProxyModel->columnCount(); ++i) {
+        const QString ckey = QString::number(i);
+        const bool visible = jvis.contains(ckey) ? jvis.value(ckey).toBool() : true;
+        ui->tbl->setColumnHidden(i, !visible);
+    }
+}
+
+void RAbstractEditorReport::showColumnVisibilityDialog()
+{
+    if(!mProxyModel || mProxyModel->columnCount() == 0) {
+        return;
+    }
+
+    const QString key = QStringLiteral("report_columns_visible_%1").arg(mEditorName);
+    const QString raw = __c5config.getRegValue(key, "").toString();
+    QJsonObject jvis = QJsonDocument::fromJson(raw.toUtf8()).object();
+    QDialog dlg(this);
+    dlg.setWindowTitle(tr("Columns"));
+    auto *v = new QVBoxLayout(&dlg);
+    auto *list = new QListWidget;
+    list->setMinimumHeight(280);
+
+    for(int c = 0; c < mProxyModel->columnCount(); ++c) {
+        const QString header = mProxyModel->headerData(c, Qt::Horizontal, Qt::DisplayRole).toString();
+        auto *it = new QListWidgetItem(header);
+        it->setData(Qt::UserRole, c);
+        it->setFlags(it->flags() | Qt::ItemIsUserCheckable);
+        const QString ckey = QString::number(c);
+        const bool visible = jvis.contains(ckey) ? jvis.value(ckey).toBool() : !ui->tbl->isColumnHidden(c);
+        it->setCheckState(visible ? Qt::Checked : Qt::Unchecked);
+        list->addItem(it);
+    }
+    v->addWidget(list);
+
+    auto *btnRow = new QHBoxLayout;
+    auto *btnAll = new QPushButton(tr("All"));
+    auto *btnNone = new QPushButton(tr("None"));
+    auto *btnReset = new QPushButton(tr("Reset"));
+    btnRow->addWidget(btnAll);
+    btnRow->addWidget(btnNone);
+    btnRow->addWidget(btnReset);
+    btnRow->addStretch(1);
+    v->addLayout(btnRow);
+
+    auto *box = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
+    v->addWidget(box);
+    connect(box, &QDialogButtonBox::accepted, &dlg, &QDialog::accept);
+    connect(box, &QDialogButtonBox::rejected, &dlg, &QDialog::reject);
+    connect(btnAll, &QPushButton::clicked, list, [list] {
+        for(int i = 0; i < list->count(); ++i) {
+            list->item(i)->setCheckState(Qt::Checked);
+        }
+    });
+    connect(btnNone, &QPushButton::clicked, list, [list] {
+        for(int i = 0; i < list->count(); ++i) {
+            list->item(i)->setCheckState(Qt::Unchecked);
+        }
+    });
+    connect(btnReset, &QPushButton::clicked, list, [list] {
+        for(int i = 0; i < list->count(); ++i) {
+            list->item(i)->setCheckState(Qt::Checked);
+        }
+    });
+
+    dlg.resize(460, 440);
+    if(dlg.exec() != QDialog::Accepted) {
+        return;
+    }
+
+    jvis = QJsonObject();
+    for(int i = 0; i < list->count(); ++i) {
+        const QListWidgetItem *it = list->item(i);
+        const int c = it->data(Qt::UserRole).toInt();
+        const bool visible = it->checkState() == Qt::Checked;
+        jvis.insert(QString::number(c), visible);
+    }
+    __c5config.setRegValue(key, QJsonDocument(jvis).toJson(QJsonDocument::Compact));
+    applySavedColumnVisibility();
+}
+
+QJsonObject RAbstractEditorReport::filterObject(const QString &name)
+{
+    for (int i = 0; i < mFilterValues.size(); i++) {
+        auto obj = mFilterValues.at(i).toObject();
+        if (obj.contains(name)) {
+            return obj;
+        }
+    }
+    return {};
 }
 
 void RAbstractEditorReport::applyFilter()
@@ -345,6 +498,124 @@ RAbstractEditorDialog* RAbstractEditorReport::createEditorDialog(const QString &
 void RAbstractEditorReport::on_leFilter_textChanged(const QString &arg1)
 {
     mProxyModel->setGlobalFilter(arg1);
+}
+
+void RAbstractEditorReport::newData()
+{
+    if (mEditorName == "form_salary") {
+        auto *w = new C5SalaryEditor();
+        __mainWindow->addWidget(w);
+    }
+
+    if (mEditorName == "form_revenue") {
+        int cashboxId = 0;
+        int currencyId = 1;
+        const QJsonObject cashboxObj = filterObject("cashbox");
+        if(!cashboxObj.isEmpty()) {
+            cashboxId = cashboxObj.value("cashbox").toInt();
+        }
+        const QJsonObject currencyObj = filterObject("currency");
+        if(!currencyObj.isEmpty()) {
+            currencyId = currencyObj.value("currency").toInt(1);
+        }
+
+        C5RevenueCashOp d(mUser, this);
+        d.setCashboxAndCurrency(cashboxId, currencyId);
+        if(d.exec() == QDialog::Accepted) {
+            getData();
+        }
+    }
+}
+
+void RAbstractEditorReport::showColumnValueFilterDialog(int col)
+{
+    if(!mModel || col < 0 || col >= mModel->columnCount(QModelIndex())) {
+        return;
+    }
+    if(ui->tbl->isColumnHidden(col)) {
+        return;
+    }
+    if(mModel->rowCount(QModelIndex()) == 0) {
+        C5Message::info(tr("No data to filter."));
+        return;
+    }
+    QSet<QString> uniques;
+    for(int r = 0; r < mModel->rowCount(QModelIndex()); ++r) {
+        uniques.insert(mModel->data(mModel->index(r, col), Qt::DisplayRole).toString());
+    }
+    QStringList sorted = uniques.values();
+    std::sort(sorted.begin(), sorted.end(), [](const QString &a, const QString &b) {
+        return QString::localeAwareCompare(a, b) < 0;
+    });
+    const bool hadFilter = mProxyModel->hasColumnValueFilter(col);
+    const QSet<QString> prevAllowed = mProxyModel->columnAllowedValues(col);
+    QDialog dlg(this);
+    dlg.setWindowTitle(tr("Filter: %1")
+                           .arg(mModel->headerData(col, Qt::Horizontal, Qt::DisplayRole).toString()));
+    auto *v = new QVBoxLayout(&dlg);
+    auto *list = new QListWidget;
+    list->setMinimumHeight(280);
+    for(const QString &val : sorted) {
+        auto *it = new QListWidgetItem;
+        it->setData(Qt::UserRole, val);
+        it->setText(val.isEmpty() ? tr("(empty)") : val);
+        it->setFlags(it->flags() | Qt::ItemIsUserCheckable);
+        if(!hadFilter) {
+            it->setCheckState(Qt::Checked);
+        } else {
+            it->setCheckState(prevAllowed.contains(val) ? Qt::Checked : Qt::Unchecked);
+        }
+        list->addItem(it);
+    }
+    v->addWidget(list);
+    auto *btnRow = new QHBoxLayout;
+    auto *btnAll = new QPushButton(tr("All"));
+    auto *btnNone = new QPushButton(tr("None"));
+    auto *btnReset = new QPushButton(tr("Reset"));
+    btnRow->addWidget(btnAll);
+    btnRow->addWidget(btnNone);
+    btnRow->addWidget(btnReset);
+    btnRow->addStretch(1);
+    v->addLayout(btnRow);
+    auto *box = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
+    v->addWidget(box);
+    connect(box, &QDialogButtonBox::accepted, &dlg, &QDialog::accept);
+    connect(box, &QDialogButtonBox::rejected, &dlg, &QDialog::reject);
+    connect(btnAll, &QPushButton::clicked, list, [list] {
+        for(int i = 0; i < list->count(); ++i) {
+            list->item(i)->setCheckState(Qt::Checked);
+        }
+    });
+    connect(btnNone, &QPushButton::clicked, list, [list] {
+        for(int i = 0; i < list->count(); ++i) {
+            list->item(i)->setCheckState(Qt::Unchecked);
+        }
+    });
+    connect(btnReset, &QPushButton::clicked, this, [this, col, list] {
+        mProxyModel->clearColumnValueFilter(col);
+        for(int i = 0; i < list->count(); ++i) {
+            list->item(i)->setCheckState(Qt::Checked);
+        }
+    });
+    dlg.resize(500, 420);
+    if(dlg.exec() != QDialog::Accepted) {
+        return;
+    }
+    QSet<QString> chosen;
+    for(int i = 0; i < list->count(); ++i) {
+        if(list->item(i)->checkState() == Qt::Checked) {
+            chosen.insert(list->item(i)->data(Qt::UserRole).toString());
+        }
+    }
+    if(chosen.isEmpty()) {
+        mProxyModel->setColumnValueAllowList(col, QSet<QString>{ });
+        return;
+    }
+    if(chosen.size() == uniques.size()) {
+        mProxyModel->clearColumnValueFilter(col);
+        return;
+    }
+    mProxyModel->setColumnValueAllowList(col, chosen);
 }
 
 void RAbstractEditorReport::exportToExcel()

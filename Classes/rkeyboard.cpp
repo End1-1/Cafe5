@@ -57,30 +57,53 @@ RKeyboard::RKeyboard(QWidget *parent) :
             << ui->btn4_8
             << ui->btn4_9
             << ui->btn4_10;
+    fLineNumpad << ui->btnNP_7
+                << ui->btnNP_8
+                << ui->btnNP_9
+                << ui->btnNP_slash
+                << ui->btnNP_4
+                << ui->btnNP_5
+                << ui->btnNP_6
+                << ui->btnNP_star
+                << ui->btnNP_1
+                << ui->btnNP_2
+                << ui->btnNP_3
+                << ui->btnNP_minus
+                << ui->btnNP_0
+                << ui->btnNP_dot
+                << ui->btnNP_plus;
+    connectButtons(fLineNumpad);
+    ui->btnNP_enter->setStyleSheet(styleSheet());
+    connect(ui->btnNP_enter, &QToolButton::clicked, this, [this]() {
+        emit accept();
+    });
     connectButtons(fLine1b);
     connectButtons(fLine2b);
     connectButtons(fLine3b);
     connectButtons(fLine4b);
     fShiftOn = false;
     fCapsOn = false;
-    setupEnglish();
     setStyleSheet("");
     ui->btnRu->setVisible(false);
 
     switch(mKbdLang) {
     case 1:
+        fCurrentLanguage = QStringLiteral("en");
         setupEnglish();
         break;
 
     case 2:
+        fCurrentLanguage = QStringLiteral("am");
         setupArmenian();
         break;
 
     case 3:
+        fCurrentLanguage = QStringLiteral("ru");
         setupRussia();
         break;
 
     default:
+        fCurrentLanguage = QStringLiteral("am");
         setupArmenian();
         break;
     }
@@ -144,7 +167,7 @@ void RKeyboard::btnTextClicked()
 
     if(fShiftOn) {
         fShiftOn = false;
-        setupEnglish();
+        setupKbd();
     }
 
     ui->leResult->setText(fText);
@@ -183,50 +206,50 @@ void RKeyboard::setButtonsText(QList<QToolButton*>& buttons, const QString &text
 
 void RKeyboard::setupEnglish()
 {
-    setButtonsText(fLine1b, "`1234567890-=\\");
-    setButtonsText(fLine2b, "qwertyuiop[]");
-    setButtonsText(fLine3b, "asdfghjkl;'");
-    setButtonsText(fLine4b, "zxcvbnm,./");
+    setButtonsText(fLine1b, QStringLiteral("`1234567890-=\\"));
+    setButtonsText(fLine2b, QStringLiteral("qwertyuiop[]"));
+    setButtonsText(fLine3b, QStringLiteral("asdfghjkl;'"));
+    setButtonsText(fLine4b, QStringLiteral("zxcvbnm,./"));
 }
 
 void RKeyboard::setupEnglishCaps()
 {
-    setButtonsText(fLine1b, "~!@#$%^&*()_+|");
-    setButtonsText(fLine2b, "QWERTYUIOP{}");
-    setButtonsText(fLine3b, "ASDFGHJKL:\"");
-    setButtonsText(fLine4b, "ZXCVBNM<>?");
+    setButtonsText(fLine1b, QStringLiteral("~!@#$%^&*()_+|"));
+    setButtonsText(fLine2b, QStringLiteral("QWERTYUIOP{}"));
+    setButtonsText(fLine3b, QStringLiteral("ASDFGHJKL:\""));
+    setButtonsText(fLine4b, QStringLiteral("ZXCVBNM<>?"));
 }
 
 void RKeyboard::setupRussia()
 {
-    setButtonsText(fLine1b, "ё1234567890-=\\");
-    setButtonsText(fLine2b, "йцукенгшщзхъ");
-    setButtonsText(fLine3b, "фывапролджэ");
-    setButtonsText(fLine4b, "ячсмитьбю.");
+    setButtonsText(fLine1b, QString::fromUtf8(u8"ё1234567890-=\\"));
+    setButtonsText(fLine2b, QString::fromUtf8(u8"йцукенгшщзхъ"));
+    setButtonsText(fLine3b, QString::fromUtf8(u8"фывапролджэ"));
+    setButtonsText(fLine4b, QString::fromUtf8(u8"ячсмитьбю."));
 }
 
 void RKeyboard::setupRussiaCaps()
 {
-    setButtonsText(fLine1b, "Ё!\"№;%:?*()_+/");
-    setButtonsText(fLine2b, "ЙЦУКЕНГШЩЗХЪ");
-    setButtonsText(fLine3b, "ФЫВАПРОЛДЖЭ");
-    setButtonsText(fLine4b, "ЯЧСМИТЬБЮ,");
+    setButtonsText(fLine1b, QString::fromUtf8(u8"Ё!\"№;%:?*()_+/"));
+    setButtonsText(fLine2b, QString::fromUtf8(u8"ЙЦУКЕНГШЩЗХЪ"));
+    setButtonsText(fLine3b, QString::fromUtf8(u8"ФЫВАПРОЛДЖЭ"));
+    setButtonsText(fLine4b, QString::fromUtf8(u8"ЯЧСМИТЬБЮ,"));
 }
 
 void RKeyboard::setupArmenian()
 {
-    setButtonsText(fLine1b, "՝էթփձջւևրչճ-ժշ");
-    setButtonsText(fLine2b, "քոեռտըւիօպխծ");
-    setButtonsText(fLine3b, "ասդֆգհյկլ;՛");
-    setButtonsText(fLine4b, "զղցվբնմ,․/");
+    setButtonsText(fLine1b, QString::fromUtf8(u8"՝էթփձջւևրչճ-ժշ"));
+    setButtonsText(fLine2b, QString::fromUtf8(u8"քոեռտըւիօպխծ"));
+    setButtonsText(fLine3b, QString::fromUtf8(u8"ասդֆգհյկլ;՛"));
+    setButtonsText(fLine4b, QString::fromUtf8(u8"զղցվբնմ,․/"));
 }
 
 void RKeyboard::setupArmenianCaps()
 {
-    setButtonsText(fLine1b, "՜ԷԹՓՁՋՒևՐՉՃ—ԺՇ");
-    setButtonsText(fLine2b, "ՔՈԵՌՏԸՒԻՕՊԽԾ");
-    setButtonsText(fLine3b, "ԱՍԴՖԳՀՅԿԼ։\"");
-    setButtonsText(fLine4b, "ԶՂՑՎԲՆՄ<>՞");
+    setButtonsText(fLine1b, QString::fromUtf8(u8"՜ԷԹՓՁՋՒևՐՉՃ—ԺՇ"));
+    setButtonsText(fLine2b, QString::fromUtf8(u8"ՔՈԵՌՏԸՒԻՕՊԽԾ"));
+    setButtonsText(fLine3b, QString::fromUtf8(u8"ԱՍԴՖԳՀՅԿԼ։\""));
+    setButtonsText(fLine4b, QString::fromUtf8(u8"ԶՂՑՎԲՆՄ<>՞"));
 }
 
 void RKeyboard::setupKbd()

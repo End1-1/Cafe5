@@ -25,11 +25,14 @@ public:
 
     static void reconnect(const QString &host, const QString &key, const QString &username, const QString &password);
 
-    void sendMessage(const QString &message);
+    bool isConnected() const;
 
-    void sendBinaryMessage(const QByteArray &ba);
+    /// Returns false if not connected or the socket failed to send.
+    bool sendMessage(const QString &message);
 
-    void sendMessage(const QJsonObject &json);
+    bool sendBinaryMessage(const QByteArray &ba);
+
+    bool sendMessage(const QJsonObject &json);
 
 public slots:
     void connectToServer();

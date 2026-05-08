@@ -70,6 +70,8 @@ private:
 
     QString fCurrentLanguage;
 
+    QList<QToolButton*> fLineNumpad;
+
     QList<QToolButton*> fLine1b;
 
     QList<QToolButton*> fLine2b;

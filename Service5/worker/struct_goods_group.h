@@ -9,6 +9,7 @@ struct GoodsGroupItem {
     int parentId;
     int dept;
     int color;
+    int queue;
     QString name;
     QString nameLower;
     QStringList words;
@@ -19,13 +20,14 @@ template<>
 struct JsonParser<GoodsGroupItem> {
     static GoodsGroupItem fromJson(const QJsonObject &jo)
     {
-        return GoodsGroupItem{
-            jo["f_id"].toInt(),
-            jo["f_parent"].toInt(),
-            jo["f_class"].toInt(),
-            jo["f_color"].toInt(),
-            jo["f_name"].toString()
-        };
+        GoodsGroupItem g;
+        g.id = jo["f_id"].toInt();
+        g.parentId = jo["f_parent"].toInt();
+        g.queue = jo.value("f_queue").toInt();
+        g.dept = jo["f_class"].toInt();
+        g.color = jo["f_color"].toInt();
+        g.name = jo["f_name"].toString();
+        return g;
     }
 
     static GoodsGroupItem* pointerFromJson(const QJsonObject &jo)
@@ -47,6 +49,7 @@ struct StructTraits<GoodsGroupItem>
     static QVariant name(const GoodsGroupItem &s) { return s.name; }
     static QVariant dept(const GoodsGroupItem &s) { return s.dept; };
     static QVariant color(const GoodsGroupItem &s) { return s.color; }
+    static QVariant queue(const GoodsGroupItem &s) { return s.queue; }
 
     static constexpr ColumnDef<GoodsGroupItem> columns[] = {{"ID", &id}, {"Name", &name}, {"Dept", &dept}, {"Color", &color}};
 

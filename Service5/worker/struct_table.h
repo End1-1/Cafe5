@@ -11,6 +11,7 @@ struct TableItem {
     int staff = 0;
     int specialConfigId = 0;
     double amount = 0;
+    QString orderNumber;
     QString staffName;
     QString name;
     QString comment;
@@ -38,6 +39,7 @@ struct JsonParser<TableItem> {
         ti.specialConfigId = jo["f_special_config"].toInt();
         ti.staff = jo["f_current_staff"].toInt();
         ti.amount = jo["f_amount"].toDouble();
+        ti.orderNumber = jo.value("f_prefix").toString();
         ti.staffName = jo["f_current_staff_name"].toString();
         ti.name = jo["f_name"].toString();
         ti.comment = jo["f_comment"].toString();

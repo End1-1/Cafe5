@@ -1,33 +1,34 @@
 #include "ce5goods.h"
-#include "ui_ce5goods.h"
+#include <QBuffer>
+#include <QClipboard>
+#include <QCompleter>
+#include <QDateTime>
+#include <QFileDialog>
+#include <QFontDatabase>
+#include <QInputDialog>
+#include <QMenu>
+#include <QPaintEngine>
+#include <QPrintPreviewDialog>
+#include <QPrinter>
+#include <QPushButton>
+#include <QStringListModel>
+#include "barcode.h"
 #include "c5cache.h"
+#include "c5codenameselectorfunctions.h"
+#include "c5config.h"
+#include "c5database.h"
+#include "c5htmlprint.h"
+#include "c5message.h"
+#include "c5replacecharacter.h"
+#include "c5selector.h"
+#include "c5storebarcode.h"
+#include "c5user.h"
+#include "c5utils.h"
 #include "ce5goodsgroup.h"
+#include "ce5goodsmodel.h"
 #include "ce5goodsunit.h"
 #include "ce5partner.h"
-#include "c5message.h"
-#include "c5selector.h"
-#include "barcode.h"
-#include "ce5goodsmodel.h"
-#include "c5database.h"
-#include "c5config.h"
-#include "c5user.h"
-#include "c5storebarcode.h"
-#include "c5utils.h"
-#include "c5replacecharacter.h"
-#include "c5htmlprint.h"
-#include <QClipboard>
-#include <QFontDatabase>
-#include <QDateTime>
-#include <QCompleter>
-#include <QMenu>
-#include <QFileDialog>
-#include <QBuffer>
-#include <QStringListModel>
-#include <QInputDialog>
-#include <QPushButton>
-#include <QPaintEngine>
-#include <QPrinter>
-#include <QPrintPreviewDialog>
+#include "ui_ce5goods.h"
 #include <stdexcept>
 
 static int fLastGroup = 0;
@@ -44,6 +45,7 @@ CE5Goods::CE5Goods(QWidget *parent) :
     ui->leLowLevel->setValidator(new QDoubleValidator(0, 100000, 4));
     ui->tblGoods->setColumnWidths(7, 0, 0, 400, 80, 80, 80, 80);
     ui->leStoreId->setSelector(ui->leStoreIdName, cache_goods, 1, 3);
+    ui->wGoodsType->selectorCallback = goodsTypeItemSelector;
 #ifndef QT_DEBUG
     ui->leIsComplect->setVisible(false);
 #endif
@@ -317,7 +319,8 @@ QJsonObject CE5Goods::makeJsonObject()
     j["f_storeid"] = ui->leStoreId->getInteger();
     j["f_adg"] = ui->leAdg->text();
     j["f_nospecial_price"] = ui->chNoSpecialPrice->isChecked() ? 1 : 0;
-    j["f_service"] = ui->chService->isChecked() ? 1 : 0;
+    j["f_service"] = ui->wGoodsType->value() == 3 ? 1 : 0;
+    j["f_type"] = ui->wGoodsType->value();
     j["f_enabled"] = ui->chEnabled->isChecked() ? 1 : 0;
     j["f_production"] = ui->chProduction->isChecked() ? 1  : 0;
     j["f_wholenumber"] = ui->chOnlyWholeNumber->isChecked() ? 1 : 0;
@@ -480,7 +483,7 @@ void CE5Goods::openResponse(const QJsonObject &jdoc)
     ui->chSameStoreId->setChecked(ui->leStoreId->getInteger() == ui->leCode->getInteger());
     ui->chEnabled->setChecked(j["f_enabled"].toInt() > 0);
     ui->chOnlyWholeNumber->setChecked(j["f_wholenumber"].toInt() > 0);
-    ui->chService->setChecked(j["f_service"].toInt() > 0);
+    ui->wGoodsType->setCodeAndName(j.value("f_type").toInt(), j.value("f_type_name").toString());
     ui->chNoSpecialPrice->setChecked(j["f_nospecial_price"].toInt() > 0);
     ui->leComplectOutputQty->setDouble(j["f_complectout"].toDouble());
     ui->chComponentExit->setChecked(j["f_component_exit"].toInt() > 0);

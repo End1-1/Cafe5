@@ -45,12 +45,16 @@ int main(int argc, char* argv[])
     }
 
     QDir d;
-    QFile file(d.homePath() + "/" + _APPLICATION_ + "/" + _MODULE_ + ".lock.pid");
-    file.remove();
-    QLockFile lockFile(d.homePath() + "/" + _APPLICATION_  + "/" + _MODULE_ + ".lock.pid");
-
-    if(!lockFile.tryLock()) {
-        C5Message::error(QObject::tr("An instance of application already running"));
+    const QString lockDir = d.homePath() + "/" + _APPLICATION_;
+    QDir().mkpath(lockDir);
+    QLockFile lockFile(lockDir + "/" + _MODULE_ + ".lock.pid");
+    lockFile.setStaleLockTime(0); // для singleton-приложения
+    if (!lockFile.tryLock()) {
+        if (lockFile.error() == QLockFile::LockFailedError) {
+            C5Message::error(QObject::tr("An instance of application already running"));
+        } else {
+            C5Message::error(QObject::tr("Cannot create lock file: %1").arg(lockFile.fileName()));
+        }
         return -1;
     }
 

@@ -20,6 +20,7 @@ private slots:
     void on_btnClose_clicked();
 
     void on_openWeb_clicked();
+    void on_btnRestartBreeze_clicked();
 
 private:
     Ui::c5aboutdlg *ui;

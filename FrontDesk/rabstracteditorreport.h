@@ -45,11 +45,21 @@ private:
 
     RFilterProxyModel* mProxyModel;
 
+    void newData();
+
     void getData();
+
+    QJsonObject filterObject(const QString &name);
 
     void applyFilter();
 
     void removeAction();
+
+    void showColumnVisibilityDialog();
+
+    void applySavedColumnVisibility();
+
+    void showColumnValueFilterDialog(int column);
 
     void exportToExcel();
 

@@ -27,6 +27,8 @@ public:
 
     void pulish();
 
+    void setPackageParentButtonChecked(bool checked);
+
     bool mShowRemoved;
 
 protected:
@@ -39,6 +41,8 @@ private slots:
 
     void on_btnPause_clicked();
 
+    void on_btnEditPackage_clicked();
+
 private:
     Ui::WaiterDishWidget* ui;
 
@@ -46,4 +50,8 @@ signals:
     void stopPlay();
 
     void setEndDate(QDateTime);
+
+    void editPackage(QString);
+
+    void packageParentToggled(const QString &waiterLineId, bool checked);
 };

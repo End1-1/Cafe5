@@ -175,25 +175,48 @@ bool C5Printing::br(qreal height)
 
 void C5Printing::image(const QPixmap &img, Qt::Alignment align)
 {
-    if (img.isNull())
+    if (img.isNull()) {
         return;
+    }
 
-    int x = 0;
-    if (align == Qt::AlignRight)
-        x = fNormalWidth - img.width();
-    else if (align == Qt::AlignHCenter)
-        x = (fNormalWidth - img.width()) / 2;
+    // 1. ПОДГОТОВКА ИЗОБРАЖЕНИЯ
+    // Просто берем локальную копию без изменения цветов
+    QPixmap p = img;
 
-    fPainter.drawPixmap(x, fTop, img);
-    fTempTop = qMax(fTempTop, img.height());
+    // 2. МАСШТАБИРОВАНИЕ
+    // Если картинка шире холста fNormalWidth, пропорционально уменьшаем её
+    if (p.width() > fNormalWidth) {
+        p = p.scaledToWidth(fNormalWidth, Qt::SmoothTransformation);
+    }
 
+    // 3. РАСЧЕТ КООРДИНАТЫ X
+    // Центрируем или прижимаем к краю, следя, чтобы X не стал отрицательным
+    int posX = 0;
+    if (align & Qt::AlignHCenter) {
+        posX = (fNormalWidth - p.width()) / 2;
+    } else if (align & Qt::AlignRight) {
+        posX = fNormalWidth - p.width();
+    }
+
+    if (posX < 0) {
+        posX = 0;
+    }
+
+    // 4. ОТРИСОВКА
+    if (fPainter.isActive()) {
+        fPainter.drawPixmap(posX, fTop, p);
+    }
+
+    // Обновляем временную высоту для корректной работы br()
+    fTempTop = qMax(fTempTop, p.height());
+
+    // 5. СОХРАНЕНИЕ В JSON ДЛЯ МОБИЛКИ
     QByteArray ba;
     QBuffer bu(&ba);
     bu.open(QIODevice::WriteOnly);
-    img.save(&bu, "PNG");
+    p.save(&bu, "PNG");
 
-    addToJson("image",
-              {{"data", QString::fromLatin1(ba.toBase64())}, {"align", (int) align}, {"width", img.width()}, {"height", img.height()}});
+    addToJson("image", {{"data", QString::fromLatin1(ba.toBase64())}, {"align", (int) align}, {"width", p.width()}, {"height", p.height()}});
 }
 
 void C5Printing::image(const QString &fileName, Qt::Alignment align)

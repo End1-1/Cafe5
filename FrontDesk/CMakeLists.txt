@@ -218,6 +218,8 @@ set(APP_SOURCES
     dwaiterworkstationconfig.ui
     rabstracteditordialog.ui
     rabstracteditorreport.ui
+    c5revenuecashop.ui
+    wdashboardsettings.ui
     rwaiterstationconfig.ui
     wdashboard.ui
     worderinspector.ui
@@ -228,7 +230,7 @@ set(APP_SOURCES
     ../Classes/QProgressIndicator.h
     ../Classes/c5servername.h
     ../Classes/c5tableview.h
-    ../Classes/dict_payment_type.h
+    ../dictionaries/dict_payment_type.h
     ../Classes/ean8generator.h
     ../NTable/nhandler.h
     ../NTable/nsearchdlg.h
@@ -502,7 +504,7 @@ set(APP_SOURCES
     ../NTable/nfilterdlg.h
     ../Classes/appwebsocket.h
     ../Classes/c5htmlprint.h
-    ../Classes/dict_dish_state.h
+    ../dictionaries/dict_dish_state.h
     ../Forms/c5codenameselector.h
     ../Forms/c5connectiondialog.h
     ../Forms/c5fiscalcancel.h
@@ -533,11 +535,13 @@ set(APP_SOURCES
     dwaiterworkstationconfig.h
     rabstracteditordialog.h
     rabstracteditorreport.h
+    c5revenuecashop.h
+    wdashboardsettings.h
     rabstractspecialwidget.h
     rwaiterstationconfig.h
     wdashboard.h
     worderinspector.h
-    ../Classes/dict_doc_reason.h
+    ../dictionaries/dict_doc_reason.h
     rfilterdialog.h
     ../../desktop.newtax/Src/printtaxn.h
     ../Forms/previewdialog.h
@@ -547,7 +551,7 @@ set(APP_SOURCES
     ../Classes/QProgressIndicator.cpp
     ../Classes/c5servername.cpp
     ../Classes/c5tableview.cpp
-    ../Classes/dict_payment_type.cpp
+    ../dictionaries/dict_payment_type.cpp
     ../Classes/ean8generator.cpp
     ../NTable/nhandler.cpp
     ../NTable/nsearchdlg.cpp
@@ -555,7 +559,7 @@ set(APP_SOURCES
     ../NTable/ntreenode.cpp
     ../NTable/ntreewidget.cpp
     ../NTable/treemodel.cpp
-    dict_dish_state.cpp
+    ../dictionaries/dict_dish_state.cpp
     rfilterproxymodel.cpp
     rwaiterorder.cpp
     ../NTable/ntablemodel.cpp
@@ -834,6 +838,8 @@ set(APP_SOURCES
     dwaiterworkstationconfig.cpp
     rabstracteditordialog.cpp
     rabstracteditorreport.cpp
+    c5revenuecashop.cpp
+    wdashboardsettings.cpp
     rabstractspecialwidget.cpp
     rwaiterstationconfig.cpp
     wdashboard.cpp
@@ -842,6 +848,10 @@ set(APP_SOURCES
     ../../desktop.newtax/Src/printtaxn.cpp
     ../Forms/previewdialog.cpp
     c5storeinput.cpp
+
+    c5salaryeditor.ui
+    c5salaryeditor.h
+    c5salaryeditor.cpp
 )
 
 
@@ -895,6 +905,7 @@ target_include_directories(OfficeN PRIVATE
     ../Data
     ../Classes
     ../NTable
+    ../dictionaries
     ../Reports
     ../TableRecord
     ../Service5/worker

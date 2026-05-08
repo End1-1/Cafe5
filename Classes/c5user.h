@@ -38,6 +38,8 @@ public:
 
     int group();
 
+    bool active = false;
+
     void authByUsernamePass(const QString &username, const QString &pass, NInterface *n, std::function<void (const QJsonObject&)> callback);
 
     void authByPinPass(const QString &pin, const QString &pass, NInterface *n, std::function<void (const QJsonObject&)> callback);

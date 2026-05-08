@@ -164,6 +164,8 @@ FORMS += \
     dwaiterworkstationconfig.ui \
     rabstracteditordialog.ui \
     rabstracteditorreport.ui \
+    c5revenuecashop.ui \
+    wdashboardsettings.ui \
     rwaiterstationconfig.ui \
     wdashboard.ui \
     worderinspector.ui \
@@ -174,7 +176,7 @@ HEADERS += \
         $$PWD/../Classes/QProgressIndicator.h \
         $$PWD/../Classes/c5servername.h \
         $$PWD/../Classes/c5tableview.h \
-        $$PWD/../Classes/dict_payment_type.h \
+        $$PWD/../dictionaries/dict_payment_type.h \
         $$PWD/../Classes/ean8generator.h \
         $$PWD/../NTable/nhandler.h \
         $$PWD/../NTable/nsearchdlg.h \
@@ -499,6 +501,8 @@ HEADERS += \
         dwaiterworkstationconfig.h \
         rabstracteditordialog.h \
         rabstracteditorreport.h \
+        c5revenuecashop.h \
+        wdashboardsettings.h \
         rabstractspecialwidget.h \
         rwaiterstationconfig.h \
         version.h \
@@ -512,7 +516,7 @@ SOURCES += \
     $$PWD/../Classes/QProgressIndicator.cpp \
     $$PWD/../Classes/c5servername.cpp \
     $$PWD/../Classes/c5tableview.cpp \
-    $$PWD/../Classes/dict_payment_type.cpp \
+    $$PWD/../dictionaries/dict_payment_type.cpp \
     $$PWD/../Classes/ean8generator.cpp \
     $$PWD/../NTable/nhandler.cpp \
     $$PWD/../NTable/nsearchdlg.cpp \
@@ -814,6 +818,8 @@ SOURCES += \
         dwaiterworkstationconfig.cpp \
         rabstracteditordialog.cpp \
         rabstracteditorreport.cpp \
+        c5revenuecashop.cpp \
+        wdashboardsettings.cpp \
         rabstractspecialwidget.cpp \
         rwaiterstationconfig.cpp \
         wdashboard.cpp \

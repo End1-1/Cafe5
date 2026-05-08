@@ -1,9 +1,10 @@
 #include "dlgsearchinmenu.h"
-#include "ui_dlgsearchinmenu.h"
-#include "c5utils.h"
-#include <QStyledItemDelegate>
 #include <QPainter>
+#include <QStyledItemDelegate>
 #include <QTextLayout>
+#include "c5utils.h"
+#include "struct_workstationitem.h"
+#include "ui_dlgsearchinmenu.h"
 
 class DishCellDelegate : public QStyledItemDelegate
 {
@@ -58,7 +59,7 @@ public:
         p->setFont(groupFont);
         QFontMetrics fmGroup(groupFont);
         const int lineH1 = fmGroup.height();
-        QRect groupRect(textRect.left(), textRect.top(), textRect.width(), lineH1);
+        QRect groupRect(r.left(), r.top(), r.width(), lineH1);
         QString groupText = groupName;
 
         if(fmGroup.horizontalAdvance(groupName) > groupRect.width()) {
@@ -179,6 +180,16 @@ DlgSearchInMenu::~DlgSearchInMenu()
 void DlgSearchInMenu::showEvent(QShowEvent *e)
 {
     C5Dialog::showEvent(e);
+    int hSectionSize = mWorkStation.data.value("dlgsearchmenu_hsection_size").toInt();
+    if (hSectionSize == 0) {
+        hSectionSize = 160;
+    }
+    int vSectionSize = mWorkStation.data.value("dlgsearchmenu_vsection_size").toInt();
+    if (vSectionSize == 0) {
+        vSectionSize = 64;
+    }
+    ui->tbl->horizontalHeader()->setDefaultSectionSize(hSectionSize);
+    ui->tbl->verticalHeader()->setDefaultSectionSize(vSectionSize);
     ui->tbl->setColumnCount(width() / ui->tbl->horizontalHeader()->defaultSectionSize());
 }
 

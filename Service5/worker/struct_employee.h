@@ -8,6 +8,7 @@
 struct StructEmployee : ParentItem
 {
     int id = 0;
+    int groupId;
     QString groupName;
     QString firstName;
     QString lastName;
@@ -30,6 +31,7 @@ struct JsonParser<StructEmployee>
     {
         StructEmployee s;
         s.id = jo["f_id"].toInt();
+        s.groupId = jo.value("f_group").toInt();
         s.groupName = jo["f_group_name"].toString();
         s.firstName = jo["f_first"].toString();
         s.lastName = jo["f_last"].toString();
@@ -43,20 +45,20 @@ template<>
 struct StructTraits<StructEmployee>
 {
     static QVariant id(const StructEmployee &s) { return s.id; }
+    static QVariant groupId(const StructEmployee &s) { return s.groupId; }
     static QVariant groupName(const StructEmployee &s) { return s.groupName; }
     static QVariant firstName(const StructEmployee &s) { return s.firstName; }
     static QVariant lastName(const StructEmployee &s) { return s.lastName; }
     static QVariant login(const StructEmployee &s) { return s.login; }
     static QVariant phone(const StructEmployee &s) { return s.phone; }
 
-    static constexpr ColumnDef<StructEmployee> columns[] = {
-        {"ID", &id},
-        {"Group", &groupName},
-        {"First", &firstName},
-        {"Last", &lastName},
-        {"Login", &login},
-        {"Phone", &phone}
-    };
+    static constexpr ColumnDef<StructEmployee> columns[] = {{"ID", &id},
+                                                            {"Group ID", &groupId},
+                                                            {"Group", &groupName},
+                                                            {"First", &firstName},
+                                                            {"Last", &lastName},
+                                                            {"Login", &login},
+                                                            {"Phone", &phone}};
 
     static constexpr int columnCount() { return sizeof(columns) / sizeof(columns[0]); }
 

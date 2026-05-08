@@ -85,7 +85,7 @@ QString C5ConnectionDialog::username()
 
 QString C5ConnectionDialog::password()
 {
-    return ui->leServerUsername->text();
+    return ui->leServerPassword->text();
 }
 
 int C5ConnectionDialog::connectionType()

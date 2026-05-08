@@ -1,4 +1,5 @@
 #include "appwebsocket.h"
+#include <QAbstractSocket>
 #include <QDebug>
 #include <QTimer>
 #include <QJsonDocument>
@@ -49,21 +50,44 @@ void AppWebSocket::reconnect(const QString &host, const QString &key, const QStr
     instance->connectToServer();
 }
 
-void AppWebSocket::sendMessage(const QString &message)
+bool AppWebSocket::isConnected() const
+{
+    return mSocket && mSocket->state() == QAbstractSocket::ConnectedState;
+}
+
+bool AppWebSocket::sendMessage(const QString &message)
 {
     qDebug() << "sending message" << message;
-    mSocket->sendTextMessage(message);
+    if(!isConnected()) {
+        qDebug() << "sendMessage: not connected";
+        return false;
+    }
+    const qint64 n = mSocket->sendTextMessage(message);
+    if(n < 0 || (n == 0 && !message.isEmpty())) {
+        qDebug() << "sendTextMessage failed" << mSocket->errorString();
+        return false;
+    }
+    return true;
 }
 
-void AppWebSocket::sendBinaryMessage(const QByteArray &ba)
+bool AppWebSocket::sendBinaryMessage(const QByteArray &ba)
 {
     qDebug() << "sending binary message" << ba.size() << "bytes";
-    mSocket->sendBinaryMessage(ba);
+    if(!isConnected()) {
+        qDebug() << "sendBinaryMessage: not connected";
+        return false;
+    }
+    const qint64 n = mSocket->sendBinaryMessage(ba);
+    if(n < 0 || (n == 0 && !ba.isEmpty())) {
+        qDebug() << "sendBinaryMessage failed" << mSocket->errorString();
+        return false;
+    }
+    return true;
 }
 
-void AppWebSocket::sendMessage(const QJsonObject &json)
+bool AppWebSocket::sendMessage(const QJsonObject &json)
 {
-    sendMessage(QJsonDocument(json).toJson(QJsonDocument::Compact));
+    return sendMessage(QJsonDocument(json).toJson(QJsonDocument::Compact));
 }
 
 void AppWebSocket::connectToServer()

@@ -79,7 +79,7 @@ set(APP_SOURCES
 # Executable
 # -------------------------
 add_executable(${PROJECT_NAME} ${APP_SOURCES}
-    ../Classes/dict_payment_type.cpp ../Classes/dict_payment_type.h)
+    ../dictionaries/dict_payment_type.cpp ../dictionaries/dict_payment_type.h)
 
 # -------------------------
 # Настройки Unity Build и исключения

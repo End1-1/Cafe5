@@ -1,5 +1,8 @@
 #include "goodsgroupbutton.h"
 #include <QLabel>
+#include <QFontMetrics>
+#include <QResizeEvent>
+#include <QShowEvent>
 #include <QVBoxLayout>
 #include <QStyle>
 
@@ -20,6 +23,73 @@ GoodsGroupButton::GoodsGroupButton(const QString &text, QWidget *parent) :
     auto *lay = new QVBoxLayout(this);
     lay->setContentsMargins(3, 3, 3, 3);
     lay->addWidget(mLabel);
+}
+
+void GoodsGroupButton::cacheBaseFontSize()
+{
+    if(mBasePointSize > 0) {
+        return;
+    }
+
+    const QFont &f = mLabel->font();
+
+    if(f.pointSize() > 0) {
+        mBasePointSize = f.pointSize();
+    } else if(f.pixelSize() > 0) {
+        mBasePointSize = qMax(7, qRound(f.pixelSize() * 72.0 / qreal(logicalDpiY())));
+    } else {
+        mBasePointSize = 11;
+    }
+}
+
+void GoodsGroupButton::scaleLabelFont()
+{
+    if(!mLabel || mLabel->text().isEmpty()) {
+        return;
+    }
+
+    cacheBaseFontSize();
+
+    const int w = mLabel->width() - 4;
+    const int h = mLabel->height() - 4;
+
+    if(w <= 0 || h <= 0) {
+        return;
+    }
+
+    const QString t = mLabel->text();
+    const int minPt = 7;
+    const QFont baseFont = mLabel->font();
+    QFont f = baseFont;
+    int chosen = minPt;
+
+    for(int pt = mBasePointSize; pt >= minPt; --pt) {
+        f = baseFont;
+        f.setPointSize(pt);
+        QFontMetrics fm(f);
+        const QRect br = fm.boundingRect(QRect(0, 0, w, h), Qt::AlignCenter | Qt::TextWordWrap, t);
+
+        if(br.width() <= w && br.height() <= h) {
+            chosen = pt;
+            break;
+        }
+    }
+
+    f.setPointSize(chosen);
+    mLabel->setFont(f);
+}
+
+void GoodsGroupButton::resizeEvent(QResizeEvent *e)
+{
+    QFrame::resizeEvent(e);
+    scaleLabelFont();
+}
+
+void GoodsGroupButton::showEvent(QShowEvent *e)
+{
+    QFrame::showEvent(e);
+    cacheBaseFontSize();
+    scaleLabelFont();
 }
 
 void GoodsGroupButton::setColor(int c)

@@ -1,7 +1,9 @@
 #include "c5waiterdialog.h"
-#include "c5user.h"
+#include <QDebug>
 #include <QShowEvent>
+#include <QStringList>
 #include <QWindow>
+#include "c5user.h"
 
 C5WaiterDialog::C5WaiterDialog(C5User *user)
     : C5Dialog(user)

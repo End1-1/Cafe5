@@ -265,5 +265,6 @@
         <file>guests.png</file>
         <file>view.png</file>
         <file>pause.png</file>
+        <file>prepaid.png</file>
     </qresource>
 </RCC>

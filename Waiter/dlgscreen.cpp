@@ -174,8 +174,8 @@ void DlgScreen::on_btnAccept_clicked()
         NDataProvider::sessionKey = jo["sessionkey"].toString();
 
         if(!user->check(cp_t5_waiter_edit_order)) {
+            DlgDashboard(QJsonObject(), user).exec();
             user->deleteLater();
-            C5Message::error(tr("You have not permission to enter the working area"));
             return;
         }
 

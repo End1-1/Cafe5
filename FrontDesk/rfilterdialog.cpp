@@ -24,6 +24,37 @@ RFilterDialog::~RFilterDialog()
     delete ui;
 }
 
+QVariant RFilterDialog::valueByName(const QString &name) const
+{
+    for (auto *w : findChildren<QWidget*>()) {
+        if(!w->property("name").isValid()) {
+            continue;
+        }
+
+        if(w->property("name").toString() != name) {
+            continue;
+        }
+
+        if(auto *ed = qobject_cast<C5DateEdit *>(w)) {
+            return ed->date().toString(FORMAT_DATE_TO_STR_MYSQL);
+        }
+
+        if(auto *en = qobject_cast<C5LineEdit *>(w)) {
+            return en->getInteger();
+        }
+
+        if(auto *kv = qobject_cast<C5CodeNameSelector *>(w)) {
+            return kv->value();
+        }
+
+        if(auto *cb = qobject_cast<QComboBox *>(w)) {
+            return cb->currentData().toInt();
+        }
+    }
+
+    return {};
+}
+
 void RFilterDialog::buildWidget(const QString &settingsPrefix, const QJsonArray &ja)
 {
     mSettingsPrefix = settingsPrefix;
@@ -75,6 +106,10 @@ void RFilterDialog::buildWidget(const QString &settingsPrefix, const QJsonArray 
                 cn->selectorCallback = currencyItemSelector;
             } else if (jo.value("function").toString() == "cashbox") {
                 cn->selectorCallback = cashboxItemSelector;
+            } else if (jo.value("function").toString() == "employee") {
+                cn->selectorCallback = employeeItemSelector;
+            } else if (jo.value("function").toString() == "employee_group") {
+                cn->selectorCallback = employeeGroupItemSelector;
             }
             int storedValue = __c5config.getRegValue(QString("rfilter_%1_%2").arg(mSettingsPrefix, jo.value("name").toString())).toInt();
             QString storedName = __c5config.getRegValue(QString("rfilter_%1_%2_name").arg(mSettingsPrefix, jo.value("name").toString()))
@@ -96,7 +131,16 @@ void RFilterDialog::buildWidget(const QString &settingsPrefix, const QJsonArray 
                 cb->addItem(jvv.value("label").toString(), jvv.value("value").toInt());
             }
 
-            cb->setCurrentIndex(cb->findData(jo.value("default").toInt()));
+            const int defaultValue = jo.value("default").toInt();
+            const int savedValue = __c5config.getRegValue(
+                QString("rfilter_%1_%2").arg(mSettingsPrefix, jo.value("name").toString()),
+                defaultValue).toInt();
+
+            int idx = cb->findData(savedValue);
+            if(idx < 0) {
+                idx = cb->findData(defaultValue);
+            }
+            cb->setCurrentIndex(idx < 0 ? 0 : idx);
 
             ui->gl->addWidget(cb, row, 1);
         }
@@ -149,6 +193,10 @@ QJsonArray RFilterDialog::filterValues()
             auto *cb = qobject_cast<QComboBox *>(w);
             if (cb) {
                 addparam(w->property("name").toString(), cb->currentData().toInt());
+                __c5config.setRegValue(QString("rfilter_%1_%2").arg(mSettingsPrefix, w->property("name").toString()),
+                                        cb->currentData().toInt());
+                __c5config.setRegValue(QString("rfilter_%1_%2_name").arg(mSettingsPrefix, w->property("name").toString()),
+                                        cb->currentText());
                 continue;
             }
         }

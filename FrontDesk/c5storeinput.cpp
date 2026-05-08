@@ -735,7 +735,17 @@ void C5StoreInput::on_leScancode_returnPressed()
     jo["barcode"] = text;
     jo["requestId"] = mWebSocketRequestId;
     qDebug() << "Sending request" << jo;
-    AppWebSocket::instance->sendBinaryMessage(QJsonDocument(jo).toJson());
+    if(!AppWebSocket::instance) {
+        C5Message::error(tr("WebSocket is not initialized. Restart the application."));
+        return;
+    }
+    if(!AppWebSocket::instance->isConnected()) {
+        C5Message::error(tr("No connection to the server. Check the network and try again."));
+        return;
+    }
+    if(!AppWebSocket::instance->sendBinaryMessage(QJsonDocument(jo).toJson())) {
+        C5Message::error(tr("Failed to send the barcode request. Check the connection to the server."));
+    }
 }
 
 void C5StoreInput::on_btnAddAdd_clicked()

@@ -21,6 +21,7 @@
 #include "struct_currency.h"
 #include "struct_employee.h"
 #include "struct_employee_group.h"
+#include "struct_goods_type.h"
 #include "struct_goods_item.h"
 #include "struct_partner.h"
 #include "struct_payment_type.h"
@@ -509,6 +510,8 @@ void ServerThread::handleCommand(SocketStruct ws, const QJsonObject &jdoc, QStri
             repMsg = C5SearchEngine::mInstance->searchCashbox(jdoc, ws);
         } else if (command == SelectorName<StructPaymentType>::value) {
             repMsg = C5SearchEngine::mInstance->searchPaymentType(jdoc, ws);
+        } else if (command == SelectorName<StructGoodsType>::value) {
+            repMsg = C5SearchEngine::mInstance->searchGoodsType(jdoc, ws);
         } else if (command == SelectorName<StructEmployee>::value) {
             repMsg = C5SearchEngine::mInstance->searchEmployee(jdoc, ws);
         } else if (command == SelectorName<StructEmployeeGroup>::value) {

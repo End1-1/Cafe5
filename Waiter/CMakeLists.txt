@@ -11,6 +11,8 @@ set(CMAKE_AUTOUIC ON)
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
+set(CMAKE_UNITY_BUILD OFF)
+
 # ---------- Qt ----------
 find_package(Qt6 REQUIRED COMPONENTS
     Core
@@ -46,6 +48,7 @@ include_directories(
     ../Editors
     ../Forms
     ../Service
+    ../dictionaries
     ../Printing
     ../NTable
     ../Http
@@ -84,7 +87,7 @@ qt_add_executable(Waiter WIN32
 
     ../Classes/c5threadobject.cpp
     ../Classes/calculator.cpp
-    ../Classes/dict_payment_type.cpp
+    ../dictionaries/dict_payment_type.cpp
     ../Classes/dlgpassword.cpp
     ../Classes/idram.cpp
     ../Classes/logwriter.cpp
@@ -146,6 +149,9 @@ qt_add_executable(Waiter WIN32
     goodsgroupbutton.cpp
         main.cpp
         dlgface.cpp
+        dlgpreorderslist.cpp
+        dlgpreorderslist.h
+        dlgpreorderslist.ui
     ../Cafe5/c5dialog.cpp
     ../Cafe5/c5utils.cpp
     ../Cafe5/c5message.cpp
@@ -195,11 +201,11 @@ qt_add_executable(Waiter WIN32
     ../Classes/c5threadobject.h
     ../Classes/calculator.h
     ../Classes/chatmessage.h
-    ../Classes/dict_currency.h
-    ../Classes/dict_dish_state.h
-    ../Classes/dict_goods_types.h
-    ../Classes/dict_payment_type.h
-    ../Classes/dict_workstation.h
+    ../dictionaries/dict_currency.h
+    ../dictionaries/dict_dish_state.h
+    ../dictionaries/dict_goods_types.h
+    ../dictionaries/dict_payment_type.h
+    ../dictionaries/dict_workstation.h
     ../Classes/dlgpassword.h
     ../Classes/format_bytes.h
     ../Classes/goodsreserve.h
@@ -372,6 +378,8 @@ qt_add_executable(Waiter WIN32
     wplast30sessions.ui
     ../../desktop.newTax/Src/printtaxn.cpp
     dlgmovemoney.h dlgmovemoney.cpp dlgmovemoney.ui
+    dlgkitcheninprogress.h dlgkitcheninprogress.cpp dlgkitcheninprogress.ui
+    dlgpreorderdatetime.h dlgpreorderdatetime.cpp dlgprecheckoptions.ui
 )
 
 # ---------- Qt link ----------

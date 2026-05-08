@@ -11,6 +11,11 @@ struct PartnerItem {
     QString phone;
     QString nameLower;
     QStringList words;
+
+    QJsonObject toJson() const
+    {
+        return {{"f_id", id}, {"f_taxcode", tin}, {"f_taxname", taxName}, {"f_contact", contactName}, {"f_phone", phone}};
+    };
 };
 
 template<> struct SelectorName<PartnerItem> {

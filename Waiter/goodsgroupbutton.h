@@ -2,6 +2,8 @@
 #include <QFrame>
 
 class QLabel;
+class QResizeEvent;
+class QShowEvent;
 
 class GoodsGroupButton: public QFrame
 {
@@ -16,8 +18,18 @@ protected:
 
     void mouseReleaseEvent(QMouseEvent *e) override;
 
+    void resizeEvent(QResizeEvent *e) override;
+
+    void showEvent(QShowEvent *e) override;
+
 private:
     QLabel* mLabel;
+
+    int mBasePointSize = 0;
+
+    void cacheBaseFontSize();
+
+    void scaleLabelFont();
 
 signals:
     void clicked();

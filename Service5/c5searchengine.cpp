@@ -13,6 +13,7 @@
 #include "struct_currency.h"
 #include "struct_employee.h"
 #include "struct_employee_group.h"
+#include "struct_goods_type.h"
 #include "struct_goods_item.h"
 #include "struct_partner.h"
 #include "struct_payment_type.h"
@@ -47,6 +48,7 @@ QReadWriteLock mPartnersLock;
 QReadWriteLock mCurrencyLock;
 QReadWriteLock mCashboxLock;
 QReadWriteLock mPaymentTypeLock;
+QReadWriteLock mGoodsTypeLock;
 QReadWriteLock mEmployeeLock;
 QReadWriteLock mEmployeeGroupLock;
 QHash<QString, QVector<StorageItem>> mStorages;
@@ -58,6 +60,7 @@ QHash<QString, QVector<StoreDocTypeItem>> mStoreDocType;
 QHash<QString, QVector<StructCurrency>> mCurrency;
 QHash<QString, QVector<StructCashbox>> mCashbox;
 QHash<QString, QVector<StructPaymentType>> mPaymentType;
+QHash<QString, QVector<StructGoodsType>> mGoodsType;
 QHash<QString, QVector<StructEmployee>> mEmployees;
 QHash<QString, QVector<StructEmployeeGroup>> mEmployeeGroups;
 
@@ -410,6 +413,25 @@ void C5SearchEngine::init(const QString &databaseName, const QString &serverKey)
         tmpPayment.append(s);
     }
     mPaymentType[serverKey] = tmpPayment;
+    /* GOODS TYPES */
+    QVector<StructGoodsType> tmpGoodsType;
+    tmpGoodsType.reserve(256);
+    db.exec(R"(
+    SELECT gt.f_id, l.f_value AS f_type_name
+    FROM c_goods_type gt
+    INNER JOIN l_dictionary l ON l.f_dict='c_goods_type' AND l.f_lang='hy' AND l.f_dict_id=gt.f_id
+    ORDER BY gt.f_id
+    )");
+
+    while (db.next()) {
+        StructGoodsType s;
+        s.id = db.integer("f_id");
+        s.name = db.string("f_type_name");
+        s.nameLower = s.name.toLower();
+        s.words = s.nameLower.split(" ", Qt::SkipEmptyParts);
+        tmpGoodsType.append(s);
+    }
+    mGoodsType[serverKey] = tmpGoodsType;
     /* EMPLOYEE GROUPS */
     QVector<StructEmployeeGroup> tmpEmployeeGroups;
     tmpEmployeeGroups.reserve(64);
@@ -430,7 +452,7 @@ void C5SearchEngine::init(const QString &databaseName, const QString &serverKey)
     QVector<StructEmployee> tmpEmployee;
     tmpEmployee.reserve(256);
     db.exec(R"(
-    SELECT gr.f_name AS f_group_name, u.f_first, u.f_last, u.f_login, u.f_phone, u.f_id
+    SELECT gr.f_name AS f_group_name, u.f_group, u.f_first, u.f_last, u.f_login, u.f_phone, u.f_id
     FROM s_user u
     LEFT JOIN s_user_group gr ON gr.f_id=u.f_id
     WHERE u.f_state=1
@@ -439,6 +461,7 @@ void C5SearchEngine::init(const QString &databaseName, const QString &serverKey)
     while (db.next()) {
         StructEmployee s;
         s.id = db.integer("f_id");
+        s.groupId = db.integer("f_group");
         s.groupName = db.string("f_group_name");
         s.firstName = db.string("f_first");
         s.lastName = db.string("f_last");
@@ -460,6 +483,7 @@ void C5SearchEngine::init(const QString &databaseName, const QString &serverKey)
     qDebug() << "currency " << databaseName << mCurrency[serverKey].count() << "items";
     qDebug() << "cashbox " << databaseName << mCashbox[serverKey].count() << "items";
     qDebug() << "payment types " << databaseName << mPaymentType[serverKey].count() << "items";
+    qDebug() << "goods types " << databaseName << mGoodsType[serverKey].count() << "items";
     qDebug() << "employee groups " << databaseName << mEmployeeGroups[serverKey].count() << "items";
     qDebug() << "employees " << databaseName << mEmployees[serverKey].count() << "items";
 }
@@ -820,7 +844,7 @@ QString C5SearchEngine::searchPartnerItem(const QJsonObject &jo, const SocketStr
     jrep["actionId"] = jo["actionId"];
     QString needle = jo["lower_name"].toString().trimmed();
     QStringList qwords = needle.split(' ', Qt::SkipEmptyParts);
-    QJsonArray jstorages;
+    QJsonArray jpartners;
     {
         QReadLocker rl(&mPartnersLock);
         const QVector<PartnerItem> &siv = mPartners.value(ss.tenantId);
@@ -848,14 +872,13 @@ QString C5SearchEngine::searchPartnerItem(const QJsonObject &jo, const SocketStr
             if (!match)
                 continue;
 
-            jstorages.append(
-                {{"f_id", si.id}, {"f_taxcode", si.tin}, {"f_taxname", si.taxName}, {"f_contact", si.contactName}, {"f_phone", si.phone}});
+            jpartners.append(si.toJson());
 
-            if (jstorages.size() >= limit)
+            if (jpartners.size() >= limit)
                 break;
         }
     }
-    jrep["result"] = jstorages;
+    jrep["result"] = jpartners;
     return QJsonDocument(jrep).toJson(QJsonDocument::Compact);
 }
 
@@ -937,7 +960,7 @@ QString C5SearchEngine::updateDictionary(const QJsonObject &jo, const SocketStru
         QWriteLocker wl(&mEmployeeLock);
         db[":f_id"] = jo.value("id").toInt();
         db.exec(R"(
-        SELECT gr.f_name AS f_group_name, u.f_first, u.f_last, u.f_login, u.f_phone, u.f_id
+        SELECT gr.f_name AS f_group_name, u.f_group, u.f_first, u.f_last, u.f_login, u.f_phone, u.f_id
         FROM s_user u
         LEFT JOIN s_user_group gr ON gr.f_id=u.f_id
         WHERE u.f_state=1 and u.f_id=:f_id
@@ -946,6 +969,7 @@ QString C5SearchEngine::updateDictionary(const QJsonObject &jo, const SocketStru
 
         if (db.next()) {
             se.id = db.integer("f_id");
+            se.groupId = db.integer("f_group");
             se.groupName = db.string("f_group_name");
             se.firstName = db.string("f_first");
             se.lastName = db.string("f_last");
@@ -1254,6 +1278,52 @@ QString C5SearchEngine::searchPaymentType(const QJsonObject &jo, const SocketStr
     return QJsonDocument(jrep).toJson(QJsonDocument::Compact);
 }
 
+QString C5SearchEngine::searchGoodsType(const QJsonObject &jo, const SocketStruct &ss)
+{
+    QJsonObject jrep;
+    jrep["errorCode"] = 0;
+    jrep["requestId"] = jo["requestId"];
+    jrep["actionId"] = jo["actionId"];
+    QString needle = jo["lower_name"].toString().trimmed();
+    QStringList qwords = needle.split(' ', Qt::SkipEmptyParts);
+    QJsonArray jtypes;
+    {
+        QReadLocker rl(&mGoodsTypeLock);
+        const QVector<StructGoodsType> &siv = mGoodsType.value(ss.tenantId);
+        const int limit = 50000;
+
+        for (auto const &si : siv) {
+            bool match = true;
+
+            for (const QString &qw : qwords) {
+                bool found = false;
+
+                for (const QString &w : si.words) {
+                    if (w.startsWith(qw)) {
+                        found = true;
+                        break;
+                    }
+                }
+
+                if (!found) {
+                    match = false;
+                    break;
+                }
+            }
+
+            if (!match)
+                continue;
+
+            jtypes.append(QJsonObject{{"f_id", si.id}, {"f_name", si.name}});
+
+            if (jtypes.size() >= limit)
+                break;
+        }
+    }
+    jrep["result"] = jtypes;
+    return QJsonDocument(jrep).toJson(QJsonDocument::Compact);
+}
+
 QString C5SearchEngine::searchEmployee(const QJsonObject &jo, const SocketStruct &ss)
 {
     QJsonObject jrep;
@@ -1291,6 +1361,7 @@ QString C5SearchEngine::searchEmployee(const QJsonObject &jo, const SocketStruct
                 continue;
 
             jemployees.append(QJsonObject{{"f_id", si.id},
+                                          {"f_group", si.groupId},
                                           {"f_group_name", si.groupName},
                                           {"f_first", si.firstName},
                                           {"f_last", si.lastName},

@@ -12,6 +12,7 @@
 #include "struct_storage_item.h"
 #include "struct_employee.h"
 #include "struct_employee_group.h"
+#include "struct_goods_type.h"
 
 template<typename T>
 [[nodiscard]] inline QVector<T> selectItem(bool loadFirst = false, bool multiSelect = false, const QPoint &position = {-1, -1})
@@ -124,6 +125,15 @@ inline auto cashboxItemSelector = [](C5CodeNameSelector *s) {
 
 inline auto paymentTypeItemSelector = [](C5CodeNameSelector *s) {
     const auto r = selectItem<StructPaymentType>(true, false, s->getPosition());
+    if (r.isEmpty()) {
+        return;
+    }
+    const auto &g = r.first();
+    s->setCodeAndName(g.id, g.name);
+};
+
+inline auto goodsTypeItemSelector = [](C5CodeNameSelector *s) {
+    const auto r = selectItem<StructGoodsType>(true, false, s->getPosition());
     if (r.isEmpty()) {
         return;
     }

@@ -43,6 +43,47 @@ void RFilterProxyModel::setColumnFilter(int col, const QString &f)
     emit sumsChanged(columnSums);
 }
 
+void RFilterProxyModel::setColumnValueAllowList(int col, const QSet<QString> &allowed)
+{
+    if(allowed.isEmpty()) {
+        columnValueAllow.insert(col, QSet<QString>{ });
+    } else {
+        columnValueAllow[col] = allowed;
+    }
+    invalidateFilter();
+    recalcSums();
+    emit sumsChanged(columnSums);
+}
+
+void RFilterProxyModel::clearColumnValueFilter(int col)
+{
+    columnValueAllow.remove(col);
+    invalidateFilter();
+    recalcSums();
+    emit sumsChanged(columnSums);
+}
+
+void RFilterProxyModel::clearAllColumnValueFilters()
+{
+    if(columnValueAllow.isEmpty()) {
+        return;
+    }
+    columnValueAllow.clear();
+    invalidateFilter();
+    recalcSums();
+    emit sumsChanged(columnSums);
+}
+
+bool RFilterProxyModel::hasColumnValueFilter(int col) const
+{
+    return columnValueAllow.contains(col);
+}
+
+QSet<QString> RFilterProxyModel::columnAllowedValues(int col) const
+{
+    return columnValueAllow.value(col);
+}
+
 double RFilterProxyModel::sumForColumn(int col) const
 {
     return columnSums.value(col, 0.0);
@@ -66,6 +107,20 @@ bool RFilterProxyModel::filterAcceptsRow(int row, const QModelIndex &parent) con
         } else {
             if(!cell.contains(filter, Qt::CaseInsensitive))
                 return false;
+        }
+    }
+
+    // ---- Column value allow list (right-click header filter) ----
+    for(auto it = columnValueAllow.constBegin(); it != columnValueAllow.constEnd(); ++it) {
+        const int col = it.key();
+        const QSet<QString> &allowed = it.value();
+        idx = m->index(row, col, parent);
+        const QString cell = m->data(idx).toString();
+        if(allowed.isEmpty()) {
+            return false;
+        }
+        if(!allowed.contains(cell)) {
+            return false;
         }
     }
 

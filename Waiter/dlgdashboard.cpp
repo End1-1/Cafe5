@@ -91,13 +91,16 @@ void DlgDashboard::setup()
         ui->wsessionifno->setVisible(true);
         ui->wsessionstatus->setVisible(false);
         ui->btnOpenCashbox->setEnabled(false);
-        ui->btnCloseCashbox->setEnabled(true);
-        ui->btnCashIn->setEnabled(true);
-        ui->btnCashOut->setEnabled(true);
+        ui->btnCloseCashbox->setEnabled(mUser->check(cp_t5_waiter_open_close_shift));
+        ui->btnCashIn->setEnabled(mUser->check(cp_t5_waiter_cash_operations));
+        ui->btnCashOut->setEnabled(mUser->check(cp_t5_waiter_cash_operations));
+        ui->btnGoHall->setEnabled(mUser->check(cp_t5_waiter_edit_order));
     }
 
     ui->btnOrders->setEnabled(mUser->check(cp_t5_waiter_reports));
     ui->btnReports->setEnabled(mUser->check(cp_t5_waiter_reports));
+    ui->btnCheckin->setEnabled(!mUser->active);
+    ui->btnCheckout->setEnabled(mUser->active);
 }
 
 void DlgDashboard::on_btnCloseCashbox_clicked()
@@ -106,10 +109,17 @@ void DlgDashboard::on_btnCloseCashbox_clicked()
         return ;
     }
 
+    DlgMoveMoney d(mUser);
+    d.setMode(2);
+
+    if (d.exec() != QDialog::Accepted) {
+        return;
+    }
+
     NInterface::query1("/engine/v2/waiter/cashbox/close",
                        mUser->mSessionKey,
                        this,
-                       {{"cashbox_id", mWorkStation.cashboxId()}},
+                       {{"cashbox_id", mWorkStation.cashboxId()}, {"amount_cash", d.amount()}},
                        [this](const QJsonObject &jdoc) {
                            mCashboxData = jdoc.value("cashbox").toObject();
                            C5Printing p;
@@ -179,9 +189,31 @@ void DlgDashboard::on_btnReports_clicked()
     d.exec();
 }
 
-void DlgDashboard::on_btnCheckin_clicked() {}
+void DlgDashboard::on_btnCheckin_clicked()
+{
+    if(C5Message::question(tr("Confirm to checkin")) != QDialog::Accepted) {
+        return;
+    }
 
-void DlgDashboard::on_btnCheckout_clicked() {}
+    NInterface::query1("/engine/v2/common/attendance/checkin", mUser->mSessionKey, this, {}, [this](const QJsonObject &) {
+        ui->btnCheckin->setEnabled(false);
+        ui->btnCheckout->setEnabled(true);
+        C5Message::info(tr("Checkin completed"));
+    });
+}
+
+void DlgDashboard::on_btnCheckout_clicked()
+{
+    if(C5Message::question(tr("Confirm to checkout")) != QDialog::Accepted) {
+        return;
+    }
+
+    NInterface::query1("/engine/v2/common/attendance/checkout", mUser->mSessionKey, this, {}, [this](const QJsonObject &) {
+        ui->btnCheckin->setEnabled(true);
+        ui->btnCheckout->setEnabled(false);
+        C5Message::info(tr("Checkout completed"));
+    });
+}
 
 void DlgDashboard::on_btnCashIn_clicked()
 {
@@ -191,7 +223,7 @@ void DlgDashboard::on_btnCashIn_clicked()
     }
 
     DlgMoveMoney d(mUser);
-    d.setMode(true);
+    d.setMode(1);
 
     if(d.exec() != QDialog::Accepted) {
         return;
@@ -225,7 +257,7 @@ void DlgDashboard::on_btnCashOut_clicked()
     }
 
     DlgMoveMoney d(mUser);
-    d.setMode(false);
+    d.setMode(0);
 
     if(d.exec() != QDialog::Accepted) {
         return;

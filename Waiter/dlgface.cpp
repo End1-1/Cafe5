@@ -1,17 +1,20 @@
 #include "dlgface.h"
-#include "ui_dlgface.h"
-#include "c5user.h"
-#include "dlgorder.h"
-#include "dlgguest.h"
-#include "tablewidget.h"
-#include "c5permissions.h"
-#include "ninterface.h"
-#include "format_date.h"
-#include "dlgdashboard.h"
-#include "struct_workstationitem.h"
-#include <QToolButton>
 #include <QCloseEvent>
 #include <QScreen>
+#include <QToolButton>
+#include "c5permissions.h"
+#include "c5user.h"
+#include "dlgdashboard.h"
+#include "dlgguest.h"
+#include "dlgorder.h"
+#include "dlgpreorderslist.h"
+#include "dlgkitcheninprogress.h"
+#include "dlgtext.h"
+#include "format_date.h"
+#include "ninterface.h"
+#include "struct_workstationitem.h"
+#include "tablewidget.h"
+#include "ui_dlgface.h"
 
 #define HALL_COL_WIDTH 175
 #define HALL_ROW_HEIGHT 60
@@ -34,10 +37,12 @@ DlgFace::DlgFace(C5User *user) :
     //TODO
     ui->btnGuests->setVisible(false);
     mSelectedHall = mWorkStation.defaultHallId();
+    setupButtons();
 }
 
 DlgFace::~DlgFace()
 {
+    mTableWidgetsPool.clear();
     delete ui;
 }
 
@@ -110,39 +115,52 @@ void DlgFace::filterHall()
         ui->vlHall->addWidget(btn);
     }
 
-    while(ui->sglHall->itemAt(0)) {
-        ui->sglHall->itemAt(0)->widget()->deleteLater();
-        ui->sglHall->removeItem(ui->sglHall->itemAt(0));
+    QVector<TableItem> visible;
+    visible.reserve(mTables.size());
+
+    for(const TableItem &t : mTables) {
+        if(mSelectedHall > 0 && t.hall != mSelectedHall) {
+            continue;
+        }
+
+        if(mTablesOfStaff > 0 && t.staff != mTablesOfStaff) {
+            continue;
+        }
+
+        visible.push_back(t);
     }
 
-    QRect f = qApp->screens().at(0)->geometry();
-    int sw = ui->shall->width() - 20;
-    int cc = (sw / 204) - 1;
+    const int sw = ui->shall->width() - 20;
+    const int cc = (sw / 204) - 1;
     int delta = sw - ((cc + 1) * 204);
     delta /= cc;
-    int minWidth = 200 + delta;
-    qDebug() << sw;
-    int col = 0;
+    const int minWidth = 200 + delta;
+    const int needed = visible.size();
+
+    while(mTableWidgetsPool.size() < needed) {
+        auto *tw = new TableWidget(this);
+        connect(tw, &TableWidget::clicked, this, &DlgFace::tableClicked);
+        mTableWidgetsPool.append(tw);
+    }
+
+    while(mTableWidgetsPool.size() > needed) {
+        TableWidget *tw = mTableWidgetsPool.takeLast();
+        ui->sglHall->removeWidget(tw);
+        tw->deleteLater();
+    }
+
+    for(TableWidget *tw : mTableWidgetsPool) {
+        ui->sglHall->removeWidget(tw);
+    }
+
     int row = 0;
+    int col = 0;
 
-    for(auto const &t : mTables) {
-        if(mSelectedHall > 0) {
-            if(t.hall != mSelectedHall) {
-                continue;
-            }
-        }
-
-        if(mTablesOfStaff > 0) {
-            if(t.staff  != mTablesOfStaff) {
-                continue;
-            }
-        }
-
-        auto *tw = new TableWidget();
+    for(int i = 0; i < needed; ++i) {
+        TableWidget *tw = mTableWidgetsPool[i];
         tw->setMinimumWidth(minWidth);
         tw->setMaximumWidth(minWidth);
-        connect(tw, &TableWidget::clicked, this, &DlgFace::tableClicked);
-        tw->setTable(t);
+        tw->setTable(visible[i]);
         ui->sglHall->addWidget(tw, row, col++, 1, 1);
 
         if(col > cc) {
@@ -172,35 +190,24 @@ void DlgFace::colorizeHall()
     }
 }
 
-void DlgFace::updateHall()
+void DlgFace::updateHall(const QJsonObject &filter)
 {
-    fHttp->createHttpQueryLambda("/engine/v2/waiter/hall/get",
-                                 {},
-    [this](const QJsonObject & jdoc) {
-        mTables = parseJsonArray<TableItem>(jdoc["tables"].toArray());
-        int i = 0;
+    QJsonObject jparams;
 
-        while(ui->sglHall->itemAt(i)) {
-            auto *tw = static_cast<TableWidget*>(ui->sglHall->itemAt(i)->widget());
+    for (auto it = filter.begin(); it != filter.end(); ++it) {
+        jparams.insert(it.key(), it.value());
+    }
 
-            if(!tw) {
-                break;
-            }
-
-            i++;
-            auto it = std::find_if(mTables.begin(), mTables.end(),
-            [tw](const TableItem & t) {
-                return t.id == tw->mTable.id;
-            });
-
-            if(it != mTables.end()) {
-                tw->updateTable(*it);
-            }
-        }
-    }, [](const QJsonObject & jerr) {
-    },
-    QVariant(),
-    false);
+    fHttp->createHttpQueryLambda(
+        "/engine/v2/waiter/hall/get",
+        jparams,
+        [this](const QJsonObject &jdoc) {
+            mTables = parseJsonArray<TableItem>(jdoc["tables"].toArray());
+            filterHall();
+        },
+        [](const QJsonObject &jerr) {},
+        QVariant(),
+        false);
 }
 
 void DlgFace::showEvent(QShowEvent *e)
@@ -259,14 +266,18 @@ void DlgFace::initData()
         mGoodsGroups.clear();
         mDishes.clear();
         QJsonArray ja = jdoc["groups"].toArray();
+        QVector<GoodsGroupItem*> allGroups;
         QHash<int, GoodsGroupItem*> groupMap;
+        allGroups.reserve(ja.size());
 
         for(int i = 0; i < ja.size(); i++) {
             auto *g = JsonParser<GoodsGroupItem>::pointerFromJson(ja.at(i).toObject());
+            allGroups << g;
             groupMap[g->id] = g;
         }
 
-        for(auto *g : groupMap) {
+        /* QHash iteration order is undefined; keep backend JSON order. */
+        for(auto *g : allGroups) {
             if(g->parentId == 0) {
                 mGoodsGroups << g;
             } else if(groupMap.contains(g->parentId)) {
@@ -275,8 +286,10 @@ void DlgFace::initData()
         }
 
         ja = jdoc["dishes"].toArray();
+        mDishes.reserve(ja.size());
 
         for(int i = 0; i  < ja.size(); i++) {
+            /* Keep dishes in backend JSON order (no hash/map reordering). */
             mDishes << JsonParser<DishAItem>::pointerFromJson(ja.at(i).toObject());
         }
 
@@ -290,4 +303,56 @@ void DlgFace::on_btnDashboard_clicked()
 {
     mRoute = 2;
     accept();
+}
+
+void DlgFace::on_btnPreorders_clicked()
+{
+    /* После закрытия заказа снова показываем список; выход в зал — кнопка Lock, как на экране столов. */
+    while(true) {
+        DlgPreordersList d(mUser, &mHall, &mTables, &mGoodsGroups, &mDishes, this);
+
+        if(d.exec() != QDialog::Accepted || d.mOrderId.isEmpty()) {
+            break;
+        }
+
+        fTimer.stop();
+
+        TableItem t;
+        for(const auto &ti : mTables) {
+            if(ti.id == d.mTableId) {
+                t = ti;
+                break;
+            }
+        }
+
+        HallItem h;
+        for(const auto &hi : mHall) {
+            if(hi.id == d.mHallId) {
+                h = hi;
+                break;
+            }
+        }
+
+        auto *order = new DlgOrder(mUser, h, t, &mGoodsGroups, &mDishes);
+        order->setOrderId(d.mOrderId);
+        order->exec();
+        order->deleteLater();
+
+        updateHall();
+        fTimer.start(TIMER_TIMEOUT_INTERVAL);
+    }
+}
+
+void DlgFace::on_btnInProgress_clicked()
+{
+    fTimer.stop();
+    DlgKitchenInProgress d(mUser, &mHall, &mTables, &mGoodsGroups, &mDishes, this);
+    d.exec();
+    updateHall();
+    fTimer.start(TIMER_TIMEOUT_INTERVAL);
+}
+
+void DlgFace::on_btnNormalView_clicked()
+{
+    updateHall();
 }

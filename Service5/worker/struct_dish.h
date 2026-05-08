@@ -7,6 +7,7 @@ struct DishAItem {
     int id;
     int menuId;
     double price;
+    int type;
     int group;
     int store;
     int color;
@@ -41,6 +42,7 @@ struct JsonParser<DishAItem> {
         di.id = jo.value("f_dish").toInt();
         di.menuId = jo.value("f_menu").toInt();
         di.price = jo.value("f_price").toDouble();
+        di.type = jo.value("f_type").toInt();
         di.group = jo.value("f_group").toInt();
         di.store = jo.value("f_store").toInt();
         di.color = jo.value("f_color").toInt();

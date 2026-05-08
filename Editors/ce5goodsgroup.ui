@@ -14,49 +14,16 @@
    <string>Form</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
-   <item row="0" column="2" colspan="2">
-    <widget class="C5LineEditWithSelector" name="leCode">
-     <property name="focusPolicy">
-      <enum>Qt::FocusPolicy::NoFocus</enum>
-     </property>
+   <item row="4" column="2" colspan="2">
+    <widget class="C5LineEditWithSelector" name="lineEdit_2">
      <property name="Field" stdset="0">
-      <string>f_id</string>
+      <string>f_name</string>
      </property>
-     <property name="Primary" stdset="0">
+     <property name="First" stdset="0">
       <bool>true</bool>
      </property>
-    </widget>
-   </item>
-   <item row="5" column="2" colspan="2">
-    <widget class="C5LineEditWithSelector" name="lineEdit_3">
-     <property name="Field" stdset="0">
-      <string>f_taxdept</string>
-     </property>
-     <property name="Type" stdset="0">
-      <number>1</number>
-     </property>
-     <property name="Default" stdset="0">
-      <string>1</string>
-     </property>
-    </widget>
-   </item>
-   <item row="4" column="0">
-    <widget class="QLabel" name="label_2">
-     <property name="text">
-      <string>Name</string>
-     </property>
-    </widget>
-   </item>
-   <item row="2" column="3">
-    <widget class="C5LineEditWithSelector" name="leParentGroupName">
-     <property name="focusPolicy">
-      <enum>Qt::FocusPolicy::NoFocus</enum>
-     </property>
-     <property name="maxLength">
-      <number>0</number>
-     </property>
-     <property name="f_parentname" stdset="0">
-      <string/>
+     <property name="allowall" stdset="0">
+      <bool>true</bool>
      </property>
     </widget>
    </item>
@@ -64,39 +31,6 @@
     <widget class="QLabel" name="label_4">
      <property name="text">
       <string>ADG code</string>
-     </property>
-    </widget>
-   </item>
-   <item row="7" column="2" colspan="2">
-    <widget class="C5LineEditWithSelector" name="lineEdit_4">
-     <property name="Field" stdset="0">
-      <string>f_adgcode</string>
-     </property>
-    </widget>
-   </item>
-   <item row="8" column="2" colspan="2">
-    <widget class="C5LineEditWithSelector" name="lineEdit_5">
-     <property name="Field" stdset="0">
-      <string>f_chargevalue</string>
-     </property>
-     <property name="Default" stdset="0">
-      <string>0</string>
-     </property>
-    </widget>
-   </item>
-   <item row="1" column="2" colspan="2">
-    <widget class="C5LineEditWithSelector" name="leClass">
-     <property name="maxLength">
-      <number>2</number>
-     </property>
-     <property name="Field" stdset="0">
-      <string>f_class</string>
-     </property>
-     <property name="Type" stdset="0">
-      <number>0</number>
-     </property>
-     <property name="Default" stdset="0">
-      <string>1</string>
      </property>
     </widget>
    </item>
@@ -119,37 +53,17 @@
      </property>
     </widget>
    </item>
-   <item row="4" column="2" colspan="2">
-    <widget class="C5LineEditWithSelector" name="lineEdit_2">
-     <property name="Field" stdset="0">
-      <string>f_name</string>
-     </property>
-     <property name="First" stdset="0">
-      <bool>true</bool>
-     </property>
-     <property name="allowall" stdset="0">
-      <bool>true</bool>
-     </property>
-    </widget>
-   </item>
-   <item row="5" column="0">
-    <widget class="QLabel" name="label_3">
+   <item row="2" column="0">
+    <widget class="QLabel" name="label_8">
      <property name="text">
-      <string>Tax dept</string>
+      <string>Parent</string>
      </property>
     </widget>
    </item>
-   <item row="8" column="0">
+   <item row="9" column="0">
     <widget class="QLabel" name="label_5">
      <property name="text">
       <string>Charge value</string>
-     </property>
-    </widget>
-   </item>
-   <item row="0" column="0">
-    <widget class="QLabel" name="label">
-     <property name="text">
-      <string>Code</string>
      </property>
     </widget>
    </item>
@@ -160,17 +74,83 @@
      </property>
     </widget>
    </item>
-   <item row="2" column="0">
-    <widget class="QLabel" name="label_8">
-     <property name="text">
-      <string>Parent</string>
+   <item row="7" column="2" colspan="2">
+    <widget class="C5LineEditWithSelector" name="lineEdit_4">
+     <property name="Field" stdset="0">
+      <string>f_adgcode</string>
      </property>
     </widget>
    </item>
-   <item row="3" column="0">
-    <widget class="QLabel" name="label_9">
+   <item row="2" column="3">
+    <widget class="C5LineEditWithSelector" name="leParentGroupName">
+     <property name="focusPolicy">
+      <enum>Qt::FocusPolicy::NoFocus</enum>
+     </property>
+     <property name="maxLength">
+      <number>0</number>
+     </property>
+     <property name="f_parentname" stdset="0">
+      <string/>
+     </property>
+    </widget>
+   </item>
+   <item row="9" column="2" colspan="2">
+    <widget class="C5LineEditWithSelector" name="lineEdit_5">
+     <property name="Field" stdset="0">
+      <string>f_chargevalue</string>
+     </property>
+     <property name="Default" stdset="0">
+      <string>0</string>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="2" colspan="2">
+    <widget class="C5LineEditWithSelector" name="leCode">
+     <property name="focusPolicy">
+      <enum>Qt::FocusPolicy::NoFocus</enum>
+     </property>
+     <property name="Field" stdset="0">
+      <string>f_id</string>
+     </property>
+     <property name="Primary" stdset="0">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="4" column="0">
+    <widget class="QLabel" name="label_2">
      <property name="text">
-      <string>Color</string>
+      <string>Name</string>
+     </property>
+    </widget>
+   </item>
+   <item row="5" column="0">
+    <widget class="QLabel" name="label_3">
+     <property name="text">
+      <string>Tax dept</string>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="0">
+    <widget class="QLabel" name="label">
+     <property name="text">
+      <string>Code</string>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="2" colspan="2">
+    <widget class="C5LineEditWithSelector" name="leClass">
+     <property name="maxLength">
+      <number>2</number>
+     </property>
+     <property name="Field" stdset="0">
+      <string>f_class</string>
+     </property>
+     <property name="Type" stdset="0">
+      <number>0</number>
+     </property>
+     <property name="Default" stdset="0">
+      <string>1</string>
      </property>
     </widget>
    </item>
@@ -181,6 +161,43 @@
      </property>
      <property name="SetColor" stdset="0">
       <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="5" column="2" colspan="2">
+    <widget class="C5LineEditWithSelector" name="lineEdit_3">
+     <property name="Field" stdset="0">
+      <string>f_taxdept</string>
+     </property>
+     <property name="Type" stdset="0">
+      <number>1</number>
+     </property>
+     <property name="Default" stdset="0">
+      <string>1</string>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="0">
+    <widget class="QLabel" name="label_9">
+     <property name="text">
+      <string>Color</string>
+     </property>
+    </widget>
+   </item>
+   <item row="8" column="0">
+    <widget class="QLabel" name="label_6">
+     <property name="text">
+      <string>Queue</string>
+     </property>
+    </widget>
+   </item>
+   <item row="8" column="2">
+    <widget class="C5LineEditWithSelector" name="lineEdit_6">
+     <property name="Field" stdset="0">
+      <string>f_order</string>
+     </property>
+     <property name="Type" stdset="0">
+      <number>1</number>
      </property>
     </widget>
    </item>

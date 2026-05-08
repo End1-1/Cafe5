@@ -36,7 +36,7 @@
     <number>24</number>
    </property>
    <item row="0" column="3">
-    <widget class="QWidget" name="wContSystem_3" native="true">
+    <widget class="QWidget" name="wStore" native="true">
      <layout class="QVBoxLayout" name="verticalLayout_4">
       <property name="spacing">
        <number>14</number>
@@ -314,7 +314,7 @@
     </widget>
    </item>
    <item row="0" column="2">
-    <widget class="QWidget" name="wContSystem_5" native="true">
+    <widget class="QWidget" name="wCashbox" native="true">
      <layout class="QVBoxLayout" name="verticalLayout_6">
       <property name="spacing">
        <number>14</number>
@@ -426,7 +426,7 @@
          <cursorShape>PointingHandCursor</cursorShape>
         </property>
         <property name="text">
-         <string>Revenue</string>
+         <string>Cash movement</string>
         </property>
         <property name="icon">
          <iconset resource="../resources/res.qrc">
@@ -536,7 +536,7 @@
     </spacer>
    </item>
    <item row="0" column="1">
-    <widget class="QWidget" name="wContSystem_2" native="true">
+    <widget class="QWidget" name="wSaleReport" native="true">
      <layout class="QVBoxLayout" name="verticalLayout_3">
       <property name="spacing">
        <number>14</number>
@@ -722,7 +722,7 @@
     </widget>
    </item>
    <item row="0" column="6">
-    <widget class="QWidget" name="wContSystem" native="true">
+    <widget class="QWidget" name="wSystem" native="true">
      <layout class="QVBoxLayout" name="verticalLayout">
       <property name="spacing">
        <number>14</number>
@@ -977,7 +977,7 @@
     </widget>
    </item>
    <item row="0" column="5">
-    <widget class="QWidget" name="wContSystem_4" native="true">
+    <widget class="QWidget" name="wGoods" native="true">
      <layout class="QVBoxLayout" name="verticalLayout_5">
       <property name="spacing">
        <number>14</number>

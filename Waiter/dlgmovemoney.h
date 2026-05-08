@@ -15,7 +15,9 @@ public:
 
     ~DlgMoveMoney() override;
 
-    void setMode(bool isCashIn);
+    void setAmount(double value);
+
+    void setMode(int mode);
 
     double amount() const;
 

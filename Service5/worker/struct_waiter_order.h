@@ -1,11 +1,14 @@
 #pragma once
 
+#include <QStringList>
+#include <QJsonDocument>
+#include <QJsonParseError>
 #include "c5jsonparser.h"
-#include "struct_waiter_dish.h"
 #include "dict_dish_state.h"
+#include "dict_goods_types.h"
 #include "dict_payment_type.h"
 #include "format_date.h"
-#include <QStringList>
+#include "struct_waiter_dish.h"
 
 struct WaiterOrder {
     QString id;
@@ -43,8 +46,10 @@ struct WaiterOrder {
                 continue;
             }
 
-            if(!d.isPrinted()) {
-                return false;
+            if (d.type == GOODS_TYPE_GOODS || d.type == GOODS_TYPE_PACKAGE) {
+                if (!d.isPrinted()) {
+                    return false;
+                }
             }
         }
 
@@ -80,10 +85,7 @@ struct WaiterOrder {
     {
         return data["f_discount_amount"].toDouble();
     }
-    double prepaidAmount() const
-    {
-        return data["f_prepaid_amount"].toDouble();
-    }
+    double prepaidAmount() const { return data.value("f_deposit_prepaid").toVariant().toDouble(); }
 
     double amountPaid() const
     {
@@ -159,7 +161,19 @@ struct JsonParser<WaiterOrder> {
         wo.hallName = jo["f_hall_name"].toString();
         wo.tableName = jo["f_table_name"].toString();
         wo.totalDue = jo["f_amounttotal"].toDouble();
-        wo.data = QJsonDocument::fromJson(jo["f_data"].toString().toUtf8()).object();
+        {
+            const QJsonValue fd = jo.value(QStringLiteral("f_data"));
+
+            if(fd.isObject()) {
+                wo.data = fd.toObject();
+            } else if(fd.isString()) {
+                QJsonParseError pe{};
+                const QJsonDocument doc = QJsonDocument::fromJson(fd.toString().toUtf8(), &pe);
+                wo.data = doc.isObject() ? doc.object() : QJsonObject{};
+            } else {
+                wo.data = QJsonObject{};
+            }
+        }
         const QJsonArray dishes = jo["dishes"].toArray();
 
         for(const QJsonValue &v : dishes) {

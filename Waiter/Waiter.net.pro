@@ -50,7 +50,7 @@ SOURCES += \
     ../Classes/c5tablerec.cpp \
     ../Classes/c5threadobject.cpp \
     ../Classes/calculator.cpp \
-    ../Classes/dict_payment_type.cpp \
+    ../dictionaries/dict_payment_type.cpp \
     ../Classes/dlgpassword.cpp \
     ../Classes/idram.cpp \
     ../Classes/logwriter.cpp \
@@ -113,10 +113,12 @@ SOURCES += \
     goodsgroupbutton.cpp \
         main.cpp \
         dlgface.cpp \
+        dlgkitcheninprogress.cpp \
     ../Cafe5/c5dialog.cpp \
     ../Cafe5/c5utils.cpp \
     ../Cafe5/c5message.cpp \
     dlgorder.cpp \
+    dlgpreorderdatetime.cpp \
     ../Classes/c5user.cpp \
     ../Classes/c5menu.cpp \
     ../Classes/c5witerconf.cpp \
@@ -169,7 +171,7 @@ HEADERS += \
     ../Classes/dict_currency.h \
     ../Classes/dict_dish_state.h \
     ../Classes/dict_goods_types.h \
-    ../Classes/dict_payment_type.h \
+    ../dictionaries/dict_payment_type.h \
     ../Classes/dict_workstation.h \
     ../Classes/dlgpassword.h \
     ../Classes/format_bytes.h \
@@ -223,6 +225,7 @@ HEADERS += \
     dlgdashboard.h \
     dlgeditphone.h \
         dlgface.h \
+        dlgkitcheninprogress.h \
     ../Cafe5/c5dialog.h \
     ../Cafe5/c5utils.h \
     ../Cafe5/c5message.h \
@@ -230,6 +233,7 @@ HEADERS += \
     dlglist.h \
     dlglistdishspecial.h \
     dlgorder.h \
+    dlgpreorderdatetime.h \
     ../Classes/c5user.h \
     ../Classes/c5menu.h \
     ../Classes/c5witerconf.h \
@@ -315,11 +319,13 @@ FORMS += \
     dlgdashboard.ui \
     dlgeditphone.ui \
         dlgface.ui \
+        dlgkitcheninprogress.ui \
     ../Cafe5/c5message.ui \
     dlgguests.ui \
     dlglist.ui \
     dlglistdishspecial.ui \
     dlgorder.ui \
+    dlgpreorderdatetime.ui \
     dlgprecheckoptions.ui \
     dlgrealreports.ui \
     dlgreportparams.ui \

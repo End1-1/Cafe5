@@ -8,7 +8,7 @@ CR5GoodsGroup::CR5GoodsGroup(QWidget *parent) :
     fLabel = tr("Group of goods");
     fSqlQuery = R"(
     select gr.f_id, grp.f_name as f_parent, gr.f_name, gr.f_class, gr.f_taxdept, gr.f_adgcode, gr.f_chargevalue,
-    g.qnt
+    g.qnt, gr.f_order
     from c_groups gr
     left join c_groups grp on grp.f_id=gr.f_parent
     left join (select g.f_group, count(g.f_id) as qnt from c_goods g group by 1) g on g.f_group = gr.f_id
@@ -22,6 +22,7 @@ CR5GoodsGroup::CR5GoodsGroup(QWidget *parent) :
     fTranslation["f_chargevalue"] = tr("Charge value");
     fTranslation["f_color"] = tr("Color");
     fTranslation["qnt"] = tr("Qty");
+    fTranslation["f_order"] = tr("Queue");
     fEditor = new CE5GoodsGroup();
 }
 

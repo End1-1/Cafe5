@@ -33,6 +33,7 @@ public:
     void rtext(const QString text);
     void lrtext(const QString &leftText, const QString &rightText, qreal textWidth = 0);
     void image(const QPixmap &img, Qt::Alignment align = Qt::AlignLeft);
+    void image(const QString &fileName, Qt::Alignment align);
 
     bool br(qreal height = 0);
     bool print(QPrinter &prn);
@@ -44,8 +45,6 @@ public:
     void addToJson(const QString &type, const QVariantMap &params);
 
     QImage resultImage() const;
-
-    void image(const QString &fileName, Qt::Alignment align);
 
 private:
     QImage fImage;

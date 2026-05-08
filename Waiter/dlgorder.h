@@ -34,6 +34,8 @@ public:
 
     void setOrderId(const QString &id);
 
+    void setCreateAsPreorder(bool value);
+
     void setStoplistmode();
 
     bool stoplistMode();
@@ -81,6 +83,12 @@ private:
     QTimer fTimer;
 
     QString mStringBuffer;
+
+    QString mSelectedPackage;
+    bool mCreateAsPreorder = false;
+
+    /** Opening existing header by UUID (preorders list / reports): skip open-table — it only resolves state=1 and would clear f_id. */
+    bool mSkipOpenTableOnShow = false;
 
     const QVector<GoodsGroupItem*>* mGroups;
 
@@ -151,12 +159,16 @@ private:
 
     void addDishToOrder(DishAItem *g, QDishButton *btn);
 
+    void syncPackageParentButtons();
+
     void funcWithAuth(int permission, const QString &title, std::function<void(C5User*)> function);
 
 private slots:
     void parseOrder(const QJsonObject &jdoc);
 
     void handleOrderDishClick(const QString &id);
+
+    void onPackageFillParentToggled(const QString &waiterLineId, bool checked);
 
     void setPaymentButtonChecked(bool checked);
 
@@ -185,6 +197,8 @@ private slots:
     void on_btnPrintService_clicked();
 
     void on_btnSit_clicked();
+
+    void on_btnPrepaid_clicked();
 
     void on_btnChangeStaff_clicked();
 
@@ -251,6 +265,8 @@ private slots:
     void on_btnCopyUUID_clicked();
 
     void on_btnGuest_clicked();
+
+    void on_btnPreorderDateTime_clicked();
 
 signals:
 

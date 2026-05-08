@@ -21,7 +21,11 @@ TableWidget::~TableWidget()
 void TableWidget::setTable(const TableItem &t)
 {
     mTable = t;
-    ui->tw1lbName->setText(mTable.name);
+    QString tableName = mTable.name;
+    if (!mTable.orderNumber.isEmpty()) {
+        tableName = QString("%1 - %2").arg(tableName, mTable.orderNumber);
+    }
+    ui->tw1lbName->setText(tableName);
     ui->tw1lbStaff->setText(mTable.staffName);
     ui->tw1lbAmount->setText(float_str(mTable.amount, 2));
     ui->tw1lbAmount->setVisible(mTable.amount > 0);
