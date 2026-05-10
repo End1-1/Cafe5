@@ -413,13 +413,14 @@ void C5SearchEngine::init(const QString &databaseName, const QString &serverKey)
         tmpPayment.append(s);
     }
     mPaymentType[serverKey] = tmpPayment;
-    /* GOODS TYPES */
+    /* GOODS TYPES (LEFT JOIN: rows in c_goods_type without l_dictionary still searchable) */
     QVector<StructGoodsType> tmpGoodsType;
     tmpGoodsType.reserve(256);
     db.exec(R"(
-    SELECT gt.f_id, l.f_value AS f_type_name
+    SELECT gt.f_id,
+           COALESCE(NULLIF(TRIM(l.f_value), ''), CAST(gt.f_id AS CHAR)) AS f_type_name
     FROM c_goods_type gt
-    INNER JOIN l_dictionary l ON l.f_dict='c_goods_type' AND l.f_lang='hy' AND l.f_dict_id=gt.f_id
+    LEFT JOIN l_dictionary l ON l.f_dict='c_goods_type' AND l.f_lang='hy' AND l.f_dict_id=gt.f_id
     ORDER BY gt.f_id
     )");
 
@@ -1042,6 +1043,45 @@ QString C5SearchEngine::updateDictionary(const QJsonObject &jo, const SocketStru
         if (!updated) {
             siv.append(sg);
         }
+    } else if (entity == "goods_type") {
+        QWriteLocker wl(&mGoodsTypeLock);
+        db[":f_id"] = jo.value("id").toInt();
+        db.exec(R"(
+        SELECT gt.f_id,
+               COALESCE(NULLIF(TRIM(l.f_value), ''), CAST(gt.f_id AS CHAR)) AS f_type_name
+        FROM c_goods_type gt
+        LEFT JOIN l_dictionary l ON l.f_dict='c_goods_type' AND l.f_lang='hy' AND l.f_dict_id=gt.f_id
+        WHERE gt.f_id=:f_id
+        )");
+        StructGoodsType gt;
+
+        if (db.next()) {
+            gt.id = db.integer("f_id");
+            gt.name = db.string("f_type_name");
+            gt.nameLower = gt.name.toLower();
+            gt.words = gt.nameLower.split(" ", Qt::SkipEmptyParts);
+        } else {
+            QString err = QString("Invalid goods type id=%1").arg(jo.value("id").toInt());
+            LogWriterError(err);
+            jrep["errorCode"] = 1;
+            jrep["errorMessage"] = err;
+            return QJsonDocument(jrep).toJson(QJsonDocument::Compact);
+        }
+
+        QVector<StructGoodsType> &siv = mGoodsType[ss.tenantId];
+        bool updated = false;
+
+        for (int i = 0; i < siv.size(); i++) {
+            if (siv[i].id == gt.id) {
+                siv[i] = gt;
+                updated = true;
+                break;
+            }
+        }
+
+        if (!updated) {
+            siv.append(gt);
+        }
     }
 
     jrep["status"] = 1;
@@ -1299,7 +1339,7 @@ QString C5SearchEngine::searchGoodsType(const QJsonObject &jo, const SocketStruc
                 bool found = false;
 
                 for (const QString &w : si.words) {
-                    if (w.startsWith(qw)) {
+                    if (w.startsWith(qw, Qt::CaseInsensitive)) {
                         found = true;
                         break;
                     }

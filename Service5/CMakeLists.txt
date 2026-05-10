@@ -55,6 +55,7 @@ set(HEADERS
     worker/struct_employee.h
     worker/struct_employee_group.h
     worker/struct_storage_item.h
+    worker/struct_goods_type.h
 )
 
 # Основной исполняемый файл
