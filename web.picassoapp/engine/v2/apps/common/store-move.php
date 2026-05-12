@@ -73,7 +73,7 @@ class StoreMove extends Auth
         left join c_goods g on g.f_id=su.f_item_id
         left join c_groups gr on gr.f_id=g.f_group
         left join c_units u on u.f_id=g.f_unit
-        left join store_stock st on st.f_doc_row_id=su.f_id
+        left join store_stock st on st.f_id=su.f_id
         where su.f_doc=?
         order by su.f_row
         EOD;

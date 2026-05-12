@@ -84,6 +84,68 @@ class Cashbox extends Auth
         $this->echoResult();
     }
 
+    public function GetCashOperation($params)
+    {
+        $id = (int)($params->id ?? 0);
+        if ($id <= 0) {
+            dieWithCode("id not specified");
+        }
+        $row = $this->select(
+            "SELECT f_id, f_cashbox_id, f_session_id, f_order_id, f_operation_type, f_payment_type_id, f_datetime, f_debit, f_credit, f_currency_id, f_comment FROM cash_operations WHERE f_id=?",
+            "i",
+            [$id]
+        )->fetch_assoc();
+        if (!$row) {
+            die(Translator::t("Not found"));
+        }
+        $orderId = trim((string)($row["f_order_id"] ?? ""));
+        if ($orderId !== "") {
+            die(Translator::t("Only direct cash operations can be edited."));
+        }
+        $this->result["operation"] = $row;
+        $this->echoResult();
+    }
+
+    public function UpdateCashOperation($params)
+    {
+        $id = (int)($params->id ?? 0);
+        if ($id <= 0) {
+            dieWithCode("id not specified");
+        }
+        $existing = $this->select("SELECT f_id, f_order_id FROM cash_operations WHERE f_id=?", "i", [$id])->fetch_assoc();
+        if (!$existing) {
+            die(Translator::t("Not found"));
+        }
+        $orderId = trim((string)($existing["f_order_id"] ?? ""));
+        if ($orderId !== "") {
+            die(Translator::t("Only direct cash operations can be edited."));
+        }
+
+        $v = [];
+        $v["f_operation_type"] = (int)($params->f_operation_type ?? 0);
+        $v["f_payment_type_id"] = (int)($params->f_payment_type_id ?? 0);
+        $v["f_debit"] = (float)($params->f_debit ?? 0);
+        $v["f_credit"] = (float)($params->f_credit ?? 0);
+        $dt = trim((string)($params->f_datetime ?? ""));
+        if ($dt !== "") {
+            $ts = strtotime($dt);
+            $v["f_datetime"] = $ts ? date("Y-m-d H:i:s", $ts) : date("Y-m-d H:i:s");
+        } else {
+            $v["f_datetime"] = date("Y-m-d H:i:s");
+        }
+        $v["f_currency_id"] = (int)($params->f_currency_id ?? 1);
+        $v["f_comment"] = trim((string)($params->f_comment ?? ""));
+
+        if ((float)$v["f_debit"] <= 0.009 && (float)$v["f_credit"] <= 0.009) {
+            die(Translator::t("Amount must be greater than zero"));
+        }
+        if ($v["f_comment"] === "") {
+            die(Translator::t("Comment is required"));
+        }
+
+        $this->update("cash_operations", $v, $id);
+        $this->echoResult();
+    }
 
     public function Open($params)
     {

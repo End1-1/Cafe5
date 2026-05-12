@@ -2,6 +2,8 @@
 
 #include "c5widget.h"
 #include <QJsonArray>
+#include <QModelIndex>
+#include <QVariant>
 
 namespace Ui
 {
@@ -25,8 +27,18 @@ public:
 protected:
     virtual void showEvent(QShowEvent *e) override;
 
-private slots:
-    void on_tbl_doubleClicked(const QModelIndex &index);
+    virtual void newData();
+
+    void getData();
+
+    QJsonObject filterObject(const QString &name);
+
+    QModelIndex reportMapViewIndexToSource(const QModelIndex &viewIndex) const;
+
+    QVariant reportSourceCellData(int sourceRow, int column, int role = Qt::DisplayRole) const;
+
+protected slots:
+    virtual void on_tbl_doubleClicked(const QModelIndex &index);
 
     void on_leFilter_textChanged(const QString &arg1);
 
@@ -44,12 +56,6 @@ private:
     RAbstractEditorTableModel* mModel;
 
     RFilterProxyModel* mProxyModel;
-
-    void newData();
-
-    void getData();
-
-    QJsonObject filterObject(const QString &name);
 
     void applyFilter();
 

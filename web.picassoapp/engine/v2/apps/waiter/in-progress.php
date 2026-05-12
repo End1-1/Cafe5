@@ -4,7 +4,7 @@
 # Last Modified: 2026-05-04
 # Kitchen queue: orders with unfinished kitchen lines (o_goods_process.f_status < 4).
 # Include closed/paid headers (f_state=2) so dishes stay visible until served on kitchen workflow.
-# Paid flags: f_amount_cash / f_amount_card / f_amount_idram on client (> 0); f_amount_other ignored.
+# Payment breakdown from oh.f_data (amounts > 0 → show method names on kitchen client).
 
 require_once __DIR__ . "/index.php";
 
@@ -41,7 +41,13 @@ class InProgress extends Auth
                     'f_time_open' => $r['f_time_open'],
                     'f_amount_cash' => $r['f_amount_cash'],
                     'f_amount_card' => $r['f_amount_card'],
+                    'f_amount_bank' => $r['f_amount_bank'],
                     'f_amount_idram' => $r['f_amount_idram'],
+                    'f_amount_complimentary' => $r['f_amount_complimentary'],
+                    'f_amount_other' => $r['f_amount_other'],
+                    'f_amount_telcell' => $r['f_amount_telcell'],
+                    'f_amount_debt' => $r['f_amount_debt'],
+                    'f_amount_prepaid' => $r['f_amount_prepaid'],
                     'f_guest_name' => $r['f_guest_name'],
                     'f_guest_phone' => $r['f_guest_phone'],
                     'f_guest_address' => $r['f_guest_address'],
@@ -80,7 +86,13 @@ class InProgress extends Auth
             COALESCE(json_value(oh.f_data, '$.f_time_open'), '') AS f_time_open,
             COALESCE(json_value(oh.f_data, '$.f_amount_cash'), '0') AS f_amount_cash,
             COALESCE(json_value(oh.f_data, '$.f_amount_card'), '0') AS f_amount_card,
+            COALESCE(json_value(oh.f_data, '$.f_amount_bank'), '0') AS f_amount_bank,
             COALESCE(json_value(oh.f_data, '$.f_amount_idram'), '0') AS f_amount_idram,
+            COALESCE(json_value(oh.f_data, '$.f_amount_complimentary'), '0') AS f_amount_complimentary,
+            COALESCE(json_value(oh.f_data, '$.f_amount_other'), '0') AS f_amount_other,
+            COALESCE(json_value(oh.f_data, '$.f_amount_telcell'), '0') AS f_amount_telcell,
+            COALESCE(json_value(oh.f_data, '$.f_amount_debt'), '0') AS f_amount_debt,
+            COALESCE(json_value(oh.f_data, '$.f_amount_prepaid'), '0') AS f_amount_prepaid,
             COALESCE(json_value(oh.f_data, '$.f_guest.f_guest_name'), '') AS f_guest_name,
             COALESCE(json_value(oh.f_data, '$.f_guest.f_guest_phone'), '') AS f_guest_phone,
             COALESCE(json_value(oh.f_data, '$.f_guest.f_guest_address'), '') AS f_guest_address

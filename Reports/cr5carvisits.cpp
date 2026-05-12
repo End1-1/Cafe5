@@ -1,11 +1,10 @@
 #include "cr5carvisits.h"
-#include "c5waiterorder.h"
-#include "c5mainwindow.h"
-#include "c5tablemodel.h"
 #include "c5database.h"
-#include "c5salefromstoreorder.h"
-#include "cr5carvisitsfilter.h"
+#include "c5mainwindow.h"
 #include "c5message.h"
+#include "c5salefromstoreorder.h"
+#include "c5tablemodel.h"
+#include "cr5carvisitsfilter.h"
 
 CR5CarVisits::CR5CarVisits(QWidget *parent) :
     C5ReportWidget(parent)
@@ -117,8 +116,6 @@ bool CR5CarVisits::tblDoubleClicked(int row, int column, const QJsonArray &value
     if(db.nextRow()) {
         switch(abs(db.getInt(0))) {
         case 1: {
-            C5WaiterOrder *wo = __mainWindow->createTab<C5WaiterOrder>();
-            wo->setOrder(values.at(fModel->fColumnNameIndex["f_id"]).toString());
             break;
         }
 
@@ -128,14 +125,10 @@ bool CR5CarVisits::tblDoubleClicked(int row, int column, const QJsonArray &value
         }
 
         default: {
-            C5WaiterOrder *wo = __mainWindow->createTab<C5WaiterOrder>();
-            wo->setOrder(values.at(fModel->fColumnNameIndex["f_id"]).toString());
             break;
         }
         }
     } else {
-        C5WaiterOrder *wo = __mainWindow->createTab<C5WaiterOrder>();
-        wo->setOrder(values.at(fModel->fColumnNameIndex["f_id"]).toString());
     }
 
     return true;

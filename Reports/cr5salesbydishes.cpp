@@ -1,11 +1,10 @@
 #include "cr5salesbydishes.h"
-#include "cr5salesbydishesfilter.h"
-#include "c5waiterorder.h"
-#include "c5tablemodel.h"
+#include "c5dishwidget.h"
 #include "c5mainwindow.h"
 #include "c5message.h"
+#include "c5tablemodel.h"
 #include "ce5editor.h"
-#include "c5dishwidget.h"
+#include "cr5salesbydishesfilter.h"
 
 CR5SalesByDishes::CR5SalesByDishes(QWidget *parent) :
     C5ReportWidget(parent)
@@ -145,8 +144,6 @@ bool CR5SalesByDishes::tblDoubleClicked(int row, int column, const QVector<QJson
         return true;
     }
 
-    C5WaiterOrder *wo = __mainWindow->createTab<C5WaiterOrder>();
-    wo->setOrder(v.at(fModel->fColumnNameIndex["f_id"]).toString());
     return true;
 }
 

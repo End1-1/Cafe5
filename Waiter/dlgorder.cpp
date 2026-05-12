@@ -2204,6 +2204,7 @@ void DlgOrder::createPaymentButtons()
 {
     int row = 0, col = 0;
     QPointer<DlgOrder> self(this);
+    const QJsonObject &jo = mWorkStation.data.value("setup_buttons").toObject();
 
     for(auto pt : std::as_const(payment_types)) {
         auto *btn = new QToolButton(this);
@@ -2211,8 +2212,11 @@ void DlgOrder::createPaymentButtons()
         btn->setMinimumHeight(50);
         btn->setText(QCoreApplication::translate("PaymentType", payment_names[pt]));
         btn->setEnabled(payment_special[pt] ? mUser->check(cp_t5_waiter_special_payment_types) : true);
+        bool btnEnabled = jo.contains(QString("payment_button_%1").arg(pt)) ? jo.value(QString("payment_button_%1").arg(pt)).toBool()
+                                                                            : true;
+        btn->setEnabled(btn->isEnabled() && btnEnabled);
         connect(btn, &QToolButton::clicked, this, [self, pt]() {
-            if(self->ui->lbAmount->property("amount").toDouble() < 0.01) {
+            if (self->ui->lbAmount->property("amount").toDouble() < 0.01) {
                 return;
             }
 
@@ -2236,7 +2240,7 @@ void DlgOrder::createPaymentButtons()
         ui->glPaymentType->addWidget(btn, row, col);
         col++;
 
-        if(col == 2) {
+        if (col == 2) {
             col = 0;
             row++;
         }

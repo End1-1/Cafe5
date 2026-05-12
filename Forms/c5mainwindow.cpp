@@ -12,7 +12,6 @@
 #include <QToolButton>
 #include <QWindow>
 #include "c5aboutdlg.h"
-#include "c5cashdoc.h"
 #include "c5changepassword.h"
 #include "c5config.h"
 #include "c5dishselfcostgenprice.h"
@@ -24,8 +23,6 @@
 #include "c5reporttemplatedriver.h"
 #include "c5route.h"
 #include "c5salarydoc.h"
-#include "c5salarypayment.h"
-#include "c5saledoc.h"
 #include "c5storedecompilation.h"
 #include "c5storeinventory.h"
 #include "c5toolbarwidget.h"
@@ -33,7 +30,6 @@
 #include "c5user.h"
 #include "c5widget.h"
 #include "cr5breezeservice.h"
-#include "cr5cashdetailed.h"
 #include "cr5cashmovement.h"
 #include "cr5cashnames.h"
 #include "cr5complectations.h"
@@ -74,11 +70,8 @@
 #include "cr5ordermarks.h"
 #include "cr5preorders.h"
 #include "cr5reports.h"
-#include "cr5routedaily.h"
 #include "cr5salarybyworkers.h"
-#include "cr5salefromstore.h"
 #include "cr5salefromstoretotal.h"
-#include "cr5saleremoveddishes.h"
 #include "cr5salesbydishes.h"
 #include "cr5settings.h"
 #include "cr5storereason.h"
@@ -623,14 +616,10 @@ void C5MainWindow::on_listWidgetItemClicked(const QModelIndex &index)
         break;
 
     case cp_t2_reatail_trade: {
-        auto *retaildoc = createTab<C5SaleDoc>();
-        retaildoc->setMode(1);
         break;
     }
 
     case cp_t2_whosale_trade: {
-        auto *whosaledoc = createTab<C5SaleDoc>();
-        whosaledoc->setMode(2);
         break;
     }
 
@@ -639,7 +628,6 @@ void C5MainWindow::on_listWidgetItemClicked(const QModelIndex &index)
         break;
 
     case cp_t3_store_sale:
-        createTab<CR5SaleFromStore>();
         break;
 
     case cp_t3_debts_partner:
@@ -651,7 +639,7 @@ void C5MainWindow::on_listWidgetItemClicked(const QModelIndex &index)
         break;
 
     case cp_t3_sale_removed_dishes:
-        createTab<CR5SaleRemovedDishes>();
+
         break;
 
     case cp_t3_sale_dishes:
@@ -783,7 +771,6 @@ void C5MainWindow::on_listWidgetItemClicked(const QModelIndex &index)
         break;
 
     case cp_t7_route_exec:
-        createTab<CR5RouteDaily>();
         break;
 
     case cp_t8_cash_names:
@@ -791,11 +778,9 @@ void C5MainWindow::on_listWidgetItemClicked(const QModelIndex &index)
         break;
 
     case cp_t8_cash_doc:
-        createTab<C5CashDoc>()->loadSuggest();
         break;
 
     case cp_t8_cash_detailed_report:
-        createTab<CR5CashDetailed>();
         break;
 
     case cp_t8_cash_movement:
@@ -831,7 +816,6 @@ void C5MainWindow::on_listWidgetItemClicked(const QModelIndex &index)
         break;
 
     case cp_t9_payment:
-        createTab<C5SalaryPayment>();
         break;
 
     case cp_t10_action_list:

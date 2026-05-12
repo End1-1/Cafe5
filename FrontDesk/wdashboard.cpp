@@ -17,8 +17,11 @@
 #include "cr5usersgroups.h"
 #include "ntablewidget.h"
 #include "rabstracteditorreport.h"
-#include "wdashboardsettings.h"
+#include "rcashmovement.h"
+#include "rdebts.h"
+#include "rtotalreviewreport.h"
 #include "ui_wdashboard.h"
+#include "wdashboardsettings.h"
 
 WDashboard::WDashboard(C5User *user, QWidget *parent)
     : C5Widget(parent)
@@ -192,7 +195,7 @@ QWidget* WDashboard::createForm(const QString &name, QIcon icon)
     }
 
     if (name == "form_revenue") {
-        return new RAbstractEditorReport(tr("Revenue"), icon, name);
+        return new RCashMovement(tr("Revenue"), icon, name);
     }
 
     if (name == "form_groups_of_goods") {
@@ -221,6 +224,7 @@ QWidget* WDashboard::createForm(const QString &name, QIcon icon)
 
     if (name == "form_halls") {
         auto *halls = new CR5Hall();
+
         halls->postProcess();
         return halls;
     }
@@ -241,7 +245,7 @@ QWidget* WDashboard::createForm(const QString &name, QIcon icon)
     }
 
     if (name == "form_debts") {
-        return new RAbstractEditorReport(tr("City ledger"), icon, name);
+        return new RDebts(tr("City ledger"), icon, name);
     }
 
     if (name == "form_partners") {
@@ -251,7 +255,7 @@ QWidget* WDashboard::createForm(const QString &name, QIcon icon)
     }
 
     if (name == "form_summary") {
-        return new RAbstractEditorReport(tr("Store documents"), icon, name);
+        return new RTotalReviewReport(tr("Summary"), icon, name);
     }
 
     Q_ASSERT_X(false, "check name", QString("NO WIDGET NAMED %1 ").arg(name).toLatin1());

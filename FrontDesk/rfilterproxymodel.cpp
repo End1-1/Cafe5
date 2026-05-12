@@ -180,7 +180,7 @@ void RFilterProxyModel::recalcSums()
 
         for(int r = 0; r < rows; r++) {
             QModelIndex idx = index(r, it.key());
-            double v = str_float(data(idx).toString());
+            double v = str_money_mysql_format(data(idx).toString());
             it.value() += v;
         }
     }

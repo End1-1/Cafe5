@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1108</width>
+    <width>1024</width>
     <height>768</height>
    </rect>
   </property>
@@ -162,6 +162,18 @@
       </item>
       <item>
        <widget class="QLineEdit" name="leSearchAny">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>320</width>
+          <height>16777215</height>
+         </size>
+        </property>
         <property name="clearButtonEnabled">
          <bool>true</bool>
         </property>
@@ -190,6 +202,41 @@
         <property name="icon">
          <iconset resource="resources/res.qrc">
           <normaloff>:/edit.png</normaloff>:/edit.png</iconset>
+        </property>
+        <property name="iconSize">
+         <size>
+          <width>28</width>
+          <height>28</height>
+         </size>
+        </property>
+        <property name="toolButtonStyle">
+         <enum>Qt::ToolButtonStyle::ToolButtonIconOnly</enum>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QToolButton" name="btnSettings">
+        <property name="minimumSize">
+         <size>
+          <width>48</width>
+          <height>44</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>60</width>
+          <height>16777215</height>
+         </size>
+        </property>
+        <property name="focusPolicy">
+         <enum>Qt::FocusPolicy::NoFocus</enum>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+        <property name="icon">
+         <iconset resource="resources/res.qrc">
+          <normaloff>:/setting.png</normaloff>:/setting.png</iconset>
         </property>
         <property name="iconSize">
          <size>
@@ -238,6 +285,11 @@
      </column>
      <column>
       <property name="text">
+       <string>Time</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
        <string>Table</string>
       </property>
      </column>
@@ -258,12 +310,7 @@
      </column>
      <column>
       <property name="text">
-       <string>Paid</string>
-      </property>
-     </column>
-     <column>
-      <property name="text">
-       <string>Time</string>
+       <string>Payment</string>
       </property>
      </column>
      <column>
@@ -292,11 +339,11 @@
          <height>50</height>
         </size>
        </property>
-       <property name="checkable">
-        <bool>true</bool>
-       </property>
        <property name="text">
         <string>Cooking</string>
+       </property>
+       <property name="checkable">
+        <bool>true</bool>
        </property>
       </widget>
      </item>
@@ -314,11 +361,11 @@
          <height>50</height>
         </size>
        </property>
-       <property name="checkable">
-        <bool>true</bool>
-       </property>
        <property name="text">
         <string>Ready</string>
+       </property>
+       <property name="checkable">
+        <bool>true</bool>
        </property>
       </widget>
      </item>
@@ -336,11 +383,11 @@
          <height>50</height>
         </size>
        </property>
-       <property name="checkable">
-        <bool>true</bool>
-       </property>
        <property name="text">
         <string>Accepted</string>
+       </property>
+       <property name="checkable">
+        <bool>true</bool>
        </property>
       </widget>
      </item>
@@ -348,6 +395,9 @@
       <spacer name="horizontalSpacer_wall">
        <property name="orientation">
         <enum>Qt::Orientation::Horizontal</enum>
+       </property>
+       <property name="sizeType">
+        <enum>QSizePolicy::Policy::Preferred</enum>
        </property>
        <property name="sizeHint" stdset="0">
         <size>
@@ -392,6 +442,7 @@
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <resources>
+  <include location="resources/res.qrc"/>
   <include location="resources/res.qrc"/>
  </resources>
  <connections/>

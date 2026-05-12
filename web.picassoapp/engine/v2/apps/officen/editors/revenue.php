@@ -102,15 +102,16 @@ class Revenue
         // 2. Список операций
         $sqlOps = <<<EOD
     SELECT 
-        op.f_operation_type,         -- index 0
-        op.f_order_id,               -- index 1
-        op.f_datetime,               -- index 2
-        lp.f_value as payment_type,  -- index 3 (из словаря)
-        money_fmt(op.f_debit) as d_f, -- index 4
-        money_fmt(op.f_credit) as c_f, -- index 5
-        op.f_comment,                -- index 6
-        op.f_debit,                  -- index 7 (raw)
-        op.f_credit                  -- index 8 (raw)
+        op.f_id,                     -- index 0 (для редактирования)
+        op.f_operation_type,         -- index 1
+        op.f_order_id,               -- index 2 (UUID заказа; пусто = прямая кассовая операция)
+        op.f_datetime,               -- index 3
+        lp.f_value as payment_type,  -- index 4
+        money_fmt(op.f_debit) as d_f, -- index 5
+        money_fmt(op.f_credit) as c_f, -- index 6
+        op.f_comment,                -- index 7
+        op.f_debit,                  -- index 8 (raw)
+        op.f_credit                  -- index 9 (raw)
     FROM cash_operations op
     LEFT JOIN cash_box cb ON cb.f_id = op.f_cashbox_id
     LEFT JOIN l_dictionary lp ON lp.f_dict_id = op.f_payment_type_id AND lp.f_dict = 'cash_payment_types'
@@ -130,8 +131,9 @@ class Revenue
 
         // Строка начального сальдо
         $rows[] = [
+            "", // f_id
             "", // Type
-            "", // Order ID
+            "", // Order ID / UUID
             $dateStart . " 00:00:00",
             Translator::t("OPENING BALANCE"),
             "", // Payment Type
@@ -141,19 +143,20 @@ class Revenue
         ];
 
         foreach ($dbRows as $dbRow) {
-            $paymentType = $dbRow[3];
-            $debitFmt    = $dbRow[4];
-            $creditFmt   = $dbRow[5];
-            $comment     = $dbRow[6];
-            $debitRaw    = (float)$dbRow[7];
-            $creditRaw   = (float)$dbRow[8];
+            $paymentType = $dbRow[4];
+            $debitFmt    = $dbRow[5];
+            $creditFmt   = $dbRow[6];
+            $comment     = $dbRow[7];
+            $debitRaw    = (float)$dbRow[8];
+            $creditRaw   = (float)$dbRow[9];
 
             $currentBalance += ($debitRaw - $creditRaw);
 
             $rows[] = [
-                $dbRow[0], // f_operation_type
-                $dbRow[1], // f_order_id (будет скрыт)
-                $dbRow[2], // f_datetime
+                $dbRow[0], // f_id
+                $dbRow[1], // f_operation_type
+                $dbRow[2], // f_order_id
+                $dbRow[3], // f_datetime
                 $comment,
                 $paymentType,
                 ($debitRaw > 0) ? $debitFmt : "",
@@ -164,8 +167,9 @@ class Revenue
 
         return [
             "rows" => $rows,
-            "hidden_columns" => [0, 1],
+            "hidden_columns" => [0, 1, 2],
             "headers" => [
+                Translator::t("Id"),
                 Translator::t("Type"),
                 "UUID",
                 Translator::t("DateTime"),
@@ -176,7 +180,7 @@ class Revenue
                 Translator::t("Balance")
             ],
             "toolbar" => ["reload" => true, "filter" => true, "new" => true],
-            "sum" => [5, 6, 7], // Суммируем приход, расход и баланс
+            "sum" => [6, 7, 8], // Суммируем приход, расход и баланс
             "filter" => $this->getFilterConfig()
         ];
     }

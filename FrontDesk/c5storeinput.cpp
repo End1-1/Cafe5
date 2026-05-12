@@ -238,6 +238,9 @@ bool C5StoreInput::buildDoc()
     if (ui->wPartner->value() == 0) {
         err += tr("Partner not selected") + "<br>";
     }
+    if (ui->wCurrency->value() == 0) {
+        ui->wCurrency->setCodeAndName(1, tr("Armenian dram"));
+    }
     if (mDocData.uuid.isEmpty()) {
         mDocData.uuid = QUuid::createUuid().toString(QUuid::WithoutBraces).toUtf8();
     }
@@ -556,6 +559,7 @@ void C5StoreInput::draftDocument()
         mDocData.version++;
         mActionSave->setEnabled(true);
         mActionDraft->setEnabled(true);
+        ui->wtoolbar->setEnabled(true);
         C5Message::info(tr("Saved"));
     });
 }

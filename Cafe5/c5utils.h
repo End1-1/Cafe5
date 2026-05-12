@@ -6,6 +6,7 @@
 #include <QDateTime>
 #include <QCryptographicHash>
 #include <QJsonDocument>
+#include <QLocale>
 #include <QRegularExpression>
 
 const QRegularExpression float_expr1("(?!\\d[\\.\\,][1-9]+)0+$");
@@ -14,6 +15,23 @@ const QRegularExpression float_expr2("[\\.\\,]$");
 #define hostinfo QHostInfo::localHostName().toLower()
 #define float_str(value, f) QLocale().toString(value, 'f', f).remove(float_expr1).remove(float_expr2)
 #define str_float(value) QLocale().toDouble(value)
+
+/// Parse amounts formatted by MySQL \c FORMAT() as in \c money_fmt (comma thousands, '.' decimals, optional TRIM of trailing ".00").
+/// Does not use the OS locale so sums match on any client locale.
+inline double str_money_mysql_format(const QString &value)
+{
+    QString s = value.trimmed();
+    s.remove(QChar(0xA0));
+    s.remove(' ');
+    if(s.isEmpty()) {
+        return 0.0;
+    }
+    s.remove(',');
+    bool ok = false;
+    const double d = QLocale::c().toDouble(s, &ok);
+    return ok ? d : 0.0;
+}
+
 #define json_str(value) QString(QJsonDocument(value).toJson(QJsonDocument::Compact))
 #define str_json(value) QJsonDocument::fromJson(value.toUtf8()).object()
 

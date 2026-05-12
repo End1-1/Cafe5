@@ -48,7 +48,9 @@ class SoldItems
             g.f_name as f_item_name,
             money_fmt(sum(og.f_qty)) as f_qty,
             ' ' as f_price,
-            money_fmt(sum(og.f_total)) as f_total
+            money_fmt(sum(og.f_total)) as f_total,
+            money_fmt(sum(sq.f_qty*sq.f_price)) as f_cosg,
+            money_fmt(sum(og.f_total)-sum(sq.f_qty*sq.f_price)) as f_profit
         ";
             // Группируем только по Группе и Наименованию товара
             $group_by = "GROUP BY gr.f_name, g.f_name";
@@ -64,7 +66,9 @@ class SoldItems
             g.f_name as f_item_name,
             money_fmt(og.f_qty) as f_qty,
             money_fmt(og.f_price) as f_price,
-            money_fmt(og.f_total) as f_total
+            money_fmt(og.f_total) as f_total,
+            money_fmt(sum(sq.f_qty*sq.f_price)) as f_cosg,
+            money_fmt(sum(og.f_total)-sum(sq.f_qty*sq.f_price)) as f_profit
         ";
             $group_by = "";
             $order_by = "ORDER BY  gr.f_name, g.f_name";
@@ -78,6 +82,7 @@ class SoldItems
     LEFT JOIN o_header oh ON oh.f_id=og.f_header
     LEFT JOIN h_tables t ON t.f_id=oh.f_table
     LEFT JOIN h_halls h ON h.f_id=t.f_hall
+    left join store_calc_queue sq on sq.f_row_sale_id=og.f_id
     WHERE oh.f_state=2 AND og.f_state=1 
     $date_filter 
     $group_filter
@@ -95,6 +100,8 @@ class SoldItems
             Translator::t("Qty"),
             Translator::t("Price"),
             Translator::t("Total"),
+            Translator::t("Total COGS"),
+            Translator::t("Profit"),
         ];
 
         return [
@@ -103,7 +110,7 @@ class SoldItems
             "toolbar" => ["delete" => true, "reload" => true, "filter" => true],
             "headers" => $headers,
             "hidden_columns" => $summarize == 0 ? [0] : [0, 1, 2, 3, 7],
-            "sum" => [6, 8],
+            "sum" => [6, 8, 9, 10],
             "filter" => [
                 ["type" => "combobox", "name" => "summarize", "label" => Translator::t("Summarize"), "default" => 1, "values" => [
                     ["label" => Translator::t("Yes"), "value" => 1],

@@ -59,6 +59,8 @@ private slots:
 
     void tickClock();
 
+    void on_btnSettings_clicked();
+
 private:
     struct KitchenLinePick {
         QString lineId;
@@ -69,12 +71,12 @@ private:
     enum KitchenCol {
         ColHeaderId = 0,
         ColOrderPrefix,
+        ColTimeOpen,
         ColTableName,
         ColHallName,
         ColDishes,
         ColGuest,
         ColPaid,
-        ColTimeOpen,
         ColStatus,
     };
 
@@ -116,11 +118,9 @@ private:
 
     QString kitchenStatusText(int status) const;
 
-    QString paidYesNoText(bool paid) const;
+    QString paymentColumnText(const QJsonObject &order) const;
 
     static QString formatQtyWidth5(double qty);
-
-    static bool isOrderPaid(const QJsonObject &order);
 
     static QString guestMultiline(const QJsonObject &order);
 

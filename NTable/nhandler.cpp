@@ -5,17 +5,14 @@
 #include "c5database.h"
 #include "c5mainwindow.h"
 #include "c5message.h"
-#include "c5saledoc.h"
 #include "c5user.h"
-#include "c5waiterorder.h"
 #include "ce5goods.h"
 #include "nfilterdlg.h"
 #include "ntablemodel.h"
 
 #include "c5discountredeem.h"
-#include "c5salefromstoreorder.h"
-#include "c5costumerdebtpayment.h"
 #include "c5dishwidget.h"
+#include "c5salefromstoreorder.h"
 
 static const QString hDebt = "90dd520c-f072-11ee-b90b-7c10c9bcac82";
 static const QString hShortDebt = "ec26fd1c-2391-11ef-a99a-7c10c9bcac82";
@@ -59,8 +56,6 @@ void NHandler::handle(const QJsonArray &ja)
                 if(db.nextRow()) {
                     switch(abs(db.getInt(0))) {
                     case 1: {
-                        C5WaiterOrder *wo = __mainWindow->createTab<C5WaiterOrder>();
-                        wo->setOrder(ja.at(3).toString());
                         break;
                     }
 
@@ -71,10 +66,7 @@ void NHandler::handle(const QJsonArray &ja)
                     }
                 }
             } else if(!ja.at(4).toString().isEmpty()) {
-                C5CostumerDebtPayment d(mUser, 0);
-                d.setId(ja.at(4).toString());
-                d.exec();
-            } else if(!ja.at(5).toString().isEmpty()) {
+            } else if (!ja.at(5).toString().isEmpty()) {
                 //TODO
                 // C5StoreDoc *sd = __mainWindow->createTab<C5StoreDoc>();
                 // QString err;
@@ -88,13 +80,8 @@ void NHandler::handle(const QJsonArray &ja)
             break;
         }
     } else if(mHandlers.at(1).toString() == hShortDebt) {
-        C5CostumerDebtPayment d(mUser, 0);
-        d.setId(ja.at(0).toString());
-        d.exec();
-    } else if(mHandlers.at(1).toString() == hDraftSale) {
-        auto *retaildoc = __mainWindow->createTab<C5SaleDoc>();
-        retaildoc->openDraft(ja.at(0).toString());
-    } else if(mHandlers.at(1).toString() == hDiscountReturnAmount) {
+    } else if (mHandlers.at(1).toString() == hDraftSale) {
+    } else if (mHandlers.at(1).toString() == hDiscountReturnAmount) {
         if(row < 0) {
             return;
         }
@@ -110,7 +97,7 @@ void NHandler::handle(const QJsonArray &ja)
             dr.exec();
         }
         }
-    } else if(mHandlers.at(1).toString()  == hMenuReview) {
+    } else if (mHandlers.at(1).toString() == hMenuReview) {
         if(row < 0) {
             return;
         }
@@ -181,9 +168,7 @@ void NHandler::toolWidget(QWidget *w)
             b->setText(tr("New customer payment"));
             b->setAutoRaise(true);
             b->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
-            connect(b, &QAbstractButton::clicked, [this]() {
-                C5CostumerDebtPayment(mUser, BCLIENTDEBTS_SOURCE_SALE).exec();
-            });
+            connect(b, &QAbstractButton::clicked, [this]() {});
             gl->addWidget(b, 0, 0, Qt::AlignLeft);
             b = new QToolButton(w);
             b->setIcon(QIcon(":/new.png"));
@@ -191,7 +176,7 @@ void NHandler::toolWidget(QWidget *w)
             b->setAutoRaise(true);
             b->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
             connect(b, &QAbstractButton::clicked, [this]() {
-                C5CostumerDebtPayment(mUser, BCLIENTDEBTS_SOURCE_INPUT).exec();
+
             });
             gl->addWidget(b, 1, 0, Qt::AlignLeft);
         } else if(mHandlers.contains(hShortDebt)) {

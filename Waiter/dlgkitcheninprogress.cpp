@@ -16,8 +16,13 @@
 #include <QTime>
 #include <algorithm>
 #include <limits>
+#include <QCoreApplication>
+#include <QSettings>
+#include <QVariant>
 #include "c5message.h"
+#include "dict_payment_type.h"
 #include "c5user.h"
+#include "dlgkitchensettings.h"
 #include "dlgorder.h"
 #include "dlgsimleoptions.h"
 #include "dlgtext.h"
@@ -30,6 +35,55 @@ namespace
 constexpr int kKitchenRoleTableId = int(Qt::UserRole) + 40;
 
 constexpr int kKitchenRoleHallId = int(Qt::UserRole) + 41;
+
+struct KitchenColDef {
+    int col;
+    const char *id;
+    const char *label;
+    int defaultWidth;
+    bool defaultVisible;
+};
+
+/* Order matches the visible columns; ColHeaderId is technical and not exposed. */
+const KitchenColDef kKitchenCols[] = {
+    {1 /*ColOrderPrefix*/, "order_prefix", QT_TRANSLATE_NOOP("DlgKitchenSettings", "Order"),     120, true},
+    {2 /*ColTimeOpen*/,    "time_open",    QT_TRANSLATE_NOOP("DlgKitchenSettings", "Time"),      120, true},
+    {3 /*ColTableName*/,   "table_name",   QT_TRANSLATE_NOOP("DlgKitchenSettings", "Table"),      90, true},
+    {4 /*ColHallName*/,    "hall_name",    QT_TRANSLATE_NOOP("DlgKitchenSettings", "Hall"),       90, true},
+    {5 /*ColDishes*/,      "dishes",       QT_TRANSLATE_NOOP("DlgKitchenSettings", "Dishes"),    300, true},
+    {6 /*ColGuest*/,       "guest",        QT_TRANSLATE_NOOP("DlgKitchenSettings", "Guest"),     200, true},
+    {7 /*ColPaid*/,        "payment",      QT_TRANSLATE_NOOP("DlgKitchenSettings", "Payment"),   140, true},
+    {8 /*ColStatus*/,      "status",       QT_TRANSLATE_NOOP("DlgKitchenSettings", "Status"),     84, true},
+};
+
+QString kitchenColRegKey(const QString &id, const char *suffix)
+{
+    return QStringLiteral("kitchen_col_%1_%2").arg(id, QLatin1String(suffix));
+}
+
+/* Mirror C5Config::getRegValue / setRegValue location so existing settings
+ * (and any settings written elsewhere by the same convention) stay consistent. */
+QString kitchenSettingsApp()
+{
+    return QString::fromUtf8(_APPLICATION_) + QStringLiteral("\\") + QString::fromUtf8(_MODULE_);
+}
+
+QString kitchenSettingsOrg()
+{
+    return QString::fromUtf8(_ORGANIZATION_);
+}
+
+QVariant readKitchenSetting(const QString &key, const QVariant &def)
+{
+    QSettings s(kitchenSettingsOrg(), kitchenSettingsApp());
+    return s.value(key, def);
+}
+
+void writeKitchenSetting(const QString &key, const QVariant &value)
+{
+    QSettings s(kitchenSettingsOrg(), kitchenSettingsApp());
+    s.setValue(key, value);
+}
 
 QColor kitchenRowBackground(int minLineStatus)
 {
@@ -76,6 +130,41 @@ int minStatusInLines(const QJsonArray &lines)
     }
 
     return mn >= 99 ? 1 : mn;
+}
+
+QString formatKitchenOpenedCell(const QJsonObject &order)
+{
+    const QString d = order.value(QStringLiteral("f_date_open")).toString().trimmed();
+    const QString t = order.value(QStringLiteral("f_time_open")).toString().trimmed();
+    QString datePart = d;
+
+    if(!d.isEmpty()) {
+        const QDate qd = QDate::fromString(d, QStringLiteral("yyyy-MM-dd"));
+
+        if(qd.isValid()) {
+            datePart = qd.toString(FORMAT_DATE_TO_STR);
+        }
+    }
+
+    QString timePart = t;
+
+    if(!t.isEmpty()) {
+        const QTime qt = QTime::fromString(t, QStringLiteral("HH:mm:ss"));
+
+        if(qt.isValid()) {
+            timePart = qt.toString(FORMAT_TIME_TO_SHORT_STR);
+        }
+    }
+
+    if(datePart.isEmpty()) {
+        return timePart;
+    }
+
+    if(timePart.isEmpty()) {
+        return datePart;
+    }
+
+    return datePart + QLatin1Char('\n') + timePart;
 }
 
 qint64 kitchenOrderOpenedSortKeyMs(const QJsonObject &order)
@@ -152,9 +241,6 @@ DlgKitchenInProgress::DlgKitchenInProgress(C5User *user,
     ui->tblKitchenOrders->setWordWrap(true);
     ui->tblKitchenOrders->setColumnHidden(ColHeaderId, true);
     ui->tblKitchenOrders->horizontalHeader()->setSectionResizeMode(QHeaderView::Fixed);
-    if(QTableWidgetItem *h = ui->tblKitchenOrders->horizontalHeaderItem(ColDishes)) {
-        h->setText(QStringLiteral("Наименование"));
-    }
     applyFixedColumnLayout();
 
     connect(ui->leOrderNumber, &QLineEdit::textChanged, this, &DlgKitchenInProgress::on_leOrderNumber_textChanged);
@@ -164,6 +250,7 @@ DlgKitchenInProgress::DlgKitchenInProgress(C5User *user,
 
     connect(&mClockTimer, &QTimer::timeout, this, &DlgKitchenInProgress::tickClock);
     setupButtons();
+    ui->btnSettings->setVisible(mUser->id() == 1);
 }
 
 DlgKitchenInProgress::~DlgKitchenInProgress()
@@ -188,9 +275,33 @@ QString DlgKitchenInProgress::kitchenStatusText(int status) const
     }
 }
 
-QString DlgKitchenInProgress::paidYesNoText(bool paid) const
+QString DlgKitchenInProgress::paymentColumnText(const QJsonObject &order) const
 {
-    return paid ? tr("Yes", "kitchen_paid_column") : tr("No", "kitchen_paid_column");
+    QStringList parts;
+
+    for(int pt : payment_types) {
+        const QString field = payment_fields.value(pt);
+
+        if(field.isEmpty()) {
+            continue;
+        }
+
+        const double amt = order.value(field).toVariant().toDouble();
+
+        if(amt > 1e-9) {
+            const char *const nm = payment_names.value(pt);
+
+            if(nm) {
+                parts << QCoreApplication::translate("PaymentType", nm);
+            }
+        }
+    }
+
+    if(parts.isEmpty()) {
+        return tr("No", "kitchen_paid_column");
+    }
+
+    return parts.join(QStringLiteral(", "));
 }
 
 QString DlgKitchenInProgress::formatQtyWidth5(double qty)
@@ -213,19 +324,6 @@ QString DlgKitchenInProgress::formatQtyWidth5(double qty)
     }
 
     return s.leftJustified(5, QLatin1Char(' '));
-}
-
-bool DlgKitchenInProgress::isOrderPaid(const QJsonObject &order)
-{
-    auto gt0 = [](const QJsonValue &v) {
-        const QVariant qv = v.toVariant();
-
-        return qv.toDouble() > 1e-9;
-    };
-
-    return gt0(order.value(QStringLiteral("f_amount_cash")))
-           || gt0(order.value(QStringLiteral("f_amount_card")))
-           || gt0(order.value(QStringLiteral("f_amount_idram")));
 }
 
 QString DlgKitchenInProgress::guestMultiline(const QJsonObject &order)
@@ -269,9 +367,13 @@ QString DlgKitchenInProgress::haystackForSearch(const QJsonObject &order) const
     parts << order.value(QStringLiteral("f_table_name")).toString();
     parts << order.value(QStringLiteral("f_hall_name")).toString();
     parts << order.value(QStringLiteral("f_time_open")).toString();
-    parts << order.value(QStringLiteral("f_amount_cash")).toVariant().toString();
-    parts << order.value(QStringLiteral("f_amount_card")).toVariant().toString();
-    parts << order.value(QStringLiteral("f_amount_idram")).toVariant().toString();
+    for(int pt : payment_types) {
+        const QString field = payment_fields.value(pt);
+
+        if(!field.isEmpty()) {
+            parts << order.value(field).toVariant().toString();
+        }
+    }
     parts << guestMultiline(order);
 
     const QJsonArray lines = order.value(QStringLiteral("lines")).toArray();
@@ -349,9 +451,8 @@ void DlgKitchenInProgress::fillTableRows(const QJsonArray &orders)
         auto *itHall = new QTableWidgetItem(order.value(QStringLiteral("f_hall_name")).toString());
         auto *itDishes = new QTableWidgetItem(dishTexts.join(QLatin1Char('\n')));
         auto *itGuest = new QTableWidgetItem(guestMultiline(order));
-        const bool paid = isOrderPaid(order);
-        auto *itPaid = new QTableWidgetItem(paidYesNoText(paid));
-        auto *itTime = new QTableWidgetItem(order.value(QStringLiteral("f_time_open")).toString());
+        auto *itPaid = new QTableWidgetItem(paymentColumnText(order));
+        auto *itTime = new QTableWidgetItem(formatKitchenOpenedCell(order));
         auto *itStatus = new QTableWidgetItem(statusTexts.join(QLatin1Char('\n')));
 
         const Qt::Alignment top = Qt::AlignTop;
@@ -389,20 +490,16 @@ void DlgKitchenInProgress::fillTableRows(const QJsonArray &orders)
 
 void DlgKitchenInProgress::applyFixedColumnLayout()
 {
-    const int viewportWidth = qMax(1, ui->tblKitchenOrders->viewport()->width());
-    const double scale = viewportWidth / 1024.0;
-    auto scaled = [scale](int base, int minw) {
-        return qMax(minw, int(base * scale));
-    };
+    /* Technical id column always hidden. */
+    ui->tblKitchenOrders->setColumnHidden(ColHeaderId, true);
 
-    ui->tblKitchenOrders->setColumnWidth(ColOrderPrefix, scaled(120, 80));
-    ui->tblKitchenOrders->setColumnWidth(ColTableName, scaled(90, 70));
-    ui->tblKitchenOrders->setColumnWidth(ColHallName, scaled(90, 70));
-    ui->tblKitchenOrders->setColumnWidth(ColDishes, scaled(300, 220));
-    ui->tblKitchenOrders->setColumnWidth(ColGuest, scaled(200, 130));
-    ui->tblKitchenOrders->setColumnWidth(ColPaid, scaled(70, 55));
-    ui->tblKitchenOrders->setColumnWidth(ColTimeOpen, scaled(70, 55));
-    ui->tblKitchenOrders->setColumnWidth(ColStatus, scaled(84, 65));
+    for(const KitchenColDef &c : kKitchenCols) {
+        const QString idStr = QLatin1String(c.id);
+        const bool visible = readKitchenSetting(kitchenColRegKey(idStr, "visible"), c.defaultVisible).toBool();
+        const int width = qMax(20, readKitchenSetting(kitchenColRegKey(idStr, "width"), c.defaultWidth).toInt());
+        ui->tblKitchenOrders->setColumnHidden(c.col, !visible);
+        ui->tblKitchenOrders->setColumnWidth(c.col, width);
+    }
 }
 
 void DlgKitchenInProgress::applyFrontendFilters()
@@ -757,4 +854,40 @@ void DlgKitchenInProgress::on_btnOrderNumberKbd_clicked()
     }
 
     ui->leOrderNumber->setText(s);
+}
+
+void DlgKitchenInProgress::on_btnSettings_clicked()
+{
+    QVector<KitchenColSetting> cols;
+    cols.reserve(int(sizeof(kKitchenCols) / sizeof(kKitchenCols[0])));
+
+    for(const KitchenColDef &c : kKitchenCols) {
+        KitchenColSetting s;
+        s.id = QLatin1String(c.id);
+        s.label = QCoreApplication::translate("DlgKitchenSettings", c.label);
+        s.defaultWidth = c.defaultWidth;
+        s.defaultVisible = c.defaultVisible;
+        s.minWidth = 30;
+        s.maxWidth = 1200;
+        s.visible = readKitchenSetting(kitchenColRegKey(s.id, "visible"), c.defaultVisible).toBool();
+        s.width = qBound(s.minWidth,
+                         readKitchenSetting(kitchenColRegKey(s.id, "width"), c.defaultWidth).toInt(),
+                         s.maxWidth);
+        cols.append(s);
+    }
+
+    DlgKitchenSettings dlg(mUser, cols, this);
+
+    if(dlg.exec() != QDialog::Accepted) {
+        return;
+    }
+
+    const QVector<KitchenColSetting> updated = dlg.result();
+
+    for(const KitchenColSetting &s : updated) {
+        writeKitchenSetting(kitchenColRegKey(s.id, "visible"), s.visible);
+        writeKitchenSetting(kitchenColRegKey(s.id, "width"), s.width);
+    }
+
+    applyFixedColumnLayout();
 }

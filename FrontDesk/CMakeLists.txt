@@ -80,12 +80,12 @@ set(APP_SOURCES
     ../Editors/ce5packagelist.ui
     ../Editors/ce5storereason.ui
     ../Forms/armsoftexportoptions.ui
-    ../Forms/c5cashdoc.ui
+
     ../Forms/c5changedocinputprice.ui
     ../Forms/c5changepassword.ui
     ../Forms/c5changepriceofgroup.ui
 
-    ../Forms/c5costumerdebtpayment.ui
+
     ../Forms/c5datasynchronize.ui
     ../Forms/c5daterange.ui
     ../Forms/c5dbresetoption.ui
@@ -105,8 +105,8 @@ set(APP_SOURCES
     ../Forms/c5progressdialog.ui
     ../Forms/c5route.ui
     ../Forms/c5salarydoc.ui
-    ../Forms/c5salarypayment.ui
-    ../Forms/c5saledoc.ui
+
+
     ../Forms/c5goodsprice.ui
     c5aboutdlg.ui
     ../Forms/c5salefromstoreorder.ui
@@ -119,7 +119,7 @@ set(APP_SOURCES
     c5storeinventory.ui
     ../Forms/c5toolbarwidget.ui
     ../Forms/c5translatorform.ui
-    ../Forms/c5waiterorder.ui
+
     ../Forms/change.ui
     ../Forms/cr5routereport.ui
 
@@ -150,7 +150,7 @@ set(APP_SOURCES
     ../Reports/cr5cashdetailedfilter.ui
     ../Reports/cr5cashmovementfilter.ui
     ../Reports/cr5consuptionreasonfilter.ui
-    ../Reports/cr5costumerdebtsfilter.ui
+
     ../Reports/cr5currencycrossratehistoryfilter.ui
     ../Reports/cr5currencyratehistoryfilter.ui
     ../Reports/cr5draftoutputbyrecipefilter.ui
@@ -291,12 +291,12 @@ set(APP_SOURCES
     ../Editors/ce5storereason.h
     ../Forms/armsoftexportoptions.h
     ../Forms/barcode.h
-    ../Forms/c5cashdoc.h
+
     ../Forms/c5changedocinputprice.h
     ../Forms/c5changepassword.h
     ../Forms/c5changepriceofgroup.h
 
-    ../Forms/c5costumerdebtpayment.h
+
     ../Forms/c5datasynchronize.h
     ../Forms/c5daterange.h
     ../Forms/c5dbresetoption.h
@@ -317,8 +317,8 @@ set(APP_SOURCES
     ../Forms/c5reportwidget.h
     ../Forms/c5route.h
     ../Forms/c5salarydoc.h
-    ../Forms/c5salarypayment.h
-    ../Forms/c5saledoc.h
+
+
     ../Forms/c5salefromstoreorder.h
     ../Forms/c5selector.h
     ../Forms/c5srofinventory.h
@@ -330,7 +330,7 @@ set(APP_SOURCES
     ../Forms/c5tablewidgetwithselector.h
     ../Forms/c5toolbarwidget.h
     ../Forms/c5translatorform.h
-    ../Forms/c5waiterorder.h
+
     ../Forms/change.h
     ../Forms/cr5routereport.h
 
@@ -358,7 +358,7 @@ set(APP_SOURCES
     ../Reports/cr5breezeservice.h
     ../Reports/cr5carvisits.h
     ../Reports/cr5carvisitsfilter.h
-    ../Reports/cr5cashdetailed.h
+
     ../Reports/cr5cashdetailedfilter.h
     ../Reports/cr5cashmovement.h
     ../Reports/cr5cashmovementfilter.h
@@ -366,8 +366,8 @@ set(APP_SOURCES
     ../Reports/cr5complectations.h
     ../Reports/cr5consuptionreason.h
     ../Reports/cr5consuptionreasonfilter.h
-    ../Reports/cr5costumerdebts.h
-    ../Reports/cr5costumerdebtsfilter.h
+
+
     ../Reports/cr5currencies.h
     ../Reports/cr5currencycrossrate.h
     ../Reports/cr5currencycrossratehistory.h
@@ -403,7 +403,7 @@ set(APP_SOURCES
     ../Reports/cr5printers.h
     ../Reports/cr5reports.h
     ../Reports/cr5reportsfilter.h
-    ../Reports/cr5routedaily.h
+
     ../Reports/cr5routedailyfilter.h
     ../Reports/cr5salarybyworkers.h
     ../Reports/cr5salarybyworkersfilter.h
@@ -411,19 +411,13 @@ set(APP_SOURCES
     ../Reports/cr5saleflags.h
     ../Reports/cr5salefromstoretotal.h
     ../Reports/cr5salefromstoretotalfilter.h
-    ../Reports/cr5saleremoveddishes.h
+
     ../Reports/cr5saleremoveddishesfilter.h
     ../Reports/cr5salesbydishes.h
     ../Reports/cr5salesbydishesfilter.h
     ../Reports/cr5storereason.h
     ../Reports/cr5usersfilter.h
     ../Service5Working/utils/servicecommands.h
-    ../TableRecord/aheader.h
-    ../TableRecord/bclientdebts.h
-    ../TableRecord/bhistory.h
-    ../TableRecord/c5dbrecord.h
-    ../TableRecord/cpartners.h
-    ../TableRecord/ecash.h
     ../Cafe5/c5config.h
     ../Cafe5/c5database.h
     ../Cafe5/c5dialog.h
@@ -489,7 +483,7 @@ set(APP_SOURCES
     ../Editors/ce5dishremovereason.h
     ../Reports/cr5discountsystem.h
     ../Editors/ce5discountcard.h
-    ../Reports/cr5salefromstore.h
+
     ../Reports/cr5salefromstorefilter.h
     ../Reports/cr5hall.h
     ../Editors/ce5halls.h
@@ -604,12 +598,12 @@ set(APP_SOURCES
     ../Editors/ce5storereason.cpp
     ../Forms/armsoftexportoptions.cpp
     ../Forms/barcode.cpp
-    ../Forms/c5cashdoc.cpp
+
     ../Forms/c5changedocinputprice.cpp
     ../Forms/c5changepassword.cpp
     ../Forms/c5changepriceofgroup.cpp
 
-    ../Forms/c5costumerdebtpayment.cpp
+
     ../Forms/c5datasynchronize.cpp
     ../Forms/c5daterange.cpp
     ../Forms/c5dbresetoption.cpp
@@ -630,8 +624,8 @@ set(APP_SOURCES
     ../Forms/c5reportwidget.cpp
     ../Forms/c5route.cpp
     ../Forms/c5salarydoc.cpp
-    ../Forms/c5salarypayment.cpp
-    ../Forms/c5saledoc.cpp
+
+
     ../Forms/c5salefromstoreorder.cpp
     ../Forms/c5selector.cpp
     ../Forms/c5srofinventory.cpp
@@ -643,7 +637,7 @@ set(APP_SOURCES
     ../Forms/c5tablewidgetwithselector.cpp
     ../Forms/c5toolbarwidget.cpp
     ../Forms/c5translatorform.cpp
-    ../Forms/c5waiterorder.cpp
+
     ../Forms/change.cpp
     ../Forms/cr5routereport.cpp
 
@@ -671,7 +665,7 @@ set(APP_SOURCES
     ../Reports/cr5breezeservice.cpp
     ../Reports/cr5carvisits.cpp
     ../Reports/cr5carvisitsfilter.cpp
-    ../Reports/cr5cashdetailed.cpp
+
     ../Reports/cr5cashdetailedfilter.cpp
     ../Reports/cr5cashmovement.cpp
     ../Reports/cr5cashmovementfilter.cpp
@@ -679,8 +673,8 @@ set(APP_SOURCES
     ../Reports/cr5complectations.cpp
     ../Reports/cr5consuptionreason.cpp
     ../Reports/cr5consuptionreasonfilter.cpp
-    ../Reports/cr5costumerdebts.cpp
-    ../Reports/cr5costumerdebtsfilter.cpp
+
+
     ../Reports/cr5currencies.cpp
     ../Reports/cr5currencycrossrate.cpp
     ../Reports/cr5currencycrossratehistory.cpp
@@ -721,7 +715,7 @@ set(APP_SOURCES
     ../Reports/cr5printers.cpp
     ../Reports/cr5reports.cpp
     ../Reports/cr5reportsfilter.cpp
-    ../Reports/cr5routedaily.cpp
+
     ../Reports/cr5routedailyfilter.cpp
     ../Reports/cr5salarybyworkers.cpp
     ../Reports/cr5salarybyworkersfilter.cpp
@@ -729,18 +723,12 @@ set(APP_SOURCES
     ../Reports/cr5saleflags.cpp
     ../Reports/cr5salefromstoretotal.cpp
     ../Reports/cr5salefromstoretotalfilter.cpp
-    ../Reports/cr5saleremoveddishes.cpp
+
     ../Reports/cr5saleremoveddishesfilter.cpp
     ../Reports/cr5salesbydishes.cpp
     ../Reports/cr5salesbydishesfilter.cpp
     ../Reports/cr5storereason.cpp
     ../Reports/cr5usersfilter.cpp
-    ../TableRecord/aheader.cpp
-    ../TableRecord/bclientdebts.cpp
-    ../TableRecord/bhistory.cpp
-    ../TableRecord/c5dbrecord.cpp
-    ../TableRecord/cpartners.cpp
-    ../TableRecord/ecash.cpp
     ../Cafe5/c5config.cpp
     ../Cafe5/c5database.cpp
     ../Cafe5/c5dialog.cpp
@@ -806,7 +794,7 @@ set(APP_SOURCES
     ../Editors/ce5dishremovereason.cpp
     ../Reports/cr5discountsystem.cpp
     ../Editors/ce5discountcard.cpp
-    ../Reports/cr5salefromstore.cpp
+
     ../Reports/cr5salefromstorefilter.cpp
     ../Reports/cr5hall.cpp
     ../Editors/ce5halls.cpp
@@ -870,7 +858,10 @@ add_executable(OfficeN ${APP_SOURCES}
     mainwindow.cpp
     ../Service5/worker/struct_currency.h
     ../Service5/worker/struct_cashbox.h
-    ../Service5/worker/struct_payment_type.h)
+    ../Service5/worker/struct_payment_type.h
+    rcashmovement.h rcashmovement.cpp
+    rdebts.h rdebts.cpp
+    rtotalreviewreport.h rtotalreviewreport.cpp)
 
 set_target_properties(OfficeN PROPERTIES
     UNITY_BUILD ON

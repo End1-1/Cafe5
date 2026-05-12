@@ -114,6 +114,7 @@ SOURCES += \
         main.cpp \
         dlgface.cpp \
         dlgkitcheninprogress.cpp \
+        dlgkitchensettings.cpp \
     ../Cafe5/c5dialog.cpp \
     ../Cafe5/c5utils.cpp \
     ../Cafe5/c5message.cpp \
@@ -226,6 +227,7 @@ HEADERS += \
     dlgeditphone.h \
         dlgface.h \
         dlgkitcheninprogress.h \
+        dlgkitchensettings.h \
     ../Cafe5/c5dialog.h \
     ../Cafe5/c5utils.h \
     ../Cafe5/c5message.h \
@@ -320,6 +322,7 @@ FORMS += \
     dlgeditphone.ui \
         dlgface.ui \
         dlgkitcheninprogress.ui \
+        dlgkitchensettings.ui \
     ../Cafe5/c5message.ui \
     dlgguests.ui \
     dlglist.ui \

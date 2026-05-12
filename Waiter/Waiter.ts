@@ -4918,27 +4918,27 @@ MS Excel</source>
     <message>
         <location filename="../dictionaries/dict_dish_state.cpp" line="5"/>
         <source>None</source>
-        <translation type="unfinished"></translation>
+        <translation>Անհայտ</translation>
     </message>
     <message>
         <location filename="../dictionaries/dict_dish_state.cpp" line="6"/>
         <source>Normal</source>
-        <translation type="unfinished"></translation>
+        <translation>Նորմալ</translation>
     </message>
     <message>
         <location filename="../dictionaries/dict_dish_state.cpp" line="7"/>
         <source>Mistake</source>
-        <translation type="unfinished">Սխալ</translation>
+        <translation>Սխալ</translation>
     </message>
     <message>
         <location filename="../dictionaries/dict_dish_state.cpp" line="8"/>
         <source>Void</source>
-        <translation type="unfinished"></translation>
+        <translation>Ճեղարկված</translation>
     </message>
     <message>
         <location filename="../dictionaries/dict_dish_state.cpp" line="9"/>
         <source>Set</source>
-        <translation type="unfinished"></translation>
+        <translation>Փաթեթ</translation>
     </message>
 </context>
 <context>
@@ -5875,144 +5875,222 @@ MS Excel</source>
     </message>
     <message>
         <location filename="dlgkitcheninprogress.ui" line="107"/>
-        <location filename="dlgkitcheninprogress.cpp" line="755"/>
+        <location filename="dlgkitcheninprogress.cpp" line="855"/>
         <source>Order No</source>
         <translation>Պատվեր №</translation>
     </message>
     <message>
         <location filename="dlgkitcheninprogress.ui" line="159"/>
-        <location filename="dlgkitcheninprogress.cpp" line="744"/>
+        <location filename="dlgkitcheninprogress.cpp" line="844"/>
         <source>Search</source>
         <translation>Փնտրել</translation>
     </message>
     <message>
-        <location filename="dlgkitcheninprogress.ui" line="231"/>
+        <location filename="dlgkitcheninprogress.ui" line="266"/>
         <source>Id</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="dlgkitcheninprogress.ui" line="236"/>
+        <location filename="dlgkitcheninprogress.ui" line="271"/>
         <source>Order</source>
         <translation>Պատվեր</translation>
     </message>
     <message>
-        <location filename="dlgkitcheninprogress.ui" line="241"/>
+        <location filename="dlgkitcheninprogress.ui" line="281"/>
         <source>Table</source>
         <translation>Սեղան</translation>
     </message>
     <message>
-        <location filename="dlgkitcheninprogress.ui" line="246"/>
+        <location filename="dlgkitcheninprogress.ui" line="286"/>
         <source>Hall</source>
         <translation>Սրահ</translation>
     </message>
     <message>
-        <location filename="dlgkitcheninprogress.ui" line="251"/>
+        <location filename="dlgkitcheninprogress.ui" line="291"/>
         <source>Dishes</source>
-        <translation>Ուտեստներ</translation>
+        <translation>Անվանում</translation>
     </message>
     <message>
-        <location filename="dlgkitcheninprogress.ui" line="256"/>
+        <location filename="dlgkitcheninprogress.ui" line="296"/>
         <source>Guest</source>
         <translation>Հյուր</translation>
     </message>
     <message>
-        <location filename="dlgkitcheninprogress.ui" line="261"/>
-        <source>Paid</source>
-        <translation>Վճարում</translation>
-    </message>
-    <message>
-        <location filename="dlgkitcheninprogress.ui" line="266"/>
+        <location filename="dlgkitcheninprogress.ui" line="276"/>
         <source>Time</source>
         <translation>Ժամ</translation>
     </message>
     <message>
-        <location filename="dlgkitcheninprogress.ui" line="271"/>
+        <location filename="dlgkitcheninprogress.ui" line="301"/>
+        <source>Payment</source>
+        <translation>Վճարում</translation>
+    </message>
+    <message>
+        <location filename="dlgkitcheninprogress.ui" line="306"/>
         <source>Status</source>
         <translation>Վիճակ</translation>
     </message>
     <message>
-        <location filename="dlgkitcheninprogress.ui" line="299"/>
+        <location filename="dlgkitcheninprogress.ui" line="331"/>
         <source>Cooking</source>
         <translation>Պատրաստվող</translation>
     </message>
     <message>
-        <location filename="dlgkitcheninprogress.ui" line="321"/>
+        <location filename="dlgkitcheninprogress.ui" line="353"/>
         <source>Ready</source>
         <translation>Պատրաստ</translation>
     </message>
     <message>
-        <location filename="dlgkitcheninprogress.ui" line="343"/>
+        <location filename="dlgkitcheninprogress.ui" line="375"/>
         <source>Accepted</source>
         <translation>Ընդունված</translation>
     </message>
     <message>
-        <location filename="dlgkitcheninprogress.ui" line="375"/>
+        <location filename="dlgkitcheninprogress.ui" line="410"/>
         <source>Lock</source>
         <translation>Փակել</translation>
     </message>
     <message>
-        <location filename="dlgkitcheninprogress.cpp" line="179"/>
+        <location filename="dlgkitcheninprogress.cpp" line="269"/>
         <source>Accepted</source>
         <comment>kitchen_line_status</comment>
         <translation>Ընդունված</translation>
     </message>
     <message>
-        <location filename="dlgkitcheninprogress.cpp" line="181"/>
+        <location filename="dlgkitcheninprogress.cpp" line="271"/>
         <source>Cooking</source>
         <comment>kitchen_line_status</comment>
         <translation>Պատրաստվող</translation>
     </message>
     <message>
-        <location filename="dlgkitcheninprogress.cpp" line="183"/>
+        <location filename="dlgkitcheninprogress.cpp" line="273"/>
         <source>Ready</source>
         <comment>kitchen_line_status</comment>
         <translation>Պատրաստ</translation>
     </message>
     <message>
-        <location filename="dlgkitcheninprogress.cpp" line="185"/>
+        <location filename="dlgkitcheninprogress.cpp" line="275"/>
         <source>Served</source>
         <comment>kitchen_line_status</comment>
         <translation>Հանձնված</translation>
     </message>
     <message>
-        <location filename="dlgkitcheninprogress.cpp" line="193"/>
-        <source>Yes</source>
-        <comment>kitchen_paid_column</comment>
-        <translation>Այո</translation>
-    </message>
-    <message>
-        <location filename="dlgkitcheninprogress.cpp" line="193"/>
+        <location filename="dlgkitcheninprogress.cpp" line="304"/>
         <source>No</source>
         <comment>kitchen_paid_column</comment>
         <translation>Ոչ</translation>
     </message>
     <message>
-        <location filename="dlgkitcheninprogress.cpp" line="497"/>
+        <location filename="dlgkitcheninprogress.cpp" line="597"/>
         <source>Mark as served to the guest? The line will disappear from the kitchen list.</source>
         <comment>kitchen_confirm_served</comment>
         <translation>Հաստատեք հանձնելը</translation>
     </message>
     <message>
-        <location filename="dlgkitcheninprogress.cpp" line="499"/>
+        <location filename="dlgkitcheninprogress.cpp" line="599"/>
         <source>Mark all selected lines as served to the guest? They will disappear from the kitchen list.</source>
         <comment>kitchen_confirm_served_all</comment>
         <translation>Հաստատեք հանձնելը</translation>
     </message>
     <message>
-        <location filename="dlgkitcheninprogress.cpp" line="572"/>
+        <location filename="dlgkitcheninprogress.cpp" line="672"/>
         <source>All</source>
         <comment>kitchen_pick_line</comment>
         <translation>Բոլորը</translation>
     </message>
     <message>
-        <location filename="dlgkitcheninprogress.cpp" line="706"/>
+        <location filename="dlgkitcheninprogress.cpp" line="806"/>
         <source>Cannot open order</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="dlgkitcheninprogress.cpp" line="729"/>
+        <location filename="dlgkitcheninprogress.cpp" line="829"/>
         <source>Cannot resolve hall/table</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
+    </message>
+</context>
+<context>
+    <name>DlgKitchenSettings</name>
+    <message>
+        <location filename="dlgkitchensettings.ui" line="14"/>
+        <location filename="dlgkitchensettings.ui" line="35"/>
+        <source>Column settings</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="dlgkitchensettings.ui" line="45"/>
+        <source>Toggle visibility and adjust column widths.</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="dlgkitchensettings.ui" line="77"/>
+        <source>Show</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="dlgkitchensettings.ui" line="82"/>
+        <source>Column</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="dlgkitchensettings.ui" line="87"/>
+        <source>Width</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="dlgkitchensettings.ui" line="112"/>
+        <source>Reset to defaults</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="dlgkitchensettings.ui" line="144"/>
+        <source>Cancel</source>
+        <translation>Հրաժարվել</translation>
+    </message>
+    <message>
+        <location filename="dlgkitchensettings.ui" line="163"/>
+        <source>Save</source>
+        <translation>Պահպանել</translation>
+    </message>
+    <message>
+        <location filename="dlgkitcheninprogress.cpp" line="49"/>
+        <source>Order</source>
+        <translation>Պատվեր</translation>
+    </message>
+    <message>
+        <location filename="dlgkitcheninprogress.cpp" line="50"/>
+        <source>Time</source>
+        <translation>Ժամ</translation>
+    </message>
+    <message>
+        <location filename="dlgkitcheninprogress.cpp" line="51"/>
+        <source>Table</source>
+        <translation>Սեղան</translation>
+    </message>
+    <message>
+        <location filename="dlgkitcheninprogress.cpp" line="52"/>
+        <source>Hall</source>
+        <translation>Սրահ</translation>
+    </message>
+    <message>
+        <location filename="dlgkitcheninprogress.cpp" line="53"/>
+        <source>Dishes</source>
+        <translation>Ուտեստներ</translation>
+    </message>
+    <message>
+        <location filename="dlgkitcheninprogress.cpp" line="54"/>
+        <source>Guest</source>
+        <translation>Հյուր</translation>
+    </message>
+    <message>
+        <location filename="dlgkitcheninprogress.cpp" line="55"/>
+        <source>Payment</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="dlgkitcheninprogress.cpp" line="56"/>
+        <source>Status</source>
+        <translation>Վիճակ</translation>
     </message>
 </context>
 <context>
@@ -6616,47 +6694,52 @@ info</source>
         <translation>Նշված վճարման եղանակները չի կարելի խարնել</translation>
     </message>
     <message>
-        <location filename="dlgorder.cpp" line="3040"/>
+        <location filename="dlgorder.cpp" line="2799"/>
+        <source>Order was not opened</source>
+        <translation>Պարվերը դատարկ է</translation>
+    </message>
+    <message>
+        <location filename="dlgorder.cpp" line="3053"/>
         <source>Reprint selected items?</source>
         <translation>Կրկնակի տպել նշված տողերը՞</translation>
     </message>
     <message>
-        <location filename="dlgorder.cpp" line="3055"/>
+        <location filename="dlgorder.cpp" line="3068"/>
         <source>Reprint service</source>
         <translation>Կրկնակի տպել</translation>
     </message>
     <message>
-        <location filename="dlgorder.cpp" line="3208"/>
+        <location filename="dlgorder.cpp" line="3221"/>
         <source>Mark selected items as complimentary</source>
         <translation>Նշել ընտրված տողերը որպես հյուրասիրություն</translation>
     </message>
     <message>
-        <location filename="dlgorder.cpp" line="3340"/>
+        <location filename="dlgorder.cpp" line="3353"/>
         <source>Nothing to transfer</source>
         <translation>Ոչինչ չկա տեղափոխելու համար</translation>
     </message>
     <message>
-        <location filename="dlgorder.cpp" line="3365"/>
+        <location filename="dlgorder.cpp" line="3378"/>
         <source>Transfer successfull</source>
         <translation>Տեղափոխությունը կատարված է</translation>
     </message>
     <message>
-        <location filename="dlgorder.cpp" line="3376"/>
+        <location filename="dlgorder.cpp" line="3389"/>
         <source>Confirm table transfer</source>
         <translation>Հատատեք սեղանի տեղափոխությունը</translation>
     </message>
     <message>
-        <location filename="dlgorder.cpp" line="3397"/>
+        <location filename="dlgorder.cpp" line="3410"/>
         <source>Do you want to reopen order?</source>
         <translation>Դուք ցանկանում եք վերաբացել պատվերը՞</translation>
     </message>
     <message>
-        <location filename="dlgorder.cpp" line="3410"/>
+        <location filename="dlgorder.cpp" line="3423"/>
         <source>Do you want to print the fiscal receipt?</source>
         <translation>Ցանկանում եք տպել ՀԴՄ՞</translation>
     </message>
     <message>
-        <location filename="dlgorder.cpp" line="3499"/>
+        <location filename="dlgorder.cpp" line="3512"/>
         <source>Empty order</source>
         <translation>Դատարկ պատվեր</translation>
     </message>
@@ -6672,7 +6755,7 @@ info</source>
     </message>
     <message>
         <location filename="dlgorder.cpp" line="789"/>
-        <location filename="dlgorder.cpp" line="3224"/>
+        <location filename="dlgorder.cpp" line="3237"/>
         <source>Complimentary</source>
         <translation>Հյուրասիրություն</translation>
     </message>
@@ -6746,7 +6829,7 @@ info</source>
     </message>
     <message>
         <location filename="dlgorder.cpp" line="1169"/>
-        <location filename="dlgorder.cpp" line="2938"/>
+        <location filename="dlgorder.cpp" line="2951"/>
         <source>Cannot add comment to hourly payment</source>
         <translation>Ժամավարձը խմբագրման ենթակա չէ</translation>
     </message>
@@ -6767,26 +6850,26 @@ info</source>
     </message>
     <message>
         <location filename="dlgorder.cpp" line="1456"/>
-        <location filename="dlgorder.cpp" line="2950"/>
-        <location filename="dlgorder.cpp" line="3090"/>
+        <location filename="dlgorder.cpp" line="2963"/>
+        <location filename="dlgorder.cpp" line="3103"/>
         <source>Do you want to remove this item</source>
         <translation>Հաստատեք հեռացումը</translation>
     </message>
     <message>
         <location filename="dlgorder.cpp" line="1463"/>
-        <location filename="dlgorder.cpp" line="3098"/>
+        <location filename="dlgorder.cpp" line="3111"/>
         <source>Reason of remove</source>
         <translation>Հեռացման պատճառը</translation>
     </message>
     <message>
         <location filename="dlgorder.cpp" line="1467"/>
-        <location filename="dlgorder.cpp" line="3102"/>
+        <location filename="dlgorder.cpp" line="3115"/>
         <source>Mistake</source>
         <translation>Սխալ</translation>
     </message>
     <message>
         <location filename="dlgorder.cpp" line="1467"/>
-        <location filename="dlgorder.cpp" line="3102"/>
+        <location filename="dlgorder.cpp" line="3115"/>
         <source>With store output</source>
         <translation>Դուրսգրումով</translation>
     </message>
@@ -6794,26 +6877,26 @@ info</source>
         <location filename="dlgorder.cpp" line="1467"/>
         <location filename="dlgorder.cpp" line="1571"/>
         <location filename="dlgorder.cpp" line="1623"/>
-        <location filename="dlgorder.cpp" line="2817"/>
-        <location filename="dlgorder.cpp" line="3102"/>
+        <location filename="dlgorder.cpp" line="2830"/>
+        <location filename="dlgorder.cpp" line="3115"/>
         <source>Cancel</source>
         <translation>Հրաժարվել</translation>
     </message>
     <message>
         <location filename="dlgorder.cpp" line="1503"/>
-        <location filename="dlgorder.cpp" line="2848"/>
-        <location filename="dlgorder.cpp" line="3153"/>
-        <location filename="dlgorder.cpp" line="3319"/>
+        <location filename="dlgorder.cpp" line="2861"/>
+        <location filename="dlgorder.cpp" line="3166"/>
+        <location filename="dlgorder.cpp" line="3332"/>
         <source>Remove printed dish</source>
         <translation>Մենեջերի գախտնաբառ</translation>
     </message>
     <message>
         <location filename="dlgorder.cpp" line="1334"/>
         <location filename="dlgorder.cpp" line="1512"/>
-        <location filename="dlgorder.cpp" line="2856"/>
-        <location filename="dlgorder.cpp" line="3162"/>
-        <location filename="dlgorder.cpp" line="3328"/>
-        <location filename="dlgorder.cpp" line="3385"/>
+        <location filename="dlgorder.cpp" line="2869"/>
+        <location filename="dlgorder.cpp" line="3175"/>
+        <location filename="dlgorder.cpp" line="3341"/>
+        <location filename="dlgorder.cpp" line="3398"/>
         <source>Permission denied</source>
         <translation>Արգելված է</translation>
     </message>
@@ -6874,22 +6957,22 @@ info</source>
     </message>
     <message>
         <location filename="dlgorder.cpp" line="2742"/>
-        <location filename="dlgorder.cpp" line="3415"/>
+        <location filename="dlgorder.cpp" line="3428"/>
         <source>Printing fiscal check</source>
         <translation>ՀԴՄ կտրոնի տպում</translation>
     </message>
     <message>
-        <location filename="dlgorder.cpp" line="2880"/>
+        <location filename="dlgorder.cpp" line="2893"/>
         <source>Raise permissions</source>
         <translation>Ստանալ իրավասություն</translation>
     </message>
     <message>
-        <location filename="dlgorder.cpp" line="2900"/>
+        <location filename="dlgorder.cpp" line="2913"/>
         <source>Order comment</source>
         <translation>Պատվերի մեկնաբանություն</translation>
     </message>
     <message>
-        <location filename="dlgorder.cpp" line="2943"/>
+        <location filename="dlgorder.cpp" line="2956"/>
         <source>Use removal tool</source>
         <translation>Օգտագործեք հեռացման կոճակը</translation>
     </message>
@@ -7763,7 +7846,7 @@ STOPLIST-ից</translation>
     <message>
         <location filename="dlgsearchinmenu.ui" line="66"/>
         <source>Search in menu</source>
-        <translation type="unfinished">Փնտրել անվանուն</translation>
+        <translation>Փնտրել անվանուն</translation>
     </message>
     <message>
         <location filename="dlgsearchinmenu.ui" line="117"/>

@@ -1,6 +1,5 @@
 #include "c5salarydoc.h"
 #include "c5cache.h"
-#include "c5cashdoc.h"
 #include "c5config.h"
 #include "c5dateedit.h"
 #include "c5lineeditwithselector.h"
@@ -323,10 +322,6 @@ void C5SalaryDoc::removeSalaryOfShift()
 
     while(db.nextRow()) {
         paid.append(db.getString("f_paid"));
-    }
-
-    for(const QString &s : paid) {
-        C5CashDoc::removeDoc(db, s);
     }
 }
 

@@ -21,7 +21,6 @@
 #include "c5config.h"
 #include "c5mainwindow.h"
 #include "c5message.h"
-#include "c5revenuecashop.h"
 #include "c5salaryeditor.h"
 #include "c5storeinput.h"
 #include "c5storeinventory.h"
@@ -185,10 +184,15 @@ void RAbstractEditorReport::on_tbl_doubleClicked(const QModelIndex &index)
         return;
     }
 
+    const QModelIndex srcIndex = mProxyModel->mapToSource(index);
+    if(!srcIndex.isValid()) {
+        return;
+    }
+
     RAbstractEditorDialog *dialog = nullptr;
 
     if(mEditorName == "Workstations") {
-        int type = mModel->data(mModel->index(index.row(), 1), Qt::DisplayRole).toInt();
+        int type = mModel->data(mModel->index(srcIndex.row(), 1), Qt::DisplayRole).toInt();
 
         switch(type) {
         case WORKSTATION_WAITER:
@@ -230,7 +234,7 @@ void RAbstractEditorReport::on_tbl_doubleClicked(const QModelIndex &index)
                 return;
             }
             auto *sdoc = new C5SalaryEditor();
-            QDate date = QDate::fromString(mModel->data(mModel->index(index.row(), 0), Qt::DisplayRole).toString(), FORMAT_DATE_TO_STR);
+            QDate date = QDate::fromString(mModel->data(mModel->index(srcIndex.row(), 0), Qt::DisplayRole).toString(), FORMAT_DATE_TO_STR);
             sdoc->open(date, type);
             __mainWindow->addWidget(sdoc);
         }
@@ -245,7 +249,7 @@ void RAbstractEditorReport::on_tbl_doubleClicked(const QModelIndex &index)
         NInterface::query1("/engine/v2/common/store-move/open",
                            mUser->mSessionKey,
                            this,
-                           {{"id", mModel->data(mModel->index(index.row(), 0), Qt::DisplayRole).toString()}},
+                           {{"id", mModel->data(mModel->index(srcIndex.row(), 0), Qt::DisplayRole).toString()}},
                            [this](const QJsonObject &jo) {
                                StoreInputDocument sid = JsonParser<StoreInputDocument>::fromJson(jo.value("doc").toObject());
                                switch (sid.type) {
@@ -267,7 +271,7 @@ void RAbstractEditorReport::on_tbl_doubleClicked(const QModelIndex &index)
     }
 
     if (mEditorName == "form_cashsessions") {
-        QString id = mModel->data(mModel->index(index.row(), 0), Qt::DisplayRole).toString();
+        QString id = mModel->data(mModel->index(srcIndex.row(), 0), Qt::DisplayRole).toString();
         NInterface::query1("/engine/v2/waiter/order/query-order", mUser->mSessionKey, this, {{"id", id}}, [this](const QJsonObject &jo) {
             WaiterOrder order = JsonParser<WaiterOrder>::fromJson(jo.value("order").toObject());
 
@@ -283,7 +287,7 @@ void RAbstractEditorReport::on_tbl_doubleClicked(const QModelIndex &index)
         NInterface::query1("/engine/v2/common/stock/open-inventory",
                            mUser->mSessionKey,
                            this,
-                           {{"id", mModel->data(mModel->index(index.row(), 0), Qt::DisplayRole).toString()}},
+                           {{"id", mModel->data(mModel->index(srcIndex.row(), 0), Qt::DisplayRole).toString()}},
                            [this](const QJsonObject &jo) {
                                StoreInventoryDocument sid = JsonParser<StoreInventoryDocument>::fromJson(jo.value("data").toObject());
 
@@ -295,7 +299,7 @@ void RAbstractEditorReport::on_tbl_doubleClicked(const QModelIndex &index)
     }
 
     if (dialog) {
-        QJsonValue id = mModel->data(mModel->index(index.row(), 0), Qt::DisplayRole).toJsonValue();
+        QJsonValue id = mModel->data(mModel->index(srcIndex.row(), 0), Qt::DisplayRole).toJsonValue();
         dialog->setId(id);
 
         if(dialog->exec() == QDialog::Accepted) {
@@ -458,6 +462,22 @@ QJsonObject RAbstractEditorReport::filterObject(const QString &name)
     return {};
 }
 
+QModelIndex RAbstractEditorReport::reportMapViewIndexToSource(const QModelIndex &viewIndex) const
+{
+    if(!viewIndex.isValid() || !mProxyModel) {
+        return {};
+    }
+    return mProxyModel->mapToSource(viewIndex);
+}
+
+QVariant RAbstractEditorReport::reportSourceCellData(int sourceRow, int column, int role) const
+{
+    if(!mModel || sourceRow < 0 || column < 0) {
+        return {};
+    }
+    return mModel->data(mModel->index(sourceRow, column), role);
+}
+
 void RAbstractEditorReport::applyFilter()
 {
     RFilterDialog df(mUser);
@@ -476,6 +496,10 @@ void RAbstractEditorReport::removeAction()
     if (!index.isValid()) {
         return;
     }
+    const QModelIndex srcIndex = mProxyModel->mapToSource(index);
+    if (!srcIndex.isValid()) {
+        return;
+    }
     if (C5Message::question(tr("Do you want to delete the selected document?")) != QDialog::Accepted) {
         return;
     }
@@ -483,8 +507,8 @@ void RAbstractEditorReport::removeAction()
         NInterface::query1("/engine/v2/common/store-move/remove",
                            mUser->mSessionKey,
                            this,
-                           {{"id", mModel->data(mModel->index(index.row(), 0), Qt::DisplayRole).toString()}},
-                           [this, index](const QJsonObject &jo) { mModel->removeRow(index.row()); });
+                           {{"id", mModel->data(mModel->index(srcIndex.row(), 0), Qt::DisplayRole).toString()}},
+                           [this, srcIndex](const QJsonObject &jo) { mModel->removeRow(srcIndex.row()); });
         return;
     }
 }
@@ -505,25 +529,6 @@ void RAbstractEditorReport::newData()
     if (mEditorName == "form_salary") {
         auto *w = new C5SalaryEditor();
         __mainWindow->addWidget(w);
-    }
-
-    if (mEditorName == "form_revenue") {
-        int cashboxId = 0;
-        int currencyId = 1;
-        const QJsonObject cashboxObj = filterObject("cashbox");
-        if(!cashboxObj.isEmpty()) {
-            cashboxId = cashboxObj.value("cashbox").toInt();
-        }
-        const QJsonObject currencyObj = filterObject("currency");
-        if(!currencyObj.isEmpty()) {
-            currencyId = currencyObj.value("currency").toInt(1);
-        }
-
-        C5RevenueCashOp d(mUser, this);
-        d.setCashboxAndCurrency(cashboxId, currencyId);
-        if(d.exec() == QDialog::Accepted) {
-            getData();
-        }
     }
 }
 
@@ -675,7 +680,7 @@ void RAbstractEditorReport::exportToExcel()
             const QString textVal = mProxyModel->data(mProxyModel->index(r, c), Qt::DisplayRole).toString();
 
             if(mProxyModel->numericCols.contains(c)) {
-                d.write(currentExcelRow, excelCol, str_float(textVal), bfn);
+                d.write(currentExcelRow, excelCol, str_money_mysql_format(textVal), bfn);
             } else {
                 d.write(currentExcelRow, excelCol, textVal, bf);
             }

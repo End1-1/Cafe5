@@ -1,8 +1,8 @@
 #include "cr5reports.h"
 #include <QJsonObject>
+#include "c5database.h"
 #include "c5mainwindow.h"
 #include "c5message.h"
-#include "c5saledoc.h"
 #include "c5tablemodel.h"
 #include "c5tablewidget.h"
 #include "cr5reportsfilter.h"
@@ -112,36 +112,7 @@ bool CR5Reports::tblDoubleClicked(int row, int column, const QJsonArray &values)
         return true;
     }
 
-    if(fHandlerUuid == REPORT_HANDLER_SALE_DOC_OPEN_DRAFT) {
-        C5Database db;
-        db[":f_id"] = values.at(0).toString();
-        db.exec("select * from o_draft_sale where f_id=:f_id");
-
-        if(!db.nextRow()) {
-            C5Message::error(tr("Program error"), "draft not found by id");
-            return false;
-        }
-
-        int type = db.getInt("f_saletype");
-
-        if(type == 3) {
-            //todo QString err;
-            // auto *storedoc = __mainWindow->createTab<C5StoreDoc>();
-            // storedoc->setProperty("fromdraft", values.at(0).toString());
-            // storedoc->setMode(C5StoreDoc::sdInput);
-
-            // if(!storedoc->openDraft(values.at(0).toString(), err))  {
-            //     C5Message::error(err);
-            //     return false;
-            // }
-        } else {
-            auto *retaildoc = __mainWindow->createTab<C5SaleDoc>();
-            retaildoc->setMode(1);
-
-            if(!retaildoc->reportHandler(REPORT_HANDLER_SALE_DOC_OPEN_DRAFT, values.at(0))) {
-            }
-        }
-    } else if(fHandlerUuid == REPORT_HANDLER_GIFT_CARD_TOTAL) {
+    if (fHandlerUuid == REPORT_HANDLER_GIFT_CARD_TOTAL) {
         __mainWindow->createNTab("/engine/reports/gifthistorydetails.php", "", QJsonObject{{"card", values.at(1).toString()}});
     }
 
