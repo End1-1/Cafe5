@@ -106,25 +106,30 @@ void DlgPreordersList::loadData()
                                          ui->tblPreorders->setItem(r, 5, new QTableWidgetItem(creationCellText(o.value("f_date_open").toString(),
                                                                                                       o.value("f_time_open").toString())));
                                          ui->tblPreorders->setItem(r, 6, new QTableWidgetItem(preorderCellText(o.value("f_preorder_datetime").toString())));
+                                         const double totalAmt = o.value("f_amounttotal").toVariant().toDouble();
+                                         auto *totalItem = new QTableWidgetItem(QString("%1 %2").arg(float_str(totalAmt, 2), CURRENCY_SHORT));
+                                         totalItem->setTextAlignment(Qt::AlignRight | Qt::AlignVCenter);
+                                         ui->tblPreorders->setItem(r, 7, totalItem);
                                          const double prepaidAmt = o.value("f_deposit_prepaid").toVariant().toDouble();
-                                         ui->tblPreorders->setItem(r, 7,
-                                                                  new QTableWidgetItem(QString("%1 %2").arg(float_str(prepaidAmt, 2), CURRENCY_SHORT)));
-                                         ui->tblPreorders->setItem(r, 8, new QTableWidgetItem(o.value("f_guest_name").toString().trimmed()));
-                                         ui->tblPreorders->setItem(r,
-                                                                   9,
-                                                                   new QTableWidgetItem(o.value("f_guest_phone").toString().trimmed()));
+                                         auto *prepaidItem = new QTableWidgetItem(QString("%1 %2").arg(float_str(prepaidAmt, 2), CURRENCY_SHORT));
+                                         prepaidItem->setTextAlignment(Qt::AlignRight | Qt::AlignVCenter);
+                                         ui->tblPreorders->setItem(r, 8, prepaidItem);
+                                         ui->tblPreorders->setItem(r, 9, new QTableWidgetItem(o.value("f_guest_name").toString().trimmed()));
                                          ui->tblPreorders->setItem(r,
                                                                    10,
+                                                                   new QTableWidgetItem(o.value("f_guest_phone").toString().trimmed()));
+                                         ui->tblPreorders->setItem(r,
+                                                                   11,
                                                                    new QTableWidgetItem(o.value("f_guest_address").toString().trimmed()));
                                          auto *itHiddenTable = new QTableWidgetItem(QString::number(o.value("f_table").toInt()));
                                          auto *itHiddenHall = new QTableWidgetItem(QString::number(o.value("f_hall").toInt()));
-                                         ui->tblPreorders->setItem(r, 11, itHiddenTable);
-                                         ui->tblPreorders->setItem(r, 12, itHiddenHall);
+                                         ui->tblPreorders->setItem(r, 12, itHiddenTable);
+                                         ui->tblPreorders->setItem(r, 13, itHiddenHall);
                                          ++r;
                                      }
                                      ui->tblPreorders->setColumnHidden(0, true);
-                                     ui->tblPreorders->setColumnHidden(11, true);
                                      ui->tblPreorders->setColumnHidden(12, true);
+                                     ui->tblPreorders->setColumnHidden(13, true);
                                      ui->tblPreorders->resizeColumnsToContents();
                                  },
                                  [](const QJsonObject &) {},
@@ -141,8 +146,8 @@ void DlgPreordersList::openCurrent()
     }
 
     mOrderId = ui->tblPreorders->item(row, 0)->text();
-    mTableId = ui->tblPreorders->item(row, 11)->text().toInt();
-    mHallId = ui->tblPreorders->item(row, 12)->text().toInt();
+    mTableId = ui->tblPreorders->item(row, 12)->text().toInt();
+    mHallId = ui->tblPreorders->item(row, 13)->text().toInt();
     accept();
 }
 

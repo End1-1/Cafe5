@@ -1,4 +1,5 @@
 #include "dlgdashboard.h"
+#include "c5cashoperationtypes.h"
 #include "ui_dlgdashboard.h"
 #include "c5message.h"
 #include "ninterface.h"
@@ -24,6 +25,7 @@ DlgDashboard::DlgDashboard(const QJsonObject &jcashbox, C5User *user)
       mCashboxData(jcashbox)
 {
     ui->setupUi(this);
+    ui->lbStaff->setText(user->shortFullName());
     setup();
 }
 
@@ -109,17 +111,30 @@ void DlgDashboard::on_btnCloseCashbox_clicked()
         return ;
     }
 
-    DlgMoveMoney d(mUser);
-    d.setMode(2);
+    double amount_cash = 0;
+    const bool cashCounted = mWorkStation.data.value(QStringLiteral("input_cashbox_amount_before_close")).toBool();
 
-    if (d.exec() != QDialog::Accepted) {
-        return;
+    if (cashCounted) {
+        DlgMoveMoney d(mUser);
+        d.setMode(2);
+
+        if (d.exec() != QDialog::Accepted) {
+            return;
+        }
+        amount_cash = d.amount();
     }
 
-    NInterface::query1("/engine/v2/waiter/cashbox/close",
+    QJsonObject closeParams;
+    closeParams[QStringLiteral("cashbox_id")] = mWorkStation.cashboxId();
+    closeParams[QStringLiteral("amount_cash")] = amount_cash;
+    if (cashCounted) {
+        closeParams[QStringLiteral("cash_counted")] = true;
+    }
+
+    NInterface::query1(QStringLiteral("/engine/v2/waiter/cashbox/close"),
                        mUser->mSessionKey,
                        this,
-                       {{"cashbox_id", mWorkStation.cashboxId()}, {"amount_cash", d.amount()}},
+                       closeParams,
                        [this](const QJsonObject &jdoc) {
                            mCashboxData = jdoc.value("cashbox").toObject();
                            C5Printing p;
@@ -158,6 +173,18 @@ void DlgDashboard::on_btnCloseCashbox_clicked()
                            p.br();
                            p.lrtext(tr("Expected amount"), mCashboxData["f_amount_expected"].toString());
                            p.br();
+                           if (mCashboxData.contains(QStringLiteral("f_amount_fact"))) {
+                               p.lrtext(tr("Counted cash"), mCashboxData[QStringLiteral("f_amount_fact")].toString());
+                               p.br();
+                           }
+                           const double diffRaw = mCashboxData[QStringLiteral("f_amount_difference_raw")].toDouble();
+                           if (qAbs(diffRaw) > 0.009) {
+                               const QString diffLabel = diffRaw > 0
+                                   ? tr("Cash Overage")
+                                   : tr("Cash Shortage");
+                               p.lrtext(diffLabel, mCashboxData[QStringLiteral("f_amount_difference")].toString());
+                               p.br();
+                           }
                            p.line();
                            p.br();
                            p.print(printer);
@@ -234,6 +261,7 @@ void DlgDashboard::on_btnCashIn_clicked()
                        this,
                        {{"cashbox_id", mWorkStation.cashboxId()},
                         {"f_order_id", ""},
+                        {"f_operation_type", CASH_OP_DEBT_RECOVERY},
                         {"f_payment_type_id", PAYMENT_TYPE_CASH},
                         {"f_debit", d.amount()},
                         {"f_credit", 0},
@@ -268,6 +296,7 @@ void DlgDashboard::on_btnCashOut_clicked()
                        this,
                        {{"cashbox_id", mWorkStation.cashboxId()},
                         {"f_order_id", ""},
+                        {"f_operation_type", CASH_OP_TOTAL_EXPENSES},
                         {"f_payment_type_id", PAYMENT_TYPE_CASH},
                         {"f_debit", 0},
                         {"f_credit", d.amount()},

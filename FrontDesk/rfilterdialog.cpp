@@ -111,11 +111,11 @@ void RFilterDialog::buildWidget(const QString &settingsPrefix, const QJsonArray 
             } else if (jo.value("function").toString() == "employee_group") {
                 cn->selectorCallback = employeeGroupItemSelector;
             }
-            int storedValue = __c5config.getRegValue(QString("rfilter_%1_%2").arg(mSettingsPrefix, jo.value("name").toString())).toInt();
-            QString storedName = __c5config.getRegValue(QString("rfilter_%1_%2_name").arg(mSettingsPrefix, jo.value("name").toString()))
-                                     .toString();
-            if (storedValue > 0) {
-                cn->setCodeAndName(storedValue, storedName);
+            const QString regKey = QString("rfilter_%1_%2").arg(mSettingsPrefix, jo.value("name").toString());
+            const QVariant stored = __c5config.getRegValue(regKey);
+            if (stored.isValid()) {
+                const QString storedName = __c5config.getRegValue(regKey + QStringLiteral("_name")).toString();
+                cn->setCodeAndName(stored.toInt(), storedName);
             }
             ui->gl->addWidget(cn, row, 0, 1, 3);
         }
@@ -184,9 +184,17 @@ QJsonArray RFilterDialog::filterValues()
 
             auto *kv = qobject_cast<C5CodeNameSelector *>(w);
             if (kv) {
-                addparam(w->property("name").toString(), kv->value());
-                __c5config.setRegValue(QString("rfilter_%1_%2").arg(mSettingsPrefix, w->property("name").toString()), kv->value());
-                __c5config.setRegValue(QString("rfilter_%1_%2_name").arg(mSettingsPrefix, w->property("name").toString()), kv->name());
+                const int code = kv->value();
+                const QString nm = kv->name().trimmed();
+                // Пустой селектор: code=0 и пустое имя — не слать на сервер (иначе type_id=0 и т.д.)
+                if (code > 0 || !nm.isEmpty()) {
+                    addparam(w->property("name").toString(), code);
+                    __c5config.setRegValue(QString("rfilter_%1_%2").arg(mSettingsPrefix, w->property("name").toString()), code);
+                    __c5config.setRegValue(QString("rfilter_%1_%2_name").arg(mSettingsPrefix, w->property("name").toString()), kv->name());
+                } else {
+                    __c5config.setRegValue(QString("rfilter_%1_%2").arg(mSettingsPrefix, w->property("name").toString()), QVariant());
+                    __c5config.setRegValue(QString("rfilter_%1_%2_name").arg(mSettingsPrefix, w->property("name").toString()), QString());
+                }
                 continue;
             }
 

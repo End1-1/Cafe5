@@ -3,6 +3,7 @@
 # Created: 2026-01-17 16:06:01
 # Last Modified: 2026-03-15 19:50:23
 require_once __DIR__ . "/index.php";
+require_once __DIR__ . "/../worker/dict-cash-operation-type.php";
 
 class Cashbox extends Auth
 {
@@ -127,7 +128,7 @@ class Cashbox extends Auth
                     "f_cashbox_id" => $cash_session["f_cashbox_id"],
                     "f_session_id" => $cash_session["f_id"],
                     "f_user" => $this->userid,
-                    "f_operation_type" => 1,
+                    "f_operation_type" => CASH_OP_SALES_REVENUE,
                     "f_payment_type_id" => $pt,
                     "f_datetime" => date("Y-m-d H:i:s"),
                     "f_debit" => $today[$pn],

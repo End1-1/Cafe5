@@ -118,6 +118,7 @@ SOURCES += \
     ../Cafe5/c5dialog.cpp \
     ../Cafe5/c5utils.cpp \
     ../Cafe5/c5message.cpp \
+    ../Cafe5/c5registrysettings.cpp \
     dlgorder.cpp \
     dlgpreorderdatetime.cpp \
     ../Classes/c5user.cpp \

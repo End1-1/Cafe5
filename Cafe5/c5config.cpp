@@ -1,4 +1,5 @@
 #include "c5config.h"
+#include "c5registrysettings.h"
 #include "c5database.h"
 #include <QDir>
 #include <QMutex>
@@ -10,6 +11,7 @@
 QString C5Config::fAppHomePath;
 QString C5Config::fAppLogFile;
 QString C5Config::fSettingsName;
+QString &C5Config::fSettingsSubPath = C5RegistrySettings::settingsSubPath;
 int C5Config::fSettingsId;
 QString C5Config::fLastUsername;
 QString C5Config::fDBName;
@@ -193,15 +195,20 @@ void C5Config::initParamsFromDb()
     }
 }
 
+QString C5Config::registryPath()
+{
+    return C5RegistrySettings::registryPath();
+}
+
 QVariant C5Config::getRegValue(const QString &key, const QVariant &defaultValue)
 {
-    QSettings s(_ORGANIZATION_, _APPLICATION_ + QString("\\") + _MODULE_);
+    QSettings s(_ORGANIZATION_, registryPath());
     return s.value(key, defaultValue);
 }
 
 void C5Config::setRegValue(const QString &key, const QVariant &value)
 {
-    QSettings s(_ORGANIZATION_, _APPLICATION_ + QString("\\") + _MODULE_);
+    QSettings s(_ORGANIZATION_, registryPath());
     s.setValue(key, value);
 }
 

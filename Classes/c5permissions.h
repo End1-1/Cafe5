@@ -103,7 +103,6 @@ const int cp_t8_currency_cross_rate_history = 811;
 const int cp_t8_shifts = 812;
 
 const int cp_t9_salary = 900;
-const int cp_t9_salary_doc = 901;
 const int cp_t9_report = 902;
 const int cp_t9_payment = 903;
 

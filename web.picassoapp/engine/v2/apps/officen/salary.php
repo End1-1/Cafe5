@@ -6,6 +6,28 @@ require_once __DIR__ . "/index.php";
 
 class Salary extends Auth
 {
+    public function StaffPosition($params)
+    {
+        $staff = (int)($params->staff ?? $params->f_staff ?? 0);
+        if ($staff <= 0) {
+            dieWithCode("Employee is required");
+        }
+
+        $sql = <<<SQL
+        SELECT
+            u.f_group AS f_position,
+            g.f_name AS f_position_name
+        FROM s_user u
+        LEFT JOIN s_user_group g ON g.f_id = u.f_group
+        WHERE u.f_id = ?
+        SQL;
+
+        $row = $this->select($sql, "i", [$staff])->fetch_assoc();
+        $this->result["f_position"] = (int)($row["f_position"] ?? 0);
+        $this->result["f_position_name"] = (string)($row["f_position_name"] ?? "");
+        $this->echoResult();
+    }
+
     public function Open($params)
     {
         $date = $params->date ?? null;
@@ -18,19 +40,21 @@ class Salary extends Auth
             dieWithCode("Invalid salary type");
         }
 
-        // Load rows for this document (date + type)
         $sql = <<<SQL
         SELECT
             s.f_id,
             s.f_staff,
-            s.f_position,
+            COALESCE(NULLIF(s.f_position, 0), u.f_group) AS f_position,
             CONCAT(u.f_last, ' ', u.f_first) AS f_staff_name,
             gr.f_name AS f_position_name,
+            COALESCE(s.f_fixed, 0) AS f_fixed,
+            COALESCE(s.f_calculated, 0) AS f_calculated,
+            COALESCE(s.f_bonus, 0) AS f_bonus,
             COALESCE(s.f_amount_credit, 0) AS f_amount_credit,
             COALESCE(s.f_amount_debit, 0) AS f_amount_debit
         FROM s_salary s
         LEFT JOIN s_user u ON u.f_id = s.f_staff
-        LEFT JOIN c_groups gr ON gr.f_id = s.f_position
+        LEFT JOIN s_user_group gr ON gr.f_id = COALESCE(NULLIF(s.f_position, 0), u.f_group)
         WHERE s.f_date = ?
           AND s.f_type = ?
         ORDER BY u.f_last, u.f_first, gr.f_name
@@ -60,7 +84,6 @@ class Salary extends Auth
 
         $this->beginTransaction();
         try {
-            // Replace rows for the same date+type (so saving accrual won't wipe payment and vice versa)
             $this->select("delete from s_salary where f_date=? and f_type=?", "si", [$date, $f_type], true);
 
             foreach ($itemsRaw as $it) {
@@ -71,31 +94,61 @@ class Salary extends Auth
                 $staff = (int)($it->f_staff ?? $it->staff ?? 0);
                 $position = (int)($it->f_position ?? $it->position ?? 0);
 
-                $credit = (float)($it->f_amount_credit ?? $it->amount_credit ?? $it->credit ?? 0);
-                $debit = (float)($it->f_amount_debit ?? $it->amount_debit ?? $it->debit ?? 0);
-
-                if ($staff <= 0 || $position <= 0) {
+                if ($staff <= 0) {
                     continue;
                 }
 
-                if ($credit == 0 && $debit == 0) {
+                if ($position <= 0) {
+                    $ur = $this->select("select f_group from s_user where f_id=?", "i", [$staff])->fetch_assoc();
+                    $position = (int)($ur["f_group"] ?? 0);
+                }
+
+                if ($position <= 0) {
                     continue;
                 }
 
                 if ($f_type === 1) {
+                    $fixed = (float)($it->f_fixed ?? 0);
+                    $calculated = (float)($it->f_calculated ?? 0);
+                    $bonus = (float)($it->f_bonus ?? 0);
+                    $credit = (float)($it->f_amount_credit ?? ($fixed + $calculated + $bonus));
                     $debit = 0;
-                } else {
-                    $credit = 0;
-                }
 
-                $v = [
-                    "f_date" => $date,
-                    "f_type" => $f_type,
-                    "f_staff" => $staff,
-                    "f_position" => $position,
-                    "f_amount_credit" => $credit,
-                    "f_amount_debit" => $debit
-                ];
+                    if ($credit == 0) {
+                        continue;
+                    }
+
+                    $v = [
+                        "f_date" => $date,
+                        "f_type" => $f_type,
+                        "f_staff" => $staff,
+                        "f_position" => $position,
+                        "f_fixed" => $fixed,
+                        "f_calculated" => $calculated,
+                        "f_bonus" => $bonus,
+                        "f_amount_credit" => $credit,
+                        "f_amount_debit" => $debit,
+                    ];
+                } else {
+                    $debit = (float)($it->f_amount_debit ?? $it->amount_debit ?? $it->debit ?? 0);
+                    $credit = 0;
+
+                    if ($debit == 0) {
+                        continue;
+                    }
+
+                    $v = [
+                        "f_date" => $date,
+                        "f_type" => $f_type,
+                        "f_staff" => $staff,
+                        "f_position" => $position,
+                        "f_fixed" => 0,
+                        "f_calculated" => 0,
+                        "f_bonus" => 0,
+                        "f_amount_credit" => $credit,
+                        "f_amount_debit" => $debit,
+                    ];
+                }
 
                 $this->insert("s_salary", $v);
             }
@@ -109,5 +162,442 @@ class Salary extends Auth
         $this->result["status"] = 0;
         $this->result["saved"] = true;
         $this->echoResult();
+    }
+
+    /**
+     * Salary rules from s_user_group.f_data (see CE5UserGroup).
+     * Optional positions[] — unique group ids from the document; if empty, all groups.
+     */
+    public function GetFormulas($params)
+    {
+        $formulas = $this->loadGroupFormulas($params->positions ?? $params->f_positions ?? null);
+        $this->result["formulas"] = $formulas;
+        $this->echoResult();
+    }
+
+    /**
+     * Accrual calculation for document rows (f_type = 1).
+     * rows[]: f_staff, f_position; f_bonus is preserved from the client when sent.
+     */
+    public function CalculateAccrual($params)
+    {
+        $date = $params->date ?? null;
+        if (empty($date)) {
+            dieWithCode("Salary date is required");
+        }
+
+        $rowsRaw = $params->rows ?? [];
+        if (!is_array($rowsRaw) || count($rowsRaw) === 0) {
+            dieWithCode("Rows are required");
+        }
+
+        [$date1, $date2] = $this->salaryDayRange($date);
+
+        $positionIds = [];
+        foreach ($rowsRaw as $row) {
+            if (empty($row)) {
+                continue;
+            }
+            $position = (int)($row->f_position ?? $row->position ?? 0);
+            if ($position > 0) {
+                $positionIds[$position] = true;
+            }
+        }
+
+        $formulas = $this->loadGroupFormulas(array_keys($positionIds));
+
+        $positionCounts = [];
+        foreach ($rowsRaw as $row) {
+            if (empty($row)) {
+                continue;
+            }
+            $position = (int)($row->f_position ?? $row->position ?? 0);
+            if ($position > 0) {
+                $positionCounts[$position] = ($positionCounts[$position] ?? 0) + 1;
+            }
+        }
+
+        $items = [];
+        foreach ($rowsRaw as $row) {
+            if (empty($row)) {
+                continue;
+            }
+
+            $staff = (int)($row->f_staff ?? $row->staff ?? 0);
+            $position = (int)($row->f_position ?? $row->position ?? 0);
+            if ($staff <= 0 || $position <= 0) {
+                $items[] = [
+                    "f_staff" => $staff,
+                    "f_position" => $position,
+                    "f_fixed" => 0,
+                    "f_calculated" => 0,
+                    "f_bonus" => (float)($row->f_bonus ?? 0),
+                    "f_total" => (float)($row->f_bonus ?? 0),
+                ];
+                continue;
+            }
+
+            $formula = $formulas[(string)$position] ?? $this->defaultFormula();
+            $posCount = max(1, (int)($positionCounts[$position] ?? 1));
+
+            $fixed = (float)($formula["f_fixed"] ?? 0);
+            $varPart = $this->variableSalaryPart($staff, $position, $date1, $formula, $posCount);
+            $calculated = (float)($varPart["variable"] ?? 0);
+            $dishTaxableBase = (float)($varPart["dish_taxable_base"] ?? 0);
+            [$fixed, $calculated] = $this->clampSalaryBase($fixed, $calculated, $formula);
+
+            $bonus = (float)($row->f_bonus ?? 0);
+            $items[] = [
+                "f_staff" => $staff,
+                "f_position" => $position,
+                "f_fixed" => round($fixed, 2),
+                "f_dish_taxable_base" => round($dishTaxableBase, 2),
+                "f_calculated" => round($calculated, 2),
+                "f_bonus" => round($bonus, 2),
+                "f_total" => round($fixed + $calculated + $bonus, 2),
+            ];
+        }
+
+        $this->result["date_from"] = $date1;
+        $this->result["date_to"] = $date2;
+        $this->result["items"] = $items;
+        $this->echoResult();
+    }
+
+    private function defaultFormula(): array
+    {
+        return [
+            "f_fixed" => 0,
+            "f_min" => 0,
+            "f_max" => 0,
+            "f_dep" => 0,
+            "f_total" => 0,
+            "f_owntotal" => 0,
+            "f_skip_amount" => -1,
+            "f_count_working_time" => false,
+        ];
+    }
+
+    private function parseGroupFormulaJson(mixed $json): array
+    {
+        if (is_array($json)) {
+            $data = $json;
+        } else {
+            $data = json_decode(is_string($json) ? $json : '{}', true);
+        }
+        if (!is_array($data)) {
+            $data = [];
+        }
+
+        return [
+            "f_fixed" => (float)($data["f_fixed"] ?? 0),
+            "f_min" => (float)($data["f_min"] ?? 0),
+            "f_max" => (float)($data["f_max"] ?? 0),
+            "f_dep" => (float)($data["f_dep"] ?? 0),
+            "f_total" => (float)($data["f_total"] ?? 0),
+            "f_owntotal" => (float)($data["f_owntotal"] ?? 0),
+            "f_skip_amount" => (float)($data["f_skip_amount"] ?? -1),
+            "f_count_working_time" => !empty($data["f_count_working_time"]),
+        ];
+    }
+
+    /**
+     * Percent of revenue; if skipAmount >= 0, subtract it from revenue first.
+     * Negative skipAmount — full revenue is used (skip not applied).
+     */
+    private function revenuePercentAmount(float $revenueSum, float $percent, float $skipAmount): float
+    {
+        if ($percent <= 0.0001) {
+            return 0.0;
+        }
+        $base = $revenueSum;
+        if ($skipAmount >= 0) {
+            $base = max(0.0, $revenueSum - $skipAmount);
+        }
+        return $base * ($percent / 100.0);
+    }
+
+    /**
+     * @param array<int>|null $positionIds
+     * @return array<string, array<string, float>>
+     */
+    private function loadGroupFormulas($positionIds): array
+    {
+        $ids = [];
+        if (is_array($positionIds)) {
+            foreach ($positionIds as $id) {
+                $id = (int)$id;
+                if ($id > 0) {
+                    $ids[$id] = true;
+                }
+            }
+        }
+        $ids = array_keys($ids);
+
+        if (count($ids) > 0) {
+            $placeholders = implode(",", array_fill(0, count($ids), "?"));
+            $sql = "SELECT f_id, f_data FROM s_user_group WHERE f_id IN ($placeholders)";
+            $types = str_repeat("i", count($ids));
+            $rows = $this->select($sql, $types, $ids)->fetch_all(MYSQLI_ASSOC);
+        } else {
+            $rows = $this->select("SELECT f_id, f_data FROM s_user_group")->fetch_all(MYSQLI_ASSOC);
+        }
+
+        $formulas = [];
+        foreach ($rows as $row) {
+            $gid = (int)($row["f_id"] ?? 0);
+            if ($gid <= 0) {
+                continue;
+            }
+            $formulas[(string)$gid] = $this->parseGroupFormulaJson($row["f_data"] ?? null);
+        }
+
+        return $formulas;
+    }
+
+    /** @return array{0: string, 1: string} */
+    private function salaryDayRange(string $date): array
+    {
+        $ts = strtotime($date);
+        if ($ts === false) {
+            $ts = time();
+        }
+        $day = date("Y-m-d", $ts);
+        return [$day, $day];
+    }
+
+    /** @return array{variable: float, dish_taxable_base: float} */
+    private function variableSalaryPart(int $staff, int $position, string $day, array $formula, int $posCount): array
+    {
+        $variable = 0.0;
+        $dishTaxableBase = 0.0;
+        $depCode = (int)($formula["f_dep"] ?? 0);
+        $totalPct = (float)($formula["f_total"] ?? 0);
+        $ownPct = (float)($formula["f_owntotal"] ?? 0);
+        $skipAmount = (float)($formula["f_skip_amount"] ?? -1);
+        $byWorkingTime = !empty($formula["f_count_working_time"]);
+
+        if ($depCode > 0) {
+            $dishPart = $this->dishOutputSalaryPart(
+                $staff,
+                $depCode,
+                $day,
+                $byWorkingTime,
+                $byWorkingTime ? 1 : max(1, $posCount),
+                $skipAmount
+            );
+            $variable += (float)($dishPart["amount"] ?? 0);
+            $dishTaxableBase = (float)($dishPart["taxable_base"] ?? 0);
+        }
+
+        if ($totalPct > 0.0001) {
+            $sql = <<<SQL
+            SELECT COALESCE(SUM(oh.f_amounttotal), 0) AS revenue_sum
+            FROM o_header oh
+            WHERE oh.f_state = 2
+              AND oh.f_datecash = ?
+            SQL;
+            $row = $this->select($sql, "s", [$day])->fetch_assoc();
+            $revenueSum = (float)($row["revenue_sum"] ?? 0);
+            $variable += $this->revenuePercentAmount($revenueSum, $totalPct, $skipAmount) / max(1, $posCount);
+        }
+
+        if ($ownPct > 0.0001) {
+            $sql = <<<SQL
+            SELECT COALESCE(SUM(oh.f_amounttotal), 0) AS revenue_sum
+            FROM o_header oh
+            WHERE oh.f_state = 2
+              AND oh.f_datecash = ?
+              AND oh.f_staff = ?
+            SQL;
+            $row = $this->select($sql, "si", [$day, $staff])->fetch_assoc();
+            $revenueSum = (float)($row["revenue_sum"] ?? 0);
+            $variable += $this->revenuePercentAmount($revenueSum, $ownPct, $skipAmount);
+        }
+
+        return [
+            "variable" => $variable,
+            "dish_taxable_base" => $dishTaxableBase,
+        ];
+    }
+
+    /**
+     * Salary from sold dishes — department, fixed and percent from c_goods.f_data.
+     * Only lines with service check printed (o_goods.f_data.f_printed = true).
+     * Cash day: o_header.f_datecash; open and closed checks (f_state 1, 2).
+     * Working-time clip uses o_goods.f_data.f_append_time.
+     */
+    /**
+     * @return array{amount: float, taxable_base: float}
+     */
+    private function dishOutputSalaryPart(
+        int $staff,
+        int $depCode,
+        string $day,
+        bool $byWorkingTime,
+        int $divideBy,
+        float $skipAmount = -1
+    ): array {
+        $sql = <<<SQL
+        SELECT
+            cg.f_id AS goods_id,
+            COALESCE(cg.f_name, '') AS goods_name,
+            og.f_qty,
+            og.f_total,
+            CAST(JSON_UNQUOTE(JSON_VALUE(cg.f_data, '$.f_salary_fixed_value')) AS DECIMAL(18, 4)) AS sal_fixed,
+            CAST(JSON_UNQUOTE(JSON_VALUE(cg.f_data, '$.f_salary_percent_value')) AS DECIMAL(18, 4)) AS sal_pct,
+            JSON_UNQUOTE(JSON_VALUE(og.f_data, '$.f_append_time')) AS append_time
+        FROM o_goods og
+        INNER JOIN o_header oh ON oh.f_id = og.f_header
+        INNER JOIN c_goods cg ON cg.f_id = og.f_goods
+        WHERE oh.f_state IN (1, 2)
+          AND og.f_state = 1
+          AND oh.f_datecash = ?
+          AND CAST(JSON_UNQUOTE(JSON_VALUE(cg.f_data, '$.f_salary_department')) AS SIGNED) = ?
+          AND LOWER(COALESCE(JSON_UNQUOTE(JSON_VALUE(og.f_data, '$.f_printed')), 'false')) IN ('true', '1')
+        SQL;
+
+        $rows = $this->select($sql, "si", [$day, $depCode])->fetch_all(MYSQLI_ASSOC);
+        $windows = $byWorkingTime ? $this->attendanceWindowsOnDay($staff, $day) : [];
+
+        $fixedSum = 0.0;
+        $percentPay = 0.0;
+        $percentSales = 0.0;
+
+        foreach ($rows as $row) {
+            $fixed = (float)($row["sal_fixed"] ?? 0);
+            $pct = (float)($row["sal_pct"] ?? 0);
+            $name = trim((string)($row["goods_name"] ?? ""));
+            $goodsId = (int)($row["goods_id"] ?? 0);
+            if ($name === '' && $goodsId > 0) {
+                $name = '#' . $goodsId;
+            }
+
+            if ($fixed > 0.0001 && $pct > 0.0001) {
+                dieWithCode(
+                    'Goods "' . $name . '": both salary fixed amount and salary percent are set in product card. '
+                    . 'Leave only one of f_salary_fixed_value or f_salary_percent_value in goods f_data.'
+                );
+            }
+
+            if ($byWorkingTime) {
+                $appendTs = strtotime((string)($row["append_time"] ?? ''));
+                if ($appendTs === false || !$this->isTimestampInWindows($appendTs, $windows)) {
+                    continue;
+                }
+            }
+
+            $qty = (float)($row["f_qty"] ?? 0);
+            $lineTotal = (float)($row["f_total"] ?? 0);
+
+            if ($fixed > 0.0001) {
+                $fixedSum += $qty * $fixed;
+            } elseif ($pct > 0.0001) {
+                $percentSales += $lineTotal;
+                $percentPay += $lineTotal * ($pct / 100.0);
+            }
+        }
+
+        if ($percentPay > 0.0001 && $percentSales > 0.0001 && $skipAmount >= 0) {
+            $taxableSales = max(0.0, $percentSales - $skipAmount);
+            $percentPay *= ($taxableSales / $percentSales);
+        } else {
+            $taxableSales = $percentSales;
+        }
+
+        $divide = max(1, $divideBy);
+        return [
+            "amount" => ($fixedSum + $percentPay) / $divide,
+            "taxable_base" => ($percentSales > 0.0001 ? $taxableSales : 0.0) / $divide,
+        ];
+    }
+
+    /**
+     * Attendance intervals clipped to calendar day [00:00:00 .. 23:59:59].
+     *
+     * @return array<int, array{0: int, 1: int}>
+     */
+    private function attendanceWindowsOnDay(int $staff, string $day): array
+    {
+        $dayStart = strtotime($day . ' 00:00:00');
+        $dayEnd = strtotime($day . ' 23:59:59');
+        if ($dayStart === false || $dayEnd === false) {
+            return [];
+        }
+
+        $sql = <<<SQL
+        SELECT f_in, f_out
+        FROM s_attendance
+        WHERE f_worker = ?
+          AND f_out IS NOT NULL
+          AND f_in <= ?
+          AND f_out >= ?
+        ORDER BY f_in
+        SQL;
+
+        $rows = $this->select(
+            $sql,
+            'iss',
+            [$staff, date('Y-m-d H:i:s', $dayEnd), date('Y-m-d H:i:s', $dayStart)]
+        )->fetch_all(MYSQLI_ASSOC);
+
+        $windows = [];
+        foreach ($rows as $row) {
+            $inTs = strtotime((string)($row['f_in'] ?? ''));
+            $outTs = strtotime((string)($row['f_out'] ?? ''));
+            if ($inTs === false || $outTs === false || $outTs < $inTs) {
+                continue;
+            }
+            $start = max($inTs, $dayStart);
+            $end = min($outTs, $dayEnd);
+            if ($end >= $start) {
+                $windows[] = [$start, $end];
+            }
+        }
+
+        return $windows;
+    }
+
+    /**
+     * @param array<int, array{0: int, 1: int}> $windows
+     */
+    private function isTimestampInWindows(int $ts, array $windows): bool
+    {
+        foreach ($windows as [$start, $end]) {
+            if ($ts >= $start && $ts <= $end) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Clamp fixed + calculated (without bonus): trim calculated first, then fixed.
+     *
+     * @return array{0: float, 1: float}
+     */
+    private function clampSalaryBase(float $fixed, float $calculated, array $formula): array
+    {
+        $minVal = (float)($formula["f_min"] ?? 0);
+        $maxVal = (float)($formula["f_max"] ?? 0);
+        $sum = $fixed + $calculated;
+
+        if ($minVal > 0.0001 && $sum < $minVal - 0.0001) {
+            $calculated += $minVal - $sum;
+            $sum = $fixed + $calculated;
+        }
+
+        if ($maxVal > 0.0001 && $sum > $maxVal + 0.0001) {
+            $excess = $sum - $maxVal;
+            $fromCalc = min($calculated, $excess);
+            $calculated -= $fromCalc;
+            $excess -= $fromCalc;
+            if ($excess > 0.0001) {
+                $fixed = max(0.0, $fixed - $excess);
+            }
+        }
+
+        return [$fixed, $calculated];
     }
 }

@@ -1,4 +1,5 @@
 #include "c5storeinput.h"
+#include <QCoreApplication>
 #include <QClipboard>
 #include <QDesktopServices>
 #include <QFileDialog>
@@ -25,6 +26,8 @@
 #include "c5user.h"
 #include "c5utils.h"
 #include "calculator.h"
+#include "dict_payment_type.h"
+#include "store_document_status.h"
 #include "ce5goods.h"
 #include "ce5partner.h"
 #include "format_date.h"
@@ -127,7 +130,9 @@ void C5StoreInput::setDocument(StoreInputDocument doc)
         ui->wCurrency->setCodeAndName(doc.currency_id, doc.currency_name);
     }
     if (doc.payment_type_id) {
-        ui->wPaymentType->setCodeAndName(doc.payment_type_id, doc.payment_type_id_name);
+        const char *const nm = payment_names.value(doc.payment_type_id);
+        const QString ptName = nm ? QCoreApplication::translate("PaymentType", nm) : doc.payment_type_id_name;
+        ui->wPaymentType->setCodeAndName(doc.payment_type_id, ptName);
     }
     double totalQty = 0;
     for (int i = 0; i < doc.items.size(); i++) {
@@ -302,7 +307,7 @@ bool C5StoreInput::buildDoc()
 
 void C5StoreInput::setState()
 {
-    mActionSave->setEnabled(mDocData.status == 0);
+    mActionSave->setEnabled(mDocData.status == STORE_DOC_STATUS_DRAFT);
     ui->wtoolbar->setEnabled(mActionSave->isEnabled());
 }
 
@@ -539,7 +544,17 @@ void C5StoreInput::saveDocument()
     if (!buildDoc()) {
         return;
     }
-    mDocData.status = 1;
+    if (ui->wCashbox->value() > 0) {
+        QString err;
+        if (ui->wPaymentType->value() <= 0) {
+            err += tr("Payment type not specified") + QStringLiteral("<br>");
+        }
+        if (!err.isEmpty()) {
+            C5Message::error(err);
+            return;
+        }
+    }
+    mDocData.status = STORE_DOC_STATUS_POSTED;
     QJsonObject jdoc = mDocData.toJson();
     NInterface::query1("/engine/v2/common/store-move/input", mUser->mSessionKey, this, {{"doc", jdoc}}, [this](const QJsonObject) {
         mDocData.version++;
@@ -553,7 +568,7 @@ void C5StoreInput::draftDocument()
     if (!buildDoc()) {
         return;
     }
-    mDocData.status = 0;
+    mDocData.status = STORE_DOC_STATUS_DRAFT;
     QJsonObject jdoc = mDocData.toJson();
     NInterface::query1("/engine/v2/common/store-move/input", mUser->mSessionKey, this, {{"doc", jdoc}}, [this](const QJsonObject) {
         mDocData.version++;

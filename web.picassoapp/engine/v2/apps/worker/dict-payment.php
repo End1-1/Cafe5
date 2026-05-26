@@ -3,15 +3,17 @@
 # Created: 2026-01-18 16:58:17
 # Last Modified: 2026-02-02 12:11:52
 
-define("PAYMENT_TYPE_CASH", 1);
-define("PAYMENT_TYPE_CARD", 2);
-define("PAYMENT_TYPE_BANK", 3);
-define("PAYMENT_TYPE_IDRAM", 4);
-define("PAYMENT_TYPE_COMPLIMENTARY", 5);
-define("PAYMENT_OTHER", 6);
-define("PAYMENT_TELCELL", 7);
-define("PAYMENT_DEBT", 8);
-define("PAYMENT_PREPAID", 9);
+if (!defined("PAYMENT_TYPE_CASH")) {
+    define("PAYMENT_TYPE_CASH", 1);
+    define("PAYMENT_TYPE_CARD", 2);
+    define("PAYMENT_TYPE_BANK", 3);
+    define("PAYMENT_TYPE_IDRAM", 4);
+    define("PAYMENT_TYPE_COMPLIMENTARY", 5);
+    define("PAYMENT_OTHER", 6);
+    define("PAYMENT_TELCELL", 7);
+    define("PAYMENT_DEBT", 8);
+    define("PAYMENT_PREPAID", 9);
+}
 
 return [
     "types" => [

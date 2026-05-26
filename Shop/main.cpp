@@ -12,6 +12,7 @@
 #include <QSettings>
 #include <QStyleFactory>
 #include <QTranslator>
+#include "c5registrysettings.h"
 #include "c5connectiondialog.h"
 #include "c5dialog.h"
 #include "c5message.h"
@@ -108,11 +109,12 @@ int main(int argc, char* argv[])
             multicopy = true;
         }
 
-        if (s.startsWith("/settingspath")) {
-            QStringList ver = s.split("=");
-
-            if (ver.length() == 2) {
-                C5ConnectionDialog::mSettingsPath = ver.at(1);
+        if (s.startsWith("/settingspath", Qt::CaseInsensitive)) {
+            const int eq = s.indexOf(QLatin1Char('='));
+            if (eq > 0) {
+                const QString subPath = s.mid(eq + 1).trimmed();
+                C5Config::fSettingsSubPath = subPath;
+                C5ConnectionDialog::mSettingsPath = subPath;
             }
         }
     }

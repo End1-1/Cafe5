@@ -58,10 +58,33 @@ struct WaiterDish {
             delta += serviceFactor();
         }
         if (countDiscount()) {
-            delta -= discountFactor();
+            delta -= qAbs(discountFactor());
         }
         total += total * delta;
         return total;
+    }
+
+    /** Line amount for display / client totals (order-level service/discount factors). */
+    double lineAmount(bool isPreorder, bool includeUnprinted,
+                      double orderServiceFactor, double orderDiscountFactor) const
+    {
+        if (data.value(QStringLiteral("f_complimentary")).toBool()) {
+            return 0;
+        }
+        if (!isPreorder && !includeUnprinted && !isPrinted()) {
+            return 0;
+        }
+
+        double priceModificator = 0;
+
+        if (countService()) {
+            priceModificator += orderServiceFactor;
+        }
+        if (countDiscount()) {
+            priceModificator -= qAbs(orderDiscountFactor);
+        }
+
+        return qty * price * (1.0 + priceModificator);
     }
     QString appendedTime()
     {
@@ -77,8 +100,8 @@ struct WaiterDish {
         return data["f_remove_time"].toString();
     }
 
-    QString adgtCode() { return data["f_adgt_code"].toString(); }
-    QString translated()
+    QString adgtCode() { return data["f_adgt"].toString(); }
+    QString translated() const
     {
         return dishName;
     }
@@ -171,6 +194,8 @@ struct JsonParser<WaiterDish> {
                            << "raw:" << raw;
             }
         }
+        wd.data["f_fiscal_department"] = jo["f_fiscal_department"];
+        wd.data["f_adgt"] = jo["f_adgt"];
 
         return wd;
     }

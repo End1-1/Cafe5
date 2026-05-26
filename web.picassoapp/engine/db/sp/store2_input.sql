@@ -100,7 +100,7 @@ BEGIN
         IF (cashbox_id > 0) THEN
             INSERT INTO cash_operations (f_cashbox_id, f_order_id, f_user, f_operation_type, f_payment_type_id,
                                          f_datetime, f_credit)
-            VALUES (cashbox_id, doc_uuid, create_user, 2, payment_type_id, doc_date, doc_sum);
+            VALUES (cashbox_id, doc_uuid, create_user, 3, payment_type_id, doc_date, doc_sum);
         ELSE
             INSERT INTO cash_debts (f_date, f_partner, f_doc_type, f_doc_uuid, f_credit, f_debit, f_currency_id)
             VALUES (doc_date, partner_id, 1, doc_uuid, doc_sum, 0, currency_id);

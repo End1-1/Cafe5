@@ -24,8 +24,9 @@ private slots:
     void on_btnSave_clicked();
     void on_btnCancel_clicked();
     void on_btnCashbox_clicked();
-
 private:
+    void refillCashOperationTypeCombo();
+    int selectedOperationType() const;
     Ui::C5RevenueCashOp *ui;
     int mCashboxId = 0;
     int mCurrencyId = 1;

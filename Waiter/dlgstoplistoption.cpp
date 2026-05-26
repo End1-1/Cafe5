@@ -2,7 +2,6 @@
 #include <QPrinterInfo>
 #include "c5message.h"
 #include "c5printing.h"
-#include "c5tabledata.h"
 #include "c5user.h"
 #include "c5utils.h"
 #include "dlgorder.h"
@@ -33,18 +32,14 @@ void DlgStopListOption::removeStopListResponse(const QJsonObject &jdoc)
 {
     fHttp->httpQueryFinished(sender());
     C5Message::info(tr("The stoplist was removed"));
+    fDlgOrder->updateStopList(jdoc.value("stoplist").toArray());
     accept();
 }
 
 void DlgStopListOption::printStopListResponse(const QJsonObject &jdoc)
 {
     fHttp->httpQueryFinished(sender());
-    C5TableData::instance()->setStopList(jdoc["list"].toArray());
     accept();
-
-    if(C5TableData::instance()->mStopList.isEmpty()) {
-        return;
-    }
 
     QList<int> menu; //QList<int> menu = dbmenu->list();
     QMap<QString, QList<int> > printList;
@@ -75,15 +70,14 @@ void DlgStopListOption::printStopListResponse(const QJsonObject &jdoc)
         p.line();
         p.br();
 
-        for(QMap<int, double>::const_iterator it = C5TableData::instance()->mStopList.constBegin();
-                it != C5TableData::instance()->mStopList.constEnd(); it++) {
-            if(sq.value().contains(it.key())) {
-                p.ltext(tds("d_dish", "f_name", it.key()), 0);
-                p.rtext(float_str(it.value(), 2));
-                p.br();
-                p.line();
-                p.br();
-            }
+        const QJsonArray &ja = jdoc.value("stoplist").toArray();
+        for (int i = 0; i < ja.size(); i++) {
+            auto const &d = ja.at(i).toObject();
+            p.lrtext(d.value("f_dish_name").toString(), d.value("f_qty").toString());
+
+            p.br();
+            p.line();
+            p.br();
         }
 
         p.br();
@@ -101,8 +95,7 @@ void DlgStopListOption::on_btnCancel_clicked()
 void DlgStopListOption::on_btnClearStopList_clicked()
 {
     if(C5Message::question(tr("Are sure to clear stoplist?")) == QDialog::Accepted) {
-        fHttp->createHttpQuery("/engine/waiter/stoplist.php", QJsonObject{ {"action", "remove"}}, SLOT(removeStopListResponse(
-                    QJsonObject)));
+        fHttp->createHttpQuery("/engine/v2/waiter/stoplist/remove-stoplist", {}, SLOT(removeStopListResponse(QJsonObject)));
     }
 }
 
@@ -120,6 +113,5 @@ void DlgStopListOption::on_btnViewStopList_clicked()
 
 void DlgStopListOption::on_btnPrintStoplist_clicked()
 {
-    fHttp->createHttpQuery("/engine/waiter/stoplist.php", QJsonObject{{"action", "get"}}, SLOT(printStopListResponse(
-                QJsonObject)));
+    fHttp->createHttpQuery("/engine/v2/waiter/stoplist/get", {}, SLOT(printStopListResponse(QJsonObject)));
 }

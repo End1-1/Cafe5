@@ -1,0 +1,319 @@
+/* SelfBoard intro — portrait 1080×1920 */
+
+#DlgStart {
+    background-color: transparent;
+}
+
+#lblBackground {
+    background-color: transparent;
+}
+
+#widgetHeader {
+    background-color: transparent;
+}
+
+#lblBanner {
+    color: rgba(255, 255, 255, 0.55);
+    font-size: 22px;
+    font-weight: 400;
+    padding: 12px 24px;
+    border: 2px dashed rgba(255, 255, 255, 0.35);
+    border-radius: 8px;
+    min-width: 280px;
+    min-height: 48px;
+}
+
+#btnTakeAway,
+#btnDineIn {
+    background-color: #ffffff;
+    border: none;
+    border-radius: 32px;
+    color: #1a1a1a;
+    font-size: 30px;
+    font-weight: 600;
+    padding: 28px 20px 36px 20px;
+    min-width: 400px;
+    min-height: 420px;
+}
+
+#btnTakeAway:hover,
+#btnDineIn:hover {
+    background-color: #f5f5f5;
+}
+
+#btnTakeAway:pressed,
+#btnDineIn:pressed {
+    background-color: #e8e8e8;
+}
+
+#widgetLangPanel {
+    background-color: rgba(255, 255, 255, 0.9);
+    border-radius: 28px;
+}
+
+#lblSelectLanguage {
+    color: #2a2a2a;
+    font-size: 26px;
+    font-weight: 500;
+    padding: 8px 0 4px 0;
+}
+
+#btnLangRu,
+#btnLangEn,
+#btnLangHy {
+    background-color: #e8e8e8;
+    border: none;
+    border-radius: 36px;
+    color: #2a2a2a;
+    font-size: 22px;
+    font-weight: 500;
+    padding: 14px 28px 14px 20px;
+    min-height: 72px;
+    text-align: left;
+}
+
+#btnLangRu:checked,
+#btnLangEn:checked,
+#btnLangHy:checked {
+    background-color: #c5db00;
+    color: #1a1a1a;
+}
+
+#widgetQrPanel {
+    background-color: #c5db00;
+    border-radius: 4px;
+    padding: 12px;
+}
+
+#lblQrHint {
+    color: #1a1a1a;
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+}
+
+#widgetFooter {
+    background-color: #6d7d6d;
+    min-height: 72px;
+    max-height: 72px;
+}
+
+#lblPowered {
+    color: #ffffff;
+    font-size: 16px;
+}
+
+#lblPoweredLinks {
+    color: rgba(255, 255, 255, 0.85);
+    font-size: 14px;
+}
+
+/* --- Menu screen --- */
+
+#DlgMenu {
+    background-color: #f3f3f3;
+}
+
+#widgetSidebar {
+    background-color: #ececec;
+    border-right: 1px solid #d8d8d8;
+}
+
+#btnLanguage {
+    background-color: #c5db00;
+    border: none;
+    border-radius: 8px;
+    color: #1a1a1a;
+    font-size: 16px;
+    font-weight: 600;
+    padding: 10px 12px;
+    text-align: left;
+}
+
+#btnHome,
+#btnServiceMode {
+    background-color: transparent;
+    border: none;
+    color: #2a2a2a;
+    font-size: 18px;
+    font-weight: 500;
+    padding: 8px 4px;
+    text-align: left;
+}
+
+#btnMenuGroup {
+    background-color: transparent;
+    border: none;
+    border-radius: 8px;
+    color: #2a2a2a;
+    font-size: 17px;
+    font-weight: 500;
+    padding: 8px 6px;
+    text-align: left;
+}
+
+#btnMenuGroup:checked {
+    background-color: #ffffff;
+    font-weight: 700;
+}
+
+#btnGroupChip {
+    background-color: #e4e4e4;
+    border: none;
+    border-radius: 12px;
+    color: #2a2a2a;
+    font-size: 17px;
+    font-weight: 500;
+    padding: 10px 20px;
+}
+
+#btnGroupChip:checked {
+    background-color: #b8b8b8;
+    font-weight: 700;
+}
+
+#leSearch {
+    background-color: #ffffff;
+    border: 1px solid #dddddd;
+    border-radius: 24px;
+    font-size: 18px;
+    padding: 8px 16px 8px 40px;
+}
+
+#btnFavorites {
+    background-color: #e53935;
+    border: none;
+    border-radius: 24px;
+    color: #ffffff;
+    font-size: 22px;
+    font-weight: 700;
+}
+
+#widgetContent {
+    background-color: #f8f8f8;
+}
+
+#lblBanner {
+    background-color: #e0e0e0;
+    border: none;
+    border-radius: 8px;
+    color: #888888;
+    font-size: 20px;
+}
+
+#frameAppPromo {
+    background-color: #ffffff;
+    border: 1px solid #e4e4e4;
+    border-radius: 16px;
+}
+
+#lblPromoTitle {
+    font-size: 22px;
+    font-weight: 700;
+    color: #1a1a1a;
+}
+
+#lblPromoLine1,
+#lblPromoLine2,
+#lblPromoLine3 {
+    font-size: 16px;
+    color: #444444;
+}
+
+#lblPopularTitle {
+    font-size: 28px;
+    font-weight: 700;
+    color: #1a1a1a;
+    padding: 8px 0;
+}
+
+#dishCardGrid {
+    background-color: #ffffff;
+    border: 1px solid #e8e8e8;
+    border-radius: 20px;
+    min-width: 376px;
+    max-width: 376px;
+    min-height: 186px;
+    max-height: 186px;
+}
+
+#dishGridName {
+    font-size: 24px;
+    font-weight: 600;
+    color: #1a1a1a;
+}
+
+#dishCardPopular,
+#dishCardListing {
+    background-color: #ffffff;
+    border: 1px solid #e8e8e8;
+    border-radius: 16px;
+    min-width: 236px;
+    max-width: 236px;
+    min-height: 377px;
+    max-height: 377px;
+}
+
+#dishPopularTitle {
+    font-size: 22px;
+    font-weight: 700;
+    color: #1a1a1a;
+}
+
+#dishPopularSubtitle {
+    font-size: 16px;
+    color: #777777;
+}
+
+#dishPopularTime {
+    font-size: 14px;
+    color: #666666;
+}
+
+#dishPopularPrice {
+    font-size: 20px;
+    font-weight: 700;
+    color: #1a1a1a;
+}
+
+#dishPopularInfo {
+    background-color: #e53935;
+    border: none;
+    border-radius: 14px;
+    color: #ffffff;
+    font-weight: 700;
+}
+
+#widgetOrderBar {
+    background-color: #ffffff;
+    border-top: 1px solid #dddddd;
+}
+
+#btnCancelOrder {
+    background-color: transparent;
+    border: none;
+    color: #e53935;
+    font-size: 18px;
+    font-weight: 700;
+}
+
+#lblCartSummary {
+    font-size: 22px;
+    font-weight: 600;
+    color: #1a1a1a;
+}
+
+#btnGoToCart {
+    background-color: #c5db00;
+    border: none;
+    border-radius: 12px;
+    color: #1a1a1a;
+    font-size: 22px;
+    font-weight: 700;
+    padding: 16px 24px;
+}
+
+#widgetOrderQr {
+    background-color: #c5db00;
+    border-radius: 4px;
+}

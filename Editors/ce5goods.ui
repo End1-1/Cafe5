@@ -20,7 +20,7 @@
       <enum>Qt::FocusPolicy::NoFocus</enum>
      </property>
      <property name="currentIndex">
-      <number>0</number>
+      <number>4</number>
      </property>
      <widget class="QWidget" name="tab">
       <attribute name="title">
@@ -1447,12 +1447,18 @@
        <property name="sizeConstraint">
         <enum>QLayout::SizeConstraint::SetMinAndMaxSize</enum>
        </property>
-       <item row="1" column="0">
-        <widget class="QLabel" name="label_5">
-         <property name="text">
-          <string>Same store id</string>
+       <item row="3" column="3">
+        <spacer name="horizontalSpacer">
+         <property name="orientation">
+          <enum>Qt::Orientation::Horizontal</enum>
          </property>
-        </widget>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>40</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
        </item>
        <item row="4" column="0">
         <widget class="QLabel" name="label_14">
@@ -1461,16 +1467,54 @@
          </property>
         </widget>
        </item>
-       <item row="3" column="1" colspan="2">
-        <widget class="C5LineEditWithSelector" name="leWebLink">
-         <property name="focusPolicy">
-          <enum>Qt::FocusPolicy::NoFocus</enum>
+       <item row="0" column="0">
+        <widget class="QLabel" name="label_7">
+         <property name="text">
+          <string>Only whole number</string>
          </property>
-         <property name="readOnly">
-          <bool>false</bool>
+        </widget>
+       </item>
+       <item row="1" column="1">
+        <widget class="C5CheckBox" name="chSameStoreId">
+         <property name="text">
+          <string/>
          </property>
-         <property name="Field" stdset="0">
-          <string>f_weblink</string>
+        </widget>
+       </item>
+       <item row="3" column="0">
+        <widget class="QLabel" name="label_13">
+         <property name="text">
+          <string>Web link</string>
+         </property>
+        </widget>
+       </item>
+       <item row="6" column="1">
+        <spacer name="verticalSpacer">
+         <property name="orientation">
+          <enum>Qt::Orientation::Vertical</enum>
+         </property>
+         <property name="sizeType">
+          <enum>QSizePolicy::Policy::Expanding</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>0</width>
+           <height>0</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item row="1" column="0">
+        <widget class="QLabel" name="label_5">
+         <property name="text">
+          <string>Same store id</string>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="0">
+        <widget class="QLabel" name="label_6">
+         <property name="text">
+          <string>Store output goods</string>
          </property>
         </widget>
        </item>
@@ -1490,10 +1534,26 @@
          </property>
         </widget>
        </item>
-       <item row="1" column="1">
-        <widget class="C5CheckBox" name="chSameStoreId">
-         <property name="text">
-          <string/>
+       <item row="2" column="2">
+        <widget class="C5LineEditWithSelector" name="leStoreIdName">
+         <property name="focusPolicy">
+          <enum>Qt::FocusPolicy::NoFocus</enum>
+         </property>
+         <property name="readOnly">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="1" colspan="2">
+        <widget class="C5LineEditWithSelector" name="leWebLink">
+         <property name="focusPolicy">
+          <enum>Qt::FocusPolicy::NoFocus</enum>
+         </property>
+         <property name="readOnly">
+          <bool>false</bool>
+         </property>
+         <property name="Field" stdset="0">
+          <string>f_weblink</string>
          </property>
         </widget>
        </item>
@@ -1513,66 +1573,6 @@
          </property>
         </widget>
        </item>
-       <item row="2" column="0">
-        <widget class="QLabel" name="label_6">
-         <property name="text">
-          <string>Store output goods</string>
-         </property>
-        </widget>
-       </item>
-       <item row="0" column="0">
-        <widget class="QLabel" name="label_7">
-         <property name="text">
-          <string>Only whole number</string>
-         </property>
-        </widget>
-       </item>
-       <item row="3" column="3">
-        <spacer name="horizontalSpacer">
-         <property name="orientation">
-          <enum>Qt::Orientation::Horizontal</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>40</width>
-           <height>20</height>
-          </size>
-         </property>
-        </spacer>
-       </item>
-       <item row="5" column="1">
-        <spacer name="verticalSpacer">
-         <property name="orientation">
-          <enum>Qt::Orientation::Vertical</enum>
-         </property>
-         <property name="sizeType">
-          <enum>QSizePolicy::Policy::Expanding</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>0</width>
-           <height>0</height>
-          </size>
-         </property>
-        </spacer>
-       </item>
-       <item row="2" column="2">
-        <widget class="C5LineEditWithSelector" name="leStoreIdName">
-         <property name="focusPolicy">
-          <enum>Qt::FocusPolicy::NoFocus</enum>
-         </property>
-         <property name="readOnly">
-          <bool>true</bool>
-         </property>
-        </widget>
-       </item>
-       <item row="3" column="0">
-        <widget class="QLabel" name="label_13">
-         <property name="text">
-          <string>Web link</string>
-         </property>
-        </widget>
-       </item>
        <item row="0" column="1">
         <widget class="C5CheckBox" name="chOnlyWholeNumber">
          <property name="text">
@@ -1584,6 +1584,45 @@
          <property name="Default" stdset="0">
           <number>0</number>
          </property>
+        </widget>
+       </item>
+       <item row="5" column="0" colspan="3">
+        <widget class="QGroupBox" name="grSalary">
+         <property name="title">
+          <string>Salary</string>
+         </property>
+         <layout class="QGridLayout" name="gridLayout_5">
+          <item row="0" column="0">
+           <widget class="QLabel" name="label_2">
+            <property name="text">
+             <string>Department</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="0">
+           <widget class="QLabel" name="label_16">
+            <property name="text">
+             <string>Fixed value</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="0">
+           <widget class="QLabel" name="label_17">
+            <property name="text">
+             <string>Percent value</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1">
+           <widget class="C5LineEdit" name="leSalaryDepartment"/>
+          </item>
+          <item row="1" column="1">
+           <widget class="C5LineEdit" name="leSalaryFixedValue"/>
+          </item>
+          <item row="2" column="1">
+           <widget class="C5LineEdit" name="leSalaryPercentValue"/>
+          </item>
+         </layout>
         </widget>
        </item>
       </layout>
@@ -1656,6 +1695,11 @@
    <header location="global">c5lineedit.h</header>
   </customwidget>
   <customwidget>
+   <class>C5LineEditWithSelector</class>
+   <extends>QLineEdit</extends>
+   <header location="global">c5lineeditwithselector.h</header>
+  </customwidget>
+  <customwidget>
    <class>C5TableWidget</class>
    <extends>QTableWidget</extends>
    <header location="global">c5tablewidget.h</header>
@@ -1665,11 +1709,6 @@
    <extends>QFrame</extends>
    <header location="global">c5codenameselector.h</header>
    <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>C5LineEditWithSelector</class>
-   <extends>QLineEdit</extends>
-   <header location="global">c5lineeditwithselector.h</header>
   </customwidget>
   <customwidget>
    <class>C5CheckBox</class>
@@ -1683,13 +1722,13 @@
   </customwidget>
  </customwidgets>
  <tabstops>
-  <tabstop>leCode</tabstop>
-  <tabstop>leSupplier</tabstop>
-  <tabstop>leGroup</tabstop>
-  <tabstop>leUnit</tabstop>
-  <tabstop>leLowLevel</tabstop>
-  <tabstop>leQtyBox</tabstop>
-  <tabstop>leFiscalName</tabstop>
+  <tabstop>chOnlyWholeNumber</tabstop>
+  <tabstop>chSameStoreId</tabstop>
+  <tabstop>leStoreId</tabstop>
+  <tabstop>leQueue</tabstop>
+  <tabstop>leSalaryDepartment</tabstop>
+  <tabstop>leSalaryFixedValue</tabstop>
+  <tabstop>leSalaryPercentValue</tabstop>
   <tabstop>leName</tabstop>
   <tabstop>leScanCode</tabstop>
   <tabstop>leCostPrice</tabstop>
@@ -1699,20 +1738,29 @@
   <tabstop>leMargin2</tabstop>
   <tabstop>leAutodiscount</tabstop>
   <tabstop>tblPricing</tabstop>
-  <tabstop>chSameStoreId</tabstop>
+  <tabstop>leSupplier</tabstop>
   <tabstop>leComplectOutputQty</tabstop>
   <tabstop>leIsComplect</tabstop>
   <tabstop>plainTextEdit</tabstop>
   <tabstop>leLowLevel_2</tabstop>
   <tabstop>chComponentExit</tabstop>
-  <tabstop>leQueue</tabstop>
+  <tabstop>leUnit</tabstop>
   <tabstop>tblAs</tabstop>
   <tabstop>leAcc</tabstop>
-  <tabstop>leStoreId</tabstop>
+  <tabstop>leGroup</tabstop>
   <tabstop>leBarcode</tabstop>
   <tabstop>rbGenEAN8</tabstop>
   <tabstop>tblBarcodes</tabstop>
-  <tabstop>chOnlyWholeNumber</tabstop>
+  <tabstop>leCode</tabstop>
+  <tabstop>tblMenu</tabstop>
+  <tabstop>chCountDiscount</tabstop>
+  <tabstop>chCountService</tabstop>
+  <tabstop>leHourlyRole</tabstop>
+  <tabstop>chHourlyPayment</tabstop>
+  <tabstop>leCookingTime</tabstop>
+  <tabstop>leLowLevel</tabstop>
+  <tabstop>leQtyBox</tabstop>
+  <tabstop>leFiscalName</tabstop>
  </tabstops>
  <resources>
   <include location="../resources/res.qrc"/>

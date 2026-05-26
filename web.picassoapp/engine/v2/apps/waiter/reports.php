@@ -10,7 +10,8 @@ class Reports extends Auth
     public function GetOrders($params)
     {
         $sql = <<<EOD
-        select oh.f_id, oh.f_prefix, h.f_name as f_hall_name, t.f_name as f_table_name,
+        select oh.f_id, oh.f_prefix, oh.f_table as f_table, t.f_hall as f_hall,
+        h.f_name as f_hall_name, t.f_name as f_table_name,
         date_fmt(json_value(oh.f_data, '$.f_date_close')) as f_date_open,
         json_value(oh.f_data, '$.f_time_open') as f_time_open,
         json_value(oh.f_data, '$.f_date_close') as f_date_close,

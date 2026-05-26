@@ -65,6 +65,21 @@ class StoreMoves
             $date_filter .= " and sd.f_store_out=? ";
         }
 
+        if (array_key_exists('status_id', $filter)
+            && $filter['status_id'] !== ''
+            && $filter['status_id'] !== null
+            && is_numeric($filter['status_id'])) {
+            $bindtypes .= "i";
+            $bindvalues[] = (int)$filter['status_id'];
+            $date_filter .= " and sd.f_status=? ";
+        }
+
+        if (($filter["patner_id"] ?? 0) > 0) {
+            $bindtypes .= "i";
+            $bindvalues[] = $filter["patner_id"];
+            $date_filter .= " and sd.f_partner=? ";
+        }
+
         $sql = <<<EOD
         SELECT sd.f_id, ld2.f_value, 
         date_fmt(sd.f_doc_date), sd.f_user_id, si.f_name as f_store_in_name, so.f_name as f_store_out_name, 
@@ -109,6 +124,7 @@ class StoreMoves
             "filter" => [
                 ["type" => "date", "name" => "date1", "label" => Translator::t("Date start")],
                 ["type" => "date", "name" => "date2", "label" => Translator::t("Date end")],
+                ["type" => "keyvalue", "name" => "status_id", "label" => Translator::t("Status"), "function" => "store_doc_status"],
                 ["type" => "keyvalue", "name" => "type_id", "label" => Translator::t("Type"), "function" => "store_doc_type"],
                 ["type" => "keyvalue", "name" => "store_in_id", "label" => Translator::t("Input store"), "function" => "store"],
                 ["type" => "keyvalue", "name" => "store_out_id", "label" => Translator::t("Output store"), "function" => "store"],

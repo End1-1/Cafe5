@@ -18,8 +18,12 @@ class StoreDocuments
         $filterRaw = $params->filter ?? [];
         $filter = [];
         foreach ($filterRaw as $item) {
-            foreach ((array)$item as $k => $v) {
-                if (!empty($v)) {
+            if (is_object($item)) {
+                foreach ($item as $k => $v) {
+                    $filter[$k] = $v;
+                }
+            } elseif (is_array($item)) {
+                foreach ($item as $k => $v) {
                     $filter[$k] = $v;
                 }
             }
@@ -44,13 +48,26 @@ class StoreDocuments
             'patner_id'    => 'sd.f_partner'
         ];
 
-        // 2. Динамически добавляем фильтры
+        // 2. Фильтры: status_id=0 — черновик (store_document.f_status), 1 — проведён;
+        //    0 у type_id / складов / партнёра = «не выбрано» (пустой селектор в клиенте).
         foreach ($map as $key => $column) {
-            if (isset($filter[$key])) {
-                $sql_where .= " AND $column = ? ";
-                $bindtypes .= "s";
-                $bindvalues[] = $filter[$key];
+            if (!array_key_exists($key, $filter)) {
+                continue;
             }
+            $val = $filter[$key];
+            if ($val === '' || $val === null) {
+                continue;
+            }
+            if ($key === 'status_id') {
+                if (!is_numeric($val)) {
+                    continue;
+                }
+            } elseif ((int)$val <= 0) {
+                continue;
+            }
+            $sql_where .= " AND $column = ? ";
+            $bindtypes .= "i";
+            $bindvalues[] = (int)$val;
         }
 
         // 3. Формируем SQL. ВАЖНО: плейсхолдеры ? для локали стоят в JOIN-ах,

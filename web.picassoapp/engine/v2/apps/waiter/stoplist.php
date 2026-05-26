@@ -20,8 +20,21 @@ class StopList extends Auth
                 $v["f_qty"] = $params->qty;
                 $this->update("c_stoplist", $v, $params->dish, "f_dish");
             }
-            
         }
+        $this->echoResult();
+    }
+
+    public function RemoveStopList($params)
+    {
+        $this->result["stoplist"] = $this->select("select f_dish from c_stoplist")->fetch_all();
+        $this->select("delete from c_stoplist", "", [], true);
+        $this->echoResult();
+    }
+
+    public function Get($params)
+    {
+        $stoplist = $this->stmtall("select f_dish, f_qty from d_stoplist")->fetch_all(MYSQLI_ASSOC);
+        $this->result["list"] = $stoplist;
         $this->echoResult();
     }
 }

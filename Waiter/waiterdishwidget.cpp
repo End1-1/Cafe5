@@ -43,6 +43,15 @@ WaiterDishWidget::~WaiterDishWidget()
     delete ui;
 }
 
+void WaiterDishWidget::setDisplayContext(bool bistroMode, bool isPreorder,
+                                         double orderServiceFactor, double orderDiscountFactor)
+{
+    mBistroMode = bistroMode;
+    mIsPreorder = isPreorder;
+    mOrderServiceFactor = orderServiceFactor;
+    mOrderDiscountFactor = orderDiscountFactor;
+}
+
 void WaiterDishWidget::pulish()
 {
     ui->lbTimeOfDish->style()->unpolish(ui->lbTimeOfDish);
@@ -87,16 +96,32 @@ void WaiterDishWidget::updateDish(WaiterDish value)
         ui->lbEmarks->setVisible(!mOrderItem.emarks().isEmpty());
         ui->lbComplimentary->setVisible(mOrderItem.complimentary());
         ui->lbQty1->setText(float_str(mOrderItem.qty, 2));
-        ui->lbTotal->setText(float_str(mOrderItem.total(false), 2));
+        {
+            const double lineTotal = mBistroMode
+                                         ? mOrderItem.lineAmount(mIsPreorder, true,
+                                                                 mOrderServiceFactor, mOrderDiscountFactor)
+                                         : mOrderItem.total(mIsPreorder);
+            ui->lbTotal->setText(float_str(lineTotal, 2));
+        }
         ui->lbComment->setVisible(!mOrderItem.comment().isEmpty() || !mOrderItem.removeReason().isEmpty());
         ui->lbComment->setText(mOrderItem.comment() + "<br>" + mOrderItem.removeReason());
 
         if(mOrderItem.state == DISH_STATE_OK) {
+            setVisible(true);
+            /* Reused row may keep removed (3) or set (4) styles from a previous dish. */
+            ui->orderDishFrame->setProperty("state", QVariant());
+            ui->lbComment->setProperty("state", QVariant());
+            ui->lbTimeOfDish->setProperty("state", QVariant());
+            ui->btnDish->setProperty("state", QVariant());
+            ui->lbTotal->setProperty("state", QVariant());
             ui->lbQty1->setProperty("state", mOrderItem.isPrinted() ? "1" : "0");
+            ui->orderDishFrame->style()->unpolish(ui->orderDishFrame);
+            ui->orderDishFrame->style()->polish(ui->orderDishFrame);
             ui->lbQty1->style()->polish(ui->lbQty1);
             ui->lbPackageDelta->setText(float_str(mOrderItem.packageNominalDelta, 2));
             pulish();
         } else if(mOrderItem.state == DISH_STATE_SET) {
+            setVisible(true);
             ui->orderDishFrame->setProperty("state", "4");
             ui->lbTimeOfDish->setText(mOrderItem.removedTime());
             ui->lbComment->setProperty("state", "4");

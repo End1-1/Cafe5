@@ -13,6 +13,7 @@ class Menu extends Auth
         gr.f_id,
         gr.f_parent,
         gr.f_name,
+        gr.f_taxdept as f_fiscal_department,
         gr.f_order as f_queue,
         COALESCE(g.f_qty, 0) AS f_qty,
         CAST(gr.f_class AS INT) AS f_class,
@@ -41,10 +42,11 @@ class Menu extends Auth
         $sql = <<< EOD
         SELECT m.f_id AS f_menu, m.f_name, mm.f_price, 
         g.f_type,
+        gr.f_taxdept as f_fiscal_department,
         gr.f_name as f_group_name,
         mm.f_dish, g.f_group, g.f_name AS f_goods_name, g.f_color,gr.f_taxdept,
         mm.f_store, mm.f_print1, mm.f_print2, mm.f_state,
-        if (length(g.f_adg)>0, g.f_adg, gr.f_adgcode) AS f_adgt, gr.f_taxdept,
+        if (length(coalesce(g.f_adg, ''))>0, g.f_adg, gr.f_adgcode) AS f_adgt, gr.f_taxdept,
         mm.f_recent, g.f_emark_required, cast(coalesce(sl.f_qty, -999) AS INT) as f_stoplist,
         g.f_data, g.f_scancode
         FROM c_menu_names m

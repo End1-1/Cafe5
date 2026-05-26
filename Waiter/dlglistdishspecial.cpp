@@ -1,6 +1,5 @@
 #include "dlglistdishspecial.h"
 #include "ui_dlglistdishspecial.h"
-#include "c5tabledata.h"
 
 static DlgListDishSpecial* __d = nullptr;
 
@@ -18,37 +17,38 @@ DlgListDishSpecial::~DlgListDishSpecial()
 
 bool DlgListDishSpecial::getSpecial(C5User *user, int dish, QString &special)
 {
-    if(!__d) {
-        __d = new DlgListDishSpecial(user);
-    }
+    //TODO
+    // if(!__d) {
+    //     __d = new DlgListDishSpecial(user);
+    // }
 
-    __d->fResult = "";
-    QJsonArray sp = objs("d_special");
-    __d->ui->lst->clear();
+    // __d->fResult = "";
+    // QJsonArray sp = objs("d_special");
+    // __d->ui->lst->clear();
 
-    for(int i = 0; i < sp.size(); i++) {
-        const QJsonObject &jo = sp.at(i).toObject();
+    // for(int i = 0; i < sp.size(); i++) {
+    //     const QJsonObject &jo = sp.at(i).toObject();
 
-        if(jo["f_dish"].toInt() == dish) {
-            __d->ui->lst->addItem(jo["f_comment"].toString());
-        }
-    }
+    //     if(jo["f_dish"].toInt() == dish) {
+    //         __d->ui->lst->addItem(jo["f_comment"].toString());
+    //     }
+    // }
 
-    if(__d->ui->lst->count() > 0) {
-        QListWidgetItem *item = new QListWidgetItem(__d->ui->lst);
-        item->setIcon(QIcon(":/cancel.png"));
-        item->setText(tr("Cancel"));
-        __d->ui->lst->addItem(item);
+    // if(__d->ui->lst->count() > 0) {
+    //     QListWidgetItem *item = new QListWidgetItem(__d->ui->lst);
+    //     item->setIcon(QIcon(":/cancel.png"));
+    //     item->setText(tr("Cancel"));
+    //     __d->ui->lst->addItem(item);
 
-        for(int i = 0; i < __d->ui->lst->count(); i++) {
-            __d->ui->lst->item(i)->setSizeHint(QSize(100, 50));
-        }
+    //     for(int i = 0; i < __d->ui->lst->count(); i++) {
+    //         __d->ui->lst->item(i)->setSizeHint(QSize(100, 50));
+    //     }
 
-        if(__d->exec() == QDialog::Accepted) {
-            special = __d->fResult.trimmed();
-            return special.length() > 0;
-        }
-    }
+    //     if(__d->exec() == QDialog::Accepted) {
+    //         special = __d->fResult.trimmed();
+    //         return special.length() > 0;
+    //     }
+    // }
 
     return true;
 }

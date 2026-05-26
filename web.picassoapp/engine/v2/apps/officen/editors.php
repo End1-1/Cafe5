@@ -19,6 +19,7 @@ class Editors extends Auth
         "form_debts" => "Debts",
         "form_revenue" => "Revenue",
         "form_salary" => "Salary",
+        "form_order_in_progress" => "OrderInProgress",
     ];
 
     private function validate($params)

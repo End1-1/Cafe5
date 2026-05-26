@@ -69,7 +69,10 @@ class CashSessions
     CONCAT(u1.f_last, ' ', LEFT(u1.f_first, 1), '.') AS f_staff,
     CONCAT(u2.f_last, ' ', LEFT(u2.f_first, 1), '.') AS f_cashier,
     money_fmt(oh.f_amounttotal), $other_payments,
-    money_fmt(CAST(JSON_VALUE(oh.f_data, '$.f_service_amount') AS DECIMAL(14,2))) AS f_service_amount
+    money_fmt(CAST(JSON_VALUE(oh.f_data, '$.f_service_amount') AS DECIMAL(14,2))) AS f_service_amount,
+    COALESCE(JSON_VALUE(oh.f_data, '$.f_guest.f_guest_name'), '') AS f_guest_name,
+    COALESCE(JSON_VALUE(oh.f_data, '$.f_guest.f_guest_phone'), '') AS f_guest_phone,
+    COALESCE(JSON_VALUE(oh.f_data, '$.f_guest.f_guest_address'), '') AS f_guest_address
     FROM o_header oh
     LEFT JOIN s_user u1 ON u1.f_id=oh.f_staff
     LEFT JOIN s_user u2 ON u2.f_id=oh.f_cashier
@@ -98,13 +101,16 @@ class CashSessions
             $headers[] = Translator::t($name);
         }
         $headers[] = Translator::t("Service amount");
+        $headers[] = Translator::t("Guest");
+        $headers[] = Translator::t("Phone");
+        $headers[] = Translator::t("Address");
 
         return [
             "rows" => $this->db->select($sql)->fetch_all(MYSQLI_NUM),
             "toolbar" => ["delete" => true, "reload" => true, "filter" => true],
             "headers" => $headers,
             "hidden_columns" => [0],
-            "sum" => [9, 10, 11, 12, 13, 14, 15], // Поправил индексы суммы (Total начинается с 9)
+            "sum" => [9, 10, 11, 12, 13, 14, 15],
             "filter" => [
                 ["type" => "combobox", "name" => "datemode", "label" => Translator::t("Filter by date type"), "default" => 1, "values" => [
                     ["label" => Translator::t("Order closing date"), "value" => 1],

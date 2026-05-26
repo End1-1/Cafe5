@@ -4,8 +4,7 @@
 #include <QDate>
 #include <QShowEvent>
 
-namespace Ui
-{
+namespace Ui {
 class C5SalaryEditor;
 }
 
@@ -19,13 +18,14 @@ public:
 
     QToolBar *toolBar() override;
 
-    // Sets initial state and triggers lazy load on showEvent.
-    void open(const QDate &date, int type);
+    /** Opens salary accrual document (f_type = 1). */
+    void open(const QDate &date);
 
 private slots:
     void on_btnAddStaff_clicked();
     void on_btnRemoveStaff_clicked();
     void on_btnChangePosition_clicked();
+    void calculateDocument();
     void saveDocument();
     void removeDocument();
 
@@ -37,13 +37,20 @@ private:
         colNum,
         colPosition,
         colName,
-        colAmount
+        colFixed,
+        colDishBase,
+        colCalculated,
+        colBonus,
+        colTotal
     };
 
     Ui::C5SalaryEditor *ui;
 
     void initTable();
     void recalcTotal();
+    void updateRowTotal(int row);
+    void appendStaffRow(int staffId, const QString &staffName, int positionId, const QString &positionName);
+    void applyCalculatedRow(int row, double fixed, double dishBase, double calculated, double total);
     QString buildPrintHtml() const;
 
 protected slots:
@@ -55,5 +62,4 @@ protected:
 private:
     bool mLoadOnShow = false;
     QDate mOpenDate;
-    int mOpenType = 1;
 };

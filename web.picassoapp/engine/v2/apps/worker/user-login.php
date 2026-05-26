@@ -36,8 +36,10 @@ class UserLogin extends Auth
         if ($params->nootp ?? false) {
             $this->result["nootp"] = true;
             $this->result["userdata"] = $userdata;
-            $this->writeSession($userdata);
             $this->setUserData($userdata);
+            $this->result["user"] = ["f_id" => (int)$userdata["f_id"]];
+            $this->result["config"] = $this->result["jsonconfig"] ?? ["f_config" => []];
+            $this->writeSession($userdata);
             return;
         }
         $params->user = $userdata["f_id"];
@@ -64,8 +66,10 @@ class UserLogin extends Auth
         if ($params->nootp ?? false) {
             $this->result["nootp"] = true;
             $this->result["userdata"] = $userdata;
-            $this->writeSession($userdata);
             $this->setUserData($userdata);
+            $this->result["user"] = ["f_id" => (int)$userdata["f_id"]];
+            $this->result["config"] = $this->result["jsonconfig"] ?? ["f_config" => []];
+            $this->writeSession($userdata);
             return;
         }
         $params->user = $userdata["f_id"];

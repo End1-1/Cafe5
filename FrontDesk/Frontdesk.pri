@@ -164,6 +164,8 @@ FORMS += \
     dwaiterworkstationconfig.ui \
     rabstracteditordialog.ui \
     rabstracteditorreport.ui \
+    c5salaryeditor.ui \
+    c5salarypaymenteditor.ui \
     c5revenuecashop.ui \
     wdashboardsettings.ui \
     rwaiterstationconfig.ui \
@@ -393,6 +395,7 @@ HEADERS += \
         ../Cafe5/c5dialog.h \
         ../Cafe5/c5message.h \
         ../Cafe5/c5utils.h \
+        ../Cafe5/c5cashoperationtypes.h \
         ../Classes/c5permissions.h \
         ../Classes/c5grid.h \
         ../Reports/cr5usersgroups.h \
@@ -501,6 +504,8 @@ HEADERS += \
         dwaiterworkstationconfig.h \
         rabstracteditordialog.h \
         rabstracteditorreport.h \
+        c5salaryeditor.h \
+        c5salarypaymenteditor.h \
         c5revenuecashop.h \
         wdashboardsettings.h \
         rabstractspecialwidget.h \
@@ -722,6 +727,7 @@ SOURCES += \
         ../TableRecord/oheader.cpp \
             main.cpp \
         ../Cafe5/c5config.cpp \
+        ../Cafe5/c5registrysettings.cpp \
         ../Cafe5/c5database.cpp \
         ../Cafe5/c5dialog.cpp \
         ../Cafe5/c5message.cpp \
@@ -818,6 +824,8 @@ SOURCES += \
         dwaiterworkstationconfig.cpp \
         rabstracteditordialog.cpp \
         rabstracteditorreport.cpp \
+        c5salaryeditor.cpp \
+        c5salarypaymenteditor.cpp \
         c5revenuecashop.cpp \
         wdashboardsettings.cpp \
         rabstractspecialwidget.cpp \

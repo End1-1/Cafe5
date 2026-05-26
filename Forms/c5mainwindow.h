@@ -79,8 +79,6 @@ private slots:
 
     void menuListReponse(const QJsonObject &jdoc);
 
-    void updateTimeout();
-
     void hotKey();
 
     void tabCloseRequested(int index);

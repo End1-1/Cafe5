@@ -17,7 +17,7 @@
    <item>
     <widget class="QTabWidget" name="tabWidget">
      <property name="currentIndex">
-      <number>0</number>
+      <number>1</number>
      </property>
      <widget class="QWidget" name="tab">
       <attribute name="title">
@@ -64,41 +64,10 @@
          </property>
         </widget>
        </item>
-       <item row="2" column="0">
-        <widget class="QLabel" name="label_3">
-         <property name="text">
-          <string>Start time</string>
-         </property>
-        </widget>
-       </item>
        <item row="2" column="1">
-        <widget class="C5LineEditWithSelector" name="leStartTime">
-         <property name="Field" stdset="0">
-          <string>f_starttime</string>
-         </property>
-        </widget>
-       </item>
-       <item row="3" column="0">
-        <widget class="QLabel" name="label_4">
-         <property name="text">
-          <string>Duration</string>
-         </property>
-        </widget>
-       </item>
-       <item row="3" column="1">
-        <widget class="C5LineEditWithSelector" name="leDuration">
-         <property name="Field" stdset="0">
-          <string>f_duration</string>
-         </property>
-         <property name="Type" stdset="0">
-          <string>1</string>
-         </property>
-        </widget>
-       </item>
-       <item row="4" column="1">
         <spacer name="verticalSpacer">
          <property name="orientation">
-          <enum>Qt::Vertical</enum>
+          <enum>Qt::Orientation::Vertical</enum>
          </property>
          <property name="sizeHint" stdset="0">
           <size>
@@ -115,31 +84,18 @@
        <string>Salary</string>
       </attribute>
       <layout class="QGridLayout" name="gridLayout">
-       <item row="3" column="0">
-        <widget class="QLabel" name="label_8">
-         <property name="text">
-          <string>Value of department</string>
-         </property>
-        </widget>
+       <item row="3" column="1">
+        <widget class="C5LineEdit" name="leValDep"/>
        </item>
-       <item row="0" column="1">
-        <widget class="C5LineEdit" name="leFixed"/>
-       </item>
-       <item row="1" column="1">
-        <widget class="C5LineEdit" name="leMin"/>
+       <item row="4" column="1">
+        <widget class="C5LineEdit" name="leSkipAmount"/>
        </item>
        <item row="6" column="1">
-        <spacer name="verticalSpacer_2">
-         <property name="orientation">
-          <enum>Qt::Vertical</enum>
+        <widget class="QPlainTextEdit" name="teData">
+         <property name="Field" stdset="0">
+          <string>f_data</string>
          </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>20</width>
-           <height>40</height>
-          </size>
-         </property>
-        </spacer>
+        </widget>
        </item>
        <item row="2" column="0">
         <widget class="QLabel" name="label_7">
@@ -148,23 +104,23 @@
          </property>
         </widget>
        </item>
-       <item row="4" column="0">
-        <widget class="QLabel" name="label_10">
-         <property name="text">
-          <string>Value of total</string>
-         </property>
-        </widget>
-       </item>
-       <item row="4" column="1">
-        <widget class="C5LineEdit" name="leValTotal"/>
-       </item>
        <item row="2" column="1">
         <widget class="C5LineEdit" name="leMax"/>
+       </item>
+       <item row="0" column="1">
+        <widget class="C5LineEdit" name="leFixed"/>
        </item>
        <item row="1" column="0">
         <widget class="QLabel" name="label_6">
          <property name="text">
           <string>Minimum</string>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="0">
+        <widget class="QLabel" name="label_8">
+         <property name="text">
+          <string>Department code</string>
          </property>
         </widget>
        </item>
@@ -175,18 +131,42 @@
          </property>
         </widget>
        </item>
-       <item row="3" column="1">
-        <widget class="C5LineEdit" name="leValDep"/>
+       <item row="1" column="1">
+        <widget class="C5LineEdit" name="leMin"/>
        </item>
-       <item row="5" column="0">
-        <widget class="QLabel" name="label_11">
+       <item row="7" column="1">
+        <spacer name="verticalSpacer_2">
+         <property name="orientation">
+          <enum>Qt::Orientation::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>40</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item row="4" column="0">
+        <widget class="QLabel" name="label_10">
          <property name="text">
-          <string>Own total</string>
+          <string>Skip amount</string>
          </property>
         </widget>
        </item>
        <item row="5" column="1">
-        <widget class="C5LineEdit" name="lwOwnTotal"/>
+        <widget class="QCheckBox" name="chCountWorkingTime">
+         <property name="text">
+          <string/>
+         </property>
+        </widget>
+       </item>
+       <item row="5" column="0">
+        <widget class="QLabel" name="label_11">
+         <property name="text">
+          <string>Count only working time</string>
+         </property>
+        </widget>
        </item>
       </layout>
      </widget>

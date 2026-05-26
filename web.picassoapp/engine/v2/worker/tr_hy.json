@@ -211,5 +211,20 @@
     "Net": "Զուտ",
     "Cashbox close surplus": "Փակման ժամանակ ավելցուկ",
     "Cashbox close shortage": "Փակման ժամանակ պակասնորդ",
-    "Total COGS": "Ինքնառժեք"
+    "Cash Overage": "Կանխիկ ավելցուկ",
+    "Cash Shortage": "Կանխիկ պակասորդ",
+    "Counted cash": "Հաշվառված կանխիկ",
+    "Sales Revenue": "Վաճառքի եկամուտ",
+    "Total Expenses": "Ընդհանուր ծախսեր",
+    "Purchasing Costs": "Գնումների ծախս",
+    "Salaries and Wages": "Աշխատավարձ",
+    "Debt Recovery": "Պարտքի մարում (մուտք)",
+    "Debt Repayment": "Պարտքի մարում (ելք)",
+    "Utilities": "Կոմունալ ծախսեր",
+    "Operation type": "Օպերացիայի տեսակ",
+    "Total COGS": "Ինքնառժեք",
+    "Show payment methods": "need_translate Show payment methods",
+    "Guest": "need_translate Guest",
+    "Phone": "need_translate Phone",
+    "Address": "need_translate Address"
 }

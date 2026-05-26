@@ -19,6 +19,9 @@ public:
 
     virtual void updateDish(WaiterDish value) override;
 
+    void setDisplayContext(bool bistroMode, bool isPreorder,
+                           double orderServiceFactor, double orderDiscountFactor);
+
     void setCheckMode(bool v);
 
     void setChecked(bool v);
@@ -30,6 +33,12 @@ public:
     void setPackageParentButtonChecked(bool checked);
 
     bool mShowRemoved;
+
+private:
+    bool mBistroMode = false;
+    bool mIsPreorder = false;
+    double mOrderServiceFactor = 0;
+    double mOrderDiscountFactor = 0;
 
 protected:
     virtual bool event(QEvent *event) override;

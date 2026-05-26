@@ -4,33 +4,66 @@
 #include <QAbstractItemView>
 #include <QBrush>
 #include <QColor>
+#include <QCoreApplication>
+#include <QDate>
+#include <QDateEdit>
 #include <QDateTime>
+#include <QDialog>
+#include <QDialogButtonBox>
 #include <QHeaderView>
 #include <QHideEvent>
 #include <QJsonArray>
 #include <QLineEdit>
+#include <QSettings>
 #include <QShowEvent>
 #include <QStringList>
 #include <QTableWidgetItem>
-#include <QDialog>
 #include <QTime>
-#include <algorithm>
-#include <limits>
-#include <QCoreApplication>
-#include <QSettings>
+#include <QTimer>
+#include <QVBoxLayout>
 #include <QVariant>
 #include "c5message.h"
-#include "dict_payment_type.h"
 #include "c5user.h"
+#include "c5utils.h"
+#include "dict_currency.h"
+#include "dict_payment_type.h"
 #include "dlgkitchensettings.h"
 #include "dlgorder.h"
 #include "dlgsimleoptions.h"
 #include "dlgtext.h"
 #include "format_date.h"
 #include "ninterface.h"
+#include <algorithm>
+#include <limits>
 
 namespace
 {
+
+static bool pickKitchenHistoryDate(QWidget *parent, QDate &outDate)
+{
+    QDialog dlg(parent);
+    dlg.setWindowTitle(QCoreApplication::translate("DlgKitchenInProgress", "Archive date", "kitchen_history_mode"));
+    dlg.setMinimumSize(280, 120);
+    auto *lay = new QVBoxLayout(&dlg);
+    lay->setContentsMargins(12, 12, 12, 12);
+    auto *de = new QDateEdit(QDate::currentDate(), &dlg);
+    de->setCalendarPopup(true);
+    de->setDisplayFormat(QStringLiteral("dd.MM.yyyy"));
+    de->setMaximumDate(QDate::currentDate());
+    lay->addWidget(de);
+    auto *bb = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, &dlg);
+    QObject::connect(bb, &QDialogButtonBox::accepted, &dlg, &QDialog::accept);
+    QObject::connect(bb, &QDialogButtonBox::rejected, &dlg, &QDialog::reject);
+    lay->addWidget(bb);
+
+    if(dlg.exec() != QDialog::Accepted) {
+        return false;
+    }
+
+    outDate = de->date();
+
+    return outDate.isValid();
+}
 
 constexpr int kKitchenRoleTableId = int(Qt::UserRole) + 40;
 
@@ -44,19 +77,41 @@ struct KitchenColDef {
     bool defaultVisible;
 };
 
-/* Order matches the visible columns; ColHeaderId is technical and not exposed. */
-const KitchenColDef kKitchenCols[] = {
-    {1 /*ColOrderPrefix*/, "order_prefix", QT_TRANSLATE_NOOP("DlgKitchenSettings", "Order"),     120, true},
-    {2 /*ColTimeOpen*/,    "time_open",    QT_TRANSLATE_NOOP("DlgKitchenSettings", "Time"),      120, true},
-    {3 /*ColTableName*/,   "table_name",   QT_TRANSLATE_NOOP("DlgKitchenSettings", "Table"),      90, true},
-    {4 /*ColHallName*/,    "hall_name",    QT_TRANSLATE_NOOP("DlgKitchenSettings", "Hall"),       90, true},
-    {5 /*ColDishes*/,      "dishes",       QT_TRANSLATE_NOOP("DlgKitchenSettings", "Dishes"),    300, true},
-    {6 /*ColGuest*/,       "guest",        QT_TRANSLATE_NOOP("DlgKitchenSettings", "Guest"),     200, true},
-    {7 /*ColPaid*/,        "payment",      QT_TRANSLATE_NOOP("DlgKitchenSettings", "Payment"),   140, true},
-    {8 /*ColStatus*/,      "status",       QT_TRANSLATE_NOOP("DlgKitchenSettings", "Status"),     84, true},
+/* Live queue table: columns, registry keys, sorting — separate from history. */
+const KitchenColDef kKitchenLiveColDefs[] = {
+    {1 /*ColOrderPrefix*/, "order_prefix", QT_TRANSLATE_NOOP("KitchenLiveTable", "Order"),     120, true},
+    {2 /*ColTimeOpen*/,    "time_open",    QT_TRANSLATE_NOOP("KitchenLiveTable", "Time"),      120, true},
+    {3 /*ColTableName*/,   "table_name",   QT_TRANSLATE_NOOP("KitchenLiveTable", "Table"),      90, true},
+    {4 /*ColHallName*/,    "hall_name",    QT_TRANSLATE_NOOP("KitchenLiveTable", "Hall"),       90, true},
+    {5 /*ColDishes*/,      "dishes",       QT_TRANSLATE_NOOP("KitchenLiveTable", "Dishes"),    300, true},
+    {6 /*ColGuest*/,       "guest",        QT_TRANSLATE_NOOP("KitchenLiveTable", "Guest"),     200, true},
+    {7 /*ColPaid*/,        "payment",      QT_TRANSLATE_NOOP("KitchenLiveTable", "Payment"),   160, true},
+    {8 /*ColStatus*/,      "status",       QT_TRANSLATE_NOOP("KitchenLiveTable", "Status"),     84, true},
 };
 
-QString kitchenColRegKey(const QString &id, const char *suffix)
+/* Archive table: own labels/context; column ids match layout indices only. */
+const KitchenColDef kKitchenHistoryColDefs[] = {
+    {1 /*ColOrderPrefix*/, "order_prefix", QT_TRANSLATE_NOOP("KitchenHistoryTable", "Order"),     120, true},
+    {2 /*ColTimeOpen*/,    "time_open",    QT_TRANSLATE_NOOP("KitchenHistoryTable", "Time"),      120, true},
+    {3 /*ColTableName*/,   "table_name",   QT_TRANSLATE_NOOP("KitchenHistoryTable", "Table"),      90, true},
+    {4 /*ColHallName*/,    "hall_name",    QT_TRANSLATE_NOOP("KitchenHistoryTable", "Hall"),       90, true},
+    {5 /*ColDishes*/,      "dishes",       QT_TRANSLATE_NOOP("KitchenHistoryTable", "Dishes"),    300, true},
+    {6 /*ColGuest*/,       "guest",        QT_TRANSLATE_NOOP("KitchenHistoryTable", "Guest"),     200, true},
+    {7 /*ColPaid*/,        "payment",      QT_TRANSLATE_NOOP("KitchenHistoryTable", "Payment"),   160, true},
+    {8 /*ColStatus*/,      "status",       QT_TRANSLATE_NOOP("KitchenHistoryTable", "Status"),     84, true},
+};
+
+QString kitchenLiveColRegKey(const QString &id, const char *suffix)
+{
+    return QStringLiteral("kitchen_live_col_%1_%2").arg(id, QLatin1String(suffix));
+}
+
+QString kitchenHistoryColRegKey(const QString &id, const char *suffix)
+{
+    return QStringLiteral("kitchen_hist_col_%1_%2").arg(id, QLatin1String(suffix));
+}
+
+QString kitchenLegacyColRegKey(const QString &id, const char *suffix)
 {
     return QStringLiteral("kitchen_col_%1_%2").arg(id, QLatin1String(suffix));
 }
@@ -83,6 +138,23 @@ void writeKitchenSetting(const QString &key, const QVariant &value)
 {
     QSettings s(kitchenSettingsOrg(), kitchenSettingsApp());
     s.setValue(key, value);
+}
+
+QVariant readLiveColSetting(const QString &id, const char *suffix, const QVariant &def)
+{
+    QSettings s(kitchenSettingsOrg(), kitchenSettingsApp());
+    const QString kNew = kitchenLiveColRegKey(id, suffix);
+
+    if(s.contains(kNew)) {
+        return s.value(kNew);
+    }
+
+    return s.value(kitchenLegacyColRegKey(id, suffix), def);
+}
+
+QVariant readHistoryColSetting(const QString &id, const char *suffix, const QVariant &def)
+{
+    return readKitchenSetting(kitchenHistoryColRegKey(id, suffix), def);
 }
 
 QColor kitchenRowBackground(int minLineStatus)
@@ -181,7 +253,7 @@ qint64 kitchenOrderOpenedSortKeyMs(const QJsonObject &order)
     return dt.isValid() ? dt.toMSecsSinceEpoch() : std::numeric_limits<qint64>::max();
 }
 
-void sortKitchenOrdersOldestFirst(QJsonArray &arr)
+void sortLiveKitchenRowsByOpenedTime(QJsonArray &arr)
 {
     struct Item {
         qint64 keyMs = std::numeric_limits<qint64>::max();
@@ -214,6 +286,61 @@ void sortKitchenOrdersOldestFirst(QJsonArray &arr)
     }
 }
 
+void sortHistoryKitchenRowsByOpenedTime(QJsonArray &arr)
+{
+    struct Item {
+        qint64 keyMs = std::numeric_limits<qint64>::max();
+        int originalIndex = 0;
+        QJsonValue value;
+    };
+
+    QVector<Item> vec;
+    vec.reserve(arr.size());
+    int idx = 0;
+
+    for(const auto &v : arr) {
+        Item it;
+        it.keyMs = kitchenOrderOpenedSortKeyMs(v.toObject());
+        it.originalIndex = idx++;
+        it.value = v;
+        vec.append(it);
+    }
+
+    std::sort(vec.begin(), vec.end(), [](const Item &a, const Item &b) {
+        if(a.keyMs != b.keyMs) {
+            return a.keyMs < b.keyMs;
+        }
+        return a.originalIndex < b.originalIndex;
+    });
+    arr = QJsonArray();
+
+    for(const auto &it : vec) {
+        arr.append(it.value);
+    }
+}
+
+QJsonArray liveJsonPayloadDataArray(const QJsonObject &jdoc)
+{
+    const QJsonValue v = jdoc.value(QStringLiteral("data"));
+
+    if(v.isArray()) {
+        return v.toArray();
+    }
+
+    return QJsonArray();
+}
+
+QJsonArray historyJsonPayloadDataArray(const QJsonObject &jdoc)
+{
+    const QJsonValue v = jdoc.value(QStringLiteral("data"));
+
+    if(v.isArray()) {
+        return v.toArray();
+    }
+
+    return QJsonArray();
+}
+
 } // namespace
 
 DlgKitchenInProgress::DlgKitchenInProgress(C5User *user,
@@ -236,12 +363,19 @@ DlgKitchenInProgress::DlgKitchenInProgress(C5User *user,
 
     ui->tblKitchenOrders->setSelectionBehavior(QAbstractItemView::SelectRows);
     ui->tblKitchenOrders->setSelectionMode(QAbstractItemView::SingleSelection);
-    ui->tblKitchenOrders->verticalHeader()->setVisible(false);
-    ui->tblKitchenOrders->verticalHeader()->setMinimumSectionSize(56);
+    {
+        QHeaderView *vh = ui->tblKitchenOrders->verticalHeader();
+        vh->setVisible(true);
+        vh->setMinimumWidth(44);
+        vh->setDefaultSectionSize(56);
+        vh->setSectionsClickable(false);
+        vh->setSectionResizeMode(QHeaderView::Fixed);
+    }
     ui->tblKitchenOrders->setWordWrap(true);
     ui->tblKitchenOrders->setColumnHidden(ColHeaderId, true);
     ui->tblKitchenOrders->horizontalHeader()->setSectionResizeMode(QHeaderView::Fixed);
-    applyFixedColumnLayout();
+    liveSetupTableHorizontalHeaders();
+    liveApplyFixedColumnLayout();
 
     connect(ui->leOrderNumber, &QLineEdit::textChanged, this, &DlgKitchenInProgress::on_leOrderNumber_textChanged);
     connect(ui->leSearchAny, &QLineEdit::textChanged, this, &DlgKitchenInProgress::on_leSearchAny_textChanged);
@@ -251,6 +385,9 @@ DlgKitchenInProgress::DlgKitchenInProgress(C5User *user,
     connect(&mClockTimer, &QTimer::timeout, this, &DlgKitchenInProgress::tickClock);
     setupButtons();
     ui->btnSettings->setVisible(mUser->id() == 1);
+    ui->btnHistory->setText(tr("History", "kitchen_history_mode"));
+    mOriginalWindowTitle = windowTitle();
+    setKitchenHistoryReadonly(false);
 }
 
 DlgKitchenInProgress::~DlgKitchenInProgress()
@@ -277,7 +414,8 @@ QString DlgKitchenInProgress::kitchenStatusText(int status) const
 
 QString DlgKitchenInProgress::paymentColumnText(const QJsonObject &order) const
 {
-    QStringList parts;
+    QStringList typeParts;
+    double paidTotal = 0.0;
 
     for(int pt : payment_types) {
         const QString field = payment_fields.value(pt);
@@ -289,19 +427,36 @@ QString DlgKitchenInProgress::paymentColumnText(const QJsonObject &order) const
         const double amt = order.value(field).toVariant().toDouble();
 
         if(amt > 1e-9) {
+            paidTotal += amt;
             const char *const nm = payment_names.value(pt);
 
             if(nm) {
-                parts << QCoreApplication::translate("PaymentType", nm);
+                typeParts << QCoreApplication::translate("PaymentType", nm);
             }
         }
     }
 
-    if(parts.isEmpty()) {
-        return tr("No", "kitchen_paid_column");
+    const double orderTotal = order.value(QStringLiteral("f_amounttotal")).toVariant().toDouble();
+    const QString orderTotalLine = QStringLiteral("%1 %2").arg(float_str(orderTotal, 2), CURRENCY_SHORT);
+
+    const QString typeLine = typeParts.isEmpty()
+                                 ? tr("No", "kitchen_paid_column")
+                                 : typeParts.join(QStringLiteral(", "));
+
+    QStringList lines;
+    lines << typeLine;
+
+    if(paidTotal > 1e-9) {
+        if(qAbs(orderTotal - paidTotal) > 0.01) {
+            lines << orderTotalLine;
+        }
+
+        lines << QStringLiteral("%1 %2").arg(float_str(paidTotal, 2), CURRENCY_SHORT);
+    } else {
+        lines << orderTotalLine;
     }
 
-    return parts.join(QStringLiteral(", "));
+    return lines.join(QLatin1Char('\n'));
 }
 
 QString DlgKitchenInProgress::formatQtyWidth5(double qty)
@@ -360,13 +515,14 @@ QString DlgKitchenInProgress::normalizedOrderSuffix(const QString &s)
     return t.mid(i).trimmed();
 }
 
-QString DlgKitchenInProgress::haystackForSearch(const QJsonObject &order) const
+QString DlgKitchenInProgress::liveHaystackForOrderSearch(const QJsonObject &order) const
 {
     QStringList parts;
     parts << order.value(QStringLiteral("f_order_prefix")).toString();
     parts << order.value(QStringLiteral("f_table_name")).toString();
     parts << order.value(QStringLiteral("f_hall_name")).toString();
     parts << order.value(QStringLiteral("f_time_open")).toString();
+    parts << order.value(QStringLiteral("f_amounttotal")).toVariant().toString();
     for(int pt : payment_types) {
         const QString field = payment_fields.value(pt);
 
@@ -390,18 +546,118 @@ QString DlgKitchenInProgress::haystackForSearch(const QJsonObject &order) const
     return parts.join(QLatin1Char('\n'));
 }
 
+QString DlgKitchenInProgress::historyHaystackForOrderSearch(const QJsonObject &order) const
+{
+    QStringList parts;
+    parts << order.value(QStringLiteral("f_order_prefix")).toString();
+    parts << order.value(QStringLiteral("f_table_name")).toString();
+    parts << order.value(QStringLiteral("f_hall_name")).toString();
+    parts << order.value(QStringLiteral("f_time_open")).toString();
+    parts << order.value(QStringLiteral("f_amounttotal")).toVariant().toString();
+    for(int pt : payment_types) {
+        const QString field = payment_fields.value(pt);
+
+        if(!field.isEmpty()) {
+            parts << order.value(field).toVariant().toString();
+        }
+    }
+    parts << guestMultiline(order);
+
+    const QJsonArray lines = order.value(QStringLiteral("lines")).toArray();
+
+    for(const auto &lv : lines) {
+        const QJsonObject lo = lv.toObject();
+        parts << lo.value(QStringLiteral("f_goods_name")).toString();
+        parts << lo.value(QStringLiteral("f_comment")).toString();
+        parts << QString::number(lo.value(QStringLiteral("f_qty")).toVariant().toDouble());
+        parts << QString::number(lo.value(QStringLiteral("f_status")).toInt());
+        parts << lo.value(QStringLiteral("f_goods_row_id")).toString();
+    }
+
+    return parts.join(QLatin1Char('\n'));
+}
+
+void DlgKitchenInProgress::liveSetupTableHorizontalHeaders()
+{
+    QTableWidget *tw = ui->tblKitchenOrders;
+
+    for(const KitchenColDef &c : kKitchenLiveColDefs) {
+        const QString t = QCoreApplication::translate("KitchenLiveTable", c.label);
+
+        if(QTableWidgetItem *hi = tw->horizontalHeaderItem(c.col)) {
+            hi->setText(t);
+        }
+    }
+}
+
+void DlgKitchenInProgress::historySetupTableHorizontalHeaders()
+{
+    QTableWidget *tw = ui->tblKitchenOrders;
+
+    for(const KitchenColDef &c : kKitchenHistoryColDefs) {
+        const QString t = QCoreApplication::translate("KitchenHistoryTable", c.label);
+
+        if(QTableWidgetItem *hi = tw->horizontalHeaderItem(c.col)) {
+            hi->setText(t);
+        }
+    }
+}
+
 void DlgKitchenInProgress::syncFilterButtons()
 {
+    ui->btnFilterAll->setChecked(mStatusFilter == 0);
     ui->btnFilterAccepted->setChecked(mStatusFilter == 1);
     ui->btnFilterCooking->setChecked(mStatusFilter == 2);
     ui->btnFilterReady->setChecked(mStatusFilter == 3);
 }
 
-void DlgKitchenInProgress::fillTableRows(const QJsonArray &orders)
+void DlgKitchenInProgress::liveApplyFixedColumnLayout()
+{
+    ui->tblKitchenOrders->setColumnHidden(ColHeaderId, true);
+
+    for(const KitchenColDef &c : kKitchenLiveColDefs) {
+        const QString idStr = QLatin1String(c.id);
+        const bool visible = readLiveColSetting(idStr, "visible", c.defaultVisible).toBool();
+        const int width = qMax(20, readLiveColSetting(idStr, "width", c.defaultWidth).toInt());
+        ui->tblKitchenOrders->setColumnHidden(c.col, !visible);
+        ui->tblKitchenOrders->setColumnWidth(c.col, width);
+    }
+}
+
+void DlgKitchenInProgress::historyApplyFixedColumnLayout()
+{
+    ui->tblKitchenOrders->setColumnHidden(ColHeaderId, true);
+
+    for(const KitchenColDef &c : kKitchenHistoryColDefs) {
+        const QString idStr = QLatin1String(c.id);
+        const bool visible = readHistoryColSetting(idStr, "visible", c.defaultVisible).toBool();
+        const int width = qMax(20, readHistoryColSetting(idStr, "width", c.defaultWidth).toInt());
+        ui->tblKitchenOrders->setColumnHidden(c.col, !visible);
+        ui->tblKitchenOrders->setColumnWidth(c.col, width);
+    }
+}
+
+void DlgKitchenInProgress::liveClearTable()
 {
     ui->tblKitchenOrders->setUpdatesEnabled(false);
     ui->tblKitchenOrders->setRowCount(0);
-    m_linesPickByTableRow.clear();
+    mLiveLinePicksByTableRow.clear();
+    ui->tblKitchenOrders->setUpdatesEnabled(true);
+}
+
+void DlgKitchenInProgress::historyClearTable()
+{
+    ui->tblKitchenOrders->setUpdatesEnabled(false);
+    ui->tblKitchenOrders->setRowCount(0);
+    mHistoryLinePicksByTableRow.clear();
+    ui->tblKitchenOrders->setUpdatesEnabled(true);
+}
+
+void DlgKitchenInProgress::liveFillTableRows(const QJsonArray &orders)
+{
+    ui->tblKitchenOrders->setUpdatesEnabled(false);
+    ui->tblKitchenOrders->setRowCount(0);
+    mLiveLinePicksByTableRow.clear();
 
     int r = 0;
 
@@ -478,31 +734,108 @@ void DlgKitchenInProgress::fillTableRows(const QJsonArray &orders)
         ui->tblKitchenOrders->setItem(r, ColStatus, itStatus);
 
         paintKitchenOrderRow(ui->tblKitchenOrders, r, rowColorStatus);
-        m_linesPickByTableRow.append(picks);
+        mLiveLinePicksByTableRow.append(picks);
 
         ++r;
     }
 
     ui->tblKitchenOrders->resizeRowsToContents();
-    applyFixedColumnLayout();
+    liveApplyFixedColumnLayout();
     ui->tblKitchenOrders->setUpdatesEnabled(true);
 }
 
-void DlgKitchenInProgress::applyFixedColumnLayout()
+void DlgKitchenInProgress::historyFillTableRows(const QJsonArray &orders)
 {
-    /* Technical id column always hidden. */
-    ui->tblKitchenOrders->setColumnHidden(ColHeaderId, true);
+    ui->tblKitchenOrders->setUpdatesEnabled(false);
+    ui->tblKitchenOrders->setRowCount(0);
+    mHistoryLinePicksByTableRow.clear();
 
-    for(const KitchenColDef &c : kKitchenCols) {
-        const QString idStr = QLatin1String(c.id);
-        const bool visible = readKitchenSetting(kitchenColRegKey(idStr, "visible"), c.defaultVisible).toBool();
-        const int width = qMax(20, readKitchenSetting(kitchenColRegKey(idStr, "width"), c.defaultWidth).toInt());
-        ui->tblKitchenOrders->setColumnHidden(c.col, !visible);
-        ui->tblKitchenOrders->setColumnWidth(c.col, width);
+    int r = 0;
+
+    for(const auto &ov : orders) {
+        const QJsonObject order = ov.toObject();
+        const QJsonArray lines = order.value(QStringLiteral("lines")).toArray();
+
+        if(lines.isEmpty()) {
+            continue;
+        }
+
+        QVector<KitchenLinePick> picks;
+        QStringList dishTexts;
+        QStringList statusTexts;
+
+        for(const auto &lv : lines) {
+            const QJsonObject lo = lv.toObject();
+            const QString lineId = lo.value(QStringLiteral("f_goods_row_id")).toString();
+            const int st = lo.value(QStringLiteral("f_status")).toInt();
+            const double qty = lo.value(QStringLiteral("f_qty")).toVariant().toDouble();
+            const QString name = lo.value(QStringLiteral("f_goods_name")).toString();
+            const QString comment = lo.value(QStringLiteral("f_comment")).toString().trimmed();
+            const QString qty5 = formatQtyWidth5(qty);
+            QString dishLine = qty5 + name;
+
+            if(!comment.isEmpty()) {
+                dishLine += QStringLiteral(" (") + comment + QLatin1Char(')');
+            }
+
+            dishTexts << dishLine;
+            statusTexts << kitchenStatusText(st);
+            KitchenLinePick p;
+            p.lineId = lineId;
+            p.status = st;
+            p.pickerLabel = qty5 + name.trimmed();
+            picks.append(p);
+        }
+
+        ui->tblKitchenOrders->insertRow(r);
+        const int rowColorStatus = minStatusInLines(lines);
+
+        auto *itHeader = new QTableWidgetItem(order.value(QStringLiteral("f_header_id")).toString());
+        auto *itOrd = new QTableWidgetItem(order.value(QStringLiteral("f_order_prefix")).toString());
+        auto *itTable = new QTableWidgetItem(order.value(QStringLiteral("f_table_name")).toString());
+        itTable->setData(kKitchenRoleTableId, order.value(QStringLiteral("f_table")).toInt());
+        itTable->setData(kKitchenRoleHallId, order.value(QStringLiteral("f_hall")).toInt());
+        auto *itHall = new QTableWidgetItem(order.value(QStringLiteral("f_hall_name")).toString());
+        auto *itDishes = new QTableWidgetItem(dishTexts.join(QLatin1Char('\n')));
+        auto *itGuest = new QTableWidgetItem(guestMultiline(order));
+        auto *itPaid = new QTableWidgetItem(paymentColumnText(order));
+        auto *itTime = new QTableWidgetItem(formatKitchenOpenedCell(order));
+        auto *itStatus = new QTableWidgetItem(statusTexts.join(QLatin1Char('\n')));
+
+        const Qt::Alignment top = Qt::AlignTop;
+
+        itHeader->setTextAlignment(Qt::AlignLeft | top);
+        itOrd->setTextAlignment(Qt::AlignLeft | top);
+        itTable->setTextAlignment(Qt::AlignLeft | top);
+        itHall->setTextAlignment(Qt::AlignLeft | top);
+        itDishes->setTextAlignment(Qt::AlignLeft | top);
+        itGuest->setTextAlignment(Qt::AlignLeft | top);
+        itPaid->setTextAlignment(Qt::AlignLeft | top);
+        itTime->setTextAlignment(Qt::AlignLeft | top);
+        itStatus->setTextAlignment(Qt::AlignLeft | top);
+
+        ui->tblKitchenOrders->setItem(r, ColHeaderId, itHeader);
+        ui->tblKitchenOrders->setItem(r, ColOrderPrefix, itOrd);
+        ui->tblKitchenOrders->setItem(r, ColTableName, itTable);
+        ui->tblKitchenOrders->setItem(r, ColHallName, itHall);
+        ui->tblKitchenOrders->setItem(r, ColDishes, itDishes);
+        ui->tblKitchenOrders->setItem(r, ColGuest, itGuest);
+        ui->tblKitchenOrders->setItem(r, ColPaid, itPaid);
+        ui->tblKitchenOrders->setItem(r, ColTimeOpen, itTime);
+        ui->tblKitchenOrders->setItem(r, ColStatus, itStatus);
+
+        paintKitchenOrderRow(ui->tblKitchenOrders, r, rowColorStatus);
+        mHistoryLinePicksByTableRow.append(picks);
+
+        ++r;
     }
+
+    ui->tblKitchenOrders->resizeRowsToContents();
+    historyApplyFixedColumnLayout();
+    ui->tblKitchenOrders->setUpdatesEnabled(true);
 }
 
-void DlgKitchenInProgress::applyFrontendFilters()
+QJsonArray DlgKitchenInProgress::liveFilterOrdersForView() const
 {
     QJsonArray filtered;
     const QString orderRaw = ui->leOrderNumber->text().trimmed();
@@ -510,8 +843,9 @@ void DlgKitchenInProgress::applyFrontendFilters()
     const QString searchRaw = ui->leSearchAny->text().trimmed();
     const bool useSearch = searchRaw.size() > 2;
     const QString needle = useSearch ? searchRaw.toLower() : QString();
+    const bool applyLineStatus = (mStatusFilter != 0);
 
-    for(const auto &v : mAllKitchenRows) {
+    for(const auto &v : mLiveKitchenRows) {
         const QJsonObject order = v.toObject();
         const QJsonArray lines = order.value(QStringLiteral("lines")).toArray();
 
@@ -519,7 +853,7 @@ void DlgKitchenInProgress::applyFrontendFilters()
             continue;
         }
 
-        if(mStatusFilter != 0) {
+        if(applyLineStatus) {
             bool any = false;
 
             for(const auto &lv : lines) {
@@ -546,33 +880,207 @@ void DlgKitchenInProgress::applyFrontendFilters()
             }
         }
 
-        if(useSearch && !haystackForSearch(order).toLower().contains(needle)) {
+        if(useSearch && !liveHaystackForOrderSearch(order).toLower().contains(needle)) {
             continue;
         }
 
         filtered.append(order);
     }
 
-    fillTableRows(filtered);
+    return filtered;
 }
 
-void DlgKitchenInProgress::ingestServerDoc(const QJsonObject &jdoc)
+QJsonArray DlgKitchenInProgress::historyFilterOrdersForView() const
 {
-    mAllKitchenRows = jdoc.value(QStringLiteral("data")).toArray();
-    sortKitchenOrdersOldestFirst(mAllKitchenRows);
-    applyFrontendFilters();
+    QJsonArray filtered;
+    const QString orderRaw = ui->leOrderNumber->text().trimmed();
+    const QString orderKey = normalizedOrderSuffix(orderRaw);
+    const QString searchRaw = ui->leSearchAny->text().trimmed();
+    const bool useSearch = searchRaw.size() > 2;
+    const QString needle = useSearch ? searchRaw.toLower() : QString();
+
+    for(const auto &v : mHistoryKitchenRows) {
+        const QJsonObject order = v.toObject();
+        const QJsonArray lines = order.value(QStringLiteral("lines")).toArray();
+
+        if(lines.isEmpty()) {
+            continue;
+        }
+
+        if(!orderRaw.isEmpty()) {
+            if(orderKey.isEmpty()) {
+                continue;
+            }
+
+            const QString prefKey = normalizedOrderSuffix(order.value(QStringLiteral("f_order_prefix")).toString());
+
+            if(prefKey != orderKey) {
+                continue;
+            }
+        }
+
+        if(useSearch && !historyHaystackForOrderSearch(order).toLower().contains(needle)) {
+            continue;
+        }
+
+        filtered.append(order);
+    }
+
+    return filtered;
 }
 
-void DlgKitchenInProgress::reloadList()
+void DlgKitchenInProgress::liveReflowTableFromBuffer()
 {
+    liveFillTableRows(liveFilterOrdersForView());
+}
+
+void DlgKitchenInProgress::historyReflowTableFromBuffer()
+{
+    historyFillTableRows(historyFilterOrdersForView());
+}
+
+void DlgKitchenInProgress::liveApplySearchFromLineEdits()
+{
+    liveReflowTableFromBuffer();
+}
+
+void DlgKitchenInProgress::historyApplySearchFromLineEdits()
+{
+    historyReflowTableFromBuffer();
+}
+
+void DlgKitchenInProgress::ingestLiveKitchenDoc(const QJsonObject &jdoc)
+{
+    mLiveKitchenRows = liveJsonPayloadDataArray(jdoc);
+    sortLiveKitchenRowsByOpenedTime(mLiveKitchenRows);
+
+    if(mKitchenHistoryReadonly) {
+        return;
+    }
+
+    liveReflowTableFromBuffer();
+}
+
+void DlgKitchenInProgress::ingestHistoryKitchenDoc(const QJsonObject &jdoc)
+{
+    mHistoryKitchenRows = historyJsonPayloadDataArray(jdoc);
+    sortHistoryKitchenRowsByOpenedTime(mHistoryKitchenRows);
+
+    if(!mKitchenHistoryReadonly) {
+        return;
+    }
+
+    historyReflowTableFromBuffer();
+}
+
+void DlgKitchenInProgress::reloadLiveKitchenList()
+{
+    /* History mode: never start live /get (initial load is one-shot from showEvent; other callers are explicit). */
+    if(mKitchenHistoryReadonly) {
+        return;
+    }
+
+    ++mLiveKitchenRequestGen;
+    const int gen = mLiveKitchenRequestGen;
+
     fHttp->createHttpQueryLambda(QStringLiteral("/engine/v2/waiter/in-progress/get"),
                                  {},
-                                 [this](const QJsonObject &jdoc) {
-                                     ingestServerDoc(jdoc);
+                                 [this, gen](const QJsonObject &jdoc) {
+                                     if(gen != mLiveKitchenRequestGen) {
+                                         return;
+                                     }
+
+                                     ingestLiveKitchenDoc(jdoc);
                                  },
                                  [](const QJsonObject &) {},
                                  {},
                                  false);
+}
+
+void DlgKitchenInProgress::loadKitchenHistoryForDate(const QString &historyDateYmd)
+{
+    ++mHistoryKitchenRequestGen;
+    const int gen = mHistoryKitchenRequestGen;
+
+    mHistoryKitchenRows = QJsonArray();
+
+    if(mKitchenHistoryReadonly) {
+        historyClearTable();
+    }
+
+    fHttp->createHttpQueryLambda(QStringLiteral("/engine/v2/waiter/in-progress/get-history-for-date"),
+                                 QJsonObject{{QStringLiteral("date"), historyDateYmd}},
+                                 [this, gen](const QJsonObject &jdoc) {
+                                     if(gen != mHistoryKitchenRequestGen) {
+                                         return;
+                                     }
+
+                                     ingestHistoryKitchenDoc(jdoc);
+                                 },
+                                 [this, gen](const QJsonObject &jerr) {
+                                     if(gen != mHistoryKitchenRequestGen) {
+                                         return;
+                                     }
+
+                                     mHistoryKitchenRows = QJsonArray();
+
+                                     if(mKitchenHistoryReadonly) {
+                                         historyReflowTableFromBuffer();
+                                     }
+
+                                     const QString msg = jerr.value(QStringLiteral("errorMessage")).toString();
+
+                                     if(!msg.isEmpty()) {
+                                         C5Message::error(msg);
+                                     }
+                                 },
+                                 {},
+                                 false);
+}
+
+void DlgKitchenInProgress::setKitchenHistoryReadonly(bool readonly, const QString &historyDateYmd)
+{
+    if(readonly && !mKitchenHistoryReadonly) {
+        /* Invalidate deferred showEvent reloads and in-flight /get callbacks when entering history. */
+        ++mLiveKitchenRequestGen;
+    }
+
+    mKitchenHistoryReadonly = readonly;
+    mKitchenHistoryDate = readonly ? historyDateYmd : QString();
+
+    if(readonly && !historyDateYmd.isEmpty()) {
+        const QDate d = QDate::fromString(historyDateYmd, QStringLiteral("yyyy-MM-dd"));
+        const QString dateShown = d.isValid() ? d.toString(FORMAT_DATE_TO_STR) : historyDateYmd;
+        setWindowTitle(tr("%1 — %2 (history)", "kitchen_in_progress_title").arg(mOriginalWindowTitle, dateShown));
+    } else {
+        setWindowTitle(mOriginalWindowTitle);
+    }
+
+    /* Status filters stay enabled in history: click switches back to live queue with that filter. */
+    ui->btnOrderNumberKbd->setEnabled(!readonly);
+    ui->btnSearchAnyKbd->setEnabled(!readonly);
+    ui->btnSettings->setEnabled(!readonly && mUser->id() == 1);
+
+    if(readonly) {
+        historySetupTableHorizontalHeaders();
+        historyApplyFixedColumnLayout();
+    } else {
+        liveSetupTableHorizontalHeaders();
+        liveApplyFixedColumnLayout();
+    }
+}
+
+void DlgKitchenInProgress::on_btnHistory_clicked()
+{
+    QDate d;
+
+    if(!pickKitchenHistoryDate(this, d)) {
+        return;
+    }
+
+    const QString ymd = d.toString(QStringLiteral("yyyy-MM-dd"));
+    setKitchenHistoryReadonly(true, ymd);
+    loadKitchenHistoryForDate(ymd);
 }
 
 void DlgKitchenInProgress::applyKitchenLineStatusToLines(const QVector<QString> &lineIds, int status)
@@ -620,7 +1128,7 @@ void DlgKitchenInProgress::runKitchenStatusUpdateChain(const QVector<QString> &l
                                  },
                                  [this, lineIds, index, status, isLast](const QJsonObject &jdoc) {
                                      if(isLast) {
-                                         ingestServerDoc(jdoc);
+                                         ingestLiveKitchenDoc(jdoc);
                                      } else {
                                          runKitchenStatusUpdateChain(lineIds, index + 1, status);
                                      }
@@ -632,6 +1140,10 @@ void DlgKitchenInProgress::runKitchenStatusUpdateChain(const QVector<QString> &l
 
 void DlgKitchenInProgress::openStatusPickerForLineIds(const QVector<QString> &lineIds)
 {
+    if(mKitchenHistoryReadonly) {
+        return;
+    }
+
     if(lineIds.isEmpty()) {
         return;
     }
@@ -649,11 +1161,15 @@ void DlgKitchenInProgress::openStatusPickerForLineIds(const QVector<QString> &li
 
 void DlgKitchenInProgress::openStatusPickerForTableRow(int row)
 {
-    if(row < 0 || row >= m_linesPickByTableRow.size()) {
+    if(mKitchenHistoryReadonly) {
         return;
     }
 
-    const QVector<KitchenLinePick> &picks = m_linesPickByTableRow.at(row);
+    if(row < 0 || row >= mLiveLinePicksByTableRow.size()) {
+        return;
+    }
+
+    const QVector<KitchenLinePick> &picks = mLiveLinePicksByTableRow.at(row);
 
     if(picks.isEmpty()) {
         return;
@@ -706,9 +1222,19 @@ void DlgKitchenInProgress::showEvent(QShowEvent *e)
 
     ui->lbStaff->setText(mUser->fullName());
     ui->lbTime->setText(QTime::currentTime().toString(FORMAT_TIME_TO_SHORT_STR));
-    applyFixedColumnLayout();
+
+    if(mKitchenHistoryReadonly) {
+        historyApplyFixedColumnLayout();
+    } else {
+        liveApplyFixedColumnLayout();
+    }
+
+    if(!mKitchenHistoryReadonly && !mDidInitialShowEventLiveLoad) {
+        mDidInitialShowEventLiveLoad = true;
+        reloadLiveKitchenList();
+    }
+
     mClockTimer.start(1000);
-    reloadList();
 }
 
 void DlgKitchenInProgress::hideEvent(QHideEvent *e)
@@ -729,43 +1255,82 @@ void DlgKitchenInProgress::on_btnExit_clicked()
 
 void DlgKitchenInProgress::on_leOrderNumber_returnPressed()
 {
-    applyFrontendFilters();
+    if(mKitchenHistoryReadonly) {
+        historyApplySearchFromLineEdits();
+    } else {
+        liveApplySearchFromLineEdits();
+    }
 }
 
 void DlgKitchenInProgress::on_leSearchAny_returnPressed()
 {
-    applyFrontendFilters();
+    if(mKitchenHistoryReadonly) {
+        historyApplySearchFromLineEdits();
+    } else {
+        liveApplySearchFromLineEdits();
+    }
 }
 
 void DlgKitchenInProgress::on_leOrderNumber_textChanged(const QString &)
 {
-    applyFrontendFilters();
+    if(mKitchenHistoryReadonly) {
+        historyApplySearchFromLineEdits();
+    } else {
+        liveApplySearchFromLineEdits();
+    }
 }
 
 void DlgKitchenInProgress::on_leSearchAny_textChanged(const QString &)
 {
-    applyFrontendFilters();
+    if(mKitchenHistoryReadonly) {
+        historyApplySearchFromLineEdits();
+    } else {
+        liveApplySearchFromLineEdits();
+    }
 }
 
 void DlgKitchenInProgress::on_btnFilterAccepted_clicked()
 {
+    if(mKitchenHistoryReadonly) {
+        setKitchenHistoryReadonly(false);
+    }
+
     mStatusFilter = (mStatusFilter == 1) ? 0 : 1;
     syncFilterButtons();
-    applyFrontendFilters();
+    reloadLiveKitchenList();
 }
 
 void DlgKitchenInProgress::on_btnFilterCooking_clicked()
 {
+    if(mKitchenHistoryReadonly) {
+        setKitchenHistoryReadonly(false);
+    }
+
     mStatusFilter = (mStatusFilter == 2) ? 0 : 2;
     syncFilterButtons();
-    applyFrontendFilters();
+    reloadLiveKitchenList();
 }
 
 void DlgKitchenInProgress::on_btnFilterReady_clicked()
 {
+    if(mKitchenHistoryReadonly) {
+        setKitchenHistoryReadonly(false);
+    }
+
     mStatusFilter = (mStatusFilter == 3) ? 0 : 3;
     syncFilterButtons();
-    applyFrontendFilters();
+    reloadLiveKitchenList();
+}
+
+void DlgKitchenInProgress::on_btnFilterAll_clicked()
+{
+    if(mKitchenHistoryReadonly) {
+        setKitchenHistoryReadonly(false);
+    }
+
+    mStatusFilter = 0;
+    syncFilterButtons();
+    reloadLiveKitchenList();
 }
 
 void DlgKitchenInProgress::on_tblKitchenOrders_cellClicked(int row, int column)
@@ -784,6 +1349,10 @@ void DlgKitchenInProgress::on_tblKitchenOrders_cellClicked(int row, int column)
 
 void DlgKitchenInProgress::openDlgOrderForKitchenRow(int row)
 {
+    if(mKitchenHistoryReadonly) {
+        return;
+    }
+
     if(row < 0 || !mHalls || !mTables || !mGroups || !mDishes) {
         return;
     }
@@ -831,7 +1400,7 @@ void DlgKitchenInProgress::openDlgOrderForKitchenRow(int row)
     order->setOrderId(headerId);
     order->exec();
     order->deleteLater();
-    reloadList();
+    reloadLiveKitchenList();
 }
 
 void DlgKitchenInProgress::on_btnSearchAnyKbd_clicked()
@@ -859,19 +1428,19 @@ void DlgKitchenInProgress::on_btnOrderNumberKbd_clicked()
 void DlgKitchenInProgress::on_btnSettings_clicked()
 {
     QVector<KitchenColSetting> cols;
-    cols.reserve(int(sizeof(kKitchenCols) / sizeof(kKitchenCols[0])));
+    cols.reserve(int(sizeof(kKitchenLiveColDefs) / sizeof(kKitchenLiveColDefs[0])));
 
-    for(const KitchenColDef &c : kKitchenCols) {
+    for(const KitchenColDef &c : kKitchenLiveColDefs) {
         KitchenColSetting s;
         s.id = QLatin1String(c.id);
-        s.label = QCoreApplication::translate("DlgKitchenSettings", c.label);
+        s.label = QCoreApplication::translate("KitchenLiveTable", c.label);
         s.defaultWidth = c.defaultWidth;
         s.defaultVisible = c.defaultVisible;
         s.minWidth = 30;
         s.maxWidth = 1200;
-        s.visible = readKitchenSetting(kitchenColRegKey(s.id, "visible"), c.defaultVisible).toBool();
+        s.visible = readLiveColSetting(s.id, "visible", c.defaultVisible).toBool();
         s.width = qBound(s.minWidth,
-                         readKitchenSetting(kitchenColRegKey(s.id, "width"), c.defaultWidth).toInt(),
+                         readLiveColSetting(s.id, "width", c.defaultWidth).toInt(),
                          s.maxWidth);
         cols.append(s);
     }
@@ -885,9 +1454,9 @@ void DlgKitchenInProgress::on_btnSettings_clicked()
     const QVector<KitchenColSetting> updated = dlg.result();
 
     for(const KitchenColSetting &s : updated) {
-        writeKitchenSetting(kitchenColRegKey(s.id, "visible"), s.visible);
-        writeKitchenSetting(kitchenColRegKey(s.id, "width"), s.width);
+        writeKitchenSetting(kitchenLiveColRegKey(s.id, "visible"), s.visible);
+        writeKitchenSetting(kitchenLiveColRegKey(s.id, "width"), s.width);
     }
 
-    applyFixedColumnLayout();
+    liveApplyFixedColumnLayout();
 }

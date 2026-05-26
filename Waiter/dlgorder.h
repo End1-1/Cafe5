@@ -22,6 +22,7 @@ class WOrder;
 class C5LineEdit;
 class WaiterOrderItemWidget;
 class QDishButton;
+class DlgCustDisplay;
 
 class DlgOrder : public C5WaiterDialog
 {
@@ -39,6 +40,8 @@ public:
     void setStoplistmode();
 
     bool stoplistMode();
+
+    void updateStopList(const QJsonArray &objs);
 
     void viewStoplist();
 
@@ -98,6 +101,8 @@ private:
 
     bool fStoplistMode;
 
+    DlgCustDisplay *mCustomerDisplay = nullptr;
+
     void makeFavorites();
 
     void makeGroups(int parent, int dept);
@@ -154,6 +159,30 @@ private:
     void printService(const QJsonObject &jdoc);
 
     void printRemovedDish(const QJsonObject &jdoc);
+
+    void updateCustomerDisplay();
+
+    void openCustomerDisplay();
+
+    void tryOpenCustomerDisplayIfEnabled();
+
+    void closeCustomerDisplay(bool userTurnedOff = false);
+
+    bool isBistroMode() const;
+
+    double orderDisplayTotalDue() const;
+
+    void applyBistroPrecheckAfterService();
+
+    void startNewOrderOnTableAfterBistroClose();
+
+    void removeStaleOrderDishRows();
+
+    void syncOrderDishWidgetsVisibility();
+
+    void resetBistroOrderUi();
+
+    void syncQtyPanelButtonsEnabled(bool enabled);
 
     void setDishQty(std::function<double (WaiterDish)> getQty);
 
@@ -267,6 +296,10 @@ private slots:
     void on_btnGuest_clicked();
 
     void on_btnPreorderDateTime_clicked();
+
+    void on_btnActivatePreorder_pressed();
+
+    void on_btnShowCustomerDisplay_clicked();
 
 signals:
 

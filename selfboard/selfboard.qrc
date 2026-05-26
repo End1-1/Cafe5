@@ -1,0 +1,25 @@
+<RCC>
+    <qresource prefix="/">
+        <file>res/selfboard.css</file>
+        <file>res/background_food.png</file>
+        <file>res/main_logo.png</file>
+        <file>res/icon_takeaway.png</file>
+        <file>res/icon_dinein.png</file>
+        <file>res/flag_ru.png</file>
+        <file>res/flag_en.png</file>
+        <file>res/flag_am.png</file>
+        <file>res/qr_placeholder.png</file>
+        <file>res/footer_logo_myqr.png</file>
+        <file>res/icon_youtube.png</file>
+        <file>res/icon_facebook.png</file>
+        <file>res/dish_placeholder.png</file>
+        <file>res/cat_burger.png</file>
+        <file>res/cat_bbq.png</file>
+        <file>res/cat_coffee.png</file>
+        <file>res/cat_chips.png</file>
+        <file>res/cat_spaghetti.png</file>
+        <file>res/cat_gelato.png</file>
+        <file>res/cat_pizza.png</file>
+        <file>res/cat_hotdog.png</file>
+    </qresource>
+</RCC>

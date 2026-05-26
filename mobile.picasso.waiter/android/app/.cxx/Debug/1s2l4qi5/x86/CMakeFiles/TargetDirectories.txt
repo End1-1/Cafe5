@@ -1,0 +1,2 @@
+C:/projects/picasso.waiter/android/app/.cxx/Debug/1s2l4qi5/x86/CMakeFiles/edit_cache.dir
+C:/projects/picasso.waiter/android/app/.cxx/Debug/1s2l4qi5/x86/CMakeFiles/rebuild_cache.dir

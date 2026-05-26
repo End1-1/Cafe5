@@ -23,6 +23,7 @@
 #include "c5permissions.h"
 #include "c5user.h"
 #include "c5utils.h"
+#include "store_document_status.h"
 #include "calculator.h"
 #include "ce5goods.h"
 #include "format_date.h"
@@ -289,7 +290,7 @@ bool C5StoreOutput::buildDoc()
 
 void C5StoreOutput::setState()
 {
-    mActionSave->setEnabled(mDocData.status == 0);
+    mActionSave->setEnabled(mDocData.status == STORE_DOC_STATUS_DRAFT);
     ui->wtoolbar->setEnabled(mActionSave->isEnabled());
 }
 
@@ -525,7 +526,7 @@ void C5StoreOutput::saveDocument()
     if (!buildDoc()) {
         return;
     }
-    mDocData.status = 1;
+    mDocData.status = STORE_DOC_STATUS_POSTED;
     QJsonObject jdoc = mDocData.toJson();
     NInterface::query1("/engine/v2/common/store-move/output", mUser->mSessionKey, this, {{"doc", jdoc}}, [this](const QJsonObject) {
         mDocData.version++;
@@ -539,7 +540,7 @@ void C5StoreOutput::draftDocument()
     if (!buildDoc()) {
         return;
     }
-    mDocData.status = 0;
+    mDocData.status = STORE_DOC_STATUS_DRAFT;
     QJsonObject jdoc = mDocData.toJson();
     NInterface::query1("/engine/v2/common/store-move/output", mUser->mSessionKey, this, {{"doc", jdoc}}, [this](const QJsonObject) {
         mDocData.version++;

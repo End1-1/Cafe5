@@ -53,6 +53,11 @@
      </column>
      <column>
       <property name="text">
+       <string>Total</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
        <string>Prepaid</string>
       </property>
      </column>

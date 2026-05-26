@@ -130,7 +130,6 @@ class Goods extends PClass
             $this->sinsert("as_convert", $v);
         }
 
-        $this->result["AAAAAAAAAAAA"] = $this->params->goods->f_id;
         $this->stmtall("delete from c_goods_multiscancode where f_goods=?", "i", [$this->params->goods->f_id]);
         foreach ($this->params->f_barcodes as $b) {
             $this->stmtall("delete from c_goods_multiscancode where f_id=?", "s", [$b]);

@@ -1,0 +1,61 @@
+name: picassowaiter
+description: ""
+publish_to: 'none'
+
+version: 1.0.6+83
+environment:
+  sdk: ^3.8.1
+
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons: ^1.0.8
+  flutter_svg: ^2.2.1
+  flutter_launcher_icons: ^0.14.4
+  shared_preferences: ^2.5.3
+  package_info_plus: ^9.0.0
+  intl: any
+  http: ^1.1.2
+  flutter_bloc: ^9.1.1
+  equatable: ^2.0.5
+  image_picker: ^1.2.0
+  flutter_slidable: ^4.0.1
+  url_launcher: ^6.3.0
+  flutter_localizations:
+    sdk: flutter
+  google_mlkit_barcode_scanning: ^0.14.1
+  camera: ^0.11.2
+  path: ^1.9.1
+  path_provider: ^2.1.5
+
+
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+  flutter_lints: ^5.0.0
+
+flutter:
+  generate: true
+  uses-material-design: true
+  assets:
+    - assets/
+
+flutter_launcher_icons:
+  android: "launcher_icon"
+  ios: true
+  image_path: "assets/icon.png"
+  min_sdk_android: 21 # android min sdk min:16, default 21
+  web:
+    generate: true
+    image_path: "assets/icon.png"
+    background_color: "#hexcode"
+    theme_color: "#hexcode"
+  windows:
+    generate: true
+    image_path: "assets/icon.png"
+    icon_size: 48 # min:48, max:256, default: 48
+  macos:
+    generate: true
+    image_path: "assets/icon.png"

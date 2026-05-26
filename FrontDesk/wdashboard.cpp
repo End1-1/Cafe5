@@ -19,6 +19,7 @@
 #include "rabstracteditorreport.h"
 #include "rcashmovement.h"
 #include "rdebts.h"
+#include "rorderinprogress.h"
 #include "rtotalreviewreport.h"
 #include "ui_wdashboard.h"
 #include "wdashboardsettings.h"
@@ -256,6 +257,10 @@ QWidget* WDashboard::createForm(const QString &name, QIcon icon)
 
     if (name == "form_summary") {
         return new RTotalReviewReport(tr("Summary"), icon, name);
+    }
+
+    if (name == "form_order_in_progress") {
+        return new ROrderInProgress(tr("Order in progress"), icon, name);
     }
 
     Q_ASSERT_X(false, "check name", QString("NO WIDGET NAMED %1 ").arg(name).toLatin1());

@@ -299,6 +299,9 @@ QJsonObject CE5Goods::makeJsonObject()
     jdata["f_hourly_payment"] = ui->chHourlyPayment->isChecked();
     jdata["f_hourly_rule"] = ui->leHourlyRole->text();
     jdata["f_cooking_time"] = ui->leCookingTime->getInteger();
+    jdata["f_salary_department"] = ui->leSalaryDepartment->getInteger();
+    jdata["f_salary_fixed_value"] = ui->leSalaryFixedValue->getDouble();
+    jdata["f_salary_percent_value"] = ui->leSalaryPercentValue->getDouble();
     QJsonObject j;
     j["f_id"] = ui->leCode->getInteger();
     j["f_name"] = ui->leName->text();
@@ -624,6 +627,9 @@ void CE5Goods::openResponse(const QJsonObject &jdoc)
     ui->chHourlyPayment->setChecked(jdata["f_hourly_payment"].toBool());
     ui->leHourlyRole->setText(jdata["f_hourly_rule"].toString());
     ui->leCookingTime->setInteger(jdata["f_cooking_time"].toInt());
+    ui->leSalaryDepartment->setInteger(jdata["f_salary_department"].toInt());
+    ui->leSalaryFixedValue->setDouble(jdata["f_salary_fixed_value"].toDouble());
+    ui->leSalaryPercentValue->setDouble(jdata.value("f_salary_percent_value").toDouble());
     ui->tblMenu->setUpdatesEnabled(true);
     fHttp->httpQueryFinished(sender());
 }

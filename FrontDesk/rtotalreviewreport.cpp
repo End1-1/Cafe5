@@ -36,11 +36,7 @@ void RTotalReviewReport::on_tbl_doubleClicked(const QModelIndex &index)
         editorName = "form_sold_items";
         title = tr("Sold items");
         key = QStringLiteral("filter_values_form_sold_items");
-        filterValues = QJsonArray{
-            QJsonObject{{"summarize", 1}},
-            QJsonObject{{"date1", date}},
-            QJsonObject{{"date2", date}}
-        };
+        filterValues = QJsonArray{QJsonObject{{"summarize", 0}}, QJsonObject{{"date1", date}}, QJsonObject{{"date2", date}}};
     } else {
         return;
     }

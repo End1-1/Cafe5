@@ -125,6 +125,11 @@ public:
 
     static QString fSettingsName;
 
+    /** @deprecated Use C5RegistrySettings::settingsSubPath */
+    static QString &fSettingsSubPath;
+
+    static QString registryPath();
+
     static QString fLastUsername;
 
     static bool fFullScreen;

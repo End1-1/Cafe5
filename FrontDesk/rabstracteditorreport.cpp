@@ -22,6 +22,7 @@
 #include "c5mainwindow.h"
 #include "c5message.h"
 #include "c5salaryeditor.h"
+#include "c5salarypaymenteditor.h"
 #include "c5storeinput.h"
 #include "c5storeinventory.h"
 #include "c5storeoutput.h"
@@ -233,10 +234,16 @@ void RAbstractEditorReport::on_tbl_doubleClicked(const QModelIndex &index)
             if (type == 0) {
                 return;
             }
-            auto *sdoc = new C5SalaryEditor();
             QDate date = QDate::fromString(mModel->data(mModel->index(srcIndex.row(), 0), Qt::DisplayRole).toString(), FORMAT_DATE_TO_STR);
-            sdoc->open(date, type);
-            __mainWindow->addWidget(sdoc);
+            if (type == 1) {
+                auto *sdoc = new C5SalaryEditor();
+                sdoc->open(date);
+                __mainWindow->addWidget(sdoc);
+            } else if (type == 2) {
+                auto *pdoc = new C5SalaryPaymentEditor();
+                pdoc->open(date);
+                __mainWindow->addWidget(pdoc);
+            }
         }
         return;
     }
@@ -328,7 +335,11 @@ void RAbstractEditorReport::getData()
         mModel->setJson(jdoc);
         mProxyModel->clearAllColumnValueFilters();
         ui->tbl->resizeColumnsToContents();
-        applySavedColumnVisibility();
+        mReportDefaultHiddenColumns.clear();
+        for(const QJsonValue &hv : jdoc.value(QStringLiteral("hidden_columns")).toArray()) {
+            mReportDefaultHiddenColumns.insert(hv.toInt());
+        }
+        applyColumnVisibility();
 
         QJsonArray colWidths = jdoc.value("col_widths").toArray();
 
@@ -365,15 +376,21 @@ void RAbstractEditorReport::getData()
     });
 }
 
-void RAbstractEditorReport::applySavedColumnVisibility()
+void RAbstractEditorReport::applyColumnVisibility()
 {
     const QString key = QStringLiteral("report_columns_visible_%1").arg(mEditorName);
     const QString raw = __c5config.getRegValue(key, "").toString();
     const QJsonObject jvis = QJsonDocument::fromJson(raw.toUtf8()).object();
+    const bool registrySet = !jvis.isEmpty();
 
     for(int i = 0; i < mProxyModel->columnCount(); ++i) {
         const QString ckey = QString::number(i);
-        const bool visible = jvis.contains(ckey) ? jvis.value(ckey).toBool() : true;
+        bool visible;
+        if(registrySet) {
+            visible = jvis.contains(ckey) ? jvis.value(ckey).toBool() : true;
+        } else {
+            visible = !mReportDefaultHiddenColumns.contains(i);
+        }
         ui->tbl->setColumnHidden(i, !visible);
     }
 }
@@ -387,6 +404,7 @@ void RAbstractEditorReport::showColumnVisibilityDialog()
     const QString key = QStringLiteral("report_columns_visible_%1").arg(mEditorName);
     const QString raw = __c5config.getRegValue(key, "").toString();
     QJsonObject jvis = QJsonDocument::fromJson(raw.toUtf8()).object();
+    const bool registrySet = !jvis.isEmpty();
     QDialog dlg(this);
     dlg.setWindowTitle(tr("Columns"));
     auto *v = new QVBoxLayout(&dlg);
@@ -399,7 +417,9 @@ void RAbstractEditorReport::showColumnVisibilityDialog()
         it->setData(Qt::UserRole, c);
         it->setFlags(it->flags() | Qt::ItemIsUserCheckable);
         const QString ckey = QString::number(c);
-        const bool visible = jvis.contains(ckey) ? jvis.value(ckey).toBool() : !ui->tbl->isColumnHidden(c);
+        const bool visible = registrySet
+            ? (jvis.contains(ckey) ? jvis.value(ckey).toBool() : true)
+            : !mReportDefaultHiddenColumns.contains(c);
         it->setCheckState(visible ? Qt::Checked : Qt::Unchecked);
         list->addItem(it);
     }
@@ -448,10 +468,10 @@ void RAbstractEditorReport::showColumnVisibilityDialog()
         jvis.insert(QString::number(c), visible);
     }
     __c5config.setRegValue(key, QJsonDocument(jvis).toJson(QJsonDocument::Compact));
-    applySavedColumnVisibility();
+    applyColumnVisibility();
 }
 
-QJsonObject RAbstractEditorReport::filterObject(const QString &name)
+QJsonObject RAbstractEditorReport::filterObject(const QString &name) const
 {
     for (int i = 0; i < mFilterValues.size(); i++) {
         auto obj = mFilterValues.at(i).toObject();
@@ -527,8 +547,19 @@ void RAbstractEditorReport::on_leFilter_textChanged(const QString &arg1)
 void RAbstractEditorReport::newData()
 {
     if (mEditorName == "form_salary") {
-        auto *w = new C5SalaryEditor();
-        __mainWindow->addWidget(w);
+        const int choice = C5Message::question(tr("Select document type"),
+                                               tr("Accrual"),
+                                               tr("Cancel"),
+                                               tr("Payment"));
+        if (choice == QDialog::Accepted) {
+            auto *sdoc = new C5SalaryEditor();
+            sdoc->open(QDate::currentDate());
+            __mainWindow->addWidget(sdoc);
+        } else if (choice == 2) {
+            auto *pdoc = new C5SalaryPaymentEditor();
+            pdoc->open(QDate::currentDate());
+            __mainWindow->addWidget(pdoc);
+        }
     }
 }
 

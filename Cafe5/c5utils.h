@@ -2,12 +2,15 @@
 #define C5UTILS_H
 
 #include <QString>
+#include <QApplication>
 #include <QHostInfo>
 #include <QDateTime>
 #include <QCryptographicHash>
 #include <QJsonDocument>
 #include <QLocale>
 #include <QRegularExpression>
+#include <QTableWidget>
+#include <QWidget>
 
 const QRegularExpression float_expr1("(?!\\d[\\.\\,][1-9]+)0+$");
 const QRegularExpression float_expr2("[\\.\\,]$");
@@ -15,6 +18,46 @@ const QRegularExpression float_expr2("[\\.\\,]$");
 #define hostinfo QHostInfo::localHostName().toLower()
 #define float_str(value, f) QLocale().toString(value, 'f', f).remove(float_expr1).remove(float_expr2)
 #define str_float(value) QLocale().toDouble(value)
+
+/// Parse amounts from QTableWidget cells (user input or QString::number with '.' decimal).
+/// Works the same on any OS locale (comma or dot as decimal separator).
+inline double str_table_amount(const QString &value)
+{
+    QString s = value.trimmed();
+    if (s.isEmpty()) {
+        return 0.0;
+    }
+    s.remove(QChar(0xA0));
+    s.remove(' ');
+    const int lastComma = s.lastIndexOf(',');
+    const int lastDot = s.lastIndexOf('.');
+    if (lastComma >= 0 && lastDot >= 0) {
+        if (lastComma > lastDot) {
+            s.remove('.');
+            s.replace(',', '.');
+        } else {
+            s.remove(',');
+        }
+    } else if (lastComma >= 0) {
+        s.replace(',', '.');
+    }
+    bool ok = false;
+    const double d = QLocale::c().toDouble(s, &ok);
+    return ok ? d : 0.0;
+}
+
+/// Commit in-place editor in QTableWidget before reading cell values (e.g. on Save).
+inline void commit_table_edits(QTableWidget *table)
+{
+    if (!table) {
+        return;
+    }
+    if (QWidget *fw = QApplication::focusWidget()) {
+        if (table->isAncestorOf(fw)) {
+            table->setCurrentCell(-1, -1);
+        }
+    }
+}
 
 /// Parse amounts formatted by MySQL \c FORMAT() as in \c money_fmt (comma thousands, '.' decimals, optional TRIM of trailing ".00").
 /// Does not use the OS locale so sums match on any client locale.

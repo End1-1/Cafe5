@@ -6,12 +6,12 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>980</width>
+    <width>1100</width>
     <height>680</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Salary Editor</string>
+   <string>Salary accrual</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayoutMain">
    <property name="spacing">
@@ -45,36 +45,6 @@
        </property>
       </widget>
      </item>
-      <item>
-       <widget class="QLabel" name="lbType">
-        <property name="text">
-         <string>Type</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QComboBox" name="cbType">
-        <item>
-         <property name="text">
-          <string>1 - Accrual</string>
-         </property>
-         <property name="data">
-          <number>1</number>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>2 - Payment / Withholding</string>
-         </property>
-         <property name="data">
-          <number>2</number>
-         </property>
-        </item>
-        <property name="currentIndex">
-         <number>0</number>
-        </property>
-       </widget>
-      </item>
      <item>
       <spacer name="horizontalSpacerDate">
        <property name="orientation">
@@ -159,41 +129,6 @@
      <property name="alternatingRowColors">
       <bool>true</bool>
      </property>
-     <column>
-      <property name="text">
-       <string>DbId</string>
-      </property>
-     </column>
-     <column>
-      <property name="text">
-       <string>PositionId</string>
-      </property>
-     </column>
-     <column>
-      <property name="text">
-       <string>StaffId</string>
-      </property>
-     </column>
-     <column>
-      <property name="text">
-       <string>#</string>
-      </property>
-     </column>
-     <column>
-      <property name="text">
-       <string>Position</string>
-      </property>
-     </column>
-     <column>
-      <property name="text">
-       <string>Name</string>
-      </property>
-     </column>
-     <column>
-      <property name="text">
-       <string>Amount</string>
-      </property>
-     </column>
     </widget>
    </item>
    <item>
@@ -214,7 +149,7 @@
      <item>
       <widget class="QLabel" name="lbTotalTitle">
        <property name="text">
-        <string>Total:</string>
+        <string>Total accrued:</string>
        </property>
       </widget>
      </item>

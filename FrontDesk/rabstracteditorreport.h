@@ -3,6 +3,7 @@
 #include "c5widget.h"
 #include <QJsonArray>
 #include <QModelIndex>
+#include <QSet>
 #include <QVariant>
 
 namespace Ui
@@ -31,11 +32,15 @@ protected:
 
     void getData();
 
-    QJsonObject filterObject(const QString &name);
+    QJsonObject filterObject(const QString &name) const;
 
     QModelIndex reportMapViewIndexToSource(const QModelIndex &viewIndex) const;
 
     QVariant reportSourceCellData(int sourceRow, int column, int role = Qt::DisplayRole) const;
+
+    virtual void applyFilter();
+
+    Ui::RAbstractEditorReport *ui = nullptr;
 
 protected slots:
     virtual void on_tbl_doubleClicked(const QModelIndex &index);
@@ -43,7 +48,6 @@ protected slots:
     void on_leFilter_textChanged(const QString &arg1);
 
 private:
-    Ui::RAbstractEditorReport* ui;
 
     bool mFirstLoad = true;
 
@@ -57,13 +61,13 @@ private:
 
     RFilterProxyModel* mProxyModel;
 
-    void applyFilter();
+    QSet<int> mReportDefaultHiddenColumns;
 
     void removeAction();
 
     void showColumnVisibilityDialog();
 
-    void applySavedColumnVisibility();
+    void applyColumnVisibility();
 
     void showColumnValueFilterDialog(int column);
 

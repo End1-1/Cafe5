@@ -1,6 +1,10 @@
 #pragma once
+#include <QAction>
+#include <QCoreApplication>
+#include <QMenu>
 #include "c5codenameselector.h"
 #include "c5structtableview.h"
+#include "dict_payment_type.h"
 #include "store_doc_status.h"
 #include "store_doc_type.h"
 #include "struct_cashbox.h"
@@ -8,7 +12,6 @@
 #include "struct_goods_group.h"
 #include "struct_goods_item.h"
 #include "struct_partner.h"
-#include "struct_payment_type.h"
 #include "struct_storage_item.h"
 #include "struct_employee.h"
 #include "struct_employee_group.h"
@@ -124,12 +127,20 @@ inline auto cashboxItemSelector = [](C5CodeNameSelector *s) {
 };
 
 inline auto paymentTypeItemSelector = [](C5CodeNameSelector *s) {
-    const auto r = selectItem<StructPaymentType>(true, false, s->getPosition());
-    if (r.isEmpty()) {
+    QMenu menu;
+    for (int pt : payment_types) {
+        const char *const nm = payment_names.value(pt);
+        if (!nm) {
+            continue;
+        }
+        QAction *const a = menu.addAction(QCoreApplication::translate("PaymentType", nm));
+        a->setData(pt);
+    }
+    QAction *const picked = menu.exec(s->getPosition());
+    if (!picked) {
         return;
     }
-    const auto &g = r.first();
-    s->setCodeAndName(g.id, g.name);
+    s->setCodeAndName(picked->data().toInt(), picked->text());
 };
 
 inline auto goodsTypeItemSelector = [](C5CodeNameSelector *s) {

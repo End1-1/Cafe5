@@ -14,6 +14,7 @@
 #include "c5mainwindow.h"
 #include "c5message.h"
 #include "c5officewidget.h"
+#include "c5registrysettings.h"
 #include "c5servername.h"
 #include "c5systempreference.h"
 #include "logwriter.h"
@@ -56,26 +57,34 @@ int main(int argc, char* argv[])
         a.installTranslator(&t);
     }
 
-    LogWriter::write(LogWriterLevel::verbose, "Support SSL", QSslSocket::supportsSsl() ? "true" : "false");
-    LogWriter::write(LogWriterLevel::verbose, "Support SSL version", QSslSocket::sslLibraryBuildVersionString());
-    auto c5sn  = new C5ServerName(QString("%1://%2").arg(C5ConnectionDialog::instance()->connectionType() == C5ConnectionDialog::noneSecure ? "ws" : "wss",
-                                  C5ConnectionDialog::instance()->serverAddress() + "/ws"));
-
-    for(const QString &s : a.arguments()) {
-        if(s.startsWith("/monitor")) {
-            QList<QScreen*> screens = a.screens();
+    for (const QString &s : a.arguments()) {
+        if (s.startsWith("/monitor")) {
+            QList<QScreen *> screens = a.screens();
             int monitor = 0;
             QStringList mon = s.split("=");
 
-            if(mon.length() == 2) {
+            if (mon.length() == 2) {
                 monitor = mon.at(1).toInt();
                 C5Dialog::mScreen = monitor;
                 C5MainWindow::mScreen = monitor;
             }
         }
+        if (s.startsWith("/settingspath", Qt::CaseInsensitive)) {
+            const int eq = s.indexOf(QLatin1Char('='));
+            if (eq > 0) {
+                const QString subPath = s.mid(eq + 1).trimmed();
+                C5RegistrySettings::settingsSubPath = subPath;
+                C5ConnectionDialog::mSettingsPath = subPath;
+            }
+        }
     }
 
-    if(!c5sn->getServers()) {
+    LogWriter::write(LogWriterLevel::verbose, "Support SSL", QSslSocket::supportsSsl() ? "true" : "false");
+    LogWriter::write(LogWriterLevel::verbose, "Support SSL version", QSslSocket::sslLibraryBuildVersionString());
+    auto c5sn  = new C5ServerName(QString("%1://%2").arg(C5ConnectionDialog::instance()->connectionType() == C5ConnectionDialog::noneSecure ? "ws" : "wss",
+                                  C5ConnectionDialog::instance()->serverAddress() + "/ws"));
+
+    if (!c5sn->getServers()) {
         C5ConnectionDialog::showSettings(nullptr);
         C5Message::error(c5sn->mErrorString);
         return -1;

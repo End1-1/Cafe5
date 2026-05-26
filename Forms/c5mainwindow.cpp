@@ -14,6 +14,7 @@
 #include "c5aboutdlg.h"
 #include "c5changepassword.h"
 #include "c5config.h"
+#include "c5database.h"
 #include "c5dishselfcostgenprice.h"
 #include "c5goodsprice.h"
 #include "c5goodsspecialprices.h"
@@ -22,7 +23,6 @@
 #include "c5permissions.h"
 #include "c5reporttemplatedriver.h"
 #include "c5route.h"
-#include "c5salarydoc.h"
 #include "c5storedecompilation.h"
 #include "c5storeinventory.h"
 #include "c5toolbarwidget.h"
@@ -409,28 +409,6 @@ void C5MainWindow::menuListReponse(const QJsonObject &jdoc)
     http->httpQueryFinished(sender());
 }
 
-void C5MainWindow::updateTimeout()
-{
-    fTimer.stop();
-
-    if(mUser && (mUser->id() == 77 || mUser->id() == 81)) {
-        C5Database db;
-        db.exec("select f_id from o_draft_sale where f_id not in (select f_header from o_draft_sound) and f_saletype<3 ");
-
-        while(db.nextRow()) {
-            C5Message::info(tr("New order!") + " " + db.getString("f_id"), tr("OK"), "", true);
-            C5Database db2(db);
-            db2[":f_header"] = db.getString("f_id");
-            db2[":f_timeconfirmed"] = QDateTime::currentDateTime();
-            db2.insert("o_draft_sound", false);
-        }
-
-        //player->deleteLater();
-    }
-
-    fTimer.start(10000);
-}
-
 void C5MainWindow::hotKey()
 {
     QShortcut *s = static_cast<QShortcut*>(sender());
@@ -807,10 +785,6 @@ void C5MainWindow::on_listWidgetItemClicked(const QModelIndex &index)
         createTab<CR5CurrencyCrossRateHistory>();
         break;
 
-    case cp_t9_salary_doc:
-        createTab<C5SalaryDoc>();
-        break;
-
     case cp_t9_report:
         createTab<CR5SalaryByWorkers>();
         break;
@@ -1028,7 +1002,6 @@ void C5MainWindow::setDB()
 
     if(addMainLevel(db.at(1), cp_t9_salary, tr("Salary"), ":/employee.png", l)) {
         l->setProperty("reportlevel", 4);
-        addTreeL3Item(l, cp_t9_salary_doc, tr("New salary document"), ":/employee.png");
         addTreeL3Item(l, cp_t9_report, tr("History"), ":/employee.png");
         addTreeL3Item(l, cp_t9_payment, tr("Payments"), ":/employee.png");
     }

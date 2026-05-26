@@ -104,7 +104,7 @@ set(APP_SOURCES
     ../Forms/c5passwords.ui
     ../Forms/c5progressdialog.ui
     ../Forms/c5route.ui
-    ../Forms/c5salarydoc.ui
+
 
 
     ../Forms/c5goodsprice.ui
@@ -316,7 +316,7 @@ set(APP_SOURCES
     ../Forms/c5progressdialog.h
     ../Forms/c5reportwidget.h
     ../Forms/c5route.h
-    ../Forms/c5salarydoc.h
+
 
 
     ../Forms/c5salefromstoreorder.h
@@ -423,6 +423,7 @@ set(APP_SOURCES
     ../Cafe5/c5dialog.h
     ../Cafe5/c5message.h
     ../Cafe5/c5utils.h
+    ../Cafe5/c5cashoperationtypes.h
     ../Classes/c5permissions.h
     ../Classes/c5grid.h
     ../Reports/cr5usersgroups.h
@@ -623,7 +624,7 @@ set(APP_SOURCES
     ../Forms/c5progressdialog.cpp
     ../Forms/c5reportwidget.cpp
     ../Forms/c5route.cpp
-    ../Forms/c5salarydoc.cpp
+
 
 
     ../Forms/c5salefromstoreorder.cpp
@@ -730,6 +731,7 @@ set(APP_SOURCES
     ../Reports/cr5storereason.cpp
     ../Reports/cr5usersfilter.cpp
     ../Cafe5/c5config.cpp
+    ../Cafe5/c5registrysettings.cpp
     ../Cafe5/c5database.cpp
     ../Cafe5/c5dialog.cpp
     ../Cafe5/c5message.cpp
@@ -826,6 +828,7 @@ set(APP_SOURCES
     dwaiterworkstationconfig.cpp
     rabstracteditordialog.cpp
     rabstracteditorreport.cpp
+    rorderinprogress.cpp
     c5revenuecashop.cpp
     wdashboardsettings.cpp
     rabstractspecialwidget.cpp
@@ -840,6 +843,9 @@ set(APP_SOURCES
     c5salaryeditor.ui
     c5salaryeditor.h
     c5salaryeditor.cpp
+    c5salarypaymenteditor.ui
+    c5salarypaymenteditor.h
+    c5salarypaymenteditor.cpp
 )
 
 
@@ -861,6 +867,8 @@ add_executable(OfficeN ${APP_SOURCES}
     ../Service5/worker/struct_payment_type.h
     rcashmovement.h rcashmovement.cpp
     rdebts.h rdebts.cpp
+    dlgdebtsredeem.h dlgdebtsredeem.cpp dlgdebtsredeem.ui
+    rorderinprogress.h rorderinprogress.cpp
     rtotalreviewreport.h rtotalreviewreport.cpp)
 
 set_target_properties(OfficeN PROPERTIES
@@ -881,7 +889,7 @@ set_source_files_properties(
 # -----------------------
 # Создает таргет OfficeN_lupdate для обновления .ts файлов
 qt_add_lupdate(OfficeN
-    TS_FILES "OfficeN.ts"
+    TS_FILES "FrontDesk.ts"
 )
 
 # -----------------------

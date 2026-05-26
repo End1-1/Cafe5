@@ -22,6 +22,8 @@ error_reporting(E_ALL);
 ini_set("display_errors", "On");
 ini_set("memory_limit", "4512M");
 date_default_timezone_set("Asia/Yerevan");
+setlocale(LC_NUMERIC, 'C');
+setlocale(LC_CTYPE, 'C.UTF-8');
 
 require_once __DIR__ . "/check-app.php";
 require_once __DIR__ . "/../cnf.php";

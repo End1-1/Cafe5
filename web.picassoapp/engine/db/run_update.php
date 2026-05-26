@@ -434,6 +434,33 @@ $v = 223;
 $sql[$v] = <<<EOD
     update s_app set f_version = '$v' where lower(f_app)='db';
     alter table o_service_values add column f_comment varchar(64);
+    alter table s_salary add column f_fixed decimal(14,2) after f_position, add column f_calculated decimal(14,2) after f_fixed, add column f_bonus decimal(14,2) after f_calculated;
+EOD;
+
+$v = 224;
+$sql[$v] = <<<EOD
+    update s_app set f_version = '$v' where lower(f_app)='db';
+    alter table s_user_group add column f_data json, drop column f_starttime, drop column f_duration;
+    CREATE table cash_operations_types (f_id integer primary key auto_increment);
+    ALTER TABLE cash_operations_types ADD COLUMN f_comment VARCHAR(32);
+EOD;
+
+$v = 225;
+$sql[$v] = <<<EOD
+    update s_app set f_version = '$v' where lower(f_app)='db';
+    INSERT INTO cash_operations_types (f_id, f_comment) VALUES
+    (1, 'Sales Revenue'),
+    (2, 'Total Expenses'),
+    (3, 'Purchasing Costs'),
+    (4, 'Salaries and Wages'),
+    (5, 'Debt Recovery'),
+    (6, 'Debt Repayment'),
+    (7, 'Utilities'),
+    (8, 'Cash Shortage'),
+    (9, 'Cash Overage')
+    ON DUPLICATE KEY UPDATE f_comment = VALUES(f_comment);
+    UPDATE cash_operations SET f_operation_type = 5 WHERE f_operation_type = 101;
+    UPDATE cash_operations SET f_operation_type = 2 WHERE f_operation_type = 102;
 EOD;
 
 $update_verision = intval(stmtall("select * from s_app where lower(f_app)='db'")->fetch_assoc()["f_version"]);

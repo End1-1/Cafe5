@@ -68,6 +68,13 @@
        </spacer>
       </item>
       <item>
+       <widget class="QLabel" name="lbStaff">
+        <property name="text">
+         <string>Kudryashov Vasili</string>
+        </property>
+       </widget>
+      </item>
+      <item>
        <widget class="QToolButton" name="btnClose">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Expanding" vsizetype="Fixed">

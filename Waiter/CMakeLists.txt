@@ -83,7 +83,7 @@ qt_add_executable(Waiter WIN32
     ../Classes/c5gridgilter.cpp
     ../Classes/c5random.cpp
     ../Classes/c5replacecharacter.cpp
-    ../Classes/c5tabledata.cpp
+
 
     ../Classes/c5threadobject.cpp
     ../Classes/calculator.cpp
@@ -155,6 +155,7 @@ qt_add_executable(Waiter WIN32
     ../Cafe5/c5dialog.cpp
     ../Cafe5/c5utils.cpp
     ../Cafe5/c5message.cpp
+    ../Cafe5/c5registrysettings.cpp
     dlgorder.cpp
     ../Classes/c5user.cpp
     ../Classes/c5menu.cpp
@@ -196,7 +197,7 @@ qt_add_executable(Waiter WIN32
     ../Classes/c5gridgilter.h
     ../Classes/c5random.h
     ../Classes/c5replacecharacter.h
-    ../Classes/c5tabledata.h
+
 
     ../Classes/c5threadobject.h
     ../Classes/calculator.h
@@ -259,7 +260,9 @@ qt_add_executable(Waiter WIN32
         dlgface.h
     ../Cafe5/c5dialog.h
     ../Cafe5/c5utils.h
+    ../Cafe5/c5cashoperationtypes.h
     ../Cafe5/c5message.h
+    ../Cafe5/c5registrysettings.h
     dlgguests.h
     dlglist.h
     dlglistdishspecial.h
@@ -381,6 +384,7 @@ qt_add_executable(Waiter WIN32
     dlgkitcheninprogress.h dlgkitcheninprogress.cpp dlgkitcheninprogress.ui
     dlgkitchensettings.h dlgkitchensettings.cpp dlgkitchensettings.ui
     dlgpreorderdatetime.h dlgpreorderdatetime.cpp dlgprecheckoptions.ui
+    dlgcustdisplay.h dlgcustdisplay.cpp dlgcustdisplay.ui
 )
 
 # ---------- Qt link ----------

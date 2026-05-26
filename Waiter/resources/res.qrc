@@ -266,5 +266,6 @@
         <file>view.png</file>
         <file>pause.png</file>
         <file>prepaid.png</file>
+        <file>display.png</file>
     </qresource>
 </RCC>

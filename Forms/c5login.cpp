@@ -9,6 +9,7 @@
 #include "appwebsocket.h"
 #include "c5officewidget.h"
 #include "c5connectiondialog.h"
+#include "c5registrysettings.h"
 #include <QSettings>
 
 C5Login::C5Login(C5User *user) :
@@ -53,7 +54,7 @@ void C5Login::on_btnOk_clicked()
             fServers[i] = js;
         }
 
-        QSettings s(_ORGANIZATION_, _APPLICATION_ + QString("\\") + _MODULE_);
+        QSettings s(_ORGANIZATION_, C5RegistrySettings::registryPath());
         s.setValue("lastdb", ui->cbDatabases->currentText());
         s.setValue("lastusername", ui->leUsername->currentText());
         s.setValue("lastversion", ui->leVersion->text());
@@ -121,7 +122,7 @@ void C5Login::readServers()
         ui->cbDatabases->addItem(js["name"].toString(), js["db"].toString());
     }
 
-    QSettings s(_ORGANIZATION_, _APPLICATION_ + QString("\\") + _MODULE_);
+    QSettings s(_ORGANIZATION_, C5RegistrySettings::registryPath());
 #ifdef QT_DEBUG
 
     if(s.value("lastversion").toString().isEmpty() == false) {

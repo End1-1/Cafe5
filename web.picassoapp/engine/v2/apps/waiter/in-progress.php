@@ -39,6 +39,7 @@ class InProgress extends Auth
                     'f_hall_name' => $r['f_hall_name'],
                     'f_date_open' => $r['f_date_open'],
                     'f_time_open' => $r['f_time_open'],
+                    'f_amounttotal' => $r['f_amounttotal'],
                     'f_amount_cash' => $r['f_amount_cash'],
                     'f_amount_card' => $r['f_amount_card'],
                     'f_amount_bank' => $r['f_amount_bank'],
@@ -84,6 +85,7 @@ class InProgress extends Auth
             COALESCE(json_value(og.f_data, '$.f_comment'), '') AS f_comment,
             COALESCE(json_value(oh.f_data, '$.f_date_open'), '') AS f_date_open,
             COALESCE(json_value(oh.f_data, '$.f_time_open'), '') AS f_time_open,
+            COALESCE(oh.f_amounttotal, 0) AS f_amounttotal,
             COALESCE(json_value(oh.f_data, '$.f_amount_cash'), '0') AS f_amount_cash,
             COALESCE(json_value(oh.f_data, '$.f_amount_card'), '0') AS f_amount_card,
             COALESCE(json_value(oh.f_data, '$.f_amount_bank'), '0') AS f_amount_bank,
@@ -112,6 +114,69 @@ class InProgress extends Auth
 
         $this->result['data'] = $this->aggregateKitchenOrders($rows);
         $this->result['status_labels'] = self::STATUS_LABELS;
+        $this->echoResult();
+    }
+
+    /**
+     * Архив кухни на дату: строки с кухонным статусом > 3 (подано гостю),
+     * календарный день — по дате заказа o_header.f_datecash (как в кассовых сменах / отчётах).
+     * Заголовки как у get(): открытые и закрытые столы (f_state IN 1,2).
+     *
+     * @param object $params date "Y-m-d"
+     */
+    public function getHistoryForDate($params)
+    {
+        $date = trim((string)($params->date ?? ''));
+        if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $date)) {
+            dieWithCode(Translator::t('Invalid date'));
+        }
+
+        $sql = <<<EOD
+        SELECT 
+            oh.f_id AS f_header_id,
+            oh.f_table AS f_table,
+            t.f_hall AS f_hall,
+            oh.f_prefix AS f_order_prefix,
+            og.f_id AS f_goods_row_id,
+            og.f_qty AS f_qty,
+            ogp.f_status,
+            cg.f_name AS f_goods_name,
+            t.f_name AS f_table_name,
+            hh.f_name AS f_hall_name,
+            COALESCE(json_value(og.f_data, '$.f_comment'), '') AS f_comment,
+            COALESCE(json_value(oh.f_data, '$.f_date_open'), '') AS f_date_open,
+            COALESCE(json_value(oh.f_data, '$.f_time_open'), '') AS f_time_open,
+            COALESCE(oh.f_amounttotal, 0) AS f_amounttotal,
+            COALESCE(json_value(oh.f_data, '$.f_amount_cash'), '0') AS f_amount_cash,
+            COALESCE(json_value(oh.f_data, '$.f_amount_card'), '0') AS f_amount_card,
+            COALESCE(json_value(oh.f_data, '$.f_amount_bank'), '0') AS f_amount_bank,
+            COALESCE(json_value(oh.f_data, '$.f_amount_idram'), '0') AS f_amount_idram,
+            COALESCE(json_value(oh.f_data, '$.f_amount_complimentary'), '0') AS f_amount_complimentary,
+            COALESCE(json_value(oh.f_data, '$.f_amount_other'), '0') AS f_amount_other,
+            COALESCE(json_value(oh.f_data, '$.f_amount_telcell'), '0') AS f_amount_telcell,
+            COALESCE(json_value(oh.f_data, '$.f_amount_debt'), '0') AS f_amount_debt,
+            COALESCE(json_value(oh.f_data, '$.f_amount_prepaid'), '0') AS f_amount_prepaid,
+            COALESCE(json_value(oh.f_data, '$.f_guest.f_guest_name'), '') AS f_guest_name,
+            COALESCE(json_value(oh.f_data, '$.f_guest.f_guest_phone'), '') AS f_guest_phone,
+            COALESCE(json_value(oh.f_data, '$.f_guest.f_guest_address'), '') AS f_guest_address
+        FROM o_goods_process ogp
+        INNER JOIN o_header oh ON oh.f_id = ogp.f_header AND oh.f_state IN (1, 2)
+        INNER JOIN h_tables t ON t.f_id = oh.f_table
+        LEFT JOIN h_halls hh ON hh.f_id = t.f_hall
+        INNER JOIN o_goods og ON og.f_id = ogp.f_id AND og.f_state = 1
+        INNER JOIN c_goods cg ON cg.f_id = og.f_goods
+        WHERE ogp.f_status > 3
+          AND DATE(oh.f_datecash) = ?
+        ORDER BY oh.f_prefix,
+          og.f_row,
+          cg.f_name
+        EOD;
+
+        $rows = $this->select($sql, 's', [$date])->fetch_all(MYSQLI_ASSOC);
+
+        $this->result['data'] = $this->aggregateKitchenOrders($rows);
+        $this->result['status_labels'] = self::STATUS_LABELS;
+        $this->result['history_date'] = $date;
         $this->echoResult();
     }
 

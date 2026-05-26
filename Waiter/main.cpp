@@ -7,6 +7,7 @@
 #include <QSettings>
 #include <QTimer>
 #include <QTranslator>
+#include "c5registrysettings.h"
 #include "c5connectiondialog.h"
 #include "c5message.h"
 #include "c5systempreference.h"
@@ -69,6 +70,15 @@ int main(int argc, char* argv[])
                 if (monitor < screens.length()) {
                     C5Dialog::mScreen = monitor;
                 }
+            }
+        }
+
+        if (s.startsWith("/settingspath", Qt::CaseInsensitive)) {
+            const int eq = s.indexOf(QLatin1Char('='));
+            if (eq > 0) {
+                const QString subPath = s.mid(eq + 1).trimmed();
+                C5RegistrySettings::settingsSubPath = subPath;
+                C5ConnectionDialog::mSettingsPath = subPath;
             }
         }
     }

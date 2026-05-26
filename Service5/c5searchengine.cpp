@@ -455,7 +455,7 @@ void C5SearchEngine::init(const QString &databaseName, const QString &serverKey)
     db.exec(R"(
     SELECT gr.f_name AS f_group_name, u.f_group, u.f_first, u.f_last, u.f_login, u.f_phone, u.f_id
     FROM s_user u
-    LEFT JOIN s_user_group gr ON gr.f_id=u.f_id
+    LEFT JOIN s_user_group gr ON gr.f_id=u.f_group
     WHERE u.f_state=1
     )");
 
@@ -963,7 +963,7 @@ QString C5SearchEngine::updateDictionary(const QJsonObject &jo, const SocketStru
         db.exec(R"(
         SELECT gr.f_name AS f_group_name, u.f_group, u.f_first, u.f_last, u.f_login, u.f_phone, u.f_id
         FROM s_user u
-        LEFT JOIN s_user_group gr ON gr.f_id=u.f_id
+        LEFT JOIN s_user_group gr ON gr.f_id=u.f_group
         WHERE u.f_state=1 and u.f_id=:f_id
         )");
         StructEmployee se;

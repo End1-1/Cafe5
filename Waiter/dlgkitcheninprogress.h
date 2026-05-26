@@ -51,6 +51,8 @@ private slots:
 
     void on_btnFilterReady_clicked();
 
+    void on_btnFilterAll_clicked();
+
     void on_tblKitchenOrders_cellClicked(int row, int column);
 
     void on_btnSearchAnyKbd_clicked();
@@ -60,6 +62,8 @@ private slots:
     void tickClock();
 
     void on_btnSettings_clicked();
+
+    void on_btnHistory_clicked();
 
 private:
     struct KitchenLinePick {
@@ -84,13 +88,30 @@ private:
 
     QTimer mClockTimer;
 
-    /** Grouped orders from GET / update-status (each element has lines[]). */
-    QJsonArray mAllKitchenRows;
+    QString mOriginalWindowTitle;
 
-    /** Line ids / labels per visible table row (for status change). */
-    QVector<QVector<KitchenLinePick>> m_linesPickByTableRow;
+    bool mKitchenHistoryReadonly = false;
 
-    /** 0 = all statuses; otherwise any kitchen line status 1 / 2 / 3 matches order. */
+    QString mKitchenHistoryDate;
+
+    /** Live queue buffer — only `/in-progress/get` and update-status. */
+    QJsonArray mLiveKitchenRows;
+    int mLiveKitchenRequestGen = 0;
+
+    /** History buffer — only `/in-progress/get-history-for-date`. */
+    QJsonArray mHistoryKitchenRows;
+    int mHistoryKitchenRequestGen = 0;
+
+    /** Line picks for live table rows (status change). */
+    QVector<QVector<KitchenLinePick>> mLiveLinePicksByTableRow;
+
+    /** Line picks for history table rows (read-only; kept for symmetry / future). */
+    QVector<QVector<KitchenLinePick>> mHistoryLinePicksByTableRow;
+
+    /** First non-spontaneous showEvent: load live queue once. */
+    bool mDidInitialShowEventLiveLoad = false;
+
+    /** 0 = all statuses; otherwise any kitchen line status 1 / 2 / 3 matches order (live only). */
     int mStatusFilter = 0;
 
     const QVector<HallItem> *mHalls = nullptr;
@@ -101,18 +122,51 @@ private:
 
     const QVector<DishAItem *> *mDishes = nullptr;
 
-    void reloadList();
+    void reloadLiveKitchenList();
 
-    void ingestServerDoc(const QJsonObject &jdoc);
+    void loadKitchenHistoryForDate(const QString &historyDateYmd);
 
-    void applyFrontendFilters();
+    void setKitchenHistoryReadonly(bool readonly, const QString &historyDateYmd = QString());
 
-    void fillTableRows(const QJsonArray &orders);
-    void applyFixedColumnLayout();
+    void ingestLiveKitchenDoc(const QJsonObject &jdoc);
+
+    void ingestHistoryKitchenDoc(const QJsonObject &jdoc);
+
+    /* --- Live queue (current kitchen): own headers, columns registry, filter, fill. --- */
+    void liveSetupTableHorizontalHeaders();
+
+    void liveApplyFixedColumnLayout();
+
+    void liveClearTable();
+
+    void liveFillTableRows(const QJsonArray &orders);
+
+    QJsonArray liveFilterOrdersForView() const;
+
+    QString liveHaystackForOrderSearch(const QJsonObject &order) const;
+
+    void liveReflowTableFromBuffer();
+
+    void liveApplySearchFromLineEdits();
+
+    /* --- History (served archive): separate code path; same QTableWidget in UI only. --- */
+    void historySetupTableHorizontalHeaders();
+
+    void historyApplyFixedColumnLayout();
+
+    void historyClearTable();
+
+    void historyFillTableRows(const QJsonArray &orders);
+
+    QJsonArray historyFilterOrdersForView() const;
+
+    QString historyHaystackForOrderSearch(const QJsonObject &order) const;
+
+    void historyReflowTableFromBuffer();
+
+    void historyApplySearchFromLineEdits();
 
     void syncFilterButtons();
-
-    QString haystackForSearch(const QJsonObject &order) const;
 
     static QString normalizedOrderSuffix(const QString &s);
 

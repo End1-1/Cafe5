@@ -4,6 +4,7 @@
 #include <QPrinterInfo>
 #include <QSettings>
 #include <QStyledItemDelegate>
+#include "c5jsonparser.h"
 #include "c5message.h"
 #include "c5printing.h"
 #include "c5user.h"
@@ -35,10 +36,20 @@ public:
     }
 };
 
-DlgReports::DlgReports(C5User *user) :
+DlgReports::DlgReports(C5User *user,
+                       const QVector<HallItem> *halls,
+                       const QVector<TableItem> *tables,
+                       const QVector<GoodsGroupItem *> *groups,
+                       const QVector<DishAItem *> *dishes,
+                       QWidget *parent) :
     C5WaiterDialog(user),
-    ui(new Ui::DlgReports)
+    ui(new Ui::DlgReports),
+    mHalls(halls),
+    mTables(tables),
+    mGroups(groups),
+    mDishes(dishes)
 {
+    Q_UNUSED(parent);
     ui->setupUi(this);
     ui->tbl->setItemDelegate(new GridDelegate(ui->tbl));
     ui->tblTotal->setItemDelegate(new GridDelegate(ui->tblTotal));
@@ -46,11 +57,125 @@ DlgReports::DlgReports(C5User *user) :
     setLangIcon();
     mDate1 = QDate::currentDate();
     mDate2 = QDate::currentDate();
+
+    if(!mGroups || !mDishes) {
+        mOwnsMenuData = true;
+        mHalls = &mHallsOwned;
+        mTables = &mTablesOwned;
+        mGroups = &mGoodsGroupsOwned;
+        mDishes = &mDishesOwned;
+    }
 }
 
 DlgReports::~DlgReports()
 {
+    if(mOwnsMenuData) {
+        qDeleteAll(mGoodsGroupsOwned);
+        qDeleteAll(mDishesOwned);
+    }
+
     delete ui;
+}
+
+const QVector<HallItem> &DlgReports::halls() const
+{
+    return mHalls ? *mHalls : mHallsOwned;
+}
+
+const QVector<TableItem> &DlgReports::tables() const
+{
+    return mTables ? *mTables : mTablesOwned;
+}
+
+void DlgReports::initMenuData()
+{
+    if(mMenuLoadStarted) {
+        return;
+    }
+
+    mMenuLoadStarted = true;
+
+    auto *httpHall = new NInterface(this);
+    httpHall->createHttpQueryLambda("/engine/v2/waiter/hall/get",
+                                    {},
+                                    [this, httpHall](const QJsonObject &jdoc) {
+                                        mHallsOwned = parseJsonArray<HallItem>(jdoc["halls"].toArray());
+                                        mTablesOwned = parseJsonArray<TableItem>(jdoc["tables"].toArray());
+                                        httpHall->deleteLater();
+                                    },
+                                    [httpHall](const QJsonObject &) {
+                                        httpHall->deleteLater();
+                                    },
+                                    QVariant(),
+                                    false);
+
+    auto *httpMenu = new NInterface(this);
+    httpMenu->createHttpQueryLambda("/engine/v2/waiter/menu/get",
+                                    {},
+                                    [this, httpMenu](const QJsonObject &jdoc) {
+                                        qDeleteAll(mGoodsGroupsOwned);
+                                        qDeleteAll(mDishesOwned);
+                                        mGoodsGroupsOwned.clear();
+                                        mDishesOwned.clear();
+
+                                        QJsonArray ja = jdoc["groups"].toArray();
+                                        QVector<GoodsGroupItem *> allGroups;
+                                        QHash<int, GoodsGroupItem *> groupMap;
+                                        allGroups.reserve(ja.size());
+
+                                        for(int i = 0; i < ja.size(); i++) {
+                                            auto *g = JsonParser<GoodsGroupItem>::pointerFromJson(ja.at(i).toObject());
+                                            allGroups << g;
+                                            groupMap[g->id] = g;
+                                        }
+
+                                        for(auto *g : allGroups) {
+                                            if(g->parentId == 0) {
+                                                mGoodsGroupsOwned << g;
+                                            } else if(groupMap.contains(g->parentId)) {
+                                                groupMap[g->parentId]->children << g;
+                                            }
+                                        }
+
+                                        ja = jdoc["dishes"].toArray();
+                                        mDishesOwned.reserve(ja.size());
+
+                                        for(int i = 0; i < ja.size(); i++) {
+                                            mDishesOwned << JsonParser<DishAItem>::pointerFromJson(ja.at(i).toObject());
+                                        }
+
+                                        httpMenu->deleteLater();
+                                    },
+                                    [httpMenu](const QJsonObject &) {
+                                        httpMenu->deleteLater();
+                                    },
+                                    QVariant(),
+                                    false);
+}
+
+bool DlgReports::resolveHallTable(int tableId, int hallId, HallItem &h, TableItem &t) const
+{
+    for(const TableItem &ti : tables()) {
+        if(ti.id == tableId) {
+            t = ti;
+            break;
+        }
+    }
+
+    if(t.id <= 0) {
+        return false;
+    }
+
+    const int resolvedHallId = hallId > 0 ? hallId : t.hall;
+
+    for(const HallItem &hi : halls()) {
+        if(hi.id == resolvedHallId) {
+            h = hi;
+            return true;
+        }
+    }
+
+    return false;
 }
 
 void DlgReports::openReports(C5User *user)
@@ -63,6 +188,11 @@ void DlgReports::openReports(C5User *user)
 void DlgReports::showEvent(QShowEvent *e)
 {
     C5WaiterDialog::showEvent(e);
+
+    if(mOwnsMenuData) {
+        initMenuData();
+    }
+
     getDailyCommon();
 }
 
@@ -92,10 +222,14 @@ void DlgReports::getDailyCommon()
             ui->tbl->setString(r, c++, o["f_staff_name"].toString());
             ui->tbl->setString(r, c++, o["f_amount_total"].toString());
             ui->tbl->setString(r, c++, o["f_fiscal"].toString());
+            ui->tbl->setString(r, kColTableId, QString::number(o["f_table"].toInt()));
+            ui->tbl->setString(r, kColHallId, QString::number(o["f_hall"].toInt()));
         }
 
         ui->tbl->resizeColumnsToContents();
         ui->tbl->setColumnWidth(0, 0);
+        ui->tbl->setColumnHidden(kColTableId, true);
+        ui->tbl->setColumnHidden(kColHallId, true);
         ui->tblTotal->setColumnCount(ui->tbl->columnCount());
 
         for(int i = 0; i < ui->tbl->columnCount(); i++) {
@@ -285,8 +419,24 @@ void DlgReports::on_btnOpenReport_clicked()
         return;
     }
 
-    QString orderId = ui->tbl->getString(row, 0);
-    DlgOrder d(mUser, {}, {}, {}, {});
+    if(!mGroups || mGroups->isEmpty() || !mDishes || mDishes->isEmpty()) {
+        C5Message::error(tr("Menu is not loaded yet. Please wait and try again."));
+        return;
+    }
+
+    const QString orderId = ui->tbl->getString(row, 0);
+    const int tableId = ui->tbl->getString(row, kColTableId).toInt();
+    const int hallId = ui->tbl->getString(row, kColHallId).toInt();
+
+    HallItem h;
+    TableItem t;
+
+    if(!resolveHallTable(tableId, hallId, h, t)) {
+        C5Message::error(tr("Cannot resolve hall/table for selected order"));
+        return;
+    }
+
+    DlgOrder d(mUser, h, t, mGroups, mDishes);
     d.setOrderId(orderId);
     d.exec();
 }

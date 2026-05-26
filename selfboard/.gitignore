@@ -1,0 +1,7 @@
+build/
+build-*/
+CMakeLists.txt.user
+CMakeCache.txt
+CMakeFiles/
+*.autosave
+i18n/*.qm

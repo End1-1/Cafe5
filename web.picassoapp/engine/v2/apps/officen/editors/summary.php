@@ -5,6 +5,9 @@ class Summary
 {
     private $db;
 
+    /** @var array<string,mixed>|null */
+    private static $paymentConfig = null;
+
     public function __construct($db)
     {
         $this->db = $db;
@@ -16,72 +19,169 @@ class Summary
         return number_format($val, 2, '.', ',');
     }
 
+    /**
+     * @return array<string,mixed>
+     */
+    private function paymentConfig(): array
+    {
+        if (self::$paymentConfig !== null) {
+            return self::$paymentConfig;
+        }
+
+        $path = __DIR__ . '/../../worker/dict-payment.php';
+        if (!is_file($path)) {
+            self::$paymentConfig = ['types' => [], 'fields' => [], 'names' => []];
+            return self::$paymentConfig;
+        }
+
+        if (!defined('PAYMENT_TYPE_CASH')) {
+            self::$paymentConfig = require $path;
+        } else {
+            self::$paymentConfig = [
+                'types' => [1, 2, 3, 4, 5, 6, 7, 8, 9],
+                'fields' => [
+                    1 => 'f_amount_cash', 2 => 'f_amount_card', 3 => 'f_amount_bank', 4 => 'f_amount_idram',
+                    5 => 'f_amount_complimentary', 6 => 'f_amount_other', 7 => 'f_amount_telcell',
+                    8 => 'f_amount_debt', 9 => 'f_amount_prepaid',
+                ],
+                'names' => [
+                    1 => 'Cash', 2 => 'Card', 3 => 'Bank', 4 => 'Idram', 5 => 'Complimentary',
+                    6 => 'Other', 7 => 'Telcell', 8 => 'Debt', 9 => 'Prepaid',
+                ],
+            ];
+        }
+
+        return self::$paymentConfig;
+    }
+
     private function parseFilter($params)
     {
         $filterRaw = $params->filter ?? [];
         $filter = [];
         foreach ($filterRaw as $item) {
             if (is_object($item) || is_array($item)) {
-                foreach ($item as $k => $v) $filter[$k] = $v;
+                foreach ($item as $k => $v) {
+                    $filter[$k] = $v;
+                }
             }
         }
         return $filter;
     }
 
-    private function formatForClient($data)
+    /**
+     * @param array<string> $paymentFieldKeys
+     * @return array<string,mixed>
+     */
+    private function initRow($date, array $paymentFieldKeys = [])
     {
-        ksort($data);
-        $rows = [];
-        foreach ($data as $d => $v) {
-            $rows[] = [
-                $d,
-                $this->money_fmt($v['revenue']),
-                $this->money_fmt($v['cost_price']),
-                $this->money_fmt($v['salary']),
-                $this->money_fmt($v['procurement']),
-                $this->money_fmt($v['other_expenses']),
-                $this->money_fmt($v['profit'])
-            ];
+        $payments = [];
+        foreach ($paymentFieldKeys as $fk) {
+            $payments[$fk] = 0.0;
         }
 
         return [
-            "rows" => $rows,
-            "toolbar" => ["reload" => true, "filter" => true],
-            "headers" => [
-                Translator::t("Date"),
-                Translator::t("Revenue"),
-                Translator::t("Cost Price"),
-                Translator::t("Salary"),
-                Translator::t("Procurement"),
-                Translator::t("Other Expenses"),
-                Translator::t("Profit"),
-            ],
-            "sum" => [1, 2, 3, 4, 5, 6],
-            "filter" => [
-                ["type" => "date", "name" => "date1", "label" => Translator::t("Date start")],
-                ["type" => "date", "name" => "date2", "label" => Translator::t("Date end")],
-            ]
-        ];
-    }
-
-    private function initRow($date)
-    {
-        return [
             'date' => $date,
             'revenue' => 0,
+            'payments' => $payments,
             'cost_price' => 0,
             'salary' => 0,
             'procurement' => 0,
             'other_expenses' => 0,
-            'profit' => 0
+            'profit' => 0,
+        ];
+    }
+
+    /**
+     * @param array<string,array<string,mixed>> $data
+     * @param array<string,mixed> $payConfig
+     */
+    private function formatForClient(array $data, bool $showPayments, array $payConfig)
+    {
+        ksort($data);
+
+        $headers = [
+            Translator::t('Date'),
+            Translator::t('Revenue'),
+        ];
+
+        if ($showPayments) {
+            foreach ($payConfig['types'] as $pt) {
+                $headers[] = Translator::t($payConfig['names'][$pt] ?? (string)$pt);
+            }
+        }
+
+        $headers = array_merge($headers, [
+            Translator::t('Cost Price'),
+            Translator::t('Salary'),
+            Translator::t('Procurement'),
+            Translator::t('Other Expenses'),
+            Translator::t('Profit'),
+        ]);
+
+        $sumCols = [1];
+        $col = 2;
+        if ($showPayments) {
+            foreach ($payConfig['types'] as $pt) {
+                $sumCols[] = $col++;
+            }
+        }
+        $sumCols = array_merge($sumCols, [$col, $col + 1, $col + 2, $col + 3, $col + 4]);
+
+        $rows = [];
+        foreach ($data as $d => $v) {
+            $row = [
+                $d,
+                $this->money_fmt($v['revenue']),
+            ];
+
+            if ($showPayments) {
+                foreach ($payConfig['types'] as $pt) {
+                    $fk = $payConfig['fields'][$pt] ?? '';
+                    $row[] = $this->money_fmt($v['payments'][$fk] ?? 0);
+                }
+            }
+
+            $row[] = $this->money_fmt($v['cost_price']);
+            $row[] = $this->money_fmt($v['salary']);
+            $row[] = $this->money_fmt($v['procurement']);
+            $row[] = $this->money_fmt($v['other_expenses']);
+            $row[] = $this->money_fmt($v['profit']);
+            $rows[] = $row;
+        }
+
+        return [
+            'rows' => $rows,
+            'toolbar' => ['reload' => true, 'filter' => true],
+            'headers' => $headers,
+            'sum' => $sumCols,
+            'filter' => [
+                ['type' => 'date', 'name' => 'date1', 'label' => Translator::t('Date start')],
+                ['type' => 'date', 'name' => 'date2', 'label' => Translator::t('Date end')],
+                ['type' => 'combobox', 'name' => 'show_payments', 'label' => Translator::t('Show payment methods'), 'default' => 0, 'values' => [
+                    ['label' => Translator::t('No'), 'value' => 0],
+                    ['label' => Translator::t('Yes'), 'value' => 1],
+                ]],
+            ],
         ];
     }
 
     public function Get($params)
     {
         $filter = $this->parseFilter($params);
-        $date1 = $filter["date1"] ?? date('Y-m-01');
-        $date2 = $filter["date2"] ?? date('Y-m-t');
+        $date1 = $filter['date1'] ?? date('Y-m-01');
+        $date2 = $filter['date2'] ?? date('Y-m-t');
+        $showPayments = (int)($filter['show_payments'] ?? 0) === 1;
+
+        $payConfig = $this->paymentConfig();
+        $paymentFieldKeys = [];
+        if ($showPayments) {
+            foreach ($payConfig['types'] as $pt) {
+                $fk = $payConfig['fields'][$pt] ?? '';
+                if ($fk !== '') {
+                    $paymentFieldKeys[] = $fk;
+                }
+            }
+        }
 
         $dailyReport = [];
 
@@ -90,11 +190,32 @@ class Summary
                        FROM o_header 
                        WHERE f_datecash BETWEEN ? AND ? AND f_state=2 
                        GROUP BY f_date";
-        $revData = $this->db->select($sqlRevenue, "ss", [$date1, $date2])->fetch_all(MYSQLI_ASSOC);
+        $revData = $this->db->select($sqlRevenue, 'ss', [$date1, $date2])->fetch_all(MYSQLI_ASSOC);
         foreach ($revData as $row) {
             $date = $row['f_date'];
-            $dailyReport[$date] = $this->initRow($date);
+            $dailyReport[$date] = $this->initRow($date, $paymentFieldKeys);
             $dailyReport[$date]['revenue'] = (float)$row['revenue'];
+        }
+
+        if ($showPayments && !empty($paymentFieldKeys)) {
+            $sumParts = [];
+            foreach ($paymentFieldKeys as $field) {
+                $sumParts[] = "SUM(COALESCE(CAST(JSON_VALUE(f_data, '\$.$field') AS DECIMAL(14,2)), 0)) AS `$field`";
+            }
+            $sqlPayments = 'SELECT CAST(f_datecash AS DATE) AS f_date, ' . implode(', ', $sumParts) . '
+                       FROM o_header
+                       WHERE f_datecash BETWEEN ? AND ? AND f_state=2
+                       GROUP BY f_date';
+            $payData = $this->db->select($sqlPayments, 'ss', [$date1, $date2])->fetch_all(MYSQLI_ASSOC);
+            foreach ($payData as $row) {
+                $date = $row['f_date'];
+                if (!isset($dailyReport[$date])) {
+                    $dailyReport[$date] = $this->initRow($date, $paymentFieldKeys);
+                }
+                foreach ($paymentFieldKeys as $field) {
+                    $dailyReport[$date]['payments'][$field] = (float)($row[$field] ?? 0);
+                }
+            }
         }
 
         // 2. СЕБЕСТОИМОСТЬ (Расчет по складской очереди)
@@ -103,10 +224,12 @@ class Summary
                     LEFT JOIN o_header o ON o.f_id = st.f_doc_sale_id
                     WHERE o.f_datecash BETWEEN ? AND ? AND o.f_state=2 
                     GROUP BY f_date";
-        $costData = $this->db->select($sqlCost, "ss", [$date1, $date2])->fetch_all(MYSQLI_ASSOC);
+        $costData = $this->db->select($sqlCost, 'ss', [$date1, $date2])->fetch_all(MYSQLI_ASSOC);
         foreach ($costData as $row) {
             $date = $row['f_date'];
-            if (!isset($dailyReport[$date])) $dailyReport[$date] = $this->initRow($date);
+            if (!isset($dailyReport[$date])) {
+                $dailyReport[$date] = $this->initRow($date, $paymentFieldKeys);
+            }
             $dailyReport[$date]['cost_price'] = (float)$row['cost_price'];
         }
 
@@ -115,10 +238,12 @@ class Summary
                             FROM store_document 
                             WHERE f_doc_date BETWEEN ? AND ? AND f_doc_type=1 
                             GROUP BY f_date";
-        $procData = $this->db->select($sqlProcurement, "ss", [$date1, $date2])->fetch_all(MYSQLI_ASSOC);
+        $procData = $this->db->select($sqlProcurement, 'ss', [$date1, $date2])->fetch_all(MYSQLI_ASSOC);
         foreach ($procData as $row) {
             $date = $row['f_date'];
-            if (!isset($dailyReport[$date])) $dailyReport[$date] = $this->initRow($date);
+            if (!isset($dailyReport[$date])) {
+                $dailyReport[$date] = $this->initRow($date, $paymentFieldKeys);
+            }
             $dailyReport[$date]['procurement'] = (float)$row['procurement'];
         }
 
@@ -127,35 +252,36 @@ class Summary
                       FROM s_salary 
                       WHERE f_date BETWEEN ? AND ? and f_type=1
                       GROUP BY f_date";
-        $salData = $this->db->select($sqlSalary, "ss", [$date1, $date2])->fetch_all(MYSQLI_ASSOC);
+        $salData = $this->db->select($sqlSalary, 'ss', [$date1, $date2])->fetch_all(MYSQLI_ASSOC);
         foreach ($salData as $row) {
             $date = $row['f_date'];
-            if (!isset($dailyReport[$date])) $dailyReport[$date] = $this->initRow($date);
+            if (!isset($dailyReport[$date])) {
+                $dailyReport[$date] = $this->initRow($date, $paymentFieldKeys);
+            }
             $dailyReport[$date]['salary'] = (float)$row['salary'];
         }
 
-        // 5. ПРОЧИЕ ТРАТЫ (Теперь берем строго КРЕДИТ из кассовых операций)
-        // Важно: CAST(f_datetime AS DATE) обязателен, иначе GROUP BY будет по секундам
+        // 5. ПРОЧИЕ ТРАТЫ
         $sqlOther = "SELECT CAST(f_datetime AS DATE) as f_date, SUM(f_credit) as other_expenses 
                      FROM cash_operations 
                      WHERE f_datetime BETWEEN ? AND ? 
                      AND f_order_id IS NULL 
                      GROUP BY f_date";
-        $otherData = $this->db->select($sqlOther, "ss", [$date1, $date2])->fetch_all(MYSQLI_ASSOC);
+        $otherData = $this->db->select($sqlOther, 'ss', [$date1, $date2])->fetch_all(MYSQLI_ASSOC);
         foreach ($otherData as $row) {
             $date = $row['f_date'];
-            if (!isset($dailyReport[$date])) $dailyReport[$date] = $this->initRow($date);
+            if (!isset($dailyReport[$date])) {
+                $dailyReport[$date] = $this->initRow($date, $paymentFieldKeys);
+            }
             $dailyReport[$date]['other_expenses'] = (float)$row['other_expenses'];
         }
 
         // 6. РАСЧЕТ ИТОГА
         foreach ($dailyReport as &$day) {
-            // Прибыль = Выручка - Себестоимость - ЗП - Прочие расходы.
-            // Закуп (procurement) обычно не вычитают из прибыли напрямую, 
-            // так как это "замороженные" деньги в товаре, но если у тебя такая логика - ок.
             $day['profit'] = $day['revenue'] - $day['cost_price'] - $day['salary'] - $day['other_expenses'];
         }
+        unset($day);
 
-        return $this->formatForClient($dailyReport);
+        return $this->formatForClient($dailyReport, $showPayments, $payConfig);
     }
 }
