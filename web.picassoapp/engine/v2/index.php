@@ -104,6 +104,11 @@ if (!method_exists($controller, $methodName)) {
     dieWithCode("Method not found: {$methodName}");
 }
 
+$actionMethod = new ReflectionMethod($controller, $methodName);
+if ($actionMethod->getDeclaringClass()->getName() === Db::class) {
+    dieWithCode("Method not found: {$methodName}");
+}
+
 if ($methodName != "Login" && $methodName != "CheckOtp" && $methodName != "PinLogin" && $methodName != "HashLogin") {
     if (!$controller->auth()) {
         dieWithCode("Unauthorized", 401);
@@ -130,5 +135,5 @@ if (!empty($_FILES) || isset($_POST['data'])) {
     }
 }
 
-Translator::$locale = empty($jsonParams->locale) ? LANG : $jsonParams->locale;
+Translator::$locale = (empty($jsonParams) || empty($jsonParams->locale)) ? LANG : $jsonParams->locale;
 $controller->{$methodName}($jsonParams);

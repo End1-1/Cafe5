@@ -3,6 +3,7 @@
 #include "c5database.h"
 #include "c5utils.h"
 #include "c5message.h"
+#include "dlguserfingerprint.h"
 
 C5Passwords::C5Passwords(C5User *user) :
     C5Dialog(user),
@@ -85,4 +86,9 @@ void C5Passwords::on_chFrontPassword_clicked(bool checked)
 void C5Passwords::on_chWaiterPassword_clicked(bool checked)
 {
     ui->leWaiterPass->setEnabled(checked);
+}
+
+void C5Passwords::on_btnFingerPrint_clicked()
+{
+    DlgUserFingerprint::edit(fUserId, mUser);
 }

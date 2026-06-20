@@ -15,7 +15,7 @@ public:
     static void init(const QString &databaseName, const QString &serverKey);
     QString search(const QJsonObject &jo);
     QString searchPartner(const QJsonObject &jo);
-    QString searchGoodsGroups(const QJsonObject &jo);
+    QString searchGoodsGroups(const QJsonObject &jo, const SocketStruct &ss);
     QString searchStore(const QJsonObject &jo);
     QString searchUpdatePartnerCache(const QJsonObject &jo);
     //New version of search
@@ -23,6 +23,7 @@ public:
     QString searchGoodsItem(const QJsonObject &jo, const SocketStruct &ss);
     QString searchPartnerItem(const QJsonObject &jo, const SocketStruct &ss);
     QString updateDictionary(const QJsonObject &jo, const SocketStruct &ss);
+    QString reloadDictionary(const QJsonObject &jo, const SocketStruct &ss);
     QString searchStoreDocStatus(const QJsonObject &jo, const SocketStruct &ss);
     QString searchStoreDocType(const QJsonObject &jo, const SocketStruct &ss);
     QString searchCurrency(const QJsonObject &jo, const SocketStruct &ss);

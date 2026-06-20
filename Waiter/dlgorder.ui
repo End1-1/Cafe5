@@ -70,6 +70,22 @@
        </widget>
       </item>
       <item>
+       <widget class="QLabel" name="lbOrderNumber">
+        <property name="focusPolicy">
+         <enum>Qt::FocusPolicy::NoFocus</enum>
+        </property>
+        <property name="text">
+         <string>A00001</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignmentFlag::AlignCenter</set>
+        </property>
+        <property name="wordWrap">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item>
        <widget class="QLabel" name="lbStaff">
         <property name="focusPolicy">
          <enum>Qt::FocusPolicy::NoFocus</enum>
@@ -183,7 +199,173 @@
             <property name="spacing">
              <number>1</number>
             </property>
-            <item row="12" column="0">
+            <item row="3" column="0" colspan="2">
+             <widget class="QToolButton" name="btnOrderComment">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="minimumSize">
+               <size>
+                <width>0</width>
+                <height>50</height>
+               </size>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>16777215</width>
+                <height>16777215</height>
+               </size>
+              </property>
+              <property name="focusPolicy">
+               <enum>Qt::FocusPolicy::NoFocus</enum>
+              </property>
+              <property name="text">
+               <string>Comment</string>
+              </property>
+              <property name="icon">
+               <iconset resource="resources/res.qrc">
+                <normaloff>:/notes.png</normaloff>:/notes.png</iconset>
+              </property>
+              <property name="iconSize">
+               <size>
+                <width>32</width>
+                <height>32</height>
+               </size>
+              </property>
+              <property name="toolButtonStyle">
+               <enum>Qt::ToolButtonStyle::ToolButtonTextBesideIcon</enum>
+              </property>
+             </widget>
+            </item>
+            <item row="7" column="1">
+             <widget class="QToolButton" name="btnStopListMode">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="minimumSize">
+               <size>
+                <width>0</width>
+                <height>50</height>
+               </size>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>16777215</width>
+                <height>16777215</height>
+               </size>
+              </property>
+              <property name="focusPolicy">
+               <enum>Qt::FocusPolicy::NoFocus</enum>
+              </property>
+              <property name="text">
+               <string/>
+              </property>
+              <property name="icon">
+               <iconset resource="resources/res.qrc">
+                <normaloff>:/stop.png</normaloff>:/stop.png</iconset>
+              </property>
+              <property name="iconSize">
+               <size>
+                <width>32</width>
+                <height>32</height>
+               </size>
+              </property>
+              <property name="toolButtonStyle">
+               <enum>Qt::ToolButtonStyle::ToolButtonIconOnly</enum>
+              </property>
+              <property name="setup_key" stdset="0">
+               <string>dlgorder_disable_btnstoplistmode</string>
+              </property>
+             </widget>
+            </item>
+            <item row="11" column="0" colspan="2">
+             <widget class="QToolButton" name="btnPreorderDateTime">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="minimumSize">
+               <size>
+                <width>0</width>
+                <height>50</height>
+               </size>
+              </property>
+              <property name="focusPolicy">
+               <enum>Qt::FocusPolicy::NoFocus</enum>
+              </property>
+              <property name="text">
+               <string>Preorder 
+atetime</string>
+              </property>
+              <property name="icon">
+               <iconset resource="resources/res.qrc">
+                <normaloff>:/prepaid.png</normaloff>:/prepaid.png</iconset>
+              </property>
+              <property name="iconSize">
+               <size>
+                <width>32</width>
+                <height>32</height>
+               </size>
+              </property>
+              <property name="toolButtonStyle">
+               <enum>Qt::ToolButtonStyle::ToolButtonTextBesideIcon</enum>
+              </property>
+              <property name="setup_key" stdset="0">
+               <string>dlgorder_disable_btnpreorder_datetime</string>
+              </property>
+             </widget>
+            </item>
+            <item row="5" column="0" colspan="2">
+             <widget class="QToolButton" name="btnGuest">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="minimumSize">
+               <size>
+                <width>0</width>
+                <height>50</height>
+               </size>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>16777215</width>
+                <height>16777215</height>
+               </size>
+              </property>
+              <property name="focusPolicy">
+               <enum>Qt::FocusPolicy::NoFocus</enum>
+              </property>
+              <property name="text">
+               <string>Client
+info</string>
+              </property>
+              <property name="icon">
+               <iconset resource="resources/res.qrc">
+                <normaloff>:/guests.png</normaloff>:/guests.png</iconset>
+              </property>
+              <property name="iconSize">
+               <size>
+                <width>32</width>
+                <height>32</height>
+               </size>
+              </property>
+              <property name="toolButtonStyle">
+               <enum>Qt::ToolButtonStyle::ToolButtonTextBesideIcon</enum>
+              </property>
+             </widget>
+            </item>
+            <item row="13" column="0">
              <widget class="QToolButton" name="btnShowHideRemoved">
               <property name="sizePolicy">
                <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
@@ -224,6 +406,170 @@
               </property>
               <property name="setup_key" stdset="0">
                <string>dlgorder_disable_btnshowhideremoved</string>
+              </property>
+             </widget>
+            </item>
+            <item row="8" column="1">
+             <widget class="QToolButton" name="btnSit">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="minimumSize">
+               <size>
+                <width>0</width>
+                <height>50</height>
+               </size>
+              </property>
+              <property name="focusPolicy">
+               <enum>Qt::FocusPolicy::NoFocus</enum>
+              </property>
+              <property name="text">
+               <string>3</string>
+              </property>
+              <property name="icon">
+               <iconset resource="resources/res.qrc">
+                <normaloff>:/sit.png</normaloff>:/sit.png</iconset>
+              </property>
+              <property name="iconSize">
+               <size>
+                <width>32</width>
+                <height>32</height>
+               </size>
+              </property>
+              <property name="toolButtonStyle">
+               <enum>Qt::ToolButtonStyle::ToolButtonTextUnderIcon</enum>
+              </property>
+              <property name="setup_key" stdset="0">
+               <string>dlgorder_disable_btnsit</string>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="0">
+             <widget class="QToolButton" name="btnTransferDishes">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="minimumSize">
+               <size>
+                <width>0</width>
+                <height>50</height>
+               </size>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>16777215</width>
+                <height>16777215</height>
+               </size>
+              </property>
+              <property name="focusPolicy">
+               <enum>Qt::FocusPolicy::NoFocus</enum>
+              </property>
+              <property name="text">
+               <string/>
+              </property>
+              <property name="icon">
+               <iconset resource="resources/res.qrc">
+                <normaloff>:/move-dish.png</normaloff>:/move-dish.png</iconset>
+              </property>
+              <property name="iconSize">
+               <size>
+                <width>36</width>
+                <height>36</height>
+               </size>
+              </property>
+              <property name="toolButtonStyle">
+               <enum>Qt::ToolButtonStyle::ToolButtonIconOnly</enum>
+              </property>
+              <property name="setup_key" stdset="0">
+               <string>dlgorder_disable_btntransferdishes</string>
+              </property>
+             </widget>
+            </item>
+            <item row="8" column="0">
+             <widget class="QToolButton" name="btnReceiptLanguage">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="minimumSize">
+               <size>
+                <width>0</width>
+                <height>50</height>
+               </size>
+              </property>
+              <property name="focusPolicy">
+               <enum>Qt::FocusPolicy::NoFocus</enum>
+              </property>
+              <property name="text">
+               <string/>
+              </property>
+              <property name="icon">
+               <iconset resource="resources/res.qrc">
+                <normaloff>:/armenia.png</normaloff>:/armenia.png</iconset>
+              </property>
+              <property name="iconSize">
+               <size>
+                <width>32</width>
+                <height>32</height>
+               </size>
+              </property>
+              <property name="toolButtonStyle">
+               <enum>Qt::ToolButtonStyle::ToolButtonTextUnderIcon</enum>
+              </property>
+              <property name="setup_key" stdset="0">
+               <string>dlgorder_disable_btnreceiptlanguage</string>
+              </property>
+             </widget>
+            </item>
+            <item row="4" column="0" colspan="2">
+             <widget class="QToolButton" name="btnChangeStaff">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="minimumSize">
+               <size>
+                <width>0</width>
+                <height>50</height>
+               </size>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>16777215</width>
+                <height>16777215</height>
+               </size>
+              </property>
+              <property name="focusPolicy">
+               <enum>Qt::FocusPolicy::NoFocus</enum>
+              </property>
+              <property name="text">
+               <string>Staff</string>
+              </property>
+              <property name="icon">
+               <iconset resource="resources/res.qrc">
+                <normaloff>:/staff.png</normaloff>:/staff.png</iconset>
+              </property>
+              <property name="iconSize">
+               <size>
+                <width>32</width>
+                <height>32</height>
+               </size>
+              </property>
+              <property name="toolButtonStyle">
+               <enum>Qt::ToolButtonStyle::ToolButtonTextBesideIcon</enum>
+              </property>
+              <property name="setup_key" stdset="0">
+               <string>dlgorder_disable_btnchangestaff</string>
               </property>
              </widget>
             </item>
@@ -274,276 +620,7 @@
               </property>
              </widget>
             </item>
-            <item row="5" column="0" colspan="2">
-             <widget class="QToolButton" name="btnGuest">
-              <property name="sizePolicy">
-               <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-                <horstretch>0</horstretch>
-                <verstretch>0</verstretch>
-               </sizepolicy>
-              </property>
-              <property name="minimumSize">
-               <size>
-                <width>0</width>
-                <height>50</height>
-               </size>
-              </property>
-              <property name="maximumSize">
-               <size>
-                <width>16777215</width>
-                <height>16777215</height>
-               </size>
-              </property>
-              <property name="focusPolicy">
-               <enum>Qt::FocusPolicy::NoFocus</enum>
-              </property>
-              <property name="text">
-               <string>Client
-info</string>
-              </property>
-              <property name="icon">
-               <iconset resource="resources/res.qrc">
-                <normaloff>:/guests.png</normaloff>:/guests.png</iconset>
-              </property>
-              <property name="iconSize">
-               <size>
-                <width>32</width>
-                <height>32</height>
-               </size>
-              </property>
-              <property name="toolButtonStyle">
-               <enum>Qt::ToolButtonStyle::ToolButtonTextBesideIcon</enum>
-              </property>
-             </widget>
-            </item>
             <item row="7" column="0">
-             <widget class="QToolButton" name="btnReceiptLanguage">
-              <property name="sizePolicy">
-               <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-                <horstretch>0</horstretch>
-                <verstretch>0</verstretch>
-               </sizepolicy>
-              </property>
-              <property name="minimumSize">
-               <size>
-                <width>0</width>
-                <height>50</height>
-               </size>
-              </property>
-              <property name="focusPolicy">
-               <enum>Qt::FocusPolicy::NoFocus</enum>
-              </property>
-              <property name="text">
-               <string/>
-              </property>
-              <property name="icon">
-               <iconset resource="resources/res.qrc">
-                <normaloff>:/armenia.png</normaloff>:/armenia.png</iconset>
-              </property>
-              <property name="iconSize">
-               <size>
-                <width>32</width>
-                <height>32</height>
-               </size>
-              </property>
-              <property name="toolButtonStyle">
-               <enum>Qt::ToolButtonStyle::ToolButtonTextUnderIcon</enum>
-              </property>
-              <property name="setup_key" stdset="0">
-               <string>dlgorder_disable_btnreceiptlanguage</string>
-              </property>
-             </widget>
-            </item>
-            <item row="9" column="0" colspan="2">
-             <widget class="QToolButton" name="btnPrepaid">
-              <property name="sizePolicy">
-               <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-                <horstretch>0</horstretch>
-                <verstretch>0</verstretch>
-               </sizepolicy>
-              </property>
-              <property name="minimumSize">
-               <size>
-                <width>0</width>
-                <height>50</height>
-               </size>
-              </property>
-              <property name="focusPolicy">
-               <enum>Qt::FocusPolicy::NoFocus</enum>
-              </property>
-              <property name="text">
-               <string>Prepaid</string>
-              </property>
-              <property name="icon">
-               <iconset resource="resources/res.qrc">
-                <normaloff>:/prepaid.png</normaloff>:/prepaid.png</iconset>
-              </property>
-              <property name="iconSize">
-               <size>
-                <width>32</width>
-                <height>32</height>
-               </size>
-              </property>
-              <property name="checkable">
-               <bool>true</bool>
-              </property>
-              <property name="checked">
-               <bool>false</bool>
-              </property>
-              <property name="toolButtonStyle">
-               <enum>Qt::ToolButtonStyle::ToolButtonTextBesideIcon</enum>
-              </property>
-              <property name="setup_key" stdset="0">
-               <string>dlgorder_disable_btnprepaid</string>
-              </property>
-             </widget>
-            </item>
-            <item row="7" column="1">
-             <widget class="QToolButton" name="btnSit">
-              <property name="sizePolicy">
-               <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-                <horstretch>0</horstretch>
-                <verstretch>0</verstretch>
-               </sizepolicy>
-              </property>
-              <property name="minimumSize">
-               <size>
-                <width>0</width>
-                <height>50</height>
-               </size>
-              </property>
-              <property name="focusPolicy">
-               <enum>Qt::FocusPolicy::NoFocus</enum>
-              </property>
-              <property name="text">
-               <string>3</string>
-              </property>
-              <property name="icon">
-               <iconset resource="resources/res.qrc">
-                <normaloff>:/sit.png</normaloff>:/sit.png</iconset>
-              </property>
-              <property name="iconSize">
-               <size>
-                <width>32</width>
-                <height>32</height>
-               </size>
-              </property>
-              <property name="toolButtonStyle">
-               <enum>Qt::ToolButtonStyle::ToolButtonTextUnderIcon</enum>
-              </property>
-              <property name="setup_key" stdset="0">
-               <string>dlgorder_disable_btnsit</string>
-              </property>
-             </widget>
-            </item>
-            <item row="6" column="1">
-             <widget class="QToolButton" name="btnStopListMode">
-              <property name="sizePolicy">
-               <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-                <horstretch>0</horstretch>
-                <verstretch>0</verstretch>
-               </sizepolicy>
-              </property>
-              <property name="minimumSize">
-               <size>
-                <width>0</width>
-                <height>50</height>
-               </size>
-              </property>
-              <property name="maximumSize">
-               <size>
-                <width>16777215</width>
-                <height>16777215</height>
-               </size>
-              </property>
-              <property name="focusPolicy">
-               <enum>Qt::FocusPolicy::NoFocus</enum>
-              </property>
-              <property name="text">
-               <string/>
-              </property>
-              <property name="icon">
-               <iconset resource="resources/res.qrc">
-                <normaloff>:/stop.png</normaloff>:/stop.png</iconset>
-              </property>
-              <property name="iconSize">
-               <size>
-                <width>32</width>
-                <height>32</height>
-               </size>
-              </property>
-              <property name="toolButtonStyle">
-               <enum>Qt::ToolButtonStyle::ToolButtonIconOnly</enum>
-              </property>
-              <property name="setup_key" stdset="0">
-               <string>dlgorder_disable_btnstoplistmode</string>
-              </property>
-             </widget>
-            </item>
-            <item row="4" column="0" colspan="2">
-             <widget class="QToolButton" name="btnChangeStaff">
-              <property name="sizePolicy">
-               <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-                <horstretch>0</horstretch>
-                <verstretch>0</verstretch>
-               </sizepolicy>
-              </property>
-              <property name="minimumSize">
-               <size>
-                <width>0</width>
-                <height>50</height>
-               </size>
-              </property>
-              <property name="maximumSize">
-               <size>
-                <width>16777215</width>
-                <height>16777215</height>
-               </size>
-              </property>
-              <property name="focusPolicy">
-               <enum>Qt::FocusPolicy::NoFocus</enum>
-              </property>
-              <property name="text">
-               <string>Staff</string>
-              </property>
-              <property name="icon">
-               <iconset resource="resources/res.qrc">
-                <normaloff>:/staff.png</normaloff>:/staff.png</iconset>
-              </property>
-              <property name="iconSize">
-               <size>
-                <width>32</width>
-                <height>32</height>
-               </size>
-              </property>
-              <property name="toolButtonStyle">
-               <enum>Qt::ToolButtonStyle::ToolButtonTextBesideIcon</enum>
-              </property>
-              <property name="setup_key" stdset="0">
-               <string>dlgorder_disable_btnchangestaff</string>
-              </property>
-             </widget>
-            </item>
-            <item row="2" column="0" colspan="2">
-             <widget class="QLabel" name="lbOrderComment">
-              <property name="sizePolicy">
-               <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-                <horstretch>0</horstretch>
-                <verstretch>0</verstretch>
-               </sizepolicy>
-              </property>
-              <property name="text">
-               <string>My dear</string>
-              </property>
-              <property name="alignment">
-               <set>Qt::AlignmentFlag::AlignCenter</set>
-              </property>
-              <property name="wordWrap">
-               <bool>true</bool>
-              </property>
-             </widget>
-            </item>
-            <item row="6" column="0">
              <widget class="QToolButton" name="btnPackage">
               <property name="sizePolicy">
                <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
@@ -587,49 +664,27 @@ info</string>
               </property>
              </widget>
             </item>
-            <item row="3" column="0" colspan="2">
-             <widget class="QToolButton" name="btnOrderComment">
+            <item row="2" column="0" colspan="2">
+             <widget class="QLabel" name="lbOrderComment">
               <property name="sizePolicy">
-               <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+               <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
                 <horstretch>0</horstretch>
                 <verstretch>0</verstretch>
                </sizepolicy>
               </property>
-              <property name="minimumSize">
-               <size>
-                <width>0</width>
-                <height>50</height>
-               </size>
-              </property>
-              <property name="maximumSize">
-               <size>
-                <width>16777215</width>
-                <height>16777215</height>
-               </size>
-              </property>
-              <property name="focusPolicy">
-               <enum>Qt::FocusPolicy::NoFocus</enum>
-              </property>
               <property name="text">
-               <string>Comment</string>
+               <string>My dear</string>
               </property>
-              <property name="icon">
-               <iconset resource="resources/res.qrc">
-                <normaloff>:/notes.png</normaloff>:/notes.png</iconset>
+              <property name="alignment">
+               <set>Qt::AlignmentFlag::AlignCenter</set>
               </property>
-              <property name="iconSize">
-               <size>
-                <width>32</width>
-                <height>32</height>
-               </size>
-              </property>
-              <property name="toolButtonStyle">
-               <enum>Qt::ToolButtonStyle::ToolButtonTextBesideIcon</enum>
+              <property name="wordWrap">
+               <bool>true</bool>
               </property>
              </widget>
             </item>
             <item row="10" column="0" colspan="2">
-             <widget class="QToolButton" name="btnPreorderDateTime">
+             <widget class="QToolButton" name="btnPrepaid">
               <property name="sizePolicy">
                <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
                 <horstretch>0</horstretch>
@@ -646,8 +701,7 @@ info</string>
                <enum>Qt::FocusPolicy::NoFocus</enum>
               </property>
               <property name="text">
-               <string>Preorder 
-atetime</string>
+               <string>Prepaid</string>
               </property>
               <property name="icon">
                <iconset resource="resources/res.qrc">
@@ -659,59 +713,21 @@ atetime</string>
                 <height>32</height>
                </size>
               </property>
+              <property name="checkable">
+               <bool>true</bool>
+              </property>
+              <property name="checked">
+               <bool>false</bool>
+              </property>
               <property name="toolButtonStyle">
                <enum>Qt::ToolButtonStyle::ToolButtonTextBesideIcon</enum>
               </property>
               <property name="setup_key" stdset="0">
-               <string>dlgorder_disable_btnpreorder_datetime</string>
+               <string>dlgorder_disable_btnprepaid</string>
               </property>
              </widget>
             </item>
-            <item row="0" column="0">
-             <widget class="QToolButton" name="btnTransferDishes">
-              <property name="sizePolicy">
-               <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-                <horstretch>0</horstretch>
-                <verstretch>0</verstretch>
-               </sizepolicy>
-              </property>
-              <property name="minimumSize">
-               <size>
-                <width>0</width>
-                <height>50</height>
-               </size>
-              </property>
-              <property name="maximumSize">
-               <size>
-                <width>16777215</width>
-                <height>16777215</height>
-               </size>
-              </property>
-              <property name="focusPolicy">
-               <enum>Qt::FocusPolicy::NoFocus</enum>
-              </property>
-              <property name="text">
-               <string/>
-              </property>
-              <property name="icon">
-               <iconset resource="resources/res.qrc">
-                <normaloff>:/move-dish.png</normaloff>:/move-dish.png</iconset>
-              </property>
-              <property name="iconSize">
-               <size>
-                <width>36</width>
-                <height>36</height>
-               </size>
-              </property>
-              <property name="toolButtonStyle">
-               <enum>Qt::ToolButtonStyle::ToolButtonIconOnly</enum>
-              </property>
-              <property name="setup_key" stdset="0">
-               <string>dlgorder_disable_btntransferdishes</string>
-              </property>
-             </widget>
-            </item>
-            <item row="8" column="0" colspan="2">
+            <item row="9" column="0" colspan="2">
              <widget class="QToolButton" name="btnActivatePreorder">
               <property name="sizePolicy">
                <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
@@ -747,6 +763,95 @@ Preorder</string>
               </property>
               <property name="setup_key" stdset="0">
                <string>dlgorder_disable_btnactivate_preorder</string>
+              </property>
+             </widget>
+            </item>
+            <item row="6" column="0" colspan="2">
+             <widget class="QToolButton" name="btnDeliveryAmount">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="minimumSize">
+               <size>
+                <width>0</width>
+                <height>50</height>
+               </size>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>16777215</width>
+                <height>16777215</height>
+               </size>
+              </property>
+              <property name="focusPolicy">
+               <enum>Qt::FocusPolicy::NoFocus</enum>
+              </property>
+              <property name="text">
+               <string>Delivery
+amount</string>
+              </property>
+              <property name="icon">
+               <iconset resource="resources/res.qrc">
+                <normaloff>:/delivery.png</normaloff>:/delivery.png</iconset>
+              </property>
+              <property name="iconSize">
+               <size>
+                <width>32</width>
+                <height>32</height>
+               </size>
+              </property>
+              <property name="toolButtonStyle">
+               <enum>Qt::ToolButtonStyle::ToolButtonTextBesideIcon</enum>
+              </property>
+              <property name="setup_key" stdset="0">
+               <string>dlgorder_disable_btndeliveryamount</string>
+              </property>
+             </widget>
+            </item>
+            <item row="13" column="1">
+             <widget class="QToolButton" name="btnShowCustomerDisplay">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="minimumSize">
+               <size>
+                <width>0</width>
+                <height>50</height>
+               </size>
+              </property>
+              <property name="focusPolicy">
+               <enum>Qt::FocusPolicy::NoFocus</enum>
+              </property>
+              <property name="text">
+               <string/>
+              </property>
+              <property name="icon">
+               <iconset resource="resources/res.qrc">
+                <normaloff>:/display.png</normaloff>:/display.png</iconset>
+              </property>
+              <property name="iconSize">
+               <size>
+                <width>32</width>
+                <height>32</height>
+               </size>
+              </property>
+              <property name="checkable">
+               <bool>true</bool>
+              </property>
+              <property name="checked">
+               <bool>false</bool>
+              </property>
+              <property name="toolButtonStyle">
+               <enum>Qt::ToolButtonStyle::ToolButtonIconOnly</enum>
+              </property>
+              <property name="setup_key" stdset="0">
+               <string>dlgorder_disable_btnshowcustomerdisplay</string>
               </property>
              </widget>
             </item>
@@ -788,50 +893,6 @@ Preorder</string>
              <width>32</width>
              <height>32</height>
             </size>
-           </property>
-          </widget>
-         </item>
-         <item row="13" column="0" colspan="2">
-          <widget class="QToolButton" name="btnShowCustomerDisplay">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="minimumSize">
-            <size>
-             <width>0</width>
-             <height>50</height>
-            </size>
-           </property>
-           <property name="focusPolicy">
-            <enum>Qt::FocusPolicy::NoFocus</enum>
-           </property>
-           <property name="text">
-            <string/>
-           </property>
-           <property name="icon">
-            <iconset resource="resources/res.qrc">
-             <normaloff>:/display.png</normaloff>:/display.png</iconset>
-           </property>
-           <property name="iconSize">
-            <size>
-             <width>32</width>
-             <height>32</height>
-            </size>
-           </property>
-           <property name="checkable">
-            <bool>true</bool>
-           </property>
-           <property name="checked">
-            <bool>false</bool>
-           </property>
-           <property name="toolButtonStyle">
-            <enum>Qt::ToolButtonStyle::ToolButtonIconOnly</enum>
-           </property>
-           <property name="setup_key" stdset="0">
-            <string>dlgorder_disable_btnshowcustomerdisplay</string>
            </property>
           </widget>
          </item>
@@ -912,13 +973,13 @@ Preorder</string>
            <property name="minimumSize">
             <size>
              <width>0</width>
-             <height>50</height>
+             <height>54</height>
             </size>
            </property>
            <property name="maximumSize">
             <size>
              <width>16777215</width>
-             <height>50</height>
+             <height>54</height>
             </size>
            </property>
            <property name="focusPolicy">
@@ -1560,7 +1621,7 @@ Preorder</string>
            <x>0</x>
            <y>0</y>
            <width>343</width>
-           <height>600</height>
+           <height>596</height>
           </rect>
          </property>
          <layout class="QVBoxLayout" name="vs">
@@ -1774,7 +1835,7 @@ Preorder</string>
      <property name="focusPolicy">
       <enum>Qt::FocusPolicy::NoFocus</enum>
      </property>
-     <layout class="QGridLayout" name="gridLayout">
+     <layout class="QGridLayout" name="gridLayout" rowstretch="1,0,0">
       <property name="leftMargin">
        <number>0</number>
       </property>
@@ -1823,7 +1884,7 @@ Preorder</string>
          <item>
           <widget class="QWidget" name="wdepts" native="true">
            <property name="sizePolicy">
-            <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+            <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
              <horstretch>0</horstretch>
              <verstretch>0</verstretch>
             </sizepolicy>
@@ -1831,13 +1892,13 @@ Preorder</string>
            <property name="minimumSize">
             <size>
              <width>0</width>
-             <height>0</height>
+             <height>54</height>
             </size>
            </property>
            <property name="maximumSize">
             <size>
              <width>16777215</width>
-             <height>16777215</height>
+             <height>54</height>
             </size>
            </property>
            <property name="focusPolicy">
@@ -2232,7 +2293,7 @@ Preorder</string>
          <item>
           <widget class="QWidget" name="wgroups" native="true">
            <property name="sizePolicy">
-            <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+            <sizepolicy hsizetype="Expanding" vsizetype="Maximum">
              <horstretch>1</horstretch>
              <verstretch>0</verstretch>
             </sizepolicy>
@@ -2270,6 +2331,18 @@ Preorder</string>
             </property>
             <item>
              <widget class="QScrollArea" name="groupsScrollArea">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="minimumSize">
+               <size>
+                <width>0</width>
+                <height>0</height>
+               </size>
+              </property>
               <property name="verticalScrollBarPolicy">
                <enum>Qt::ScrollBarPolicy::ScrollBarAlwaysOn</enum>
               </property>

@@ -3,6 +3,11 @@
 
 #include "c5waiterdialog.h"
 
+#include <QJsonArray>
+
+class QTimer;
+class ZkfingerprintReader;
+
 namespace Ui
 {
 class DlgScreen;
@@ -23,6 +28,8 @@ protected:
     virtual void paintEvent(QPaintEvent *e) override;
 
     virtual void showEvent(QShowEvent *e) override;
+
+    void closeEvent(QCloseEvent *event) override;
 
 private slots:
     void on_btnCancel_clicked();
@@ -55,14 +62,31 @@ private slots:
 
     void on_btnClose_clicked();
 
+    void on_btnFingerPrint_clicked();
+
+    void onFingerprintProbe(const QByteArray &probe);
+
 private:
     Ui::DlgScreen* ui;
+
+    ZkfingerprintReader *mReader = nullptr;
+    QJsonArray mFingerprintItems;
+    bool mFingerprintBusy = false;
 
     void tryExit();
 
     void updatePin();
 
+    void loadFingerprints();
+    void startFingerprintScan();
+    void stopFingerprintScan();
+    int matchFingerprintUser(const QByteArray &probe);
+    void completeLogin(C5User *user);
+    void showFingerPrintStatus(const QString &text, const QColor &color, int hideMs = 0);
+    void clearFingerPrintStatus();
+
     QString mPin;
+    QTimer *mFingerPrintStatusTimer = nullptr;
 };
 
 #endif // DLGSCREEN_H

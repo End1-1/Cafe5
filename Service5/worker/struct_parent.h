@@ -7,9 +7,19 @@ struct ParentItem {
     QJsonObject data;
     void parseData(const QJsonObject &jo, const QString &key = "f_data")
     {
-        if(jo.contains(key) && jo[key].isString()) {
+        if(!jo.contains(key)) {
+            return;
+        }
+
+        const QJsonValue value = jo[key];
+        if(value.isObject()) {
+            data = value.toObject();
+            return;
+        }
+
+        if(value.isString()) {
             QJsonParseError err;
-            const QByteArray raw = jo[key].toString().toUtf8();
+            const QByteArray raw = value.toString().toUtf8();
             QJsonDocument doc = QJsonDocument::fromJson(raw, &err);
 
             if(err.error == QJsonParseError::NoError && doc.isObject()) {

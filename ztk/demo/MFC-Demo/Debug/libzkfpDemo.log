@@ -1,0 +1,16 @@
+﻿生成启动时间为 2018/3/19 10:01:47。
+     1>项目“D:\MyDemo\biosdk\ZKFingerSDK\ZKFingerSDK_Windows_ZK10-Lite\CPP\MFC-Demo\libzkfpDemo.vcxproj”在节点 2 上(Build 个目标)。
+     1>ClCompile:
+         D:\Visual Studio2012\VC\bin\CL.exe /c /ZI /nologo /W3 /WX- /Od /Oy- /D WIN32 /D _WINDOWS /D _DEBUG /D _MBCS /Gm /EHsc /RTC1 /MTd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Yu"stdafx.h" /Fp"Debug\libzkfpDemo.pch" /Fo"Debug\\" /Fd"Debug\vc110.pdb" /Gd /TP /analyze- /errorReport:prompt libzkfpDemoDlg.cpp
+         libzkfpDemoDlg.cpp
+       Link:
+         D:\Visual Studio2012\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"D:\MyDemo\biosdk\ZKFingerSDK\ZKFingerSDK_Windows_ZK10-Lite\CPP\MFC-Demo\Debug\libzkfpDemo.exe" /INCREMENTAL /NOLOGO /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /manifestinput:"D:\Visual Studio2012\VC\Include\Manifest\dpiaware.manifest" /DEBUG /PDB:"D:\MyDemo\biosdk\ZKFingerSDK\ZKFingerSDK_Windows_ZK10-Lite\CPP\MFC-Demo\Debug\libzkfpDemo.pdb" /SUBSYSTEM:WINDOWS /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"D:\MyDemo\biosdk\ZKFingerSDK\ZKFingerSDK_Windows_ZK10-Lite\CPP\MFC-Demo\Debug\libzkfpDemo.lib" /MACHINE:X86 /SAFESEH Debug\libzkfpDemo.res
+         Debug\libzkfpDemo.obj
+         Debug\libzkfpDemoDlg.obj
+         Debug\stdafx.obj
+         libzkfpDemo.vcxproj -> D:\MyDemo\biosdk\ZKFingerSDK\ZKFingerSDK_Windows_ZK10-Lite\CPP\MFC-Demo\Debug\libzkfpDemo.exe
+     1>已完成生成项目“D:\MyDemo\biosdk\ZKFingerSDK\ZKFingerSDK_Windows_ZK10-Lite\CPP\MFC-Demo\libzkfpDemo.vcxproj”(Build 个目标)的操作。
+
+生成成功。
+
+已用时间 00:00:00.46

@@ -52,6 +52,9 @@ C5RevenueCashOp::C5RevenueCashOp(C5User *user, QWidget *parent)
     ui->dsAmount->setMaximum(999999999.00);
     ui->deDateTime->setDateTime(QDateTime::currentDateTime());
     refillCashOperationTypeCombo();
+    connect(ui->cbExpenseType, QOverload<int>::of(&QComboBox::currentIndexChanged), this, [this](int) {
+        syncOperationFromExpenseType();
+    });
 }
 
 void C5RevenueCashOp::refillCashOperationTypeCombo()
@@ -78,6 +81,18 @@ void C5RevenueCashOp::refillCashOperationTypeCombo()
         ui->cbExpenseType->setCurrentIndex(defIdx >= 0 ? defIdx : 0);
     }
     ui->cbExpenseType->setEnabled(true);
+}
+
+void C5RevenueCashOp::syncOperationFromExpenseType()
+{
+    const int opType = selectedOperationType();
+    const int wantData = isCashOperationIncome(opType) ? 1 : 2;
+    for (int i = 0; i < ui->cbOperation->count(); ++i) {
+        if (ui->cbOperation->itemData(i).toInt() == wantData) {
+            ui->cbOperation->setCurrentIndex(i);
+            break;
+        }
+    }
 }
 
 int C5RevenueCashOp::selectedOperationType() const
@@ -170,11 +185,11 @@ void C5RevenueCashOp::on_btnSave_clicked()
         return;
     }
 
-    const bool income = ui->cbOperation->currentIndex() == 0;
+    const int operationType = selectedOperationType();
+    const bool income = isCashOperationIncome(operationType);
     const int paymentTypeId = ui->cbPaymentType->currentData().toInt();
     const double debit = income ? amount : 0.0;
     const double credit = income ? 0.0 : amount;
-    const int operationType = selectedOperationType();
 
     if(mOperationId > 0) {
         NInterface::query1("/engine/v2/waiter/cashbox/update-cash-operation",

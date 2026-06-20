@@ -239,7 +239,7 @@ QVariant C5TableModel::data(const QModelIndex &index, int role) const
             return fColorData[fProxyData.at(index.row())][index.column()];
         }
 
-        return QVariant(QApplication::palette().color(QPalette::Base));
+        return QVariant();
 
     case Qt::FontRole: {
         QFont fo;

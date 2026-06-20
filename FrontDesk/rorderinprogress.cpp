@@ -19,21 +19,26 @@
 namespace
 {
 
-constexpr int kColKitchenStatus = 9;
+/** Must match orderinprogress.php ordersToReportRows column order. */
+constexpr int kColOrderId = 0;
+constexpr int kColStatusText = 13;
+/** Hidden numeric min kitchen status for row background (from o_goods_process.f_status). */
+constexpr int kColKitchenStatus = 14;
 
 QColor kitchenRowBackground(int minLineStatus)
 {
     switch(minLineStatus) {
-        case 1:
-            return QColor(QStringLiteral("#455a71"));
-        case 2:
-            return QColor(QStringLiteral("#b86228"));
-        case 3:
-            return QColor(QStringLiteral("#2d7a54"));
-        case 4:
-            return QColor(QStringLiteral("#54687a"));
-        default:
-            return QColor(QStringLiteral("#495963"));
+    case 1:
+        return QColor(QStringLiteral("#455a71"));
+    case 2:
+        return QColor(QStringLiteral("#b86228"));
+    case 3:
+        return QColor(QStringLiteral("#2d7a54"));
+    case 4:
+    case 6:
+        return QColor(QStringLiteral("#54687a"));
+    default:
+        return QColor(QStringLiteral("#495963"));
     }
 }
 
@@ -60,10 +65,14 @@ public:
         }
 
         bool ok = false;
-        const int st = stIdx.data(Qt::DisplayRole).toInt(&ok);
+        int st = stIdx.data(Qt::DisplayRole).toInt(&ok);
 
         if(!ok) {
             return;
+        }
+
+        if(st == 6) {
+            st = 4;
         }
 
         const QColor bg = kitchenRowBackground(st);
@@ -103,10 +112,27 @@ ROrderInProgress::ROrderInProgress(const QString &title, QIcon icon, const QStri
     }
 }
 
+void ROrderInProgress::tuneReportTableLayout()
+{
+    if(!ui->tbl->model() || ui->tbl->model()->columnCount() <= kColStatusText) {
+        return;
+    }
+
+    if(QHeaderView *hdr = ui->tbl->horizontalHeader()) {
+        hdr->setSectionResizeMode(kColStatusText, QHeaderView::ResizeToContents);
+    }
+
+    const int statusW = ui->tbl->columnWidth(kColStatusText);
+    if(statusW < 120) {
+        ui->tbl->setColumnWidth(kColStatusText, 120);
+    }
+}
+
 void ROrderInProgress::onTableModelReset()
 {
     ui->tbl->resizeColumnsToContents();
     ui->tbl->resizeRowsToContents();
+    tuneReportTableLayout();
 
     const int cols = ui->tbl->model() ? ui->tbl->model()->columnCount() : 0;
     ui->tblTotal->setColumnCount(cols);
@@ -153,22 +179,8 @@ void ROrderInProgress::applyFilter()
     startAutoReload();
 }
 
-void ROrderInProgress::on_tbl_doubleClicked(const QModelIndex &index)
+void ROrderInProgress::openOrderInspector(const QString &orderId)
 {
-    if(!index.isValid()) {
-        return;
-    }
-
-    const QModelIndex srcIndex = reportMapViewIndexToSource(index);
-    if(!srcIndex.isValid()) {
-        return;
-    }
-
-    const QString orderId = reportSourceCellData(srcIndex.row(), 0).toString().trimmed();
-    if(orderId.isEmpty()) {
-        return;
-    }
-
     NInterface::query1(QStringLiteral("/engine/v2/waiter/order/query-order"),
                        mUser->mSessionKey,
                        this,
@@ -185,4 +197,23 @@ void ROrderInProgress::on_tbl_doubleClicked(const QModelIndex &index)
                            __mainWindow->addWidget(sw);
                            sw->setOrder(order);
                        });
+}
+
+void ROrderInProgress::on_tbl_doubleClicked(const QModelIndex &index)
+{
+    if(!index.isValid()) {
+        return;
+    }
+
+    const QModelIndex srcIndex = reportMapViewIndexToSource(index);
+    if(!srcIndex.isValid()) {
+        return;
+    }
+
+    const QString orderId = reportSourceCellData(srcIndex.row(), kColOrderId).toString().trimmed();
+    if(orderId.isEmpty()) {
+        return;
+    }
+
+    openOrderInspector(orderId);
 }

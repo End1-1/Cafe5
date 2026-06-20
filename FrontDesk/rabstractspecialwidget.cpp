@@ -4,8 +4,7 @@
 
 RAbstractSpecialWidget::RAbstractSpecialWidget(QWidget *parent)
     : C5Widget(parent)
-{
-}
+{}
 
 QJsonArray RAbstractSpecialWidget::getValues()
 {

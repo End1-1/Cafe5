@@ -141,3 +141,6 @@ UPDATE s_app SET f_version='198' WHERE f_app='DB';
 CREATE TABLE users_elina_day_end (f_id INTEGER PRIMARY KEY AUTO_INCREMENT, f_state INT, f_date DATE, f_hall INT, f_prevday FLOAT (12,0), f_income FLOAT(12,0), f_inputother FLOAT(12,0), f_return FLOAT(12,0), f_sale FLOAT(12,0), f_output FLOAT(12,0), f_final FLOAT(12,0), f_check FLOAT(12,0));
 ALTER TABLE `a_store` CHANGE COLUMN `f_base` `f_base` CHAR(36) NULL DEFAULT NULL COLLATE 'latin1_general_ci' AFTER `f_total`, CHANGE COLUMN `f_baseDoc` `f_baseDoc` CHAR(36) NULL DEFAULT NULL AFTER `f_base`;
 
+#31/05/2026 — data repair (run once): web.picassoapp/engine/db/repair_o_goods_process_status_times.sql
+UPDATE s_app SET f_version='199' WHERE f_app='DB';
+

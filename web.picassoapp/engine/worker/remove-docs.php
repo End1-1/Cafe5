@@ -65,6 +65,8 @@ class RemoveStoreDocument extends DB
         $this->stmtall("delete from b_gift_card_history where f_trsale=?", "s", [$id]);
         $this->stmtall("delete from b_clients_debts where f_order=?", "s", [$id]);
 
+        $this->stmtall("delete from cash_operations where f_order_id=?", "s", [$id]);
+
         $this->stmtall("delete from o_goods where f_header=?", "s", [$id]);
         $this->stmtall("delete from o_header where f_id=?", "s", [$id]);
         $this->stmtall("delete from o_header_flags where f_id=?", "s", [$id]);

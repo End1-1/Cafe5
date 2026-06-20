@@ -1,0 +1,14 @@
+{
+  "name": "web.selfboard",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Web version of the SelfBoard self-service ordering kiosk (Cafe5).",
+  "type": "commonjs",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

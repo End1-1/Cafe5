@@ -5,6 +5,8 @@
 require_once __DIR__ . "/index.php";
 require_once __DIR__ . "/../worker/dict-cash-operation-type.php";
 require_once __DIR__ . "/../worker/dict-payment.php";
+require_once __DIR__ . "/../../worker/fmt.php";
+require_once __DIR__ . "/../../worker/helper.php";
 
 class Cashbox extends Auth
 {
@@ -171,6 +173,7 @@ class Cashbox extends Auth
             die(Translator::t("Only direct cash operations can be edited."));
         }
         $this->result["operation"] = $row;
+        $this->result["operation"]["f_comment"] = translate_cash_operation_comment((string)($row["f_comment"] ?? ""));
         $this->echoResult();
     }
 
@@ -240,8 +243,13 @@ class Cashbox extends Auth
         }
         $cashCounted = !empty($params->cash_counted);
         $amountFact = (float)($params->amount_cash ?? ($params->amount_fact ?? 0));
-        $expected = (float)($cashbox["f_amount_expected"] ?? 0);
-        $diff = $amountFact - $expected;
+        $currencyId = (int)($params->currency_id ?? 1);
+        if ($currencyId <= 0) {
+            $currencyId = 1;
+        }
+        $funds = $this->cashboxFundsByCashbox((int)$cash_session["f_cashbox_id"], $currencyId);
+        $expectedCash = (float)($funds[PAYMENT_TYPE_CASH] ?? 0);
+        $diff = $amountFact - $expectedCash;
 
         if ($cashCounted && abs($diff) > 0.0001) {
             $isSurplus = $diff > 0;
@@ -265,9 +273,195 @@ class Cashbox extends Auth
         $cashbox["f_user_close"] = $this->userid;
         $cashbox["f_amount_fact"] = $amountFact;
         $cashbox["f_amount_expected"] = $cashbox["f_amount_expected"];
-        $cashbox["f_amount_difference"] = $amountFact - $expected;
+        $cashbox["f_amount_difference"] = $diff;
         $this->update("cash_session", $cashbox, $cashbox["f_id"]);
-        $this->result["cashbox"] = $this->GetCashboxSession($cash_session["f_id"]);
+        $session = $this->GetCashboxSession($cash_session["f_id"]);
+        $session["f_amount_expected_cash"] = money_fmt($expectedCash);
+        $this->result["cashbox"] = $session;
+        $this->echoResult();
+    }
+
+    /**
+     * Net balance per payment type for a cashbox (same basis as revenue report total).
+     *
+     * @return array<int,float> payment_type_id => available amount
+     */
+    private function cashboxFundsByCashbox(int $cashboxId, int $currencyId): array
+    {
+        $payment = require __DIR__ . "/../worker/dict-payment.php";
+        $funds = [];
+
+        $rows = $this->select(
+            "SELECT op.f_payment_type_id,
+                    SUM(COALESCE(op.f_debit, 0) - COALESCE(op.f_credit, 0)) AS f_available
+             FROM cash_operations op
+             WHERE op.f_cashbox_id = ?
+               AND COALESCE(op.f_currency_id, 1) = ?
+             GROUP BY op.f_payment_type_id",
+            "ii",
+            [$cashboxId, $currencyId]
+        )->fetch_all(MYSQLI_ASSOC);
+
+        foreach ($rows as $r) {
+            $pt = (int)$r["f_payment_type_id"];
+            if ($pt <= 0 || empty($payment["cashbox"][$pt])) {
+                continue;
+            }
+            $funds[$pt] = (float)$r["f_available"];
+        }
+
+        return $funds;
+    }
+
+    /**
+     * Available funds in the open session of a cashbox, split by (cashbox-relevant) payment type.
+     * Cash payment type also includes the session opening amount.
+     *
+     * @return array<int,float> payment_type_id => available amount (only positive balances)
+     */
+    private function cashboxFundsBySession(int $sessionId, float $amountOpen): array
+    {
+        $payment = require __DIR__ . "/../worker/dict-payment.php";
+        $funds = [];
+
+        $rows = $this->select(
+            "SELECT f_payment_type_id, SUM(COALESCE(f_debit,0) - COALESCE(f_credit,0)) AS f_available
+             FROM cash_operations WHERE f_session_id=? GROUP BY f_payment_type_id",
+            "i",
+            [$sessionId]
+        )->fetch_all(MYSQLI_ASSOC);
+
+        foreach ($rows as $r) {
+            $pt = (int)$r["f_payment_type_id"];
+            if (empty($payment["cashbox"][$pt])) {
+                continue;
+            }
+            $funds[$pt] = (float)$r["f_available"];
+        }
+
+        $funds[PAYMENT_TYPE_CASH] = ($funds[PAYMENT_TYPE_CASH] ?? 0) + $amountOpen;
+
+        return $funds;
+    }
+
+    public function GetCashboxFunds($params)
+    {
+        $cashboxId = (int)($params->cashbox_id ?? 0);
+        if ($cashboxId <= 0) {
+            dieWithCode("cashbox_id not specified");
+        }
+
+        $currencyId = (int)($params->currency_id ?? 1);
+        if ($currencyId <= 0) {
+            $currencyId = 1;
+        }
+
+        $funds = $this->cashboxFundsByCashbox($cashboxId, $currencyId);
+
+        $payment = require __DIR__ . "/../worker/dict-payment.php";
+        $out = [];
+        foreach ($payment["types"] as $pt) {
+            if (empty($payment["cashbox"][$pt])) {
+                continue;
+            }
+            $available = round((float)($funds[$pt] ?? 0), 2);
+            if ($available <= 0.00001) {
+                continue;
+            }
+            $out[] = [
+                "f_payment_type_id" => $pt,
+                "f_name" => Translator::t($payment["names"][$pt] ?? (string)$pt),
+                "f_available" => $available,
+                "f_available_fmt" => number_format($available, 2, ".", ""),
+            ];
+        }
+
+        $this->result["funds"] = $out;
+        $this->result["currency_id"] = $currencyId;
+        $this->echoResult();
+    }
+
+    public function TransferFunds($params)
+    {
+        $sourceId = (int)($params->source_cashbox_id ?? 0);
+        $destId = (int)($params->dest_cashbox_id ?? 0);
+        $items = $params->items ?? [];
+
+        if ($sourceId <= 0) {
+            dieWithCode(Translator::t("Source cashbox is required"));
+        }
+        if ($destId <= 0) {
+            dieWithCode(Translator::t("Destination cashbox is required"));
+        }
+        if ($sourceId === $destId) {
+            dieWithCode(Translator::t("Source and destination must differ"));
+        }
+
+        $currencyId = (int)($params->currency_id ?? 1);
+        if ($currencyId <= 0) {
+            $currencyId = 1;
+        }
+        $available = $this->cashboxFundsByCashbox($sourceId, $currencyId);
+
+        $transfers = [];
+        foreach ((array)$items as $it) {
+            $pt = (int)($it->f_payment_type_id ?? 0);
+            $amount = round((float)($it->amount ?? 0), 2);
+            if ($pt <= 0 || $amount <= 0.00001) {
+                continue;
+            }
+            if ($amount - (float)($available[$pt] ?? 0) > 0.00001) {
+                dieWithCode(Translator::t("Amount exceeds available funds"));
+            }
+            $transfers[] = ["pt" => $pt, "amount" => $amount];
+        }
+
+        if (empty($transfers)) {
+            dieWithCode(Translator::t("Amount must be greater than zero"));
+        }
+
+        $this->beginTransaction();
+
+        $now = date("Y-m-d H:i:s");
+        $userComment = trim((string)($params->comment ?? ""));
+        $outComment = translate_template('Transfer to cashbox %cashbox', ['%cashbox' => (string)$destId]);
+        $inComment = translate_template('Transfer from cashbox %cashbox', ['%cashbox' => (string)$sourceId]);
+        if ($userComment !== "") {
+            $outComment .= ": " . $userComment;
+            $inComment .= ": " . $userComment;
+        }
+
+        foreach ($transfers as $t) {
+            $this->insert("cash_operations", [
+                "f_cashbox_id" => $sourceId,
+                "f_session_id" => 0,
+                "f_order_id" => "",
+                "f_user" => $this->userid,
+                "f_operation_type" => CASH_OP_TRANSFER_OUT,
+                "f_payment_type_id" => $t["pt"],
+                "f_datetime" => $now,
+                "f_debit" => 0,
+                "f_credit" => $t["amount"],
+                "f_currency_id" => $currencyId,
+                "f_comment" => $outComment,
+            ]);
+
+            $this->insert("cash_operations", [
+                "f_cashbox_id" => $destId,
+                "f_session_id" => 0,
+                "f_order_id" => "",
+                "f_user" => $this->userid,
+                "f_operation_type" => CASH_OP_TRANSFER_IN,
+                "f_payment_type_id" => $t["pt"],
+                "f_datetime" => $now,
+                "f_debit" => $t["amount"],
+                "f_credit" => 0,
+                "f_currency_id" => $currencyId,
+                "f_comment" => $inComment,
+            ]);
+        }
+
+        $this->commit();
         $this->echoResult();
     }
 

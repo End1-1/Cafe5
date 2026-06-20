@@ -67,6 +67,12 @@ bool C5Editor::getJsonObject(QJsonObject &j)
     return false;
 }
 
+void C5Editor::appendResultRow(const QMap<QString, QVariant> &row)
+{
+    fData.clear();
+    fData.append(row);
+}
+
 void C5Editor::reject()
 {
     fEditor->clear();

@@ -30,6 +30,10 @@ private:
     void startAutoReload();
     void stopAutoReload();
 
+    void openOrderInspector(const QString &orderId);
+
+    void tuneReportTableLayout();
+
     QTimer mReloadTimer;
 };
 

@@ -4,6 +4,8 @@
 #include <QDialog>
 #include <QJsonArray>
 
+class QScreen;
+
 namespace Ui
 {
 class NSearchDlg;
@@ -17,6 +19,7 @@ public:
     explicit NSearchDlg(QWidget *parent = nullptr);
     ~NSearchDlg();
     void setData(const QJsonArray &jcols, const QJsonArray &jdata);
+    void prepareForScreen(QScreen *screen = nullptr);
     QStringList mId;
     QStringList mName;
 

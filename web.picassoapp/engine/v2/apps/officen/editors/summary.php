@@ -1,6 +1,8 @@
 <?php
 # © 2026 , Kudryashov Vasili
 
+require_once __DIR__ . '/../../worker/dict-cash-operation-type.php';
+
 class Summary
 {
     private $db;
@@ -52,6 +54,15 @@ class Summary
         }
 
         return self::$paymentConfig;
+    }
+
+    private function normalizeReportDate($date): string
+    {
+        if ($date instanceof \DateTimeInterface) {
+            return $date->format('Y-m-d');
+        }
+        $s = trim((string)$date);
+        return strlen($s) >= 10 ? substr($s, 0, 10) : $s;
     }
 
     private function parseFilter($params)
@@ -170,6 +181,14 @@ class Summary
         $filter = $this->parseFilter($params);
         $date1 = $filter['date1'] ?? date('Y-m-01');
         $date2 = $filter['date2'] ?? date('Y-m-t');
+        $date1 = date('Y-m-d', strtotime($date1));
+        $date2 = date('Y-m-d', strtotime($date2));
+        if ($date1 === '1970-01-01') {
+            $date1 = date('Y-m-01');
+        }
+        if ($date2 === '1970-01-01') {
+            $date2 = date('Y-m-t');
+        }
         $showPayments = (int)($filter['show_payments'] ?? 0) === 1;
 
         $payConfig = $this->paymentConfig();
@@ -192,7 +211,7 @@ class Summary
                        GROUP BY f_date";
         $revData = $this->db->select($sqlRevenue, 'ss', [$date1, $date2])->fetch_all(MYSQLI_ASSOC);
         foreach ($revData as $row) {
-            $date = $row['f_date'];
+            $date = $this->normalizeReportDate($row['f_date']);
             $dailyReport[$date] = $this->initRow($date, $paymentFieldKeys);
             $dailyReport[$date]['revenue'] = (float)$row['revenue'];
         }
@@ -208,7 +227,7 @@ class Summary
                        GROUP BY f_date';
             $payData = $this->db->select($sqlPayments, 'ss', [$date1, $date2])->fetch_all(MYSQLI_ASSOC);
             foreach ($payData as $row) {
-                $date = $row['f_date'];
+                $date = $this->normalizeReportDate($row['f_date']);
                 if (!isset($dailyReport[$date])) {
                     $dailyReport[$date] = $this->initRow($date, $paymentFieldKeys);
                 }
@@ -226,7 +245,7 @@ class Summary
                     GROUP BY f_date";
         $costData = $this->db->select($sqlCost, 'ss', [$date1, $date2])->fetch_all(MYSQLI_ASSOC);
         foreach ($costData as $row) {
-            $date = $row['f_date'];
+            $date = $this->normalizeReportDate($row['f_date']);
             if (!isset($dailyReport[$date])) {
                 $dailyReport[$date] = $this->initRow($date, $paymentFieldKeys);
             }
@@ -240,7 +259,7 @@ class Summary
                             GROUP BY f_date";
         $procData = $this->db->select($sqlProcurement, 'ss', [$date1, $date2])->fetch_all(MYSQLI_ASSOC);
         foreach ($procData as $row) {
-            $date = $row['f_date'];
+            $date = $this->normalizeReportDate($row['f_date']);
             if (!isset($dailyReport[$date])) {
                 $dailyReport[$date] = $this->initRow($date, $paymentFieldKeys);
             }
@@ -254,22 +273,38 @@ class Summary
                       GROUP BY f_date";
         $salData = $this->db->select($sqlSalary, 'ss', [$date1, $date2])->fetch_all(MYSQLI_ASSOC);
         foreach ($salData as $row) {
-            $date = $row['f_date'];
+            $date = $this->normalizeReportDate($row['f_date']);
             if (!isset($dailyReport[$date])) {
                 $dailyReport[$date] = $this->initRow($date, $paymentFieldKeys);
             }
             $dailyReport[$date]['salary'] = (float)$row['salary'];
         }
 
-        // 5. ПРОЧИЕ ТРАТЫ
-        $sqlOther = "SELECT CAST(f_datetime AS DATE) as f_date, SUM(f_credit) as other_expenses 
+        // 5. ПРОЧИЕ ТРАТЫ — cash_operations без заказа, только типы «прочий расход»:
+        // 2 Total Expenses, 6 Debt Repayment, 7 Utilities, 8 Cash Shortage.
+        // Не включаем: 1 выручка, 3 закуп (store_document), 4 зарплата (s_salary),
+        // 5 взыскание долга, 9 излишек, 10 доставка, 11/12 переводы между кассами.
+        $otherExpenseOpTypes = [
+            CASH_OP_TOTAL_EXPENSES,
+            CASH_OP_DEBT_REPAYMENT,
+            CASH_OP_UTILITIES,
+            CASH_OP_CASH_SHORTAGE,
+        ];
+        $opPlaceholders = implode(',', array_fill(0, count($otherExpenseOpTypes), '?'));
+        // f_order_id: ручные операции из FrontDesk/Waiter сохраняются как '' (не NULL).
+        $sqlOther = "SELECT CAST(f_datetime AS DATE) as f_date,
+                            SUM(GREATEST(f_credit, f_debit)) as other_expenses
                      FROM cash_operations 
-                     WHERE f_datetime BETWEEN ? AND ? 
-                     AND f_order_id IS NULL 
+                     WHERE CAST(f_datetime AS DATE) BETWEEN ? AND ? 
+                     AND (f_order_id IS NULL OR TRIM(f_order_id) = '')
+                     AND f_operation_type IN ($opPlaceholders)
+                     AND (f_credit > 0 OR f_debit > 0)
                      GROUP BY f_date";
-        $otherData = $this->db->select($sqlOther, 'ss', [$date1, $date2])->fetch_all(MYSQLI_ASSOC);
+        $otherBindTypes = 'ss' . str_repeat('i', count($otherExpenseOpTypes));
+        $otherBindValues = array_merge([$date1, $date2], $otherExpenseOpTypes);
+        $otherData = $this->db->select($sqlOther, $otherBindTypes, $otherBindValues)->fetch_all(MYSQLI_ASSOC);
         foreach ($otherData as $row) {
-            $date = $row['f_date'];
+            $date = $this->normalizeReportDate($row['f_date']);
             if (!isset($dailyReport[$date])) {
                 $dailyReport[$date] = $this->initRow($date, $paymentFieldKeys);
             }

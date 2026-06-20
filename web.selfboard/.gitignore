@@ -1,0 +1,11 @@
+# Local server configuration with credentials — never commit
+config.json
+
+# Node
+node_modules/
+npm-debug.log*
+
+# Editor / OS
+.DS_Store
+Thumbs.db
+*.log

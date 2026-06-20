@@ -86,6 +86,8 @@ C5SalaryEditor::C5SalaryEditor(QWidget *parent)
 
         open(d);
     });
+
+    connect(ui->btnAutofill, &QToolButton::clicked, this, &C5SalaryEditor::autofillDocument);
 }
 
 C5SalaryEditor::~C5SalaryEditor()
@@ -353,6 +355,48 @@ void C5SalaryEditor::on_btnChangePosition_clicked()
     }
     itName->setFlags(itName->flags() & ~Qt::ItemIsEditable);
     itName->setText(groups.first().name);
+}
+
+void C5SalaryEditor::autofillDocument()
+{
+    if (ui->tblSalary->rowCount() > 0
+        && C5Message::question(tr("Replace current rows with employees from attendance?"))
+               != QDialog::Accepted) {
+        return;
+    }
+
+    const QString dateStr = ui->deDate->date().toString(QStringLiteral("yyyy-MM-dd"));
+
+    NInterface::query1(QStringLiteral("/engine/v2/officen/salary/autofill-accrual"),
+                       mUser->mSessionKey,
+                       this,
+                       {{QStringLiteral("date"), dateStr}},
+                       [this](const QJsonObject &jo) {
+                           const QJsonArray items = jo.value(QStringLiteral("items")).toArray();
+
+                           QSignalBlocker sb(ui->tblSalary);
+                           ui->tblSalary->setRowCount(0);
+
+                           for (const QJsonValue &v : items) {
+                               const QJsonObject it = v.toObject();
+                               const int staffId = it.value(QStringLiteral("f_staff")).toInt();
+                               if (staffId <= 0) {
+                                   continue;
+                               }
+
+                               QString staffName = it.value(QStringLiteral("f_staff_name")).toString().trimmed();
+                               int positionId = it.value(QStringLiteral("f_position")).toInt();
+                               QString positionName = it.value(QStringLiteral("f_position_name")).toString().trimmed();
+
+                               appendStaffRow(staffId, staffName, positionId, positionName);
+                           }
+
+                           if (items.isEmpty()) {
+                               C5Message::info(tr("No registered employees with attendance on this date."));
+                           }
+
+                           recalcTotal();
+                       });
 }
 
 void C5SalaryEditor::applyCalculatedRow(int row, double fixed, double dishBase, double calculated, double total)

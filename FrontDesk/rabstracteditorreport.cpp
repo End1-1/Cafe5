@@ -28,7 +28,6 @@
 #include "c5storeoutput.h"
 #include "c5user.h"
 #include "c5utils.h"
-#include "dict_workstation.h"
 #include "rabstracteditordialog.h"
 #include "rfilterdialog.h"
 #include "rfilterproxymodel.h"
@@ -87,8 +86,8 @@ public:
     }
 };
 
-RAbstractEditorReport::RAbstractEditorReport(const QString &title, QIcon icon, const QString &editorName)
-    : C5Widget(),
+RAbstractEditorReport::RAbstractEditorReport(const QString &title, QIcon icon, const QString &editorName, QWidget *parent)
+    : C5Widget(parent),
       ui(new Ui::RAbstractEditorReport)
 {
     ui->setupUi(this);
@@ -169,11 +168,22 @@ QToolBar* RAbstractEditorReport::toolBar()
     return fToolBar;
 }
 
+void RAbstractEditorReport::reloadReport()
+{
+    mFirstLoad = false;
+    getData();
+}
+
+void RAbstractEditorReport::setDeferredLoad(bool deferred)
+{
+    mDeferredLoad = deferred;
+}
+
 void RAbstractEditorReport::showEvent(QShowEvent *e)
 {
     C5Widget::showEvent(e);
 
-    if(mFirstLoad) {
+    if(mFirstLoad && !mDeferredLoad) {
         mFirstLoad = false;
         getData();
     }
@@ -191,20 +201,6 @@ void RAbstractEditorReport::on_tbl_doubleClicked(const QModelIndex &index)
     }
 
     RAbstractEditorDialog *dialog = nullptr;
-
-    if(mEditorName == "Workstations") {
-        int type = mModel->data(mModel->index(srcIndex.row(), 1), Qt::DisplayRole).toInt();
-
-        switch(type) {
-        case WORKSTATION_WAITER:
-            dialog = createEditorDialog("Workstations");
-            break;
-
-        default:
-            Q_ASSERT_X(false, "check editor type", QString("Invalid type of editor %1").arg(type).toLatin1());
-            break;
-        }
-    }
 
     if (mEditorName == "form_salary") {
         auto obj = filterObject("viewmode");
@@ -496,6 +492,15 @@ QVariant RAbstractEditorReport::reportSourceCellData(int sourceRow, int column, 
         return {};
     }
     return mModel->data(mModel->index(sourceRow, column), role);
+}
+
+int RAbstractEditorReport::reportColumnFromEnd(int offsetFromEnd) const
+{
+    if(!mModel || offsetFromEnd >= 0) {
+        return -1;
+    }
+    const int colCount = mModel->columnCount({});
+    return colCount + offsetFromEnd;
 }
 
 void RAbstractEditorReport::applyFilter()

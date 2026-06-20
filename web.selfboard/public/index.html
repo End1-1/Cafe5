@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>SelfBoard</title>
+    <link rel="icon" href="res/main_logo.png" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div id="app">
+      <!-- ===================== START SCREEN ===================== -->
+      <section id="screen-start" class="screen">
+        <div class="bg"></div>
+        <div class="start-inner">
+          <header class="start-header">
+            <img class="logo" src="res/main_logo.png" alt="logo" />
+            <div class="banner" data-i18n="banner">Banner place</div>
+          </header>
+
+          <div class="order-type">
+            <button class="order-btn" id="btn-takeaway">
+              <img src="res/icon_takeaway.png" alt="" />
+              <span data-i18n="takeAway">Take away</span>
+            </button>
+            <button class="order-btn" id="btn-dinein">
+              <img src="res/icon_dinein.png" alt="" />
+              <span data-i18n="dineIn">Dine in</span>
+            </button>
+          </div>
+
+          <div class="lang-panel">
+            <div class="lang-title" data-i18n="selectLanguage">Select language</div>
+            <div class="lang-row">
+              <button class="lang-btn" data-locale="ru">
+                <img src="res/flag_ru.png" alt="" />Русский
+              </button>
+              <button class="lang-btn" data-locale="en">
+                <img src="res/flag_en.png" alt="" />English
+              </button>
+              <button class="lang-btn" data-locale="hy">
+                <img src="res/flag_am.png" alt="" />Հայերեն
+              </button>
+            </div>
+          </div>
+
+          <div class="qr-row">
+            <div class="qr-panel">
+              <img src="res/qr_placeholder.png" alt="QR" />
+              <div class="qr-hint" data-i18n="scanApp">SCAN AND DOWNLOAD APP</div>
+            </div>
+          </div>
+        </div>
+
+        <footer class="start-footer">
+          <img class="footer-logo" src="res/footer_logo_myqr.png" alt="" />
+          <div class="footer-center">
+            <div class="powered">Powered by Keyiosk Technologies</div>
+            <div class="links">Keyiosk.com | KeyioskTech.com</div>
+          </div>
+          <div class="social">
+            <img src="res/icon_youtube.png" alt="YouTube" />
+            <img src="res/icon_facebook.png" alt="Facebook" />
+          </div>
+        </footer>
+
+        <div id="start-overlay" class="overlay hidden">
+          <div class="overlay-box">
+            <div class="spinner" id="start-spinner"></div>
+            <div id="start-overlay-text"></div>
+            <button class="retry hidden" id="start-retry" data-i18n="retry">Retry</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===================== MENU SCREEN ===================== -->
+      <section id="screen-menu" class="screen hidden">
+        <aside class="sidebar">
+          <img class="side-logo" src="res/main_logo.png" alt="logo" />
+          <button class="btn-language" id="btn-language">English</button>
+          <button class="side-nav-btn" id="btn-home">
+            <span>&#8962;</span><span data-i18n="home">Home</span>
+          </button>
+          <button class="side-nav-btn" id="btn-service-mode">
+            <img id="service-mode-icon" src="res/icon_takeaway.png" alt="" />
+            <span id="service-mode-label" data-i18n="takeAway">Take away</span>
+          </button>
+          <div class="side-sep"></div>
+          <div class="group-list" id="group-list"></div>
+          <div class="side-sep"></div>
+          <div class="side-footer">
+            <img src="res/icon_youtube.png" alt="YouTube" />
+            <img src="res/icon_facebook.png" alt="Facebook" />
+          </div>
+        </aside>
+
+        <div class="content">
+          <div class="topbar">
+            <div class="search-row">
+              <div class="search-wrap">
+                <span class="search-icon">&#128269;</span>
+                <input id="le-search" type="text" data-i18n-ph="search" placeholder="Search" />
+              </div>
+              <button class="btn-favorites" title="Favorites">&#9829;</button>
+            </div>
+            <div class="chips" id="chips"></div>
+          </div>
+
+          <div class="dish-scroll">
+            <div class="dish-grid" id="dish-grid"></div>
+          </div>
+
+          <div class="order-bar">
+            <button class="btn-cancel-order" id="btn-cancel-order" data-i18n="cancelOrder">
+              Cancel order
+            </button>
+            <div class="cart-summary" id="cart-summary"></div>
+            <button class="btn-cart" id="btn-cart" data-i18n="goToCart">Go to cart</button>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <!-- ===================== DISH DETAILS MODAL ===================== -->
+    <div id="details-modal" class="modal-backdrop hidden">
+      <div class="modal-card" style="max-width: 640px">
+        <div class="modal-head">
+          <button class="modal-close" data-close="details">&times;</button>
+        </div>
+        <div class="modal-body">
+          <h2 id="details-title"></h2>
+          <div id="details-hint"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===================== PACKAGE PICKER MODAL ===================== -->
+    <div id="pkg-modal" class="modal-backdrop hidden">
+      <div class="modal-card">
+        <div class="modal-head">
+          <button class="modal-close" data-close="pkg">&times;</button>
+        </div>
+        <div class="modal-body">
+          <div class="pkg-grid">
+            <div class="pkg-left">
+              <img class="pkg-image" id="pkg-image" alt="" />
+              <div class="pkg-title" id="pkg-title"></div>
+              <div class="pkg-desc" id="pkg-desc"></div>
+              <div class="badges" id="pkg-badges"></div>
+              <div class="pkg-bju">
+                <div class="bju-box"><div class="bju-value" id="pkg-kcal">—</div><div class="bju-title" data-i18n="calories">Calories</div></div>
+                <div class="bju-box"><div class="bju-value" id="pkg-fat">—</div><div class="bju-title" data-i18n="fats">Fats</div></div>
+                <div class="bju-box"><div class="bju-value" id="pkg-carbs">—</div><div class="bju-title" data-i18n="carbs">Carbs</div></div>
+                <div class="bju-box"><div class="bju-value" id="pkg-protein">—</div><div class="bju-title" data-i18n="protein">Protein</div></div>
+              </div>
+              <input class="pkg-instructions" id="pkg-instructions" type="text" data-i18n-ph="instructions"
+                placeholder="Add any special instructions (allergies, important and details)" />
+            </div>
+            <div class="pkg-right">
+              <div id="pkg-attributes"></div>
+              <div class="pkg-unavailable hidden" id="pkg-unavailable" data-i18n="unavailable">
+                This combination is not available. Please change your selection.
+              </div>
+              <div class="qty-wrap">
+                <button class="qty-btn qty-minus" id="pkg-qty-minus">&minus;</button>
+                <div class="qty-value" id="pkg-qty">1</div>
+                <button class="qty-btn qty-plus" id="pkg-qty-plus">+</button>
+              </div>
+              <button class="btn-add" id="pkg-add" data-i18n="add">Add</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===================== CART MODAL ===================== -->
+    <div id="cart-modal" class="modal-backdrop hidden">
+      <div class="modal-card" style="max-width: 720px">
+        <div class="modal-head">
+          <button class="modal-close" data-close="cart">&times;</button>
+        </div>
+        <div class="modal-body">
+          <h2 id="cart-title" data-i18n="yourOrder">Your order</h2>
+          <div class="cart-lines" id="cart-lines"></div>
+          <div class="cart-total">
+            <span data-i18n="total">Total</span>
+            <span id="cart-total-value"></span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script type="module" src="app.js"></script>
+  </body>
+</html>

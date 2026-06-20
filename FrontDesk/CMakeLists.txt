@@ -102,6 +102,7 @@ set(APP_SOURCES
     ../Forms/c5login.ui
     ../Forms/c5mainwindow.ui
     ../Forms/c5passwords.ui
+    ../Forms/dlguserfingerprint.ui
     ../Forms/c5progressdialog.ui
     ../Forms/c5route.ui
 
@@ -218,11 +219,17 @@ set(APP_SOURCES
     dwaiterworkstationconfig.ui
     rabstracteditordialog.ui
     rabstracteditorreport.ui
+    rworkstationsreport.ui
+    dlgservicevalue.ui
     c5revenuecashop.ui
     wdashboardsettings.ui
     rwaiterstationconfig.ui
+    rworkstationconfigcommon.ui
+    rworkstationconfigshop.ui
+    rworkstationconfigwaiter.ui
     wdashboard.ui
     worderinspector.ui
+    wdishkitchentimesdlg.ui
     rfilterdialog.ui
     c5storeinput.ui
 
@@ -313,6 +320,8 @@ set(APP_SOURCES
     ../Forms/c5login.h
     ../Forms/c5mainwindow.h
     ../Forms/c5passwords.h
+    ../Forms/dlguserfingerprint.h
+    zkfingerprintreader.h
     ../Forms/c5progressdialog.h
     ../Forms/c5reportwidget.h
     ../Forms/c5route.h
@@ -531,11 +540,18 @@ set(APP_SOURCES
     rabstracteditordialog.h
     rabstracteditorreport.h
     c5revenuecashop.h
+    c5cashtransfer.h
     wdashboardsettings.h
     rabstractspecialwidget.h
+    ../dictionaries/dict_workstation.h
     rwaiterstationconfig.h
+    rworkstationconfigwidget.h
+    rworkstationconfigcommon.h
+    rworkstationconfigshop.h
+    rworkstationconfigwaiter.h
     wdashboard.h
     worderinspector.h
+    wdishkitchentimesdlg.h
     ../dictionaries/dict_doc_reason.h
     rfilterdialog.h
     ../../desktop.newtax/Src/printtaxn.h
@@ -621,6 +637,8 @@ set(APP_SOURCES
     ../Forms/c5login.cpp
     ../Forms/c5mainwindow.cpp
     ../Forms/c5passwords.cpp
+    ../Forms/dlguserfingerprint.cpp
+    zkfingerprintreader.cpp
     ../Forms/c5progressdialog.cpp
     ../Forms/c5reportwidget.cpp
     ../Forms/c5route.cpp
@@ -830,11 +848,17 @@ set(APP_SOURCES
     rabstracteditorreport.cpp
     rorderinprogress.cpp
     c5revenuecashop.cpp
+    c5cashtransfer.cpp
     wdashboardsettings.cpp
     rabstractspecialwidget.cpp
     rwaiterstationconfig.cpp
+    rworkstationconfigwidget.cpp
+    rworkstationconfigcommon.cpp
+    rworkstationconfigshop.cpp
+    rworkstationconfigwaiter.cpp
     wdashboard.cpp
     worderinspector.cpp
+    wdishkitchentimesdlg.cpp
     rfilterdialog.cpp
     ../../desktop.newtax/Src/printtaxn.cpp
     ../Forms/previewdialog.cpp
@@ -869,7 +893,11 @@ add_executable(OfficeN ${APP_SOURCES}
     rdebts.h rdebts.cpp
     dlgdebtsredeem.h dlgdebtsredeem.cpp dlgdebtsredeem.ui
     rorderinprogress.h rorderinprogress.cpp
-    rtotalreviewreport.h rtotalreviewreport.cpp)
+    rtotalreviewreport.h rtotalreviewreport.cpp
+    rmenureviewreport.h rmenureviewreport.cpp
+    rworkstationsreport.h rworkstationsreport.cpp
+    dlgservicevalue.h dlgservicevalue.cpp
+    rservicevaluesreport.h rservicevaluesreport.cpp)
 
 set_target_properties(OfficeN PROPERTIES
     UNITY_BUILD ON
@@ -927,6 +955,11 @@ target_compile_definitions(OfficeN PRIVATE
 )
 
 # -----------------------
+# ZKTeco fingerprint SDK (ztk)
+# -----------------------
+add_subdirectory(../ztk ${CMAKE_BINARY_DIR}/ztk)
+
+# -----------------------
 # Link Libraries
 # -----------------------
 # Указываем директории для линковки OpenSSL
@@ -954,6 +987,19 @@ target_link_libraries(OfficeN PRIVATE
     Gdi32.lib
     User32.lib
 )
+
+if(TARGET ZKFingerprint)
+    target_link_libraries(OfficeN PRIVATE ZKFingerprint)
+
+    if(ZKFP_RUNTIME_DLL)
+        add_custom_command(TARGET OfficeN POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E copy_if_different
+                    "${ZKFP_RUNTIME_DLL}"
+                    "$<TARGET_FILE_DIR:OfficeN>"
+            COMMENT "Copy libzkfp.dll next to OfficeN"
+        )
+    endif()
+endif()
 
 # -----------------------
 # QXlsx Integration

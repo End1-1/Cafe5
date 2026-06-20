@@ -7,11 +7,11 @@
 #include "c5message.h"
 #include "c5user.h"
 #include "ce5goods.h"
+#include "c5editor.h"
 #include "nfilterdlg.h"
 #include "ntablemodel.h"
 
 #include "c5discountredeem.h"
-#include "c5dishwidget.h"
 #include "c5salefromstoreorder.h"
 
 static const QString hDebt = "90dd520c-f072-11ee-b90b-7c10c9bcac82";
@@ -20,6 +20,41 @@ static const QString hDraftSale  = "39617ca7-8fa4-11ed-8ad3-1078d2d2b808";
 static const QString hDiscountReturnAmount = "d563c585-aeb9-11f0-a2cb-8a884be02f31";
 static const QString hMenuReview = "65a0e1d4-c843-11f0-9ee3-0a002700000e";
 static const QString hGoods = "78dd7b1e-12d5-11f1-9245-8a884be02f31";
+
+namespace {
+
+bool isGoodsHandlerAt(const QVariantList &handlers, int index)
+{
+    if(handlers.size() <= index) {
+        return false;
+    }
+
+    const QString handler = handlers.at(index).toString();
+    return handler == hMenuReview || handler == hGoods;
+}
+
+bool openGoodsEditor(C5User *user, int goodsId)
+{
+    CE5Goods *ep = new CE5Goods();
+    C5Editor *e = C5Editor::createEditor(user, ep, 0);
+    ep->setId(goodsId);
+    QList<QMap<QString, QVariant>> data;
+    const bool saved = e->getResult(data);
+    delete e;
+
+    if(!saved) {
+        return false;
+    }
+
+    if(data.isEmpty() || data.at(0).value(QStringLiteral("f_id")).toInt() == 0) {
+        C5Message::error(QObject::tr("Cannot change goods without code"));
+        return false;
+    }
+
+    return true;
+}
+
+} // namespace
 
 NHandler::NHandler(C5User *user, QObject *parent)
     : QObject{parent},
@@ -97,55 +132,27 @@ void NHandler::handle(const QJsonArray &ja)
             dr.exec();
         }
         }
-    } else if (mHandlers.at(1).toString() == hMenuReview) {
+    } else if(isGoodsHandlerAt(mHandlers, 1)) {
         if(row < 0) {
             return;
         }
 
-        auto *ep = new C5DishWidget();
-        auto *e = C5Editor::createEditor(mUser, ep, m->data(row, 0).toInt());
-        QList<QMap<QString, QVariant> > data;
-
-        if(e->getResult(data)) {
-        }
-
-        delete e;
-    } else if (mHandlers.at(0).toString() == hGoods) {
+        openGoodsEditor(mUser, m->data(row, 0).toInt());
+    } else if(mHandlers.at(0).toString() == hGoods) {
         if (row < 0) {
             return;
         }
-        CE5Goods *ep = new CE5Goods();
-        C5Editor *e = C5Editor::createEditor(mUser, ep, 0);
-        ep->setId(ja.at(0).toInt());
-        QList<QMap<QString, QVariant> > data;
-
-        if (e->getResult(data)) {
-            if (data.at(0)["f_id"].toInt() == 0) {
-                C5Message::error(tr("Cannot change goods without code"));
-                return;
-            }
-        }
-
-        delete e;
+        openGoodsEditor(mUser, ja.at(0).toInt());
     }
 }
 
 void NHandler::handle(const QVariant &v)
 {
-    if(mHandlers.isEmpty()) {
+    if(!isGoodsHandlerAt(mHandlers, 1)) {
         return;
     }
 
-    if(mHandlers.at(1).toString()  == hMenuReview) {
-        auto *ep = new C5DishWidget();
-        auto *e = C5Editor::createEditor(mUser, ep, v.toInt());
-        QList<QMap<QString, QVariant> > data;
-
-        if(e->getResult(data)) {
-        }
-
-        delete e;
-    }
+    openGoodsEditor(mUser, v.toInt());
 }
 
 void NHandler::toolWidget(QWidget *w)

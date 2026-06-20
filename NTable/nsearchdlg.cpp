@@ -1,12 +1,15 @@
 #include "nsearchdlg.h"
 #include "ui_nsearchdlg.h"
 #include "ntablemodel.h"
+#include <QGuiApplication>
+#include <QScreen>
 
 NSearchDlg::NSearchDlg(QWidget *parent) :
     QDialog(parent),
     ui(new Ui::NSearchDlg)
 {
     ui->setupUi(this);
+    ui->verticalLayout->setStretch(1, 1);
     auto *m = new NTableModel();
     ui->mTableView->setModel(m);
 }
@@ -22,6 +25,25 @@ void NSearchDlg::setData(const QJsonArray &jcols, const QJsonArray &jdata)
     m->setDatasource(jcols, jdata);
     m->setCheckedBox(true, true);
     ui->mTableView->resizeColumnsToContents();
+}
+
+void NSearchDlg::prepareForScreen(QScreen *screen)
+{
+    if(!screen) {
+        screen = window() ? window()->screen() : QGuiApplication::primaryScreen();
+    }
+
+    if(!screen) {
+        return;
+    }
+
+    const QRect area = screen->availableGeometry();
+    const int targetHeight = area.height() / 3;
+    resize(width(), qMax(targetHeight, minimumHeight()));
+
+    QRect frame = frameGeometry();
+    frame.moveCenter(area.center());
+    move(frame.topLeft());
 }
 
 void NSearchDlg::on_btnCancel_clicked()

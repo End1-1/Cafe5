@@ -55,6 +55,8 @@ public:
 
     NTreeNode* m_root;
 
+    int topLevelDishCount() const;
+
 private:
     int mMaxColumns = 0;
 

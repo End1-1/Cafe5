@@ -1,0 +1,6 @@
+# Safety net: never serve the credentials file over HTTP.
+# (When the docroot is web.selfboard/public this file is above the docroot and
+#  ignored; config.json is already outside the docroot in that case.)
+<FilesMatch "^config\.json$">
+    Require all denied
+</FilesMatch>

@@ -16,7 +16,9 @@ class Salary extends Auth
         $sql = <<<SQL
         SELECT
             u.f_group AS f_position,
-            g.f_name AS f_position_name
+            g.f_name AS f_position_name,
+            (SELECT COALESCE(SUM(ss.f_amount_credit) - SUM(ss.f_amount_debit), 0)
+             FROM s_salary ss WHERE ss.f_staff = u.f_id) AS f_debt
         FROM s_user u
         LEFT JOIN s_user_group g ON g.f_id = u.f_group
         WHERE u.f_id = ?
@@ -25,6 +27,64 @@ class Salary extends Auth
         $row = $this->select($sql, "i", [$staff])->fetch_assoc();
         $this->result["f_position"] = (int)($row["f_position"] ?? 0);
         $this->result["f_position_name"] = (string)($row["f_position_name"] ?? "");
+        $this->result["f_debt"] = (float)($row["f_debt"] ?? 0);
+        $this->echoResult();
+    }
+
+    /**
+     * Staff with registered fingerprint who worked on the given day (s_attendance).
+     */
+    public function AutofillAccrual($params)
+    {
+        $date = trim((string)($params->date ?? ''));
+        if ($date === '') {
+            dieWithCode("Salary date is required");
+        }
+
+        $dayStart = strtotime($date . ' 00:00:00');
+        $dayEnd = strtotime($date . ' 23:59:59');
+        if ($dayStart === false || $dayEnd === false) {
+            dieWithCode("Invalid salary date");
+        }
+
+        $sql = <<<SQL
+        SELECT
+            u.f_id AS f_staff,
+            TRIM(CONCAT(u.f_last, ' ', u.f_first)) AS f_staff_name,
+            COALESCE(NULLIF(a.f_position, 0), u.f_group) AS f_position,
+            gr.f_name AS f_position_name
+        FROM s_attendance a
+        INNER JOIN s_user u ON u.f_id = a.f_worker
+        INNER JOIN s_user_fingerprint fp ON fp.f_user = u.f_id AND COALESCE(fp.f_size, 0) > 0
+        LEFT JOIN s_user_group gr ON gr.f_id = COALESCE(NULLIF(a.f_position, 0), u.f_group)
+        WHERE a.f_in <= ?
+          AND IFNULL(a.f_out, ?) >= ?
+        ORDER BY a.f_worker, a.f_in DESC
+        SQL;
+
+        $rows = $this->select(
+            $sql,
+            'sss',
+            [date('Y-m-d H:i:s', $dayEnd), date('Y-m-d H:i:s', $dayEnd), date('Y-m-d H:i:s', $dayStart)]
+        )->fetch_all(MYSQLI_ASSOC);
+
+        $seen = [];
+        $items = [];
+        foreach ($rows as $row) {
+            $staffId = (int)($row['f_staff'] ?? 0);
+            if ($staffId <= 0 || isset($seen[$staffId])) {
+                continue;
+            }
+            $seen[$staffId] = true;
+            $items[] = [
+                'f_staff' => $staffId,
+                'f_staff_name' => (string)($row['f_staff_name'] ?? ''),
+                'f_position' => (int)($row['f_position'] ?? 0),
+                'f_position_name' => (string)($row['f_position_name'] ?? ''),
+            ];
+        }
+
+        $this->result['items'] = $items;
         $this->echoResult();
     }
 
@@ -51,7 +111,9 @@ class Salary extends Auth
             COALESCE(s.f_calculated, 0) AS f_calculated,
             COALESCE(s.f_bonus, 0) AS f_bonus,
             COALESCE(s.f_amount_credit, 0) AS f_amount_credit,
-            COALESCE(s.f_amount_debit, 0) AS f_amount_debit
+            COALESCE(s.f_amount_debit, 0) AS f_amount_debit,
+            (SELECT COALESCE(SUM(ss.f_amount_credit) - SUM(ss.f_amount_debit), 0)
+             FROM s_salary ss WHERE ss.f_staff = s.f_staff) AS f_debt
         FROM s_salary s
         LEFT JOIN s_user u ON u.f_id = s.f_staff
         LEFT JOIN s_user_group gr ON gr.f_id = COALESCE(NULLIF(s.f_position, 0), u.f_group)

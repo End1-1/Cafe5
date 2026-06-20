@@ -158,7 +158,13 @@ struct WaiterDish {
         j["f_price"] = price;
         j["f_row"] = row;
         j["f_emarks"] = emarks();
-        j["f_data"] = data;
+        j[QStringLiteral("f_data")] = data;
+        if(data.contains(QStringLiteral("f_kitchen_status"))) {
+            j[QStringLiteral("f_process_status")] = data.value(QStringLiteral("f_kitchen_status"));
+        }
+        if(data.contains(QStringLiteral("f_goods_process"))) {
+            j[QStringLiteral("f_goods_process")] = data.value(QStringLiteral("f_goods_process"));
+        }
         return j;
     }
 };
@@ -182,18 +188,39 @@ struct JsonParser<WaiterDish> {
         wd.price = jo["f_price"].toDouble();
         wd.data = {};
 
-        if(jo.contains("f_data") && jo["f_data"].isString()) {
-            QJsonParseError err;
-            const QByteArray raw = jo["f_data"].toString().toUtf8();
-            QJsonDocument doc = QJsonDocument::fromJson(raw, &err);
+        if(jo.contains(QStringLiteral("f_data"))) {
+            const QJsonValue fd = jo.value(QStringLiteral("f_data"));
+            if(fd.isObject()) {
+                wd.data = fd.toObject();
+            } else if(fd.isString()) {
+                QJsonParseError err;
+                const QByteArray raw = fd.toString().toUtf8();
+                const QJsonDocument doc = QJsonDocument::fromJson(raw, &err);
 
-            if(err.error == QJsonParseError::NoError && doc.isObject()) {
-                wd.data = doc.object();
-            } else {
-                qWarning() << "f_data parse error:" << err.errorString()
-                           << "raw:" << raw;
+                if(err.error == QJsonParseError::NoError && doc.isObject()) {
+                    wd.data = doc.object();
+                } else {
+                    qWarning() << "f_data parse error:" << err.errorString()
+                               << "raw:" << raw;
+                }
             }
         }
+
+        if(jo.contains(QStringLiteral("f_process_status"))) {
+            wd.data.insert(QStringLiteral("f_kitchen_status"), jo.value(QStringLiteral("f_process_status")).toInt(0));
+        }
+
+        const QJsonValue processRaw = jo.value(QStringLiteral("f_process_data"));
+        if(processRaw.isObject()) {
+            wd.data.insert(QStringLiteral("f_goods_process"), processRaw.toObject());
+        } else if(processRaw.isString() && !processRaw.toString().trimmed().isEmpty()) {
+            QJsonParseError err;
+            const QJsonDocument doc = QJsonDocument::fromJson(processRaw.toString().toUtf8(), &err);
+            if(err.error == QJsonParseError::NoError && doc.isObject()) {
+                wd.data.insert(QStringLiteral("f_goods_process"), doc.object());
+            }
+        }
+
         wd.data["f_fiscal_department"] = jo["f_fiscal_department"];
         wd.data["f_adgt"] = jo["f_adgt"];
 

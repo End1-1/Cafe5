@@ -106,6 +106,16 @@
        </widget>
       </item>
       <item>
+       <widget class="QToolButton" name="btnAutofill">
+        <property name="text">
+         <string>Autofill</string>
+        </property>
+        <property name="toolTip">
+         <string>Fill from registered employees with attendance on this date</string>
+        </property>
+       </widget>
+      </item>
+      <item>
        <spacer name="horizontalSpacerToolbar">
         <property name="orientation">
          <enum>Qt::Orientation::Horizontal</enum>

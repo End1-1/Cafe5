@@ -34,6 +34,7 @@ struct WaiterOrder {
     QJsonObject data;
     QList<WaiterDish> dishes;
     QList<WaiterDish> precheckDishes;
+    QJsonArray calcQueue;
     QString nameLower;
     QStringList words;
     QJsonObject rawBody;
@@ -248,6 +249,8 @@ struct JsonParser<WaiterOrder> {
         for(const QJsonValue &v : precheckdishes) {
             wo.precheckDishes.append(JsonParser<WaiterDish>::fromJson(v.toObject()));
         }
+
+        wo.calcQueue = jo.value(QStringLiteral("calc_queue")).toArray();
 
         return wo;
     }

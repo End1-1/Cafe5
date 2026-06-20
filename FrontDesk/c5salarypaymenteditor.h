@@ -35,6 +35,7 @@ private:
         colNum,
         colPosition,
         colName,
+        colDebt,
         colAmount
     };
 
@@ -42,7 +43,7 @@ private:
 
     void initTable();
     void recalcTotal();
-    void appendStaffRow(int staffId, const QString &staffName, int positionId, const QString &positionName);
+    void appendStaffRow(int staffId, const QString &staffName, int positionId, const QString &positionName, double debt);
     QString buildPrintHtml() const;
 
 protected slots:

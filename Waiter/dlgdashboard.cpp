@@ -101,8 +101,25 @@ void DlgDashboard::setup()
 
     ui->btnOrders->setEnabled(mUser->check(cp_t5_waiter_reports));
     ui->btnReports->setEnabled(mUser->check(cp_t5_waiter_reports));
+    refreshAttendanceStatus();
+}
+
+void DlgDashboard::updateAttendanceButtons()
+{
     ui->btnCheckin->setEnabled(!mUser->active);
     ui->btnCheckout->setEnabled(mUser->active);
+}
+
+void DlgDashboard::refreshAttendanceStatus()
+{
+    NInterface::query1(QStringLiteral("/engine/v2/common/attendance/open"),
+                       mUser->mSessionKey,
+                       this,
+                       {},
+                       [this](const QJsonObject &jo) {
+                           mUser->active = jo.value(QStringLiteral("active")).toBool();
+                           updateAttendanceButtons();
+                       });
 }
 
 void DlgDashboard::on_btnCloseCashbox_clicked()
@@ -135,7 +152,7 @@ void DlgDashboard::on_btnCloseCashbox_clicked()
                        mUser->mSessionKey,
                        this,
                        closeParams,
-                       [this](const QJsonObject &jdoc) {
+                       [this, cashCounted](const QJsonObject &jdoc) {
                            mCashboxData = jdoc.value("cashbox").toObject();
                            C5Printing p;
                            QPrinterInfo pi = QPrinterInfo::printerInfo(mWorkStation.defaultPrinter());
@@ -171,13 +188,18 @@ void DlgDashboard::on_btnCloseCashbox_clicked()
                            p.br();
                            p.lrtext(tr("Operations"), QString::number(mCashboxData.value("f_orders_count").toInt()));
                            p.br();
-                           p.lrtext(tr("Expected amount"), mCashboxData["f_amount_expected"].toString());
+                           p.lrtext(tr("Shift total"), mCashboxData[QStringLiteral("f_amount_expected")].toString());
                            p.br();
-                           if (mCashboxData.contains(QStringLiteral("f_amount_fact"))) {
+                           if (cashCounted) {
+                               const QString expectedCash = mCashboxData.value(QStringLiteral("f_amount_expected_cash")).toString();
+                               if (!expectedCash.isEmpty()) {
+                                   p.lrtext(tr("Expected cash"), expectedCash);
+                                   p.br();
+                               }
                                p.lrtext(tr("Counted cash"), mCashboxData[QStringLiteral("f_amount_fact")].toString());
                                p.br();
                            }
-                           const double diffRaw = mCashboxData[QStringLiteral("f_amount_difference_raw")].toDouble();
+                           const double diffRaw = mCashboxData[QStringLiteral("f_amount_difference_raw")].toVariant().toDouble();
                            if (qAbs(diffRaw) > 0.009) {
                                const QString diffLabel = diffRaw > 0
                                    ? tr("Cash Overage")
@@ -188,9 +210,65 @@ void DlgDashboard::on_btnCloseCashbox_clicked()
                            p.line();
                            p.br();
                            p.print(printer);
+
+                           if (cashCounted) {
+                               const double diffRaw = mCashboxData[QStringLiteral("f_amount_difference_raw")].toVariant().toDouble();
+                               if (qAbs(diffRaw) > 0.009) {
+                                   const QString diffLabel = diffRaw > 0
+                                       ? tr("Cash Overage")
+                                       : tr("Cash Shortage");
+                                   C5Message::info(diffLabel + ": " + mCashboxData[QStringLiteral("f_amount_difference")].toString());
+                                   printDifferenceAct(mCashboxData);
+                               }
+                           }
+
                            mCashboxData["f_id"] = 0;
                            setup();
                        });
+}
+
+void DlgDashboard::printDifferenceAct(const QJsonObject &cashbox)
+{
+    C5Printing p;
+    QPrinterInfo pi = QPrinterInfo::printerInfo(mWorkStation.defaultPrinter());
+    QPrinter printer(pi);
+    printer.setPageSize(QPageSize::Custom);
+    printer.setFullPage(false);
+    QRectF pr = printer.pageRect(QPrinter::DevicePixel);
+    constexpr qreal SAFE_RIGHT_MM = 4.0;
+    qreal safePx = SAFE_RIGHT_MM * printer.logicalDpiX() / 25.4;
+    p.setSceneParams(pr.width() - safePx, pr.height(), printer.logicalDpiX());
+    p.setFont(qApp->font());
+    p.setFontSize(22);
+
+    const double diffRaw = cashbox.value(QStringLiteral("f_amount_difference_raw")).toVariant().toDouble();
+    const bool overage = diffRaw > 0;
+
+    p.ctext(overage ? tr("Cash Overage Act") : tr("Cash Shortage Act"));
+    p.br();
+    p.ctext(tr("Session") + " " + QString::number(cashbox.value(QStringLiteral("f_id")).toInt()));
+    p.br();
+    p.br();
+    p.lrtext(tr("Close"), cashbox.value(QStringLiteral("f_date_close")).toString());
+    p.br();
+    p.rtext(cashbox.value(QStringLiteral("f_user_close_name")).toString());
+    p.br();
+    p.br();
+    const QString expectedCash = cashbox.value(QStringLiteral("f_amount_expected_cash")).toString();
+    p.lrtext(expectedCash.isEmpty() ? tr("Expected amount") : tr("Expected cash"),
+             expectedCash.isEmpty() ? cashbox.value(QStringLiteral("f_amount_expected")).toString() : expectedCash);
+    p.br();
+    p.lrtext(tr("Counted cash"), cashbox.value(QStringLiteral("f_amount_fact")).toString());
+    p.br();
+    p.lrtext(overage ? tr("Cash Overage") : tr("Cash Shortage"),
+             cashbox.value(QStringLiteral("f_amount_difference")).toString());
+    p.br();
+    p.line();
+    p.br();
+    p.br();
+    p.lrtext(tr("Signature"), QStringLiteral("______________"));
+    p.br();
+    p.print(printer);
 }
 
 void DlgDashboard::on_btnGoHall_clicked()
@@ -222,9 +300,9 @@ void DlgDashboard::on_btnCheckin_clicked()
         return;
     }
 
-    NInterface::query1("/engine/v2/common/attendance/checkin", mUser->mSessionKey, this, {}, [this](const QJsonObject &) {
-        ui->btnCheckin->setEnabled(false);
-        ui->btnCheckout->setEnabled(true);
+    NInterface::query1("/engine/v2/common/attendance/checkin", mUser->mSessionKey, this, {}, [this](const QJsonObject &jo) {
+        mUser->active = jo.value(QStringLiteral("active")).toBool();
+        updateAttendanceButtons();
         C5Message::info(tr("Checkin completed"));
     });
 }
@@ -235,9 +313,9 @@ void DlgDashboard::on_btnCheckout_clicked()
         return;
     }
 
-    NInterface::query1("/engine/v2/common/attendance/checkout", mUser->mSessionKey, this, {}, [this](const QJsonObject &) {
-        ui->btnCheckin->setEnabled(true);
-        ui->btnCheckout->setEnabled(false);
+    NInterface::query1("/engine/v2/common/attendance/checkout", mUser->mSessionKey, this, {}, [this](const QJsonObject &jo) {
+        mUser->active = jo.value(QStringLiteral("active")).toBool();
+        updateAttendanceButtons();
         C5Message::info(tr("Checkout completed"));
     });
 }

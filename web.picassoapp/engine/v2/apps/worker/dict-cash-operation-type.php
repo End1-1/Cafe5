@@ -12,6 +12,9 @@ if (!defined('CASH_OP_SALES_REVENUE')) {
     define('CASH_OP_UTILITIES', 7);
     define('CASH_OP_CASH_SHORTAGE', 8);
     define('CASH_OP_CASH_OVERAGE', 9);
+    define('CASH_OP_DELIVERY_FEE', 10);
+    define('CASH_OP_TRANSFER_OUT', 11);
+    define('CASH_OP_TRANSFER_IN', 12);
 }
 
 /** @deprecated use CASH_OP_SALES_REVENUE */
@@ -21,14 +24,17 @@ if (!defined('CASHBOX_IN')) {
 
 return [
     'names' => [
-        CASH_OP_SALES_REVENUE => 'Sales Revenue',
-        CASH_OP_TOTAL_EXPENSES => 'Total Expenses',
-        CASH_OP_PURCHASING_COSTS => 'Purchasing Costs',
-        CASH_OP_SALARIES => 'Salaries and Wages',
-        CASH_OP_DEBT_RECOVERY => 'Debt Recovery',
-        CASH_OP_DEBT_REPAYMENT => 'Debt Repayment',
-        CASH_OP_UTILITIES => 'Utilities',
-        CASH_OP_CASH_SHORTAGE => 'Cash Shortage',
-        CASH_OP_CASH_OVERAGE => 'Cash Overage',
+        CASH_OP_SALES_REVENUE => Translator::t('Sales Revenue'),
+        CASH_OP_TOTAL_EXPENSES => Translator::t('Total Expenses'),
+        CASH_OP_PURCHASING_COSTS => Translator::t('Purchasing Costs'),
+        CASH_OP_SALARIES => Translator::t('Salaries and Wages'),
+        CASH_OP_DEBT_RECOVERY => Translator::t('Debt Recovery'),
+        CASH_OP_DEBT_REPAYMENT => Translator::t('Debt Repayment'),
+        CASH_OP_UTILITIES => Translator::t('Utilities'),
+        CASH_OP_CASH_SHORTAGE => Translator::t('Cash Shortage'),
+        CASH_OP_CASH_OVERAGE => Translator::t('Cash Overage'),
+        CASH_OP_DELIVERY_FEE => Translator::t('Delivery Fee'),
+        CASH_OP_TRANSFER_OUT => Translator::t('Transfer Out'),
+        CASH_OP_TRANSFER_IN => Translator::t('Transfer In'),
     ],
 ];

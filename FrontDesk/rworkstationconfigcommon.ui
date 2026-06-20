@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>RWorkstationConfigCommon</class>
+ <widget class="QWidget" name="RWorkstationConfigCommon">
+  <layout class="QFormLayout" name="formLayout">
+   <item row="0" column="0">
+    <widget class="QLabel" name="labelPresent">
+     <property name="text">
+      <string>Present card pattern</string>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="1">
+    <widget class="QLineEdit" name="lePresentCard"/>
+   </item>
+   <item row="1" column="0">
+    <widget class="QLabel" name="labelDiscount">
+     <property name="text">
+      <string>Discount card pattern</string>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="1">
+    <widget class="QLineEdit" name="leDiscountCard"/>
+   </item>
+   <item row="2" column="0">
+    <widget class="QLabel" name="labelAccumulate">
+     <property name="text">
+      <string>Accumulate card pattern</string>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="1">
+    <widget class="QLineEdit" name="leAccumulateCard"/>
+   </item>
+   <item row="3" column="0">
+    <widget class="QLabel" name="labelScale">
+     <property name="text">
+      <string>Scale pattern</string>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="1">
+    <widget class="QLineEdit" name="leScalePattern"/>
+   </item>
+   <item row="4" column="0">
+    <widget class="QLabel" name="labelPartner">
+     <property name="text">
+      <string>Quick debt partner id</string>
+     </property>
+    </widget>
+   </item>
+   <item row="4" column="1">
+    <widget class="QLineEdit" name="leQuickDebtPartner"/>
+   </item>
+   <item row="5" column="0">
+    <widget class="QLabel" name="labelPrint">
+     <property name="text">
+      <string>Print server URL</string>
+     </property>
+    </widget>
+   </item>
+   <item row="5" column="1">
+    <widget class="QLineEdit" name="lePrintServer"/>
+   </item>
+   <item row="6" column="0">
+    <widget class="QLabel" name="labelCashboxClose">
+     <property name="text">
+      <string>Input cashbox amount before close</string>
+     </property>
+    </widget>
+   </item>
+   <item row="6" column="1">
+    <widget class="QCheckBox" name="chInputCashboxBeforeClose"/>
+   </item>
+   <item row="7" column="0">
+    <widget class="QLabel" name="labelBistro">
+     <property name="text">
+      <string>Bistro mode</string>
+     </property>
+    </widget>
+   </item>
+   <item row="7" column="1">
+    <widget class="QCheckBox" name="chBistro"/>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

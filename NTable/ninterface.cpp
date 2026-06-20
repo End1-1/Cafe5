@@ -1,8 +1,25 @@
 #include "ninterface.h"
 #include "nloadingdlg.h"
 #include "ndataprovider.h"
+#ifdef SELFBOARD
+#include <QMessageBox>
+#else
 #include "c5message.h"
+#endif
 #include <QPointer>
+
+namespace {
+
+void ninterfaceShowError(const QString &msg)
+{
+#ifdef SELFBOARD
+    QMessageBox::critical(nullptr, QString(), msg);
+#else
+    C5Message::error(msg);
+#endif
+}
+
+} // namespace
 
 NInterface::NInterface(QObject *parent)
     : QObject{parent},
@@ -67,7 +84,7 @@ void NInterface::createHttpQueryLambda(const QString &route, const QJsonObject &
     connect(np, &NDataProvider::error, this->parent(), [this, np, errCallback, finish](const QString &msg) {
         finish();
         if(fProgress) {
-            C5Message::error(msg);
+            ninterfaceShowError(msg);
         }
 
         errCallback({{"status", 1}, {"errorMessage", msg}});
@@ -101,7 +118,7 @@ void NInterface::createHttpQueryLambda2(const QString &route, const QJsonObject 
 
         if(!errCallback({{"status", 1}, {"errorMessage", msg}})) {
             if(fProgress) {
-                C5Message::error(msg);
+                ninterfaceShowError(msg);
             }
         }
         np->deleteLater();
@@ -178,7 +195,7 @@ void NInterface::query(const QString &route, const QString &bearer, QObject *con
         }
 
         if(!handled && iface->fProgress) {
-            C5Message::error(msg);
+            ninterfaceShowError(msg);
         }
 
         np->deleteLater();
@@ -277,6 +294,6 @@ void NInterface::httpQueryError(const QString &err)
     }
 
     if(fProgress) {
-        C5Message::error(e);
+        ninterfaceShowError(e);
     }
 }

@@ -32,7 +32,7 @@ private:
 
     QString mEditorName;
 
-    RAbstractSpecialWidget* mWidget;
+    RAbstractSpecialWidget* mWidget = nullptr;
 
     void createWidget();
 

@@ -11,8 +11,12 @@
 #include "c5utils.h"
 #include "struct_workstationitem.h"
 #include "dlgdashboard.h"
+#include "zkfingerprintreader.h"
+#include <QCloseEvent>
+#include <QJsonArray>
 #include <QKeyEvent>
 #include <QPainter>
+#include <QTimer>
 
 DlgScreen::DlgScreen(C5User *user) :
     C5WaiterDialog(user),
@@ -25,6 +29,7 @@ DlgScreen::DlgScreen(C5User *user) :
     setPalette(pal);
 
     ui->lbVersion->setText(NDataProvider::mFileVersion);
+    ui->lbFingerPrint->clear();
     updatePin();
     installEventFilter(this);
     setFocusPolicy(Qt::StrongFocus);
@@ -33,6 +38,7 @@ DlgScreen::DlgScreen(C5User *user) :
 
 DlgScreen::~DlgScreen()
 {
+    stopFingerprintScan();
     delete ui;
 }
 
@@ -96,6 +102,167 @@ void DlgScreen::showEvent(QShowEvent *e)
                        [](const QJsonObject &jdoc) {
                            mWorkStation = JsonParser<WorkstationItem>::fromJson(jdoc);
                        });
+    loadFingerprints();
+}
+
+void DlgScreen::closeEvent(QCloseEvent *event)
+{
+    stopFingerprintScan();
+    C5WaiterDialog::closeEvent(event);
+}
+
+void DlgScreen::loadFingerprints()
+{
+    NInterface::query1(QStringLiteral("/engine/v2/officen/user/list-fingerprints"),
+                       mUser->mSessionKey,
+                       this,
+                       {},
+                       [this](const QJsonObject &jo) {
+                           mFingerprintItems = jo.value(QStringLiteral("items")).toArray();
+                           if(!mFingerprintItems.isEmpty()) {
+                               startFingerprintScan();
+                           }
+                       });
+}
+
+void DlgScreen::startFingerprintScan()
+{
+    if(mFingerprintBusy || mFingerprintItems.isEmpty()) {
+        return;
+    }
+
+    if(!mReader) {
+        mReader = new ZkfingerprintReader(this);
+        connect(mReader, &ZkfingerprintReader::probeReady, this, &DlgScreen::onFingerprintProbe);
+        connect(mReader, &ZkfingerprintReader::error, this, [this](const QString &message) {
+            showFingerPrintStatus(message, Qt::red, 2500);
+        });
+    }
+
+    if(!mReader->openDevice()) {
+        return;
+    }
+
+    mFingerprintBusy = true;
+    clearFingerPrintStatus();
+    mReader->startIdentification();
+}
+
+void DlgScreen::stopFingerprintScan()
+{
+    if(!mReader) {
+        return;
+    }
+
+    mReader->cancelCapture();
+    mReader->closeDevice();
+    mFingerprintBusy = false;
+}
+
+void DlgScreen::showFingerPrintStatus(const QString &text, const QColor &color, int hideMs)
+{
+    if(!mFingerPrintStatusTimer) {
+        mFingerPrintStatusTimer = new QTimer(this);
+        mFingerPrintStatusTimer->setSingleShot(true);
+        connect(mFingerPrintStatusTimer, &QTimer::timeout, this, &DlgScreen::clearFingerPrintStatus);
+    }
+
+    mFingerPrintStatusTimer->stop();
+    ui->lbFingerPrint->setStyleSheet(QStringLiteral("color: %1;").arg(color.name()));
+    ui->lbFingerPrint->setText(text);
+
+    if(hideMs > 0) {
+        mFingerPrintStatusTimer->start(hideMs);
+    }
+}
+
+void DlgScreen::clearFingerPrintStatus()
+{
+    if(mFingerPrintStatusTimer) {
+        mFingerPrintStatusTimer->stop();
+    }
+
+    ui->lbFingerPrint->clear();
+    ui->lbFingerPrint->setStyleSheet(QString());
+}
+
+int DlgScreen::matchFingerprintUser(const QByteArray &probe)
+{
+    if(!mReader) {
+        return 0;
+    }
+
+    int score = 0;
+    return mReader->identifyProbe(mFingerprintItems, probe, &score);
+}
+
+void DlgScreen::onFingerprintProbe(const QByteArray &probe)
+{
+    mFingerprintBusy = false;
+
+    const int userId = matchFingerprintUser(probe);
+    if(userId <= 0) {
+        showFingerPrintStatus(tr("Fingerprint not recognized"), Qt::red, 2500);
+        QTimer::singleShot(2500, this, [this]() {
+            startFingerprintScan();
+        });
+        return;
+    }
+
+    showFingerPrintStatus(tr("Login successful"), QColor(0, 128, 0));
+    stopFingerprintScan();
+
+    auto *user = new C5User();
+    NDataProvider::sessionKey = mUser->mSessionKey;
+    user->authorizeByUserId(userId, fHttp, [this, user](const QJsonObject &) {
+        completeLogin(user);
+    }, [this, user]() {
+        user->deleteLater();
+        showFingerPrintStatus(tr("Access denied"), Qt::red, 2500);
+        NDataProvider::sessionKey = mUser->mSessionKey;
+        QTimer::singleShot(2500, this, [this]() {
+            loadFingerprints();
+        });
+    });
+}
+
+void DlgScreen::completeLogin(C5User *user)
+{
+    if(!user->check(cp_t5_waiter_edit_order)) {
+        DlgDashboard(QJsonObject(), user).exec();
+        user->deleteLater();
+        NDataProvider::sessionKey = mUser->mSessionKey;
+        loadFingerprints();
+        return;
+    }
+
+    QTimer::singleShot(1, user, [this, user]() {
+        int finish = 0;
+
+        do {
+            QDialog *dlg;
+
+            switch(finish) {
+            case 2:
+                dlg = new DlgDashboard(QJsonObject(), user);
+                break;
+
+            case 3:
+                dlg = new DlgFace(user);
+                break;
+
+            default:
+                dlg = new DlgFace(user);
+            }
+
+            finish = dlg->exec();
+            delete dlg;
+        } while(finish > 1);
+
+        user->deleteLater();
+        NDataProvider::sessionKey = mUser->mSessionKey;
+        loadFingerprints();
+    });
 }
 
 void DlgScreen::on_btnCancel_clicked()
@@ -165,43 +332,14 @@ void DlgScreen::on_btn0_clicked()
 
 void DlgScreen::on_btnAccept_clicked()
 {
+    stopFingerprintScan();
+
     auto *user = new C5User();
     QString pin = mPin;
     mPin.clear();
     updatePin();
-    user->authorize(pin, fHttp, [ = ](const  QJsonObject & jdoc) {
-        QJsonObject jo = jdoc["data"].toObject();
-        NDataProvider::sessionKey = jo["sessionkey"].toString();
-
-        if(!user->check(cp_t5_waiter_edit_order)) {
-            DlgDashboard(QJsonObject(), user).exec();
-            user->deleteLater();
-            return;
-        }
-
-        QTimer::singleShot(1, user, [ = ]() {
-            int finish = 0;
-
-            do {
-                QDialog *dlg;
-
-                switch(finish) {
-                case 2:
-                    dlg = new DlgDashboard(QJsonObject(), user);
-                    break;
-
-                case 3:
-                    dlg = new DlgFace(user);
-                    break;
-
-                default:
-                    dlg = new DlgFace(user);
-                }
-
-                finish = dlg->exec();
-                delete dlg;
-            } while(finish > 1);
-        });
+    user->authorize(pin, fHttp, [this, user](const QJsonObject &) {
+        completeLogin(user);
     }, [user]() {
         user->deleteLater();
     });
@@ -238,4 +376,19 @@ void DlgScreen::on_btnClose_clicked()
     if(C5Message::question(tr("Are you sure to close application")) == QDialog::Accepted) {
         qApp->quit();
     }
+}
+
+void DlgScreen::on_btnFingerPrint_clicked()
+{
+    if(mFingerprintBusy) {
+        stopFingerprintScan();
+        return;
+    }
+
+    if(mFingerprintItems.isEmpty()) {
+        loadFingerprints();
+        return;
+    }
+
+    startFingerprintScan();
 }

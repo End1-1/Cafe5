@@ -110,10 +110,32 @@ private slots:
 
     void on_btnFromProduct_clicked();
 
+    void on_btnAddModificator_clicked();
+
+    void on_btnRemoveModificator_clicked();
+
+    void on_btnAddRelatedDrink_clicked();
+
+    void on_btnRemoveRelatedDrink_clicked();
+
+    void on_btnAddRelatedOther_clicked();
+
+    void on_btnRemoveRelatedOther_clicked();
+
 private:
     Ui::CE5Goods* ui;
 
     int addGoodsRow();
+
+    int addModificatorRow();
+
+    int addRelatedRow(C5TableWidget *tbl);
+
+    void loadModificatorsFromJson(const QJsonArray &items);
+
+    void loadRelatedFromJson(C5TableWidget *tbl, const QJsonArray &items);
+
+    bool addRelatedFromSelector(C5TableWidget *tbl);
 
     void countTotal();
 

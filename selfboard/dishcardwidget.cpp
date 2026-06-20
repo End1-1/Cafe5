@@ -2,6 +2,8 @@
 
 #include "menutypes.h"
 
+#include "dishimageutils.h"
+
 #include <QLabel>
 #include <QMouseEvent>
 #include <QPixmap>
@@ -46,9 +48,7 @@ void DishCardWidget::buildGridCard(const MenuDish &dish)
 
     auto *image = new QLabel(this);
     image->setObjectName(QStringLiteral("dishGridImage"));
-    image->setFixedSize(150, 154);
-    image->setScaledContents(true);
-    image->setPixmap(QPixmap(dish.imagePath));
+    setDishImageOnLabel(image, dish.imagePath, 154, 150);
     layout->addWidget(image);
 }
 
@@ -72,18 +72,68 @@ void DishCardWidget::buildTileCard(const MenuDish &dish, const char *cardObjectN
 
     auto *image = new QLabel(this);
     image->setObjectName(QStringLiteral("dishTileImage"));
-    image->setFixedSize(212, 212);
-    image->setScaledContents(true);
-    image->setPixmap(QPixmap(dish.imagePath));
+    setDishImageOnLabel(image, dish.imagePath, 212, 212);
     layout->addWidget(image, 0, Qt::AlignHCenter);
 
     auto *title = new QLabel(dish.name, this);
     title->setObjectName(QStringLiteral("dishPopularTitle"));
     layout->addWidget(title);
 
-    auto *subtitle = new QLabel(dish.groupName, this);
+    QString subtitleText = dish.groupName;
+    if (!dish.attrType.isEmpty() || !dish.attrSize.isEmpty()) {
+        QStringList parts;
+        if (!dish.attrType.isEmpty()) {
+            parts << dish.attrType;
+        }
+        if (!dish.attrSize.isEmpty()) {
+            QString sizeText = dish.attrSize;
+            if (!dish.attrMeasurement.isEmpty()) {
+                sizeText += QLatin1Char(' ') + dish.attrMeasurement;
+            }
+            parts << sizeText;
+        }
+        subtitleText = parts.join(QStringLiteral(" · "));
+    }
+    auto *subtitle = new QLabel(subtitleText, this);
     subtitle->setObjectName(QStringLiteral("dishPopularSubtitle"));
     layout->addWidget(subtitle);
+
+    // Dietary / allergen badges
+    int badgeCount = 0;
+    auto *badgesHost = new QWidget(this);
+    auto *badgesLayout = new QHBoxLayout(badgesHost);
+    badgesLayout->setContentsMargins(0, 0, 0, 0);
+    badgesLayout->setSpacing(6);
+
+    const auto addBadgeIcon = [&](bool enabled, const char *iconPath) {
+        if (!enabled) {
+            return;
+        }
+        auto *icon = new QLabel(badgesHost);
+        icon->setFixedSize(24, 24);
+        icon->setScaledContents(true);
+        icon->setPixmap(QPixmap(QString::fromUtf8(iconPath)));
+        badgesLayout->addWidget(icon);
+        ++badgeCount;
+    };
+
+    addBadgeIcon(dish.glutenFree, ":/dietary/gluten-free.png");
+    addBadgeIcon(dish.vegetarian, ":/dietary/vegitarian.png");
+    addBadgeIcon(dish.vegan, ":/dietary/vegan.png");
+    addBadgeIcon(dish.noGmo, ":/dietary/no-gmo.png");
+    addBadgeIcon(dish.noLactose, ":/dietary/lactose-free.png");
+    addBadgeIcon(dish.noSugar, ":/dietary/sugar-free.png");
+    addBadgeIcon(dish.containsNuts, ":/dietary/contain-nuts.png");
+    if (dish.halalKosher) {
+        addBadgeIcon(true, ":/dietary/halal.png");
+        addBadgeIcon(true, ":/dietary/kosher.png");
+    }
+
+    if (badgeCount > 0) {
+        layout->addWidget(badgesHost);
+    } else {
+        badgesHost->hide();
+    }
 
     auto *bottom = new QHBoxLayout();
     auto *time = new QLabel(dish.prepTime, this);

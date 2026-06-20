@@ -283,12 +283,13 @@ class Db
 
             foreach ($rulesArr as $rule) {
 
-                if (
-                    $rule === 'integer' &&
-                    !filter_var($value, FILTER_VALIDATE_INT) &&
-                    $value !== '0'
-                ) {
-                    $errors[] = "$field must be integer";
+                if ($rule === 'integer') {
+                    $intVal = filter_var($value, FILTER_VALIDATE_INT, FILTER_NULL_ON_FAILURE);
+                    if ($intVal === null) {
+                        $errors[] = "$field must be integer";
+                    } else {
+                        $value = (int)$intVal;
+                    }
                 }
 
                 if ($rule === 'numeric' && !is_numeric($value)) {

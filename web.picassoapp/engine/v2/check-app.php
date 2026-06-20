@@ -11,7 +11,8 @@ $apps = [
     "picasso.store" => "1.1.5",
     "picasso.waiter" => "1.0.4",
     "smart" => "1.9.12",
-    "carwash" => "1.0.2"
+    "carwash" => "1.0.2",
+    "selfboard" => "0.1.0"
 ];
 
 $appName = $_SERVER['HTTP_X_APPLICATION_NAME'] ?? null;

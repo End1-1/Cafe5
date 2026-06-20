@@ -33,7 +33,7 @@ public:
 
     ~DlgOrder();
 
-    void setOrderId(const QString &id);
+    void setOrderId(const QString &id, bool reopenIfClosed = false);
 
     void setCreateAsPreorder(bool value);
 
@@ -228,6 +228,8 @@ private slots:
     void on_btnSit_clicked();
 
     void on_btnPrepaid_clicked();
+
+    void on_btnDeliveryAmount_clicked();
 
     void on_btnChangeStaff_clicked();
 

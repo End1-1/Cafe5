@@ -313,7 +313,624 @@
     padding: 16px 24px;
 }
 
+#btnGoToCart:disabled {
+    background-color: #e0e0e0;
+    color: #999999;
+}
+
 #widgetOrderQr {
-    background-color: #c5db00;
+    background-color: #f0f0f0;
     border-radius: 4px;
+}
+
+#DlgPackagePick {
+    background-color: transparent;
+}
+
+#pkgPickCard {
+    background-color: #ffffff;
+    border: 1px solid #e8e8e8;
+    border-radius: 24px;
+}
+
+#pkgPickDivider {
+    background-color: #eeeeee;
+    border: none;
+}
+
+#pkgPickSidebarTitle {
+    font-size: 18px;
+    font-weight: 700;
+    color: #1a1a1a;
+    padding: 0 0 8px 4px;
+}
+
+#pkgPickStepItem {
+    background-color: #f3f3f3;
+    border-radius: 16px;
+}
+
+#pkgPickStepItem[active="true"] {
+    background-color: #ffffff;
+    border: 1px solid #e8e8e8;
+}
+
+#pkgPickStepItem[done="true"] {
+    background-color: #f3f3f3;
+}
+
+#pkgPickStepIndicator {
+    background-color: #d8d8d8;
+    border-radius: 14px;
+    color: #ffffff;
+    font-size: 16px;
+    font-weight: 700;
+}
+
+#pkgPickStepItem[done="true"] #pkgPickStepIndicator {
+    background-color: #6a8f00;
+}
+
+#pkgPickStepItem[active="true"] #pkgPickStepIndicator {
+    background-color: #d8d8d8;
+}
+
+#pkgPickStepLabel {
+    font-size: 16px;
+    font-weight: 600;
+    color: #1a1a1a;
+}
+
+#pkgPickContentTitle {
+    font-size: 22px;
+    font-weight: 700;
+    color: #1a1a1a;
+    padding-bottom: 4px;
+}
+
+#pkgPickBjuPills {
+    font-size: 14px;
+    color: #666666;
+}
+
+#pkgPickAttrSection {
+    background-color: transparent;
+}
+
+#pkgPickAttrSelectedBox {
+    background-color: #ffffff;
+    border: 1px solid #dddddd;
+    border-radius: 12px;
+}
+
+#pkgPickAttrSelectedLabel {
+    font-size: 17px;
+    font-weight: 600;
+    color: #1a1a1a;
+}
+
+#pkgPickAttrSelectedArrow {
+    font-size: 18px;
+    color: #888888;
+}
+
+#pkgPickAttrOptions {
+    background-color: #ffffff;
+    border: 1px solid #eeeeee;
+    border-radius: 12px;
+}
+
+#pkgPickModCard {
+    background-color: #ffffff;
+    border: 1px solid #eeeeee;
+    border-radius: 12px;
+    margin-top: 8px;
+}
+
+#pkgPickModName {
+    font-size: 17px;
+    font-weight: 600;
+    color: #1a1a1a;
+}
+
+#pkgPickModPrice {
+    font-size: 15px;
+    color: #666666;
+}
+
+#pkgPickGoToMenu {
+    background-color: transparent;
+    border: none;
+    color: #666666;
+    font-size: 18px;
+    font-weight: 600;
+    padding: 8px 12px;
+}
+
+#pkgPickTotal {
+    font-size: 20px;
+    font-weight: 700;
+    color: #1a1a1a;
+    padding-right: 8px;
+}
+
+#pkgPickBackBtn {
+    background-color: #f0f0f0;
+    border: none;
+    border-radius: 14px;
+    color: #1a1a1a;
+    font-size: 18px;
+    font-weight: 600;
+    min-height: 52px;
+    padding: 0 20px;
+}
+
+#pkgPickNextBtn {
+    background-color: #c5db00;
+    border: none;
+    border-radius: 14px;
+    color: #1a1a1a;
+    font-size: 18px;
+    font-weight: 700;
+    min-height: 52px;
+    min-width: 180px;
+    padding: 0 24px;
+}
+
+#pkgPickNextBtn:disabled {
+    background-color: #e0e0e0;
+    color: #999999;
+}
+
+#pkgPickStubCard {
+    background-color: #ffffff;
+    border: 1px solid #eeeeee;
+    border-radius: 16px;
+    min-height: 220px;
+}
+
+#pkgPickStubImage {
+    background-color: #f3f3f3;
+    border-radius: 12px;
+    color: #bbbbbb;
+    font-size: 32px;
+}
+
+#pkgPickStubName {
+    font-size: 18px;
+    font-weight: 600;
+    color: #1a1a1a;
+}
+
+#pkgPickStubPrice {
+    font-size: 16px;
+    color: #666666;
+}
+
+#pkgPickStubHint {
+    font-size: 16px;
+    color: #888888;
+    padding-top: 8px;
+}
+
+#pkgPickCloseBtn {
+    background-color: transparent;
+    border: none;
+    color: #888888;
+    font-size: 28px;
+    font-weight: 400;
+    min-width: 44px;
+    min-height: 44px;
+    padding: 0;
+}
+
+#pkgPickCloseBtn:hover {
+    color: #1a1a1a;
+}
+
+#pkgPickEmpty {
+    font-size: 18px;
+    color: #aa3300;
+    padding: 8px 0;
+}
+
+#pkgPickTitle {
+    font-size: 28px;
+    font-weight: 700;
+    color: #1a1a1a;
+}
+
+#pkgPickDescription {
+    font-size: 16px;
+    color: #666666;
+    line-height: 1.4;
+}
+
+#pkgPickImage {
+    border-radius: 16px;
+    background-color: #f3f3f3;
+}
+
+/* legacy BJU boxes kept for compatibility */
+
+#dishTileImage,
+#dishGridImage {
+    background-color: transparent;
+}
+
+#pkgPickBjuBox {
+    background-color: #f3f3f3;
+    border-radius: 12px;
+    padding: 12px 8px;
+    min-height: 72px;
+}
+
+#pkgPickBjuValue {
+    font-size: 18px;
+    font-weight: 700;
+    color: #1a1a1a;
+}
+
+#pkgPickBjuTitle {
+    font-size: 13px;
+    color: #888888;
+}
+
+#pkgPickInstructions {
+    font-size: 15px;
+    padding: 14px 16px;
+    border: 1px solid #dddddd;
+    border-radius: 12px;
+    background-color: #ffffff;
+    color: #1a1a1a;
+}
+
+#pkgPickAttrHeader {
+    font-size: 20px;
+    font-weight: 700;
+    color: #1a1a1a;
+    padding: 4px 0 8px 0;
+}
+
+#pkgPickUnavailableHint {
+    background-color: #fff8e1;
+    color: #5c4a00;
+    border: 1px solid #f0d878;
+    border-radius: 10px;
+    padding: 10px 14px;
+    font-size: 15px;
+}
+
+#pkgPickAttrRow {
+    min-height: 48px;
+    background-color: transparent;
+}
+
+#pkgPickAttrLabel {
+    font-size: 17px;
+    color: #1a1a1a;
+}
+
+#pkgPickAttrPrice {
+    font-size: 17px;
+    font-weight: 500;
+    color: #1a1a1a;
+    min-width: 72px;
+}
+
+#pkgPickAttrDivider {
+    background-color: #eeeeee;
+    max-height: 1px;
+    min-height: 1px;
+    border: none;
+}
+
+#pkgPickAttrRadio {
+    font-size: 17px;
+    color: #1a1a1a;
+    spacing: 12px;
+    padding: 4px 0;
+}
+
+#pkgPickAttrRadio::indicator {
+    width: 22px;
+    height: 22px;
+}
+
+#pkgPickAttrRadio::indicator:unchecked {
+    border: 2px solid #1a1a1a;
+    border-radius: 11px;
+    background-color: #ffffff;
+}
+
+#pkgPickAttrRadio::indicator:checked {
+    border: 2px solid #6a8f00;
+    border-radius: 11px;
+    background-color: #c5db00;
+}
+
+#pkgPickModCheck {
+    font-size: 17px;
+    color: #1a1a1a;
+    spacing: 12px;
+    padding: 4px 0;
+}
+
+#pkgPickModCheck::indicator {
+    width: 22px;
+    height: 22px;
+}
+
+#pkgPickModCheck::indicator:unchecked {
+    border: 2px solid #1a1a1a;
+    border-radius: 6px;
+    background-color: #ffffff;
+}
+
+#pkgPickModCheck::indicator:checked {
+    border: 2px solid #6a8f00;
+    border-radius: 6px;
+    background-color: #c5db00;
+}
+
+#pkgPickQtyWrap {
+    background-color: #f0f0f0;
+    border-radius: 28px;
+    min-height: 56px;
+    max-height: 56px;
+}
+
+#pkgPickQtyMinus {
+    background-color: #f5f0c8;
+    border: none;
+    border-radius: 28px;
+    font-size: 26px;
+    font-weight: 600;
+    color: #1a1a1a;
+    min-width: 56px;
+    max-width: 56px;
+    min-height: 56px;
+    max-height: 56px;
+}
+
+#pkgPickQtyPlus {
+    background-color: #c5db00;
+    border: none;
+    border-radius: 28px;
+    font-size: 26px;
+    font-weight: 600;
+    color: #1a1a1a;
+    min-width: 56px;
+    max-width: 56px;
+    min-height: 56px;
+    max-height: 56px;
+}
+
+#pkgPickQtyValue {
+    font-size: 22px;
+    font-weight: 700;
+    color: #1a1a1a;
+    background-color: transparent;
+}
+
+/* pkgPickAdd replaced by pkgPickNextBtn */
+
+/* --- Cart screen --- */
+
+#DlgCart {
+    background-color: #f3f3f3;
+}
+
+#DlgCart #lblTitle {
+    font-size: 28px;
+    font-weight: 700;
+    color: #1a1a1a;
+    padding: 16px 24px 8px 24px;
+}
+
+#DlgCart #lblBanner {
+    color: rgba(0, 0, 0, 0.45);
+    font-size: 22px;
+    border: 2px dashed #cccccc;
+    border-radius: 8px;
+    min-height: 96px;
+    background-color: #e8e8e8;
+}
+
+#cartLineCard {
+    background-color: #ffffff;
+    border-radius: 16px;
+}
+
+#cartLineName {
+    font-size: 24px;
+    font-weight: 700;
+    color: #1a1a1a;
+}
+
+#cartLineModifiers {
+    font-size: 16px;
+    color: #666666;
+}
+
+#cartLinePrice {
+    font-size: 18px;
+    font-weight: 600;
+    color: #1a1a1a;
+}
+
+#cartLineEditLabel {
+    font-size: 16px;
+    color: #666666;
+}
+
+#cartQtyWrap {
+    background-color: #f0f0f0;
+    border-radius: 28px;
+}
+
+#cartQtyMinus {
+    background-color: #f5f0c8;
+    border: none;
+    border-radius: 28px;
+    font-size: 26px;
+    font-weight: 600;
+    color: #1a1a1a;
+    min-width: 56px;
+    max-width: 56px;
+    min-height: 56px;
+    max-height: 56px;
+}
+
+#cartQtyPlus {
+    background-color: #c5db00;
+    border: none;
+    border-radius: 28px;
+    font-size: 26px;
+    font-weight: 600;
+    color: #1a1a1a;
+    min-width: 56px;
+    max-width: 56px;
+    min-height: 56px;
+    max-height: 56px;
+}
+
+#cartQtyValue {
+    font-size: 22px;
+    font-weight: 700;
+    color: #1a1a1a;
+}
+
+#cartEmptyLabel {
+    font-size: 22px;
+    color: #666666;
+    padding: 48px 24px;
+}
+
+#DlgCart #btnOrderMore {
+    background-color: #e8e8e8;
+    border: none;
+    border-radius: 12px;
+    font-size: 20px;
+    font-weight: 700;
+    color: #1a1a1a;
+    min-height: 72px;
+    padding: 0 24px;
+}
+
+#DlgCart #btnGoToPay {
+    background-color: #c5db00;
+    border: none;
+    border-radius: 12px;
+    font-size: 20px;
+    font-weight: 700;
+    color: #1a1a1a;
+    min-height: 72px;
+    padding: 0 24px;
+}
+
+#DlgCart #lblCartSummary {
+    font-size: 22px;
+    font-weight: 700;
+    color: #1a1a1a;
+}
+
+#DlgCart #widgetFooter,
+#DlgPayment #widgetFooter {
+    background-color: #c5db00;
+}
+
+#DlgCart #lblPoweredBy,
+#DlgPayment #lblPoweredBy {
+    color: #1a1a1a;
+    font-size: 14px;
+    padding-right: 16px;
+}
+
+/* --- Payment screen --- */
+
+#DlgPayment {
+    background-color: #f3f3f3;
+}
+
+#DlgPayment #widgetPaymentCard {
+    background-color: #ffffff;
+    border: 2px solid #b8d4f0;
+    border-radius: 24px;
+    margin: 24px;
+}
+
+#DlgPayment #lblTitle {
+    font-size: 30px;
+    font-weight: 700;
+    color: #1a1a1a;
+}
+
+#DlgPayment #lblTotal {
+    font-size: 26px;
+    font-weight: 700;
+    color: #1a1a1a;
+    padding: 8px 0 16px 0;
+}
+
+#DlgPayment #lblInstruction {
+    font-size: 20px;
+    color: #444444;
+    padding: 16px 12px;
+}
+
+#DlgPayment #btnBackToCart {
+    background-color: #e8e8e8;
+    border: none;
+    border-radius: 12px;
+    font-size: 18px;
+    font-weight: 600;
+    color: #1a1a1a;
+}
+
+#DlgPaymentStub #btnPaid {
+    background-color: #c5db00;
+    border: none;
+    border-radius: 12px;
+    font-size: 18px;
+    font-weight: 700;
+}
+
+#DlgPaymentStub #btnInsufficient,
+#DlgPaymentStub #btnOtherError {
+    background-color: #ececec;
+    border: none;
+    border-radius: 12px;
+    font-size: 18px;
+    font-weight: 600;
+}
+
+/* --- Order accepted overlay --- */
+
+#orderDoneTitle {
+    color: #ffffff;
+    font-size: 34px;
+    font-weight: 700;
+}
+
+#orderDoneNumber {
+    color: #c5db00;
+    font-size: 72px;
+    font-weight: 800;
+    padding: 16px 0;
+}
+
+#orderDoneHint {
+    color: #ffffff;
+    font-size: 22px;
+    max-width: 720px;
+}
+
+#orderDoneOk {
+    background-color: #c5db00;
+    border: none;
+    border-radius: 16px;
+    color: #1a1a1a;
+    font-size: 24px;
+    font-weight: 700;
 }

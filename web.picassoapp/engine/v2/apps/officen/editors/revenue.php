@@ -2,6 +2,7 @@
 # © 2026 , Kudryashov Vasili
 
 require_once __DIR__ . "/../../../worker/helper.php";
+require_once __DIR__ . '/../../worker/dict-cash-operation-type.php';
 
 class Revenue
 {
@@ -79,6 +80,7 @@ class Revenue
         $cashboxId = (int)($filter["cashbox"] ?? 0);
         $dateStart = (!empty($filter["date1"])) ? $filter["date1"] : '2000-01-01';
         $dateEnd = (!empty($filter["date2"])) ? $filter["date2"] : date('Y-m-d');
+        $otherExpensesOnly = (int)($filter['other_expenses'] ?? 0) === 1;
 
         $baseWhere = " op.f_currency_id = ? ";
         $baseParams = [$currencyId];
@@ -90,33 +92,49 @@ class Revenue
             $baseTypes .= "i";
         }
 
-        // 1. Входящий остаток
-        $sqlStart = "SELECT SUM(op.f_debit) - SUM(op.f_credit) FROM cash_operations op WHERE $baseWhere AND op.f_datetime < ?";
-        $paramsStart = $baseParams;
-        $paramsStart[] = $dateStart . " 00:00:00";
-        $typesStart = $baseTypes . "s";
+        if ($otherExpensesOnly) {
+            $baseWhere .= ' AND (op.f_order_id IS NULL OR TRIM(op.f_order_id) = \'\')';
+            $baseWhere .= ' AND op.f_operation_type IN ('
+                . CASH_OP_TOTAL_EXPENSES . ','
+                . CASH_OP_DEBT_REPAYMENT . ','
+                . CASH_OP_UTILITIES . ','
+                . CASH_OP_CASH_SHORTAGE
+                . ')';
+            $baseWhere .= ' AND (op.f_credit > 0 OR op.f_debit > 0)';
+        }
 
-        $resStart = $this->db->select($sqlStart, $typesStart, $paramsStart)->fetch_row();
-        $openingBalance = (float)($resStart[0] ?? 0);
+        $openingBalance = 0.0;
+        if (!$otherExpensesOnly) {
+            // 1. Входящий остаток
+            $sqlStart = "SELECT SUM(op.f_debit) - SUM(op.f_credit) FROM cash_operations op WHERE $baseWhere AND op.f_datetime < ?";
+            $paramsStart = $baseParams;
+            $paramsStart[] = $dateStart . " 00:00:00";
+            $typesStart = $baseTypes . "s";
+
+            $resStart = $this->db->select($sqlStart, $typesStart, $paramsStart)->fetch_row();
+            $openingBalance = (float)($resStart[0] ?? 0);
+        }
 
         // 2. Список операций
         $sqlOps = <<<EOD
     SELECT 
         op.f_id,                     -- index 0 (для редактирования)
-        COALESCE(cot.f_comment, CAST(op.f_operation_type AS CHAR)) AS f_operation_type_name,
+        COALESCE(lot.f_value, CAST(op.f_operation_type AS CHAR)) AS f_operation_type_name,
         op.f_operation_type,         -- index 2 (id)
         op.f_order_id,               -- index 3 (UUID заказа; пусто = прямая кассовая операция)
         op.f_datetime,               -- index 4
-        lp.f_value as payment_type,  -- index 5
-        money_fmt(op.f_debit) as d_f, -- index 6
-        money_fmt(op.f_credit) as c_f, -- index 7
-        op.f_comment,                -- index 8
-        op.f_debit,                  -- index 9 (raw)
-        op.f_credit                  -- index 10 (raw)
+        TRIM(CONCAT(u.f_last, ' ', LEFT(u.f_first, 1), '.')) AS operator_name, -- index 5
+        lp.f_value as payment_type,  -- index 6
+        money_fmt(op.f_debit) as d_f, -- index 7
+        money_fmt(op.f_credit) as c_f, -- index 8
+        op.f_comment,                -- index 9
+        op.f_debit,                  -- index 10 (raw)
+        op.f_credit                  -- index 11 (raw)
     FROM cash_operations op
     LEFT JOIN cash_box cb ON cb.f_id = op.f_cashbox_id
-    LEFT JOIN cash_operations_types cot ON cot.f_id = op.f_operation_type
-    LEFT JOIN l_dictionary lp ON lp.f_dict_id = op.f_payment_type_id AND lp.f_dict = 'cash_payment_types'
+    LEFT JOIN l_dictionary lot ON lot.f_dict_id = op.f_operation_type AND lot.f_dict = 'cash_operations_types' AND lot.f_lang = 'hy'
+    LEFT JOIN s_user u ON u.f_id = op.f_user
+    LEFT JOIN l_dictionary lp ON lp.f_dict_id = op.f_payment_type_id AND lp.f_dict = 'cash_payment_types' AND lp.f_lang = 'hy'
     WHERE $baseWhere AND op.f_datetime BETWEEN ? AND ?
     ORDER BY op.f_datetime ASC, op.f_id ASC
     EOD;
@@ -131,27 +149,49 @@ class Revenue
         $rows = [];
         $currentBalance = $openingBalance;
 
-        // Строка начального сальдо
-        $rows[] = [
-            "",
-            "",
-            "",
-            "",
-            $dateStart . " 00:00:00",
-            Translator::t("OPENING BALANCE"),
-            "",
-            "",
-            "",
-            number_format($openingBalance, 2, '.', ' ')
-        ];
+        if (!$otherExpensesOnly) {
+            // Строка начального сальдо
+            $rows[] = [
+                "",
+                "",
+                "",
+                "",
+                $dateStart . " 00:00:00",
+                "",
+                Translator::t("OPENING BALANCE"),
+                "",
+                "",
+                "",
+                number_format($openingBalance, 2, '.', ' ')
+            ];
+        }
 
         foreach ($dbRows as $dbRow) {
-            $paymentType = $dbRow[5];
-            $debitFmt    = $dbRow[6];
-            $creditFmt   = $dbRow[7];
-            $comment     = $dbRow[8];
-            $debitRaw    = (float)$dbRow[9];
-            $creditRaw   = (float)$dbRow[10];
+            $operator    = $dbRow[5];
+            $paymentType = $dbRow[6];
+            $debitFmt    = $dbRow[7];
+            $creditFmt   = $dbRow[8];
+            $comment     = translate_cash_operation_comment((string)$dbRow[9]);
+            $debitRaw    = (float)$dbRow[10];
+            $creditRaw   = (float)$dbRow[11];
+
+            if ($otherExpensesOnly) {
+                $expenseAmt = max($creditRaw, $debitRaw);
+                $rows[] = [
+                    $dbRow[0],
+                    $dbRow[1],
+                    $dbRow[2],
+                    $dbRow[3],
+                    $dbRow[4],
+                    $operator,
+                    $comment,
+                    $paymentType,
+                    "",
+                    $expenseAmt > 0.009 ? money_fmt_php($expenseAmt) : "-",
+                    "",
+                ];
+                continue;
+            }
 
             $currentBalance += ($debitRaw - $creditRaw);
 
@@ -161,6 +201,7 @@ class Revenue
                 $dbRow[2], // f_operation_type id
                 $dbRow[3], // f_order_id
                 $dbRow[4], // f_datetime
+                $operator,
                 $comment,
                 $paymentType,
                 ($debitRaw > 0) ? $debitFmt : "",
@@ -171,12 +212,14 @@ class Revenue
 
         return [
             "rows" => $rows,
-            "hidden_columns" => [0, 2, 3],
+            "hidden_columns" => $otherExpensesOnly ? [0, 2, 3, 10] : [0, 2, 3],
             "headers" => [
                 Translator::t("Id"),
                 Translator::t("Type"),
+                "TypeId",
                 "UUID",
                 Translator::t("DateTime"),
+                Translator::t("Operator"),
                 Translator::t("Comment"),
                 Translator::t("Payment type"),
                 Translator::t("Income"),
@@ -184,7 +227,7 @@ class Revenue
                 Translator::t("Balance")
             ],
             "toolbar" => ["reload" => true, "filter" => true, "new" => true],
-            "sum" => [7, 8, 9],
+            "sum" => $otherExpensesOnly ? [9] : [8, 9, 10],
             "filter" => $this->getFilterConfig()
         ];
     }

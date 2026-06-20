@@ -19,12 +19,61 @@
 #include <QPrinter>
 #include <QPrintPreviewDialog>
 #include <xlsxdocument.h>
+#include <QAbstractItemView>
+#include <QColor>
+#include <QPalette>
+
+namespace {
+
+void setupGridTableAppearance(QTableView *view)
+{
+    view->setAlternatingRowColors(true);
+    view->setSelectionBehavior(QAbstractItemView::SelectRows);
+    view->setShowGrid(true);
+
+    QPalette pal = view->palette();
+    pal.setColor(QPalette::Base, QColor(255, 255, 255));
+    pal.setColor(QPalette::AlternateBase, QColor(246, 246, 246));
+    pal.setColor(QPalette::Highlight, QColor(72, 149, 208));
+    pal.setColor(QPalette::HighlightedText, Qt::white);
+    view->setPalette(pal);
+
+    view->setStyleSheet(QStringLiteral(
+        "QTableView {"
+        "  gridline-color: #e0e0e0;"
+        "  background-color: #ffffff;"
+        "  alternate-background-color: #f6f6f6;"
+        "  selection-background-color: #4895d0;"
+        "  selection-color: #ffffff;"
+        "  outline: 0;"
+        "}"
+        "QTableView::item:selected {"
+        "  background-color: #4895d0;"
+        "  color: #ffffff;"
+        "}"
+        "QTableView::item:selected:!active {"
+        "  background-color: #7eb3dd;"
+        "  color: #ffffff;"
+        "}"
+        "QHeaderView::section {"
+        "  background-color: #f2f2f2;"
+        "  color: #333333;"
+        "  padding: 5px 6px;"
+        "  border: none;"
+        "  border-right: 1px solid #e0e0e0;"
+        "  border-bottom: 1px solid #d0d0d0;"
+        "  font-weight: bold;"
+        "}"));
+}
+
+} // namespace
 
 C5Grid::C5Grid(QWidget *parent) :
     C5OfficeWidget(parent),
     ui(new Ui::C5Grid)
 {
     ui->setupUi(this);
+    setupGridTableAppearance(ui->tblView);
     fCheckboxes = false;
     fModel = new C5TableModel(ui->tblView);
     ui->tblView->setModel(fModel);

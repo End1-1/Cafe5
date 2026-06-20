@@ -49,5 +49,11 @@ private:
 
     void setup();
 
+    void updateAttendanceButtons();
+
+    void refreshAttendanceStatus();
+
+    void printDifferenceAct(const QJsonObject &cashbox);
+
     int mRoute = 0;
 };

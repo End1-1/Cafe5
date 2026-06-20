@@ -34,10 +34,12 @@ void NLoadingDlg::open()
 
 void NLoadingDlg::reject()
 {
+    hide();
 }
 
 void NLoadingDlg::accept()
 {
+    hide();
 }
 
 void NLoadingDlg::resetSeconds()

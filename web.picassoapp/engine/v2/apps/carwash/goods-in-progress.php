@@ -36,10 +36,21 @@ class GoodsInProgress extends Auth
         $sql = <<<EOD
         UPDATE o_goods_process 
         SET f_status = ?,
-        f_data = JSON_SET(
-            COALESCE(f_data, '{}'),
-            '$jsonTimePath', NOW(),
-            '$.f_substatus', ?
+        f_data = JSON_REMOVE(
+            JSON_SET(
+                COALESCE(f_data, '{}'),
+                '{$jsonTimePath}',
+                COALESCE(
+                    NULLIF(JSON_UNQUOTE(JSON_EXTRACT(f_data, '{$jsonTimePath}')), ''),
+                    NULLIF(JSON_UNQUOTE(JSON_EXTRACT(f_data, '\$."$jsonTimePath"')), ''),
+                    NULLIF(JSON_UNQUOTE(JSON_EXTRACT(f_data, '$.jsonTimePath')), ''),
+                    DATE_FORMAT(NOW(), '%Y-%m-%d %H:%i:%s')
+                ),
+                '$.f_substatus', ?
+            ),
+            '\$."$jsonTimePath"',
+            '$.jsonTimePath',
+            '\$.$jsonTimePath'
         )
         WHERE f_id = ?
         EOD;

@@ -12,6 +12,7 @@
 #include "c5message.h"
 #include "c5systempreference.h"
 #include "c5user.h"
+#include "../WaiterDesigner/waitertablestyle.h"
 #include "dict_workstation.h"
 #include "dlgscreen.h"
 #include "dlgsplashscreen.h"
@@ -38,12 +39,7 @@ int main(int argc, char* argv[])
     QCoreApplication::setLibraryPaths(libPath);
 #endif
     qputenv("QT_ASSUME_UTF8", "1");
-    QFile styleSheet(a.applicationDirPath() + "/waiter.css");
-
-    if(styleSheet.open(QIODevice::ReadOnly)) {
-        a.setStyleSheet(styleSheet.readAll());
-        styleSheet.close();
-    }
+    WaiterTblTablesStyle::loadAtStartup();
 
     QDir d;
     const QString lockDir = d.homePath() + "/" + _APPLICATION_;

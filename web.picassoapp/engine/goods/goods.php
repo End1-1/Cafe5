@@ -14,8 +14,12 @@ class Goods extends PClass
 
     public function open()
     {
-        $image = stmtall("select f_image from c_goods_images where f_id=?", "i", [$this->id])->fetch_assoc();
-        $this->result["image"] = $image["f_image"] ?? "";
+        $imageRow = stmtall(
+            "select f_image from c_goods_images where f_id=?",
+            "i",
+            [$this->id]
+        )->fetch_assoc();
+        $this->result["image"] = $imageRow["f_image"] ?? "";
 
         $goods = stmtall("select * from c_goods where f_id=?", "i", [$this->id])->fetch_assoc();
         $typename = stmtall("select f_value from l_dictionary where f_dict='c_goods_type' and f_lang='hy' and f_dict_id=?", "i", [$goods["f_type"]])->fetch_assoc();
@@ -79,8 +83,35 @@ class Goods extends PClass
         }
 
         $v = get_object_vars($this->params->goods);
-        if (isset($v["f_data"]) && is_object($v["f_data"])) {
-            $v["f_data"] = json_encode($v["f_data"], JSON_UNESCAPED_UNICODE);
+        if (isset($v["f_data"])) {
+            if (is_object($v["f_data"])) {
+                $incoming = json_decode(json_encode($v["f_data"]), true);
+            } elseif (is_array($v["f_data"])) {
+                $incoming = $v["f_data"];
+            } else {
+                $incoming = json_decode((string) $v["f_data"], true);
+            }
+            if (!is_array($incoming)) {
+                $incoming = [];
+            }
+
+            if (!$isnew && !empty($this->params->goods->f_id)) {
+                $existingRow = $this->stmtall(
+                    "select f_data from c_goods where f_id=?",
+                    "i",
+                    [$this->params->goods->f_id]
+                )->fetch_assoc();
+                $existing = [];
+                if (!empty($existingRow["f_data"])) {
+                    $existing = json_decode($existingRow["f_data"], true);
+                    if (!is_array($existing)) {
+                        $existing = [];
+                    }
+                }
+                $incoming = array_merge($existing, $incoming);
+            }
+
+            $v["f_data"] = json_encode($incoming, JSON_UNESCAPED_UNICODE);
         }
         $this->params->goods->f_id = $this->sinsertupdate("c_goods", $v, $this->params->goods->f_id, $isnew);
         if ($isnew) {
@@ -91,19 +122,31 @@ class Goods extends PClass
 
         $v["f_id"] = $this->params->goods->f_id;
         $this->sinsertupdate("c_goods_option", $v, $this->params->goods->f_id, $isnew);
-        $imageSize = empty($this->params->image) ? 0 : strlen($this->params->image);
-        $v["f_id"] = $this->params->goods->f_id;
-        $v["f_image"] = $this->params->image;
+
+        // Image row is independent from c_goods: existing goods may have no c_goods_images row yet.
+        $imageRow = $this->stmtall(
+            "select f_id from c_goods_images where f_id=?",
+            "i",
+            [$this->params->goods->f_id]
+        )->fetch_assoc();
+        $isnewImage = empty($imageRow);
+
+        $imagePayload = $this->params->image ?? "";
+        $imageSize = empty($imagePayload) ? 0 : strlen($imagePayload);
+        $vImg = [
+            "f_id" => $this->params->goods->f_id,
+            "f_image" => $imagePayload,
+            "f_size" => $imageSize,
+        ];
         if ($imageSize == 0) {
-            $v["f_bigimagesize"] = 0;
-            $v["f_bigimage"] = null;
+            $vImg["f_bigimagesize"] = 0;
+            $vImg["f_bigimage"] = null;
         }
         if (!empty($this->params->bigimage)) {
-            $v["f_bigimage"] = $this->params->bigimage;
-            $v["f_bigimagesize"] = strlen($this->params->bigimage);
+            $vImg["f_bigimage"] = $this->params->bigimage;
+            $vImg["f_bigimagesize"] = strlen($this->params->bigimage);
         }
-        $v["f_size"] = $imageSize;
-        $this->sinsertupdate("c_goods_images", $v, $this->params->goods->f_id, $isnew);
+        $this->sinsertupdate("c_goods_images", $vImg, $this->params->goods->f_id, $isnewImage);
 
         $this->stmtall("delete from c_goods_complectation where f_base=?", "i", [$this->params->goods->f_id]);
         foreach ($this->params->c_goods_complectation as $c) {

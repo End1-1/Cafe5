@@ -129,6 +129,7 @@ void C5SalaryPaymentEditor::showEvent(QShowEvent *e)
                            for (const auto &v : items) {
                                const QJsonObject it = v.toObject();
                                const double amount = it.value(QStringLiteral("f_amount_debit")).toString().toDouble();
+                               const double debt = it.value(QStringLiteral("f_debt")).toString().toDouble();
 
                                ui->tblSalary->insertRow(row);
 
@@ -138,6 +139,7 @@ void C5SalaryPaymentEditor::showEvent(QShowEvent *e)
                                auto *itNum = new QTableWidgetItem(QString::number(row + 1));
                                auto *itPos = new QTableWidgetItem(it.value(QStringLiteral("f_position_name")).toString());
                                auto *itName = new QTableWidgetItem(it.value(QStringLiteral("f_staff_name")).toString());
+                               auto *itDebt = new QTableWidgetItem(QString::number(debt, 'f', 2));
                                auto *itAmount = new QTableWidgetItem(QString::number(amount, 'f', 2));
 
                                itDbId->setFlags(itDbId->flags() & ~Qt::ItemIsEditable);
@@ -146,8 +148,10 @@ void C5SalaryPaymentEditor::showEvent(QShowEvent *e)
                                itNum->setFlags(itNum->flags() & ~Qt::ItemIsEditable);
                                itPos->setFlags(itPos->flags() & ~Qt::ItemIsEditable);
                                itName->setFlags(itName->flags() & ~Qt::ItemIsEditable);
+                               itDebt->setFlags(itDebt->flags() & ~Qt::ItemIsEditable);
 
                                itNum->setTextAlignment(Qt::AlignCenter);
+                               itDebt->setTextAlignment(Qt::AlignRight | Qt::AlignVCenter);
                                itAmount->setTextAlignment(Qt::AlignRight | Qt::AlignVCenter);
 
                                ui->tblSalary->setItem(row, colDbId, itDbId);
@@ -156,6 +160,7 @@ void C5SalaryPaymentEditor::showEvent(QShowEvent *e)
                                ui->tblSalary->setItem(row, colNum, itNum);
                                ui->tblSalary->setItem(row, colPosition, itPos);
                                ui->tblSalary->setItem(row, colName, itName);
+                               ui->tblSalary->setItem(row, colDebt, itDebt);
                                ui->tblSalary->setItem(row, colAmount, itAmount);
 
                                ++row;
@@ -165,7 +170,7 @@ void C5SalaryPaymentEditor::showEvent(QShowEvent *e)
                        });
 }
 
-void C5SalaryPaymentEditor::appendStaffRow(int staffId, const QString &staffName, int positionId, const QString &positionName)
+void C5SalaryPaymentEditor::appendStaffRow(int staffId, const QString &staffName, int positionId, const QString &positionName, double debt)
 {
     const int row = ui->tblSalary->rowCount();
     ui->tblSalary->insertRow(row);
@@ -176,6 +181,7 @@ void C5SalaryPaymentEditor::appendStaffRow(int staffId, const QString &staffName
     auto *itNum = new QTableWidgetItem(QString::number(row + 1));
     auto *itPos = new QTableWidgetItem(positionName);
     auto *itName = new QTableWidgetItem(staffName);
+    auto *itDebt = new QTableWidgetItem(QString::number(debt, 'f', 2));
     auto *itAmount = new QTableWidgetItem(QStringLiteral("0.00"));
 
     itDbId->setFlags(itDbId->flags() & ~Qt::ItemIsEditable);
@@ -184,7 +190,9 @@ void C5SalaryPaymentEditor::appendStaffRow(int staffId, const QString &staffName
     itNum->setFlags(itNum->flags() & ~Qt::ItemIsEditable);
     itPos->setFlags(itPos->flags() & ~Qt::ItemIsEditable);
     itName->setFlags(itName->flags() & ~Qt::ItemIsEditable);
+    itDebt->setFlags(itDebt->flags() & ~Qt::ItemIsEditable);
     itNum->setTextAlignment(Qt::AlignCenter);
+    itDebt->setTextAlignment(Qt::AlignRight | Qt::AlignVCenter);
     itAmount->setTextAlignment(Qt::AlignRight | Qt::AlignVCenter);
 
     ui->tblSalary->setItem(row, colDbId, itDbId);
@@ -193,6 +201,7 @@ void C5SalaryPaymentEditor::appendStaffRow(int staffId, const QString &staffName
     ui->tblSalary->setItem(row, colNum, itNum);
     ui->tblSalary->setItem(row, colPosition, itPos);
     ui->tblSalary->setItem(row, colName, itName);
+    ui->tblSalary->setItem(row, colDebt, itDebt);
     ui->tblSalary->setItem(row, colAmount, itAmount);
     ui->tblSalary->setCurrentCell(row, colAmount);
 }
@@ -219,6 +228,7 @@ void C5SalaryPaymentEditor::on_btnAddStaff_clicked()
                        [this, employee, employeeName, selectorPos](const QJsonObject &jo) {
                            int positionId = jo.value(QStringLiteral("f_position")).toInt();
                            QString positionName = jo.value(QStringLiteral("f_position_name")).toString().trimmed();
+                           const double debt = jo.value(QStringLiteral("f_debt")).toVariant().toDouble();
 
                            if (positionId <= 0) {
                                positionId = employee.groupId;
@@ -236,7 +246,7 @@ void C5SalaryPaymentEditor::on_btnAddStaff_clicked()
                                positionName = groups.first().name;
                            }
 
-                           appendStaffRow(employee.id, employeeName, positionId, positionName);
+                           appendStaffRow(employee.id, employeeName, positionId, positionName, debt);
                        });
 }
 
@@ -380,7 +390,7 @@ void C5SalaryPaymentEditor::print()
 void C5SalaryPaymentEditor::initTable()
 {
     ui->tblSalary->setRowCount(0);
-    ui->tblSalary->setColumnCount(7);
+    ui->tblSalary->setColumnCount(8);
     ui->tblSalary->setHorizontalHeaderLabels({
         QStringLiteral("DbId"),
         QStringLiteral("PositionId"),
@@ -388,6 +398,7 @@ void C5SalaryPaymentEditor::initTable()
         QStringLiteral("#"),
         tr("Position"),
         tr("Name"),
+        tr("Debt"),
         tr("Paid amount"),
     });
     ui->tblSalary->setColumnHidden(colDbId, true);
@@ -396,6 +407,7 @@ void C5SalaryPaymentEditor::initTable()
     ui->tblSalary->horizontalHeader()->setSectionResizeMode(colNum, QHeaderView::ResizeToContents);
     ui->tblSalary->horizontalHeader()->setSectionResizeMode(colPosition, QHeaderView::Stretch);
     ui->tblSalary->horizontalHeader()->setSectionResizeMode(colName, QHeaderView::Stretch);
+    ui->tblSalary->horizontalHeader()->setSectionResizeMode(colDebt, QHeaderView::ResizeToContents);
     ui->tblSalary->horizontalHeader()->setSectionResizeMode(colAmount, QHeaderView::ResizeToContents);
     ui->tblSalary->verticalHeader()->setVisible(false);
     ui->tblSalary->setSelectionBehavior(QAbstractItemView::SelectRows);
@@ -427,17 +439,20 @@ QString C5SalaryPaymentEditor::buildPrintHtml() const
             + QStringLiteral("</p>");
     html += QStringLiteral("<table><thead><tr>"
                            "<th>#</th><th>") + tr("Position").toHtmlEscaped() + QStringLiteral("</th><th>")
-            + tr("Name").toHtmlEscaped() + QStringLiteral("</th><th>") + tr("Paid amount").toHtmlEscaped()
+            + tr("Name").toHtmlEscaped() + QStringLiteral("</th><th>") + tr("Debt").toHtmlEscaped()
+            + QStringLiteral("</th><th>") + tr("Paid amount").toHtmlEscaped()
             + QStringLiteral("</th></tr></thead><tbody>");
 
     for (int i = 0; i < ui->tblSalary->rowCount(); ++i) {
         const QString pos = ui->tblSalary->item(i, colPosition) ? ui->tblSalary->item(i, colPosition)->text() : QString();
         const QString name = ui->tblSalary->item(i, colName) ? ui->tblSalary->item(i, colName)->text() : QString();
+        const QString debt = ui->tblSalary->item(i, colDebt) ? ui->tblSalary->item(i, colDebt)->text() : QStringLiteral("0.00");
         const QString amount = ui->tblSalary->item(i, colAmount) ? ui->tblSalary->item(i, colAmount)->text() : QStringLiteral("0.00");
         html += QStringLiteral("<tr>");
         html += QStringLiteral("<td class='num'>") + QString::number(i + 1).toHtmlEscaped() + QStringLiteral("</td>");
         html += QStringLiteral("<td>") + pos.toHtmlEscaped() + QStringLiteral("</td>");
         html += QStringLiteral("<td>") + name.toHtmlEscaped() + QStringLiteral("</td>");
+        html += QStringLiteral("<td class='money'>") + debt.toHtmlEscaped() + QStringLiteral("</td>");
         html += QStringLiteral("<td class='money'>") + amount.toHtmlEscaped() + QStringLiteral("</td>");
         html += QStringLiteral("</tr>");
     }

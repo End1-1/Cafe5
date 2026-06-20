@@ -4,117 +4,17 @@
 #include "c5utils.h"
 #include "c5user.h"
 #include "struct_workstationitem.h"
+#include "../WaiterDesigner/waitertablestyle.h"
+#include "../WaiterDesigner/tablecelldelegate.h"
+#include <QApplication>
 #include <QScrollBar>
-#include <QStyledItemDelegate>
-#include <QPainter>
-
-enum TableRoles {
-    RoleId = Qt::UserRole,
-    RoleState,
-    RoleAmount,
-    RoleStaff,
-    RoleName
-};
-
-class TableCellDelegate : public QStyledItemDelegate
-{
-public:
-    explicit TableCellDelegate(QObject *parent = nullptr)
-        : QStyledItemDelegate(parent) {}
-
-    void paint(QPainter *p,
-               const QStyleOptionViewItem &opt,
-               const QModelIndex &idx) const override
-    {
-        p->save();
-        // inset = толщина "разделителя"
-        const int inset = 1;
-        QRect r = opt.rect.adjusted(inset, inset, -inset, -inset);
-        // id
-        int id = idx.data(RoleId).toInt();
-        // --- фон по состоянию ---
-        QColor bg(Qt::white);
-        int state = idx.data(RoleState).toInt();
-
-        if(state == 2)
-            bg = QColor(200, 247, 197);   // зелёный
-        else if(state == 3)
-            bg = QColor(247, 197, 197);   // красный
-
-        // если id == 0 — просто фон и выходим
-        if(id == 0) {
-            p->fillRect(r, bg);
-            p->restore();
-            return;
-        }
-
-        // фон ячейки
-        p->fillRect(r, bg);
-        // --- данные ---
-        QString name  = idx.data(RoleName).toString();
-        QString staff = idx.data(RoleStaff).toString();
-        double amount = idx.data(RoleAmount).toDouble();
-        const int pad = 6;
-        // --- имя стола (лево-верх) ---
-        QFont f = opt.font;
-        f.setBold(true);
-        QRect nameRect(r.left() + pad, r.top() + pad, r.width() / 2, 18);
-        // начальный размер
-        int fontSize = 14;
-        const int minFontSize = 8;
-        QFontMetrics fm(f);
-
-        while(fontSize >= minFontSize) {
-            f.setPointSize(fontSize);
-            fm = QFontMetrics(f);
-
-            if(fm.horizontalAdvance(name) <= nameRect.width())
-                break;
-
-            fontSize--;
-        }
-
-        p->setFont(f);
-        p->setPen(Qt::black);
-        p->drawText(nameRect, Qt::AlignCenter | Qt::AlignVCenter, name);
-        f.setPointSize(10);
-        f.setBold(true);
-        p->setFont(f);
-
-        // --- сумма (право-верх) ---
-        if(amount > 0.01) {
-            p->drawText(
-                QRect(r.center().x(), r.top() + pad,
-                      r.width() / 2 - pad, 18),
-                Qt::AlignRight | Qt::AlignVCenter,
-                float_str(amount,  2)
-            );
-        }
-
-        // --- staff (вторая строка) ---
-        f.setBold(false);
-        p->setFont(f);
-        p->drawText(
-            QRect(r.left() + pad, r.top() + pad + 20,
-                  r.width() - pad * 2, 18),
-            Qt::AlignLeft | Qt::AlignVCenter,
-            staff
-        );
-        p->restore();
-    }
-
-    QSize sizeHint(const QStyleOptionViewItem&, const QModelIndex&) const override
-    {
-        return QSize(200, 56);
-    }
-};
 
 DlgTables::DlgTables(C5User *user) :
     C5WaiterDialog(user),
     ui(new Ui::DlgTables)
 {
     ui->setupUi(this);
-    ui->tblTables->setItemDelegate(new TableCellDelegate(ui->tblTables));
+    WaiterTblTablesStyle::applyToTable(ui->tblTables);
 }
 
 DlgTables::~DlgTables()
@@ -190,11 +90,11 @@ void DlgTables::hallClicked()
 
     for(auto t : copy) {
         auto *item = new QTableWidgetItem();
-        item->setData(RoleId, t.id);
-        item->setData(RoleState, t.tableState);
-        item->setData(RoleAmount, t.amount);
-        item->setData(RoleStaff, t.staffName);
-        item->setData(RoleName, t.name);
+        item->setData(WaiterRoleId, t.id);
+        item->setData(WaiterRoleState, t.tableState);
+        item->setData(WaiterRoleAmount, t.amount);
+        item->setData(WaiterRoleStaff, t.staffName);
+        item->setData(WaiterRoleName, t.name);
         ui->tblTables->setItem(r, c, item);
         ++c;
 
@@ -216,11 +116,11 @@ void DlgTables::on_tblTables_itemClicked(QTableWidgetItem *item)
         return;
     }
 
-    if(item->data(RoleId).toInt() == 0) {
+    if(item->data(WaiterRoleId).toInt() == 0) {
         return;
     }
 
-    mResult = item->data(RoleId).toInt();
-    mTableName = item->data(RoleName).toString();
+    mResult = item->data(WaiterRoleId).toInt();
+    mTableName = item->data(WaiterRoleName).toString();
     accept();
 }

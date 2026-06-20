@@ -1,4 +1,5 @@
 #include "dlgorder.h"
+#include <QAbstractScrollArea>
 #include "dlgcustdisplay.h"
 #include "dict_dish_state.h"
 #include <cmath>
@@ -150,6 +151,39 @@ DlgOrder::DlgOrder(C5User *user, HallItem h, TableItem t, const QVector<GoodsGro
     mDishes(dishes)
 {
     ui->setupUi(this);
+    ui->glGroups->setSizeConstraint(QLayout::SetNoConstraint);
+    ui->scrollAreaWidgetContents->setMinimumSize(0, 0);
+    ui->scrollAreaWidgetContents->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Ignored);
+    ui->groupsScrollArea->setMinimumHeight(0);
+    ui->groupsScrollArea->setSizeAdjustPolicy(QAbstractScrollArea::AdjustIgnored);
+    constexpr int toolbarRowHeight = 54;
+    ui->wqtypanelup->setFixedHeight(toolbarRowHeight);
+    ui->wdepts->setFixedHeight(toolbarRowHeight);
+    for (QAbstractButton *b : ui->wqtypanelup->findChildren<QAbstractButton *>()) {
+        b->setMinimumHeight(toolbarRowHeight);
+        b->setMaximumHeight(toolbarRowHeight);
+    }
+    for (QAbstractButton *b : ui->wdepts->findChildren<QAbstractButton *>()) {
+        b->setMinimumHeight(toolbarRowHeight);
+        b->setMaximumHeight(toolbarRowHeight);
+    }
+    ui->horizontalLayout->setAlignment(Qt::AlignTop);
+    ui->gridLayout->setRowStretch(0, 1);
+    ui->gridLayout->setRowStretch(1, 0);
+    ui->gridLayout->setRowStretch(2, 0);
+    ui->gridLayout->setAlignment(ui->wclosedorder, Qt::AlignTop);
+    ui->gridLayout->setAlignment(ui->wpayment, Qt::AlignTop);
+    ui->lmenua->setStretch(ui->lmenua->indexOf(ui->wdepts), 0);
+    ui->lmenua->setStretch(ui->lmenua->indexOf(ui->wgroups), 0);
+    ui->lmenua->setStretch(ui->lmenua->indexOf(ui->wdishes), 1);
+    ui->verticalLayout_5->setStretch(ui->verticalLayout_5->indexOf(ui->dishScrollArea), 1);
+    ui->glDishes->setSizeConstraint(QLayout::SetNoConstraint);
+    ui->scrollAreaWidgetContents_2->setMinimumSize(0, 0);
+    ui->scrollAreaWidgetContents_2->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Minimum);
+    ui->dishScrollArea->setMinimumHeight(0);
+    ui->dishScrollArea->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    ui->dishScrollArea->setSizeAdjustPolicy(QAbstractScrollArea::AdjustIgnored);
+    ui->wdishes->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     ui->btnPreorderDateTime->setText(tr("Preorder datetime"));
     installEventFilter(this);
     setFocusPolicy(Qt::StrongFocus);
@@ -202,11 +236,14 @@ DlgOrder::~DlgOrder()
     delete ui;
 }
 
-void DlgOrder::setOrderId(const QString &id)
+void DlgOrder::setOrderId(const QString &id, bool reopenIfClosed)
 {
     mSkipOpenTableOnShow = true;
     mOrder.id = id;
-    NInterface::query1("/engine/v2/waiter/order/open-order", mUser->mSessionKey, this,
+    const char *route = reopenIfClosed
+        ? "/engine/v2/waiter/order/reopen-order"
+        : "/engine/v2/waiter/order/open-order";
+    NInterface::query1(route, mUser->mSessionKey, this,
     {{"id", id}}, [this](const QJsonObject & jdoc) {
         parseOrder(jdoc);
     });
@@ -449,8 +486,6 @@ void DlgOrder::makeGroups(int parent, int dept)
             row ++;
         }
     }
-
-    ui->glGroups->setRowStretch(row + 1, 1);
 
     for(int i = 0; i < dcolCount; i++) {
         ui->glGroups->setColumnStretch(i, 1);
@@ -756,13 +791,16 @@ void DlgOrder::printPrecheck(const QString &currentStaff)
     }
 
     if (mOrder.data.contains("f_guest")) {
+        const QJsonObject guest = mOrder.dataValue("f_guest").toObject();
         p.ltext(tr("Client"));
         p.br();
-        p.ltext(mOrder.dataValue("f_guest").toObject().value("f_guest_name").toString());
+        if(!mWorkStation.data.value(QStringLiteral("do_not_print_customer_on_receipt")).toBool()) {
+            p.ltext(guest.value(QStringLiteral("f_guest_name")).toString());
+            p.br();
+        }
+        p.ltext(guest.value(QStringLiteral("f_guest_phone")).toString());
         p.br();
-        p.ltext(mOrder.dataValue("f_guest").toObject().value("f_guest_phone").toString());
-        p.br();
-        p.ltext(mOrder.dataValue("f_guest").toObject().value("f_guest_address").toString());
+        p.ltext(guest.value(QStringLiteral("f_guest_address")).toString());
         p.br();
     }
 
@@ -2525,9 +2563,8 @@ void DlgOrder::createPaymentButtons()
         btn->setMinimumHeight(50);
         btn->setText(QCoreApplication::translate("PaymentType", payment_names[pt]));
         btn->setEnabled(payment_special[pt] ? mUser->check(cp_t5_waiter_special_payment_types) : true);
-        bool btnEnabled = jo.contains(QString("payment_button_%1").arg(pt)) ? jo.value(QString("payment_button_%1").arg(pt)).toBool()
-                                                                            : true;
-        btn->setEnabled(btn->isEnabled() && btnEnabled);
+        const bool disabled = jo.value(QString("payment_button_%1").arg(pt)).toBool(false);
+        btn->setEnabled(btn->isEnabled() && !disabled);
         connect(btn, &QToolButton::clicked, this, [self, pt]() {
             if (self->ui->lbAmount->property("amount").toDouble() < 0.01) {
                 return;
@@ -2694,6 +2731,7 @@ void DlgOrder::parseOrder(const QJsonObject & jdoc)
                                || mOrder.state == ORDER_STATE_OPEN
                                || mOrder.state == ORDER_STATE_PREORDER;
     ui->lbTableName->setText(mOrder.tableName);
+    ui->lbOrderNumber->setText(mOrder.receiptNumber);
     ui->lbOrderComment->setVisible(!mOrder.comment().isEmpty());
     ui->lbOrderComment->setText(mOrder.comment());
     ui->wgroups->setVisible(!lockByPrecheck);
@@ -2958,6 +2996,10 @@ void DlgOrder::parseOrder(const QJsonObject & jdoc)
     ui->btnPrepaid->setText(prepaidAmount > 0.001
                                 ? QString("%1 %2").arg(float_str(prepaidAmount, 2), CURRENCY_SHORT)
                                 : tr("Prepaid"));
+    const double deliveryAmount = mOrder.data.value("f_delivery_amount").toDouble();
+    ui->btnDeliveryAmount->setText(deliveryAmount > 0.001
+                                       ? QString("%1 %2").arg(float_str(deliveryAmount, 2), CURRENCY_SHORT)
+                                       : tr("Delivery\namount"));
     {
         const bool preorder = (mOrder.state == ORDER_STATE_PREORDER);
         ui->btnPreorderDateTime->setVisible(preorder);
@@ -3131,6 +3173,7 @@ void DlgOrder::on_btnCloseOrder_clicked()
             {{"id", self->mOrder.id},
              {"fiscal", fiscalInfo},
              {"cashbox_id", mWorkStation.cashboxId()},
+             {"cost_depend_on_service_and_discount", mWorkStation.data.value(QStringLiteral("cost_depend_on_service_and_discount")).toBool()},
              {"cash_session_id", self->mOrder.cashSessionId}},
             [self](const QJsonObject &jdoc) {
                 self->parseOrder(jdoc);
@@ -4156,4 +4199,25 @@ void DlgOrder::on_btnShowCustomerDisplay_clicked()
     }
 
     openCustomerDisplay();
+}
+
+void DlgOrder::on_btnDeliveryAmount_clicked()
+{
+    if(mOrder.id.isEmpty()) {
+        C5Message::error(tr("Order was not opened"));
+        return;
+    }
+
+    DlgMoveMoney d(mUser);
+    d.setMode(0);
+    d.setAmount(mOrder.data.value("f_delivery_amount").toDouble());
+    if(d.exec() != QDialog::Accepted) {
+        return;
+    }
+
+    NInterface::query1("/engine/v2/waiter/order/set-data-value",
+                       mUser->mSessionKey,
+                       this,
+                       {{"id", mOrder.id}, {"key", "f_delivery_amount"}, {"value", d.amount()}},
+                       [this](const QJsonObject &jdoc) { parseOrder(jdoc); });
 }

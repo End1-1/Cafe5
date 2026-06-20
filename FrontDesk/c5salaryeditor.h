@@ -25,6 +25,7 @@ private slots:
     void on_btnAddStaff_clicked();
     void on_btnRemoveStaff_clicked();
     void on_btnChangePosition_clicked();
+    void autofillDocument();
     void calculateDocument();
     void saveDocument();
     void removeDocument();

@@ -17,6 +17,8 @@
 #include "struct_goods_type.h"
 #include "ui_c5structtableview.h"
 
+QMap<QString, QJsonArray> C5StructTableView::sLastResultsByEngine;
+
 C5StructTableView::C5StructTableView(C5User *user)
     : C5Dialog(user), ui(new Ui::C5StructTableView)
 {
@@ -32,6 +34,18 @@ C5StructTableView::C5StructTableView(C5User *user)
     connect(AppWebSocket::instance, &AppWebSocket::bMessageReceived,
     this, [this](const QJsonObject & jo) {
         if(!jo.contains("result")) {
+            if(!mReloadRequestId.isEmpty() && jo.contains(QStringLiteral("requestId"))
+               && jo.value(QStringLiteral("requestId")).toString() == mReloadRequestId) {
+                mReloadRequestId.clear();
+                if(jo.value(QStringLiteral("errorCode")).toInt() != 0) {
+                    const QString err = jo.value(QStringLiteral("errorMessage")).toString();
+                    C5Message::error(!err.isEmpty() ? err : tr("Failed to reload dictionary from server."));
+                } else {
+                    sLastResultsByEngine.remove(mSearchEngine);
+                    sendSearchRequest();
+                }
+                return;
+            }
             if(jo.contains(QStringLiteral("error")) || jo.contains(QStringLiteral("errorMessage"))
                || jo.contains(QStringLiteral("errorCode"))) {
                 if(jo.contains(QStringLiteral("requestId")) && !mLastRequestId.isEmpty()
@@ -48,6 +62,7 @@ C5StructTableView::C5StructTableView(C5User *user)
         }
 
         QJsonArray arr = jo["result"].toArray();
+        sLastResultsByEngine[mSearchEngine] = arr;
 
         if(mSearchEngine == SelectorName<StorageItem>::value) {
             handleSearchResult<StorageItem>(arr, static_cast<C5StructModel<StorageItem>*>(ui->tbl->model()));
@@ -59,7 +74,7 @@ C5StructTableView::C5StructTableView(C5User *user)
             handleSearchResult<StoreDocStatusItem>(arr, static_cast<C5StructModel<StoreDocStatusItem> *>(ui->tbl->model()));
         } else if (mSearchEngine == SelectorName<StoreDocTypeItem>::value) {
             handleSearchResult<StoreDocTypeItem>(arr, static_cast<C5StructModel<StoreDocTypeItem> *>(ui->tbl->model()));
-        } else if (mSearchEngine == SelectorName<StoreDocTypeItem>::value) {
+        } else if (mSearchEngine == SelectorName<GoodsGroupItem>::value) {
             handleSearchResult<GoodsGroupItem>(arr, static_cast<C5StructModel<GoodsGroupItem> *>(ui->tbl->model()));
         } else if (mSearchEngine == SelectorName<StructCurrency>::value) {
             handleSearchResult<StructCurrency>(arr, static_cast<C5StructModel<StructCurrency> *>(ui->tbl->model()));
@@ -238,4 +253,27 @@ void C5StructTableView::on_tbl_doubleClicked(const QModelIndex &index)
 void C5StructTableView::on_btnCancel_clicked()
 {
     reject();
+}
+
+void C5StructTableView::on_btnRefreash_clicked()
+{
+    if(!AppWebSocket::instance) {
+        C5Message::error(tr("WebSocket is not initialized. Restart the application."));
+        return;
+    }
+    if(!AppWebSocket::instance->isConnected()) {
+        C5Message::error(tr("No connection to the server. Check the network and try again."));
+        return;
+    }
+
+    QJsonObject jo;
+    jo["command"] = "search_engine_reload_dict";
+    jo["engine"] = mSearchEngine;
+    jo["requestId"] = QUuid::createUuid().toString(QUuid::WithoutBraces);
+    mReloadRequestId = jo["requestId"].toString();
+
+    if(!AppWebSocket::instance->sendBinaryMessage(QJsonDocument(jo).toJson())) {
+        mReloadRequestId.clear();
+        C5Message::error(tr("Failed to send the reload request. Check the connection to the server."));
+    }
 }

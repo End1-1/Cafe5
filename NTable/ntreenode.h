@@ -9,6 +9,7 @@ public:
     QList<QVariant> values;
     QList<NTreeNode*> children;
     NTreeNode* parent;
+    bool spacer = false;
     NTreeNode(NTreeNode *p = nullptr);
     NTreeNode(const QList<QVariant>& rowValues, NTreeNode *p = nullptr);
     ~NTreeNode();

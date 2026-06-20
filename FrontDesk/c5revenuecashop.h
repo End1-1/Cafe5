@@ -26,6 +26,7 @@ private slots:
     void on_btnCashbox_clicked();
 private:
     void refillCashOperationTypeCombo();
+    void syncOperationFromExpenseType();
     int selectedOperationType() const;
     Ui::C5RevenueCashOp *ui;
     int mCashboxId = 0;

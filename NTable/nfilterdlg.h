@@ -33,6 +33,9 @@ private slots:
     void on_btnApply_clicked();
 
 private:
+    void showSuggestionsForButton(QPushButton *btn);
+    void closeLoadingDialog();
+
     Ui::NFilterDlg* ui;
     QMap<QString, QJsonArray> mData;
     QMap<QString, QJsonArray> mCols;

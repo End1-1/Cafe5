@@ -5,17 +5,22 @@
 #include <QDateTime>
 #include <QFileDialog>
 #include <QFontDatabase>
+#include <QHeaderView>
 #include <QInputDialog>
 #include <QMenu>
 #include <QPaintEngine>
 #include <QPrintPreviewDialog>
 #include <QPrinter>
+#include <QCheckBox>
+#include <QPainter>
+#include <QPixmap>
 #include <QPushButton>
 #include <QStringListModel>
 #include "barcode.h"
 #include "c5cache.h"
 #include "c5codenameselectorfunctions.h"
 #include "c5config.h"
+#include "c5editor.h"
 #include "c5database.h"
 #include "c5htmlprint.h"
 #include "c5message.h"
@@ -28,17 +33,352 @@
 #include "ce5goodsmodel.h"
 #include "ce5goodsunit.h"
 #include "ce5partner.h"
+#include "dict_goods_types.h"
 #include "ui_ce5goods.h"
 #include <stdexcept>
 
 static int fLastGroup = 0;
 static int fLastUnit = 0;
 
+static QByteArray decodeBase64ImagePayload(const QString &payload)
+{
+    QString text = payload.trimmed();
+    if(text.isEmpty()) {
+        return {};
+    }
+
+    // Supports "data:image/png;base64,...." style payload.
+    if(text.startsWith(QStringLiteral("data:"), Qt::CaseInsensitive)) {
+        const int comma = text.indexOf(QLatin1Char(','));
+        if(comma >= 0) {
+            text = text.mid(comma + 1);
+        }
+    }
+
+    // DB / transport may insert line breaks; strip common whitespace before decode.
+    text.remove(QLatin1Char(' '));
+    text.remove(QLatin1Char('\n'));
+    text.remove(QLatin1Char('\r'));
+    text.remove(QLatin1Char('\t'));
+
+    return QByteArray::fromBase64(text.toLatin1());
+}
+
+static void setLabelPixmapScaled(QLabel *label, const QPixmap &pm)
+{
+    if(!label || pm.isNull()) {
+        return;
+    }
+
+    const QSize target = label->size();
+    if(target.isEmpty() || target.width() <= 1 || target.height() <= 1) {
+        label->setPixmap(pm);
+        return;
+    }
+
+    label->setPixmap(pm.scaled(target, Qt::KeepAspectRatio, Qt::SmoothTransformation));
+}
+
+static bool loadGoodsImageToLabel(int goodsId, QLabel *label, QString *outBase64 = nullptr)
+{
+    if(goodsId <= 0 || !label) {
+        return false;
+    }
+
+    C5Database db;
+    db[":f_id"] = goodsId;
+    db.exec("select f_image from c_goods_images where f_id=:f_id");
+    if(!db.nextRow()) {
+        return false;
+    }
+
+    const QString imagePayload = db.getValue("f_image").toString();
+    const QByteArray rawFromFImage = decodeBase64ImagePayload(imagePayload);
+    QPixmap p;
+    if(!rawFromFImage.isEmpty() && p.loadFromData(rawFromFImage)) {
+        setLabelPixmapScaled(label, p);
+        if(outBase64) {
+            *outBase64 = imagePayload;
+        }
+        return true;
+    }
+
+    return false;
+}
+
+static QJsonValue dynamicAttributeToJson(const QString &value, const QString &measurement, const QString &priceText)
+{
+    const QString trimmedValue = value.trimmed();
+    const QString trimmedMeas = measurement.trimmed();
+    bool priceOk = false;
+    const double price = priceText.trimmed().replace(QLatin1Char(','), QLatin1Char('.')).toDouble(&priceOk);
+    const bool hasMeas = !trimmedMeas.isEmpty();
+
+    if (!hasMeas && !priceOk) {
+        return trimmedValue;
+    }
+
+    QJsonObject obj;
+    obj.insert(QStringLiteral("value"), trimmedValue);
+    if (hasMeas) {
+        obj.insert(QStringLiteral("measurement"), trimmedMeas);
+    }
+    if (priceOk) {
+        obj.insert(QStringLiteral("price"), price);
+    }
+    return obj;
+}
+
+static void readDynamicAttributeFromJson(
+    const QJsonValue &json,
+    QString *value,
+    QString *measurement,
+    QString *priceText)
+{
+    if (json.isObject()) {
+        const QJsonObject obj = json.toObject();
+        *value = obj.value(QStringLiteral("value")).toString();
+        *measurement = obj.value(QStringLiteral("measurement")).toString();
+        if (obj.contains(QStringLiteral("price"))) {
+            *priceText = QString::number(obj.value(QStringLiteral("price")).toDouble());
+        } else {
+            priceText->clear();
+        }
+        return;
+    }
+    *value = json.toString();
+    measurement->clear();
+    priceText->clear();
+}
+
+static QString modificatorSelectorQuery()
+{
+    return QString(R"(
+        select g.f_id as `%1`, gg.f_name as `%2`, g.f_name as `%3`, u.f_name as `%4`,
+               g.f_scancode as `%5`, gpr.f_price1 as `%6`
+        from c_goods g
+        left join c_groups gg on gg.f_id=g.f_group
+        left join c_units u on u.f_id=g.f_unit
+        left join c_goods_prices gpr on gpr.f_goods=g.f_id and gpr.f_currency=1
+        where g.f_type=%7 and coalesce(g.f_enabled, 1)=1
+        order by g.f_name
+    )")
+        .arg(QObject::tr("Code").toLower(),
+             QObject::tr("Group").toLower(),
+             QObject::tr("Name").toLower(),
+             QObject::tr("Unit").toLower(),
+             QObject::tr("Scancode").toLower(),
+             QObject::tr("Price").toLower())
+        .arg(GOODS_TYPE_MODIFICATOR);
+}
+
+static QString menuDishSelectorQuery()
+{
+    return QString(R"(
+        select mm.f_dish as `%1`, gr.f_name as `%2`, g.f_name as `%3`, u.f_name as `%4`,
+               g.f_scancode as `%5`, gpr.f_price1 as `%6`
+        from c_menu mm
+        inner join c_goods g on g.f_id = mm.f_dish
+        left join c_groups gr on gr.f_id = g.f_group
+        left join c_units u on u.f_id = g.f_unit
+        left join c_goods_prices gpr on gpr.f_goods = g.f_id and gpr.f_currency = 1
+        where mm.f_menu = 1 and mm.f_state = 1 and coalesce(g.f_enabled, 1) = 1
+        order by g.f_name
+    )")
+        .arg(QObject::tr("Code").toLower(),
+             QObject::tr("Group").toLower(),
+             QObject::tr("Name").toLower(),
+             QObject::tr("Unit").toLower(),
+             QObject::tr("Scancode").toLower(),
+             QObject::tr("Price").toLower());
+}
+
+static QJsonArray relatedItemsFromTable(C5TableWidget *tbl)
+{
+    QJsonArray items;
+    if(!tbl) {
+        return items;
+    }
+
+    for(int i = 0; i < tbl->rowCount(); ++i) {
+        const int dishId = tbl->getInteger(i, 0);
+        if(dishId <= 0) {
+            continue;
+        }
+        QJsonObject item;
+        item.insert(QStringLiteral("f_id"), dishId);
+        item.insert(QStringLiteral("f_name"), tbl->getString(i, 1).trimmed());
+        items.append(item);
+    }
+    return items;
+}
+
+static QJsonObject parseGoodsFData(const QJsonValue &rawFData)
+{
+    if(rawFData.isObject()) {
+        return rawFData.toObject();
+    }
+
+    const QString text = rawFData.toString().trimmed();
+    if(text.isEmpty()) {
+        return {};
+    }
+
+    const QJsonDocument doc = QJsonDocument::fromJson(text.toUtf8());
+    return doc.isObject() ? doc.object() : QJsonObject();
+}
+
+static QJsonArray modificatorsFromTable(C5TableWidget *tbl)
+{
+    QJsonArray modificators;
+    if(!tbl) {
+        return modificators;
+    }
+
+    for(int i = 0; i < tbl->rowCount(); ++i) {
+        C5TableWidgetItem *idItem = tbl->item(i, 0);
+        C5TableWidgetItem *nameItem = tbl->item(i, 1);
+        C5LineEdit *priceEdit = tbl->lineEdit(i, 2);
+        C5CheckBox *requiredBox = tbl->checkBox(i, 3);
+        if(!idItem || !nameItem || !priceEdit || !requiredBox) {
+            continue;
+        }
+
+        int modificatorId = idItem->data(Qt::EditRole).toInt();
+        if(modificatorId <= 0) {
+            modificatorId = idItem->text().trimmed().toInt();
+        }
+        if(modificatorId <= 0) {
+            continue;
+        }
+
+        QJsonObject item;
+        item.insert(QStringLiteral("f_id"), modificatorId);
+        item.insert(QStringLiteral("f_name"), nameItem->text().trimmed());
+        item.insert(QStringLiteral("f_price"), priceEdit->getDouble());
+        item.insert(QStringLiteral("f_required"), requiredBox->isChecked());
+        modificators.append(item);
+    }
+
+    return modificators;
+}
+
+static void initDynamicAttributesTable(QTableWidget *tbl)
+{
+    if(!tbl) {
+        return;
+    }
+
+    constexpr int kRows = 2;
+    constexpr int kColAttribute = 0;
+    constexpr int kColValue = 1;
+    constexpr int kColMeasurement = 2;
+    constexpr int kColPrice = 3;
+    constexpr int kRequiredCols = 4; // Attribute / Value / Measurement / Price
+
+    if(tbl->columnCount() < kRequiredCols) {
+        tbl->setColumnCount(kRequiredCols);
+    }
+    tbl->setRowCount(kRows);
+
+    const QString kType = QStringLiteral("Type");
+    const QString kSize = QStringLiteral("Size");
+
+    for(int r = 0; r < kRows; ++r) {
+        const QString attrName = (r == 0) ? kType : kSize;
+
+        QTableWidgetItem *attrItem = tbl->item(r, kColAttribute);
+        if(!attrItem) {
+            attrItem = new QTableWidgetItem();
+            tbl->setItem(r, kColAttribute, attrItem);
+        }
+        attrItem->setText(attrName);
+        attrItem->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
+
+        QTableWidgetItem *valItem = tbl->item(r, kColValue);
+        if(!valItem) {
+            valItem = new QTableWidgetItem();
+            tbl->setItem(r, kColValue, valItem);
+        }
+        valItem->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled | Qt::ItemIsEditable);
+
+        QTableWidgetItem *measItem = tbl->item(r, kColMeasurement);
+        if(!measItem) {
+            measItem = new QTableWidgetItem();
+            tbl->setItem(r, kColMeasurement, measItem);
+        }
+        measItem->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled | Qt::ItemIsEditable);
+        if (r == 0) {
+            measItem->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
+            measItem->setText(QString());
+        }
+
+        QTableWidgetItem *priceItem = tbl->item(r, kColPrice);
+        if(!priceItem) {
+            priceItem = new QTableWidgetItem();
+            tbl->setItem(r, kColPrice, priceItem);
+        }
+        priceItem->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled | Qt::ItemIsEditable);
+    }
+}
+
 CE5Goods::CE5Goods(QWidget *parent) :
     CE5Editor(parent),
     ui(new Ui::CE5Goods)
 {
     ui->setupUi(this);
+
+    // Hardcoded required dynamic attributes.
+    initDynamicAttributesTable(ui->tblDynamicAttributes);
+    ui->tblModificators->setColumnWidths(4, 60, 200, 80, 70);
+    ui->tblModificators->horizontalHeader()->setStretchLastSection(false);
+    ui->tblModificators->horizontalHeader()->setSectionResizeMode(1, QHeaderView::Stretch);
+    ui->tblRelatedDrinks->setColumnWidths(2, 60, 300);
+    ui->tblRelatedDrinks->horizontalHeader()->setStretchLastSection(false);
+    ui->tblRelatedDrinks->horizontalHeader()->setSectionResizeMode(1, QHeaderView::Stretch);
+    ui->tblRelatedOther->setColumnWidths(2, 60, 300);
+    ui->tblRelatedOther->horizontalHeader()->setStretchLastSection(false);
+    ui->tblRelatedOther->horizontalHeader()->setSectionResizeMode(1, QHeaderView::Stretch);
+
+    {
+        constexpr QSize dietaryIconSize(24, 24);
+        const auto limitDietaryIcon = [&](QCheckBox *cb) {
+            if (!cb) {
+                return;
+            }
+            cb->setIconSize(dietaryIconSize);
+        };
+        limitDietaryIcon(ui->chGlutenFree);
+        limitDietaryIcon(ui->chVegetarian);
+        limitDietaryIcon(ui->chVegan);
+        limitDietaryIcon(ui->chNoGmo);
+        limitDietaryIcon(ui->chNoLactose);
+        limitDietaryIcon(ui->chNoSugar);
+        limitDietaryIcon(ui->chContainsNuts);
+
+        const QPixmap halal(QStringLiteral(":/dietary/halal.png"));
+        const QPixmap kosher(QStringLiteral(":/dietary/kosher.png"));
+        if (!halal.isNull() && !kosher.isNull()) {
+            const QPixmap halalScaled =
+                halal.scaled(dietaryIconSize, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+            const QPixmap kosherScaled =
+                kosher.scaled(dietaryIconSize, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+            constexpr int gap = 4;
+            QPixmap combined(halalScaled.width() + gap + kosherScaled.width(),
+                             qMax(halalScaled.height(), kosherScaled.height()));
+            combined.fill(Qt::transparent);
+            QPainter painter(&combined);
+            painter.drawPixmap(0, (combined.height() - halalScaled.height()) / 2, halalScaled);
+            painter.drawPixmap(halalScaled.width() + gap,
+                               (combined.height() - kosherScaled.height()) / 2,
+                               kosherScaled);
+            ui->chHalalKosher->setIcon(QIcon(combined));
+            ui->chHalalKosher->setIconSize(combined.size());
+        } else {
+            limitDietaryIcon(ui->chHalalKosher);
+        }
+    }
+
     ui->leSupplier->setSelector(ui->leSupplierName, cache_goods_partners);
     ui->leGroup->setSelector(ui->leGroupName, cache_goods_group);
     ui->leUnit->setSelector(ui->leUnitName, cache_goods_unit);
@@ -212,6 +552,10 @@ bool CE5Goods::save(QString &err, QList<QMap<QString, QVariant> >& data)
         }
     }
 
+    if(ui->wGoodsType->value() == 0) {
+        err += tr("Goods type must be selected") + "<br>";
+    }
+
     if(ui->leQtyBox->getDouble() < 1) {
         ui->leQtyBox->setDouble(1);
     }
@@ -232,6 +576,7 @@ void CE5Goods::clear()
 {
     int scancode = ui->leScanCode->getInteger();
     fImage.clear();
+    fBigImage.clear();
     ui->tblBarcodes->setRowCount(0);
     ui->tblGoods->clearContents();
     ui->tblGoods->setRowCount(0);
@@ -280,6 +625,46 @@ void CE5Goods::clear()
 
     ui->chCountDiscount->setChecked(true);
     ui->chCountService->setChecked(true);
+
+    // Dietary / allergen badges
+    ui->chGlutenFree->setChecked(false);
+    ui->chVegetarian->setChecked(false);
+    ui->chVegan->setChecked(false);
+    ui->chNoGmo->setChecked(false);
+    ui->chNoLactose->setChecked(false);
+    ui->chNoSugar->setChecked(false);
+    ui->chContainsNuts->setChecked(false);
+    ui->chHalalKosher->setChecked(false);
+
+    ui->leBjuKcal->clear();
+    ui->leBjuProtein->clear();
+    ui->leBjuFat->clear();
+    ui->leBjuCarbs->clear();
+
+    // Reset dynamic attributes (keep two required rows).
+    initDynamicAttributesTable(ui->tblDynamicAttributes);
+    if(ui->tblDynamicAttributes->item(0, 1)) {
+        ui->tblDynamicAttributes->item(0, 1)->setText(QString());
+    }
+    if(ui->tblDynamicAttributes->item(1, 1)) {
+        ui->tblDynamicAttributes->item(1, 1)->setText(QString());
+    }
+    if(ui->tblDynamicAttributes->item(0, 2)) {
+        ui->tblDynamicAttributes->item(0, 2)->setText(QString());
+    }
+    if(ui->tblDynamicAttributes->item(1, 2)) {
+        ui->tblDynamicAttributes->item(1, 2)->setText(QString());
+    }
+    if(ui->tblDynamicAttributes->item(0, 3)) {
+        ui->tblDynamicAttributes->item(0, 3)->setText(QString());
+    }
+    if(ui->tblDynamicAttributes->item(1, 3)) {
+        ui->tblDynamicAttributes->item(1, 3)->setText(QString());
+    }
+
+    ui->tblModificators->setRowCount(0);
+    ui->tblRelatedDrinks->setRowCount(0);
+    ui->tblRelatedOther->setRowCount(0);
 }
 
 QPushButton* CE5Goods::b1()
@@ -302,6 +687,51 @@ QJsonObject CE5Goods::makeJsonObject()
     jdata["f_salary_department"] = ui->leSalaryDepartment->getInteger();
     jdata["f_salary_fixed_value"] = ui->leSalaryFixedValue->getDouble();
     jdata["f_salary_percent_value"] = ui->leSalaryPercentValue->getDouble();
+
+    // Saved to c_goods.f_data.f_dietary_badge
+    QJsonObject dietaryBadge;
+    dietaryBadge["gluten_free"] = ui->chGlutenFree->isChecked();
+    dietaryBadge["vegetarian"] = ui->chVegetarian->isChecked();
+    dietaryBadge["vegan"] = ui->chVegan->isChecked();
+    dietaryBadge["no_gmo"] = ui->chNoGmo->isChecked();
+    dietaryBadge["no_lactose"] = ui->chNoLactose->isChecked();
+    dietaryBadge["no_sugar"] = ui->chNoSugar->isChecked();
+    dietaryBadge["contains_nuts"] = ui->chContainsNuts->isChecked();
+    dietaryBadge["halal_kosher"] = ui->chHalalKosher->isChecked();
+    jdata["f_dietary_badge"] = dietaryBadge;
+
+    QJsonObject bju;
+    bju.insert(QStringLiteral("kcal"), ui->leBjuKcal->getDouble());
+    bju.insert(QStringLiteral("protein"), ui->leBjuProtein->getDouble());
+    bju.insert(QStringLiteral("fat"), ui->leBjuFat->getDouble());
+    bju.insert(QStringLiteral("carbs"), ui->leBjuCarbs->getDouble());
+    jdata[QStringLiteral("f_bju")] = bju;
+
+    // Stored to c_goods.f_data.f_dynamic_attributes (Type/Size + Measurement + Price).
+    QJsonObject dynAttrs;
+    initDynamicAttributesTable(ui->tblDynamicAttributes);
+    const auto typeValue = ui->tblDynamicAttributes->item(0, 1)
+                               ? ui->tblDynamicAttributes->item(0, 1)->text()
+                               : QString();
+    const auto typePrice = ui->tblDynamicAttributes->item(0, 3)
+                               ? ui->tblDynamicAttributes->item(0, 3)->text()
+                               : QString();
+    const auto sizeValue = ui->tblDynamicAttributes->item(1, 1)
+                               ? ui->tblDynamicAttributes->item(1, 1)->text()
+                               : QString();
+    const auto sizeMeas = ui->tblDynamicAttributes->item(1, 2)
+                              ? ui->tblDynamicAttributes->item(1, 2)->text()
+                              : QString();
+    const auto sizePrice = ui->tblDynamicAttributes->item(1, 3)
+                               ? ui->tblDynamicAttributes->item(1, 3)->text()
+                               : QString();
+    dynAttrs.insert(QStringLiteral("Type"), dynamicAttributeToJson(typeValue, QString(), typePrice));
+    dynAttrs.insert(QStringLiteral("Size"), dynamicAttributeToJson(sizeValue, sizeMeas, sizePrice));
+    jdata[QStringLiteral("f_dynamic_attributes")] = dynAttrs;
+    jdata[QStringLiteral("f_modificators")] = modificatorsFromTable(ui->tblModificators);
+    jdata[QStringLiteral("f_related_drink")] = relatedItemsFromTable(ui->tblRelatedDrinks);
+    jdata[QStringLiteral("f_related_other")] = relatedItemsFromTable(ui->tblRelatedOther);
+
     QJsonObject j;
     j["f_id"] = ui->leCode->getInteger();
     j["f_name"] = ui->leName->text();
@@ -454,6 +884,12 @@ void CE5Goods::saveResponse(const QJsonObject &jdoc)
         C5Cache::cache(cache_goods)->refreshId("g.f_id", j["f_id"].toInt());
     }
 
+    if(C5Editor *editor = qobject_cast<C5Editor *>(fEditor)) {
+        QMap<QString, QVariant> row;
+        row.insert(QStringLiteral("f_id"), jdoc.value(QStringLiteral("f_id")).toInt());
+        editor->appendResultRow(row);
+    }
+
     if(acceptOnSave()) {
         emit Accept();
     }
@@ -461,14 +897,23 @@ void CE5Goods::saveResponse(const QJsonObject &jdoc)
 
 void CE5Goods::openResponse(const QJsonObject &jdoc)
 {
-    fImage = jdoc["image"].toString();
-    QByteArray ba = QByteArray::fromBase64(fImage.toLatin1());
+    const QString imagePayload = jdoc.value(QStringLiteral("image")).toString();
+    fImage = imagePayload;
+
+    const QByteArray raw = decodeBase64ImagePayload(imagePayload);
     QPixmap p;
-    p.loadFromData(ba);
-    QPixmap scaledPixmap = p.scaled(ui->lbImage->size(), Qt::KeepAspectRatio, Qt::SmoothTransformation);
-    ui->lbImage->setPixmap(scaledPixmap);
+    bool imageShown = !raw.isEmpty() && p.loadFromData(raw);
+    if(imageShown) {
+        setLabelPixmapScaled(ui->lbImage, p);
+    } else {
+        ui->lbImage->setPixmap(QPixmap());
+        ui->lbImage->setText(tr("Image"));
+    }
     QJsonObject j = jdoc["goods"].toObject();
     ui->leCode->setInteger(j["f_id"].toInt());
+    if(!imageShown) {
+        loadGoodsImageToLabel(ui->leCode->getInteger(), ui->lbImage, &fImage);
+    }
     ui->leName->setText(j["f_name"].toString());
     ui->leGroup->setValue(j["f_group"].toInt());
     ui->leSupplier->setValue(j["f_supplier"].toInt());
@@ -621,7 +1066,7 @@ void CE5Goods::openResponse(const QJsonObject &jdoc)
         ch->setChecked(jm["f_recent"].toInt());
     }
 
-    QJsonObject jdata = QJsonDocument::fromJson(jdoc["goods"].toObject()["f_data"].toString().toUtf8()).object();
+    QJsonObject jdata = parseGoodsFData(jdoc.value(QStringLiteral("goods")).toObject().value(QStringLiteral("f_data")));
     ui->chCountDiscount->setChecked(jdata["f_count_discount"].toBool());
     ui->chCountService->setChecked(jdata["f_count_service"].toBool());
     ui->chHourlyPayment->setChecked(jdata["f_hourly_payment"].toBool());
@@ -630,6 +1075,65 @@ void CE5Goods::openResponse(const QJsonObject &jdoc)
     ui->leSalaryDepartment->setInteger(jdata["f_salary_department"].toInt());
     ui->leSalaryFixedValue->setDouble(jdata["f_salary_fixed_value"].toDouble());
     ui->leSalaryPercentValue->setDouble(jdata.value("f_salary_percent_value").toDouble());
+
+    // Dietary / allergen badges
+    const QJsonValue jb = jdata.value("f_dietary_badge");
+    const auto dObj = jb.isObject() ? jb.toObject() : QJsonObject();
+    ui->chGlutenFree->setChecked(dObj.value("gluten_free").toBool());
+    ui->chVegetarian->setChecked(dObj.value("vegetarian").toBool());
+    ui->chVegan->setChecked(dObj.value("vegan").toBool());
+    ui->chNoGmo->setChecked(dObj.value("no_gmo").toBool());
+    ui->chNoLactose->setChecked(dObj.value("no_lactose").toBool());
+    ui->chNoSugar->setChecked(dObj.value("no_sugar").toBool());
+    ui->chContainsNuts->setChecked(dObj.value("contains_nuts").toBool());
+    ui->chHalalKosher->setChecked(dObj.value("halal_kosher").toBool());
+
+    const QJsonObject bjuObj = jdata.value(QStringLiteral("f_bju")).toObject();
+    ui->leBjuKcal->setDouble(bjuObj.value(QStringLiteral("kcal")).toDouble());
+    ui->leBjuProtein->setDouble(bjuObj.value(QStringLiteral("protein")).toDouble());
+    ui->leBjuFat->setDouble(bjuObj.value(QStringLiteral("fat")).toDouble());
+    ui->leBjuCarbs->setDouble(bjuObj.value(QStringLiteral("carbs")).toDouble());
+
+    // Dynamic attributes (hardcoded required Type/Size rows + Measurement column).
+    initDynamicAttributesTable(ui->tblDynamicAttributes);
+    const QJsonObject dynObj = jdata.value(QStringLiteral("f_dynamic_attributes")).toObject();
+
+    QString typeValue;
+    QString typeMeas;
+    QString typePrice;
+    QString sizeValue;
+    QString sizeMeas;
+    QString sizePrice;
+    readDynamicAttributeFromJson(dynObj.value(QStringLiteral("Type")), &typeValue, &typeMeas, &typePrice);
+    readDynamicAttributeFromJson(dynObj.value(QStringLiteral("Size")), &sizeValue, &sizeMeas, &sizePrice);
+
+    if (sizeMeas.isEmpty()) {
+        sizeMeas = dynObj.value(QStringLiteral("Measurement")).toString();
+    }
+
+    if(ui->tblDynamicAttributes->item(0, 1)) {
+        ui->tblDynamicAttributes->item(0, 1)->setText(typeValue);
+    }
+    if(ui->tblDynamicAttributes->item(1, 1)) {
+        ui->tblDynamicAttributes->item(1, 1)->setText(sizeValue);
+    }
+    if(ui->tblDynamicAttributes->item(0, 2)) {
+        ui->tblDynamicAttributes->item(0, 2)->setText(QString());
+    }
+    if(ui->tblDynamicAttributes->item(1, 2)) {
+        ui->tblDynamicAttributes->item(1, 2)->setText(sizeMeas);
+    }
+    if(ui->tblDynamicAttributes->item(0, 3)) {
+        ui->tblDynamicAttributes->item(0, 3)->setText(typePrice);
+    }
+    if(ui->tblDynamicAttributes->item(1, 3)) {
+        ui->tblDynamicAttributes->item(1, 3)->setText(sizePrice);
+    }
+
+    loadModificatorsFromJson(jdata.value(QStringLiteral("f_modificators")).toArray());
+    loadRelatedFromJson(ui->tblRelatedDrinks, jdata.value(QStringLiteral("f_related_drink")).toArray());
+    loadRelatedFromJson(ui->tblRelatedOther, jdata.value(QStringLiteral("f_related_other")).toArray());
+
     ui->tblMenu->setUpdatesEnabled(true);
     fHttp->httpQueryFinished(sender());
 }
@@ -889,6 +1393,7 @@ void CE5Goods::uploadImage()
 
     QByteArray ba;
     QBuffer bigBuff(&ba);
+    bigBuff.open(QIODevice::WriteOnly);
     pm.save(&bigBuff, "JPG");
     fBigImage = ba.toBase64();
 
@@ -903,8 +1408,13 @@ void CE5Goods::uploadImage()
         pm.save(&buff, "JPG");
     } while(ba.size() > 100000);
 
-    ui->lbImage->setPixmap(pm.scaled(ui->lbImage->size(), Qt::KeepAspectRatio, Qt::SmoothTransformation));
-    fImage = QString(ba.toBase64());
+    if(ba.isEmpty()) {
+        C5Message::error(tr("Could not encode image"));
+        return;
+    }
+
+    setLabelPixmapScaled(ui->lbImage, pm);
+    fImage = QString::fromLatin1(ba.toBase64());
 }
 
 void CE5Goods::removeImage()
@@ -914,6 +1424,7 @@ void CE5Goods::removeImage()
     }
 
     fImage = "";
+    fBigImage.clear();
     ui->lbImage->setText(tr("Image"));
 }
 
@@ -1025,6 +1536,11 @@ void CE5Goods::countTotal()
 
     ui->leTotal->setDouble(total);
     setComplectFlag();
+
+    if(ui->wGoodsType->value() == GOODS_TYPE_DISH
+            || ui->wGoodsType->value() == GOODS_TYPE_GOODS) {
+        ui->leCostPrice->setDouble(total);
+    }
 }
 
 void CE5Goods::setComplectFlag()
@@ -1140,17 +1656,7 @@ void CE5Goods::on_tabWidget_currentChanged(int index)
 {
     switch(index) {
     case 3: {
-        C5Database db;
-        db[":f_id"] = ui->leCode->getInteger();
-        db.exec("select * from c_goods_images where f_id=:f_id");
-
-        if(db.nextRow()) {
-            QPixmap p;
-
-            if(p.loadFromData(db.getValue("f_data").toByteArray())) {
-                ui->lbImage->setPixmap(p.scaled(ui->lbImage->size(), Qt::KeepAspectRatio, Qt::SmoothTransformation));
-            }
-        }
+        loadGoodsImageToLabel(ui->leCode->getInteger(), ui->lbImage, &fImage);
     }
     }
 }
@@ -1316,4 +1822,183 @@ void CE5Goods::on_btnFromProduct_clicked()
     }
 
     countTotal();
+}
+
+int CE5Goods::addModificatorRow()
+{
+    const int row = ui->tblModificators->rowCount();
+    ui->tblModificators->setRowCount(row + 1);
+    ui->tblModificators->setItem(row, 0, new QTableWidgetItem());
+    ui->tblModificators->setItem(row, 1, new QTableWidgetItem());
+    ui->tblModificators->item(row, 0)->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
+    ui->tblModificators->item(row, 1)->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
+
+    C5LineEdit *price = ui->tblModificators->createLineEdit(row, 2);
+    price->setValidator(new QDoubleValidator(0, 999999999, 2));
+    price->fDecimalPlaces = 2;
+    ui->tblModificators->createCheckbox(row, 3);
+    return row;
+}
+
+void CE5Goods::loadModificatorsFromJson(const QJsonArray &items)
+{
+    ui->tblModificators->setRowCount(0);
+
+    for(const QJsonValue &value : items) {
+        if(!value.isObject()) {
+            continue;
+        }
+
+        const QJsonObject item = value.toObject();
+        const int modificatorId = item.value(QStringLiteral("f_id")).toInt();
+        if(modificatorId <= 0) {
+            continue;
+        }
+
+        const int row = addModificatorRow();
+        ui->tblModificators->setInteger(row, 0, modificatorId);
+        ui->tblModificators->setString(row, 1, item.value(QStringLiteral("f_name")).toString());
+        ui->tblModificators->lineEdit(row, 2)->setDouble(item.value(QStringLiteral("f_price")).toDouble());
+        ui->tblModificators->checkBox(row, 3)->setChecked(item.value(QStringLiteral("f_required")).toBool());
+    }
+}
+
+void CE5Goods::on_btnAddModificator_clicked()
+{
+    QJsonArray vals;
+    if(!C5Selector::getValue(mUser, modificatorSelectorQuery(), vals)) {
+        return;
+    }
+
+    const int modificatorId = vals.at(1).toInt();
+    if(modificatorId <= 0) {
+        return;
+    }
+
+    for(int i = 0; i < ui->tblModificators->rowCount(); ++i) {
+        if(ui->tblModificators->getInteger(i, 0) == modificatorId) {
+            C5Message::error(tr("This modificator is already added"));
+            return;
+        }
+    }
+
+    const int row = addModificatorRow();
+    ui->tblModificators->setInteger(row, 0, modificatorId);
+    ui->tblModificators->setString(row, 1, vals.at(3).toString());
+    ui->tblModificators->lineEdit(row, 2)->setDouble(vals.at(6).toDouble());
+    ui->tblModificators->checkBox(row, 3)->setChecked(false);
+}
+
+void CE5Goods::on_btnRemoveModificator_clicked()
+{
+    const int row = ui->tblModificators->currentRow();
+    if(row < 0) {
+        return;
+    }
+
+    if(C5Message::question(tr("Confirm to remove") + "<br>" + ui->tblModificators->getString(row, 1)) != QDialog::Accepted) {
+        return;
+    }
+
+    ui->tblModificators->removeRow(row);
+}
+
+int CE5Goods::addRelatedRow(C5TableWidget *tbl)
+{
+    const int row = tbl->rowCount();
+    tbl->setRowCount(row + 1);
+    tbl->setItem(row, 0, new QTableWidgetItem());
+    tbl->setItem(row, 1, new QTableWidgetItem());
+    tbl->item(row, 0)->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
+    tbl->item(row, 1)->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
+    return row;
+}
+
+void CE5Goods::loadRelatedFromJson(C5TableWidget *tbl, const QJsonArray &items)
+{
+    if(!tbl) {
+        return;
+    }
+    tbl->setRowCount(0);
+
+    for(const QJsonValue &value : items) {
+        if(!value.isObject()) {
+            continue;
+        }
+        const QJsonObject item = value.toObject();
+        const int dishId = item.value(QStringLiteral("f_id")).toInt();
+        if(dishId <= 0) {
+            continue;
+        }
+        const int row = addRelatedRow(tbl);
+        tbl->setInteger(row, 0, dishId);
+        tbl->setString(row, 1, item.value(QStringLiteral("f_name")).toString());
+    }
+}
+
+bool CE5Goods::addRelatedFromSelector(C5TableWidget *tbl)
+{
+    if(!tbl) {
+        return false;
+    }
+
+    QJsonArray vals;
+    if(!C5Selector::getValue(mUser, menuDishSelectorQuery(), vals)) {
+        return false;
+    }
+
+    const int dishId = vals.at(1).toInt();
+    if(dishId <= 0) {
+        return false;
+    }
+
+    for(int i = 0; i < tbl->rowCount(); ++i) {
+        if(tbl->getInteger(i, 0) == dishId) {
+            C5Message::error(tr("This dish is already added"));
+            return false;
+        }
+    }
+
+    const int row = addRelatedRow(tbl);
+    tbl->setInteger(row, 0, dishId);
+    tbl->setString(row, 1, vals.at(3).toString());
+    return true;
+}
+
+void CE5Goods::on_btnAddRelatedDrink_clicked()
+{
+    addRelatedFromSelector(ui->tblRelatedDrinks);
+}
+
+void CE5Goods::on_btnRemoveRelatedDrink_clicked()
+{
+    const int row = ui->tblRelatedDrinks->currentRow();
+    if(row < 0) {
+        return;
+    }
+
+    if(C5Message::question(tr("Confirm to remove") + "<br>" + ui->tblRelatedDrinks->getString(row, 1)) != QDialog::Accepted) {
+        return;
+    }
+
+    ui->tblRelatedDrinks->removeRow(row);
+}
+
+void CE5Goods::on_btnAddRelatedOther_clicked()
+{
+    addRelatedFromSelector(ui->tblRelatedOther);
+}
+
+void CE5Goods::on_btnRemoveRelatedOther_clicked()
+{
+    const int row = ui->tblRelatedOther->currentRow();
+    if(row < 0) {
+        return;
+    }
+
+    if(C5Message::question(tr("Confirm to remove") + "<br>" + ui->tblRelatedOther->getString(row, 1)) != QDialog::Accepted) {
+        return;
+    }
+
+    ui->tblRelatedOther->removeRow(row);
 }

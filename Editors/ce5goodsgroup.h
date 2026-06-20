@@ -16,13 +16,43 @@ public:
 
     ~CE5GoodsGroup();
 
-    virtual QString title() {return tr("Goods group"); }
+    virtual QString title() { return tr("Goods group"); }
 
-    virtual QString table() {return "c_groups"; }
+    virtual QString table() { return "c_groups"; }
 
-private:
-    Ui::CE5GoodsGroup* ui;
+    virtual void setId(int id) override;
+
+    virtual bool save(QString &err, QList<QMap<QString, QVariant>> &data) override;
+
+    virtual void clear() override;
+
+    virtual bool isOnline() override;
+
+    virtual bool checkData(QString &err) override;
 
 private slots:
+    void openResponse(const QJsonObject &jdoc);
+
+    void saveResponse(const QJsonObject &jdoc);
+
     void setColor();
+
+    void uploadImage();
+
+    void removeImage();
+
+    void on_lbImg_customContextMenuRequested(const QPoint &pos);
+
+private:
+    void applyGroup(const QJsonObject &group, const QString &imageBase64);
+
+    QJsonObject makeSaveJson() const;
+
+    Ui::CE5GoodsGroup *ui;
+
+    QByteArray fPendingImage;
+
+    bool fImageChanged = false;
+
+    bool fRemoveImage = false;
 };

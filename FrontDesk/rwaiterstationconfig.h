@@ -11,7 +11,7 @@ class RWaiterStationConfig : public RAbstractSpecialWidget
 {
     Q_OBJECT
 public:
-    explicit RWaiterStationConfig(QWidget *parent = nullptr);
+    explicit RWaiterStationConfig(C5Widget *parent = nullptr);
     ~RWaiterStationConfig();
 private:
     Ui::RWaiterStationConfig* ui;

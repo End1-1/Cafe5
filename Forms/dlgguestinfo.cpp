@@ -1,7 +1,17 @@
 #include "dlgguestinfo.h"
 #include "dlgtext.h"
 #include "ui_dlgguestinfo.h"
+#include <QDialog>
+#include <QJsonArray>
+#include <QLabel>
+#include <QListWidget>
+#include <QListWidgetItem>
+#include <QPointer>
 #include <QRegularExpression>
+#include <QVBoxLayout>
+#include "c5user.h"
+#include "ninterface.h"
+#include "rkeyboard.h"
 
 DlgGuestInfo::DlgGuestInfo(C5User *user) :
     C5Dialog(user),
@@ -97,4 +107,85 @@ QString DlgGuestInfo::displayPhone(const QString &phone)
             .arg(local.mid(0, 2))
             .arg(local.mid(2, 3))
             .arg(local.mid(5, 3));
+}
+
+void DlgGuestInfo::on_btnSearch_clicked()
+{
+    QDialog dlg(this);
+    dlg.setObjectName(QStringLiteral("guestSearchDialog"));
+    dlg.setWindowTitle(tr("Search customer"));
+
+    auto *v = new QVBoxLayout(&dlg);
+    v->setContentsMargins(2, 2, 2, 2);
+    v->setSpacing(2);
+
+    auto *hint = new QLabel(tr("Enter name or phone (min 2 characters)"));
+    v->addWidget(hint);
+
+    auto *list = new QListWidget();
+    list->setObjectName(QStringLiteral("guestSearchList"));
+    list->setSelectionMode(QAbstractItemView::SingleSelection);
+    v->addWidget(list, 1);
+
+    auto *kb = new RKeyboard();
+    v->addWidget(kb);
+
+    dlg.resize(700, 720);
+
+    QPointer<QListWidget> listPtr(list);
+
+    connect(kb, &RKeyboard::textChanged, this, [this, listPtr](const QString &text) {
+        if(!listPtr) {
+            return;
+        }
+
+        const QString q = text.trimmed();
+        if(q.length() <= 1) {
+            listPtr->clear();
+            return;
+        }
+
+        NInterface::query1(QStringLiteral("/engine/v2/waiter/customer/search"),
+                           mUser->mSessionKey,
+                           this,
+                           {{"query", q}},
+                           [listPtr](const QJsonObject &jo) {
+                               if(!listPtr) {
+                                   return;
+                               }
+
+                               listPtr->clear();
+                               const QJsonArray arr = jo.value(QStringLiteral("customers")).toArray();
+                               for(const QJsonValue &cv : arr) {
+                                   const QJsonObject c = cv.toObject();
+                                   const QString name = c.value(QStringLiteral("f_name")).toString();
+                                   const QString phone = displayPhone(c.value(QStringLiteral("f_phone")).toString());
+                                   const QString address = c.value(QStringLiteral("f_address")).toString();
+                                   QStringList lines;
+                                   lines << QString("%1   %2").arg(name, phone);
+                                   if(!address.isEmpty()) {
+                                       lines << address;
+                                   }
+                                   auto *it = new QListWidgetItem(lines.join('\n'));
+                                   it->setData(Qt::UserRole, c);
+                                   listPtr->addItem(it);
+                               }
+                           });
+    });
+
+    connect(list, &QListWidget::itemClicked, &dlg, [this, &dlg](QListWidgetItem *item) {
+        if(!item) {
+            return;
+        }
+
+        const QJsonObject c = item->data(Qt::UserRole).toJsonObject();
+        ui->leContactName->setText(c.value(QStringLiteral("f_name")).toString());
+        ui->lePhoneNumber->setText(displayPhone(c.value(QStringLiteral("f_phone")).toString()));
+        ui->leAddress->setText(c.value(QStringLiteral("f_address")).toString());
+        dlg.accept();
+    });
+
+    connect(kb, &RKeyboard::reject, &dlg, &QDialog::reject);
+
+    dlg.exec();
 }

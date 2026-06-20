@@ -35,6 +35,16 @@ padding: 10px;
 border: 1px solid #eeeeee;
 }
 
+QWidget#wqtypanelup QToolButton,
+QWidget#wqtypaneldown QToolButton,
+QWidget#wdepts QToolButton {
+min-height: 54px;
+max-height: 54px;
+margin: 0px;
+padding: 0px;
+border: none;
+}
+
 QLineEdit {
 background: #ffffff;
 }

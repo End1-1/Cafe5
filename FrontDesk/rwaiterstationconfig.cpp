@@ -1,9 +1,9 @@
 #include "rwaiterstationconfig.h"
 #include "ui_rwaiterstationconfig.h"
 
-RWaiterStationConfig::RWaiterStationConfig(QWidget *parent)
-    : RAbstractSpecialWidget(parent),
-      ui(new Ui::RWaiterStationConfig)
+RWaiterStationConfig::RWaiterStationConfig(C5Widget *parent)
+    : RAbstractSpecialWidget(parent)
+    , ui(new Ui::RWaiterStationConfig)
 {
     ui->setupUi(this);
 }

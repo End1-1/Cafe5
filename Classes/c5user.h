@@ -46,6 +46,8 @@ public:
 
     void authorize(const QString &pin, NInterface *n, std::function<void(const QJsonObject&)> callback, std::function<void ()> errorCallback);
 
+    void authorizeByUserId(int userId, NInterface *n, std::function<void(const QJsonObject&)> callback, std::function<void()> errorCallback);
+
     bool check(int permission);
 
     bool enterWork();

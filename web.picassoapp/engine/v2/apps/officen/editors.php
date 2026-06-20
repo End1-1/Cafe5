@@ -20,6 +20,8 @@ class Editors extends Auth
         "form_revenue" => "Revenue",
         "form_salary" => "Salary",
         "form_order_in_progress" => "OrderInProgress",
+        "form_groups_of_goods" => "GoodsGroup",
+        "form_service_values" => "ServiceValues",
     ];
 
     private function validate($params)
@@ -61,6 +63,36 @@ class Editors extends Auth
         $class = new $className($this);
 
         $this->result = array_merge($class->GetItem($params), $this->result);
+        $this->echoResult();
+    }
+
+    public function Save($params)
+    {
+        $this->validate($params);
+
+        $className = $this->allowedEditors[$params->editor];
+        $class = new $className($this);
+
+        if (!method_exists($class, 'save')) {
+            dieWithCode(Translator::t('Save is not supported for this editor'));
+        }
+
+        $this->result = array_merge($class->save($params), $this->result);
+        $this->echoResult();
+    }
+
+    public function Remove($params)
+    {
+        $this->validate($params);
+
+        $className = $this->allowedEditors[$params->editor];
+        $class = new $className($this);
+
+        if (!method_exists($class, 'delete')) {
+            dieWithCode(Translator::t('Delete is not supported for this editor'));
+        }
+
+        $this->result = array_merge($class->delete($params), $this->result);
         $this->echoResult();
     }
 }

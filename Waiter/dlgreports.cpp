@@ -436,7 +436,11 @@ void DlgReports::on_btnOpenReport_clicked()
         return;
     }
 
+    if(C5Message::question(tr("Do you want to reopen order?")) != QDialog::Accepted) {
+        return;
+    }
+
     DlgOrder d(mUser, h, t, mGroups, mDishes);
-    d.setOrderId(orderId);
+    d.setOrderId(orderId, true);
     d.exec();
 }

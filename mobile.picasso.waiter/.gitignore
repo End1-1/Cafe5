@@ -1,32 +1,45 @@
-### IntelliJ IDEA ###
-out/
-!**/src/main/**/out/
-!**/src/test/**/out/
-
-### Eclipse ###
-.apt_generated
-.classpath
-.factorypath
-.project
-.settings
-.springBeans
-.sts4-cache
-bin/
-!**/src/main/**/bin/
-!**/src/test/**/bin/
-
-### NetBeans ###
-/nbproject/private/
-/nbbuild/
-/dist/
-/nbdist/
-/.nb-gradle/
+# Flutter / Dart
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.pub-cache/
+.pub/
 /build/
-/.dart_tool/
-/.idea/
+coverage/
+*.g.dart
+*.freezed.dart
+*.mocks.dart
 
-### VS Code ###
+# Generated l10n (uncomment if you run flutter gen-l10n in CI only)
+# lib/l10n/app_localizations*.dart
+
+# Android signing (never commit secrets)
+**/android/key.properties
+upload-keystore.jks
+**/*.jks
+**/*.keystore
+
+# IDE
+.idea/
+*.iml
 .vscode/
+*.swp
+*.swo
+*~
 
-### Mac OS ###
+# OS
 .DS_Store
+Thumbs.db
+Desktop.ini
+
+# Logs / crash dumps
+*.log
+hs_err_pid*
+replay_pid*
+
+# Local tooling
+devtools_options.yaml
+
+# Legacy Java build dirs (not used by Flutter layout)
+/out/
+/bin/

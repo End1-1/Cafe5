@@ -56,6 +56,7 @@ include_directories(
     ../Service5Working/raw
     ../Service5Working/socket
     ../Service5/worker
+    ../FrontDesk
     C:/Development/OpenSSL-Win64/include
     C:/Development/projects/desktop.newtax/Src
 )
@@ -75,6 +76,10 @@ qt_add_executable(Waiter WIN32
     ${APP_SOURCES}
     ${APP_RESOURCES}
     resources/res.qrc
+    ../WaiterDesigner/waitertablestyle.cpp
+    ../WaiterDesigner/waitertablestyle.h
+    ../WaiterDesigner/tablecelldelegate.cpp
+    ../WaiterDesigner/tablecelldelegate.h
     ../Cafe5/c5double.cpp
     ../Cafe5/c5systempreference.cpp
     ../Cafe5/calendar.cpp
@@ -137,6 +142,8 @@ qt_add_executable(Waiter WIN32
     dlgreportparams.cpp
     dlgreportsfilter.cpp
     dlgscreen.cpp
+    ../FrontDesk/zkfingerprintreader.cpp
+    ../FrontDesk/zkfingerprintreader.h
     dlgsearchinmenu.cpp
     dlgsimleoptions.cpp
     dlgsplitorder.cpp
@@ -149,6 +156,7 @@ qt_add_executable(Waiter WIN32
     goodsgroupbutton.cpp
         main.cpp
         dlgface.cpp
+        dlgattendanceauth.cpp
         dlgpreorderslist.cpp
         dlgpreorderslist.h
         dlgpreorderslist.ui
@@ -258,6 +266,7 @@ qt_add_executable(Waiter WIN32
     dlgdashboard.h
     dlgeditphone.h
         dlgface.h
+        dlgattendanceauth.h
     ../Cafe5/c5dialog.h
     ../Cafe5/c5utils.h
     ../Cafe5/c5cashoperationtypes.h
@@ -350,6 +359,7 @@ qt_add_executable(Waiter WIN32
     dlgdashboard.ui
     dlgeditphone.ui
         dlgface.ui
+        dlgattendanceauth.ui
     ../Cafe5/c5message.ui
     dlgguests.ui
     dlglist.ui
@@ -418,6 +428,20 @@ target_link_libraries(Waiter PRIVATE
     Version
 )
 
+add_subdirectory(../ztk ${CMAKE_BINARY_DIR}/ztk-waiter)
+if(TARGET ZKFingerprint)
+    target_link_libraries(Waiter PRIVATE ZKFingerprint)
+
+    if(ZKFP_RUNTIME_DLL)
+        add_custom_command(TARGET Waiter POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E copy_if_different
+                    "${ZKFP_RUNTIME_DLL}"
+                    "$<TARGET_FILE_DIR:Waiter>"
+            COMMENT "Copy libzkfp.dll next to Waiter"
+        )
+    endif()
+endif()
+
 # ---------- Windows flags ----------
 if(MSVC)
     target_compile_options(Waiter PRIVATE
@@ -431,4 +455,3 @@ add_custom_target(version_inc
 )
 
 add_dependencies(Waiter version_inc)
-

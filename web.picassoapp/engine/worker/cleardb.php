@@ -1,6 +1,6 @@
 <?php
 #(C) 2025 Kudryashov Vasili
-# Last modified - 2025-05-09 14:00:10
+# Last modified - 2026-06-08 14:54:10
 require_once __DIR__ . "/worker.php";
 
 class ClearDB extends DB
@@ -13,6 +13,10 @@ class ClearDB extends DB
     public function storeandsale()
     {
         $sql = <<<EOD
+        DROP TRIGGER `prevent_multi_delete`;
+        DELETE from cash_debts;
+        delete from cash_operations;
+        delete from cash_session;
         delete from store_moves;   
         delete from  store_user;
         delete from store_stock;

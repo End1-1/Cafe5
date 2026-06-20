@@ -1,6 +1,8 @@
 #include "selfboarddisplay.h"
 
 #include <QApplication>
+#include <QCloseEvent>
+#include <QDialog>
 #include <QGraphicsProxyWidget>
 #include <QGraphicsScene>
 #include <QGraphicsView>
@@ -35,6 +37,16 @@ public:
         layout->addWidget(m_view);
 
         connect(m_content, &QObject::destroyed, this, &QWidget::close);
+    }
+
+    void closeEvent(QCloseEvent *event) override
+    {
+        if (m_content) {
+            if (auto *dialog = qobject_cast<QDialog *>(m_content)) {
+                dialog->done(QDialog::Rejected);
+            }
+        }
+        QWidget::closeEvent(event);
     }
 
 protected:

@@ -2,6 +2,7 @@
 #include "c5utils.h"
 #include <QColor>
 #include <QFont>
+#include <QSize>
 
 NTreeModel::NTreeModel(QObject* parent)
     : QAbstractItemModel(parent),
@@ -115,6 +116,10 @@ QVariant NTreeModel::data(const QModelIndex& index, int role) const
         return QVariant();
 
     if(role == Qt::BackgroundRole) {
+        if(node->spacer) {
+            return QColor(0xfa, 0xfc, 0xfe);
+        }
+
         // перебираем все колонки которые являются цветовыми
         for(int colorCol : mRowColors) {
             if(colorCol < node->values.size()) {
@@ -136,10 +141,15 @@ QVariant NTreeModel::data(const QModelIndex& index, int role) const
     if(role == Qt::FontRole) {
         QFont f;
 
-        if(node->parent == m_root)
+        if(node->parent == m_root && !node->spacer) {
             f.setBold(true);
+        }
 
         return f;
+    }
+
+    if(role == Qt::SizeHintRole && node->spacer) {
+        return QSize(0, 10);
     }
 
     // --- ВСЕ ОСТАЛЬНЫЕ РОЛИ ---
@@ -242,8 +252,11 @@ void NTreeModel::setDatasource(const QJsonArray &jcols, const QJsonArray &jchild
             NTreeNode *node = new NTreeNode(parent);
 
             // записываем данные
-            for(const QJsonValue &dv : data)
+            for(const QJsonValue &dv : data) {
                 node->values.append(dv.toVariant());
+            }
+
+            node->spacer = o.value(QStringLiteral("spacer")).toBool(false);
 
             // обновляем maxColumns
             if(node->values.size() > mMaxColumns)
@@ -261,6 +274,19 @@ void NTreeModel::setDatasource(const QJsonArray &jcols, const QJsonArray &jchild
     mFilteredRootChildren.clear();
     mFilteredRootChildren = m_root->children;
     endResetModel();
+}
+
+int NTreeModel::topLevelDishCount() const
+{
+    int count = 0;
+
+    for(NTreeNode *node : mFilteredRootChildren) {
+        if(!node->spacer) {
+            ++count;
+        }
+    }
+
+    return count;
 }
 
 NTreeNode* NTreeModel::parseNode(const QJsonObject &obj)
@@ -318,7 +344,13 @@ void NTreeModel::setFilter(const QString &filter)
     QString f = filter.trimmed();
 
     // фильтруем root->children
-    for(NTreeNode *node : m_root->children) {
+    for(int i = 0; i < m_root->children.size(); ++i) {
+        NTreeNode *node = m_root->children.at(i);
+
+        if(node->spacer) {
+            continue;
+        }
+
         bool match = false;
 
         // проверяем только values родителя (строка)
@@ -329,8 +361,13 @@ void NTreeModel::setFilter(const QString &filter)
             }
         }
 
-        if(match)
+        if(match) {
             mFilteredRootChildren.append(node);
+
+            if(i + 1 < m_root->children.size() && m_root->children.at(i + 1)->spacer) {
+                mFilteredRootChildren.append(m_root->children.at(i + 1));
+            }
+        }
     }
 
     endResetModel();

@@ -16,6 +16,7 @@ C5User::C5User(C5User *other)
     fConfig = other->fConfig;
     fSettings = other->fSettings;
     mSessionKey = other->mSessionKey;
+    active = other->active;
 }
 
 void C5User::copy(C5User *other)
@@ -25,6 +26,7 @@ void C5User::copy(C5User *other)
     fConfig = other->fConfig;
     fSettings = other->fSettings;
     mSessionKey = other->mSessionKey;
+    active = other->active;
 }
 
 void C5User::copySettings(C5User *other)
@@ -180,4 +182,19 @@ void C5User::authorize(const QString & pin, NInterface * n, std::function<void (
         Q_UNUSED(jerr);
         errorCallback();
     });
+}
+
+void C5User::authorizeByUserId(int userId, NInterface *n, std::function<void(const QJsonObject &)> callback, std::function<void()> errorCallback)
+{
+    n->createHttpQueryLambda(QStringLiteral("/engine/v2/officen/user/fingerprint-login"),
+                           QJsonObject{{QStringLiteral("user_id"), userId}},
+                           [this, callback](const QJsonObject &jdoc) {
+                               QJsonObject wrapped{{QStringLiteral("data"), jdoc}};
+                               setUserData(wrapped);
+                               callback(wrapped);
+                           },
+                           [ = ](const QJsonObject &jerr) {
+                               Q_UNUSED(jerr);
+                               errorCallback();
+                           });
 }

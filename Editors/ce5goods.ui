@@ -20,7 +20,7 @@
       <enum>Qt::FocusPolicy::NoFocus</enum>
      </property>
      <property name="currentIndex">
-      <number>4</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="tab">
       <attribute name="title">
@@ -1447,63 +1447,6 @@
        <property name="sizeConstraint">
         <enum>QLayout::SizeConstraint::SetMinAndMaxSize</enum>
        </property>
-       <item row="3" column="3">
-        <spacer name="horizontalSpacer">
-         <property name="orientation">
-          <enum>Qt::Orientation::Horizontal</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>40</width>
-           <height>20</height>
-          </size>
-         </property>
-        </spacer>
-       </item>
-       <item row="4" column="0">
-        <widget class="QLabel" name="label_14">
-         <property name="text">
-          <string>Queue in list</string>
-         </property>
-        </widget>
-       </item>
-       <item row="0" column="0">
-        <widget class="QLabel" name="label_7">
-         <property name="text">
-          <string>Only whole number</string>
-         </property>
-        </widget>
-       </item>
-       <item row="1" column="1">
-        <widget class="C5CheckBox" name="chSameStoreId">
-         <property name="text">
-          <string/>
-         </property>
-        </widget>
-       </item>
-       <item row="3" column="0">
-        <widget class="QLabel" name="label_13">
-         <property name="text">
-          <string>Web link</string>
-         </property>
-        </widget>
-       </item>
-       <item row="6" column="1">
-        <spacer name="verticalSpacer">
-         <property name="orientation">
-          <enum>Qt::Orientation::Vertical</enum>
-         </property>
-         <property name="sizeType">
-          <enum>QSizePolicy::Policy::Expanding</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>0</width>
-           <height>0</height>
-          </size>
-         </property>
-        </spacer>
-       </item>
        <item row="1" column="0">
         <widget class="QLabel" name="label_5">
          <property name="text">
@@ -1515,6 +1458,13 @@
         <widget class="QLabel" name="label_6">
          <property name="text">
           <string>Store output goods</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="0">
+        <widget class="QLabel" name="label_7">
+         <property name="text">
+          <string>Only whole number</string>
          </property>
         </widget>
        </item>
@@ -1541,48 +1491,6 @@
          </property>
          <property name="readOnly">
           <bool>true</bool>
-         </property>
-        </widget>
-       </item>
-       <item row="3" column="1" colspan="2">
-        <widget class="C5LineEditWithSelector" name="leWebLink">
-         <property name="focusPolicy">
-          <enum>Qt::FocusPolicy::NoFocus</enum>
-         </property>
-         <property name="readOnly">
-          <bool>false</bool>
-         </property>
-         <property name="Field" stdset="0">
-          <string>f_weblink</string>
-         </property>
-        </widget>
-       </item>
-       <item row="4" column="1">
-        <widget class="C5LineEditWithSelector" name="leQueue">
-         <property name="maximumSize">
-          <size>
-           <width>100</width>
-           <height>16777215</height>
-          </size>
-         </property>
-         <property name="Field" stdset="0">
-          <string>f_queue</string>
-         </property>
-         <property name="Type" stdset="0">
-          <number>1</number>
-         </property>
-        </widget>
-       </item>
-       <item row="0" column="1">
-        <widget class="C5CheckBox" name="chOnlyWholeNumber">
-         <property name="text">
-          <string/>
-         </property>
-         <property name="Field" stdset="0">
-          <string>f_wholenumber</string>
-         </property>
-         <property name="Default" stdset="0">
-          <number>0</number>
          </property>
         </widget>
        </item>
@@ -1624,6 +1532,98 @@
           </item>
          </layout>
         </widget>
+       </item>
+       <item row="3" column="0">
+        <widget class="QLabel" name="label_13">
+         <property name="text">
+          <string>Web link</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="1">
+        <widget class="C5CheckBox" name="chSameStoreId">
+         <property name="text">
+          <string/>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="1">
+        <widget class="C5CheckBox" name="chOnlyWholeNumber">
+         <property name="text">
+          <string/>
+         </property>
+         <property name="Field" stdset="0">
+          <string>f_wholenumber</string>
+         </property>
+         <property name="Default" stdset="0">
+          <number>0</number>
+         </property>
+        </widget>
+       </item>
+       <item row="4" column="0">
+        <widget class="QLabel" name="label_14">
+         <property name="text">
+          <string>Queue in list</string>
+         </property>
+        </widget>
+       </item>
+       <item row="6" column="1">
+        <spacer name="verticalSpacer">
+         <property name="orientation">
+          <enum>Qt::Orientation::Vertical</enum>
+         </property>
+         <property name="sizeType">
+          <enum>QSizePolicy::Policy::Expanding</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>0</width>
+           <height>0</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item row="4" column="1">
+        <widget class="C5LineEditWithSelector" name="leQueue">
+         <property name="maximumSize">
+          <size>
+           <width>100</width>
+           <height>16777215</height>
+          </size>
+         </property>
+         <property name="Field" stdset="0">
+          <string>f_queue</string>
+         </property>
+         <property name="Type" stdset="0">
+          <number>1</number>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="1" colspan="2">
+        <widget class="C5LineEditWithSelector" name="leWebLink">
+         <property name="focusPolicy">
+          <enum>Qt::FocusPolicy::NoFocus</enum>
+         </property>
+         <property name="readOnly">
+          <bool>false</bool>
+         </property>
+         <property name="Field" stdset="0">
+          <string>f_weblink</string>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="3">
+        <spacer name="horizontalSpacer">
+         <property name="orientation">
+          <enum>Qt::Orientation::Horizontal</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>40</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
        </item>
       </layout>
      </widget>
@@ -1680,6 +1680,541 @@
            <string>X</string>
           </property>
          </column>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="tab_8">
+      <attribute name="title">
+       <string>Attributes</string>
+      </attribute>
+      <layout class="QVBoxLayout" name="verticalLayout_5">
+       <item>
+        <widget class="QGroupBox" name="grDietaryBadge">
+         <property name="title">
+          <string>Dietary / Allergen Badges</string>
+         </property>
+         <layout class="QGridLayout" name="gridLayoutDietaryBadges">
+          <item row="0" column="0">
+           <widget class="QCheckBox" name="chGlutenFree">
+            <property name="text">
+             <string>Gluten-free</string>
+            </property>
+            <property name="icon">
+             <iconset resource="../resources/res.qrc">
+              <normaloff>:/dietary/gluten-free.png</normaloff>:/dietary/gluten-free.png</iconset>
+            </property>
+            <property name="iconSize">
+             <size>
+              <width>24</width>
+              <height>24</height>
+             </size>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1">
+           <widget class="QCheckBox" name="chVegetarian">
+            <property name="text">
+             <string>Vegetarian</string>
+            </property>
+            <property name="icon">
+             <iconset resource="../resources/res.qrc">
+              <normaloff>:/dietary/vegitarian.png</normaloff>:/dietary/vegitarian.png</iconset>
+            </property>
+            <property name="iconSize">
+             <size>
+              <width>24</width>
+              <height>24</height>
+             </size>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="0">
+           <widget class="QCheckBox" name="chVegan">
+            <property name="text">
+             <string>Vegan</string>
+            </property>
+            <property name="icon">
+             <iconset resource="../resources/res.qrc">
+              <normaloff>:/dietary/vegan.png</normaloff>:/dietary/vegan.png</iconset>
+            </property>
+            <property name="iconSize">
+             <size>
+              <width>24</width>
+              <height>24</height>
+             </size>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="1">
+           <widget class="QCheckBox" name="chNoGmo">
+            <property name="text">
+             <string>No GMO</string>
+            </property>
+            <property name="icon">
+             <iconset resource="../resources/res.qrc">
+              <normaloff>:/dietary/no-gmo.png</normaloff>:/dietary/no-gmo.png</iconset>
+            </property>
+            <property name="iconSize">
+             <size>
+              <width>24</width>
+              <height>24</height>
+             </size>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="0">
+           <widget class="QCheckBox" name="chNoLactose">
+            <property name="text">
+             <string>Lactose-free</string>
+            </property>
+            <property name="icon">
+             <iconset resource="../resources/res.qrc">
+              <normaloff>:/dietary/lactose-free.png</normaloff>:/dietary/lactose-free.png</iconset>
+            </property>
+            <property name="iconSize">
+             <size>
+              <width>24</width>
+              <height>24</height>
+             </size>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="1">
+           <widget class="QCheckBox" name="chNoSugar">
+            <property name="text">
+             <string>Sugar-free</string>
+            </property>
+            <property name="icon">
+             <iconset resource="../resources/res.qrc">
+              <normaloff>:/dietary/sugar-free.png</normaloff>:/dietary/sugar-free.png</iconset>
+            </property>
+            <property name="iconSize">
+             <size>
+              <width>24</width>
+              <height>24</height>
+             </size>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="0">
+           <widget class="QCheckBox" name="chContainsNuts">
+            <property name="text">
+             <string>Contains nuts</string>
+            </property>
+            <property name="icon">
+             <iconset resource="../resources/res.qrc">
+              <normaloff>:/dietary/contain-nuts.png</normaloff>:/dietary/contain-nuts.png</iconset>
+            </property>
+            <property name="iconSize">
+             <size>
+              <width>24</width>
+              <height>24</height>
+             </size>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="1">
+           <widget class="QCheckBox" name="chHalalKosher">
+            <property name="text">
+             <string>Halal / Kosher</string>
+            </property>
+            <property name="icon">
+             <iconset resource="../resources/res.qrc">
+              <normaloff>:/dietary/halal.png</normaloff>:/dietary/halal.png</iconset>
+            </property>
+            <property name="iconSize">
+             <size>
+              <width>52</width>
+              <height>24</height>
+             </size>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
+        <widget class="QGroupBox" name="grBJU">
+         <property name="title">
+          <string>Macros / Nutrition (per 100 g)</string>
+         </property>
+         <layout class="QFormLayout" name="formLayoutBju">
+          <item row="0" column="0">
+           <widget class="QLabel" name="lblBjuKcal">
+            <property name="text">
+             <string>Calories, kcal</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1">
+           <widget class="C5LineEdit" name="leBjuKcal">
+            <property name="Type" stdset="0">
+             <number>2</number>
+            </property>
+            <property name="DecimalPlaces" stdset="0">
+             <number>1</number>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="0">
+           <widget class="QLabel" name="lblBjuProtein">
+            <property name="text">
+             <string>Protein, g</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="1">
+           <widget class="C5LineEdit" name="leBjuProtein">
+            <property name="Type" stdset="0">
+             <number>2</number>
+            </property>
+            <property name="DecimalPlaces" stdset="0">
+             <number>2</number>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="0">
+           <widget class="QLabel" name="lblBjuFat">
+            <property name="text">
+             <string>Fat, g</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="1">
+           <widget class="C5LineEdit" name="leBjuFat">
+            <property name="Type" stdset="0">
+             <number>2</number>
+            </property>
+            <property name="DecimalPlaces" stdset="0">
+             <number>2</number>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="0">
+           <widget class="QLabel" name="lblBjuCarbs">
+            <property name="text">
+             <string>Carbs, g</string>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="1">
+           <widget class="C5LineEdit" name="leBjuCarbs">
+            <property name="Type" stdset="0">
+             <number>2</number>
+            </property>
+            <property name="DecimalPlaces" stdset="0">
+             <number>2</number>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
+        <widget class="QWidget" name="widget_2" native="true">
+         <layout class="QHBoxLayout" name="horizontalLayout_7">
+          <item>
+           <widget class="QGroupBox" name="grDynamicAttributes">
+            <property name="title">
+             <string>Dynamic attributes</string>
+            </property>
+            <layout class="QVBoxLayout" name="verticalLayout_6">
+             <item>
+              <widget class="QTableWidget" name="tblDynamicAttributes">
+               <attribute name="verticalHeaderVisible">
+                <bool>false</bool>
+               </attribute>
+               <column>
+                <property name="text">
+                 <string>Attribute</string>
+                </property>
+               </column>
+               <column>
+                <property name="text">
+                 <string>Value</string>
+                </property>
+               </column>
+               <column>
+                <property name="text">
+                 <string>Measurement</string>
+                </property>
+               </column>
+               <column>
+                <property name="text">
+                 <string>Price</string>
+                </property>
+               </column>
+              </widget>
+             </item>
+            </layout>
+           </widget>
+          </item>
+          <item>
+           <widget class="QGroupBox" name="grModificators">
+            <property name="title">
+             <string>Modificators</string>
+            </property>
+            <layout class="QVBoxLayout" name="verticalLayout_9">
+             <item>
+              <widget class="QWidget" name="wtoolbarModificators" native="true">
+               <layout class="QHBoxLayout" name="horizontalLayoutModificators">
+                <property name="spacing">
+                 <number>1</number>
+                </property>
+                <property name="leftMargin">
+                 <number>1</number>
+                </property>
+                <property name="topMargin">
+                 <number>1</number>
+                </property>
+                <property name="rightMargin">
+                 <number>1</number>
+                </property>
+                <property name="bottomMargin">
+                 <number>1</number>
+                </property>
+                <item>
+                 <widget class="QPushButton" name="btnAddModificator">
+                  <property name="focusPolicy">
+                   <enum>Qt::FocusPolicy::NoFocus</enum>
+                  </property>
+                  <property name="text">
+                   <string/>
+                  </property>
+                  <property name="icon">
+                   <iconset resource="../resources/res.qrc">
+                    <normaloff>:/add.png</normaloff>:/add.png</iconset>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QPushButton" name="btnRemoveModificator">
+                  <property name="focusPolicy">
+                   <enum>Qt::FocusPolicy::NoFocus</enum>
+                  </property>
+                  <property name="text">
+                   <string/>
+                  </property>
+                  <property name="icon">
+                   <iconset resource="../resources/res.qrc">
+                    <normaloff>:/remove.png</normaloff>:/remove.png</iconset>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <spacer name="horizontalSpacerModificators">
+                  <property name="orientation">
+                   <enum>Qt::Orientation::Horizontal</enum>
+                  </property>
+                  <property name="sizeHint" stdset="0">
+                   <size>
+                    <width>40</width>
+                    <height>20</height>
+                   </size>
+                  </property>
+                 </spacer>
+                </item>
+               </layout>
+              </widget>
+             </item>
+             <item>
+              <widget class="C5TableWidget" name="tblModificators">
+               <attribute name="verticalHeaderVisible">
+                <bool>false</bool>
+               </attribute>
+               <column>
+                <property name="text">
+                 <string>ID</string>
+                </property>
+               </column>
+               <column>
+                <property name="text">
+                 <string>Modificator name</string>
+                </property>
+               </column>
+               <column>
+                <property name="text">
+                 <string>Price</string>
+                </property>
+               </column>
+               <column>
+                <property name="text">
+                 <string>Required</string>
+                </property>
+               </column>
+              </widget>
+             </item>
+            </layout>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
+        <spacer name="verticalSpacer_4">
+         <property name="orientation">
+          <enum>Qt::Orientation::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>40</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="tab_9">
+      <attribute name="title">
+       <string>Relations</string>
+      </attribute>
+      <layout class="QHBoxLayout" name="horizontalLayout_15">
+       <item>
+        <widget class="QGroupBox" name="grRelatedDrinks">
+         <property name="title">
+          <string>Drinks</string>
+         </property>
+         <layout class="QVBoxLayout" name="verticalLayoutRelatedDrinks">
+          <item>
+           <widget class="QWidget" name="wtoolbarRelatedDrinks" native="true">
+            <layout class="QHBoxLayout" name="horizontalLayoutRelatedDrinks">
+             <item>
+              <widget class="QPushButton" name="btnAddRelatedDrink">
+               <property name="focusPolicy">
+                <enum>Qt::FocusPolicy::NoFocus</enum>
+               </property>
+               <property name="text">
+                <string/>
+               </property>
+               <property name="icon">
+                <iconset resource="../resources/res.qrc">
+                 <normaloff>:/add.png</normaloff>:/add.png</iconset>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QPushButton" name="btnRemoveRelatedDrink">
+               <property name="focusPolicy">
+                <enum>Qt::FocusPolicy::NoFocus</enum>
+               </property>
+               <property name="text">
+                <string/>
+               </property>
+               <property name="icon">
+                <iconset resource="../resources/res.qrc">
+                 <normaloff>:/remove.png</normaloff>:/remove.png</iconset>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <spacer name="horizontalSpacerRelatedDrinks">
+               <property name="orientation">
+                <enum>Qt::Orientation::Horizontal</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>40</width>
+                 <height>20</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+            </layout>
+           </widget>
+          </item>
+          <item>
+           <widget class="C5TableWidget" name="tblRelatedDrinks">
+            <attribute name="verticalHeaderVisible">
+             <bool>false</bool>
+            </attribute>
+            <column>
+             <property name="text">
+              <string>ID</string>
+             </property>
+            </column>
+            <column>
+             <property name="text">
+              <string>Dish name</string>
+             </property>
+            </column>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
+        <widget class="QGroupBox" name="grRelatedOther">
+         <property name="title">
+          <string>Others</string>
+         </property>
+         <layout class="QVBoxLayout" name="verticalLayoutRelatedOther">
+          <item>
+           <widget class="QWidget" name="wtoolbarRelatedOther" native="true">
+            <layout class="QHBoxLayout" name="horizontalLayoutRelatedOther">
+             <item>
+              <widget class="QPushButton" name="btnAddRelatedOther">
+               <property name="focusPolicy">
+                <enum>Qt::FocusPolicy::NoFocus</enum>
+               </property>
+               <property name="text">
+                <string/>
+               </property>
+               <property name="icon">
+                <iconset resource="../resources/res.qrc">
+                 <normaloff>:/add.png</normaloff>:/add.png</iconset>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QPushButton" name="btnRemoveRelatedOther">
+               <property name="focusPolicy">
+                <enum>Qt::FocusPolicy::NoFocus</enum>
+               </property>
+               <property name="text">
+                <string/>
+               </property>
+               <property name="icon">
+                <iconset resource="../resources/res.qrc">
+                 <normaloff>:/remove.png</normaloff>:/remove.png</iconset>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <spacer name="horizontalSpacerRelatedOther">
+               <property name="orientation">
+                <enum>Qt::Orientation::Horizontal</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>40</width>
+                 <height>20</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+            </layout>
+           </widget>
+          </item>
+          <item>
+           <widget class="C5TableWidget" name="tblRelatedOther">
+            <attribute name="verticalHeaderVisible">
+             <bool>false</bool>
+            </attribute>
+            <column>
+             <property name="text">
+              <string>ID</string>
+             </property>
+            </column>
+            <column>
+             <property name="text">
+              <string>Dish name</string>
+             </property>
+            </column>
+           </widget>
+          </item>
+         </layout>
         </widget>
        </item>
       </layout>

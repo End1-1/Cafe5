@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>RWorkstationConfigShop</class>
+ <widget class="QWidget" name="RWorkstationConfigShop">
+  <layout class="QFormLayout" name="formLayout">
+   <item row="0" column="0">
+    <widget class="QLabel" name="labelCashbox">
+     <property name="text">
+      <string>Cashbox id</string>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="1">
+    <widget class="QLineEdit" name="leCashboxId"/>
+   </item>
+   <item row="1" column="0">
+    <widget class="QLabel" name="labelHall">
+     <property name="text">
+      <string>Default hall id</string>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="1">
+    <widget class="QLineEdit" name="leHallId"/>
+   </item>
+   <item row="2" column="0">
+    <widget class="QLabel" name="labelFiscal">
+     <property name="text">
+      <string>Fiscal machine id</string>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="1">
+    <widget class="QLineEdit" name="leFiscalId"/>
+   </item>
+   <item row="3" column="0">
+    <widget class="QLabel" name="labelStore">
+     <property name="text">
+      <string>Default store id</string>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="1">
+    <widget class="QLineEdit" name="leStoreId"/>
+   </item>
+   <item row="4" column="0">
+    <widget class="QLabel" name="labelPhone">
+     <property name="text">
+      <string>Receipt phone</string>
+     </property>
+    </widget>
+   </item>
+   <item row="4" column="1">
+    <widget class="QLineEdit" name="leReceiptPhone"/>
+   </item>
+   <item row="5" column="0">
+    <widget class="QLabel" name="labelNoTable">
+     <property name="text">
+      <string>Receipt without table</string>
+     </property>
+    </widget>
+   </item>
+   <item row="5" column="1">
+    <widget class="QCheckBox" name="chReceiptNoTable"/>
+   </item>
+   <item row="6" column="0">
+    <widget class="QLabel" name="labelNoService">
+     <property name="text">
+      <string>Receipt without service hint</string>
+     </property>
+    </widget>
+   </item>
+   <item row="6" column="1">
+    <widget class="QCheckBox" name="chReceiptNoServiceHint"/>
+   </item>
+   <item row="7" column="0">
+    <widget class="QLabel" name="labelNoDiscount">
+     <property name="text">
+      <string>Receipt without discount hint</string>
+     </property>
+    </widget>
+   </item>
+   <item row="7" column="1">
+    <widget class="QCheckBox" name="chReceiptNoDiscountHint"/>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

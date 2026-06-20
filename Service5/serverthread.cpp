@@ -21,8 +21,9 @@
 #include "struct_currency.h"
 #include "struct_employee.h"
 #include "struct_employee_group.h"
-#include "struct_goods_type.h"
+#include "struct_goods_group.h"
 #include "struct_goods_item.h"
+#include "struct_goods_type.h"
 #include "struct_partner.h"
 #include "struct_payment_type.h"
 #include "struct_storage_item.h"
@@ -490,8 +491,13 @@ void ServerThread::handleCommand(SocketStruct ws, const QJsonObject &jdoc, QStri
         } else if (command == "hotel_cache_update") {
             repMsg = updateHotelCache(jdoc);
         } else if (command == "search_engine_reload") {
+            for (auto it = mDatabases.constBegin(); it != mDatabases.constEnd(); ++it) {
+                C5SearchEngine::init(it.value(), it.key());
+            }
             C5SearchEngine::init(fDbList);
             LogWriter::write(LogWriterLevel::verbose, "Initialized databases", fDbList.join(","));
+        } else if (command == "search_engine_reload_dict") {
+            repMsg = C5SearchEngine::mInstance->reloadDictionary(jdoc, ws);
         } else if (command == "search_text") {
             repMsg = C5SearchEngine::mInstance->search(jdoc);
         } else if (command == SelectorName<StorageItem>::value) {
@@ -518,8 +524,8 @@ void ServerThread::handleCommand(SocketStruct ws, const QJsonObject &jdoc, QStri
             repMsg = C5SearchEngine::mInstance->searchEmployeeGroup(jdoc, ws);
         } else if (command == "search_partner") {
             repMsg = C5SearchEngine::mInstance->searchPartner(jdoc);
-        } else if (command == "search_goods_groups") {
-            repMsg = C5SearchEngine::mInstance->searchGoodsGroups(jdoc);
+        } else if (command == SelectorName<GoodsGroupItem>::value) {
+            repMsg = C5SearchEngine::mInstance->searchGoodsGroups(jdoc, ws);
         } else if (command == "search_store") {
             repMsg = C5SearchEngine::mInstance->searchStore(jdoc);
         } else if (command == "search_update_partner_cache") {

@@ -463,6 +463,52 @@ $sql[$v] = <<<EOD
     UPDATE cash_operations SET f_operation_type = 2 WHERE f_operation_type = 102;
 EOD;
 
+$v = 226;
+$sql[$v] = <<<EOD
+    update s_app set f_version = '$v' where lower(f_app)='db';
+INSERT INTO `l_dictionary` (`f_dict`, `f_dict_id`, `f_lang`, `f_value`) VALUES ('c_goods_type', 6, 'hy', 'Փաթեթի անդամ');
+EOD;
+
+$v = 227;
+$sql[$v] = <<<EOD
+    update s_app set f_version = '$v' where lower(f_app)='db';
+    INSERT INTO cash_operations_types (f_id, f_comment) VALUES
+    (10, 'Delivery Fee')
+    ON DUPLICATE KEY UPDATE f_comment = VALUES(f_comment);
+EOD;
+
+$v = 228;
+$sql[$v] = <<<EOD
+    update s_app set f_version = '$v' where lower(f_app)='db';
+    INSERT INTO cash_operations_types (f_id, f_comment) VALUES
+    (11, 'Transfer Out'),
+    (12, 'Transfer In')
+    ON DUPLICATE KEY UPDATE f_comment = VALUES(f_comment);
+EOD;
+
+$v = 229;
+$sql[$v] = <<<EOD
+    update s_app set f_version = '$v' where lower(f_app)='db';
+    UPDATE cash_operations
+    SET f_credit = f_debit, f_debit = 0
+    WHERE (f_order_id IS NULL OR TRIM(f_order_id) = '')
+      AND f_operation_type IN (2, 6, 7, 8)
+      AND f_debit > 0
+      AND f_credit <= 0;
+EOD;
+
+$v = 230;
+$sql[$v] = <<<EOD
+    update s_app set f_version = '$v' where lower(f_app)='db';
+    CREATE TABLE s_user_fingerprint (
+  f_user      INT PRIMARY KEY,
+  f_template  MEDIUMBLOB NOT NULL,
+  f_size      INT NOT NULL,
+  f_updated   DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  FOREIGN KEY (f_user) REFERENCES s_user(f_id)
+);
+EOD;
+
 $update_verision = intval(stmtall("select * from s_app where lower(f_app)='db'")->fetch_assoc()["f_version"]);
 for ($i = $update_verision + 1; $i <= $v; $i++) {
     if (isset($sql[$i])) {

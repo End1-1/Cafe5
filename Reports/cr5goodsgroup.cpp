@@ -1,5 +1,19 @@
 #include "cr5goodsgroup.h"
 #include "ce5goodsgroup.h"
+#include "c5cache.h"
+#include "c5codenameselectorfunctions.h"
+#include "c5message.h"
+#include "c5officewidget.h"
+#include "c5tablemodel.h"
+#include "c5user.h"
+#include "ninterface.h"
+#include "struct_goods_group.h"
+
+namespace {
+
+constexpr int kColGoodsQty = 7;
+
+} // namespace
 
 CR5GoodsGroup::CR5GoodsGroup(QWidget *parent) :
     C5ReportWidget(parent)
@@ -31,6 +45,7 @@ QToolBar* CR5GoodsGroup::toolBar()
     if(!fToolBar) {
         QList<ToolBarButtons> btn;
         btn << ToolBarButtons::tbNew
+            << ToolBarButtons::tbDelete
             << ToolBarButtons::tbClearFilter
             << ToolBarButtons::tbRefresh
             << ToolBarButtons::tbExcel
@@ -39,4 +54,62 @@ QToolBar* CR5GoodsGroup::toolBar()
     }
 
     return fToolBar;
+}
+
+void CR5GoodsGroup::removeWithId(int id, int row)
+{
+    if(id <= 0 || !fModel || row < 0 || row >= fModel->rowCount()) {
+        return;
+    }
+
+    if(C5Message::question(tr("Delete selected goods group?")) != QDialog::Accepted) {
+        return;
+    }
+
+    const int goodsQty = fModel->data(row, kColGoodsQty, Qt::EditRole).toInt();
+    int moveTo = 0;
+
+    if(goodsQty > 0) {
+        if(C5Message::question(tr("Group contains %1 goods. Move them to another group and delete?").arg(goodsQty)) !=
+                QDialog::Accepted) {
+            return;
+        }
+
+        const auto groups = selectItem<GoodsGroupItem>(false, false);
+        if(groups.isEmpty()) {
+            return;
+        }
+
+        moveTo = groups.first().id;
+        if(moveTo <= 0) {
+            return;
+        }
+
+        if(moveTo == id) {
+            C5Message::error(tr("Select another group"));
+            return;
+        }
+    }
+
+    QJsonObject params{
+        {QStringLiteral("editor"), QStringLiteral("form_groups_of_goods")},
+        {QStringLiteral("f_id"), id},
+    };
+    if(moveTo > 0) {
+        params.insert(QStringLiteral("move_to"), moveTo);
+    }
+
+    NInterface::query(QStringLiteral("/engine/v2/officen/editors/remove"),
+                      C5OfficeWidget::mUser->mSessionKey,
+                      this,
+                      params,
+                      [this, row](const QJsonObject &) {
+                          fModel->removeRow(row);
+                          C5Cache::cache(cache_goods_group)->refresh();
+                          C5Message::info(tr("Deleted"));
+                      },
+                      [](const QJsonObject &) { return false; },
+                      true,
+                      5000,
+                      false);
 }

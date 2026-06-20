@@ -1,0 +1,10 @@
+{
+  "host": "picassoapp.local",
+  "https": false,
+  "rejectUnauthorized": false,
+  "username": "kiosk",
+  "password": "secret",
+  "locale": "en",
+  "port": 8080,
+  "appVersion": "0.1.0.76"
+}

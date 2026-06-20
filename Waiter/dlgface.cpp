@@ -9,6 +9,7 @@
 #include "dlgorder.h"
 #include "dlgpreorderslist.h"
 #include "dlgkitcheninprogress.h"
+#include "dlgattendanceauth.h"
 #include "dlgtext.h"
 #include "format_date.h"
 #include "ninterface.h"
@@ -355,4 +356,14 @@ void DlgFace::on_btnInProgress_clicked()
 void DlgFace::on_btnNormalView_clicked()
 {
     updateHall();
+}
+
+void DlgFace::on_btnAttendance_clicked()
+{
+    fTimer.stop();
+
+    DlgAttendanceAuth auth(mUser, this);
+    auth.exec();
+
+    fTimer.start(TIMER_TIMEOUT_INTERVAL);
 }

@@ -270,5 +270,17 @@
         <file>cashbox.png</file>
         <file>sales.png</file>
         <file>columns.png</file>
+        <file>dietary/gluten-free.png</file>
+        <file>dietary/vegitarian.png</file>
+        <file>dietary/vegan.png</file>
+        <file>dietary/no-gmo.png</file>
+        <file>dietary/no-dairy.png</file>
+        <file>dietary/lactose-free.png</file>
+        <file>dietary/sugar-free.png</file>
+        <file>dietary/contain-nuts.png</file>
+        <file>dietary/halal.png</file>
+        <file>dietary/kosher.png</file>
+        <file>dietary/fish-seafood.png</file>
+        <file>fingerprint.png</file>
     </qresource>
 </RCC>

@@ -27,6 +27,8 @@ private slots:
 
     void on_chWaiterPassword_clicked(bool checked);
 
+    void on_btnFingerPrint_clicked();
+
 private:
     Ui::C5Passwords *ui;
 

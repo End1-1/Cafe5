@@ -11,6 +11,9 @@ public:
     CR5GoodsGroup(QWidget *parent = nullptr);
 
     virtual QToolBar *toolBar();
+
+protected:
+    void removeWithId(int id, int row) override;
 };
 
 #endif // CR5GOODSGROUP_H

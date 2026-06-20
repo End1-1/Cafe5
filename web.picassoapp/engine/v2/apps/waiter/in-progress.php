@@ -118,8 +118,8 @@ class InProgress extends Auth
     }
 
     /**
-     * Архив кухни на дату: строки с кухонным статусом > 3 (подано гостю),
-     * календарный день — по дате заказа o_header.f_datecash (как в кассовых сменах / отчётах).
+     * Архив кухни на дату: строки со статусом «подано» (>= 4),
+     * календарный день — по дате перевода в статус 4 (o_goods_process.f_data f_status_4_*_time).
      * Заголовки как у get(): открытые и закрытые столы (f_state IN 1,2).
      *
      * @param object $params date "Y-m-d"
@@ -165,8 +165,13 @@ class InProgress extends Auth
         LEFT JOIN h_halls hh ON hh.f_id = t.f_hall
         INNER JOIN o_goods og ON og.f_id = ogp.f_id AND og.f_state = 1
         INNER JOIN c_goods cg ON cg.f_id = og.f_goods
-        WHERE ogp.f_status > 3
-          AND DATE(oh.f_datecash) = ?
+        WHERE ogp.f_status >= 4
+          AND DATE(COALESCE(
+            NULLIF(JSON_UNQUOTE(JSON_EXTRACT(ogp.f_data, '$.f_status_4_1_time')), ''),
+            NULLIF(JSON_UNQUOTE(JSON_EXTRACT(ogp.f_data, '$.f_status_4_2_time')), ''),
+            NULLIF(JSON_UNQUOTE(JSON_EXTRACT(ogp.f_data, '$.f_status_4_3_time')), ''),
+            NULLIF(JSON_UNQUOTE(JSON_EXTRACT(ogp.f_data, '$.f_status_4_4_time')), '')
+          )) = ?
         ORDER BY oh.f_prefix,
           og.f_row,
           cg.f_name
@@ -220,10 +225,21 @@ class InProgress extends Auth
         $sql = <<<EOD
         UPDATE o_goods_process 
         SET f_status = ?,
-        f_data = JSON_SET(
-            COALESCE(f_data, '{}'),
-            '$jsonTimePath', NOW(),
-            '$.f_substatus', ?
+        f_data = JSON_REMOVE(
+            JSON_SET(
+                COALESCE(f_data, '{}'),
+                '{$jsonTimePath}',
+                COALESCE(
+                    NULLIF(JSON_UNQUOTE(JSON_EXTRACT(f_data, '{$jsonTimePath}')), ''),
+                    NULLIF(JSON_UNQUOTE(JSON_EXTRACT(f_data, '\$."$jsonTimePath"')), ''),
+                    NULLIF(JSON_UNQUOTE(JSON_EXTRACT(f_data, '$.jsonTimePath')), ''),
+                    DATE_FORMAT(NOW(), '%Y-%m-%d %H:%i:%s')
+                ),
+                '$.f_substatus', ?
+            ),
+            '\$."$jsonTimePath"',
+            '$.jsonTimePath',
+            '\$.$jsonTimePath'
         )
         WHERE f_id = ?
         EOD;

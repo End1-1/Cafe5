@@ -32,6 +32,8 @@ private slots:
 
     void on_btnEditContact_clicked();
 
+    void on_btnSearch_clicked();
+
 private:
     Ui::DlgGuestInfo *ui;
 

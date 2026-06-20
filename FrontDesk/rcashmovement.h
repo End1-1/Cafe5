@@ -10,8 +10,13 @@ class RCashMovement : public RAbstractEditorReport
 public:
     RCashMovement(const QString &title, QIcon icon, const QString &editorName);
 
+    QToolBar* toolBar() override;
+
 protected:
     void newData() override;
+
+private:
+    void openCashTransfer();
 
 protected slots:
     void on_tbl_doubleClicked(const QModelIndex &index) override;

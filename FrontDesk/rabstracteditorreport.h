@@ -19,18 +19,26 @@ class RAbstractEditorReport : public C5Widget
 {
     Q_OBJECT
 public:
-    explicit RAbstractEditorReport(const QString &title, QIcon icon, const QString &editorName);
+    explicit RAbstractEditorReport(const QString &title, QIcon icon, const QString &editorName, QWidget *parent = nullptr);
 
     ~RAbstractEditorReport();
 
     virtual QToolBar* toolBar() override;
+
+    /** Load or refresh report data from the server. */
+    void reloadReport();
+
+    /** When true, data is not fetched in showEvent (use reloadReport / tab activation). */
+    void setDeferredLoad(bool deferred);
+
+    QString mEditorName;
 
 protected:
     virtual void showEvent(QShowEvent *e) override;
 
     virtual void newData();
 
-    void getData();
+    virtual void removeAction();
 
     QJsonObject filterObject(const QString &name) const;
 
@@ -38,7 +46,13 @@ protected:
 
     QVariant reportSourceCellData(int sourceRow, int column, int role = Qt::DisplayRole) const;
 
+    int reportColumnFromEnd(int offsetFromEnd) const;
+
     virtual void applyFilter();
+
+    RAbstractEditorDialog* createEditorDialog(const QString &editorName);
+
+    void getData();
 
     Ui::RAbstractEditorReport *ui = nullptr;
 
@@ -51,7 +65,7 @@ private:
 
     bool mFirstLoad = true;
 
-    QString mEditorName;
+    bool mDeferredLoad = false;
 
     QJsonArray mFilterWidget;
 
@@ -63,8 +77,6 @@ private:
 
     QSet<int> mReportDefaultHiddenColumns;
 
-    void removeAction();
-
     void showColumnVisibilityDialog();
 
     void applyColumnVisibility();
@@ -72,6 +84,4 @@ private:
     void showColumnValueFilterDialog(int column);
 
     void exportToExcel();
-
-    RAbstractEditorDialog* createEditorDialog(const QString &editorName);
 };

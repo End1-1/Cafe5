@@ -1,13 +1,54 @@
 #include "rcashmovement.h"
+#include "c5cashtransfer.h"
+#include "c5config.h"
 #include "c5mainwindow.h"
 #include "c5revenuecashop.h"
 #include "ninterface.h"
 #include <QDialog>
 #include <QJsonObject>
+#include <QToolBar>
 
 RCashMovement::RCashMovement(const QString &title, QIcon icon, const QString &editorName)
     : RAbstractEditorReport(title, icon, editorName)
 {}
+
+QToolBar* RCashMovement::toolBar()
+{
+    const bool firstBuild = (fToolBar == nullptr);
+    QToolBar *tb = RAbstractEditorReport::toolBar();
+
+    if(firstBuild && tb) {
+        tb->addAction(QIcon(":/cash.png"), tr("Cash\nmovement"), this, [this] { openCashTransfer(); });
+    }
+
+    return tb;
+}
+
+void RCashMovement::openCashTransfer()
+{
+    auto *dlg = new C5CashTransfer(mUser, this);
+
+    const QJsonObject currencyObj = filterObject(QStringLiteral("currency"));
+    if(!currencyObj.isEmpty()) {
+        dlg->setCurrencyId(currencyObj.value(QStringLiteral("currency")).toInt(1));
+    }
+
+    const QJsonObject cashboxObj = filterObject(QStringLiteral("cashbox"));
+    if(!cashboxObj.isEmpty()) {
+        const int cashboxId = cashboxObj.value(QStringLiteral("cashbox")).toInt();
+        if(cashboxId > 0) {
+            const QString cashboxName = __c5config.getRegValue(
+                QStringLiteral("rfilter_%1_cashbox_name").arg(mEditorName)).toString();
+            dlg->setSourceCashbox(cashboxId,
+                                  cashboxName.isEmpty() ? QString::number(cashboxId) : cashboxName);
+        }
+    }
+
+    if(dlg->exec() == QDialog::Accepted) {
+        getData();
+    }
+    dlg->deleteLater();
+}
 
 void RCashMovement::on_tbl_doubleClicked(const QModelIndex &index)
 {
@@ -26,7 +67,7 @@ void RCashMovement::on_tbl_doubleClicked(const QModelIndex &index)
         return;
     }
 
-    const QString orderId = reportSourceCellData(srcIndex.row(), 2).toString().trimmed();
+    const QString orderId = reportSourceCellData(srcIndex.row(), 3).toString().trimmed();
     if(!orderId.isEmpty()) {
         return;
     }

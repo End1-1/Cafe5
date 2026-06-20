@@ -3,9 +3,13 @@
 
 #include <QDialog>
 
-#include "menustubclient.h"
+#include "webmenuclient.h"
 #include "ordercart.h"
 
+class DlgCart;
+class DlgOrderDone;
+class DlgPackagePick;
+class DlgPayment;
 class QButtonGroup;
 class QGridLayout;
 class QHBoxLayout;
@@ -27,6 +31,9 @@ public:
 
 protected:
     void changeEvent(QEvent *event) override;
+    bool eventFilter(QObject *watched, QEvent *event) override;
+    void keyPressEvent(QKeyEvent *event) override;
+    void resizeEvent(QResizeEvent *event) override;
 
 private slots:
     void onGroupClicked(int groupId);
@@ -47,10 +54,21 @@ private:
     void updateServiceModeLabel();
     void updateCartSummary();
     QVector<MenuDish> filteredDishes() const;
+    void showPackagePicker(const MenuDish &package);
+    void closePackagePicker();
+    void showCartOverlay();
+    void closeCartOverlay();
+    void showPaymentOverlay();
+    void closePaymentOverlay();
+    void onCartOverlayFinished(int result);
+    void onPaymentOverlayFinished(int result);
+    void submitPaidOrder();
+    void showOrderDone(const QString &orderNumber);
+    void closeOrderDone();
 
     Ui::DlgMenu *ui;
     ServiceMode m_serviceMode;
-    MenuStubClient m_menuClient;
+    WebMenuClient m_menuClient;
     OrderCart m_cart;
     int m_currentGroupId = 0;
     QButtonGroup *m_groupButtons = nullptr;
@@ -58,6 +76,11 @@ private:
     QVBoxLayout *m_groupsLayout = nullptr;
     QHBoxLayout *m_chipsLayout = nullptr;
     QGridLayout *m_dishGridLayout = nullptr;
+    DlgPackagePick *m_packagePick = nullptr;
+    DlgCart *m_cartOverlay = nullptr;
+    DlgPayment *m_paymentOverlay = nullptr;
+    DlgOrderDone *m_orderDoneOverlay = nullptr;
+    bool m_orderSubmitInProgress = false;
 };
 
 #endif // DLGMENU_H

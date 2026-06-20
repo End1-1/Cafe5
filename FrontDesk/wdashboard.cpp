@@ -17,10 +17,12 @@
 #include "cr5usersgroups.h"
 #include "ntablewidget.h"
 #include "rabstracteditorreport.h"
+#include "rmenureviewreport.h"
 #include "rcashmovement.h"
 #include "rdebts.h"
 #include "rorderinprogress.h"
 #include "rtotalreviewreport.h"
+#include "rworkstationsreport.h"
 #include "ui_wdashboard.h"
 #include "wdashboardsettings.h"
 
@@ -133,7 +135,7 @@ void WDashboard::onCommandButtonClicked()
 QWidget* WDashboard::createForm(const QString &name, QIcon icon)
 {
     if (name == "form_workstations") {
-        return new RAbstractEditorReport(tr("Workstations"), icon, name);
+        return new RWorkstationsReport(tr("Workstations"), icon, name);
     }
 
     if (name == "form_cashsessions") {
@@ -174,11 +176,6 @@ QWidget* WDashboard::createForm(const QString &name, QIcon icon)
         return a;
     }
 
-    if (name == "form_inventory") {
-        auto *a = __mainWindow->createTab<CR5Goods>();
-        return a;
-    }
-
     if (name == "form_inventory_documents") {
         return new RAbstractEditorReport(tr("Inventory"), icon, name);
     }
@@ -197,6 +194,10 @@ QWidget* WDashboard::createForm(const QString &name, QIcon icon)
 
     if (name == "form_revenue") {
         return new RCashMovement(tr("Revenue"), icon, name);
+    }
+
+    if (name == "form_menu") {
+        return new RMenuReviewReport(mUser, tr("Menu review"), icon);
     }
 
     if (name == "form_groups_of_goods") {

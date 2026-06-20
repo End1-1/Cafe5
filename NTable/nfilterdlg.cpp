@@ -15,10 +15,13 @@
 #include <QJsonParseError>
 #include <QLabel>
 #include <QComboBox>
+#include <QGuiApplication>
+#include <QScreen>
 
 NFilterDlg::NFilterDlg(QWidget *parent) :
     QDialog(parent),
-    ui(new Ui::NFilterDlg)
+    ui(new Ui::NFilterDlg),
+    mLoadingDlg(nullptr)
 {
     ui->setupUi(this);
     mVersion = 1;
@@ -217,33 +220,54 @@ void NFilterDlg::clear()
     }
 }
 
+void NFilterDlg::closeLoadingDialog()
+{
+    if(!mLoadingDlg) {
+        return;
+    }
+
+    mLoadingDlg->hide();
+    mLoadingDlg->deleteLater();
+    mLoadingDlg = nullptr;
+}
+
+void NFilterDlg::showSuggestionsForButton(QPushButton *btn)
+{
+    auto *c = btn->property("lineedit").value<C5LineEdit*>();
+    auto *l = btn->property("label").value<QLabel*>();
+    const QString filterName = btn->property("filter").toString();
+
+    if(!c || !l || !mData.contains(filterName)) {
+        return;
+    }
+
+    NSearchDlg f(this);
+    f.setData(mCols[filterName], mData[filterName]);
+    f.prepareForScreen(window() ? window()->screen() : nullptr);
+
+    if(f.exec()) {
+        c->setText(f.mId.join(","));
+        l->setText(f.mName.join(","));
+    }
+}
+
 void NFilterDlg::openSuggestions()
 {
     auto *btn = static_cast<QPushButton*>(sender());
-    auto *c = btn->property("lineedit").value<C5LineEdit*>();
-    auto *l = btn->property("label").value<QLabel*>();
+    const QString filterName = btn->property("filter").toString();
 
-    if(mData.contains(btn->property("filter").toString())) {
-        QPoint btnPos = c->pos();
-        btnPos.setY(btnPos.y() + c->height());
-        NSearchDlg f(this);
-        f.move(mapToGlobal(btnPos));
-        f.setData(mCols[btn->property("filter").toString()], mData[btn->property("filter").toString()]);
-
-        if(f.exec()) {
-            c->setText(f.mId.join(","));
-            l->setText(f.mName.join(","));
-        }
+    if(mData.contains(filterName)) {
+        showSuggestionsForButton(btn);
     } else {
         auto *nd = new NDataProvider(this);
         nd->setProperty("btn", QVariant::fromValue(btn));
         connect(nd, &NDataProvider::started, this, &NFilterDlg::queryStarted);
         connect(nd, &NDataProvider::error, this, &NFilterDlg::queryError);
         connect(nd, &NDataProvider::done, this, &NFilterDlg::queryFinished);
-        QString url = QString("/engine/reports/filters/%1.php").arg(btn->property("filter").toString());
+        QString url = QString("/engine/reports/filters/%1.php").arg(filterName);
 
         if(mVersion == 2) {
-            url = QString("/engine/v2/apps/reports/filters/%1.php").arg(btn->property("filter").toString());
+            url = QString("/engine/v2/apps/reports/filters/%1.php").arg(filterName);
         }
 
         nd->getData(url, QJsonObject());
@@ -252,6 +276,7 @@ void NFilterDlg::openSuggestions()
 
 void NFilterDlg::queryStarted()
 {
+    closeLoadingDialog();
     mLoadingDlg = new NLoadingDlg(tr("Query"), this);
     mLoadingDlg->open();
 }
@@ -261,20 +286,23 @@ void NFilterDlg::queryError(const QString &error)
     sender()->deleteLater();
     LogWriterError(error);
     C5Message::error(error);
-    mLoadingDlg->deleteLater();
+    closeLoadingDialog();
 }
 
 void NFilterDlg::queryFinished(const QJsonObject &ba)
 {
-    mLoadingDlg->reject();
-    mLoadingDlg->deleteLater();
+    closeLoadingDialog();
     auto *btn = sender()->property("btn").value<QPushButton*>();
     sender()->deleteLater();
-    QJsonArray jcols = ba["cols"].toArray();
-    QJsonArray jdata = ba["rows"].toArray();
-    mData[btn->property("filter").toString()] = jdata;
-    mCols[btn->property("filter").toString()] = jcols;
-    btn->click();
+
+    if(!btn) {
+        return;
+    }
+
+    const QString filterName = btn->property("filter").toString();
+    mData[filterName] = ba["rows"].toArray();
+    mCols[filterName] = ba["cols"].toArray();
+    showSuggestionsForButton(btn);
 }
 
 void NFilterDlg::on_btnCancel_clicked()

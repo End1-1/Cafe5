@@ -23,15 +23,46 @@ class Attendance extends Auth
         return !empty($active);
     }
 
-    public function Checkin($params)
+    private function findOpenAttendance(int $workerId): ?array
     {
         $active = $this->select(
-            "select * from s_attendance where f_worker=? and f_out is null order by f_id desc limit 1",
+            "SELECT * FROM s_attendance WHERE f_worker = ? AND f_out IS NULL ORDER BY f_id DESC LIMIT 1",
             "i",
-            [$this->userid]
+            [$workerId]
         )->fetch_assoc();
-        if (!empty($active)) {
+
+        return $active ?: null;
+    }
+
+    private function closeOpenAttendance(array $active, ?string $comment = null): void
+    {
+        $v = [
+            "f_out" => date("Y-m-d H:i:s"),
+            "f_state" => 0,
+        ];
+        if ($comment !== null && $comment !== "") {
+            $v["f_comment"] = $comment;
+        }
+        $this->update("s_attendance", $v, $active["f_id"]);
+    }
+
+    public function Open($params)
+    {
+        $this->result["user_id"] = (int)$this->userid;
+        $this->result["active"] = $this->IsCheckin($this->userid);
+        $this->echoResult();
+    }
+
+    public function Checkin($params)
+    {
+        if ($this->IsCheckin($this->userid)) {
             dieWithCode(Translator::t("Already checked in"));
+        }
+
+        $comment = !empty($params->comment) ? (string)$params->comment : null;
+        $stale = $this->findOpenAttendance($this->userid);
+        if ($stale !== null) {
+            $this->closeOpenAttendance($stale, $comment);
         }
 
         $v = [];
@@ -41,33 +72,132 @@ class Attendance extends Auth
         $v["f_in"] = date("Y-m-d H:i:s");
         $v["f_state"] = 1;
         $v["f_break_minutes"] = 0;
-        if (!empty($params->comment)) {
-            $v["f_comment"] = (string)$params->comment;
+        if ($comment !== null) {
+            $v["f_comment"] = $comment;
         }
         $attendanceId = $this->insert("s_attendance", $v);
         $this->result["attendance"] = $this->select("select * from s_attendance where f_id=?", "i", [$attendanceId])->fetch_assoc();
+        $this->result["active"] = true;
         $this->echoResult();
     }
 
     public function Checkout($params)
     {
-        $active = $this->select(
-            "select * from s_attendance where f_worker=? and f_out is null order by f_id desc limit 1",
-            "i",
-            [$this->userid]
-        )->fetch_assoc();
-        if (empty($active)) {
+        if (!$this->IsCheckin($this->userid)) {
             dieWithCode(Translator::t("No active checkin"));
         }
 
-        $v = [];
-        $v["f_out"] = date("Y-m-d H:i:s");
-        $v["f_state"] = 0;
-        if (!empty($params->comment)) {
-            $v["f_comment"] = (string)$params->comment;
+        $active = $this->findOpenAttendance($this->userid);
+        if ($active === null) {
+            dieWithCode(Translator::t("No active checkin"));
         }
-        $this->update("s_attendance", $v, $active["f_id"]);
+
+        $comment = !empty($params->comment) ? (string)$params->comment : null;
+        $this->closeOpenAttendance($active, $comment);
         $this->result["attendance"] = $this->select("select * from s_attendance where f_id=?", "i", [$active["f_id"]])->fetch_assoc();
+        $this->result["active"] = false;
+        $this->echoResult();
+    }
+
+    public function VerifyPin($params)
+    {
+        $pin = (string)($params->pin ?? "");
+        if ($pin === "") {
+            dieWithCode("PIN is required");
+        }
+
+        $row = $this->select(
+            "SELECT f_id, f_first, f_last FROM s_user WHERE f_altpassword = MD5(?)",
+            "s",
+            [$pin]
+        )->fetch_assoc();
+        if (empty($row)) {
+            dieWithCode(Translator::t("Access denied"), 401);
+        }
+
+        $userId = (int)$row["f_id"];
+        $this->result["user_id"] = $userId;
+        $this->result["f_name"] = trim($row["f_last"] . " " . $row["f_first"]);
+        $this->result["active"] = $this->IsCheckin($userId);
+        $this->echoResult();
+    }
+
+    public function OpenUser($params)
+    {
+        $userId = (int)($params->user_id ?? 0);
+        if ($userId <= 0) {
+            dieWithCode("User is required");
+        }
+
+        $row = $this->select(
+            "SELECT f_id, f_first, f_last FROM s_user WHERE f_id = ?",
+            "i",
+            [$userId]
+        )->fetch_assoc();
+        if (empty($row)) {
+            dieWithCode("User not found");
+        }
+
+        $this->result["user_id"] = $userId;
+        $this->result["f_name"] = trim($row["f_last"] . " " . $row["f_first"]);
+        $this->result["active"] = $this->IsCheckin($userId);
+        $this->echoResult();
+    }
+
+    public function ToggleForUser($params)
+    {
+        $userId = (int)($params->user_id ?? 0);
+        if ($userId <= 0) {
+            dieWithCode("User is required");
+        }
+
+        $user = $this->select("SELECT f_id, f_group FROM s_user WHERE f_id = ?", "i", [$userId])->fetch_assoc();
+        if (empty($user)) {
+            dieWithCode("User not found");
+        }
+
+        $comment = !empty($params->comment) ? (string)$params->comment : null;
+
+        if ($this->IsCheckin($userId)) {
+            $active = $this->findOpenAttendance($userId);
+            if ($active === null) {
+                dieWithCode(Translator::t("No active checkin"));
+            }
+            $this->closeOpenAttendance($active, $comment);
+            $this->result["action"] = "checkout";
+            $this->result["attendance"] = $this->select(
+                "SELECT * FROM s_attendance WHERE f_id = ?",
+                "i",
+                [$active["f_id"]]
+            )->fetch_assoc();
+        } else {
+            $stale = $this->findOpenAttendance($userId);
+            if ($stale !== null) {
+                $this->closeOpenAttendance($stale, $comment);
+            }
+
+            $v = [
+                "f_date" => date("Y-m-d"),
+                "f_worker" => $userId,
+                "f_position" => (int)($user["f_group"] ?? 0),
+                "f_in" => date("Y-m-d H:i:s"),
+                "f_state" => 1,
+                "f_break_minutes" => 0,
+            ];
+            if ($comment !== null) {
+                $v["f_comment"] = $comment;
+            }
+            $attendanceId = $this->insert("s_attendance", $v);
+            $this->result["action"] = "checkin";
+            $this->result["attendance"] = $this->select(
+                "SELECT * FROM s_attendance WHERE f_id = ?",
+                "i",
+                [$attendanceId]
+            )->fetch_assoc();
+        }
+
+        $this->result["user_id"] = $userId;
+        $this->result["active"] = $this->IsCheckin($userId);
         $this->echoResult();
     }
 }

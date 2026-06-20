@@ -7,6 +7,7 @@
 #include <QTimer>
 #include <QJsonDocument>
 #include <QJsonArray>
+#include <QMap>
 
 namespace Ui
 {
@@ -40,6 +41,8 @@ private slots:
 
     void on_btnCancel_clicked();
 
+    void on_btnRefreash_clicked();
+
 private:
     Ui::C5StructTableView* ui;
 
@@ -55,6 +58,10 @@ private:
 
     QString mLastRequestId;
 
+    QString mReloadRequestId;
+
+    static QMap<QString, QJsonArray> sLastResultsByEngine;
+
     QMap<QString, QString> selectorTitles();
 
 };
@@ -69,6 +76,11 @@ inline QVector<T> C5StructTableView::get(const QString &searchEngine, bool getAl
     tv.mEmptySearch = getAllListFirst;
     auto *model = new C5StructModel<T>(&tv);
     tv.tableView()->setModel(model);
+
+    if(sLastResultsByEngine.contains(searchEngine)) {
+        model->setData(parseJsonArray<T>(sLastResultsByEngine.value(searchEngine)));
+        tv.tableView()->resizeColumnsToContents();
+    }
 
     if(getAllListFirst) {
         tv.on_leSearchText_textChanged("");

@@ -24,6 +24,15 @@ public:
 private slots:
     void dishSelectionChanged(int currentRow, int currentColumn, int previousRow, int previousColumn);
 
+    void copyOrderIdToClipboard();
+
+    void calcQueueCellChanged(int row, int column);
+
+    void dishCellDoubleClicked(int row, int column);
+
+protected:
+    bool eventFilter(QObject *watched, QEvent *event) override;
+
 private:
     Ui::WOrderInspector *ui = nullptr;
 
@@ -38,4 +47,24 @@ private:
     void fillHeader();
 
     void fillDishes();
+
+    void fillLog();
+
+    void fillCalcQueue();
+
+    void updateCalcQueueSumRow();
+
+    void refreshCalcQueueRowTotal(int row);
+
+    bool mCalcQueueFilling = false;
+
+    static constexpr int calcQueueColCost = 4;
+
+    static constexpr int calcQueueColTotal = 5;
+
+    static constexpr int dishColAppendTime = 9;
+
+    static constexpr int dishColPrintTime = 10;
+
+    static constexpr int dishColKitchen = 11;
 };

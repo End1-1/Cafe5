@@ -96,7 +96,29 @@ class Order extends Auth
                 [$params->id, (int)$header["f_cash_session_id"], CASH_OP_SALES_REVENUE],
                 true
             );
+
+            $deliveryRow = $this->select(
+                "select coalesce(sum(f_credit), 0) as f_amount from cash_operations where f_order_id=? and f_session_id=? and f_operation_type=?",
+                "sii",
+                [$params->id, (int)$header["f_cash_session_id"], CASH_OP_DELIVERY_FEE]
+            )->fetch_assoc();
+            $deliveryAmount = (float)($deliveryRow["f_amount"] ?? 0);
+            if ($deliveryAmount > 0) {
+                $this->select(
+                    "update cash_session set f_amount_expected=f_amount_expected+? where f_id=?",
+                    "di",
+                    [$deliveryAmount, (int)$header["f_cash_session_id"]],
+                    true
+                );
+            $this->select(
+                "delete from cash_operations where f_order_id=? and f_session_id=? and f_operation_type=?",
+                "sii",
+                [$params->id, (int)$header["f_cash_session_id"], CASH_OP_DELIVERY_FEE],
+                true
+            );
+            }
         }
+        $storeRollback = $this->rollbackStoreOutputForOrder($params->id, $header);
         $odata["f_amount_cash"] = 0;
         $odata["f_amount_card"] = 0;
         $odata["f_amount_bank"] = 0;
@@ -111,6 +133,14 @@ class Order extends Auth
         $odata["f_first_close"] = false;
         $odata["log"][] = ["ts" => date("Y-m-d H:i:s"), "action" => "reopen", "user" => $this->fullName()];
         $odata["log"][] = ["ts" => date("Y-m-d H:i:s"), "action" => "rollback cash operations", "amount" => $rollbackAmount, "user" => $this->fullName()];
+        if ($storeRollback["docs"] > 0) {
+            $odata["log"][] = [
+                "ts" => date("Y-m-d H:i:s"),
+                "action" => "rollback store output",
+                "docs" => $storeRollback["docs"],
+                "user" => $this->fullName()
+            ];
+        }
         $this->update("o_header", [
             "f_state" => 1,
             "f_data" => json_encode($odata, JSON_UNESCAPED_UNICODE)
@@ -1032,26 +1062,264 @@ EOD;
     {
         $oheader = $this->GetHeader($params->id);
         $oheader["dishes"] = $this->GetDishes($oheader["f_id"]);
+        $oheader["calc_queue"] = $this->GetCalcQueue($oheader["f_id"]);
         $this->result["order"] = $oheader;
         $this->echoResult();
     }
 
+    public function GetCalcQueue($orderId)
+    {
+        $sql = <<<EOD
+        SELECT
+            scq.f_id,
+            scq.f_row_sale_id,
+            scq.f_item_id,
+            scq.f_qty,
+            scq.f_price,
+            scq.f_status,
+            scq.f_store_id,
+            COALESCE(dish_g.f_name, '') AS f_dish_name,
+            COALESCE(og.f_qty, 0) AS f_sold_qty,
+            COALESCE(comp.f_name, '') AS f_component_name
+        FROM store_calc_queue scq
+        LEFT JOIN o_goods og ON og.f_id = scq.f_row_sale_id
+        LEFT JOIN c_goods dish_g ON dish_g.f_id = og.f_goods
+        LEFT JOIN c_goods comp ON comp.f_id = scq.f_item_id
+        WHERE scq.f_doc_sale_id = ?
+        ORDER BY og.f_row, dish_g.f_name, comp.f_name
+        EOD;
+
+        return $this->select($sql, "s", [$orderId])->fetch_all(MYSQLI_ASSOC);
+    }
+
+    /**
+     * Edit kitchen status times (o_goods_process.f_data) and optional append/print (o_goods.f_data).
+     *
+     * params: id (o_goods uuid), process_times { "1": "Y-m-d H:i:s", ... }, f_append_time, f_print_time (empty = clear)
+     */
+    public function SetDishKitchenTimes($params)
+    {
+        $id = (string)($params->id ?? '');
+        if ($id === '') {
+            dieWithCode(Translator::t('Missing id'));
+        }
+
+        $row = $this->select(
+            <<<EOD
+            SELECT og.f_id, og.f_header, og.f_data, ogp.f_id AS process_id, ogp.f_data AS process_data
+            FROM o_goods og
+            LEFT JOIN o_goods_process ogp ON ogp.f_id = og.f_id
+            WHERE og.f_id = ?
+            EOD,
+            's',
+            [$id]
+        )->fetch_assoc();
+
+        if (!$row) {
+            dieWithCode(Translator::t('Record not found'));
+        }
+
+        $headerId = (string)($row['f_header'] ?? '');
+        $ogData = json_decode($row['f_data'] ?? '{}', true);
+        if (!is_array($ogData)) {
+            $ogData = [];
+        }
+
+        $procData = json_decode($row['process_data'] ?? '{}', true);
+        if (!is_array($procData)) {
+            $procData = [];
+        }
+
+        if (property_exists($params, 'process_times')) {
+            $times = (array)($params->process_times ?? []);
+            for ($st = 1; $st <= 4; ++$st) {
+                $key = "f_status_{$st}_1_time";
+                $stKey = (string)$st;
+                if (!array_key_exists($stKey, $times) && !array_key_exists($st, $times)) {
+                    continue;
+                }
+                $raw = trim((string)($times[$stKey] ?? $times[$st] ?? ''));
+                if ($raw === '') {
+                    unset($procData[$key]);
+                    for ($ss = 2; $ss <= 4; ++$ss) {
+                        unset($procData["f_status_{$st}_{$ss}_time"]);
+                    }
+                    continue;
+                }
+                $ts = strtotime($raw);
+                if ($ts === false) {
+                    dieWithCode(Translator::t('Invalid kitchen time for status ') . $st);
+                }
+                $procData[$key] = date('Y-m-d H:i:s', $ts);
+            }
+        }
+
+        if (property_exists($params, 'f_append_time')) {
+            $raw = trim((string)$params->f_append_time);
+            if ($raw === '') {
+                unset($ogData['f_append_time']);
+            } else {
+                $ts = strtotime($raw);
+                if ($ts === false) {
+                    dieWithCode(Translator::t('Invalid append time'));
+                }
+                $ogData['f_append_time'] = date('Y-m-d H:i:s', $ts);
+            }
+        }
+
+        if (property_exists($params, 'f_print_time')) {
+            $raw = trim((string)$params->f_print_time);
+            if ($raw === '') {
+                unset($ogData['f_print_time']);
+            } else {
+                $ts = strtotime($raw);
+                if ($ts === false) {
+                    dieWithCode(Translator::t('Invalid print time'));
+                }
+                $ogData['f_print_time'] = date('Y-m-d H:i:s', $ts);
+            }
+        }
+
+        $this->update('o_goods', [
+            'f_data' => json_encode($ogData, JSON_UNESCAPED_UNICODE),
+        ], $id);
+
+        if (empty($row['process_id'])) {
+            $this->ensureGoodsProcessRows($headerId);
+        }
+
+        if (!empty($procData)) {
+            $procData['f_substatus'] = (int)($procData['f_substatus'] ?? 1);
+        } else {
+            $procData = ['f_substatus' => 1];
+        }
+
+        $this->update('o_goods_process', [
+            'f_data' => json_encode($procData, JSON_UNESCAPED_UNICODE),
+        ], $id);
+
+        if ($headerId !== '') {
+            $this->result['order'] = $this->GetOrder($headerId);
+        }
+        $this->echoResult();
+    }
+
+    public function SetCalcQueuePrice($params)
+    {
+        $id = (string)($params->id ?? '');
+        if ($id === '') {
+            dieWithCode(Translator::t('Missing id'));
+        }
+        if (!property_exists($params, 'price')) {
+            dieWithCode(Translator::t('Missing price'));
+        }
+
+        $row = $this->select(
+            "SELECT f_id, f_doc_sale_id FROM store_calc_queue WHERE f_id = ?",
+            "s",
+            [$id]
+        )->fetch_assoc();
+        if (!$row) {
+            dieWithCode(Translator::t('Record not found'));
+        }
+
+        $price = round((float)$params->price, 2);
+        $this->update('store_calc_queue', ['f_price' => $price], $id);
+
+        $orderId = (string)($row['f_doc_sale_id'] ?? '');
+        if ($orderId !== '') {
+            $this->result['calc_queue'] = $this->GetCalcQueue($orderId);
+        }
+        $this->echoResult();
+    }
+
+    /**
+     * Kitchen times live in o_goods_process.f_data (not in o_goods.f_data).
+     * Backfill rows for legacy lines that were added before o_goods_process existed.
+     */
+    private function ensureGoodsProcessRows(string $headerId): void
+    {
+        $sql = <<<EOD
+        INSERT INTO o_goods_process (f_id, f_header, f_status, f_daily_number, f_data)
+        SELECT
+            og.f_id,
+            og.f_header,
+            1,
+            COALESCE(NULLIF(JSON_UNQUOTE(JSON_EXTRACT(oh.f_data, '$.f_daily_number')), ''), '-'),
+            JSON_OBJECT(
+                'f_status_1_1_time',
+                COALESCE(
+                    NULLIF(TRIM(JSON_UNQUOTE(JSON_EXTRACT(og.f_data, '$.f_append_time'))), ''),
+                    DATE_FORMAT(NOW(), '%Y-%m-%d %H:%i:%s')
+                ),
+                'f_substatus', 1,
+                'f_cooking_start', '1981-09-05 00:01:00',
+                'f_cooking_end', DATE_FORMAT(NOW(), '%Y-%m-%d %H:%i:%s')
+            )
+        FROM o_goods og
+        INNER JOIN o_header oh ON oh.f_id = og.f_header
+        LEFT JOIN o_goods_process ogp ON ogp.f_id = og.f_id
+        WHERE og.f_header = ?
+          AND og.f_state = 1
+          AND ogp.f_id IS NULL
+        EOD;
+        $this->select($sql, 's', [$headerId], true);
+    }
+
     public function GetDishes($header)
     {
+        $this->ensureGoodsProcessRows($header);
         $sql = <<<EOD
         select og.f_id, og.f_state, og.f_type, og.f_parent, og.f_emarks, og.f_data,
         og.f_row, og.f_qty, og.f_price, og.f_total, og.f_store,
         og.f_goods as f_dish, g.f_name as f_dish_name,
         if (length(COALESCE(g.f_adg, ''))>0, g.f_adg, p2.f_adgcode) AS f_adgt,
         p2.f_taxdept as f_fiscal_department,
-        og.f_header
+        og.f_header,
+        ogp.f_status AS f_process_status,
+        JSON_DETAILED(ogp.f_data) AS f_process_data
         from o_goods og 
         left join c_goods g on g.f_id=og.f_goods
         left join c_groups p2 on p2.f_id=g.f_group
+        left join o_goods_process ogp on ogp.f_id = og.f_id
         where og.f_header=?
         order by og.f_row
         EOD;
-        return $this->select($sql, "s", [$header])->fetch_all(MYSQLI_ASSOC);
+        return $this->normalizeDishesKitchenFields(
+            $this->select($sql, "s", [$header])->fetch_all(MYSQLI_ASSOC)
+        );
+    }
+
+    /**
+     * Kitchen queue data lives in o_goods_process (not o_goods.f_data / o_header.f_data).
+     *
+     * @param array<int,array<string,mixed>> $rows
+     * @return array<int,array<string,mixed>>
+     */
+    private function normalizeDishesKitchenFields(array $rows): array
+    {
+        foreach ($rows as &$row) {
+            $st = $row['f_process_status'] ?? null;
+            $row['f_process_status'] = ($st === null || $st === '') ? 0 : (int)$st;
+
+            $raw = $row['f_process_data'] ?? null;
+            if ($raw === null || $raw === '') {
+                $row['f_process_data'] = [];
+                continue;
+            }
+
+            if (is_string($raw)) {
+                $decoded = json_decode($raw, true);
+                $row['f_process_data'] = is_array($decoded) ? $decoded : [];
+            } elseif (is_array($raw)) {
+                $row['f_process_data'] = $raw;
+            } else {
+                $row['f_process_data'] = [];
+            }
+        }
+        unset($row);
+
+        return $rows;
     }
 
     public function GetHeaderData($id)
@@ -1154,6 +1422,45 @@ EOD;
         $this->echoResult();
     }
 
+    /**
+     * Record the delivery courier fee as a cash-out tied to the order.
+     * Idempotent: re-closing the same order rolls back the previous delivery operation first,
+     * so the cash drawer expected amount stays correct. Linked by f_order_id so order removal cleans it up.
+     */
+    private function applyDeliveryCashout($orderId, $cashSessionId, $cashboxId, array $odata, string $prefix)
+    {
+        $cashSessionId = (int)$cashSessionId;
+        $deliveryAmount = (float)($odata["f_delivery_amount"] ?? 0);
+
+        $prev = $this->select(
+            "select coalesce(sum(f_credit), 0) as f_amount from cash_operations where f_order_id=? and f_operation_type=?",
+            "si",
+            [$orderId, CASH_OP_DELIVERY_FEE]
+        )->fetch_assoc();
+        $prevAmount = (float)($prev["f_amount"] ?? 0);
+        if ($prevAmount > 0.00001) {
+            $this->select("update cash_session set f_amount_expected=f_amount_expected+? where f_id=?", "di", [$prevAmount, $cashSessionId], true);
+        }
+        $this->select("delete from cash_operations where f_order_id=? and f_operation_type=?", "si", [$orderId, CASH_OP_DELIVERY_FEE], true);
+
+        if ($deliveryAmount <= 0.00001) {
+            return;
+        }
+
+        $this->insert("cash_operations", [
+            "f_cashbox_id" => $cashboxId,
+            "f_session_id" => $cashSessionId,
+            "f_order_id" => $orderId,
+            "f_user" => $this->userid,
+            "f_operation_type" => CASH_OP_DELIVERY_FEE,
+            "f_payment_type_id" => PAYMENT_TYPE_CASH,
+            "f_datetime" => date("Y-m-d H:i:s"),
+            "f_credit" => $deliveryAmount,
+            "f_comment" => str_replace("%ordernumber", $prefix, Translator::t("Delivery for %ordernumber")),
+        ]);
+        $this->select("update cash_session set f_amount_expected=f_amount_expected-? where f_id=?", "di", [$deliveryAmount, $cashSessionId], true);
+    }
+
     public function CloseOrder($params)
     {
         $this->assertOrderKitchenPrinted($params->id);
@@ -1222,6 +1529,7 @@ EOD;
         }
 
         $this->select("update cash_session set f_amount_expected=f_amount_expected+? where f_id=?", "di", [$total, $cash_session_id], true);
+        $this->applyDeliveryCashout($params->id, $cash_session_id, $params->cashbox_id ?? null, $odata, (string)$row["f_prefix"]);
         $odata["f_date_close"] = date("Y-m-d");
         $odata["f_time_close"] = date("H:i:s");
         $odata["f_fiscal"] = $params->fiscal->out ?? [];
@@ -1239,7 +1547,7 @@ EOD;
         $v["f_cash_session_id"] = $cash_session_id;
         $v["f_partner"] = $partnerId;
         $this->update("o_header", $v, $params->id);
-        $this->CalculationOutput($params->id);
+        $this->CalculationOutput($params->id, $this->resolveCostDependOnServiceAndDiscount($params));
         $this->result["order"] = $this->GetOrder($params->id);
         $this->result["order"]["precheck_dishes"] = $this->GetPrecheckDishes($params->id);
         $this->echoResult();
@@ -1317,19 +1625,36 @@ EOD;
         $v["f_staff"] = $this->userid;
         // $v["f_cash_session_id"] = $cash_session["f_id"];
         $this->update("o_header", $v, $params->id);
-        $this->CalculationOutput($params->id);
+        $this->CalculationOutput($params->id, $this->resolveCostDependOnServiceAndDiscount($params));
         $this->result["order"] = $this->GetOrder($params->id);
         $this->result["order"]["precheck_dishes"] = $this->GetPrecheckDishes($params->id);
 
-        $gp =  (object)($params->o_goods_process_status ?? ["f_status" => 0, "f_substatus" => 0]);
-        if (($gp->f_status ?? 0) !== 0) {
-            $this->select("update o_goods_process set f_status=? where f_header=?", "is", [$gp->f_status, $params->id], true);
+        $gp = (object)($params->o_goods_process_status ?? ["f_status" => 0, "f_substatus" => 0]);
+        $closeKitchenStatus = (int)($gp->f_status ?? 0);
+        if ($closeKitchenStatus >= 1 && $closeKitchenStatus <= 4) {
+            $ss = max(1, (int)($gp->f_substatus ?? 1));
+            $jsonTimePath = sprintf('$.f_status_%d_%d_time', $closeKitchenStatus, $ss);
+            $sql = <<<EOD
+            UPDATE o_goods_process
+            SET f_status = ?,
+            f_data = JSON_SET(
+                COALESCE(f_data, '{}'),
+                '{$jsonTimePath}',
+                COALESCE(
+                    NULLIF(JSON_UNQUOTE(JSON_EXTRACT(f_data, '{$jsonTimePath}')), ''),
+                    DATE_FORMAT(NOW(), '%Y-%m-%d %H:%i:%s')
+                ),
+                '$.f_substatus', ?
+            )
+            WHERE f_header = ?
+            EOD;
+            $this->select($sql, 'iis', [$closeKitchenStatus, $ss, $params->id], true);
         }
         $this->echoResult();
     }
 
 
-    public function CalculationOutput($id)
+    public function CalculationOutput($id, $costDependOnServiceAndDiscount = false)
     {
         $oheader = $this->select("select f_prefix from o_header where f_id=?", "s", [$id])->fetch_assoc();
         // 1. Очистка старой очереди
@@ -1395,6 +1720,10 @@ EOD;
 
         $this->select($sql_expand, "s", [$id], true);
 
+        if ($costDependOnServiceAndDiscount) {
+            $this->applyCostServiceAndDiscountToQueue($id);
+        }
+
         $doc_date = date('Y-m-d H:i:s');
         // 1. Готовим комментарий заранее
         $comment = Translator::t("Sale") . " " . ($oheader["f_prefix"] ?? '');
@@ -1439,17 +1768,160 @@ SQL;
                 $json_res = json_decode($func_row['result'] ?? '', true);
 
                 if (isset($json_res['status']) && $json_res['status'] == 0) {
+                    $paramsDecoded = json_decode($params, true);
+                    $docUuid = $paramsDecoded['doc_uuid'] ?? null;
 
                     $this->select(
-                        "update store_calc_queue set f_status=1 WHERE f_doc_sale_id = ? AND f_store_id = ?",
-                        "ss",
-                        [$id, $row['f_store_id']],
+                        "update store_calc_queue set f_status=1, f_doc_store_out_id=? WHERE f_doc_sale_id = ? AND f_store_id = ?",
+                        "sss",
+                        [$docUuid, $id, $row['f_store_id']],
                         true
                     );
                 } else {
                     error_log("Discharge error for store " . ($row['f_store_id'] ?? 'unknown') . ": " . ($json_res['msg'] ?? 'Unknown error'));
                 }
             }
+        }
+    }
+
+    /** Cancel posted store write-offs for a closed sale (reopen order). */
+    private function rollbackStoreOutputForOrder(string $orderId, array $header): array
+    {
+        $docRows = $this->select(
+            "SELECT DISTINCT f_doc_store_out_id AS doc_id
+             FROM store_calc_queue
+             WHERE f_doc_sale_id = ? AND f_status = 1
+               AND f_doc_store_out_id IS NOT NULL AND f_doc_store_out_id <> ''",
+            "s",
+            [$orderId]
+        )->fetch_all(MYSQLI_ASSOC);
+
+        if (empty($docRows)) {
+            $saleComment = Translator::t("Sale") . " " . ($header["f_prefix"] ?? "");
+            $docRows = $this->select(
+                "SELECT DISTINCT sd.f_id AS doc_id
+                 FROM store_document sd
+                 INNER JOIN (
+                     SELECT DISTINCT f_store_id
+                     FROM store_calc_queue
+                     WHERE f_doc_sale_id = ? AND f_status = 1
+                 ) q ON q.f_store_id = sd.f_store_out
+                 WHERE sd.f_doc_type = 2
+                   AND sd.f_status = 1
+                   AND JSON_UNQUOTE(JSON_EXTRACT(sd.f_data, '$.comment')) = ?
+                   AND DATE(sd.f_doc_date) = ?",
+                "sss",
+                [$orderId, $saleComment, $header["f_datecash"] ?? date("Y-m-d")]
+            )->fetch_all(MYSQLI_ASSOC);
+
+            if (empty($docRows)) {
+                $docRows = $this->select(
+                    "SELECT DISTINCT sd.f_id AS doc_id
+                     FROM store_document sd
+                     WHERE sd.f_doc_type = 2
+                       AND sd.f_status = 1
+                       AND JSON_UNQUOTE(JSON_EXTRACT(sd.f_data, '$.comment')) = ?
+                       AND DATE(sd.f_doc_date) = ?",
+                    "ss",
+                    [$saleComment, $header["f_datecash"] ?? date("Y-m-d")]
+                )->fetch_all(MYSQLI_ASSOC);
+            }
+        }
+
+        $rolledBack = 0;
+        foreach ($docRows as $docRow) {
+            $docId = $docRow["doc_id"] ?? "";
+            if ($docId === "") {
+                continue;
+            }
+
+            $res = $this->select("SELECT sf_store2_output_delete(?) AS result", "s", [$docId]);
+            $row = $res->fetch_assoc();
+            $result = json_decode($row["result"] ?? "", true);
+            if (($result["status"] ?? 1) > 0) {
+                $this->rollback();
+                dieWithCode($result["msg"] ?? Translator::t("Store rollback failed"));
+            }
+            $rolledBack++;
+        }
+
+        if ($rolledBack > 0) {
+            $this->select(
+                "UPDATE store_calc_queue SET f_status = 0, f_doc_store_out_id = NULL WHERE f_doc_sale_id = ? AND f_status = 1",
+                "s",
+                [$orderId],
+                true
+            );
+        }
+
+        return ["docs" => $rolledBack];
+    }
+
+    private function resolveCostDependOnServiceAndDiscount($params): bool
+    {
+        if (!isset($params->cost_depend_on_service_and_discount)) {
+            return false;
+        }
+
+        $v = $params->cost_depend_on_service_and_discount;
+
+        return $v === true || $v === 1 || $v === '1' || $v === 'true';
+    }
+
+    /**
+     * Same price modificator as CountAmounts: service + discount on dish lines that count them.
+     */
+    private function costPriceModificatorForDish(array $ddata, array $odata): float
+    {
+        $modificator = 0.0;
+
+        if (!empty($ddata['f_count_service'])) {
+            $modificator += (float)($odata['f_service_factor'] ?? 0);
+        }
+
+        if (!empty($ddata['f_count_discount'])) {
+            $modificator -= abs((float)($odata['f_discount_factor'] ?? 0));
+        }
+
+        return $modificator;
+    }
+
+    /** Apply order service/discount factors to store_calc_queue.f_price (COGS). */
+    private function applyCostServiceAndDiscountToQueue(string $orderId): void
+    {
+        $header = $this->select("select f_data from o_header where f_id=?", "s", [$orderId])->fetch_assoc();
+        if (!$header) {
+            return;
+        }
+
+        $odata = json_decode($header['f_data'] ?? '{}', true);
+        if (!is_array($odata)) {
+            $odata = [];
+        }
+
+        $sql = <<<EOD
+        SELECT scq.f_id, scq.f_price, og.f_data
+        FROM store_calc_queue scq
+        INNER JOIN o_goods og ON og.f_id = scq.f_row_sale_id
+        WHERE scq.f_doc_sale_id = ?
+        EOD;
+
+        $rows = $this->select($sql, "s", [$orderId])->fetch_all(MYSQLI_ASSOC);
+
+        foreach ($rows as $row) {
+            $ddata = json_decode($row['f_data'] ?? '{}', true);
+            if (!is_array($ddata)) {
+                $ddata = [];
+            }
+
+            $modificator = $this->costPriceModificatorForDish($ddata, $odata);
+            if (abs($modificator) < 1e-9) {
+                continue;
+            }
+
+            $basePrice = (float)($row['f_price'] ?? 0);
+            $newPrice = round($basePrice * (1 + $modificator), 2);
+            $this->update('store_calc_queue', ['f_price' => $newPrice], $row['f_id']);
         }
     }
 

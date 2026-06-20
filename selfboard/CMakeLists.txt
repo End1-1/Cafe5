@@ -9,36 +9,80 @@ set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
 
-find_package(Qt6 REQUIRED COMPONENTS Core Gui Widgets LinguistTools)
+find_package(Qt6 REQUIRED COMPONENTS Core Gui Widgets Network LinguistTools)
+
+include_directories(
+    ../NTable
+    ../Classes
+    ../Cafe5
+)
 
 set(SOURCES
     main.cpp
     dlgstart.cpp
+    dlgserversettings.cpp
+    serverconfig.cpp
+    appsettings.cpp
+    selfboardsettings.cpp
     dlgmenu.cpp
+    dlgcart.cpp
+    dlgpayment.cpp
+    dlgpaymentstub.cpp
+    dlgorderdone.cpp
+    selfboardordersubmit.cpp
     dlgdishdetails.cpp
+    dlgpackagepick.cpp
+    menuhelpers.cpp
     menustubclient.cpp
+    menucache.cpp
+    webmenuclient.cpp
     dishcardwidget.cpp
     ordercart.cpp
     selfboarddisplay.cpp
+    ../NTable/ndataprovider.cpp
+    ../NTable/ninterface.cpp
+    ../NTable/nloadingdlg.cpp
+    ../Classes/logwriter.cpp
+    ../Classes/QProgressIndicator.cpp
 )
 
 set(HEADERS
     dlgstart.h
+    dlgserversettings.h
+    serverconfig.h
+    appsettings.h
+    selfboardsettings.h
     dlgmenu.h
+    dlgcart.h
+    dlgpayment.h
+    dlgpaymentstub.h
+    dlgorderdone.h
+    selfboardordersubmit.h
+    paymentstubtypes.h
     dlgdishdetails.h
+    dlgpackagepick.h
+    menuhelpers.h
     menutypes.h
     imenuclient.h
     menustubclient.h
+    menucache.h
+    webmenuclient.h
     dishcardwidget.h
     ordercart.h
     selfboarddisplay.h
     version.h
+    ../Classes/format_bytes.h
 )
 
 set(FORMS
     dlgstart.ui
+    dlgserversettings.ui
     dlgmenu.ui
+    dlgcart.ui
+    dlgpayment.ui
+    dlgpaymentstub.ui
     dlgdishdetails.ui
+    ../NTable/nloadingdlg.ui
 )
 
 set(TS_FILES
@@ -68,10 +112,13 @@ target_compile_definitions(SelfBoard PRIVATE
     _MODULE_="selfboard"
 )
 
+set_source_files_properties(../NTable/ninterface.cpp PROPERTIES COMPILE_DEFINITIONS SELFBOARD)
+
 target_link_libraries(SelfBoard PRIVATE
     Qt6::Core
     Qt6::Gui
     Qt6::Widgets
+    Qt6::Network
 )
 
 qt_add_translations(SelfBoard

@@ -73,7 +73,9 @@ void NTreeWidget::query()
     auto *nd = new NDataProvider(this);
     connect(nd, &NDataProvider::started, this, &NTreeWidget::queryStarted);
     connect(nd, &NDataProvider::error, this, &NTreeWidget::queryError);
-    connect(nd, &NDataProvider::done, this, &NTreeWidget::queryFinished);
+    connect(nd, &NDataProvider::done, this, [this](const QJsonObject &ba) {
+        queryFinished(ba);
+    });
     QJsonObject jf = fFilter ? fFilter->filter() : QJsonObject();
 
     if(!fInitParams.isEmpty()) {
@@ -128,7 +130,7 @@ void NTreeWidget::sum()
     ui->tblTotal->setColumnCount(model->columnCount());
     ui->tblTotal->setVisible(model->fColSum.count() > 0);
     QStringList l;
-    l.append(QString::number(model->rowCount()));
+    l.append(QString::number(static_cast<NTreeModel*>(ui->mTreeView->model())->topLevelDishCount()));
     ui->tblTotal->setVerticalHeaderLabels(l);
 
     for(int i = 0; i < ui->tblTotal->columnCount(); i++) {
@@ -356,10 +358,16 @@ void NTreeWidget::on_leFilterLineedit_textEdited(const QString &arg1)
 
 void NTreeWidget::on_mTreeView_doubleClicked(const QModelIndex &index)
 {
+    onTreeViewDoubleClicked(index);
+}
+
+void NTreeWidget::onTreeViewDoubleClicked(const QModelIndex &index)
+{
     auto *node = static_cast<NTreeNode*>(index.internalPointer());
 
-    if(!node)
+    if(!node || node->spacer) {
         return;
+    }
 
     auto *m = static_cast<NTreeModel*>(ui->mTreeView->model());
 

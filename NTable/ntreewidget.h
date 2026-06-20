@@ -27,6 +27,12 @@ public:
     virtual void hotKey(const QString &key) override;
     void initParams(const QJsonObject &o);
 
+protected slots:
+    virtual void queryFinished(const QJsonObject &ba);
+
+protected:
+    virtual void onTreeViewDoubleClicked(const QModelIndex &index);
+
 private:
     Ui::NTreeWidget* ui;
     int fFilterColumn;
@@ -43,7 +49,6 @@ private slots:
     void queryStarted();
     void filterByColumn();
     void queryError(const QString &error);
-    void queryFinished(const QJsonObject &ba);
     void exportToExcel();
     void refreshData();
     void clearFilter();

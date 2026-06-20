@@ -1124,6 +1124,29 @@
        </widget>
       </item>
       <item>
+       <widget class="QCommandLinkButton" name="btnCashSessions_10">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="cursor">
+         <cursorShape>PointingHandCursor</cursorShape>
+        </property>
+        <property name="text">
+         <string>Menu</string>
+        </property>
+        <property name="icon">
+         <iconset resource="../resources/res.qrc">
+          <normaloff>:/grapes.png</normaloff>:/grapes.png</iconset>
+        </property>
+        <property name="form" stdset="0">
+         <string>form_menu</string>
+        </property>
+       </widget>
+      </item>
+      <item>
        <widget class="QCommandLinkButton" name="btnGroupOfGoods">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Preferred" vsizetype="Preferred">

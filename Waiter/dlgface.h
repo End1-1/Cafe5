@@ -52,6 +52,8 @@ private slots:
 
     void on_btnNormalView_clicked();
 
+    void on_btnAttendance_clicked();
+
 protected:
     virtual void showEvent(QShowEvent *e) override;
 

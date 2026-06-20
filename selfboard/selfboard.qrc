@@ -21,5 +21,14 @@
         <file>res/cat_gelato.png</file>
         <file>res/cat_pizza.png</file>
         <file>res/cat_hotdog.png</file>
+        <file alias="dietary/gluten-free.png">../resources/dietary/gluten-free.png</file>
+        <file alias="dietary/vegitarian.png">../resources/dietary/vegitarian.png</file>
+        <file alias="dietary/vegan.png">../resources/dietary/vegan.png</file>
+        <file alias="dietary/no-gmo.png">../resources/dietary/no-gmo.png</file>
+        <file alias="dietary/lactose-free.png">../resources/dietary/lactose-free.png</file>
+        <file alias="dietary/sugar-free.png">../resources/dietary/sugar-free.png</file>
+        <file alias="dietary/contain-nuts.png">../resources/dietary/contain-nuts.png</file>
+        <file alias="dietary/halal.png">../resources/dietary/halal.png</file>
+        <file alias="dietary/kosher.png">../resources/dietary/kosher.png</file>
     </qresource>
 </RCC>

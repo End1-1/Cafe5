@@ -45,6 +45,7 @@ FORMS += \
     ../Forms/c5login.ui \
     ../Forms/c5mainwindow.ui \
     ../Forms/c5passwords.ui \
+    ../Forms/dlguserfingerprint.ui \
     ../Forms/c5progressdialog.ui \
     ../Forms/c5route.ui \
     ../Forms/c5salarydoc.ui \
@@ -164,13 +165,19 @@ FORMS += \
     dwaiterworkstationconfig.ui \
     rabstracteditordialog.ui \
     rabstracteditorreport.ui \
+    rworkstationsreport.ui \
+    dlgservicevalue.ui \
     c5salaryeditor.ui \
     c5salarypaymenteditor.ui \
     c5revenuecashop.ui \
     wdashboardsettings.ui \
     rwaiterstationconfig.ui \
+    rworkstationconfigcommon.ui \
+    rworkstationconfigshop.ui \
+    rworkstationconfigwaiter.ui \
     wdashboard.ui \
     worderinspector.ui \
+    wdishkitchentimesdlg.ui \
     rfilterdialog.ui
 
 
@@ -270,6 +277,8 @@ HEADERS += \
         ../Forms/c5login.h \
         ../Forms/c5mainwindow.h \
         ../Forms/c5passwords.h \
+        ../Forms/dlguserfingerprint.h \
+        $$PWD/zkfingerprintreader.h \
         ../Forms/c5progressdialog.h \
         ../Forms/c5reportwidget.h \
         ../Forms/c5route.h \
@@ -504,15 +513,24 @@ HEADERS += \
         dwaiterworkstationconfig.h \
         rabstracteditordialog.h \
         rabstracteditorreport.h \
+        rworkstationsreport.h \
+        dlgservicevalue.h \
+        rservicevaluesreport.h \
         c5salaryeditor.h \
         c5salarypaymenteditor.h \
         c5revenuecashop.h \
         wdashboardsettings.h \
         rabstractspecialwidget.h \
+        ../dictionaries/dict_workstation.h \
         rwaiterstationconfig.h \
+        rworkstationconfigwidget.h \
+        rworkstationconfigcommon.h \
+        rworkstationconfigshop.h \
+        rworkstationconfigwaiter.h \
         version.h \
         wdashboard.h \
         worderinspector.h \
+        wdishkitchentimesdlg.h \
         ../Classes/dict_doc_reason.h \
         rfilterdialog.h
 
@@ -603,6 +621,8 @@ SOURCES += \
         ../Forms/c5login.cpp \
         ../Forms/c5mainwindow.cpp \
         ../Forms/c5passwords.cpp \
+        ../Forms/dlguserfingerprint.cpp \
+        $$PWD/zkfingerprintreader.cpp \
         ../Forms/c5progressdialog.cpp \
         ../Forms/c5reportwidget.cpp \
         ../Forms/c5route.cpp \
@@ -824,14 +844,22 @@ SOURCES += \
         dwaiterworkstationconfig.cpp \
         rabstracteditordialog.cpp \
         rabstracteditorreport.cpp \
+        rworkstationsreport.cpp \
+        dlgservicevalue.cpp \
+        rservicevaluesreport.cpp \
         c5salaryeditor.cpp \
         c5salarypaymenteditor.cpp \
         c5revenuecashop.cpp \
         wdashboardsettings.cpp \
         rabstractspecialwidget.cpp \
         rwaiterstationconfig.cpp \
+        rworkstationconfigwidget.cpp \
+        rworkstationconfigcommon.cpp \
+        rworkstationconfigshop.cpp \
+        rworkstationconfigwaiter.cpp \
         wdashboard.cpp \
         worderinspector.cpp \
+        wdishkitchentimesdlg.cpp \
         rfilterdialog.cpp
 
 include(C:/projects/QXlsx/QXlsx.pri)
