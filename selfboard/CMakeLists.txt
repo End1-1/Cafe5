@@ -24,6 +24,8 @@ set(SOURCES
     serverconfig.cpp
     appsettings.cpp
     selfboardsettings.cpp
+    selfboardlanguage.cpp
+    selfboardbottomchrome.cpp
     dlgmenu.cpp
     dlgcart.cpp
     dlgpayment.cpp
@@ -52,6 +54,8 @@ set(HEADERS
     serverconfig.h
     appsettings.h
     selfboardsettings.h
+    selfboardlanguage.h
+    selfboardbottomchrome.h
     dlgmenu.h
     dlgcart.h
     dlgpayment.h

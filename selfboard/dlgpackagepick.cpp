@@ -19,11 +19,19 @@
 #include <QPushButton>
 #include <QRadioButton>
 #include <QScrollArea>
+#include <QSizePolicy>
 #include <QStackedWidget>
 #include <QStyle>
 #include <QVBoxLayout>
 
 namespace {
+
+constexpr int kRelatedCardHeight = 260;
+constexpr int kRelatedGridColumns = 3;
+constexpr int kRelatedGridVisibleRows = 3;
+constexpr int kRelatedGridSpacing = 16;
+constexpr int kRelatedScrollHeight = kRelatedGridVisibleRows * kRelatedCardHeight
+    + (kRelatedGridVisibleRows - 1) * kRelatedGridSpacing;
 
 void clearLayout(QLayout *layout)
 {
@@ -45,10 +53,38 @@ void addBadgeIcon(QWidget *host, QHBoxLayout *layout, bool enabled, const char *
     }
     auto *icon = new QLabel(host);
     icon->setObjectName(QStringLiteral("pkgPickBadgeIcon"));
-    icon->setFixedSize(36, 36);
+    icon->setFixedSize(44, 44);
+    icon->setAlignment(Qt::AlignCenter);
     icon->setScaledContents(true);
     icon->setPixmap(QPixmap(QString::fromUtf8(iconPath)));
-    layout->addWidget(icon);
+    layout->addWidget(icon, 0, Qt::AlignVCenter);
+}
+
+QFrame *addBjuBox(QWidget *host, QHBoxLayout *layout, const QString &valueText, const QString &title)
+{
+    auto *box = new QFrame(host);
+    box->setObjectName(QStringLiteral("pkgPickBjuBox"));
+    auto *boxLayout = new QVBoxLayout(box);
+    boxLayout->setContentsMargins(10, 8, 10, 8);
+    boxLayout->setSpacing(6);
+
+    auto *valueLbl = new QLabel(valueText, box);
+    valueLbl->setObjectName(QStringLiteral("pkgPickBjuValue"));
+    valueLbl->setAlignment(Qt::AlignCenter);
+
+    auto *divider = new QFrame(box);
+    divider->setObjectName(QStringLiteral("pkgPickBjuDivider"));
+    divider->setFixedHeight(1);
+
+    auto *titleLbl = new QLabel(title, box);
+    titleLbl->setObjectName(QStringLiteral("pkgPickBjuTitle"));
+    titleLbl->setAlignment(Qt::AlignCenter);
+
+    boxLayout->addWidget(valueLbl);
+    boxLayout->addWidget(divider);
+    boxLayout->addWidget(titleLbl);
+    layout->addWidget(box, 0, Qt::AlignVCenter);
+    return box;
 }
 
 class AttrOptionRow : public QWidget
@@ -116,8 +152,7 @@ DlgPackagePick::DlgPackagePick(const MenuDish &package, QWidget *parent)
     m_card->setAttribute(Qt::WA_StyledBackground, true);
 
     buildUi();
-    showPackageBadges();
-    showPackageBju();
+    rebuildNutritionRow();
 
     const bool hasModificators = !MenuHelpers::pickerModificators(m_package).isEmpty();
     const bool hasRelated = !m_package.relatedDrinks.isEmpty() || !m_package.relatedOther.isEmpty();
@@ -208,31 +243,53 @@ QString DlgPackagePick::formatOptionLabel(const QString &key, const QString &val
     return name;
 }
 
-QWidget *DlgPackagePick::makeStepSidebarItem(int index, const QString &title)
+QWidget *DlgPackagePick::makeStepSidebarItem(int index, const QString &title, const QString &subtitle)
 {
-    auto *item = new QFrame(m_card);
+    auto *wrap = new QWidget();
+    wrap->setObjectName(QStringLiteral("pkgPickStepWrap"));
+    auto *wrapLayout = new QVBoxLayout(wrap);
+    wrapLayout->setContentsMargins(4, 2, 4, 8);
+    wrapLayout->setSpacing(0);
+
+    auto *item = new QFrame(wrap);
     item->setObjectName(QStringLiteral("pkgPickStepItem"));
     item->setProperty("stepIndex", index);
+    item->setProperty("personalizeStep", index == 0);
+    item->setAttribute(Qt::WA_StyledBackground, true);
+    item->setMinimumHeight(68);
+    item->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Minimum);
 
     auto *layout = new QHBoxLayout(item);
-    layout->setContentsMargins(16, 14, 16, 14);
-    layout->setSpacing(12);
+    layout->setContentsMargins(20, 18, 20, 18);
+    layout->setSpacing(14);
 
     auto *indicator = new QLabel(item);
     indicator->setObjectName(QStringLiteral("pkgPickStepIndicator"));
-    indicator->setFixedSize(28, 28);
+    indicator->setFixedSize(32, 32);
     indicator->setAlignment(Qt::AlignCenter);
+    indicator->setAttribute(Qt::WA_StyledBackground, true);
     indicator->setProperty("stepIndicator", true);
 
-    auto *label = new QLabel(title, item);
-    label->setObjectName(QStringLiteral("pkgPickStepLabel"));
-    label->setWordWrap(true);
+    auto *textCol = new QVBoxLayout();
+    textCol->setSpacing(4);
+    auto *titleLbl = new QLabel(title, item);
+    titleLbl->setObjectName(QStringLiteral("pkgPickStepTitle"));
+    titleLbl->setWordWrap(true);
+    textCol->addWidget(titleLbl);
+    if (!subtitle.isEmpty()) {
+        auto *subLbl = new QLabel(subtitle, item);
+        subLbl->setObjectName(QStringLiteral("pkgPickStepSubtitle"));
+        subLbl->setWordWrap(true);
+        textCol->addWidget(subLbl);
+    }
 
-    layout->addWidget(indicator, 0, Qt::AlignTop);
-    layout->addWidget(label, 1);
+    layout->addWidget(indicator, 0, Qt::AlignVCenter);
+    layout->addLayout(textCol, 1);
 
-    m_stepItems.append(item);
-    return item;
+    wrapLayout->addWidget(item);
+
+    m_stepItems.append(wrap);
+    return wrap;
 }
 
 QWidget *DlgPackagePick::buildRelatedPickPage(const QString &title, QVector<RelatedPickState> &picks)
@@ -257,47 +314,83 @@ QWidget *DlgPackagePick::buildRelatedPickPage(const QString &title, QVector<Rela
         "QScrollArea#pkgPickScroll > QWidget > QWidget { background: transparent; }"));
 
     auto *gridHost = new QWidget();
+    gridHost->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Minimum);
     auto *grid = new QGridLayout(gridHost);
     grid->setContentsMargins(0, 0, 0, 0);
-    grid->setSpacing(16);
+    grid->setSpacing(kRelatedGridSpacing);
+    for (int col = 0; col < kRelatedGridColumns; ++col) {
+        grid->setColumnStretch(col, 1);
+    }
 
     for (int i = 0; i < picks.size(); ++i) {
         RelatedPickState &pick = picks[i];
         auto *card = new QFrame(gridHost);
-        card->setObjectName(QStringLiteral("pkgPickStubCard"));
+        card->setObjectName(QStringLiteral("pkgPickRelatedCard"));
+        card->setFixedHeight(kRelatedCardHeight);
+        card->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
         auto *cardLayout = new QVBoxLayout(card);
         cardLayout->setContentsMargins(16, 16, 16, 16);
         cardLayout->setSpacing(8);
 
         auto *img = new QLabel(card);
-        img->setObjectName(QStringLiteral("pkgPickStubImage"));
+        img->setObjectName(QStringLiteral("pkgPickRelatedImage"));
         img->setFixedHeight(120);
         img->setAlignment(Qt::AlignCenter);
-        setDishImageOnLabel(img, pick.dish.imagePath, 120, 120);
+        setDishImageOnLabel(img, pick.dish.imagePath, 120, 160);
 
         auto *name = new QLabel(pick.dish.name, card);
-        name->setObjectName(QStringLiteral("pkgPickStubName"));
+        name->setObjectName(QStringLiteral("pkgPickRelatedName"));
         name->setWordWrap(true);
+        name->setAlignment(Qt::AlignHCenter);
+        name->setMaximumHeight(40);
 
-        auto *price = new QLabel(
-            tr("%1 ֏").arg(QString::number(pick.dish.price, 'f', 0)), card);
-        price->setObjectName(QStringLiteral("pkgPickStubPrice"));
+        pick.bottomStack = new QStackedWidget(card);
+        pick.bottomStack->setObjectName(QStringLiteral("pkgPickRelatedBottom"));
+        pick.bottomStack->setFixedHeight(52);
 
-        auto *qtyRow = new QHBoxLayout();
-        qtyRow->setSpacing(8);
-        auto *btnMinus = new QPushButton(QStringLiteral("−"), card);
-        btnMinus->setObjectName(QStringLiteral("pkgPickQtyMinus"));
-        btnMinus->setEnabled(pick.qty > 0);
-        pick.qtyLabel = new QLabel(QString::number(pick.qty), card);
-        pick.qtyLabel->setObjectName(QStringLiteral("pkgPickQtyValue"));
-        pick.qtyLabel->setAlignment(Qt::AlignCenter);
-        pick.qtyLabel->setMinimumWidth(36);
-        auto *btnPlus = new QPushButton(QStringLiteral("+"), card);
-        btnPlus->setObjectName(QStringLiteral("pkgPickQtyPlus"));
-        qtyRow->addWidget(btnMinus);
-        qtyRow->addWidget(pick.qtyLabel, 1);
-        qtyRow->addWidget(btnPlus);
+        auto *idleRow = new QWidget(pick.bottomStack);
+        idleRow->setObjectName(QStringLiteral("pkgPickRelatedIdleRow"));
+        auto *idleLayout = new QHBoxLayout(idleRow);
+        idleLayout->setContentsMargins(0, 0, 0, 0);
+        idleLayout->setSpacing(12);
+        auto *idlePrice = new QLabel(
+            tr("%1 ֏").arg(QString::number(pick.dish.price, 'f', 0)), idleRow);
+        idlePrice->setObjectName(QStringLiteral("pkgPickRelatedIdlePrice"));
+        idlePrice->setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
+        auto *btnAdd = new QPushButton(QStringLiteral("+"), idleRow);
+        btnAdd->setObjectName(QStringLiteral("pkgPickRelatedAddBtn"));
+        btnAdd->setFixedSize(35, 35);
+        btnAdd->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+        idleLayout->addWidget(idlePrice, 1);
+        idleLayout->addWidget(btnAdd, 0, Qt::AlignRight | Qt::AlignVCenter);
 
+        auto *activeRow = new QWidget(pick.bottomStack);
+        activeRow->setObjectName(QStringLiteral("pkgPickRelatedActiveRow"));
+        auto *activeLayout = new QHBoxLayout(activeRow);
+        activeLayout->setContentsMargins(0, 0, 0, 0);
+        activeLayout->setSpacing(12);
+        auto *btnMinus = new QPushButton(QStringLiteral("−"), activeRow);
+        btnMinus->setObjectName(QStringLiteral("pkgPickRelatedMinus"));
+        btnMinus->setFixedSize(35, 35);
+        btnMinus->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+        pick.qtySummaryLabel = new QLabel(activeRow);
+        pick.qtySummaryLabel->setObjectName(QStringLiteral("pkgPickRelatedQtySummary"));
+        pick.qtySummaryLabel->setAlignment(Qt::AlignCenter);
+        auto *btnPlus = new QPushButton(QStringLiteral("+"), activeRow);
+        btnPlus->setObjectName(QStringLiteral("pkgPickRelatedPlus"));
+        btnPlus->setFixedSize(35, 35);
+        btnPlus->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+        activeLayout->addWidget(btnMinus, 0, Qt::AlignVCenter);
+        activeLayout->addWidget(pick.qtySummaryLabel, 1);
+        activeLayout->addWidget(btnPlus, 0, Qt::AlignVCenter);
+
+        pick.bottomStack->addWidget(idleRow);
+        pick.bottomStack->addWidget(activeRow);
+        pick.bottomStack->setCurrentIndex(0);
+
+        connect(btnAdd, &QPushButton::clicked, this, [this, &picks, i]() {
+            changeRelatedQty(picks, i, 1);
+        });
         connect(btnMinus, &QPushButton::clicked, this, [this, &picks, i]() {
             changeRelatedQty(picks, i, -1);
         });
@@ -307,19 +400,34 @@ QWidget *DlgPackagePick::buildRelatedPickPage(const QString &title, QVector<Rela
 
         cardLayout->addWidget(img);
         cardLayout->addWidget(name);
-        cardLayout->addWidget(price);
-        cardLayout->addLayout(qtyRow);
+        cardLayout->addWidget(pick.bottomStack);
 
-        grid->addWidget(card, i / 3, i % 3);
+        const int row = i / kRelatedGridColumns;
+        const int col = i % kRelatedGridColumns;
+        grid->setRowStretch(row, 0);
+        grid->addWidget(card, row, col);
+    }
+
+    const int rowCount = picks.isEmpty()
+        ? 0
+        : (picks.size() + kRelatedGridColumns - 1) / kRelatedGridColumns;
+    if (rowCount > 0) {
+        auto *bottomSpacer = new QWidget(gridHost);
+        bottomSpacer->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Expanding);
+        grid->addWidget(bottomSpacer, rowCount, 0, 1, kRelatedGridColumns);
+        grid->setRowStretch(rowCount, 1);
     }
 
     scroll->setWidget(gridHost);
-    layout->addWidget(scroll, 1);
+    scroll->setFixedHeight(kRelatedScrollHeight);
+    scroll->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+    layout->addWidget(scroll, 0);
 
     auto *hintLbl = new QLabel(tr("Optional - skip if you do not want to add anything."), page);
     hintLbl->setObjectName(QStringLiteral("pkgPickStubHint"));
     hintLbl->setWordWrap(true);
     layout->addWidget(hintLbl);
+    layout->addStretch();
 
     return page;
 }
@@ -358,15 +466,24 @@ void DlgPackagePick::initRelatedPicks()
     }
 }
 
+void DlgPackagePick::updateRelatedPickUi(RelatedPickState &pick)
+{
+    if (pick.bottomStack) {
+        pick.bottomStack->setCurrentIndex(pick.qty > 0 ? 1 : 0);
+    }
+    if (pick.qtySummaryLabel) {
+        pick.qtySummaryLabel->setText(
+            tr("%1x %2 ֏").arg(pick.qty).arg(QString::number(pick.dish.price, 'f', 0)));
+    }
+}
+
 void DlgPackagePick::changeRelatedQty(QVector<RelatedPickState> &picks, int index, int delta)
 {
     if (index < 0 || index >= picks.size()) {
         return;
     }
     picks[index].qty = qMax(0, picks[index].qty + delta);
-    if (picks[index].qtyLabel) {
-        picks[index].qtyLabel->setText(QString::number(picks[index].qty));
-    }
+    updateRelatedPickUi(picks[index]);
     updateFooter();
 }
 
@@ -469,17 +586,18 @@ void DlgPackagePick::buildUi()
 
     auto *sidebar = new QFrame(m_card);
     sidebar->setObjectName(QStringLiteral("pkgPickSidebar"));
-    sidebar->setFixedWidth(260);
+    sidebar->setAttribute(Qt::WA_StyledBackground, true);
+    sidebar->setFixedWidth(300);
     m_sidebarLayout = new QVBoxLayout(sidebar);
-    m_sidebarLayout->setContentsMargins(0, 0, 0, 0);
-    m_sidebarLayout->setSpacing(10);
+    m_sidebarLayout->setContentsMargins(14, 18, 14, 18);
+    m_sidebarLayout->setSpacing(14);
 
     auto *sidebarTitle = new QLabel(tr("Your choice"), sidebar);
     sidebarTitle->setObjectName(QStringLiteral("pkgPickSidebarTitle"));
+    sidebarTitle->setAlignment(Qt::AlignCenter);
     m_sidebarLayout->addWidget(sidebarTitle);
 
-    const QString personalizeTitle = tr("Personalize %1").arg(m_package.name);
-    m_sidebarLayout->addWidget(makeStepSidebarItem(0, personalizeTitle));
+    m_sidebarLayout->addWidget(makeStepSidebarItem(0, tr("Personalize"), m_package.name));
     m_sidebarLayout->addWidget(makeStepSidebarItem(1, tr("Choose drink")));
     m_sidebarLayout->addWidget(makeStepSidebarItem(2, tr("Add extra")));
     m_sidebarLayout->addStretch();
@@ -530,16 +648,12 @@ void DlgPackagePick::buildHeader()
     m_lblDescription->setWordWrap(true);
     info->addWidget(m_lblDescription);
 
-    m_lblBjuPills = new QLabel(m_card);
-    m_lblBjuPills->setObjectName(QStringLiteral("pkgPickBjuPills"));
-    m_lblBjuPills->setWordWrap(true);
-    info->addWidget(m_lblBjuPills);
-
-    m_badgesHost = new QWidget(m_card);
-    m_badgesLayout = new QHBoxLayout(m_badgesHost);
-    m_badgesLayout->setContentsMargins(0, 0, 0, 0);
-    m_badgesLayout->setSpacing(10);
-    info->addWidget(m_badgesHost);
+    m_nutritionRow = new QWidget(m_card);
+    m_nutritionRow->setObjectName(QStringLiteral("pkgPickNutritionRow"));
+    m_nutritionLayout = new QHBoxLayout(m_nutritionRow);
+    m_nutritionLayout->setContentsMargins(0, 0, 0, 0);
+    m_nutritionLayout->setSpacing(8);
+    info->addWidget(m_nutritionRow);
 
     info->addStretch();
     header->addLayout(info, 1);
@@ -840,45 +954,61 @@ void DlgPackagePick::selectInitialSelections()
     }
 }
 
-void DlgPackagePick::showPackageBadges()
+void DlgPackagePick::rebuildNutritionRow()
 {
-    clearLayout(m_badgesLayout);
-    const MenuDish &dish = m_package;
-    addBadgeIcon(m_badgesHost, m_badgesLayout, dish.glutenFree, ":/dietary/gluten-free.png");
-    addBadgeIcon(m_badgesHost, m_badgesLayout, dish.vegetarian, ":/dietary/vegitarian.png");
-    addBadgeIcon(m_badgesHost, m_badgesLayout, dish.vegan, ":/dietary/vegan.png");
-    addBadgeIcon(m_badgesHost, m_badgesLayout, dish.noGmo, ":/dietary/no-gmo.png");
-    addBadgeIcon(m_badgesHost, m_badgesLayout, dish.noLactose, ":/dietary/lactose-free.png");
-    addBadgeIcon(m_badgesHost, m_badgesLayout, dish.noSugar, ":/dietary/sugar-free.png");
-    addBadgeIcon(m_badgesHost, m_badgesLayout, dish.containsNuts, ":/dietary/contain-nuts.png");
-    if (dish.halalKosher) {
-        addBadgeIcon(m_badgesHost, m_badgesLayout, true, ":/dietary/halal.png");
-        addBadgeIcon(m_badgesHost, m_badgesLayout, true, ":/dietary/kosher.png");
+    if (!m_nutritionLayout) {
+        return;
     }
-    m_badgesLayout->addStretch();
-}
+    clearLayout(m_nutritionLayout);
 
-void DlgPackagePick::showPackageBju()
-{
     const MenuDish &dish = m_package;
-    QStringList pills;
     if (dish.fat > 0.0) {
-        pills << tr("%1 gr Fats").arg(QString::number(dish.fat, 'f', 0));
+        addBjuBox(m_nutritionRow, m_nutritionLayout,
+                  tr("%1 gr").arg(QString::number(dish.fat, 'f', 0)),
+                  tr("Fats"));
     }
     if (dish.carbs > 0.0) {
-        pills << tr("%1 gr Carbs").arg(QString::number(dish.carbs, 'f', 0));
+        addBjuBox(m_nutritionRow, m_nutritionLayout,
+                  tr("%1 gr").arg(QString::number(dish.carbs, 'f', 0)),
+                  tr("Carbs"));
     }
     if (dish.protein > 0.0) {
-        pills << tr("%1 gr Protein").arg(QString::number(dish.protein, 'f', 0));
+        addBjuBox(m_nutritionRow, m_nutritionLayout,
+                  tr("%1 gr").arg(QString::number(dish.protein, 'f', 0)),
+                  tr("Protein"));
     }
     if (dish.kcal > 0.0) {
-        pills << tr("%1 kcal Calories").arg(QString::number(dish.kcal, 'f', dish.kcal >= 100 ? 0 : 1));
+        addBjuBox(m_nutritionRow, m_nutritionLayout,
+                  tr("%1 kcal").arg(QString::number(dish.kcal, 'f', dish.kcal >= 100 ? 0 : 1)),
+                  tr("Calories"));
     }
-    if (pills.isEmpty()) {
-        m_lblBjuPills->hide();
-    } else {
-        m_lblBjuPills->setText(pills.join(QStringLiteral("   ")));
-        m_lblBjuPills->show();
+
+    const int bjuCount = m_nutritionLayout->count();
+
+    const auto addDietaryBadge = [&](bool enabled, const char *iconPath) {
+        if (!enabled) {
+            return;
+        }
+        if (bjuCount > 0 && m_nutritionLayout->count() == bjuCount) {
+            m_nutritionLayout->addSpacing(12);
+        }
+        addBadgeIcon(m_nutritionRow, m_nutritionLayout, true, iconPath);
+    };
+
+    addDietaryBadge(dish.glutenFree, ":/dietary/gluten-free.png");
+    addDietaryBadge(dish.vegetarian, ":/dietary/vegitarian.png");
+    addDietaryBadge(dish.vegan, ":/dietary/vegan.png");
+    addDietaryBadge(dish.noGmo, ":/dietary/no-gmo.png");
+    addDietaryBadge(dish.noLactose, ":/dietary/lactose-free.png");
+    addDietaryBadge(dish.noSugar, ":/dietary/sugar-free.png");
+    addDietaryBadge(dish.containsNuts, ":/dietary/contain-nuts.png");
+    if (dish.halalKosher) {
+        addDietaryBadge(true, ":/dietary/halal.png");
+        addDietaryBadge(true, ":/dietary/kosher.png");
+    }
+
+    if (m_nutritionRow) {
+        m_nutritionRow->setVisible(m_nutritionLayout->count() > 0);
     }
 }
 
@@ -1015,30 +1145,34 @@ void DlgPackagePick::updateFooter()
 
 void DlgPackagePick::updateStepUi()
 {
-    for (int i = 0; i < m_stepItems.size(); ++i) {
-        QFrame *item = m_stepItems.at(i);
+    for (QWidget *wrap : m_stepItems) {
+        auto *item = wrap->findChild<QFrame *>(QStringLiteral("pkgPickStepItem"));
+        if (!item) {
+            continue;
+        }
         const int stepIndex = item->property("stepIndex").toInt();
+        const bool isActive = stepIndex == static_cast<int>(m_step);
+        const bool isDone = stepIndex < static_cast<int>(m_step);
+        const bool isSelected = isActive || isDone;
 
-        item->setProperty("done", stepIndex < static_cast<int>(m_step));
-        item->setProperty("active", stepIndex == static_cast<int>(m_step));
+        item->setProperty("done", isDone);
+        item->setProperty("active", isActive);
+        item->setProperty("selected", isSelected);
         item->style()->unpolish(item);
         item->style()->polish(item);
 
-        QLabel *indicator = nullptr;
-        for (QLabel *lbl : item->findChildren<QLabel *>()) {
-            if (lbl->property("stepIndicator").toBool()) {
-                indicator = lbl;
-                break;
-            }
-        }
+        QLabel *indicator = item->findChild<QLabel *>(QStringLiteral("pkgPickStepIndicator"));
         if (!indicator) {
             continue;
         }
-        if (stepIndex < static_cast<int>(m_step)) {
+        indicator->setProperty("checked", isSelected);
+        if (isSelected) {
             indicator->setText(QStringLiteral("✓"));
         } else {
             indicator->setText(QString());
         }
+        indicator->style()->unpolish(indicator);
+        indicator->style()->polish(indicator);
     }
 
     if (m_btnBack) {

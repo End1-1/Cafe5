@@ -3,12 +3,11 @@
 
 #include <QDialog>
 #include <QLabel>
-#include <QTranslator>
+
+#include "dlgmenu.h"
 
 class QShowEvent;
 class QKeyEvent;
-
-#include "dlgmenu.h"
 
 class QButtonGroup;
 
@@ -56,7 +55,6 @@ private:
     bool m_menuReady = false;
     QLabel *m_background = nullptr;
     QButtonGroup *m_langGroup = nullptr;
-    QTranslator m_translator;
     QString m_currentLocale = QStringLiteral("en");
 };
 

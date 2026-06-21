@@ -166,7 +166,7 @@
          <number>16</number>
         </property>
         <property name="leftMargin">
-         <number>24</number>
+         <number>16</number>
         </property>
         <property name="topMargin">
          <number>20</number>
@@ -339,167 +339,19 @@
     </layout>
    </item>
    <item>
-    <widget class="QWidget" name="widgetOrderBar" native="true">
+    <widget class="QWidget" name="widgetBottomChromeHost" native="true">
      <property name="minimumSize">
       <size>
        <width>0</width>
-       <height>100</height>
+       <height>287</height>
       </size>
      </property>
      <property name="maximumSize">
       <size>
        <width>16777215</width>
-       <height>100</height>
+       <height>287</height>
       </size>
      </property>
-     <layout class="QHBoxLayout" name="orderBarLayout">
-      <item>
-       <widget class="QPushButton" name="btnCancelOrder">
-        <property name="text">
-         <string>CANCEL ORDER</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QLabel" name="lblCartSummary">
-        <property name="text">
-         <string>Cart: 0   0 ֏</string>
-        </property>
-        <property name="alignment">
-         <set>Qt::AlignmentFlag::AlignCenter</set>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QPushButton" name="btnGoToCart">
-        <property name="minimumSize">
-         <size>
-          <width>280</width>
-          <height>0</height>
-         </size>
-        </property>
-        <property name="text">
-         <string>GO TO CART</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QWidget" name="widgetOrderQr" native="true">
-        <property name="minimumSize">
-         <size>
-          <width>120</width>
-          <height>88</height>
-         </size>
-        </property>
-        <layout class="QVBoxLayout" name="orderQrLayout">
-         <item>
-          <widget class="QLabel" name="lblOrderQr">
-           <property name="minimumSize">
-            <size>
-             <width>72</width>
-             <height>72</height>
-            </size>
-           </property>
-           <property name="text">
-            <string/>
-           </property>
-           <property name="scaledContents">
-            <bool>true</bool>
-           </property>
-          </widget>
-         </item>
-        </layout>
-       </widget>
-      </item>
-     </layout>
-    </widget>
-   </item>
-   <item>
-    <widget class="QWidget" name="widgetFooter" native="true">
-     <property name="minimumSize">
-      <size>
-       <width>0</width>
-       <height>72</height>
-      </size>
-     </property>
-     <property name="maximumSize">
-      <size>
-       <width>16777215</width>
-       <height>72</height>
-      </size>
-     </property>
-     <layout class="QHBoxLayout" name="footerLayout">
-      <item>
-       <widget class="QLabel" name="lblFooterLogo">
-        <property name="minimumSize">
-         <size>
-          <width>100</width>
-          <height>48</height>
-         </size>
-        </property>
-        <property name="text">
-         <string/>
-        </property>
-        <property name="scaledContents">
-         <bool>true</bool>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <layout class="QVBoxLayout" name="footerCenterLayout">
-        <item>
-         <widget class="QLabel" name="lblPowered">
-          <property name="text">
-           <string>Powered by Keyiosk Technologies</string>
-          </property>
-          <property name="alignment">
-           <set>Qt::AlignmentFlag::AlignCenter</set>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QLabel" name="lblPoweredLinks">
-          <property name="text">
-           <string>Keyiosk.com | KeyioskTech.com</string>
-          </property>
-          <property name="alignment">
-           <set>Qt::AlignmentFlag::AlignCenter</set>
-          </property>
-         </widget>
-        </item>
-       </layout>
-      </item>
-      <item>
-       <layout class="QHBoxLayout" name="socialLayout">
-        <item>
-         <widget class="QToolButton" name="btnYoutube">
-          <property name="minimumSize">
-           <size>
-            <width>40</width>
-            <height>40</height>
-           </size>
-          </property>
-          <property name="text">
-           <string/>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QToolButton" name="btnFacebook">
-          <property name="minimumSize">
-           <size>
-            <width>40</width>
-            <height>40</height>
-           </size>
-          </property>
-          <property name="text">
-           <string/>
-          </property>
-         </widget>
-        </item>
-       </layout>
-      </item>
-     </layout>
     </widget>
    </item>
   </layout>

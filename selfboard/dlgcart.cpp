@@ -1,4 +1,5 @@
 #include "dlgcart.h"
+#include "selfboardlanguage.h"
 #include "ui_dlgcart.h"
 
 #include <QEvent>
@@ -161,6 +162,7 @@ void DlgCart::setupAppearance()
     if (styleFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
         setStyleSheet(QString::fromUtf8(styleFile.readAll()));
     }
+    SelfboardLanguage::instance().bindPickerButton(ui->btnLanguage);
 }
 
 void DlgCart::setupTouchScroll()

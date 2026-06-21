@@ -2,6 +2,7 @@
 
 #include "appsettings.h"
 #include "dlgmenu.h"
+#include "selfboardlanguage.h"
 #include "dlgserversettings.h"
 #include "menucache.h"
 #include "selfboarddisplay.h"
@@ -63,8 +64,8 @@ DlgStart::DlgStart(QWidget *parent)
     setupIcons();
     setupLanguageGroup();
 
-    QSettings settings = SelfBoardSettings::store();
-    const QString savedLocale = settings.value(QStringLiteral("locale"), QStringLiteral("en")).toString();
+    SelfboardLanguage::instance().loadSavedLocale();
+    const QString savedLocale = SelfboardLanguage::instance().currentLocale();
     int langId = kLangEn;
     if (savedLocale == QStringLiteral("ru")) {
         langId = kLangRu;
@@ -74,7 +75,6 @@ DlgStart::DlgStart(QWidget *parent)
     if (QAbstractButton *btn = m_langGroup->button(langId)) {
         btn->setChecked(true);
     }
-    applyLanguage(savedLocale);
 
     auto *settingsShortcut = new QShortcut(QKeySequence(Qt::Key_F3), this);
     settingsShortcut->setContext(Qt::ApplicationShortcut);
@@ -217,23 +217,17 @@ void DlgStart::updateLanguageButtonIcons()
 
 void DlgStart::applyLanguage(const QString &localeCode)
 {
-    const QString code = localeCode.isEmpty() ? QStringLiteral("en") : localeCode;
-    if (code == m_currentLocale) {
-        return;
+    SelfboardLanguage::instance().applyLocale(localeCode);
+    m_currentLocale = SelfboardLanguage::instance().currentLocale();
+
+    int langId = kLangEn;
+    if (m_currentLocale == QStringLiteral("ru")) {
+        langId = kLangRu;
+    } else if (m_currentLocale == QStringLiteral("hy")) {
+        langId = kLangHy;
     }
-
-    qApp->removeTranslator(&m_translator);
-
-    const QString qmPath = QStringLiteral(":/lang/SelfBoard_%1.qm").arg(code);
-    if (m_translator.load(qmPath)) {
-        qApp->installTranslator(&m_translator);
-        m_currentLocale = code;
-        ui->retranslateUi(this);
-        updateLanguageButtonIcons();
-
-        QSettings settings = SelfBoardSettings::store();
-        settings.setValue(QStringLiteral("locale"), code);
-        SelfBoardSettings::flush();
+    if (QAbstractButton *btn = m_langGroup->button(langId)) {
+        btn->setChecked(true);
     }
 }
 

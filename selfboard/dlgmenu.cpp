@@ -1,5 +1,7 @@
 #include "dlgmenu.h"
 
+#include "selfboardlanguage.h"
+#include "selfboardbottomchrome.h"
 #include "dlgcart.h"
 #include "dlgdishdetails.h"
 #include "dlgpackagepick.h"
@@ -81,17 +83,20 @@ DlgMenu::DlgMenu(ServiceMode mode, QWidget *parent)
     ui->scrollDishes->setAlignment(Qt::AlignTop | Qt::AlignLeft);
     ui->widgetDishesHost->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Minimum);
 
+    ui->widgetSidebar->setAttribute(Qt::WA_StyledBackground, true);
+    ui->widgetContent->setAttribute(Qt::WA_StyledBackground, true);
+    ui->widgetDishesHost->setAttribute(Qt::WA_StyledBackground, true);
+
     setupAppearance();
     setupTouchScroll();
 
     ui->lblSidebarLogo->setPixmap(QPixmap(QStringLiteral(":/res/main_logo.png")));
-    ui->lblOrderQr->setPixmap(QPixmap(QStringLiteral(":/res/qr_placeholder.png")));
-    ui->lblFooterLogo->setPixmap(QPixmap(QStringLiteral(":/res/footer_logo_myqr.png")));
-    ui->btnYoutube->setIcon(QIcon(QStringLiteral(":/res/icon_youtube.png")));
-    ui->btnFacebook->setIcon(QIcon(QStringLiteral(":/res/icon_facebook.png")));
-    ui->btnYoutube->setIconSize(QSize(36, 36));
-    ui->btnFacebook->setIconSize(QSize(36, 36));
     ui->btnFavorites->setText(QStringLiteral("♥"));
+
+    m_bottomChrome = new SelfboardBottomChrome(this);
+    auto *chromeHostLayout = new QVBoxLayout(ui->widgetBottomChromeHost);
+    chromeHostLayout->setContentsMargins(0, 0, 0, 0);
+    chromeHostLayout->addWidget(m_bottomChrome);
 
     updateServiceModeLabel();
 
@@ -113,12 +118,10 @@ DlgMenu::DlgMenu(ServiceMode mode, QWidget *parent)
 
     updateCartSummary();
 
-    ui->lblCartSummary->setCursor(Qt::PointingHandCursor);
-    ui->lblCartSummary->installEventFilter(this);
-
     connect(ui->btnHome, &QPushButton::clicked, this, &QDialog::reject);
-    connect(ui->btnCancelOrder, &QPushButton::clicked, this, &DlgMenu::onCancelOrder);
-    connect(ui->btnGoToCart, &QPushButton::clicked, this, &DlgMenu::onGoToCart);
+    connect(m_bottomChrome, &SelfboardBottomChrome::cancelOrderClicked, this, &DlgMenu::onCancelOrder);
+    connect(m_bottomChrome, &SelfboardBottomChrome::goToCartClicked, this, &DlgMenu::onGoToCart);
+    connect(m_bottomChrome, &SelfboardBottomChrome::cartSummaryClicked, this, &DlgMenu::onGoToCart);
     connect(ui->leSearch, &QLineEdit::textChanged, this, &DlgMenu::onSearchTextChanged);
 }
 
@@ -136,6 +139,7 @@ void DlgMenu::changeEvent(QEvent *event)
     if (event->type() == QEvent::LanguageChange) {
         ui->retranslateUi(this);
         updateServiceModeLabel();
+        updateCartSummary();
     }
     QDialog::changeEvent(event);
 }
@@ -147,19 +151,17 @@ void DlgMenu::setupAppearance()
         setStyleSheet(QString::fromUtf8(styleFile.readAll()));
     }
 
-    QSettings settings = SelfBoardSettings::store();
-    const QString locale = settings.value(QStringLiteral("locale"), QStringLiteral("en")).toString();
-    if (locale == QStringLiteral("ru")) {
-        ui->btnLanguage->setText(tr("Русский"));
-    } else if (locale == QStringLiteral("hy")) {
-        ui->btnLanguage->setText(tr("Հայերեն"));
-    } else {
-        ui->btnLanguage->setText(tr("English"));
-    }
+    SelfboardLanguage::instance().bindPickerButton(ui->btnLanguage);
 }
 
 void DlgMenu::setupTouchScroll()
 {
+    ui->scrollDishes->setStyleSheet(QStringLiteral("background: #ececec; border: none;"));
+    ui->scrollDishes->viewport()->setStyleSheet(QStringLiteral("background: #ececec;"));
+    ui->scrollGroupChips->setStyleSheet(QStringLiteral("background: #ececec; border: none;"));
+    ui->scrollGroupChips->viewport()->setStyleSheet(QStringLiteral("background: #ececec;"));
+    ui->scrollGroups->setStyleSheet(QStringLiteral("background: #ececec; border: none;"));
+    ui->scrollGroups->viewport()->setStyleSheet(QStringLiteral("background: #ececec;"));
     QScroller::grabGesture(ui->scrollGroupChips->viewport(), QScroller::LeftMouseButtonGesture);
     QScroller::grabGesture(ui->scrollDishes->viewport(), QScroller::LeftMouseButtonGesture);
 }
@@ -296,16 +298,6 @@ void DlgMenu::keyPressEvent(QKeyEvent *event)
     QDialog::keyPressEvent(event);
 }
 
-bool DlgMenu::eventFilter(QObject *watched, QEvent *event)
-{
-    if (watched == ui->lblCartSummary
-        && event->type() == QEvent::MouseButtonRelease
-        && !m_cart.isEmpty()) {
-        onGoToCart();
-        return true;
-    }
-    return QDialog::eventFilter(watched, event);
-}
 
 void DlgMenu::resizeEvent(QResizeEvent *event)
 {
@@ -404,9 +396,12 @@ void DlgMenu::onSearchTextChanged(const QString &text)
 
 void DlgMenu::updateCartSummary()
 {
-    ui->lblCartSummary->setText(
-        tr("Cart: %1   %2 ֏").arg(m_cart.itemCount()).arg(QString::number(m_cart.totalAmount(), 'f', 0)));
-    ui->btnGoToCart->setEnabled(!m_cart.isEmpty());
+    if (!m_bottomChrome) {
+        return;
+    }
+    m_bottomChrome->setCartCount(m_cart.itemCount());
+    m_bottomChrome->setCartTotal(m_cart.totalAmount());
+    m_bottomChrome->setGoToCartEnabled(!m_cart.isEmpty());
 }
 
 void DlgMenu::onCancelOrder()

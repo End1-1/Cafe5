@@ -6,6 +6,8 @@
 #include "webmenuclient.h"
 #include "ordercart.h"
 
+class SelfboardBottomChrome;
+
 class DlgCart;
 class DlgOrderDone;
 class DlgPackagePick;
@@ -31,7 +33,6 @@ public:
 
 protected:
     void changeEvent(QEvent *event) override;
-    bool eventFilter(QObject *watched, QEvent *event) override;
     void keyPressEvent(QKeyEvent *event) override;
     void resizeEvent(QResizeEvent *event) override;
 
@@ -80,6 +81,7 @@ private:
     DlgCart *m_cartOverlay = nullptr;
     DlgPayment *m_paymentOverlay = nullptr;
     DlgOrderDone *m_orderDoneOverlay = nullptr;
+    SelfboardBottomChrome *m_bottomChrome = nullptr;
     bool m_orderSubmitInProgress = false;
 };
 

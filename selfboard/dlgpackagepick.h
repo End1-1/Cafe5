@@ -58,7 +58,8 @@ private:
     {
         MenuDish dish;
         int qty = 0;
-        QLabel *qtyLabel = nullptr;
+        QStackedWidget *bottomStack = nullptr;
+        QLabel *qtySummaryLabel = nullptr;
     };
 
     void buildUi();
@@ -71,8 +72,7 @@ private:
     void initRelatedPicks();
     void buildAttributeGroups();
     void buildModificatorGroups();
-    void showPackageBadges();
-    void showPackageBju();
+    void rebuildNutritionRow();
     void updatePreview();
     void updateOptionPrices();
     void updateStepUi();
@@ -94,8 +94,9 @@ private:
     QString measurementForKey(const QString &key, const QString &value) const;
     QString sectionTitle(const QString &key) const;
     QString formatOptionLabel(const QString &key, const QString &value) const;
-    QWidget *makeStepSidebarItem(int index, const QString &title);
+    QWidget *makeStepSidebarItem(int index, const QString &title, const QString &subtitle = QString());
     void changeRelatedQty(QVector<RelatedPickState> &picks, int index, int delta);
+    void updateRelatedPickUi(RelatedPickState &pick);
 
     MenuDish m_package;
     int m_quantity = 1;
@@ -109,13 +110,12 @@ private:
     QLabel *m_lblTitle = nullptr;
     QLabel *m_lblDescription = nullptr;
     QLabel *m_lblEmpty = nullptr;
-    QWidget *m_badgesHost = nullptr;
-    QHBoxLayout *m_badgesLayout = nullptr;
-    QLabel *m_lblBjuPills = nullptr;
+    QWidget *m_nutritionRow = nullptr;
+    QHBoxLayout *m_nutritionLayout = nullptr;
     QLineEdit *m_leInstructions = nullptr;
 
     QVBoxLayout *m_sidebarLayout = nullptr;
-    QVector<QFrame *> m_stepItems;
+    QVector<QWidget *> m_stepItems;
 
     QStackedWidget *m_contentStack = nullptr;
     QWidget *m_pagePersonalize = nullptr;

@@ -1,5 +1,6 @@
 #include "dlgpayment.h"
 #include "appsettings.h"
+#include "selfboardlanguage.h"
 #include "dlgpaymentstub.h"
 #include "ui_dlgpayment.h"
 
@@ -63,6 +64,7 @@ void DlgPayment::setupAppearance()
     if (styleFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
         setStyleSheet(QString::fromUtf8(styleFile.readAll()));
     }
+    SelfboardLanguage::instance().bindPickerButton(ui->btnLanguage);
 }
 
 void DlgPayment::showEvent(QShowEvent *event)
