@@ -122,6 +122,8 @@ private slots:
 
     void on_btnRemoveRelatedOther_clicked();
 
+    void on_leComplectOutputQty_textEdited(const QString &arg1);
+
 private:
     Ui::CE5Goods* ui;
 

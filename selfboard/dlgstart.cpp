@@ -178,6 +178,9 @@ void DlgStart::updateLoadingOverlayGeometry()
 void DlgStart::setupIcons()
 {
     ui->lblLogo->setPixmap(QPixmap(QStringLiteral(":/res/main_logo.png")));
+    ui->lblLogo->setFixedSize(225, 225);
+    ui->lblBanner->setFixedHeight(225);
+    ui->headerLayout->setAlignment(Qt::AlignTop);
     ui->btnTakeAway->setIcon(QIcon(QStringLiteral(":/res/icon_takeaway.png")));
     ui->btnDineIn->setIcon(QIcon(QStringLiteral(":/res/icon_dinein.png")));
     ui->lblQrCode->setPixmap(QPixmap(QStringLiteral(":/res/qr_placeholder.png")));

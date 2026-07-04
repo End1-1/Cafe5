@@ -3,8 +3,11 @@
 
 #include <QDate>
 #include <QHeaderView>
+#include <QJsonArray>
+#include <QJsonObject>
 #include <QPrintDialog>
 #include <QPrinter>
+#include <QSet>
 #include <QSignalBlocker>
 #include <QTextDocument>
 
@@ -115,11 +118,13 @@ void C5SalaryPaymentEditor::showEvent(QShowEvent *e)
     ui->tblSalary->setRowCount(0);
     ui->leTotalAmount->setText(QStringLiteral("0.00"));
 
+    const QDate openDate = mOpenDate.isValid() ? mOpenDate : ui->deDate->date();
+
     NInterface::query1(QStringLiteral("/engine/v2/officen/salary/open"),
                        mUser->mSessionKey,
                        this,
                        {{QStringLiteral("date"), dateStr}, {QStringLiteral("f_type"), kSalaryTypePayment}},
-                       [this](const QJsonObject &jo) {
+                       [this, openDate](const QJsonObject &jo) {
                            QSignalBlocker sb2(ui->tblSalary);
 
                            const QJsonArray items = jo.value(QStringLiteral("items")).toArray();
@@ -164,6 +169,70 @@ void C5SalaryPaymentEditor::showEvent(QShowEvent *e)
                                ui->tblSalary->setItem(row, colAmount, itAmount);
 
                                ++row;
+                           }
+
+                           recalcTotal();
+
+                           if (items.isEmpty()) {
+                               offerAutofillFromAccrual(openDate);
+                           }
+                       });
+}
+
+void C5SalaryPaymentEditor::offerAutofillFromAccrual(const QDate &date)
+{
+    if (!date.isValid() || date != QDate::currentDate()) {
+        return;
+    }
+
+    if (ui->tblSalary->rowCount() > 0) {
+        return;
+    }
+
+    if (C5Message::question(tr("Fill the payment document with employees from salary accrual for today?"))
+            != QDialog::Accepted) {
+        return;
+    }
+
+    fillFromAccrual(date);
+}
+
+void C5SalaryPaymentEditor::fillFromAccrual(const QDate &date)
+{
+    if (!date.isValid()) {
+        return;
+    }
+
+    const QString dateStr = date.toString(QStringLiteral("yyyy-MM-dd"));
+
+    NInterface::query1(QStringLiteral("/engine/v2/officen/salary/open"),
+                       mUser->mSessionKey,
+                       this,
+                       {{QStringLiteral("date"), dateStr}, {QStringLiteral("f_type"), 1}},
+                       [this](const QJsonObject &jo) {
+                           const QJsonArray items = jo.value(QStringLiteral("items")).toArray();
+                           if (items.isEmpty()) {
+                               C5Message::info(tr("No salary accrual entries found for this date."));
+                               return;
+                           }
+
+                           QSignalBlocker sb(ui->tblSalary);
+                           QSet<int> seenStaff;
+
+                           for (const QJsonValue &v : items) {
+                               const QJsonObject it = v.toObject();
+                               const int staffId = it.value(QStringLiteral("f_staff")).toInt();
+                               if (staffId <= 0 || seenStaff.contains(staffId)) {
+                                   continue;
+                               }
+
+                               seenStaff.insert(staffId);
+                               const int positionId = it.value(QStringLiteral("f_position")).toInt();
+                               const QString staffName = it.value(QStringLiteral("f_staff_name")).toString().trimmed();
+                               const QString positionName = it.value(QStringLiteral("f_position_name")).toString().trimmed();
+                               const double debt = it.value(QStringLiteral("f_debt")).toVariant().toDouble();
+
+                               appendStaffRow(staffId, staffName, positionId, positionName, debt);
                            }
 
                            recalcTotal();

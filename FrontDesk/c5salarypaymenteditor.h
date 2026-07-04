@@ -44,6 +44,8 @@ private:
     void initTable();
     void recalcTotal();
     void appendStaffRow(int staffId, const QString &staffName, int positionId, const QString &positionName, double debt);
+    void offerAutofillFromAccrual(const QDate &date);
+    void fillFromAccrual(const QDate &date);
     QString buildPrintHtml() const;
 
 protected slots:

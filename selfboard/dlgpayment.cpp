@@ -13,6 +13,7 @@
 #include <QPixmap>
 #include <QScreen>
 #include <QShowEvent>
+#include <QSizePolicy>
 #include <QTimer>
 
 DlgPayment::DlgPayment(OrderCart *cart, QWidget *parent)
@@ -30,6 +31,17 @@ DlgPayment::DlgPayment(OrderCart *cart, QWidget *parent)
     setupAppearance();
 
     ui->lblLogo->setPixmap(QPixmap(QStringLiteral(":/res/main_logo.png")));
+    ui->lblLogo->setFixedSize(248, 225);
+    ui->lblBanner->setFixedHeight(225);
+    ui->lblBanner->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+    ui->headerTopRow->setAlignment(Qt::AlignTop);
+    ui->headerTopRow->setStretch(0, 0);
+    ui->headerTopRow->setStretch(1, 1);
+    ui->headerLayout->setAlignment(Qt::AlignTop);
+    ui->headerLeftLayout->setAlignment(Qt::AlignTop);
+    ui->widgetHeader->setMinimumHeight(0);
+    ui->widgetHeader->setMaximumHeight(QWIDGETSIZE_MAX);
+    ui->widgetHeader->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Minimum);
     ui->lblFooterLogo->setPixmap(QPixmap(QStringLiteral(":/res/footer_logo_myqr.png")));
     ui->lblCardImage->setPixmap(QPixmap(QStringLiteral(":/res/dish_placeholder.png"))
                                      .scaled(360, 220, Qt::KeepAspectRatio, Qt::SmoothTransformation));

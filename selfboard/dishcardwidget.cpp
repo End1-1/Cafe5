@@ -7,13 +7,16 @@
 #include <QLabel>
 #include <QMouseEvent>
 #include <QPixmap>
+#include <QColor>
 #include <QPushButton>
 #include <QVBoxLayout>
 #include <QHBoxLayout>
+#include <QPalette>
 
 DishCardWidget::DishCardWidget(Style style, const MenuDish &dish, QWidget *parent)
     : QFrame(parent)
     , m_dishId(dish.id)
+    , m_imagePath(dish.imagePath)
 {
     if (style == Style::Grid) {
         setObjectName(QStringLiteral("dishCardGrid"));
@@ -28,6 +31,42 @@ DishCardWidget::DishCardWidget(Style style, const MenuDish &dish, QWidget *paren
 
     if (style == Style::Listing || style == Style::Popular) {
         setCursor(Qt::PointingHandCursor);
+    }
+
+    setAttribute(Qt::WA_StyledBackground, true);
+    setAutoFillBackground(true);
+
+    const QColor white(0xff, 0xff, 0xff);
+    QPalette cardPalette = palette();
+    cardPalette.setColor(QPalette::Window, white);
+    cardPalette.setColor(QPalette::Base, white);
+    setPalette(cardPalette);
+
+    const QString radius = (objectName() == QStringLiteral("dishCardGrid")) ? QStringLiteral("20px")
+                                                                            : QStringLiteral("16px");
+    setStyleSheet(QStringLiteral(
+                      "QFrame#%1 {"
+                      "  background-color: #ffffff;"
+                      "  border: 1px solid #e0e0e0;"
+                      "  border-radius: %2;"
+                      "}"
+                      "QFrame#%1 QLabel {"
+                      "  background: transparent;"
+                      "  border: none;"
+                      "}")
+                      .arg(objectName(), radius));
+
+    applyCardLabelStyles();
+}
+
+void DishCardWidget::applyCardLabelStyles()
+{
+    for (QLabel *label : findChildren<QLabel *>()) {
+        if (!label->pixmap().isNull()) {
+            styleTransparentImageLabel(label);
+        } else {
+            styleTransparentTextLabel(label);
+        }
     }
 }
 
@@ -48,8 +87,8 @@ void DishCardWidget::buildGridCard(const MenuDish &dish)
 
     auto *image = new QLabel(this);
     image->setObjectName(QStringLiteral("dishGridImage"));
-    setDishImageOnLabel(image, dish.imagePath, 154, 150);
-    layout->addWidget(image);
+    setCenteredDishImageOnLabel(image, dish.imagePath, 150, 154);
+    layout->addWidget(image, 0, Qt::AlignVCenter);
 }
 
 void DishCardWidget::buildTileCard(const MenuDish &dish, const char *cardObjectName)
@@ -72,8 +111,19 @@ void DishCardWidget::buildTileCard(const MenuDish &dish, const char *cardObjectN
 
     auto *image = new QLabel(this);
     image->setObjectName(QStringLiteral("dishTileImage"));
-    setDishImageOnLabel(image, dish.imagePath, 212, 212);
-    layout->addWidget(image, 0, Qt::AlignHCenter);
+    const int imageSide = w - 24;
+    setCenteredDishImageOnLabel(image, dish.imagePath, imageSide, imageSide);
+
+    auto *imageRow = new QWidget(this);
+    imageRow->setAutoFillBackground(false);
+    imageRow->setStyleSheet(QStringLiteral("background: transparent;"));
+    auto *imageRowLayout = new QHBoxLayout(imageRow);
+    imageRowLayout->setContentsMargins(0, 0, 0, 0);
+    imageRowLayout->setSpacing(0);
+    imageRowLayout->addStretch();
+    imageRowLayout->addWidget(image, 0, Qt::AlignCenter);
+    imageRowLayout->addStretch();
+    layout->addWidget(imageRow);
 
     auto *title = new QLabel(dish.name, this);
     title->setObjectName(QStringLiteral("dishPopularTitle"));
@@ -101,6 +151,8 @@ void DishCardWidget::buildTileCard(const MenuDish &dish, const char *cardObjectN
     // Dietary / allergen badges
     int badgeCount = 0;
     auto *badgesHost = new QWidget(this);
+    badgesHost->setAutoFillBackground(false);
+    badgesHost->setStyleSheet(QStringLiteral("background: transparent;"));
     auto *badgesLayout = new QHBoxLayout(badgesHost);
     badgesLayout->setContentsMargins(0, 0, 0, 0);
     badgesLayout->setSpacing(6);
@@ -111,8 +163,7 @@ void DishCardWidget::buildTileCard(const MenuDish &dish, const char *cardObjectN
         }
         auto *icon = new QLabel(badgesHost);
         icon->setFixedSize(24, 24);
-        icon->setScaledContents(true);
-        icon->setPixmap(QPixmap(QString::fromUtf8(iconPath)));
+        setTransparentPixmapOnLabel(icon, QPixmap(QString::fromUtf8(iconPath)), 24, 24);
         badgesLayout->addWidget(icon);
         ++badgeCount;
     };
@@ -138,6 +189,9 @@ void DishCardWidget::buildTileCard(const MenuDish &dish, const char *cardObjectN
     auto *bottom = new QHBoxLayout();
     auto *time = new QLabel(dish.prepTime, this);
     time->setObjectName(QStringLiteral("dishPopularTime"));
+    if (dish.prepTime.isEmpty()) {
+        time->hide();
+    }
     bottom->addWidget(time, 1);
 
     auto *price = new QLabel(tr("%1 ֏").arg(QString::number(dish.price, 'f', 0)), this);
@@ -167,4 +221,39 @@ void DishCardWidget::mousePressEvent(QMouseEvent *event)
         emit addToCartClicked(m_dishId);
     }
     QFrame::mousePressEvent(event);
+}
+
+int DishCardWidget::dishId() const
+{
+    return m_dishId;
+}
+
+QPixmap DishCardWidget::thumbnailPixmap() const
+{
+    const auto *tileImage = findChild<QLabel *>(QStringLiteral("dishTileImage"));
+    if (tileImage && !tileImage->pixmap().isNull()) {
+        return tileImage->pixmap();
+    }
+
+    const auto *gridImage = findChild<QLabel *>(QStringLiteral("dishGridImage"));
+    if (gridImage && !gridImage->pixmap().isNull()) {
+        return gridImage->pixmap();
+    }
+
+    return loadDishPixmap(m_imagePath);
+}
+
+QPoint DishCardWidget::flyStartGlobalPos() const
+{
+    const auto *tileImage = findChild<QLabel *>(QStringLiteral("dishTileImage"));
+    if (tileImage) {
+        return tileImage->mapToGlobal(tileImage->rect().center());
+    }
+
+    const auto *gridImage = findChild<QLabel *>(QStringLiteral("dishGridImage"));
+    if (gridImage) {
+        return gridImage->mapToGlobal(gridImage->rect().center());
+    }
+
+    return mapToGlobal(rect().center());
 }

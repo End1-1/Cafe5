@@ -502,6 +502,41 @@
           </widget>
          </item>
          <item>
+          <widget class="QPushButton" name="btnCloseSession">
+           <property name="minimumSize">
+            <size>
+             <width>36</width>
+             <height>36</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>36</width>
+             <height>36</height>
+            </size>
+           </property>
+           <property name="focusPolicy">
+            <enum>Qt::FocusPolicy::NoFocus</enum>
+           </property>
+           <property name="toolTip">
+            <string>Close session</string>
+           </property>
+           <property name="text">
+            <string/>
+           </property>
+           <property name="icon">
+            <iconset resource="../resources/res.qrc">
+             <normaloff>:/shift.png</normaloff>:/shift.png</iconset>
+           </property>
+           <property name="iconSize">
+            <size>
+             <width>30</width>
+             <height>30</height>
+            </size>
+           </property>
+          </widget>
+         </item>
+         <item>
           <widget class="QPushButton" name="btnCloseApplication">
            <property name="minimumSize">
             <size>
@@ -546,6 +581,7 @@
         <zorder>btnGiftCard</zorder>
         <zorder>chRegisterCard</zorder>
         <zorder>btnCashout</zorder>
+        <zorder>btnCloseSession</zorder>
         <zorder>btnColumns</zorder>
         <zorder>btnMinimize</zorder>
         <zorder>btnCloseApplication</zorder>

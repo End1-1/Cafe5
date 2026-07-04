@@ -359,20 +359,19 @@ void ServerThread::onTextMessage(const QString &msg)
             unregisterSocket(jdoc, ws);
             return;
         } else {
-            QThreadPool::globalInstance()->start(QRunnable::create([this, jdoc, wsCopy, uuid, ws]() {
+            SocketStruct ss;
+            {
+                QMutexLocker ml(&mSocketMutex);
+                auto it = fSockets.find(ws);
+                if (it == fSockets.end())
+                    return;
+                ss = it.value();
+            }
+
+            QThreadPool::globalInstance()->start(QRunnable::create([this, jdoc, wsCopy, uuid, ss]() {
                 if(!wsCopy)
                     return;
 
-                SocketStruct ss;
-                {
-                    QMutexLocker ml(&mSocketMutex);
-                    auto it = fSockets.find(ws);
-                    if (it == fSockets.end())
-                        return;
-                    ss = it.value();
-                }
-
-                QJsonObject jresponse;
                 QString repMsg;
                 handleCommand(ss, jdoc, repMsg);
 
@@ -414,20 +413,19 @@ void ServerThread::onBinaryMessage(const QByteArray &msg)
             return;
         } else {
             LogWriter::write(LogWriterLevel::verbose, "REQUEST " + uuid, msg);
-            QThreadPool::globalInstance()->start(QRunnable::create([this, jdoc, wsCopy, uuid, ws]() {
+            SocketStruct ss;
+            {
+                QMutexLocker ml(&mSocketMutex);
+                auto it = fSockets.find(ws);
+                if (it == fSockets.end())
+                    return;
+                ss = it.value();
+            }
+
+            QThreadPool::globalInstance()->start(QRunnable::create([this, jdoc, wsCopy, uuid, ss]() {
                 if(!wsCopy)
                     return;
 
-                SocketStruct ss;
-                {
-                    QMutexLocker ml(&mSocketMutex);
-                    auto it = fSockets.find(ws);
-                    if (it == fSockets.end())
-                        return;
-                    ss = it.value();
-                }
-
-                QJsonObject jresponse;
                 QString repMsg;
                 handleCommand(ss, jdoc, repMsg);
 

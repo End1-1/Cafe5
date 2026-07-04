@@ -280,6 +280,10 @@ void C5MainWindow::tabCloseRequested(int index)
         return;
     }
 
+    if(!w->confirmTabClose()) {
+        return;
+    }
+
     fTab->removeTab(index);
     delete w;
 }

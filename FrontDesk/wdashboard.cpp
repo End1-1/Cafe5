@@ -5,6 +5,7 @@
 #include "C5StoreInput.h"
 #include "c5config.h"
 #include "c5mainwindow.h"
+#include "c5salefromstoreorder.h"
 #include "c5storeinventory.h"
 #include "c5storeoutput.h"
 #include "cr5goods.h"
@@ -17,9 +18,9 @@
 #include "cr5usersgroups.h"
 #include "ntablewidget.h"
 #include "rabstracteditorreport.h"
-#include "rmenureviewreport.h"
 #include "rcashmovement.h"
 #include "rdebts.h"
+#include "rmenureviewreport.h"
 #include "rorderinprogress.h"
 #include "rtotalreviewreport.h"
 #include "rworkstationsreport.h"
@@ -136,6 +137,10 @@ QWidget* WDashboard::createForm(const QString &name, QIcon icon)
 {
     if (name == "form_workstations") {
         return new RWorkstationsReport(tr("Workstations"), icon, name);
+    }
+
+    if (name == "form_newsale") {
+        return new RAbstractEditorReport(tr("Cash sessions"), icon, name);
     }
 
     if (name == "form_cashsessions") {

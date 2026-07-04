@@ -38,22 +38,23 @@ $ws_worker = new class {
             "id"      => $id,
             "ts"      => time()
         ]);
+        $ack = $ws->receiveJson();
         $ws->close();
-        return true;
+        return $ack && (int)($ack["errorCode"] ?? 1) === 0;
     }
 
-    // Новая функция специально для цен (принимает строку данных)
     public function updatePrices($items)
     {
         $ws = $this->getWS();
         if (!$ws) return false;
         $ws->sendJson([
             "command" => "update_goods_last_input_prices",
-            "data"    => json_encode($items, JSON_UNESCAPED_UNICODE),
+            "data"    => $items,
             "ts"      => time()
         ]);
+        $ack = $ws->receiveJson();
         $ws->close();
-        return true;
+        return $ack && (int)($ack["errorCode"] ?? 1) === 0;
     }
 };
 

@@ -5,6 +5,8 @@
 
 #include <QWidget>
 
+class DlgMenu;
+class QLabel;
 class QPaintEvent;
 
 namespace Ui {
@@ -34,17 +36,26 @@ public slots:
 private slots:
     void on_btnOrderMore_clicked();
     void on_btnGoToPay_clicked();
+    void onServiceModeClicked();
 
 private:
     void setupAppearance();
+    void setupHeaderLayout();
+    void setupServiceModeButton();
+    void updateServiceModeLabel();
+    void setupOrderBarSummary();
     void setupTouchScroll();
     void rebuildCartList();
     void updateSummary();
+    QString lineSubtitle(const MenuDish &dish) const;
     QString modifiersText(const MenuDish &dish) const;
     void clearLayout(QLayout *layout);
 
     Ui::DlgCart *ui;
     OrderCart *m_cart;
+    DlgMenu *m_menu = nullptr;
+    QLabel *m_lblCartBadge = nullptr;
+    QLabel *m_lblCartAmount = nullptr;
 };
 
 #endif // DLGCART_H

@@ -58,6 +58,9 @@ set(APP_SOURCES
 
     ../Http/httplite.h
     ../Http/httplite.cpp
+    ../Cafe5/c5registrysettings.cpp ../Cafe5/c5registrysettings.h
+
+
 
 
     # Файлы в корне проекта (по одному разу!)
@@ -66,7 +69,7 @@ set(APP_SOURCES
     dlgpin.cpp dlgregistercard.cpp dlgshopcustomer.cpp dlgshowcolumns.cpp
     dqty.cpp goodsreturnreason.cpp main.cpp sales.cpp searchitems.cpp selectstaff.cpp
     threadworker.cpp userphoto.cpp  vieworder.cpp
-    wcustomerdisplay.cpp working.cpp worder.cpp
+    wcustomerdisplay.cpp working.cpp worder.cpp wsession.cpp
     dlgpaymentchoose.cpp dlgpaymentchoose.h dlgpaymentchoose.ui
     printreceiptgroup.cpp printreceiptgroup.h
     version.h
@@ -102,7 +105,7 @@ set_target_properties(${PROJECT_NAME} PROPERTIES
 target_include_directories(${PROJECT_NAME} PRIVATE
     . ../Cafe5  ../TableRecord ../NTable ../Classes ../Cache
     ../Controls ../Forms ../Service ../Service5/worker ../StructModel
-    ../Printing ../RESOURCES ../Http
+    ../Printing ../RESOURCES ../Http ../dictionaries
     C:/Development/projects/desktop.newtax/Src
     C:/Development/OpenSSL-Win64/include
 )

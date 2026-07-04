@@ -8,9 +8,10 @@ void OrderCart::clear()
 {
     m_dishes.clear();
     m_qty.clear();
+    m_editableLineKeys.clear();
 }
 
-void OrderCart::addDish(const MenuDish &dish, int qty)
+void OrderCart::addDish(const MenuDish &dish, int qty, bool editable)
 {
     if (dish.id <= 0 || qty <= 0) {
         return;
@@ -19,6 +20,9 @@ void OrderCart::addDish(const MenuDish &dish, int qty)
     const QString key = MenuHelpers::cartLineKey(dish);
     m_dishes.insert(key, dish);
     m_qty[key] = m_qty.value(key, 0) + qty;
+    if (editable) {
+        m_editableLineKeys.insert(key);
+    }
 }
 
 void OrderCart::setQuantity(const QString &lineKey, int quantity)
@@ -29,6 +33,7 @@ void OrderCart::setQuantity(const QString &lineKey, int quantity)
     if (quantity <= 0) {
         m_qty.remove(lineKey);
         m_dishes.remove(lineKey);
+        m_editableLineKeys.remove(lineKey);
         return;
     }
     m_qty[lineKey] = quantity;
@@ -63,6 +68,7 @@ QVector<CartLine> OrderCart::lines() const
         line.dish = m_dishes.value(it.key());
         line.id = line.dish.id;
         line.quantity = it.value();
+        line.editable = m_editableLineKeys.contains(it.key());
         result.append(line);
     }
     return result;
@@ -71,6 +77,11 @@ QVector<CartLine> OrderCart::lines() const
 bool OrderCart::isEmpty() const
 {
     return m_qty.isEmpty();
+}
+
+bool OrderCart::isLineEditable(const QString &lineKey) const
+{
+    return m_editableLineKeys.contains(lineKey);
 }
 
 QJsonObject OrderCart::dynamicAttributesJson(const MenuDish &dish) const

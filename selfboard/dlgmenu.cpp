@@ -1,5 +1,7 @@
 #include "dlgmenu.h"
 
+#include "cartflyanimation.h"
+#include "dishcardanimhost.h"
 #include "selfboardlanguage.h"
 #include "selfboardbottomchrome.h"
 #include "dlgcart.h"
@@ -9,56 +11,203 @@
 #include "dlgpayment.h"
 #include "selfboardordersubmit.h"
 #include "dishcardwidget.h"
+#include "dishimageutils.h"
 #include "menuhelpers.h"
 #include "ui_dlgmenu.h"
 
 #include <QAbstractButton>
+#include <QAction>
 #include <QButtonGroup>
+#include <QEasingCurve>
 #include <QEvent>
 #include <QFile>
 #include <QIcon>
 #include <QKeyEvent>
+#include <QMenu>
+#include <QParallelAnimationGroup>
+#include <QPropertyAnimation>
 #include <QResizeEvent>
+#include <QSequentialAnimationGroup>
+#include <QTimer>
+#include <QColor>
+#include <QFontMetrics>
+#include <QHBoxLayout>
+#include <QLabel>
 #include <QLayoutItem>
-#include <QLineEdit>
+#include <QPalette>
 #include <QPixmap>
 #include <QPushButton>
+#include <QScrollBar>
 #include <QScroller>
 #include "selfboardsettings.h"
 
 #include <QSettings>
 #include <QMessageBox>
-#include <QToolButton>
 
 namespace {
+
+constexpr int kMenuGroupButtonWidth = 240;
+constexpr int kMenuGroupPaddingH = 12;
+constexpr int kMenuGroupPaddingV = 12;
+constexpr int kMenuGroupIconSize = 40;
+constexpr int kMenuGroupGap = 10;
+constexpr int kMenuGroupMinHeight = 72;
+constexpr int kMenuGroupMaxTextLines = 2;
+
+int menuGroupTextBlockHeight(const QFontMetrics &fm)
+{
+    return fm.lineSpacing() * kMenuGroupMaxTextLines + fm.descent();
+}
+
+constexpr int kPanelSlideDurationMs = 300;
+constexpr int kCardAnimDurationMs = 420;
+constexpr int kCardStaggerDelayMs = 45;
+constexpr int kCardSlideOffsetPx = 28;
+
+QString elideToTwoLines(const QString &text, const QFont &font, int width)
+{
+    QFontMetrics fm(font);
+    const int maxHeight = menuGroupTextBlockHeight(fm);
+    const QRect maxRect(0, 0, width, maxHeight);
+
+    if (fm.boundingRect(maxRect, Qt::TextWordWrap | Qt::AlignLeft, text).height() <= maxHeight) {
+        return text;
+    }
+
+    QString trial = text;
+    while (trial.length() > 1) {
+        trial.chop(1);
+        const QString candidate = trial + QString(QChar(0x2026));
+        if (fm.boundingRect(maxRect, Qt::TextWordWrap | Qt::AlignLeft, candidate).height() <= maxHeight) {
+            return candidate;
+        }
+    }
+
+    return fm.elidedText(text, Qt::ElideRight, width);
+}
+
+void styleTransparentGroupLabel(QLabel *label)
+{
+    styleTransparentTextLabel(label);
+}
+
+void styleWhiteSidebarButton(QPushButton *btn)
+{
+    if (!btn) {
+        return;
+    }
+    btn->setAttribute(Qt::WA_StyledBackground, true);
+    btn->setAutoFillBackground(true);
+    btn->setFlat(true);
+
+    QPalette palette = btn->palette();
+    palette.setColor(QPalette::Button, QColor(0xff, 0xff, 0xff));
+    palette.setColor(QPalette::Window, QColor(0xff, 0xff, 0xff));
+    btn->setPalette(palette);
+}
+
+void styleWhiteSidebarGroupButton(QPushButton *btn)
+{
+    if (!btn) {
+        return;
+    }
+
+    const QColor white(0xff, 0xff, 0xff);
+    btn->setFlat(true);
+    btn->setAttribute(Qt::WA_StyledBackground, true);
+    btn->setAutoFillBackground(true);
+
+    QPalette palette = btn->palette();
+    for (const QPalette::ColorRole role :
+         {QPalette::Button, QPalette::Window, QPalette::Base, QPalette::Light,
+          QPalette::Midlight, QPalette::Mid, QPalette::Dark, QPalette::Shadow}) {
+        palette.setColor(role, white);
+    }
+    btn->setPalette(palette);
+    btn->setStyleSheet(QStringLiteral(
+        "QPushButton {"
+        "  background-color: #ffffff;"
+        "  border: none;"
+        "  border-radius: 0;"
+        "  color: #2a2a2a;"
+        "  text-align: left;"
+        "  padding: 0;"
+        "}"
+        "QPushButton:hover,"
+        "QPushButton:pressed,"
+        "QPushButton:checked {"
+        "  background-color: #ffffff;"
+        "  border: none;"
+        "}"
+        "QPushButton QLabel {"
+        "  background: transparent;"
+        "  border: none;"
+        "}"));
+}
 
 QPushButton *makeSidebarGroupButton(const MenuGroup &group, QWidget *parent)
 {
     auto *btn = new QPushButton(parent);
     btn->setObjectName(QStringLiteral("btnMenuGroup"));
     btn->setCheckable(true);
-    btn->setText(group.name);
+    btn->setText(QString());
+    btn->setIcon(QIcon());
     btn->setProperty("groupId", group.id);
+    btn->setFixedWidth(kMenuGroupButtonWidth);
+    btn->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Minimum);
+
+    auto *layout = new QHBoxLayout(btn);
+    layout->setContentsMargins(kMenuGroupPaddingH, kMenuGroupPaddingV, kMenuGroupPaddingH, kMenuGroupPaddingV);
+    layout->setSpacing(kMenuGroupGap);
+
+    auto *iconLabel = new QLabel(btn);
+    iconLabel->setObjectName(QStringLiteral("lblMenuGroupIcon"));
+    iconLabel->setAttribute(Qt::WA_TransparentForMouseEvents, true);
 
     QPixmap icon(group.iconPath);
     if (icon.isNull()) {
         icon = QPixmap(QStringLiteral(":/res/dish_placeholder.png"));
     }
     if (!icon.isNull()) {
-        btn->setIcon(QIcon(icon.scaled(40, 40, Qt::KeepAspectRatio, Qt::SmoothTransformation)));
-        btn->setIconSize(QSize(40, 40));
+        setTransparentPixmapOnLabel(iconLabel, icon, kMenuGroupIconSize, kMenuGroupIconSize);
+    } else {
+        iconLabel->setFixedSize(kMenuGroupIconSize, kMenuGroupIconSize);
     }
-    btn->setMinimumHeight(56);
-    return btn;
-}
 
-QPushButton *makeChipButton(const MenuGroup &group, QWidget *parent)
-{
-    auto *btn = new QPushButton(group.name, parent);
-    btn->setObjectName(QStringLiteral("btnGroupChip"));
-    btn->setCheckable(true);
-    btn->setMinimumHeight(44);
-    btn->setMinimumWidth(100);
+    auto *textLabel = new QLabel(btn);
+    textLabel->setObjectName(QStringLiteral("lblMenuGroupName"));
+    textLabel->setWordWrap(true);
+    textLabel->setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
+    textLabel->setAttribute(Qt::WA_TransparentForMouseEvents, true);
+    styleTransparentGroupLabel(textLabel);
+
+    const int textWidth = kMenuGroupButtonWidth - kMenuGroupPaddingH * 2 - kMenuGroupIconSize - kMenuGroupGap;
+    const QFont textFont = textLabel->font();
+    const QFontMetrics fm(textFont);
+    textLabel->setFixedWidth(textWidth);
+    textLabel->setText(elideToTwoLines(group.name, textFont, textWidth));
+
+    layout->addWidget(iconLabel, 0, Qt::AlignVCenter);
+    layout->addWidget(textLabel, 1, Qt::AlignVCenter);
+
+    const auto updateGroupButtonHeight = [btn, iconLabel, textLabel]() {
+        const QFontMetrics fm(textLabel->font());
+        const int blockHeight = menuGroupTextBlockHeight(fm);
+        textLabel->setFixedHeight(blockHeight);
+        const int contentHeight = qMax(kMenuGroupIconSize, blockHeight);
+        btn->setFixedHeight(qMax(kMenuGroupMinHeight, contentHeight + kMenuGroupPaddingV * 2));
+    };
+
+    updateGroupButtonHeight();
+
+    QObject::connect(btn, &QPushButton::toggled, btn, [textLabel, updateGroupButtonHeight](bool checked) {
+        QFont font = textLabel->font();
+        font.setBold(checked);
+        textLabel->setFont(font);
+        updateGroupButtonHeight();
+    });
+
+    styleWhiteSidebarGroupButton(btn);
     return btn;
 }
 
@@ -75,7 +224,6 @@ DlgMenu::DlgMenu(ServiceMode mode, QWidget *parent)
     setFixedSize(1080, 1920);
 
     m_groupsLayout = ui->groupsHostLayout;
-    m_chipsLayout = ui->chipsLayout;
     m_dishGridLayout = ui->dishGridLayout;
 
     m_dishGridLayout->setAlignment(Qt::AlignTop | Qt::AlignLeft);
@@ -88,10 +236,11 @@ DlgMenu::DlgMenu(ServiceMode mode, QWidget *parent)
     ui->widgetDishesHost->setAttribute(Qt::WA_StyledBackground, true);
 
     setupAppearance();
+    setupServiceModeButton();
     setupTouchScroll();
+    setupDishPanelHost();
 
     ui->lblSidebarLogo->setPixmap(QPixmap(QStringLiteral(":/res/main_logo.png")));
-    ui->btnFavorites->setText(QStringLiteral("♥"));
 
     m_bottomChrome = new SelfboardBottomChrome(this);
     auto *chromeHostLayout = new QVBoxLayout(ui->widgetBottomChromeHost);
@@ -99,38 +248,35 @@ DlgMenu::DlgMenu(ServiceMode mode, QWidget *parent)
     chromeHostLayout->addWidget(m_bottomChrome);
 
     updateServiceModeLabel();
+    ui->btnServiceMode->setCursor(Qt::PointingHandCursor);
 
     m_groupButtons = new QButtonGroup(this);
     m_groupButtons->setExclusive(true);
     connect(m_groupButtons, &QButtonGroup::idClicked, this, &DlgMenu::onGroupClicked);
 
-    m_chipButtons = new QButtonGroup(this);
-    m_chipButtons->setExclusive(true);
-    connect(m_chipButtons, &QButtonGroup::idClicked, this, &DlgMenu::onGroupClicked);
-
     buildSidebarGroups();
-    buildGroupChips();
 
     const QVector<MenuGroup> groups = m_menuClient.groups();
     if (!groups.isEmpty()) {
-        selectGroup(groups.first().id);
+        selectGroup(groups.first().id, false);
     }
 
     updateCartSummary();
 
-    connect(ui->btnHome, &QPushButton::clicked, this, &QDialog::reject);
+    connect(ui->btnServiceMode, &QPushButton::clicked, this, &DlgMenu::onServiceModeClicked);
     connect(m_bottomChrome, &SelfboardBottomChrome::cancelOrderClicked, this, &DlgMenu::onCancelOrder);
     connect(m_bottomChrome, &SelfboardBottomChrome::goToCartClicked, this, &DlgMenu::onGoToCart);
     connect(m_bottomChrome, &SelfboardBottomChrome::cartSummaryClicked, this, &DlgMenu::onGoToCart);
-    connect(ui->leSearch, &QLineEdit::textChanged, this, &DlgMenu::onSearchTextChanged);
 }
 
 DlgMenu::~DlgMenu()
 {
+    stopContentAnimations();
     closeOrderDone();
     closePaymentOverlay();
     closeCartOverlay();
     closePackagePicker();
+    closeDishDetails();
     delete ui;
 }
 
@@ -152,30 +298,187 @@ void DlgMenu::setupAppearance()
     }
 
     SelfboardLanguage::instance().bindPickerButton(ui->btnLanguage);
+
+    ui->lblSidebarLogo->setFixedSize(240, 225);
+    ui->lblBanner->setFixedHeight(225);
+    ui->lblBanner->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+    ui->bodyLayout->setAlignment(Qt::AlignTop);
+    ui->sidebarLayout->setAlignment(Qt::AlignTop);
+    ui->contentLayout->setAlignment(Qt::AlignTop);
+}
+
+void DlgMenu::setServiceMode(ServiceMode mode)
+{
+    if (m_serviceMode == mode) {
+        return;
+    }
+
+    m_serviceMode = mode;
+    updateServiceModeLabel();
+}
+
+void DlgMenu::setupServiceModeButton()
+{
+    QPushButton *btn = ui->btnServiceMode;
+    if (btn->findChild<QLabel *>(QStringLiteral("lblServiceModeReload"))) {
+        return;
+    }
+
+    btn->setAttribute(Qt::WA_StyledBackground, true);
+    btn->setAutoFillBackground(true);
+    styleWhiteSidebarButton(btn);
+
+    btn->setText(QString());
+    btn->setIcon(QIcon());
+
+    auto *layout = new QHBoxLayout(btn);
+    layout->setContentsMargins(4, 8, 6, 8);
+    layout->setSpacing(8);
+
+    auto *modeIcon = new QLabel(btn);
+    modeIcon->setObjectName(QStringLiteral("lblServiceModeIcon"));
+    modeIcon->setFixedSize(28, 28);
+    modeIcon->setScaledContents(true);
+    modeIcon->setAttribute(Qt::WA_TransparentForMouseEvents, true);
+
+    auto *modeText = new QLabel(btn);
+    modeText->setObjectName(QStringLiteral("lblServiceModeText"));
+    modeText->setAttribute(Qt::WA_TransparentForMouseEvents, true);
+
+    auto *reloadIcon = new QLabel(btn);
+    reloadIcon->setObjectName(QStringLiteral("lblServiceModeReload"));
+    reloadIcon->setFixedSize(22, 22);
+    reloadIcon->setScaledContents(true);
+    reloadIcon->setPixmap(QPixmap(QStringLiteral(":/res/reload.png")));
+    reloadIcon->setAttribute(Qt::WA_TransparentForMouseEvents, true);
+
+    layout->addWidget(modeIcon, 0, Qt::AlignVCenter);
+    layout->addWidget(modeText, 1, Qt::AlignVCenter);
+    layout->addWidget(reloadIcon, 0, Qt::AlignVCenter);
 }
 
 void DlgMenu::setupTouchScroll()
 {
     ui->scrollDishes->setStyleSheet(QStringLiteral("background: #ececec; border: none;"));
     ui->scrollDishes->viewport()->setStyleSheet(QStringLiteral("background: #ececec;"));
-    ui->scrollGroupChips->setStyleSheet(QStringLiteral("background: #ececec; border: none;"));
-    ui->scrollGroupChips->viewport()->setStyleSheet(QStringLiteral("background: #ececec;"));
-    ui->scrollGroups->setStyleSheet(QStringLiteral("background: #ececec; border: none;"));
+    ui->scrollGroups->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    ui->scrollGroups->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    ui->scrollGroups->setStyleSheet(QStringLiteral(
+        "QScrollArea#scrollGroups { background: #ececec; border: none; }"
+        "QScrollArea#scrollGroups QScrollBar:vertical { width: 0px; background: transparent; }"
+        "QScrollArea#scrollGroups QScrollBar:horizontal { height: 0px; background: transparent; }"));
     ui->scrollGroups->viewport()->setStyleSheet(QStringLiteral("background: #ececec;"));
-    QScroller::grabGesture(ui->scrollGroupChips->viewport(), QScroller::LeftMouseButtonGesture);
+    ui->widgetGroupsHost->setMinimumWidth(kMenuGroupButtonWidth);
+    ui->widgetGroupsHost->setMaximumWidth(kMenuGroupButtonWidth);
     QScroller::grabGesture(ui->scrollDishes->viewport(), QScroller::LeftMouseButtonGesture);
+    QScroller::grabGesture(ui->scrollGroups->viewport(), QScroller::LeftMouseButtonGesture);
+}
+
+void DlgMenu::setupDishPanelHost()
+{
+    m_dishPanelHost = new QWidget(ui->widgetContent);
+    m_dishPanelHost->setObjectName(QStringLiteral("dishPanelHost"));
+    m_dishPanelHost->setAttribute(Qt::WA_StyledBackground, true);
+    m_dishPanelHost->setStyleSheet(QStringLiteral("background: #ececec;"));
+    m_dishPanelHost->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+
+    m_dishSlidePanel = new QWidget(m_dishPanelHost);
+    m_dishSlidePanel->setObjectName(QStringLiteral("dishSlidePanel"));
+    m_dishSlidePanel->setAttribute(Qt::WA_StyledBackground, true);
+    m_dishSlidePanel->setStyleSheet(QStringLiteral("background: #ececec;"));
+
+    const int scrollIndex = ui->contentLayout->indexOf(ui->scrollDishes);
+    ui->contentLayout->removeWidget(ui->scrollDishes);
+    ui->scrollDishes->setParent(m_dishSlidePanel);
+    ui->contentLayout->insertWidget(scrollIndex, m_dishPanelHost);
+
+    m_dishPanelHost->installEventFilter(this);
+    syncDishPanelGeometry();
+}
+
+void DlgMenu::syncDishPanelGeometry()
+{
+    if (!m_dishPanelHost || !m_dishSlidePanel) {
+        return;
+    }
+
+    const int w = m_dishPanelHost->width();
+    const int h = m_dishPanelHost->height();
+    if (w <= 0 || h <= 0) {
+        return;
+    }
+
+    ui->scrollDishes->setGeometry(0, 0, w, h);
+
+    if (m_panelSlideAnim) {
+        m_dishSlidePanel->resize(w, h);
+        return;
+    }
+
+    m_dishSlidePanel->setGeometry(0, 0, w, h);
+}
+
+bool DlgMenu::eventFilter(QObject *watched, QEvent *event)
+{
+    if (watched == m_dishPanelHost && event->type() == QEvent::Resize) {
+        syncDishPanelGeometry();
+        return false;
+    }
+
+    return QDialog::eventFilter(watched, event);
 }
 
 void DlgMenu::updateServiceModeLabel()
 {
-    if (m_serviceMode == ServiceMode::TakeAway) {
-        ui->btnServiceMode->setText(tr("Take away"));
-        ui->btnServiceMode->setIcon(QIcon(QStringLiteral(":/res/icon_takeaway.png")));
-    } else {
-        ui->btnServiceMode->setText(tr("Dine in"));
-        ui->btnServiceMode->setIcon(QIcon(QStringLiteral(":/res/icon_dinein.png")));
+    const bool takeAway = m_serviceMode == ServiceMode::TakeAway;
+    const QString text = takeAway ? tr("Take away") : tr("Dine in");
+    const QString iconPath = takeAway ? QStringLiteral(":/res/icon_takeaway.png")
+                                      : QStringLiteral(":/res/icon_dinein.png");
+
+    if (auto *modeText = ui->btnServiceMode->findChild<QLabel *>(QStringLiteral("lblServiceModeText"))) {
+        ui->btnServiceMode->setText(QString());
+        ui->btnServiceMode->setIcon(QIcon());
+        if (auto *modeIcon = ui->btnServiceMode->findChild<QLabel *>(QStringLiteral("lblServiceModeIcon"))) {
+            modeIcon->setPixmap(QPixmap(iconPath));
+        }
+        modeText->setText(text);
+        return;
     }
+
+    ui->btnServiceMode->setText(text);
+    ui->btnServiceMode->setIcon(QIcon(iconPath));
     ui->btnServiceMode->setIconSize(QSize(28, 28));
+}
+
+void DlgMenu::onServiceModeClicked()
+{
+    QMenu menu(this);
+    menu.setObjectName(QStringLiteral("menuServiceMode"));
+
+    const auto addMode = [&](ServiceMode mode, const QString &label, const QString &iconPath) {
+        QAction *action = menu.addAction(QIcon(iconPath), label);
+        if (mode == m_serviceMode) {
+            action->setCheckable(true);
+            action->setChecked(true);
+        }
+        connect(action, &QAction::triggered, this, [this, mode]() {
+            if (m_serviceMode == mode) {
+                return;
+            }
+            setServiceMode(mode);
+        });
+    };
+
+    addMode(ServiceMode::TakeAway,
+            tr("Take away"),
+            QStringLiteral(":/res/icon_takeaway.png"));
+    addMode(ServiceMode::DineIn,
+            tr("Dine in"),
+            QStringLiteral(":/res/icon_dinein.png"));
+
+    const QPoint pos = ui->btnServiceMode->mapToGlobal(QPoint(0, ui->btnServiceMode->height() + 4));
+    menu.setFixedWidth(qMax(ui->btnServiceMode->width(), 188));
+    menu.exec(pos);
 }
 
 void DlgMenu::buildSidebarGroups()
@@ -190,59 +493,56 @@ void DlgMenu::buildSidebarGroups()
     m_groupsLayout->addStretch();
 }
 
-void DlgMenu::buildGroupChips()
+void DlgMenu::selectGroup(int groupId, bool animatePanel)
 {
-    clearLayout(m_chipsLayout);
-
-    for (const MenuGroup &group : m_menuClient.groups()) {
-        QPushButton *btn = makeChipButton(group, ui->widgetChipsHost);
-        m_chipButtons->addButton(btn, group.id);
-        m_chipsLayout->addWidget(btn);
-    }
-    m_chipsLayout->addStretch();
-}
-
-void DlgMenu::selectGroup(int groupId)
-{
+    const bool groupChanged = groupId != m_currentGroupId;
     m_currentGroupId = groupId;
 
     if (QAbstractButton *btn = m_groupButtons->button(groupId)) {
         btn->setChecked(true);
     }
-    if (QAbstractButton *chip = m_chipButtons->button(groupId)) {
-        chip->setChecked(true);
-        ui->scrollGroupChips->ensureWidgetVisible(chip, 24, 0);
+
+    stopContentAnimations();
+    rebuildDishGrid(groupChanged && animatePanel);
+
+    if (!groupChanged) {
+        finalizeCardAppearance();
+        return;
     }
 
-    rebuildDishGrid();
+    startGroupReveal(animatePanel);
+}
+
+void DlgMenu::startGroupReveal(bool animatePanel)
+{
+    QTimer::singleShot(0, this, [this, animatePanel]() {
+        syncDishPanelGeometry();
+
+        if (animatePanel && m_dishPanelHost && m_dishPanelHost->width() > 50) {
+            animatePanelSlideIn();
+        } else {
+            if (m_dishSlidePanel) {
+                m_dishSlidePanel->move(0, 0);
+            }
+            animateDishCardsStagger();
+        }
+    });
 }
 
 void DlgMenu::onGroupClicked(int groupId)
 {
-    selectGroup(groupId);
+    selectGroup(groupId, true);
 }
 
 QVector<MenuDish> DlgMenu::filteredDishes() const
 {
-    const QVector<MenuDish> all = m_menuClient.dishesByGroup(m_currentGroupId);
-    const QString needle = ui->leSearch->text().trimmed();
-    if (needle.isEmpty()) {
-        return all;
-    }
-
-    QVector<MenuDish> result;
-    for (const MenuDish &dish : all) {
-        if (dish.name.contains(needle, Qt::CaseInsensitive)
-            || dish.groupName.contains(needle, Qt::CaseInsensitive)) {
-            result.append(dish);
-        }
-    }
-    return result;
+    return m_menuClient.dishesByGroup(m_currentGroupId);
 }
 
-void DlgMenu::rebuildDishGrid()
+void DlgMenu::rebuildDishGrid(bool prepareForAnimation)
 {
     clearLayout(m_dishGridLayout);
+    m_lastBuiltCardHosts.clear();
 
     const QVector<MenuDish> dishes = filteredDishes();
     int row = 0;
@@ -250,9 +550,20 @@ void DlgMenu::rebuildDishGrid()
 
     for (const MenuDish &dish : dishes) {
         auto *card = new DishCardWidget(DishCardWidget::Style::Listing, dish, ui->widgetDishesHost);
-        connect(card, &DishCardWidget::addToCartClicked, this, &DlgMenu::onAddToCart);
+        connect(card, &DishCardWidget::addToCartClicked, this, [this, card](int dishId) {
+            onAddToCart(dishId, card);
+        });
         connect(card, &DishCardWidget::infoClicked, this, &DlgMenu::onDishInfo);
-        m_dishGridLayout->addWidget(card, row, col);
+
+        auto *host = new DishCardAnimHost(card, ui->widgetDishesHost);
+        if (prepareForAnimation) {
+            host->setSlideY(kCardSlideOffsetPx);
+        } else {
+            host->setSlideY(0.0);
+        }
+
+        m_dishGridLayout->addWidget(host, row, col);
+        m_lastBuiltCardHosts.append(host);
 
         ++col;
         if (col >= MenuLayout::kListingColumns) {
@@ -268,6 +579,121 @@ void DlgMenu::rebuildDishGrid()
                       + margins.top() + margins.bottom();
     ui->widgetDishesHost->setMinimumHeight(gridH);
     ui->widgetDishesHost->adjustSize();
+    ui->scrollDishes->verticalScrollBar()->setValue(0);
+}
+
+void DlgMenu::stopContentAnimations()
+{
+    if (m_panelSlideAnim) {
+        m_panelSlideAnim->stop();
+        delete m_panelSlideAnim;
+        m_panelSlideAnim = nullptr;
+    }
+
+    if (m_cardStaggerGroup) {
+        m_cardStaggerGroup->stop();
+        delete m_cardStaggerGroup;
+        m_cardStaggerGroup = nullptr;
+    }
+
+    if (m_dishSlidePanel) {
+        m_dishSlidePanel->move(0, 0);
+    }
+
+    finalizeCardAppearance();
+}
+
+void DlgMenu::finalizeCardAppearance()
+{
+    for (DishCardAnimHost *host : m_lastBuiltCardHosts) {
+        if (!host) {
+            continue;
+        }
+        host->setSlideY(0.0);
+    }
+}
+
+void DlgMenu::animatePanelSlideIn()
+{
+    if (!m_dishPanelHost || !m_dishSlidePanel) {
+        animateDishCardsStagger();
+        return;
+    }
+
+    syncDishPanelGeometry();
+
+    const int panelWidth = m_dishPanelHost->width();
+    const int panelHeight = m_dishPanelHost->height();
+    if (panelWidth <= 0 || panelHeight <= 0) {
+        animateDishCardsStagger();
+        return;
+    }
+
+    m_dishSlidePanel->resize(panelWidth, panelHeight);
+    m_dishSlidePanel->move(-panelWidth, 0);
+
+    auto *anim = new QPropertyAnimation(m_dishSlidePanel, "pos", this);
+    anim->setDuration(kPanelSlideDurationMs);
+    anim->setStartValue(QPoint(-panelWidth, 0));
+    anim->setEndValue(QPoint(0, 0));
+    anim->setEasingCurve(QEasingCurve::OutCubic);
+
+    connect(anim, &QPropertyAnimation::finished, this, [this]() {
+        m_panelSlideAnim = nullptr;
+        if (m_dishSlidePanel) {
+            m_dishSlidePanel->move(0, 0);
+        }
+        syncDishPanelGeometry();
+        animateDishCardsStagger();
+    });
+
+    m_panelSlideAnim = anim;
+    anim->start();
+}
+
+void DlgMenu::animateDishCardsStagger()
+{
+    if (m_lastBuiltCardHosts.isEmpty()) {
+        return;
+    }
+
+    if (m_cardStaggerGroup) {
+        m_cardStaggerGroup->stop();
+        delete m_cardStaggerGroup;
+        m_cardStaggerGroup = nullptr;
+    }
+
+    auto *parallel = new QParallelAnimationGroup(this);
+
+    for (int i = 0; i < m_lastBuiltCardHosts.size(); ++i) {
+        DishCardAnimHost *host = m_lastBuiltCardHosts.at(i);
+        if (!host) {
+            continue;
+        }
+
+        host->setSlideY(kCardSlideOffsetPx);
+
+        auto *sequence = new QSequentialAnimationGroup(parallel);
+        if (i > 0) {
+            sequence->addPause(i * kCardStaggerDelayMs);
+        }
+
+        auto *slideAnim = new QPropertyAnimation(host, "slideY", sequence);
+        slideAnim->setDuration(kCardAnimDurationMs);
+        slideAnim->setStartValue(static_cast<qreal>(kCardSlideOffsetPx));
+        slideAnim->setEndValue(0.0);
+        slideAnim->setEasingCurve(QEasingCurve::OutBack);
+        sequence->addAnimation(slideAnim);
+        parallel->addAnimation(sequence);
+    }
+
+    connect(parallel, &QParallelAnimationGroup::finished, this, [this]() {
+        m_cardStaggerGroup = nullptr;
+        finalizeCardAppearance();
+    });
+
+    m_cardStaggerGroup = parallel;
+    parallel->start();
 }
 
 void DlgMenu::clearLayout(QLayout *layout)
@@ -302,8 +728,12 @@ void DlgMenu::keyPressEvent(QKeyEvent *event)
 void DlgMenu::resizeEvent(QResizeEvent *event)
 {
     QDialog::resizeEvent(event);
+    syncDishPanelGeometry();
     if (m_packagePick && m_packagePick->isVisible()) {
         m_packagePick->setGeometry(rect());
+    }
+    if (m_dishDetails && m_dishDetails->isVisible()) {
+        m_dishDetails->setGeometry(rect());
     }
     if (m_cartOverlay && m_cartOverlay->isVisible()) {
         m_cartOverlay->setGeometry(QRect(QPoint(0, 0), size()));
@@ -329,11 +759,13 @@ void DlgMenu::closePackagePicker()
 void DlgMenu::showPackagePicker(const MenuDish &package)
 {
     closePackagePicker();
+    closeDishDetails();
 
     m_packagePick = new DlgPackagePick(package, this);
     m_packagePick->setGeometry(rect());
-    connect(m_packagePick, &DlgPackagePick::accepted, this, [this](const MenuDish &line, int qty, const QVector<QPair<MenuDish, int>> &extras) {
-        m_cart.addDish(line, qty);
+    connect(m_packagePick, &DlgPackagePick::accepted, this, [this, package](const MenuDish &line, int qty, const QVector<QPair<MenuDish, int>> &extras) {
+        const bool editable = MenuHelpers::dishHasThreeStepPicker(package);
+        m_cart.addDish(line, qty, editable);
         for (const QPair<MenuDish, int> &extra : extras) {
             if (extra.second > 0) {
                 m_cart.addDish(extra.first, extra.second);
@@ -341,6 +773,7 @@ void DlgMenu::showPackagePicker(const MenuDish &package)
         }
         updateCartSummary();
         closePackagePicker();
+        showCartOverlay();
     });
     connect(m_packagePick, &DlgPackagePick::rejected, this, &DlgMenu::closePackagePicker);
     m_packagePick->raise();
@@ -348,7 +781,7 @@ void DlgMenu::showPackagePicker(const MenuDish &package)
     m_packagePick->setFocus(Qt::OtherFocusReason);
 }
 
-void DlgMenu::onAddToCart(int dishId)
+void DlgMenu::onAddToCart(int dishId, DishCardWidget *card)
 {
     const MenuDish dish = m_menuClient.dishById(dishId);
     if (dish.id <= 0) {
@@ -375,6 +808,39 @@ void DlgMenu::onAddToCart(int dishId)
 
     m_cart.addDish(dish);
     updateCartSummary();
+    playFlyToCart(card);
+}
+
+void DlgMenu::playFlyToCart(DishCardWidget *card)
+{
+    if (!card || !m_bottomChrome) {
+        return;
+    }
+
+    const QPixmap pixmap = card->thumbnailPixmap();
+    if (pixmap.isNull()) {
+        m_bottomChrome->playCartAddedBump();
+        return;
+    }
+
+    SelfboardBottomChrome *chrome = m_bottomChrome;
+    CartFlyAnimation::run(pixmap,
+                          card->flyStartGlobalPos(),
+                          chrome->cartFlyTargetGlobalPos(),
+                          [chrome]() {
+                              chrome->playCartAddedBump();
+                          });
+}
+
+void DlgMenu::closeDishDetails()
+{
+    if (!m_dishDetails) {
+        return;
+    }
+    DlgDishDetails *overlay = m_dishDetails;
+    m_dishDetails = nullptr;
+    overlay->hide();
+    overlay->deleteLater();
 }
 
 void DlgMenu::onDishInfo(int dishId)
@@ -384,14 +850,13 @@ void DlgMenu::onDishInfo(int dishId)
         return;
     }
 
-    DlgDishDetails dlg(dish, this);
-    dlg.exec();
-}
-
-void DlgMenu::onSearchTextChanged(const QString &text)
-{
-    Q_UNUSED(text);
-    rebuildDishGrid();
+    closeDishDetails();
+    m_dishDetails = new DlgDishDetails(dish, this);
+    m_dishDetails->setGeometry(rect());
+    connect(m_dishDetails, &DlgDishDetails::closed, this, &DlgMenu::closeDishDetails);
+    m_dishDetails->raise();
+    m_dishDetails->show();
+    m_dishDetails->setFocus(Qt::OtherFocusReason);
 }
 
 void DlgMenu::updateCartSummary()
@@ -443,9 +908,11 @@ void DlgMenu::showCartOverlay()
 
     m_cartOverlay = new DlgCart(&m_cart, this);
     m_cartOverlay->setGeometry(QRect(QPoint(0, 0), size()));
+    m_cartOverlay->setFixedSize(size());
     connect(m_cartOverlay, &DlgCart::finished, this, &DlgMenu::onCartOverlayFinished);
     m_cartOverlay->raise();
     m_cartOverlay->show();
+    m_cartOverlay->activateWindow();
 }
 
 void DlgMenu::showPaymentOverlay()

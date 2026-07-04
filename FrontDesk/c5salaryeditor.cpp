@@ -1,6 +1,7 @@
 #include "c5salaryeditor.h"
 #include "ui_c5salaryeditor.h"
 
+#include "dlgsalarydishsales.h"
 #include <QDate>
 #include <QHeaderView>
 #include <QJsonArray>
@@ -63,12 +64,16 @@ C5SalaryEditor::C5SalaryEditor(QWidget *parent)
     });
 
     connect(ui->tblSalary, &QTableWidget::cellDoubleClicked, this, [this](int row, int column) {
-        if (column != colPosition) {
+        if (column == colPosition) {
+            ui->tblSalary->setCurrentCell(row, column);
+            on_btnChangePosition_clicked();
             return;
         }
 
-        ui->tblSalary->setCurrentCell(row, column);
-        on_btnChangePosition_clicked();
+        if (column == colDishBase) {
+            ui->tblSalary->setCurrentCell(row, column);
+            showDishSalesDetail(row);
+        }
     });
 
     connect(ui->deDate, &QDateEdit::dateChanged, this, [this](const QDate &d) {
@@ -405,6 +410,59 @@ void C5SalaryEditor::applyCalculatedRow(int row, double fixed, double dishBase, 
     setMoneyCell(ui->tblSalary, row, colDishBase, dishBase, false);
     setMoneyCell(ui->tblSalary, row, colCalculated, calculated, true);
     setMoneyCell(ui->tblSalary, row, colTotal, total, false);
+}
+
+int C5SalaryEditor::countSamePositionRows(int positionId) const
+{
+    if (positionId <= 0) {
+        return 1;
+    }
+
+    int count = 0;
+    for (int row = 0; row < ui->tblSalary->rowCount(); ++row) {
+        const auto *itPos = ui->tblSalary->item(row, colPositionId);
+        if (itPos && itPos->text().toInt() == positionId) {
+            ++count;
+        }
+    }
+
+    return qMax(1, count);
+}
+
+void C5SalaryEditor::showDishSalesDetail(int row)
+{
+    if (row < 0 || row >= ui->tblSalary->rowCount()) {
+        return;
+    }
+
+    const int staffId = ui->tblSalary->item(row, colStaffId)
+                            ? ui->tblSalary->item(row, colStaffId)->text().toInt()
+                            : 0;
+    const int positionId = ui->tblSalary->item(row, colPositionId)
+                               ? ui->tblSalary->item(row, colPositionId)->text().toInt()
+                               : 0;
+    const QString staffName = ui->tblSalary->item(row, colName)
+                                  ? ui->tblSalary->item(row, colName)->text()
+                                  : QString();
+
+    if (staffId <= 0) {
+        C5Message::info(tr("Employee is not set."));
+        return;
+    }
+    if (positionId <= 0) {
+        C5Message::info(tr("Position is not set."));
+        return;
+    }
+
+    auto *dlg = new DlgSalaryDishSales(mUser,
+                                       ui->deDate->date(),
+                                       staffId,
+                                       staffName,
+                                       positionId,
+                                       countSamePositionRows(positionId),
+                                       this);
+    dlg->setAttribute(Qt::WA_DeleteOnClose);
+    dlg->open();
 }
 
 void C5SalaryEditor::calculateDocument()

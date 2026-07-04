@@ -50,13 +50,13 @@
       <widget class="QWidget" name="widgetSidebar" native="true">
        <property name="minimumSize">
         <size>
-         <width>220</width>
+         <width>272</width>
          <height>0</height>
         </size>
        </property>
        <property name="maximumSize">
         <size>
-         <width>220</width>
+         <width>272</width>
          <height>16777215</height>
         </size>
        </property>
@@ -80,14 +80,14 @@
          <widget class="QLabel" name="lblSidebarLogo">
           <property name="minimumSize">
            <size>
-            <width>72</width>
-            <height>72</height>
+            <width>240</width>
+            <height>225</height>
            </size>
           </property>
           <property name="maximumSize">
            <size>
-            <width>72</width>
-            <height>72</height>
+            <width>240</width>
+            <height>225</height>
            </size>
           </property>
           <property name="text">
@@ -106,13 +106,6 @@
          </widget>
         </item>
         <item>
-         <widget class="QPushButton" name="btnHome">
-          <property name="text">
-           <string>Home</string>
-          </property>
-         </widget>
-        </item>
-        <item>
          <widget class="QPushButton" name="btnServiceMode">
           <property name="text">
            <string>Dine in</string>
@@ -121,6 +114,12 @@
         </item>
         <item>
          <widget class="QScrollArea" name="scrollGroups">
+          <property name="horizontalScrollBarPolicy">
+           <enum>Qt::ScrollBarPolicy::ScrollBarAlwaysOff</enum>
+          </property>
+          <property name="verticalScrollBarPolicy">
+           <enum>Qt::ScrollBarPolicy::ScrollBarAlwaysOff</enum>
+          </property>
           <property name="frameShape">
            <enum>QFrame::Shape::NoFrame</enum>
           </property>
@@ -132,13 +131,13 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>188</width>
+             <width>240</width>
              <height>1518</height>
             </rect>
            </property>
            <layout class="QVBoxLayout" name="groupsHostLayout">
             <property name="spacing">
-             <number>8</number>
+             <number>1</number>
             </property>
             <property name="leftMargin">
              <number>0</number>
@@ -182,7 +181,13 @@
           <property name="minimumSize">
            <size>
             <width>0</width>
-            <height>72</height>
+            <height>225</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>16777215</width>
+            <height>225</height>
            </size>
           </property>
           <property name="text">
@@ -192,100 +197,6 @@
            <set>Qt::AlignmentFlag::AlignCenter</set>
           </property>
          </widget>
-        </item>
-        <item>
-         <widget class="QScrollArea" name="scrollGroupChips">
-          <property name="minimumSize">
-           <size>
-            <width>0</width>
-            <height>52</height>
-           </size>
-          </property>
-          <property name="maximumSize">
-           <size>
-            <width>16777215</width>
-            <height>52</height>
-           </size>
-          </property>
-          <property name="frameShape">
-           <enum>QFrame::Shape::NoFrame</enum>
-          </property>
-          <property name="horizontalScrollBarPolicy">
-           <enum>Qt::ScrollBarPolicy::ScrollBarAlwaysOff</enum>
-          </property>
-          <property name="verticalScrollBarPolicy">
-           <enum>Qt::ScrollBarPolicy::ScrollBarAlwaysOff</enum>
-          </property>
-          <property name="widgetResizable">
-           <bool>true</bool>
-          </property>
-          <widget class="QWidget" name="widgetChipsHost">
-           <property name="geometry">
-            <rect>
-             <x>0</x>
-             <y>0</y>
-             <width>810</width>
-             <height>52</height>
-            </rect>
-           </property>
-           <layout class="QHBoxLayout" name="chipsLayout">
-            <property name="spacing">
-             <number>12</number>
-            </property>
-            <property name="leftMargin">
-             <number>0</number>
-            </property>
-            <property name="topMargin">
-             <number>0</number>
-            </property>
-            <property name="rightMargin">
-             <number>0</number>
-            </property>
-            <property name="bottomMargin">
-             <number>0</number>
-            </property>
-           </layout>
-          </widget>
-         </widget>
-        </item>
-        <item>
-         <layout class="QHBoxLayout" name="searchLayout">
-          <property name="spacing">
-           <number>12</number>
-          </property>
-          <item>
-           <widget class="QLineEdit" name="leSearch">
-            <property name="minimumSize">
-             <size>
-              <width>0</width>
-              <height>48</height>
-             </size>
-            </property>
-            <property name="placeholderText">
-             <string>Search...</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QToolButton" name="btnFavorites">
-            <property name="minimumSize">
-             <size>
-              <width>48</width>
-              <height>48</height>
-             </size>
-            </property>
-            <property name="maximumSize">
-             <size>
-              <width>48</width>
-              <height>48</height>
-             </size>
-            </property>
-            <property name="text">
-             <string/>
-            </property>
-           </widget>
-          </item>
-         </layout>
         </item>
         <item>
          <widget class="QScrollArea" name="scrollDishes">

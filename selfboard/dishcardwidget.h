@@ -1,6 +1,9 @@
 #pragma once
 
 #include <QFrame>
+#include <QPixmap>
+#include <QPoint>
+#include <QString>
 
 #include "menutypes.h"
 
@@ -18,6 +21,10 @@ public:
 
     explicit DishCardWidget(Style style, const MenuDish &dish, QWidget *parent = nullptr);
 
+    int dishId() const;
+    QPixmap thumbnailPixmap() const;
+    QPoint flyStartGlobalPos() const;
+
 signals:
     void addToCartClicked(int dishId);
     void infoClicked(int dishId);
@@ -28,7 +35,9 @@ protected:
 private:
     void buildGridCard(const MenuDish &dish);
     void buildTileCard(const MenuDish &dish, const char *cardObjectName);
+    void applyCardLabelStyles();
 
     int m_dishId = 0;
+    QString m_imagePath;
     QPushButton *m_infoButton = nullptr;
 };

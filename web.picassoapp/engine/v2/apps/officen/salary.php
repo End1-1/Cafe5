@@ -326,6 +326,63 @@ class Salary extends Auth
         $this->echoResult();
     }
 
+    /**
+     * Breakdown of dish sales base (percent dishes only) for salary accrual row.
+     */
+    public function DishSalesDetail($params)
+    {
+        $date = trim((string)($params->date ?? ''));
+        if ($date === '') {
+            dieWithCode("Salary date is required");
+        }
+
+        $staff = (int)($params->f_staff ?? $params->staff ?? 0);
+        $position = (int)($params->f_position ?? $params->position ?? 0);
+        $posCount = max(1, (int)($params->f_position_count ?? $params->position_count ?? 1));
+
+        if ($staff <= 0) {
+            dieWithCode("Employee is required");
+        }
+        if ($position <= 0) {
+            dieWithCode("Position is required");
+        }
+
+        [$date1] = $this->salaryDayRange($date);
+        $formulas = $this->loadGroupFormulas([$position]);
+        $formula = $formulas[(string)$position] ?? $this->defaultFormula();
+        $depCode = (int)($formula["f_dep"] ?? 0);
+        $skipAmount = (float)($formula["f_skip_amount"] ?? -1);
+        $byWorkingTime = !empty($formula["f_count_working_time"]);
+
+        $staffRow = $this->select(
+            "SELECT TRIM(CONCAT(u.f_last, ' ', u.f_first)) AS f_staff_name FROM s_user u WHERE u.f_id = ?",
+            "i",
+            [$staff]
+        )->fetch_assoc();
+
+        $detail = $this->buildDishPercentSalesDetail(
+            $staff,
+            $depCode,
+            $date1,
+            $byWorkingTime,
+            $posCount,
+            $skipAmount
+        );
+
+        $this->result["date"] = $date1;
+        $this->result["f_staff"] = $staff;
+        $this->result["f_staff_name"] = trim((string)($staffRow["f_staff_name"] ?? ""));
+        $this->result["f_position"] = $position;
+        $this->result["f_department"] = $depCode;
+        $this->result["items"] = $detail["items"];
+        $this->result["f_sales_total"] = $detail["f_sales_total"];
+        $this->result["f_skip_amount"] = $detail["f_skip_amount"];
+        $this->result["f_taxable_sales"] = $detail["f_taxable_sales"];
+        $this->result["f_dish_taxable_base"] = $detail["f_dish_taxable_base"];
+        $this->result["f_divide_by"] = $detail["f_divide_by"];
+        $this->echoResult();
+    }
+
     private function defaultFormula(): array
     {
         return [
@@ -500,6 +557,153 @@ class Salary extends Auth
         int $divideBy,
         float $skipAmount = -1
     ): array {
+        $rows = $this->queryDishSalaryGoodsRows($depCode, $day);
+        $windows = $byWorkingTime ? $this->attendanceWindowsOnDay($staff, $day) : [];
+
+        $fixedSum = 0.0;
+        $percentPay = 0.0;
+        $percentSales = 0.0;
+
+        foreach ($rows as $row) {
+            $line = $this->parseDishSalaryGoodsRow($row);
+            if ($line === null) {
+                continue;
+            }
+
+            if ($byWorkingTime) {
+                $appendTs = strtotime((string)($line["append_time"] ?? ''));
+                if ($appendTs === false || !$this->isTimestampInWindows($appendTs, $windows)) {
+                    continue;
+                }
+            }
+
+            if ($line["sal_fixed"] > 0.0001) {
+                $fixedSum += $line["f_qty"] * $line["sal_fixed"];
+            } elseif ($line["sal_pct"] > 0.0001) {
+                $percentSales += $line["f_total"];
+                $percentPay += $line["f_total"] * ($line["sal_pct"] / 100.0);
+            }
+        }
+
+        if ($percentPay > 0.0001 && $percentSales > 0.0001 && $skipAmount >= 0) {
+            $taxableSales = max(0.0, $percentSales - $skipAmount);
+            $percentPay *= ($taxableSales / $percentSales);
+        } else {
+            $taxableSales = $percentSales;
+        }
+
+        $divide = max(1, $divideBy);
+        return [
+            "amount" => ($fixedSum + $percentPay) / $divide,
+            "taxable_base" => ($percentSales > 0.0001 ? $taxableSales : 0.0) / $divide,
+        ];
+    }
+
+    /**
+     * Percent-dish breakdown for dish sales base column.
+     *
+     * @return array{
+     *   items: array<int, array<string, float|int|string>>,
+     *   f_sales_total: float,
+     *   f_skip_amount: float,
+     *   f_taxable_sales: float,
+     *   f_dish_taxable_base: float,
+     *   f_divide_by: int
+     * }
+     */
+    private function buildDishPercentSalesDetail(
+        int $staff,
+        int $depCode,
+        string $day,
+        bool $byWorkingTime,
+        int $divideBy,
+        float $skipAmount = -1
+    ): array {
+        $empty = [
+            "items" => [],
+            "f_sales_total" => 0.0,
+            "f_skip_amount" => $skipAmount,
+            "f_taxable_sales" => 0.0,
+            "f_dish_taxable_base" => 0.0,
+            "f_divide_by" => max(1, $divideBy),
+        ];
+
+        if ($depCode <= 0) {
+            return $empty;
+        }
+
+        $rows = $this->queryDishSalaryGoodsRows($depCode, $day);
+        $windows = $byWorkingTime ? $this->attendanceWindowsOnDay($staff, $day) : [];
+        $agg = [];
+
+        foreach ($rows as $row) {
+            $line = $this->parseDishSalaryGoodsRow($row);
+            if ($line === null || $line["sal_pct"] <= 0.0001 || $line["sal_fixed"] > 0.0001) {
+                continue;
+            }
+
+            if ($byWorkingTime) {
+                $appendTs = strtotime((string)($line["append_time"] ?? ''));
+                if ($appendTs === false || !$this->isTimestampInWindows($appendTs, $windows)) {
+                    continue;
+                }
+            }
+
+            $goodsId = (int)$line["goods_id"];
+            if (!isset($agg[$goodsId])) {
+                $agg[$goodsId] = [
+                    "f_goods" => $goodsId,
+                    "f_goods_name" => (string)$line["goods_name"],
+                    "f_qty" => 0.0,
+                    "f_sales" => 0.0,
+                    "f_percent" => (float)$line["sal_pct"],
+                ];
+            }
+
+            $agg[$goodsId]["f_qty"] += (float)$line["f_qty"];
+            $agg[$goodsId]["f_sales"] += (float)$line["f_total"];
+        }
+
+        $items = [];
+        $percentSales = 0.0;
+        foreach ($agg as $item) {
+            $sales = round((float)$item["f_sales"], 2);
+            $percent = (float)$item["f_percent"];
+            $items[] = [
+                "f_goods" => (int)$item["f_goods"],
+                "f_goods_name" => (string)$item["f_goods_name"],
+                "f_qty" => round((float)$item["f_qty"], 4),
+                "f_sales" => $sales,
+                "f_percent" => round($percent, 4),
+                "f_pay" => round($sales * ($percent / 100.0), 2),
+            ];
+            $percentSales += $sales;
+        }
+
+        usort($items, static function (array $a, array $b): int {
+            return strcmp((string)$a["f_goods_name"], (string)$b["f_goods_name"]);
+        });
+
+        if ($percentSales > 0.0001 && $skipAmount >= 0) {
+            $taxableSales = max(0.0, $percentSales - $skipAmount);
+        } else {
+            $taxableSales = $percentSales;
+        }
+
+        $divide = max(1, $divideBy);
+        return [
+            "items" => $items,
+            "f_sales_total" => round($percentSales, 2),
+            "f_skip_amount" => $skipAmount,
+            "f_taxable_sales" => round($taxableSales, 2),
+            "f_dish_taxable_base" => round(($percentSales > 0.0001 ? $taxableSales : 0.0) / $divide, 2),
+            "f_divide_by" => $divide,
+        ];
+    }
+
+    /** @return array<int, array<string, mixed>> */
+    private function queryDishSalaryGoodsRows(int $depCode, string $day): array
+    {
         $sql = <<<SQL
         SELECT
             cg.f_id AS goods_id,
@@ -519,58 +723,41 @@ class Salary extends Auth
           AND LOWER(COALESCE(JSON_UNQUOTE(JSON_VALUE(og.f_data, '$.f_printed')), 'false')) IN ('true', '1')
         SQL;
 
-        $rows = $this->select($sql, "si", [$day, $depCode])->fetch_all(MYSQLI_ASSOC);
-        $windows = $byWorkingTime ? $this->attendanceWindowsOnDay($staff, $day) : [];
+        return $this->select($sql, "si", [$day, $depCode])->fetch_all(MYSQLI_ASSOC);
+    }
 
-        $fixedSum = 0.0;
-        $percentPay = 0.0;
-        $percentSales = 0.0;
-
-        foreach ($rows as $row) {
-            $fixed = (float)($row["sal_fixed"] ?? 0);
-            $pct = (float)($row["sal_pct"] ?? 0);
-            $name = trim((string)($row["goods_name"] ?? ""));
-            $goodsId = (int)($row["goods_id"] ?? 0);
-            if ($name === '' && $goodsId > 0) {
-                $name = '#' . $goodsId;
-            }
-
-            if ($fixed > 0.0001 && $pct > 0.0001) {
-                dieWithCode(
-                    'Goods "' . $name . '": both salary fixed amount and salary percent are set in product card. '
-                    . 'Leave only one of f_salary_fixed_value or f_salary_percent_value in goods f_data.'
-                );
-            }
-
-            if ($byWorkingTime) {
-                $appendTs = strtotime((string)($row["append_time"] ?? ''));
-                if ($appendTs === false || !$this->isTimestampInWindows($appendTs, $windows)) {
-                    continue;
-                }
-            }
-
-            $qty = (float)($row["f_qty"] ?? 0);
-            $lineTotal = (float)($row["f_total"] ?? 0);
-
-            if ($fixed > 0.0001) {
-                $fixedSum += $qty * $fixed;
-            } elseif ($pct > 0.0001) {
-                $percentSales += $lineTotal;
-                $percentPay += $lineTotal * ($pct / 100.0);
-            }
+    /**
+     * @return array<string, mixed>|null
+     */
+    private function parseDishSalaryGoodsRow(array $row): ?array
+    {
+        $fixed = (float)($row["sal_fixed"] ?? 0);
+        $pct = (float)($row["sal_pct"] ?? 0);
+        $name = trim((string)($row["goods_name"] ?? ""));
+        $goodsId = (int)($row["goods_id"] ?? 0);
+        if ($name === '' && $goodsId > 0) {
+            $name = '#' . $goodsId;
         }
 
-        if ($percentPay > 0.0001 && $percentSales > 0.0001 && $skipAmount >= 0) {
-            $taxableSales = max(0.0, $percentSales - $skipAmount);
-            $percentPay *= ($taxableSales / $percentSales);
-        } else {
-            $taxableSales = $percentSales;
+        if ($fixed > 0.0001 && $pct > 0.0001) {
+            dieWithCode(
+                'Goods "' . $name . '": both salary fixed amount and salary percent are set in product card. '
+                . 'Leave only one of f_salary_fixed_value or f_salary_percent_value in goods f_data.'
+            );
         }
 
-        $divide = max(1, $divideBy);
+        if ($fixed <= 0.0001 && $pct <= 0.0001) {
+            return null;
+        }
+
         return [
-            "amount" => ($fixedSum + $percentPay) / $divide,
-            "taxable_base" => ($percentSales > 0.0001 ? $taxableSales : 0.0) / $divide,
+            "goods_id" => $goodsId,
+            "goods_name" => $name,
+            "f_qty" => (float)($row["f_qty"] ?? 0),
+            "f_total" => (float)($row["f_total"] ?? 0),
+            "sal_fixed" => $fixed,
+            "sal_pct" => $pct,
+            "append_time" => (string)($row["append_time"] ?? ''),
         ];
     }
 

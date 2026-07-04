@@ -12,7 +12,6 @@
 #include <QHBoxLayout>
 #include <QKeyEvent>
 #include <QLabel>
-#include <QLineEdit>
 #include <QMouseEvent>
 #include <QPainter>
 #include <QPaintEvent>
@@ -30,8 +29,12 @@ constexpr int kRelatedCardHeight = 260;
 constexpr int kRelatedGridColumns = 3;
 constexpr int kRelatedGridVisibleRows = 3;
 constexpr int kRelatedGridSpacing = 16;
+constexpr int kPkgPickImageSize = 220;
 constexpr int kRelatedScrollHeight = kRelatedGridVisibleRows * kRelatedCardHeight
     + (kRelatedGridVisibleRows - 1) * kRelatedGridSpacing;
+constexpr int kPkgPickTopInset = 262;
+constexpr int kPkgPickSideMargin = 24;
+constexpr int kPkgPickBottomMargin = 24;
 
 void clearLayout(QLayout *layout)
 {
@@ -152,7 +155,7 @@ DlgPackagePick::DlgPackagePick(const MenuDish &package, QWidget *parent)
     m_card->setAttribute(Qt::WA_StyledBackground, true);
 
     buildUi();
-    rebuildNutritionRow();
+    rebuildHeaderInfo();
 
     const bool hasModificators = !MenuHelpers::pickerModificators(m_package).isEmpty();
     const bool hasRelated = !m_package.relatedDrinks.isEmpty() || !m_package.relatedOther.isEmpty();
@@ -194,9 +197,10 @@ void DlgPackagePick::resizeEvent(QResizeEvent *event)
     if (!m_card) {
         return;
     }
-    const int marginH = 24;
-    const int marginV = 24;
-    m_card->setGeometry(rect().adjusted(marginH, marginV, -marginH, -marginV));
+    m_card->setGeometry(kPkgPickSideMargin,
+                        kPkgPickTopInset,
+                        qMax(0, width() - kPkgPickSideMargin * 2),
+                        qMax(0, height() - kPkgPickTopInset - kPkgPickBottomMargin));
 }
 
 void DlgPackagePick::mousePressEvent(QMouseEvent *event)
@@ -631,29 +635,43 @@ void DlgPackagePick::buildHeader()
 
     m_lblImage = new QLabel(m_card);
     m_lblImage->setObjectName(QStringLiteral("pkgPickImage"));
-    m_lblImage->setFixedSize(160, 160);
+    m_lblImage->setFixedSize(kPkgPickImageSize, kPkgPickImageSize);
     m_lblImage->setAlignment(Qt::AlignCenter);
-    setDishImageOnLabel(m_lblImage, m_package.imagePath, 160, 160);
+    setDishImageOnLabel(m_lblImage, m_package.imagePath, kPkgPickImageSize, kPkgPickImageSize);
     header->addWidget(m_lblImage, 0, Qt::AlignTop);
 
     auto *info = new QVBoxLayout();
     info->setSpacing(10);
+    info->setAlignment(Qt::AlignTop | Qt::AlignLeft);
 
     m_lblTitle = new QLabel(m_package.name, m_card);
     m_lblTitle->setObjectName(QStringLiteral("pkgPickTitle"));
-    info->addWidget(m_lblTitle);
+    m_lblTitle->setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
+    info->addWidget(m_lblTitle, 0, Qt::AlignLeft);
 
     m_lblDescription = new QLabel(m_package.description, m_card);
     m_lblDescription->setObjectName(QStringLiteral("pkgPickDescription"));
     m_lblDescription->setWordWrap(true);
-    info->addWidget(m_lblDescription);
+    m_lblDescription->setAlignment(Qt::AlignLeft | Qt::AlignTop);
+    info->addWidget(m_lblDescription, 0, Qt::AlignLeft);
 
-    m_nutritionRow = new QWidget(m_card);
-    m_nutritionRow->setObjectName(QStringLiteral("pkgPickNutritionRow"));
-    m_nutritionLayout = new QHBoxLayout(m_nutritionRow);
-    m_nutritionLayout->setContentsMargins(0, 0, 0, 0);
-    m_nutritionLayout->setSpacing(8);
-    info->addWidget(m_nutritionRow);
+    m_badgesRow = new QWidget(m_card);
+    m_badgesRow->setObjectName(QStringLiteral("pkgPickBadgesRow"));
+    m_badgesRow->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Fixed);
+    m_badgesLayout = new QHBoxLayout(m_badgesRow);
+    m_badgesLayout->setContentsMargins(0, 0, 0, 0);
+    m_badgesLayout->setSpacing(8);
+    m_badgesLayout->setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
+    info->addWidget(m_badgesRow, 0, Qt::AlignLeft);
+
+    m_bjuRow = new QWidget(m_card);
+    m_bjuRow->setObjectName(QStringLiteral("pkgPickBjuRow"));
+    m_bjuRow->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Fixed);
+    m_bjuLayout = new QHBoxLayout(m_bjuRow);
+    m_bjuLayout->setContentsMargins(0, 0, 0, 0);
+    m_bjuLayout->setSpacing(8);
+    m_bjuLayout->setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
+    info->addWidget(m_bjuRow, 0, Qt::AlignLeft);
 
     info->addStretch();
     header->addLayout(info, 1);
@@ -732,12 +750,6 @@ void DlgPackagePick::buildPersonalizePage()
     m_lblEmpty->setWordWrap(true);
     m_lblEmpty->hide();
     pageLayout->addWidget(m_lblEmpty);
-
-    m_leInstructions = new QLineEdit(m_pagePersonalize);
-    m_leInstructions->setObjectName(QStringLiteral("pkgPickInstructions"));
-    m_leInstructions->setPlaceholderText(
-        tr("Add any special instructions (allergies, important and details)"));
-    pageLayout->addWidget(m_leInstructions);
 
     auto *qtyWrap = new QFrame(m_pagePersonalize);
     qtyWrap->setObjectName(QStringLiteral("pkgPickQtyWrap"));
@@ -954,45 +966,21 @@ void DlgPackagePick::selectInitialSelections()
     }
 }
 
-void DlgPackagePick::rebuildNutritionRow()
+void DlgPackagePick::rebuildHeaderInfo()
 {
-    if (!m_nutritionLayout) {
+    if (!m_badgesLayout || !m_bjuLayout) {
         return;
     }
-    clearLayout(m_nutritionLayout);
+    clearLayout(m_badgesLayout);
+    clearLayout(m_bjuLayout);
 
     const MenuDish &dish = m_package;
-    if (dish.fat > 0.0) {
-        addBjuBox(m_nutritionRow, m_nutritionLayout,
-                  tr("%1 gr").arg(QString::number(dish.fat, 'f', 0)),
-                  tr("Fats"));
-    }
-    if (dish.carbs > 0.0) {
-        addBjuBox(m_nutritionRow, m_nutritionLayout,
-                  tr("%1 gr").arg(QString::number(dish.carbs, 'f', 0)),
-                  tr("Carbs"));
-    }
-    if (dish.protein > 0.0) {
-        addBjuBox(m_nutritionRow, m_nutritionLayout,
-                  tr("%1 gr").arg(QString::number(dish.protein, 'f', 0)),
-                  tr("Protein"));
-    }
-    if (dish.kcal > 0.0) {
-        addBjuBox(m_nutritionRow, m_nutritionLayout,
-                  tr("%1 kcal").arg(QString::number(dish.kcal, 'f', dish.kcal >= 100 ? 0 : 1)),
-                  tr("Calories"));
-    }
-
-    const int bjuCount = m_nutritionLayout->count();
 
     const auto addDietaryBadge = [&](bool enabled, const char *iconPath) {
         if (!enabled) {
             return;
         }
-        if (bjuCount > 0 && m_nutritionLayout->count() == bjuCount) {
-            m_nutritionLayout->addSpacing(12);
-        }
-        addBadgeIcon(m_nutritionRow, m_nutritionLayout, true, iconPath);
+        addBadgeIcon(m_badgesRow, m_badgesLayout, true, iconPath);
     };
 
     addDietaryBadge(dish.glutenFree, ":/dietary/gluten-free.png");
@@ -1006,9 +994,35 @@ void DlgPackagePick::rebuildNutritionRow()
         addDietaryBadge(true, ":/dietary/halal.png");
         addDietaryBadge(true, ":/dietary/kosher.png");
     }
+    m_badgesLayout->addStretch();
 
-    if (m_nutritionRow) {
-        m_nutritionRow->setVisible(m_nutritionLayout->count() > 0);
+    if (dish.fat > 0.0) {
+        addBjuBox(m_bjuRow, m_bjuLayout,
+                  tr("%1 gr").arg(QString::number(dish.fat, 'f', 0)),
+                  tr("Fats"));
+    }
+    if (dish.carbs > 0.0) {
+        addBjuBox(m_bjuRow, m_bjuLayout,
+                  tr("%1 gr").arg(QString::number(dish.carbs, 'f', 0)),
+                  tr("Carbs"));
+    }
+    if (dish.protein > 0.0) {
+        addBjuBox(m_bjuRow, m_bjuLayout,
+                  tr("%1 gr").arg(QString::number(dish.protein, 'f', 0)),
+                  tr("Protein"));
+    }
+    if (dish.kcal > 0.0) {
+        addBjuBox(m_bjuRow, m_bjuLayout,
+                  tr("%1 kcal").arg(QString::number(dish.kcal, 'f', dish.kcal >= 100 ? 0 : 1)),
+                  tr("Calories"));
+    }
+    m_bjuLayout->addStretch();
+
+    if (m_badgesRow) {
+        m_badgesRow->setVisible(m_badgesLayout->count() > 0);
+    }
+    if (m_bjuRow) {
+        m_bjuRow->setVisible(m_bjuLayout->count() > 0);
     }
 }
 

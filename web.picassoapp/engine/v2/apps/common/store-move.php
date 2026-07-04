@@ -22,9 +22,18 @@ class StoreMove extends Auth
             dieWithCode("Exit with {$result["status"]}");
         }
         $this->commit();
-        if ($params->doc->doc_status == 1) {
-            $items = $params->doc->items;
-            $worker = require_once __DIR__ . "/../../worker/ws-notify.php";
+
+        $items = [];
+        foreach ($params->doc->items ?? [] as $item) {
+            $item = (array)$item;
+            $itemId = (int)($item["item_id"] ?? 0);
+            $price = (float)($item["price"] ?? $item["f_price"] ?? 0);
+            if ($itemId > 0 && $price > 0) {
+                $items[] = ["item_id" => $itemId, "price" => $price];
+            }
+        }
+        if (!empty($items)) {
+            $worker = require __DIR__ . "/../../worker/ws-notify.php";
             $worker->updatePrices($items);
         }
         $this->echoResult();

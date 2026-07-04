@@ -1,10 +1,19 @@
 #include "menuhelpers.h"
 
+#include <QCoreApplication>
 #include <QFile>
 #include <QJsonArray>
 #include <QJsonDocument>
 
 namespace {
+
+QString formatCookingTime(int minutes)
+{
+    if (minutes <= 0) {
+        return QString();
+    }
+    return QCoreApplication::translate("MenuHelpers", "%1 Min").arg(minutes);
+}
 
 QString dynStr(const QJsonValue &v)
 {
@@ -234,9 +243,9 @@ void fillDishFromMenuRow(MenuDish &dish, const QJsonObject &row)
     dish.print1 = row.value(QStringLiteral("f_print1")).toString();
     dish.print2 = row.value(QStringLiteral("f_print2")).toString();
     dish.popular = row.value(QStringLiteral("f_recent")).toInt() > 0;
-    dish.prepTime = QStringLiteral("10 - 15 Min");
 
     const QJsonObject dataObj = parseGoodsDataObject(row.value(QStringLiteral("f_data")));
+    dish.prepTime = formatCookingTime(dataObj.value(QStringLiteral("f_cooking_time")).toInt());
     dish.countService = dataObj.value(QStringLiteral("f_count_service")).toBool();
     dish.countDiscount = dataObj.value(QStringLiteral("f_count_discount")).toBool();
     applyDietaryAndBju(dish, dataObj);
@@ -542,6 +551,13 @@ bool dishNeedsOptionsPicker(const MenuDish &dish)
         return packageNeedsAttributePicker(dish.packageComponents);
     }
     return !dish.modificators.isEmpty();
+}
+
+bool dishHasThreeStepPicker(const MenuDish &dish)
+{
+    return dish.isPackage()
+        && !dish.relatedDrinks.isEmpty()
+        && !dish.relatedOther.isEmpty();
 }
 
 } // namespace MenuHelpers

@@ -15,7 +15,6 @@ class QCheckBox;
 class QFrame;
 class QHBoxLayout;
 class QLabel;
-class QLineEdit;
 class QPushButton;
 class QStackedWidget;
 class QVBoxLayout;
@@ -72,7 +71,7 @@ private:
     void initRelatedPicks();
     void buildAttributeGroups();
     void buildModificatorGroups();
-    void rebuildNutritionRow();
+    void rebuildHeaderInfo();
     void updatePreview();
     void updateOptionPrices();
     void updateStepUi();
@@ -110,9 +109,10 @@ private:
     QLabel *m_lblTitle = nullptr;
     QLabel *m_lblDescription = nullptr;
     QLabel *m_lblEmpty = nullptr;
-    QWidget *m_nutritionRow = nullptr;
-    QHBoxLayout *m_nutritionLayout = nullptr;
-    QLineEdit *m_leInstructions = nullptr;
+    QWidget *m_badgesRow = nullptr;
+    QHBoxLayout *m_badgesLayout = nullptr;
+    QWidget *m_bjuRow = nullptr;
+    QHBoxLayout *m_bjuLayout = nullptr;
 
     QVBoxLayout *m_sidebarLayout = nullptr;
     QVector<QWidget *> m_stepItems;

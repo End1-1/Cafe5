@@ -1,4 +1,5 @@
 #include "dlgpin.h"
+#include <QJsonArray>
 #include <QJsonObject>
 #include <QKeyEvent>
 #include "appwebsocket.h"
@@ -94,6 +95,13 @@ void DlgPin::on_btnEnter_clicked()
             mUser->fSettings = settings;
             mUser->fConfig = jo["config"].toObject()["f_config"].toObject();
             mUser->mSessionKey = NDataProvider::sessionKey;
+            mUser->active = jo.value(QStringLiteral("active")).toBool();
+
+            const QJsonArray jpermissions = jo.value(QStringLiteral("permissions")).toArray();
+
+            for (int i = 0; i < jpermissions.count(); i++) {
+                mUser->addPermission(jpermissions.at(i).toInt());
+            }
 
             AppWebSocket::reconnect((C5ConnectionDialog::instance()->connectionType()
                                              == C5ConnectionDialog::instance()->noneSecure

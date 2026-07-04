@@ -221,6 +221,7 @@ set(APP_SOURCES
     rabstracteditorreport.ui
     rworkstationsreport.ui
     dlgservicevalue.ui
+    dlgsalarydishsales.ui
     c5revenuecashop.ui
     wdashboardsettings.ui
     rwaiterstationconfig.ui
@@ -897,6 +898,7 @@ add_executable(OfficeN ${APP_SOURCES}
     rmenureviewreport.h rmenureviewreport.cpp
     rworkstationsreport.h rworkstationsreport.cpp
     dlgservicevalue.h dlgservicevalue.cpp
+    dlgsalarydishsales.h dlgsalarydishsales.cpp
     rservicevaluesreport.h rservicevaluesreport.cpp)
 
 set_target_properties(OfficeN PROPERTIES
@@ -991,14 +993,15 @@ target_link_libraries(OfficeN PRIVATE
 if(TARGET ZKFingerprint)
     target_link_libraries(OfficeN PRIVATE ZKFingerprint)
 
-    if(ZKFP_RUNTIME_DLL)
+    foreach(_zkfp_runtime_dll IN LISTS ZKFP_RUNTIME_DLLS)
+        get_filename_component(_zkfp_runtime_name "${_zkfp_runtime_dll}" NAME)
         add_custom_command(TARGET OfficeN POST_BUILD
             COMMAND ${CMAKE_COMMAND} -E copy_if_different
-                    "${ZKFP_RUNTIME_DLL}"
+                    "${_zkfp_runtime_dll}"
                     "$<TARGET_FILE_DIR:OfficeN>"
-            COMMENT "Copy libzkfp.dll next to OfficeN"
+            COMMENT "Copy ${_zkfp_runtime_name} next to OfficeN"
         )
-    endif()
+    endforeach()
 endif()
 
 # -----------------------

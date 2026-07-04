@@ -7,6 +7,7 @@
 #include <QTimer>
 #include <QJsonDocument>
 #include <QJsonArray>
+#include <QHash>
 #include <QMap>
 
 namespace Ui
@@ -23,6 +24,8 @@ public:
 
     template<typename T>
     static QVector<T> get(const QString &searchEngine, bool getAllListFirst, bool multiSelect, QPoint point);;
+
+    static void updateGoodsLastInputPrices(const QHash<int, double> &prices);
 
     template<typename T>
     void handleSearchResult(const QJsonArray &jarr, C5StructModel<T>* model)

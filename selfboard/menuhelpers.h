@@ -88,6 +88,9 @@ QString cartLineKey(const MenuDish &dish);
 /** Package attribute picker and/or modificator picker. */
 bool dishNeedsOptionsPicker(const MenuDish &dish);
 
+/** Package with Personalize + Drink + Extra steps (related drinks and extras). */
+bool dishHasThreeStepPicker(const MenuDish &dish);
+
 } // namespace MenuHelpers
 
 #endif // MENUHELPERS_H

@@ -16,11 +16,12 @@
     color: rgba(255, 255, 255, 0.55);
     font-size: 22px;
     font-weight: 400;
-    padding: 12px 24px;
+    padding: 0 24px;
     border: 2px dashed rgba(255, 255, 255, 0.35);
     border-radius: 8px;
     min-width: 280px;
-    min-height: 48px;
+    min-height: 225px;
+    max-height: 225px;
 }
 
 #btnTakeAway,
@@ -222,46 +223,109 @@
     padding-right: 12px;
 }
 
-#btnHome,
 #btnServiceMode {
-    background-color: transparent;
+    background-color: #ffffff;
     border: none;
+    border-radius: 0;
     color: #2a2a2a;
     font-size: 18px;
     font-weight: 500;
-    padding: 8px 4px;
+    padding: 8px 6px;
     text-align: left;
+    min-height: 44px;
+}
+
+#btnServiceMode:hover,
+#btnServiceMode:pressed {
+    background-color: #ffffff;
+}
+
+#lblServiceModeText {
+    color: #2a2a2a;
+    font-size: 18px;
+    font-weight: 500;
+    background-color: transparent;
+}
+
+#lblServiceModeIcon,
+#lblServiceModeReload {
+    background-color: transparent;
+}
+
+#menuServiceMode {
+    background-color: #ffffff;
+    border: 1px solid #dddddd;
+    border-radius: 0;
+    padding: 10px 0;
+}
+
+#menuServiceMode::item {
+    font-size: 17px;
+    font-weight: 600;
+    color: #1a1a1a;
+    padding: 14px 20px 14px 16px;
+    margin: 4px 10px;
+    border-radius: 0;
+}
+
+#menuServiceMode::item:selected {
+    background-color: #f0f6cc;
+}
+
+#menuServiceMode::icon {
+    padding-left: 4px;
+    padding-right: 12px;
 }
 
 #btnMenuGroup {
-    background-color: transparent;
+    background-color: #ffffff;
     border: none;
-    border-radius: 8px;
+    border-radius: 0;
     color: #2a2a2a;
     font-size: 17px;
     font-weight: 500;
-    padding: 8px 6px;
-    text-align: left;
+    padding: 0;
+    min-width: 240px;
+    max-width: 240px;
+    min-height: 72px;
+}
+
+#lblMenuGroupIcon {
+    background: transparent;
+    border: none;
+}
+
+#lblMenuGroupName {
+    color: #2a2a2a;
+    font-size: 17px;
+    font-weight: 500;
+    background: transparent;
+    border: none;
+}
+
+#scrollGroups QScrollBar:vertical,
+#scrollGroups QScrollBar:horizontal {
+    width: 0px;
+    height: 0px;
+    margin: 0;
+    background: transparent;
+}
+
+#widgetGroupsHost {
+    background-color: #ececec;
+    min-width: 240px;
+    max-width: 240px;
+}
+
+#btnMenuGroup:hover,
+#btnMenuGroup:pressed {
+    background-color: #ffffff;
 }
 
 #btnMenuGroup:checked {
     background-color: #ffffff;
     font-weight: 700;
-}
-
-#btnGroupChip {
-    background-color: #e4e4e4;
-    border: none;
-    border-radius: 12px;
-    color: #2a2a2a;
-    font-size: 17px;
-    font-weight: 500;
-    padding: 10px 20px;
-}
-
-#btnGroupChip:checked {
-    background-color: #b8b8b8;
-    font-weight: 700;
+    color: #1a1a1a;
 }
 
 #leSearch {
@@ -294,17 +358,14 @@
     background-color: #ececec;
 }
 
-#widgetChipsHost,
-#widgetGroupsHost {
-    background-color: #ececec;
-}
-
 #lblBanner {
     background-color: #e0e0e0;
     border: none;
     border-radius: 8px;
     color: #888888;
     font-size: 20px;
+    min-height: 225px;
+    max-height: 225px;
 }
 
 #frameAppPromo {
@@ -335,7 +396,7 @@
 
 #dishCardGrid {
     background-color: #ffffff;
-    border: 1px solid #e8e8e8;
+    border: 1px solid #e0e0e0;
     border-radius: 20px;
     min-width: 376px;
     max-width: 376px;
@@ -347,12 +408,14 @@
     font-size: 24px;
     font-weight: 600;
     color: #1a1a1a;
+    background: transparent;
+    border: none;
 }
 
 #dishCardPopular,
 #dishCardListing {
     background-color: #ffffff;
-    border: 1px solid #e8e8e8;
+    border: 1px solid #e0e0e0;
     border-radius: 16px;
     min-width: 236px;
     max-width: 236px;
@@ -364,22 +427,30 @@
     font-size: 22px;
     font-weight: 700;
     color: #1a1a1a;
+    background: transparent;
+    border: none;
 }
 
 #dishPopularSubtitle {
     font-size: 16px;
     color: #777777;
+    background: transparent;
+    border: none;
 }
 
 #dishPopularTime {
     font-size: 14px;
     color: #666666;
+    background: transparent;
+    border: none;
 }
 
 #dishPopularPrice {
     font-size: 20px;
     font-weight: 700;
     color: #1a1a1a;
+    background: transparent;
+    border: none;
 }
 
 #dishPopularInfo {
@@ -428,6 +499,113 @@
 }
 
 #DlgPackagePick {
+    background-color: transparent;
+}
+
+#DlgDishDetails {
+    background-color: transparent;
+}
+
+#dishDetailsCard {
+    background-color: #ffffff;
+    border: 1px solid #e8e8e8;
+    border-radius: 24px;
+}
+
+#dishDetailsDivider {
+    background-color: #eeeeee;
+    border: none;
+}
+
+#dishDetailsDialogTitle {
+    font-size: 22px;
+    font-weight: 700;
+    color: #1a1a1a;
+}
+
+#dishDetailsCloseBtn {
+    background-color: #f3f3f3;
+    border: none;
+    border-radius: 22px;
+    color: #333333;
+    font-size: 28px;
+    font-weight: 400;
+}
+
+#dishDetailsCloseBtn:hover {
+    background-color: #e8e8e8;
+}
+
+#dishDetailsImage {
+    border-radius: 16px;
+    background-color: #f3f3f3;
+}
+
+#dishDetailsName {
+    font-size: 28px;
+    font-weight: 700;
+    color: #1a1a1a;
+}
+
+#dishDetailsGroup {
+    font-size: 16px;
+    color: #777777;
+}
+
+#dishDetailsPrepTime {
+    font-size: 15px;
+    color: #666666;
+}
+
+#dishDetailsPrice {
+    font-size: 22px;
+    font-weight: 700;
+    color: #1a1a1a;
+}
+
+#dishDetailsDescription {
+    font-size: 16px;
+    color: #666666;
+    line-height: 1.45;
+}
+
+#dishDetailsAttributes,
+#dishDetailsModifiers {
+    font-size: 16px;
+    color: #444444;
+    line-height: 1.4;
+}
+
+#dishDetailsBadgesRow,
+#dishDetailsBjuRow {
+    margin-top: 4px;
+}
+
+#dishDetailsBjuBox {
+    background-color: #f3f3f3;
+    border-radius: 10px;
+    min-width: 76px;
+    max-width: 96px;
+}
+
+#dishDetailsBjuValue {
+    font-size: 15px;
+    font-weight: 700;
+    color: #1a1a1a;
+}
+
+#dishDetailsBjuTitle {
+    font-size: 12px;
+    font-weight: 500;
+    color: #666666;
+}
+
+#dishDetailsBjuDivider {
+    background-color: #dddddd;
+    border: none;
+}
+
+#dishDetailsBadgeIcon {
     background-color: transparent;
 }
 
@@ -509,10 +687,6 @@
     font-weight: 700;
     color: #1a1a1a;
     padding-bottom: 4px;
-}
-
-#pkgPickNutritionRow {
-    margin-top: 4px;
 }
 
 #pkgPickBjuBox {
@@ -768,24 +942,37 @@
     font-size: 28px;
     font-weight: 700;
     color: #1a1a1a;
+    qproperty-alignment: 'AlignLeft | AlignVCenter';
 }
 
 #pkgPickDescription {
     font-size: 16px;
     color: #666666;
     line-height: 1.4;
+    qproperty-alignment: 'AlignLeft | AlignTop';
+}
+
+#pkgPickBadgesRow,
+#pkgPickBjuRow {
+    margin-top: 4px;
 }
 
 #pkgPickImage {
     border-radius: 16px;
     background-color: #f3f3f3;
+    min-width: 220px;
+    max-width: 220px;
+    min-height: 220px;
+    max-height: 220px;
 }
 
 /* legacy BJU boxes kept for compatibility */
 
 #dishTileImage,
 #dishGridImage {
-    background-color: transparent;
+    background: transparent;
+    border: none;
+    qproperty-alignment: AlignCenter;
 }
 
 #pkgPickInstructions {
@@ -933,118 +1120,195 @@
     background-color: #f3f3f3;
 }
 
+#DlgCart #widgetHeader {
+    background-color: #f3f3f3;
+}
+
+#DlgCart #widgetHeaderLeft {
+    background-color: transparent;
+}
+
 #DlgCart #lblTitle {
-    font-size: 28px;
+    font-size: 26px;
     font-weight: 700;
     color: #1a1a1a;
-    padding: 16px 24px 8px 24px;
+    letter-spacing: 0.5px;
+    padding: 14px 24px 10px 24px;
+    background: transparent;
+}
+
+#DlgCart #frameTitleRule {
+    color: #d0d0d0;
+    background-color: #d0d0d0;
+    border: none;
+    margin: 0 24px 16px 24px;
+    max-height: 1px;
 }
 
 #DlgCart #lblBanner {
     color: rgba(0, 0, 0, 0.45);
     font-size: 22px;
+    font-weight: 400;
     border: 2px dashed #cccccc;
     border-radius: 8px;
-    min-height: 96px;
+    min-height: 225px;
+    max-height: 225px;
     background-color: #e8e8e8;
 }
 
-#cartLineCard {
+#DlgCart #scrollCart,
+#DlgCart #widgetCartHost {
+    background-color: #f3f3f3;
+    border: none;
+}
+
+#DlgCart #cartLineRow {
+    background: transparent;
+}
+
+#DlgCart #cartLineCard {
     background-color: #ffffff;
+    border: none;
     border-radius: 16px;
 }
 
-#cartLineName {
+#DlgCart #cartLineCard QLabel {
+    background: transparent;
+    border: none;
+}
+
+#DlgCart #cartLineImage {
+    border-radius: 12px;
+    background-color: #f3f3f3;
+}
+
+#DlgCart #cartLineName {
     font-size: 24px;
     font-weight: 700;
     color: #1a1a1a;
 }
 
-#cartLineModifiers {
+#DlgCart #cartLineCategory,
+#DlgCart #cartLineVariant {
     font-size: 16px;
+    font-weight: 400;
+    color: #777777;
+}
+
+#DlgCart #cartLineModifiers {
+    font-size: 16px;
+    font-weight: 400;
+    color: #1a1a1a;
+    line-height: 1.35;
+    padding-top: 4px;
+}
+
+#DlgCart #cartLineUnitPrice {
+    font-size: 16px;
+    font-weight: 400;
     color: #666666;
 }
 
-#cartLinePrice {
-    font-size: 18px;
-    font-weight: 600;
-    color: #1a1a1a;
-}
-
-#cartLineEditLabel {
-    font-size: 16px;
-    color: #666666;
-}
-
-#cartQtyWrap {
-    background-color: #f0f0f0;
-    border-radius: 28px;
-}
-
-#cartQtyMinus {
-    background-color: #f5f0c8;
-    border: none;
-    border-radius: 28px;
-    font-size: 26px;
-    font-weight: 600;
-    color: #1a1a1a;
-    min-width: 56px;
-    max-width: 56px;
-    min-height: 56px;
-    max-height: 56px;
-}
-
-#cartQtyPlus {
-    background-color: #c5db00;
-    border: none;
-    border-radius: 28px;
-    font-size: 26px;
-    font-weight: 600;
-    color: #1a1a1a;
-    min-width: 56px;
-    max-width: 56px;
-    min-height: 56px;
-    max-height: 56px;
-}
-
-#cartQtyValue {
-    font-size: 22px;
+#DlgCart #cartLineTotalPrice {
+    font-size: 20px;
     font-weight: 700;
     color: #1a1a1a;
+    padding-top: 2px;
+    padding-bottom: 8px;
 }
 
-#cartEmptyLabel {
+#DlgCart #cartLineEditLabel {
+    font-size: 16px;
+    font-weight: 400;
+    color: #666666;
+    text-decoration: underline;
+}
+
+#DlgCart #cartQtyWrap {
+    background-color: #ececec;
+    border-radius: 28px;
+}
+
+#DlgCart #cartQtyMinus {
+    background-color: #f5f0c8;
+    border: none;
+    border-radius: 22px;
+    font-size: 22px;
+    font-weight: 600;
+    color: #1a1a1a;
+    min-width: 44px;
+    max-width: 44px;
+    min-height: 44px;
+    max-height: 44px;
+}
+
+#DlgCart #cartQtyPlus {
+    background-color: #c5db00;
+    border: none;
+    border-radius: 22px;
+    font-size: 22px;
+    font-weight: 600;
+    color: #1a1a1a;
+    min-width: 44px;
+    max-width: 44px;
+    min-height: 44px;
+    max-height: 44px;
+}
+
+#DlgCart #cartQtyValue {
+    font-size: 20px;
+    font-weight: 700;
+    color: #1a1a1a;
+    min-width: 40px;
+    max-width: 40px;
+    background: transparent;
+}
+
+#DlgCart #cartEmptyLabel {
     font-size: 22px;
     color: #666666;
     padding: 48px 24px;
+    background: transparent;
+}
+
+#DlgCart #widgetOrderBar {
+    background-color: #ffffff;
+    border-top: 1px solid #dddddd;
 }
 
 #DlgCart #btnOrderMore {
     background-color: #e8e8e8;
     border: none;
     border-radius: 12px;
-    font-size: 20px;
+    font-size: 18px;
     font-weight: 700;
     color: #1a1a1a;
     min-height: 72px;
-    padding: 0 24px;
+    min-width: 220px;
+    padding: 0 20px;
 }
 
 #DlgCart #btnGoToPay {
     background-color: #c5db00;
     border: none;
     border-radius: 12px;
-    font-size: 20px;
+    font-size: 18px;
     font-weight: 700;
-    color: #1a1a1a;
+    color: #ffffff;
     min-height: 72px;
+    min-width: 280px;
     padding: 0 24px;
 }
 
-#DlgCart #lblCartSummary {
+#DlgCart #widgetCartSummary {
+    background: transparent;
+}
+
+#DlgCart #lblCartAmount {
     font-size: 22px;
     font-weight: 700;
     color: #1a1a1a;
+    background: transparent;
 }
 
 #DlgCart #widgetFooter,

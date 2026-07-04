@@ -1,14 +1,18 @@
 #include "working.h"
+#include <QFile>
 #include <QInputDialog>
 #include <QKeyEvent>
 #include <QMessageBox>
 #include <QMovie>
+#include <QPageSize>
+#include <QPrinter>
 #include <QPrinterInfo>
 #include <QProcess>
 #include <QScreen>
 #include <QSettings>
 #include <QShortcut>
 #include <QTimer>
+#include <QtMath>
 #include "c5cleartablewidget.h"
 #include "c5message.h"
 #include "c5permissions.h"
@@ -22,6 +26,7 @@
 #include "dlgpin.h"
 #include "dlgregistercard.h"
 #include "dlgshowcolumns.h"
+#include "dqty.h"
 #include "ndataprovider.h"
 #include "ninterface.h"
 #include "printreceiptgroup.h"
@@ -32,6 +37,7 @@
 #include "ui_working.h"
 #include "wcustomerdisplay.h"
 #include "worder.h"
+#include "wsession.h"
 
 QHash<QString, int> Working::fGoodsRows;
 QMap<QString, double> Working::fUnitDefaultQty;
@@ -151,7 +157,8 @@ Working::Working(C5User *user, QWidget *parent) :
     ui->lbHost->setText(NDataProvider::mHost);
     fHttp = new NInterface(this);
     mMovie = new QMovie(":/progressbar.gif");
-    newSale(1);
+    setSaleControlsEnabled(false);
+    checkCashboxSession();
 }
 
 Working::~Working()
@@ -234,7 +241,7 @@ void Working::getGoods(int id)
 
 WOrder* Working::worder()
 {
-    return static_cast<WOrder*>(ui->tab->currentWidget());
+    return qobject_cast<WOrder *>(ui->tab->currentWidget());
 }
 
 void Working::loadStaff()
@@ -264,8 +271,189 @@ void Working::loadStaff()
     // }
 }
 
+void Working::checkCashboxSession()
+{
+    const int cashboxId = mWorkStation.cashboxId();
+
+    if (cashboxId <= 0) {
+        showSessionWidget();
+        return;
+    }
+
+    NInterface::query1(QStringLiteral("/engine/v2/waiter/cashbox/check-status"),
+                       mUser->mSessionKey,
+                       this,
+                       {{QStringLiteral("cashbox_id"), cashboxId}},
+                       [this](const QJsonObject &jdoc) {
+                           const QJsonObject session = jdoc.value(QStringLiteral("cashbox_session")).toObject();
+
+                           if (session.value(QStringLiteral("f_id")).toInt() > 0) {
+                               mSessionActive = true;
+                               setSaleControlsEnabled(true);
+                               newSale(1);
+                           } else {
+                               showSessionWidget();
+                           }
+                       });
+}
+
+void Working::showSessionWidget()
+{
+    mSessionActive = false;
+    setSaleControlsEnabled(false);
+
+    while (ui->tab->count() > 0) {
+        QWidget *w = ui->tab->widget(0);
+        ui->tab->removeTab(0);
+        w->deleteLater();
+    }
+
+    auto *ws = new WSession(mUser, this);
+    ui->tab->addTab(ws, tr("Session"));
+    ui->tab->setTabsClosable(false);
+    connect(ws, &WSession::sessionOpened, this, &Working::onSessionOpened);
+}
+
+void Working::onSessionOpened()
+{
+    if (mSessionActive) {
+        return;
+    }
+
+    auto *ws = qobject_cast<WSession *>(ui->tab->currentWidget());
+
+    if (ws) {
+        ui->tab->removeTab(ui->tab->currentIndex());
+        ws->deleteLater();
+    }
+
+    ui->tab->setTabsClosable(true);
+    mSessionActive = true;
+    setSaleControlsEnabled(true);
+    newSale(1);
+}
+
+void Working::setSaleControlsEnabled(bool enabled)
+{
+    ui->btnNewRetail->setEnabled(enabled);
+    ui->btnNewWhosale->setEnabled(enabled);
+    ui->btnWriteOrder->setEnabled(enabled);
+    ui->btnCloseSession->setEnabled(enabled && mUser->check(cp_t5_waiter_open_close_shift));
+}
+
+void Working::printCloseSessionReport(const QJsonObject &cashbox, bool cashCounted)
+{
+    C5Printing p;
+    QPrinterInfo pi = QPrinterInfo::printerInfo(mWorkStation.defaultPrinter());
+    QPrinter printer(pi);
+    printer.setPageSize(QPageSize::Custom);
+    printer.setFullPage(false);
+    QRectF pr = printer.pageRect(QPrinter::DevicePixel);
+    constexpr qreal SAFE_RIGHT_MM = 4.0;
+    qreal safePx = SAFE_RIGHT_MM * printer.logicalDpiX() / 25.4;
+    p.setSceneParams(pr.width() - safePx, pr.height(), printer.logicalDpiX());
+    p.setFont(qApp->font());
+    p.setFontSize(22);
+    const QString logoFile = qApp->applicationDirPath() + "/logo_receipt.png";
+
+    if (QFile::exists(logoFile)) {
+        p.image(logoFile, Qt::AlignHCenter);
+        p.br();
+    }
+
+    p.ctext(tr("Closing session") + " " + QString::number(cashbox.value(QStringLiteral("f_id")).toInt()));
+    p.br();
+    p.br();
+    p.lrtext(tr("Open"), cashbox.value(QStringLiteral("f_date_open")).toString());
+    p.br();
+    p.rtext(cashbox.value(QStringLiteral("f_user_open_name")).toString());
+    p.br();
+    p.br();
+    p.lrtext(tr("Close"), cashbox.value(QStringLiteral("f_date_close")).toString());
+    p.br();
+    p.rtext(cashbox.value(QStringLiteral("f_user_close_name")).toString());
+    p.br();
+    p.br();
+    p.lrtext(tr("Operations"), QString::number(cashbox.value(QStringLiteral("f_orders_count")).toInt()));
+    p.br();
+    p.lrtext(tr("Shift total"), cashbox.value(QStringLiteral("f_amount_expected")).toString());
+    p.br();
+
+    if (cashCounted) {
+        const QString expectedCash = cashbox.value(QStringLiteral("f_amount_expected_cash")).toString();
+
+        if (!expectedCash.isEmpty()) {
+            p.lrtext(tr("Expected cash"), expectedCash);
+            p.br();
+        }
+
+        p.lrtext(tr("Counted cash"), cashbox.value(QStringLiteral("f_amount_fact")).toString());
+        p.br();
+    }
+
+    const double diffRaw = cashbox.value(QStringLiteral("f_amount_difference_raw")).toVariant().toDouble();
+
+    if (qAbs(diffRaw) > 0.009) {
+        const QString diffLabel = diffRaw > 0 ? tr("Cash Overage") : tr("Cash Shortage");
+        p.lrtext(diffLabel, cashbox.value(QStringLiteral("f_amount_difference")).toString());
+        p.br();
+    }
+
+    p.line();
+    p.br();
+    p.print(printer);
+}
+
+void Working::printDifferenceAct(const QJsonObject &cashbox)
+{
+    C5Printing p;
+    QPrinterInfo pi = QPrinterInfo::printerInfo(mWorkStation.defaultPrinter());
+    QPrinter printer(pi);
+    printer.setPageSize(QPageSize::Custom);
+    printer.setFullPage(false);
+    QRectF pr = printer.pageRect(QPrinter::DevicePixel);
+    constexpr qreal SAFE_RIGHT_MM = 4.0;
+    qreal safePx = SAFE_RIGHT_MM * printer.logicalDpiX() / 25.4;
+    p.setSceneParams(pr.width() - safePx, pr.height(), printer.logicalDpiX());
+    p.setFont(qApp->font());
+    p.setFontSize(22);
+
+    const double diffRaw = cashbox.value(QStringLiteral("f_amount_difference_raw")).toVariant().toDouble();
+    const bool overage = diffRaw > 0;
+
+    p.ctext(overage ? tr("Cash Overage Act") : tr("Cash Shortage Act"));
+    p.br();
+    p.ctext(tr("Session") + " " + QString::number(cashbox.value(QStringLiteral("f_id")).toInt()));
+    p.br();
+    p.br();
+    p.lrtext(tr("Close"), cashbox.value(QStringLiteral("f_date_close")).toString());
+    p.br();
+    p.rtext(cashbox.value(QStringLiteral("f_user_close_name")).toString());
+    p.br();
+    p.br();
+    const QString expectedCash = cashbox.value(QStringLiteral("f_amount_expected_cash")).toString();
+    p.lrtext(expectedCash.isEmpty() ? tr("Expected amount") : tr("Expected cash"),
+             expectedCash.isEmpty() ? cashbox.value(QStringLiteral("f_amount_expected")).toString() : expectedCash);
+    p.br();
+    p.lrtext(tr("Counted cash"), cashbox.value(QStringLiteral("f_amount_fact")).toString());
+    p.br();
+    p.lrtext(overage ? tr("Cash Overage") : tr("Cash Shortage"),
+             cashbox.value(QStringLiteral("f_amount_difference")).toString());
+    p.br();
+    p.line();
+    p.br();
+    p.br();
+    p.lrtext(tr("Signature"), QStringLiteral("______________"));
+    p.br();
+    p.print(printer);
+}
+
 WOrder* Working::newSale(int type)
 {
+    if (!mSessionActive) {
+        return nullptr;
+    }
+
     WOrder *w = new WOrder(mUser, type, fCustomerDisplay, this);
     QObjectList ol = w->children();
 
@@ -540,19 +728,43 @@ void Working::uploadDataFinished()
 }
 void Working::shortcutEscape()
 {
-    worder()->clearCode();
+    WOrder *w = worder();
+
+    if (!w) {
+        return;
+    }
+
+    w->clearCode();
 }
 void Working::shortcutMinus()
 {
-    worder()->keyMinus();
+    WOrder *w = worder();
+
+    if (!w) {
+        return;
+    }
+
+    w->keyMinus();
 }
 void Working::shortcutPlus()
 {
-    worder()->keyPlus();
+    WOrder *w = worder();
+
+    if (!w) {
+        return;
+    }
+
+    w->keyPlus();
 }
 void Working::shortcutAsterix()
 {
-    worder()->keyAsterix();
+    WOrder *w = worder();
+
+    if (!w) {
+        return;
+    }
+
+    w->keyAsterix();
 }
 void Working::shortcutF1()
 {
@@ -855,4 +1067,62 @@ void Working::on_btnCashout_clicked()
 void Working::on_btnBooking_clicked()
 {
     openSearch();
+}
+
+void Working::on_btnCloseSession_clicked()
+{
+    if (!mSessionActive) {
+        return;
+    }
+
+    if (!mUser->check(cp_t5_waiter_open_close_shift)) {
+        C5Message::error(mUser->error());
+        return;
+    }
+
+    if (C5Message::question(tr("Do you want to close active session?")) != QDialog::Accepted) {
+        return;
+    }
+
+    double amount_cash = 0;
+    const bool cashCounted = mWorkStation.data.value(QStringLiteral("input_cashbox_amount_before_close")).toBool();
+
+    if (cashCounted) {
+        amount_cash = DQty::getQty(tr("Cash in drawer"), 0, this);
+
+        if (amount_cash < 0) {
+            return;
+        }
+    }
+
+    QJsonObject closeParams;
+    closeParams[QStringLiteral("cashbox_id")] = mWorkStation.cashboxId();
+    closeParams[QStringLiteral("amount_cash")] = amount_cash;
+
+    if (cashCounted) {
+        closeParams[QStringLiteral("cash_counted")] = true;
+    }
+
+    NInterface::query1(QStringLiteral("/engine/v2/waiter/cashbox/close"),
+                       mUser->mSessionKey,
+                       this,
+                       closeParams,
+                       [this, cashCounted](const QJsonObject &jdoc) {
+                           const QJsonObject cashbox = jdoc.value(QStringLiteral("cashbox")).toObject();
+                           printCloseSessionReport(cashbox, cashCounted);
+
+                           if (cashCounted) {
+                               const double diffRaw = cashbox.value(QStringLiteral("f_amount_difference_raw")).toVariant().toDouble();
+
+                               if (qAbs(diffRaw) > 0.009) {
+                                   const QString diffLabel = diffRaw > 0
+                                       ? tr("Cash Overage")
+                                       : tr("Cash Shortage");
+                                   C5Message::info(diffLabel + ": " + cashbox.value(QStringLiteral("f_amount_difference")).toString());
+                                   printDifferenceAct(cashbox);
+                               }
+                           }
+
+                           showSessionWidget();
+                       });
 }

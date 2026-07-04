@@ -113,7 +113,7 @@ int main(int argc, char* argv[])
             const int eq = s.indexOf(QLatin1Char('='));
             if (eq > 0) {
                 const QString subPath = s.mid(eq + 1).trimmed();
-                C5Config::fSettingsSubPath = subPath;
+                //C5Config::fSettingsSubPath = subPath;
                 C5ConnectionDialog::mSettingsPath = subPath;
             }
         }

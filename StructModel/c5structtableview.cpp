@@ -19,6 +19,33 @@
 
 QMap<QString, QJsonArray> C5StructTableView::sLastResultsByEngine;
 
+void C5StructTableView::updateGoodsLastInputPrices(const QHash<int, double> &prices)
+{
+    if (prices.isEmpty()) {
+        return;
+    }
+
+    const QString engine = SelectorName<GoodsItem>::value;
+    if (!sLastResultsByEngine.contains(engine)) {
+        return;
+    }
+
+    QJsonArray updated;
+    const QJsonArray cached = sLastResultsByEngine.value(engine);
+
+    for (const QJsonValue &value : cached) {
+        QJsonObject item = value.toObject();
+        const int itemId = item.value(QStringLiteral("f_id")).toInt();
+        const auto it = prices.constFind(itemId);
+        if (it != prices.constEnd()) {
+            item[QStringLiteral("f_lastinputprice")] = *it;
+        }
+        updated.append(item);
+    }
+
+    sLastResultsByEngine[engine] = updated;
+}
+
 C5StructTableView::C5StructTableView(C5User *user)
     : C5Dialog(user), ui(new Ui::C5StructTableView)
 {

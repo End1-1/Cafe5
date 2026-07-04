@@ -31,7 +31,10 @@
 #include "ce5goods.h"
 #include "ce5partner.h"
 #include "format_date.h"
+#include "ninterface.h"
+#include "c5structtableview.h"
 #include "ui_c5storeinput.h"
+#include <QDialog>
 #include <xlsxdocument.h>
 
 C5StoreInput::C5StoreInput(C5User *user, const QString &title, QIcon icon, QWidget *parent)
@@ -82,6 +85,13 @@ C5StoreInput::C5StoreInput(C5User *user, const QString &title, QIcon icon, QWidg
         ui->wCurrency->setCodeAndName(__c5config.getRegValue("storedoc_pinned_currency_id").toInt(),
                                       __c5config.getRegValue("storedoc_pinned_currency_name").toString());
     }
+    ui->btnPinDate->setChecked(__c5config.getRegValue("storedoc_pin_date", false).toBool());
+    if (ui->btnPinDate->isChecked()) {
+        const QDate pinnedDate = __c5config.getRegValue("storedoc_pinned_date").toDate();
+        if (pinnedDate.isValid()) {
+            ui->deDate->setDate(pinnedDate);
+        }
+    }
 
     adjustSize();
 
@@ -107,6 +117,7 @@ C5StoreInput::C5StoreInput(C5User *user, const QString &title, QIcon icon, QWidg
         __c5config.setRegValue("storedoc_pinned_currency_id", ui->wCurrency->value());
         __c5config.setRegValue("storedoc_pinned_currency_name", ui->wCurrency->name());
     });
+    captureInitialState();
 }
 
 C5StoreInput::~C5StoreInput()
@@ -118,6 +129,7 @@ C5StoreInput::~C5StoreInput()
 void C5StoreInput::setDocument(StoreInputDocument doc)
 {
     mDocData = doc;
+    mDocumentPersisted = !doc.uuid.isEmpty();
     ui->deDate->setDate(QDateTime::fromString(doc.date, FORMAT_DATETIME_TO_STR_MYSQL).date());
     ui->leDocNum->setText(doc.user_id);
     ui->wInputStore->setCodeAndName(doc.store_in, doc.store_in_name);
@@ -146,6 +158,7 @@ void C5StoreInput::setDocument(StoreInputDocument doc)
     ui->leTotal->setData(doc.sum);
     ui->leTotalQty->setDouble(totalQty);
     setState();
+    captureInitialState();
 }
 
 QToolBar *C5StoreInput::toolBar()
@@ -194,6 +207,119 @@ bool C5StoreInput::removeDoc(QString id, bool showmessage)
 
 bool C5StoreInput::allowChangeDatabase()
 {
+    return false;
+}
+
+void C5StoreInput::captureInitialState()
+{
+    mInitialDate = ui->deDate->date();
+    mInitialStoreId = ui->wInputStore->value();
+    mInitialPartnerId = ui->wPartner->value();
+    mInitialCurrencyId = ui->wCurrency->value();
+    mInitialCashboxId = ui->wCashbox->value();
+    mInitialPaymentTypeId = ui->wPaymentType->value();
+    mInitialComment = ui->leComment->text();
+    mInitialDocNum = ui->leDocNum->text();
+}
+
+bool C5StoreInput::hasUnsavedChanges() const
+{
+    if (mDocumentPersisted) {
+        return false;
+    }
+
+    if (ui->tblGoods->rowCount() > 0 || ui->tblAdd->rowCount() > 0) {
+        return true;
+    }
+
+    if (ui->leComment->text().trimmed() != mInitialComment.trimmed()) {
+        return true;
+    }
+
+    if (ui->leDocNum->text().trimmed() != mInitialDocNum.trimmed()) {
+        return true;
+    }
+
+    if (ui->deDate->date() != mInitialDate) {
+        return true;
+    }
+
+    if (ui->wInputStore->value() != mInitialStoreId) {
+        return true;
+    }
+
+    if (ui->wPartner->value() != mInitialPartnerId) {
+        return true;
+    }
+
+    if (ui->wCurrency->value() != mInitialCurrencyId) {
+        return true;
+    }
+
+    if (ui->wCashbox->value() != mInitialCashboxId) {
+        return true;
+    }
+
+    return ui->wPaymentType->value() != mInitialPaymentTypeId;
+}
+
+double C5StoreInput::goodsRowPrice(int row) const
+{
+    C5LineEdit *lprice = ui->tblGoods->lineEdit(row, col_price);
+    double price = lprice->getDouble();
+    if (price <= 0.001) {
+        price = str_float(lprice->placeholderText());
+    }
+    return price;
+}
+
+void C5StoreInput::syncGoodsSearchCachePrices() const
+{
+    QHash<int, double> prices;
+    for (const StoreUser &item : mDocData.items) {
+        if (item.item_id > 0 && item.price > 0.001) {
+            prices[item.item_id] = item.price;
+        }
+    }
+    C5StructTableView::updateGoodsLastInputPrices(prices);
+}
+
+bool C5StoreInput::confirmTabClose()
+{
+    if (!hasUnsavedChanges()) {
+        return true;
+    }
+
+    const int choice = C5Message::question(tr("Document has unsaved changes. Save before closing?"),
+                                           tr("Save"),
+                                           tr("Cancel"),
+                                           tr("Close without saving"));
+
+    if (choice == QDialog::Rejected) {
+        return false;
+    }
+
+    if (choice == 2) {
+        return true;
+    }
+
+    if (!buildDoc()) {
+        return false;
+    }
+
+    mDocData.status = STORE_DOC_STATUS_DRAFT;
+    const QJsonObject jdoc = mDocData.toJson();
+    NInterface::query1("/engine/v2/common/store-move/input",
+                       mUser->mSessionKey,
+                       this,
+                       {{"doc", jdoc}},
+                       [this](const QJsonObject &) {
+                           mDocData.version++;
+                           mDocumentPersisted = true;
+                           syncGoodsSearchCachePrices();
+                           setState();
+                           __mainWindow->removeTab(this);
+                       });
     return false;
 }
 
@@ -268,7 +394,7 @@ bool C5StoreInput::buildDoc()
         st.uuid = QUuid::createUuid().toString(QUuid::WithoutBraces).toUtf8();
         st.item_id = ui->tblGoods->getInteger(i, col_goods_id);
         st.qty = ui->tblGoods->lineEdit(i, col_goods_qty)->getDouble();
-        st.price = ui->tblGoods->lineEdit(i, col_price)->getDouble();
+        st.price = goodsRowPrice(i);
         st.expire_date = ui->tblGoods->getWidget<C5DateEdit>(i, col_valid_date)->toMySQLDate(false);
         st.comment = ui->tblGoods->lineEdit(i, col_comment)->text();
         st.row = i;
@@ -296,6 +422,9 @@ bool C5StoreInput::buildDoc()
         }
         if (st.qty < 0.001) {
             err += tr("Quantity not valid on row #") + QString::number(i + 1) + "<br>";
+        }
+        if (st.price <= 0.001) {
+            err += tr("Price not valid on row #") + QString::number(i + 1) + "<br>";
         }
     }
     if (!err.isEmpty()) {
@@ -558,6 +687,8 @@ void C5StoreInput::saveDocument()
     QJsonObject jdoc = mDocData.toJson();
     NInterface::query1("/engine/v2/common/store-move/input", mUser->mSessionKey, this, {{"doc", jdoc}}, [this](const QJsonObject) {
         mDocData.version++;
+        mDocumentPersisted = true;
+        syncGoodsSearchCachePrices();
         setState();
         C5Message::info(tr("Saved"));
     });
@@ -572,6 +703,8 @@ void C5StoreInput::draftDocument()
     QJsonObject jdoc = mDocData.toJson();
     NInterface::query1("/engine/v2/common/store-move/input", mUser->mSessionKey, this, {{"doc", jdoc}}, [this](const QJsonObject) {
         mDocData.version++;
+        mDocumentPersisted = true;
+        syncGoodsSearchCachePrices();
         mActionSave->setEnabled(true);
         mActionDraft->setEnabled(true);
         ui->wtoolbar->setEnabled(true);
@@ -651,9 +784,8 @@ void C5StoreInput::tblQtyChanged(const QString &arg1)
     }
 
     C5LineEdit *lqty = ui->tblGoods->lineEdit(row, col_goods_qty);
-    C5LineEdit *lprice = ui->tblGoods->lineEdit(row, col_price);
     C5LineEdit *ltotal = ui->tblGoods->lineEdit(row, col_total);
-    ltotal->setDouble(lqty->getDouble() * lprice->getDouble());
+    ltotal->setDouble(lqty->getDouble() * goodsRowPrice(row));
     countTotal();
 }
 
@@ -902,4 +1034,12 @@ void C5StoreInput::fillFromInventory(const QList<InventoryDiff> &surpluses)
 
     countTotal(); // Пересчитываем итоги документа
     ui->leComment->setText(tr("Imported from inventory surplus ") + QDate::currentDate().toString(FORMAT_DATE_TO_STR));
+}
+
+void C5StoreInput::on_btnPinDate_clicked(bool checked)
+{
+    __c5config.setRegValue("storedoc_pin_date", checked);
+    if (checked) {
+        __c5config.setRegValue("storedoc_pinned_date", ui->deDate->date());
+    }
 }

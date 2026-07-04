@@ -26,6 +26,7 @@ set(SOURCES
     selfboardsettings.cpp
     selfboardlanguage.cpp
     selfboardbottomchrome.cpp
+    cartflyanimation.cpp
     dlgmenu.cpp
     dlgcart.cpp
     dlgpayment.cpp
@@ -39,6 +40,7 @@ set(SOURCES
     menucache.cpp
     webmenuclient.cpp
     dishcardwidget.cpp
+    dishcardanimhost.cpp
     ordercart.cpp
     selfboarddisplay.cpp
     ../NTable/ndataprovider.cpp
@@ -56,6 +58,7 @@ set(HEADERS
     selfboardsettings.h
     selfboardlanguage.h
     selfboardbottomchrome.h
+    cartflyanimation.h
     dlgmenu.h
     dlgcart.h
     dlgpayment.h
@@ -72,6 +75,7 @@ set(HEADERS
     menucache.h
     webmenuclient.h
     dishcardwidget.h
+    dishcardanimhost.h
     ordercart.h
     selfboarddisplay.h
     version.h
@@ -85,7 +89,6 @@ set(FORMS
     dlgcart.ui
     dlgpayment.ui
     dlgpaymentstub.ui
-    dlgdishdetails.ui
     ../NTable/nloadingdlg.ui
 )
 

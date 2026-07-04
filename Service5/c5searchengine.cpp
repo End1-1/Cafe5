@@ -32,6 +32,7 @@ SELECT
     gp.f_price1disc, 
     gp.f_price2, 
     gp.f_price2disc,
+    g.f_lastinputprice AS f_lastinput,
     IF(LENGTH(g.f_adg) > 0, g.f_adg, gr.f_adgcode) AS f_adgt
 FROM c_goods g
 LEFT JOIN c_goods_multiscancode gm ON gm.f_goods = g.f_id
@@ -1208,10 +1209,17 @@ QString C5SearchEngine::updateDictionary(const QJsonObject &jo, const SocketStru
         if (db.next()) {
             QString name = db.string("f_group_name") + " " + db.string("f_name") + " " + db.string("f_scancode");
             gi.id = db.integer("f_id");
+            gi.groupId = db.integer("f_group_id");
             gi.groupName = db.string("f_group_name");
             gi.name = db.string("f_name");
             gi.barcode = db.string("f_scancode");
             gi.unitName = db.string("f_unit_name");
+            gi.lastInputPrice = db.doubleValue("f_lastinput");
+            gi.price1 = db.doubleValue("f_price1");
+            gi.price1disc = db.doubleValue("f_price1disc");
+            gi.price2 = db.doubleValue("f_price2");
+            gi.price2disc = db.doubleValue("f_price2disc");
+            gi.adgt = db.string("f_adgt");
             gi.nameLower = name.toLower();
             gi.words = name.toLower().split(" ", Qt::SkipEmptyParts);
         } else {
@@ -1754,18 +1762,23 @@ QString C5SearchEngine::searchUpdateGoodsLastInputPrices(const QJsonObject &jo, 
     jrep["requestId"] = jo["requestId"];
     jrep["actionId"] = jo["actionId"];
 
-    // Данные приходят в поле "data", которое содержит JSON-строку с массивом товаров
-    // Согласно PHP коду: $notify("update_goods_last_input_prices", json_encode($items, ...), $isnew);
-    QString dataStr = jo.value("data").toString();
-    QJsonDocument doc = QJsonDocument::fromJson(dataStr.toUtf8());
-
-    if (!doc.isArray()) {
+    QJsonArray items;
+    const QJsonValue dataVal = jo.value("data");
+    if (dataVal.isArray()) {
+        items = dataVal.toArray();
+    } else if (dataVal.isString()) {
+        const QJsonDocument doc = QJsonDocument::fromJson(dataVal.toString().toUtf8());
+        if (!doc.isArray()) {
+            jrep["errorCode"] = 1;
+            jrep["errorMessage"] = "Invalid data format: expected array of items";
+            return QJsonDocument(jrep).toJson(QJsonDocument::Compact);
+        }
+        items = doc.array();
+    } else {
         jrep["errorCode"] = 1;
         jrep["errorMessage"] = "Invalid data format: expected array of items";
         return QJsonDocument(jrep).toJson(QJsonDocument::Compact);
     }
-
-    QJsonArray items = doc.array();
     int updatedCount = 0;
 
     {
@@ -1784,9 +1797,14 @@ QString C5SearchEngine::searchUpdateGoodsLastInputPrices(const QJsonObject &jo, 
         for (int i = 0; i < items.size(); ++i) {
             QJsonObject itemObj = items.at(i).toObject();
             int itemId = itemObj.value("item_id").toInt();
-            double lastPrice = itemObj.value("price").toDouble();
+            double lastPrice = itemObj.value("price").toVariant().toDouble();
+            if (lastPrice <= 0.0 && itemObj.contains("f_price")) {
+                lastPrice = itemObj.value("f_price").toVariant().toDouble();
+            }
 
-            // Ищем товар в кэше по ID через индексную карту
+            if (itemId <= 0 || lastPrice <= 0.0) {
+                continue;
+            }
             if (indexMap.contains(itemId)) {
                 int vectorIndex = indexMap.value(itemId);
                 if (vectorIndex >= 0 && vectorIndex < goodsVector.size()) {

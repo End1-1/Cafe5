@@ -149,6 +149,12 @@ export function parsePackageComponent(row) {
   );
 }
 
+function formatCookingTime(minutes) {
+  const value = toNumber(minutes);
+  if (value <= 0) return "";
+  return `${value} Min`;
+}
+
 export function fillDishFromMenuRow(row) {
   const dataObj = parseGoodsData(row.f_data);
   const dyn = dynamicAttrsFromData(dataObj);
@@ -162,7 +168,7 @@ export function fillDishFromMenuRow(row) {
       description: trimStr(row.f_description),
       price: toNumber(row.f_price),
       popular: toNumber(row.f_recent) > 0,
-      prepTime: "10 - 15 Min",
+      prepTime: formatCookingTime(dataObj.f_cooking_time),
       imagePath: imageDataUri(row.f_image),
       attrType: dyn.type,
       attrSize: dyn.size,

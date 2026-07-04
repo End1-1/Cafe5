@@ -46,13 +46,13 @@
      <property name="minimumSize">
       <size>
        <width>0</width>
-       <height>120</height>
+       <height>225</height>
       </size>
      </property>
      <property name="maximumSize">
       <size>
        <width>16777215</width>
-       <height>120</height>
+       <height>225</height>
       </size>
      </property>
      <layout class="QHBoxLayout" name="headerLayout">
@@ -75,14 +75,14 @@
        <widget class="QLabel" name="lblLogo">
         <property name="minimumSize">
          <size>
-          <width>106</width>
-          <height>106</height>
+          <width>225</width>
+          <height>225</height>
          </size>
         </property>
         <property name="maximumSize">
          <size>
-          <width>106</width>
-          <height>106</height>
+          <width>225</width>
+          <height>225</height>
          </size>
         </property>
         <property name="text">
@@ -109,10 +109,22 @@
       <item>
        <widget class="QLabel" name="lblBanner">
         <property name="sizePolicy">
-         <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+         <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
           <horstretch>1</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>225</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>16777215</width>
+          <height>225</height>
+         </size>
         </property>
         <property name="text">
          <string>Banner place</string>

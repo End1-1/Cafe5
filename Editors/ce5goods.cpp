@@ -1539,7 +1539,19 @@ void CE5Goods::countTotal()
 
     if(ui->wGoodsType->value() == GOODS_TYPE_DISH
             || ui->wGoodsType->value() == GOODS_TYPE_GOODS) {
-        ui->leCostPrice->setDouble(total);
+        double costPrice = total;
+
+        if(ui->tblGoods->rowCount() > 0) {
+            double outputQty = ui->leComplectOutputQty->getDouble();
+
+            if(outputQty < 0.001) {
+                outputQty = 1;
+            }
+
+            costPrice = total / outputQty;
+        }
+
+        ui->leCostPrice->setDouble(costPrice);
     }
 }
 
@@ -1780,6 +1792,12 @@ void CE5Goods::on_leBarcode_returnPressed()
 void CE5Goods::on_leTotal_textChanged(const QString &arg1)
 {
     //ui->leCostPrice->setText(arg1);
+}
+
+void CE5Goods::on_leComplectOutputQty_textEdited(const QString &arg1)
+{
+    Q_UNUSED(arg1);
+    countTotal();
 }
 
 void CE5Goods::on_rbGenEAN8_clicked(bool checked)

@@ -1,5 +1,6 @@
 #pragma once
 
+#include <QDate>
 #include <QLabel>
 #include "c5widget.h"
 #include "office_structs.h"
@@ -45,6 +46,8 @@ public:
 
     virtual bool allowChangeDatabase() override;
 
+    bool confirmTabClose() override;
+
     double total();
 
     void setStore(int id, const QString &name);
@@ -73,6 +76,24 @@ private:
     QAction *mActionDraft;
 
     QString mWebSocketRequestId;
+
+    QDate mInitialDate;
+    int mInitialStoreId = 0;
+    int mInitialPartnerId = 0;
+    int mInitialCurrencyId = 0;
+    int mInitialCashboxId = 0;
+    int mInitialPaymentTypeId = 0;
+    QString mInitialComment;
+    QString mInitialDocNum;
+    bool mDocumentPersisted = false;
+
+    void captureInitialState();
+
+    bool hasUnsavedChanges() const;
+
+    double goodsRowPrice(int row) const;
+
+    void syncGoodsSearchCachePrices() const;
 
     bool buildDoc();
 
@@ -160,4 +181,5 @@ private slots:
     void on_btnSaveComment_clicked();
 
     void on_btnRemoveGoods_clicked();
+    void on_btnPinDate_clicked(bool checked);
 };

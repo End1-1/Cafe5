@@ -28,6 +28,7 @@ struct Flag {
 };
 
 class WCustomerDisplay;
+class WSession;
 class QMovie;
 class C5User;
 
@@ -89,6 +90,18 @@ private:
     QMovie* mMovie;
 
     void openSearch();
+
+    void checkCashboxSession();
+
+    void showSessionWidget();
+
+    void setSaleControlsEnabled(bool enabled);
+
+    void printCloseSessionReport(const QJsonObject &cashbox, bool cashCounted);
+
+    void printDifferenceAct(const QJsonObject &cashbox);
+
+    bool mSessionActive = false;
 
 private slots:
     void orderSaved(QWidget* w);
@@ -164,6 +177,10 @@ private slots:
     void on_btnCashout_clicked();
 
     void on_btnBooking_clicked();
+
+    void on_btnCloseSession_clicked();
+
+    void onSessionOpened();
 };
 
 #endif // WORKING_H

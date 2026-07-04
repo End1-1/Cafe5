@@ -137,6 +137,29 @@
        </widget>
       </item>
       <item>
+       <widget class="QCommandLinkButton" name="btnNewSale">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="cursor">
+         <cursorShape>PointingHandCursor</cursorShape>
+        </property>
+        <property name="text">
+         <string>New sale</string>
+        </property>
+        <property name="icon">
+         <iconset resource="../resources/res.qrc">
+          <normaloff>:/storage.png</normaloff>:/storage.png</iconset>
+        </property>
+        <property name="form" stdset="0">
+         <string>form_newsale</string>
+        </property>
+       </widget>
+      </item>
+      <item>
        <widget class="QCommandLinkButton" name="btnNewStoreInput">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Preferred" vsizetype="Preferred">

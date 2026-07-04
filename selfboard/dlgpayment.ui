@@ -43,13 +43,16 @@
    </property>
    <item>
     <widget class="QWidget" name="widgetHeader" native="true">
-     <property name="minimumSize">
-      <size>
-       <width>0</width>
-       <height>180</height>
-      </size>
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
      </property>
-     <layout class="QHBoxLayout" name="headerLayout">
+     <layout class="QVBoxLayout" name="headerLayout">
+      <property name="spacing">
+       <number>12</number>
+      </property>
       <property name="leftMargin">
        <number>24</number>
       </property>
@@ -63,19 +66,22 @@
        <number>12</number>
       </property>
       <item>
-       <layout class="QVBoxLayout" name="headerLeftLayout">
+       <layout class="QHBoxLayout" name="headerTopRow">
+        <property name="spacing">
+         <number>16</number>
+        </property>
         <item>
          <widget class="QLabel" name="lblLogo">
           <property name="minimumSize">
            <size>
-            <width>72</width>
-            <height>72</height>
+            <width>248</width>
+            <height>225</height>
            </size>
           </property>
           <property name="maximumSize">
            <size>
-            <width>72</width>
-            <height>72</height>
+            <width>248</width>
+            <height>225</height>
            </size>
           </property>
           <property name="text">
@@ -87,22 +93,73 @@
          </widget>
         </item>
         <item>
-         <widget class="QPushButton" name="btnLanguage">
+         <widget class="QLabel" name="lblBanner">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+            <horstretch>1</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="minimumSize">
+           <size>
+            <width>0</width>
+            <height>225</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>16777215</width>
+            <height>225</height>
+           </size>
+          </property>
           <property name="text">
-           <string>English</string>
+           <string>Banner place</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignmentFlag::AlignCenter</set>
           </property>
          </widget>
         </item>
        </layout>
       </item>
       <item>
-       <widget class="QLabel" name="lblBanner">
-        <property name="text">
-         <string>Banner place</string>
+       <widget class="QWidget" name="widgetHeaderLeft" native="true">
+        <property name="minimumSize">
+         <size>
+          <width>248</width>
+          <height>0</height>
+         </size>
         </property>
-        <property name="alignment">
-         <set>Qt::AlignmentFlag::AlignCenter</set>
+        <property name="maximumSize">
+         <size>
+          <width>248</width>
+          <height>16777215</height>
+         </size>
         </property>
+        <layout class="QVBoxLayout" name="headerLeftLayout">
+         <property name="spacing">
+          <number>12</number>
+         </property>
+         <property name="leftMargin">
+          <number>0</number>
+         </property>
+         <property name="topMargin">
+          <number>0</number>
+         </property>
+         <property name="rightMargin">
+          <number>0</number>
+         </property>
+         <property name="bottomMargin">
+          <number>0</number>
+         </property>
+         <item>
+          <widget class="QPushButton" name="btnLanguage">
+           <property name="text">
+            <string>English</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
        </widget>
       </item>
      </layout>

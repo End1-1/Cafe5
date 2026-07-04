@@ -52,6 +52,8 @@ private:
     void updateRowTotal(int row);
     void appendStaffRow(int staffId, const QString &staffName, int positionId, const QString &positionName);
     void applyCalculatedRow(int row, double fixed, double dishBase, double calculated, double total);
+    void showDishSalesDetail(int row);
+    int countSamePositionRows(int positionId) const;
     QString buildPrintHtml() const;
 
 protected slots:

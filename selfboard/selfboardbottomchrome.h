@@ -1,6 +1,7 @@
 #ifndef SELFBOARDBOTTOMCHROME_H
 #define SELFBOARDBOTTOMCHROME_H
 
+#include <QPoint>
 #include <QWidget>
 
 class QLabel;
@@ -17,6 +18,9 @@ public:
     void setCartCount(int count);
     void setCartTotal(double total);
     void setGoToCartEnabled(bool enabled);
+
+    QPoint cartFlyTargetGlobalPos() const;
+    void playCartAddedBump();
 
     QWidget *cartSummaryWidget() const;
 

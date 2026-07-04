@@ -432,14 +432,15 @@ add_subdirectory(../ztk ${CMAKE_BINARY_DIR}/ztk-waiter)
 if(TARGET ZKFingerprint)
     target_link_libraries(Waiter PRIVATE ZKFingerprint)
 
-    if(ZKFP_RUNTIME_DLL)
+    foreach(_zkfp_runtime_dll IN LISTS ZKFP_RUNTIME_DLLS)
+        get_filename_component(_zkfp_runtime_name "${_zkfp_runtime_dll}" NAME)
         add_custom_command(TARGET Waiter POST_BUILD
             COMMAND ${CMAKE_COMMAND} -E copy_if_different
-                    "${ZKFP_RUNTIME_DLL}"
+                    "${_zkfp_runtime_dll}"
                     "$<TARGET_FILE_DIR:Waiter>"
-            COMMENT "Copy libzkfp.dll next to Waiter"
+            COMMENT "Copy ${_zkfp_runtime_name} next to Waiter"
         )
-    endif()
+    endforeach()
 endif()
 
 # ---------- Windows flags ----------

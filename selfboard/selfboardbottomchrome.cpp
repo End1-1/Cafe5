@@ -3,9 +3,12 @@
 #include <QEvent>
 #include <QHBoxLayout>
 #include <QLabel>
+#include <QParallelAnimationGroup>
 #include <QPixmap>
+#include <QPropertyAnimation>
 #include <QPushButton>
 #include <QResizeEvent>
+#include <QSequentialAnimationGroup>
 #include <QToolButton>
 #include <QVBoxLayout>
 
@@ -186,6 +189,61 @@ void SelfboardBottomChrome::setGoToCartEnabled(bool enabled)
     if (m_btnGoToCart) {
         m_btnGoToCart->setEnabled(enabled);
     }
+}
+
+QPoint SelfboardBottomChrome::cartFlyTargetGlobalPos() const
+{
+    if (m_lblCartBadge) {
+        return m_lblCartBadge->mapToGlobal(m_lblCartBadge->rect().center());
+    }
+    if (m_cartSummary) {
+        return m_cartSummary->mapToGlobal(m_cartSummary->rect().center());
+    }
+    return mapToGlobal(rect().center());
+}
+
+void SelfboardBottomChrome::playCartAddedBump()
+{
+    if (!m_lblCartBadge) {
+        return;
+    }
+
+    constexpr int kBase = 24;
+    constexpr int kPeak = 34;
+
+    auto *growWidth = new QPropertyAnimation(m_lblCartBadge, "minimumWidth", this);
+    growWidth->setDuration(120);
+    growWidth->setStartValue(kBase);
+    growWidth->setEndValue(kPeak);
+
+    auto *growHeight = new QPropertyAnimation(m_lblCartBadge, "minimumHeight", this);
+    growHeight->setDuration(120);
+    growHeight->setStartValue(kBase);
+    growHeight->setEndValue(kPeak);
+
+    auto *shrinkWidth = new QPropertyAnimation(m_lblCartBadge, "minimumWidth", this);
+    shrinkWidth->setDuration(120);
+    shrinkWidth->setStartValue(kPeak);
+    shrinkWidth->setEndValue(kBase);
+
+    auto *shrinkHeight = new QPropertyAnimation(m_lblCartBadge, "minimumHeight", this);
+    shrinkHeight->setDuration(120);
+    shrinkHeight->setStartValue(kPeak);
+    shrinkHeight->setEndValue(kBase);
+
+    auto *grow = new QParallelAnimationGroup(this);
+    grow->addAnimation(growWidth);
+    grow->addAnimation(growHeight);
+
+    auto *shrink = new QParallelAnimationGroup(this);
+    shrink->addAnimation(shrinkWidth);
+    shrink->addAnimation(shrinkHeight);
+
+    auto *sequence = new QSequentialAnimationGroup(this);
+    sequence->addAnimation(grow);
+    sequence->addAnimation(shrink);
+    connect(sequence, &QSequentialAnimationGroup::finished, sequence, &QObject::deleteLater);
+    sequence->start();
 }
 
 bool SelfboardBottomChrome::eventFilter(QObject *watched, QEvent *event)
