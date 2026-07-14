@@ -24,6 +24,7 @@
 #include "c5reporttemplatedriver.h"
 #include "c5route.h"
 #include "c5storedecompilation.h"
+#include "c5storeinput.h"
 #include "c5storeinventory.h"
 #include "c5toolbarwidget.h"
 #include "c5translatorform.h"
@@ -167,6 +168,21 @@ C5MainWindow::~C5MainWindow()
 
 void C5MainWindow::closeEvent(QCloseEvent *event)
 {
+    for(int i = 0; i < fTab->count(); i++) {
+        auto *storeInput = dynamic_cast<C5StoreInput*>(fTab->widget(i));
+
+        if(!storeInput) {
+            continue;
+        }
+
+        fTab->setCurrentIndex(i);
+
+        if(!storeInput->confirmApplicationClose()) {
+            event->ignore();
+            return;
+        }
+    }
+
     if(C5Message::question(tr("Are you sure to close application?")) != QDialog::Accepted) {
         event->ignore();
         return;

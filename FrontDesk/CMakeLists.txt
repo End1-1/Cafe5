@@ -224,7 +224,7 @@ set(APP_SOURCES
     dlgsalarydishsales.ui
     c5revenuecashop.ui
     wdashboardsettings.ui
-    rwaiterstationconfig.ui
+
     rworkstationconfigcommon.ui
     rworkstationconfigshop.ui
     rworkstationconfigwaiter.ui
@@ -545,7 +545,7 @@ set(APP_SOURCES
     wdashboardsettings.h
     rabstractspecialwidget.h
     ../dictionaries/dict_workstation.h
-    rwaiterstationconfig.h
+
     rworkstationconfigwidget.h
     rworkstationconfigcommon.h
     rworkstationconfigshop.h
@@ -852,7 +852,7 @@ set(APP_SOURCES
     c5cashtransfer.cpp
     wdashboardsettings.cpp
     rabstractspecialwidget.cpp
-    rwaiterstationconfig.cpp
+
     rworkstationconfigwidget.cpp
     rworkstationconfigcommon.cpp
     rworkstationconfigshop.cpp
@@ -893,6 +893,10 @@ add_executable(OfficeN ${APP_SOURCES}
     rcashmovement.h rcashmovement.cpp
     rdebts.h rdebts.cpp
     dlgdebtsredeem.h dlgdebtsredeem.cpp dlgdebtsredeem.ui
+    storeinputxmlimport.h storeinputxmlimport.cpp
+    dlgstoreinputxmlinvoicepick.h dlgstoreinputxmlinvoicepick.cpp dlgstoreinputxmlinvoicepick.ui
+    dlgstoreinputxmlpartnerupdate.h dlgstoreinputxmlpartnerupdate.cpp dlgstoreinputxmlpartnerupdate.ui
+    dlgstoreinputxmlgoodsmatch.h dlgstoreinputxmlgoodsmatch.cpp dlgstoreinputxmlgoodsmatch.ui
     rorderinprogress.h rorderinprogress.cpp
     rtotalreviewreport.h rtotalreviewreport.cpp
     rmenureviewreport.h rmenureviewreport.cpp

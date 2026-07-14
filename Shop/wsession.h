@@ -21,7 +21,7 @@ public:
     ~WSession();
 
 signals:
-    void sessionOpened();
+    void sessionOpened(const QJsonObject &session);
 
 protected:
     void showEvent(QShowEvent *e) override;

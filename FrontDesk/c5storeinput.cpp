@@ -5,6 +5,7 @@
 #include <QFileDialog>
 #include <QHash>
 #include <QInputDialog>
+#include <QJsonArray>
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QJsonParseError>
@@ -33,8 +34,15 @@
 #include "format_date.h"
 #include "ninterface.h"
 #include "c5structtableview.h"
+#include "c5storeoutput.h"
+#include "dlgstoreinputxmlgoodsmatch.h"
+#include "dlgstoreinputxmlinvoicepick.h"
+#include "dlgstoreinputxmlpartnerupdate.h"
+#include "storeinputxmlimport.h"
+#include "struct_goods_item.h"
 #include "ui_c5storeinput.h"
 #include <QDialog>
+#include <QEventLoop>
 #include <xlsxdocument.h>
 
 C5StoreInput::C5StoreInput(C5User *user, const QString &title, QIcon icon, QWidget *parent)
@@ -73,6 +81,17 @@ C5StoreInput::C5StoreInput(C5User *user, const QString &title, QIcon icon, QWidg
     fFocusNextChild = false;
     fCanChangeFocus = true;
     ui->tblAdd->setColumnWidths(ui->tblAdd->columnCount(), 0, 300, 80);
+    ui->tblRelatedOutput->setColumnWidth(col_related_id, 0);
+    ui->tblRelatedOutput->setColumnWidth(col_related_doc_type, 0);
+    ui->tblRelatedOutput->setColumnWidth(col_related_type, 100);
+    ui->tblRelatedOutput->setColumnWidth(col_related_number, 110);
+    ui->tblRelatedOutput->setColumnWidth(col_related_status, 90);
+    ui->tblRelatedOutput->setColumnWidth(col_related_date, 110);
+    ui->tblRelatedOutput->setColumnWidth(col_related_store_out, 140);
+    ui->tblRelatedOutput->setColumnWidth(col_related_store_in, 140);
+    ui->tblRelatedOutput->setColumnWidth(col_related_sum, 90);
+    mRelatedOutputTabIndex = ui->tw->indexOf(ui->t5);
+    ui->tw->setTabText(mRelatedOutputTabIndex, tr("Write-off"));
     ui->deDate->setEnabled(mUser->check(cp_t1_allow_change_store_doc_date));
 
     if (__c5config.getRegValue("storedoc_storeinput").toBool()) {
@@ -159,6 +178,8 @@ void C5StoreInput::setDocument(StoreInputDocument doc)
     ui->leTotalQty->setDouble(totalQty);
     setState();
     captureInitialState();
+    mRelatedOutputsLoaded = false;
+    ui->tblRelatedOutput->setRowCount(0);
 }
 
 QToolBar *C5StoreInput::toolBar()
@@ -176,6 +197,10 @@ QToolBar *C5StoreInput::toolBar()
                             tr("Export\nto Excel"),
                             this,
                             SLOT(exportToExcel()));
+        fToolBar->addAction(QIcon(":/xml.png"),
+                            tr("Import\nfrom XML"),
+                            this,
+                            SLOT(importFromXml()));
         fToolBar->addAction(QIcon(":/barcode.png"),
                             tr("Print\nbarcode"),
                             this,
@@ -284,16 +309,59 @@ void C5StoreInput::syncGoodsSearchCachePrices() const
     C5StructTableView::updateGoodsLastInputPrices(prices);
 }
 
+int C5StoreInput::unsavedCloseChoice() const
+{
+    return C5Message::question(tr("Document has unsaved changes. Save before closing?"),
+                               tr("Save"),
+                               tr("Cancel"),
+                               tr("Close without saving"));
+}
+
+bool C5StoreInput::saveDraftBlocking()
+{
+    if (!buildDoc()) {
+        return false;
+    }
+
+    mDocData.status = STORE_DOC_STATUS_DRAFT;
+    const QJsonObject jdoc = mDocData.toJson();
+    bool ok = false;
+    QEventLoop loop;
+
+    NInterface::query("/engine/v2/common/store-move/input",
+                      mUser->mSessionKey,
+                      this,
+                      {{"doc", jdoc}},
+                      [&](const QJsonObject &) {
+                          mDocData.version++;
+                          mDocumentPersisted = true;
+                          syncGoodsSearchCachePrices();
+                          setState();
+                          ok = true;
+                          if (mRelatedOutputsLoaded) {
+                              loadRelatedOutputs();
+                          }
+                          loop.quit();
+                      },
+                      [&](const QJsonObject &) {
+                          loop.quit();
+                          return true;
+                      },
+                      true,
+                      60000,
+                      false);
+
+    loop.exec();
+    return ok;
+}
+
 bool C5StoreInput::confirmTabClose()
 {
     if (!hasUnsavedChanges()) {
         return true;
     }
 
-    const int choice = C5Message::question(tr("Document has unsaved changes. Save before closing?"),
-                                           tr("Save"),
-                                           tr("Cancel"),
-                                           tr("Close without saving"));
+    const int choice = unsavedCloseChoice();
 
     if (choice == QDialog::Rejected) {
         return false;
@@ -321,6 +389,25 @@ bool C5StoreInput::confirmTabClose()
                            __mainWindow->removeTab(this);
                        });
     return false;
+}
+
+bool C5StoreInput::confirmApplicationClose()
+{
+    if (!hasUnsavedChanges()) {
+        return true;
+    }
+
+    const int choice = unsavedCloseChoice();
+
+    if (choice == QDialog::Rejected) {
+        return false;
+    }
+
+    if (choice == 2) {
+        return true;
+    }
+
+    return saveDraftBlocking();
 }
 
 
@@ -690,6 +777,9 @@ void C5StoreInput::saveDocument()
         mDocumentPersisted = true;
         syncGoodsSearchCachePrices();
         setState();
+        if (mRelatedOutputsLoaded) {
+            loadRelatedOutputs();
+        }
         C5Message::info(tr("Saved"));
     });
 }
@@ -708,6 +798,9 @@ void C5StoreInput::draftDocument()
         mActionSave->setEnabled(true);
         mActionDraft->setEnabled(true);
         ui->wtoolbar->setEnabled(true);
+        if (mRelatedOutputsLoaded) {
+            loadRelatedOutputs();
+        }
         C5Message::info(tr("Saved"));
     });
 }
@@ -1042,4 +1135,275 @@ void C5StoreInput::on_btnPinDate_clicked(bool checked)
     if (checked) {
         __c5config.setRegValue("storedoc_pinned_date", ui->deDate->date());
     }
+}
+
+void C5StoreInput::on_tw_currentChanged(int index)
+{
+    if (index == mRelatedOutputTabIndex) {
+        loadRelatedOutputs();
+    }
+}
+
+void C5StoreInput::on_btnRefreshRelatedOutput_clicked()
+{
+    loadRelatedOutputs();
+}
+
+void C5StoreInput::loadRelatedOutputs()
+{
+    ui->tblRelatedOutput->setRowCount(0);
+
+    if (!mDocumentPersisted || mDocData.uuid.isEmpty()) {
+        return;
+    }
+
+    NInterface::query1("/engine/v2/common/store-move/related-outputs",
+                       mUser->mSessionKey,
+                       this,
+                       {{"id", mDocData.uuid}},
+                       [this](const QJsonObject &jo) {
+                           const QJsonArray rows = jo.value("rows").toArray();
+                           ui->tblRelatedOutput->setRowCount(rows.size());
+                           for (int i = 0; i < rows.size(); ++i) {
+                               const QJsonObject row = rows.at(i).toObject();
+                               ui->tblRelatedOutput->setString(i, col_related_id, row.value("f_id").toString());
+                               ui->tblRelatedOutput->setString(i, col_related_type, row.value("f_type_name").toString());
+                               QString docNum = row.value("f_doc_number").toString();
+                               if (docNum.isEmpty()) {
+                                   docNum = row.value("f_user_id").toString();
+                               }
+                               ui->tblRelatedOutput->setString(i, col_related_number, docNum);
+                               ui->tblRelatedOutput->setString(i, col_related_status, row.value("f_status_name").toString());
+                               ui->tblRelatedOutput->setString(i, col_related_date, row.value("f_doc_date").toString());
+                               ui->tblRelatedOutput->setString(i, col_related_store_out, row.value("f_store_out_name").toString());
+                               ui->tblRelatedOutput->setString(i, col_related_store_in, row.value("f_store_in_name").toString());
+                               ui->tblRelatedOutput->setDouble(i, col_related_sum, row.value("f_sum").toDouble());
+                               ui->tblRelatedOutput->setInteger(i, col_related_doc_type, row.value("f_doc_type").toInt());
+                           }
+                           mRelatedOutputsLoaded = true;
+                       });
+}
+
+void C5StoreInput::openRelatedDocument(const QString &docId, int docType)
+{
+    NInterface::query1("/engine/v2/common/store-move/open",
+                       mUser->mSessionKey,
+                       this,
+                       {{"id", docId}},
+                       [this, docType](const QJsonObject &jo) {
+                           Q_UNUSED(docType);
+                           StoreInputDocument sid = JsonParser<StoreInputDocument>::fromJson(jo.value("doc").toObject());
+                           switch (sid.type) {
+                           case DOC_TYPE_STORE_INPUT: {
+                               auto *sw = new C5StoreInput(mUser, tr("Store input"), QIcon(":/storage.png"));
+                               __mainWindow->addWidget(sw);
+                               sw->setDocument(sid);
+                               break;
+                           }
+                           case DOC_TYPE_STORE_OUTPUT:
+                           case DOC_TYPE_STORE_MOVE: {
+                               auto *sw = new C5StoreOutput(mUser, tr("Store output"), QIcon(":/storage.png"));
+                               __mainWindow->addWidget(sw);
+                               sw->setDocument(sid);
+                               break;
+                           }
+                           default:
+                               C5Message::error(tr("Unsupported document type"));
+                               break;
+                           }
+                       });
+}
+
+void C5StoreInput::on_tblRelatedOutput_cellDoubleClicked(int row, int column)
+{
+    Q_UNUSED(column);
+    if (row < 0) {
+        return;
+    }
+
+    const QString docId = ui->tblRelatedOutput->getString(row, col_related_id);
+    if (docId.isEmpty()) {
+        return;
+    }
+
+    const int docType = ui->tblRelatedOutput->getInteger(row, col_related_doc_type);
+    openRelatedDocument(docId, docType);
+}
+
+void C5StoreInput::importFromXml()
+{
+    if (mDocData.status != STORE_DOC_STATUS_DRAFT) {
+        C5Message::error(tr("Import is available only for draft documents"));
+        return;
+    }
+
+    const QString path = QFileDialog::getOpenFileName(this, tr("Import from XML"), QString(), tr("XML files (*.xml)"));
+    if (path.isEmpty()) {
+        return;
+    }
+
+    QString error;
+    const QVector<StoreInputXmlInvoice> invoices = StoreInputXmlImport::parseFile(path, error);
+    if (!error.isEmpty()) {
+        C5Message::error(error);
+        return;
+    }
+
+    StoreInputXmlInvoice invoice;
+    if (invoices.size() > 1) {
+        DlgStoreInputXmlInvoicePick pickDlg(invoices, this);
+        if (pickDlg.exec() != QDialog::Accepted) {
+            return;
+        }
+        invoice = pickDlg.selectedInvoice();
+    } else {
+        invoice = invoices.first();
+    }
+
+    if (ui->tblGoods->rowCount() > 0) {
+        const int choice = C5Message::question(tr("Document already contains goods lines. Replace existing lines?"),
+                                               tr("Replace"),
+                                               tr("Cancel"),
+                                               tr("Add"));
+        if (choice == QDialog::Rejected) {
+            return;
+        }
+        if (choice == QDialog::Accepted) {
+            ui->tblGoods->setRowCount(0);
+        }
+    }
+
+    auto partnerFieldDiffers = [](const QString &left, const QString &right) {
+        return StoreInputXmlImport::normalizeName(left).compare(StoreInputXmlImport::normalizeName(right),
+                                                                  Qt::CaseInsensitive)
+            != 0;
+    };
+
+    QJsonObject partner;
+    if (!StoreInputXmlImport::findPartnerByTin(mUser, this, invoice.tin, partner, error)) {
+        if (!error.contains(QStringLiteral("Partner not found"), Qt::CaseInsensitive)) {
+            C5Message::error(error);
+            return;
+        }
+        if (C5Message::question(tr("Partner with TIN %1 was not found. Create from invoice data?").arg(invoice.tin))
+            != QDialog::Accepted) {
+            return;
+        }
+        if (!StoreInputXmlImport::createPartner(mUser, this, invoice.tin, invoice.supplierName, invoice.supplierAddress, partner, error)) {
+            C5Message::error(error);
+            return;
+        }
+    } else {
+        const bool taxNameDiffers = partnerFieldDiffers(partner.value(QStringLiteral("f_taxname")).toString(), invoice.supplierName);
+        const bool addressDiffers = partnerFieldDiffers(partner.value(QStringLiteral("f_address")).toString(), invoice.supplierAddress);
+        if (taxNameDiffers || addressDiffers) {
+            DlgStoreInputXmlPartnerUpdate partnerDlg(partner, invoice.supplierName, invoice.supplierAddress, this);
+            if (partnerDlg.exec() == QDialog::Accepted) {
+                partner = partnerDlg.updatedPartner();
+                if (!StoreInputXmlImport::updatePartner(mUser, this, partner, error)) {
+                    C5Message::error(error);
+                    return;
+                }
+            }
+        }
+    }
+
+    ui->wPartner->setCodeAndName(partner.value(QStringLiteral("f_id")).toInt(),
+                                 partner.value(QStringLiteral("f_taxname")).toString());
+    ui->deDate->setDate(invoice.supplyDate);
+    ui->leDocNum->setText(invoice.docNumber);
+    QString comment = invoice.additionalData.trimmed();
+    if (!comment.isEmpty()) {
+        ui->leComment->setText(comment);
+    }
+
+    QVector<StoreInputXmlGoodsMappingRow> matchedRows;
+    QVector<StoreInputXmlGoodLine> unmatchedLines;
+    matchedRows.reserve(invoice.goods.size());
+    unmatchedLines.reserve(invoice.goods.size());
+
+    for (const StoreInputXmlGoodLine &line : invoice.goods) {
+        GoodsItem goodsItem;
+        QString goodsError;
+        if (StoreInputXmlImport::findGoodsByExactName(mUser, line.description, goodsItem, goodsError)) {
+            StoreInputXmlGoodsMappingRow mapped;
+            mapped.source = line;
+            mapped.goodsId = goodsItem.id;
+            mapped.goodsName = goodsItem.name;
+            mapped.goodsUnit = goodsItem.unitName;
+            mapped.goodsAdgt = goodsItem.adgt;
+            matchedRows.append(mapped);
+        } else if (!goodsError.isEmpty()) {
+            C5Message::error(goodsError);
+            return;
+        } else {
+            unmatchedLines.append(line);
+        }
+    }
+
+    if (!unmatchedLines.isEmpty()) {
+        DlgStoreInputXmlGoodsMatch goodsDlg(unmatchedLines, this);
+        if (goodsDlg.exec() != QDialog::Accepted) {
+            return;
+        }
+        const QVector<StoreInputXmlGoodsMappingRow> manualRows = goodsDlg.rows();
+        for (const StoreInputXmlGoodsMappingRow &row : manualRows) {
+            StoreInputXmlGoodsMappingRow mapped = row;
+            GoodsItem goodsItem;
+            if (!StoreInputXmlImport::findGoodsById(mapped.goodsId, goodsItem)) {
+                QString lookupError;
+                if (!StoreInputXmlImport::findGoodsByExactName(mUser, mapped.goodsName, goodsItem, lookupError)) {
+                    C5Message::error(tr("Cannot load goods data for: %1").arg(mapped.goodsName));
+                    return;
+                }
+            }
+            mapped.goodsUnit = goodsItem.unitName;
+            mapped.goodsAdgt = goodsItem.adgt;
+            matchedRows.append(mapped);
+        }
+    }
+
+    for (const StoreInputXmlGoodsMappingRow &row : matchedRows) {
+        if (row.updateName) {
+            if (!mUser->check(cp_t6_goods)) {
+                C5Message::error(mUser->error());
+                return;
+            }
+            if (!StoreInputXmlImport::renameGoods(mUser, this, row.goodsId, row.source.description, error)) {
+                C5Message::error(error);
+                return;
+            }
+        }
+    }
+
+    for (const StoreInputXmlGoodsMappingRow &row : matchedRows) {
+        GoodsItem goodsItem;
+        if (!StoreInputXmlImport::findGoodsById(row.goodsId, goodsItem)) {
+            goodsItem.id = row.goodsId;
+            goodsItem.name = row.updateName ? row.source.description : row.goodsName;
+            goodsItem.unitName = row.goodsUnit;
+            goodsItem.adgt = row.goodsAdgt;
+        } else if (row.updateName) {
+            goodsItem.name = row.source.description;
+        }
+
+        const StoreInputXmlGoodLine &source = row.source;
+        const double total = source.qty * source.pricePerUnit;
+        QString comment = source.classifierCode;
+        if (!source.unit.isEmpty()) {
+            comment = comment.isEmpty() ? source.unit : comment + QStringLiteral(" / ") + source.unit;
+        }
+        const int tableRow = addGoods(goodsItem.id,
+                                      goodsItem.name,
+                                      source.qty,
+                                      goodsItem.unitName,
+                                      source.pricePerUnit,
+                                      total,
+                                      comment,
+                                      goodsItem.adgt);
+        ui->tblGoods->lineEdit(tableRow, col_price)->setPlaceholderText(float_str(goodsItem.lastInputPrice, 2));
+    }
+
+    countTotal();
+    C5Message::info(tr("Imported %1 goods lines from invoice %2").arg(matchedRows.size()).arg(invoice.docNumber));
 }

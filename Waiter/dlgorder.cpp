@@ -140,6 +140,14 @@ FiscalMachine fiscalMachineForWorkstation(const WorkstationItem &ws)
     return getFiscalMachine(ws.fiscalMachineId());
 }
 
+int receiptNameWidthMm(int baseWidthMm, int sideMarginMm)
+{
+    if(sideMarginMm <= 0) {
+        return baseWidthMm;
+    }
+    return qMax(8, baseWidthMm - 2 * sideMarginMm);
+}
+
 }
 
 DlgOrder::DlgOrder(C5User *user, HallItem h, TableItem t, const QVector<GoodsGroupItem*>* groups, const QVector<DishAItem*>* dishes) :
@@ -729,6 +737,9 @@ void DlgOrder::printPrecheck(const QString &currentStaff)
     p.setSceneParams(pr.width() - safePx, pr.height(), printer.logicalDpiX());
     p.setFont(font);
     p.setFontSize(bs);
+    const int sideMarginMm = qMax(0, mWorkStation.printPaperWidthMm());
+    p.setRightMarginMm(sideMarginMm);
+    const int nameWidthMm = receiptNameWidthMm(35, sideMarginMm);
     QString logoFile = qApp->applicationDirPath() + "/logo_receipt.png";
 
     if(QFile::exists(logoFile)) {
@@ -745,15 +756,15 @@ void DlgOrder::printPrecheck(const QString &currentStaff)
     switch(mOrder.state) {
     case ORDER_STATE_OPEN:
     case ORDER_STATE_CLOSE:
-        p.ltext(tr("Order No"));
+        p.ltext(tr("Order No"), sideMarginMm);
         break;
 
     case ORDER_STATE_PREORDER:
-        p.ltext(tr("Preorder No"));
+        p.ltext(tr("Preorder No"), sideMarginMm);
         break;
 
     default:
-        p.ltext(QString::number(mOrder.state) + ": " + tr("Error in state"));
+        p.ltext(QString::number(mOrder.state) + ": " + tr("Error in state"), sideMarginMm);
         break;
     }
 
@@ -764,60 +775,60 @@ void DlgOrder::printPrecheck(const QString &currentStaff)
 
     if (!jtax.isEmpty()) {
         // jtax = QJsonDocument::fromJson(jtax.value("out").toString().toUtf8()).object();
-        p.ltext(jtax["taxpayer"].toString(), 0);
+        p.ltext(jtax["taxpayer"].toString(), sideMarginMm);
         p.br();
-        p.ltext(jtax["address"].toString(), 0);
+        p.ltext(jtax["address"].toString(), sideMarginMm);
         p.br();
-        p.ltext(tr("TIN"), 0);
+        p.ltext(tr("TIN"), sideMarginMm);
         p.rtext(jtax["tin"].toString());
         p.br();
-        p.ltext(tr("Device number"), 0);
+        p.ltext(tr("Device number"), sideMarginMm);
         p.rtext(jtax["crn"].toString());
         p.br();
-        p.ltext(tr("Serial"), 0);
+        p.ltext(tr("Serial"), sideMarginMm);
         p.rtext(jtax["sn"].toString());
         p.br();
-        p.ltext(tr("Fiscal"), 0);
+        p.ltext(tr("Fiscal"), sideMarginMm);
         p.rtext(jtax["fiscal"].toString());
         p.br();
-        p.ltext(tr("Receipt number"), 0);
+        p.ltext(tr("Receipt number"), sideMarginMm);
         p.rtext(QString::number(jtax["rseq"].toInt()));
         p.br();
-        p.ltext(tr("Date"), 0);
+        p.ltext(tr("Date"), sideMarginMm);
         p.rtext(QDateTime::fromMSecsSinceEpoch(jtax["time"].toDouble()).toString(FORMAT_DATETIME_TO_STR));
         p.br();
-        p.ltext(tr("(F)"), 0);
+        p.ltext(tr("(F)"), sideMarginMm);
         p.br();
     }
 
     if (mOrder.data.contains("f_guest")) {
         const QJsonObject guest = mOrder.dataValue("f_guest").toObject();
-        p.ltext(tr("Client"));
+        p.ltext(tr("Client"), sideMarginMm);
         p.br();
         if(!mWorkStation.data.value(QStringLiteral("do_not_print_customer_on_receipt")).toBool()) {
-            p.ltext(guest.value(QStringLiteral("f_guest_name")).toString());
+            p.ltext(guest.value(QStringLiteral("f_guest_name")).toString(), sideMarginMm);
             p.br();
         }
-        p.ltext(guest.value(QStringLiteral("f_guest_phone")).toString());
+        p.ltext(guest.value(QStringLiteral("f_guest_phone")).toString(), sideMarginMm);
         p.br();
-        p.ltext(guest.value(QStringLiteral("f_guest_address")).toString());
+        p.ltext(guest.value(QStringLiteral("f_guest_address")).toString(), sideMarginMm);
         p.br();
     }
 
     p.br(1);
     if (!mWorkStation.data.value("receipt_no_table").toBool()) {
-        p.ltext(tr("Table"), 0);
+        p.ltext(tr("Table"), sideMarginMm);
         p.rtext(QString("%1/%2").arg(mOrder.hallName, mOrder.tableName));
         p.br();
     }
-    p.ltext(tr("Staff"), 0);
+    p.ltext(tr("Staff"), sideMarginMm);
     p.rtext(currentStaff);
     p.br();
     p.br(2);
     p.line(2);
     p.br(2);
     //p.setFontSize(bs - 4);
-    p.ltext(tr("Name"), 0);
+    p.ltext(tr("Name"), sideMarginMm, nameWidthMm);
     p.ltext(tr("Qty"), 33);
     p.ltext(tr("Price"), 41);
     p.rtext(tr("Amount"));
@@ -836,7 +847,7 @@ void DlgOrder::printPrecheck(const QString &currentStaff)
         }
 
         if(!dish.adgtCode().isEmpty()) {
-            p.ltext(QString("%1: %2").arg(tr("Class"), dish.adgtCode()), 0);
+            p.ltext(QString("%1: %2").arg(tr("Class"), dish.adgtCode()), sideMarginMm);
             p.br();
         }
 
@@ -861,7 +872,7 @@ void DlgOrder::printPrecheck(const QString &currentStaff)
             name += "*** ";
         }
 
-        p.ltext(name, 0, 35);
+        p.ltext(name, sideMarginMm, nameWidthMm);
         p.ltext(float_str(dish.qty, 2), 33, 8);
         p.ltext(float_str(dish.price, 2), 41, 12);
         p.rtext(float_str(dish.total(mOrder.state == ORDER_STATE_PREORDER), 2));
@@ -875,56 +886,56 @@ void DlgOrder::printPrecheck(const QString &currentStaff)
 
     if (noservice) {
         if (!mWorkStation.data.value("receipt_no_service_hint").toBool()) {
-            p.ltext(QString("* - %1").arg(tr("No service")).toLower());
+            p.ltext(QString("* - %1").arg(tr("No service")).toLower(), sideMarginMm);
             p.br();
         }
     }
 
     if (nodiscount) {
         if (!mWorkStation.data.value("receipt_no_discount_hint").toBool()) {
-            p.ltext(QString("** - %1").arg(tr("No discount")).toLower());
+            p.ltext(QString("** - %1").arg(tr("No discount")).toLower(), sideMarginMm);
             p.br();
         }
     }
 
     if(complimentary) {
-        p.ltext(QString("*** - %1").arg(tr("Complimentary")).toLower());
+        p.ltext(QString("*** - %1").arg(tr("Complimentary")).toLower(), sideMarginMm);
         p.br();
     }
 
     p.setFontSize(bs + 2);
-    p.ltext(tr("Subtotal"), 0);
+    p.ltext(tr("Subtotal"), sideMarginMm);
     p.rtext(float_str(mOrder.subTotal(), 2));
     p.br();
 
     if (mOrder.serviceFactor() > 0) {
         const QString serviceComment = mOrder.data.value(QStringLiteral("f_service_comment")).toString().trimmed();
-        p.ltext(serviceComment.isEmpty() ? tr("Service") : serviceComment);
+        p.ltext(serviceComment.isEmpty() ? tr("Service") : serviceComment, sideMarginMm);
         p.rtext("+" + float_str(mOrder.serviceFactor() * 100, 2) + "%");
         p.br();
     }
 
     if (mOrder.discountFactor() > 0) {
         const QString discountComment = mOrder.data.value(QStringLiteral("f_discount_comment")).toString().trimmed();
-        p.ltext(discountComment.isEmpty() ? tr("Discount") : discountComment);
+        p.ltext(discountComment.isEmpty() ? tr("Discount") : discountComment, sideMarginMm);
         p.rtext("-" + float_str(mOrder.discountFactor() * 100, 2) + "%");
         p.br();
     }
 
     if(mOrder.prepaidAmount() > 0) {
-        p.ltext(tr("Prepaid amount"), 0);
+        p.ltext(tr("Prepaid amount"), sideMarginMm);
         p.setFontSize(bs);
         p.rtext(float_str(mOrder.prepaidAmount() * -1, 2));
         p.br();
     }
 
-    p.ltext(tr("Total due"));
+    p.ltext(tr("Total due"), sideMarginMm);
     p.rtext(float_str(mOrder.totalDue, 2));
     p.br();
     p.br();
-    auto printPaymentFunc = [this, &p](int id) {
+    auto printPaymentFunc = [this, &p, sideMarginMm](int id) {
         if(mOrder.payment(payment_fields[id]) > 0) {
-            p.ltext(QCoreApplication::translate("PaymentType", payment_names[id]), 0);
+            p.ltext(QCoreApplication::translate("PaymentType", payment_names[id]), sideMarginMm);
             p.rtext(float_str(mOrder.payment(payment_fields[id]), 2));
             p.br();
         }
@@ -936,10 +947,10 @@ void DlgOrder::printPrecheck(const QString &currentStaff)
 
     if(mOrder.amountPaid() - mOrder.totalDue > 0) {
         p.br();
-        p.ltext(tr("Amount paid"), 0);
+        p.ltext(tr("Amount paid"), sideMarginMm);
         p.rtext(float_str(mOrder.amountPaid(), 2));
         p.br();
-        p.ltext(tr("Change"), 0);
+        p.ltext(tr("Change"), sideMarginMm);
         p.rtext(float_str(mOrder.amountPaid() - mOrder.totalDue, 2));
         p.br();
     }
@@ -951,7 +962,7 @@ void DlgOrder::printPrecheck(const QString &currentStaff)
         printSignature = true;
         p.br();
         p.br();
-        p.ltext(receiptPolicy);
+        p.ltext(receiptPolicy, sideMarginMm);
         p.br();
     }
 
@@ -968,15 +979,15 @@ void DlgOrder::printPrecheck(const QString &currentStaff)
 
     p.br();
     p.setFontSize(bs - 2);
-    p.ltext(tr("Thank you for visit!"), 0);
+    p.ltext(tr("Thank you for visit!"), sideMarginMm);
     p.br();
 
     if(mOrder.state == ORDER_STATE_OPEN || mOrder.state == ORDER_STATE_CLOSE) {
-        p.ltext(QString("%1: %2").arg(tr("Sample")).arg(mOrder.printCount()));
+        p.ltext(QString("%1: %2").arg(tr("Sample")).arg(mOrder.printCount()), sideMarginMm);
     }
 
     p.br();
-    p.ltext(tr("Printed"), 0);
+    p.ltext(tr("Printed"), sideMarginMm);
     p.rtext(QDateTime::currentDateTime().toString(FORMAT_DATETIME_TO_STR));
     p.br();
 
@@ -1010,18 +1021,19 @@ void DlgOrder::printService(const QJsonObject &jdoc)
         C5Printing p;
         QPrinterInfo pi = QPrinterInfo::printerInfo(printerName);
         QPrinter printer(pi);
-        constexpr qreal SAFE_RIGHT_MM = 10.0;
         QRectF pr = printer.pageRect(QPrinter::DevicePixel);
 
         // Вместо printer.logicalDpiX() используем жестко 96
         qreal fixedDpi = 96.0;
-        qreal safePx = SAFE_RIGHT_MM * fixedDpi / 25.4;
 
         // Передаем fixedDpi в параметры сцены
         p.setSceneParams(pr.width(), pr.height(), fixedDpi);
         p.setFont(font);
         p.setFontBold(true);
         p.setFontSize(bs);
+        const int sideMarginMm = qMax(0, mWorkStation.printPaperWidthMm());
+        p.setRightMarginMm(sideMarginMm);
+        const int nameWidthMm = receiptNameWidthMm(65, sideMarginMm);
         if(jdoc["reprint"].toBool()) {
             p.ctext(tr("REPRINT"));
             p.br();
@@ -1038,19 +1050,19 @@ void DlgOrder::printService(const QJsonObject &jdoc)
         p.br();
         p.br();
         p.setFontBold(false);
-        p.ltext(tr("Table"), 0);
+        p.ltext(tr("Table"), sideMarginMm);
         p.rtext(jh["f_table_name"].toString());
         p.br();
-        p.ltext(tr("Order no"), 0);
+        p.ltext(tr("Order no"), sideMarginMm);
         p.rtext(jh["f_prefix"].toString());
         p.br();
-        p.ltext(tr("Date"), 0);
+        p.ltext(tr("Date"), sideMarginMm);
         p.rtext(QDate::currentDate().toString(FORMAT_DATE_TO_STR));
         p.br();
-        p.ltext(tr("Time"), 0);
+        p.ltext(tr("Time"), sideMarginMm);
         p.rtext(QTime::currentTime().toString(FORMAT_TIME_TO_STR));
         p.br();
-        p.ltext(tr("Staff"), 0);
+        p.ltext(tr("Staff"), sideMarginMm);
         p.rtext(mUser->shortFullName());
         p.br();
         p.line();
@@ -1065,7 +1077,7 @@ void DlgOrder::printService(const QJsonObject &jdoc)
             const QString dishName = fromPackage
                                          ? QStringLiteral(">>> %1").arg(jd[QStringLiteral("f_dish_name")].toString())
                                          : jd[QStringLiteral("f_dish_name")].toString();
-            p.ltext(dishName, 0, 65);
+            p.ltext(dishName, sideMarginMm, nameWidthMm);
             p.setFontBold(true);
             const QString qtyLine = jd.value(QStringLiteral("f_qty_line")).toString();
             const QString qtyOut = qtyLine.isEmpty()
@@ -1077,7 +1089,7 @@ void DlgOrder::printService(const QJsonObject &jdoc)
                 p.br();
                 p.setFontSize(bs - 4);
                 p.setFontBold(true);
-                p.ltext(jd["f_comment"].toString(), 0, 650);
+                p.ltext(jd["f_comment"].toString(), sideMarginMm, 650);
                 p.br();
                 p.setFontSize(bs + 2);
             }
@@ -1090,7 +1102,7 @@ void DlgOrder::printService(const QJsonObject &jdoc)
         p.line();
         p.br(1);
         p.setFontSize(bs - 6);
-        p.ltext(QString("%1 %2").arg(tr("Printer: "), printerName));
+        p.ltext(QString("%1 %2").arg(tr("Printer: "), printerName), sideMarginMm);
         p.setFontBold(true);
         p.rtext(jo["side"].toString());
         p.br();
@@ -1323,7 +1335,7 @@ void DlgOrder::setDishQty(std::function<double(WaiterDish)> getQty)
 
         double qty = getQty(d);
 
-        if(qty <= 0.01) {
+        if(qty <= 0.000001) {
             return;
         }
 
@@ -1376,7 +1388,7 @@ void DlgOrder::setDishQty(std::function<double(WaiterDish)> getQty)
 
     double qty = getQty(d);
 
-    if(qty <= 0.01) {
+    if(qty <= 0.000001) {
         return;
     }
 
@@ -2914,6 +2926,8 @@ void DlgOrder::parseOrder(const QJsonObject & jdoc)
         }
 
         QPointer<DlgOrder> self(this);
+        const bool autoFiscal = mWorkStation.data.value(QStringLiteral("f_auto_fiscal")).toBool();
+        bool forceAutoFiscal = false;
 
         for(auto pt : payment_types) {
             double rowAmount = mOrder.payment(payment_fields[pt]);
@@ -2927,7 +2941,13 @@ void DlgOrder::parseOrder(const QJsonObject & jdoc)
                 continue;
             }
 
-            if(pt == 2) {
+            if(autoFiscal
+                    && (pt == PAYMENT_TYPE_CASH
+                        || pt == PAYMENT_TYPE_CARD
+                        || pt == PAYMENT_TYPE_IDRAM
+                        || pt == PAYMENT_TYPE_TELCELL)) {
+                forceAutoFiscal = true;
+            } else if(!autoFiscal && pt == PAYMENT_TYPE_CARD) {
                 ui->btnPrintFiscal->setChecked(true);
             }
 
@@ -2950,6 +2970,13 @@ void DlgOrder::parseOrder(const QJsonObject & jdoc)
                 b->deleteLater();
             });
             ui->vlPayment->addWidget(b);
+        }
+
+        if(forceAutoFiscal) {
+            ui->btnPrintFiscal->setChecked(true);
+            ui->btnPrintFiscal->setEnabled(false);
+        } else {
+            ui->btnPrintFiscal->setEnabled(true);
         }
     }
 
@@ -3157,6 +3184,11 @@ void DlgOrder::on_btnCloseOrder_clicked()
 
     if(paymentsCount > 1 && hasMixed && hasNoMixed) {
         C5Message::error(tr("Combining payment types is not allowed."));
+        return;
+    }
+
+    if (mOrder.cashSessionId <= 0) {
+        C5Message::error(tr("Cashbox session is not assigned to order"));
         return;
     }
 

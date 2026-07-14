@@ -128,6 +128,7 @@ abstract class WorkstationConfigBase
             'f_quick_debt_partner_id',
             'dlgsearchmenu_hsection_size',
             'dlgsearchmenu_vsection_size',
+            'print_paper_width',
         ], true)) {
             return (int)$value;
         }
@@ -140,6 +141,7 @@ abstract class WorkstationConfigBase
             'receipt_no_discount_hint',
             'input_cashbox_amount_before_close',
             'bistro',
+            'f_auto_fiscal',
         ], true)) {
             return (bool)$value;
         }

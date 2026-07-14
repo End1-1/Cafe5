@@ -417,3 +417,176 @@ QListWidget#guestSearchList::item:selected {
     background: #455a71;
     color: #ffffff;
 }
+
+/* Kitchen in-progress fine (card layout) */
+QDialog#DlgKitchenInProgressFine {
+    background: #1f1f1f;
+}
+
+QDialog#DlgKitchenInProgressFine QLabel#lbTime {
+    color: #ffffff;
+    font-size: 28px;
+    font-weight: 600;
+    min-width: 80px;
+}
+
+QDialog#DlgKitchenInProgressFine QPushButton#btnTabLive,
+QDialog#DlgKitchenInProgressFine QPushButton#btnTabHistory {
+    border-radius: 14px;
+    padding: 10px 18px;
+    font-size: 16px;
+    font-weight: 600;
+    border: 2px solid #5a5a5a;
+    background: #2a2a2a;
+    color: #ffffff;
+}
+
+QDialog#DlgKitchenInProgressFine QPushButton#btnTabLive:checked,
+QDialog#DlgKitchenInProgressFine QPushButton#btnTabHistory:checked {
+    background: #ffffff;
+    color: #111111;
+    border-color: #ffffff;
+}
+
+QDialog#DlgKitchenInProgressFine QLabel#lbLiveCount {
+    background: #111111;
+    color: #ffffff;
+    border-radius: 16px;
+    font-weight: 700;
+    font-size: 14px;
+}
+
+QDialog#DlgKitchenInProgressFine QScrollArea#scrollCards,
+QDialog#DlgKitchenInProgressFine QWidget#scrollCardsContents {
+    background: transparent;
+    border: none;
+}
+
+QDialog#DlgKitchenInProgressFine QScrollArea#scrollCards > QWidget > QWidget {
+    background: transparent;
+}
+
+QWidget#kitchenFineOrderCard {
+    background: #2f3d52;
+    border-radius: 16px;
+    min-width: 310px;
+    max-width: 310px;
+}
+
+QWidget#kitchenFineColumn {
+    min-width: 310px;
+    max-width: 310px;
+}
+
+QWidget#kitchenFineOrderCard[card_color="blue"] {
+    background: #2f3d52;
+}
+
+QWidget#kitchenFineOrderCard[card_color="yellow"] {
+    background: #4a3a24;
+}
+
+QWidget#kitchenFineOrderCard[card_color="green"] {
+    background: #244533;
+}
+
+QWidget#kitchenFineOrderCard[card_color="red"] {
+    background: #4a2424;
+}
+
+QWidget#kitchenFineCardHeader[card_color="blue"] QLabel#kitchenFineOrderPrefix {
+    background: #2f6fed;
+    color: #ffffff;
+    border-radius: 10px;
+    padding: 6px 12px;
+    font-weight: 700;
+}
+
+QWidget#kitchenFineCardHeader[card_color="yellow"] QLabel#kitchenFineOrderPrefix {
+    background: #e6a020;
+    color: #111111;
+    border-radius: 10px;
+    padding: 6px 12px;
+    font-weight: 700;
+}
+
+QWidget#kitchenFineCardHeader[card_color="green"] QLabel#kitchenFineOrderPrefix {
+    background: #2fb56a;
+    color: #ffffff;
+    border-radius: 10px;
+    padding: 6px 12px;
+    font-weight: 700;
+}
+
+QWidget#kitchenFineCardHeader[card_color="red"] QLabel#kitchenFineOrderPrefix {
+    background: #e53935;
+    color: #ffffff;
+    border-radius: 10px;
+    padding: 6px 12px;
+    font-weight: 700;
+}
+
+QWidget#kitchenFineTimeWrap {
+    background: #ffffff;
+    border-radius: 10px;
+}
+
+QLabel#kitchenFineOrderTime {
+    color: #111111;
+    font-weight: 600;
+}
+
+QWidget#kitchenFineItemsHost {
+    background: transparent;
+}
+
+QWidget#kitchenFineItemRow {
+    background: #ffffff;
+    border-radius: 12px;
+}
+
+QLabel#kitchenFineItemQty {
+    background: #eceff3;
+    color: #111111;
+    border-radius: 8px;
+    font-weight: 700;
+    font-size: 16px;
+    min-height: 36px;
+}
+
+QLabel#kitchenFineItemName {
+    color: #111111;
+    font-weight: 700;
+    font-size: 15px;
+}
+
+QLabel#kitchenFineItemComment {
+    color: #666666;
+    font-size: 13px;
+}
+
+QPushButton#kitchenFineStatusButton {
+    border: none;
+    border-bottom-left-radius: 16px;
+    border-bottom-right-radius: 16px;
+    color: #ffffff;
+    font-size: 16px;
+    font-weight: 700;
+}
+
+QPushButton#kitchenFineStatusButton[card_color="blue"] {
+    background: #2f6fed;
+}
+
+QPushButton#kitchenFineStatusButton[card_color="yellow"] {
+    background: #e6a020;
+    color: #111111;
+}
+
+QPushButton#kitchenFineStatusButton[card_color="green"] {
+    background: #2fb56a;
+}
+
+QPushButton#kitchenFineStatusButton[card_color="red"] {
+    background: #e53935;
+}

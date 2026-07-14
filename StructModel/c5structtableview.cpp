@@ -46,6 +46,11 @@ void C5StructTableView::updateGoodsLastInputPrices(const QHash<int, double> &pri
     sLastResultsByEngine[engine] = updated;
 }
 
+QJsonArray C5StructTableView::cachedResults(const QString &searchEngine)
+{
+    return sLastResultsByEngine.value(searchEngine);
+}
+
 C5StructTableView::C5StructTableView(C5User *user)
     : C5Dialog(user), ui(new Ui::C5StructTableView)
 {

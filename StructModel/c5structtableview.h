@@ -27,6 +27,8 @@ public:
 
     static void updateGoodsLastInputPrices(const QHash<int, double> &prices);
 
+    static QJsonArray cachedResults(const QString &searchEngine);
+
     template<typename T>
     void handleSearchResult(const QJsonArray &jarr, C5StructModel<T>* model)
     {

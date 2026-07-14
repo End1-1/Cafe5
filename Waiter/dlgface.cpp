@@ -8,7 +8,7 @@
 #include "dlgguest.h"
 #include "dlgorder.h"
 #include "dlgpreorderslist.h"
-#include "dlgkitcheninprogress.h"
+#include "dlgkitcheninprogressfine.h"
 #include "dlgattendanceauth.h"
 #include "dlgtext.h"
 #include "format_date.h"
@@ -347,7 +347,7 @@ void DlgFace::on_btnPreorders_clicked()
 void DlgFace::on_btnInProgress_clicked()
 {
     fTimer.stop();
-    DlgKitchenInProgress d(mUser, &mHall, &mTables, &mGoodsGroups, &mDishes, this);
+    DlgKitchenInProgressFine d(mUser, &mHall, &mTables, &mGoodsGroups, &mDishes, this);
     d.exec();
     updateHall();
     fTimer.start(TIMER_TIMEOUT_INTERVAL);

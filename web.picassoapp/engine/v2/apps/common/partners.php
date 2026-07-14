@@ -28,6 +28,24 @@ class Partners extends Auth
         $this->echoResult();
     }
 
+    public function GetByTin($params)
+    {
+        $tin = trim((string)($params->f_taxcode ?? ""));
+        if ($tin === "") {
+            dieWithCode("f_taxcode is required");
+        }
+        $row = $this->select(
+            "select f_id from c_partners where f_taxcode=? and f_state>0 limit 1",
+            "s",
+            [$tin]
+        )->fetch_assoc();
+        if (!$row) {
+            dieWithCode("Partner not found");
+        }
+        $this->result["partner"] = $this->GetPartnerData((int)$row["f_id"]);
+        $this->echoResult();
+    }
+
     public function Save($params)
     {
 

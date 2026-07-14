@@ -117,6 +117,7 @@ void SelfBoardOrderSubmit::submit(OrderCart *cart,
         int nextIndex = 0;
         int tableId = 0;
         int cashboxId = 0;
+        int cashSessionId = 0;
         double serviceFactor = 0.0;
         double totalAmount = 0.0;
         QString sessionKey;
@@ -146,6 +147,11 @@ void SelfBoardOrderSubmit::submit(OrderCart *cart,
     const auto closeOrder = std::make_shared<std::function<void()>>();
 
     *closeOrder = [state, fail, closeOrder]() {
+        if (state->cashSessionId <= 0) {
+            fail(QCoreApplication::translate("SelfBoardOrderSubmit", "Cashbox session is not open"));
+            return;
+        }
+
         NInterface::query(
             QStringLiteral("/engine/v2/waiter/order/close-order"),
             state->sessionKey,
@@ -155,7 +161,7 @@ void SelfBoardOrderSubmit::submit(OrderCart *cart,
                 {QStringLiteral("fiscal"), QJsonObject{}},
                 {QStringLiteral("cashbox_id"), state->cashboxId},
                 {QStringLiteral("cost_depend_on_service_and_discount"), false},
-                {QStringLiteral("cash_session_id"), 0},
+                {QStringLiteral("cash_session_id"), state->cashSessionId},
             },
             [state, fail](const QJsonObject &jdoc) {
                 if (jdoc.value(QStringLiteral("status")).toInt() != 1) {
@@ -263,6 +269,12 @@ void SelfBoardOrderSubmit::submit(OrderCart *cart,
                     fail(QCoreApplication::translate("SelfBoardOrderSubmit", "Order id is missing in server response"));
                     return;
                 }
+                const int cashSessionId = order.value(QStringLiteral("f_cash_session_id")).toInt();
+                if (cashSessionId <= 0) {
+                    fail(QCoreApplication::translate("SelfBoardOrderSubmit", "Cashbox session is not open"));
+                    return;
+                }
+                state->cashSessionId = cashSessionId;
                 state->orderId = orderId;
                 ++state->nextIndex;
                 (*addNextDish)();

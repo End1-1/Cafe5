@@ -17,8 +17,10 @@ class WorkstationConfigCommon extends WorkstationConfigBase
             'f_scale_pattern',
             'f_quick_debt_partner_id',
             'input_cashbox_amount_before_close',
-            'print_sssserver',
+            'print_server',
+            'print_paper_width',
             'bistro',
+            'f_auto_fiscal',
         ];
     }
 
@@ -31,8 +33,19 @@ class WorkstationConfigCommon extends WorkstationConfigBase
             'f_scale_pattern' => '22',
             'f_quick_debt_partner_id' => 0,
             'input_cashbox_amount_before_close' => true,
-            'print_sssserver' => 'http://127.0.0.1:8181/print',
+            'print_server' => 'http://127.0.0.1:8181/print',
+            'print_paper_width' => 0,
             'bistro' => false,
+            'f_auto_fiscal' => false,
         ];
+    }
+
+    /** @param array<string,mixed> $stored */
+    protected function mergeDefaults(array $stored): array
+    {
+        if (!isset($stored['print_server']) && isset($stored['print_sssserver'])) {
+            $stored['print_server'] = $stored['print_sssserver'];
+        }
+        return parent::mergeDefaults($stored);
     }
 }

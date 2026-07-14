@@ -2,6 +2,7 @@
 #define DLGPAYMENTCHOOSE_H
 
 #include "c5shopdialog.h"
+#include <QJsonObject>
 #include <qcoreapplication.h>
 
 namespace Ui
@@ -22,21 +23,32 @@ public:
 
     static bool getValues(C5User *user, double total, double& cash, double& card, double& idram, double& telcell, double& bank,
                           double& prepaid, double& debt, double& cashin, double& change,
-                          bool &fiscal, bool readOnlyPrepaid, double maxPrepaid);
+                          bool &fiscal, bool readOnlyPrepaid, double maxPrepaid,
+                          QJsonObject *pinpadResponse = nullptr);
 
     virtual bool keyEnter() override;
-
-private slots:
-    void on_btnCashRemain_clicked();
 
 private:
     bool fFiscal;
 
+    QJsonObject fPinpadResponse;
+
+    bool processArcusCardPayment(QString &error);
+
     void setFiscalStyle();
 
-private slots:
-
     void checkFiscal();
+
+    void clearAll(QLineEdit *le);
+
+    void countChange();
+
+    Ui::DlgPaymentChoose* ui;
+
+    double fMaxPrepaid;
+
+private slots:
+    void on_btnCashRemain_clicked();
 
     void on_btnBack_clicked();
 
@@ -91,15 +103,6 @@ private slots:
     void on_leChange_returnPressed();
 
     void on_leCredit_returnPressed();
-
-private:
-    Ui::DlgPaymentChoose* ui;
-
-    void clearAll(QLineEdit *le);
-
-    void countChange();
-
-    double fMaxPrepaid;
 };
 
 #endif // DLGPAYMENTCHOOSE_H

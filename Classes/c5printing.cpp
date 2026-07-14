@@ -8,6 +8,7 @@ C5Printing::C5Printing()
 {
     fLogicalDpiX = 96;
     fNormalWidth = 500;
+    fRightMarginMm = 0;
     reset();
 }
 
@@ -21,6 +22,7 @@ void C5Printing::reset()
 {
     fTop = 0;
     fTempTop = 0;
+    fRightMarginMm = 0;
     fJsonData = QJsonArray();
     setSceneParams(fNormalWidth, 20000, fLogicalDpiX);
 
@@ -50,6 +52,16 @@ void C5Printing::setSceneParams(qreal width, qreal height, qreal logicalDpiX)
     fPainter.setRenderHint(QPainter::Antialiasing, true);
     fPainter.setRenderHint(QPainter::TextAntialiasing, true);
     fPainter.setRenderHint(QPainter::SmoothPixmapTransform, true);
+}
+
+void C5Printing::setRightMarginMm(qreal mm)
+{
+    fRightMarginMm = qMax<qreal>(0.0, mm);
+}
+
+int C5Printing::rightMarginPx() const
+{
+    return qRound(fRightMarginMm * fMM);
 }
 
 void C5Printing::addToJson(const QString &type, const QVariantMap &params)
@@ -93,7 +105,10 @@ void C5Printing::ltext(const QString &text, qreal x, qreal textWidth)
     int posX = qRound(x * fMM);
 
     // Считаем ширину в пикселях
-    int width = (textWidth > 0) ? qRound(textWidth * fMM) : (fNormalWidth - posX);
+    int width = (textWidth > 0) ? qRound(textWidth * fMM) : (fNormalWidth - posX - rightMarginPx());
+    if(width < 1) {
+        width = 1;
+    }
 
     // Отрисовка с переносом
     // Используем высоту 10000, чтобы тексту было куда расти вниз
@@ -117,7 +132,8 @@ void C5Printing::ltext(const QString &text, qreal x, qreal textWidth)
 void C5Printing::ctext(const QString &text)
 {
     fPainter.setFont(fFont);
-    QRect rect(0, fTop, fNormalWidth, 10000);
+    const int rightPad = rightMarginPx();
+    QRect rect(0, fTop, qMax(1, fNormalWidth - rightPad), 10000);
     QRect bound = fPainter.boundingRect(rect, Qt::AlignHCenter | Qt::AlignTop | Qt::TextWordWrap, text);
     fPainter.drawText(rect, Qt::AlignHCenter | Qt::AlignTop | Qt::TextWordWrap, text);
 
@@ -129,7 +145,7 @@ void C5Printing::rtext(const QString text)
 {
     fPainter.setFont(fFont);
     int w = QFontMetrics(fFont).horizontalAdvance(text);
-    int posX = qMax(0, fNormalWidth - w - 5);
+    int posX = qMax(0, fNormalWidth - w - 5 - rightMarginPx());
     fPainter.drawText(posX, fTop + QFontMetrics(fFont).ascent(), text);
 
     fTempTop = qMax(fTempTop, fLineHeight);
@@ -154,7 +170,7 @@ void C5Printing::line(int lineWidth)
 {
     fLinePen.setWidth(lineWidth);
     fPainter.setPen(fLinePen);
-    fPainter.drawLine(0, fTop, fNormalWidth, fTop);
+    fPainter.drawLine(0, fTop, qMax(0, fNormalWidth - rightMarginPx()), fTop);
 
     if (lineWidth > 1) {
         addToJson("line2", {{"width", lineWidth}});

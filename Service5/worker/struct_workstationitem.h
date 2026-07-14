@@ -59,7 +59,26 @@ struct WorkstationItem : public ParentItem {
     }
     const int fiscalMachineId() const { return data.value("f_fiscal_machine_id").toInt(); }
     const int quickDebtPartnerId() const { return data.value("f_quick_debt_partner_id").toInt(); }
-    const QString printServer() const { return data.value("print_server").toString(); }
+    const QString printServer() const
+    {
+        QString url = data.value(QStringLiteral("print_server")).toString();
+        if(url.isEmpty()) {
+            url = data.value(QStringLiteral("print_sssserver")).toString();
+        }
+        return url;
+    }
+    int printPaperWidthMm() const { return data.value(QStringLiteral("print_paper_width")).toInt(); }
+
+    bool isArcusConfigured() const
+    {
+        return arcusPort() > 0 && !arcusAddress().trimmed().isEmpty() && !arcusKey().trimmed().isEmpty();
+    }
+
+    int arcusPort() const { return data.value(QStringLiteral("arcus_port")).toInt(); }
+
+    QString arcusAddress() const { return data.value(QStringLiteral("arcus_address")).toString(); }
+
+    QString arcusKey() const { return data.value(QStringLiteral("arcus_key")).toString(); }
 };
 
 template<>

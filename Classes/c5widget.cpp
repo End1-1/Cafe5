@@ -157,6 +157,11 @@ bool C5Widget::confirmTabClose()
     return true;
 }
 
+bool C5Widget::confirmApplicationClose()
+{
+    return true;
+}
+
 bool C5Widget::parseBroadcastMessage(int what, const QString &msg, QString &replystr)
 {
     Q_UNUSED(what);

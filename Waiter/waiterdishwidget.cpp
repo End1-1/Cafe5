@@ -95,7 +95,7 @@ void WaiterDishWidget::updateDish(WaiterDish value)
     } else {
         ui->lbEmarks->setVisible(!mOrderItem.emarks().isEmpty());
         ui->lbComplimentary->setVisible(mOrderItem.complimentary());
-        ui->lbQty1->setText(float_str(mOrderItem.qty, 2));
+        ui->lbQty1->setText(float_str(mOrderItem.qty, 3));
         {
             const double lineTotal = mBistroMode
                                          ? mOrderItem.lineAmount(mIsPreorder, true,

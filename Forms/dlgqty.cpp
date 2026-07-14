@@ -1,6 +1,19 @@
 #include "dlgqty.h"
 #include "ui_dlgqty.h"
-#include "c5config.h"
+
+namespace {
+
+double parseQtyText(const QString &raw)
+{
+    QString t = raw.trimmed();
+    t.replace(QLatin1Char(','), QLatin1Char('.'));
+    t.remove(QLatin1Char(' '));
+    bool ok = false;
+    const double v = t.toDouble(&ok);
+    return ok ? v : 0.0;
+}
+
+}
 
 DlgQty::DlgQty(C5User *user) :
     C5Dialog(user),
@@ -20,8 +33,8 @@ bool DlgQty::getQty(double& qty, const QString &name, C5User *user)
     d.ui->label->setText(name);
 
     if(d.exec() == QDialog::Accepted) {
-        qty = d.ui->leQty->getDouble();
-        return true;
+        qty = parseQtyText(d.ui->leQty->text());
+        return qty > 0.000001;
     }
 
     return false;
@@ -34,25 +47,39 @@ void DlgQty::on_btnClear_clicked()
 
 void DlgQty::click(const QString &c)
 {
-    if(c == "0" && ui->leQty->getDouble() < 0.001) {
-        return;
-    }
+    QString text = ui->leQty->text();
 
-    if(c == ".") {
-        if(ui->leQty->getDouble() < 0.001) {
-            ui->leQty->setText("0.");
+    if(c == QLatin1String(".")) {
+        if(text.contains(QLatin1Char('.'))) {
+            return;
+        }
+
+        if(text.isEmpty()) {
+            ui->leQty->setText(QStringLiteral("0."));
         } else {
-            if(ui->leQty->text().contains(".")) {
-                return;
-            }
-
-            ui->leQty->setText(ui->leQty->text() + ".");
+            ui->leQty->setText(text + QLatin1Char('.'));
         }
 
         return;
     }
 
-    ui->leQty->setText(ui->leQty->text() + c);
+    if(c == QLatin1String("0")) {
+        if(text.isEmpty()) {
+            ui->leQty->setText(QStringLiteral("0"));
+            return;
+        }
+
+        /* Leading zeros without a decimal are useless ("00", "01"...). */
+        if(!text.contains(QLatin1Char('.')) && text == QLatin1String("0")) {
+            return;
+        }
+    } else if(text == QLatin1String("0")) {
+        /* Replace lone integer zero: 0 + 8 → 8, not 08. */
+        ui->leQty->setText(c);
+        return;
+    }
+
+    ui->leQty->setText(text + c);
 }
 
 void DlgQty::on_btn1_clicked()
@@ -142,7 +169,7 @@ void DlgQty::on_btnCancel_clicked()
 
 void DlgQty::on_btnOk_clicked()
 {
-    if(ui->leQty->getDouble() > 0.001) {
+    if(parseQtyText(ui->leQty->text()) > 0.000001) {
         accept();
     }
 }

@@ -392,6 +392,9 @@ qt_add_executable(Waiter WIN32
     ../../desktop.newTax/Src/printtaxn.cpp
     dlgmovemoney.h dlgmovemoney.cpp dlgmovemoney.ui
     dlgkitcheninprogress.h dlgkitcheninprogress.cpp dlgkitcheninprogress.ui
+    dlgkitcheninprogressfine.h dlgkitcheninprogressfine.cpp dlgkitcheninprogressfine.ui
+    kitchenfineordercard.h kitchenfineordercard.cpp
+    kitchenfineitemrow.h kitchenfineitemrow.cpp
     dlgkitchensettings.h dlgkitchensettings.cpp dlgkitchensettings.ui
     dlgpreorderdatetime.h dlgpreorderdatetime.cpp dlgprecheckoptions.ui
     dlgcustdisplay.h dlgcustdisplay.cpp dlgcustdisplay.ui

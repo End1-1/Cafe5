@@ -25,6 +25,9 @@ void RWorkstationConfigShop::applyConfig(const QJsonObject &config)
     ui->chReceiptNoTable->setChecked(config.value(QStringLiteral("receipt_no_table")).toBool(true));
     ui->chReceiptNoServiceHint->setChecked(config.value(QStringLiteral("receipt_no_service_hint")).toBool(true));
     ui->chReceiptNoDiscountHint->setChecked(config.value(QStringLiteral("receipt_no_discount_hint")).toBool(true));
+    ui->leArcusPort->setText(QString::number(config.value(QStringLiteral("arcus_port")).toInt()));
+    ui->leArcustAddress->setText(config.value(QStringLiteral("arcus_address")).toString());
+    ui->leArcusKey->setText(config.value(QStringLiteral("arcus_key")).toString());
 }
 
 QJsonObject RWorkstationConfigShop::collectConfig() const
@@ -38,5 +41,8 @@ QJsonObject RWorkstationConfigShop::collectConfig() const
     jo.insert(QStringLiteral("receipt_no_table"), ui->chReceiptNoTable->isChecked());
     jo.insert(QStringLiteral("receipt_no_service_hint"), ui->chReceiptNoServiceHint->isChecked());
     jo.insert(QStringLiteral("receipt_no_discount_hint"), ui->chReceiptNoDiscountHint->isChecked());
+    jo.insert(QStringLiteral("arcus_port"), ui->leArcusPort->text().trimmed().toInt());
+    jo.insert(QStringLiteral("arcus_address"), ui->leArcustAddress->text().trimmed());
+    jo.insert(QStringLiteral("arcus_key"), ui->leArcusKey->text().trimmed());
     return jo;
 }

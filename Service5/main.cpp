@@ -51,7 +51,9 @@ int main(int argc, char *argv[])
 
             ConfigIni::init(APPDIR + "config.ini");
             LogWriter::fCurrentLevel = 100;
-            LogWriter::write(LogWriterLevel::verbose, "", "Running in console mode");
+            LogWriter::write(LogWriterLevel::verbose, "",
+                             QString("Running in console mode. Log candidates: %1")
+                                 .arg(LogWriter::candidateLogDirectories().join(" | ")));
 
             ServerThread server(APPDIR);
             server.run();
@@ -97,7 +99,9 @@ VOID SvcInit(DWORD dwArgc, LPTSTR *lpszArgv)
     // Инициализация ресурсов внутри потока сервиса
     ConfigIni::init(APPDIR + "config.ini");
     LogWriter::fCurrentLevel = 100;
-    LogWriter::write(LogWriterLevel::verbose, "", "Service thread started, app initialized");
+    LogWriter::write(LogWriterLevel::verbose, "",
+                     QString("Service thread started. Log candidates: %1")
+                         .arg(LogWriter::candidateLogDirectories().join(" | ")));
 
     ReportSvcStatus(SERVICE_RUNNING, NO_ERROR, 0);
 

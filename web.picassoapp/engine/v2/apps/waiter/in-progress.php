@@ -62,6 +62,7 @@ class InProgress extends Auth
                 'f_goods_name' => $r['f_goods_name'],
                 'f_status' => (int) $r['f_status'],
                 'f_comment' => $r['f_comment'],
+                'f_ready_at' => $r['f_ready_at'] ?? '',
             ];
         }
 
@@ -97,7 +98,13 @@ class InProgress extends Auth
             COALESCE(json_value(oh.f_data, '$.f_amount_prepaid'), '0') AS f_amount_prepaid,
             COALESCE(json_value(oh.f_data, '$.f_guest.f_guest_name'), '') AS f_guest_name,
             COALESCE(json_value(oh.f_data, '$.f_guest.f_guest_phone'), '') AS f_guest_phone,
-            COALESCE(json_value(oh.f_data, '$.f_guest.f_guest_address'), '') AS f_guest_address
+            COALESCE(json_value(oh.f_data, '$.f_guest.f_guest_address'), '') AS f_guest_address,
+            COALESCE(
+                NULLIF(JSON_UNQUOTE(JSON_EXTRACT(ogp.f_data, '$.f_status_3_1_time')), ''),
+                NULLIF(JSON_UNQUOTE(JSON_EXTRACT(ogp.f_data, '$.f_status_3_2_time')), ''),
+                NULLIF(JSON_UNQUOTE(JSON_EXTRACT(ogp.f_data, '$.f_status_3_3_time')), ''),
+                NULLIF(JSON_UNQUOTE(JSON_EXTRACT(ogp.f_data, '$.f_status_3_4_time')), '')
+            ) AS f_ready_at
         FROM o_goods_process ogp
         INNER JOIN o_header oh ON oh.f_id = ogp.f_header AND oh.f_state IN (1, 2)
         INNER JOIN h_tables t ON t.f_id = oh.f_table
@@ -158,7 +165,13 @@ class InProgress extends Auth
             COALESCE(json_value(oh.f_data, '$.f_amount_prepaid'), '0') AS f_amount_prepaid,
             COALESCE(json_value(oh.f_data, '$.f_guest.f_guest_name'), '') AS f_guest_name,
             COALESCE(json_value(oh.f_data, '$.f_guest.f_guest_phone'), '') AS f_guest_phone,
-            COALESCE(json_value(oh.f_data, '$.f_guest.f_guest_address'), '') AS f_guest_address
+            COALESCE(json_value(oh.f_data, '$.f_guest.f_guest_address'), '') AS f_guest_address,
+            COALESCE(
+                NULLIF(JSON_UNQUOTE(JSON_EXTRACT(ogp.f_data, '$.f_status_3_1_time')), ''),
+                NULLIF(JSON_UNQUOTE(JSON_EXTRACT(ogp.f_data, '$.f_status_3_2_time')), ''),
+                NULLIF(JSON_UNQUOTE(JSON_EXTRACT(ogp.f_data, '$.f_status_3_3_time')), ''),
+                NULLIF(JSON_UNQUOTE(JSON_EXTRACT(ogp.f_data, '$.f_status_3_4_time')), '')
+            ) AS f_ready_at
         FROM o_goods_process ogp
         INNER JOIN o_header oh ON oh.f_id = ogp.f_header AND oh.f_state IN (1, 2)
         INNER JOIN h_tables t ON t.f_id = oh.f_table

@@ -51,6 +51,10 @@ public:
 
     static Working* working();
 
+    int cashSessionId() const;
+
+    bool hasActiveSession() const;
+
     static QMap<int, Flag> fFlags;
 
     static QHash<QString, int> fGoodsRows;
@@ -95,13 +99,23 @@ private:
 
     void showSessionWidget();
 
+    void applyCashboxSession(const QJsonObject &session);
+
+    void clearCashboxSession();
+
+    void refreshCashboxSession();
+
+    void updateSessionUi();
+
     void setSaleControlsEnabled(bool enabled);
 
     void printCloseSessionReport(const QJsonObject &cashbox, bool cashCounted);
 
     void printDifferenceAct(const QJsonObject &cashbox);
 
-    bool mSessionActive = false;
+    int mCashSessionId = 0;
+
+    QJsonObject mCashboxSessionData;
 
 private slots:
     void orderSaved(QWidget* w);
@@ -180,7 +194,7 @@ private slots:
 
     void on_btnCloseSession_clicked();
 
-    void onSessionOpened();
+    void onSessionOpened(const QJsonObject &session);
 };
 
 #endif // WORKING_H

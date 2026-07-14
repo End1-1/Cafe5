@@ -19,6 +19,18 @@ class C5StoreInput : public C5Widget
 {
     Q_OBJECT
 
+    enum RelatedOutputColumns {
+        col_related_id = 0,
+        col_related_type,
+        col_related_number,
+        col_related_status,
+        col_related_date,
+        col_related_store_out,
+        col_related_store_in,
+        col_related_sum,
+        col_related_doc_type
+    };
+
     enum Columns {
         col_rec_in_id = 0,
         col_goods_id,   // 1
@@ -47,6 +59,8 @@ public:
     virtual bool allowChangeDatabase() override;
 
     bool confirmTabClose() override;
+
+    bool confirmApplicationClose() override;
 
     double total();
 
@@ -87,13 +101,25 @@ private:
     QString mInitialDocNum;
     bool mDocumentPersisted = false;
 
+    int mRelatedOutputTabIndex = -1;
+
+    bool mRelatedOutputsLoaded = false;
+
     void captureInitialState();
+
+    void loadRelatedOutputs();
+
+    void openRelatedDocument(const QString &docId, int docType);
 
     bool hasUnsavedChanges() const;
 
     double goodsRowPrice(int row) const;
 
     void syncGoodsSearchCachePrices() const;
+
+    int unsavedCloseChoice() const;
+
+    bool saveDraftBlocking();
 
     bool buildDoc();
 
@@ -181,5 +207,14 @@ private slots:
     void on_btnSaveComment_clicked();
 
     void on_btnRemoveGoods_clicked();
+
     void on_btnPinDate_clicked(bool checked);
+
+    void on_tw_currentChanged(int index);
+
+    void on_btnRefreshRelatedOutput_clicked();
+
+    void on_tblRelatedOutput_cellDoubleClicked(int row, int column);
+
+    void importFromXml();
 };

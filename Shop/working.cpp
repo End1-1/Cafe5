@@ -216,6 +216,16 @@ Working* Working::working()
     return fInstance;
 }
 
+int Working::cashSessionId() const
+{
+    return mCashSessionId;
+}
+
+bool Working::hasActiveSession() const
+{
+    return mCashSessionId > 0;
+}
+
 Flag Working::flag(int id)
 {
     if(fFlags.contains(id)) {
@@ -288,8 +298,7 @@ void Working::checkCashboxSession()
                            const QJsonObject session = jdoc.value(QStringLiteral("cashbox_session")).toObject();
 
                            if (session.value(QStringLiteral("f_id")).toInt() > 0) {
-                               mSessionActive = true;
-                               setSaleControlsEnabled(true);
+                               applyCashboxSession(session);
                                newSale(1);
                            } else {
                                showSessionWidget();
@@ -297,10 +306,65 @@ void Working::checkCashboxSession()
                        });
 }
 
+void Working::applyCashboxSession(const QJsonObject &session)
+{
+    mCashboxSessionData = session;
+    mCashSessionId = session.value(QStringLiteral("f_id")).toInt();
+    updateSessionUi();
+    setSaleControlsEnabled(true);
+}
+
+void Working::clearCashboxSession()
+{
+    mCashboxSessionData = QJsonObject();
+    mCashSessionId = 0;
+    updateSessionUi();
+    setSaleControlsEnabled(false);
+}
+
+void Working::refreshCashboxSession()
+{
+    const int cashboxId = mWorkStation.cashboxId();
+
+    if (cashboxId <= 0 || !hasActiveSession()) {
+        return;
+    }
+
+    NInterface::query1(QStringLiteral("/engine/v2/waiter/cashbox/check-status"),
+                       mUser->mSessionKey,
+                       this,
+                       {{QStringLiteral("cashbox_id"), cashboxId}},
+                       [this](const QJsonObject &jdoc) {
+                           const QJsonObject session = jdoc.value(QStringLiteral("cashbox_session")).toObject();
+
+                           if (session.value(QStringLiteral("f_id")).toInt() > 0) {
+                               applyCashboxSession(session);
+                           } else {
+                               clearCashboxSession();
+                               showSessionWidget();
+                           }
+                       });
+}
+
+void Working::updateSessionUi()
+{
+    if (!hasActiveSession()) {
+        ui->lbShift->setVisible(false);
+        ui->lbShiftInfo->setText(tr("closed"));
+        return;
+    }
+
+    ui->lbShift->setVisible(true);
+    ui->lbShiftInfo->setText(QStringLiteral("#%1 | %2 | %3 %4")
+                                 .arg(mCashSessionId)
+                                 .arg(mCashboxSessionData.value(QStringLiteral("f_amount_expected")).toString())
+                                 .arg(mCashboxSessionData.value(QStringLiteral("f_orders_count")).toInt())
+                                 .arg(tr("ops")));
+}
+
 void Working::showSessionWidget()
 {
-    mSessionActive = false;
-    setSaleControlsEnabled(false);
+    clearCashboxSession();
 
     while (ui->tab->count() > 0) {
         QWidget *w = ui->tab->widget(0);
@@ -314,9 +378,9 @@ void Working::showSessionWidget()
     connect(ws, &WSession::sessionOpened, this, &Working::onSessionOpened);
 }
 
-void Working::onSessionOpened()
+void Working::onSessionOpened(const QJsonObject &session)
 {
-    if (mSessionActive) {
+    if (hasActiveSession()) {
         return;
     }
 
@@ -328,8 +392,7 @@ void Working::onSessionOpened()
     }
 
     ui->tab->setTabsClosable(true);
-    mSessionActive = true;
-    setSaleControlsEnabled(true);
+    applyCashboxSession(session);
     newSale(1);
 }
 
@@ -450,7 +513,7 @@ void Working::printDifferenceAct(const QJsonObject &cashbox)
 
 WOrder* Working::newSale(int type)
 {
-    if (!mSessionActive) {
+    if (!hasActiveSession()) {
         return nullptr;
     }
 
@@ -514,6 +577,7 @@ void Working::orderSaved(QWidget *w)
         if (wt == w) {
             ui->tab->removeTab(i);
             w->deleteLater();
+            refreshCashboxSession();
             if (ui->tab->count() == 0) {
                 newSale(1);
             }
@@ -1071,7 +1135,7 @@ void Working::on_btnBooking_clicked()
 
 void Working::on_btnCloseSession_clicked()
 {
-    if (!mSessionActive) {
+    if (!hasActiveSession()) {
         return;
     }
 

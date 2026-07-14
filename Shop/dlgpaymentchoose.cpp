@@ -1,9 +1,13 @@
 #include "dlgpaymentchoose.h"
+#include <QCoreApplication>
 #include <QDoubleValidator>
 #include <QShortcut>
 #include <QStyle>
+#include "arcusclient.h"
 #include "c5message.h"
 #include "c5utils.h"
+#include "nloadingdlg.h"
+#include "struct_workstationitem.h"
 #include "ui_dlgpaymentchoose.h"
 
 DlgPaymentChoose::DlgPaymentChoose(C5User *user) :
@@ -48,7 +52,8 @@ bool DlgPaymentChoose::getValues(C5User *user,
                                  double &change,
                                  bool &fiscal,
                                  bool readOnlyPrepaid,
-                                 double maxPrepaid)
+                                 double maxPrepaid,
+                                 QJsonObject *pinpadResponse)
 {
     DlgPaymentChoose d(user);
     d.ui->leTotal->setDouble(total);
@@ -83,6 +88,9 @@ bool DlgPaymentChoose::getValues(C5User *user,
         cashin = d.ui->leCashIn->getDouble();
         change = d.ui->leChange->getDouble();
         fiscal = d.fFiscal;
+        if (pinpadResponse) {
+            *pinpadResponse = d.fPinpadResponse;
+        }
         return true;
     }
 
@@ -217,7 +225,46 @@ void DlgPaymentChoose::on_btnPay_clicked()
         return;
     }
 
+    fPinpadResponse = QJsonObject();
+    if (ui->leCard->getDouble() > 0.001) {
+        QString error;
+        if (!processArcusCardPayment(error)) {
+            C5Message::error(error);
+            return;
+        }
+    }
+
     accept();
+}
+
+bool DlgPaymentChoose::processArcusCardPayment(QString &error)
+{
+    if (!mWorkStation.isArcusConfigured()) {
+        error = tr("Arcus is not configured for this workstation");
+        return false;
+    }
+
+    const double card = ui->leCard->getDouble();
+    const qint64 amountMinor = qRound64(card * 100.0);
+    NLoadingDlg loading(tr("Card payment"), this);
+    loading.show();
+    QCoreApplication::processEvents();
+
+    QJsonObject response;
+    const bool ok = ArcusClient::chargeCard(mWorkStation.arcusAddress(),
+                                            mWorkStation.arcusPort(),
+                                            mWorkStation.arcusKey(),
+                                            amountMinor,
+                                            response,
+                                            error);
+    loading.close();
+
+    if (!ok) {
+        return false;
+    }
+
+    fPinpadResponse = response;
+    return true;
 }
 
 void DlgPaymentChoose::on_leCash_textChanged(const QString &arg1)

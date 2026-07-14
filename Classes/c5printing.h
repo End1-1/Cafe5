@@ -19,6 +19,7 @@ public:
     virtual ~C5Printing();
 
     void setSceneParams(qreal width, qreal height, qreal logicalDpiX);
+    void setRightMarginMm(qreal mm);
     void reset();
 
     // Настройки текста
@@ -52,9 +53,11 @@ private:
 
     int fTempTop;
     int fNormalWidth;
+    int rightMarginPx() const;
 
     qreal fMM;
     qreal fLogicalDpiX;
+    qreal fRightMarginMm = 0;
 
     QFont fFont;
     QPen fLinePen;

@@ -108,7 +108,7 @@ void WSession::finishSessionOpen()
     mFinished = true;
     mOpening = true;
     ui->btnOpenCashbox->setEnabled(false);
-    emit sessionOpened();
+    emit sessionOpened(mCashboxData);
 }
 
 void WSession::setup()

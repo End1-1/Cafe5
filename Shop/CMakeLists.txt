@@ -58,6 +58,7 @@ set(APP_SOURCES
 
     ../Http/httplite.h
     ../Http/httplite.cpp
+    arcusclient.h arcusclient.cpp
     ../Cafe5/c5registrysettings.cpp ../Cafe5/c5registrysettings.h
 
 

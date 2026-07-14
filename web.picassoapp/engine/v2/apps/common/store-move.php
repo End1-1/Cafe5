@@ -92,6 +92,44 @@ class StoreMove extends Auth
         $this->echoResult();
     }
 
+    public function relatedOutputs($params)
+    {
+        $id = $params->id ?? '';
+        if ($id === '') {
+            dieWithCode(Translator::t("Document id is required"));
+        }
+
+        $locale = Translator::$locale;
+        $sql = <<<EOD
+        SELECT DISTINCT sd.f_id,
+               sd.f_doc_type,
+               ld_type.f_value AS f_type_name,
+               ld_status.f_value AS f_status_name,
+               date_fmt(sd.f_doc_date) AS f_doc_date,
+               sd.f_user_id,
+               COALESCE(NULLIF(TRIM(sd.f_user_id), ''), LEFT(sd.f_id, 8)) AS f_doc_number,
+               COALESCE(so.f_name, '') AS f_store_out_name,
+               COALESCE(si.f_name, '') AS f_store_in_name,
+               sd.f_sum
+        FROM store_stock ss
+        INNER JOIN store_moves sm ON sm.f_batch_id = ss.f_id AND sm.f_doc <> ss.f_doc
+        INNER JOIN store_document sd ON sd.f_id = sm.f_doc
+        LEFT JOIN c_storages so ON so.f_id = sd.f_store_out
+        LEFT JOIN c_storages si ON si.f_id = sd.f_store_in
+        LEFT JOIN l_dictionary ld_status ON ld_status.f_dict_id = sd.f_status
+            AND ld_status.f_dict = 'store_statuses' AND ld_status.f_lang = ?
+        LEFT JOIN l_dictionary ld_type ON ld_type.f_dict_id = sd.f_doc_type
+            AND ld_type.f_dict = 'store_types' AND ld_type.f_lang = ?
+        WHERE ss.f_doc = ?
+          AND sm.f_qty_out > 0
+        ORDER BY sd.f_doc_date DESC, sd.f_user_id
+        EOD;
+
+        $rows = $this->select($sql, "sss", [$locale, $locale, $id])->fetch_all(MYSQLI_ASSOC);
+        $this->result["rows"] = $rows;
+        $this->echoResult();
+    }
+
     public function remove($params)
     {
         // 1. Начинаем транзакцию, так как удаление затрагивает много таблиц

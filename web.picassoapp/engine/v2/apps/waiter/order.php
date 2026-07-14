@@ -790,7 +790,7 @@ EOD;
         require_once __DIR__ . "/cashbox.php";
         $cc = new Cashbox();
         $cashboxId = $cc->resolveCashboxId($params);
-        $cash_session = $cc->ensureOpenSession($cashboxId, (int)$this->userid, 0);
+        $cash_session = $cc->GetOpenedCashboxSessionId($cashboxId);
         if (!$cash_session) {
             dieWithCode("Cashbox session is empty");
         }
@@ -818,6 +818,7 @@ EOD;
         $v["f_staff"] = $this->userid;
         $v["f_cashier"] = $this->userid;
         $v["f_currentstaff"] = $this->userid;
+        $v["f_cash_session_id"] = $cash_session["f_id"];
         $v["f_data"] = json_encode([
             "f_service_factor" => $service_factor,
             "f_discount_factor" => $discount_factor,
@@ -1013,6 +1014,10 @@ EOD;
         foreach ($payment["types"] as $pt) {
             $pn = $payment["fields"][$pt];
             $odata[$pn] = $params->$pn ?? 0;
+        }
+
+        if (!empty($params->f_pinpad_response)) {
+            $odata["f_pinpad_response"] = json_decode(json_encode($params->f_pinpad_response), true);
         }
 
         $this->applyDepositPrepaidAndRecalcTotals($odata, (float)($oheader["f_amounttotal"] ?? 0));
@@ -1473,14 +1478,17 @@ EOD;
         $payment = $this->paymentDict();
         require_once __DIR__ . "/cashbox.php";
         $cc = new Cashbox();
-        $cash_session_id = (int)$params->cash_session_id;
-        if ($cash_session_id === 0 || $odata["f_first_close"]) {
-            $cashboxId = $cc->resolveCashboxId($params);
-            $cash_session = $cc->GetOpenedCashboxSessionId($cashboxId);
-            if (!$cash_session) {
-                dieWithCode("Cashbox session is empty");
-            }
-            $cash_session_id = $cash_session["f_id"];
+        $cash_session_id = (int)($params->cash_session_id ?? 0);
+        if ($cash_session_id <= 0) {
+            dieWithCode("cash_session_id is required");
+        }
+        $cash_session_row = $cc->GetRawCashboxSession($cash_session_id);
+        if (!$cash_session_row || (int)$cash_session_row["f_state"] !== 1) {
+            dieWithCode("Cashbox session is not open");
+        }
+        $cashboxId = $cc->resolveCashboxId($params);
+        if ((int)$cash_session_row["f_cashbox_id"] !== $cashboxId) {
+            dieWithCode("cash_session_id does not match cashbox");
         }
 
         $totalDue = (float)($row["f_amounttotal"] ?? 0);

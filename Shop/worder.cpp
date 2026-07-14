@@ -205,11 +205,12 @@ void WOrder::writeOrder(std::function<void()> nextStep)
 
     //TODO replace prepaid max amount
     double cash = 0, card = 0, idram = 0, bank = 0, telcell = 0, debt = 0, prepaid = 0, cashin = 0, change = 0;
+    QJsonObject pinpadResponse;
     if (ui->btnF5->isChecked()) {
         debt = mOrder.totalDue;
     }
     if (!DlgPaymentChoose::getValues(
-            fUser, mOrder.totalDue, cash, card, idram, telcell, bank, prepaid, debt, cashin, change, _printFiscal, prepaidReadonly, 0)) {
+            fUser, mOrder.totalDue, cash, card, idram, telcell, bank, prepaid, debt, cashin, change, _printFiscal, prepaidReadonly, 0, &pinpadResponse)) {
         return;
     }
 
@@ -241,18 +242,30 @@ void WOrder::writeOrder(std::function<void()> nextStep)
         _printFiscal = false;
     }
 
+    const int cashSessionId = Working::working()->cashSessionId();
+    if (cashSessionId <= 0) {
+        C5Message::error(tr("Cashbox session is not open"));
+        return;
+    }
+
     QPointer<WOrder> self(this);
+    QJsonObject setAmountsParams{
+        {QStringLiteral("id"), self->mOrder.id},
+        {QStringLiteral("f_amount_cash"), cash},
+        {QStringLiteral("f_amount_card"), card},
+        {QStringLiteral("f_amount_bank"), bank},
+        {QStringLiteral("f_amount_idram"), idram},
+        {QStringLiteral("f_amount_debt"), debt},
+        {QStringLiteral("f_amount_telcell"), telcell},
+        {QStringLiteral("f_amount_prepaid"), prepaid}};
+    if (!pinpadResponse.isEmpty()) {
+        setAmountsParams.insert(QStringLiteral("f_pinpad_response"), pinpadResponse);
+    }
+
     NInterface::query1("/engine/v2/waiter/order/set-amounts",
                        self->fUser->mSessionKey,
                        self,
-                       {{"id", self->mOrder.id},
-                        {"f_amount_cash", cash},
-                        {"f_amount_card", card},
-                        {"f_amount_bank", bank},
-                        {"f_amount_idram", idram},
-                        {"f_amount_debt", debt},
-                        {"f_amount_telcell", telcell},
-                        {"f_amount_prepaid", prepaid}},
+                       setAmountsParams,
                        [=](const QJsonObject &jdoc) {
                            if (!self) {
                                return;
@@ -267,7 +280,8 @@ void WOrder::writeOrder(std::function<void()> nextStep)
                                                   self,
                                                   {{"id", self->mOrder.id},
                                                    {"fiscal", fiscalInfo},
-                                                   {"cashbox_id", mWorkStation.cashboxId()}},
+                                                   {"cashbox_id", mWorkStation.cashboxId()},
+                                                   {"cash_session_id", cashSessionId}},
                                                   [self](const QJsonObject &jdoc) {
                                                       self->parseOrder(jdoc);
                                                       self->printPrecheck();
