@@ -179,8 +179,17 @@ bool C5Widget::reportHandler(const QString &handleId, const QVariant &data)
 
 void C5Widget::updateRequired(const QString &msg, const QString &appName, const QString &newVersion)
 {
-    Q_UNUSED(appName);
-    Q_UNUSED(newVersion);
-    C5Message::info(msg);
+    const QString question = (msg.isEmpty()
+                                  ? tr("A new version of the application is required.")
+                                  : msg)
+                             + QStringLiteral("<br><br>")
+                             + tr("To continue you must update. Update now?");
+    if (C5Message::question(question) != QDialog::Accepted) {
+        qApp->exit(0);
+        return;
+    }
+    if (!C5Message::tryStartUpdater(appName, newVersion)) {
+        C5Message::info(tr("Updater not found. Reinstall the application."));
+    }
     qApp->exit(0);
 }

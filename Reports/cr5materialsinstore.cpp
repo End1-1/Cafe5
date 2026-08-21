@@ -1,11 +1,11 @@
 #include "cr5materialsinstore.h"
 #include "cr5materialinstorefilter.h"
 #include "c5tablemodel.h"
-#include "c5mainwindow.h"
 #include "c5database.h"
 #include "c5message.h"
-#include "c5storebarcode.h"
+#include "dlgprintbarcodelabels.h"
 #include "c5config.h"
+#include "c5utils.h"
 #include "ce5goods.h"
 
 CR5MaterialsInStore::CR5MaterialsInStore(QWidget *parent) :
@@ -293,34 +293,50 @@ void CR5MaterialsInStore::setColors()
 
 void CR5MaterialsInStore::printBarcode()
 {
+    const int currencyId = fFilter->currency().isEmpty()
+            ? __c5config.getValue(param_default_currency).toInt()
+            : fFilter->currency().toInt();
+    const int colGoods = fModel->indexForColumnName("f_goods");
+    const int colScan = fModel->indexForColumnName("f_scancode");
+    const int colQty = fModel->indexForColumnName("f_qty");
+    const int colPrice = fModel->indexForColumnName("f_price1");
+    const int colCode = fModel->indexForColumnName("f_code");
+
+    QList<BarcodeLabelItem> items;
     C5Database db;
-    db[":f_id"] = fFilter->currency().isEmpty() ? __c5config.getValue(param_default_currency) : fFilter->currency();
-    db.exec("select f_symbol from e_currency where f_id=:f_id");
-    db.nextRow();
-    QString s = db.getString("f_symbol");
-    C5StoreBarcode *b = __mainWindow->createTab<C5StoreBarcode>();
-    b->fCurrencyName = s;
 
     for(int i = 0; i < fModel->rowCount(); i++) {
         if(fFilter->unit().isEmpty()) {
-            b->addRow(fModel->data(i, fModel->indexForColumnName("f_goods"), Qt::EditRole).toString(),
-                      fModel->data(i, fModel->indexForColumnName("f_scancode"), Qt::EditRole).toString(),
-                      fModel->data(i, fModel->indexForColumnName("f_qty"), Qt::EditRole).toInt(), fFilter->currency().toInt(), "");
+            BarcodeLabelItem it;
+            it.name = fModel->data(i, colGoods, Qt::EditRole).toString();
+            it.barcode = fModel->data(i, colScan, Qt::EditRole).toString();
+            it.qty = fModel->data(i, colQty, Qt::EditRole).toInt();
+            const double price = colPrice >= 0
+                    ? fModel->data(i, colPrice, Qt::EditRole).toDouble()
+                    : 0.0;
+            it.price = float_str(price, 2);
+            items.append(it);
         } else if(fFilter->unit() == "10") {
-            db[":f_qty"] = fModel->data(i, fModel->indexForColumnName("f_qty"), Qt::EditRole);
-            db[":f_base"] = fModel->data(i, fModel->indexForColumnName("f_code"), Qt::EditRole);
-            db.exec("select g.f_name, g.f_id, g.f_scancode, c.f_qty*:f_qty as f_qty from c_goods_complectation c "
+            db[":f_qty"] = fModel->data(i, colQty, Qt::EditRole);
+            db[":f_base"] = fModel->data(i, colCode, Qt::EditRole);
+            db[":f_currency"] = currencyId;
+            db.exec("select g.f_name, g.f_scancode, c.f_qty*:f_qty as f_qty, gpr.f_price1 "
+                    "from c_goods_complectation c "
                     "left join c_goods g on g.f_id=c.f_goods "
+                    "left join c_goods_prices gpr on gpr.f_goods=g.f_id and gpr.f_currency=:f_currency "
                     "where c.f_base=:f_base ");
-
             while(db.nextRow()) {
-                b->addRow(db.getString("f_name"),
-                          db.getString("f_scancode"),
-                          db.getDouble("f_qty"), fFilter->currency().toInt(),
-                          fModel->data(i, fModel->indexForColumnName("f_group"), Qt::EditRole).toString());
+                BarcodeLabelItem it;
+                it.name = db.getString("f_name");
+                it.barcode = db.getString("f_scancode");
+                it.qty = static_cast<int>(db.getDouble("f_qty"));
+                it.price = float_str(db.getDouble("f_price1"), 2);
+                items.append(it);
             }
         }
     }
+
+    DlgPrintBarcodeLabels::printLabels(this, items);
 }
 
 void CR5MaterialsInStore::buildQuery()

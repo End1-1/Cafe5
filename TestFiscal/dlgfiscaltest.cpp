@@ -378,53 +378,70 @@ void DlgFiscalTest::on_btnPrint_clicked()
 
     QPointer<DlgFiscalTest> self(this);
     auto *thread = new QThread(this);
-    auto *pt = new PrintTaxN(ip, port, password, extPos, opPin, opPassword, nullptr);
-    pt->moveToThread(thread);
+    // Context for started(): must live in the worker thread. QThread object itself
+    // lives on the GUI thread — connecting started→thread runs the slot on GUI and freezes UI.
+    auto *workerCtx = new QObject();
+    workerCtx->moveToThread(thread);
 
-    connect(thread, &QThread::started, pt, [pt, rows, cash, card, prepaid, simpleMode, simpleTaxDept, extPos]() {
+    connect(thread, &QThread::started, workerCtx, [=]() {
+        auto *pt = new PrintTaxN(ip, port, password, extPos, opPin, opPassword, nullptr);
+
+        QObject::connect(pt, &PrintTaxN::finished, self,
+                         [self](const QString &inJson, const QString &outJson, const QString &err, int result) {
+            if (!self) {
+                return;
+            }
+            self->ui->btnPrint->setEnabled(true);
+            if (result == pt_err_ok) {
+                self->ui->lblStatus->setText(tr("Printed OK"));
+                self->ui->teLog->setPlainText(
+                    QStringLiteral("IN:\n%1\n\nOUT:\n%2").arg(inJson, outJson));
+                self->saveState();
+                QMessageBox::information(self, tr("Test fiscal"), tr("Fiscal receipt printed"));
+            } else {
+                self->ui->lblStatus->setText(tr("Print failed"));
+                self->ui->teLog->setPlainText(
+                    QStringLiteral("IN:\n%1\n\nOUT:\n%2\n\nERROR:\n%3\nRESULT: %4")
+                        .arg(inJson, outJson, err)
+                        .arg(result));
+                self->saveState();
+                QMessageBox::critical(self, tr("Test fiscal"),
+                                      err.isEmpty() ? tr("Print failed") : err);
+            }
+        },
+        Qt::QueuedConnection);
+
+        QObject::connect(pt, &PrintTaxN::finished, pt, &QObject::deleteLater);
+        QObject::connect(pt, &PrintTaxN::finished, thread, &QThread::quit);
+
         if (simpleMode) {
             pt->fJsonHeader[QStringLiteral("paidAmount")] = cash + card + prepaid;
             pt->makeJsonAndPrintSimple(simpleTaxDept, card, prepaid, extPos);
-            return;
+        } else {
+            for (const GoodsRow &g : rows) {
+                pt->addGoods(g.taxDept,
+                             g.adg,
+                             g.code,
+                             g.name,
+                             g.price,
+                             g.qty,
+                             g.discount);
+            }
+            pt->makeJsonAndPrint(cash, card, prepaid);
         }
-
-        for (const GoodsRow &g : rows) {
-            pt->addGoods(g.taxDept,
-                         g.adg,
-                         g.code,
-                         g.name,
-                         g.price,
-                         g.qty,
-                         g.discount);
-        }
-        pt->makeJsonAndPrint(cash, card, prepaid);
     });
 
-    connect(pt, &PrintTaxN::finished, self, [self](const QString &inJson, const QString &outJson, const QString &err, int result) {
-        if (!self) {
+    connect(thread, &QThread::finished, workerCtx, &QObject::deleteLater);
+    connect(thread, &QThread::finished, thread, &QObject::deleteLater);
+
+    // Safety: connect 5s + read/write up to 120s; unlock UI if something hangs.
+    QTimer::singleShot(130000, self, [self]() {
+        if (!self || self->ui->btnPrint->isEnabled()) {
             return;
         }
         self->ui->btnPrint->setEnabled(true);
-        if (result == pt_err_ok) {
-            self->ui->lblStatus->setText(tr("Printed OK"));
-            self->ui->teLog->setPlainText(
-                QStringLiteral("IN:\n%1\n\nOUT:\n%2").arg(inJson, outJson));
-            self->saveState();
-            QMessageBox::information(self, tr("Test fiscal"), tr("Fiscal receipt printed"));
-        } else {
-            self->ui->lblStatus->setText(tr("Print failed"));
-            self->ui->teLog->setPlainText(
-                QStringLiteral("IN:\n%1\n\nOUT:\n%2\n\nERROR:\n%3\nRESULT: %4")
-                    .arg(inJson, outJson, err)
-                    .arg(result));
-            self->saveState();
-            QMessageBox::critical(self, tr("Test fiscal"), err.isEmpty() ? tr("Print failed") : err);
-        }
-    }, Qt::QueuedConnection);
-
-    connect(pt, &PrintTaxN::finished, pt, &QObject::deleteLater);
-    connect(pt, &PrintTaxN::finished, thread, &QThread::quit);
-    connect(thread, &QThread::finished, thread, &QObject::deleteLater);
+        self->ui->lblStatus->setText(tr("Print timeout"));
+    });
 
     thread->start();
 }

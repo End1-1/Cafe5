@@ -1,4 +1,5 @@
 #include "ce5editor.h"
+#include <QCoreApplication>
 #include <QPlainTextEdit>
 #include <QPushButton>
 #include <QTableWidget>
@@ -342,6 +343,22 @@ bool CE5Editor::save(QString &err, QList<QMap<QString, QVariant> >& data)
     return err.isEmpty();
 }
 
+namespace {
+
+/** Label after empty=/nonzero= in Check; strip quotes; translate in editor's UI context. */
+QString checkRuleFieldLabel(const QObject *editor, const QString &rule)
+{
+    QString name = rule.mid(rule.indexOf(QLatin1Char('=')) + 1).trimmed();
+    if((name.startsWith(QLatin1Char('"')) && name.endsWith(QLatin1Char('"')))
+       || (name.startsWith(QLatin1Char('\'')) && name.endsWith(QLatin1Char('\'')))) {
+        name = name.mid(1, name.size() - 2);
+    }
+    const QByteArray utf8 = name.toUtf8();
+    return QCoreApplication::translate(editor->metaObject()->className(), utf8.constData());
+}
+
+} // namespace
+
 bool CE5Editor::checkData(QString &err)
 {
     foreach(C5LineEdit *le, fLines) {
@@ -353,15 +370,13 @@ bool CE5Editor::checkData(QString &err)
                     le->setText(le->text().trimmed());
 
                     if(le->isEmpty()) {
-                        err += QString("%1 %2<br>")
-                               .arg(rule.mid(rule.indexOf("=") + 1, rule.length() - rule.indexOf("=")))
-                               .arg(tr("cannot be empty"));
+                        err += QString("%1 %2\n")
+                               .arg(checkRuleFieldLabel(this, rule), tr("cannot be empty"));
                     }
                 } else if(rule.mid(0, 7) == "nonzero") {
                     if(le->getDouble() < 0.0001) {
-                        err += QString("%1 %2<br>")
-                               .arg(rule.mid(rule.indexOf("=") + 1, rule.length() - rule.indexOf("=")))
-                               .arg("cannot be zero");
+                        err += QString("%1 %2\n")
+                               .arg(checkRuleFieldLabel(this, rule), tr("cannot be zero"));
                     }
                 }
             }
@@ -375,9 +390,8 @@ bool CE5Editor::checkData(QString &err)
             foreach(QString rule, rules) {
                 if(rule.mid(0, 5) == "empty") {
                     if(cb->currentData().toInt() == 0) {
-                        err += QString("%1 %2<br>")
-                               .arg(rule.mid(rule.indexOf("=") + 1, rule.length() - rule.indexOf("=")))
-                               .arg(tr("cannot be empty"));
+                        err += QString("%1 %2\n")
+                               .arg(checkRuleFieldLabel(this, rule), tr("cannot be empty"));
                     }
                 }
             }
@@ -416,8 +430,10 @@ void CE5Editor::clear()
     foreach(C5ComboBox *cb, fCombos) {
         cb->setCurrentIndex(-1);
 
-        if(cb->property("default").toInt() > 0) {
-            cb->setCurrentIndex(cb->findData(cb->property("default")));
+        // ItemData from setDBValues is int; property may be QString from .ui — always toInt().
+        const int def = cb->property("default").toInt();
+        if(def > 0) {
+            cb->setCurrentIndex(cb->findData(def));
         }
     }
 

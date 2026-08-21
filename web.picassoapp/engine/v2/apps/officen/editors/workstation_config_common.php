@@ -21,6 +21,7 @@ class WorkstationConfigCommon extends WorkstationConfigBase
             'print_paper_width',
             'bistro',
             'f_auto_fiscal',
+            'dont_allow_negative_remains',
         ];
     }
 
@@ -33,10 +34,11 @@ class WorkstationConfigCommon extends WorkstationConfigBase
             'f_scale_pattern' => '22',
             'f_quick_debt_partner_id' => 0,
             'input_cashbox_amount_before_close' => true,
-            'print_server' => 'http://127.0.0.1:8181/print',
+            'print_server' => '',
             'print_paper_width' => 0,
             'bistro' => false,
             'f_auto_fiscal' => false,
+            'dont_allow_negative_remains' => false,
         ];
     }
 

@@ -113,7 +113,7 @@ void RFilterDialog::buildWidget(const QString &settingsPrefix, const QJsonArray 
             }
             const QString regKey = QString("rfilter_%1_%2").arg(mSettingsPrefix, jo.value("name").toString());
             const QVariant stored = __c5config.getRegValue(regKey);
-            if (stored.isValid()) {
+            if (stored.isValid() && stored.toInt() > 0) {
                 const QString storedName = __c5config.getRegValue(regKey + QStringLiteral("_name")).toString();
                 cn->setCodeAndName(stored.toInt(), storedName);
             }

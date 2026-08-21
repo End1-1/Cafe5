@@ -332,6 +332,35 @@
          </widget>
         </item>
         <item>
+         <widget class="QPushButton" name="btnSalesAssistant">
+          <property name="minimumSize">
+           <size>
+            <width>0</width>
+            <height>40</height>
+           </size>
+          </property>
+          <property name="styleSheet">
+           <string notr="true">                QPushButton:checked{
+                    background-color: rgb(0, 150, 0);
+					font-weight:bold;
+                }</string>
+          </property>
+          <property name="text">
+           <string>By Sales Assistant</string>
+          </property>
+          <property name="icon">
+           <iconset resource="../resources/res.qrc">
+            <normaloff>:/print.png</normaloff>:/print.png</iconset>
+          </property>
+          <property name="checkable">
+           <bool>true</bool>
+          </property>
+          <property name="checked">
+           <bool>false</bool>
+          </property>
+         </widget>
+        </item>
+        <item>
          <widget class="Line" name="line">
           <property name="orientation">
            <enum>Qt::Orientation::Horizontal</enum>
@@ -365,6 +394,23 @@
           </property>
           <property name="text">
            <string>Print tax X</string>
+          </property>
+          <property name="icon">
+           <iconset resource="../resources/res.qrc">
+            <normaloff>:/print.png</normaloff>:/print.png</iconset>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="btnPrintTotal">
+          <property name="minimumSize">
+           <size>
+            <width>0</width>
+            <height>40</height>
+           </size>
+          </property>
+          <property name="text">
+           <string>Print total</string>
           </property>
           <property name="icon">
            <iconset resource="../resources/res.qrc">
@@ -410,30 +456,6 @@
           <property name="icon">
            <iconset resource="../resources/res.qrc">
             <normaloff>:/restart.png</normaloff>:/restart.png</iconset>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="Line" name="line_3">
-          <property name="orientation">
-           <enum>Qt::Orientation::Horizontal</enum>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QPushButton" name="btnCashColletion">
-          <property name="minimumSize">
-           <size>
-            <width>0</width>
-            <height>40</height>
-           </size>
-          </property>
-          <property name="text">
-           <string>Cash collection</string>
-          </property>
-          <property name="icon">
-           <iconset resource="../resources/res.qrc">
-            <normaloff>:/cashcollection.png</normaloff>:/cashcollection.png</iconset>
           </property>
          </widget>
         </item>

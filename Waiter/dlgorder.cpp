@@ -2,6 +2,8 @@
 #include <QAbstractScrollArea>
 #include "dlgcustdisplay.h"
 #include "dict_dish_state.h"
+#include "../WaiterDesigner/waitergoodsgroupstyle.h"
+#include "../WaiterDesigner/waitergoodsdishstyle.h"
 #include <cmath>
 #include <memory>
 #include <QClipboard>
@@ -9,17 +11,24 @@
 #include <QFile>
 #include <QInputDialog>
 #include <QDialog>
+#include <QElapsedTimer>
+#include <QEventLoop>
+#include <QJsonArray>
 #include <QJsonObject>
 #include <QJsonValue>
+#include <QKeyEvent>
 #include <QPaintEvent>
 #include <QPainter>
 #include <QPointer>
 #include <QPrinterInfo>
 #include <QScreen>
 #include <QScrollBar>
+#include <QSet>
 #include <QSettings>
+#include <QShortcut>
 #include <QThread>
 #include <QToolButton>
+#include <algorithm>
 #include "c5message.h"
 #include "c5permissions.h"
 #include "c5printing.h"
@@ -38,9 +47,11 @@
 #include "dlglistdishspecial.h"
 #include "dlglistofdishcomments.h"
 #include "dlgmovemoney.h"
+#include "dlgorderdatamatrix.h"
 #include "dlgpreorderdatetime.h"
 #include "dlgpassword.h"
 #include "dlgprecheckoptions.h"
+#include "dlgrecentdishes.h"
 #include "dlgqty.h"
 #include "dlgreceiptlanguage.h"
 #include "dlgsearchinmenu.h"
@@ -140,6 +151,83 @@ FiscalMachine fiscalMachineForWorkstation(const WorkstationItem &ws)
     return getFiscalMachine(ws.fiscalMachineId());
 }
 
+/** HDM v0.7.3: map Waiter payments to paidAmount / paidAmountCard / PaymentSystem. */
+struct FiscalPaymentPayload {
+    double cash = 0;
+    double nonCash = 0;
+    double prepaid = 0;
+    int paymentSystem = -1; // 1 card, 10 telcell, 13 idram; -1 omit
+    bool forceInternalPos = false; // idram/telcell → useExtPOS false
+};
+
+FiscalPaymentPayload fiscalPaymentsFromOrder(const WaiterOrder &order)
+{
+    FiscalPaymentPayload p;
+    p.cash = order.paidCash();
+    const double card = order.paidCard();
+    const double idram = order.paidIdram();
+    const double telcell = order.paidTelcell();
+    p.nonCash = card + idram + telcell;
+    p.prepaid = order.paidPrepaid();
+
+    if (p.nonCash < 0.001) {
+        return p;
+    }
+
+    // Dominant non-cash; ties: Card → Idram → Telcell
+    if (card >= idram && card >= telcell && card > 0.001) {
+        p.paymentSystem = 1;
+        p.forceInternalPos = false;
+    } else if (idram >= telcell && idram > 0.001) {
+        p.paymentSystem = 13;
+        p.forceInternalPos = true;
+    } else if (telcell > 0.001) {
+        p.paymentSystem = 10;
+        p.forceInternalPos = true;
+    }
+    return p;
+}
+
+void applyFiscalPayments(PrintTaxN *pt, const FiscalPaymentPayload &pay)
+{
+    if (!pt) {
+        return;
+    }
+    pt->setPaymentSystem(pay.paymentSystem);
+    if (pay.forceInternalPos) {
+        pt->setUseExtPosOverride(QStringLiteral("false"));
+    } else {
+        pt->setUseExtPosOverride(QString());
+    }
+}
+
+QStringList collectFiscalEmarks(const WaiterOrder &order)
+{
+    QStringList result;
+    auto appendUnique = [&result](const QString &code) {
+        const QString trimmed = code.trimmed();
+        if (trimmed.isEmpty() || result.contains(trimmed)) {
+            return;
+        }
+        result.append(trimmed);
+    };
+
+    const QJsonValue datamatrix = order.data.value(QStringLiteral("f_datamatrix"));
+    if (datamatrix.isArray()) {
+        for (const QJsonValue &v : datamatrix.toArray()) {
+            appendUnique(v.toString());
+        }
+    }
+
+    for (const WaiterDish &dish : order.dishes) {
+        if (dish.state != DISH_STATE_OK) {
+            continue;
+        }
+        appendUnique(dish.emarks());
+    }
+    return result;
+}
+
 int receiptNameWidthMm(int baseWidthMm, int sideMarginMm)
 {
     if(sideMarginMm <= 0) {
@@ -159,6 +247,11 @@ DlgOrder::DlgOrder(C5User *user, HallItem h, TableItem t, const QVector<GoodsGro
     mDishes(dishes)
 {
     ui->setupUi(this);
+    {
+        const WaiterGoodsGroupStyle &groupStyle = WaiterGoodsGroupStyle::cachedStyle();
+        ui->glGroups->setSpacing(groupStyle.spacing);
+        ui->wgroups->setMaximumHeight(groupStyle.stripMaxHeight());
+    }
     ui->glGroups->setSizeConstraint(QLayout::SetNoConstraint);
     ui->scrollAreaWidgetContents->setMinimumSize(0, 0);
     ui->scrollAreaWidgetContents->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Ignored);
@@ -194,8 +287,24 @@ DlgOrder::DlgOrder(C5User *user, HallItem h, TableItem t, const QVector<GoodsGro
     ui->wdishes->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     ui->btnPreorderDateTime->setText(tr("Preorder datetime"));
     installEventFilter(this);
+    ui->wOrderInfo->installEventFilter(this);
+    ui->lbTableName->installEventFilter(this);
+    ui->lbOrderNumber->installEventFilter(this);
+    ui->lbStaff->installEventFilter(this);
+    ui->lbTime->installEventFilter(this);
     setFocusPolicy(Qt::StrongFocus);
     setFocus();
+
+    // Window-wide: numpad/keyboard +/- work even when focus is on a child (dish button, etc.)
+    auto addQtyShortcut = [this](QKeySequence seq, void (DlgOrder::*slot)()) {
+        auto *sc = new QShortcut(seq, this);
+        sc->setContext(Qt::WindowShortcut);
+        connect(sc, &QShortcut::activated, this, slot);
+    };
+    addQtyShortcut(QKeySequence(Qt::Key_Plus), &DlgOrder::on_btnPlus1_clicked);
+    addQtyShortcut(QKeySequence(Qt::Key_Minus), &DlgOrder::on_btnMinus1_clicked);
+    addQtyShortcut(QKeySequence(Qt::KeypadModifier | Qt::Key_Plus), &DlgOrder::on_btnPlus1_clicked);
+    addQtyShortcut(QKeySequence(Qt::KeypadModifier | Qt::Key_Minus), &DlgOrder::on_btnMinus1_clicked);
 
     if(mTable.specialConfigId > 0 && mTable.specialConfigId != mHall.configId) {
         mHall.data = mTable.data;
@@ -234,6 +343,7 @@ DlgOrder::DlgOrder(C5User *user, HallItem h, TableItem t, const QVector<GoodsGro
 #endif
     createPaymentButtons();
     configBtnNum();
+    configCashTenderButtons();
     configOtherButtons();
     setupButtons();
 }
@@ -334,6 +444,17 @@ void DlgOrder::reject()
 
 bool DlgOrder::eventFilter(QObject *o, QEvent *e)
 {
+    if(e->type() == QEvent::MouseButtonRelease) {
+        if(o == ui->wOrderInfo
+                || o == ui->lbTableName
+                || o == ui->lbOrderNumber
+                || o == ui->lbStaff
+                || o == ui->lbTime) {
+            on_btnExit_clicked();
+            return true;
+        }
+    }
+
     if((e->type() == QEvent::Resize || e->type() == QEvent::Show)) {
         updateScrollButtonPositions();
     }
@@ -351,8 +472,20 @@ bool DlgOrder::eventFilter(QObject *o, QEvent *e)
             return true;
         }
 
-        if(!k->text().isEmpty()) {
-            mStringBuffer += k->text();
+        // Numpad / keyboard +/- → same as btnPlus1 / btnMinus1
+        // Match by key and by text: some layouts/numpads deliver text without Key_Minus.
+        const QString t = k->text();
+        if(k->key() == Qt::Key_Plus || t == QLatin1String("+")) {
+            on_btnPlus1_clicked();
+            return true;
+        }
+        if(k->key() == Qt::Key_Minus || t == QLatin1String("-") || t == QString(QChar(0x2212))) {
+            on_btnMinus1_clicked();
+            return true;
+        }
+
+        if(!t.isEmpty()) {
+            mStringBuffer += t;
             return true;
         }
     }
@@ -363,6 +496,10 @@ bool DlgOrder::eventFilter(QObject *o, QEvent *e)
 void DlgOrder::showEvent(QShowEvent *e)
 {
     C5WaiterDialog::showEvent(e);
+
+    for (auto child : ui->wappcontainer->findChildren<QWidget *>(QString(), Qt::FindDirectChildrenOnly)) {
+        qDebug() << child->objectName() << "minHint:" << child->minimumSizeHint();
+    }
 
     if(mTable.id > 0) {
         fMenuID = mHall.defaultMenu();
@@ -508,7 +645,10 @@ void DlgOrder::makeDishes(int group, int favorite)
     if (ui->dishScrollArea->verticalScrollBarPolicy() == Qt::ScrollBarAlwaysOn) {
         scrollBarWidth = ui->dishScrollArea->verticalScrollBar()->width();
     }
-    int availableWidth = ui->dishScrollArea->viewport()->width();
+    int     availableWidth = ui->dishScrollArea->viewport()->width();
+
+    const WaiterGoodsDishStyle &dishStyle = WaiterGoodsDishStyle::cachedStyle();
+    ui->glDishes->setSpacing(dishStyle.spacing);
 
     while (ui->glDishes->itemAt(0)) {
         ui->glDishes->itemAt(0)->widget()->deleteLater();
@@ -725,16 +865,49 @@ void DlgOrder::printPrecheck(const QString &currentStaff)
     int bs = 20;
     QFont font(qApp->font());
     font.setPointSize(bs);
-    QString printerName = mUser->fConfig["receipt_printer"].toString();
+    const QString printerTarget = mWorkStation.precheckPrinter();
+    if (printerTarget.isEmpty()) {
+        C5Message::error(tr("Precheck printer is not configured"));
+        return;
+    }
+    const bool viaPrintServer = WorkstationItem::isPrintServerTarget(printerTarget);
+    const QString progressTitle = tr("Printer: %1").arg(printerTarget);
+    if (NLoadingDlg *dlg = NInterface::currentLoadingDialog()) {
+        dlg->setTitle(progressTitle);
+        qApp->processEvents();
+    }
+    QElapsedTimer shownFor;
+    shownFor.start();
+
+    auto holdProgressVisible = [&]() {
+        if (NLoadingDlg *dlg = NInterface::currentLoadingDialog()) {
+            dlg->setTitle(progressTitle);
+        }
+        while (shownFor.elapsed() < 2000) {
+            qApp->processEvents(QEventLoop::AllEvents, 50);
+            QThread::msleep(30);
+        }
+    };
+
     C5Printing p;
-    QPrinterInfo pi = QPrinterInfo::printerInfo(printerName);
-    QPrinter printer(pi);
-    printer.setPageSize(QPageSize::Custom);
-    printer.setFullPage(false);
-    QRectF pr = printer.pageRect(QPrinter::DevicePixel);
-    constexpr qreal SAFE_RIGHT_MM = 4.0;
-    qreal safePx = SAFE_RIGHT_MM * printer.logicalDpiX() / 25.4;
-    p.setSceneParams(pr.width() - safePx, pr.height(), printer.logicalDpiX());
+    std::unique_ptr<QPrinter> printer;
+    if (!viaPrintServer) {
+        const QPrinterInfo pi = QPrinterInfo::printerInfo(printerTarget);
+        if (pi.isNull()) {
+            holdProgressVisible();
+            C5Message::error(tr("Printer not found") + ": " + printerTarget);
+            return;
+        }
+        printer = std::make_unique<QPrinter>(pi);
+        printer->setPageSize(QPageSize::Custom);
+        printer->setFullPage(false);
+        QRectF pr = printer->pageRect(QPrinter::DevicePixel);
+        constexpr qreal SAFE_RIGHT_MM = 4.0;
+        qreal safePx = SAFE_RIGHT_MM * printer->logicalDpiX() / 25.4;
+        p.setSceneParams(pr.width() - safePx, pr.height(), printer->logicalDpiX());
+    } else {
+        p.setSceneParams(650, 2800, 96);
+    }
     p.setFont(font);
     p.setFontSize(bs);
     const int sideMarginMm = qMax(0, mWorkStation.printPaperWidthMm());
@@ -991,15 +1164,17 @@ void DlgOrder::printPrecheck(const QString &currentStaff)
     p.rtext(QDateTime::currentDateTime().toString(FORMAT_DATETIME_TO_STR));
     p.br();
 
-    if (mWorkStation.printServer().isEmpty() == false) {
+    if (viaPrintServer) {
         HttpLite *http = new HttpLite(this);
         QJsonObject json;
         json["print_data"] = p.jsonData();
-        json["printer_name"] = printerName;
-
-        http->post(mWorkStation.printServer(), json);
+        http->post(printerTarget, json);
+        holdProgressVisible();
+    } else if (!p.print(*printer)) {
+        holdProgressVisible();
+        C5Message::error(tr("Print failed") + ": " + printerTarget);
     } else {
-        p.print(printer);
+        holdProgressVisible();
     }
 }
 
@@ -1365,6 +1540,7 @@ void DlgOrder::setDishQty(std::function<double(WaiterDish)> getQty)
                 {"package_id", d.id},
                 {"copies", copies},
                 {"cashbox_id", mWorkStation.cashboxId()},
+                {"create_process", mWorkStation.customerNotification()},
             },
             [this](const QJsonObject &jdoc) {
                 parseOrder(jdoc);
@@ -1419,7 +1595,8 @@ void DlgOrder::setDishQty(std::function<double(WaiterDish)> getQty)
              {"count_service", d.countService()},
              {"count_discount", d.countDiscount()},
              {"empty_order", mOrder.dishes.empty()},
-             {"service_factor", mHall.serviceFactor()}},
+             {"service_factor", mHall.serviceFactor()},
+             {"create_process", mWorkStation.customerNotification()}},
             [this, d](const QJsonObject &jdoc) {
                 if (jdoc.contains("stoplist")) {
                     for (auto *jg : *mDishes) {
@@ -1508,7 +1685,8 @@ void DlgOrder::addDishToOrder(DishAItem *g, QDishButton *btn)
              {"print1", g->print1},
              {"print2", g->print2},
              {"empty_order", mOrder.dishes.empty()},
-             {"service_factor", mHall.serviceFactor()}},
+             {"service_factor", mHall.serviceFactor()},
+             {"create_process", mWorkStation.customerNotification()}},
             [this, g, btn](const QJsonObject &jdoc) {
                 if (jdoc.contains("stoplist")) {
                     for (auto *jg : *mDishes) {
@@ -1560,6 +1738,7 @@ void DlgOrder::funcWithAuth(int permission, const QString &title, std::function<
 void DlgOrder::timeout()
 {
     ui->lbTime->setText(QTime::currentTime().toString(FORMAT_TIME_TO_SHORT_STR));
+
     fTimerCounter++;
     if (!(fTimerCounter % 60)) {
         QPointer<DlgOrder> self(this);
@@ -2175,6 +2354,8 @@ void DlgOrder::on_btnTotal_clicked()
         const QString route = self->mOrder.state == ORDER_STATE_PREORDER
                                   ? "/engine/v2/waiter/order/print-precheck-of-preorder"
                                   : "/engine/v2/waiter/order/print-precheck";
+        NInterface::prepareLoadingTitle(
+            QObject::tr("Printer: %1").arg(mWorkStation.precheckPrinter()));
         self->fHttp->query(route,
                            bearer, self,
         {{"id", self->mOrder.id}},
@@ -2655,6 +2836,102 @@ void DlgOrder::configBtnNum()
     }
 }
 
+void DlgOrder::configCashTenderButtons()
+{
+    const QVector<QToolButton *> buttons = {
+        ui->btnCash1,
+        ui->btnCash2,
+        ui->btnCash3,
+        ui->btnCash4,
+    };
+    for (QToolButton *b : buttons) {
+        connect(b, &QToolButton::clicked, this, [this, b]() {
+            const double value = b->property("amount").toDouble();
+            if (value < 0.01) {
+                return;
+            }
+            ui->lbAmount->setProperty("amount", value);
+            ui->lbAmount->setProperty("str", QString::number(value, 'f', 0));
+            ui->lbAmount->setText(QString("%1 %2").arg(float_str(value, 2), CURRENCY_SHORT));
+        });
+    }
+    updateCashTenderButtons();
+}
+
+QList<int> DlgOrder::cashTenderSuggestions(double due) const
+{
+    static const int denoms[] = {1000, 2000, 5000, 10000, 20000};
+    const int dueInt = qMax(0, static_cast<int>(std::ceil(due - 1e-9)));
+    if (dueInt <= 0) {
+        return {};
+    }
+
+    QSet<int> candidates;
+    for (int b : denoms) {
+        const int n = ((dueInt + b - 1) / b) * b;
+        if (n >= dueInt) {
+            candidates.insert(n);
+        }
+    }
+    const int base = ((dueInt + 999) / 1000) * 1000;
+    candidates.insert(base + 1000);
+
+    QList<int> sorted = candidates.values();
+    std::sort(sorted.begin(), sorted.end());
+
+    QList<int> result;
+    for (int v : sorted) {
+        if (v >= dueInt) {
+            result.append(v);
+            if (result.size() == 4) {
+                return result;
+            }
+        }
+    }
+
+    int last = result.isEmpty() ? base : result.last();
+    while (result.size() < 4) {
+        last += 10000;
+        if (!result.contains(last)) {
+            result.append(last);
+        }
+    }
+    return result;
+}
+
+double DlgOrder::paymentRemainDue() const
+{
+    double remain = orderDisplayTotalDue();
+    for (auto pt : payment_types) {
+        remain -= mOrder.payment(payment_fields[pt]);
+    }
+    return remain;
+}
+
+void DlgOrder::updateCashTenderButtons()
+{
+    const QList<int> suggestions = cashTenderSuggestions(paymentRemainDue());
+    const QVector<QToolButton *> buttons = {
+        ui->btnCash1,
+        ui->btnCash2,
+        ui->btnCash3,
+        ui->btnCash4,
+    };
+    for (int i = 0; i < buttons.size(); ++i) {
+        QToolButton *b = buttons.at(i);
+        if (i < suggestions.size()) {
+            const int amount = suggestions.at(i);
+            b->setProperty("amount", amount);
+            b->setText(QString::number(amount));
+            b->setEnabled(true);
+        } else {
+            b->setProperty("amount", 0);
+            b->setText(QString());
+            b->setEnabled(false);
+        }
+    }
+}
+
 void DlgOrder::configOtherButtons()
 {
     ui->btnTotal->setEnabled(mUser->check(cp_t5_waiter_print_precheck));
@@ -2978,6 +3255,8 @@ void DlgOrder::parseOrder(const QJsonObject & jdoc)
         } else {
             ui->btnPrintFiscal->setEnabled(true);
         }
+
+        updateCashTenderButtons();
     }
 
     if(jdoc.contains("restore_stoplist_qty")) {
@@ -3066,6 +3345,7 @@ void DlgOrder::parseOrder(const QJsonObject & jdoc)
     const QJsonObject &jg = mOrder.data.value("f_guest").toObject();
     QString guestName = jg.value("f_guest_name").toString();
     ui->btnGuest->setText(guestName.isEmpty() ? tr("Guest info") : guestName);
+    updateDatamatrixButton();
     qDebug() << "Parse order" << startQuery.msecsTo(QDateTime::currentDateTime());
     ui->orderScrollArea->setUpdatesEnabled(true);
     qApp->processEvents();
@@ -3077,6 +3357,8 @@ void DlgOrder::parseOrder(const QJsonObject & jdoc)
 void DlgOrder::handleOrderDishClick(const QString & id)
 {
     emit(orderDishClicked(id));
+    // Keep keyboard focus on the dialog so numpad +/- / barcode buffer work.
+    setFocus(Qt::OtherFocusReason);
 }
 
 void DlgOrder::onPackageFillParentToggled(const QString &waiterLineId, bool checked)
@@ -3187,17 +3469,14 @@ void DlgOrder::on_btnCloseOrder_clicked()
         return;
     }
 
-    if (mOrder.cashSessionId <= 0) {
-        C5Message::error(tr("Cashbox session is not assigned to order"));
-        return;
-    }
-
     QPointer<DlgOrder> self(this);
     auto closeOrderFunc = [self](const QJsonObject & fiscalInfo) {
         if(!self) {
             return;
         }
 
+        NInterface::prepareLoadingTitle(
+            QObject::tr("Printer: %1").arg(mWorkStation.precheckPrinter()));
         NInterface::query(
             "/engine/v2/waiter/order/close-order",
             self->mUser->mSessionKey,
@@ -3258,7 +3537,10 @@ void DlgOrder::on_btnCloseOrder_clicked()
                              d.discountFactor() * 100);
             }
 
-            pt->makeJsonAndPrint(order.paidCash(), order.paidCard(), order.paidPrepaid());
+            const FiscalPaymentPayload pay = fiscalPaymentsFromOrder(order);
+            applyFiscalPayments(pt, pay);
+            pt->fEmarks = collectFiscalEmarks(order);
+            pt->makeJsonAndPrint(pay.cash, pay.nonCash, pay.prepaid);
         });
         connect(pt, &PrintTaxN::started, loading, &QDialog::show, Qt::QueuedConnection);
         connect(pt, &PrintTaxN::finished, self, [self, loadingPtr, closeOrderFunc, sessionKey, fiscalHandled](
@@ -3277,7 +3559,8 @@ void DlgOrder::on_btnCloseOrder_clicked()
             QJsonObject reply{{"in", QJsonDocument::fromJson(inJson.toUtf8()).object()},
                               {"out", QJsonDocument::fromJson(outJson.toUtf8()).object()},
                               {"error", err},
-                              {"result", result}};
+                              {"result", result},
+                              {"f_fiscal_machine_id", mWorkStation.fiscalMachineId()}};
 
             if(result == 0) {
                 closeOrderFunc(reply);
@@ -3801,6 +4084,7 @@ void DlgOrder::on_btnSetWholeAmount_clicked()
     ui->lbAmount->setProperty("amount", remain);
     ui->lbAmount->setProperty("str", QString::number(remain, 'f', 2));
     ui->lbAmount->setText(QString("%1 %2").arg(float_str(remain, 2), CURRENCY_SHORT));
+    updateCashTenderButtons();
 }
 
 void DlgOrder::on_btnNumClear_clicked()
@@ -3962,7 +4246,10 @@ void DlgOrder::on_btnPrintClosedFiscal_clicked()
                          dish.discountFactor() * 100);
         }
 
-        pt->makeJsonAndPrint(order.paidCash(), order.paidCard(), order.paidPrepaid());
+        const FiscalPaymentPayload pay = fiscalPaymentsFromOrder(order);
+        applyFiscalPayments(pt, pay);
+        pt->fEmarks = collectFiscalEmarks(order);
+        pt->makeJsonAndPrint(pay.cash, pay.nonCash, pay.prepaid);
     });
     connect(pt, &PrintTaxN::started, loading, &QDialog::show, Qt::QueuedConnection);
     connect(pt, &PrintTaxN::finished, self, [self, loadingPtr, sessionKey, orderId](
@@ -3981,7 +4268,10 @@ void DlgOrder::on_btnPrintClosedFiscal_clicked()
                               {"fiscal", QJsonObject{{"in", inJson},
                                                      {"out", outJson},
                                                      {"error", err},
-                                                     {"result", result}}}};
+                                                     {"result", result},
+                                                     {"f_fiscal_machine_id", mWorkStation.fiscalMachineId()}}}};
+            NInterface::prepareLoadingTitle(
+                QObject::tr("Printer: %1").arg(mWorkStation.precheckPrinter()));
             NInterface::query("/engine/v2/waiter/order/fiscal-printed", sessionKey, self, reply,
                               [self](const QJsonObject &jdoc) {
                                   if(!self) {
@@ -3997,7 +4287,8 @@ void DlgOrder::on_btnPrintClosedFiscal_clicked()
                               {"in", inJson},
                               {"out", outJson},
                               {"error", err},
-                              {"result", result}};
+                              {"result", result},
+                              {"f_fiscal_machine_id", mWorkStation.fiscalMachineId()}};
             NInterface::query("/engine/v2/waiter/order/fiscal-log", sessionKey, self, reply,
                               [](const QJsonObject &) {},
                               [](const QJsonObject &) { return false; });
@@ -4252,4 +4543,70 @@ void DlgOrder::on_btnDeliveryAmount_clicked()
                        this,
                        {{"id", mOrder.id}, {"key", "f_delivery_amount"}, {"value", d.amount()}},
                        [this](const QJsonObject &jdoc) { parseOrder(jdoc); });
+}
+
+void DlgOrder::updateDatamatrixButton()
+{
+    bool hasCodes = false;
+    const QJsonValue datamatrix = mOrder.data.value(QStringLiteral("f_datamatrix"));
+    if (datamatrix.isArray()) {
+        for (const QJsonValue &v : datamatrix.toArray()) {
+            if (!v.toString().trimmed().isEmpty()) {
+                hasCodes = true;
+                break;
+            }
+        }
+    }
+
+    ui->btnDatamatrix->setStyleSheet(hasCodes
+        ? QStringLiteral(
+            "QToolButton {"
+            " background-color: #a8e6a1;"
+            " border: 2px solid #3d8b37;"
+            " border-radius: 4px;"
+            "}"
+            "QToolButton:pressed {"
+            " background-color: #7ed987;"
+            "}")
+        : QString());
+}
+
+void DlgOrder::on_btnDatamatrix_clicked()
+{
+    if (mOrder.id.isEmpty()) {
+        C5Message::error(tr("Order was not opened"));
+        return;
+    }
+
+    QStringList codes;
+    const QJsonValue datamatrix = mOrder.data.value(QStringLiteral("f_datamatrix"));
+    if (datamatrix.isArray()) {
+        for (const QJsonValue &v : datamatrix.toArray()) {
+            const QString code = v.toString().trimmed();
+            if (!code.isEmpty()) {
+                codes.append(code);
+            }
+        }
+    }
+
+    if (!DlgOrderDatamatrix::editCodes(mUser, codes, this)) {
+        return;
+    }
+
+    QJsonArray arr;
+    for (const QString &code : codes) {
+        arr.append(code);
+    }
+
+    NInterface::query1("/engine/v2/waiter/order/set-data-value",
+                       mUser->mSessionKey,
+                       this,
+                       {{"id", mOrder.id}, {"key", "f_datamatrix"}, {"value", arr}},
+                       [this](const QJsonObject &jdoc) { parseOrder(jdoc); });
+}
+
+void DlgOrder::on_btnLast40Min_clicked()
+{
+    const int minutes = mWorkStation.data.value(QStringLiteral("recent_dishes_minutes")).toInt(40);
+    DlgRecentDishes::open(mUser, minutes, this);
 }

@@ -1,11 +1,38 @@
 #include "sqlquery.h"
 #include "logwriter.h"
-#include "database.h"
+#include <QCoreApplication>
 #include <QDebug>
+#include <QFile>
+#include <QJsonArray>
 #include <QJsonDocument>
 #include <QJsonObject>
-#include <QJsonArray>
-#include <QFile>
+
+namespace {
+
+QString handlersDir()
+{
+    return QCoreApplication::applicationDirPath() + QLatin1String("/handlers");
+}
+
+bool loadServerNameConfig(QJsonObject &jconf, QString &err)
+{
+    const QString configFile = handlersDir() + QLatin1String("/servername.ini");
+    if (!QFile::exists(configFile)) {
+        LogWriter::write(LogWriterLevel::errors, "",
+                         QString("sqlquery config path not exists: %1").arg(configFile));
+        err = "Server not configured";
+        return false;
+    }
+    QFile f(configFile);
+    if (!f.open(QIODevice::ReadOnly)) {
+        err = "Server not configured";
+        return false;
+    }
+    jconf = QJsonDocument::fromJson(f.readAll()).object();
+    return true;
+}
+
+}
 
 bool office(const QJsonObject &jreq, QJsonObject &jret, QString &err)
 {
@@ -15,8 +42,9 @@ bool office(const QJsonObject &jreq, QJsonObject &jret, QString &err)
         return false;
     }
     QJsonArray ja;
+    QJsonObject jo;
 #ifdef REMOTE_ELINA
-    QJsonObject jo = QJsonObject();
+    jo = QJsonObject();
     jo["name"] = "Archive";
     jo["waiter_server"] = "";
     jo["host"] = "e3.picasso.am/info.php";
@@ -55,7 +83,6 @@ bool office(const QJsonObject &jreq, QJsonObject &jret, QString &err)
 #endif
 #ifdef REMOTE_DEBUG
     jo = QJsonObject();
-    jo = QJsonObject();
     jo["name"] = "Elina";
     jo["waiter_server"] = "";
     jo["host"] = "e3.picasso.am/info.php";
@@ -79,16 +106,10 @@ bool office(const QJsonObject &jreq, QJsonObject &jret, QString &err)
     ja.append(jo);
 #endif
 #ifdef REMOTE_ALL
-    QString configFile = path + "/servername.ini";
-    if (!QFile::exists(configFile)) {
-        LogWriter::write(LogWriterLevel::errors, "", QString("sqlquery config path not exists: %1").arg(configFile));
-        err = "Server not configured";
+    QJsonObject jconf;
+    if (!loadServerNameConfig(jconf, err)) {
         return false;
     }
-    QFile f(configFile);
-    f.open(QIODevice::ReadOnly);
-    QJsonObject jconf = QJsonDocument::fromJson(f.readAll()).object();
-    f.close();
     ja = jconf[jreq["params"].toObject()["name"].toString()].toArray();
 #endif
     jret["result"] = ja;
@@ -103,6 +124,7 @@ bool shop(const QJsonObject &jreq, QJsonObject &jret, QString &err)
         return false;
     }
     QJsonArray ja;
+    QJsonObject jo;
 #ifdef REMOTE_VALSH
 #ifdef QT_DEBUG
     jo = QJsonObject();
@@ -141,7 +163,7 @@ bool shop(const QJsonObject &jreq, QJsonObject &jret, QString &err)
     jo["fullscreen"] = "";
     ja.append(jo);
 #else
-    QJsonObject jo = QJsonObject();
+    jo = QJsonObject();
     jo["name"] = "Archive";
     jo["waiter_server"] = "";
     jo["host"] = "e3.picasso.am/info.php";
@@ -166,22 +188,16 @@ bool shop(const QJsonObject &jreq, QJsonObject &jret, QString &err)
     ja.append(jo);
 #endif
 #ifdef REMOTE_ALL
-    QString configFile = path + "/servername.ini";
-    if (!QFile::exists(configFile)) {
-        LogWriter::write(LogWriterLevel::errors, "", QString("sqlquery config path not exists: %1").arg(configFile));
-        err = "Server not configured";
+    QJsonObject jconf;
+    if (!loadServerNameConfig(jconf, err)) {
         return false;
     }
-    QFile f(configFile);
-    f.open(QIODevice::ReadOnly);
-    QJsonObject jconf = QJsonDocument::fromJson(f.readAll()).object();
-    f.close();
-    if (!jconf.contains(jreq["params"].toObject()["name"].toString())) {
-        err = QString("Params %1 not declare %2").arg(jreq["params"].toObject()["name"].toString(),
-              QJsonDocument(jconf).toJson());
+    const QString name = jreq["params"].toObject()["name"].toString();
+    if (!jconf.contains(name)) {
+        err = QString("Params %1 not declare %2").arg(name, QJsonDocument(jconf).toJson());
         return false;
     }
-    ja.append(jconf[jreq["params"].toObject()["name"].toString()].toObject());
+    ja.append(jconf[name].toObject());
 #endif
     jret["result"] = ja;
     return true;

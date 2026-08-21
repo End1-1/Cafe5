@@ -1,12 +1,13 @@
 #include "rcashmovement.h"
+#include <QDialog>
+#include <QJsonObject>
+#include <QToolBar>
 #include "c5cashtransfer.h"
 #include "c5config.h"
 #include "c5mainwindow.h"
 #include "c5revenuecashop.h"
+#include "c5user.h"
 #include "ninterface.h"
-#include <QDialog>
-#include <QJsonObject>
-#include <QToolBar>
 
 RCashMovement::RCashMovement(const QString &title, QIcon icon, const QString &editorName)
     : RAbstractEditorReport(title, icon, editorName)

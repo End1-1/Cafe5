@@ -309,6 +309,10 @@ class Salary extends Auth
             [$fixed, $calculated] = $this->clampSalaryBase($fixed, $calculated, $formula);
 
             $bonus = (float)($row->f_bonus ?? 0);
+            $late = $this->lateFineForStaffDay($staff, $date1, $formula);
+            $lateMinutes = (int)($late["late_minutes"] ?? 0);
+            $fine = (float)($late["fine"] ?? 0);
+            $total = max(0.0, $fixed + $calculated + $bonus - $fine);
             $items[] = [
                 "f_staff" => $staff,
                 "f_position" => $position,
@@ -316,7 +320,9 @@ class Salary extends Auth
                 "f_dish_taxable_base" => round($dishTaxableBase, 2),
                 "f_calculated" => round($calculated, 2),
                 "f_bonus" => round($bonus, 2),
-                "f_total" => round($fixed + $calculated + $bonus, 2),
+                "f_late_minutes" => $lateMinutes,
+                "f_fine" => round($fine, 2),
+                "f_total" => round($total, 2),
             ];
         }
 
@@ -394,6 +400,10 @@ class Salary extends Auth
             "f_owntotal" => 0,
             "f_skip_amount" => -1,
             "f_count_working_time" => false,
+            "f_work_start_time" => "09:00",
+            "f_work_end_time" => "18:00",
+            "f_fine_per_minute" => 0,
+            "f_maximum_fine_minutes" => 0,
         ];
     }
 
@@ -417,6 +427,68 @@ class Salary extends Auth
             "f_owntotal" => (float)($data["f_owntotal"] ?? 0),
             "f_skip_amount" => (float)($data["f_skip_amount"] ?? -1),
             "f_count_working_time" => !empty($data["f_count_working_time"]),
+            "f_work_start_time" => $this->normalizeHm((string)($data["f_work_start_time"] ?? "09:00"), "09:00"),
+            "f_work_end_time" => $this->normalizeHm((string)($data["f_work_end_time"] ?? "18:00"), "18:00"),
+            "f_fine_per_minute" => (float)($data["f_fine_per_minute"] ?? 0),
+            "f_maximum_fine_minutes" => (int)($data["f_maximum_fine_minutes"] ?? 0),
+        ];
+    }
+
+    private function normalizeHm(string $hm, string $fallback): string
+    {
+        $hm = trim($hm);
+        if (preg_match('/^\d{1,2}:\d{2}/', $hm, $m)) {
+            $parts = explode(':', $m[0]);
+            $h = max(0, min(23, (int)$parts[0]));
+            $min = max(0, min(59, (int)$parts[1]));
+            return sprintf('%02d:%02d', $h, $min);
+        }
+        return $fallback;
+    }
+
+    /**
+     * Late fine vs group work start time using first s_attendance.f_in of the day.
+     * @return array{late_minutes: int, fine: float}
+     */
+    private function lateFineForStaffDay(int $staff, string $day, array $formula): array
+    {
+        $empty = ["late_minutes" => 0, "fine" => 0.0];
+        if ($staff <= 0) {
+            return $empty;
+        }
+
+        $finePerMinute = (float)($formula["f_fine_per_minute"] ?? 0);
+        $maxMinutes = (int)($formula["f_maximum_fine_minutes"] ?? 0);
+        if ($finePerMinute <= 0.0001 || $maxMinutes <= 0) {
+            return $empty;
+        }
+
+        $startHm = $this->normalizeHm((string)($formula["f_work_start_time"] ?? "09:00"), "09:00");
+        $scheduledTs = strtotime($day . ' ' . $startHm . ':00');
+        if ($scheduledTs === false) {
+            return $empty;
+        }
+
+        $row = $this->select(
+            "SELECT MIN(f_in) AS f_in FROM s_attendance WHERE f_worker = ? AND DATE(f_in) = ?",
+            "is",
+            [$staff, $day]
+        )->fetch_assoc();
+
+        $inRaw = (string)($row["f_in"] ?? '');
+        if ($inRaw === '') {
+            return $empty;
+        }
+        $inTs = strtotime($inRaw);
+        if ($inTs === false) {
+            return $empty;
+        }
+
+        $lateMinutes = (int)max(0, floor(($inTs - $scheduledTs) / 60));
+        $capped = min($lateMinutes, $maxMinutes);
+        return [
+            "late_minutes" => $lateMinutes,
+            "fine" => $capped * $finePerMinute,
         ];
     }
 

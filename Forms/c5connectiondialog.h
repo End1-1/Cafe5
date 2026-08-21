@@ -22,6 +22,9 @@ public:
 
     static C5ConnectionDialog* instance();
 
+    /** Re-read connection fields from QSettings into the UI. */
+    void reloadFromRegistry();
+
     QString serverAddress();
 
     QString serverKey();

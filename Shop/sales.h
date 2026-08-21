@@ -11,6 +11,7 @@ class Sales;
 class C5User;
 class Working;
 class QPropertyAnimation;
+class QJsonObject;
 
 class Sales : public C5ShopDialog
 {
@@ -52,10 +53,12 @@ private slots:
 
     void on_btnCloseMenu_clicked();
 
+    void on_btnSalesAssistant_clicked();
+
+    void on_btnPrintTotal_clicked();
+
 private:
     Ui::Sales* ui;
-
-    bool showAll = false;
 
     C5User* fUser;
 
@@ -70,6 +73,10 @@ private:
     void refreshTotal();
 
     void refreshItems();
+
+    void refreshByStaff();
+
+    void printDailyByPayment(const QJsonObject &jdoc);
 
     int fViewMode;
 

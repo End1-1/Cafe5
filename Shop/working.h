@@ -1,6 +1,9 @@
 #ifndef WORKING_H
 #define WORKING_H
 
+#include <QJsonObject>
+#include <QPixmap>
+#include <functional>
 #include "c5shopdialog.h"
 
 namespace Ui
@@ -43,7 +46,15 @@ public:
 
     WOrder* worder();
 
+    WCustomerDisplay* customerDisplay() const { return fCustomerDisplay; }
+
+    /** Repaint buyer display from the current sale tab (or clear if none). */
+    void refreshCustomerDisplay();
+
     WOrder* newSale(int type);
+
+    /** Open a tab for an already-reopened order (make-draft). */
+    WOrder* openExistingSale(const QJsonObject &orderResponse);
 
     bool eventFilter(QObject* watched, QEvent* event);
 
@@ -54,6 +65,12 @@ public:
     int cashSessionId() const;
 
     bool hasActiveSession() const;
+
+    /** Tables from h_tables for shop hall (ordered by f_id). */
+    const QList<int>& shopTableIds() const { return mShopTableIds; }
+
+    /** First hall table not used by an open sale tab. */
+    int allocateFreeTableId() const;
 
     static QMap<int, Flag> fFlags;
 
@@ -69,8 +86,16 @@ public:
 
     Flag flag(int id);
 
+    void loadStaff(std::function<void()> next = nullptr);
+
 public slots:
-    void getGoods(int id);
+    void getGoods(int id, const QString &scancode, double stockQty = -1);
+
+private slots:
+    void on_btnProgressWindow_clicked();
+
+private slots:
+    void on_btnAttendance_clicked();
 
 private:
     Ui::Working* ui;
@@ -79,9 +104,7 @@ private:
 
     NInterface* fHttp;
 
-    WCustomerDisplay* fCustomerDisplay;
-
-    void loadStaff();
+    WCustomerDisplay* fCustomerDisplay = nullptr;
 
     int ordersCount();
 
@@ -107,6 +130,8 @@ private:
 
     void updateSessionUi();
 
+    void updateWsStatus();
+
     void setSaleControlsEnabled(bool enabled);
 
     void printCloseSessionReport(const QJsonObject &cashbox, bool cashCounted);
@@ -116,6 +141,10 @@ private:
     int mCashSessionId = 0;
 
     QJsonObject mCashboxSessionData;
+
+    QList<int> mShopTableIds;
+
+    void loadShopTables(std::function<void()> next);
 
 private slots:
     void orderSaved(QWidget* w);

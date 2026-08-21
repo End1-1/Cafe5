@@ -1,20 +1,35 @@
 <?php
 defined('APP') or die('Die, vampire!');
 
-$data = file_get_contents(__DIR__ . "/res/translator_hy.txt");
-$tr=explode("\r\n", $data);
-$translator = [];
-foreach ($tr as $tt) {
-	$ta = explode("=", $tt);
-	if (count($ta)>1) {
-		$translator[$ta[0]] = $ta[1];
-	}
+if (!defined('LANG')) {
+	define('LANG', 'hy');
 }
 
-function tr($s) {
-	global $translator;
-	if (array_key_exists($s, $translator)) {
-		return $translator[$s];
+require_once __DIR__ . '/v2/worker/translator.php';
+
+/**
+ * Legacy API strings → v2 Translator (tr_hy.json / tr_ru.json).
+ * Locale is set in app.php from request JSON "locale".
+ */
+function tr($s)
+{
+	return Translator::t((string)$s);
+}
+
+/**
+ * Normalize client locale (UI am/ru → API hy/ru).
+ */
+function applyRequestLocale($params): void
+{
+	$locale = LANG;
+	if (!empty($params) && !empty($params->locale)) {
+		$locale = strtolower(trim((string)$params->locale));
 	}
-	return $s;
+	if ($locale === 'am') {
+		$locale = 'hy';
+	}
+	if (!in_array($locale, ['hy', 'ru'], true)) {
+		$locale = LANG;
+	}
+	Translator::$locale = $locale;
 }

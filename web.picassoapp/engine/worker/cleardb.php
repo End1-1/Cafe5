@@ -21,6 +21,9 @@ class ClearDB extends DB
         delete from  store_user;
         delete from store_stock;
         delete from store_document;
+        delete from store_calc_queue;
+        delete from store_inventory_user;
+        delete from store_inventory_document;
         
         delete from a_store_sale;
         delete from op_body where f_id='1';
@@ -85,6 +88,7 @@ class ClearDB extends DB
         delete from s_settings_names;
         delete from s_user_photo;
         delete from s_user_access;
+        delete from s_user_fingerprint;
         delete from c_partners;
         delete from s_user where f_id>1;
         delete from s_user_group where f_id>1;
@@ -99,6 +103,7 @@ class ClearDB extends DB
         delete from d_dish;
         delete from d_part2;
         delete from c_menu;
+        delete from s_images;
         delete from c_goods_option;
         delete from c_goods_multiscancode;
         delete from d_part1;
@@ -149,6 +154,10 @@ class ClearDB extends DB
         delete from mf_actions_group;
 
         delete from s_log_store_price;
+        delete from s_login_session;
+        delete from s_activation;
+        delete from s_salary;
+        delete from s_salary_attendance;
 
         delete from c_storages;
         alter table a_store_sale auto_increment=0;

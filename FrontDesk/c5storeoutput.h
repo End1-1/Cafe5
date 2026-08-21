@@ -75,7 +75,7 @@ private:
 
     QAction *mActionDraft;
 
-    bool buildDoc();
+    bool buildDoc(bool requireValidQty);
 
     void setState();
 

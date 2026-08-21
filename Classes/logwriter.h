@@ -13,6 +13,7 @@ const QString verbose = "verbose";
 const QString warning = "warning";
 const QString errors = "errors";
 const QString special = "special";
+const QString websocket = "websocket";
 }
 
 class LogWriter

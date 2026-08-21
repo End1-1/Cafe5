@@ -7,6 +7,7 @@
 #include <QMutex>
 #include <QPointer>
 #include <QThreadPool>
+#include <QTimer>
 #include <QWebSocket>
 #include <QWebSocketServer>
 #include "armsoft.h"
@@ -35,43 +36,93 @@ ServerThread::ServerThread(const QString &configPath) :
     QObject(),
     fConfigPath(configPath)
 {
+}
+
+ServerThread::~ServerThread()
+{
+    qDebug() << "ServerThread destructor";
+    if(fInitRetryTimer) {
+        fInitRetryTimer->stop();
+    }
+    if(fServer) {
+        fServer->deleteLater();
+    }
+}
+
+bool ServerThread::initializeDatabases()
+{
     Database db;
     int port = 3306;
 #ifdef QT_DEBUG
     port = 3306;
 #endif
 
-    if(db.open("127.0.0.1", "service5", "root", "root5", port)) {
-        db.exec("select fkey, fname, concat(fkey, '.', fdb) as fuid from dblist");
-
-        while(db.next()) {
-            fDbList.append(db.string("fname"));
-            mDatabases[db.string("fuid")] = db.string("fname");
-            C5SearchEngine ::init(db.string("fname"), db.string("fuid"));
-        }
-
-        C5SearchEngine::init(fDbList);
-        LogWriter::write(LogWriterLevel::verbose, "Initialized databases", mDatabases.values().join(","));
-    } else {
+    if(!db.open("127.0.0.1", "service5", "root", "root5", port)) {
         LogWriter::write(LogWriterLevel::errors, "Failed initialization of service5 database", db.lastDbError());
+        return false;
     }
+
+    mDatabases.clear();
+    fDbList.clear();
+    db.exec("select fkey, fname, concat(fkey, '.', fdb) as fuid from dblist");
+
+    while(db.next()) {
+        fDbList.append(db.string("fname"));
+        mDatabases[db.string("fuid")] = db.string("fname");
+        C5SearchEngine::init(db.string("fname"), db.string("fuid"));
+    }
+
+    C5SearchEngine::init(fDbList);
+    LogWriter::write(LogWriterLevel::verbose, "Initialized databases", mDatabases.values().join(","));
+    return true;
 }
 
-ServerThread::~ServerThread()
+void ServerThread::startListening()
 {
-    qDebug() << "ServerThread destructor";
-    fServer->deleteLater();
-}
+    if(fServer && fServer->isListening()) {
+        return;
+    }
 
-void ServerThread::run()
-{
     int port = ConfigIni::value("server/port").toInt();
-
     if(!port) {
         port = 10002;
     }
 
-    fServer = new QWebSocketServer("BreezeServer", QWebSocketServer::NonSecureMode, this);
+    if(!fServer) {
+        fServer = new QWebSocketServer("BreezeServer", QWebSocketServer::NonSecureMode, this);
+        connect(fServer, SIGNAL(newConnection()), this, SLOT(onNewConnection()));
+    }
+
+    if(!fServer->listen(QHostAddress::Any, port)) {
+        LogWriter::write(LogWriterLevel::errors, "",
+                         "Cannot listen port: " + QString::number(port) + " " + fServer->errorString());
+        exit(1);
+        return;
+    }
+
+    LogWriter::write(LogWriterLevel::verbose, "", QString("Listen port: %1").arg(port));
+}
+
+void ServerThread::retryInitialize()
+{
+    LogWriter::write(LogWriterLevel::verbose, "",
+                     "Retrying service5 database initialization...");
+    if(!initializeDatabases()) {
+        LogWriter::write(LogWriterLevel::errors, "",
+                         "service5 database still unavailable, next retry in 10s");
+        return;
+    }
+
+    if(fInitRetryTimer) {
+        fInitRetryTimer->stop();
+    }
+    LogWriter::write(LogWriterLevel::verbose, "",
+                     "service5 database initialized after retry, opening WebSocket");
+    startListening();
+}
+
+void ServerThread::run()
+{
     int cores = QThread::idealThreadCount();
     int threads = qMax(4, cores * 2);
     QThreadPool::globalInstance()->setMaxThreadCount(threads);
@@ -80,16 +131,18 @@ void ServerThread::run()
                      "",
                      QString("ThreadPool size: %1 (cores %2)").arg(threads).arg(cores));
 
-    // fServer->setMaxPendingConnections(10000);
-    if(!fServer->listen(QHostAddress::Any, port)) {
-        LogWriter::write(LogWriterLevel::errors, "",
-                         "Cannot listen port: " + QString::number(port) + " " + fServer->errorString());
-        exit(1);
+    fInitRetryTimer = new QTimer(this);
+    fInitRetryTimer->setInterval(10000);
+    connect(fInitRetryTimer, &QTimer::timeout, this, &ServerThread::retryInitialize);
+
+    if(initializeDatabases()) {
+        startListening();
         return;
     }
 
-    connect(fServer, SIGNAL(newConnection()), this, SLOT(onNewConnection()));
-    LogWriter::write(LogWriterLevel::verbose, "", QString("Listen port: %1").arg(port));
+    LogWriter::write(LogWriterLevel::errors, "",
+                     "WebSocket listen deferred: service5 database unavailable, retry every 10s");
+    fInitRetryTimer->start();
 }
 
 QString ServerThread::getDbList(const QJsonObject &jdoc)
@@ -205,58 +258,93 @@ QString ServerThread::handleDll(const QJsonObject &jdoc, const QString &command)
 
 void ServerThread::registerSocket(const QJsonObject &jdoc, QWebSocket *ws)
 {
-    auto dbk = mDatabases.find(jdoc["key"].toString());
-
-    if(dbk == mDatabases.end()) {
-        ws->close();
-        return;
-    }
-
-    Database db;
-    int port = 3306;
-#ifdef QT_DEBUG
-    port = 3306;
-#endif
     auto fail = [&](int code, const QString &msg) {
         LogWriter::write(LogWriterLevel::errors, "register_socket", msg);
-        ws->sendTextMessage(QJsonDocument(QJsonObject{{"errorCode", code}, {"errorMessage", msg}})
-                                .toJson(QJsonDocument::Compact));
+        ws->sendTextMessage(QJsonDocument(QJsonObject{{"errorCode", code}, {"errorMessage", msg}}).toJson(QJsonDocument::Compact));
         ws->close();
     };
-    if(!db.open("localhost", dbk.value(), "root", "root5", port)) {
-        LogWriter::write(LogWriterLevel::errors, "register_socket", db.lastDbError());
-
-        fail(0, "Code 110");
+    const QString key = jdoc["key"].toString();
+    const QString database = jdoc["database"].toString();
+    auto dbk = mDatabases.end();
+    if (!key.isEmpty()) {
+        dbk = mDatabases.find(key);
+    } else if (!database.isEmpty()) {
+        for (auto it = mDatabases.begin(); it != mDatabases.end(); ++it) {
+            if (it.value().compare(database, Qt::CaseInsensitive) == 0) {
+                dbk = it;
+                break;
+            }
+        }
+        if (dbk == mDatabases.end()) {
+            Database db;
+            int port = 3306;
+            if (db.open("127.0.0.1", "service5", "root", "root5", port)) {
+                db[":n"] = database;
+                db.exec("select concat(fkey, '.', fdb) as fuid, fname from dblist "
+                        "where fname=:n or fdb=:n or fpath=:n limit 1");
+                if (db.next()) {
+                    const QString fuid = db.string("fuid");
+                    const QString fname = db.string("fname");
+                    if (!mDatabases.contains(fuid)) {
+                        mDatabases[fuid] = fname;
+                        fDbList.append(fname);
+                    }
+                    dbk = mDatabases.find(fuid);
+                }
+            }
+        }
+    }
+    if (dbk == mDatabases.end()) {
+        fail(0, "database/key not found");
         return;
     }
-
-    db[":f_username"] = jdoc["username"].toString();
-    db[":f_password"] = jdoc["password"].toString();
-    db.exec("select f_id from s_user where f_login=:f_username and f_password=md5(:f_password)");
-
-    if(!db.next()) {
-        fail(0, "user with used credentials not found");
+    int userId = 0;
+    if (jdoc.contains("username") && jdoc.contains("password")) {
+        Database db;
+        int port = 3306;
+#ifdef QT_DEBUG
+        port = 3306;
+#endif
+        if (!db.open("localhost", dbk.value(), "root", "root5", port)) {
+            LogWriter::write(LogWriterLevel::errors, "register_socket", db.lastDbError());
+            fail(0, "Code 110");
+            return;
+        }
+        db[":f_username"] = jdoc["username"].toString();
+        db[":f_password"] = jdoc["password"].toString();
+        db.exec("select f_id from s_user where f_login=:f_username and f_password=md5(:f_password)");
+        if (!db.next()) {
+            fail(0, "user with used credentials not found");
+            return;
+        }
+        userId = db.integer("f_id");
+    } else if (jdoc.contains("userid")) {
+        userId = jdoc["userid"].toInt();
+        if (userId <= 0) {
+            fail(0, "invalid userid");
+            return;
+        }
+    } else {
+        fail(0, "username/password or userid required");
         return;
     }
-
     QMutexLocker ml(&mSocketMutex);
     auto it = fSockets.find(ws);
-
-    if(it == fSockets.end()) {
+    if (it == fSockets.end()) {
         fail(0, "Code 111");
         return;
     }
-
     SocketStruct &ss = it.value();
-
-    if(!ss.tenantId.isEmpty()) {
+    if (!ss.tenantId.isEmpty()) {
         fail(0, "Code 112");
         return;
     }
-
     ss.tenantId = dbk.key();
     ss.databaseName = dbk.value();
-    ss.userId = db.integer("f_id");
+    ss.userId = userId;
+    LogWriter::write(LogWriterLevel::verbose,
+                     "register_socket",
+                     QString("ok tenant=%1 db=%2 user=%3").arg(ss.tenantId, ss.databaseName).arg(ss.userId));
     ws->sendTextMessage(R"({"status":1})");
 }
 
@@ -267,13 +355,38 @@ void ServerThread::unregisterSocket(const QJsonObject &jdoc, QWebSocket *ws)
 
 QString ServerThread::updateHotelCache(const QJsonObject &jdoc)
 {
-    QMutexLocker ml(&mSocketMutex);
+    // handleCommand runs on QThreadPool; QWebSocket lives on ServerThread's thread.
+    // Sending from a worker enables QSocketNotifier off-thread → Qt warning / UB.
+    const QString payload = QString::fromUtf8(QJsonDocument(jdoc).toJson(QJsonDocument::Compact));
+    const QString database = jdoc.value(QStringLiteral("database")).toString();
 
-    for(const SocketStruct &ss : qAsConst(fSockets)) {
-        ss.socket->sendTextMessage(QJsonDocument(jdoc).toJson(QJsonDocument::Compact));
+    QList<QPointer<QWebSocket>> targets;
+    {
+        QMutexLocker ml(&mSocketMutex);
+        for (const SocketStruct &ss : qAsConst(fSockets)) {
+            if (!ss.socket || ss.tenantId.isEmpty()) {
+                continue;
+            }
+            if (!database.isEmpty()
+                && ss.databaseName.compare(database, Qt::CaseInsensitive) != 0) {
+                continue;
+            }
+            targets.append(QPointer<QWebSocket>(ss.socket));
+        }
     }
 
-    return QJsonDocument({"errorCode", 0}).toJson(QJsonDocument::Compact);
+    for (const QPointer<QWebSocket> &ws : targets) {
+        if (!ws) {
+            continue;
+        }
+        QMetaObject::invokeMethod(ws, [ws, payload]() {
+            if (ws) {
+                ws->sendTextMessage(payload);
+            }
+        }, Qt::QueuedConnection);
+    }
+
+    return QJsonDocument(QJsonObject{{"errorCode", 0}}).toJson(QJsonDocument::Compact);
 }
 
 QString ServerThread::armsoft(const QJsonObject &jdoc)
@@ -310,27 +423,17 @@ void ServerThread::onNewConnection()
 void ServerThread::onDisconnected()
 {
     QMutexLocker ml(&mSocketMutex);
-    QWebSocket *ws = qobject_cast<QWebSocket*>(sender());
-
-    if(!ws) {
+    QWebSocket *ws = qobject_cast<QWebSocket *>(sender());
+    if (!ws) {
         return;
     }
-
     auto it = fSockets.find(ws);
-
-    if(it != fSockets.end()) {
-        LogWriter::write(
-            LogWriterLevel::verbose,
-            "",
-            QString("disconnected: tenant=%1 user=%2 type=%3")
-            .arg(it->databaseName)
-            .arg(it->userId)
-        );
+    if (it != fSockets.end()) {
+        LogWriter::write(LogWriterLevel::verbose, "", QString("disconnected: tenant=%1 user=%2").arg(it->databaseName).arg(it->userId));
         fSockets.erase(it);
     } else {
         LogWriter::write(LogWriterLevel::verbose, "", "disconnected: unknown socket");
     }
-
     ws->deleteLater();
 }
 

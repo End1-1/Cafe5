@@ -57,6 +57,7 @@ Source: "C:\build\Install_Cafe5_x64\sqldrivers\qsqlmysql.dll"; DestDir: "{app}\s
 Source: "C:\build\Install_Cafe5_x64\sqldrivers\qsqlodbc.dll"; DestDir: "{app}\sqldrivers"; Flags: onlyifdoesntexist
 Source: "C:\build\Install_Cafe5_x64\printsupport\windowsprintersupport.dll"; DestDir: "{app}\printsupport"; Flags: onlyifdoesntexist
 Source: "C:\build\Install_Cafe5_x64\imageformats\qjpeg.dll"; DestDir: "{app}\imageformats"; Flags: onlyifdoesntexist
+Source: "C:\build\Install_Cafe5_x64\imageformats\qwebp.dll"; DestDir: "{app}\imageformats"; Flags: onlyifdoesntexist
 Source: "C:\build\Install_Cafe5_x64\platforms\qminimal.dll"; DestDir: "{app}\platforms"; Flags: onlyifdoesntexist
 Source: "C:\build\Install_Cafe5_x64\platforms\qwindows.dll"; DestDir: "{app}\platforms"; Flags: onlyifdoesntexist
 Source: "C:\build\Install_Cafe5_x64\vcredist\VC_redist.x64.exe"; DestDir: {tmp}; Flags: deleteafterinstall

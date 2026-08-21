@@ -256,20 +256,14 @@ bool C5SettingsWidget::save(QString &err, QList<QMap<QString, QVariant> >& data)
 
     db[":f_settings"] = ui->leCode->getInteger();
     db.exec("delete from s_settings_values where f_settings=:f_settings");
-    QString sql = "insert into s_settings_values (f_settings, f_key, f_value) values ";
-    bool first = true;
 
+    // Bind values — raw SQL breaks Windows paths (\t \n \' etc.) and leaves param empty at runtime.
     for(QMap<int, QString>::const_iterator it = fTags.constBegin(); it != fTags.constEnd(); it++) {
-        if(first) {
-            first = false;
-        } else {
-            sql += ",";
-        }
-
-        sql += QString("(%1, %2, '%3')").arg(ui->leCode->text(), QString::number(it.key()), it.value());
+        db[":f_settings"] = ui->leCode->getInteger();
+        db[":f_key"] = it.key();
+        db[":f_value"] = it.value();
+        db.insert("s_settings_values", false);
     }
-
-    db.exec(sql);
     db[":f_counter"] = ui->leInputDocCounter->getInteger();
     db.update("a_type", where_id(DOC_TYPE_STORE_INPUT));
     db[":f_counter"] = ui->leOutDocCounter->getInteger();
@@ -359,6 +353,10 @@ bool C5SettingsWidget::save(QString &err, QList<QMap<QString, QVariant> >& data)
     db[":f_name"] = ui->leSettingsName->text();
     db[":f_config"] = __jsonstr(jc);
     db.update("sys_json_config", "where f_id=:f_id");
+
+    // Reload the profile we just saved (not whatever ss_settings name is in the registry).
+    __c5config.fSettingsId = ui->leCode->getInteger();
+    __c5config.fSettingsName = ui->leSettingsName->text();
     __c5config.initParamsFromDb();
     return true;
 }
@@ -386,7 +384,10 @@ void C5SettingsWidget::setWidgetValue(QWidget *w, const QString &value)
             || !strcmp(w->metaObject()->className(), "C5LineEditWithSelector")) {
         static_cast<C5LineEdit*>(w)->setText(value);
     } else if(!strcmp(w->metaObject()->className(), "C5ComboBox")) {
-        static_cast<C5ComboBox*>(w)->setIndexForValue(value);
+        // Combo ItemData is int (setDBValues); QString "1" does not match with findData.
+        bool ok = false;
+        const int id = value.toInt(&ok);
+        static_cast<C5ComboBox*>(w)->setIndexForValue(ok ? QVariant(id) : QVariant(value));
     } else if(!strcmp(w->metaObject()->className(), "C5CheckBox")) {
         static_cast<C5CheckBox*>(w)->setChecked(value == "1");
     } else if(!strcmp(w->metaObject()->className(), "QRadioButton")) {

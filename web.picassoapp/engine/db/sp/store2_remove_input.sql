@@ -35,6 +35,9 @@ BEGIN
     END IF;
 
     DELETE FROM store_user WHERE f_doc = p_doc_uuid;
+    DELETE FROM cash_operations WHERE f_order_id = p_doc_uuid;
+    DELETE FROM cash_debts WHERE f_doc_uuid = p_doc_uuid;
+    DELETE FROM b_clients_debts WHERE f_storedoc = p_doc_uuid;
     DELETE FROM store_document WHERE f_id = p_doc_uuid;
     RETURN JSON_OBJECT('status', 0, 'msg', 'ok');
 END$$

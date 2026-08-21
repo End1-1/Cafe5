@@ -13,6 +13,8 @@
 #include <QDebug>
 #include <QGraphicsScene>
 #include <QGraphicsTextItem>
+#include <QTextOption>
+#include "jsons.h"
 #include "ean8generator.h"
 #include <QDebug>
 #include <QImage>
@@ -217,6 +219,269 @@ bool C5StoreBarcode::printOneBarcode(const QString &code, const QString &price, 
     p.drawText(10, 185, code);
     p.drawText(10, 155, QString("%1: %2").arg(tr("Price"), price));
     return printer.printerState() != QPrinter::Error;
+}
+
+bool C5StoreBarcode::printOneBarcode60x30(const QString &code, const QString &price, const QString &name,
+        QPrintDialog &pd)
+{
+    QPrinter *printer = pd.printer();
+    if(!printer) {
+        return false;
+    }
+
+    const QString barcode = code.trimmed();
+    const qreal pageW = 60.0;
+    const qreal pageH = 30.0;
+    QPageSize pageSize(QSizeF(pageW, pageH), QPageSize::Millimeter, QStringLiteral("60x30mm"));
+    QPageLayout layout(pageSize, QPageLayout::Portrait, QMarginsF(0, 0, 0, 0));
+    printer->setPageLayout(layout);
+    printer->setFullPage(true);
+    printer->setOutputFormat(QPrinter::NativeFormat);
+
+    QPainter p(printer);
+    if(!p.isActive()) {
+        return false;
+    }
+
+    // Work in millimeters.
+    p.scale(printer->logicalDpiX() / 25.4, printer->logicalDpiY() / 25.4);
+
+    const QString fontFamily = currentLabelFontFamily();
+    QFont f(fontFamily);
+
+    // Top row: name (left, 2 lines) | price + դր. (right, same baseline)
+    // After scale-to-mm, use pixelSize so "3" = 3 mm (pointSize would be scaled again).
+    const qreal margin = 1.2;
+    const qreal priceW = 18.0; // ~5 digits + " դր."
+    const qreal gap = 1.5;
+    const qreal nameW = pageW - margin * 2 - priceW - gap;
+    const qreal topY = 0.8;
+    const qreal topH = 10.0;
+
+    f.setPixelSize(3);
+    f.setBold(true);
+    p.setFont(f);
+    QTextOption nameOpt;
+    nameOpt.setWrapMode(QTextOption::WordWrap);
+    nameOpt.setAlignment(Qt::AlignLeft | Qt::AlignTop);
+    {
+        const qreal s = 0.9; // −10%
+        p.save();
+        p.scale(s, s);
+        p.drawText(QRectF((margin + 2.0) / s, topY / s, nameW / s, topH / s),
+                   name.trimmed(), nameOpt);
+        p.restore();
+    }
+
+    f.setPixelSize(3);
+    f.setBold(true);
+    p.setFont(f);
+    const QString priceText = QStringLiteral("%1 դր.").arg(price.trimmed());
+    {
+        const qreal s = 0.9 * 1.3; // base −10%, then +30%
+        p.save();
+        p.scale(s, s);
+        p.drawText(QRectF((pageW - margin - priceW - 2.0) / s, topY / s, priceW / s, topH / s),
+                   priceText,
+                   Qt::AlignRight | Qt::AlignTop);
+        p.restore();
+    }
+
+    // Bottom: barcode + code digits
+    // DrawBarcode(..., iY0, iY10, iY11, ...) uses iY10/iY11 as bar HEIGHT, not bottom Y.
+    if(!barcode.isEmpty()) {
+        Barcode128 bc;
+        const QByteArray raw = barcode.toLatin1();
+        bool allDigits = true;
+        for(QChar ch : barcode) {
+            if(!ch.isDigit()) {
+                allDigits = false;
+                break;
+            }
+        }
+        bool ok = false;
+        if(allDigits && barcode.length() % 2 == 0) {
+            ok = bc.Encode128C(raw.constData());
+        }
+        if(!ok) {
+            ok = bc.Encode128B(raw.constData());
+        }
+        const qreal barTop = 11.0;
+        const qreal barH = 12.0;
+        if(ok && bc.GetEncodeLength() > 0) {
+            const qreal availW = pageW - margin * 2;
+            qreal penW = availW / bc.GetEncodeLength();
+            penW = qBound(0.20, penW, 0.45);
+            const qreal usedW = bc.GetEncodeLength() * penW;
+            const qreal x0 = (pageW - usedW) / 2.0;
+            bc.DrawBarcode(p, x0, barTop, barH, barH, penW);
+        }
+
+        f.setPixelSize(3);
+        f.setBold(false);
+        p.setFont(f);
+        // Place under bars with bottom margin so descenders are not clipped.
+        const qreal codeY = barTop + barH + 0.4;
+        p.drawText(QRectF(margin, codeY, pageW - margin * 2, pageH - codeY - 0.5),
+                   barcode,
+                   Qt::AlignHCenter | Qt::AlignTop);
+    }
+
+    return printer->printerState() != QPrinter::Error;
+}
+
+QString C5StoreBarcode::currentLabelTemplateId()
+{
+    const QString id = __c5config.getRegValue(QStringLiteral("barcode_label_template"),
+                                              QString::fromLatin1(kTemplate60x30)).toString().trimmed();
+    if(id == QLatin1String(kTemplate57x30Qr)) {
+        return QString::fromLatin1(kTemplate57x30Qr);
+    }
+    return QString::fromLatin1(kTemplate60x30);
+}
+
+void C5StoreBarcode::setCurrentLabelTemplateId(const QString &id)
+{
+    if(id == QLatin1String(kTemplate57x30Qr)) {
+        __c5config.setRegValue(QStringLiteral("barcode_label_template"), QString::fromLatin1(kTemplate57x30Qr));
+    } else {
+        __c5config.setRegValue(QStringLiteral("barcode_label_template"), QString::fromLatin1(kTemplate60x30));
+    }
+}
+
+QString C5StoreBarcode::currentLabelFontFamily()
+{
+    const QString appFont = __c5config.getValue(param_app_font_family).trimmed();
+    const QString family = __c5config.getRegValue(QStringLiteral("barcode_label_font_family"),
+                                                  appFont).toString().trimmed();
+    return family.isEmpty() ? appFont : family;
+}
+
+void C5StoreBarcode::setCurrentLabelFontFamily(const QString &family)
+{
+    const QString normalized = family.trimmed();
+    if(!normalized.isEmpty()) {
+        __c5config.setRegValue(QStringLiteral("barcode_label_font_family"), normalized);
+    }
+}
+
+QString C5StoreBarcode::configShopName()
+{
+    C5Database db;
+    db[":f_id"] = 1;
+    db.exec("select f_config from sys_json_config where f_id=:f_id");
+
+    if(db.nextRow()) {
+        return __strjson(db.getString("f_config"))["companyname"].toString();
+    }
+
+    return QString();
+}
+
+bool C5StoreBarcode::printSelected(const QString &code, const QString &price, const QString &name, QPrintDialog &pd)
+{
+    if(currentLabelTemplateId() == QLatin1String(kTemplate57x30Qr)) {
+        return printOneBarcode57x30Qr(code, price, name, pd);
+    }
+    return printOneBarcode60x30(code, price, name, pd);
+}
+
+bool C5StoreBarcode::printOneBarcode57x30Qr(const QString &code, const QString &price, const QString &name,
+        QPrintDialog &pd)
+{
+    QPrinter *printer = pd.printer();
+    if(!printer) {
+        return false;
+    }
+
+    const QString barcode = code.trimmed();
+    const qreal pageW = 57.0;
+    const qreal pageH = 30.0;
+    QPageSize pageSize(QSizeF(pageW, pageH), QPageSize::Millimeter, QStringLiteral("57x30mm"));
+    QPageLayout layout(pageSize, QPageLayout::Portrait, QMarginsF(0, 0, 0, 0));
+    printer->setPageLayout(layout);
+    printer->setFullPage(true);
+    printer->setOutputFormat(QPrinter::NativeFormat);
+
+    QPainter p(printer);
+    if(!p.isActive()) {
+        return false;
+    }
+    p.scale(printer->logicalDpiX() / 25.4, printer->logicalDpiY() / 25.4);
+
+    const QString fontFamily = currentLabelFontFamily();
+    QFont f(fontFamily);
+
+    const qreal margin = 1.2;
+    const qreal qrSize = 20.0;
+    const qreal qrGap = 1.0;
+    const qreal textW = pageW - margin * 2 - qrSize - qrGap;
+    const qreal topY = 1.0;
+
+    // QR on the right edge (barcode payload). Modules are painted as rectangles:
+    // scaling a mono QImage down to label size destroys module edges and scanners fail.
+    if(!barcode.isEmpty()) {
+        CQR_Encode qrEncode;
+        QByteArray payload = barcode.toUtf8();
+        if(qrEncode.EncodeData(QR_LEVEL_M, 0, true, -1, payload.data())) {
+            const int modules = qrEncode.m_nSymbleSize;
+            const int total = modules + QR_MARGIN * 2;
+            const qreal module = qrSize / total;
+            const qreal qrX = pageW - margin - qrSize;
+            const qreal qrY = (pageH - qrSize) / 2.0 + 2.5;
+            p.save();
+            p.setRenderHint(QPainter::Antialiasing, false);
+            p.setPen(Qt::NoPen);
+            p.setBrush(Qt::white);
+            p.drawRect(QRectF(qrX, qrY, qrSize, qrSize));
+            p.setBrush(Qt::black);
+
+            // Merge neighbour dark modules into a single rectangle to avoid seams.
+            for(int y = 0; y < modules; ++y) {
+                int runStart = -1;
+                for(int x = 0; x <= modules; ++x) {
+                    const bool dark = x < modules && qrEncode.m_byModuleData[x][y];
+                    if(dark && runStart < 0) {
+                        runStart = x;
+                    } else if(!dark && runStart >= 0) {
+                        p.drawRect(QRectF(qrX + (QR_MARGIN + runStart) * module,
+                                          qrY + (QR_MARGIN + y) * module,
+                                          (x - runStart) * module,
+                                          module));
+                        runStart = -1;
+                    }
+                }
+            }
+
+            p.restore();
+        }
+    }
+
+    const QString shop = configShopName();
+    f.setPixelSize(3);
+    f.setBold(true);
+    p.setFont(f);
+    QTextOption textOpt;
+    textOpt.setWrapMode(QTextOption::NoWrap);
+    textOpt.setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
+    p.drawText(QRectF(margin, topY, textW, 4.5), shop, textOpt);
+
+    textOpt.setWrapMode(QTextOption::WordWrap);
+    textOpt.setAlignment(Qt::AlignLeft | Qt::AlignTop);
+    p.drawText(QRectF(margin, topY + 5.0, textW, 8.0), name.trimmed(), textOpt);
+
+    // Bottom-left: price + readable barcode (one line higher).
+    const QString priceText = QStringLiteral("Գին: %1").arg(price.trimmed());
+    p.drawText(QRectF(margin, pageH - 13.5, textW, 4.0),
+               priceText,
+               Qt::AlignLeft | Qt::AlignVCenter);
+
+    QTextOption codeOpt;
+    codeOpt.setWrapMode(QTextOption::WrapAnywhere);
+    codeOpt.setAlignment(Qt::AlignLeft | Qt::AlignTop);
+    p.drawText(QRectF(margin, pageH - 9.5, textW, 8.0), barcode, codeOpt);
+
+    return printer->printerState() != QPrinter::Error;
 }
 
 bool C5StoreBarcode::printOneBarcode2(const QString &code, const QString &price, QString link,

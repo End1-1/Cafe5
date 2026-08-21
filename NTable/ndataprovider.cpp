@@ -1,4 +1,5 @@
 #include "ndataprovider.h"
+#include "c5uilanguage.h"
 #include "logwriter.h"
 #include "format_bytes.h"
 #include <QHostInfo>
@@ -9,6 +10,32 @@
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QElapsedTimer>
+
+namespace {
+
+QString setupPackageName(const QString &appName)
+{
+    if (appName.compare(QStringLiteral("officen"), Qt::CaseInsensitive) == 0) {
+        return QStringLiteral("frontdesk");
+    }
+    return appName.toLower();
+}
+
+QString setupDownloadUrl(const QString &appName, const QString &version)
+{
+    return QStringLiteral("https://picasso.am/files/%1_setup_%2.exe")
+        .arg(setupPackageName(appName), version);
+}
+
+/** UI am/ru → API hy/ru (Translator loads tr_{locale}.json). */
+QString apiLocale()
+{
+    return C5UiLanguage::current() == QLatin1String(C5UiLanguage::kRu)
+               ? QStringLiteral("ru")
+               : QStringLiteral("hy");
+}
+
+} // namespace
 
 bool  NDataProvider::mDebug = false;
 QString NDataProvider::sessionKey;
@@ -58,6 +85,7 @@ void NDataProvider::getData(const QString &route, const QJsonObject &data)
     jo["hostinfo"] = QHostInfo::localHostName().toLower();
     jo["app"] = mAppName;
     jo["appversion"] = mFileVersion;
+    jo["locale"] = apiLocale();
 #ifdef QT_DEBUG
     jo["debug"] = true;
 #endif
@@ -110,18 +138,20 @@ void NDataProvider::queryFinished(QNetworkReply *r)
     }
 
     if(httpCode == 500) {
-        emit error(ba);
+        QJsonObject jerr = QJsonDocument::fromJson(ba).object();
+        const QString msg = jerr.value(QStringLiteral("error")).toString();
+        emit error(msg.isEmpty() ? QString::fromUtf8(ba) : msg);
         return;
     }
 
     if(httpCode == 426) {
         QJsonObject jmsg = QJsonDocument::fromJson(ba).object();
-        QString msg = QString("%1<br>%2 > %3<br><p><a href=\"launch-updater?version=%3\">%4</a></p>")
+        const QString newVersion = jmsg.value("new_version").toString();
+        QString msg = QString("%1<br>%2 → %3")
                       .arg(tr("Application update required"),
                            jmsg.value("old_version").toString(),
-                           jmsg.value("new_version").toString(),
-                           tr("Click to launch updater"));
-        emit updateRequired(msg, mAppName, jmsg.value("new_version").toString());
+                           newVersion);
+        emit updateRequired(msg, mAppName, newVersion);
         return;
     }
 

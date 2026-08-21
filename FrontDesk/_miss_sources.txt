@@ -1,0 +1,271 @@
+OK
+Cancel
+Code
+Group
+Name
+Unit
+Retail price
+Address
+Phone
+Email
+Description
+Row
+Rate
+Date
+Status
+Price
+Type
+Currency
+Comment
+Save
+Amount
+Goods
+Change password
+Old password
+New password
+Confirm password
+Wholesale price
+...
+Connection
+Access denied
+Saved
+Filter
+User
+Database access
+Login
+Customer
+Card
+Store
+Start
+Search
+1
+0
+Barcode
+Menu
+Image
+Color
+Qty
+Total
+Dish
+Copy
+Close
+Refresh
+Fiscal
+000111222
+Stock
+01/01/2024 - 01/01/2025
+Remove
+Confirm
+Apply
+Groups
+Reports
+Documents
+Report
+Payment
+Cash
+Waiter
+Discount
+Other
+Partners
+Tables
+Preferences
+Login to manager
+Login to waiter
+Users
+Databases
+Settings
+Permissions
+Username
+Password
+Database
+Storehouse
+Logout
+Disconnected
+History
+Translator
++
+-
+0.00
+Print
+%n row(s): amount is zero.
+%n row(s): employee is not set.
+Debt
+Sale
+Partner
+Time
+Hall
+Order
+Find
+116
+Full
+Orders
+Login after payment
+##:##:##
+Print
+scancodes
+Print
+scancodes 2
+Print
+descriptions
+End
+Number
+Select
+Add
+Draft
+New
+document
+Deleted
+Quantity
+Sum
+Export
+to Excel
+Print
+barcode
+Import
+from XML
+Price
+warning
+%3
+Failed to write delete errors:
+%1
+Replace
+Не оплачено
+Update
+Armenian
+Russian
+New
+Edit
+Save
+changes
+Search by
+parameters
+Clear
+Export to
+MS Excel
+Count
+Create
+Active
+3
+Value
+Dishes
+Printer
+Enabled
+Append
+2
+Weight
+Account
+Cost price
+-1
+Required
+Options
+Sale price
+Created
+Ready
+Notes
+Key
+Width
+Size
+Category
+Manager
+Table
+Configuration
+Minimum
+Maximum
+Tax
+All
+Yes
+No
+Use closing
+datetime
+Host
+Backup
+database
+Reset
+database
+Supplier
+Average
+Configure
+tablet
+Warning
+English
+Max
+Add
+Add
+work
+Remove
+action
+Select
+all workers
+Remove
+user
+Delete
+settings
+Partial
+passwords
+Set group
+permissions
+8
+÷
+7
+=
+*
+4
+5
+9
++/-
+6
+.
+1000
+5000
+2000
+10000
+15000
+20000
+%1
+%2: %3
++374 99 999-999
++374  -
+Delete
+0.5
+1.5
+0.33
+,
+0.25
+Summary
+Loading...
+ %
+Rename
+Import
+Invoice: %1
+Supplier: %2
+TIN: %3
+Date: %4
+Total: %5
+Lines: %6
+27.07.2019 22:16
+View
+‹
+›
+Columns
+Reset
+Cash
+movement
+Recalculate
+store output
+Recalculate store output for the selected period?
+Existing write-offs will be removed and sales will be posted again.
+Failed
+%3
+Clear
+/
+⏎
+Important
+Cashier
+Port
+Return
+Inventory
+Cost
+Open
+—
+Empty
+About

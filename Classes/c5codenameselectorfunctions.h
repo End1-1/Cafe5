@@ -3,6 +3,7 @@
 #include <QCoreApplication>
 #include <QMenu>
 #include "c5codenameselector.h"
+#include "c5database.h"
 #include "c5structtableview.h"
 #include "dict_payment_type.h"
 #include "store_doc_status.h"
@@ -15,7 +16,7 @@
 #include "struct_storage_item.h"
 #include "struct_employee.h"
 #include "struct_employee_group.h"
-#include "struct_goods_type.h"
+#include "dict_goods_types.h"
 
 template<typename T>
 [[nodiscard]] inline QVector<T> selectItem(bool loadFirst = false, bool multiSelect = false, const QPoint &position = {-1, -1})
@@ -144,12 +145,20 @@ inline auto paymentTypeItemSelector = [](C5CodeNameSelector *s) {
 };
 
 inline auto goodsTypeItemSelector = [](C5CodeNameSelector *s) {
-    const auto r = selectItem<StructGoodsType>(true, false, s->getPosition());
-    if (r.isEmpty()) {
+    QMenu menu;
+    for (int gt : goods_types) {
+        const QString name = goodsTypeDisplayName(gt);
+        if (name.isEmpty()) {
+            continue;
+        }
+        QAction *const a = menu.addAction(name);
+        a->setData(gt);
+    }
+    QAction *const picked = menu.exec(s->getPosition());
+    if (!picked) {
         return;
     }
-    const auto &g = r.first();
-    s->setCodeAndName(g.id, g.name);
+    s->setCodeAndName(picked->data().toInt(), picked->text());
 };
 
 inline auto employeeItemSelector = [](C5CodeNameSelector *s) {
@@ -175,6 +184,46 @@ inline auto employeeGroupItemSelector = [](C5CodeNameSelector *s) {
     }
     const auto &g = r.first();
     s->setCodeAndName(g.id, g.name);
+};
+
+inline auto ararixGroupItemSelector = [](C5CodeNameSelector *s) {
+    C5Database db;
+    QMenu menu;
+    if (db.exec("select f_id, f_name from ararix_goods_groups order by f_sort, f_name")) {
+        while (db.nextRow()) {
+            QAction *const a = menu.addAction(db.getString(1));
+            a->setData(db.getInt(0));
+        }
+    }
+    if (menu.actions().isEmpty()) {
+        QAction *const empty = menu.addAction(QCoreApplication::translate("Ararix", "No Ararix groups"));
+        empty->setEnabled(false);
+    }
+    QAction *const picked = menu.exec(s->getPosition());
+    if (!picked || !picked->isEnabled()) {
+        return;
+    }
+    s->setCodeAndName(picked->data().toInt(), picked->text());
+};
+
+inline auto ararixCountryItemSelector = [](C5CodeNameSelector *s) {
+    C5Database db;
+    QMenu menu;
+    if (db.exec("select f_id, f_name from ararix_goods_country order by f_sort, f_name")) {
+        while (db.nextRow()) {
+            QAction *const a = menu.addAction(db.getString(1));
+            a->setData(db.getInt(0));
+        }
+    }
+    if (menu.actions().isEmpty()) {
+        QAction *const empty = menu.addAction(QCoreApplication::translate("Ararix", "No cuisine countries"));
+        empty->setEnabled(false);
+    }
+    QAction *const picked = menu.exec(s->getPosition());
+    if (!picked || !picked->isEnabled()) {
+        return;
+    }
+    s->setCodeAndName(picked->data().toInt(), picked->text());
 };
 
 inline auto mapPointToGlobal(QWidget *w)

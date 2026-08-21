@@ -60,6 +60,7 @@ class WorkstationConfigWaiter extends WorkstationConfigBase
             'f_fiscal_machine_id',
             'f_default_store_id',
             'receipt_phone',
+            'precheck_printer',
             'receipt_no_table',
             'receipt_no_service_hint',
             'receipt_policy',
@@ -68,6 +69,8 @@ class WorkstationConfigWaiter extends WorkstationConfigBase
             'dlgsearchmenu_vsection_size',
             'cost_depend_on_service_and_discount',
             'do_not_print_customer_on_receipt',
+            'customer_notification',
+            'recent_dishes_minutes',
             'setup_buttons',
         ];
     }
@@ -80,14 +83,17 @@ class WorkstationConfigWaiter extends WorkstationConfigBase
             'f_fiscal_machine_id' => 1,
             'f_default_store_id' => 1,
             'receipt_phone' => '',
-            'receipt_no_table' => true,
-            'receipt_no_service_hint' => true,
+            'precheck_printer' => '',
+            'receipt_no_table' => false,
+            'receipt_no_service_hint' => false,
             'receipt_policy' => '',
-            'receipt_no_discount_hint' => true,
+            'receipt_no_discount_hint' => false,
             'dlgsearchmenu_hsection_size' => 240,
             'dlgsearchmenu_vsection_size' => 100,
             'cost_depend_on_service_and_discount' => false,
             'do_not_print_customer_on_receipt' => false,
+            'customer_notification' => false,
+            'recent_dishes_minutes' => 40,
             'setup_buttons' => self::defaultSetupButtons(),
         ];
     }

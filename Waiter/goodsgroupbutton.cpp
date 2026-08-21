@@ -1,4 +1,5 @@
 #include "goodsgroupbutton.h"
+#include "../WaiterDesigner/waitergoodsgroupstyle.h"
 #include <QLabel>
 #include <QFontMetrics>
 #include <QResizeEvent>
@@ -23,6 +24,23 @@ GoodsGroupButton::GoodsGroupButton(const QString &text, QWidget *parent) :
     auto *lay = new QVBoxLayout(this);
     lay->setContentsMargins(3, 3, 3, 3);
     lay->addWidget(mLabel);
+    applyStyleFont();
+}
+
+void GoodsGroupButton::applyStyleFont()
+{
+    const WaiterGoodsGroupStyle &style = WaiterGoodsGroupStyle::cachedStyle();
+    QFont f = mLabel->font();
+    f.setPointSize(qBound(7, style.fontSize, 48));
+    f.setBold(style.fontBold);
+    mLabel->setFont(f);
+    QPalette pal = mLabel->palette();
+    pal.setColor(QPalette::WindowText, style.fontColor);
+    pal.setColor(QPalette::Text, style.fontColor);
+    mLabel->setPalette(pal);
+    mLabel->setStyleSheet(QStringLiteral("QLabel#goodsGroupName { color: %1; background: transparent; }")
+                              .arg(style.fontColor.name(QColor::HexRgb)));
+    mBasePointSize = qBound(7, style.fontSize, 48);
 }
 
 void GoodsGroupButton::cacheBaseFontSize()
@@ -30,16 +48,7 @@ void GoodsGroupButton::cacheBaseFontSize()
     if(mBasePointSize > 0) {
         return;
     }
-
-    const QFont &f = mLabel->font();
-
-    if(f.pointSize() > 0) {
-        mBasePointSize = f.pointSize();
-    } else if(f.pixelSize() > 0) {
-        mBasePointSize = qMax(7, qRound(f.pixelSize() * 72.0 / qreal(logicalDpiY())));
-    } else {
-        mBasePointSize = 11;
-    }
+    applyStyleFont();
 }
 
 void GoodsGroupButton::scaleLabelFont()
@@ -59,13 +68,15 @@ void GoodsGroupButton::scaleLabelFont()
 
     const QString t = mLabel->text();
     const int minPt = 7;
-    const QFont baseFont = mLabel->font();
+    QFont baseFont = mLabel->font();
+    baseFont.setBold(WaiterGoodsGroupStyle::cachedStyle().fontBold);
     QFont f = baseFont;
     int chosen = minPt;
 
     for(int pt = mBasePointSize; pt >= minPt; --pt) {
         f = baseFont;
         f.setPointSize(pt);
+        f.setBold(baseFont.bold());
         QFontMetrics fm(f);
         const QRect br = fm.boundingRect(QRect(0, 0, w, h), Qt::AlignCenter | Qt::TextWordWrap, t);
 
@@ -76,6 +87,7 @@ void GoodsGroupButton::scaleLabelFont()
     }
 
     f.setPointSize(chosen);
+    f.setBold(baseFont.bold());
     mLabel->setFont(f);
 }
 
@@ -88,28 +100,37 @@ void GoodsGroupButton::resizeEvent(QResizeEvent *e)
 void GoodsGroupButton::showEvent(QShowEvent *e)
 {
     QFrame::showEvent(e);
-    cacheBaseFontSize();
+    applyStyleFont();
     scaleLabelFont();
 }
 
 void GoodsGroupButton::setColor(int c)
 {
+    const WaiterGoodsGroupStyle &style = WaiterGoodsGroupStyle::cachedStyle();
+    const QString border = style.borderWidth > 0
+                               ? QStringLiteral("border:%1px solid %2;")
+                                     .arg(style.borderWidth)
+                                     .arg(QLatin1String(WaiterGoodsGroupStyle::borderColorCss))
+                               : QStringLiteral("border:none;");
     QColor color = QColor::fromRgb(c);
-    setStyleSheet(QString(
+    setStyleSheet(QStringLiteral(
                       "QFrame#goodsGroupFrame {"
                       "background:%1;"
+                      "%4"
                       "}"
                       "QFrame#goodsGroupFrame:hover {"
                       "background:%2;"
+                      "%4"
                       "}"
-                      "QFrame#goodsGroupFrame:pressed {"
+                      "QFrame#goodsGroupFrame[pressed=\"true\"] {"
                       "background:%3;"
+                      "%4"
                       "}"
                   )
-                  .arg(color.name())
-                  .arg(color.lighter(130).name())
-                  .arg(color.darker(130).name())
-                 );
+                  .arg(color.name(),
+                       color.lighter(130).name(),
+                       color.darker(130).name(),
+                       border));
 }
 
 void GoodsGroupButton::mousePressEvent(QMouseEvent *e)

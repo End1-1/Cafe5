@@ -68,6 +68,7 @@ void C5FiscalCancel::on_btnRequestCancel_clicked()
     db[":f_out"] = jsnout;
     db[":f_err"] = err;
     db[":f_result"] = result;
+    db[":f_fiscal_machine_id"] = fm.id > 0 ? fm.id : mWorkStation.fiscalMachineId();
     db.insert("o_tax_log", false);
 
     if(result != pt_err_ok) {

@@ -8,6 +8,8 @@
 #include "c5salefromstoreorder.h"
 #include "c5storeinventory.h"
 #include "c5storeoutput.h"
+#include "c5storemovement.h"
+#include "c5storecomplectation.h"
 #include "cr5goods.h"
 #include "cr5goodsgroup.h"
 #include "cr5goodspartners.h"
@@ -19,6 +21,7 @@
 #include "ntablewidget.h"
 #include "rabstracteditorreport.h"
 #include "rcashmovement.h"
+#include "rconsumedgoods.h"
 #include "rdebts.h"
 #include "rmenureviewreport.h"
 #include "rorderinprogress.h"
@@ -155,6 +158,14 @@ QWidget* WDashboard::createForm(const QString &name, QIcon icon)
         return new C5StoreOutput(mUser, tr("Store output"), icon);
     }
 
+    if (name == "form_newstoremovement") {
+        return new C5StoreMovement(mUser, tr("Store movement"), icon);
+    }
+
+    if (name == "form_newstorecomplecation") {
+        return new C5StoreComplectation(mUser, tr("Store complectation"), icon);
+    }
+
     if (name == "form_store_documents") {
         return new RAbstractEditorReport(tr("Store documents"), icon, name);
     }
@@ -194,7 +205,7 @@ QWidget* WDashboard::createForm(const QString &name, QIcon icon)
     }
 
     if (name == "form_consumed_goods") {
-        return new RAbstractEditorReport(tr("Consumed goods"), icon, name);
+        return new RConsumedGoods(tr("Consumed goods"), icon, name);
     }
 
     if (name == "form_revenue") {

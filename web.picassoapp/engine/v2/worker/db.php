@@ -100,8 +100,12 @@ class Db
 
         $stmt->bind_param($bindTypes, ...$bindValues);
 
-        if (!$stmt->execute()) {
-            dieWithCode($stmt->error);
+        try {
+            if (!$stmt->execute()) {
+                dieWithCode($stmt->error);
+            }
+        } catch (mysqli_sql_exception $e) {
+            dieWithCode($e->getMessage());
         }
 
         $id = $stmt->insert_id;
@@ -186,7 +190,9 @@ class Db
         if (is_array($newData) || is_object($newData)) {
             $jsonString = json_encode($newData, JSON_UNESCAPED_UNICODE);
         } else {
-            $jsonString = $newData;
+            // For scalar values (e.g. string date) JSON_EXTRACT expects valid JSON.
+            // Encode it to JSON literal: "2026-08-18 12:14:00", 123, true, null...
+            $jsonString = json_encode($newData, JSON_UNESCAPED_UNICODE);
         }
 
         // 2. Используем чистый JSON_SET. 
@@ -310,7 +316,11 @@ class Db
 
                 if (str_starts_with($rule, 'max:')) {
                     $max = (int)substr($rule, 4);
-                    if (strlen((string)$value) > $max) {
+                    if (is_string($value) || in_array('string', $rulesArr, true)) {
+                        if (mb_strlen((string)$value, 'UTF-8') > $max) {
+                            $errors[] = "$field max $max";
+                        }
+                    } elseif (is_numeric($value) && (float)$value > $max) {
                         $errors[] = "$field max $max";
                     }
                 }

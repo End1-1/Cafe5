@@ -85,11 +85,19 @@ void C5LineEdit::setTag(int tag)
 void C5LineEdit::setColor(int c)
 {
     fColor = c;
-    QPalette palette;
-    QColor color = QColor::fromRgb(c);
-    palette.setColor(QPalette::Base, color);
-    palette.setColor(QPalette::Text, color);
-    setPalette(palette);
+    if(c == -1) {
+        setStyleSheet(QString());
+        return;
+    }
+    QColor color = QColor::fromRgb(static_cast<QRgb>(c));
+    if(color.alpha() == 0) {
+        color.setAlpha(255);
+    }
+    const QColor text = color.lightness() > 128 ? QColor(Qt::black) : QColor(Qt::white);
+    setStyleSheet(QStringLiteral(
+                      "QLineEdit { background-color: %1; color: %2; }"
+                      "QLineEdit:focus { background-color: %1; color: %2; }")
+                      .arg(color.name(QColor::HexRgb), text.name(QColor::HexRgb)));
 }
 
 int C5LineEdit::color()
@@ -126,10 +134,11 @@ void C5LineEdit::keyPressEvent(QKeyEvent *e)
         if (!strcmp(v->metaObject()->className(), "QDoubleValidator")) {
             const QDoubleValidator *dv = static_cast<const QDoubleValidator *>(v);
             switch (e->key()) {
-                case 43:
-                    //e->accept();
-                    //e->ignore();
-                    //break;
+                case 43: // '+' / numpad +
+                    // Do not insert '+'; still forward to addEventKeys handlers (e.g. fill price from hint).
+                    if(!fEventKeys.isEmpty() && fEventKeys.contains(QLatin1Char('+'))) {
+                        emit keyPressed(QLatin1Char('+'));
+                    }
                     return;
                 case 45:
                     if (dv->bottom() > 0.0000001) {
@@ -169,13 +178,12 @@ void C5LineEdit::keyPressEvent(QKeyEvent *e)
 
 void C5LineEdit::keyReleaseEvent(QKeyEvent *event)
 {
-    if (!fEventKeys.isEmpty()) {
-        int key = event->key();
-        if (key >= 0x20 && key <= 0x10FFFF) {
-            if (fEventKeys.contains(QChar(event->key()))) {
-                emit keyPressed(QChar(event->key()));
-                event->ignore();
-            }
+    // Event keys are handled on keyPress only to avoid firing the action twice.
+    if(!fEventKeys.isEmpty()) {
+        const int key = event->key();
+        if(key >= 0x20 && key <= 0x10FFFF && fEventKeys.contains(QChar(key))) {
+            event->ignore();
+            return;
         }
     }
     QLineEdit::keyReleaseEvent(event);

@@ -15,13 +15,14 @@ C5DateEdit::C5DateEdit(QWidget *parent) :
 
     QFontMetrics fm(font());
 
-    int w = fm.horizontalAdvance("00/00/0000");
+    // Text + calendar action icon + stylesheet padding (officestyle.css) + margins.
+    int w = fm.horizontalAdvance(QStringLiteral("00/00/0000"));
+    w += 36;  // trailing calendar action
+    w += 28;  // left/right padding from app stylesheet
+    w += 12;  // text margins / border
 
-    w += 24;
-    w += 8;
-
-    setMaximumWidth(w);
     setMinimumWidth(w);
+    setMaximumWidth(QWIDGETSIZE_MAX);
 
     fRow = 0;
     fColumn = 0;

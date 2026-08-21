@@ -9,6 +9,7 @@ class CE5Goods;
 }
 
 class Barcode;
+class C5TableWidget;
 
 class CE5Goods : public CE5Editor
 {
@@ -123,6 +124,8 @@ private slots:
     void on_btnRemoveRelatedOther_clicked();
 
     void on_leComplectOutputQty_textEdited(const QString &arg1);
+
+    void setColor();
 
 private:
     Ui::CE5Goods* ui;

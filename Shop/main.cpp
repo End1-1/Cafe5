@@ -11,12 +11,12 @@
 #include <QScreen>
 #include <QSettings>
 #include <QStyleFactory>
-#include <QTranslator>
 #include "c5registrysettings.h"
 #include "c5connectiondialog.h"
 #include "c5dialog.h"
 #include "c5message.h"
 #include "c5systempreference.h"
+#include "c5uilanguage.h"
 #include "c5user.h"
 #include "dict_workstation.h"
 #include "dlgpin.h"
@@ -53,12 +53,6 @@ int main(int argc, char* argv[])
         if (styleSheet.open(QIODevice::ReadOnly)) {
             a.setStyleSheet(styleSheet.readAll());
         }
-    }
-
-    auto *t = new QTranslator();
-
-    if (t->load(":/lang/Shop.qm")) {
-        a.installTranslator(t);
     }
 
     QString fileVersion =  FileVersion::getVersionString(a.applicationFilePath());
@@ -115,25 +109,36 @@ int main(int argc, char* argv[])
                 const QString subPath = s.mid(eq + 1).trimmed();
                 //C5Config::fSettingsSubPath = subPath;
                 C5ConnectionDialog::mSettingsPath = subPath;
+                C5RegistrySettings::settingsSubPath = subPath;
             }
         }
     }
 
+    C5UiLanguage::configure(QStringLiteral(":/lang/Shop.qm"),
+                            QStringLiteral(":/lang/Shop_ru.qm"));
+    C5UiLanguage::loadSaved();
+
+    const QString appHome = d.homePath() + "/" + _APPLICATION_;
+    d.mkpath(appHome);
+    d.mkpath(appHome + "/logs");
+
+    // Must stay in scope for the whole process lifetime — otherwise the lock is released
+    // immediately and a leftover/stale lock.pid (or missing dir) falsely blocks startup.
+    QLockFile lockFile(appHome + "/" + _MODULE_ + ".lock.pid");
+
     if (!multicopy) {
-        QLockFile lockFile(d.homePath() + "/" + _APPLICATION_ + "/lock.pid");
+        lockFile.setStaleLockTime(0);
+        lockFile.removeStaleLockFile();
 
         if (!lockFile.tryLock()) {
-            C5Message::error(QObject::tr("An instance of application already running"));
+            if (lockFile.error() == QLockFile::LockFailedError) {
+                C5Message::error(QObject::tr("An instance of application already running"));
+            } else {
+                C5Message::error(QObject::tr("Cannot create lock file: %1").arg(lockFile.fileName()));
+            }
+
             return -1;
         }
-    }
-
-    if(!d.exists(d.homePath() + "/" + _APPLICATION_)) {
-        d.mkpath(d.homePath() + "/" + _APPLICATION_);
-    }
-
-    if(!d.exists(d.homePath() + "/" + _APPLICATION_ + "/logs")) {
-        d.mkpath(d.homePath() + "/" + _APPLICATION_ + "/logs");
     }
 
     if(!C5SystemPreference::checkDecimalPointAndSeparator()) {
@@ -166,7 +171,8 @@ int main(int argc, char* argv[])
         if (mWorkStation.defaultStoreId() > 0) {
             w->setWindowTitle(w->windowTitle() + "[" + mWorkStation.defaultStoreName() + "]");
         } else {
-            C5Message::error(QObject::tr("Store is not defined."));
+            C5Message::error(QObject::tr("Store is not defined.\nWorkstation: %1\nAccount: %2\nSet f_default_store_id in workstation settings.")
+                                 .arg(mWorkStation.name, mWorkStation.stationAccount));
             qApp->quit();
         }
         dlgsplash->hide();

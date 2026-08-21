@@ -53,7 +53,7 @@ class Salary
         SQL;
         $headers = [Translator::t("Worker"), Translator::t("Amount")];
         return [
-            "sql" => !(empty($params->debug)) ? $sql : "",
+            "sql" => "",
             "rows" => $this->db->select($sql)->fetch_all(MYSQLI_NUM),
             "toolbar" => ["delete" => true, "reload" => true, "filter" => true, "new" => true],
             "headers" => $headers,
@@ -181,7 +181,7 @@ class Salary
         return [
             "sql" => $sql,
             "rows" => $this->db->select($sql)->fetch_all(MYSQLI_NUM),
-            "toolbar" => ["reload" => true, "filter" => true],
+            "toolbar" => ["delete" => false, "reload" => true, "filter" => true, "new" => true],
             "headers" => [Translator::t("Worker"), Translator::t("Total Time (HH:MM)"), Translator::t("Total Minutes")],
             "sum" => [2], // Суммируем минуты в подвале
             "filter" => $this->getFilterConfig()
@@ -222,7 +222,7 @@ SQL;
         return [
             "sql" => $sql,
             "rows" => $this->db->select($sql)->fetch_all(MYSQLI_NUM),
-            "toolbar" => ["delete" => true, "reload" => true, "filter" => true],
+            "toolbar" => ["delete" => true, "reload" => true, "filter" => true, "new" => true],
             "headers" => [
                 Translator::t("Date"),
                 Translator::t("Worker"),
@@ -242,7 +242,7 @@ SQL;
         return [
             ["type" => "date", "name" => "date1", "label" => Translator::t("Date start")],
             ["type" => "date", "name" => "date2", "label" => Translator::t("Date end")],
-            ["type" => "combobox", "name" => "viewmode", "label" => Translator::t("View mode"), "default" => 1, "values" => [
+            ["type" => "viewmode", "name" => "viewmode", "label" => Translator::t("View mode"), "default" => 1, "values" => [
                 ["label" => Translator::t("Current total"), "value" => 1],
                 ["label" => Translator::t("Historical accyral / payments"), "value" => 2],
                 ["label" => Translator::t("Historical detailed"), "value" => 3],

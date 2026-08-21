@@ -1,5 +1,4 @@
 #include "storeinputxmlimport.h"
-#include "appwebsocket.h"
 #include "c5structtableview.h"
 #include "c5user.h"
 #include "ninterface.h"
@@ -12,8 +11,6 @@
 #include <QJsonDocument>
 #include <QObject>
 #include <QRegularExpression>
-#include <QTimer>
-#include <QUuid>
 #include <QXmlStreamReader>
 
 namespace {
@@ -61,6 +58,7 @@ void parseTaxpayer(QXmlStreamReader &xml, StoreInputXmlInvoice &invoice)
 StoreInputXmlGoodLine parseGood(QXmlStreamReader &xml)
 {
     StoreInputXmlGoodLine line;
+    double totalPriceWithVat = 0;
     while (xml.readNextStartElement()) {
         const QString tag = localName(xml);
         if (tag == QLatin1String("Description")) {
@@ -71,11 +69,19 @@ StoreInputXmlGoodLine parseGood(QXmlStreamReader &xml)
             line.unit = readElementText(xml);
         } else if (tag == QLatin1String("Amount")) {
             line.qty = readDouble(readElementText(xml));
-        } else if (tag == QLatin1String("PricePerUnit")) {
-            line.pricePerUnit = readDouble(readElementText(xml));
+        } else if (tag == QLatin1String("TotalPrice")) {
+            // Final line amount including VAT (PricePerUnit in XML is without VAT).
+            totalPriceWithVat = readDouble(readElementText(xml));
+        } else if (tag == QLatin1String("PricePerUnit") || tag == QLatin1String("Price")
+                   || tag == QLatin1String("VAT") || tag == QLatin1String("VATRate")) {
+            xml.skipCurrentElement();
         } else {
             xml.skipCurrentElement();
         }
+    }
+    if (line.qty > 0 && totalPriceWithVat > 0) {
+        line.pricePerUnit = totalPriceWithVat / line.qty;
+        line.totalPrice = totalPriceWithVat;
     }
     return line;
 }
@@ -94,8 +100,10 @@ void parseGoodsInfo(QXmlStreamReader &xml, StoreInputXmlInvoice &invoice, QStrin
                 error = QCoreApplication::translate("StoreInputXmlImport", "Invalid quantity for goods: %1").arg(line.description);
                 return;
             }
-            if (line.pricePerUnit <= 0) {
-                error = QCoreApplication::translate("StoreInputXmlImport", "Invalid price for goods: %1").arg(line.description);
+            if (line.pricePerUnit <= 0 || line.totalPrice <= 0) {
+                error = QCoreApplication::translate("StoreInputXmlImport",
+                                                    "Invalid TotalPrice for goods: %1")
+                            .arg(line.description);
                 return;
             }
             invoice.goods.append(line);
@@ -132,7 +140,9 @@ bool parseSignableData(QXmlStreamReader &xml, StoreInputXmlInvoice &invoice, QSt
                             xml.skipCurrentElement();
                         }
                     }
-                } else if (child == QLatin1String("SupplyDate")) {
+                } else if (child == QLatin1String("SupplyDate")
+                           || child == QLatin1String("DeliveryDate")) {
+                    // Invoice uses SupplyDate; AccountingDocument uses DeliveryDate.
                     invoice.supplyDate = parseSupplyDate(readElementText(xml));
                 } else if (child == QLatin1String("AdditionalData")) {
                     invoice.additionalData = readElementText(xml);
@@ -172,58 +182,6 @@ bool parseSignableData(QXmlStreamReader &xml, StoreInputXmlInvoice &invoice, QSt
         return false;
     }
     return true;
-}
-
-QJsonObject syncWebSocketQuery(const QJsonObject &request, QString &error)
-{
-    if (!AppWebSocket::instance || !AppWebSocket::instance->isConnected()) {
-        error = QCoreApplication::translate("StoreInputXmlImport", "No connection to the server");
-        return {};
-    }
-
-    QEventLoop loop;
-    const QString requestId = QUuid::createUuid().toString(QUuid::WithoutBraces);
-    QJsonObject req = request;
-    req.insert(QStringLiteral("requestId"), requestId);
-    QJsonObject response;
-
-    const QMetaObject::Connection conn = QObject::connect(
-        AppWebSocket::instance,
-        &AppWebSocket::bMessageReceived,
-        &loop,
-        [&](const QJsonObject &jdoc) {
-            if (jdoc.value(QStringLiteral("requestId")).toString() != requestId) {
-                return;
-            }
-            response = jdoc;
-            loop.quit();
-        });
-
-    if (!AppWebSocket::instance->sendMessage(req)) {
-        error = QCoreApplication::translate("StoreInputXmlImport", "Failed to send request to server");
-        QObject::disconnect(conn);
-        return {};
-    }
-
-    QTimer timer;
-    timer.setSingleShot(true);
-    QObject::connect(&timer, &QTimer::timeout, &loop, &QEventLoop::quit);
-    timer.start(60000);
-    loop.exec();
-    QObject::disconnect(conn);
-
-    if (response.isEmpty()) {
-        error = QCoreApplication::translate("StoreInputXmlImport", "Server response timeout");
-        return {};
-    }
-    if (response.value(QStringLiteral("errorCode")).toInt() != 0) {
-        error = response.value(QStringLiteral("errorMessage")).toString();
-        if (error.isEmpty()) {
-            error = QCoreApplication::translate("StoreInputXmlImport", "Server error");
-        }
-        return {};
-    }
-    return response;
 }
 
 } // namespace
@@ -365,6 +323,7 @@ bool StoreInputXmlImport::createPartner(C5User *user,
     const QJsonObject params{
         {QStringLiteral("f_category"), 1},
         {QStringLiteral("f_state"), 1},
+        {QStringLiteral("f_group"), 2},
         {QStringLiteral("f_taxcode"), tin},
         {QStringLiteral("f_taxname"), taxName},
         {QStringLiteral("f_name"), taxName},
@@ -391,9 +350,12 @@ bool StoreInputXmlImport::updatePartner(C5User *user, QObject *context, const QJ
     return response.value(QStringLiteral("partner")).toObject().value(QStringLiteral("f_id")).toInt() > 0;
 }
 
-bool StoreInputXmlImport::findGoodsByExactName(C5User *user, const QString &description, GoodsItem &goods, QString &error)
+bool StoreInputXmlImport::findGoodsByExactName(C5User *user,
+                                               QObject *context,
+                                               const QString &description,
+                                               GoodsItem &goods,
+                                               QString &error)
 {
-    Q_UNUSED(user)
     const QString needle = normalizeName(description);
     if (needle.isEmpty()) {
         error = QCoreApplication::translate("StoreInputXmlImport", "Empty goods description");
@@ -416,35 +378,37 @@ bool StoreInputXmlImport::findGoodsByExactName(C5User *user, const QString &desc
             goods = singleMatch;
             return true;
         }
+        if (matchCount > 1) {
+            error.clear();
+            return false;
+        }
     }
 
-    QJsonObject request;
-    request.insert(QStringLiteral("command"), engine);
-    request.insert(QStringLiteral("lower_name"), needle.toLower());
-    const QJsonObject response = syncWebSocketQuery(request, error);
-    if (response.isEmpty()) {
+    QJsonObject response;
+    if (!httpQuery(user,
+                   context,
+                   QStringLiteral("/engine/v2/common/goods/find-by-exact-name"),
+                   {{QStringLiteral("f_name"), needle}},
+                   response,
+                   error)) {
         return false;
     }
 
-    GoodsItem singleMatch;
-    int matchCount = 0;
-    const QJsonArray arr = response.value(QStringLiteral("result")).toArray();
-    for (const QJsonValue &value : arr) {
-        const GoodsItem item = JsonParser<GoodsItem>::fromJson(value.toObject());
-        if (normalizeName(item.name).compare(needle, Qt::CaseInsensitive) == 0) {
-            singleMatch = item;
-            ++matchCount;
-        }
+    const QJsonValue goodsValue = response.value(QStringLiteral("goods"));
+    if (!goodsValue.isObject()) {
+        error.clear();
+        return false;
     }
-    if (matchCount == 1) {
-        goods = singleMatch;
-        return true;
+    const GoodsItem item = JsonParser<GoodsItem>::fromJson(goodsValue.toObject());
+    if (item.id <= 0) {
+        error.clear();
+        return false;
     }
-    error.clear();
-    return false;
+    goods = item;
+    return true;
 }
 
-bool StoreInputXmlImport::findGoodsById(int goodsId, GoodsItem &goods)
+bool StoreInputXmlImport::findGoodsById(C5User *user, QObject *context, int goodsId, GoodsItem &goods, QString &error)
 {
     if (goodsId <= 0) {
         return false;
@@ -459,7 +423,62 @@ bool StoreInputXmlImport::findGoodsById(int goodsId, GoodsItem &goods)
             return true;
         }
     }
-    return false;
+
+    QJsonObject response;
+    if (!httpQuery(user,
+                   context,
+                   QStringLiteral("/engine/v2/common/goods/get"),
+                   {{QStringLiteral("f_id"), goodsId}},
+                   response,
+                   error)) {
+        return false;
+    }
+    const GoodsItem item = JsonParser<GoodsItem>::fromJson(response.value(QStringLiteral("goods")).toObject());
+    if (item.id <= 0) {
+        return false;
+    }
+    goods = item;
+    return true;
+}
+
+bool StoreInputXmlImport::createGoodsFromXml(C5User *user,
+                                             QObject *context,
+                                             int supplierId,
+                                             const StoreInputXmlGoodLine &line,
+                                             GoodsItem &goods,
+                                             QString &error)
+{
+    if (supplierId <= 0) {
+        error = QCoreApplication::translate("StoreInputXmlImport", "Supplier is not defined");
+        return false;
+    }
+    const QString name = normalizeName(line.description);
+    if (name.isEmpty()) {
+        error = QCoreApplication::translate("StoreInputXmlImport", "Empty goods description");
+        return false;
+    }
+
+    QJsonObject response;
+    if (!httpQuery(user,
+                   context,
+                   QStringLiteral("/engine/v2/common/goods/create-from-xml"),
+                   {{QStringLiteral("f_name"), name},
+                    {QStringLiteral("f_unit_name"), normalizeName(line.unit)},
+                    {QStringLiteral("f_supplier"), supplierId},
+                    {QStringLiteral("f_adg"), line.classifierCode},
+                    {QStringLiteral("f_lastinputprice"), line.pricePerUnit}},
+                   response,
+                   error)) {
+        return false;
+    }
+
+    const GoodsItem item = JsonParser<GoodsItem>::fromJson(response.value(QStringLiteral("goods")).toObject());
+    if (item.id <= 0) {
+        error = QCoreApplication::translate("StoreInputXmlImport", "Failed to create goods");
+        return false;
+    }
+    goods = item;
+    return true;
 }
 
 bool StoreInputXmlImport::renameGoods(C5User *user, QObject *context, int goodsId, const QString &name, QString &error)
@@ -469,6 +488,44 @@ bool StoreInputXmlImport::renameGoods(C5User *user, QObject *context, int goodsI
                      context,
                      QStringLiteral("/engine/v2/common/goods/rename"),
                      {{QStringLiteral("f_id"), goodsId}, {QStringLiteral("f_name"), name}},
+                     response,
+                     error);
+}
+
+bool StoreInputXmlImport::findExistingByInvoiceNumber(C5User *user,
+                                                      QObject *context,
+                                                      const QString &series,
+                                                      const QString &number,
+                                                      QJsonArray &docs,
+                                                      QString &error)
+{
+    docs = QJsonArray();
+    QJsonObject response;
+    if (!httpQuery(user,
+                   context,
+                   QStringLiteral("/engine/v2/common/store-move/find-by-invoice-number"),
+                   {{QStringLiteral("f_series"), series},
+                    {QStringLiteral("f_number"), number},
+                    {QStringLiteral("f_user_id"), series + number}},
+                   response,
+                   error)) {
+        return false;
+    }
+    docs = response.value(QStringLiteral("docs")).toArray();
+    return true;
+}
+
+bool StoreInputXmlImport::removeDocument(C5User *user, QObject *context, const QString &id, QString &error)
+{
+    if (id.trimmed().isEmpty()) {
+        error = QCoreApplication::translate("StoreInputXmlImport", "Document id is empty");
+        return false;
+    }
+    QJsonObject response;
+    return httpQuery(user,
+                     context,
+                     QStringLiteral("/engine/v2/common/store-move/remove"),
+                     {{QStringLiteral("id"), id}},
                      response,
                      error);
 }

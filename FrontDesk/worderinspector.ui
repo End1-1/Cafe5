@@ -77,9 +77,6 @@
          </property>
          <item>
           <widget class="QLabel" name="mOrderId">
-           <property name="cursor">
-            <cursorShape>Qt::CursorShape::PointingHandCursor</cursorShape>
-           </property>
            <property name="text">
             <string/>
            </property>

@@ -122,6 +122,47 @@ class Attendance extends Auth
         $this->echoResult();
     }
 
+    public function VerifyLogin($params)
+    {
+        $login = trim((string)($params->login ?? ""));
+        $password = (string)($params->password ?? "");
+        if ($login === "" || $password === "") {
+            dieWithCode(Translator::t("Access denied"), 401);
+        }
+
+        $row = $this->select(
+            "SELECT f_id, f_first, f_last FROM s_user WHERE f_login = ? AND f_password = MD5(?)",
+            "ss",
+            [$login, $password]
+        )->fetch_assoc();
+        if (empty($row)) {
+            dieWithCode(Translator::t("Access denied"), 401);
+        }
+
+        $userId = (int)$row["f_id"];
+        $this->result["user_id"] = $userId;
+        $this->result["f_name"] = trim($row["f_last"] . " " . $row["f_first"]);
+        $this->result["active"] = $this->IsCheckin($userId);
+        $this->echoResult();
+    }
+
+    public function CheckedIn($params)
+    {
+        $rows = $this->select(
+            "SELECT u.f_id, u.f_group, concat(u.f_last, ' ', u.f_first) as f_name,
+                    to_base64(p.f_data) as f_photo
+             FROM s_attendance a
+             INNER JOIN s_user u ON u.f_id = a.f_worker
+             LEFT JOIN s_user_photo p ON p.f_id = u.f_id
+             WHERE a.f_out IS NULL AND a.f_state = 1
+               AND a.f_in > NOW() - INTERVAL 16 HOUR
+             ORDER BY u.f_last, u.f_first"
+        )->fetch_all(MYSQLI_ASSOC);
+
+        $this->result["users"] = $rows ?: [];
+        $this->echoResult();
+    }
+
     public function OpenUser($params)
     {
         $userId = (int)($params->user_id ?? 0);

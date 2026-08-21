@@ -10,6 +10,12 @@
 #include "c5officewidget.h"
 #include "c5connectiondialog.h"
 #include "c5registrysettings.h"
+#include "c5uilanguage.h"
+#include <QAction>
+#include <QEvent>
+#include <QIcon>
+#include <QMenu>
+#include <QPoint>
 #include <QSettings>
 
 C5Login::C5Login(C5User *user) :
@@ -23,12 +29,29 @@ C5Login::C5Login(C5User *user) :
     ui->leVersion->setVisible(false);
 #endif
     readServers();
+    updateLangButton();
     adjustSize();
 }
 
 C5Login::~C5Login()
 {
     delete ui;
+}
+
+void C5Login::changeEvent(QEvent *e)
+{
+    C5OfficeDialog::changeEvent(e);
+    if(e->type() == QEvent::LanguageChange) {
+        ui->retranslateUi(this);
+        updateLangButton();
+    }
+}
+
+void C5Login::updateLangButton()
+{
+    const QString lang = C5UiLanguage::current();
+    ui->btnLang->setIcon(QIcon(C5UiLanguage::flagIcon(lang)));
+    ui->btnLang->setToolTip(C5UiLanguage::displayName(lang));
 }
 
 void C5Login::on_btnCancel_clicked()
@@ -142,4 +165,36 @@ void C5Login::readServers()
 void C5Login::on_btnConfig_clicked()
 {
     C5ConnectionDialog::showSettings(this);
+}
+
+void C5Login::on_btnLang_clicked()
+{
+    const QString current = C5UiLanguage::current();
+    QMenu menu(this);
+    menu.setToolTipsVisible(true);
+
+    auto *actAm = menu.addAction(QIcon(C5UiLanguage::flagIcon(C5UiLanguage::kAm)),
+                                 C5UiLanguage::displayName(C5UiLanguage::kAm));
+    actAm->setData(QString(C5UiLanguage::kAm));
+    actAm->setCheckable(true);
+    actAm->setChecked(current == QLatin1String(C5UiLanguage::kAm));
+
+    auto *actRu = menu.addAction(QIcon(C5UiLanguage::flagIcon(C5UiLanguage::kRu)),
+                                 C5UiLanguage::displayName(C5UiLanguage::kRu));
+    actRu->setData(QString(C5UiLanguage::kRu));
+    actRu->setCheckable(true);
+    actRu->setChecked(current == QLatin1String(C5UiLanguage::kRu));
+
+    QAction *chosen = menu.exec(ui->btnLang->mapToGlobal(QPoint(0, ui->btnLang->height())));
+    if(!chosen) {
+        return;
+    }
+
+    const QString lang = chosen->data().toString();
+    if(lang == current) {
+        return;
+    }
+
+    C5UiLanguage::apply(lang);
+    updateLangButton();
 }

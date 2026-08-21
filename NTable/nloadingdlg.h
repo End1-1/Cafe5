@@ -25,6 +25,8 @@ public:
 
     void resetSeconds();
 
+    void setTitle(const QString &title);
+
 public Q_SLOTS:
     void hide();
 

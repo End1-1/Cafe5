@@ -80,6 +80,29 @@ abstract class WorkstationConfigBase
         };
     }
 
+    /** Apply defaults to a raw config array (missing keys only). */
+    public function withDefaults(array $stored): array
+    {
+        $merged = $this->mergeDefaults($stored);
+        // 0 in required ids usually means "never set" (empty field / old '{}'), not a real FK.
+        foreach (['f_cashbox_id', 'f_default_hall_id', 'f_default_store_id', 'f_fiscal_machine_id'] as $key) {
+            $defaults = $this->defaultConfig();
+            if (!array_key_exists($key, $defaults)) {
+                continue;
+            }
+            if ((int)($merged[$key] ?? 0) <= 0 && (int)$defaults[$key] > 0) {
+                $merged[$key] = (int)$defaults[$key];
+            }
+        }
+        return $merged;
+    }
+
+    /** Default config JSON for a newly created workstation row. */
+    public function defaultConfigJson(): string
+    {
+        return json_encode($this->defaultConfig(), JSON_UNESCAPED_UNICODE);
+    }
+
     /** @return array<string,mixed> */
     protected function mergeDefaults(array $stored): array
     {
@@ -120,15 +143,17 @@ abstract class WorkstationConfigBase
         }
 
         if (in_array($key, [
-
             'f_cashbox_id',
             'f_default_hall_id',
+            'f_default_table_id',
             'f_fiscal_machine_id',
             'f_default_store_id',
             'f_quick_debt_partner_id',
             'dlgsearchmenu_hsection_size',
             'dlgsearchmenu_vsection_size',
             'print_paper_width',
+            'arcus_port',
+            'recent_dishes_minutes',
         ], true)) {
             return (int)$value;
         }
@@ -136,12 +161,14 @@ abstract class WorkstationConfigBase
         if (in_array($key, [
             'cost_depend_on_service_and_discount',
             'do_not_print_customer_on_receipt',
+            'customer_notification',
             'receipt_no_table',
             'receipt_no_service_hint',
             'receipt_no_discount_hint',
             'input_cashbox_amount_before_close',
             'bistro',
             'f_auto_fiscal',
+            'dont_allow_negative_remains',
         ], true)) {
             return (bool)$value;
         }

@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<style>
+@page { size: A4; margin: 10mm; }
+body {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 9pt;
+  color: #000;
+  margin: 0;
+}
+h1 {
+  font-size: 14pt;
+  margin: 0 0 4px 0;
+}
+.meta {
+  color: #444;
+  margin-bottom: 10px;
+  font-size: 9pt;
+}
+.cols {
+  column-count: 2;
+  column-gap: 8mm;
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+  break-inside: avoid;
+}
+th, td {
+  border: 1px solid #333;
+  padding: 3px 4px;
+  vertical-align: middle;
+}
+th {
+  background: #eee;
+  font-weight: 700;
+  text-align: center;
+}
+tr.store td {
+  background: #f3f3f3;
+  border: none;
+  padding-top: 8px;
+  padding-bottom: 4px;
+}
+tr.group td {
+  background: #fafafa;
+  border: none;
+  padding-top: 6px;
+  padding-bottom: 2px;
+  font-weight: 700;
+}
+td.code { width: 10%; text-align: center; }
+td.name { width: 34%; }
+td.bal {
+  width: 12%;
+  text-align: right;
+}
+td.qty {
+  width: 14%;
+  min-width: 18mm;
+  height: 18px;
+}
+td.unit { width: 10%; text-align: center; }
+td.sku { width: 20%; }
+th.bal { width: 12%; }
+th.qty { width: 14%; min-width: 18mm; }
+</style>
+</head>
+<body>
+  <h1>{{title}}</h1>
+  <div class="meta">{{created}}</div>
+  <div class="cols">
+    <table>
+      <thead>
+        <tr>
+          <th class="code">{{col_code}}</th>
+          <th class="name">{{col_name}}</th>
+          {{balance_header}}
+          <th class="qty">{{col_qty}}</th>
+          <th class="unit">{{col_unit}}</th>
+          <th class="sku">{{col_sku}}</th>
+        </tr>
+      </thead>
+      <tbody>
+        {{rows}}
+      </tbody>
+    </table>
+  </div>
+</body>
+</html>

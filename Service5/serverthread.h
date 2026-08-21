@@ -4,6 +4,7 @@
 #include "socketstruct.h"
 #include <QObject>
 
+class QTimer;
 class QWebSocketServer;
 class QWebSocket;
 
@@ -18,11 +19,15 @@ public slots:
     void run();
 
 private:
-    QWebSocketServer* fServer;
+    QWebSocketServer* fServer = nullptr;
+    QTimer *fInitRetryTimer = nullptr;
     const QString fConfigPath;
     QHash<QString, QString> mDatabases;
     QHash<QWebSocket*, SocketStruct> fSockets;
     QStringList fDbList;
+
+    bool initializeDatabases();
+    void startListening();
     QString getDbList(const QJsonObject &jdoc);
     QString getConnection(const QJsonObject &jdoc);
     QString handleDll(const QJsonObject &jdoc, const QString &command);
@@ -33,6 +38,7 @@ private:
     void handleCommand(SocketStruct ws, const QJsonObject &jdoc, QString &repMsg);
 
 private slots:
+    void retryInitialize();
     void onNewConnection();
     void onDisconnected();
     void onTextMessage(const QString &msg);

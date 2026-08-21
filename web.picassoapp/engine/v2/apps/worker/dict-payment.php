@@ -55,7 +55,9 @@ return [
     "cashbox" => [
         PAYMENT_TYPE_CASH => true,
         PAYMENT_TYPE_CARD => true,
-        PAYMENT_TYPE_BANK => true,
+        // Bank transfer is a deferred settlement (money comes later).
+        // Track it via cash_debts instead of cash_operations.
+        PAYMENT_TYPE_BANK => false,
         PAYMENT_TYPE_IDRAM => true,
         PAYMENT_TYPE_COMPLIMENTARY => false,
         PAYMENT_OTHER => false,

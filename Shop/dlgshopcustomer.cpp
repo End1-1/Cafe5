@@ -33,6 +33,7 @@ void DlgShopCustomer::on_btnSave_clicked()
                        this,
                        {{"f_category", 2},
                         {"f_state", 1},
+                        {"f_group", 3},
                         {"f_taxcode", ui->leTin->text()},
                         {"f_taxname", ui->leLegalName->text()},
                         {"f_name", ui->leName->text()},

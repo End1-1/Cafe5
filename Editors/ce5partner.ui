@@ -251,9 +251,6 @@
          <property name="Field" stdset="0">
           <string>f_manager</string>
          </property>
-         <property name="default" stdset="0">
-          <number>1</number>
-         </property>
          <property name="type" stdset="0">
           <string>int</string>
          </property>

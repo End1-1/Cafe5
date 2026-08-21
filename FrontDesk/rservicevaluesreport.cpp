@@ -1,10 +1,11 @@
 #include "rservicevaluesreport.h"
-#include "dlgservicevalue.h"
-#include "ui_rabstracteditorreport.h"
-#include "c5message.h"
-#include "ninterface.h"
 #include <QDialog>
 #include <QTableView>
+#include "c5message.h"
+#include "c5user.h"
+#include "dlgservicevalue.h"
+#include "ninterface.h"
+#include "ui_rabstracteditorreport.h"
 
 RServiceValuesReport::RServiceValuesReport(const QString &title, QIcon icon, const QString &editorName, QWidget *parent)
     : RAbstractEditorReport(title, icon, editorName, parent)

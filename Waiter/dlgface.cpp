@@ -10,6 +10,7 @@
 #include "dlgpreorderslist.h"
 #include "dlgkitcheninprogressfine.h"
 #include "dlgattendanceauth.h"
+#include "dlgrecentdishes.h"
 #include "dlgtext.h"
 #include "format_date.h"
 #include "ninterface.h"
@@ -107,8 +108,18 @@ void DlgFace::filterHall()
     }
 
     for(auto const &h : mHall) {
+        int openCount = 0;
+        for(const TableItem &t : mTables) {
+            if(t.hall != h.id) {
+                continue;
+            }
+            // 2 = order, 3 = precheck
+            if(t.tableState == 2 || t.tableState == 3) {
+                ++openCount;
+            }
+        }
         QToolButton *btn = new QToolButton();
-        btn->setText(h.name);
+        btn->setText(QStringLiteral("%1 (%2)").arg(h.name).arg(openCount));
         btn->setToolButtonStyle(Qt::ToolButtonTextOnly);
         btn->setMinimumSize(QSize(140, 50));
         btn->setProperty("id", h.id);
@@ -177,17 +188,27 @@ void DlgFace::filterHall()
 void DlgFace::colorizeHall()
 {
     for(int i = 0; i < ui->vlHall->count(); i++) {
-        QToolButton *btn = dynamic_cast<QToolButton*>(ui->vlHall->itemAt(i)->widget());
-
-        if(btn) {
-            if(btn->property("id").toInt() == mSelectedHall) {
-                btn->setProperty("stylesheet_button_selected", true);
-                btn->style()->polish(btn);
-            } else {
-                btn->setProperty("stylesheet_button_selected", false);
-                btn->style()->polish(btn);
-            }
+        QToolButton *btn = qobject_cast<QToolButton*>(ui->vlHall->itemAt(i)->widget());
+        if(!btn) {
+            continue;
         }
+        const bool selected = btn->property("id").toInt() == mSelectedHall;
+        btn->setProperty("stylesheet_button_selected", selected);
+        // Widget stylesheet: QToolButton ignores background without an explicit border on Windows.
+        if(selected) {
+            btn->setStyleSheet(QStringLiteral(
+                "QToolButton {"
+                "background-color: #2d9cdb;"
+                "color: white;"
+                "font-weight: 600;"
+                "border: 1px solid #1a7aaf;"
+                "}"));
+        } else {
+            btn->setStyleSheet(QString());
+        }
+        btn->style()->unpolish(btn);
+        btn->style()->polish(btn);
+        btn->update();
     }
 }
 
@@ -366,4 +387,10 @@ void DlgFace::on_btnAttendance_clicked()
     auth.exec();
 
     fTimer.start(TIMER_TIMEOUT_INTERVAL);
+}
+
+void DlgFace::on_btnLast40Min_clicked()
+{
+    const int minutes = mWorkStation.data.value(QStringLiteral("recent_dishes_minutes")).toInt(40);
+    DlgRecentDishes::open(mUser, minutes, this);
 }

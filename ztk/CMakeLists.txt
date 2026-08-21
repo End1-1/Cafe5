@@ -11,11 +11,18 @@ if(NOT EXISTS "${ZTK_ROOT}/lib/libzkfp.lib")
     return()
 endif()
 
-# Runtime chain for libzkfp.dll (x64): libzkfp -> ZKFPCap.dll, fpslib.dll
+# Runtime chain (x64):
+#   libzkfp.dll -> ZKFPCap.dll, fpslib.dll
+#   ZKFPCap.dll -> libzksensorcore.dll + ZKFPSensors\*.dll
+#   libzksensorcore.dll -> libusb0.dll
+#   fpslib.dll -> zkfpslibLow.dll
 set(ZKFP_RUNTIME_DLL_NAMES
     libzkfp.dll
     ZKFPCap.dll
     fpslib.dll
+    libzksensorcore.dll
+    libusb0.dll
+    zkfpslibLow.dll
 )
 
 set(ZKFP_RUNTIME_DLLS "")
@@ -25,6 +32,13 @@ foreach(_zkfp_name IN LISTS ZKFP_RUNTIME_DLL_NAMES)
         list(APPEND ZKFP_RUNTIME_DLLS "${_zkfp_path}")
     endif()
 endforeach()
+
+set(ZKFP_SENSORS_DIR "${ZTK_ROOT}/lib/ZKFPSensors")
+if(EXISTS "${ZKFP_SENSORS_DIR}")
+    set(ZKFP_SENSORS_DIR "${ZKFP_SENSORS_DIR}" CACHE INTERNAL "ZKTeco sensor plugin directory")
+else()
+    set(ZKFP_SENSORS_DIR "" CACHE INTERNAL "ZKTeco sensor plugin directory")
+endif()
 
 add_library(ZKFingerprint SHARED IMPORTED GLOBAL)
 

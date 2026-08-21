@@ -307,6 +307,19 @@
            </widget>
           </item>
           <item>
+           <widget class="C5CheckBox" name="chOnlineSale">
+            <property name="focusPolicy">
+             <enum>Qt::FocusPolicy::NoFocus</enum>
+            </property>
+            <property name="layoutDirection">
+             <enum>Qt::LayoutDirection::RightToLeft</enum>
+            </property>
+            <property name="text">
+             <string>Online sale</string>
+            </property>
+           </widget>
+          </item>
+          <item>
            <widget class="C5CheckBox" name="chProduction">
             <property name="focusPolicy">
              <enum>Qt::FocusPolicy::NoFocus</enum>
@@ -316,12 +329,6 @@
             </property>
             <property name="text">
              <string>Production</string>
-            </property>
-            <property name="Field" stdset="0">
-             <string>f_production</string>
-            </property>
-            <property name="Default" stdset="0">
-             <string>0</string>
             </property>
            </widget>
           </item>
@@ -840,6 +847,26 @@
          </column>
         </widget>
        </item>
+       <item row="14" column="7">
+        <widget class="QLabel" name="lbLastinputprice_5">
+         <property name="text">
+          <string>Service print</string>
+         </property>
+        </widget>
+       </item>
+       <item row="14" column="8" colspan="2">
+        <widget class="C5ComboBox" name="cbServicePrint">
+         <property name="minimumSize">
+          <size>
+           <width>150</width>
+           <height>0</height>
+          </size>
+         </property>
+         <property name="editable">
+          <bool>false</bool>
+         </property>
+        </widget>
+       </item>
       </layout>
      </widget>
      <widget class="QWidget" name="tab_6">
@@ -847,7 +874,123 @@
        <string>Additional</string>
       </attribute>
       <layout class="QGridLayout" name="gridLayout_4">
-       <item row="11" column="2" colspan="2">
+       <item row="9" column="0">
+        <widget class="QLabel" name="lbLowLevel_7">
+         <property name="text">
+          <string>Hourly payment</string>
+         </property>
+        </widget>
+       </item>
+       <item row="5" column="0">
+        <widget class="QLabel" name="lbLowLevel_6">
+         <property name="text">
+          <string>Count discount</string>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="2">
+        <widget class="C5LineEditWithSelector" name="leAcc">
+         <property name="minimumSize">
+          <size>
+           <width>100</width>
+           <height>0</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>100</width>
+           <height>16777215</height>
+          </size>
+         </property>
+         <property name="Field" stdset="0">
+          <string>f_acc</string>
+         </property>
+         <property name="Type" stdset="0">
+          <string>0</string>
+         </property>
+        </widget>
+       </item>
+       <item row="9" column="3">
+        <widget class="C5LineEditWithSelector" name="leHourlyRole">
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>0</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>16777215</width>
+           <height>16777215</height>
+          </size>
+         </property>
+         <property name="Field" stdset="0">
+          <string>f_acc</string>
+         </property>
+         <property name="Type" stdset="0">
+          <string>0</string>
+         </property>
+        </widget>
+       </item>
+       <item row="4" column="2">
+        <widget class="C5LineEditWithSelector" name="leColor">
+         <property name="minimumSize">
+          <size>
+           <width>100</width>
+           <height>0</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>100</width>
+           <height>16777215</height>
+          </size>
+         </property>
+         <property name="Field" stdset="0">
+          <string>f_color</string>
+         </property>
+         <property name="SetColor" stdset="0">
+          <bool>true</bool>
+         </property>
+         <property name="Type" stdset="0">
+          <string>1</string>
+         </property>
+         <property name="Default" stdset="0">
+          <string>-1</string>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="3">
+        <spacer name="horizontalSpacer_6">
+         <property name="orientation">
+          <enum>Qt::Orientation::Horizontal</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>40</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item row="9" column="2">
+        <widget class="QCheckBox" name="chHourlyPayment">
+         <property name="text">
+          <string/>
+         </property>
+        </widget>
+       </item>
+       <item row="10" column="0" colspan="2">
+        <widget class="QLabel" name="label">
+         <property name="text">
+          <string>Description</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignmentFlag::AlignLeading|Qt::AlignmentFlag::AlignLeft|Qt::AlignmentFlag::AlignTop</set>
+         </property>
+        </widget>
+       </item>
+       <item row="10" column="2" colspan="2">
         <widget class="QPlainTextEdit" name="plainTextEdit">
          <property name="minimumSize">
           <size>
@@ -869,6 +1012,13 @@
          </property>
          <property name="Field" stdset="0">
           <string>f_description</string>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="0">
+        <widget class="QLabel" name="lbLastinputprice_3">
+         <property name="text">
+          <string>Account</string>
          </property>
         </widget>
        </item>
@@ -894,13 +1044,37 @@
          </property>
         </widget>
        </item>
-       <item row="6" column="2">
+       <item row="8" column="0">
+        <widget class="QLabel" name="lbLowLevel_5">
+         <property name="text">
+          <string>Count service</string>
+         </property>
+        </widget>
+       </item>
+       <item row="5" column="2">
         <widget class="QCheckBox" name="chCountDiscount">
          <property name="text">
           <string/>
          </property>
          <property name="checked">
           <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="8" column="2">
+        <widget class="QCheckBox" name="chCountService">
+         <property name="text">
+          <string/>
+         </property>
+         <property name="checked">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="4" column="0">
+        <widget class="QLabel" name="lbLastinputprice_4">
+         <property name="text">
+          <string>Color</string>
          </property>
         </widget>
        </item>
@@ -911,37 +1085,7 @@
          </property>
         </widget>
        </item>
-       <item row="4" column="3">
-        <spacer name="horizontalSpacer_6">
-         <property name="orientation">
-          <enum>Qt::Orientation::Horizontal</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>40</width>
-           <height>20</height>
-          </size>
-         </property>
-        </spacer>
-       </item>
-       <item row="4" column="0">
-        <widget class="QLabel" name="lbLastinputprice_3">
-         <property name="text">
-          <string>Account</string>
-         </property>
-        </widget>
-       </item>
-       <item row="11" column="0" colspan="2">
-        <widget class="QLabel" name="label">
-         <property name="text">
-          <string>Description</string>
-         </property>
-         <property name="alignment">
-          <set>Qt::AlignmentFlag::AlignLeading|Qt::AlignmentFlag::AlignLeft|Qt::AlignmentFlag::AlignTop</set>
-         </property>
-        </widget>
-       </item>
-       <item row="12" column="2">
+       <item row="11" column="2">
         <spacer name="verticalSpacer_2">
          <property name="orientation">
           <enum>Qt::Orientation::Vertical</enum>
@@ -953,88 +1097,6 @@
           </size>
          </property>
         </spacer>
-       </item>
-       <item row="6" column="0">
-        <widget class="QLabel" name="lbLowLevel_6">
-         <property name="text">
-          <string>Count discount</string>
-         </property>
-        </widget>
-       </item>
-       <item row="9" column="0">
-        <widget class="QLabel" name="lbLowLevel_5">
-         <property name="text">
-          <string>Count service</string>
-         </property>
-        </widget>
-       </item>
-       <item row="10" column="0">
-        <widget class="QLabel" name="lbLowLevel_7">
-         <property name="text">
-          <string>Hourly payment</string>
-         </property>
-        </widget>
-       </item>
-       <item row="9" column="2">
-        <widget class="QCheckBox" name="chCountService">
-         <property name="text">
-          <string/>
-         </property>
-         <property name="checked">
-          <bool>true</bool>
-         </property>
-        </widget>
-       </item>
-       <item row="4" column="2">
-        <widget class="C5LineEditWithSelector" name="leAcc">
-         <property name="minimumSize">
-          <size>
-           <width>100</width>
-           <height>0</height>
-          </size>
-         </property>
-         <property name="maximumSize">
-          <size>
-           <width>100</width>
-           <height>16777215</height>
-          </size>
-         </property>
-         <property name="Field" stdset="0">
-          <string>f_acc</string>
-         </property>
-         <property name="Type" stdset="0">
-          <string>0</string>
-         </property>
-        </widget>
-       </item>
-       <item row="10" column="3">
-        <widget class="C5LineEditWithSelector" name="leHourlyRole">
-         <property name="minimumSize">
-          <size>
-           <width>0</width>
-           <height>0</height>
-          </size>
-         </property>
-         <property name="maximumSize">
-          <size>
-           <width>16777215</width>
-           <height>16777215</height>
-          </size>
-         </property>
-         <property name="Field" stdset="0">
-          <string>f_acc</string>
-         </property>
-         <property name="Type" stdset="0">
-          <string>0</string>
-         </property>
-        </widget>
-       </item>
-       <item row="10" column="2">
-        <widget class="QCheckBox" name="chHourlyPayment">
-         <property name="text">
-          <string/>
-         </property>
-        </widget>
        </item>
       </layout>
      </widget>
@@ -1835,6 +1897,79 @@
         </widget>
        </item>
        <item>
+        <widget class="QGroupBox" name="grAddAttr">
+         <property name="title">
+          <string>Additional attributes</string>
+         </property>
+         <layout class="QGridLayout" name="gridLayout_6">
+          <item row="1" column="0">
+           <widget class="QLabel" name="label_18">
+            <property name="text">
+             <string>Country</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="1">
+           <widget class="C5CodeNameSelector" name="wDishCountry">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+              <horstretch>1</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>20</height>
+             </size>
+            </property>
+            <property name="frameShape">
+             <enum>QFrame::Shape::Box</enum>
+            </property>
+            <property name="frameShadow">
+             <enum>QFrame::Shadow::Plain</enum>
+            </property>
+            <property name="selectorName" stdset="0">
+             <string>Country</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="0">
+           <widget class="QLabel" name="label_19">
+            <property name="text">
+             <string>Ararix group</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1">
+           <widget class="C5CodeNameSelector" name="wArarixGroup">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+              <horstretch>1</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>20</height>
+             </size>
+            </property>
+            <property name="frameShape">
+             <enum>QFrame::Shape::Box</enum>
+            </property>
+            <property name="frameShadow">
+             <enum>QFrame::Shadow::Plain</enum>
+            </property>
+            <property name="selectorName" stdset="0">
+             <string>Ararix group</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
         <widget class="QGroupBox" name="grBJU">
          <property name="title">
           <string>Macros / Nutrition (per 100 g)</string>
@@ -2225,14 +2360,14 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>C5LineEdit</class>
-   <extends>QLineEdit</extends>
-   <header location="global">c5lineedit.h</header>
-  </customwidget>
-  <customwidget>
    <class>C5LineEditWithSelector</class>
    <extends>QLineEdit</extends>
    <header location="global">c5lineeditwithselector.h</header>
+  </customwidget>
+  <customwidget>
+   <class>C5LineEdit</class>
+   <extends>QLineEdit</extends>
+   <header location="global">c5lineedit.h</header>
   </customwidget>
   <customwidget>
    <class>C5TableWidget</class>
@@ -2257,13 +2392,13 @@
   </customwidget>
  </customwidgets>
  <tabstops>
-  <tabstop>chOnlyWholeNumber</tabstop>
-  <tabstop>chSameStoreId</tabstop>
-  <tabstop>leStoreId</tabstop>
-  <tabstop>leQueue</tabstop>
-  <tabstop>leSalaryDepartment</tabstop>
-  <tabstop>leSalaryFixedValue</tabstop>
-  <tabstop>leSalaryPercentValue</tabstop>
+  <tabstop>leCode</tabstop>
+  <tabstop>leSupplier</tabstop>
+  <tabstop>leGroup</tabstop>
+  <tabstop>leUnit</tabstop>
+  <tabstop>leLowLevel</tabstop>
+  <tabstop>leQtyBox</tabstop>
+  <tabstop>leFiscalName</tabstop>
   <tabstop>leName</tabstop>
   <tabstop>leScanCode</tabstop>
   <tabstop>leCostPrice</tabstop>
@@ -2273,29 +2408,46 @@
   <tabstop>leMargin2</tabstop>
   <tabstop>leAutodiscount</tabstop>
   <tabstop>tblPricing</tabstop>
-  <tabstop>leSupplier</tabstop>
-  <tabstop>leComplectOutputQty</tabstop>
-  <tabstop>leIsComplect</tabstop>
-  <tabstop>plainTextEdit</tabstop>
-  <tabstop>leLowLevel_2</tabstop>
-  <tabstop>chComponentExit</tabstop>
-  <tabstop>leUnit</tabstop>
-  <tabstop>tblAs</tabstop>
-  <tabstop>leAcc</tabstop>
-  <tabstop>leGroup</tabstop>
-  <tabstop>leBarcode</tabstop>
-  <tabstop>rbGenEAN8</tabstop>
-  <tabstop>tblBarcodes</tabstop>
-  <tabstop>leCode</tabstop>
   <tabstop>tblMenu</tabstop>
+  <tabstop>leLowLevel_2</tabstop>
+  <tabstop>leAcc</tabstop>
+  <tabstop>leColor</tabstop>
   <tabstop>chCountDiscount</tabstop>
   <tabstop>chCountService</tabstop>
-  <tabstop>leHourlyRole</tabstop>
   <tabstop>chHourlyPayment</tabstop>
+  <tabstop>plainTextEdit</tabstop>
+  <tabstop>leHourlyRole</tabstop>
+  <tabstop>chOnlyWholeNumber</tabstop>
+  <tabstop>chSameStoreId</tabstop>
+  <tabstop>leStoreId</tabstop>
+  <tabstop>leQueue</tabstop>
+  <tabstop>leSalaryDepartment</tabstop>
+  <tabstop>leSalaryFixedValue</tabstop>
+  <tabstop>leSalaryPercentValue</tabstop>
+  <tabstop>chGlutenFree</tabstop>
+  <tabstop>chVegan</tabstop>
+  <tabstop>chNoLactose</tabstop>
+  <tabstop>chContainsNuts</tabstop>
+  <tabstop>chVegetarian</tabstop>
+  <tabstop>chNoGmo</tabstop>
+  <tabstop>chNoSugar</tabstop>
+  <tabstop>chHalalKosher</tabstop>
+  <tabstop>leBjuKcal</tabstop>
+  <tabstop>leBjuProtein</tabstop>
+  <tabstop>leBjuFat</tabstop>
+  <tabstop>leBjuCarbs</tabstop>
+  <tabstop>tblDynamicAttributes</tabstop>
+  <tabstop>tblModificators</tabstop>
+  <tabstop>leComplectOutputQty</tabstop>
+  <tabstop>chComponentExit</tabstop>
+  <tabstop>leBarcode</tabstop>
+  <tabstop>tblBarcodes</tabstop>
+  <tabstop>leIsComplect</tabstop>
+  <tabstop>tblAs</tabstop>
   <tabstop>leCookingTime</tabstop>
-  <tabstop>leLowLevel</tabstop>
-  <tabstop>leQtyBox</tabstop>
-  <tabstop>leFiscalName</tabstop>
+  <tabstop>tblRelatedDrinks</tabstop>
+  <tabstop>tblRelatedOther</tabstop>
+  <tabstop>rbGenEAN8</tabstop>
  </tabstops>
  <resources>
   <include location="../resources/res.qrc"/>

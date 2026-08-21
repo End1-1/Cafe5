@@ -65,7 +65,7 @@ void RDebts::redeemDebt()
     params.insert(QStringLiteral("currency_id"), currencyId);
     params.insert(QStringLiteral("amount"), dlg.amount());
     params.insert(QStringLiteral("cashbox_id"), dlg.cashboxId());
-    params.insert(QStringLiteral("payment_type_id"), 1);
+    params.insert(QStringLiteral("payment_type_id"), dlg.paymentTypeId());
     params.insert(QStringLiteral("comment"), dlg.comment());
     params.insert(QStringLiteral("date"), dlg.redeemDateMysql());
     NInterface::query1(QStringLiteral("/engine/v2/waiter/cashbox/redeem-debt"),

@@ -78,7 +78,10 @@ void DlgSplitOrder::on_btnChoseTable_clicked()
     NInterface::query1("/engine/v2/waiter/order/open-table", self->mUser->mSessionKey, self, {
         {"table", tableId},
         {"locksrc", hostinfo},
-        {"create_empty", true}
+        {"create_empty", true},
+        /* New empty order on dest: take service/discount from source split order, not dest hall default. */
+        {"service_factor", self->mOrder1.serviceFactor()},
+        {"discount_factor", self->mOrder1.discountFactor()}
     },
     [self](const QJsonObject  & jdoc1) {
         if(!self) {

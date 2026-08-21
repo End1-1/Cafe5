@@ -2,6 +2,7 @@
 #define GOODSRETURNREASON_H
 
 #include "c5dialog.h"
+#include <QJsonArray>
 
 namespace Ui
 {
@@ -18,6 +19,8 @@ public:
     explicit GoodsReturnReason(C5User *user);
 
     ~GoodsReturnReason();
+
+    void setReasons(const QJsonArray &reasons);
 
     int fReason;
 

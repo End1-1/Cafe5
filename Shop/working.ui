@@ -219,6 +219,79 @@
           </widget>
          </item>
          <item>
+          <widget class="QPushButton" name="btnProgressWindow">
+           <property name="minimumSize">
+            <size>
+             <width>36</width>
+             <height>36</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>36</width>
+             <height>36</height>
+            </size>
+           </property>
+           <property name="focusPolicy">
+            <enum>Qt::FocusPolicy::NoFocus</enum>
+           </property>
+           <property name="toolTip">
+            <string>Costumer display</string>
+           </property>
+           <property name="text">
+            <string/>
+           </property>
+           <property name="icon">
+            <iconset resource="../resources/res.qrc">
+             <normaloff>:/dish.png</normaloff>:/dish.png</iconset>
+           </property>
+           <property name="iconSize">
+            <size>
+             <width>30</width>
+             <height>30</height>
+            </size>
+           </property>
+           <property name="checkable">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="btnAttendance">
+           <property name="minimumSize">
+            <size>
+             <width>36</width>
+             <height>36</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>36</width>
+             <height>36</height>
+            </size>
+           </property>
+           <property name="focusPolicy">
+            <enum>Qt::FocusPolicy::NoFocus</enum>
+           </property>
+           <property name="toolTip">
+            <string>Help</string>
+           </property>
+           <property name="text">
+            <string/>
+           </property>
+           <property name="icon">
+            <iconset resource="../resources/res.qrc">
+             <normaloff>:/partners.png</normaloff>:/partners.png</iconset>
+           </property>
+           <property name="iconSize">
+            <size>
+             <width>30</width>
+             <height>30</height>
+            </size>
+           </property>
+          </widget>
+         </item>
+         <item>
           <widget class="QPushButton" name="btnCostumerDisplay">
            <property name="minimumSize">
             <size>
@@ -586,6 +659,8 @@
         <zorder>btnMinimize</zorder>
         <zorder>btnCloseApplication</zorder>
         <zorder>btnBooking</zorder>
+        <zorder>btnAttendance</zorder>
+        <zorder>btnProgressWindow</zorder>
        </widget>
       </item>
      </layout>
@@ -687,6 +762,20 @@
        </widget>
       </item>
       <item>
+       <widget class="Line" name="line_5">
+        <property name="orientation">
+         <enum>Qt::Orientation::Vertical</enum>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="lbPrinter">
+        <property name="text">
+         <string>Printer</string>
+        </property>
+       </widget>
+      </item>
+      <item>
        <widget class="Line" name="line_4">
         <property name="orientation">
          <enum>Qt::Orientation::Vertical</enum>
@@ -719,6 +808,13 @@
          </size>
         </property>
        </spacer>
+      </item>
+      <item>
+       <widget class="QLabel" name="lbWS">
+        <property name="text">
+         <string>WebSocket: connecting</string>
+        </property>
+       </widget>
       </item>
      </layout>
     </widget>

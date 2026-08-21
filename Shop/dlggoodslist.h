@@ -2,6 +2,10 @@
 #define DLGGOODSLIST_H
 
 #include "c5shopdialog.h"
+#include <QJsonObject>
+
+class QTimer;
+class QKeyEvent;
 
 namespace Ui
 {
@@ -18,7 +22,9 @@ public:
     ~DlgGoodsList();
 
 protected:
-    virtual bool event(QEvent *event) override;
+    virtual bool eventFilter(QObject *watched, QEvent *event) override;
+
+    virtual void keyPressEvent(QKeyEvent *event) override;
 
 private slots:
     void on_leSearch_textChanged(const QString &arg1);
@@ -27,13 +33,31 @@ private slots:
 
     void on_btnMinimize_clicked();
 
+    void onSearchCheckboxChanged();
+
+    void runSearch();
+
+    void loadAllStock();
+
 private:
     Ui::DlgGoodsList* ui;
 
-    int fGoodsId;
+    int fGoodsId = 0;
+
+    QTimer *mSearchTimer = nullptr;
+
+    int mSearchGen = 0;
+
+    void clearResults();
+
+    void fillResults(const QJsonObject &jo);
+
+    bool handleNavigationKey(int key);
+
+    void acceptCurrentRow();
 
 signals:
-    void getGoods(int, double, double, double);
+    void getGoods(int id, const QString &scancode, double stockQty = -1);
 };
 
 #endif // DLGGOODSLIST_H

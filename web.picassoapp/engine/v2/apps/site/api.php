@@ -1,37 +1,54 @@
 <?php
 # © 2025 , Kudryashov Vasili
 # Created: 2025-11-27 09:51:33
-# Last Modified: 2025-11-27 09:51:35
+# Last Modified: 2026-08-21
 require_once __DIR__ . "/index.php";
 
 class Api extends Auth
 {
     public function stock($params)
     {
-        $where = "where st.f_store in (2,3,5,24) ";
-        if (!empty($params->sku)) {
-            $skuList = $params->sku;
-            $skuList = array_filter($skuList, fn($x) => is_string($x) && preg_match('/^\d+$/', $x));
-            $quoted = array_map(fn($x) => "'$x'", $skuList);
-            $final = implode(',', $quoted);
-            $where .= "AND g.f_scancode IN ($final)";
-            # $this->result["sku"] = $final;
-        }
-        $sql = <<<EOD
-        select g.f_scancode as sku, st.f_store as store, sum(st.f_qty*st.f_type) as qty,
-        cp.f_price1 as price1, cp.f_price1disc as price1disc,
-        g.f_name as name, gr.f_name as groupname
-        from a_store st
-        left join c_goods g on  g.f_id=st.f_goods
-        left join c_goods_prices cp on cp.f_goods=st.f_goods and cp.f_currency=1
-        left join c_groups gr on gr.f_id=g.f_group
-        $where
-        group by 1,2
-        having sum(st.f_qty*st.f_type)>0
-        EOD;
-        #$this->result["sql"] = $sql;
-        $this->result["data"] = $this->select($sql)->fetch_all(MYSQLI_ASSOC);
+        $storeIds = [1];
+        $storePlaceholders = implode(",", array_fill(0, count($storeIds), "?"));
+        $types = str_repeat("i", count($storeIds));
+        $binds = $storeIds;
 
+        $skuFilter = "";
+        if (!empty($params->sku) && is_array($params->sku)) {
+            $skuList = array_values(array_filter(
+                $params->sku,
+                fn($x) => is_string($x) && $x !== ""
+            ));
+            if (!empty($skuList)) {
+                $skuPlaceholders = implode(",", array_fill(0, count($skuList), "?"));
+                $skuFilter = " AND g.f_scancode IN ($skuPlaceholders)";
+                $types .= str_repeat("s", count($skuList));
+                array_push($binds, ...$skuList);
+            }
+        }
+
+        $sql = <<<SQL
+            SELECT
+            g.f_id as f_goods_id,
+                g.f_scancode AS sku,
+                st.f_store_id AS store,
+                SUM(st.f_qty_left) AS qty,
+                cp.f_price1 AS price1,
+                cp.f_price1disc AS price1disc,
+                g.f_name AS name,
+                gr.f_name AS groupname
+            FROM store_stock st
+            INNER JOIN c_goods g ON g.f_id = st.f_item_id
+            LEFT JOIN c_goods_prices cp ON cp.f_goods = g.f_id AND cp.f_currency = 1
+            INNER JOIN c_groups gr ON gr.f_id = g.f_group
+            WHERE st.f_store_id IN ($storePlaceholders)
+              AND CAST(COALESCE(JSON_VALUE(gr.f_data, '$.f_online_sale'), '0') AS UNSIGNED) = 1
+              {$skuFilter}
+            GROUP BY g.f_id, g.f_scancode, st.f_store_id, cp.f_price1, cp.f_price1disc, g.f_name, gr.f_name
+            HAVING SUM(st.f_qty_left) > 0
+        SQL;
+
+        $this->result["data"] = $this->select($sql, $types, $binds)->fetch_all(MYSQLI_ASSOC);
         $this->echoResult();
     }
 

@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1412</width>
-    <height>666</height>
+    <height>676</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -202,6 +202,52 @@
         </property>
         <property name="form" stdset="0">
          <string>form_newstoreoutput</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QCommandLinkButton" name="btnNewStoreMovement">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="cursor">
+         <cursorShape>PointingHandCursor</cursorShape>
+        </property>
+        <property name="text">
+         <string>New store movement</string>
+        </property>
+        <property name="icon">
+         <iconset resource="../resources/res.qrc">
+          <normaloff>:/storage.png</normaloff>:/storage.png</iconset>
+        </property>
+        <property name="form" stdset="0">
+         <string>form_newstoremovement</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QCommandLinkButton" name="btnNewStoreComplectation">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="cursor">
+         <cursorShape>PointingHandCursor</cursorShape>
+        </property>
+        <property name="text">
+         <string>New store complectation</string>
+        </property>
+        <property name="icon">
+         <iconset resource="../resources/res.qrc">
+          <normaloff>:/storage.png</normaloff>:/storage.png</iconset>
+        </property>
+        <property name="form" stdset="0">
+         <string>form_newstorecomplecation</string>
         </property>
        </widget>
       </item>
@@ -1147,7 +1193,7 @@
        </widget>
       </item>
       <item>
-       <widget class="QCommandLinkButton" name="btnCashSessions_10">
+       <widget class="QCommandLinkButton" name="btnMenu">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
           <horstretch>0</horstretch>

@@ -22,6 +22,9 @@ public:
 
     int mUserId = 0;
 
+    /** Show staff cards; on success writes staffId. */
+    static bool select(Working *w, C5User *user, int &staffId);
+
 private slots:
     void on_leNum_returnPressed();
 

@@ -4,6 +4,8 @@
 #include "c5shopdialog.h"
 #include <QJsonObject>
 
+class QEvent;
+
 namespace Ui
 {
 class DlgPin;
@@ -26,6 +28,8 @@ protected:
     virtual void keyReleaseEvent(QKeyEvent *event) override;
 
     virtual void showEvent(QShowEvent *e) override;
+
+    void changeEvent(QEvent *e) override;
 
 private slots:
 
@@ -59,6 +63,8 @@ private slots:
 
     void on_btnSettings_clicked();
 
+    void on_btnLang_clicked();
+
 private:
     Ui::DlgPin* ui;
 
@@ -68,6 +74,7 @@ private:
 
     bool fDoNotAuth;
 
+    void updateLangButton();
 };
 
 #endif // DLGPIN_H

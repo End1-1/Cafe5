@@ -25,6 +25,9 @@ public:
     static int question(const QString &questionStr, const QString &yes = QObject::tr("Yes"),
                         const QString &no = QObject::tr("No"), const QString &a3 = "");
 
+    /// Starts {appDir}/updater.exe --app=... --version=... . Returns false if missing/failed.
+    static bool tryStartUpdater(const QString &appName, const QString &version);
+
 private slots:
     void timeout();
 
@@ -47,7 +50,6 @@ private:
 
     static int showMessage(const QString &text, int tp, const QString &yes, const QString &no, const QString &a3,
                            bool playsound = false);
-    void launchUpdater(const QString &path, const QStringList &args);
 };
 
 #endif // C5MESSAGE_H

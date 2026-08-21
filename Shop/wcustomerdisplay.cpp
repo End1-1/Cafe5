@@ -1,19 +1,22 @@
 #include "wcustomerdisplay.h"
 #include "ui_wcustomerdisplay.h"
+#include <QApplication>
+#include <QCloseEvent>
+#include <QScreen>
+#include <QWindow>
 
 WCustomerDisplay::WCustomerDisplay(QWidget *parent) :
-    QWidget(parent),
+    QWidget(parent, Qt::Window),
     ui(new Ui::WCustomerDisplay)
 {
     ui->setupUi(this);
+    setAttribute(Qt::WA_DeleteOnClose, true);
+    ui->tbl->horizontalHeader()->setStretchLastSection(true);
     ui->tbl->setColumnWidth(0, 400);
     ui->tbl->setColumnWidth(1, 100);
     ui->tbl->setColumnWidth(2, 100);
     ui->tbl->setColumnWidth(3, 100);
     ui->tbl->setColumnWidth(4, 100);
-    ui->tbl->horizontalHeader()->setProperty("bold", "2");
-    ui->tbl->verticalHeader()->setProperty("bold", "2");
-    ui->tbl->horizontalHeader()->style()->polish(ui->tbl->horizontalHeader());
 }
 
 WCustomerDisplay::~WCustomerDisplay()
@@ -21,16 +24,31 @@ WCustomerDisplay::~WCustomerDisplay()
     delete ui;
 }
 
+void WCustomerDisplay::placeOnSecondaryScreen()
+{
+    const QList<QScreen *> screens = qApp->screens();
+    QScreen *target = screens.size() > 1 ? screens.at(1) : (screens.isEmpty() ? nullptr : screens.first());
+
+    // Create native window first, then bind to the target screen (needed for multi-monitor).
+    show();
+    if (target && windowHandle()) {
+        windowHandle()->setScreen(target);
+        setGeometry(target->geometry());
+    }
+    showFullScreen();
+    raise();
+    activateWindow();
+}
+
 void WCustomerDisplay::clear()
 {
-    ui->tbl->clearContents();
     ui->tbl->setRowCount(0);
-    ui->lbAmount->setText(0);
+    ui->lbAmount->setText(QStringLiteral("0"));
 }
 
 void WCustomerDisplay::addRow(const QString &name, const QString &qty, const QString &price, const QString &total, const QString &discount)
 {
-    int r = ui->tbl->rowCount();
+    const int r = ui->tbl->rowCount();
     ui->tbl->setRowCount(r + 1);
     ui->tbl->setItem(r, 0, new QTableWidgetItem(name));
     ui->tbl->setItem(r, 1, new QTableWidgetItem(qty));
@@ -41,11 +59,18 @@ void WCustomerDisplay::addRow(const QString &name, const QString &qty, const QSt
 
 void WCustomerDisplay::setTotal(const QString &total)
 {
-    QStringList l;
-    for (int i = 0; i < ui->tbl->rowCount(); i++) {
-        l.append(QString::number(i + 1));
+    QStringList labels;
+    labels.reserve(ui->tbl->rowCount());
+    for (int i = 0; i < ui->tbl->rowCount(); ++i) {
+        labels.append(QString::number(i + 1));
     }
-    ui->tbl->setVerticalHeaderLabels(l);
+    ui->tbl->setVerticalHeaderLabels(labels);
     ui->tbl->resizeRowsToContents();
     ui->lbAmount->setText(total);
+}
+
+void WCustomerDisplay::closeEvent(QCloseEvent *event)
+{
+    emit displayClosed();
+    QWidget::closeEvent(event);
 }

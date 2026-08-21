@@ -509,6 +509,166 @@ $sql[$v] = <<<EOD
 );
 EOD;
 
+$v = 231;
+$sql[$v] = <<<EOD
+    update s_app set f_version = '$v' where lower(f_app)='db';
+    create table b_discount_cards (f_id integer primary key auto_increment, f_code varchar(64), f_client int, f_value float, f_mode int, f_datestart date, f_dateend date, f_number varchar(16), f_active int default 1, index idx_discount_cards_code (f_code));
+    create table b_accumulate_cards (f_id integer primary key auto_increment, f_code varchar(64), f_client int, f_value float, f_datestart date, f_dateend date, f_number varchar(16), f_active int default 1, index idx_accumulate_cards_code (f_code));
+    create table b_discount_ops (f_id char(36) primary key collate latin1_general_ci, f_order_id char(36) collate latin1_general_ci, f_card_id int null, f_partner_id int null, f_type int, f_factor float, f_amount decimal(14,2), f_date datetime default current_timestamp, f_comment varchar(255), index idx_discount_ops_order (f_order_id), index idx_discount_ops_card (f_card_id));
+    create table b_gift_card_ops (f_id char(36) primary key collate latin1_general_ci, f_card_id int, f_order_id char(36) collate latin1_general_ci null, f_amount decimal(14,2), f_op_type varchar(16), f_date datetime default current_timestamp, f_comment varchar(255), index idx_gift_card_ops_card (f_card_id), index idx_gift_card_ops_order (f_order_id));
+    create table b_accumulate_ops (f_id char(36) primary key collate latin1_general_ci, f_card_id int, f_order_id char(36) collate latin1_general_ci null, f_amount decimal(14,2), f_op_type varchar(16), f_percent float, f_date datetime default current_timestamp, f_comment varchar(255), index idx_accumulate_ops_card (f_card_id), index idx_accumulate_ops_order (f_order_id));
+    insert into b_discount_cards (f_id, f_code, f_client, f_value, f_mode, f_datestart, f_dateend, f_number, f_active) select f_id, f_code, f_client, f_value, f_mode, f_datestart, f_dateend, f_number, f_active from b_cards_discount where coalesce(f_mode, 0) <> 4;
+    insert into b_accumulate_cards (f_id, f_code, f_client, f_value, f_datestart, f_dateend, f_number, f_active) select f_id, f_code, f_client, f_value, f_datestart, f_dateend, f_number, f_active from b_cards_discount where f_mode = 4;
+    insert into b_gift_card_ops (f_id, f_card_id, f_order_id, f_amount, f_op_type, f_date, f_comment) select uuid(), b.f_id, null, coalesce(bh.f_sum, 0), 'migrate', current_timestamp, 'opening balance' from b_gift_card b inner join (select f_card, sum(f_amount) as f_sum from b_gift_card_history group by f_card) bh on bh.f_card = b.f_id where coalesce(bh.f_sum, 0) <> 0;
+    insert into b_accumulate_ops (f_id, f_card_id, f_order_id, f_amount, f_op_type, f_percent, f_date, f_comment) select uuid(), c.f_id, null, coalesce(bh.f_sum, 0), 'migrate', c.f_value, current_timestamp, 'opening balance' from b_accumulate_cards c inner join (select f_card, sum(f_amount) as f_sum from b_gift_card_history group by f_card) bh on bh.f_card = c.f_id where coalesce(bh.f_sum, 0) <> 0;
+EOD;
+
+$v = 232;
+$sql[$v] = <<<EOD
+    update s_app set f_version = '$v' where lower(f_app)='db';
+    insert ignore into c_partners_category (f_id, f_name) values (1, 'General'), (2, 'Buyer'), (3, 'Supplier');
+    insert ignore into c_partners_group (f_id, f_name) values (1, 'Main'), (2, 'Retail'), (3, 'Shop');
+    insert ignore into l_dictionary (f_dict, f_dict_id, f_lang, f_value) values
+        ('c_partners_category', 1, 'hy', 'Ընդհանուր'),
+        ('c_partners_category', 2, 'hy', 'Գնորդ'),
+        ('c_partners_category', 3, 'hy', 'Մատակարար');
+EOD;
+
+$v = 233;
+#dont forget update store2_input.sql
+$sql[$v] = <<<EOD
+    update s_app set f_version = '$v' where lower(f_app)='db';
+   create table sys_data (f_id int primary key auto_increment, f_type int, f_data json,KEY idx_sys_data_type (f_type));
+   alter table store_document change column f_user_id f_user_id char(16);
+   ALTER TABLE store_calc_queue
+  ADD INDEX calc_idx_row_sale (f_row_sale_id);
+EOD;
+
+$v = 234;
+$sql[$v] = <<<EOD
+    update s_app set f_version = '$v' where lower(f_app)='db';
+   ALTER TABLE store_calc_queue ADD INDEX calc_idx_row_sale (f_row_sale_id);
+EOD;
+
+$v = 235;
+$sql[$v] = <<<EOD
+    update s_app set f_version = '$v' where lower(f_app)='db';
+    ALTER TABLE o_tax_log ADD COLUMN f_fiscal_machine_id INT NULL;
+EOD;
+
+$v = 236;
+$sql[$v] = <<<EOD
+update s_app set f_version = '$v' where lower(f_app)='db';
+INSERT INTO `l_dictionary` (`f_dict`, `f_dict_id`, `f_lang`, `f_value`) VALUES
+('workstations_type', 1, 'ru', 'Ресторан'),
+('workstations_type', 2, 'ru', 'Фастфуд'),
+('workstations_type', 3, 'ru', 'Менеджер'),
+('workstations_type', 4, 'ru', 'Магазин'),
+('workstations_type', 5, 'ru', 'Общий'),
+('workstations_type', 6, 'ru', 'Автомойка'),
+
+('store_types', 1, 'ru', 'Приход на склад'),
+('store_types', 2, 'ru', 'Расход со склада'),
+('store_types', 3, 'ru', 'Перемещение'),
+('store_types', 4, 'ru', 'Комплектация'),
+('store_types', 5, 'ru', 'Разукомплектация'),
+
+('store_statuses', 0, 'ru', 'Черновик'),
+('store_statuses', 1, 'ru', 'Проведён'),
+
+('c_partners_state', 1, 'ru', 'Действующий'),
+('c_partners_state', 2, 'ru', 'Недействующий'),
+
+('c_partners_category', 1, 'ru', 'Общий'),
+('c_partners_category', 2, 'ru', 'Покупатель'),
+('c_partners_category', 3, 'ru', 'Поставщик'),
+
+('c_goods_type', 1, 'ru', 'Товар'),
+('c_goods_type', 2, 'ru', 'Блюдо'),
+('c_goods_type', 3, 'ru', 'Услуга'),
+('c_goods_type', 4, 'ru', 'Модификатор'),
+('c_goods_type', 5, 'ru', 'Пакет'),
+('c_goods_type', 6, 'ru', 'Член пакета'),
+
+('cash_payment_types', 1, 'ru', 'Наличные'),
+('cash_payment_types', 2, 'ru', 'Карта'),
+('cash_payment_types', 3, 'ru', 'Перевод'),
+('cash_payment_types', 4, 'ru', 'Идрам'),
+('cash_payment_types', 7, 'ru', 'ТелСелл'),
+
+('cash_operations_types', 1, 'ru', 'Приход от продаж'),
+('cash_operations_types', 2, 'ru', 'Общие расходы'),
+('cash_operations_types', 3, 'ru', 'Закупки'),
+('cash_operations_types', 4, 'ru', 'Зарплата'),
+('cash_operations_types', 5, 'ru', 'Погашение долга'),
+('cash_operations_types', 6, 'ru', 'Погашение долга клиента'),
+('cash_operations_types', 7, 'ru', 'Коммунальные'),
+('cash_operations_types', 8, 'ru', 'Недостача'),
+('cash_operations_types', 9, 'ru', 'Излишек'),
+('cash_operations_types', 10, 'ru', 'Доставка'),
+('cash_operations_types', 11, 'ru', 'Расход, перемещение'),
+('cash_operations_types', 12, 'ru', 'Приход, перемещение');
+EOD;
+
+
+$v = 237;
+$sql[$v] = <<<EOD
+update s_app set f_version = '$v' where lower(f_app)='db';
+create table if not exists c_goods_country(f_id integer primary key);
+
+EOD;
+
+$v = 238;
+$sql[$v] = <<<EOD
+update s_app set f_version = '$v' where lower(f_app)='db';
+
+create table if not exists ararix_restaurants (
+    f_id int primary key auto_increment,
+    f_name varchar(128) not null,
+    f_score int not null default 0,
+    f_location point null,
+    f_image_url varchar(255) null,
+    f_category varchar(128) null
+);
+
+create table if not exists ararix_goods_groups (
+    f_id int primary key auto_increment,
+    f_name varchar(128) not null,
+    f_image_url varchar(255) null,
+    f_sort int not null default 0
+);
+
+create table if not exists ararix_goods_country (
+    f_id int primary key auto_increment,
+    f_name varchar(128) not null,
+    f_sort int not null default 0
+);
+
+insert ignore into ararix_goods_groups (f_id, f_name, f_sort) values
+(1, 'Burger', 1),
+(2, 'Pizza', 2);
+
+insert ignore into ararix_goods_country (f_id, f_name, f_sort) values
+(1, 'Asian', 1),
+(2, 'Caucasus', 2),
+(3, 'Europian', 3),
+(4, 'Mexican', 4),
+(5, 'Japan', 5);
+
+insert into ararix_restaurants (f_name, f_score, f_location, f_category)
+select 'McDonald''s', 100, ST_GeomFromText('POINT(44.5121 40.1872)'), 'Fast food'
+from dual where not exists (select 1 from ararix_restaurants where f_name = 'McDonald''s');
+
+insert into ararix_restaurants (f_name, f_score, f_location, f_category)
+select 'KFC', 90, ST_GeomFromText('POINT(44.5140 40.1850)'), 'Fast food'
+from dual where not exists (select 1 from ararix_restaurants where f_name = 'KFC');
+
+insert into ararix_restaurants (f_name, f_score, f_location, f_category)
+select 'Pizza Lab', 95, ST_GeomFromText('POINT(44.5100 40.1890)'), 'Pizzeria / Mexican'
+from dual where not exists (select 1 from ararix_restaurants where f_name = 'Pizza Lab');
+
+EOD;
+
 $update_verision = intval(stmtall("select * from s_app where lower(f_app)='db'")->fetch_assoc()["f_version"]);
 for ($i = $update_verision + 1; $i <= $v; $i++) {
     if (isset($sql[$i])) {
@@ -525,8 +685,6 @@ for ($i = $update_verision + 1; $i <= $v; $i++) {
         $skippedFiles[] = "Update version $i skipped, no SQL found.<br>";
     }
 }
-
-
 
 echo json_encode([
     "status" => "ok",

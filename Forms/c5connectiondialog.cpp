@@ -12,6 +12,13 @@ C5ConnectionDialog::C5ConnectionDialog(QWidget *parent)
     : QDialog(parent), ui(new Ui::C5ConnectionDialog)
 {
     ui->setupUi(this);
+    reloadFromRegistry();
+}
+
+C5ConnectionDialog::~C5ConnectionDialog() { delete ui; }
+
+void C5ConnectionDialog::reloadFromRegistry()
+{
     QSettings s(_ORGANIZATION_, C5RegistrySettings::registryPath());
     ui->leAddress->setText(s.value("ss_server_address").toString());
     ui->leServerKey->setText(s.value("ss_server_key").toString());
@@ -21,8 +28,6 @@ C5ConnectionDialog::C5ConnectionDialog(QWidget *parent)
     ui->leServerUsername->setText(s.value("ss_server_username").toString());
     ui->leServerPassword->setText(s.value("ss_server_password").toString());
 }
-
-C5ConnectionDialog::~C5ConnectionDialog() { delete ui; }
 
 void C5ConnectionDialog::showSettings(QWidget *parent)
 {
@@ -49,6 +54,7 @@ void C5ConnectionDialog::showSettings(QWidget *parent)
         }
     }
 
+    instance()->reloadFromRegistry();
     instance()->exec();
 }
 
@@ -97,7 +103,8 @@ void C5ConnectionDialog::on_btnSave_clicked()
     s.setValue("ss_settings", ui->leSettingsName->text());
     s.setValue("ss_server_username", ui->leServerUsername->text());
     s.setValue("ss_server_password", ui->leServerPassword->text());
-    C5Message::info(tr("Saved"));
+    s.sync();
+    accept();
 }
 
 void C5ConnectionDialog::on_btnCancel_clicked()

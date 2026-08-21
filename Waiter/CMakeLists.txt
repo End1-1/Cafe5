@@ -78,6 +78,10 @@ qt_add_executable(Waiter WIN32
     resources/res.qrc
     ../WaiterDesigner/waitertablestyle.cpp
     ../WaiterDesigner/waitertablestyle.h
+    ../WaiterDesigner/waitergoodsgroupstyle.cpp
+    ../WaiterDesigner/waitergoodsgroupstyle.h
+    ../WaiterDesigner/waitergoodsdishstyle.cpp
+    ../WaiterDesigner/waitergoodsdishstyle.h
     ../WaiterDesigner/tablecelldelegate.cpp
     ../WaiterDesigner/tablecelldelegate.h
     ../Cafe5/c5double.cpp
@@ -149,8 +153,12 @@ qt_add_executable(Waiter WIN32
     dlgsplitorder.cpp
     dlgstafflist.cpp
     dlgstoplistoption.cpp
+    dlgrecentdishes.cpp
+    dlgrecentdishes.h
+    dlgrecentdishes.ui
     dlgtables.cpp
     dlgtext.cpp
+    dlgorderdatamatrix.cpp
     dlgtimeorder.cpp
     dlgviewstoplist.cpp
     goodsgroupbutton.cpp
@@ -164,6 +172,7 @@ qt_add_executable(Waiter WIN32
     ../Cafe5/c5utils.cpp
     ../Cafe5/c5message.cpp
     ../Cafe5/c5registrysettings.cpp
+    ../Cafe5/c5uilanguage.cpp
     dlgorder.cpp
     ../Classes/c5user.cpp
     ../Classes/c5menu.cpp
@@ -272,6 +281,7 @@ qt_add_executable(Waiter WIN32
     ../Cafe5/c5cashoperationtypes.h
     ../Cafe5/c5message.h
     ../Cafe5/c5registrysettings.h
+    ../Cafe5/c5uilanguage.h
     dlgguests.h
     dlglist.h
     dlglistdishspecial.h
@@ -292,6 +302,7 @@ qt_add_executable(Waiter WIN32
     dlgsplitorder.h
     dlgstafflist.h
     dlgstoplistoption.h
+    dlgrecentdishes.h
     dlgtables.h
     dlgtext.h
     dlgtimeorder.h
@@ -375,8 +386,10 @@ qt_add_executable(Waiter WIN32
     dlgsplitorder.ui
     dlgstafflist.ui
     dlgstoplistoption.ui
+    dlgrecentdishes.ui
     dlgtables.ui
     dlgtext.ui
+    dlgorderdatamatrix.ui
     dlgtimeorder.ui
     dlgviewstoplist.ui
     tablewidget.ui
@@ -444,6 +457,17 @@ if(TARGET ZKFingerprint)
             COMMENT "Copy ${_zkfp_runtime_name} next to Waiter"
         )
     endforeach()
+
+    if(ZKFP_SENSORS_DIR)
+        add_custom_command(TARGET Waiter POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E make_directory
+                    "$<TARGET_FILE_DIR:Waiter>/ZKFPSensors"
+            COMMAND ${CMAKE_COMMAND} -E copy_directory
+                    "${ZKFP_SENSORS_DIR}"
+                    "$<TARGET_FILE_DIR:Waiter>/ZKFPSensors"
+            COMMENT "Copy ZKFPSensors next to Waiter"
+        )
+    endif()
 endif()
 
 # ---------- Windows flags ----------

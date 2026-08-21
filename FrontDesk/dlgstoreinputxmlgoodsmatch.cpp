@@ -15,16 +15,22 @@ DlgStoreInputXmlGoodsMatch::DlgStoreInputXmlGoodsMatch(const QVector<StoreInputX
     , mSourceLines(lines)
 {
     ui->setupUi(this);
-    ui->tblGoods->setColumnCount(6);
-    ui->tblGoods->setHorizontalHeaderLabels(
-        {tr("Import name"), tr("Qty"), tr("Price"), tr("Unit"), tr("Goods in database"), tr("Update name")});
+    ui->tblGoods->setColumnCount(7);
+    ui->tblGoods->setHorizontalHeaderLabels({tr("Import name"),
+                                             tr("Qty"),
+                                             tr("Price"),
+                                             tr("Unit"),
+                                             tr("Goods in database"),
+                                             tr("Create"),
+                                             tr("Update name")});
     ui->tblGoods->horizontalHeader()->setStretchLastSection(false);
     ui->tblGoods->horizontalHeader()->setSectionResizeMode(0, QHeaderView::Stretch);
     ui->tblGoods->setColumnWidth(1, 70);
     ui->tblGoods->setColumnWidth(2, 80);
     ui->tblGoods->setColumnWidth(3, 70);
-    ui->tblGoods->setColumnWidth(4, 280);
-    ui->tblGoods->setColumnWidth(5, 90);
+    ui->tblGoods->setColumnWidth(4, 260);
+    ui->tblGoods->setColumnWidth(5, 80);
+    ui->tblGoods->setColumnWidth(6, 90);
     ui->tblGoods->setRowCount(mSourceLines.size());
 
     for (int row = 0; row < mSourceLines.size(); ++row) {
@@ -43,17 +49,38 @@ DlgStoreInputXmlGoodsMatch::DlgStoreInputXmlGoodsMatch(const QVector<StoreInputX
         ui->tblGoods->setCellWidget(row, 4, selector);
         mSelectors.append(selector);
 
+        auto *createCheck = new QCheckBox(ui->tblGoods);
+        createCheck->setText(tr("Create"));
+        createCheck->setChecked(true);
+        auto *createWrap = new QWidget(ui->tblGoods);
+        auto *createLayout = new QHBoxLayout(createWrap);
+        createLayout->setContentsMargins(6, 0, 6, 0);
+        createLayout->addWidget(createCheck);
+        ui->tblGoods->setCellWidget(row, 5, createWrap);
+        mCreateChecks.append(createCheck);
+
         auto *updateCheck = new QCheckBox(ui->tblGoods);
         updateCheck->setText(tr("Rename"));
+        updateCheck->setEnabled(false);
         auto *checkWrap = new QWidget(ui->tblGoods);
         auto *checkLayout = new QHBoxLayout(checkWrap);
         checkLayout->setContentsMargins(6, 0, 6, 0);
         checkLayout->addWidget(updateCheck);
-        ui->tblGoods->setCellWidget(row, 5, checkWrap);
+        ui->tblGoods->setCellWidget(row, 6, checkWrap);
         mUpdateChecks.append(updateCheck);
+
+        connect(createCheck, &QCheckBox::toggled, this, [selector, updateCheck](bool checked) {
+            if (checked) {
+                selector->setCodeAndName(0, QString());
+                updateCheck->setChecked(false);
+                updateCheck->setEnabled(false);
+            } else {
+                updateCheck->setEnabled(true);
+            }
+        });
     }
 
-    resize(980, qMin(680, 140 + mSourceLines.size() * 34));
+    resize(1080, qMin(680, 140 + mSourceLines.size() * 34));
     connect(ui->buttonBox, &QDialogButtonBox::accepted, this, &DlgStoreInputXmlGoodsMatch::tryAccept);
 }
 
@@ -69,9 +96,10 @@ QVector<StoreInputXmlGoodsMappingRow> DlgStoreInputXmlGoodsMatch::rows() const
     for (int row = 0; row < mSourceLines.size(); ++row) {
         StoreInputXmlGoodsMappingRow mapped;
         mapped.source = mSourceLines.at(row);
-        mapped.goodsId = mSelectors.at(row)->value();
-        mapped.goodsName = mSelectors.at(row)->name();
-        mapped.updateName = mUpdateChecks.at(row)->isChecked();
+        mapped.createNew = mCreateChecks.at(row)->isChecked();
+        mapped.goodsId = mapped.createNew ? 0 : mSelectors.at(row)->value();
+        mapped.goodsName = mapped.createNew ? mapped.source.description : mSelectors.at(row)->name();
+        mapped.updateName = !mapped.createNew && mUpdateChecks.at(row)->isChecked();
         result.append(mapped);
     }
     return result;
@@ -80,8 +108,9 @@ QVector<StoreInputXmlGoodsMappingRow> DlgStoreInputXmlGoodsMatch::rows() const
 void DlgStoreInputXmlGoodsMatch::tryAccept()
 {
     for (int row = 0; row < mSelectors.size(); ++row) {
-        if (mSelectors.at(row)->value() <= 0) {
-            C5Message::error(tr("Match all goods before import. Row: %1").arg(row + 1));
+        const bool createNew = mCreateChecks.at(row)->isChecked();
+        if (!createNew && mSelectors.at(row)->value() <= 0) {
+            C5Message::error(tr("Match or create all goods before import. Row: %1").arg(row + 1));
             return;
         }
     }

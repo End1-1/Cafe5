@@ -1,10 +1,22 @@
 #include "ce5usergroup.h"
 #include <QJsonDocument>
 #include <QJsonObject>
+#include <QTime>
 #include "c5message.h"
 #include "ui_ce5usergroup.h"
 
 namespace {
+
+QString timeEditToHm(const QTimeEdit *te)
+{
+    return te->time().toString(QStringLiteral("HH:mm"));
+}
+
+void setTimeEditFromHm(QTimeEdit *te, const QString &hm, const QTime &fallback)
+{
+    const QTime t = QTime::fromString(hm.trimmed(), QStringLiteral("HH:mm"));
+    te->setTime(t.isValid() ? t : fallback);
+}
 
 QJsonObject salaryFieldsToJson(const Ui::CE5UserGroup *ui)
 {
@@ -15,6 +27,10 @@ QJsonObject salaryFieldsToJson(const Ui::CE5UserGroup *ui)
     jo.insert(QStringLiteral("f_dep"), ui->leValDep->getInteger());
     jo.insert(QStringLiteral("f_skip_amount"), ui->leSkipAmount->getDouble());
     jo.insert(QStringLiteral("f_count_working_time"), ui->chCountWorkingTime->isChecked());
+    jo.insert(QStringLiteral("f_work_start_time"), timeEditToHm(ui->teWorkStartTime));
+    jo.insert(QStringLiteral("f_work_end_time"), timeEditToHm(ui->teWorkEndTime));
+    jo.insert(QStringLiteral("f_fine_per_minute"), ui->leFinePerMinute->getDouble());
+    jo.insert(QStringLiteral("f_maximum_fine_minutes"), ui->leMaximumFineMinutes->getInteger());
     return jo;
 }
 
@@ -26,6 +42,14 @@ void applySalaryJsonToFields(const QJsonObject &jo, Ui::CE5UserGroup *ui)
     ui->leValDep->setInteger(jo.value(QStringLiteral("f_dep")).toInt());
     ui->leSkipAmount->setDouble(jo.value(QStringLiteral("f_skip_amount")).toDouble());
     ui->chCountWorkingTime->setChecked(jo.value(QStringLiteral("f_count_working_time")).toBool());
+    setTimeEditFromHm(ui->teWorkStartTime,
+                      jo.value(QStringLiteral("f_work_start_time")).toString(),
+                      QTime(9, 0));
+    setTimeEditFromHm(ui->teWorkEndTime,
+                      jo.value(QStringLiteral("f_work_end_time")).toString(),
+                      QTime(18, 0));
+    ui->leFinePerMinute->setDouble(jo.value(QStringLiteral("f_fine_per_minute")).toDouble());
+    ui->leMaximumFineMinutes->setInteger(jo.value(QStringLiteral("f_maximum_fine_minutes")).toInt());
 }
 
 } // namespace
@@ -51,6 +75,10 @@ void CE5UserGroup::clear()
     ui->leValDep->clear();
     ui->leSkipAmount->clear();
     ui->chCountWorkingTime->setChecked(false);
+    ui->teWorkStartTime->setTime(QTime(9, 0));
+    ui->teWorkEndTime->setTime(QTime(18, 0));
+    ui->leFinePerMinute->clear();
+    ui->leMaximumFineMinutes->clear();
 }
 
 void CE5UserGroup::setId(int id)

@@ -114,6 +114,8 @@ struct WaiterOrder {
     }
     double paidCash() const { return data["f_amount_cash"].toDouble(); }
     double paidCard() const { return data["f_amount_card"].toDouble(); }
+    double paidIdram() const { return data["f_amount_idram"].toDouble(); }
+    double paidTelcell() const { return data["f_amount_telcell"].toDouble(); }
     double paidPrepaid() const
     {
         return data["f_paid_prepaid"].toDouble();

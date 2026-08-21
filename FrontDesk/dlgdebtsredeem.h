@@ -19,6 +19,7 @@ public:
     int partnerId() const;
     double amount() const;
     int cashboxId() const;
+    int paymentTypeId() const;
     QString comment() const;
     QString redeemDateMysql() const;
 

@@ -1,5 +1,7 @@
 #include "dlgsplashscreen.h"
+#include <QJsonArray>
 #include <QTimer>
+#include "c5message.h"
 #include "c5user.h"
 #include "c5utils.h"
 #include "ninterface.h"
@@ -32,10 +34,15 @@ void DlgSplashScreen::login(const QString &username,
                             std::function<void(C5User *user)> onFinish)
 {
     mOnFinish = onFinish;
+    if(username.trimmed().isEmpty() || password.isEmpty()) {
+        C5Message::error(tr("Server username / password is empty"));
+        mOnFinish(nullptr);
+        return;
+    }
     fHttp->createHttpQueryLambda(
         "/engine/v2/worker/user-login/login",
         {{"username", username}, {"password", password}, {"nootp", true}},
-        [this, onFinish](const QJsonObject &jdoc) {
+        [this](const QJsonObject &jdoc) {
             auto user = new C5User();
             user->fConfig = jdoc["jsonconfig"].toObject();
             QJsonArray jsettings = jdoc["settings"].toArray();
@@ -53,12 +60,20 @@ void DlgSplashScreen::login(const QString &username,
 
             user->fUserData = jdoc["userdata"].toObject().toVariantMap();
             user->mSessionKey = jdoc["token"].toString();
+            if(user->mSessionKey.isEmpty()) {
+                C5Message::error(tr("Login failed: empty session token"));
+                delete user;
+                mOnFinish(nullptr);
+                return;
+            }
             mUser = new C5User();
-            mUser->copySettings(user);
+            mUser->copy(user);
+            delete user;
             loadWorkstationConfig([this]() { mOnFinish(mUser); });
         },
         [this](const QJsonObject &jerr) {
-            Q_UNUSED(jerr);
+            const QString msg = jerr.value(QStringLiteral("errorMessage")).toString();
+            C5Message::error(msg.isEmpty() ? tr("Login failed") : msg);
             mOnFinish(nullptr);
         },
         QVariant(),
@@ -67,6 +82,7 @@ void DlgSplashScreen::login(const QString &username,
 
 void DlgSplashScreen::loadWorkstationConfig(std::function<void()> nextStep)
 {
+    Q_UNUSED(nextStep);
     NInterface::query(
         "/engine/v2/common/workstation/get-config",
         mUser->mSessionKey,
@@ -77,8 +93,10 @@ void DlgSplashScreen::loadWorkstationConfig(std::function<void()> nextStep)
             mOnFinish(mUser);
         },
         [this](const QJsonObject &jerr) {
+            const QString msg = jerr.value(QStringLiteral("errorMessage")).toString();
+            C5Message::error(msg.isEmpty() ? tr("Workstation config failed") : msg);
             mOnFinish(nullptr);
-            return false;
+            return true; // already shown
         });
 }
 

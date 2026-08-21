@@ -197,7 +197,7 @@ void C5StructTableView::on_btnSelect_clicked()
             isAcceptable = true;
         }
     } else if(mSearchEngine == SelectorName<PartnerItem>::value) {
-        if(static_cast<C5StructModel<GoodsItem>*>(ui->tbl->model())->hasSelectedData()) {
+        if(static_cast<C5StructModel<PartnerItem>*>(ui->tbl->model())->hasSelectedData()) {
             isAcceptable = true;
         }
     } else if (mSearchEngine == SelectorName<StoreDocStatusItem>::value) {

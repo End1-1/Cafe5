@@ -50,6 +50,7 @@ struct StoreInputDocument : public ParentItem
     QString store_out_name;
     int version = 0;
     double sum = 0;
+    double paid_amount = 0;
     int partner = 0;
     QList<StoreUser> items;
 
@@ -77,6 +78,7 @@ struct StoreInputDocument : public ParentItem
                 {"payment_type_id", payment_type_id},
                 {"cashbox_id", cashbox_id},
                 {"currency_id", currency_id},
+                {"paid_amount", paid_amount},
                 {"items", jitems}};
     }
 };
@@ -126,7 +128,31 @@ struct JsonParser<StoreInputDocument>
         sid.currency_id = jo.value("f_currency_id").toInt();
         sid.cashbox_name = jo.value("f_cashbox_name").toString();
         sid.currency_name = jo.value("f_currency_name").toString();
+        if (jo.contains("paid_amount")) {
+            sid.paid_amount = jo.value("paid_amount").toVariant().toDouble();
+        }
         sid.parseData(jo);
+        if (sid.cashbox_id <= 0) {
+            sid.cashbox_id = sid.data.value("cashbox_id").toInt();
+        }
+        if (sid.payment_type_id <= 0) {
+            sid.payment_type_id = sid.data.value("payment_type_id").toInt();
+        }
+        if (sid.currency_id <= 0) {
+            sid.currency_id = sid.data.value("currency_id").toInt();
+        }
+        if (!jo.contains("paid_amount") && sid.data.contains("paid_amount")) {
+            sid.paid_amount = sid.data.value("paid_amount").toVariant().toDouble();
+        }
+        if (sid.cashbox_name.isEmpty()) {
+            sid.cashbox_name = sid.data.value("cashbox_name").toString();
+        }
+        if (sid.payment_type_id_name.isEmpty()) {
+            sid.payment_type_id_name = sid.data.value("payment_type_name").toString();
+        }
+        if (sid.currency_name.isEmpty()) {
+            sid.currency_name = sid.data.value("currency_name").toString();
+        }
         QJsonArray ji = jo.value("items").toArray();
         for (int i = 0; i < ji.size(); i++) {
             StoreUser su = JsonParser<StoreUser>::fromJson(ji.at(i).toObject());

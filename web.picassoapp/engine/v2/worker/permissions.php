@@ -165,6 +165,7 @@ define('CP_T12_SHOP_ENTER_SALE', 1203);
 define('CP_T12_SHOP_ENTER_STORE', 1204);
 define('CP_T12_SHOP_FISCAL_REPORT', 1205);
 define('CP_T12_SHOP_SALE_OF_ALL_USERS', 1206);
+define('CP_T12_SHOP_REPORT_GOODS', 1208);
 
 
 class Permissions

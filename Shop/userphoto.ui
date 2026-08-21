@@ -59,16 +59,6 @@
       <property name="bottomMargin">
        <number>0</number>
       </property>
-      <item row="1" column="0" colspan="2">
-       <widget class="QLabel" name="lbName">
-        <property name="text">
-         <string>Name</string>
-        </property>
-        <property name="alignment">
-         <set>Qt::AlignCenter</set>
-        </property>
-       </widget>
-      </item>
       <item row="0" column="0" colspan="2">
        <widget class="QLabel" name="lbImage">
         <property name="sizePolicy">
@@ -94,7 +84,7 @@
         </property>
        </widget>
       </item>
-      <item row="2" column="0" colspan="2">
+      <item row="1" column="0" colspan="2">
        <widget class="QLabel" name="lbNum">
         <property name="font">
          <font>
@@ -105,7 +95,17 @@
          </font>
         </property>
         <property name="text">
-         <string>000111222</string>
+         <string>1</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="0" colspan="2">
+       <widget class="QLabel" name="lbName">
+        <property name="text">
+         <string>Name</string>
         </property>
         <property name="alignment">
          <set>Qt::AlignCenter</set>

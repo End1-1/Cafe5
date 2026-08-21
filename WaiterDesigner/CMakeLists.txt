@@ -11,13 +11,17 @@ set(CMAKE_AUTORCC OFF)
 
 find_package(Qt6 REQUIRED COMPONENTS Core Gui Widgets)
 
-add_executable(WaiterDesigner
+add_executable(WaiterDesigner WIN32
     main.cpp
     mainwindow.cpp
     mainwindow.h
     mainwindow.ui
     waitertablestyle.cpp
     waitertablestyle.h
+    waitergoodsgroupstyle.cpp
+    waitergoodsgroupstyle.h
+    waitergoodsdishstyle.cpp
+    waitergoodsdishstyle.h
     tablecelldelegate.cpp
     tablecelldelegate.h
 )

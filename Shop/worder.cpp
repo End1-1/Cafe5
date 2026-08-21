@@ -1,14 +1,19 @@
 #include "worder.h"
+#include <QDate>
 #include <QDir>
 #include <QFile>
 #include <QInputDialog>
 #include <QPainter>
 #include <QPointer>
+#include <QPrinter>
 #include <QPrinterInfo>
 #include <QScrollBar>
 #include <QSettings>
 #include <QThread>
+#include <QTime>
+#include <cmath>
 #include "c5checkbox.h"
+#include "c5lineedit.h"
 #include "c5message.h"
 #include "c5permissions.h"
 #include "c5printing.h"
@@ -20,6 +25,7 @@
 #include "dlgpaymentchoose.h"
 #include "dlgshopcustomer.h"
 #include "dqty.h"
+#include "format_date.h"
 #include "goodscols.h"
 #include "httplite.h"
 #include "logwriter.h"
@@ -31,6 +37,7 @@
 #include "selectstaff.h"
 #include "struct_goods_item.h"
 #include "struct_workstationitem.h"
+#include "dict_dish_state.h"
 #include "ui_worder.h"
 #include "wcustomerdisplay.h"
 #include "working.h"
@@ -42,11 +49,10 @@ WOrder::WOrder(C5User *user, int saleType, WCustomerDisplay *customerDisplay, QW
     ui->setupUi(this);
     ui->leTotal->setText("0");
 
-    fCustomerDisplay = customerDisplay;
     fUser = user;
-    fGiftCard = 0;
     fWorking = static_cast<Working *>(parent);
-    setDiscinfoVisibility(false);
+    Q_UNUSED(customerDisplay);
+    hideLoyaltyPanels();
     noImage();
     QSettings s(_ORGANIZATION_, _APPLICATION_ + QString("\\") + _MODULE_);
     ui->tblData->setColumnWidth(col_action, 40);
@@ -92,24 +98,66 @@ WOrder::~WOrder()
     delete ui;
 }
 
-void WOrder::updateCustomerDisplay(WCustomerDisplay *cd)
+void WOrder::setTableId(int tableId)
 {
-    fCustomerDisplay = cd;
+    mTableId = tableId > 0 ? tableId : 1;
+}
 
-    if (fCustomerDisplay) {
-        fCustomerDisplay->clear();
+void WOrder::loadExistingOrder(const QJsonObject &jdoc, int tableId)
+{
+    mSkipOpenTableOnShow = true;
+    setTableId(tableId);
+    parseOrder(jdoc);
+}
 
-        for (int i = 0; i < mOrder.dishes.size(); i++) {
-            auto const &g = mOrder.dishes.at(i);
-            fCustomerDisplay->addRow(g.dishName,
-                                     float_str(g.qty, 2),
-                                     float_str(g.price, 2),
-                                     float_str(g.total(false), 2),
-                                     float_str(g.discountFactor(), 2));
-        }
-
-        fCustomerDisplay->setTotal(ui->leTotal->text());
+void WOrder::updateCustomerDisplay()
+{
+    Working *working = fWorking ? fWorking : Working::working();
+    if (!working) {
+        return;
     }
+    // Only the active sale tab paints the buyer screen.
+    if (working->worder() != this) {
+        return;
+    }
+    WCustomerDisplay *cd = working->customerDisplay();
+    if (!cd) {
+        return;
+    }
+
+    cd->clear();
+    int painted = 0;
+    for (int i = 0; i < mOrder.dishes.size(); ++i) {
+        const auto &g = mOrder.dishes.at(i);
+        // Same filter as the sale table (state == 1 / OK).
+        if (g.state != 1) {
+            continue;
+        }
+        cd->addRow(g.dishName,
+                    float_str(g.qty, 2),
+                    float_str(g.price, 2),
+                    float_str(g.total(false), 2),
+                    float_str(g.discountFactor(), 2));
+        ++painted;
+    }
+    // Fallback: if server sent lines without state yet, still show something.
+    if (painted == 0) {
+        for (int i = 0; i < mOrder.dishes.size(); ++i) {
+            const auto &g = mOrder.dishes.at(i);
+            if (g.qty <= 0) {
+                continue;
+            }
+            cd->addRow(g.dishName,
+                        float_str(g.qty, 2),
+                        float_str(g.price, 2),
+                        float_str(g.total(false), 2),
+                        float_str(g.discountFactor(), 2));
+        }
+    }
+    const QString totalText = ui->leTotal->text().trimmed().isEmpty()
+                                  ? float_str(mOrder.totalDue, 2)
+                                  : ui->leTotal->text();
+    cd->setTotal(totalText);
 }
 
 void WOrder::clearCode()
@@ -149,6 +197,7 @@ void WOrder::keyAsterix()
 
 void WOrder::writeOrder(std::function<void()> nextStep)
 {
+    Q_UNUSED(nextStep);
     if (ui->btnF4->isChecked()) {
         if (ui->leTIN->text().length() != 8) {
             C5Message::error(tr("Invalid taxpayer tin"));
@@ -178,10 +227,13 @@ void WOrder::writeOrder(std::function<void()> nextStep)
     // }
 
     bool prepaidReadonly = false;
+    double prepaidFromCard = 0;
+    double maxPrepaid = 0;
 
-    if (ui->leUseAccumulated->getDouble() > 0) {
-        //fOHeader.amountPrepaid = ui->leUseAccumulated->getDouble();
-        prepaidReadonly = true;
+    if (mLoyalty.hasGift() || mLoyalty.hasAccumulate()) {
+        prepaidFromCard = mLoyalty.useAmount;
+        maxPrepaid = qMin(mLoyalty.activeBalance(), mOrder.totalDue);
+        prepaidReadonly = prepaidFromCard > 0;
     }
 
     for (int i = 0; i < mOrder.dishes.size(); i++) {
@@ -201,101 +253,156 @@ void WOrder::writeOrder(std::function<void()> nextStep)
         }
     }
 
-    bool _printFiscal = true; //TODO__c5config.alwaysOfferTaxPrint() || ui->btnF4->isChecked();
-
-    //TODO replace prepaid max amount
-    double cash = 0, card = 0, idram = 0, bank = 0, telcell = 0, debt = 0, prepaid = 0, cashin = 0, change = 0;
-    QJsonObject pinpadResponse;
-    if (ui->btnF5->isChecked()) {
-        debt = mOrder.totalDue;
-    }
-    if (!DlgPaymentChoose::getValues(
-            fUser, mOrder.totalDue, cash, card, idram, telcell, bank, prepaid, debt, cashin, change, _printFiscal, prepaidReadonly, 0, &pinpadResponse)) {
-        return;
-    }
-
-    QElapsedTimer t;
-    t.start();
-
-    //TODO
-    int partner = 0;
-    if ((debt > 0.001 || bank > 0.001) && partner == 0) {
-        C5Message::error(tr("Debt impossible on unknown partner"));
-        return;
-    }
-
-    SelectStaff ss(fWorking, fUser);
-    int worker = 0;
-
-    //TODO
-    // if (__c5config.shopDifferentStaff() && fWorking->fCurrentUsers.count() > 0) {
-    //     if (ss.exec() == QDialog::Rejected) {
-    //         return;
-    //     }
-
-    //     worker = ss.mUserId;
-    // }
-
-    FiscalMachine fm = getFiscalMachine(mWorkStation.fiscalMachineId());
-
-    if (fm.id == 0) {
-        _printFiscal = false;
-    }
-
-    const int cashSessionId = Working::working()->cashSessionId();
-    if (cashSessionId <= 0) {
-        C5Message::error(tr("Cashbox session is not open"));
-        return;
-    }
-
+    // After F12: optionally choose seller, then payment and registration.
     QPointer<WOrder> self(this);
-    QJsonObject setAmountsParams{
-        {QStringLiteral("id"), self->mOrder.id},
-        {QStringLiteral("f_amount_cash"), cash},
-        {QStringLiteral("f_amount_card"), card},
-        {QStringLiteral("f_amount_bank"), bank},
-        {QStringLiteral("f_amount_idram"), idram},
-        {QStringLiteral("f_amount_debt"), debt},
-        {QStringLiteral("f_amount_telcell"), telcell},
-        {QStringLiteral("f_amount_prepaid"), prepaid}};
-    if (!pinpadResponse.isEmpty()) {
-        setAmountsParams.insert(QStringLiteral("f_pinpad_response"), pinpadResponse);
+    auto continuePayment = [=]() {
+        if (!self) {
+            return;
+        }
+
+        bool _printFiscal = true; //TODO__c5config.alwaysOfferTaxPrint() || ui->btnF4->isChecked();
+
+        // F12: payment dialog defaults to cash (remainder after prepaid).
+        // Card / debt / etc. are chosen in the dialog if needed.
+        double prepaid = prepaidFromCard;
+        double cash = self->mOrder.totalDue - prepaid;
+        if (cash < 0) {
+            cash = 0;
+        }
+        double card = 0, idram = 0, bank = 0, telcell = 0, debt = 0, cashin = 0, change = 0;
+        QJsonObject pinpadResponse;
+        if (!DlgPaymentChoose::getValues(
+                self->fUser, self->mOrder.totalDue, cash, card, idram, telcell, bank, prepaid, debt, cashin, change, _printFiscal, prepaidReadonly, maxPrepaid, &pinpadResponse)) {
+            return;
+        }
+        self->mLoyalty.useAmount = prepaid;
+
+        // Для долга и банковского перевода нужен партнёр (ИИН не обязателен).
+        if ((debt > 0.001 || bank > 0.001) && self->mPartnerId <= 0) {
+            C5Message::error(tr("A partner must be selected for debt / bank transfer"));
+            return;
+        }
+
+        FiscalMachine fm = getFiscalMachine(mWorkStation.fiscalMachineId());
+
+        if (fm.id == 0) {
+            _printFiscal = false;
+        }
+
+        const int cashSessionId = Working::working()->cashSessionId();
+        if (cashSessionId <= 0) {
+            C5Message::error(tr("Cashbox session is not open"));
+            return;
+        }
+
+        QJsonObject setAmountsParams{
+            {QStringLiteral("id"), self->mOrder.id},
+            {QStringLiteral("f_amount_cash"), cash},
+            {QStringLiteral("f_amount_card"), card},
+            {QStringLiteral("f_amount_bank"), bank},
+            {QStringLiteral("f_amount_idram"), idram},
+            {QStringLiteral("f_amount_debt"), debt},
+            {QStringLiteral("f_amount_telcell"), telcell},
+            {QStringLiteral("f_amount_prepaid"), prepaid}};
+        if (!pinpadResponse.isEmpty()) {
+            setAmountsParams.insert(QStringLiteral("f_pinpad_response"), pinpadResponse);
+        }
+
+        auto startPayment = [=]() {
+            if (!self) {
+                return;
+            }
+            // Повторная проверка после синхронизации f_guest на сервер.
+            if ((debt > 0.001 || bank > 0.001) && self->mPartnerId <= 0) {
+                C5Message::error(tr("A partner must be selected for debt / bank transfer"));
+                return;
+            }
+
+            NInterface::query1("/engine/v2/waiter/order/set-amounts",
+                               self->fUser->mSessionKey,
+                               self,
+                               setAmountsParams,
+                               [=](const QJsonObject &jdoc) {
+                                   if (!self) {
+                                       return;
+                                   }
+                                   self->parseOrder(jdoc);
+
+                                   auto afterServicePrint = [=]() {
+                                       auto closeOrderFunc = [=](const QJsonObject &fiscalInfo) {
+                                           if (!self) {
+                                               return;
+                                           }
+
+                                           NInterface::query1("/engine/v2/waiter/order/close-order",
+                                                              self->fUser->mSessionKey,
+                                                              self,
+                                                              {{"id", self->mOrder.id},
+                                                               {"fiscal", fiscalInfo},
+                                                               {"cashbox_id", mWorkStation.cashboxId()},
+                                                               {"cash_session_id", cashSessionId},
+                                                               {"staff_id", self->mStaffId},
+                                                               {"loyalty", self->loyaltyPayload()}},
+                                                              [self](const QJsonObject &jdoc) {
+                                                                  self->parseOrder(jdoc);
+                                                                  self->printPrecheck();
+                                                                  self->mLoyalty.clear();
+                                                                  self->hideLoyaltyPanels();
+                                                                  emit self->orderSaved(self);
+                                                              });
+                                       };
+
+                                       if (_printFiscal) {
+                                           self->printFiscal([=](const QJsonObject &jtax) { closeOrderFunc(jtax); });
+                                       } else {
+                                           closeOrderFunc({});
+                                       }
+                                   };
+
+                                   if (self->needsServicePrint()) {
+                                       NInterface::query1("/engine/v2/waiter/order/print-service-check",
+                                                          self->fUser->mSessionKey,
+                                                          self,
+                                                          {{"header_id", self->mOrder.id},
+                                                           {"reprint", true}},
+                                                          [=](const QJsonObject &ps) {
+                                                              if (!self) {
+                                                                  return;
+                                                              }
+                                                              self->printServiceCheck(ps);
+                                                              self->parseOrder(ps);
+                                                              afterServicePrint();
+                                                          });
+                                   } else {
+                                       afterServicePrint();
+                                   }
+                               });
+        };
+
+        // Перед оплатой убеждаемся, что f_guest уже на заказе (партнёр мог быть выбран до первого товара).
+        if (self->mPartnerId > 0) {
+            self->persistGuestToOrder(startPayment);
+        } else {
+            startPayment();
+        }
+    };
+
+    if (mWorkStation.assignSaleToAssociate()) {
+        fWorking->loadStaff([=]() {
+            if (!self) {
+                return;
+            }
+            int staffId = 0;
+            if (!SelectStaff::select(self->fWorking, self->fUser, staffId)) {
+                return;
+            }
+            self->mStaffId = staffId;
+            continuePayment();
+        });
+    } else {
+        mStaffId = fUser->id();
+        continuePayment();
     }
-
-    NInterface::query1("/engine/v2/waiter/order/set-amounts",
-                       self->fUser->mSessionKey,
-                       self,
-                       setAmountsParams,
-                       [=](const QJsonObject &jdoc) {
-                           if (!self) {
-                               return;
-                           }
-                           auto closeOrderFunc = [=](const QJsonObject &fiscalInfo) {
-                               if (!self) {
-                                   return;
-                               }
-
-                               NInterface::query1("/engine/v2/waiter/order/close-order",
-                                                  self->fUser->mSessionKey,
-                                                  self,
-                                                  {{"id", self->mOrder.id},
-                                                   {"fiscal", fiscalInfo},
-                                                   {"cashbox_id", mWorkStation.cashboxId()},
-                                                   {"cash_session_id", cashSessionId}},
-                                                  [self](const QJsonObject &jdoc) {
-                                                      self->parseOrder(jdoc);
-                                                      self->printPrecheck();
-                                                      emit self->orderSaved(self);
-                                                  });
-                           };
-
-                           self->parseOrder(jdoc);
-                           if (_printFiscal) {
-                               printFiscal([=](const QJsonObject &jtax) { closeOrderFunc(jtax); });
-                           } else {
-                               closeOrderFunc({});
-                           }
-                       });
 }
 
 void WOrder::fixCostumer(const QString &code)
@@ -396,21 +503,19 @@ void WOrder::changePrice()
         return;
     }
 
-    auto &g = mOrder.dishes[row];
-    double currentPrice = g.price;
-
     //TODO
-    // if (__c5config.shopDenyPriceChange() && !(currentPrice < 0)) {
+    // auto &g = dish from row;
+    // if (__c5config.shopDenyPriceChange() && !(g.price < 0)) {
     //     return;
     // }
 
     double price = DQty::getQty(tr("Price"), 0, this);
 
-    if (price < 0.001) {
+    if (price < 0) {
         return;
     }
 
-    g.price = price;
+    setPriceOfRow(row, price);
 }
 
 void WOrder::changePrice(double price)
@@ -421,7 +526,7 @@ void WOrder::changePrice(double price)
         return;
     }
 
-    mOrder.dishes[row].price = price;
+    setPriceOfRow(row, price);
 }
 
 int WOrder::rowCount()
@@ -516,23 +621,141 @@ void WOrder::comma()
     // }
 }
 
+bool WOrder::needsServicePrint() const
+{
+    for (const auto &d : mOrder.dishes) {
+        if (d.state != 1) {
+            continue;
+        }
+        if (!d.printer1().trimmed().isEmpty() || !d.printer2().trimmed().isEmpty()) {
+            return true;
+        }
+    }
+    return false;
+}
+
+void WOrder::printServiceCheck(const QJsonObject &jdoc)
+{
+    QJsonObject printData = jdoc.value(QStringLiteral("print_data")).toObject();
+    const QStringList printers = printData.keys();
+    QJsonObject jh = jdoc.value(QStringLiteral("header")).toObject();
+    if (printers.isEmpty()) {
+        return;
+    }
+
+    for (const QString &printerName : printers) {
+        QJsonObject jo = printData.value(printerName).toObject();
+        QFont font(qApp->font());
+        const int bs = 22;
+        font.setPointSize(bs);
+        C5Printing p;
+        QPrinterInfo pi = QPrinterInfo::printerInfo(printerName);
+        QPrinter printer(pi);
+        QRectF pr = printer.pageRect(QPrinter::DevicePixel);
+        p.setSceneParams(pr.width(), pr.height(), 96.0);
+        p.setFont(font);
+        p.setFontBold(true);
+        p.setFontSize(bs);
+        constexpr int sideMarginMm = 5;
+        p.setRightMarginMm(sideMarginMm);
+        const int nameWidthMm = qMax(8, 65 - 2 * sideMarginMm);
+
+        p.ctext(tr("New order").toUpper());
+        p.br();
+        p.br();
+        p.setFontBold(false);
+        p.ltext(tr("Order no"), sideMarginMm);
+        p.rtext(jh.value(QStringLiteral("f_prefix")).toString());
+        p.br();
+        p.ltext(tr("Date"), sideMarginMm);
+        p.rtext(QDate::currentDate().toString(FORMAT_DATE_TO_STR));
+        p.br();
+        p.ltext(tr("Time"), sideMarginMm);
+        p.rtext(QTime::currentTime().toString(FORMAT_TIME_TO_STR));
+        p.br();
+        p.ltext(tr("Staff"), sideMarginMm);
+        p.rtext(fUser->shortFullName());
+        p.br();
+        p.line();
+        p.br(2);
+
+        for (const auto &jdv : jo.value(QStringLiteral("dishes")).toArray()) {
+            p.setFontSize(bs + 2);
+            p.setFontBold(false);
+            QJsonObject jd = jdv.toObject();
+            p.ltext(jd.value(QStringLiteral("f_dish_name")).toString(), sideMarginMm, nameWidthMm);
+            p.setFontBold(true);
+            p.rtext(float_str(jd.value(QStringLiteral("f_qty")).toDouble(), 2));
+            if (!jd.value(QStringLiteral("f_comment")).toString().isEmpty()) {
+                p.br();
+                p.setFontSize(bs - 4);
+                p.setFontBold(true);
+                p.ltext(jd.value(QStringLiteral("f_comment")).toString(), sideMarginMm, 650);
+                p.br();
+                p.setFontSize(bs + 2);
+            }
+            p.br();
+            p.line();
+            p.br(1);
+        }
+
+        p.line();
+        p.br(1);
+        p.setFontSize(bs - 6);
+        p.ltext(QString("%1 %2").arg(tr("Printer: "), printerName), sideMarginMm);
+        p.setFontBold(true);
+        p.rtext(jo.value(QStringLiteral("side")).toString());
+        p.br();
+
+        if (!pi.isNull()) {
+            if (!p.print(printer)) {
+                C5Message::error(tr("Print error"));
+            }
+        } else {
+            C5Message::error(tr("Printer not found") + ": " + printerName);
+        }
+    }
+}
+
 void WOrder::printPrecheck()
 {
-    int bs = 20;
+    if (!mWorkStation.isReceiptPrintingConfigured()) {
+        return;
+    }
+    int bs = mWorkStation.data.value("f_precheck_font_size").toInt();
+    if (bs == 0) {
+        bs = 16;
+    }
     QFont font(qApp->font());
     font.setPointSize(bs);
-    QString printerName = mWorkStation.defaultPrinter();
+    const QString printerName = mWorkStation.receiptPrinter();
     C5Printing p;
-    QPrinterInfo pi = QPrinterInfo::printerInfo(printerName);
-    QPrinter printer(pi);
-    printer.setPageSize(QPageSize::Custom);
-    printer.setFullPage(false);
-    QRectF pr = printer.pageRect(QPrinter::DevicePixel);
-    constexpr qreal SAFE_RIGHT_MM = 4.0;
-    qreal safePx = SAFE_RIGHT_MM * printer.logicalDpiX() / 25.4;
-    p.setSceneParams(pr.width() - safePx, pr.height(), printer.logicalDpiX());
+
+    // Layout metrics: receipt_printer when set; for print_server-only fall back to fixed width.
+    QPrinter *printer = nullptr;
+    QPrinterInfo pi;
+    if (mWorkStation.hasReceiptPrinter()) {
+        pi = QPrinterInfo::printerInfo(printerName);
+    }
+    QPrinter localPrinter(pi.isNull() ? QPrinterInfo() : pi);
+    if (!pi.isNull()) {
+        printer = &localPrinter;
+        localPrinter.setPageSize(QPageSize::Custom);
+        localPrinter.setFullPage(false);
+        QRectF pr = localPrinter.pageRect(QPrinter::DevicePixel);
+        constexpr qreal SAFE_RIGHT_MM = 4.0;
+        qreal safePx = SAFE_RIGHT_MM * localPrinter.logicalDpiX() / 25.4;
+        p.setSceneParams(pr.width() - safePx, pr.height(), localPrinter.logicalDpiX());
+    } else {
+        p.setSceneParams(650, 2800, 96);
+    }
     p.setFont(font);
     p.setFontSize(bs);
+    const int marginMm = qMax(0, mWorkStation.data.value(QStringLiteral("f_precheck_margins")).toInt());
+    p.setRightMarginMm(marginMm);
+    const int colQty = 33 + marginMm;
+    const int colPrice = 41 + marginMm;
+    const int nameWidthMm = qMax(10, 35 - marginMm);
     QString logoFile = qApp->applicationDirPath() + "/logo_receipt.png";
 
     if (QFile::exists(logoFile)) {
@@ -543,15 +766,15 @@ void WOrder::printPrecheck()
     switch (mOrder.state) {
     case ORDER_STATE_OPEN:
     case ORDER_STATE_CLOSE:
-        p.ltext(tr("Receipt"));
+        p.ltext(tr("Receipt"), marginMm);
         break;
 
     case ORDER_STATE_PREORDER:
-        p.ltext(tr("Preorder"));
+        p.ltext(tr("Preorder"), marginMm);
         break;
 
     default:
-        p.ltext(QString::number(mOrder.state) + ": " + tr("Error in state"));
+        p.ltext(QString::number(mOrder.state) + ": " + tr("Error in state"), marginMm);
         break;
     }
 
@@ -561,42 +784,42 @@ void WOrder::printPrecheck()
 
     if (!jtax.isEmpty()) {
         // jtax = QJsonDocument::fromJson(jtax.value("out").toString().toUtf8()).object();
-        p.ltext(jtax["taxpayer"].toString(), 0);
+        p.ltext(jtax["taxpayer"].toString(), marginMm);
         p.br();
-        p.ltext(jtax["address"].toString(), 0);
+        p.ltext(jtax["address"].toString(), marginMm);
         p.br();
-        p.ltext(tr("TIN"), 0);
+        p.ltext(tr("TIN"), marginMm);
         p.rtext(jtax["tin"].toString());
         p.br();
-        p.ltext(tr("Device number"), 0);
+        p.ltext(tr("Device number"), marginMm);
         p.rtext(jtax["crn"].toString());
         p.br();
-        p.ltext(tr("Serial"), 0);
+        p.ltext(tr("Serial"), marginMm);
         p.rtext(jtax["sn"].toString());
         p.br();
-        p.ltext(tr("Fiscal"), 0);
+        p.ltext(tr("Fiscal"), marginMm);
         p.rtext(jtax["fiscal"].toString());
         p.br();
-        p.ltext(tr("Receipt number"), 0);
+        p.ltext(tr("Receipt number"), marginMm);
         p.rtext(QString::number(jtax["rseq"].toInt()));
         p.br();
-        p.ltext(tr("Date"), 0);
+        p.ltext(tr("Date"), marginMm);
         p.rtext(QDateTime::fromMSecsSinceEpoch(jtax["time"].toDouble()).toString(FORMAT_DATETIME_TO_STR));
         p.br();
-        p.ltext(tr("(F)"), 0);
+        p.ltext(tr("(F)"), marginMm);
         p.br();
     }
 
     p.br(1);
-    p.ltext(tr("Table"), 0);
+    p.ltext(tr("Table"), marginMm);
     p.rtext(QString("%1/%2").arg(mOrder.hallName, mOrder.tableName));
     p.br();
     p.line(2);
     p.br(2);
     //p.setFontSize(bs - 4);
-    p.ltext(tr("Name"), 0);
-    p.ltext(tr("Qty"), 33);
-    p.ltext(tr("Price"), 41);
+    p.ltext(tr("Name"), marginMm);
+    p.ltext(tr("Qty"), colQty);
+    p.ltext(tr("Price"), colPrice);
     p.rtext(tr("Amount"));
     p.br();
     p.br(2);
@@ -613,15 +836,15 @@ void WOrder::printPrecheck()
         }
 
         if (!dish.adgtCode().isEmpty()) {
-            p.ltext(QString("%1: %2").arg(tr("Class"), dish.adgtCode()), 0);
+            p.ltext(QString("%1: %2").arg(tr("Class"), dish.adgtCode()), marginMm);
             p.br();
         }
 
         QString name = dish.translated();
 
-        p.ltext(name, 0, 35);
-        p.ltext(float_str(dish.qty, 2), 33, 8);
-        p.ltext(float_str(dish.price, 2), 41, 12);
+        p.ltext(name, marginMm, nameWidthMm);
+        p.ltext(float_str(dish.qty, 2), colQty, 8);
+        p.ltext(float_str(dish.price, 2), colPrice, 12);
         p.rtext(float_str(dish.total(mOrder.state == ORDER_STATE_PREORDER), 2));
         p.br();
         p.br(2);
@@ -632,14 +855,14 @@ void WOrder::printPrecheck()
     p.setFontSize(bs - 2);
 
     p.setFontSize(bs + 2);
-    p.ltext(tr("Subtotal"), 0);
+    p.ltext(tr("Subtotal"), marginMm);
     p.rtext(float_str(mOrder.subTotal(), 2));
     p.br();
 
     if (mOrder.serviceFactor() > 0) {
         //p.ltext(QString("%1 %2%").arg(tr("Service")).arg(mOrder.serviceFactor() * 100), 0);
         //p.rtext(float_str(mOrder.serviceAmount(), 2));
-        p.ltext(QString("%1").arg(tr("Service")));
+        p.ltext(QString("%1").arg(tr("Service")), marginMm);
         p.rtext("+" + float_str(mOrder.serviceFactor() * 100, 2) + "%");
         p.br();
     }
@@ -647,25 +870,25 @@ void WOrder::printPrecheck()
     if (mOrder.discountFactor() > 0) {
         // p.ltext(QString("%1 %2%").arg(tr("Discount"), float_str(mOrder.discountFactor() * 100, 2)), 0);
         // p.rtext(float_str(mOrder.discountAmount(), 2));
-        p.ltext(QString("%1").arg(tr("Discount")));
+        p.ltext(QString("%1").arg(tr("Discount")), marginMm);
         p.rtext("-" + float_str(mOrder.discountFactor() * 100, 2) + "%");
         p.br();
     }
 
     if (mOrder.prepaidAmount() > 0) {
-        p.ltext(tr("Prepaid amount"), 0);
+        p.ltext(tr("Prepaid amount"), marginMm);
         p.setFontSize(bs);
         p.rtext(float_str(mOrder.prepaidAmount() * -1, 2));
         p.br();
     }
 
-    p.ltext(tr("Total due"));
+    p.ltext(tr("Total due"), marginMm);
     p.rtext(float_str(mOrder.totalDue, 2));
     p.br();
     p.br();
-    auto printPaymentFunc = [this, &p](int id) {
+    auto printPaymentFunc = [this, &p, marginMm](int id) {
         if (mOrder.payment(payment_fields[id]) > 0) {
-            p.ltext(QCoreApplication::translate("PaymentType", payment_names[id]), 0);
+            p.ltext(QCoreApplication::translate("PaymentType", payment_names[id]), marginMm);
             p.rtext(float_str(mOrder.payment(payment_fields[id]), 2));
             p.br();
         }
@@ -677,37 +900,42 @@ void WOrder::printPrecheck()
 
     if (mOrder.amountPaid() - mOrder.totalDue > 0) {
         p.br();
-        p.ltext(tr("Amount paid"), 0);
+        p.ltext(tr("Amount paid"), marginMm);
         p.rtext(float_str(mOrder.amountPaid(), 2));
         p.br();
-        p.ltext(tr("Change"), 0);
+        p.ltext(tr("Change"), marginMm);
         p.rtext(float_str(mOrder.amountPaid() - mOrder.totalDue, 2));
         p.br();
     }
 
     p.br();
     p.setFontSize(bs - 2);
-    p.ltext(tr("Thank you for visit!"), 0);
+    p.ltext(tr("Thank you for visit!"), marginMm);
     p.br();
 
     if (mOrder.state == ORDER_STATE_OPEN || mOrder.state == ORDER_STATE_CLOSE) {
-        p.ltext(QString("%1: %2").arg(tr("Sample")).arg(mOrder.printCount()));
+        p.ltext(QString("%1: %2").arg(tr("Sample")).arg(mOrder.printCount()), marginMm);
     }
 
     p.br();
-    p.ltext(tr("Printed"), 0);
+    p.ltext(tr("Printed"), marginMm);
     p.rtext(QDateTime::currentDateTime().toString(FORMAT_DATETIME_TO_STR));
     p.br();
 
-    if (mWorkStation.printServer().isEmpty() == false) {
+    // 1) print_server set → HTTP; 2) receipt_printer set → local Qt; neither → already skipped above
+    if (mWorkStation.usePrintServer()) {
         HttpLite *http = new HttpLite(this);
         QJsonObject json;
         json["print_data"] = p.jsonData();
         json["printer_name"] = printerName;
-
         http->post(mWorkStation.printServer(), json);
-    } else {
-        p.print(printer);
+    }
+    if (mWorkStation.hasReceiptPrinter()) {
+        if (printer) {
+            p.print(*printer);
+        } else {
+            C5Message::error(tr("Printer not found") + ": " + printerName);
+        }
     }
 }
 
@@ -752,6 +980,7 @@ bool WOrder::getDiscountValue(int discountType, double &v)
 void WOrder::setPartner(PartnerItem pi)
 {
     ui->leTIN->setText(pi.tin);
+    mPartnerId = pi.id;
     QStringList parts;
     if (!pi.taxName.isEmpty()) {
         parts.append(pi.taxName);
@@ -765,10 +994,37 @@ void WOrder::setPartner(PartnerItem pi)
 
     ui->leCustomer->setText(parts.join(", "));
     ui->btnF5->setVisible(true);
+    ui->btnF5->setChecked(mWorkStation.quickDebtPartnerId() == pi.id);
 
-    if (mWorkStation.quickDebtPartnerId() == pi.id) {
-        ui->btnF5->setChecked(true);
+    // ИИН не обязателен: для долга/банка нужен только f_guest_id на заказе.
+    // Если заказ ещё не создан — сохраним партнёра при первом parseOrder с id.
+    persistGuestToOrder();
+}
+
+void WOrder::persistGuestToOrder(std::function<void()> nextStep)
+{
+    if (mOrder.id.isEmpty() || mPartnerId <= 0) {
+        if (nextStep) {
+            nextStep();
+        }
+        return;
     }
+
+    const QJsonObject guest{{QStringLiteral("f_guest_id"), mPartnerId},
+                            {QStringLiteral("f_guest_tin"), ui->leTIN->text().trimmed()},
+                            {QStringLiteral("f_guest_name"), ui->leCustomer->text().trimmed()}};
+    NInterface::query1(QStringLiteral("/engine/v2/waiter/order/set-data-value"),
+                       fUser->mSessionKey,
+                       this,
+                       {{QStringLiteral("id"), mOrder.id},
+                        {QStringLiteral("key"), QStringLiteral("f_guest")},
+                        {QStringLiteral("value"), guest}},
+                       [this, nextStep](const QJsonObject &jdoc) {
+                           parseOrder(jdoc);
+                           if (nextStep) {
+                               nextStep();
+                           }
+                       });
 }
 
 bool WOrder::setQtyOfRow(int row, double qty)
@@ -781,6 +1037,13 @@ bool WOrder::setQtyOfRow(int row, double qty)
 
     if (og.isPiece()) {
         qty = trunc(qty);
+    } else {
+        // Weight / scale: at most 3 decimals (truncate, do not round).
+        qty = std::floor(qty * 1000.0 + 1e-9) / 1000.0;
+    }
+
+    if (!allowStockForDish(og.dishId, og.isService(), og.dataValue(QStringLiteral("f_stock")).toDouble(), qty, og.id)) {
+        return false;
     }
 
     NInterface::query1("/engine/v2/waiter/order/set-dish-qty",
@@ -801,7 +1064,22 @@ bool WOrder::setQtyOfRow(int row, double qty)
 
 bool WOrder::setPriceOfRow(int row, double price)
 {
-    mOrder.dishes[row].price = price;
+    auto const &og = ui->tblData->getData(row, 0).value<WaiterDish>();
+    if (og.id.isEmpty()) {
+        C5Message::error("Error og.id.isEmpty == true");
+        return false;
+    }
+
+    NInterface::query1("/engine/v2/waiter/order/set-dish-price",
+                       fUser->mSessionKey,
+                       this,
+                       {{"id", og.id},
+                        {"dish", og.dishId},
+                        {"dish_name", og.dishName},
+                        {"new_price", price},
+                        {"order_id", mOrder.id}},
+                       [=](const QJsonObject &jdoc) { parseOrder(jdoc); });
+
     return true;
 }
 
@@ -857,19 +1135,67 @@ void WOrder::on_leCode_returnPressed()
     ui->leCode->clear();
     ui->leCode->setFocus();
 
-    if (!mWorkStation.scalePattern().isEmpty()) {
-        if (code.startsWith(mWorkStation.scalePattern())) {
-            QString weightStr = code.mid(7, 5);
-            double weight = str_float(weightStr) / 1000;
-            QString barcode = code.mid(2, 5);
-            barcode = QString::number(barcode.toInt());
+    // Piece scale label EAN-13 (hardcoded): 24[5 PLU][5 qty][check]
+    // Example 2401035000023 → flag 24, scancode 01035 → 1035, qty 00002 → 2
+    if (code.length() == 13 && code.startsWith(QStringLiteral("24"))) {
+        const QString pluRaw = code.mid(2, 5);
+        QString barcode = QString::number(pluRaw.toInt());
+        if (barcode == QLatin1String("0") && pluRaw == QLatin1String("00000")) {
+            barcode.clear();
+        }
+        const int qty = code.mid(7, 5).toInt();
+        if (!barcode.isEmpty() && qty > 0) {
             processCode(barcode, -1, [=](const QString &c) {
                 checkGoodsCode(c, [=]() {
                     ui->tblData->setCurrentCell(ui->tblData->rowCount() - 1, 0);
-                    setQtyOfRow(ui->tblData->rowCount() - 1, weight);
+                    setQtyOfRow(ui->tblData->rowCount() - 1, qty);
                 });
             });
             return;
+        }
+    }
+
+    // Scale label EAN: [2-digit flag][5-digit PLU][6-digit weight*10000]
+    // Example 2301001002405 → flag 23, scancode 01001 → 1001, weight 002405 → 0.2405 kg
+    // Match configured pattern, or any EAN-13 in the 20–29 weighted range (except 24 = piece labels above).
+    // Config often has 22 while labels use 23.
+    {
+        const QString pattern = mWorkStation.scalePattern().trimmed();
+        int prefixLen = 0;
+        bool isScale = false;
+
+        if (!pattern.isEmpty()
+            && pattern != QLatin1String("24")
+            && code.startsWith(pattern)
+            && code.length() >= pattern.length() + 11) {
+            prefixLen = pattern.length();
+            isScale = true;
+        } else if (code.length() == 13
+                   && code.at(0) == QLatin1Char('2')
+                   && code.at(1).isDigit()
+                   && !code.startsWith(QStringLiteral("24"))) {
+            prefixLen = 2;
+            isScale = true;
+        }
+
+        if (isScale) {
+            const QString pluRaw = code.mid(prefixLen, 5);
+            QString barcode = QString::number(pluRaw.toInt());
+            if (barcode == QLatin1String("0") && pluRaw == QLatin1String("00000")) {
+                barcode.clear();
+            }
+            const QString weightStr = code.mid(prefixLen + 5, 6);
+            const double weight = str_float(weightStr) / 10000.0;
+
+            if (!barcode.isEmpty() && weight > 0) {
+                processCode(barcode, -1, [=](const QString &c) {
+                    checkGoodsCode(c, [=]() {
+                        ui->tblData->setCurrentCell(ui->tblData->rowCount() - 1, 0);
+                        setQtyOfRow(ui->tblData->rowCount() - 1, weight);
+                    });
+                });
+                return;
+            }
         }
     }
 
@@ -921,41 +1247,47 @@ void WOrder::on_btnSearchPartner_clicked()
                        });
 }
 
-void WOrder::on_leUseAccumulated_textChanged(const QString &arg1)
+void WOrder::on_leUseAccumulated_3_textChanged(const QString &arg1)
 {
-    //TODO
-    // if(arg1.toDouble() > ui->leGiftCardAmount->getDouble()) {
-    //     ui->leUseAccumulated->setDouble(ui->leGiftCardAmount->getDouble());
-    // }
-    // if (ui->leUseAccumulated->getDouble() > ui->leTotal->getDouble()) {
-    //     ui->leUseAccumulated->setDouble(ui->leTotal->getDouble());
-    // }
-    // if (fBHistory.type == CARD_TYPE_ACCUMULATIVE) {
-    //     if (ui->leUseAccumulated->getDouble() > ui->leTotalAccumulated->getDouble()) {
-    //         ui->leUseAccumulated->setDouble(ui->leTotalAccumulated->getDouble());
-    //     }
-    // }
+    Q_UNUSED(arg1);
+    clampUseAmount(ui->leUseAccumulated_3);
+}
+
+void WOrder::on_leUseAccumulated_4_textChanged(const QString &arg1)
+{
+    Q_UNUSED(arg1);
+    clampUseAmount(ui->leUseAccumulated_4);
 }
 
 void WOrder::on_btnRemovePartner_clicked()
 {
-    //TODO
-    // fOHeader.partner = 0;
-    // fOHeader.taxpayerTin.clear();
-    // ui->leTIN->clear();
-    // ui->leCustomer->clear();
-    // fBHistory.card = 0;
-    // fBHistory.type = 0;
-    // fBHistory.value = 0;
+    ui->leTIN->clear();
+    ui->leCustomer->clear();
+    ui->btnF5->setChecked(false);
+    mPartnerId = 0;
 
-    // for (int i = 0; i < fOGoods.count(); i++) {
-    //     OGoods &og = fOGoods[i];
-    //     og.discountAmount = 0;
-    //     og.discountFactor = 0;
-    //     og.discountMode = 0;
-    // }
+    const bool hadDiscount = mLoyalty.hasDiscount();
+    mLoyalty.clear();
+    hideLoyaltyPanels();
 
-    // setDiscinfoVisibility(false);
+    // Снимаем ранее применённую скидку с заказа на сервере.
+    if (hadDiscount && !mOrder.id.isEmpty()) {
+        NInterface::query1("/engine/v2/waiter/order/change-discount-value",
+                           fUser->mSessionKey,
+                           this,
+                           {{"id", mOrder.id}, {"value", 0}, {"comment", "remove"}},
+                           [this](const QJsonObject &jo) { parseOrder(jo); });
+    }
+
+    if (!mOrder.id.isEmpty()) {
+        NInterface::query1("/engine/v2/waiter/order/set-data-value",
+                           fUser->mSessionKey,
+                           this,
+                           {{"id", mOrder.id},
+                            {"key", "f_guest"},
+                            {"value", QJsonObject()}},
+                           [this](const QJsonObject &jdoc) { parseOrder(jdoc); });
+    }
 }
 
 void WOrder::processCode(const QString &code, int permission, std::function<void(const QString &)> func)
@@ -1001,75 +1333,73 @@ void WOrder::checkDiscountCardCode(const QString &code)
                        {{"code", code}, {"need", CARD_TYPE_DISCOUNT}},
                        [this](const QJsonObject &jdoc) {
                            QJsonObject card = jdoc["card"].toObject();
-                           QJsonObject history = jdoc["history"].toObject();
                            QJsonObject partner = jdoc["partner"].toObject();
-                           //TODO
-                           // fBHistory.card = card["f_id"].toInt();
-                           // fBHistory.type = card["f_mode"].toInt();
-                           // fBHistory.value = card["f_value"].toDouble();
 
-                           // if (fBHistory.value < 0) {
-                           //     double v = fBHistory.value;
+                           const double value = card["f_value"].toDouble();
+                           mLoyalty.discountCardId = card["f_id"].toInt();
+                           mLoyalty.discountType = card["f_mode"].toInt();
+                           mLoyalty.discountFactor = value;
+                           mLoyalty.discountPartnerId = partner["f_id"].toInt();
 
-                           //     if (!getDiscountValue(CARD_TYPE_DISCOUNT, v)) {
-                           //         fBHistory.card = 0;
-                           //         fBHistory.type = 0;
-                           //         fBHistory.value = 0;
-                           //         return;
-                           //     }
+                           ui->leDisc_2->setText(QString("%1%").arg(float_str(value, 2)));
+                           ui->lbDisc_2->setText(QString("%1: %2%").arg(tr("Discount"), float_str(value, 2)));
+                           ui->wDiscount->setVisible(true);
 
-                           //     fBHistory.value = v;
-                           // }
+                           PartnerItem pi = JsonParser<PartnerItem>::fromJson(partner);
+                           setPartner(pi);
 
-                           ui->leDisc->setText(QString("%1%").arg(float_str(card["f_value"].toDouble(), 2)));
-                           ui->leDisc->setVisible(true);
-                           ui->lbDisc->setVisible(true);
-                           ui->lbDisc->setText(QString("%1: %2%").arg(tr("Discount"), float_str(card["f_value"].toDouble(), 2)));
-                           ui->leCustomer->setText(partner["f_name"].toString());
-                           ui->leTIN->setText(partner["f_taxcode"].toString());
-                           //TODO fOHeader.partner = partner["f_id"].toInt();
-                           bool discountRow = false;
-
-                           // for (int i = 0; i < fOGoods.count(); i++) {
-                           //     OGoods &og = fOGoods[i];
-
-                           //     if (og.rowDiscount) {
-                           //         discountRow = true;
-                           //         break;
-                           //     }
-                           // }
-
-                           // for (int i = 0; i < fOGoods.count(); i++) {
-                           //     OGoods &og = fOGoods[i];
-
-                           //     if (discountRow) {
-                           //         if (og.rowDiscount) {
-                           //             og.discountFactor = fBHistory.value / 100;
-                           //             og.discountMode = fBHistory.type;
-                           //         }
-                           //     } else {
-                           //         og.discountFactor = fBHistory.value / 100;
-                           //         og.discountMode = fBHistory.type;
-                           //     }
-                           // }
+                           // Применяем скидку к заказу на сервере и обновляем итоги.
+                           NInterface::query1("/engine/v2/waiter/order/change-discount-value",
+                                              fUser->mSessionKey,
+                                              this,
+                                              {{"id", mOrder.id},
+                                               {"value", value / 100.0},
+                                               {"comment", QString("card %1").arg(mLoyalty.discountCardId)}},
+                                              [this](const QJsonObject &jo) { parseOrder(jo); });
                        });
 }
 
 void WOrder::checkGoodsCode(const QString &code, std::function<void()> postProcess)
 {
-    auto addDishProc = [&](const QJsonObject &jdoc, std::function<void()> callback) {
+    checkGoodsId(0, code, postProcess);
+}
+
+void WOrder::checkGoodsId(int goodsId, const QString &scancode, std::function<void()> postProcess, double knownStock)
+{
+    auto addDishProc = [this, knownStock](const QJsonObject &jdoc, std::function<void()> callback) {
         const QJsonObject &jdish = jdoc.value("goods").toObject();
+        const QJsonObject store = jdoc.value("store").toObject();
         QJsonObject data = jdish.value("f_data").toObject();
+        const QString servicePrint = data.value(QStringLiteral("f_service_print")).toString().trimmed();
         data["f_barcode"] = jdish.value("f_barcode").toString();
+        // Totals need f_printed=true; kitchen paper is printed at sale close with reprint.
         data["f_printed"] = true;
         data["f_adgt"] = jdish.value("f_adgt").toString();
+        data["f_groupname"] = jdish.value("f_groupname").toString();
+        data["f_qtybox"] = jdish.value("f_qtybox").toDouble();
+        data["f_is_service"] = jdish.value("f_is_service").toInt() > 0;
+        double stockQty = store.contains(QStringLiteral("f_qty"))
+                              ? store.value(QStringLiteral("f_qty")).toDouble()
+                              : jdish.value(QStringLiteral("f_stock")).toDouble(
+                                    jdish.value(QStringLiteral("f_qty")).toDouble());
+        // Qty from F5 goods list (same source as the list UI)
+        if (knownStock >= 0) {
+            stockQty = knownStock;
+        }
+        data["f_stock"] = stockQty;
+        const int dishId = jdish.value("f_dish").toInt();
+        const bool isService = jdish.value("f_is_service").toInt() > 0;
+        const double addQty = jdish.value("f_default_qty").toDouble(1);
+        if (!allowStockForDish(dishId, isService, stockQty, addQty)) {
+            return;
+        }
         NInterface::query1("/engine/v2/waiter/order/add-dish",
                            fUser->mSessionKey,
                            this,
-                           {{"dish", jdish.value("f_dish").toInt()},
+                           {{"dish", dishId},
                             {"dish_name", jdish.value("f_dish_name").toString()},
-                            {"table", 1},
-                            {"qty", jdish.value("f_default_qty")},
+                            {"table", tableId()},
+                            {"qty", addQty},
                             {"type", 1},
                             {"cashbox_id", mWorkStation.cashboxId()},
                             {"row", mOrder.dishes.count() * 100},
@@ -1078,24 +1408,49 @@ void WOrder::checkGoodsCode(const QString &code, std::function<void()> postProce
                             {"count_discount", 0},
                             {"f_data", data},
                             {"store", mWorkStation.defaultStoreId()},
-                            {"print1", ""},
+                            {"print1", servicePrint},
                             {"print2", ""},
+                            {"create_process", !servicePrint.isEmpty()},
+                            {"shop_mode", 1},
                             {"empty_order", mOrder.dishes.empty()},
+                            {"staff_id", mStaffId},
                             {"service_factor", 0}},
                            [=](const QJsonObject &jdoc) {
                                parseOrder(jdoc);
                                scrollOrderToBottom();
                                ui->tblData->setCurrentCell(ui->tblData->rowCount() - 1, 0);
+                               // Comment typed before first item — persist once order exists
+                               if (!mOrder.id.isEmpty()
+                                   && ui->leComment->text().trimmed() != mOrder.comment()) {
+                                   on_leComment_editingFinished();
+                               }
+                               // Partner selected before first item (TIN may be empty) — write f_guest
+                               if (mPartnerId > 0
+                                   && mOrder.data.value(QStringLiteral("f_guest"))
+                                          .toObject()
+                                          .value(QStringLiteral("f_guest_id"))
+                                          .toInt()
+                                          <= 0) {
+                                   persistGuestToOrder();
+                               }
                                if (callback) {
                                    callback();
                                }
                            });
     };
 
+    QJsonObject params{{"barcode", scancode},
+                       {"store", mWorkStation.defaultStoreId()},
+                       {"draft_header", ""},
+                       {"retail", mSaleTypeMode == 1}};
+    if(goodsId > 0) {
+        params.insert(QStringLiteral("goods_id"), goodsId);
+    }
+
     NInterface::query1("/engine/v2/shop/process-barcode/get",
                        fUser->mSessionKey,
                        this,
-                       {{"barcode", code}, {"store", mWorkStation.defaultStoreId()}, {"draft_header", ""}, {"retail", mSaleTypeMode == 1}},
+                       params,
                        [=](const QJsonObject &jdoc) {
                            addDishProc(jdoc, postProcess);
                            ui->leCode->setFocus();
@@ -1108,16 +1463,20 @@ void WOrder::processPresentCard(const QString &code)
         PartnerItem pi = JsonParser<PartnerItem>::fromJson(jo.value("partner").toObject());
         setPartner(pi);
         QJsonObject jcard = jo.value("card").toObject();
-        ui->lbCardValidUntil->setVisible(true);
-        ui->leCardValidUntil->setVisible(true);
-        ui->lbCurrentAccumlated->setVisible(true);
-        ui->leCurrentAccumulated->setVisible(true);
-        ui->leCurrentAccumulated->setText(jcard.value("f_sum").toString());
-        ui->leCardValidUntil->setText(jcard.value("f_valid_until").toString());
-        ui->leUseAccumulated->setVisible(true);
-        ui->lbUseAccumulated->setVisible(true);
-        ui->leUseAccumulated->setReadOnly(false);
-        fGiftCard = jcard.value("f_id").toInt();
+
+        // Подарочная и накопительная взаимоисключающие.
+        mLoyalty.clearAccumulate();
+        ui->wAccumulateCard->setVisible(false);
+
+        mLoyalty.giftCardId = jcard.value("f_id").toInt();
+        mLoyalty.giftBalance = str_float(jcard.value("f_sum").toString());
+        mLoyalty.useAmount = 0;
+
+        ui->leCurrentAccumulated_3->setText(jcard.value("f_sum").toString());
+        ui->leCardValidUntil_3->setText(jcard.value("f_valid_until").toString());
+        ui->leUseAccumulated_3->setReadOnly(false);
+        ui->leUseAccumulated_3->setText("0");
+        ui->wGiftCard->setVisible(true);
     });
 }
 
@@ -1132,23 +1491,24 @@ void WOrder::processAccumulateCard(const QString &code)
                            setPartner(pi);
 
                            QJsonObject jcard = jo.value("card").toObject();
-                           ui->leDisc->setText(QString("%1%").arg(float_str(jcard.value("f_value").toDouble(), 2)));
-                           ui->leDisc->setVisible(true);
-                           ui->lbDisc->setVisible(true);
-                           //todo
-                           // fBHistory.card = jcard.value("f_id").toInt();
-                           // fBHistory.type = CARD_TYPE_ACCUMULATIVE;
-                           // fBHistory.value = jcard.value("f_value").toDouble();
-                           ui->lbCardValidUntil->setVisible(true);
-                           ui->leCardValidUntil->setVisible(true);
-                           ui->lbCurrentAccumlated->setVisible(true);
-                           ui->leCurrentAccumulated->setVisible(true);
-                           ui->leTotalAccumulated->setVisible(true);
-                           ui->leTotalAccumulated->setText(jcard.value("f_sum").toString());
-                           ui->leCardValidUntil->setText(jcard.value("f_valid_until").toString());
-                           ui->leUseAccumulated->setVisible(true);
-                           ui->lbUseAccumulated->setVisible(true);
-                           ui->leUseAccumulated->setReadOnly(false);
+
+                           // Накопительная и подарочная взаимоисключающие.
+                           mLoyalty.clearGift();
+                           ui->wGiftCard->setVisible(false);
+
+                           mLoyalty.accumulateCardId = jcard.value("f_id").toInt();
+                           mLoyalty.accumulateBalance = str_float(jcard.value("f_sum").toString());
+                           mLoyalty.accumulatePercent = jcard.value("f_value").toDouble();
+                           mLoyalty.useAmount = 0;
+
+                           ui->leDisc_4->setText(QString("%1%").arg(float_str(mLoyalty.accumulatePercent, 2)));
+                           ui->lbDisc_4->setText(QString("%1: %2%").arg(tr("Accumulate"), float_str(mLoyalty.accumulatePercent, 2)));
+                           ui->leCurrentAccumulated_4->setText(jcard.value("f_sum").toString());
+                           ui->leTotalAccumulated_4->setText(jcard.value("f_sum").toString());
+                           ui->leCardValidUntil_4->setText(jcard.value("f_valid_until").toString());
+                           ui->leUseAccumulated_4->setReadOnly(false);
+                           ui->leUseAccumulated_4->setText("0");
+                           ui->wAccumulateCard->setVisible(true);
                        });
 }
 
@@ -1173,8 +1533,9 @@ void WOrder::printFiscal(std::function<void(const QJsonObject &)> nextStep)
     struct FiscalJobData
     {
         QString ip, password, cashier, pin, extPos, partnerTin;
-        int saleType, port, taxDept;
-        double amountCard, amountPrepaid, amountCash;
+        int saleType, port, taxDept, paymentSystem;
+        double amountNonCash, amountPrepaid, amountCash;
+        bool forceInternalPos;
         bool simpleFiscal;
         QList<WaiterDish> goods;
     };
@@ -1184,15 +1545,30 @@ void WOrder::printFiscal(std::function<void(const QJsonObject &)> nextStep)
     job.ip = fm.ip;
     job.port = fm.port;
     job.password = fm.machinePassword;
-    //TODO WITH IDRRAM
     job.extPos = fm.externalPosString();
     job.cashier = fm.opPin;
     job.pin = fm.opPassword;
     job.partnerTin = ui->btnF4->isChecked() ? ui->leTIN->text() : "";
     job.saleType = mSaleTypeMode;
-    job.amountCard = mOrder.payment(payment_fields[PAYMENT_TYPE_CARD]);
+    const double card = mOrder.payment(payment_fields[PAYMENT_TYPE_CARD]);
+    const double idram = mOrder.payment(payment_fields[PAYMENT_TYPE_IDRAM]);
+    const double telcell = mOrder.payment(payment_fields[PAYMENT_TYPE_TELCELL]);
+    job.amountNonCash = card + idram + telcell;
     job.amountPrepaid = mOrder.payment(payment_fields[PAYMENT_TYPE_PREPAID]);
     job.amountCash = mOrder.payment(payment_fields[PAYMENT_TYPE_CASH]);
+    job.paymentSystem = -1;
+    job.forceInternalPos = false;
+    // HDM v0.7.3 PaymentSystem: bank card=1, Telcell=10, Idram=13.
+    // Only one PaymentSystem can be sent, so use the dominant non-cash payment.
+    if (card >= idram && card >= telcell && card > 0.001) {
+        job.paymentSystem = 1;
+    } else if (idram >= telcell && idram > 0.001) {
+        job.paymentSystem = 13;
+        job.forceInternalPos = true;
+    } else if (telcell > 0.001) {
+        job.paymentSystem = 10;
+        job.forceInternalPos = true;
+    }
     job.simpleFiscal = false; //todo(__c5config.getValue(param_simple_fiscal).toInt() == 1);
     job.taxDept = 1;          // todo__c5config.fMainJson["tax_dept"].toString().toInt();
     job.goods = mOrder.dishes;
@@ -1209,6 +1585,10 @@ void WOrder::printFiscal(std::function<void(const QJsonObject &)> nextStep)
     // --- ЛОГИКА В ФОНОВОМ ПОТОКЕ ---
     connect(thread, &QThread::started, pt, [=]() mutable {
         pt->fPartnerTin = job.partnerTin;
+        pt->setPaymentSystem(job.paymentSystem);
+        if (job.forceInternalPos) {
+            pt->setUseExtPosOverride(QStringLiteral("false"));
+        }
 
         // Если это обычная продажа (не возврат и т.д.)
 
@@ -1229,9 +1609,9 @@ void WOrder::printFiscal(std::function<void(const QJsonObject &)> nextStep)
         }
 
         if (job.simpleFiscal) {
-            pt->makeJsonAndPrintSimple(job.taxDept, job.amountCard, job.amountPrepaid, "false");
+            pt->makeJsonAndPrintSimple(job.taxDept, job.amountNonCash, job.amountPrepaid, "false");
         } else {
-            pt->makeJsonAndPrint(job.amountCard, job.amountPrepaid);
+            pt->makeJsonAndPrint(job.amountCash, job.amountNonCash, job.amountPrepaid);
         }
 
         // ВАЖНО: Методы pt выше сами вызовут emit finished(...), когда закончат работу с сетью
@@ -1254,7 +1634,8 @@ void WOrder::printFiscal(std::function<void(const QJsonObject &)> nextStep)
                           {"in", QJsonDocument::fromJson(inJson.toUtf8()).object()},
                           {"out", QJsonDocument::fromJson(outJson.toUtf8()).object()},
                           {"error", err},
-                          {"result", result}};
+                          {"result", result},
+                          {"f_fiscal_machine_id", mWorkStation.fiscalMachineId()}};
 
         // Логируем попытку печати на сервер
         NInterface::query1("/engine/v2/common/fiscal/log", fUser->mSessionKey, self, reply, [](const QJsonObject &) {});
@@ -1294,24 +1675,100 @@ void WOrder::printFiscal(std::function<void(const QJsonObject &)> nextStep)
 void WOrder::showEvent(QShowEvent *e)
 {
     QWidget::showEvent(e);
+    if (mSkipOpenTableOnShow) {
+        mSkipOpenTableOnShow = false;
+        return;
+    }
     NInterface::query1("/engine/v2/waiter/order/open-table",
                        fUser->mSessionKey,
                        this,
-                       {{"table", 1}, {"locksrc", hostinfo}},
+                       {{"table", tableId()}, {"locksrc", hostinfo}},
                        [=](const QJsonObject &jdoc) { parseOrder(jdoc); });
 }
 
-void WOrder::setDiscinfoVisibility(bool v)
+void WOrder::hideLoyaltyPanels()
 {
-    ui->lbDisc->setVisible(v);
-    ui->leDisc->setVisible(v);
-    ui->lbUseAccumulated->setVisible(v);
-    ui->leUseAccumulated->setVisible(v);
-    ui->leCurrentAccumulated->setVisible(v);
-    ui->lbCurrentAccumlated->setVisible(v);
-    ui->lbCardValidUntil->setVisible(v);
-    ui->leCardValidUntil->setVisible(v);
-    ui->leTotalAccumulated->setVisible(v);
+    // По умолчанию виден только итоговый виджет; панели карт появляются по мере использования.
+    ui->wDiscount->setVisible(false);
+    ui->wGiftCard->setVisible(false);
+    ui->wAccumulateCard->setVisible(false);
+
+    // Старые смешанные поля внутри wTotal больше не используются.
+    ui->lbDisc->setVisible(false);
+    ui->leDisc->setVisible(false);
+    ui->lbUseAccumulated->setVisible(false);
+    ui->leUseAccumulated->setVisible(false);
+    ui->leCurrentAccumulated->setVisible(false);
+    ui->lbCurrentAccumlated->setVisible(false);
+    ui->lbCardValidUntil->setVisible(false);
+    ui->leCardValidUntil->setVisible(false);
+    ui->leTotalAccumulated->setVisible(false);
+}
+
+void WOrder::updateLoyaltyLimits()
+{
+    const double total = mOrder.totalDue;
+    if (mLoyalty.hasGift()) {
+        double maxUse = qMin(mLoyalty.giftBalance, total);
+        if (mLoyalty.useAmount > maxUse) {
+            mLoyalty.useAmount = maxUse;
+            ui->leUseAccumulated_3->setDouble(maxUse);
+        }
+    }
+    if (mLoyalty.hasAccumulate()) {
+        double maxUse = qMin(mLoyalty.accumulateBalance, total);
+        if (mLoyalty.useAmount > maxUse) {
+            mLoyalty.useAmount = maxUse;
+            ui->leUseAccumulated_4->setDouble(maxUse);
+        }
+    }
+}
+
+void WOrder::clampUseAmount(C5LineEdit *le)
+{
+    const double entered = le->getDouble();
+    double v = entered;
+    double maxUse = qMin(mLoyalty.activeBalance(), mOrder.totalDue);
+    if (v < 0) {
+        v = 0;
+    }
+    if (v > maxUse) {
+        v = maxUse;
+    }
+    if (qAbs(v - entered) > 1e-6) {
+        le->setDouble(v);
+    }
+    mLoyalty.useAmount = v;
+}
+
+QJsonObject WOrder::loyaltyPayload() const
+{
+    QJsonObject jo;
+    if (mLoyalty.hasDiscount()) {
+        jo.insert("discount", QJsonObject{
+            {"card_id", mLoyalty.discountCardId},
+            {"partner_id", mLoyalty.discountPartnerId},
+            {"type", mLoyalty.discountType},
+            {"factor", mLoyalty.discountFactor},
+        });
+    }
+    if (mLoyalty.hasGift() && mLoyalty.useAmount > 0.001) {
+        jo.insert("gift", QJsonObject{
+            {"card_id", mLoyalty.giftCardId},
+            {"spend", mLoyalty.useAmount},
+        });
+    }
+    if (mLoyalty.hasAccumulate()) {
+        QJsonObject acc{
+            {"card_id", mLoyalty.accumulateCardId},
+            {"percent", mLoyalty.accumulatePercent},
+        };
+        if (mLoyalty.useAmount > 0.001) {
+            acc.insert("spend", mLoyalty.useAmount);
+        }
+        jo.insert("accumulate", acc);
+    }
+    return jo;
 }
 
 void WOrder::on_btnAddPartner_clicked()
@@ -1326,7 +1783,31 @@ void WOrder::on_btnAddPartner_clicked()
 void WOrder::parseOrder(const QJsonObject &jdoc)
 {
     ui->tblData->setColumnDecimals(col_qty, 3);
+    ui->tblData->setColumnDecimals(col_stock, 3);
     mOrder = JsonParser<WaiterOrder>::fromJson(jdoc["order"].toObject());
+
+    const QJsonObject guest = mOrder.data.value(QStringLiteral("f_guest")).toObject();
+    const int guestId = guest.value(QStringLiteral("f_guest_id")).toInt();
+    if (guestId > 0) {
+        mPartnerId = guestId;
+        // После make-draft / loadExistingOrder UI пустой — поднимаем имя/ИИН из f_guest.
+        // Не трогаем поля, если пользователь уже что-то ввёл локально.
+        const QString tin = guest.value(QStringLiteral("f_guest_tin")).toString();
+        const QString name = guest.value(QStringLiteral("f_guest_name")).toString();
+        if (ui->leTIN->text().isEmpty() && !tin.isEmpty()) {
+            ui->leTIN->setText(tin);
+        }
+        if (ui->leCustomer->text().isEmpty() && !name.isEmpty()) {
+            ui->leCustomer->setText(name);
+        }
+    } else if (mPartnerId <= 0) {
+        mPartnerId = 0;
+    }
+    // Если guestId == 0, но mPartnerId > 0 — партнёр выбран локально (часто до первого товара).
+    // Не обнуляем: persistGuestToOrder вызовут после появления id заказа / перед оплатой.
+    ui->btnF5->setChecked(mWorkStation.quickDebtPartnerId() == mPartnerId);
+    ui->btnF5->setVisible(mPartnerId > 0);
+
     ui->tblData->setRowCount(mOrder.normalDishesCount());
     int i = 0;
     for (auto const &g : mOrder.dishes) {
@@ -1335,15 +1816,75 @@ void WOrder::parseOrder(const QJsonObject &jdoc)
         }
         ui->tblData->setData(i, 0, QVariant::fromValue(g));
         ui->tblData->setString(i, col_barcode, g.barcode());
+        ui->tblData->setString(i, col_group, g.dataValue(QStringLiteral("f_groupname")).toString());
         ui->tblData->setString(i, col_name, g.dishName);
         ui->tblData->setDouble(i, col_qty, g.qty);
+        ui->tblData->setDouble(i, col_qtybox, g.dataValue(QStringLiteral("f_qtybox")).toDouble());
         ui->tblData->setDouble(i, col_price, g.price);
         ui->tblData->setString(i, col_unit, g.unitName);
         ui->tblData->setDouble(i, col_total, g.total(false));
+        ui->tblData->setDouble(i, col_stock, g.dataValue(QStringLiteral("f_stock")).toDouble());
         ui->tblData->setRowHidden(i, g.state != 1);
         i++;
     }
     ui->leTotal->setDouble(mOrder.totalDue);
+    if (ui->leComment->text() != mOrder.comment()) {
+        ui->leComment->setText(mOrder.comment());
+    }
+    updateLoyaltyLimits();
+    if (Working *w = fWorking ? fWorking : Working::working()) {
+        if (w->worder() == this) {
+            w->refreshCustomerDisplay();
+        }
+    }
+}
+
+double WOrder::qtyInOrderForDish(int dishId, const QString &excludeLineId) const
+{
+    double sum = 0;
+    for (const auto &d : mOrder.dishes) {
+        if (d.state != DISH_STATE_OK || d.dishId != dishId) {
+            continue;
+        }
+        if (!excludeLineId.isEmpty() && d.id == excludeLineId) {
+            continue;
+        }
+        sum += d.qty;
+    }
+    return sum;
+}
+
+bool WOrder::allowStockForDish(int dishId, bool isService, double stockQty, double addQty,
+                               const QString &excludeLineId) const
+{
+    if (!mWorkStation.dontAllowNegativeRemains() || isService || dishId <= 0) {
+        return true;
+    }
+    const double already = qtyInOrderForDish(dishId, excludeLineId);
+    if (already + addQty > stockQty + 0.0001) {
+        C5Message::error(tr("Insufficient stock") + QStringLiteral(": ")
+                         + float_str(stockQty, 3) + QStringLiteral(" / ")
+                         + float_str(already + addQty, 3));
+        return false;
+    }
+    return true;
+}
+
+void WOrder::on_leComment_editingFinished()
+{
+    if (mOrder.id.isEmpty()) {
+        return;
+    }
+    const QString comment = ui->leComment->text().trimmed();
+    if (comment == mOrder.comment()) {
+        return;
+    }
+    NInterface::query1(QStringLiteral("/engine/v2/waiter/order/set-header-comment"),
+                       fUser->mSessionKey,
+                       this,
+                       {{QStringLiteral("id"), mOrder.id},
+                        {QStringLiteral("comment"), comment}},
+                       [this](const QJsonObject &jdoc) { parseOrder(jdoc); });
 }
 
 void WOrder::scrollOrderToBottom()

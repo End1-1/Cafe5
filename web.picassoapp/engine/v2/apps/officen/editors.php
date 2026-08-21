@@ -22,6 +22,7 @@ class Editors extends Auth
         "form_order_in_progress" => "OrderInProgress",
         "form_groups_of_goods" => "GoodsGroup",
         "form_service_values" => "ServiceValues",
+        "form_tables" => "Tables",
     ];
 
     private function validate($params)
@@ -93,6 +94,36 @@ class Editors extends Auth
         }
 
         $this->result = array_merge($class->delete($params), $this->result);
+        $this->echoResult();
+    }
+
+    public function ListSaleDocs($params)
+    {
+        $this->validate($params);
+
+        $className = $this->allowedEditors[$params->editor];
+        $class = new $className($this);
+
+        if (!method_exists($class, 'listSaleDocs')) {
+            dieWithCode(Translator::t('List sale docs is not supported for this editor'));
+        }
+
+        $this->result = array_merge($class->listSaleDocs($params), $this->result);
+        $this->echoResult();
+    }
+
+    public function RecalcSale($params)
+    {
+        $this->validate($params);
+
+        $className = $this->allowedEditors[$params->editor];
+        $class = new $className($this);
+
+        if (!method_exists($class, 'recalcSale')) {
+            dieWithCode(Translator::t('Recalc sale is not supported for this editor'));
+        }
+
+        $this->result = array_merge($class->recalcSale($params), $this->result);
         $this->echoResult();
     }
 }

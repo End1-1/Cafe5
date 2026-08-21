@@ -130,6 +130,7 @@ WOrderInspector::WOrderInspector(C5User *user, const QString &title, QIcon icon,
     ui->mOrderLog->verticalHeader()->setVisible(false);
     ui->splitter->setStretchFactor(0, 3);
     ui->splitter->setStretchFactor(1, 2);
+    ui->mOrderId->setCursor(Qt::PointingHandCursor);
     ui->mOrderId->installEventFilter(this);
     connect(ui->btnCopyOrderId, &QToolButton::clicked, this, &WOrderInspector::copyOrderIdToClipboard);
     connect(ui->mDishes, &QTableWidget::currentCellChanged, this, &WOrderInspector::dishSelectionChanged);

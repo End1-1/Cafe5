@@ -9,6 +9,16 @@ class RMenuReviewReport : public NTreeWidget
 public:
     explicit RMenuReviewReport(C5User *user, const QString &title, QIcon icon, QWidget *parent = nullptr);
 
+    QToolBar *toolBar() override;
+
 protected slots:
     void queryFinished(const QJsonObject &ba) override;
+
+    void print() override;
+
+private slots:
+    void inventoryBlanks();
+
+private:
+    bool mInventoryBlankActionInserted = false;
 };

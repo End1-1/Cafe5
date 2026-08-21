@@ -190,6 +190,16 @@ private:
 
     void syncPackageParentButtons();
 
+    void updateDatamatrixButton();
+
+    QList<int> cashTenderSuggestions(double due) const;
+
+    double paymentRemainDue() const;
+
+    void updateCashTenderButtons();
+
+    void configCashTenderButtons();
+
     void funcWithAuth(int permission, const QString &title, std::function<void(C5User*)> function);
 
 private slots:
@@ -302,6 +312,10 @@ private slots:
     void on_btnActivatePreorder_pressed();
 
     void on_btnShowCustomerDisplay_clicked();
+
+    void on_btnDatamatrix_clicked();
+
+    void on_btnLast40Min_clicked();
 
 signals:
 

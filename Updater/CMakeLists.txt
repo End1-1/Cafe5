@@ -15,8 +15,6 @@ find_package(Qt6 REQUIRED COMPONENTS
     Core
     Gui
     Widgets
-    Network
-    Sql
 )
 
 # ---- Sources ----
@@ -46,9 +44,11 @@ target_link_libraries(Updater PRIVATE
     Qt6::Core
     Qt6::Gui
     Qt6::Widgets
-    Qt6::Network
-    Qt6::Sql
 )
+
+if (WIN32)
+    target_link_libraries(Updater PRIVATE winhttp shell32)
+endif()
 
 # ---- Deprecated warnings ----
 target_compile_definitions(Updater PRIVATE QT_DEPRECATED_WARNINGS)

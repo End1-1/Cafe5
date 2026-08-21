@@ -1,17 +1,25 @@
 #include "vieworder.h"
 #include <QClipboard>
+#include <QDateTime>
+#include <QJsonArray>
+#include <QJsonDocument>
 #include <QJsonObject>
+#include <QPointer>
 #include <QPrintDialog>
 #include <QPrinter>
 #include <QPrinterInfo>
+#include <QSet>
+#include <QThread>
+#include <QUuid>
 #include "c5checkbox.h"
+#include "c5lineedit.h"
 #include "c5message.h"
 #include "c5printing.h"
 #include "c5printrecipta4.h"
 #include "c5user.h"
 #include "c5utils.h"
 #include "dlgdate.h"
-#include "dqty.h"
+#include "format_date.h"
 #include "goodsreturnreason.h"
 #include "jsons.h"
 #include "ninterface.h"
@@ -23,8 +31,6 @@
 #include "worder.h"
 #include "working.h"
 
-using std::function;
-
 ViewOrder::ViewOrder(Working *w, const QString &order, C5User *user)
     : C5ShopDialog(user)
     , ui(new Ui::ViewOrder)
@@ -33,92 +39,18 @@ ViewOrder::ViewOrder(Working *w, const QString &order, C5User *user)
     ui->setupUi(this);
     showMaximized();
     fUuid = order;
-    ui->tbl->setColumnWidths(ui->tbl->columnCount(), 0, 30, 300, 100, 100, 100, 0, 200);
-    //TOPDO
-    // todo db;
-    // db[":f_id"] = order;
-    // db.exec("select o.*, concat(' ', u.f_last, u.f_first) as f_saler, "
-    //         "concat_ws(' ', p.f_taxcode, p.f_taxname, p.f_contact, p.f_phone) as "
-    //         "f_buyer "
-    //         "from o_header o "
-    //         "left join s_user u on u.f_id=o.f_staff "
-    //         "left join c_partners p on p.f_id=o.f_partner "
-    //         "where o.f_id=:f_id");
-
-    // if (db.nextRow()) {
-    //     ui->leOrderNum->setText(
-    //         QString("%1%2").arg(db.getString("f_prefix")).arg(db.getInt("f_hallid")));
-    //     ui->leAmount->setDouble(db.getDouble("f_amounttotal"));
-
-    //     fSaleDoc = QString("%1%2, %3")
-    //                    .arg(db.getString("f_prefix"),
-    //                         db.getString("f_hallid"),
-    //                         db.getDate("f_datecash").toString(FORMAT_DATE_TO_STR));
-    //     ui->leDate->setDate(db.getDate("f_datecash"));
-    //     ui->leTime->setText(db.getTime("f_timeclose").toString("HH:mm"));
-    //     ui->leUUID->setText(db.getString("f_id"));
-    //     ui->leCash->setDouble(db.getDouble("f_amountcash"));
-    //     ui->leCard->setDouble(db.getDouble("f_amountcard"));
-    //     ui->leIdram->setDouble(db.getDouble("f_amountidram"));
-    //     ui->leDebt->setDouble(db.getDouble("f_amountdebt"));
-    //     ui->leBank->setDouble(db.getDouble("f_amountbank"));
-    //     ui->leTelcell->setDouble(db.getDouble("f_amounttelcell"));
-    //     ui->leSaler->setText(db.getString("f_saler"));
-    //     ui->leBuyer->setText(db.getString("f_buyer"));
-    // } else {
-    //     C5Message::error(tr("Document is not exists"));
-    //     return;
-    // }
-
-    // db[":f_id"] = order;
-    // db.exec("select concat(' ', u.f_last, u.f_first) as f_deliveryman "
-    //         "from o_header_options o "
-    //         "left join s_user u on u.f_id=o.f_deliveryman "
-    //         "where o.f_id=:f_id");
-
-    // if (db.nextRow()) {
-    //     ui->leDeliveryMan->setText(db.getString("f_deliveryman"));
-    // }
-
-    // db[":f_header"] = order;
-    // db.exec("select b.f_id, g.f_name, g.f_id as f_goodsid, b.f_qty, b.f_price, "
-    //         "b.f_total, f_scancode,  "
-    //         "g.f_service, b.f_return, t.f_receiptnumber as f_tax, b.f_store "
-    //         "from o_goods b "
-    //         "left join o_header h on h.f_id=b.f_header "
-    //         "left join o_tax t on t.f_id=h.f_id "
-    //         "inner join c_goods g on g.f_id=b.f_goods "
-    //         "where b.f_header=:f_header "
-    //         "order by b.f_row ");
-
-    // while (db.nextRow()) {
-    //     int r = ui->tbl->addEmptyRow();
-    //     ui->tbl->setString(r, 0, db.getString("f_id"));
-    //     ui->tbl->createCheckbox(r, 1);
-    //     ui->tbl->setString(r, 2, db.getString("f_name"));
-    //     ui->tbl->setDouble(r, 3, db.getDouble("f_qty"));
-    //     ui->tbl->setDouble(r, 4, db.getDouble("f_price"));
-    //     ui->tbl->setDouble(r, 5, db.getDouble("f_total"));
-    //     ui->tbl->setInteger(r, 6, db.getInt("f_goodsid"));
-    //     ui->tbl->setString(r, 7, db.getString("f_scancode"));
-    //     ui->tbl->setString(r, 8, db.getString("f_service"));
-    //     ui->tbl->setInteger(r, 9, db.getInt("f_return"));
-    //     ui->tbl->setInteger(r, 10, db.getInt("f_store"));
-
-    //     if (db.getInt("f_return") > 0 || db.getDouble("f_price") < 0) {
-    //         ui->tbl->checkBox(r, 1)->setEnabled(false);
-    //     }
-
-    //     ui->leTaxNumber->setText(db.getString("f_tax"));
-    //     ui->btnPrintFiscal->setVisible(ui->leTaxNumber->getInteger() == 0);
-    //     ui->btnTaxReturn->setVisible(!ui->btnPrintFiscal->isVisible());
-    // }
-
-    if (ui->leAmount->getDouble() < 0) {
-        ui->btnReturn->setVisible(false);
-    }
-
+    // UUID, X, Goods, Sold qty, Price, Total, GoodsId, Scancode, Service, Return qty, Store
+    ui->tbl->setColumnWidths(ui->tbl->columnCount(), 0, 40, 300, 90, 90, 100, 0, 140, 0, 110, 0);
+    ui->tbl->setColumnDecimals(3, 3);
+    ui->tbl->setColumnDecimals(9, 3);
     ui->btnSaveReturn->setVisible(false);
+    if (auto *h = ui->tbl->horizontalHeaderItem(3)) {
+        h->setText(tr("Sold"));
+    }
+    if (auto *h = ui->tbl->horizontalHeaderItem(9)) {
+        h->setText(tr("Return qty"));
+    }
+    loadOrder();
 }
 
 ViewOrder::~ViewOrder()
@@ -126,88 +58,244 @@ ViewOrder::~ViewOrder()
     delete ui;
 }
 
+void ViewOrder::loadOrder()
+{
+    NInterface::query1(QStringLiteral("/engine/v2/shop/view-order/get"),
+                       mUser->mSessionKey,
+                       this,
+                       {{QStringLiteral("id"), fUuid}},
+                       [this](const QJsonObject &jo) { fillFromJson(jo); });
+}
+
+void ViewOrder::fillFromJson(const QJsonObject &jo)
+{
+    fHeader = jo.value(QStringLiteral("header")).toObject();
+    if (fHeader.isEmpty()) {
+        C5Message::error(tr("Document is not exists"));
+        return;
+    }
+
+    const QString number = fHeader.value(QStringLiteral("f_number")).toString();
+    ui->leOrderNum->setText(number);
+    ui->leAmount->setDouble(fHeader.value(QStringLiteral("f_amounttotal")).toDouble());
+    ui->leDate->setDate(QDate::fromString(fHeader.value(QStringLiteral("f_datecash")).toString(), FORMAT_DATE_TO_STR_MYSQL));
+    ui->leTime->setText(fHeader.value(QStringLiteral("f_time_close")).toString());
+    ui->leUUID->setText(fHeader.value(QStringLiteral("f_id")).toString());
+    ui->leCash->setDouble(fHeader.value(QStringLiteral("f_amount_cash")).toDouble());
+    ui->leCard->setDouble(fHeader.value(QStringLiteral("f_amount_card")).toDouble());
+    ui->leIdram->setDouble(fHeader.value(QStringLiteral("f_amount_idram")).toDouble());
+    ui->leDebt->setDouble(fHeader.value(QStringLiteral("f_amount_debt")).toDouble());
+    ui->leBank->setDouble(fHeader.value(QStringLiteral("f_amount_bank")).toDouble());
+    ui->leTelcell->setDouble(fHeader.value(QStringLiteral("f_amount_telcell")).toDouble());
+    ui->leSaler->setText(fHeader.value(QStringLiteral("f_saler")).toString());
+    ui->leBuyer->setText(fHeader.value(QStringLiteral("f_buyer")).toString());
+    ui->leDeliveryMan->setText(fHeader.value(QStringLiteral("f_deliveryman")).toString());
+
+    fSaleDoc = QStringLiteral("%1, %2")
+                   .arg(number, ui->leDate->date().toString(FORMAT_DATE_TO_STR));
+
+    const QJsonObject fiscal = fHeader.value(QStringLiteral("f_fiscal")).toObject();
+    const QString rseq = fiscal.contains(QStringLiteral("rseq"))
+                             ? QString::number(fiscal.value(QStringLiteral("rseq")).toInt())
+                             : QString();
+    ui->leTaxNumber->setText(rseq);
+    ui->btnPrintFiscal->setVisible(rseq.toInt() == 0);
+    ui->btnTaxReturn->setVisible(!ui->btnPrintFiscal->isVisible());
+
+    ui->tbl->setRowCount(0);
+    const QJsonArray goods = jo.value(QStringLiteral("goods")).toArray();
+    for (const QJsonValue &jv : goods) {
+        const QJsonObject g = jv.toObject();
+        const int r = ui->tbl->addEmptyRow();
+        ui->tbl->setString(r, 0, g.value(QStringLiteral("f_id")).toString());
+        auto *cb = ui->tbl->createCheckbox(r, 1);
+        ui->tbl->setString(r, 2, g.value(QStringLiteral("f_name")).toString());
+        ui->tbl->setDouble(r, 3, g.value(QStringLiteral("f_qty")).toDouble());
+        ui->tbl->setDouble(r, 4, g.value(QStringLiteral("f_price")).toDouble());
+        ui->tbl->setDouble(r, 5, g.value(QStringLiteral("f_total")).toDouble());
+        ui->tbl->setInteger(r, 6, g.value(QStringLiteral("f_goodsid")).toInt());
+        ui->tbl->setString(r, 7, g.value(QStringLiteral("f_scancode")).toString());
+        ui->tbl->setString(r, 8, g.value(QStringLiteral("f_is_service")).toBool() ? QStringLiteral("1") : QStringLiteral("0"));
+        // Col 9 = return qty (empty until return mode). Already returned kept in UserRole+3.
+        ui->tbl->setDouble(r, 9, 0);
+        ui->tbl->setInteger(r, 10, g.value(QStringLiteral("f_store")).toInt());
+        ui->tbl->item(r, 0)->setData(Qt::UserRole + 1, g.value(QStringLiteral("f_fiscal_row")).toInt());
+        ui->tbl->item(r, 0)->setData(Qt::UserRole + 2, g.value(QStringLiteral("f_qty_available")).toDouble());
+        ui->tbl->item(r, 0)->setData(Qt::UserRole + 3, g.value(QStringLiteral("f_returnedqty")).toDouble());
+
+        const double available = g.value(QStringLiteral("f_qty_available")).toDouble();
+        if (available < 0.0001 || g.value(QStringLiteral("f_price")).toDouble() < 0) {
+            cb->setEnabled(false);
+        }
+        connect(cb, &C5CheckBox::clicked, this, [this](bool checked) {
+            if (!property("return").toBool()) {
+                return;
+            }
+            int r = -1, c = -1;
+            auto *senderCb = qobject_cast<C5CheckBox *>(sender());
+            if (!senderCb || !ui->tbl->findWidget(senderCb, r, c) || r < 0) {
+                return;
+            }
+            if (auto *le = ui->tbl->lineEdit(r, 9)) {
+                if (checked && le->getDouble() < 0.0001) {
+                    le->setDouble(ui->tbl->item(r, 0)->data(Qt::UserRole + 2).toDouble());
+                    le->setFocus();
+                    le->selectAll();
+                } else if (!checked) {
+                    le->setDouble(0);
+                }
+            }
+            countOrder();
+        });
+    }
+
+    if (ui->leAmount->getDouble() < 0) {
+        ui->btnReturn->setVisible(false);
+        ui->btnMakeDraft->setVisible(false);
+    }
+    ui->btnSaveReturn->setVisible(false);
+    setProperty("return", false);
+}
+
 void ViewOrder::on_btnReturn_clicked()
 {
-    if(ui->leDate->date().daysTo(QDate::currentDate()) > 14) {
+    if (ui->leDate->date().daysTo(QDate::currentDate()) > 14) {
         C5Message::error(tr("You cannot return this item"));
         return;
     }
 
-    GoodsReturnReason r(mUser);
-    r.exec();
-    int reason = r.fReason;
-    ui->leReturnReason->setProperty("reason", r.fReason);
-    ui->leReturnReason->setText(r.fReasonName);
+    NInterface::query1(QStringLiteral("/engine/v2/shop/view-order/return-reasons"),
+                       mUser->mSessionKey,
+                       this,
+                       {},
+                       [this](const QJsonObject &jo) {
+                           GoodsReturnReason r(mUser);
+                           r.setReasons(jo.value(QStringLiteral("reasons")).toArray());
+                           if (r.exec() != QDialog::Accepted) {
+                               return;
+                           }
+                           const int reason = r.fReason;
+                           ui->leReturnReason->setProperty("reason", reason);
+                           ui->leReturnReason->setText(r.fReasonName);
+                           if (reason == 0) {
+                               return;
+                           }
 
-    if(reason == 0) {
-        return;
-    }
+                           setProperty("return", true);
+                           setStyleSheet(QStringLiteral("background:rgb(255, 210, 217);"));
+                           style()->polish(this);
+                           ui->btnSaveReturn->setVisible(true);
+                           ui->leUUID->setProperty("returnfrom", ui->leUUID->text());
+                           ui->btnReturn->setEnabled(false);
 
-    setProperty("return", true);
-    setStyleSheet("background:rgb(255, 210, 217);");
-    style()->polish(this);
-    ui->btnSaveReturn->setVisible(true);
-    ui->leUUID->setProperty("returnfrom", ui->leUUID->text());
-    ui->leUUID->clear();
-    ui->leDate->setDate(QDate::currentDate());
-    ui->btnReturn->setEnabled(false);
+                           if (auto *h = ui->tbl->horizontalHeaderItem(1)) {
+                               h->setText(tr("Sel"));
+                           }
+                           if (auto *h = ui->tbl->horizontalHeaderItem(3)) {
+                               h->setText(tr("Sold"));
+                           }
+                           if (auto *h = ui->tbl->horizontalHeaderItem(9)) {
+                               h->setText(tr("Return qty"));
+                           }
 
-    for(int i = 0; i < ui->tbl->rowCount(); i++) {
-        ui->tbl->item(i, 3)->setData(Qt::UserRole, ui->tbl->getDouble(i, 3));
-    }
+                           for (int i = 0; i < ui->tbl->rowCount(); i++) {
+                               auto *cb = ui->tbl->checkBox(i, 1);
+                               const double available = ui->tbl->item(i, 0)->data(Qt::UserRole + 2).toDouble();
+                               if (!cb->isEnabled() || available < 0.0001) {
+                                   ui->tbl->setDouble(i, 9, 0);
+                                   continue;
+                               }
+
+                               auto *le = ui->tbl->createLineEdit(i, 9);
+                               le->setDouble(0);
+                               le->setPlaceholderText(float_str(available, 3));
+                               le->setToolTip(tr("Enter return quantity (max %1)").arg(float_str(available, 3)));
+                               connect(le, &C5LineEdit::textChanged, this, [this, le](const QString &) {
+                                   int r = -1, c = -1;
+                                   if (!ui->tbl->findWidget(le, r, c) || r < 0) {
+                                       return;
+                                   }
+                                   const double maxQty = ui->tbl->item(r, 0)->data(Qt::UserRole + 2).toDouble();
+                                   double v = le->getDouble();
+                                   if (v < 0) {
+                                       v = 0;
+                                   }
+                                   if (v > maxQty) {
+                                       v = maxQty;
+                                       le->setDouble(v);
+                                   }
+                                   auto *cbRow = ui->tbl->checkBox(r, 1);
+                                   cbRow->setChecked(v > 0.0001);
+                                   countOrder();
+                               });
+                           }
+                           countOrder();
+                           C5Message::info(tr("Mark rows and enter quantity in column \"Return qty\""));
+                       });
 }
 
 void ViewOrder::countOrder()
 {
     double total = 0;
-
-    for(int i = 0; i < ui->tbl->rowCount(); i++) {
-        ui->tbl->setDouble(i, 5, ui->tbl->getDouble(i, 3) *ui->tbl->getDouble(i, 4));
-        total += ui->tbl->getDouble(i, 5);
+    for (int i = 0; i < ui->tbl->rowCount(); i++) {
+        if (!property("return").toBool()) {
+            ui->tbl->setDouble(i, 5, ui->tbl->getDouble(i, 3) * ui->tbl->getDouble(i, 4));
+            continue;
+        }
+        double qty = 0;
+        if (auto *le = ui->tbl->lineEdit(i, 9)) {
+            qty = le->getDouble();
+        } else {
+            qty = ui->tbl->getDouble(i, 9);
+        }
+        if (!ui->tbl->checkBox(i, 1)->isChecked() || qty < 0.0001) {
+            continue;
+        }
+        total += qty * ui->tbl->getDouble(i, 4);
     }
-
-    ui->leAmount->setDouble(total);
+    if (property("return").toBool()) {
+        ui->leAmount->setDouble(total);
+    }
 }
 
 void ViewOrder::on_btnTaxReturn_clicked()
 {
-    //TODO
-    // todo db;
-    // db[":f_id"] = ui->leUUID->text();
-    // db.exec("select * from o_tax_log where f_order=:f_id and f_state=1");
+    const QJsonObject fiscal = fHeader.value(QStringLiteral("f_fiscal")).toObject();
+    if (fiscal.isEmpty() || fiscal.value(QStringLiteral("rseq")).toInt() <= 0) {
+        C5Message::error(tr("No fiscal exists for this order"));
+        return;
+    }
 
-    // if(!db.nextRow()) {
-    //     C5Message::error(tr("No fiscal exists for this order"));
-    //     return;
-    // }
+    QJsonObject fiscalOut;
+    QString err;
+    // Full ticket taxback (no returnItemList) — for cancelled fiscal without goods return
+    FiscalMachine fm = getFiscalMachine(mWorkStation.fiscalMachineId());
+    PrintTaxN pt(fm.ip, fm.port, fm.machinePassword, fm.externalPosString(), fm.opPin, fm.opPassword, this);
+    QString jsnin, jsnout;
+    const int result = pt.printTaxback(fiscal.value(QStringLiteral("rseq")).toInt(),
+                                       fiscal.value(QStringLiteral("crn")).toString(),
+                                       jsnin,
+                                       jsnout,
+                                       err);
 
-    // QJsonObject jout = __strjson(db.getString("f_out"));
-    // QString crn = jout["crn"].toString();
-    // QString rseq = ui->leTaxNumber->text();
-    // FiscalMachine fm = getFiscalMachine(mWorkStation.fiscalMachineId());
-    // PrintTaxN pt(fm.ip, fm.port, fm.machinePassword, fm.externalPosString(), fm.opPin, fm.opPassword, this);
-    // QString jsnin, jsnout, err;
-    // int result;
-    // result = pt.printTaxback(rseq.toInt(), crn, jsnin, jsnout, err);
-    // db[":f_id"] = db.uuid();
-    // db[":f_order"] = fUuid;
-    // db[":f_date"] = QDate::currentDate();
-    // db[":f_time"] = QTime::currentTime();
-    // db[":f_in"] = jsnin;
-    // db[":f_out"] = jsnout;
-    // db[":f_err"] = err;
-    // db[":f_result"] = result;
-    // db.insert("o_tax_log", false);
+    QJsonObject reply{{QStringLiteral("f_id"), QUuid::createUuid().toString(QUuid::WithoutBraces)},
+                      {QStringLiteral("f_order"), fUuid},
+                      {QStringLiteral("in"), QJsonDocument::fromJson(jsnin.toUtf8()).object()},
+                      {QStringLiteral("out"), QJsonDocument::fromJson(jsnout.toUtf8()).object()},
+                      {QStringLiteral("error"), err},
+                      {QStringLiteral("result"), result},
+                      {QStringLiteral("clear_fiscal"), true},
+                      {QStringLiteral("f_fiscal_machine_id"), mWorkStation.fiscalMachineId()}};
+    NInterface::query1(QStringLiteral("/engine/v2/common/fiscal/log"), mUser->mSessionKey, this, reply, [](const QJsonObject &) {});
 
-    // if(result != pt_err_ok) {
-    //     C5Message::error(err);
-    // } else {
-    //     db[":f_fiscal"] = QVariant();
-    //     db[":f_receiptnumber"] = QVariant();
-    //     db[":f_time"] = QVariant();
-    //     db.update("o_tax", "f_id", fUuid);
-    //     C5Message::info(tr("Taxback complete"));
-    // }
+    if (result != pt_err_ok) {
+        C5Message::error(err.isEmpty() ? tr("Fiscal error") : err);
+        return;
+    }
+    ui->leTaxNumber->clear();
+    ui->btnPrintFiscal->setVisible(true);
+    ui->btnTaxReturn->setVisible(false);
+    C5Message::info(tr("Taxback complete"));
 }
 
 void ViewOrder::on_btnClose_clicked()
@@ -222,79 +310,29 @@ void ViewOrder::on_btnCopyUUID_clicked()
 
 void ViewOrder::on_btnEditDeliveryMan_clicked()
 {
-    //todo
-    // QString id, name;
-
-    // if(DlgGetIDName::get(mUser,  id, name, idname_users_fullname) == false) {
-    //     return;
-    // }
-
-    // if(C5Message::question(tr("Confirm to change the deliveryman")) != QDialog::Accepted) {
-    //     return;
-    // }
-
-    // db[":f_deliveryman"] = id;
-
-    // if(db.update("o_header_options", "f_id", ui->leUUID->text())) {
-    //     ui->leDeliveryMan->setText(name);
-    // }
+    C5Message::info(tr("Not implemented"));
 }
 
 void ViewOrder::on_btnEditSaler_clicked()
 {
-    //TODO
-    // QString id, name;
-
-    // if(DlgGetIDName::get(mUser, id, name, idname_users_fullname) == false) {
-    //     return;
-    // }
-
-    // if(C5Message::question(tr("Confirm to change the saler")) != QDialog::Accepted) {
-    //     return;
-    // }
-
-    // db[":f_staff"] = id;
-
-    // if(db.update("o_header", "f_id", ui->leUUID->text())) {
-    //     ui->leSaler->setText(name);
-    // }
+    C5Message::info(tr("Not implemented"));
 }
 
 void ViewOrder::on_btnEditBuyer_clicked()
 {
-    //todo
-    // QString id, name;
-
-    // if(DlgGetIDName::get(mUser, id, name, idname_partners_full) == false) {
-    //     return;
-    // }
-
-    // if(C5Message::question(tr("Confirm to change the buyer")) != QDialog::Accepted) {
-    //     return;
-    // }
-
-    // db[":f_partner"] = id;
-
-    // if(db.update("o_header", "f_id", ui->leUUID->text())) {
-    //     ui->leBuyer->setText(name);
-    // }
+    C5Message::info(tr("Not implemented"));
 }
 
 void ViewOrder::on_btnPrintReceipt_clicked()
 {
-    if (!mWorkStation.defaultPrinter().isEmpty()) {
-        PrintReceiptGroup p;
-
-        p.print2(ui->leUUID->text());
-    }
+    PrintReceiptGroup::print2(ui->leUUID->text(), mUser, this);
 }
 
 void ViewOrder::on_btnPrintFiscal_clicked()
 {
-    if(C5Message::question(tr("Confirm to print fiscal")) != QDialog::Accepted) {
+    if (C5Message::question(tr("Confirm to print fiscal")) != QDialog::Accepted) {
         return;
     }
-
     printCheckWithTax(ui->leUUID->text(), [this](auto rseq) { ui->leTaxNumber->setText(rseq); });
 }
 
@@ -306,19 +344,35 @@ void ViewOrder::printCheckWithTax(const QString &id, std::function<void(const QS
             return;
         }
 
-        QJsonObject jheader = jo.value("header").toObject();
         QJsonObject jpartner = jo.value("partner").toObject();
         QJsonArray jgoods = jo.value("goods").toArray();
-        double card = jheader.value("f_amountcard").toDouble();
-        double idram = jheader.value("f_idram").toDouble();
+        const double cash = fHeader.value(QStringLiteral("f_amount_cash")).toDouble();
+        const double card = fHeader.value(QStringLiteral("f_amount_card")).toDouble();
+        const double idram = fHeader.value(QStringLiteral("f_amount_idram")).toDouble();
+        const double telcell = fHeader.value(QStringLiteral("f_amount_telcell")).toDouble();
+        const double prepaid = fHeader.value(QStringLiteral("f_amount_prepaid")).toDouble();
+        const double nonCash = card + idram + telcell;
+        int paymentSystem = -1;
+        bool forceInternalPos = false;
+        if (card >= idram && card >= telcell && card > 0.001) {
+            paymentSystem = 1;
+        } else if (idram >= telcell && idram > 0.001) {
+            paymentSystem = 13;
+            forceInternalPos = true;
+        } else if (telcell > 0.001) {
+            paymentSystem = 10;
+            forceInternalPos = true;
+        }
 
         FiscalMachine fm = getFiscalMachine(mWorkStation.fiscalMachineId());
-        QString useExtPos = idram > 0.01 ? "true" : fm.externalPosString();
         QString partnerTIN = jpartner.value("f_taxcode").toString();
 
-        // Создаем pt в куче (new), так как функция закончится раньше, чем придет ответ от фискалки
-        // Указываем 'this' как родителя для автоматической очистки при закрытии окна
-        PrintTaxN *pt = new PrintTaxN(fm.ip, fm.port, fm.machinePassword, useExtPos, fm.opPin, fm.opPassword, this);
+        PrintTaxN *pt = new PrintTaxN(
+            fm.ip, fm.port, fm.machinePassword, fm.externalPosString(), fm.opPin, fm.opPassword, this);
+        pt->setPaymentSystem(paymentSystem);
+        if (forceInternalPos) {
+            pt->setUseExtPosOverride(QStringLiteral("false"));
+        }
 
         if (partnerTIN.length() == 8 && ui->btnPrintPartnerTIN->isChecked()) {
             pt->fPartnerTin = partnerTIN;
@@ -335,7 +389,6 @@ void ViewOrder::printCheckWithTax(const QString &id, std::function<void(const QS
                          jg.value("f_discountfactor").toDouble() * 100);
         }
 
-        // Подписываемся на результат
         connect(pt,
                 &PrintTaxN::finished,
                 this,
@@ -345,9 +398,9 @@ void ViewOrder::printCheckWithTax(const QString &id, std::function<void(const QS
                                       {"in", QJsonDocument::fromJson(jsonIn.toUtf8()).object()},
                                       {"out", QJsonDocument::fromJson(jsonOut.toUtf8()).object()},
                                       {"error", err},
-                                      {"result", result}};
+                                      {"result", result},
+                                      {"f_fiscal_machine_id", mWorkStation.fiscalMachineId()}};
 
-                    // Логируем результат на сервер
                     NInterface::query(
                         "/engine/v2/common/fiscal/log",
                         mUser->mSessionKey,
@@ -364,12 +417,10 @@ void ViewOrder::printCheckWithTax(const QString &id, std::function<void(const QS
                         C5Message::error(err.isEmpty() ? tr("Fiscal error") : err);
                     }
 
-                    // Удаляем объект pt после завершения работы
                     pt->deleteLater();
                 });
 
-        // Запускаем печать
-        pt->makeJsonAndPrint(card, 0);
+        pt->makeJsonAndPrint(cash, nonCash, prepaid);
     });
 }
 
@@ -377,148 +428,364 @@ void ViewOrder::on_btnPrintReceiptA4_clicked()
 {
     C5PrintReciptA4 p(ui->leUUID->text(), mUser, this);
     QString err;
-
-    if(!p.print(err)) {
+    if (!p.print(err)) {
         C5Message::error(err);
     }
 }
 
 void ViewOrder::on_btnMakeDraft_clicked()
 {
-    if(ui->leDate->date().daysTo(QDate::currentDate()) > 14) {
-        C5Message::error(tr("You cannot return this item"));
+    if ((int)fHeader.value(QStringLiteral("f_state")).toInt() != 2) {
+        C5Message::error(tr("Order is not closed"));
         return;
     }
 
-    if(ui->leDate->date().daysTo(QDate::currentDate()) > 14) {
-        C5Message::error(tr("You cannot return this item"));
+    const QJsonObject fiscal = fHeader.value(QStringLiteral("f_fiscal")).toObject();
+    const bool hasFiscal = fiscal.value(QStringLiteral("rseq")).toInt() > 0;
+
+    const QString confirmMsg = hasFiscal
+                                   ? tr("Fiscal receipt exists. Print taxback and return this sale to editing?")
+                                   : tr("Return this sale to editing?");
+    if (C5Message::question(confirmMsg) != QDialog::Accepted) {
         return;
     }
 
-    if(C5Message::question(tr("Confirm to make draft")) != QDialog::Accepted) {
+    QPointer<ViewOrder> self(this);
+
+    auto runMakeDraft = [self]() {
+        if (!self || !self->fWorking) {
+            if (self) {
+                C5Message::error(tr("Working window is not available"));
+            }
+            return;
+        }
+        int tableHint = self->fHeader.value(QStringLiteral("f_table")).toInt();
+        QSet<int> used;
+        if (self->fWorking->fTab) {
+            for (int i = 0; i < self->fWorking->fTab->count(); ++i) {
+                if (auto *wo = qobject_cast<WOrder *>(self->fWorking->fTab->widget(i))) {
+                    used.insert(wo->tableId());
+                }
+            }
+        }
+        if (tableHint <= 0 || used.contains(tableHint)) {
+            tableHint = self->fWorking->allocateFreeTableId();
+        }
+        if (tableHint <= 0) {
+            C5Message::error(tr("No free tables in hall %1. Create more tables in h_tables or close unused sale tabs.")
+                                 .arg(mWorkStation.defaultHallId()));
+            return;
+        }
+
+        NInterface::query1(QStringLiteral("/engine/v2/shop/view-order/make-draft"),
+                           self->mUser->mSessionKey,
+                           self,
+                           {{QStringLiteral("id"), self->fUuid},
+                            {QStringLiteral("table"), tableHint},
+                            {QStringLiteral("hall"), mWorkStation.defaultHallId()}},
+                           [self](const QJsonObject &jo) {
+                               if (!self || !self->fWorking) {
+                                   return;
+                               }
+                               if (!self->fWorking->openExistingSale(jo)) {
+                                   return;
+                               }
+                               self->accept();
+                           });
+    };
+
+    // After successful KKM taxback: persist clear on server, then continue make-draft.
+    auto afterFiscalCleared = [self, runMakeDraft]() {
+        if (!self) {
+            return;
+        }
+        self->fHeader.remove(QStringLiteral("f_fiscal"));
+        self->fHeader.insert(QStringLiteral("f_fiscal_taxback_at"),
+                             QDateTime::currentDateTime().toString(Qt::ISODate));
+        self->ui->leTaxNumber->clear();
+        self->ui->btnPrintFiscal->setVisible(true);
+        self->ui->btnTaxReturn->setVisible(false);
+        runMakeDraft();
+    };
+
+    auto clearFiscalOnServer = [self, afterFiscalCleared]() {
+        if (!self) {
+            return;
+        }
+        NInterface::query1(QStringLiteral("/engine/v2/shop/view-order/clear-fiscal"),
+                           self->mUser->mSessionKey,
+                           self,
+                           {{QStringLiteral("id"), self->fUuid}},
+                           [afterFiscalCleared](const QJsonObject &) { afterFiscalCleared(); });
+    };
+
+    if (!hasFiscal) {
+        runMakeDraft();
         return;
     }
 
-    fHttp->createHttpQuery("/engine/shop/make-draft.php", QJsonObject{{"id", ui->leUUID->text()}}, SLOT(
-        removeOrderResponse(QJsonObject)));
+    FiscalMachine fm = getFiscalMachine(mWorkStation.fiscalMachineId());
+    if (fm.id == 0) {
+        C5Message::error(tr("Fiscal machine is not configured"));
+        return;
+    }
+
+    PrintTaxN pt(fm.ip, fm.port, fm.machinePassword, fm.externalPosString(), fm.opPin, fm.opPassword, this);
+    QString jsnin, jsnout, err;
+    const int result = pt.printTaxback(fiscal.value(QStringLiteral("rseq")).toInt(),
+                                       fiscal.value(QStringLiteral("crn")).toString(),
+                                       jsnin,
+                                       jsnout,
+                                       err);
+
+    QJsonObject reply{{QStringLiteral("f_id"), QUuid::createUuid().toString(QUuid::WithoutBraces)},
+                      {QStringLiteral("f_order"), fUuid},
+                      {QStringLiteral("in"), QJsonDocument::fromJson(jsnin.toUtf8()).object()},
+                      {QStringLiteral("out"), QJsonDocument::fromJson(jsnout.toUtf8()).object()},
+                      {QStringLiteral("error"), err},
+                      {QStringLiteral("result"), result},
+                      {QStringLiteral("clear_fiscal"), true},
+                      {QStringLiteral("f_fiscal_machine_id"), mWorkStation.fiscalMachineId()}};
+
+    if (result != pt_err_ok) {
+        // Taxback already done on device, but DB still has fiscal — offer continue.
+        const QString failMsg = err.isEmpty() ? tr("Fiscal error") : err;
+        if (C5Message::question(
+                failMsg + QStringLiteral("\n\n")
+                + tr("If fiscal was already cancelled, clear it and continue make draft?"))
+            != QDialog::Accepted) {
+            return;
+        }
+        clearFiscalOnServer();
+        return;
+    }
+
+    // Must persist clear BEFORE make-draft; otherwise retry tries KKM again and sticks.
+    NInterface::query1(QStringLiteral("/engine/v2/common/fiscal/log"),
+                       mUser->mSessionKey,
+                       this,
+                       reply,
+                       [afterFiscalCleared](const QJsonObject &) {
+                           // clear_fiscal already applied in InsertLog; refresh UI and continue.
+                           afterFiscalCleared();
+                       });
+}
+
+bool ViewOrder::printPartialTaxback(double returnAmount, QJsonObject &fiscalOut, QString &err)
+{
+    const QJsonObject fiscal = fHeader.value(QStringLiteral("f_fiscal")).toObject();
+    const int rseq = fiscal.value(QStringLiteral("rseq")).toInt();
+    const QString crn = fiscal.value(QStringLiteral("crn")).toString();
+    if (rseq <= 0 || crn.isEmpty()) {
+        return true; // no fiscal — ok
+    }
+
+    FiscalMachine fm = getFiscalMachine(mWorkStation.fiscalMachineId());
+    if (fm.id == 0) {
+        err = tr("Fiscal machine is not configured");
+        return false;
+    }
+
+    PrintTaxN pt(fm.ip, fm.port, fm.machinePassword, fm.externalPosString(), fm.opPin, fm.opPassword, this);
+
+    const double cashPaid = fHeader.value(QStringLiteral("f_amount_cash")).toDouble();
+    const double cardPaid = fHeader.value(QStringLiteral("f_amount_card")).toDouble()
+                            + fHeader.value(QStringLiteral("f_amount_idram")).toDouble()
+                            + fHeader.value(QStringLiteral("f_amount_telcell")).toDouble();
+    const double prepaidPaid = fHeader.value(QStringLiteral("f_amount_prepaid")).toDouble();
+
+    if (cashPaid > 0.01) {
+        pt.fCashAmountForReturn = returnAmount;
+    } else if (cardPaid > 0.01) {
+        pt.fCardAmountForReturn = returnAmount;
+    } else if (prepaidPaid > 0.01) {
+        pt.fPrepaymentAmountForReturn = returnAmount;
+    } else {
+        // debt/bank only — fiscal return often skipped
+        return true;
+    }
+
+    for (int i = 0; i < ui->tbl->rowCount(); i++) {
+        if (!ui->tbl->checkBox(i, 1)->isChecked()) {
+            continue;
+        }
+        double qty = 0;
+        if (auto *le = ui->tbl->lineEdit(i, 9)) {
+            qty = le->getDouble();
+        } else {
+            qty = ui->tbl->getDouble(i, 9);
+        }
+        if (qty < 0.0001) {
+            continue;
+        }
+        const int fiscalRow = ui->tbl->item(i, 0)->data(Qt::UserRole + 1).toInt();
+        pt.addReturnItem(fiscalRow, qty);
+    }
+
+    QString jsnin, jsnout;
+    const int result = pt.printTaxback(rseq, crn, jsnin, jsnout, err);
+    fiscalOut = QJsonObject{{QStringLiteral("in"), QJsonDocument::fromJson(jsnin.toUtf8()).object()},
+                            {QStringLiteral("out"), QJsonDocument::fromJson(jsnout.toUtf8()).object()},
+                            {QStringLiteral("error"), err},
+                            {QStringLiteral("result"), result},
+                            {QStringLiteral("err"), err},
+                            {QStringLiteral("f_fiscal_machine_id"), mWorkStation.fiscalMachineId()}};
+
+    NInterface::query1(QStringLiteral("/engine/v2/common/fiscal/log"),
+                       mUser->mSessionKey,
+                       this,
+                       QJsonObject{{QStringLiteral("f_id"), QUuid::createUuid().toString(QUuid::WithoutBraces)},
+                                   {QStringLiteral("f_order"), fUuid},
+                                   {QStringLiteral("in"), fiscalOut.value(QStringLiteral("in"))},
+                                   {QStringLiteral("out"), fiscalOut.value(QStringLiteral("out"))},
+                                   {QStringLiteral("error"), err},
+                                   {QStringLiteral("result"), result},
+                                   {QStringLiteral("f_fiscal_machine_id"), mWorkStation.fiscalMachineId()}},
+                       [](const QJsonObject &) {});
+
+    return result == pt_err_ok;
+}
+
+void ViewOrder::submitReturn(const QJsonObject &fiscalInfo)
+{
+    QJsonArray items;
+    for (int i = 0; i < ui->tbl->rowCount(); i++) {
+        if (!ui->tbl->checkBox(i, 1)->isChecked()) {
+            continue;
+        }
+        double qty = 0;
+        if (auto *le = ui->tbl->lineEdit(i, 9)) {
+            qty = le->getDouble();
+        } else {
+            qty = ui->tbl->getDouble(i, 9);
+        }
+        if (qty < 0.0001) {
+            continue;
+        }
+        items.append(QJsonObject{{QStringLiteral("id"), ui->tbl->getString(i, 0)},
+                                 {QStringLiteral("qty"), qty}});
+    }
+
+    const int cashSessionId = Working::working()->cashSessionId();
+    QJsonObject params{{QStringLiteral("id"), fUuid},
+                       {QStringLiteral("reason_id"), ui->leReturnReason->property("reason").toInt()},
+                       {QStringLiteral("items"), items},
+                       {QStringLiteral("cash_session_id"), cashSessionId},
+                       {QStringLiteral("cashbox_id"), mWorkStation.cashboxId()},
+                       {QStringLiteral("store_id"), mWorkStation.defaultStoreId()}};
+    if (!fiscalInfo.isEmpty()) {
+        params.insert(QStringLiteral("fiscal"), fiscalInfo);
+    }
+
+    QPointer<ViewOrder> self(this);
+    NInterface::query1(QStringLiteral("/engine/v2/shop/view-order/create-return"),
+                       mUser->mSessionKey,
+                       this,
+                       params,
+                       [self](const QJsonObject &jo) {
+                           if (!self) {
+                               return;
+                           }
+                           Q_UNUSED(jo);
+                           C5Message::info(tr("Return completed"));
+                           self->accept();
+                       });
 }
 
 void ViewOrder::on_btnSaveReturn_clicked()
 {
-    if(ui->leReturnReason->property("reason").toInt() == 0) {
-        C5Message::error(tr("he return reason must be specified."));
+    if (ui->leReturnReason->property("reason").toInt() == 0) {
+        C5Message::error(tr("The return reason must be specified."));
         return;
     }
 
-    C5Message::info(tr("Return completed"));
+    double returnAmount = 0;
+    bool any = false;
+    for (int i = 0; i < ui->tbl->rowCount(); i++) {
+        if (!ui->tbl->checkBox(i, 1)->isChecked()) {
+            continue;
+        }
+        double qty = 0;
+        if (auto *le = ui->tbl->lineEdit(i, 9)) {
+            qty = le->getDouble();
+        } else {
+            qty = ui->tbl->getDouble(i, 9);
+        }
+        if (qty < 0.0001) {
+            continue;
+        }
+        const double maxQty = ui->tbl->item(i, 0)->data(Qt::UserRole + 2).toDouble();
+        if (qty > maxQty + 0.0001) {
+            C5Message::error(tr("Invalid qty"));
+            return;
+        }
+        any = true;
+        returnAmount += qty * ui->tbl->getDouble(i, 4);
+    }
+    if (!any || returnAmount < 0.01) {
+        C5Message::error(tr("Nothing to return"));
+        return;
+    }
+
+    if (Working::working()->cashSessionId() <= 0) {
+        C5Message::error(tr("Cashbox session is not open"));
+        return;
+    }
+    if (mWorkStation.defaultStoreId() <= 0) {
+        C5Message::error(tr("Store is not defined"));
+        return;
+    }
+
+    ui->btnSaveReturn->setEnabled(false);
+
+    QJsonObject fiscalInfo;
+    QString err;
+    if (!printPartialTaxback(returnAmount, fiscalInfo, err)) {
+        ui->btnSaveReturn->setEnabled(true);
+        C5Message::error(err.isEmpty() ? tr("Fiscal error") : err);
+        return;
+    }
+
+    submitReturn(fiscalInfo);
 }
 
 void ViewOrder::on_tbl_cellClicked(int row, int column)
 {
-    if(column < 2) {
+    if (!property("return").toBool()) {
+        return;
+    }
+    if (!ui->tbl->checkBox(row, 1)->isEnabled()) {
         return;
     }
 
-    if(!property("return").toBool()) {
-        return;
+    // Click on goods name toggles selection and focuses return qty
+    if (column == 2 || column == 1) {
+        auto *cb = ui->tbl->checkBox(row, 1);
+        if (column == 2) {
+            cb->setChecked(!cb->isChecked());
+        }
+        if (cb->isChecked()) {
+            if (auto *le = ui->tbl->lineEdit(row, 9)) {
+                if (le->getDouble() < 0.0001) {
+                    const double available = ui->tbl->item(row, 0)->data(Qt::UserRole + 2).toDouble();
+                    le->setDouble(available);
+                }
+                le->setFocus();
+                le->selectAll();
+            }
+        } else if (auto *le = ui->tbl->lineEdit(row, 9)) {
+            le->setDouble(0);
+        }
+        countOrder();
     }
-
-    double maxqty = ui->tbl->item(row, 3)->data(Qt::UserRole).toDouble();
-    double newqty = DQty::getQty(tr("Quantity"), maxqty, this);
-
-    if(newqty < 0) {
-        return;
-    }
-
-    ui->tbl->setDouble(row, 3, newqty);
-    countOrder();
 }
 
 void ViewOrder::on_btnEditReason_clicked()
 {
+    on_btnReturn_clicked();
 }
 
 void ViewOrder::on_btnPrintPrices_clicked()
 {
-    QString ppp = "f_price1";
-
-    if(C5Message::question("Զեղչված՞") == QDialog::Accepted) {
-        ppp = "f_price1disc";
-    }
-
-    QPrintDialog pd;
-    QString printerName;
-
-    if(pd.exec() == QDialog::Accepted) {
-        printerName = pd.printer()->printerName();
-    } else {
-        return;
-    }
-
-    //todo
-    // db[":f_header"] = ui->leUUID->text();
-    // QString sql = R"(
-    // SELECT og.f_goods, gc.f_goods as gg,
-    // cast(gc.f_qty as unsigned) as f_qty,
-    // cast(og.f_qty as  unsigned) as f_qty2,
-    // coalesce(gp.%1,0) as fp1,
-    // coalesce(gp2.%1,0) as fp2
-    // FROM o_goods og
-    // LEFT JOIN c_goods g ON g.f_id=og.f_goods
-    // LEFT JOIN c_goods_complectation gc ON gc.f_base=og.f_goods and g.f_unit=10
-    // LEFT JOIN c_goods_prices gp ON gp.f_goods=gc.f_goods
-    // LEFT JOIN c_goods_prices gp2 ON gp2.f_goods=og.f_goods
-    // WHERE f_header=:f_header
-    // ORDER BY og.f_row desc
-    //           )";
-    // sql.replace("%1", ppp);
-    // db.exec(sql);
-
-    // while(db.nextRow()) {
-    //     QFont font(qApp->font());
-    //     font.setPointSize(44);
-    //     font.setBold(true);
-    //     C5Printing p;
-    //     QPrinterInfo pi = QPrinterInfo::printerInfo(printerName);
-    //     QPrinter printer(pi);
-    //     printer.setPageSize(QPageSize::Custom);
-    //     printer.setFullPage(false);
-    //     QRectF pr = printer.pageRect(QPrinter::DevicePixel);
-    //     constexpr qreal SAFE_RIGHT_MM = 2.0;
-    //     qreal safePx = SAFE_RIGHT_MM * printer.logicalDpiX() / 25.4;
-    //     p.setSceneParams(pr.width() - safePx, pr.height(), printer.logicalDpiX());
-
-    //     if(ppp == "f_price1") {
-    //         p.setSceneParams(350, 100, QPageLayout::Portrait);
-    //     } else {
-    //         p.setSceneParams(350, 100, QPageLayout::Portrait);
-    //     }
-
-    //     p.setFont(font);
-    //     p.br(2);
-    //     p.br(6);
-    //     bool print = false;
-    //     int qty =  db.getInt("f_qty");
-    //     //p.line(4);
-    //     p.line();
-
-    //     if(db.getInt("gg") == 0) {
-    //         if(db.getDouble("fp2") > 0) {
-    //             print = true;
-    //             p.ctext(float_str(db.getDouble("fp2"), 1) + "֏");
-    //             qty =  db.getInt("f_qty2");
-    //         }
-    //     } else {
-    //         if(db.getDouble("fp1") > 0) {
-    //             print = true;
-    //             p.ctext(float_str(db.getDouble("fp1"), 1) + "֏");
-    //         }
-    //     }
-
-    //     if(print) {
-    //         for(int i = 0; i < qty; i++) {
-    //             p.print(printer);
-    //         }
-    //     }
-    // }
+    C5Message::info(tr("Not implemented"));
 }

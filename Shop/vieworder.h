@@ -2,13 +2,14 @@
 #define VIEWORDER_H
 
 #include "c5shopdialog.h"
+#include <QJsonObject>
+#include <functional>
 
 namespace Ui
 {
 class ViewOrder;
 }
 
-class C5Database;
 class Working;
 
 class ViewOrder : public C5ShopDialog
@@ -60,9 +61,19 @@ private:
 
     QString fUuid;
 
-    Working* fWorking;
+    Working *fWorking;
+
+    QJsonObject fHeader;
+
+    void loadOrder();
+
+    void fillFromJson(const QJsonObject &jo);
 
     void countOrder();
+
+    void submitReturn(const QJsonObject &fiscalInfo);
+
+    bool printPartialTaxback(double returnAmount, QJsonObject &fiscalOut, QString &err);
 };
 
 #endif // VIEWORDER_H

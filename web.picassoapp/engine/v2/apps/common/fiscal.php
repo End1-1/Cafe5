@@ -16,12 +16,34 @@ class Fiscal extends Auth
         $v["f_elapsed"] = $params->elapsed ?? 0;
         $v["f_in"] = is_string($params->in) ? $params->in : json_encode($params->in, JSON_UNESCAPED_UNICODE);
         $v["f_out"] = is_string($params->out) ? $params->out : json_encode($params->out, JSON_UNESCAPED_UNICODE);
-        $v["f_err"] = $params->error;
+        $v["f_err"] = $params->error ?? $params->err ?? "";
         $v["f_result"] = $params->result;
         $v["f_state"] = $params->result === 0 ? 1 : 0;
+        $machineId = (int)($params->f_fiscal_machine_id ?? $params->f_machine ?? 0);
+        if ($machineId > 0) {
+            $v["f_fiscal_machine_id"] = $machineId;
+        }
         $this->insert("o_tax_log", $v);
-        if ($params->result === 0) {
-            $this->updateJsonField("o_header", $params->f_order, "f_data", "f_fiscal", is_string($params->out) ? json_decode($params->out, true) : $params->out);
+        if ((int)($params->result ?? -1) === 0) {
+            // Taxback / make-draft: drop sale fiscal so retry does not try to cancel KKM again.
+            if (!empty($params->clear_fiscal)) {
+                $this->updateJsonField("o_header", $params->f_order, "f_data", "f_fiscal", new stdClass());
+                $this->updateJsonField(
+                    "o_header",
+                    $params->f_order,
+                    "f_data",
+                    "f_fiscal_taxback_at",
+                    date("Y-m-d H:i:s")
+                );
+            } else {
+                $this->updateJsonField(
+                    "o_header",
+                    $params->f_order,
+                    "f_data",
+                    "f_fiscal",
+                    is_string($params->out) ? json_decode($params->out, true) : $params->out
+                );
+            }
         }
     }
 

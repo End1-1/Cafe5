@@ -1,9 +1,15 @@
 #include "dlgpin.h"
+#include <QAction>
+#include <QEvent>
+#include <QIcon>
 #include <QJsonArray>
 #include <QJsonObject>
 #include <QKeyEvent>
+#include <QMenu>
+#include <QPoint>
 #include "appwebsocket.h"
 #include "c5connectiondialog.h"
+#include "c5uilanguage.h"
 #include "c5user.h"
 #include "ndataprovider.h"
 #include "ninterface.h"
@@ -20,11 +26,28 @@ DlgPin::DlgPin(QWidget *parent) :
     fLastError = false;
     installEventFilter(this);
     fDoNotAuth = false;
+    updateLangButton();
 }
 
 DlgPin::~DlgPin()
 {
     delete ui;
+}
+
+void DlgPin::changeEvent(QEvent *e)
+{
+    C5ShopDialog::changeEvent(e);
+    if(e->type() == QEvent::LanguageChange) {
+        ui->retranslateUi(this);
+        updateLangButton();
+    }
+}
+
+void DlgPin::updateLangButton()
+{
+    const QString lang = C5UiLanguage::current();
+    ui->btnLang->setIcon(QIcon(C5UiLanguage::flagIcon(lang)));
+    ui->btnLang->setToolTip(C5UiLanguage::displayName(lang));
 }
 
 bool DlgPin::getPin(QString &pin, QString &pass, bool donotauth)
@@ -244,4 +267,35 @@ void DlgPin::on_btnSettings_clicked()
     C5ConnectionDialog::showSettings(this);
     NDataProvider::mProtocol = C5ConnectionDialog::instance()->noneSecure ? "http" : "https";
     NDataProvider::mHost = C5ConnectionDialog::instance()->serverAddress();
+}
+
+void DlgPin::on_btnLang_clicked()
+{
+    const QString current = C5UiLanguage::current();
+    QMenu menu(this);
+
+    auto *actAm = menu.addAction(QIcon(C5UiLanguage::flagIcon(C5UiLanguage::kAm)),
+                                 C5UiLanguage::displayName(C5UiLanguage::kAm));
+    actAm->setData(QString(C5UiLanguage::kAm));
+    actAm->setCheckable(true);
+    actAm->setChecked(current == QLatin1String(C5UiLanguage::kAm));
+
+    auto *actRu = menu.addAction(QIcon(C5UiLanguage::flagIcon(C5UiLanguage::kRu)),
+                                 C5UiLanguage::displayName(C5UiLanguage::kRu));
+    actRu->setData(QString(C5UiLanguage::kRu));
+    actRu->setCheckable(true);
+    actRu->setChecked(current == QLatin1String(C5UiLanguage::kRu));
+
+    QAction *chosen = menu.exec(ui->btnLang->mapToGlobal(QPoint(0, ui->btnLang->height())));
+    if(!chosen) {
+        return;
+    }
+
+    const QString lang = chosen->data().toString();
+    if(lang == current) {
+        return;
+    }
+
+    C5UiLanguage::apply(lang);
+    updateLangButton();
 }

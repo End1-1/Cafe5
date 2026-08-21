@@ -235,7 +235,7 @@ class Revenue
     protected function getFilterConfig()
     {
         return [
-            ["type" => "combobox", "name" => "viewmode", "label" => Translator::t("View mode"), "default" => 1, "values" => [
+            ["type" => "viewmode", "name" => "viewmode", "label" => Translator::t("View mode"), "default" => 1, "values" => [
                 ["label" => Translator::t("Total by cashboxes"), "value" => 1],
                 ["label" => Translator::t("Detailed movement"), "value" => 2],
             ]],

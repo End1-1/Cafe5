@@ -6,18 +6,31 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>720</width>
-    <height>420</height>
+    <width>820</width>
+    <height>460</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Select invoice</string>
+   <string>Select invoices</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
     <widget class="QLabel" name="label">
      <property name="text">
-      <string>Select invoice to import</string>
+      <string>Check invoices to import. The first checked one is imported into the current document; the others open in new windows. Double-click a row to preview invoice lines.</string>
+     </property>
+     <property name="wordWrap">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QLineEdit" name="leSearch">
+     <property name="placeholderText">
+      <string>Search…</string>
+     </property>
+     <property name="clearButtonEnabled">
+      <bool>true</bool>
      </property>
     </widget>
    </item>
@@ -32,32 +45,38 @@
      <property name="editTriggers">
       <set>QAbstractItemView::EditTrigger::NoEditTriggers</set>
      </property>
-     <column>
-      <property name="text">
-       <string>Supplier</string>
-      </property>
-     </column>
-     <column>
-      <property name="text">
-       <string>TIN</string>
-      </property>
-     </column>
-     <column>
-      <property name="text">
-       <string>Invoice #</string>
-      </property>
-     </column>
-     <column>
-      <property name="text">
-       <string>Date</string>
-      </property>
-     </column>
-     <column>
-      <property name="text">
-       <string>Total</string>
-      </property>
-     </column>
     </widget>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout">
+     <item>
+      <widget class="QPushButton" name="btnSelectAll">
+       <property name="text">
+        <string>Select all</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="btnClearAll">
+       <property name="text">
+        <string>Clear all</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="horizontalSpacer">
+       <property name="orientation">
+        <enum>Qt::Orientation::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+    </layout>
    </item>
    <item>
     <widget class="QDialogButtonBox" name="buttonBox">

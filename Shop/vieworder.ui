@@ -371,7 +371,7 @@
      </column>
      <column>
       <property name="text">
-       <string>Returned</string>
+       <string>Return qty</string>
       </property>
      </column>
      <column>

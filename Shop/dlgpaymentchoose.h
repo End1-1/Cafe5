@@ -37,8 +37,6 @@ private:
 
     void setFiscalStyle();
 
-    void checkFiscal();
-
     void clearAll(QLineEdit *le);
 
     void countChange();
@@ -48,6 +46,8 @@ private:
     double fMaxPrepaid;
 
 private slots:
+    void checkFiscal();
+
     void on_btnCashRemain_clicked();
 
     void on_btnBack_clicked();

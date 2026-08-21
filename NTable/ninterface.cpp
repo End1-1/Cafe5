@@ -21,6 +21,45 @@ void ninterfaceShowError(const QString &msg)
 
 } // namespace
 
+int NInterface::sSuppressProgress = 0;
+QPointer<NLoadingDlg> NInterface::sCurrentLoading;
+QString NInterface::sPendingLoadingTitle;
+
+void NInterface::pushSuppressProgress()
+{
+    ++sSuppressProgress;
+}
+
+void NInterface::popSuppressProgress()
+{
+    if (sSuppressProgress > 0) {
+        --sSuppressProgress;
+    }
+}
+
+bool NInterface::isProgressSuppressed()
+{
+    return sSuppressProgress > 0;
+}
+
+void NInterface::setLoadingTitle(const QString &title)
+{
+    fLoadingTitle = title;
+    if (fLoadingDlg) {
+        fLoadingDlg->setTitle(title);
+    }
+}
+
+void NInterface::prepareLoadingTitle(const QString &title)
+{
+    sPendingLoadingTitle = title;
+}
+
+NLoadingDlg *NInterface::currentLoadingDialog()
+{
+    return sCurrentLoading.data();
+}
+
 NInterface::NInterface(QObject *parent)
     : QObject{parent},
       fErrorSlot(nullptr),
@@ -38,6 +77,9 @@ NInterface::~NInterface()
 void NInterface::createHttpQuery(const QString &route, const QJsonObject &params, const char* slotResponse,
                                  const QVariant &marks, bool progress, int timeout)
 {
+    if (isProgressSuppressed()) {
+        progress = false;
+    }
     fProgress = progress;
     auto *np = new NDataProvider();
     np->changeTimeout(timeout);
@@ -60,6 +102,9 @@ void NInterface::createHttpQueryLambda(const QString &route, const QJsonObject &
                                        std::function<void (const QJsonObject&)> errCallback,
                                        const QVariant &marks, bool progress, int timeout)
 {
+    if (isProgressSuppressed()) {
+        progress = false;
+    }
     fProgress = progress;
     auto *np = new NDataProvider();
     np->changeTimeout(timeout);
@@ -104,6 +149,9 @@ void NInterface::createHttpQueryLambda2(const QString &route, const QJsonObject 
                                         std::function<bool (const QJsonObject&)> errCallback,
                                         const QVariant &marks, bool progress, int timeout)
 {
+    if (isProgressSuppressed()) {
+        progress = false;
+    }
     fProgress = progress;
     auto *np = new NDataProvider();
     np->changeTimeout(timeout);
@@ -151,6 +199,10 @@ void NInterface::query(const QString &route, const QString &bearer, QObject *con
         return;
     }
 
+    if (isProgressSuppressed()) {
+        progress = false;
+    }
+
     auto *i = new NInterface();
     QPointer<NInterface> iface(i);
     i->fProgress = progress;
@@ -164,6 +216,9 @@ void NInterface::query(const QString &route, const QString &bearer, QObject *con
 
         if(iface->fProgress || iface->fLoadingDlg) {
             if(iface->fLoadingDlg) {
+                if (NInterface::sCurrentLoading == iface->fLoadingDlg) {
+                    NInterface::sCurrentLoading.clear();
+                }
                 iface->fLoadingDlg->hide();
             }
         }
@@ -236,20 +291,37 @@ void NInterface::query1(const QString &route, const QString &bearer, QObject *co
             return false;
         },
         true,
-        5000,
+        60000,
         false);
 }
 
 void NInterface::httpQueryStarted()
 {
+    if (isProgressSuppressed()) {
+        return;
+    }
     if(!fLoadingDlg) {
         if(fProgress) {
             QWidget *parentWidget = qobject_cast<QWidget *>(parent());
-            fLoadingDlg = new NLoadingDlg(tr("Query"), parentWidget);
+            QString title = fLoadingTitle;
+            if (title.isEmpty()) {
+                title = sPendingLoadingTitle;
+            }
+            if (title.isEmpty()) {
+                title = tr("Query");
+            }
+            sPendingLoadingTitle.clear();
+            fLoadingDlg = new NLoadingDlg(title, parentWidget);
         }
+    } else if (!fLoadingTitle.isEmpty()) {
+        fLoadingDlg->setTitle(fLoadingTitle);
+    } else if (!sPendingLoadingTitle.isEmpty()) {
+        fLoadingDlg->setTitle(sPendingLoadingTitle);
+        sPendingLoadingTitle.clear();
     }
 
     if(fProgress) {
+        sCurrentLoading = fLoadingDlg;
         if (fLoadingDlg->parentWidget()) {
             fLoadingDlg->move(fLoadingDlg->parentWidget()->window()->geometry().center() - fLoadingDlg->rect().center());
         }
@@ -262,13 +334,30 @@ void NInterface::httpQueryStarted()
 
 void NInterface::httpQueryStartedWithShowDialog()
 {
+    if (isProgressSuppressed()) {
+        return;
+    }
     if(!fLoadingDlg) {
         if(fProgress) {
-            fLoadingDlg = new NLoadingDlg(tr("Query"), static_cast<QWidget*>(this->parent()));
+            QString title = fLoadingTitle;
+            if (title.isEmpty()) {
+                title = sPendingLoadingTitle;
+            }
+            if (title.isEmpty()) {
+                title = tr("Query");
+            }
+            sPendingLoadingTitle.clear();
+            fLoadingDlg = new NLoadingDlg(title, static_cast<QWidget*>(this->parent()));
         }
+    } else if (!fLoadingTitle.isEmpty()) {
+        fLoadingDlg->setTitle(fLoadingTitle);
+    } else if (!sPendingLoadingTitle.isEmpty()) {
+        fLoadingDlg->setTitle(sPendingLoadingTitle);
+        sPendingLoadingTitle.clear();
     }
 
     if(fProgress) {
+        sCurrentLoading = fLoadingDlg;
         fLoadingDlg->resetSeconds();
         fLoadingDlg->open();
         fLoadingDlg->raise();
@@ -278,6 +367,9 @@ void NInterface::httpQueryStartedWithShowDialog()
 void NInterface::httpQueryFinished(QObject *sender)
 {
     if(fLoadingDlg) {
+        if (sCurrentLoading == fLoadingDlg) {
+            sCurrentLoading.clear();
+        }
         fLoadingDlg->hide();
     }
 

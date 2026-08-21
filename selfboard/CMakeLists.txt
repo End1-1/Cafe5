@@ -46,6 +46,8 @@ set(SOURCES
     ../NTable/ndataprovider.cpp
     ../NTable/ninterface.cpp
     ../NTable/nloadingdlg.cpp
+    ../Cafe5/c5registrysettings.cpp
+    ../Cafe5/c5uilanguage.cpp
     ../Classes/logwriter.cpp
     ../Classes/QProgressIndicator.cpp
 )
@@ -79,6 +81,8 @@ set(HEADERS
     ordercart.h
     selfboarddisplay.h
     version.h
+    ../Cafe5/c5registrysettings.h
+    ../Cafe5/c5uilanguage.h
     ../Classes/format_bytes.h
 )
 

@@ -21,6 +21,74 @@
 #include "struct_storage_item.h"
 #include "struct_goods_group.h"
 
+namespace {
+
+QString digitsOnly(const QString &s)
+{
+    QString out;
+    out.reserve(s.size());
+    for (const QChar &c : s) {
+        if (c.isDigit()) {
+            out.append(c);
+        }
+    }
+    return out;
+}
+
+PartnerItem makePartnerItem(int id, const QString &tin, const QString &taxName, const QString &name, const QString &phone)
+{
+    const QString phoneDigits = digitsOnly(phone);
+    QString searchable = QStringLiteral("%1 %2 %3 %4")
+                             .arg(tin, taxName, name, phone)
+                             .toLower();
+    if (!phoneDigits.isEmpty()) {
+        searchable += QLatin1Char(' ');
+        searchable += phoneDigits;
+    }
+    PartnerItem p;
+    p.id = id;
+    p.tin = tin;
+    p.taxName = taxName;
+    p.contactName = name;
+    p.phone = phone;
+    p.nameLower = searchable;
+    p.words = searchable.split(QLatin1Char(' '), Qt::SkipEmptyParts);
+    return p;
+}
+
+bool partnerMatchesQuery(const PartnerItem &si, const QStringList &qwords)
+{
+    if (qwords.isEmpty()) {
+        return true;
+    }
+    const QString phoneDigits = digitsOnly(si.phone);
+    for (const QString &qw : qwords) {
+        bool found = false;
+        if (si.nameLower.contains(qw)) {
+            found = true;
+        } else {
+            for (const QString &w : si.words) {
+                if (w.startsWith(qw)) {
+                    found = true;
+                    break;
+                }
+            }
+        }
+        if (!found) {
+            const QString qwDigits = digitsOnly(qw);
+            if (!qwDigits.isEmpty() && phoneDigits.contains(qwDigits)) {
+                found = true;
+            }
+        }
+        if (!found) {
+            return false;
+        }
+    }
+    return true;
+}
+
+} // namespace
+
 static const QString mSqlGoods = R"(
 SELECT 
     g.f_id, 
@@ -471,16 +539,11 @@ void C5SearchEngine::init(const QString &databaseName, const QString &serverKey)
     order by p.f_name
     )")) {
         while (db.next()) {
-            QString name = QString("%1 %2 %3 %4")
-                               .arg(db.string("f_taxcode"), db.string("f_taxname"), db.string("f_name"), db.string("f_phone"))
-                               .toLower();
-            tmp3.append({db.integer("f_id"),
-                         db.string("f_taxcode"),
-                         db.string("f_taxname"),
-                         db.string("f_name"),
-                         db.string("f_phone"),
-                         name,
-                         name.split(" ", Qt::SkipEmptyParts)});
+            tmp3.append(makePartnerItem(db.integer("f_id"),
+                                        db.string("f_taxcode"),
+                                        db.string("f_taxname"),
+                                        db.string("f_name"),
+                                        db.string("f_phone")));
         }
     }
     logLoaded("partners", tmp3.size());
@@ -792,16 +855,11 @@ QString C5SearchEngine::reloadDictionary(const QJsonObject &jo, const SocketStru
         order by p.f_name
         )");
         while (db.next()) {
-            QString name = QString("%1 %2 %3 %4")
-                               .arg(db.string("f_taxcode"), db.string("f_taxname"), db.string("f_name"), db.string("f_phone"))
-                               .toLower();
-            tmp.append({db.integer("f_id"),
-                        db.string("f_taxcode"),
-                        db.string("f_taxname"),
-                        db.string("f_name"),
-                        db.string("f_phone"),
-                        name,
-                        name.split(" ", Qt::SkipEmptyParts)});
+            tmp.append(makePartnerItem(db.integer("f_id"),
+                                       db.string("f_taxcode"),
+                                       db.string("f_taxname"),
+                                       db.string("f_name"),
+                                       db.string("f_phone")));
         }
         mPartners[serverKey] = std::move(tmp);
     } else if (engine == SelectorName<StoreDocStatusItem>::value) {
@@ -1207,7 +1265,7 @@ QString C5SearchEngine::searchUpdatePartnerCache(const QJsonObject &jo)
     QString sql = QString::fromStdString(R"sql(
         select f_id, f_taxname, coalesce(f_taxcode, '') as f_taxcode, f_price_politic,
         f_address, f_permanent_discount,
-        f_phone, f_contact
+        f_phone, f_contact, f_name
         from c_partners where f_state>0 and f_id=:f_id
         order by 2
         )sql");
@@ -1229,17 +1287,25 @@ QString C5SearchEngine::searchUpdatePartnerCache(const QJsonObject &jo)
     db.exec(sql);
     QJsonArray ja = mSearchPartners[databaseName];
     bool updated = false;
+    PartnerItem pi;
 
     if (db.next()) {
+        pi = makePartnerItem(db.integer("f_id"),
+                             db.string("f_taxcode"),
+                             db.string("f_taxname"),
+                             db.string("f_name"),
+                             db.string("f_phone"));
+
         QJsonObject jt;
-        jt["id"] = db.integer("f_id");
-        jt["taxname"] = db.string("f_taxname");
-        jt["tin"] = db.string("f_taxcode");
-        jt["phone"] = db.string("f_phone");
+        jt["id"] = pi.id;
+        jt["taxname"] = pi.taxName;
+        jt["tin"] = pi.tin;
+        jt["phone"] = pi.phone;
         jt["contact"] = db.string("f_contact");
         jt["address"] = db.string("f_address");
         jt["discount"] = db.doubleValue("f_permanent_discount");
         jt["mode"] = db.integer("f_price_politic");
+        jt["name"] = pi.contactName;
 
         for (int i = 0; i < ja.size(); i++) {
             const QJsonObject &jj = ja.at(i).toObject();
@@ -1257,6 +1323,26 @@ QString C5SearchEngine::searchUpdatePartnerCache(const QJsonObject &jo)
 
         mSearchPartners[databaseName] = ja;
         jrep["new"] = !updated;
+
+        // Also refresh struct search cache (search_partner_item), keyed by tenantId.
+        QWriteLocker wl(&mPartnersLock);
+        for (auto it = mPartners.begin(); it != mPartners.end(); ++it) {
+            if (!it.key().endsWith(databaseName) && it.key() != databaseName) {
+                continue;
+            }
+            QVector<PartnerItem> &siv = it.value();
+            bool found = false;
+            for (int i = 0; i < siv.size(); ++i) {
+                if (siv[i].id == pi.id) {
+                    siv[i] = pi;
+                    found = true;
+                    break;
+                }
+            }
+            if (!found) {
+                siv.append(pi);
+            }
+        }
     }
 
     seLogVerbose(QStringLiteral("searchUpdatePartnerCache db=%1 id=%2 updated=%3 cache=%4 ms=%5")
@@ -1345,9 +1431,14 @@ QString C5SearchEngine::searchGoodsItem(const QJsonObject &jo, const SocketStruc
     QStringList qwords = needle.split(' ', Qt::SkipEmptyParts);
 
     int groupId = jo.contains("group_id") ? jo.value("group_id").toInt() : 0;
+    const int requestedLimit = jo.value("limit").toInt();
+    const int limit = requestedLimit > 0 ? qMin(requestedLimit, 500) : 50000;
+    const int page = qMax(jo.value("page").toInt(), 0);
+    qint64 remainingSkip = barcode.isEmpty() ? static_cast<qint64>(page) * limit : 0;
 
     QJsonArray jgoods;
     int cacheSize = 0;
+    bool hasMore = false;
 
     {
         QReadLocker rl(&mGoodsLock);
@@ -1361,12 +1452,15 @@ QString C5SearchEngine::searchGoodsItem(const QJsonObject &jo, const SocketStruc
                               timer.elapsed(),
                               groupId > 0 ? QStringLiteral("group_id=%1").arg(groupId) : QString());
             jrep["result"] = jgoods;
+            jrep["page"] = page;
+            jrep["limit"] = limit;
+            jrep["has_more"] = false;
+            jrep["noresult"] = true;
             return QJsonDocument(jrep).toJson(QJsonDocument::Compact);
         }
 
         const QVector<GoodsItem> &siv = mGoods.value(ss.tenantId);
         cacheSize = siv.size();
-        const int limit = 50000;
 
         for (const GoodsItem &si : siv) {
             bool match = false;
@@ -1414,17 +1508,30 @@ QString C5SearchEngine::searchGoodsItem(const QJsonObject &jo, const SocketStruc
                 }
             }
 
-            // Если дошли сюда — товар подходит
+            if (remainingSkip > 0) {
+                --remainingSkip;
+                continue;
+            }
+
+            // Read one matching item beyond the page to report has_more.
+            if (jgoods.size() >= limit) {
+                hasMore = true;
+                break;
+            }
+
             jgoods.append(si.toJson());
 
-            // Ограничение выборки или мгновенный выход при нахождении уникального штрихкода
-            if (!barcode.isEmpty() || jgoods.size() >= limit) {
+            if (!barcode.isEmpty()) {
                 break;
             }
         }
     }
 
     jrep["result"] = jgoods;
+    jrep["page"] = page;
+    jrep["limit"] = limit;
+    jrep["has_more"] = hasMore;
+    jrep["noresult"] = jgoods.isEmpty();
 
     seLogSearchResult("searchGoodsItem",
                       ss.tenantId,
@@ -1432,7 +1539,11 @@ QString C5SearchEngine::searchGoodsItem(const QJsonObject &jo, const SocketStruc
                       cacheSize,
                       jgoods.size(),
                       timer.elapsed(),
-                      groupId > 0 ? QStringLiteral("group_id=%1").arg(groupId) : QString());
+                      QStringLiteral("group_id=%1 page=%2 limit=%3 has_more=%4")
+                          .arg(groupId)
+                          .arg(page)
+                          .arg(limit)
+                          .arg(hasMore ? QStringLiteral("yes") : QStringLiteral("no")));
 
     if(cacheSize == 0) {
         seLogEmptyCache("searchGoodsItem", ss.tenantId);
@@ -1461,26 +1572,9 @@ QString C5SearchEngine::searchPartnerItem(const QJsonObject &jo, const SocketStr
         const int limit = 50000;
 
         for (const PartnerItem &si : siv) {
-            bool match = true;
-
-            for (const QString &qw : qwords) {
-                bool found = false;
-
-                for (const QString &w : si.words) {
-                    if (w.startsWith(qw)) {
-                        found = true;
-                        break;
-                    }
-                }
-
-                if (!found) {
-                    match = false;
-                    break;
-                }
-            }
-
-            if (!match)
+            if (!partnerMatchesQuery(si, qwords)) {
                 continue;
+            }
 
             jpartners.append(si.toJson());
 
@@ -1676,6 +1770,70 @@ QString C5SearchEngine::updateDictionary(const QJsonObject &jo, const SocketStru
 
         if (!updated) {
             siv.append(sg);
+        }
+    } else if (entity == "partners") {
+        QWriteLocker wl(&mPartnersLock);
+        db[":f_id"] = jo.value("id").toInt();
+        db.exec(R"(
+        select p.f_id, p.f_taxcode, p.f_taxname, p.f_name, p.f_phone
+        from c_partners p
+        where p.f_id=:f_id
+        )");
+        PartnerItem pi;
+
+        if (db.next()) {
+            pi = makePartnerItem(db.integer("f_id"),
+                                 db.string("f_taxcode"),
+                                 db.string("f_taxname"),
+                                 db.string("f_name"),
+                                 db.string("f_phone"));
+        } else {
+            QString err = QString("Invalid partner with id=%1").arg(jo.value("id").toInt());
+            LogWriterError(err);
+            jrep["errorCode"] = 1;
+            jrep["errorMessage"] = err;
+            return QJsonDocument(jrep).toJson(QJsonDocument::Compact);
+        }
+
+        QVector<PartnerItem> &siv = mPartners[ss.tenantId];
+        bool updated = false;
+
+        for (int i = 0; i < siv.size(); i++) {
+            if (siv[i].id == pi.id) {
+                siv[i] = pi;
+                updated = true;
+                break;
+            }
+        }
+
+        if (!updated) {
+            siv.append(pi);
+        }
+
+        // Keep legacy JSON partner cache in sync (search_partner / search_update_partner_cache).
+        QJsonArray &ja = mSearchPartners[ss.databaseName];
+        QJsonObject jt;
+        jt["id"] = pi.id;
+        jt["taxname"] = pi.taxName;
+        jt["tin"] = pi.tin;
+        jt["phone"] = pi.phone;
+        jt["contact"] = pi.contactName;
+        jt["name"] = pi.contactName;
+        jt["address"] = QString();
+        jt["discount"] = 0;
+        jt["mode"] = 0;
+        bool legacyUpdated = false;
+
+        for (int i = 0; i < ja.size(); i++) {
+            if (ja.at(i).toObject().value("id").toInt() == pi.id) {
+                ja[i] = jt;
+                legacyUpdated = true;
+                break;
+            }
+        }
+
+        if (!legacyUpdated) {
+            ja.append(jt);
         }
     } else if (entity == "goods_type") {
         QWriteLocker wl(&mGoodsTypeLock);

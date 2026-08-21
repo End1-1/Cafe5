@@ -1,6 +1,7 @@
 #include "working.h"
 #include <QFile>
 #include <QInputDialog>
+#include <QJsonArray>
 #include <QKeyEvent>
 #include <QMessageBox>
 #include <QMovie>
@@ -9,10 +10,12 @@
 #include <QPrinterInfo>
 #include <QProcess>
 #include <QScreen>
+#include <QSet>
 #include <QSettings>
 #include <QShortcut>
 #include <QTimer>
 #include <QtMath>
+#include "appwebsocket.h"
 #include "c5cleartablewidget.h"
 #include "c5message.h"
 #include "c5permissions.h"
@@ -23,6 +26,8 @@
 #include "dlgcashout.h"
 #include "dlggiftcardsale.h"
 #include "dlggoodslist.h"
+#include "dlgattendancelogin.h"
+#include "dlgcookingprogress.h"
 #include "dlgpin.h"
 #include "dlgregistercard.h"
 #include "dlgshowcolumns.h"
@@ -32,8 +37,8 @@
 #include "printreceiptgroup.h"
 #include "sales.h"
 #include "searchitems.h"
-#include "selectprinters.h"
 #include "struct_workstationitem.h"
+#include "httplite.h"
 #include "ui_working.h"
 #include "wcustomerdisplay.h"
 #include "worder.h"
@@ -51,6 +56,12 @@ Working::Working(C5User *user, QWidget *parent) :
 {
     ui->setupUi(this);
     fInstance = this;
+    updateWsStatus();
+    if (AppWebSocket::instance) {
+        connect(AppWebSocket::instance, &AppWebSocket::socketConnecting, this, &Working::updateWsStatus);
+        connect(AppWebSocket::instance, &AppWebSocket::socketConnected, this, &Working::updateWsStatus);
+        connect(AppWebSocket::instance, &AppWebSocket::socketDisconnected, this, &Working::updateWsStatus);
+    }
     QString ip;
     fCustomerDisplay = nullptr;
     QString username;
@@ -136,10 +147,7 @@ Working::Working(C5User *user, QWidget *parent) :
     connect(timer, SIGNAL(timeout()), this, SLOT(timeout()));
     timer->start(1000);
 
-    //TODO
-    // if(__c5config.shopDifferentStaff()) {
-    //     loadStaff();
-    // }
+    loadStaff();
 
     fHaveChanges = false;
     fUpFinished = true;
@@ -155,6 +163,26 @@ Working::Working(C5User *user, QWidget *parent) :
     ui->lbStore->setText(mWorkStation.defaultStoreName());
     ui->lbCashier->setText(mUser->fullName());
     ui->lbHost->setText(NDataProvider::mHost);
+    // Status = configured names only (no substitutions).
+    {
+        QStringList parts;
+        if (mWorkStation.usePrintServer()) {
+            parts.append(tr("server: %1").arg(mWorkStation.printServer()));
+        }
+        if (mWorkStation.hasReceiptPrinter()) {
+            const QString name = mWorkStation.receiptPrinter();
+            if (QPrinterInfo::printerInfo(name).isNull()) {
+                parts.append(tr("%1 — not found, will not print").arg(name));
+            } else {
+                parts.append(name);
+            }
+        }
+        if (parts.isEmpty()) {
+            ui->lbPrinter->setText(tr("Printer: not configured"));
+        } else {
+            ui->lbPrinter->setText(tr("Printer: %1").arg(parts.join(QStringLiteral(" | "))));
+        }
+    }
     fHttp = new NInterface(this);
     mMovie = new QMovie(":/progressbar.gif");
     setSaleControlsEnabled(false);
@@ -206,8 +234,21 @@ void Working::setActiveWidget(WOrder *w)
     for(int i = 0; i < ui->tab->count(); i++) {
         if(w == ui->tab->widget(i)) {
             ui->tab->setCurrentIndex(i);
+            refreshCustomerDisplay();
             return;
         }
+    }
+}
+
+void Working::refreshCustomerDisplay()
+{
+    if (!fCustomerDisplay) {
+        return;
+    }
+    if (auto *wo = worder()) {
+        wo->updateCustomerDisplay();
+    } else {
+        fCustomerDisplay->clear();
     }
 }
 
@@ -235,18 +276,20 @@ Flag Working::flag(int id)
     }
 }
 
-void Working::getGoods(int id)
+void Working::getGoods(int id, const QString &scancode, double stockQty)
 {
-    sender()->deleteLater();
+    if(QObject *s = sender()) {
+        s->deleteLater();
+    }
     WOrder *w = static_cast<WOrder*>(ui->tab->currentWidget());
-
     if(!w) {
         return;
     }
-
-    //TODO
-    //DbGoods g(id);
-    //w->checkGoodsCode(g.scancode());
+    if(id <= 0 && scancode.isEmpty()) {
+        C5Message::error(tr("Empty barcode"));
+        return;
+    }
+    w->checkGoodsId(id, scancode, nullptr, stockQty);
 }
 
 WOrder* Working::worder()
@@ -254,31 +297,34 @@ WOrder* Working::worder()
     return qobject_cast<WOrder *>(ui->tab->currentWidget());
 }
 
-void Working::loadStaff()
+void Working::loadStaff(std::function<void()> next)
 {
-    fCurrentUsers.clear();
-    //  todo
-    // db[":f_hall"] = __c5config.defaultHall();
-    // db.exec("select u.f_id, u.f_group, concat(u.f_last, ' ' , u.f_first) as f_name, to_base64(p.f_data) as f_data "
-    //         "from s_salary_inout s "
-    //         "inner join s_user u on u.f_id=s.f_user "
-    //         "left join s_user_photo p on p.f_id=u.f_id "
-    //         "where s.f_dateout is null and s.f_hall=:f_hall");
-
-    // while(db.nextRow()) {
-    //     IUser u;
-    //     u.id = db.getInt("f_id");
-    //     u.group = db.getInt("f_group");
-    //     u.name = db.getString("f_name");
-    //     QPixmap p;
-
-    //     if(!p.loadFromData(QByteArray::fromBase64(db.getValue("f_data").toString().toLatin1()))) {
-    //         p = QPixmap(":/staff.png");
-    //     }
-
-    //     u.photo = p;
-    //     fCurrentUsers.append(u);
-    // }
+    NInterface::query1(QStringLiteral("/engine/v2/common/attendance/checked-in"),
+                       mUser->mSessionKey,
+                       this,
+                       {},
+                       [this, next](const QJsonObject &jo) {
+                           fCurrentUsers.clear();
+                           const QJsonArray users = jo.value(QStringLiteral("users")).toArray();
+                           for(const QJsonValue &v : users) {
+                               const QJsonObject o = v.toObject();
+                               IUser u;
+                               u.id = o.value(QStringLiteral("f_id")).toInt();
+                               u.group = o.value(QStringLiteral("f_group")).toInt();
+                               u.name = o.value(QStringLiteral("f_name")).toString();
+                               QPixmap p;
+                               const QByteArray photoData =
+                                   QByteArray::fromBase64(o.value(QStringLiteral("f_photo")).toString().toLatin1());
+                               if(photoData.isEmpty() || !p.loadFromData(photoData)) {
+                                   p = QPixmap(QStringLiteral(":/staff.png"));
+                               }
+                               u.photo = p;
+                               fCurrentUsers.append(u);
+                           }
+                           if(next) {
+                               next();
+                           }
+                       });
 }
 
 void Working::checkCashboxSession()
@@ -299,7 +345,7 @@ void Working::checkCashboxSession()
 
                            if (session.value(QStringLiteral("f_id")).toInt() > 0) {
                                applyCashboxSession(session);
-                               newSale(1);
+                               loadShopTables([this]() { newSale(1); });
                            } else {
                                showSessionWidget();
                            }
@@ -362,6 +408,32 @@ void Working::updateSessionUi()
                                  .arg(tr("ops")));
 }
 
+void Working::updateWsStatus()
+{
+    if (!ui->lbWS) {
+        return;
+    }
+    AppWebSocket::ConnectionState state = AppWebSocket::disconnected;
+    if (AppWebSocket::instance) {
+        state = AppWebSocket::instance->mConnectionState;
+    }
+    switch (state) {
+    case AppWebSocket::connected:
+        ui->lbWS->setText(tr("WebSocket: connected"));
+        ui->lbWS->setStyleSheet(QStringLiteral("color: #1b7a1b;"));
+        break;
+    case AppWebSocket::connecting:
+        ui->lbWS->setText(tr("WebSocket: connecting"));
+        ui->lbWS->setStyleSheet(QStringLiteral("color: #b36b00;"));
+        break;
+    case AppWebSocket::disconnected:
+    default:
+        ui->lbWS->setText(tr("WebSocket: not connected"));
+        ui->lbWS->setStyleSheet(QStringLiteral("color: #b00020;"));
+        break;
+    }
+}
+
 void Working::showSessionWidget()
 {
     clearCashboxSession();
@@ -393,7 +465,7 @@ void Working::onSessionOpened(const QJsonObject &session)
 
     ui->tab->setTabsClosable(true);
     applyCashboxSession(session);
-    newSale(1);
+    loadShopTables([this]() { newSale(1); });
 }
 
 void Working::setSaleControlsEnabled(bool enabled)
@@ -406,15 +478,25 @@ void Working::setSaleControlsEnabled(bool enabled)
 
 void Working::printCloseSessionReport(const QJsonObject &cashbox, bool cashCounted)
 {
+    if (!mWorkStation.isReceiptPrintingConfigured()) {
+        return;
+    }
     C5Printing p;
-    QPrinterInfo pi = QPrinterInfo::printerInfo(mWorkStation.defaultPrinter());
-    QPrinter printer(pi);
-    printer.setPageSize(QPageSize::Custom);
-    printer.setFullPage(false);
-    QRectF pr = printer.pageRect(QPrinter::DevicePixel);
-    constexpr qreal SAFE_RIGHT_MM = 4.0;
-    qreal safePx = SAFE_RIGHT_MM * printer.logicalDpiX() / 25.4;
-    p.setSceneParams(pr.width() - safePx, pr.height(), printer.logicalDpiX());
+    QPrinterInfo pi;
+    if (mWorkStation.hasReceiptPrinter()) {
+        pi = QPrinterInfo::printerInfo(mWorkStation.receiptPrinter());
+    }
+    QPrinter printer(pi.isNull() ? QPrinterInfo() : pi);
+    if (!pi.isNull()) {
+        printer.setPageSize(QPageSize::Custom);
+        printer.setFullPage(false);
+        QRectF pr = printer.pageRect(QPrinter::DevicePixel);
+        constexpr qreal SAFE_RIGHT_MM = 4.0;
+        qreal safePx = SAFE_RIGHT_MM * printer.logicalDpiX() / 25.4;
+        p.setSceneParams(pr.width() - safePx, pr.height(), printer.logicalDpiX());
+    } else {
+        p.setSceneParams(650, 2800, 96);
+    }
     p.setFont(qApp->font());
     p.setFontSize(22);
     const QString logoFile = qApp->applicationDirPath() + "/logo_receipt.png";
@@ -464,20 +546,40 @@ void Working::printCloseSessionReport(const QJsonObject &cashbox, bool cashCount
 
     p.line();
     p.br();
-    p.print(printer);
+    if (mWorkStation.usePrintServer()) {
+        auto *http = new HttpLite(this);
+        QJsonObject json;
+        json.insert(QStringLiteral("print_data"), p.jsonData());
+        json.insert(QStringLiteral("printer_name"),
+                    mWorkStation.hasReceiptPrinter() ? mWorkStation.receiptPrinter() : QString());
+        http->post(mWorkStation.printServer(), json);
+    }
+    if (mWorkStation.hasReceiptPrinter() && !pi.isNull()) {
+        p.print(printer);
+    }
 }
 
 void Working::printDifferenceAct(const QJsonObject &cashbox)
 {
+    if (!mWorkStation.isReceiptPrintingConfigured()) {
+        return;
+    }
     C5Printing p;
-    QPrinterInfo pi = QPrinterInfo::printerInfo(mWorkStation.defaultPrinter());
-    QPrinter printer(pi);
-    printer.setPageSize(QPageSize::Custom);
-    printer.setFullPage(false);
-    QRectF pr = printer.pageRect(QPrinter::DevicePixel);
-    constexpr qreal SAFE_RIGHT_MM = 4.0;
-    qreal safePx = SAFE_RIGHT_MM * printer.logicalDpiX() / 25.4;
-    p.setSceneParams(pr.width() - safePx, pr.height(), printer.logicalDpiX());
+    QPrinterInfo pi;
+    if (mWorkStation.hasReceiptPrinter()) {
+        pi = QPrinterInfo::printerInfo(mWorkStation.receiptPrinter());
+    }
+    QPrinter printer(pi.isNull() ? QPrinterInfo() : pi);
+    if (!pi.isNull()) {
+        printer.setPageSize(QPageSize::Custom);
+        printer.setFullPage(false);
+        QRectF pr = printer.pageRect(QPrinter::DevicePixel);
+        constexpr qreal SAFE_RIGHT_MM = 4.0;
+        qreal safePx = SAFE_RIGHT_MM * printer.logicalDpiX() / 25.4;
+        p.setSceneParams(pr.width() - safePx, pr.height(), printer.logicalDpiX());
+    } else {
+        p.setSceneParams(650, 2800, 96);
+    }
     p.setFont(qApp->font());
     p.setFontSize(22);
 
@@ -508,7 +610,17 @@ void Working::printDifferenceAct(const QJsonObject &cashbox)
     p.br();
     p.lrtext(tr("Signature"), QStringLiteral("______________"));
     p.br();
-    p.print(printer);
+    if (mWorkStation.usePrintServer()) {
+        auto *http = new HttpLite(this);
+        QJsonObject json;
+        json.insert(QStringLiteral("print_data"), p.jsonData());
+        json.insert(QStringLiteral("printer_name"),
+                    mWorkStation.hasReceiptPrinter() ? mWorkStation.receiptPrinter() : QString());
+        http->post(mWorkStation.printServer(), json);
+    }
+    if (mWorkStation.hasReceiptPrinter() && !pi.isNull()) {
+        p.print(printer);
+    }
 }
 
 WOrder* Working::newSale(int type)
@@ -517,7 +629,15 @@ WOrder* Working::newSale(int type)
         return nullptr;
     }
 
+    const int tableId = allocateFreeTableId();
+    if (tableId <= 0) {
+        C5Message::error(tr("No free tables in hall %1. Create more tables in h_tables or close unused sale tabs.")
+                             .arg(mWorkStation.defaultHallId()));
+        return nullptr;
+    }
+
     WOrder *w = new WOrder(mUser, type, fCustomerDisplay, this);
+    w->setTableId(tableId);
     QObjectList ol = w->children();
 
     for(QObject *o : ol) {
@@ -543,7 +663,105 @@ WOrder* Working::newSale(int type)
     ui->tab->addTab(w, QString("%1 #%2").arg(title).arg(ordersCount()));
     ui->tab->setCurrentIndex(ui->tab->count() - 1);
     connect(w, &WOrder::orderSaved, this, &Working::orderSaved);
+    refreshCustomerDisplay();
     return w;
+}
+
+WOrder* Working::openExistingSale(const QJsonObject &orderResponse)
+{
+    if (!hasActiveSession()) {
+        return nullptr;
+    }
+
+    const QJsonObject order = orderResponse.value(QStringLiteral("order")).toObject();
+    int tableId = orderResponse.value(QStringLiteral("table_id")).toInt();
+    if (tableId <= 0) {
+        tableId = order.value(QStringLiteral("f_table")).toInt();
+    }
+    if (tableId <= 0) {
+        tableId = allocateFreeTableId();
+    }
+    if (tableId <= 0) {
+        C5Message::error(tr("No free tables in hall %1. Create more tables in h_tables or close unused sale tabs.")
+                             .arg(mWorkStation.defaultHallId()));
+        return nullptr;
+    }
+
+    const int saleType = order.value(QStringLiteral("f_saletype")).toInt(1);
+    WOrder *w = new WOrder(mUser, saleType > 0 ? saleType : 1, fCustomerDisplay, this);
+    w->setStaffId(order.value(QStringLiteral("f_staff")).toInt());
+    w->loadExistingOrder(orderResponse, tableId);
+
+    QObjectList ol = w->children();
+    for (QObject *o : ol) {
+        auto wd = dynamic_cast<QWidget *>(o);
+        if (wd) {
+            wd->installEventFilter(this);
+        }
+    }
+
+    QString title = (saleType == 2) ? tr("Whosale") : tr("Retail");
+    ui->tab->addTab(w, QString("%1 #%2").arg(title).arg(ordersCount()));
+    ui->tab->setCurrentIndex(ui->tab->count() - 1);
+    connect(w, &WOrder::orderSaved, this, &Working::orderSaved);
+    refreshCustomerDisplay();
+    return w;
+}
+
+int Working::allocateFreeTableId() const
+{
+    QSet<int> used;
+    for (int i = 0; i < ui->tab->count(); ++i) {
+        auto *wo = qobject_cast<WOrder *>(ui->tab->widget(i));
+        if (wo && wo->tableId() > 0) {
+            used.insert(wo->tableId());
+        }
+    }
+
+    for (int id : mShopTableIds) {
+        if (!used.contains(id)) {
+            return id;
+        }
+    }
+    return 0;
+}
+
+void Working::loadShopTables(std::function<void()> next)
+{
+    if (!mShopTableIds.isEmpty()) {
+        if (next) {
+            next();
+        }
+        return;
+    }
+
+    const int hallId = mWorkStation.defaultHallId();
+    if (hallId <= 0) {
+        C5Message::error(tr("Default hall is not set for this workstation (f_default_hall_id)"));
+        return;
+    }
+
+    NInterface::query1(QStringLiteral("/engine/v2/shop/tables/get"),
+                       mUser->mSessionKey,
+                       this,
+                       {{QStringLiteral("hall"), hallId}},
+                       [this, next, hallId](const QJsonObject &jo) {
+                           mShopTableIds.clear();
+                           const QJsonArray arr = jo.value(QStringLiteral("tables")).toArray();
+                           for (const QJsonValue &v : arr) {
+                               const int id = v.toInt();
+                               if (id > 0) {
+                                   mShopTableIds.append(id);
+                               }
+                           }
+                           if (mShopTableIds.isEmpty()) {
+                               C5Message::error(tr("No tables found in h_tables for hall %1").arg(hallId));
+                               return;
+                           }
+                           if (next) {
+                               next();
+                           }
+                       });
 }
 
 int Working::ordersCount()
@@ -579,7 +797,7 @@ void Working::orderSaved(QWidget *w)
             w->deleteLater();
             refreshCashboxSession();
             if (ui->tab->count() == 0) {
-                newSale(1);
+                loadShopTables([this]() { newSale(1); });
             }
         }
     }
@@ -682,7 +900,11 @@ void Working::checkMessageResponse(const QJsonObject & jdoc)
     QFont font(qApp->font());
     font.setPointSize(12);
     C5Printing p;
-    QPrinterInfo pi = QPrinterInfo::printerInfo(mWorkStation.defaultPrinter());
+    const bool canPrint = mWorkStation.hasReceiptPrinter();
+    QPrinterInfo pi;
+    if (canPrint) {
+        pi = QPrinterInfo::printerInfo(mWorkStation.receiptPrinter());
+    }
     QPrinter printer(pi);
     printer.setPageSize(QPageSize::Custom);
     printer.setFullPage(false);
@@ -734,35 +956,8 @@ void Working::checkMessageResponse(const QJsonObject & jdoc)
                 break;
 
             case MSG_PRINT_RECEIPT: {
-                QString orderid = jjm["usermessage"].toString();
-                PrintReceiptGroup p;
-                //todo
-                int idddd = 2;
-                switch (idddd) {
-                case 1: {
-                    bool p1, p2;
-
-                    if(SelectPrinters::selectPrinters(p1, p2, mUser)) {
-                        if(p1) {
-                            p.print(orderid, 1);
-                        }
-
-                        if(p2) {
-                            p.print(orderid, 2);
-                        }
-                    }
-
-                    break;
-                }
-
-                case 2:
-                    p.print2(orderid);
-                    break;
-
-                default:
-                    break;
-                }
-
+                const QString orderid = jjm["usermessage"].toString();
+                PrintReceiptGroup::print2(orderid, mUser, this);
                 break;
             }
 
@@ -779,11 +974,13 @@ void Working::checkMessageResponse(const QJsonObject & jdoc)
         }
     }
 
-    p.br();
-    p.br();
-    p.ltext(tr("Printed"), 0);
-    p.rtext(QDateTime::currentDateTime().toString(FORMAT_DATETIME_TO_STR2));
-    p.print(printer);
+    if (canPrint && !pi.isNull()) {
+        p.br();
+        p.br();
+        p.ltext(tr("Printed"), 0);
+        p.rtext(QDateTime::currentDateTime().toString(FORMAT_DATETIME_TO_STR2));
+        p.print(printer);
+    }
 }
 
 void Working::uploadDataFinished()
@@ -832,11 +1029,11 @@ void Working::shortcutAsterix()
 }
 void Working::shortcutF1()
 {
-    newSale(1);
+    loadShopTables([this]() { newSale(1); });
 }
 void Working::shortcutF2()
 {
-    newSale(2);
+    loadShopTables([this]() { newSale(2); });
 }
 
 void Working::shortcutF7()
@@ -888,7 +1085,11 @@ void Working::qtyRemains(const QJsonObject & jdoc)
     QJsonArray ja = jo["qty"].toArray();
     bool print = false;
     C5Printing p;
-    QPrinterInfo pi = QPrinterInfo::printerInfo(mWorkStation.defaultPrinter());
+    const bool canPrint = mWorkStation.hasReceiptPrinter();
+    QPrinterInfo pi;
+    if (canPrint) {
+        pi = QPrinterInfo::printerInfo(mWorkStation.receiptPrinter());
+    }
     QPrinter printer(pi);
     printer.setPageSize(QPageSize::Custom);
     printer.setFullPage(false);
@@ -922,7 +1123,7 @@ void Working::qtyRemains(const QJsonObject & jdoc)
         }
     }
 
-    if(print) {
+    if(print && canPrint && !pi.isNull()) {
         p.ltext(tr("Printed"), 0);
         p.rtext(QDateTime::currentDateTime().toString(FORMAT_DATETIME_TO_STR2));
         p.print(printer);
@@ -943,21 +1144,19 @@ void Working::on_tab_tabCloseRequested(int index)
 
     ui->tab->removeTab(index);
     w->deleteLater();
+    refreshCustomerDisplay();
 
     if(ui->tab->count() == 0) {
-        newSale(1);
+        loadShopTables([this]() { newSale(1); });
     }
 }
 
 
 void Working::on_tab_currentChanged(int index)
 {
-    Q_UNUSED(index)
-    auto *wo = worder();
-
-    if(wo) {
-        wo->updateCustomerDisplay(fCustomerDisplay);
-    }
+    Q_UNUSED(index);
+    // Always show the active sale window on the buyer display.
+    refreshCustomerDisplay();
 }
 void Working::on_btnCloseApplication_clicked()
 {
@@ -978,7 +1177,7 @@ void Working::on_btnWriteOrder_clicked()
         ui->tab->removeTab(ui->tab->currentIndex());
 
         if (ui->tab->count() == 0) {
-            newSale(1);
+            loadShopTables([this]() { newSale(1); });
         }
 
         w->deleteLater();
@@ -994,11 +1193,11 @@ void Working::on_btnWriteOrder_clicked()
 
 void Working::on_btnNewRetail_clicked()
 {
-    newSale(1);
+    loadShopTables([this]() { newSale(1); });
 }
 void Working::on_btnNewWhosale_clicked()
 {
-    newSale(2);
+    loadShopTables([this]() { newSale(2); });
 }
 
 void Working::on_btnSalesReport_clicked()
@@ -1089,28 +1288,28 @@ void Working::on_btnCostumerDisplay_clicked(bool checked)
     Q_UNUSED(checked);
     QSettings s(_ORGANIZATION_, _APPLICATION_ + QString("\\") + _MODULE_);
 
-    if(fCustomerDisplay) {
+    if (fCustomerDisplay) {
         s.setValue("customerdisplay", false);
-        fCustomerDisplay->deleteLater();
+        auto *d = fCustomerDisplay;
         fCustomerDisplay = nullptr;
-    } else {
-        s.setValue("customerdisplay", true);
-        fCustomerDisplay = new WCustomerDisplay();
-
-        if(qApp->screens().count() > 1) {
-            fCustomerDisplay->move(qApp->screens().at(1)->geometry().x(), qApp->screens().at(1)->geometry().y());
-            fCustomerDisplay->showMaximized();
-            fCustomerDisplay->showFullScreen();
-        } else {
-            fCustomerDisplay->showFullScreen();
-        }
+        disconnect(d, nullptr, this, nullptr);
+        d->close(); // WA_DeleteOnClose
+        ui->btnCostumerDisplay->setChecked(false);
+        return;
     }
 
-    auto *wo = worder();
-
-    if(wo) {
-        wo->updateCustomerDisplay(fCustomerDisplay);
-    }
+    s.setValue("customerdisplay", true);
+    fCustomerDisplay = new WCustomerDisplay();
+    connect(fCustomerDisplay, &WCustomerDisplay::displayClosed, this, [this]() {
+        fCustomerDisplay = nullptr;
+        ui->btnCostumerDisplay->setChecked(false);
+        QSettings st(_ORGANIZATION_, _APPLICATION_ + QString("\\") + _MODULE_);
+        st.setValue("customerdisplay", false);
+    });
+    fCustomerDisplay->placeOnSecondaryScreen();
+    ui->btnCostumerDisplay->setChecked(true);
+    // Defer paint until the native window is mapped on the target screen.
+    QTimer::singleShot(0, this, [this]() { refreshCustomerDisplay(); });
 }
 
 void Working::on_btnColumns_clicked()
@@ -1189,4 +1388,16 @@ void Working::on_btnCloseSession_clicked()
 
                            showSessionWidget();
                        });
+}
+
+void Working::on_btnAttendance_clicked()
+{
+    if(DlgAttendanceLogin::run(mUser, this)) {
+        loadStaff();
+    }
+}
+
+void Working::on_btnProgressWindow_clicked()
+{
+    DlgCookingProgress(mUser, this).exec();
 }

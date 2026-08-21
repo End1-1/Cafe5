@@ -27,6 +27,8 @@ private:
 
     int mBasePointSize = 0;
 
+    void applyStyleFont();
+
     void cacheBaseFontSize();
 
     void scaleLabelFont();

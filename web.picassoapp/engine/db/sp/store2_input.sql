@@ -10,13 +10,16 @@ BEGIN
     DECLARE new_status int DEFAULT CAST(JSON_VALUE(params, '$.doc_status') AS UNSIGNED);
     DECLARE store_in int DEFAULT CAST(JSON_VALUE(params, '$.doc_store_in') AS UNSIGNED);
     DECLARE doc_uuid char(36) COLLATE latin1_general_ci DEFAULT JSON_VALUE(params, '$.doc_uuid');
-    DECLARE doc_user_id char(8) DEFAULT JSON_VALUE(params, '$.doc_user_id');
+    DECLARE doc_user_id char(16) DEFAULT JSON_VALUE(params, '$.doc_user_id');
     DECLARE create_user int DEFAULT CAST(JSON_VALUE(params, '$.doc_create_user') AS UNSIGNED);
     DECLARE cashbox_id int DEFAULT CAST(JSON_VALUE(params, '$.cashbox_id') AS unsigned);
     DECLARE payment_type_id int DEFAULT CAST(JSON_VALUE(params, '$.payment_type_id') AS UNSIGNED);
     DECLARE doc_sum decimal(14, 2) DEFAULT CAST(JSON_VALUE(params, '$.doc_sum') AS decimal(14, 2));
     DECLARE currency_id int DEFAULT CAST(JSON_VALUE(params, '$.currency_id') AS unsigned);
     DECLARE partner_id int DEFAULT CAST(JSON_VALUE(params, '$.doc_partner') AS unsigned);
+    DECLARE paid_raw longtext DEFAULT JSON_VALUE(params, '$.paid_amount');
+    DECLARE paid_amount decimal(14, 2) DEFAULT 0;
+    DECLARE debt_amount decimal(14, 2) DEFAULT 0;
 
     DECLARE p_item_id INT;
     DECLARE p_qty_arrived DECIMAL(14, 4);
@@ -40,6 +43,19 @@ BEGIN
 
     SET sql_safe_updates = 0;
 
+    IF (paid_raw IS NULL OR paid_raw = '') THEN
+        SET paid_amount = IF(IFNULL(cashbox_id, 0) > 0, doc_sum, 0);
+    ELSE
+        SET paid_amount = CAST(paid_raw AS decimal(14, 2));
+    END IF;
+    IF (paid_amount < 0) THEN
+        SET paid_amount = 0;
+    END IF;
+    IF (paid_amount > doc_sum) THEN
+        RETURN JSON_OBJECT('status', 1, 'msg', 'paid_exceeds_sum');
+    END IF;
+    SET debt_amount = doc_sum - paid_amount;
+
     SELECT f_version, f_status
     INTO current_version, current_status
     FROM store_document
@@ -52,6 +68,7 @@ BEGIN
 
     DELETE FROM b_clients_debts WHERE f_storedoc = doc_uuid;
     DELETE FROM cash_debts WHERE f_doc_uuid = doc_uuid;
+    DELETE FROM cash_operations WHERE f_order_id = doc_uuid;
     -- Реверс старого проведения (если был статус 1)
     IF (current_status = 1) THEN
         -- Сначала восстанавливаем минусы, которые этот док лечил
@@ -96,14 +113,21 @@ BEGIN
                     COLUMNS (row_uuid CHAR(36) PATH '$.id', item_id INT PATH '$.item_id', qty DECIMAL(14, 4) PATH '$.qty', price DECIMAL(14, 2) PATH '$.price', comment varchar(255) PATH '$.comment', `row` int PATH '$.row')) AS jt;
 
     IF (new_status = 1) THEN
-        -- partner debts or cashbox. if cashbox > 0 out from cash, otherwise write to debt
-        IF (cashbox_id > 0) THEN
+        IF (paid_amount > 0) THEN
+            IF (IFNULL(cashbox_id, 0) <= 0 OR IFNULL(payment_type_id, 0) <= 0) THEN
+                RETURN JSON_OBJECT('status', 1, 'msg', 'cashbox_required_for_paid');
+            END IF;
             INSERT INTO cash_operations (f_cashbox_id, f_order_id, f_user, f_operation_type, f_payment_type_id,
-                                         f_datetime, f_credit)
-            VALUES (cashbox_id, doc_uuid, create_user, 3, payment_type_id, doc_date, doc_sum);
-        ELSE
+                                         f_datetime, f_credit, f_currency_id)
+            VALUES (cashbox_id, doc_uuid, create_user, 3, payment_type_id, doc_date, paid_amount,
+                    IFNULL(currency_id, 1));
+        END IF;
+        IF (debt_amount > 0) THEN
+            IF (IFNULL(partner_id, 0) <= 0) THEN
+                RETURN JSON_OBJECT('status', 1, 'msg', 'partner_required_for_debt');
+            END IF;
             INSERT INTO cash_debts (f_date, f_partner, f_doc_type, f_doc_uuid, f_credit, f_debit, f_currency_id)
-            VALUES (doc_date, partner_id, 1, doc_uuid, doc_sum, 0, currency_id);
+            VALUES (doc_date, partner_id, 1, doc_uuid, debt_amount, 0, IFNULL(currency_id, 1));
         END IF;
 
         SET done_items = FALSE;
@@ -175,6 +199,6 @@ BEGIN
     SET g.f_lastinputprice = jt.price
     WHERE jt.price > 0;
 
-    RETURN JSON_OBJECT('status', 0, 'version', IFNULL(current_version, 0) + 1);
+    RETURN JSON_OBJECT('status', 0, 'version', IFNULL(current_version, 0) + 1, 'paid_amount', paid_amount);
 END$$
 DELIMITER ;

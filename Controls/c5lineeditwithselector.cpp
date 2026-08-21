@@ -44,6 +44,16 @@ void C5LineEditWithSelector::setCallbackDialog(C5Dialog *d)
 
 void C5LineEditWithSelector::setValue(const QString &id)
 {
+    if(id.isEmpty() || id == QLatin1String("0")) {
+        clear();
+
+        if(fNameLineEdit) {
+            fNameLineEdit->clear();
+        }
+
+        return;
+    }
+
     setText(id);
 
     if(fCache == 0) {
@@ -51,33 +61,60 @@ void C5LineEditWithSelector::setValue(const QString &id)
     }
 
     C5Cache *c = C5Cache::cache(fCache);
+    // Selector dialog inserts a checkbox column at index 0; cache rows do not.
+    // setSelector(colId, colName) uses selector indexes → shift -1 for cache.
+    const int cacheColId = fColumnId > 0 ? fColumnId - 1 : 0;
+    const int cacheColName = fColumnName > 0 ? fColumnName - 1 : 0;
     QString text;
     int row = -1;
+    bool found = false;
     QStringList ids = id.split(",", Qt::SkipEmptyParts);
 
     foreach(const QString &s, ids) {
-        row = c->find(s.toInt());
+        const int idVal = s.toInt();
+
+        if(idVal == 0) {
+            continue;
+        }
+
+        row = c->find(idVal);
+
+        // Cache may be stale (e.g. rows inserted by SQL while app was running).
+        if(row < 0) {
+            c->ensureId(idVal);
+            row = c->find(idVal);
+        }
 
         if(row > -1) {
+            found = true;
+
             if(!text.isEmpty()) {
                 text += ",";
             }
 
-            text += c->getString(row, fColumnName - 1);
+            text += c->getString(row, cacheColName);
         }
     }
 
-    if(!text.isEmpty()) {
-        fNameLineEdit->setText(text);
+    if(found) {
+        // Keep the id even when the name column is empty.
+        if(fNameLineEdit) {
+            fNameLineEdit->setText(text);
+        }
     } else {
         clear();
-        fNameLineEdit->clear();
+
+        if(fNameLineEdit) {
+            fNameLineEdit->clear();
+        }
+
+        return;
     }
 
     if(!fMultiselection) {
         if(row > -1) {
             const QJsonArray &j = c->getRow(row);
-            emit singleSelect(j.at(fColumnId).toInt(), j.at(fColumnName).toString());
+            emit singleSelect(j.at(cacheColId).toVariant().toInt(), j.at(cacheColName).toString());
         }
 
         if(fWidget && row > -1) {

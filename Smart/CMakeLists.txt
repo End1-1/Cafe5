@@ -158,6 +158,8 @@ set(HEADERS
     ../Cafe5/c5database.h
     ../Cafe5/c5dialog.h
     ../Cafe5/c5message.h
+    ../Cafe5/c5registrysettings.h
+    ../Cafe5/c5uilanguage.h
     ../Cafe5/c5utils.h
     ../Controls/c5lineedit.h
     ../Classes/c5user.h
@@ -248,6 +250,8 @@ set(SOURCES
     ../Cafe5/c5database.cpp
     ../Cafe5/c5dialog.cpp
     ../Cafe5/c5message.cpp
+    ../Cafe5/c5registrysettings.cpp
+    ../Cafe5/c5uilanguage.cpp
     ../Cafe5/c5utils.cpp
     ../Controls/c5lineedit.cpp
     ../Classes/c5user.cpp

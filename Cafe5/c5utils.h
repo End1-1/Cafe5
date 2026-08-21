@@ -92,6 +92,7 @@ inline double str_money_mysql_format(const QString &value)
 #define DOC_TYPE_STORE_INPUT 1
 #define DOC_TYPE_STORE_OUTPUT 2
 #define DOC_TYPE_STORE_MOVE 3
+#define DOC_TYPE_STORE_COMPLECTATION 4
 //#define DOC_TYPE_STORE_INVENTORY 4
 #define DOC_TYPE_CASH 5
 #define DOC_TYPE_COMPLECTATION 6

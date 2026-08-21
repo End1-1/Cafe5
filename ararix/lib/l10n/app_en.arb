@@ -1,0 +1,83 @@
+{
+  "@@locale": "en",
+  "appName": "ArariX Solutions",
+  "welcome": "Welcome",
+  "registerWithPhone": "Register with your phone number",
+  "prefix": "Prefix",
+  "phoneNumber": "Phone number",
+  "sms": "SMS",
+  "whatsapp": "WHATSAPP",
+  "orWith": "or with",
+  "google": "Google",
+  "facebook": "Facebook",
+  "termsFooter": "By continuing, you automatically accept our Terms and conditions, Privacy Policy and Cookies policy",
+  "selectCountry": "Select country",
+  "searchCountry": "Search for a country",
+  "armenia": "Armenia",
+  "phoneValidation": "Phone number validation",
+  "enterTheCode": "Enter the code",
+  "insertCodeWhatsapp": "Insert the 4-digit code that we sent via WhatsApp to {phone}",
+  "@insertCodeWhatsapp": {
+    "placeholders": {
+      "phone": {"type": "String"}
+    }
+  },
+  "insertCodeSms": "Insert the 4-digit code that we sent via SMS to {phone}",
+  "@insertCodeSms": {
+    "placeholders": {
+      "phone": {"type": "String"}
+    }
+  },
+  "resendIn": "Still nothing? Resend the code in {time}",
+  "@resendIn": {
+    "placeholders": {
+      "time": {"type": "String"}
+    }
+  },
+  "resendNow": "Resend the code",
+  "account": "Account",
+  "enterYourName": "Enter Your name",
+  "enterYourEmail": "Enter Your email",
+  "changePassword": "Change or enter your password",
+  "addAddresses": "Add your addresses",
+  "managePayments": "Manage payment options",
+  "profile": "Profile",
+  "orderHistory": "Order history",
+  "paymentMethods": "Payment methods",
+  "language": "Language",
+  "faq": "FAQ",
+  "notifications": "Notifications",
+  "deleteAccount": "Delete my account and data",
+  "silverStatus": "Silver status",
+  "changePhoneNumber": "Change phone number",
+  "enterYourPhoneNumber": "Enter your phone number",
+  "payments": "Payments",
+  "addNewCard": "Add new card",
+  "helpAndSupport": "Help and support",
+  "chooseLanguage": "Choose your language",
+  "home": "Home",
+  "menu": "Menu",
+  "orders": "Orders",
+  "comingSoon": "Coming soon",
+  "socialLoginSoon": "Social login will be available later",
+  "invalidPhone": "Enter a valid phone number",
+  "invalidOtp": "Enter the 4-digit code",
+  "errorGeneric": "Something went wrong",
+  "save": "Save",
+  "name": "Name",
+  "email": "Email",
+  "english": "English",
+  "russian": "Russian",
+  "armenian": "Armenian",
+  "englishNative": "English",
+  "russianNative": "Русский",
+  "armenianNative": "Հայերեն",
+  "searchRestaurant": "Search for a restaurant",
+  "delivery": "Delivery",
+  "takeaway": "Takeaway",
+  "dineIn": "Dine-In",
+  "topRestaurants": "Top Restaurants",
+  "dishes": "Dishes",
+  "topOffer": "Top offer",
+  "retry": "Retry"
+}

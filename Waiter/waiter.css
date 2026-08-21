@@ -39,6 +39,14 @@ QToolButton[stylesheet_button_redalert=true] {
     background: #ffa6a6;
 }
 
+QToolButton[stylesheet_button_selected=true] {
+    background: #2d9cdb;
+    background-color: #2d9cdb;
+    color: white;
+    font-weight: 600;
+    border: 1px solid #1a7aaf;
+}
+
 QToolButton[role="scrollbutton"] {
     color: white;
     font-weight: 600;
@@ -188,16 +196,37 @@ QFrame[guest_selected="2"] {
     background: #adb5bd;
 }
 
+/* waiter-goodsgroup-config: spacing=1 border=0 bg=#85a4b8 rows=3 font=12 bold=1 color=#000000 */
+/* waiter-goodsdish-config: spacing=1 border=1 bg=#ffffff height=60 font=12 bold=0 color=#000000 */
+
 QFrame#goodsGroupFrame {
     background: #85a4b8;
+    border: none;
 }
 
 QFrame#goodsGroupFrame:hover {
     background: #6d94ad;
+    border: none;
 }
 
 QFrame#goodsGroupFrame[pressed="true"] {
     background: #6d94ad;
+    border: none;
+}
+
+QFrame#goodsDishFrame {
+    background: #ffffff;
+    border: 1px solid #2c4383;
+}
+
+QFrame#goodsDishFrame:hover {
+    background: #dddddd;
+    border: 1px solid #2c4383;
+}
+
+QFrame#goodsDishFrame[pressed="true"] {
+    background: #dddddd;
+    border: 1px solid #2c4383;
 }
 
 QFrame[t1_state="1"] {
@@ -251,9 +280,16 @@ QLabel {
 
 QLabel#goodsGroupName {
     background: transparent;
-    font-size: 16px;
-    font-weight: 600;
-    color: black;
+    font-size: 12pt;
+    font-weight: bold;
+    color: #000000;
+}
+
+QLabel#goodsDishName {
+    background: transparent;
+    font-size: 12pt;
+    font-weight: normal;
+    color: #000000;
 }
 
 QLabel#lbComment {

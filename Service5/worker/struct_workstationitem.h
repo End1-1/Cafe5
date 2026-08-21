@@ -14,11 +14,7 @@ struct WorkstationItem : public ParentItem {
 
     virtual void validate() override
     {
-        Q_ASSERT_X(
-            data.contains("f_cashbox_id"),
-            "WorkstationItem",
-            "Data not contains cashbox_id key"
-        );
+        // Intentionally soft: missing keys mean misconfigured workstation (store/cashbox=0).
     }
 
     int cashboxId() const
@@ -30,12 +26,46 @@ struct WorkstationItem : public ParentItem {
         return data.value("f_default_hall_id").toInt();
     }
     const QString defaultHallName() const { return data.value("f_default_hall_name").toString(); }
+    int defaultTableId() const
+    {
+        int id = data.value("f_default_table_id").toInt();
+        return id > 0 ? id : 1;
+    }
     int defaultStoreId() const { return data.value("f_default_store_id").toInt(); }
     const QString defaultStoreName() const { return data.value("f_default_store_name").toString(); }
     const QString defaultPrinter() const
     {
-        QString printerName = data.value("f_default_printer").toString();
-        return printerName.isEmpty() ? "local" : printerName;
+        QString printerName = receiptPrinter();
+        if(printerName.isEmpty()) {
+            printerName = data.value(QStringLiteral("f_default_printer")).toString().trimmed();
+        }
+        return printerName;
+    }
+    /** Shop bill printer from RWorkstationConfigShop::leReceiptPrinter (exact Windows name). */
+    QString receiptPrinter() const
+    {
+        return data.value(QStringLiteral("receipt_printer")).toString().trimmed();
+    }
+    /** Waiter precheck: Windows printer name or print-server URL (RWorkstationConfigWaiter::lePrecheckPrinter). */
+    QString precheckPrinter() const
+    {
+        return data.value(QStringLiteral("precheck_printer")).toString().trimmed();
+    }
+    static bool isPrintServerTarget(const QString &target)
+    {
+        return target.startsWith(QStringLiteral("http://"), Qt::CaseInsensitive)
+               || target.startsWith(QStringLiteral("https://"), Qt::CaseInsensitive);
+    }
+    bool hasReceiptPrinter() const { return !receiptPrinter().isEmpty(); }
+    /** Non-empty print_server → print via HTTP. */
+    bool usePrintServer() const
+    {
+        return !printServer().isEmpty();
+    }
+    /** Print if print_server and/or receipt_printer is set (both empty → no print). */
+    bool isReceiptPrintingConfigured() const
+    {
+        return usePrintServer() || hasReceiptPrinter();
     }
     const QString scalePattern() const { return data.value("f_scale_pattern").toString(); }
     const QString presentCardPattern() const
@@ -59,12 +89,24 @@ struct WorkstationItem : public ParentItem {
     }
     const int fiscalMachineId() const { return data.value("f_fiscal_machine_id").toInt(); }
     const int quickDebtPartnerId() const { return data.value("f_quick_debt_partner_id").toInt(); }
+    /** Common config: when true, reject sale if stock would go negative. Default false = allow minus. */
+    bool dontAllowNegativeRemains() const
+    {
+        return data.value(QStringLiteral("dont_allow_negative_remains")).toBool(false);
+    }
+    /** Shop: ask which associate to assign the sale to before payment. Default false = current cashier. */
+    bool assignSaleToAssociate() const
+    {
+        return data.value(QStringLiteral("assign_sale_to_associate")).toBool(false);
+    }
+    /** Waiter: write kitchen queue (o_goods_process) when customer notifications are enabled. */
+    bool customerNotification() const
+    {
+        return data.value(QStringLiteral("customer_notification")).toBool(false);
+    }
     const QString printServer() const
     {
-        QString url = data.value(QStringLiteral("print_server")).toString();
-        if(url.isEmpty()) {
-            url = data.value(QStringLiteral("print_sssserver")).toString();
-        }
+        QString url = data.value(QStringLiteral("print_server")).toString().trimmed();
         return url;
     }
     int printPaperWidthMm() const { return data.value(QStringLiteral("print_paper_width")).toInt(); }

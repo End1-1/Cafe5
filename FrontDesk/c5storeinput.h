@@ -2,9 +2,13 @@
 
 #include <QDate>
 #include <QLabel>
+#include <QVector>
 #include "c5widget.h"
+#include "dlgstoreinputpayment.h"
+#include "dlgstoreinputpricewarn.h"
 #include "office_structs.h"
 #include "struct_doc_store_input.h"
+#include "storeinputxmlimport.h"
 
 namespace Ui
 {
@@ -75,8 +79,14 @@ public:
 
     void fillFromInventory(const QList<InventoryDiff> &surpluses);
 
+    bool importInvoiceData(const StoreInputXmlInvoice &invoice,
+                           bool askReplaceGoods,
+                           const StoreInputXmlImportOptions &options = StoreInputXmlImportOptions());
+
 protected:
     virtual void nextChild() override;
+
+    bool eventFilter(QObject *watched, QEvent *event) override;
 
 private:
     Ui::C5StoreInput *ui;
@@ -85,9 +95,9 @@ private:
 
     bool fCanChangeFocus;
 
-    QAction *mActionSave;
+    QAction *mActionSave = nullptr;
 
-    QAction *mActionDraft;
+    QAction *mActionDraft = nullptr;
 
     QString mWebSocketRequestId;
 
@@ -100,12 +110,45 @@ private:
     QString mInitialComment;
     QString mInitialDocNum;
     bool mDocumentPersisted = false;
+    bool mClosingForNewDocument = false;
+    bool mPaidAmountUserEdited = false;
+    bool mPriceWarnSuppressed = false;
+    bool mSaveBusy = false;
+    bool mPriceAskOpen = false;
+    int mFocusPriceWarnRow = -1;
+
+    QVector<StorePaymentPreset> mPaymentPresets;
+    StorePaymentPreset mCurrentPayment;
 
     int mRelatedOutputTabIndex = -1;
 
     bool mRelatedOutputsLoaded = false;
 
     void captureInitialState();
+
+    void startNewDocument();
+
+    void initPaymentCombo();
+
+    void rebuildPaymentCombo();
+
+    void setPaymentUnpaid();
+
+    void applyPaymentPreset(const StorePaymentPreset &preset);
+
+    int addOrSelectPaymentPreset(const StorePaymentPreset &preset);
+
+    StorePaymentPreset currentPaymentPreset() const;
+
+    double paidAmountFromUi() const;
+
+    void setPaidAmountUi(double amount, bool markUserEdited = false);
+
+    void syncPaidAmountWithPayment();
+
+    void updatePaidAmountEditableState();
+
+    void editPostedPaidAmount();
 
     void loadRelatedOutputs();
 
@@ -115,11 +158,29 @@ private:
 
     double goodsRowPrice(int row) const;
 
+    int priceWarnMode() const;
+
+    int priceWarnPercent() const;
+
+    /** When false (default), rows with price 0 cannot be saved. */
+    bool priceAllowZero() const;
+
+    bool priceDeviationExceeded(int row, double price) const;
+
+    bool acceptPriceDeviation(int row, double price) const;
+
+    /** Ask about price jumps before save. Returns false if user rejects any. */
+    bool confirmPricesForSave();
+
+    void setPriceWarnSuppressed(bool suppressed) { mPriceWarnSuppressed = suppressed; }
+
     void syncGoodsSearchCachePrices() const;
 
     int unsavedCloseChoice() const;
 
     bool saveDraftBlocking();
+    bool savePostedBlocking();
+    bool saveBlocking(int status);
 
     bool buildDoc();
 
@@ -217,4 +278,12 @@ private slots:
     void on_tblRelatedOutput_cellDoubleClicked(int row, int column);
 
     void importFromXml();
+    void printBarcode();
+    void on_btnPaymentConfig_clicked();
+    void on_cbPayment_currentIndexChanged(int index);
+    void onPaidAmountEditingFinished();
+    void onPriceWarnSettings();
+    void onPriceEditingFinished();
+
+    void lineEditKeyPressed(const QChar &key);
 };

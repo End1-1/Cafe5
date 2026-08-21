@@ -1,0 +1,221 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>DlgStoreInputXmlImportOptions</class>
+ <widget class="QDialog" name="DlgStoreInputXmlImportOptions">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>520</width>
+    <height>520</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>XML import options</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <widget class="QLabel" name="lbIntro">
+     <property name="text">
+      <string>Choose how to handle partners, goods and duplicate invoices during import.</string>
+     </property>
+     <property name="wordWrap">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="gbStore">
+     <property name="title">
+      <string>Input store</string>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayoutStore">
+      <item>
+       <widget class="C5CodeNameSelector" name="wStore">
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>24</height>
+         </size>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::Shape::Box</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Shadow::Plain</enum>
+        </property>
+        <property name="selectorName" stdset="0">
+         <string>Input store</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="gbPartner">
+     <property name="title">
+      <string>Partner not found</string>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayoutPartner">
+      <item>
+       <widget class="QRadioButton" name="rbPartnerAutoCreate">
+        <property name="text">
+         <string>Create partner automatically from invoice data</string>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QRadioButton" name="rbPartnerDoNotCreate">
+        <property name="text">
+         <string>Do not create — abort import of this invoice</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="gbGoods">
+     <property name="title">
+      <string>Goods not found</string>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayoutGoods">
+      <item>
+       <widget class="QRadioButton" name="rbGoodsAutoCreate">
+        <property name="text">
+         <string>Create goods automatically</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QRadioButton" name="rbGoodsMatch">
+        <property name="text">
+         <string>Open match dialog (map or create manually)</string>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="gbDuplicates">
+     <property name="title">
+      <string>Duplicates (Series + Number)</string>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayoutDuplicates">
+      <item>
+       <widget class="QRadioButton" name="rbDupOverwrite">
+        <property name="text">
+         <string>Overwrite — delete all found documents, then import one new</string>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QRadioButton" name="rbDupSkip">
+        <property name="text">
+         <string>Skip — do not import duplicate invoices</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QRadioButton" name="rbDupAbort">
+        <property name="text">
+         <string>Cancel — abort entire import if any duplicate is found</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="gbSave">
+     <property name="title">
+      <string>Save</string>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayoutSave">
+      <item>
+       <widget class="QRadioButton" name="rbSaveOpenWindows">
+        <property name="text">
+         <string>Open documents in windows (do not save automatically)</string>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QRadioButton" name="rbSaveImmediateDraft">
+        <property name="text">
+         <string>Save immediately as draft (do not open windows)</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QRadioButton" name="rbSaveImmediatePosted">
+        <property name="text">
+         <string>Save immediately fully / posted (do not open windows)</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <spacer name="verticalSpacer">
+     <property name="orientation">
+      <enum>Qt::Orientation::Vertical</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>12</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item>
+    <widget class="QDialogButtonBox" name="buttonBox">
+     <property name="orientation">
+      <enum>Qt::Orientation::Horizontal</enum>
+     </property>
+     <property name="standardButtons">
+      <set>QDialogButtonBox::StandardButton::Cancel|QDialogButtonBox::StandardButton::Ok</set>
+     </property>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>C5CodeNameSelector</class>
+   <extends>QFrame</extends>
+   <header location="global">c5codenameselector.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections>
+  <connection>
+   <sender>buttonBox</sender>
+   <signal>accepted()</signal>
+   <receiver>DlgStoreInputXmlImportOptions</receiver>
+   <slot>accept()</slot>
+  </connection>
+  <connection>
+   <sender>buttonBox</sender>
+   <signal>rejected()</signal>
+   <receiver>DlgStoreInputXmlImportOptions</receiver>
+   <slot>reject()</slot>
+  </connection>
+ </connections>
+</ui>

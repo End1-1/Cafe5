@@ -44,6 +44,7 @@ class Stock
                 Translator::t("Storage"),
                 Translator::t("Group"),
                 Translator::t("Name"),
+                Translator::t("Barcode"),
                 Translator::t("Qty"),
                 Translator::t("Unit"),
                 Translator::t("Price"),
@@ -52,10 +53,10 @@ class Stock
             ],
             "hidden_columns" => [0],
             "col_widths" => [
-                ["col" => 4, "width" => 100],
-                ["col" => 7, "width" => 100]
+                ["col" => 5, "width" => 100],
+                ["col" => 8, "width" => 100]
             ],
-            "sum" => [4, 7],
+            "sum" => [5, 8],
             "filter" => $this->getFilterConfig()
         ];
     }
@@ -93,13 +94,13 @@ class Stock
             WHERE 1=1 " . $filterExtra;
 
         if ($summarize) {
-            $sql = "SELECT MIN(st.f_doc), MAX(s.f_name), MAX(gr.f_name), MAX(g.f_name),
+            $sql = "SELECT st.f_item_id, MAX(s.f_name), MAX(gr.f_name), MAX(g.f_name), MAX(g.f_scancode),
                     money_fmt(SUM(st.f_qty_left)), MAX(u.f_name),
                     money_fmt(SUM(st.f_qty_left * st.f_price) / NULLIF(SUM(st.f_qty_left), 0)),
                     money_fmt(SUM(st.f_qty_left * st.f_price)),
                     '' " . $joinsAndFrom . " GROUP BY st.f_store_id, st.f_item_id";
         } else {
-            $sql = "SELECT st.f_doc, s.f_name, gr.f_name, g.f_name,
+            $sql = "SELECT st.f_item_id, s.f_name, gr.f_name, g.f_name, g.f_scancode,
                     money_fmt(st.f_qty_left), u.f_name, money_fmt(st.f_price), 
                     money_fmt(st.f_qty_left * st.f_price),
                     date_fmt(st.f_expiry_date) " . $joinsAndFrom;
@@ -137,10 +138,11 @@ class Stock
         }
 
         $sql = "SELECT 
-                    MIN(m.f_id), 
+                    m.f_item_id, 
                     s.f_name, 
                     gr.f_name, 
                     g.f_name,
+                    g.f_scancode,
                     money_fmt(SUM(m.f_qty_in - m.f_qty_out)), 
                     u.f_name, 
                     money_fmt(SUM(m.f_total) / NULLIF(SUM(m.f_qty_in - m.f_qty_out), 0)),
@@ -163,7 +165,7 @@ class Stock
     {
         return [
             ["type" => "date", "name" => "date1", "label" => Translator::t("Date")],
-            ["type" => "combobox", "name" => "summarize", "label" => Translator::t("View mode"), "default" => 1, "values" => [
+            ["type" => "viewmode", "name" => "summarize", "label" => Translator::t("View mode"), "default" => 1, "values" => [
                 ["label" => Translator::t("Current total"), "value" => 1],
                 ["label" => Translator::t("Current detailed"), "value" => 0],
                 ["label" => Translator::t("Historical on date"), "value" => 2]

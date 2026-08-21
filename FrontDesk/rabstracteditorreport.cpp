@@ -1,24 +1,37 @@
 #include "rabstracteditorreport.h"
+#include <QAbstractButton>
 #include <QAbstractTableModel>
 #include <QApplication>
+#include <QButtonGroup>
 #include <QColor>
+#include <QDateTime>
 #include <QDesktopServices>
 #include <QDialog>
 #include <QDialogButtonBox>
+#include <QEvent>
 #include <QFileDialog>
 #include <QFont>
+#include <QFontMetrics>
 #include <QHBoxLayout>
 #include <QHeaderView>
 #include <QJsonArray>
 #include <QJsonDocument>
+#include <QJsonObject>
 #include <QListWidget>
 #include <QPushButton>
+#include <QResizeEvent>
+#include <QScrollArea>
 #include <QScrollBar>
 #include <QSet>
+#include <QSizePolicy>
 #include <QSortFilterProxyModel>
+#include <QTimer>
+#include <QToolButton>
 #include <QUrl>
 #include <QVBoxLayout>
+#include <QtGlobal>
 #include "c5config.h"
+#include "c5editor.h"
 #include "c5mainwindow.h"
 #include "c5message.h"
 #include "c5salaryeditor.h"
@@ -26,8 +39,12 @@
 #include "c5storeinput.h"
 #include "c5storeinventory.h"
 #include "c5storeoutput.h"
+#include "dlginventoryblankeditor.h"
+#include "c5storemovement.h"
+#include "c5storecomplectation.h"
 #include "c5user.h"
 #include "c5utils.h"
+#include "ce5goods.h"
 #include "rabstracteditordialog.h"
 #include "rfilterdialog.h"
 #include "rfilterproxymodel.h"
@@ -134,6 +151,32 @@ RAbstractEditorReport::RAbstractEditorReport(const QString &title, QIcon icon, c
     connect(ui->tblTotal->horizontalScrollBar(), &QScrollBar::valueChanged, this, [this](int value) {
         ui->tbl->horizontalScrollBar()->setValue(value);
     });
+    mViewModeGroup = new QButtonGroup(this);
+    mViewModeGroup->setExclusive(true);
+    connect(mViewModeGroup, QOverload<QAbstractButton *>::of(&QButtonGroup::buttonClicked), this, [this](QAbstractButton *btn) {
+        if(!btn) {
+            return;
+        }
+        const int value = btn->property("value").toInt();
+        const QJsonObject current = filterObject(mViewModeFilterName);
+        if(!current.isEmpty() && current.value(mViewModeFilterName).toInt() == value) {
+            return;
+        }
+        setViewModeFilterValue(value);
+        __c5config.setRegValue("filter_values_" + mEditorName, QJsonDocument(mFilterValues).toJson(QJsonDocument::Compact));
+        getData();
+    });
+    connect(ui->btnViewModeLeft, &QToolButton::clicked, this, [this] { scrollViewModeBy(-120); });
+    connect(ui->btnViewModeRight, &QToolButton::clicked, this, [this] { scrollViewModeBy(120); });
+    connect(ui->scrollViewMode->horizontalScrollBar(), &QScrollBar::rangeChanged, this, [this](int, int) {
+        syncViewModeScrollRange();
+    });
+    connect(ui->scrollViewMode->horizontalScrollBar(), &QScrollBar::valueChanged, this, [this](int) {
+        syncViewModeScrollRange();
+    });
+    ui->wViewMode->installEventFilter(this);
+    ui->scrollViewMode->installEventFilter(this);
+    ui->scrollViewMode->viewport()->installEventFilter(this);
     mFilterValues =  QJsonDocument::fromJson(__c5config.getRegValue("filter_values_" + mEditorName, "").toString().toUtf8()).array();
 }
 
@@ -163,6 +206,11 @@ QToolBar* RAbstractEditorReport::toolBar()
         fToolBar->addAction(QIcon(":/excel.png"), tr("Export\nto Excel"), this, [this] {
             exportToExcel();
         });
+        if(mEditorName == QLatin1String("form_stock")) {
+            fToolBar->addAction(QIcon(QStringLiteral(":/print.png")), tr("Print blank"), this, [this] {
+                printStockInventoryBlank();
+            });
+        }
     }
 
     return fToolBar;
@@ -187,6 +235,23 @@ void RAbstractEditorReport::showEvent(QShowEvent *e)
         mFirstLoad = false;
         getData();
     }
+}
+
+void RAbstractEditorReport::resizeEvent(QResizeEvent *e)
+{
+    C5Widget::resizeEvent(e);
+    updateViewModeScrollButtons();
+}
+
+bool RAbstractEditorReport::eventFilter(QObject *watched, QEvent *event)
+{
+    if(event->type() == QEvent::Resize
+        && (watched == ui->wViewMode
+            || watched == ui->scrollViewMode
+            || watched == ui->scrollViewMode->viewport())) {
+        updateViewModeScrollButtons();
+    }
+    return C5Widget::eventFilter(watched, event);
 }
 
 void RAbstractEditorReport::on_tbl_doubleClicked(const QModelIndex &index)
@@ -254,8 +319,21 @@ void RAbstractEditorReport::on_tbl_doubleClicked(const QModelIndex &index)
                            this,
                            {{"id", mModel->data(mModel->index(srcIndex.row(), 0), Qt::DisplayRole).toString()}},
                            [this](const QJsonObject &jo) {
-                               StoreInputDocument sid = JsonParser<StoreInputDocument>::fromJson(jo.value("doc").toObject());
+                               const QJsonObject docJo = jo.value("doc").toObject();
+                               StoreInputDocument sid = JsonParser<StoreInputDocument>::fromJson(docJo);
                                switch (sid.type) {
+                               case DOC_TYPE_STORE_MOVE: {
+                                   auto *sw = new C5StoreMovement(mUser, tr("Store movement"), QIcon());
+                                   __mainWindow->addWidget(sw);
+                                   sw->setDocument(sid);
+                                   return;
+                               }
+                               case DOC_TYPE_STORE_COMPLECTATION: {
+                                   auto *sw = new C5StoreComplectation(mUser, tr("Store complectation"), QIcon());
+                                   __mainWindow->addWidget(sw);
+                                   sw->setDocument(docJo);
+                                   return;
+                               }
                                case DOC_TYPE_STORE_INPUT: {
                                    auto *sw = new C5StoreInput(mUser, tr("Store input"), QIcon());
                                    __mainWindow->addWidget(sw);
@@ -268,6 +346,9 @@ void RAbstractEditorReport::on_tbl_doubleClicked(const QModelIndex &index)
                                    sw->setDocument(sid);
                                    return;
                                }
+                               default:
+                                   C5Message::error(tr("Unsupported document type"));
+                                   return;
                                }
                            });
         return;
@@ -298,6 +379,19 @@ void RAbstractEditorReport::on_tbl_doubleClicked(const QModelIndex &index)
                                __mainWindow->addWidget(sw);
                                sw->setDocument(sid);
                            });
+        return;
+    }
+
+    if (mEditorName == "form_stock") {
+        const int goodsId = mModel->data(mModel->index(srcIndex.row(), 0), Qt::DisplayRole).toInt();
+        if (goodsId <= 0) {
+            return;
+        }
+        CE5Goods *ep = new CE5Goods();
+        C5Editor *e = C5Editor::createEditor(mUser, ep, goodsId);
+        QList<QMap<QString, QVariant>> data;
+        e->getResult(data);
+        delete e;
         return;
     }
 
@@ -369,6 +463,7 @@ void RAbstractEditorReport::getData()
 
         mProxyModel->recalcSums();
         emit mProxyModel->sumsChanged(mProxyModel->columnSums);
+        setupViewModeBar();
     });
 }
 
@@ -509,10 +604,185 @@ void RAbstractEditorReport::applyFilter()
     df.buildWidget(mEditorName, mFilterWidget);
 
     if(df.exec() == QDialog::Accepted) {
+        const QJsonObject preservedViewMode = mViewModeFilterName.isEmpty()
+            ? QJsonObject()
+            : filterObject(mViewModeFilterName);
         mFilterValues = df.filterValues();
+        if(!preservedViewMode.isEmpty()) {
+            mFilterValues.append(preservedViewMode);
+        }
         getData();
         __c5config.setRegValue("filter_values_" + mEditorName, QJsonDocument(mFilterValues).toJson(QJsonDocument::Compact));
     }
+}
+
+void RAbstractEditorReport::clearViewModeButtons()
+{
+    if(mViewModeGroup) {
+        const QList<QAbstractButton *> buttons = mViewModeGroup->buttons();
+        for(QAbstractButton *btn : buttons) {
+            mViewModeGroup->removeButton(btn);
+        }
+    }
+    auto *layout = ui->horizontalLayoutViewModeButtons;
+    while(QLayoutItem *item = layout->takeAt(0)) {
+        if(QWidget *w = item->widget()) {
+            w->deleteLater();
+        }
+        delete item;
+    }
+}
+
+void RAbstractEditorReport::setViewModeFilterValue(int value)
+{
+    if(mViewModeFilterName.isEmpty()) {
+        return;
+    }
+    for(int i = 0; i < mFilterValues.size(); ++i) {
+        QJsonObject obj = mFilterValues.at(i).toObject();
+        if(obj.contains(mViewModeFilterName)) {
+            obj.insert(mViewModeFilterName, value);
+            mFilterValues.replace(i, obj);
+            return;
+        }
+    }
+    QJsonObject obj;
+    obj.insert(mViewModeFilterName, value);
+    mFilterValues.append(obj);
+}
+
+void RAbstractEditorReport::setupViewModeBar()
+{
+    QJsonObject viewModeConfig;
+    for(int i = 0; i < mFilterWidget.size(); ++i) {
+        const QJsonObject jo = mFilterWidget.at(i).toObject();
+        if(jo.value(QStringLiteral("type")).toString() == QStringLiteral("viewmode")) {
+            viewModeConfig = jo;
+            break;
+        }
+    }
+
+    if(viewModeConfig.isEmpty()) {
+        mViewModeFilterName.clear();
+        clearViewModeButtons();
+        ui->wViewMode->hide();
+        return;
+    }
+
+    mViewModeFilterName = viewModeConfig.value(QStringLiteral("name")).toString();
+    const QJsonArray values = viewModeConfig.value(QStringLiteral("values")).toArray();
+    if(mViewModeFilterName.isEmpty() || values.isEmpty()) {
+        mViewModeFilterName.clear();
+        clearViewModeButtons();
+        ui->wViewMode->hide();
+        return;
+    }
+    const int defaultValue = viewModeConfig.value(QStringLiteral("default")).toInt(1);
+    const QJsonObject currentObj = filterObject(mViewModeFilterName);
+    int currentValue = currentObj.isEmpty() ? defaultValue : currentObj.value(mViewModeFilterName).toInt(defaultValue);
+    if(currentObj.isEmpty()) {
+        setViewModeFilterValue(currentValue);
+        __c5config.setRegValue("filter_values_" + mEditorName, QJsonDocument(mFilterValues).toJson(QJsonDocument::Compact));
+    }
+
+    clearViewModeButtons();
+    auto *layout = ui->horizontalLayoutViewModeButtons;
+    layout->setSizeConstraint(QLayout::SetFixedSize);
+    static const char *kViewModeBtnStyle =
+        "QToolButton {"
+        "  border: 1px solid #c5cdd8;"
+        "  background-color: #f7f9fc;"
+        "  color: #1e2a3a;"
+        "  padding: 2px 10px;"
+        "  margin: 0px;"
+        "}"
+        "QToolButton:hover:!checked {"
+        "  background-color: rgba(99, 132, 232, 0.12);"
+        "  border: 1px solid rgba(99, 132, 232, 0.45);"
+        "}"
+        "QToolButton:checked {"
+        "  background-color: #6384e8;"
+        "  color: #ffffff;"
+        "  border: 1px solid #4a6ad4;"
+        "}";
+    for(const QJsonValue &jv : values) {
+        const QJsonObject item = jv.toObject();
+        auto *btn = new QToolButton(ui->wViewModeButtons);
+        const QString label = item.value(QStringLiteral("label")).toString();
+        btn->setText(label);
+        btn->setCheckable(true);
+        btn->setAutoRaise(false);
+        btn->setToolButtonStyle(Qt::ToolButtonTextOnly);
+        btn->setProperty("value", item.value(QStringLiteral("value")).toInt());
+        btn->setFixedHeight(28);
+        btn->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Fixed);
+        btn->setStyleSheet(QLatin1String(kViewModeBtnStyle));
+        // Width for bold text so checked state never clips (stylesheet may still bold via theme).
+        QFont f = btn->font();
+        f.setBold(true);
+        const int textW = QFontMetrics(f).horizontalAdvance(label);
+        btn->setMinimumWidth(textW + 24);
+        layout->addWidget(btn);
+        mViewModeGroup->addButton(btn);
+        if(btn->property("value").toInt() == currentValue) {
+            btn->setChecked(true);
+        }
+    }
+    ui->wViewMode->show();
+    ui->wViewMode->setFixedHeight(28);
+    ui->scrollViewMode->setFixedHeight(28);
+    ui->wViewModeButtons->setFixedHeight(28);
+    ui->btnViewModeLeft->setFixedSize(28, 28);
+    ui->btnViewModeRight->setFixedSize(28, 28);
+    ui->horizontalLayoutViewMode->setAlignment(ui->btnViewModeLeft, Qt::AlignVCenter);
+    ui->horizontalLayoutViewMode->setAlignment(ui->scrollViewMode, Qt::AlignVCenter);
+    ui->horizontalLayoutViewMode->setAlignment(ui->btnViewModeRight, Qt::AlignVCenter);
+    ui->wViewModeButtons->adjustSize();
+    updateViewModeScrollButtons();
+    QTimer::singleShot(0, this, [this] { updateViewModeScrollButtons(); });
+}
+
+void RAbstractEditorReport::updateViewModeScrollButtons()
+{
+    if(mUpdatingViewModeScroll || !ui->wViewMode->isVisible()) {
+        return;
+    }
+    mUpdatingViewModeScroll = true;
+    // Keep scroll buttons always in the layout so restore/resize cannot
+    // lose the right button to a chicken-and-egg visibility/viewport race.
+    ui->btnViewModeLeft->show();
+    ui->btnViewModeRight->show();
+    syncViewModeScrollRange();
+    mUpdatingViewModeScroll = false;
+}
+
+void RAbstractEditorReport::syncViewModeScrollRange()
+{
+    if(!ui->wViewMode->isVisible()) {
+        return;
+    }
+
+    const int contentW = qMax(ui->wViewModeButtons->width(), ui->wViewModeButtons->sizeHint().width());
+    const int viewportW = qMax(1, ui->scrollViewMode->viewport()->width());
+    const int maxPos = qMax(0, contentW - viewportW);
+
+    QScrollBar *bar = ui->scrollViewMode->horizontalScrollBar();
+    // Force range: after restore Qt often keeps maximum=0 until user interacts.
+    bar->setRange(0, maxPos);
+    bar->setPageStep(viewportW);
+    bar->setSingleStep(40);
+
+    const bool canScroll = maxPos > 0;
+    ui->btnViewModeLeft->setEnabled(canScroll && bar->value() > 0);
+    ui->btnViewModeRight->setEnabled(canScroll && bar->value() < maxPos);
+}
+
+void RAbstractEditorReport::scrollViewModeBy(int delta)
+{
+    syncViewModeScrollRange();
+    QScrollBar *bar = ui->scrollViewMode->horizontalScrollBar();
+    bar->setValue(bar->value() + delta);
+    syncViewModeScrollRange();
 }
 
 void RAbstractEditorReport::removeAction()
@@ -657,6 +927,74 @@ void RAbstractEditorReport::showColumnValueFilterDialog(int col)
         return;
     }
     mProxyModel->setColumnValueAllowList(col, chosen);
+}
+
+void RAbstractEditorReport::printStockInventoryBlank()
+{
+    if(mEditorName != QLatin1String("form_stock") || !mProxyModel) {
+        return;
+    }
+    if(mProxyModel->rowCount() == 0) {
+        C5Message::info(tr("Empty report!"));
+        return;
+    }
+
+    // Stock report columns: Id, Storage, Group, Name, Barcode, Qty, Unit, ...
+    constexpr int colId = 0;
+    constexpr int colStore = 1;
+    constexpr int colGroup = 2;
+    constexpr int colName = 3;
+    constexpr int colSku = 4;
+    constexpr int colQty = 5;
+    constexpr int colUnit = 6;
+
+    QMap<QString, QJsonArray> itemsByStore;
+    for(int r = 0; r < mProxyModel->rowCount(); ++r) {
+        const QString name = mProxyModel->index(r, colName).data(Qt::DisplayRole).toString().trimmed();
+        if(name.isEmpty()) {
+            continue;
+        }
+        const QString storeName = mProxyModel->index(r, colStore).data(Qt::DisplayRole).toString().trimmed();
+        const int goodsId = mProxyModel->index(r, colId).data(Qt::DisplayRole).toInt();
+        QJsonObject item;
+        item.insert(QStringLiteral("goods_id"), goodsId);
+        item.insert(QStringLiteral("code"), goodsId > 0 ? QString::number(goodsId) : QString());
+        item.insert(QStringLiteral("name"), name);
+        item.insert(QStringLiteral("unit"), mProxyModel->index(r, colUnit).data(Qt::DisplayRole).toString());
+        item.insert(QStringLiteral("sku"), mProxyModel->index(r, colSku).data(Qt::DisplayRole).toString());
+        item.insert(QStringLiteral("group_name"), mProxyModel->index(r, colGroup).data(Qt::DisplayRole).toString());
+        const QString qty = mProxyModel->index(r, colQty).data(Qt::DisplayRole).toString();
+        item.insert(QStringLiteral("qty"), qty);
+        item.insert(QStringLiteral("qty_sys"), qty);
+        itemsByStore[storeName.isEmpty() ? tr("Storage") : storeName].append(item);
+    }
+
+    if(itemsByStore.isEmpty()) {
+        C5Message::info(tr("Empty report!"));
+        return;
+    }
+
+    QJsonArray stores;
+    for(auto it = itemsByStore.constBegin(); it != itemsByStore.constEnd(); ++it) {
+        QJsonObject store;
+        store.insert(QStringLiteral("store_id"), 0);
+        store.insert(QStringLiteral("store_name"), it.key());
+        store.insert(QStringLiteral("items"), it.value());
+        stores.append(store);
+    }
+
+    QString title = tr("Inventory blank");
+    if(itemsByStore.size() == 1) {
+        title += QStringLiteral(" — ") + itemsByStore.constBegin().key();
+    }
+
+    QJsonObject blank;
+    blank.insert(QStringLiteral("title"), title);
+    blank.insert(QStringLiteral("created"),
+                 QDateTime::currentDateTime().toString(QStringLiteral("yyyy-MM-dd HH:mm:ss")));
+    blank.insert(QStringLiteral("stores"), stores);
+
+    DlgInventoryBlankEditor::printBlank(blank, this);
 }
 
 void RAbstractEditorReport::exportToExcel()

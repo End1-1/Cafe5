@@ -49,6 +49,12 @@ void NLoadingDlg::resetSeconds()
     open();
 }
 
+void NLoadingDlg::setTitle(const QString &title)
+{
+    ui->lbTitle->setText(title);
+    ui->lbTitle->setWordWrap(true);
+}
+
 void NLoadingDlg::hide()
 {
     QWidget::hide();

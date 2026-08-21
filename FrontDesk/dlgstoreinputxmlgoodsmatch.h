@@ -33,5 +33,7 @@ private:
 
     QVector<C5CodeNameSelector *> mSelectors;
 
+    QVector<QCheckBox *> mCreateChecks;
+
     QVector<QCheckBox *> mUpdateChecks;
 };

@@ -79,6 +79,7 @@ void CE5GoodsGroup::clear()
     fPendingImage.clear();
     fImageChanged = false;
     fRemoveImage = false;
+    ui->chOnlineSale->setChecked(false);
     ui->lbImg->setPixmap(QPixmap());
     ui->lbImg->setText(tr("Right click to select image"));
     ui->leImageUUID->setText(C5Database::uuid());
@@ -107,6 +108,12 @@ void CE5GoodsGroup::applyGroup(const QJsonObject &group, const QString &imageBas
     ui->lineEdit_4->setText(group.value(QStringLiteral("f_adgcode")).toString());
     ui->lineEdit_5->setDouble(group.value(QStringLiteral("f_chargevalue")).toDouble());
     ui->lineEdit_6->setInteger(group.value(QStringLiteral("f_order")).toInt());
+    {
+        const QJsonValue online = group.value(QStringLiteral("f_online_sale"));
+        const bool checked = online.isBool() ? online.toBool()
+                                             : (online.toVariant().toInt() > 0);
+        ui->chOnlineSale->setChecked(checked);
+    }
 
     const QString imageId = group.value(QStringLiteral("f_image")).toString();
     if (!imageId.isEmpty()) {
@@ -182,6 +189,7 @@ QJsonObject CE5GoodsGroup::makeSaveJson() const
     jo.insert(QStringLiteral("f_chargevalue"), ui->lineEdit_5->getDouble());
     jo.insert(QStringLiteral("f_order"), intOrNull(ui->lineEdit_6->getInteger()));
     jo.insert(QStringLiteral("f_image"), ui->leImageUUID->text());
+    jo.insert(QStringLiteral("f_online_sale"), ui->chOnlineSale->isChecked() ? 1 : 0);
 
     if (fRemoveImage) {
         jo.insert(QStringLiteral("f_remove_image"), 1);

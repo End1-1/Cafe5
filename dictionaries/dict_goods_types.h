@@ -1,4 +1,8 @@
 #pragma once
+#include <QMap>
+#include <QObject>
+#include <QString>
+#include <QVector>
 
 #define GOODS_TYPE_UNKNOWN 0
 #define GOODS_TYPE_GOODS 1
@@ -7,3 +11,8 @@
 #define GOODS_TYPE_MODIFICATOR 4
 #define GOODS_TYPE_PACKAGE 5
 #define GOODS_TYPE_GUEST 6
+
+extern const QVector<int> goods_types;
+extern const QMap<int, const char *> goods_type_names;
+
+QString goodsTypeDisplayName(int typeId);

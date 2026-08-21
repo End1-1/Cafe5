@@ -178,7 +178,9 @@ struct JsonParser<WaiterDish> {
         wd.header = jo["f_header"].toString();
         wd.type = jo["f_type"].toInt();
         wd.parent = jo.value("f_parent").toString();
-        wd.state = jo["f_state"].toInt();
+        wd.state = jo.value(QStringLiteral("f_state")).isString()
+                      ? jo.value(QStringLiteral("f_state")).toString().toInt()
+                      : jo.value(QStringLiteral("f_state")).toInt();
         wd.store = jo["f_store"].toInt();
         wd.dishId = jo["f_dish"].toInt();
         wd.dishName = jo["f_dish_name"].toString();
@@ -223,6 +225,12 @@ struct JsonParser<WaiterDish> {
 
         wd.data["f_fiscal_department"] = jo["f_fiscal_department"];
         wd.data["f_adgt"] = jo["f_adgt"];
+
+        const QString colEmarks = jo.value(QStringLiteral("f_emarks")).toString().trimmed();
+        if (!colEmarks.isEmpty()
+            && wd.data.value(QStringLiteral("f_emarks")).toString().trimmed().isEmpty()) {
+            wd.data.insert(QStringLiteral("f_emarks"), colEmarks);
+        }
 
         return wd;
     }

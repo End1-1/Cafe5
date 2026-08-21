@@ -1,0 +1,1618 @@
+ArmSoft export options
+Service
+Expcense account
+Income account
+Materials
+Expense account
+VAT type
+Barista
+OK
+Cancel
+Code
+Group
+Name
+Part
+Full caption
+Unit
+Scancode
+Complect output
+Qty in box
+Retail price
+Whosale price
+Adg code
+Address
+Legal name
+Contact
+Info
+Phone
+Email
+Taxcode
+Teamlead
+Description
+Currency code
+Row
+Product code
+Product
+Process code
+Process
+Duration
+Rate
+Symbol
+Currency code1
+Currency name 1
+Currency code 2
+Currency name 2
+Date
+Status
+Price
+Type
+Form
+Currency
+Cash name
+Cash movement
+Source cashbox
+Destination cashbox
+Comment
+Select source cashbox to load available funds
+Save
+No available funds in this cashbox
+Enter amount to move or click Available to fill
+Funds
+Amount
+Available
+Click to fill amount
+Source cashbox is required
+Destination cashbox is required
+Source and destination must differ
+Amount exceeds available funds
+Amount must be greater than zero
+Change input price
+Goods
+Change
+This record not exists
+Goods is not selected
+Change password
+Old password
+New password
+Confirm password
+Password does not match
+Password cannot be empty
+Old password doesnt match
+Price for group
+Wholesale price
+Check code
+Retail discounted
+Wholesale discounted
+Check code is not valid
+Empty report
+Selector name
+Connection
+Connection  type
+Server username
+Settings name
+Server key
+Authenticate on the server
+Settings password
+None  secure
+Secure connection (SSL)
+Server address
+Server password
+Access denied
+Saved
+Filter
+Nothing was selected
+Data synchronization
+Revert
+Query
+Done
+Date range
+Date start
+Date end
+Reset option
+Select option to reset
+Reset sales and buy information
+SALE CODE
+Full reset
+FULL CODE
+Accept
+Select atleast one option
+Checking code for sales and buy not correct
+Checking code for full reset not correct
+User
+New Row
+New Column
+Database access
+Login
+Updater not found. Reinstall the application.
+Reedem accumulated
+Amount to reedem
+Redeem
+Delete record
+Customer
+Card
+Transaction
+Current balance
+Partner must be selected
+Amount must be greater then zero
+Invalid card id
+Confirm delete record
+Group action
+Store
+State
+Start
+Search price in past, if not exists
+Search
+Goods code
+Group name
+Goods name
+Calculation of the cost of dishes
+The prices was updated
+Main
+Barcode
+Emark required
+Menu
+Menu record
+Menu code
+Menu name
+Print1
+Print2
+Recent
+Additional
+Can discount
+Special dicount
+Cooking time
+Վերահաշվարկել
+Daily qty
+Set
+Dish code
+Dish name
+Մաքսիմալ քանակ
+Ready dish weight
+Same as in store
+Image
+Hourly payment
+Extra
+Add goods (+)
+New goods (Control + N)
+Remove selected row (-)
+Copy recipe (Control + C)
+Paste recipe (Control + P)
+Comments
+Append service fee
+Queue
+Reminder
+Color
+Show online
+Recipe
+Recipes
+Record
+Qty
+Total
+Dish
+Image, right click to begin
+Storage is not defined in menu.<br>
+Background color
+You should to save dish before upload an image
+Could not load image
+Remove image
+Ready weight must be greater than  0
+No changes
+Confirm to remove dish comment
+No recipe in clipboard
+Could not add goods without code
+Upload image
+No barcode defined.
+Name must be defined.
+Goods group must be defined
+Templates of queries
+Cash doc
+Dialog
+Save and new
+Copy
+Close
+Check/Uncheck all
+Check/Uncheck selected
+Request cancel
+Refresh
+Fiscal
+Request
+Response
+Confirm fiscal return
+Config fiscal machine select not implemented
+Taxback complete
+Group id
+Sold
+Stock
+Percent %
+Retail
+Whosale
+Retaile discounted
+Whosale discounted
+Goods id
+Remove
+Set retail price of selected goods
+Set whosale price of selected goods
+Edit name
+Group discount
+Group already added
+Select group of goods
+Confirm
+New name
+Confirm to remove
+Pricing options
+Round value
+Goods special whosale price
+Partner Name
+Parnert ID
+Goods barcode
+Partner addres
+Goods special price
+Goods special retail price
+Partner TIN
+Goods ID
+Goods group
+Partner ID
+Spesial price
+Diff retail
+Diff whosale
+TaxCode
+Empty report!
+Copy selection
+Copy all
+Set filter
+Remove filter
+Autofit columns widths
+Report parameters
+Parameters
+Show columns
+Apply
+Actions
+All actions
+Goods pricing
+Store input
+Store movement
+Store output
+Allow change store document date
+Goods reservatoins
+Retail sale
+Allow change cash document date
+Store complectation
+Store inventory
+Calculate dishes self cost
+Whosale sale
+All items
+Show sales of all users
+Edit stoplist
+Print precheck
+Quantity reminder
+Auto waste
+Complectations
+Classes
+Images
+Units
+Storages
+Only price edit
+Groups
+Reports
+Sales, expert mode
+Sales from store
+Documents
+Goods consuption, draft
+Detailed movement in the storage
+Debts to partners
+Sales, removed dishes
+Custom reports
+Documents in the store
+Storage uncomplected
+Discount statistics
+Goods movement
+T-store extra
+Goods movement, uncomplected
+Storage
+Preorders
+Sales, car visits
+Sales, dishes
+Reason for consuption
+Goods output by calculation and sales
+Salary
+Edit document
+Report
+Payment
+Cash
+Cash common report
+Cash names
+Movement in the cash
+Cash detailed report
+Costumer debts report
+Costumer debts pay
+Edit cash documents
+Edit currency rate
+Cash shifts
+Dish price and self cost report
+Dish remove reasons
+Menu names
+Types of dishes
+Dish departments
+Review menu
+Dishes packages
+Waiter
+Edit orders
+Reprint precheck
+Cancel precheck
+Special payment types
+Close order
+Remove printed goods
+Reprint printed goods
+Transfer items
+Change service factor
+Remove discount
+Open close shift
+Shop
+Enter to sales
+Enter to storages deals
+Fiscal report
+Report, by goods
+Report, by groups of goods
+Refund goods
+Delete row from order
+Discount
+Other
+Partners
+Credit cards
+Halls
+Tables
+Discount system
+Upload data to other server
+Settings for data synchronization
+Store reasons
+Order marks
+Route
+Route exec
+Preferences
+Login to manager
+Login to waiter
+Users groups
+Users
+Databases
+Settings
+Manufacture
+Menu availbility
+Workshops list
+Process stages
+Product list
+Action list
+Daily processes
+General report
+General report only date
+Edit tasks
+List of active tasks
+Miscellaneous
+Permissions
+Shift
+Shift was not selected
+Username
+Password
+Database
+Storehouse
+Navigation
+Close application
+Logout
+Disconnected
+Are you sure to close application?
+Dashboard
+Password changed
+Favorites
+New store inventory
+Goods reservations
+New retail traid
+New whosale traid
+Debts journal
+Storage movement, uncomplected
+Sales by goods
+New cash document
+Currency rates
+Currency cross rates
+Currency cross rates history
+History
+Payments
+Dish depts
+Groups of goods
+Special prices
+Active tasks
+Workshops
+Action stages
+Products
+Store reason
+Route report
+Positions of employees
+Employees
+Translator
+Add to favorites?
+Remove from favorites?
+Updater not found. Please download the update from the link.
+Chage password
+Waiter password
+For remove password leave this field empty
+Front desk password
+Fingerprint
+Progress
+Global search
+Revenue cash operation
+Operation
+Income
+Outcome
+Operation type
+Cashbox
+Payment type
+DateTime
+Debt Recovery
+Sales Revenue
+Cash Overage
+Total Expenses
+Purchasing Costs
+Salaries and Wages
+Debt Repayment
+Utilities
+Cash Shortage
+Cashbox must be selected in filter
+Comment is required
+filter
+Driver
+Partner status
+Route id
+PartnerId
+Taxname
+Salary accrual
+Add employee
+Remove employee
+Change position
+Autofill
+Fill from registered employees with attendance on this date
+Total accrued:
+Position
+Load document for the selected date? Current rows will be replaced.
+Calculate
+Print
+Replace current rows with employees from attendance?
+No registered employees with attendance on this date.
+Employee is not set.
+Position is not set.
+Add employees first.
+Nothing to save.
+%n row(s): amount is zero.
+%n row(s): employee is not set.
+Add at least one employee with amounts.
+Fixed
+Dish sales base
+Calculated
+Bonus
+Date: %1
+Total accrued: %1
+Salary payment
+Total paid:
+Fill the payment document with employees from salary accrual for today?
+No salary accrual entries found for this date.
+Debt
+Paid amount
+Total paid: %1
+Sale
+Order id
+Partner
+Seller
+Time
+Hall
+TaxDept
+Print A4
+Print tax
+Amount, total
+Amount, cash
+Amount, card
+Excel
+No such order
+Removal complete
+Date is not valid
+Dept option is selected, but no partner selected
+Order
+Buyer
+Material code
+Total amount
+Debug mode
+Movement document counter*
+Sale, common
+Auto date of close
+Close table after service print
+Close table after precheck
+Deny change qty
+Disable grouping when printing
+CAS program path
+Dont check qty of store
+Applicatin font base size
+Application font family
+Update temp storage for shop
+Automatically store output after sale
+Final receipt quantity selection
+Ask for precheck
+System thouthand separator
+Compact dishes in order
+Dont close empty order
+Autocharge item after close session
+Hide quantity column
+Mobile client config text
+External tax
+Never offer tax
+Service print font size
+Service print font family
+Dont print
+Receipt print font family
+Force use print alias
+Receipt print font size
+Print modicators on receipt
+External integration
+Idram server
+External scale
+Find
+Idram ID
+Idram phone
+Idram tips
+Idram wallet
+Idram name
+Idram session ID
+Date of close
+Card autoinput
+Auto cash input
+User id for hotel voucher
+Hall id for hotel record
+Mobile application connection string
+Default currency
+No invoice record for hotel
+Input quantity before append dish
+Company name
+Company info for documents
+Autodiscount
+Delivery costumer id
+Debtholder filter id
+Available stores
+Coin cashdesk
+VAT included
+Choose pos
+Hide revenue
+Prepaid only by gift
+Show whosale price
+Bank account number
+Bank name
+Company tin
+Company address
+Remind about out of stock
+Service item code
+Discount item code
+Waiter server
+Change qty of return items
+Print total quantity of goods
+Clear sale draft
+Copy from
+Full
+Change draft date to current
+Autodiscount card   number
+Max days of history
+Sale, smart
+Նկարներ
+Simple fiscal
+Static QR code text
+Dont print final receipt
+Http server
+HTTP server ip
+HTTP server port
+HTTP server username
+HTTP server password
+Connection string
+Test
+Mobile
+Picasso.store buttons
+Orders
+Loading goods
+Use websocket
+Completed orders
+Debts
+Draft sale
+Check quantity
+New order
+Store input check
+Sale output confirmation
+Return of goods
+Chat operator user id
+Deny logout
+Cash autoinput
+Print dish timeorder
+Print scancode with name
+Widthe of printer
+Card autoinput prefix
+Cash autoinput prefix
+Receipt footer text
+Sale, waiter
+Login after payment
+Working date change time
+Car mode
+Deny retail
+Deny whosale
+Deny price changing
+Fix staff
+Printing
+Receipt paper width
+Printing goods qty side
+Left of name
+Down of name
+Tax options
+Always offer tax
+Output document counter*
+Input document number digits
+Input documents counter*
+Default store
+*This settings common for all cases
+Frontdesk mode
+Movement document number digits
+Output document number digits
+No cash doc option in store doc
+No scancode in store doc
+Item code for hotel voucher
+Service value
+Main menu
+Hotel database
+Order number prefix
+Default hall
+Default table
+Receipt printer
+Loading
+Saving
+S/R quantities
+Rec id
+SR id
+SR name
+SR qty
+Goods qty
+Link
+Sizes
+Barcode print
+scancodes
+scancodes 2
+descriptions
+Set list
+Range
+End
+Output store
+Input store
+Number
+Complectation
+Select
+Add
+Base qty
+Draft
+New
+document
+Complectation goods not selected
+Complectation qty required
+Empty document
+Output store not selected
+Input store not selected
+Quantity not valid on row #
+Confirm to remove document
+Deleted
+Doc number
+Quantity
+Output goods
+Disassembly
+Output store is not defined
+Input store is not defined
+has no quantity
+Multiple rows in result, getting first
+WebSocket is not initialized. Restart the application.
+No connection to the server. Check the network and try again.
+Failed to send the barcode request. Check the connection to the server.
+Select complect
+Print template
+Print one document
+Print two document
+Goods list
+New row
+Remove row
+Edit goods on selected row
+New goods
+Search by scancode (F2)
+Leave focus
+Search in document
+Goods Id
+Valid date
+Remain
+Addtitional costs
+Responsible persons
+Accepted
+Passed
+Write-off
+Doc. number
+Sum
+Doc type
+Partial paid
+Payment settings
+Total qty
+Save comment without making draft
+Export
+to Excel
+barcode
+Duplicate as output
+Duplicate as input
+Partner not selected
+Armenian dram
+Import
+from XML
+warning
+Price difference for %1 is more than %2%. Current: %3, Old: %4. Accept?
+Document has unsaved changes. Save before closing?
+Close without saving
+Significant price difference for 
+ on row 
+Price not valid on row #
+Partner not specified
+Row #
+ empty qty
+Payment type not specified
+Paid amount is not valid
+Paid amount cannot exceed document total
+Cashbox not selected
+Cannot add goods without code
+Cannot change goods without code
+Imported from inventory surplus 
+Unsupported document type
+Import is available only for draft documents
+Import from XML
+No invoices found in XML file
+Import cancelled: invoice %1 already exists in the database.
+Preparing…
+Checking %1 (%2 / %3)
+Importing invoices…
+Importing %1 (%2 / %3)
+%1 — import failed
+%1 — save failed
+Store input XML import — errors
+Saved: %1 / %2
+Partner with TIN %1 was not found. Import aborted for invoice %2.
+Unknown error
+Empty document id
+Store input XML import — delete errors
+Failed to write delete errors:
+Failed to import invoice %1 into a new document
+Document already contains goods lines. Replace existing lines?
+Replace
+Partner with TIN %1 was not found. Create from invoice data?
+Cannot load goods data for: %1
+Imported %1 goods lines from invoice %2
+Не оплачено
+Filter by name
+Diff
+Export diffs
+Store inventorization
+Select storage
+This action will clear current result
+Cannot save an emtpy document
+Stores must be different
+Imported from inventory deficit 
+Failed to reload dictionary from server.
+Server error while loading the list.
+Failed to send the search request. Check the connection to the server.
+Failed to send the reload request. Check the connection to the server.
+Update
+English (key)
+Armenian
+Russian
+You have not permission
+Edit
+changes
+Search by
+parameters
+Clear
+Export to
+MS Excel
+Create tables for hall
+Prefix
+First
+Count
+Create
+Hall is not selected
+Load image
+Select image
+Credit card
+Base currency
+Dependened currency
+Cross currency rate
+Currency 1
+Currency 2
+Set current rate
+Cross rate
+Currency rate
+Active
+Client
+Value
+Discount type
+Card number
+Card code
+Discount card
+Duplicate card code
+Dishes
+Self cost
+Printer
+Selfcost
+Enabled
+Dish package
+Storage not selected
+The quantity of dishes must be greater then zero.
+Append
+Image UUID
+Dish department
+Right click to select image
+You should to save before upload an image
+ADG code
+Department
+Parent
+Qr Required
+ՀԴՄ բաժին
+Չփոխել չափսը
+Dish type
+Cannot parent itself
+Dish remove reason
+Program error. Cannot find field with id property
+Invalid code
+Duplicate id
+cannot be empty
+Margin 2
+Margin 1
+Low level
+Weight
+Account
+Cost price
+Pricing
+Production
+No price modificator
+Հդմ անվանում
+Box quantity
+Count service
+Count discount
+Ready output
+unit
+Row id
+Attributes
+Dietary / Allergen Badges
+Gluten-free
+Vegetarian
+Vegan
+No GMO
+Lactose-free
+Sugar-free
+Contains nuts
+Halal / Kosher
+Macros / Nutrition (per 100 g)
+Calories, kcal
+Protein, g
+Fat, g
+Carbs, g
+Dynamic attributes
+Attribute
+Measurement
+Modificators
+Modificator name
+Required
+Relations
+Drinks
+Others
+Component exit
+Options
+Same store id
+Web link
+Gen barcode EAN8
+Queue in list
+Fixed value
+Percent value
+Store output goods
+Only whole number
+Sale price
+Retail disc
+Whosale disc
+Duplicate scancode
+Goods code for store output cannot be undefined
+Goods type must be selected
+Print card
+Template not found
+Printed
+Goods card
+Internal code
+Price type
+Complectation cost
+Could not encode image
+Scancode field must be empty
+Clear current data
+This modificator is already added
+This dish is already added
+Tax dept
+Charge value
+Class
+Model
+Default qty for shop
+Full name
+Goods unit
+Hall of counter
+Counter
+Order prefix
+Default settings
+Stage
+Actions stage
+Հիմնական
+Update prices
+Չափումներ
+Անվանում
+Արժեք
+Լրացուցիչ
+Նկար
+Նյութածախս
+Կոդ
+Քանակ
+Կտորի բաղադրություն
+Սպիտակեցումը հակացուցված է
+Չոր մաքրում
+Հարդուկ
+Լվացում
+Չքամել և չչորացնել լվացքի մեքենայում
+Ընդացիկ առաջադրանքներ
+Rownum
+Duration, sec
+7h goal
+Goal price
+Update price
+Done.
+Save first
+Confirm to clear whole process
+Do you want to create complectation documents?
+Created
+Main info
+Workshop
+Ready
+Out
+Date create
+Responsible
+Notes
+Key
+Task
+Length
+Width
+Size
+Start date
+End date
+Duplicate name
+Order mark
+Package
+Sum of components
+Package price
+Sale type
+Category
+Legal Address
+Manager
+Taxpayer id
+Select category
+Select group
+Select state
+Output counter
+Complectation counter
+Movement counter
+Input counter
+Movement reason
+This item is not editable
+Special config
+Hourly fee id
+Table
+Photo
+Last name
+First name
+Configuration
+Duplicate login name
+Fine per minute
+Work start time
+Department code
+Maximum fine minute
+Work end time
+Skip amount
+Count only working time
+Minimum
+Maximum
+User group
+Car visits
+Gov number
+Bank
+Column &apos;Header&apos; must be checked in filter
+Nothing selected
+Costumer
+Gov. number
+Purpose
+Cashdesk
+Tax
+All
+Complimentary
+Not complimentary
+Yes
+No
+Returned item
+Hotel
+Date cash is null
+With buyer
+Use closing
+datetime
+Staff
+Report type
+Quantities
+Amounts
+Sale counted
+Qty, recipe
+Qty, sale
+Dish part
+Currencies
+Cross rates
+Name 1
+Name 2
+Cross rates history
+Currency code 1
+Currency rates history
+Host
+Access
+Backup
+database
+Reset
+Select folder for dump
+Backup with error
+Backup completed
+Dicount system
+Mode
+Contact name
+Client info
+Dept name
+This name in use and cannot be removed
+Confirm to remove the selected dish part and all dishes that includes this part
+Document type
+Reason*
+*Only for documents in the store
+Document state
+Supplier
+Paid
+Operator
+Type of dish
+Type of goods
+Manufacture general report only date
+Worker
+Counted
+Days
+Average
+Absent
+Image size
+Real charge value
+Fiscal name
+Build web
+Group price
+Scales
+ArmSoft map
+S/R price update
+ID Column must be included in report
+Warning! This operation will applied to all goods in the current report! Continue?
+You must select Code field in the report
+You must select Last Input field in the report
+You must select Charge value field in the report
+Used in recipes
+Used in complectation
+Used in store documents
+Used in sales (shop)
+Cannot remove 
+Select currency
+Build complete
+Last input price
+No service
+Price currency
+Group of goods
+Delete selected goods group?
+Group contains %1 goods. Move them to another group and delete?
+Select another group
+Reason
+Group of material
+In/Out
+Store, input
+Store. output
+Material
+Legal address
+Low quantity
+Min qty
+Material group
+Goods reservation
+Source
+Message
+Search date
+Show current reserves
+Date created
+Date expired
+Date completed
+Date canceled
+Default qty
+Hall counter
+Stages of actions
+Tasks
+Configure
+tablet
+Manufacture general report
+Worker state
+Worker position
+Show zeroes
+Show drafts
+Materials in the store without complects
+Total retail
+Total whosale
+Unit of complected goods must be defined
+Class 3
+Class 4
+Class 1
+Class 2
+Unit of complect
+VIew
+Storage movement, uncomplect
+Action
+Materials in the store
+Warning
+Retail amount
+Total retail discounted
+Total whosale discounted
+Whosale amount
+Code column must be included in report
+No recipe
+English
+Manufacture actions
+Stage code
+find employee
+Daily journal
+Max
+Process id
+Last
+work
+action
+all workers
+Could not add task
+No active task
+Saved, but some of quantities equals to 0.
+The quantity of the processes is greater than goal
+user
+Worker already added in selected date
+Are you sure to remove?
+Worker is not selected
+Orders marks
+Preorders history
+Time created
+Date for
+Time for
+Advance
+Invalid report id
+Confirm to remove selected objects
+Crossrate
+Edit route
+Salary by workers
+Employee
+Display
+Without fiscal
+With fiscal
+Goods type
+Returned items
+Sales from store total
+Initial
+Final, qty
+Final amount
+Show quantity
+Show amount
+Header
+Order state
+Date, cash
+Time, close
+Dept
+Dish state
+Remove reason
+Column &apos;Dish code&apos; must be checked in filter
+With recipe
+Delete
+settings
+Confirm removal
+Partial
+Store move reason
+Store price
+Retail prices
+Input prices
+Create hall
+Cannot delete default table
+Delete selected table?
+Config
+passwords
+Set group
+permissions
+Calculator
+Calendar
+Received
+Phone number
+Customer name
+Address must be defined
+Phone must defined
+Invalid phone number
+Waiter workstation
+Money in/out
+Amount cannot be zero
+Purpose must be defined
+Close session
+Current balance:
+Input from sale
+Cash amount
+Input from delivery
+Incorrect balance
+Confirm to close session
+Including:
+Other transactions
+Total balance
+Avaiable cash
+Change the store of oupput
+Change the store
+Check visible
+Store is not selected
+Are you sure to change store?
+Redeem debt
+Supplier debt (we owe)
+Customer debt (they owe us)
+Currency id
+Select partner
+Document raw editor
+Used
+Cannot remove goods that was used
+Confirm remove
+New quantity less than used
+Create route
+Select driver
+Export options
+Service out account
+Items in account
+Partner code
+Store code
+VAT value
+Items out account
+Export simple
+Service in account
+No tax
+Bank acquiring account
+Service item
+Simple  item
+Guest info
+Search customer
+Enter name or phone (min 2 characters)
+Connection success
+Connection error
+Inventory blanks
+Select a blank
+Delete selected blank?
+Compare with recipes
+No longer in recipes
+No longer in recipes (%1)
+New in recipes
+New in recipes (%1)
+Apply all
+Remove obsolete
+Add new
+Inventory blank
+Title
+SKU
+Add row
+Refresh from recipes
+Enter title
+Blank matches recipes
+Select store
+Create blank for which store?
+All stores (one common blank)
+Store #%1
+Comment for
+New cityledger
+The name cannot be empty
+TABLE
+Remove from stoplist
+Enter your username and pin
+Set quantity
+Reserve number
+Reserved qty
+Reserve date
+Available qty
+ՀԴՄ Կ/Տ
+Կանխիկ
+Cancel reserve
+Complete reserve
+Անկանխիկ
+Day of end
+Goods is not specified
+Store is not specified
+The end date is not valid
+The end date can be tomorrow
+Incorrect quantity
+Insufficient quantity
+Fiscal check printed successfully
+Sales amount
+Percent
+Accrual
+Summary
+Loading...
+Employee or position is not set.
+Date: %1, employee: %2
+Sales total: %1
+After skip amount (%1): %2
+Divided by employees with same position: %1
+Dish sales base: %1
+No percent-based dish sales found for this employee on the selected date.
+Semiready goods
+Edit service value
+New service value
+Delete selected service value?
+New City ledger
+Text
+Prepare to work
+Saved payment variants
+Variant
+Currency not selected
+Delete selected payment variant?
+Price deviation warning
+Warning mode
+Do not warn
+Warn before save
+Warn after price edit (focus lost)
+Deviation percent
+Match goods
+Some goods were not found by name. Match each line to a goods item or create a new one.
+Import name
+Goods in database
+Update name
+Rename
+Match or create all goods before import. Row: %1
+XML import options
+Choose how to handle partners, goods and duplicate invoices during import.
+Select input store
+Open documents in windows (do not save automatically)
+Save immediately as draft (do not open windows)
+Save immediately fully / posted (do not open windows)
+Save immediately as draft (do not open documents in windows)
+Partner not found
+Create partner automatically from invoice data
+Do not create — abort import of this invoice
+Goods not found
+Create goods automatically
+Open match dialog (map or create manually)
+Duplicates (Series + Number)
+Overwrite — delete all found documents, then import one new
+Skip — do not import duplicate invoices
+Cancel — abort entire import if any duplicate is found
+Select invoices
+Check invoices to import. The first checked one is imported into the current document; the others open in new windows. Double-click a row to preview invoice lines.
+Select all
+Clear all
+TIN
+Invoice #
+Check at least one invoice
+Invoice preview
+Invoice preview — %1
+Invoice: %1
+Supplier: %2
+TIN: %3
+Date: %4
+Total: %5
+Lines: %6
+Update partner data
+Partner data differs from invoice. Select fields to update.
+Field
+In database
+In invoice
+Tax name
+Select at least one field to update
+No fingerprint registered
+Register fingerprint
+Fingerprint is registered
+Replace fingerprint
+Fingerprint saved
+Waiting for scanner...
+Remove fingerprint for this user?
+Fingerprint removed
+Please, wait...
+Operation timeout
+Authorization error
+Application update required
+Search parameters
+New customer payment
+New partner payment
+Pay off a debt
+Pay off a debt?
+Redeem accumulated
+Unauthorized
+1 sec
+The message!
+Tax code
+Prepaid
+View
+Tax number
+Total advance
+Failed to start sc.exe
+Service command timeout
+Failed to start PowerShell for elevation.
+UAC request timeout.
+Sale report
+System
+Document status
+Employee group
+Use the same finger for all scans
+Registration restarted
+Press finger %1 of %2
+Failed to merge fingerprint templates
+Verification: press the same finger again
+Verification failed, try again
+Settings editor is not available for this workstation type
+Reload
+Columns
+Do you want to delete the selected document?
+Select document type
+No data to filter.
+Filter: %1
+(empty)
+Save Excel
+Could not save file
+movement
+Recalculate
+store output
+Recalculate store output for the selected period?
+Existing write-offs will be removed and sales will be posted again.
+No closed sales found for the selected period
+Recalculating store output…
+Processing %1 (%2 / %3)
+Request failed
+Failed
+Consumed goods — store output recalculation errors
+Done: %1 / %2
+Select currency in parameters.
+Redemption recorded.
+Tab
+Switch to dishes and recipes mode
+Order not found
+Cash sessions
+Sold items
+Revenue
+Session id
+Closed
+Opened
+Append time
+Print time
+Remove time
+Important
+Cashier
+Present card pattern
+Discount card pattern
+Accumulate card pattern
+Scale pattern
+Quick debt partner id
+Print server URL
+Input cashbox amount before close
+Bistro mode
+Auto fiscal
+Print side margin (mm)
+Cashbox id
+Default hall id
+Fiscal machine id
+Arcus server IP address
+Default store id
+Card payment via arkus
+Port
+Arcus authorization
+API key
+Receipt phone
+Receipt without table
+Receipt without service hint
+Receipt without discount hint
+Receipt policy
+Search menu horizontal section
+Search menu vertical section
+Cost depended on service and discount
+Precheck: phone and address only (no customer name)
+Recent dishes window (minutes)
+Setup buttons (disable when checked)
+Disable button when checked
+Station account
+Settings editor is not available for workstation type %1
+Workstations
+Service values
+Select printers
+Print #1
+Print #2
+Return
+Device number
+Serial
+Receipt number
+(F)
+Buyer taxcode
+Refund
+Class | Name | Qty | Price | Total
+Class:
+Need to pay
+Payment, cash
+Payment, card
+Thank you for visit!
+Goods line without description
+Invalid quantity for goods: %1
+Invalid TotalPrice for goods: %1
+Document id is empty
+Supplier TIN is missing
+Supply date is missing or invalid
+Invoice has no goods lines
+Cannot open file: %1
+Invalid XML file
+Invalid invoice data
+XML parse error: %1
+User is not defined
+Context is not defined
+Failed to create partner
+Empty goods description
+Supplier is not defined
+Failed to create goods
+Tax receipt number
+Print tax X report
+Print tax Z report
+Consumed goods
+New sale
+New store input
+New store output
+New store movement
+New store complectation
+Store moves
+New inventory
+Inventory documents
+City ledger
+Order in progress
+Job titles
+Store documents
+Inventory
+Menu review
+Dashboard buttons visibility
+Select visible buttons
+Dish times
+Event
+Cooking
+Served
+Status %1
+Dish id is missing
+Not authorized
+Invalid time format on row "%1". Use yyyy-MM-dd HH:mm:ss
+Failed to save dish times
+Order inspector
+Click to copy order id
+Copy order id
+Removed
+Kitchen
+Component
+Sold qty
+Consumed qty
+Cost
+Raw order
+Open
+Empty
+Moved
+Preorder
+State %1
+Failed to initialize fingerprint reader
+Failed to open fingerprint reader
+Failed to initialize fingerprint database
+Invalid fingerprint reader parameters
+Fingerprint reader is not connected
+Press finger 1 of %1
+Place your finger on the scanner
+Fingerprint reader is supported on Windows only
+About
+Restart Breeze
+Version:
+UAC confirmation requested. Breeze restart command was started as administrator.
+Failed to request administrator restart for Breeze.
+Elevation output:
+Լավ
+Մաքրել
+Ավելացնել
+Հրաժարվել

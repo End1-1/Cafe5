@@ -6,283 +6,808 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>900</width>
-    <height>620</height>
+    <width>980</width>
+    <height>720</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Waiter TableWidget style</string>
+   <string>Waiter style</string>
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QHBoxLayout" name="horizontalLayout">
     <item>
-     <widget class="QGroupBox" name="groupSettings">
-      <property name="title">
-       <string>TableWidget (DlgFace)</string>
-      </property>
-      <layout class="QFormLayout" name="formLayout">
-       <item row="0" column="0" colspan="2">
-        <layout class="QHBoxLayout" name="cssPathLayout">
-         <item>
-          <widget class="QLineEdit" name="leCssPath"/>
+     <layout class="QVBoxLayout" name="leftColumnLayout">
+      <item>
+       <widget class="QGroupBox" name="groupSettings">
+        <property name="title">
+         <string>TableWidget (DlgFace)</string>
+        </property>
+        <layout class="QFormLayout" name="formLayout">
+         <item row="0" column="0" colspan="2">
+          <layout class="QHBoxLayout" name="cssPathLayout">
+           <item>
+            <widget class="QLineEdit" name="leCssPath"/>
+           </item>
+           <item>
+            <widget class="QPushButton" name="btnBrowse">
+             <property name="text">
+              <string>...</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
          </item>
-         <item>
-          <widget class="QPushButton" name="btnBrowse">
+         <item row="1" column="0">
+          <widget class="QLabel" name="lblBorder">
            <property name="text">
-            <string>...</string>
+            <string>Border width</string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="1">
+          <widget class="QSpinBox" name="sbBorderWidth">
+           <property name="minimum">
+            <number>0</number>
+           </property>
+           <property name="maximum">
+            <number>12</number>
+           </property>
+           <property name="value">
+            <number>1</number>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="0">
+          <widget class="QLabel" name="lblGrid">
+           <property name="text">
+            <string>Border color</string>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="1">
+          <widget class="QPushButton" name="btnGridColor">
+           <property name="minimumSize">
+            <size>
+             <width>120</width>
+             <height>28</height>
+            </size>
+           </property>
+           <property name="text">
+            <string>Pick</string>
+           </property>
+          </widget>
+         </item>
+         <item row="3" column="0">
+          <widget class="QLabel" name="lblEmpty">
+           <property name="text">
+            <string>Empty — background</string>
+           </property>
+          </widget>
+         </item>
+         <item row="3" column="1">
+          <widget class="QPushButton" name="btnEmptyColor">
+           <property name="minimumSize">
+            <size>
+             <width>120</width>
+             <height>28</height>
+            </size>
+           </property>
+           <property name="text">
+            <string>Pick</string>
+           </property>
+          </widget>
+         </item>
+         <item row="4" column="0">
+          <widget class="QLabel" name="lblEmptyText">
+           <property name="text">
+            <string>Empty — text</string>
+           </property>
+          </widget>
+         </item>
+         <item row="4" column="1">
+          <widget class="QPushButton" name="btnEmptyTextColor">
+           <property name="minimumSize">
+            <size>
+             <width>120</width>
+             <height>28</height>
+            </size>
+           </property>
+           <property name="text">
+            <string>Pick</string>
+           </property>
+          </widget>
+         </item>
+         <item row="5" column="0">
+          <widget class="QLabel" name="lblOrder">
+           <property name="text">
+            <string>With order — background</string>
+           </property>
+          </widget>
+         </item>
+         <item row="5" column="1">
+          <widget class="QPushButton" name="btnOrderColor">
+           <property name="minimumSize">
+            <size>
+             <width>120</width>
+             <height>28</height>
+            </size>
+           </property>
+           <property name="text">
+            <string>Pick</string>
+           </property>
+          </widget>
+         </item>
+         <item row="6" column="0">
+          <widget class="QLabel" name="lblOrderText">
+           <property name="text">
+            <string>With order — text</string>
+           </property>
+          </widget>
+         </item>
+         <item row="6" column="1">
+          <widget class="QPushButton" name="btnOrderTextColor">
+           <property name="minimumSize">
+            <size>
+             <width>120</width>
+             <height>28</height>
+            </size>
+           </property>
+           <property name="text">
+            <string>Pick</string>
+           </property>
+          </widget>
+         </item>
+         <item row="7" column="0">
+          <widget class="QLabel" name="lblPrecheck">
+           <property name="text">
+            <string>With precheck — background</string>
+           </property>
+          </widget>
+         </item>
+         <item row="7" column="1">
+          <widget class="QPushButton" name="btnPrecheckColor">
+           <property name="minimumSize">
+            <size>
+             <width>120</width>
+             <height>28</height>
+            </size>
+           </property>
+           <property name="text">
+            <string>Pick</string>
+           </property>
+          </widget>
+         </item>
+         <item row="8" column="0">
+          <widget class="QLabel" name="lblPrecheckText">
+           <property name="text">
+            <string>With precheck — text</string>
+           </property>
+          </widget>
+         </item>
+         <item row="8" column="1">
+          <widget class="QPushButton" name="btnPrecheckTextColor">
+           <property name="minimumSize">
+            <size>
+             <width>120</width>
+             <height>28</height>
+            </size>
+           </property>
+           <property name="text">
+            <string>Pick</string>
+           </property>
+          </widget>
+         </item>
+         <item row="9" column="0">
+          <widget class="QPushButton" name="btnReload">
+           <property name="text">
+            <string>Reload</string>
+           </property>
+          </widget>
+         </item>
+         <item row="9" column="1">
+          <widget class="QPushButton" name="btnSave">
+           <property name="text">
+            <string>Save to waiter.css</string>
            </property>
           </widget>
          </item>
         </layout>
-       </item>
-       <item row="1" column="0">
-        <widget class="QLabel" name="lblBorder">
-         <property name="text">
-          <string>Border width</string>
-         </property>
-        </widget>
-       </item>
-       <item row="1" column="1">
-        <widget class="QSpinBox" name="sbBorderWidth">
-         <property name="minimum">
-          <number>0</number>
-         </property>
-         <property name="maximum">
-          <number>12</number>
-         </property>
-         <property name="value">
-          <number>1</number>
-         </property>
-        </widget>
-       </item>
-       <item row="2" column="0">
-        <widget class="QLabel" name="lblGrid">
-         <property name="text">
-          <string>Border color</string>
-         </property>
-        </widget>
-       </item>
-       <item row="2" column="1">
-        <widget class="QPushButton" name="btnGridColor">
-         <property name="minimumSize">
-          <size>
-           <width>120</width>
-           <height>28</height>
-          </size>
-         </property>
-         <property name="text">
-          <string>Pick</string>
-         </property>
-        </widget>
-       </item>
-       <item row="3" column="0">
-        <widget class="QLabel" name="lblEmpty">
-         <property name="text">
-          <string>Empty — background</string>
-         </property>
-        </widget>
-       </item>
-       <item row="3" column="1">
-        <widget class="QPushButton" name="btnEmptyColor">
-         <property name="minimumSize">
-          <size>
-           <width>120</width>
-           <height>28</height>
-          </size>
-         </property>
-         <property name="text">
-          <string>Pick</string>
-         </property>
-        </widget>
-       </item>
-       <item row="4" column="0">
-        <widget class="QLabel" name="lblEmptyText">
-         <property name="text">
-          <string>Empty — text</string>
-         </property>
-        </widget>
-       </item>
-       <item row="4" column="1">
-        <widget class="QPushButton" name="btnEmptyTextColor">
-         <property name="minimumSize">
-          <size>
-           <width>120</width>
-           <height>28</height>
-          </size>
-         </property>
-         <property name="text">
-          <string>Pick</string>
-         </property>
-        </widget>
-       </item>
-       <item row="5" column="0">
-        <widget class="QLabel" name="lblOrder">
-         <property name="text">
-          <string>With order — background</string>
-         </property>
-        </widget>
-       </item>
-       <item row="5" column="1">
-        <widget class="QPushButton" name="btnOrderColor">
-         <property name="minimumSize">
-          <size>
-           <width>120</width>
-           <height>28</height>
-          </size>
-         </property>
-         <property name="text">
-          <string>Pick</string>
-         </property>
-        </widget>
-       </item>
-       <item row="6" column="0">
-        <widget class="QLabel" name="lblOrderText">
-         <property name="text">
-          <string>With order — text</string>
-         </property>
-        </widget>
-       </item>
-       <item row="6" column="1">
-        <widget class="QPushButton" name="btnOrderTextColor">
-         <property name="minimumSize">
-          <size>
-           <width>120</width>
-           <height>28</height>
-          </size>
-         </property>
-         <property name="text">
-          <string>Pick</string>
-         </property>
-        </widget>
-       </item>
-       <item row="7" column="0">
-        <widget class="QLabel" name="lblPrecheck">
-         <property name="text">
-          <string>With precheck — background</string>
-         </property>
-        </widget>
-       </item>
-       <item row="7" column="1">
-        <widget class="QPushButton" name="btnPrecheckColor">
-         <property name="minimumSize">
-          <size>
-           <width>120</width>
-           <height>28</height>
-          </size>
-         </property>
-         <property name="text">
-          <string>Pick</string>
-         </property>
-        </widget>
-       </item>
-       <item row="8" column="0">
-        <widget class="QLabel" name="lblPrecheckText">
-         <property name="text">
-          <string>With precheck — text</string>
-         </property>
-        </widget>
-       </item>
-       <item row="8" column="1">
-        <widget class="QPushButton" name="btnPrecheckTextColor">
-         <property name="minimumSize">
-          <size>
-           <width>120</width>
-           <height>28</height>
-          </size>
-         </property>
-         <property name="text">
-          <string>Pick</string>
-         </property>
-        </widget>
-       </item>
-       <item row="9" column="0">
-        <widget class="QPushButton" name="btnReload">
-         <property name="text">
-          <string>Reload</string>
-         </property>
-        </widget>
-       </item>
-       <item row="9" column="1">
-        <widget class="QPushButton" name="btnSave">
-         <property name="text">
-          <string>Save to waiter.css</string>
-         </property>
-        </widget>
-       </item>
-      </layout>
-     </widget>
+       </widget>
+      </item>
+      <item>
+       <widget class="QGroupBox" name="groupDishGroups">
+        <property name="title">
+         <string>Dish groups (DlgOrder)</string>
+        </property>
+        <layout class="QFormLayout" name="formDishGroups">
+         <item row="0" column="0">
+          <widget class="QLabel" name="lblGroupSpacing">
+           <property name="text">
+            <string>Spacing</string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="1">
+          <widget class="QSpinBox" name="sbGroupSpacing">
+           <property name="minimum">
+            <number>0</number>
+           </property>
+           <property name="maximum">
+            <number>32</number>
+           </property>
+           <property name="value">
+            <number>1</number>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="0">
+          <widget class="QLabel" name="lblGroupBorder">
+           <property name="text">
+            <string>Border width</string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="1">
+          <widget class="QSpinBox" name="sbGroupBorderWidth">
+           <property name="minimum">
+            <number>0</number>
+           </property>
+           <property name="maximum">
+            <number>12</number>
+           </property>
+           <property name="value">
+            <number>0</number>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="0">
+          <widget class="QLabel" name="lblGroupBg">
+           <property name="text">
+            <string>Default background</string>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="1">
+          <widget class="QPushButton" name="btnGroupBgColor">
+           <property name="minimumSize">
+            <size>
+             <width>120</width>
+             <height>28</height>
+            </size>
+           </property>
+           <property name="text">
+            <string>Pick</string>
+           </property>
+          </widget>
+         </item>
+         <item row="3" column="0">
+          <widget class="QLabel" name="lblGroupRows">
+           <property name="text">
+            <string>Visible rows</string>
+           </property>
+          </widget>
+         </item>
+         <item row="3" column="1">
+          <widget class="QSpinBox" name="sbGroupVisibleRows">
+           <property name="minimum">
+            <number>1</number>
+           </property>
+           <property name="maximum">
+            <number>12</number>
+           </property>
+           <property name="value">
+            <number>3</number>
+           </property>
+          </widget>
+         </item>
+         <item row="4" column="0">
+          <widget class="QLabel" name="lblGroupFontSize">
+           <property name="text">
+            <string>Font size</string>
+           </property>
+          </widget>
+         </item>
+         <item row="4" column="1">
+          <widget class="QSpinBox" name="sbGroupFontSize">
+           <property name="minimum">
+            <number>7</number>
+           </property>
+           <property name="maximum">
+            <number>48</number>
+           </property>
+           <property name="value">
+            <number>12</number>
+           </property>
+          </widget>
+         </item>
+         <item row="5" column="0">
+          <widget class="QLabel" name="lblGroupFontBold">
+           <property name="text">
+            <string>Font bold</string>
+           </property>
+          </widget>
+         </item>
+         <item row="5" column="1">
+          <widget class="QCheckBox" name="chGroupFontBold">
+           <property name="text">
+            <string>Bold</string>
+           </property>
+           <property name="checked">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+         <item row="6" column="0">
+          <widget class="QLabel" name="lblGroupFontColor">
+           <property name="text">
+            <string>Font color</string>
+           </property>
+          </widget>
+         </item>
+         <item row="6" column="1">
+          <widget class="QPushButton" name="btnGroupFontColor">
+           <property name="minimumSize">
+            <size>
+             <width>120</width>
+             <height>28</height>
+            </size>
+           </property>
+           <property name="text">
+            <string>Pick</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </item>
+      <item>
+       <widget class="QGroupBox" name="groupDishes">
+        <property name="title">
+         <string>Dishes (DlgOrder)</string>
+        </property>
+        <layout class="QFormLayout" name="formDishes">
+         <item row="0" column="0">
+          <widget class="QLabel" name="lblDishSpacing">
+           <property name="text">
+            <string>Spacing</string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="1">
+          <widget class="QSpinBox" name="sbDishSpacing">
+           <property name="minimum">
+            <number>0</number>
+           </property>
+           <property name="maximum">
+            <number>32</number>
+           </property>
+           <property name="value">
+            <number>1</number>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="0">
+          <widget class="QLabel" name="lblDishBorder">
+           <property name="text">
+            <string>Border width</string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="1">
+          <widget class="QSpinBox" name="sbDishBorderWidth">
+           <property name="minimum">
+            <number>0</number>
+           </property>
+           <property name="maximum">
+            <number>12</number>
+           </property>
+           <property name="value">
+            <number>1</number>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="0">
+          <widget class="QLabel" name="lblDishBg">
+           <property name="text">
+            <string>Default background</string>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="1">
+          <widget class="QPushButton" name="btnDishBgColor">
+           <property name="minimumSize">
+            <size>
+             <width>120</width>
+             <height>28</height>
+            </size>
+           </property>
+           <property name="text">
+            <string>Pick</string>
+           </property>
+          </widget>
+         </item>
+         <item row="3" column="0">
+          <widget class="QLabel" name="lblDishHeight">
+           <property name="text">
+            <string>Button height</string>
+           </property>
+          </widget>
+         </item>
+         <item row="3" column="1">
+          <widget class="QSpinBox" name="sbDishHeight">
+           <property name="minimum">
+            <number>40</number>
+           </property>
+           <property name="maximum">
+            <number>200</number>
+           </property>
+           <property name="value">
+            <number>60</number>
+           </property>
+          </widget>
+         </item>
+         <item row="4" column="0">
+          <widget class="QLabel" name="lblDishFontSize">
+           <property name="text">
+            <string>Font size</string>
+           </property>
+          </widget>
+         </item>
+         <item row="4" column="1">
+          <widget class="QSpinBox" name="sbDishFontSize">
+           <property name="minimum">
+            <number>7</number>
+           </property>
+           <property name="maximum">
+            <number>48</number>
+           </property>
+           <property name="value">
+            <number>12</number>
+           </property>
+          </widget>
+         </item>
+         <item row="5" column="0">
+          <widget class="QLabel" name="lblDishFontBold">
+           <property name="text">
+            <string>Font bold</string>
+           </property>
+          </widget>
+         </item>
+         <item row="5" column="1">
+          <widget class="QCheckBox" name="chDishFontBold">
+           <property name="text">
+            <string>Bold</string>
+           </property>
+          </widget>
+         </item>
+         <item row="6" column="0">
+          <widget class="QLabel" name="lblDishFontColor">
+           <property name="text">
+            <string>Font color</string>
+           </property>
+          </widget>
+         </item>
+         <item row="6" column="1">
+          <widget class="QPushButton" name="btnDishFontColor">
+           <property name="minimumSize">
+            <size>
+             <width>120</width>
+             <height>28</height>
+            </size>
+           </property>
+           <property name="text">
+            <string>Pick</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </item>
+      <item>
+       <spacer name="leftSpacer">
+        <property name="orientation">
+         <enum>Qt::Orientation::Vertical</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>20</width>
+          <height>40</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+     </layout>
     </item>
     <item>
-     <widget class="QGroupBox" name="groupPreview">
-      <property name="title">
-       <string>Preview</string>
-      </property>
-      <layout class="QVBoxLayout" name="verticalLayout">
-       <item>
-        <widget class="QWidget" name="wPreviewHall" native="true">
-         <layout class="QHBoxLayout" name="previewHallLayout">
-          <item>
-           <widget class="QFrame" name="framePreviewEmpty">
-            <property name="minimumSize">
-             <size>
-              <width>200</width>
-              <height>100</height>
-             </size>
+     <layout class="QVBoxLayout" name="rightColumnLayout">
+      <item>
+       <widget class="QGroupBox" name="groupPreview">
+        <property name="title">
+         <string>Tables preview</string>
+        </property>
+        <layout class="QVBoxLayout" name="verticalLayout">
+         <item>
+          <widget class="QWidget" name="wPreviewHall" native="true">
+           <layout class="QHBoxLayout" name="previewHallLayout">
+            <item>
+             <widget class="QFrame" name="framePreviewEmpty">
+              <property name="minimumSize">
+               <size>
+                <width>200</width>
+                <height>100</height>
+               </size>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>200</width>
+                <height>100</height>
+               </size>
+              </property>
+              <property name="frameShape">
+               <enum>QFrame::Shape::StyledPanel</enum>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QFrame" name="framePreviewOrder">
+              <property name="minimumSize">
+               <size>
+                <width>200</width>
+                <height>100</height>
+               </size>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>200</width>
+                <height>100</height>
+               </size>
+              </property>
+              <property name="frameShape">
+               <enum>QFrame::Shape::StyledPanel</enum>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QFrame" name="framePreviewPrecheck">
+              <property name="minimumSize">
+               <size>
+                <width>200</width>
+                <height>100</height>
+               </size>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>200</width>
+                <height>100</height>
+               </size>
+              </property>
+              <property name="frameShape">
+               <enum>QFrame::Shape::StyledPanel</enum>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </item>
+      <item>
+       <widget class="QGroupBox" name="groupGroupsPreview">
+        <property name="title">
+         <string>Dish groups preview</string>
+        </property>
+        <layout class="QVBoxLayout" name="groupsPreviewLayout">
+         <item>
+          <widget class="QWidget" name="wPreviewGroups" native="true">
+           <layout class="QGridLayout" name="glPreviewGroups">
+            <property name="spacing">
+             <number>1</number>
             </property>
-            <property name="maximumSize">
-             <size>
-              <width>200</width>
-              <height>100</height>
-             </size>
+            <item row="0" column="0">
+             <widget class="QFrame" name="frameGroupPreview1">
+              <property name="minimumSize">
+               <size>
+                <width>120</width>
+                <height>48</height>
+               </size>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>16777215</width>
+                <height>48</height>
+               </size>
+              </property>
+              <property name="frameShape">
+               <enum>QFrame::Shape::StyledPanel</enum>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="1">
+             <widget class="QFrame" name="frameGroupPreview2">
+              <property name="minimumSize">
+               <size>
+                <width>120</width>
+                <height>48</height>
+               </size>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>16777215</width>
+                <height>48</height>
+               </size>
+              </property>
+              <property name="frameShape">
+               <enum>QFrame::Shape::StyledPanel</enum>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="0">
+             <widget class="QFrame" name="frameGroupPreview3">
+              <property name="minimumSize">
+               <size>
+                <width>120</width>
+                <height>48</height>
+               </size>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>16777215</width>
+                <height>48</height>
+               </size>
+              </property>
+              <property name="frameShape">
+               <enum>QFrame::Shape::StyledPanel</enum>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="1">
+             <widget class="QFrame" name="frameGroupPreview4">
+              <property name="minimumSize">
+               <size>
+                <width>120</width>
+                <height>48</height>
+               </size>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>16777215</width>
+                <height>48</height>
+               </size>
+              </property>
+              <property name="frameShape">
+               <enum>QFrame::Shape::StyledPanel</enum>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="lblGroupStripHint">
+           <property name="text">
+            <string>Strip height: 150 px</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </item>
+      <item>
+       <widget class="QGroupBox" name="groupDishesPreview">
+        <property name="title">
+         <string>Dishes preview</string>
+        </property>
+        <layout class="QVBoxLayout" name="dishesPreviewLayout">
+         <item>
+          <widget class="QWidget" name="wPreviewDishes" native="true">
+           <layout class="QGridLayout" name="glPreviewDishes">
+            <property name="spacing">
+             <number>1</number>
             </property>
-            <property name="frameShape">
-             <enum>QFrame::Shape::StyledPanel</enum>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QFrame" name="framePreviewOrder">
-            <property name="minimumSize">
-             <size>
-              <width>200</width>
-              <height>100</height>
-             </size>
-            </property>
-            <property name="maximumSize">
-             <size>
-              <width>200</width>
-              <height>100</height>
-             </size>
-            </property>
-            <property name="frameShape">
-             <enum>QFrame::Shape::StyledPanel</enum>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QFrame" name="framePreviewPrecheck">
-            <property name="minimumSize">
-             <size>
-              <width>200</width>
-              <height>100</height>
-             </size>
-            </property>
-            <property name="maximumSize">
-             <size>
-              <width>200</width>
-              <height>100</height>
-             </size>
-            </property>
-            <property name="frameShape">
-             <enum>QFrame::Shape::StyledPanel</enum>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </widget>
-       </item>
-      </layout>
-     </widget>
+            <item row="0" column="0">
+             <widget class="QFrame" name="frameDishPreview1">
+              <property name="minimumSize">
+               <size>
+                <width>140</width>
+                <height>60</height>
+               </size>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>16777215</width>
+                <height>60</height>
+               </size>
+              </property>
+              <property name="frameShape">
+               <enum>QFrame::Shape::StyledPanel</enum>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="1">
+             <widget class="QFrame" name="frameDishPreview2">
+              <property name="minimumSize">
+               <size>
+                <width>140</width>
+                <height>60</height>
+               </size>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>16777215</width>
+                <height>60</height>
+               </size>
+              </property>
+              <property name="frameShape">
+               <enum>QFrame::Shape::StyledPanel</enum>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="0">
+             <widget class="QFrame" name="frameDishPreview3">
+              <property name="minimumSize">
+               <size>
+                <width>140</width>
+                <height>60</height>
+               </size>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>16777215</width>
+                <height>60</height>
+               </size>
+              </property>
+              <property name="frameShape">
+               <enum>QFrame::Shape::StyledPanel</enum>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="1">
+             <widget class="QFrame" name="frameDishPreview4">
+              <property name="minimumSize">
+               <size>
+                <width>140</width>
+                <height>60</height>
+               </size>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>16777215</width>
+                <height>60</height>
+               </size>
+              </property>
+              <property name="frameShape">
+               <enum>QFrame::Shape::StyledPanel</enum>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="lblDishHint">
+           <property name="text">
+            <string>Button height: 60 px</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </item>
+      <item>
+       <spacer name="rightSpacer">
+        <property name="orientation">
+         <enum>Qt::Orientation::Vertical</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>20</width>
+          <height>40</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+     </layout>
     </item>
    </layout>
   </widget>

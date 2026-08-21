@@ -60,6 +60,7 @@ set(APP_SOURCES
     ../Http/httplite.cpp
     arcusclient.h arcusclient.cpp
     ../Cafe5/c5registrysettings.cpp ../Cafe5/c5registrysettings.h
+    ../Cafe5/c5uilanguage.cpp ../Cafe5/c5uilanguage.h
 
 
 
@@ -68,10 +69,13 @@ set(APP_SOURCES
     c5shopdialog.cpp dlgcashout.cpp dlgdate.cpp
     dlggetvalue.cpp dlggiftcardsale.cpp dlggoodslist.cpp
     dlgpin.cpp dlgregistercard.cpp dlgshopcustomer.cpp dlgshowcolumns.cpp
+    dlgfindorder.cpp dlgfindorder.h dlgfindorder.ui
+    dlgattendancelogin.cpp dlgattendancelogin.h dlgattendancelogin.ui
     dqty.cpp goodsreturnreason.cpp main.cpp sales.cpp searchitems.cpp selectstaff.cpp
     threadworker.cpp userphoto.cpp  vieworder.cpp
     wcustomerdisplay.cpp working.cpp worder.cpp wsession.cpp
     dlgpaymentchoose.cpp dlgpaymentchoose.h dlgpaymentchoose.ui
+    dlgcookingprogress.cpp dlgcookingprogress.h dlgcookingprogress.ui
     printreceiptgroup.cpp printreceiptgroup.h
     version.h
 

@@ -42,8 +42,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>1018</width>
-        <height>723</height>
+        <width>1022</width>
+        <height>727</height>
        </rect>
       </property>
       <layout class="QHBoxLayout" name="horizontalLayout_2">
@@ -59,7 +59,7 @@
           <enum>Qt::FocusPolicy::NoFocus</enum>
          </property>
          <property name="currentIndex">
-          <number>1</number>
+          <number>0</number>
          </property>
          <widget class="QWidget" name="tab">
           <attribute name="title">
@@ -1141,8 +1141,8 @@
                <rect>
                 <x>0</x>
                 <y>0</y>
-                <width>966</width>
-                <height>648</height>
+                <width>978</width>
+                <height>660</height>
                </rect>
               </property>
               <layout class="QGridLayout" name="gridLayout">

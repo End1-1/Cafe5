@@ -27,19 +27,27 @@ public:
 
     virtual bool checkData(QString &err) override;
 
+    virtual bool isOnline() override;
+
     virtual bool canCopy() override;
 
     virtual void copyObject() override;
 
-    virtual QString savePathV2() const override;
-
 private slots:
+    void saveResponse(const QJsonObject &jdoc);
+
     void on_btnClearManager_clicked();
 
 private:
+    QJsonObject makeSaveJson() const;
+
+    QMap<QString, QVariant> makeResultRow(int id) const;
+
+    void savePartner(bool closeEditor);
+
     Ui::CE5Partner *ui;
 
-    bool fNew;
+    bool fCloseOnSaveResponse = true;
 };
 
 #endif // CE5PARTNER_H

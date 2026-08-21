@@ -3,6 +3,7 @@
 
 QMap<QString, C5Cache*> C5Cache::fCacheList;
 QMap<int, QString> C5Cache::fCacheQuery;
+QMap<int, QString> C5Cache::fCacheIdWhere;
 QMap<QString, int> C5Cache::fTableCache;
 QMap<int, QHash<QString, int> > C5Cache::fCacheColumns;
 
@@ -44,6 +45,7 @@ C5Cache::C5Cache()
                                    .arg(tr("Retail price").toLower())
                                    .arg(tr("Whosale price").toLower())
                                    .arg(tr("Adg code"));
+        fCacheIdWhere[cache_goods] = QStringLiteral("g.f_id");
         fCacheQuery[cache_goods_store] = QString("select f_id as `%1`, f_name as `%2` from c_storages")
                                          .arg(tr("Code"), tr("Name"));
         fCacheQuery[cache_goods_partners] =
@@ -284,9 +286,13 @@ void C5Cache::refresh()
 void C5Cache::refreshId(const QString &whereField, int id)
 {
     if(fCacheIdRow.contains(id)) {
-        int row = fCacheIdRow[id];
-        fCacheIdRow.remove(id);
+        const int row = fCacheIdRow[id];
         fCacheData.erase(fCacheData.begin() + row);
+        fCacheIdRow.clear();
+
+        for(int i = 0; i < static_cast<int>(fCacheData.size()); ++i) {
+            fCacheIdRow[fCacheData[i][0].toVariant().toInt()] = i;
+        }
     }
 
     C5Database db;
@@ -300,6 +306,21 @@ void C5Cache::refreshId(const QString &whereField, int id)
         fCacheData.push_back(cacheData.at(0));
         fCacheIdRow[id] = static_cast<int>(fCacheData.size()) - 1;
     }
+}
+
+void C5Cache::ensureId(int id)
+{
+    if(id == 0 || find(id) > -1) {
+        return;
+    }
+
+    const QString where = fCacheIdWhere.value(fId);
+
+    if(where.isEmpty()) {
+        return;
+    }
+
+    refreshId(where, id);
 }
 
 C5Cache* C5Cache::cache(int cacheId)
@@ -355,7 +376,7 @@ void C5Cache::loadFromDatabase(const QString &query)
     db.exec(q, fCacheData, fCacheColumns[fId]);
 
     for(int i = 0; i < fCacheData.size(); i++) {
-        fCacheIdRow[fCacheData[i][0].toInt()] = i;
+        fCacheIdRow[fCacheData[i][0].toVariant().toInt()] = i;
     }
 }
 

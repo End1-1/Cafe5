@@ -27,6 +27,10 @@ public:
     virtual void hotKey(const QString &key) override;
     void initParams(const QJsonObject &o);
 
+protected:
+    C5User *reportUser() const { return mUser; }
+    QJsonObject reportFilter() const;
+
 protected slots:
     virtual void queryFinished(const QJsonObject &ba);
 

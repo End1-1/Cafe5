@@ -14,6 +14,8 @@ class RAbstractEditorReport;
 class RAbstractEditorTableModel;
 class RFilterProxyModel;
 class RAbstractEditorDialog;
+class QButtonGroup;
+class QToolButton;
 
 class RAbstractEditorReport : public C5Widget
 {
@@ -36,11 +38,17 @@ public:
 protected:
     virtual void showEvent(QShowEvent *e) override;
 
+    virtual void resizeEvent(QResizeEvent *e) override;
+
+    virtual bool eventFilter(QObject *watched, QEvent *event) override;
+
     virtual void newData();
 
     virtual void removeAction();
 
     QJsonObject filterObject(const QString &name) const;
+
+    QJsonArray reportFilterValues() const { return mFilterValues; }
 
     QModelIndex reportMapViewIndexToSource(const QModelIndex &viewIndex) const;
 
@@ -77,6 +85,12 @@ private:
 
     QSet<int> mReportDefaultHiddenColumns;
 
+    QButtonGroup *mViewModeGroup = nullptr;
+
+    QString mViewModeFilterName;
+
+    bool mUpdatingViewModeScroll = false;
+
     void showColumnVisibilityDialog();
 
     void applyColumnVisibility();
@@ -84,4 +98,18 @@ private:
     void showColumnValueFilterDialog(int column);
 
     void exportToExcel();
+
+    void printStockInventoryBlank();
+
+    void setupViewModeBar();
+
+    void clearViewModeButtons();
+
+    void setViewModeFilterValue(int value);
+
+    void updateViewModeScrollButtons();
+
+    void syncViewModeScrollRange();
+
+    void scrollViewModeBy(int delta);
 };

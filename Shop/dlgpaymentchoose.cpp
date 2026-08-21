@@ -25,12 +25,14 @@ DlgPaymentChoose::DlgPaymentChoose(C5User *user) :
     ui->leChange->setValidator(new QDoubleValidator(0, 1000000000, 2));
     ui->lePrepaid->setValidator(new QDoubleValidator(0, 1000000000, 2));
     fMaxPrepaid = 0;
+    auto *s = new QShortcut(QKeySequence(Qt::Key_F12), this);
+    s->setContext(Qt::WindowShortcut);
+    connect(s, &QShortcut::activated, this, &DlgPaymentChoose::checkFiscal);
 #ifdef QT_DEBUG
-    QShortcut *s = new QShortcut(QKeySequence(Qt::Key_F11), this, SLOT(checkFiscal()));
-#else
-    QShortcut *s = new QShortcut(QKeySequence(Qt::Key_F12), this, SLOT(checkFiscal()));
+    auto *sDebug = new QShortcut(QKeySequence(Qt::Key_F11), this);
+    sDebug->setContext(Qt::WindowShortcut);
+    connect(sDebug, &QShortcut::activated, this, &DlgPaymentChoose::checkFiscal);
 #endif
-    Q_UNUSED(s);
     adjustSize();
 }
 
@@ -57,6 +59,16 @@ bool DlgPaymentChoose::getValues(C5User *user,
 {
     DlgPaymentChoose d(user);
     d.ui->leTotal->setDouble(total);
+
+    const bool noPaymentChosen = cash < 0.001 && card < 0.001 && idram < 0.001
+                                 && telcell < 0.001 && bank < 0.001 && debt < 0.001;
+    if (noPaymentChosen) {
+        cash = total - prepaid;
+        if (cash < 0) {
+            cash = 0;
+        }
+    }
+
     d.ui->leCash->setDouble(cash);
     d.ui->leCard->setDouble(card);
     d.ui->leBankTransfer->setDouble(bank);
@@ -66,11 +78,15 @@ bool DlgPaymentChoose::getValues(C5User *user,
     d.ui->leDebt->setDouble(debt);
     d.ui->leCashIn->setDouble(cashin);
     d.ui->leChange->setDouble(change);
-    d.ui->leChange->setSelection(0, 9);
+    d.ui->leCash->setFocus();
+    d.ui->leCash->setSelection(0, 20);
     d.fFiscal = fiscal;
     d.setFiscalStyle();
     d.fFiscal = fiscal;
     d.fMaxPrepaid = maxPrepaid;
+    d.ui->lePrepaid->setReadOnly(readOnlyPrepaid);
+    d.ui->btnPrepaid->setEnabled(!readOnlyPrepaid);
+    d.countChange();
 
     // if(maxPrepaid < 1 && __c5config.fMainJson["prepaid_only_by_gift"].toBool()) {
     //     d.ui->lePrepaid->setEnabled(false);
@@ -94,8 +110,6 @@ bool DlgPaymentChoose::getValues(C5User *user,
         return true;
     }
 
-    d.ui->lePrepaid->setReadOnly(readOnlyPrepaid);
-    d.ui->btnPrepaid->setEnabled(!readOnlyPrepaid);
     return false;
 }
 
@@ -226,7 +240,7 @@ void DlgPaymentChoose::on_btnPay_clicked()
     }
 
     fPinpadResponse = QJsonObject();
-    if (ui->leCard->getDouble() > 0.001) {
+    if (ui->leCard->getDouble() > 0.001 && mWorkStation.isArcusConfigured()) {
         QString error;
         if (!processArcusCardPayment(error)) {
             C5Message::error(error);
@@ -239,11 +253,6 @@ void DlgPaymentChoose::on_btnPay_clicked()
 
 bool DlgPaymentChoose::processArcusCardPayment(QString &error)
 {
-    if (!mWorkStation.isArcusConfigured()) {
-        error = tr("Arcus is not configured for this workstation");
-        return false;
-    }
-
     const double card = ui->leCard->getDouble();
     const qint64 amountMinor = qRound64(card * 100.0);
     NLoadingDlg loading(tr("Card payment"), this);

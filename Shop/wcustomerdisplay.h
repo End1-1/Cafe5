@@ -3,6 +3,8 @@
 
 #include <QWidget>
 
+class QCloseEvent;
+
 namespace Ui {
 class WCustomerDisplay;
 }
@@ -17,6 +19,13 @@ public:
     void clear();
     void addRow(const QString &name, const QString &qty, const QString &price, const QString &total, const QString &discount);
     void setTotal(const QString &total);
+    void placeOnSecondaryScreen();
+
+signals:
+    void displayClosed();
+
+protected:
+    void closeEvent(QCloseEvent *event) override;
 
 private:
     Ui::WCustomerDisplay *ui;

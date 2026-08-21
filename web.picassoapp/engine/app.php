@@ -31,6 +31,8 @@ if (!isset($params)) {
 	exitError("Holy shit!");
 }
 
+applyRequestLocale($params);
+
 if (!empty($params->debug)) {
 	if ($params->debug == false) {
 		unset($params->debug);

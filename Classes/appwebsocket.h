@@ -5,6 +5,8 @@
 #include <QWebSocket>
 #include <QJsonObject>
 
+class QTimer;
+
 class AppWebSocket : public QObject
 {
     Q_OBJECT
@@ -40,11 +42,27 @@ public slots:
 private:
     QWebSocket* mSocket;
 
+    QTimer *mPingTimer;
+
+    QTimer *mReconnectTimer;
+
     QString mServerKey;
 
     QString mUsername;
 
     QString mPassword;
+
+    int mReconnectAttempt = 0;
+
+    bool mSuppressReconnect = false;
+
+    void scheduleReconnect();
+
+    void stopReconnect();
+
+    int reconnectDelayMs() const;
+
+    void logFailure(const QString &reason);
 
 private slots:
     void pingServer();

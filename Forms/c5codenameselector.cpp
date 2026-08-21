@@ -17,6 +17,11 @@ C5CodeNameSelector::~C5CodeNameSelector() { delete ui; }
 
 void C5CodeNameSelector::setCodeAndName(int code, const QString &name)
 {
+    if(code <= 0) {
+        ui->leCode->clear();
+        ui->lbName->clear();
+        return;
+    }
     ui->leCode->setInteger(code);
     ui->lbName->setText(name);
 }

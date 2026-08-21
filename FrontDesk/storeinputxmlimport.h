@@ -1,6 +1,7 @@
 #pragma once
 
 #include <QDate>
+#include <QJsonArray>
 #include <QJsonObject>
 #include <QString>
 #include <QVector>
@@ -14,7 +15,10 @@ struct StoreInputXmlGoodLine
 {
     QString description;
     double qty = 0;
+    /** Unit price including VAT (TotalPrice / Amount from XML). */
     double pricePerUnit = 0;
+    /** Line total including VAT (XML TotalPrice). */
+    double totalPrice = 0;
     QString unit;
     QString classifierCode;
 };
@@ -33,6 +37,38 @@ struct StoreInputXmlInvoice
     QVector<StoreInputXmlGoodLine> goods;
 };
 
+/** Pre-import policy chosen in DlgStoreInputXmlImportOptions. */
+struct StoreInputXmlImportOptions
+{
+    enum GoodsMissingAction {
+        GoodsAutoCreate = 0,
+        GoodsMatch = 1
+    };
+    enum PartnerMissingAction {
+        PartnerAutoCreate = 0,
+        PartnerDoNotCreate = 1
+    };
+    enum DuplicateAction {
+        DupOverwrite = 0,
+        DupSkip = 1,
+        DupAbort = 2
+    };
+    enum SaveMode {
+        SaveOpenInWindows = 0,
+        SaveImmediateDraft = 1,
+        SaveImmediatePosted = 2
+    };
+
+    GoodsMissingAction goodsMissing = GoodsMatch;
+    PartnerMissingAction partnerMissing = PartnerAutoCreate;
+    DuplicateAction duplicates = DupOverwrite;
+    int storeId = 0;
+    QString storeName;
+    SaveMode saveMode = SaveOpenInWindows;
+
+    bool saveImmediately() const { return saveMode != SaveOpenInWindows; }
+};
+
 struct StoreInputXmlGoodsMappingRow
 {
     StoreInputXmlGoodLine source;
@@ -41,6 +77,7 @@ struct StoreInputXmlGoodsMappingRow
     QString goodsUnit;
     QString goodsAdgt;
     bool updateName = false;
+    bool createNew = false;
 };
 
 class StoreInputXmlImport
@@ -73,9 +110,33 @@ public:
 
     static bool updatePartner(C5User *user, QObject *context, const QJsonObject &partner, QString &error);
 
-    static bool findGoodsByExactName(C5User *user, const QString &description, GoodsItem &goods, QString &error);
+    static bool findGoodsByExactName(C5User *user,
+                                     QObject *context,
+                                     const QString &description,
+                                     GoodsItem &goods,
+                                     QString &error);
 
-    static bool findGoodsById(int goodsId, GoodsItem &goods);
+    static bool findGoodsById(C5User *user,
+                              QObject *context,
+                              int goodsId,
+                              GoodsItem &goods,
+                              QString &error);
+
+    static bool createGoodsFromXml(C5User *user,
+                                   QObject *context,
+                                   int supplierId,
+                                   const StoreInputXmlGoodLine &line,
+                                   GoodsItem &goods,
+                                   QString &error);
 
     static bool renameGoods(C5User *user, QObject *context, int goodsId, const QString &name, QString &error);
+
+    static bool findExistingByInvoiceNumber(C5User *user,
+                                            QObject *context,
+                                            const QString &series,
+                                            const QString &number,
+                                            QJsonArray &docs,
+                                            QString &error);
+
+    static bool removeDocument(C5User *user, QObject *context, const QString &id, QString &error);
 };

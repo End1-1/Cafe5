@@ -1,0 +1,328 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>C5StoreComplectation</class>
+ <widget class="QWidget" name="C5StoreComplectation">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1100</width>
+    <height>720</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Store complectation</string>
+  </property>
+  <layout class="QGridLayout" name="gridLayout_2">
+   <property name="leftMargin">
+    <number>1</number>
+   </property>
+   <property name="topMargin">
+    <number>1</number>
+   </property>
+   <property name="rightMargin">
+    <number>1</number>
+   </property>
+   <property name="bottomMargin">
+    <number>1</number>
+   </property>
+   <property name="spacing">
+    <number>1</number>
+   </property>
+   <item row="0" column="0">
+    <widget class="QWidget" name="wheader" native="true">
+     <layout class="QGridLayout" name="gridLayout" columnminimumwidth="200,0,0,0,0,0">
+      <property name="leftMargin">
+       <number>1</number>
+      </property>
+      <property name="topMargin">
+       <number>1</number>
+      </property>
+      <property name="rightMargin">
+       <number>1</number>
+      </property>
+      <property name="bottomMargin">
+       <number>1</number>
+      </property>
+      <property name="spacing">
+       <number>2</number>
+      </property>
+      <item row="0" column="0">
+       <widget class="QLabel" name="lbDate">
+        <property name="text">
+         <string>Date</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1" colspan="2">
+       <widget class="C5DateEdit" name="deDate"/>
+      </item>
+      <item row="0" column="4">
+       <spacer name="horizontalSpacer">
+        <property name="orientation">
+         <enum>Qt::Orientation::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item row="1" column="0">
+       <widget class="QLabel" name="lbDocNum">
+        <property name="text">
+         <string>Number</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1" colspan="2">
+       <widget class="C5LineEdit" name="leDocNum"/>
+      </item>
+      <item row="2" column="0" colspan="6">
+       <widget class="C5CodeNameSelector" name="wOutputStore">
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>20</height>
+         </size>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::Shape::Box</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Shadow::Plain</enum>
+        </property>
+        <property name="selectorName" stdset="0">
+         <string>Output store</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="0" colspan="6">
+       <widget class="C5CodeNameSelector" name="wInputStore">
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>20</height>
+         </size>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::Shape::Box</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Shadow::Plain</enum>
+        </property>
+        <property name="selectorName" stdset="0">
+         <string>Input store</string>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="0">
+       <widget class="QLabel" name="lbComment">
+        <property name="text">
+         <string>Comments</string>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="1" colspan="5">
+       <widget class="C5LineEdit" name="leComment"/>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item row="1" column="0">
+    <widget class="QGroupBox" name="grComplectation">
+     <property name="title">
+      <string>Complectation</string>
+     </property>
+     <layout class="QGridLayout" name="gridComplect" columnminimumwidth="200,0,0,0,0">
+      <property name="leftMargin">
+       <number>1</number>
+      </property>
+      <property name="topMargin">
+       <number>1</number>
+      </property>
+      <property name="rightMargin">
+       <number>1</number>
+      </property>
+      <property name="bottomMargin">
+       <number>1</number>
+      </property>
+      <property name="spacing">
+       <number>2</number>
+      </property>
+      <item row="0" column="0">
+       <widget class="QLabel" name="lbName">
+        <property name="text">
+         <string>Name</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="C5LineEdit" name="leComplectationCode">
+        <property name="maximumSize">
+         <size>
+          <width>100</width>
+          <height>16777215</height>
+         </size>
+        </property>
+        <property name="readOnly">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="2">
+       <widget class="C5LineEdit" name="leComplectationScancode">
+        <property name="maximumSize">
+         <size>
+          <width>120</width>
+          <height>16777215</height>
+         </size>
+        </property>
+        <property name="readOnly">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="3">
+       <widget class="C5LineEdit" name="leComplectationName">
+        <property name="readOnly">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="4">
+       <widget class="QPushButton" name="btnSelectComplect">
+        <property name="text">
+         <string>Select</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0">
+       <widget class="QLabel" name="lbQty">
+        <property name="text">
+         <string>Qty</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1">
+       <widget class="C5LineEdit" name="leComplectationQty"/>
+      </item>
+      <item row="1" column="2">
+       <widget class="QLabel" name="lbComplectUnit">
+        <property name="text">
+         <string/>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item row="2" column="0">
+    <layout class="QHBoxLayout" name="hlTotal">
+     <property name="spacing">
+      <number>1</number>
+     </property>
+     <item>
+      <widget class="QPushButton" name="btnAddGoods">
+       <property name="text">
+        <string>Add</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="btnRemoveGoods">
+       <property name="text">
+        <string>Remove</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="hsp">
+       <property name="orientation">
+        <enum>Qt::Orientation::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QLabel" name="lbTotal">
+       <property name="text">
+        <string>Materials</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="C5LineEdit" name="leTotalQty">
+       <property name="readOnly">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item row="3" column="0">
+    <widget class="C5TableWidget" name="tblGoods">
+     <property name="columnCount">
+      <number>5</number>
+     </property>
+     <column>
+      <property name="text">
+       <string>ID</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>Name</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>Base qty</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>Qty</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>Unit</string>
+      </property>
+     </column>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>C5LineEdit</class>
+   <extends>QLineEdit</extends>
+   <header>c5lineedit.h</header>
+  </customwidget>
+  <customwidget>
+   <class>C5DateEdit</class>
+   <extends>QDateEdit</extends>
+   <header>c5dateedit.h</header>
+  </customwidget>
+  <customwidget>
+   <class>C5TableWidget</class>
+   <extends>QTableWidget</extends>
+   <header>c5tablewidget.h</header>
+  </customwidget>
+  <customwidget>
+   <class>C5CodeNameSelector</class>
+   <extends>QFrame</extends>
+   <header>c5codenameselector.h</header>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections/>
+</ui>

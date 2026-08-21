@@ -1,12 +1,23 @@
 #include "sales.h"
-#include <QInputDialog>
+#include <QApplication>
+#include <QDateTime>
+#include <QFile>
+#include <QJsonArray>
+#include <QJsonObject>
+#include <QPageSize>
+#include <QPrinter>
+#include <QPrinterInfo>
 #include <QPropertyAnimation>
-#include <QShortcut>
 #include "c5message.h"
 #include "c5permissions.h"
+#include "c5printing.h"
 #include "c5user.h"
 #include "c5utils.h"
 #include "dlgdate.h"
+#include "dlgfindorder.h"
+#include "format_date.h"
+#include "httplite.h"
+#include "ninterface.h"
 #include "printreceiptgroup.h"
 #include "printtaxn.h"
 #include "selectprinters.h"
@@ -16,6 +27,7 @@
 
 #define VM_TOTAL 0
 #define VM_ITEMS 1
+#define VM_STAFF 2
 
 Sales::Sales(C5User *user) :
     C5ShopDialog(user),
@@ -35,36 +47,7 @@ Sales::Sales(C5User *user) :
     mPanelAnim = new QPropertyAnimation(ui->wMenuPanel, "maximumWidth", this);
     mPanelAnim->setDuration(220);
     mPanelAnim->setEasingCurve(QEasingCurve::OutCubic);
-    showAll = mWorkStation.shopShowAll();
     refresh();
-    auto *sh = new QShortcut(QKeySequence(Qt::Key_F3), this);
-    sh->setContext(Qt::WindowShortcut);
-    connect(sh, &QShortcut::activated, this, [this]() {
-        C5User *tmp = new C5User(mUser);
-
-        QString password = QInputDialog::getText(this,
-                                                 tr("Password"),
-                                                 tr("Password"),
-                                                 QLineEdit::Password);
-        tmp->authorize(
-            password,
-            fHttp,
-            [this, tmp](const QJsonObject &jo) {
-                Q_UNUSED(jo)
-
-                if (tmp->check(cp_t12_shop_enter_sale)) {
-                    if (tmp->fConfig["copyfrom"].toInt() != 0) {
-                        tmp->copySettings(mUser);
-                    }
-
-                    showAll = true;
-                    refresh();
-                } else {
-                    tmp->deleteLater();
-                }
-            },
-            [tmp]() { tmp->deleteLater(); });
-    });
 }
 
 Sales::~Sales()
@@ -84,10 +67,7 @@ void Sales::showSales(Working *w, C5User *u)
 
 bool Sales::printReceipt(const QString &id, C5User *user)
 {
-    if (!mWorkStation.defaultPrinter().isEmpty()) {
-        PrintReceiptGroup p;
-            p.print2(id);
-    }
+    PrintReceiptGroup::print2(id, user, user);
     return true;
 }
 
@@ -122,77 +102,179 @@ void Sales::refresh()
     case VM_ITEMS:
         refreshItems();
         break;
+
+    case VM_STAFF:
+        refreshByStaff();
+        break;
     }
 }
 
 void Sales::refreshTotal()
 {
-    //TODO
+    QStringList h;
+    h.append("X");
+    h.append(tr("UUID"));
+    h.append(tr("Sale type code"));
+    h.append(tr("Seller"));
+    h.append(tr("Sale type"));
+    h.append(tr("Prefix"));
+    h.append(tr("##"));
+    h.append(tr("Date"));
+    h.append(tr("Amount"));
+    h.append(tr("Customer"));
+    h.append(tr("Deliverman"));
+    h.append(tr("Comment"));
+    ui->tbl->setColumnCount(h.count());
+    ui->tbl->setHorizontalHeaderLabels(h);
+    ui->tbl->setColumnWidths(ui->tbl->columnCount(), 40, 0, 0, 0, 120, 100, 100, 160, 150, 100, 100, 300);
+    ui->tbl->setRowCount(0);
+    ui->leTotal->setDouble(0);
+    ui->leTotalQty->setDouble(0);
+
+    NInterface::query1(QStringLiteral("/engine/v2/shop/sales/get-orders"),
+                       mUser->mSessionKey,
+                       this,
+                       {{QStringLiteral("hall"), mWorkStation.defaultHallId()},
+                        {QStringLiteral("date1"), ui->deStart->date().toString(FORMAT_DATE_TO_STR_MYSQL)},
+                        {QStringLiteral("date2"), ui->deEnd->date().toString(FORMAT_DATE_TO_STR_MYSQL)}},
+                       [this](const QJsonObject &jo) {
+                           const QJsonArray rows = jo.value(QStringLiteral("rows")).toArray();
+                           ui->tbl->setRowCount(rows.size());
+                           int row = 0;
+                           for(const QJsonValue &jv : rows) {
+                               const QJsonObject o = jv.toObject();
+                               const QString date = o.value(QStringLiteral("f_datecash")).toString();
+                               const QString time = o.value(QStringLiteral("f_timeclose")).toString().trimmed();
+                               const QString dateTime = time.isEmpty() ? date : QStringLiteral("%1 %2").arg(date, time);
+                               ui->tbl->createCheckbox(row, 0);
+                               ui->tbl->setData(row, 1, o.value(QStringLiteral("f_id")).toString());
+                               ui->tbl->setInteger(row, 2, o.value(QStringLiteral("f_saletype")).toInt());
+                               ui->tbl->setData(row, 3, o.value(QStringLiteral("f_login")).toString());
+                               ui->tbl->setData(row, 4, o.value(QStringLiteral("f_saletype_name")).toString());
+                               ui->tbl->setData(row, 5, o.value(QStringLiteral("f_prefix")).toString());
+                               ui->tbl->setData(row, 6, o.value(QStringLiteral("f_fiscal")).toString());
+                               ui->tbl->setData(row, 7, dateTime);
+                               ui->tbl->setDouble(row, 8, o.value(QStringLiteral("f_amounttotal")).toDouble());
+                               ui->tbl->setData(row, 9, o.value(QStringLiteral("f_client")).toString());
+                               ui->tbl->setData(row, 10, o.value(QStringLiteral("f_deliverman")).toString());
+                               ui->tbl->setData(row, 11, o.value(QStringLiteral("f_comment")).toString());
+                               ++row;
+                           }
+                           ui->leTotal->setDouble(jo.value(QStringLiteral("total")).toDouble());
+                       });
 }
 
 void Sales::refreshItems()
 {
-    //TODO
-    // QStringList h;
-    // h.append(tr("UUID"));
-    // h.append(tr("Sale type code"));
-    // h.append(tr("Seller"));
-    // h.append(tr("Sale type"));
-    // h.append(tr("Number"));
-    // h.append(tr("##"));
-    // h.append(tr("Date"));
-    // h.append(tr("Time"));
-    // h.append(tr("Scancode"));
-    // h.append(tr("Goods"));
-    // h.append(tr("Qty"));
-    // h.append(tr("Price"));
-    // h.append(tr("Total"));
-    // ui->tbl->setColumnCount(h.count());
-    // ui->tbl->setHorizontalHeaderLabels(h);
-    // ui->tbl->setColumnWidths(ui->tbl->columnCount(), 0, 0, 0, 120, 0, 100, 120, 100, 150, 250, 80, 80, 80);
-    //  db;
-    // db[":f_hall"] = __c5config.defaultHall();
-    // db[":f_start"] = ui->deStart->date();
-    // db[":f_end"] = ui->deEnd->date();
-    // db[":f_state"] = ORDER_STATE_CLOSE;
-    // QString sqlCond = "";
+    QStringList h;
+    h.append(tr("UUID"));
+    h.append(tr("Sale type code"));
+    h.append(tr("Seller"));
+    h.append(tr("Sale type"));
+    h.append(tr("Prefix"));
+    h.append(tr("##"));
+    h.append(tr("Date"));
+    h.append(tr("Scancode"));
+    h.append(tr("Goods"));
+    h.append(tr("Qty"));
+    h.append(tr("Price"));
+    h.append(tr("Total"));
+    h.append(tr("Comment"));
+    ui->tbl->setColumnCount(h.count());
+    ui->tbl->setHorizontalHeaderLabels(h);
+    ui->tbl->setColumnWidths(ui->tbl->columnCount(), 0, 0, 0, 120, 100, 100, 160, 150, 250, 80, 80, 80, 200);
+    ui->tbl->setRowCount(0);
+    ui->leTotal->setDouble(0);
+    ui->leTotalQty->setDouble(0);
 
-    // if (!fUser->check(cp_t12_shop_fiscal_report) || !showAll) {
-    //     sqlCond += " and length(json_value(oh.f_data, '$.f_fiscal.rseq'))>0 ";
-    // }
+    NInterface::query1(QStringLiteral("/engine/v2/shop/sales/get-items"),
+                       mUser->mSessionKey,
+                       this,
+                       {{QStringLiteral("hall"), mWorkStation.defaultHallId()},
+                        {QStringLiteral("date1"), ui->deStart->date().toString(FORMAT_DATE_TO_STR_MYSQL)},
+                        {QStringLiteral("date2"), ui->deEnd->date().toString(FORMAT_DATE_TO_STR_MYSQL)}},
+                       [this](const QJsonObject &jo) {
+                           const QJsonArray rows = jo.value(QStringLiteral("rows")).toArray();
+                           ui->tbl->setRowCount(rows.size());
+                           int row = 0;
+                           for(const QJsonValue &jv : rows) {
+                               const QJsonObject o = jv.toObject();
+                               const QString date = o.value(QStringLiteral("f_datecash")).toString();
+                               const QString time = o.value(QStringLiteral("f_timeclose")).toString().trimmed();
+                               const QString dateTime = time.isEmpty() ? date : QStringLiteral("%1 %2").arg(date, time);
+                               ui->tbl->setData(row, 0, o.value(QStringLiteral("f_id")).toString());
+                               ui->tbl->setInteger(row, 1, o.value(QStringLiteral("f_saletype")).toInt());
+                               ui->tbl->setData(row, 2, o.value(QStringLiteral("f_login")).toString());
+                               ui->tbl->setData(row, 3, o.value(QStringLiteral("f_saletype_name")).toString());
+                               ui->tbl->setData(row, 4, o.value(QStringLiteral("f_prefix")).toString());
+                               ui->tbl->setData(row, 5, o.value(QStringLiteral("f_fiscal")).toString());
+                               ui->tbl->setData(row, 6, dateTime);
+                               ui->tbl->setData(row, 7, o.value(QStringLiteral("f_scancode")).toString());
+                               ui->tbl->setData(row, 8, o.value(QStringLiteral("f_goodsname")).toString());
+                               ui->tbl->setDouble(row, 9, o.value(QStringLiteral("f_qty")).toDouble());
+                               ui->tbl->setDouble(row, 10, o.value(QStringLiteral("f_price")).toDouble());
+                               ui->tbl->setDouble(row, 11, o.value(QStringLiteral("f_total")).toDouble());
+                               ui->tbl->setData(row, 12, o.value(QStringLiteral("f_comment")).toString());
+                               ++row;
+                           }
+                           ui->leTotal->setDouble(jo.value(QStringLiteral("total")).toDouble());
+                           ui->leTotalQty->setDouble(jo.value(QStringLiteral("total_qty")).toDouble());
+                       });
+}
 
-    // if(!fUser->check(cp_t12_shop_sale_of_all_users)) {
-    //     sqlCond += QString(" and oh.f_staff=%1 ").arg(fUser->id());
-    // }
+void Sales::refreshByStaff()
+{
+    QStringList h;
+    h.append(tr("Code"));
+    h.append(tr("Sales assistant"));
+    h.append(tr("Login"));
+    h.append(tr("Orders"));
+    h.append(tr("Cash"));
+    h.append(tr("Card"));
+    h.append(tr("Idram"));
+    h.append(tr("Telcell"));
+    h.append(tr("Bank"));
+    h.append(tr("Debt"));
+    h.append(tr("Prepaid"));
+    h.append(tr("Total"));
+    ui->tbl->setColumnCount(h.count());
+    ui->tbl->setHorizontalHeaderLabels(h);
+    ui->tbl->setColumnWidths(ui->tbl->columnCount(), 0, 220, 120, 80, 100, 100, 100, 100, 100, 100, 100, 120);
+    ui->tbl->setRowCount(0);
+    ui->leTotal->setDouble(0);
+    ui->leTotalQty->setDouble(0);
+    ui->leTotalQty->setVisible(true);
+    ui->lbTotalQty->setVisible(true);
 
-    // db.exec("select oh.f_id, oh.f_saletype, u.f_login, os.f_name, concat(oh.f_prefix, oh.f_hallid) as f_number, json_value(oh.f_data, "
-    //         "'$.f_fiscal.rseq'),  "
-    //         "oh.f_datecash, oh.f_timeclose, g.f_scancode, g.f_name as f_goodsname, og.f_qty, og.f_price, og.f_total "
-    //         "from o_goods og "
-    //         "inner join o_header oh on oh.f_id=og.f_header "
-    //         "inner join c_goods g on g.f_id=og.f_goods "
-    //         "left join b_history h on h.f_id=oh.f_id "
-    //         "left join b_cards_discount d on d.f_id=h.f_card "
-    //         "left join c_partners c on c.f_id=d.f_client "
-    //         "left join o_sale_type os on os.f_id=oh.f_saletype "
-    //         "left join s_user u on u.f_id=oh.f_staff "
-    //         "where oh.f_datecash between :f_start and :f_end and oh.f_state=:f_state "
-    //         + sqlCond
-    //         + "and oh.f_hall=:f_hall "
-    //           "order by oh.f_datecash, oh.f_timeclose ");
-    // ui->tbl->setRowCount(db.rowCount());
-    // int row = 0;
-
-    // while(db.nextRow()) {
-    //     for(int i = 0; i < ui->tbl->columnCount(); i++) {
-    //         ui->tbl->setData(row, i, db.getValue(i));
-    //     }
-
-    //     row++;
-    // }
-
-    // int acol = 12;
-    // ui->leTotal->setDouble(ui->tbl->sumOfColumn(acol));
+    NInterface::query1(QStringLiteral("/engine/v2/shop/sales/get-by-staff"),
+                       mUser->mSessionKey,
+                       this,
+                       {{QStringLiteral("hall"), mWorkStation.defaultHallId()},
+                        {QStringLiteral("date1"), ui->deStart->date().toString(FORMAT_DATE_TO_STR_MYSQL)},
+                        {QStringLiteral("date2"), ui->deEnd->date().toString(FORMAT_DATE_TO_STR_MYSQL)}},
+                       [this](const QJsonObject &jo) {
+                           const QJsonArray rows = jo.value(QStringLiteral("rows")).toArray();
+                           ui->tbl->setRowCount(rows.size());
+                           int row = 0;
+                           for(const QJsonValue &jv : rows) {
+                               const QJsonObject o = jv.toObject();
+                               ui->tbl->setInteger(row, 0, o.value(QStringLiteral("f_staff")).toInt());
+                               ui->tbl->setData(row, 1, o.value(QStringLiteral("f_staff_name")).toString());
+                               ui->tbl->setData(row, 2, o.value(QStringLiteral("f_login")).toString());
+                               ui->tbl->setInteger(row, 3, o.value(QStringLiteral("f_count")).toInt());
+                               ui->tbl->setDouble(row, 4, o.value(QStringLiteral("f_amount_cash")).toDouble());
+                               ui->tbl->setDouble(row, 5, o.value(QStringLiteral("f_amount_card")).toDouble());
+                               ui->tbl->setDouble(row, 6, o.value(QStringLiteral("f_amount_idram")).toDouble());
+                               ui->tbl->setDouble(row, 7, o.value(QStringLiteral("f_amount_telcell")).toDouble());
+                               ui->tbl->setDouble(row, 8, o.value(QStringLiteral("f_amount_bank")).toDouble());
+                               ui->tbl->setDouble(row, 9, o.value(QStringLiteral("f_amount_debt")).toDouble());
+                               ui->tbl->setDouble(row, 10, o.value(QStringLiteral("f_amount_prepaid")).toDouble());
+                               ui->tbl->setDouble(row, 11, o.value(QStringLiteral("f_amounttotal")).toDouble());
+                               ++row;
+                           }
+                           ui->leTotal->setDouble(jo.value(QStringLiteral("total")).toDouble());
+                           ui->leTotalQty->setDouble(jo.value(QStringLiteral("total_count")).toDouble());
+                       });
 }
 
 void Sales::printTaxReport(int report_type)
@@ -244,13 +326,19 @@ void Sales::on_btnDateRight_clicked()
 void Sales::on_btnItemBack_clicked()
 {
     toggleMenu(false);
-    //TODO
-    //todo: memory leak
-    // DlgReturnItem *i = new DlgReturnItem(mUser);
-    // i->showMaximized();
-    // i->setFocus();
-    // i->exec();
-    // i->deleteLater();
+    DlgFindOrder dlg(mUser, this);
+    if (dlg.exec() != QDialog::Accepted) {
+        return;
+    }
+    const QString orderId = dlg.orderId();
+    if (orderId.isEmpty()) {
+        return;
+    }
+    auto *a = new ViewOrder(fWorking, orderId, mUser);
+    a->showMaximized();
+    a->setFocus();
+    a->exec();
+    a->deleteLater();
 }
 
 void Sales::on_btnRefresh_clicked()
@@ -262,9 +350,12 @@ void Sales::on_btnModeTotal_clicked()
 {
     toggleMenu(false);
     ui->btnModeItems->setChecked(false);
+    ui->btnSalesAssistant->setChecked(false);
     ui->btnModeTotal->setChecked(true);
     ui->btnViewOrder->setEnabled(true);
     ui->btnItemBack->setEnabled(true);
+    ui->leTotalQty->setVisible(false);
+    ui->lbTotalQty->setVisible(false);
     fViewMode = VM_TOTAL;
     refresh();
 }
@@ -274,9 +365,24 @@ void Sales::on_btnModeItems_clicked()
     toggleMenu(false);
     ui->btnModeItems->setChecked(true);
     ui->btnModeTotal->setChecked(false);
+    ui->btnSalesAssistant->setChecked(false);
     ui->btnViewOrder->setEnabled(true);
     ui->btnItemBack->setEnabled(true);
+    ui->leTotalQty->setVisible(true);
+    ui->lbTotalQty->setVisible(true);
     fViewMode = VM_ITEMS;
+    refresh();
+}
+
+void Sales::on_btnSalesAssistant_clicked()
+{
+    toggleMenu(false);
+    ui->btnSalesAssistant->setChecked(true);
+    ui->btnModeTotal->setChecked(false);
+    ui->btnModeItems->setChecked(false);
+    ui->btnViewOrder->setEnabled(false);
+    ui->btnItemBack->setEnabled(false);
+    fViewMode = VM_STAFF;
     refresh();
 }
 
@@ -339,4 +445,122 @@ void Sales::on_btnShowMenu_clicked()
 void Sales::on_btnCloseMenu_clicked()
 {
     toggleMenu(false);
+}
+
+void Sales::on_btnPrintTotal_clicked()
+{
+    toggleMenu(false);
+    if (!mWorkStation.isReceiptPrintingConfigured()) {
+        C5Message::error(tr("Receipt printer is not configured"));
+        return;
+    }
+
+    const QString date1 = ui->deStart->date().toString(FORMAT_DATE_TO_STR_MYSQL);
+    const QString date2 = ui->deEnd->date().toString(FORMAT_DATE_TO_STR_MYSQL);
+
+    NInterface::query1(QStringLiteral("/engine/v2/shop/sales/get-daily-by-payment"),
+                       mUser->mSessionKey,
+                       this,
+                       {{QStringLiteral("hall"), mWorkStation.defaultHallId()},
+                        {QStringLiteral("date1"), date1},
+                        {QStringLiteral("date2"), date2}},
+                       [this](const QJsonObject &jdoc) {
+                           printDailyByPayment(jdoc);
+                       });
+}
+
+void Sales::printDailyByPayment(const QJsonObject &jdoc)
+{
+    const QString printerName = mWorkStation.receiptPrinter();
+    QPrinterInfo pi;
+    if (mWorkStation.hasReceiptPrinter()) {
+        pi = QPrinterInfo::printerInfo(printerName);
+    }
+
+    const int bs = 20;
+    QFont font(qApp->font());
+    font.setPointSize(bs);
+    C5Printing p;
+    QPrinter printer(pi.isNull() ? QPrinterInfo() : pi);
+    if (!pi.isNull()) {
+        printer.setPageSize(QPageSize::Custom);
+        printer.setFullPage(false);
+        QRectF pr = printer.pageRect(QPrinter::DevicePixel);
+        constexpr qreal SAFE_RIGHT_MM = 4.0;
+        const qreal safePx = SAFE_RIGHT_MM * printer.logicalDpiX() / 25.4;
+        p.setSceneParams(pr.width() - safePx, pr.height(), printer.logicalDpiX());
+    } else {
+        p.setSceneParams(650, 2800, 96);
+    }
+    p.setFont(font);
+    p.setFontSize(bs);
+    p.setFontBold(true);
+
+    const QString logoFile = qApp->applicationDirPath() + QStringLiteral("/logo_receipt.png");
+    if (QFile::exists(logoFile)) {
+        p.image(logoFile, Qt::AlignHCenter);
+        p.br();
+    }
+
+    p.ctext(tr("Daily revenue"));
+    p.br();
+    p.ctext(ui->deStart->date().toString(FORMAT_DATE_TO_STR));
+    p.br();
+    if (ui->deStart->date() != ui->deEnd->date()) {
+        p.ctext(ui->deEnd->date().toString(FORMAT_DATE_TO_STR));
+        p.br();
+    }
+    p.setFontBold(false);
+    p.br();
+
+    p.ltext(tr("Orders count"), 0);
+    p.rtext(QString::number(jdoc.value(QStringLiteral("f_count_id")).toInt()));
+    p.br();
+    p.setFontBold(true);
+    p.ltext(tr("Total"), 0);
+    p.rtext(float_str(jdoc.value(QStringLiteral("f_amount_total")).toDouble(), 2));
+    p.br();
+    p.setFontBold(false);
+    p.line();
+    p.br();
+
+    auto printPay = [&p](const QString &title, double amount) {
+        if (qAbs(amount) > 0.009) {
+            p.ltext(title, 0);
+            p.rtext(float_str(amount, 2));
+            p.br();
+        }
+    };
+    printPay(tr("Cash"), jdoc.value(QStringLiteral("f_amount_cash")).toDouble());
+    printPay(tr("Card"), jdoc.value(QStringLiteral("f_amount_card")).toDouble());
+    printPay(tr("Idram"), jdoc.value(QStringLiteral("f_amount_idram")).toDouble());
+    printPay(tr("Telcell"), jdoc.value(QStringLiteral("f_amount_telcell")).toDouble());
+    printPay(tr("Bank"), jdoc.value(QStringLiteral("f_amount_bank")).toDouble());
+    printPay(tr("Debt"), jdoc.value(QStringLiteral("f_amount_debt")).toDouble());
+    printPay(tr("Prepaid"), jdoc.value(QStringLiteral("f_amount_prepaid")).toDouble());
+    printPay(tr("Complimentary"), jdoc.value(QStringLiteral("f_amount_complimentary")).toDouble());
+    printPay(tr("Other"), jdoc.value(QStringLiteral("f_amount_other")).toDouble());
+
+    p.line();
+    p.br();
+    p.br();
+    p.setFontSize(bs - 4);
+    p.ltext(tr("Printed"), 0);
+    p.rtext(QDateTime::currentDateTime().toString(FORMAT_DATETIME_TO_STR));
+    p.br();
+
+    if (mWorkStation.usePrintServer()) {
+        auto *http = new HttpLite(qApp);
+        QJsonObject json;
+        json.insert(QStringLiteral("print_data"), p.jsonData());
+        json.insert(QStringLiteral("printer_name"), printerName);
+        http->post(mWorkStation.printServer(), json);
+    }
+    if (mWorkStation.hasReceiptPrinter()) {
+        if (!pi.isNull()) {
+            p.print(printer);
+        } else {
+            C5Message::error(tr("Printer not found") + ": " + printerName);
+        }
+    }
 }

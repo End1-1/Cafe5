@@ -505,7 +505,7 @@ class OrderInProgress
 COALESCE(
     {$current},
     NULLIF(TRIM(JSON_UNQUOTE(JSON_EXTRACT(ogp.f_data, '$.f_status_1_1_time'))), ''),
-    NULLIF(TRIM(JSON_UNQUOTE(JSON_EXTRACT(ogp.f_data, '$."$jsonTimePath"'))), ''),
+    NULLIF(TRIM(JSON_UNQUOTE(JSON_EXTRACT(ogp.f_data, '\$."\$jsonTimePath"'))), ''),
     NULLIF(TRIM(JSON_UNQUOTE(JSON_EXTRACT(ogp.f_data, '$.jsonTimePath'))), '')
 )
 EOD;

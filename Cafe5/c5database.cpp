@@ -136,7 +136,8 @@ QString C5Database::execDry(const QString &sqlQuery)
         } else {
             switch(it.value().typeId()) {
             case QMetaType::QString:
-                value = QString("'%1'").arg(value.toString().replace("'", "''"));
+                // Escape \ first — MySQL treats \t \n etc. inside quotes unless NO_BACKSLASH_ESCAPES.
+                value = QString("'%1'").arg(value.toString().replace("\\", "\\\\").replace("'", "''"));
                 break;
 
             case QMetaType::QDate:

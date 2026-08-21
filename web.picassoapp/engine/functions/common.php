@@ -3,8 +3,8 @@ defined('APP') or die('Die, vampire!');
 
 function exitError($error, $code = 500) {
     http_response_code($code);
-    header('Content-Type: application/json');
-    echo json_encode(['error' => $error]);
+    header('Content-Type: application/json; charset=utf-8');
+    echo json_encode(['error' => $error], JSON_UNESCAPED_UNICODE);
     exit;
 }
 

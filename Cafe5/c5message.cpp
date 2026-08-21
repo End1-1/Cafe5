@@ -1,14 +1,28 @@
 #include "c5message.h"
 #include "ui_c5message.h"
+#include "ndataprovider.h"
 #include <QClipboard>
 #include <QTimer>
-#include <QMediaPlayer>
 #include <QProcess>
 #include <QUrlQuery>
 #include <QDir>
+#include <QFile>
 #include <QThread>
-#include <QAudioOutput>
+#include <QDesktopServices>
+#include <QCoreApplication>
+#include <QDebug>
 #include <Windows.h>
+#include <string>
+#if defined(__has_include)
+#  if __has_include(<QMediaPlayer>) && __has_include(<QAudioOutput>)
+#    include <QMediaPlayer>
+#    include <QAudioOutput>
+#    define C5MESSAGE_HAS_SOUND 1
+#  endif
+#endif
+#ifndef C5MESSAGE_HAS_SOUND
+#  define C5MESSAGE_HAS_SOUND 0
+#endif
 
 C5Message::C5Message() :
     C5Dialog(nullptr),
@@ -46,6 +60,8 @@ int C5Message::question(const QString &questionStr, const QString &yes, const QS
 
 void C5Message::timeout()
 {
+#if C5MESSAGE_HAS_SOUND
+    // Optional ding for info() with playSound=true (Shop/Waiter). Display apps may omit Multimedia.
     if (fPlaySound) {
         QMediaPlayer *mp = new QMediaPlayer();
         auto *ao = new QAudioOutput();
@@ -54,6 +70,9 @@ void C5Message::timeout()
         ao->setVolume(0.5);
         mp->play();
     }
+#else
+    Q_UNUSED(fPlaySound);
+#endif
 }
 
 int C5Message::showMessage(const QString &text, int tp, const QString &yes, const QString &no, const QString &a3,
@@ -123,23 +142,22 @@ void C5Message::on_label_linkActivated(const QString &link)
 {
     QUrl url(link);
 
-    if(url.path() == "launch-updater") {
+    if(url.scheme() == QLatin1String("http") || url.scheme() == QLatin1String("https")) {
+        QDesktopServices::openUrl(url);
+        return;
+    }
+
+    if(url.path() == QLatin1String("launch-updater")) {
         QUrlQuery urlQuery(url);
-        QString updaterPath = QDir::toNativeSeparators(QCoreApplication::applicationDirPath() + "/updater.exe");
-        QStringList params;
-
-        if(urlQuery.hasQueryItem("version")) {
-            params.append(QString("%1%2").arg("--app=", _MODULE_).toLower());
-            params.append("--version=" +  urlQuery.queryItemValue("version"));
+        const QString version = urlQuery.queryItemValue(QStringLiteral("version"));
+        QString appName = urlQuery.queryItemValue(QStringLiteral("app"));
+        if (appName.isEmpty()) {
+            appName = NDataProvider::mAppName;
         }
-
-        bool ok = QProcess::startDetached(updaterPath, params);
-
-        if(!ok) {
-            C5Message::error("Process " + updaterPath + " could not run");
+        if (!tryStartUpdater(appName, version)) {
+            C5Message::error(tr("Updater not found. Please download the update from the link."));
             return;
         }
-
         qApp->exit(0);
     }
 }
@@ -150,28 +168,48 @@ void C5Message::showEvent(QShowEvent *e)
     QTimer::singleShot(100, [this]() { ui->btnYes->setFocus(); });
 }
 
-void C5Message::launchUpdater(const QString &path, const QStringList &args)
+bool C5Message::tryStartUpdater(const QString &appName, const QString &version)
 {
-    QString cmd = "\"" + path + "\" " + args.join(" ");
-    STARTUPINFO si = { sizeof(si) };
-    PROCESS_INFORMATION pi;
-    BOOL ok = CreateProcessW(
-                  nullptr,
-                  (LPWSTR)cmd.utf16(),
-                  nullptr,
-                  nullptr,
-                  FALSE,
-                  CREATE_BREAKAWAY_FROM_JOB | DETACHED_PROCESS,
-                  nullptr,
-                  nullptr,
-                  &si,
-                  &pi
-              );
-
-    if(ok) {
-        CloseHandle(pi.hProcess);
-        CloseHandle(pi.hThread);
-    } else {
-        qDebug() << "CreateProcess failed:" << GetLastError();
+    if (appName.isEmpty() || version.isEmpty()) {
+        return false;
     }
+    const QString updaterPath = QDir::toNativeSeparators(
+        QCoreApplication::applicationDirPath() + QStringLiteral("/updater.exe"));
+    if (!QFile::exists(updaterPath)) {
+        return false;
+    }
+
+    const QStringList args{
+        QStringLiteral("--app=%1").arg(appName),
+        QStringLiteral("--version=%1").arg(version),
+    };
+
+    QString cmd = QStringLiteral("\"%1\"").arg(updaterPath);
+    for (const QString &a : args) {
+        cmd += QLatin1Char(' ');
+        cmd += a.contains(QLatin1Char(' ')) ? QStringLiteral("\"%1\"").arg(a) : a;
+    }
+
+    STARTUPINFOW si = {sizeof(si)};
+    PROCESS_INFORMATION pi{};
+    std::wstring cmdLine = cmd.toStdWString();
+    const BOOL ok = CreateProcessW(
+        nullptr,
+        cmdLine.data(),
+        nullptr,
+        nullptr,
+        FALSE,
+        CREATE_BREAKAWAY_FROM_JOB | DETACHED_PROCESS,
+        nullptr,
+        nullptr,
+        &si,
+        &pi);
+
+    if (!ok) {
+        qDebug() << "CreateProcess failed for updater:" << GetLastError();
+        return false;
+    }
+    CloseHandle(pi.hProcess);
+    CloseHandle(pi.hThread);
+    return true;
 }

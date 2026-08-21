@@ -9,15 +9,19 @@
 #include "c5goodspricing.h"
 #include "goodsasmap.h"
 #include "c5storebarcode.h"
+#include "dlgbarcodelabeltemplate.h"
+#include "dlgprintbarcodelabels.h"
 #include "c5database.h"
 #include "c5permissions.h"
 #include "c5message.h"
 #include "c5config.h"
+#include "c5utils.h"
 #include "ndataprovider.h"
+#include "appwebsocket.h"
 #include <math.h>
 #include <QFile>
-#include <QWebSocket>
-#include <QEventLoop>
+#include <QJsonDocument>
+#include <QJsonObject>
 
 QMap <QString, QString> l;
 
@@ -165,6 +169,7 @@ QToolBar* CR5Goods::toolBar()
         fToolBar->addAction(QIcon(":/scales.png"), tr("Scales"), this, SLOT(exportToScales()));
         fToolBar->addAction(QIcon(":/delete.png"), tr("Remove"), this, SLOT(deleteGoods()));
         fToolBar->addAction(QIcon(":/barcode.png"), tr("Print\nbarcode"), this, SLOT(printBarCodes()));
+        fToolBar->addAction(QIcon(":/setting.png"), tr("Label\ntemplate"), this, SLOT(selectBarcodeLabelTemplate()));
         fToolBar->addAction(QIcon(":/AS.png"), tr("ArmSoft map"), this, SLOT(armSoftMap()));
         fToolBar->addAction(QIcon(":/dress.png"), tr("S/R price update"), this, SLOT(semiReadyPriceUpdate()));
     }
@@ -323,7 +328,7 @@ void CR5Goods::exportToScales()
     QString sql =
         R"(
         select g.f_scancode, g.f_name, if(gp.f_price1disc>0, f_price1disc, f_price1) as f_saleprice,
-        g.f_wholenumber
+        g.f_wholenumber, g.f_unit
         from c_goods g
         left join c_goods_prices gp on gp.f_goods=g.f_id and gp.f_currency=1
         where g.f_enabled=1 and length(g.f_scancode) between 1 and 5
@@ -335,8 +340,21 @@ void CR5Goods::exportToScales()
 
     db.exec(sql);
 
-    if(__c5config.getValue(param_frontdesk_scale_dir).isEmpty() == false) {
-        QFile f(__c5config.getValue(param_frontdesk_scale_dir) + "/export.xml");
+    QString scaleDir = __c5config.getValue(param_frontdesk_scale_dir).trimmed();
+
+    if(scaleDir.isEmpty() && __c5config.fSettingsId > 0) {
+        C5Database dbCfg;
+        dbCfg[":f_settings"] = __c5config.fSettingsId;
+        dbCfg[":f_key"] = param_frontdesk_scale_dir;
+        dbCfg.exec("select f_value from s_settings_values where f_settings=:f_settings and f_key=:f_key");
+
+        if(dbCfg.nextRow()) {
+            scaleDir = dbCfg.getString(0).trimmed();
+        }
+    }
+
+    if(scaleDir.isEmpty() == false) {
+        QFile f(scaleDir + "/export.xml");
         if (f.open(QIODevice::WriteOnly)) {
             f.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n");
             f.write("<NewDataSet>\r\n");
@@ -348,7 +366,7 @@ void CR5Goods::exportToScales()
                 f.write(QString("<GoodName>%1</GoodName>").arg(db.getString(1)).toUtf8());
                 f.write(QString("<PriceOut2>%1</PriceOut2>").arg(db.getDouble(2)).toUtf8());
 
-                if (db.getInt("f_wholenumber") > 0) {
+                if (db.getInt("f_wholenumber") > 0 || db.getInt("f_unit") == 1) {
                     f.write(QString("<IsPiece>1</IsPiece>").toUtf8());
                 }
 
@@ -359,6 +377,8 @@ void CR5Goods::exportToScales()
             f.close();
         }
         C5Message::info(tr("Done"));
+    } else {
+        C5Message::error(tr("Scale path not configured"));
     }
 }
 
@@ -437,20 +457,39 @@ void CR5Goods::printBarCodes()
         return;
     }
 
-    db[":f_id"] = curr;
-    db.exec("select f_symbol from e_currency where f_id=:f_id");
-    db.nextRow();
-    QString s = db.getString("f_symbol");
-    C5StoreBarcode *b = __mainWindow->createTab<C5StoreBarcode>();
-    b->fCurrencyName = s;
-
-    for(int i = 0; i < fModel->rowCount(); i++) {
-        b->addRow(fModel->data(i, fModel->indexForColumnName("f_name"), Qt::EditRole).toString(),
-                  fModel->data(i, fModel->indexForColumnName("f_scancode"), Qt::EditRole).toString(),
-                  1,
-                  fFilter->currency(),
-                  "");
+    const int colName = fModel->indexForColumnName("f_name");
+    const int colScan = fModel->indexForColumnName("f_scancode");
+    const int colPrice = fModel->indexForColumnName("f_price1");
+    if(colName < 0 || colScan < 0) {
+        C5Message::info(tr("Name and scancode columns must be included in report"));
+        return;
     }
+
+    QList<BarcodeLabelItem> items;
+    for(int i = 0; i < fModel->rowCount(); i++) {
+        BarcodeLabelItem it;
+        it.name = fModel->data(i, colName, Qt::EditRole).toString();
+        it.barcode = fModel->data(i, colScan, Qt::EditRole).toString();
+        it.qty = 1;
+        if(colPrice >= 0) {
+            it.price = float_str(fModel->data(i, colPrice, Qt::EditRole).toDouble(), 2);
+        } else {
+            db[":f_scancode"] = it.barcode;
+            db[":f_currency"] = curr;
+            db.exec("select gpr.f_price1 from c_goods c "
+                    "left join c_goods_prices gpr on gpr.f_goods=c.f_id and gpr.f_currency=:f_currency "
+                    "where c.f_scancode=:f_scancode");
+            it.price = db.nextRow() ? float_str(db.getDouble("f_price1"), 2) : QStringLiteral("0");
+        }
+        items.append(it);
+    }
+
+    DlgPrintBarcodeLabels::printLabels(this, items);
+}
+
+void CR5Goods::selectBarcodeLabelTemplate()
+{
+    DlgBarcodeLabelTemplate::selectTemplate(this);
 }
 
 void CR5Goods::armSoftMap()
@@ -469,54 +508,23 @@ void CR5Goods::buildWebResponse(const QJsonObject &obj)
 {
     Q_UNUSED(obj);
     fHttp->httpQueryFinished(sender());
-    connect(&mTimer, &QTimer::timeout, this, []() {
-        qDebug() << "Websocket timeout";
-    });
-    QWebSocket *s = new QWebSocket();
-    QString host = NDataProvider::mHost;
 
-    if(NDataProvider::mProtocol == "https") {
-        host.remove(0, 8);
-        host = "wss://" + host;
-    } else {
-        host.remove(0, 7);
-        host = "ws://" + host;
-    }
-
-    QUrl url(QString("%1/ws").arg(host));
-    QEventLoop l1;
-    connect(s, &QWebSocket::connected, &l1, &QEventLoop::quit);
-    connect(s, &QWebSocket::disconnected, &l1, &QEventLoop::quit);
-    connect(this, &CR5Goods::messageReceived, &l1, &QEventLoop::quit);
-    connect(&mTimer, &QTimer::timeout, &l1, &QEventLoop::quit);
-    mTimer.start(10000);
-    s->open(url);
-    l1.exec();
-
-    if(s->state() != QAbstractSocket::ConnectedState) {
-        qDebug() << s->error() << s->errorString();
-        C5Message::error(s->errorString());
-        s->deleteLater();
-        return;
-    }
-
-    QEventLoop l2;
-    connect(s, &QWebSocket::textMessageReceived, this, [this](const QString & s) {
-        QJsonObject jrep = QJsonDocument::fromJson(s.toUtf8()).object();
-        emit messageReceived();
-    });
-    connect(this, &CR5Goods::messageReceived, &l2, &QEventLoop::quit);
-    connect(s, &QWebSocket::disconnected, &l2, &QEventLoop::quit);
-    connect(&mTimer, &QTimer::timeout, &l2, &QEventLoop::quit);
     QJsonObject jo;
     jo["command"] = "search_engine_reload";
     jo["handler"] = "office";
     jo["key"] = "asdf7fa8kk49888d!!jjdjmskkak98983mj???m";
     jo["params"] = QJsonObject();
-    s->sendTextMessage(QJsonDocument(jo).toJson(QJsonDocument::Compact));
-    l2.exec();
-    s->deleteLater();
-    C5Message::info(tr("Build complete"));
+
+    if(AppWebSocket::instance && AppWebSocket::instance->isConnected()) {
+        if(!AppWebSocket::instance->sendMessage(jo)) {
+            C5Message::error(tr("Failed to reload search engine"));
+            return;
+        }
+        C5Message::info(tr("Build complete"));
+        return;
+    }
+
+    C5Message::error(tr("No connection to the server. Check the network and try again."));
 }
 
 void CR5Goods::semiReadyPriceUpdate()

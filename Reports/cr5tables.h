@@ -12,6 +12,9 @@ public:
 
     virtual QToolBar *toolBar();
 
+protected:
+    void removeWithId(int id, int row) override;
+
 private slots:
     void createHall();
 };

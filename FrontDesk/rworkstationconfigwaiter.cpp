@@ -99,14 +99,17 @@ void RWorkstationConfigWaiter::applyConfig(const QJsonObject &config)
     ui->leFiscalId->setText(QString::number(config.value(QStringLiteral("f_fiscal_machine_id")).toInt()));
     ui->leStoreId->setText(QString::number(config.value(QStringLiteral("f_default_store_id")).toInt()));
     ui->leReceiptPhone->setText(config.value(QStringLiteral("receipt_phone")).toString());
+    ui->lePrecheckPrinter->setText(config.value(QStringLiteral("precheck_printer")).toString());
     ui->pteReceiptPolicy->setPlainText(config.value(QStringLiteral("receipt_policy")).toString());
-    ui->chReceiptNoTable->setChecked(config.value(QStringLiteral("receipt_no_table")).toBool(true));
-    ui->chReceiptNoServiceHint->setChecked(config.value(QStringLiteral("receipt_no_service_hint")).toBool(true));
-    ui->chReceiptNoDiscountHint->setChecked(config.value(QStringLiteral("receipt_no_discount_hint")).toBool(true));
+    ui->chReceiptNoTable->setChecked(config.value(QStringLiteral("receipt_no_table")).toBool(false));
+    ui->chReceiptNoServiceHint->setChecked(config.value(QStringLiteral("receipt_no_service_hint")).toBool(false));
+    ui->chReceiptNoDiscountHint->setChecked(config.value(QStringLiteral("receipt_no_discount_hint")).toBool(false));
     ui->leSearchMenuH->setText(QString::number(config.value(QStringLiteral("dlgsearchmenu_hsection_size")).toInt(240)));
     ui->leSearchMenuV->setText(QString::number(config.value(QStringLiteral("dlgsearchmenu_vsection_size")).toInt(100)));
     ui->chCostDependOnServiceAndDiscount->setChecked(config.value(u"cost_depend_on_service_and_discount").toBool(false));
     ui->chDoNotPrintCustomerOnReceipt->setChecked(config.value(u"do_not_print_customer_on_receipt").toBool(false));
+    ui->leCostumerNotification->setChecked(config.value(QStringLiteral("customer_notification")).toBool(false));
+    ui->leRecentDishesMinutes->setText(QString::number(config.value(QStringLiteral("recent_dishes_minutes")).toInt(40)));
 
     const QJsonObject buttons = config.value(QStringLiteral("setup_buttons")).toObject();
     for(auto it = mSetupButtons.begin(); it != mSetupButtons.end(); ++it) {
@@ -119,17 +122,24 @@ QJsonObject RWorkstationConfigWaiter::collectConfig() const
     QJsonObject jo;
     jo.insert(u"cost_depend_on_service_and_discount", ui->chCostDependOnServiceAndDiscount->isChecked());
     jo.insert(u"do_not_print_customer_on_receipt", ui->chDoNotPrintCustomerOnReceipt->isChecked());
+    jo.insert(QStringLiteral("customer_notification"), ui->leCostumerNotification->isChecked());
     jo.insert(QStringLiteral("f_cashbox_id"), ui->leCashboxId->text().trimmed().toInt());
     jo.insert(QStringLiteral("f_default_hall_id"), ui->leHallId->text().trimmed().toInt());
     jo.insert(QStringLiteral("f_fiscal_machine_id"), ui->leFiscalId->text().trimmed().toInt());
     jo.insert(QStringLiteral("f_default_store_id"), ui->leStoreId->text().trimmed().toInt());
     jo.insert(QStringLiteral("receipt_phone"), ui->leReceiptPhone->text().trimmed());
+    jo.insert(QStringLiteral("precheck_printer"), ui->lePrecheckPrinter->text().trimmed());
     jo.insert(QStringLiteral("receipt_policy"), ui->pteReceiptPolicy->toPlainText());
     jo.insert(QStringLiteral("receipt_no_table"), ui->chReceiptNoTable->isChecked());
     jo.insert(QStringLiteral("receipt_no_service_hint"), ui->chReceiptNoServiceHint->isChecked());
     jo.insert(QStringLiteral("receipt_no_discount_hint"), ui->chReceiptNoDiscountHint->isChecked());
     jo.insert(QStringLiteral("dlgsearchmenu_hsection_size"), ui->leSearchMenuH->text().trimmed().toInt());
     jo.insert(QStringLiteral("dlgsearchmenu_vsection_size"), ui->leSearchMenuV->text().trimmed().toInt());
+    int recentMinutes = ui->leRecentDishesMinutes->text().trimmed().toInt();
+    if (recentMinutes <= 0) {
+        recentMinutes = 40;
+    }
+    jo.insert(QStringLiteral("recent_dishes_minutes"), recentMinutes);
 
     QJsonObject buttons;
     for(auto it = mSetupButtons.begin(); it != mSetupButtons.end(); ++it) {

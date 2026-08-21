@@ -334,6 +334,7 @@ class MenuReview extends Report
         $line = array_fill(0, $columnCount, "");
         $selfCostCol = $this->fixedColumnCount() + count($this->menuColumnsForReport()) * 2;
 
+        $line[1] = $recipe["f_unit_name"] ?? "";
         $line[4] = $recipe["f_name"];
         $line[5] = $recipe["f_qty"];
         $line[$selfCostCol] = $recipe["f_price"];
@@ -358,10 +359,12 @@ class MenuReview extends Report
             c.f_base AS f_dish,
             ig.f_name AS f_name,
             c.f_qty,
+            COALESCE(u.f_name, '') AS f_unit_name,
             COALESCE(NULLIF(c.f_price, 0), ig.f_lastinputprice) AS f_price,
             ROUND(c.f_qty * COALESCE(NULLIF(c.f_price, 0), ig.f_lastinputprice), 2) AS total
         FROM c_goods_complectation c
         INNER JOIN c_goods ig ON ig.f_id = c.f_goods
+        LEFT JOIN c_units u ON u.f_id = ig.f_unit
         EOD;
         $recipes = $this->select($sql)->fetch_all(MYSQLI_ASSOC);
         $mapRecipes = [];

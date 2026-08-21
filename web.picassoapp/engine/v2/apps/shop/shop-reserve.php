@@ -59,7 +59,11 @@ class ShopReserve extends Auth
         from c_storages s
         WHERE s.f_id = ?;
         EOD;
-        $this->result["store_json"] = json_decode($this->select($sql, "i", [$params->store_id])->fetch_assoc()["store_json"]);
+        $row = $this->select($sql, "i", [$params->store_id])->fetch_assoc();
+        if (empty($row) || empty($row["store_json"])) {
+            dieWithCode(Translator::t("Store is not defined"));
+        }
+        $this->result["store_json"] = json_decode($row["store_json"]);
         $sql = <<<EOD
         select
         json_detailed(JSON_OBJECT(
@@ -80,7 +84,11 @@ class ShopReserve extends Auth
         LEFT JOIN c_goods_prices gp ON gp.f_goods=g.f_id AND gp.f_currency=1
         where g.f_id=?
         EOD;
-        $this->result["goods_json"] = json_decode($this->select($sql, "i", [$params->goods_id])->fetch_assoc()["goods_json"]);
+        $goodsRow = $this->select($sql, "i", [$params->goods_id])->fetch_assoc();
+        if (empty($goodsRow) || empty($goodsRow["goods_json"])) {
+            dieWithCode(Translator::t("Goods not found"));
+        }
+        $this->result["goods_json"] = json_decode($goodsRow["goods_json"]);
         $this->echoResult();
     }
 }

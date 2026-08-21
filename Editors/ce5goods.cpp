@@ -14,6 +14,7 @@
 #include <QCheckBox>
 #include <QPainter>
 #include <QPixmap>
+#include <QColorDialog>
 #include <QPushButton>
 #include <QStringListModel>
 #include "barcode.h"
@@ -34,7 +35,9 @@
 #include "ce5goodsunit.h"
 #include "ce5partner.h"
 #include "dict_goods_types.h"
+#include "ean8generator.h"
 #include "ui_ce5goods.h"
+#include <QPrintDialog>
 #include <stdexcept>
 
 static int fLastGroup = 0;
@@ -386,6 +389,10 @@ CE5Goods::CE5Goods(QWidget *parent) :
     ui->tblGoods->setColumnWidths(7, 0, 0, 400, 80, 80, 80, 80);
     ui->leStoreId->setSelector(ui->leStoreIdName, cache_goods, 1, 3);
     ui->wGoodsType->selectorCallback = goodsTypeItemSelector;
+    ui->wArarixGroup->setSelectorName(tr("Ararix group"));
+    ui->wArarixGroup->selectorCallback = ararixGroupItemSelector;
+    ui->wDishCountry->setSelectorName(tr("Country"));
+    ui->wDishCountry->selectorCallback = ararixCountryItemSelector;
 #ifndef QT_DEBUG
     ui->leIsComplect->setVisible(false);
 #endif
@@ -437,9 +444,14 @@ CE5Goods::CE5Goods(QWidget *parent) :
     ui->tblPricing->setHorizontalHeaderLabels(colLabels);
     ui->tblPricing->fitColumnsToWidth();
     ui->cbCurrency->setDBValues("select f_id, f_name from e_currency");
-    int basecurrecny = __c5config.getValue(param_default_currency).toInt();
-    ui->cbCurrency->setIndexForValue(basecurrecny);
+    // ItemData is int (setDBValues); findData needs int, not QString from getValue().
+    const int baseCurrency = __c5config.getValue(param_default_currency).toInt();
+    ui->cbCurrency->setProperty("default", baseCurrency);
+    ui->cbCurrency->setIndexForValue(baseCurrency);
     connect(ui->leScanCode, &C5LineEditWithSelector::doubleClicked, this, &CE5Goods::genScancode);
+    connect(ui->leColor, &C5LineEditWithSelector::doubleClicked, this, &CE5Goods::setColor);
+    ui->leColor->setInteger(-1);
+    ui->leColor->setColor(-1);
     fScancodeGenerated = false;
     db.exec("select * from e_currency_cross_rate");
 
@@ -460,9 +472,16 @@ CE5Goods::CE5Goods(QWidget *parent) :
     ui->rbGenEAN8->setChecked(__c5config.getRegValue("gen_ean8").toBool());
     ui->tblMenu->setVisible(mUser->fConfig["officen_mode"].toInt() != 2);
     ui->tblMenu->setColumnWidths(ui->tblMenu->columnCount(), 0, 0, 200, 100, 150, 100, 100, 50, 50);
+    auto fillServicePrintCombo = [this](const QStringList &printers) {
+        if(ui->cbServicePrint->count() > 0) {
+            return;
+        }
+        ui->cbServicePrint->addItem(QString());
+        ui->cbServicePrint->addItems(printers);
+    };
     if (mUser->fConfig["officen_mode"].toInt() != 2) {
         if (ui->tblMenu->rowCount() == 0) {
-            NInterface::query1("/engine/v2/officen/menu/list", mUser->mSessionKey, this, {}, [this](const QJsonObject &jdoc) {
+            NInterface::query1("/engine/v2/officen/menu/list", mUser->mSessionKey, this, {}, [this, fillServicePrintCombo](const QJsonObject &jdoc) {
                 QJsonArray jmenu = jdoc["menu"].toArray();
                 QJsonArray jstorages = jdoc["storages"].toArray();
                 QJsonArray jprinters = jdoc["printers"].toArray();
@@ -480,6 +499,8 @@ CE5Goods::CE5Goods(QWidget *parent) :
                     const QJsonObject &js = jprinters.at(i).toObject();
                     printers << js["f_name"].toString();
                 }
+
+                fillServicePrintCombo(printers);
 
                 ui->tblMenu->setUpdatesEnabled(false);
                 ui->tblMenu->setRowCount(jmenu.count());
@@ -507,6 +528,15 @@ CE5Goods::CE5Goods(QWidget *parent) :
                 ui->tblMenu->setUpdatesEnabled(true);
             });
         }
+    } else if(ui->cbServicePrint->count() == 0) {
+        NInterface::query1("/engine/v2/officen/menu/list", mUser->mSessionKey, this, {}, [fillServicePrintCombo](const QJsonObject &jdoc) {
+            QStringList printers;
+            const QJsonArray jprinters = jdoc["printers"].toArray();
+            for(int i = 0; i < jprinters.size(); i++) {
+                printers << jprinters.at(i).toObject().value(QStringLiteral("f_name")).toString();
+            }
+            fillServicePrintCombo(printers);
+        });
     }
 }
 
@@ -584,6 +614,8 @@ void CE5Goods::clear()
         ui->tblMenu->lineEdit(i, 3)->clear();
     }
     CE5Editor::clear();
+    ui->leColor->setInteger(-1);
+    ui->leColor->setColor(-1);
     ui->leLowLevel->setText("0");
 
     if(ui->tabWidget->currentIndex() > 1) {
@@ -615,8 +647,12 @@ void CE5Goods::clear()
 
     fScancodeGenerated = false;
 
-    if(ui->cbCurrency->currentData().toInt() == 0) {
-        ui->cbCurrency->setCurrentIndex(ui->cbCurrency->findData(__c5config.getValue(param_default_currency)));
+    // CE5Editor::clear() resets combos to -1; restore base currency from settings.
+    if(ui->cbCurrency->currentData().toInt() <= 0) {
+        const int defCur = __c5config.getValue(param_default_currency).toInt();
+        if(defCur > 0) {
+            ui->cbCurrency->setCurrentIndex(ui->cbCurrency->findData(defCur));
+        }
     }
 
     for(int i = 0; i < ui->tblAs->rowCount(); i++) {
@@ -625,6 +661,9 @@ void CE5Goods::clear()
 
     ui->chCountDiscount->setChecked(true);
     ui->chCountService->setChecked(true);
+    if(ui->cbServicePrint->count() > 0) {
+        ui->cbServicePrint->setCurrentIndex(0);
+    }
 
     // Dietary / allergen badges
     ui->chGlutenFree->setChecked(false);
@@ -635,6 +674,8 @@ void CE5Goods::clear()
     ui->chNoSugar->setChecked(false);
     ui->chContainsNuts->setChecked(false);
     ui->chHalalKosher->setChecked(false);
+    ui->wArarixGroup->setCodeAndName(0, QString());
+    ui->wDishCountry->setCodeAndName(0, QString());
 
     ui->leBjuKcal->clear();
     ui->leBjuProtein->clear();
@@ -667,6 +708,18 @@ void CE5Goods::clear()
     ui->tblRelatedOther->setRowCount(0);
 }
 
+void CE5Goods::setColor()
+{
+    const QColor initColor = QColor::fromRgb(static_cast<QRgb>(ui->leColor->color()));
+    const QColor chosen = QColorDialog::getColor(initColor, this, tr("Background color"));
+    if (!chosen.isValid()) {
+        return;
+    }
+    const int color = static_cast<int>(chosen.rgb());
+    ui->leColor->setColor(color);
+    ui->leColor->setInteger(color);
+}
+
 QPushButton* CE5Goods::b1()
 {
     QPushButton *btn = new QPushButton(tr("Print card"));
@@ -687,6 +740,8 @@ QJsonObject CE5Goods::makeJsonObject()
     jdata["f_salary_department"] = ui->leSalaryDepartment->getInteger();
     jdata["f_salary_fixed_value"] = ui->leSalaryFixedValue->getDouble();
     jdata["f_salary_percent_value"] = ui->leSalaryPercentValue->getDouble();
+    jdata[QStringLiteral("f_service_print")] = ui->cbServicePrint->currentText().trimmed();
+    jdata[QStringLiteral("f_online_sale")] = ui->chOnlineSale->isChecked() ? 1 : 0;
 
     // Saved to c_goods.f_data.f_dietary_badge
     QJsonObject dietaryBadge;
@@ -731,6 +786,8 @@ QJsonObject CE5Goods::makeJsonObject()
     jdata[QStringLiteral("f_modificators")] = modificatorsFromTable(ui->tblModificators);
     jdata[QStringLiteral("f_related_drink")] = relatedItemsFromTable(ui->tblRelatedDrinks);
     jdata[QStringLiteral("f_related_other")] = relatedItemsFromTable(ui->tblRelatedOther);
+    jdata[QStringLiteral("f_ararix_group")] = ui->wArarixGroup->value();
+    jdata[QStringLiteral("f_ararix_country")] = ui->wDishCountry->value();
 
     QJsonObject j;
     j["f_id"] = ui->leCode->getInteger();
@@ -764,6 +821,11 @@ QJsonObject CE5Goods::makeJsonObject()
     j["f_description"] = ui->plainTextEdit->toPlainText();
     j["f_acc"] = ui->leAcc->text();
     j["f_autodiscount"] = ui->leAutodiscount->text();
+    {
+        const int color = ui->leColor->getInteger();
+        j.insert(QStringLiteral("f_color"),
+                 color == -1 ? QJsonValue(QJsonValue::Null) : QJsonValue(color));
+    }
     fJsonData["goods"] = j;
     fJsonData["samestore"] = ui->chSameStoreId->isChecked();
     fJsonData["scangenerated"] = fScancodeGenerated;
@@ -910,34 +972,72 @@ void CE5Goods::openResponse(const QJsonObject &jdoc)
         ui->lbImage->setText(tr("Image"));
     }
     QJsonObject j = jdoc["goods"].toObject();
-    ui->leCode->setInteger(j["f_id"].toInt());
+    ui->leCode->setInteger(j["f_id"].toVariant().toInt());
     if(!imageShown) {
         loadGoodsImageToLabel(ui->leCode->getInteger(), ui->lbImage, &fImage);
     }
     ui->leName->setText(j["f_name"].toString());
-    ui->leGroup->setValue(j["f_group"].toInt());
-    ui->leSupplier->setValue(j["f_supplier"].toInt());
-    ui->leUnit->setValue(j["f_unit"].toInt());
+    ui->leGroup->setValue(j["f_group"].toVariant().toInt());
+    ui->leSupplier->setValue(j["f_supplier"].toVariant().toInt());
+    ui->leUnit->setValue(j["f_unit"].toVariant().toInt());
     ui->leScanCode->setText(j["f_scancode"].toString());
-    ui->leLowLevel->setDouble(j["f_lowlevel"].toDouble());
-    ui->leQtyBox->setDouble(j["f_qtybox"].toDouble());
+    ui->leLowLevel->setDouble(j["f_lowlevel"].toVariant().toDouble());
+    ui->leQtyBox->setDouble(j["f_qtybox"].toVariant().toDouble());
     ui->leFiscalName->setText(j["f_fiscalname"].toString());
-    ui->leCostPrice->setDouble(j["f_lastinputprice"].toDouble());
+    ui->leCostPrice->setDouble(j["f_lastinputprice"].toVariant().toDouble());
     ui->leAdg->setText(j["f_adg"].toString());
-    ui->leMargin->setDouble(j["f_price_margin"].toDouble());
-    ui->leMargin2->setDouble(j["f_price_margin2"].toDouble());
-    ui->cbCurrency->setCurrentIndex(ui->cbCurrency->findData(j["f_base_currency"].toInt()));
-    ui->leStoreId->setValue(j["f_storeid"].toInt());
-    ui->chSameStoreId->setChecked(ui->leStoreId->getInteger() == ui->leCode->getInteger());
+    ui->leMargin->setDouble(j["f_price_margin"].toVariant().toDouble());
+    ui->leMargin2->setDouble(j["f_price_margin2"].toVariant().toDouble());
+    {
+        int baseCur = j["f_base_currency"].toVariant().toInt();
+        if(baseCur <= 0) {
+            baseCur = __c5config.getValue(param_default_currency).toInt();
+        }
+        if(baseCur > 0) {
+            ui->cbCurrency->setCurrentIndex(ui->cbCurrency->findData(baseCur));
+        }
+    }
+    const int storeId = j["f_storeid"].toVariant().toInt();
+    const int code = ui->leCode->getInteger();
+
+    if(storeId > 0) {
+        C5Cache::cache(cache_goods)->ensureId(storeId);
+    }
+
+    ui->leStoreId->setValue(storeId);
+    const bool sameStore = (storeId > 0 && storeId == code);
+    ui->chSameStoreId->setChecked(sameStore);
+    ui->leStoreId->setEnabled(!sameStore);
+    ui->leStoreIdName->setEnabled(!sameStore);
     ui->chEnabled->setChecked(j["f_enabled"].toInt() > 0);
     ui->chOnlyWholeNumber->setChecked(j["f_wholenumber"].toInt() > 0);
-    ui->wGoodsType->setCodeAndName(j.value("f_type").toInt(), j.value("f_type_name").toString());
+    {
+        const int typeId = j.value("f_type").toInt();
+        QString typeName = goodsTypeDisplayName(typeId);
+        if (typeName.isEmpty()) {
+            typeName = j.value("f_type_name").toString();
+        }
+        ui->wGoodsType->setCodeAndName(typeId, typeName);
+    }
     ui->chNoSpecialPrice->setChecked(j["f_nospecial_price"].toInt() > 0);
     ui->leComplectOutputQty->setDouble(j["f_complectout"].toDouble());
     ui->chComponentExit->setChecked(j["f_component_exit"].toInt() > 0);
     ui->leWebLink->setText(j["f_weblink"].toString());
     ui->leQueue->setInteger(j["f_queue"].toInt());
     ui->leAutodiscount->setText(j["f_autodiscount"].toString());
+    {
+        const QJsonValue colorVal = j.value(QStringLiteral("f_color"));
+        const int color = colorVal.isNull() || colorVal.isUndefined()
+                              ? -1
+                              : colorVal.toVariant().toInt();
+        ui->leColor->setInteger(color);
+        if(color >= 0) {
+            // 24-bit RGB without alpha — make opaque for the swatch
+            ui->leColor->setColor(static_cast<int>(0xff000000u | static_cast<quint32>(color)));
+        } else {
+            ui->leColor->setColor(color);
+        }
+    }
     QJsonArray ja = jdoc["complect"].toArray();
 
     for(int i = 0; i < ja.size(); i++) {
@@ -969,8 +1069,11 @@ void CE5Goods::openResponse(const QJsonObject &jdoc)
         }
     }
 
-    if(ui->cbCurrency->currentData().toInt() == 0) {
-        ui->cbCurrency->setCurrentIndex(ui->cbCurrency->findData(__c5config.getValue(param_default_currency)));
+    if(ui->cbCurrency->currentData().toInt() <= 0) {
+        const int defCur = __c5config.getValue(param_default_currency).toInt();
+        if(defCur > 0) {
+            ui->cbCurrency->setCurrentIndex(ui->cbCurrency->findData(defCur));
+        }
     }
 
     ja = jdoc["astable"].toArray();
@@ -1037,6 +1140,11 @@ void CE5Goods::openResponse(const QJsonObject &jdoc)
         printers << js["f_name"].toString();
     }
 
+    if(ui->cbServicePrint->count() == 0) {
+        ui->cbServicePrint->addItem(QString());
+        ui->cbServicePrint->addItems(printers);
+    }
+
     ui->tblMenu->setUpdatesEnabled(false);
     ui->tblMenu->setRowCount(jmenu.count());
 
@@ -1070,11 +1178,31 @@ void CE5Goods::openResponse(const QJsonObject &jdoc)
     ui->chCountDiscount->setChecked(jdata["f_count_discount"].toBool());
     ui->chCountService->setChecked(jdata["f_count_service"].toBool());
     ui->chHourlyPayment->setChecked(jdata["f_hourly_payment"].toBool());
+    {
+        const QJsonValue online = jdata.value(QStringLiteral("f_online_sale"));
+        const bool checked = online.isBool() ? online.toBool()
+                                             : (online.toVariant().toInt() > 0);
+        ui->chOnlineSale->setChecked(checked);
+    }
     ui->leHourlyRole->setText(jdata["f_hourly_rule"].toString());
     ui->leCookingTime->setInteger(jdata["f_cooking_time"].toInt());
     ui->leSalaryDepartment->setInteger(jdata["f_salary_department"].toInt());
     ui->leSalaryFixedValue->setDouble(jdata["f_salary_fixed_value"].toDouble());
     ui->leSalaryPercentValue->setDouble(jdata.value("f_salary_percent_value").toDouble());
+
+    {
+        if(ui->cbServicePrint->count() == 0 && !printers.isEmpty()) {
+            ui->cbServicePrint->addItem(QString());
+            ui->cbServicePrint->addItems(printers);
+        }
+        const QString servicePrint = jdata.value(QStringLiteral("f_service_print")).toString().trimmed();
+        int idx = ui->cbServicePrint->findText(servicePrint);
+        if(idx < 0 && !servicePrint.isEmpty()) {
+            ui->cbServicePrint->addItem(servicePrint);
+            idx = ui->cbServicePrint->findText(servicePrint);
+        }
+        ui->cbServicePrint->setCurrentIndex(qMax(0, idx));
+    }
 
     // Dietary / allergen badges
     const QJsonValue jb = jdata.value("f_dietary_badge");
@@ -1087,6 +1215,30 @@ void CE5Goods::openResponse(const QJsonObject &jdoc)
     ui->chNoSugar->setChecked(dObj.value("no_sugar").toBool());
     ui->chContainsNuts->setChecked(dObj.value("contains_nuts").toBool());
     ui->chHalalKosher->setChecked(dObj.value("halal_kosher").toBool());
+
+    {
+        const int groupId = jdata.value(QStringLiteral("f_ararix_group")).toInt();
+        QString groupName;
+        if (groupId > 0) {
+            C5Database db;
+            db[":f_id"] = groupId;
+            if (db.exec("select f_name from ararix_goods_groups where f_id=:f_id") && db.nextRow()) {
+                groupName = db.getString(0);
+            }
+        }
+        ui->wArarixGroup->setCodeAndName(groupId, groupName);
+
+        const int countryId = jdata.value(QStringLiteral("f_ararix_country")).toInt();
+        QString countryName;
+        if (countryId > 0) {
+            C5Database db;
+            db[":f_id"] = countryId;
+            if (db.exec("select f_name from ararix_goods_country where f_id=:f_id") && db.nextRow()) {
+                countryName = db.getString(0);
+            }
+        }
+        ui->wDishCountry->setCodeAndName(countryId, countryName);
+    }
 
     const QJsonObject bjuObj = jdata.value(QStringLiteral("f_bju")).toObject();
     ui->leBjuKcal->setDouble(bjuObj.value(QStringLiteral("kcal")).toDouble());
@@ -1378,7 +1530,7 @@ void CE5Goods::tblTotalChanged(const QString &arg1)
 
 void CE5Goods::uploadImage()
 {
-    QString fn = QFileDialog::getOpenFileName(this, tr("Image"), "", "*.jpg;*.png;*.bmp");
+    QString fn = QFileDialog::getOpenFileName(this, tr("Image"), "", "*.jpg;*.png;*.bmp;*.webp");
 
     if(fn.isEmpty()) {
         return;
@@ -1721,21 +1873,33 @@ void CE5Goods::on_leUnitName_textChanged(const QString &arg1)
 
 void CE5Goods::on_btnPrintBarcode_clicked()
 {
-    // if(ui->rbGenEAN8->isChecked()) {
-    //     if(ui->leScanCode->text().length() == 4) {
-    //         QString code = QString("%1").arg(ui->leGroup->getInteger(), 3, 10,  QChar('0'));
-    //         ui->leScanCode->setText(ui->leScanCode->text() + code);
-    //     }
-    //     if(ui->leScanCode->text().length() == 7) {
-    //         ui->leScanCode->setText(Ean8Generator::last(ui->leScanCode->text()));
-    //     }
-    // }
-    QPrintDialog pd;
+    if(ui->rbGenEAN8->isChecked()) {
+        if(ui->leScanCode->text().length() == 4) {
+            QString code = QString("%1").arg(ui->leGroup->getInteger(), 3, 10, QChar('0'));
+            ui->leScanCode->setText(ui->leScanCode->text() + code);
+        }
 
-    if(pd.exec() == QDialog::Accepted) {
-        C5StoreBarcode::printOneBarcode(ui->leScanCode->text(), ui->tblPricing->lineEdit(0, 0)->text(), "", ui->leName->text(),
-                                        pd);
+        if(ui->leScanCode->text().length() == 7) {
+            ui->leScanCode->setText(Ean8Generator::last(ui->leScanCode->text()));
+        }
     }
+
+    const QString code = ui->leScanCode->text().trimmed();
+    if(code.isEmpty()) {
+        C5Message::error(tr("No barcode defined."));
+        return;
+    }
+
+    QPrintDialog pd;
+    if(pd.exec() != QDialog::Accepted) {
+        return;
+    }
+
+        // New compact / selected label template. Old layout kept as printOneBarcode(...).
+    C5StoreBarcode::printSelected(code,
+                                  ui->tblPricing->lineEdit(0, 0)->text(),
+                                  ui->leName->text(),
+                                  pd);
 }
 
 void CE5Goods::on_leCostPrice_textEdited(const QString &arg1)

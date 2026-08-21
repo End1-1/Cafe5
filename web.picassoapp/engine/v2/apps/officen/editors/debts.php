@@ -189,7 +189,7 @@ class Debts
     protected function getFilterConfig()
     {
         return [
-            ["type" => "combobox", "name" => "viewmode", "label" => Translator::t("View mode"), "default" => 1, "values" => [
+            ["type" => "viewmode", "name" => "viewmode", "label" => Translator::t("View mode"), "default" => 1, "values" => [
                 ["label" => Translator::t("Total partners debts"), "value" => 1],
                 ["label" => Translator::t("Detailed partners debts"), "value" => 2],
                 ["label" => Translator::t("Total customers debts"), "value" => 3],

@@ -124,6 +124,11 @@ void NTreeWidget::initParams(const QJsonObject &o)
     fInitParams = o;
 }
 
+QJsonObject NTreeWidget::reportFilter() const
+{
+    return fFilter ? fFilter->filter() : QJsonObject();
+}
+
 void NTreeWidget::sum()
 {
     auto *model = static_cast<NTreeModel*>(ui->mTreeView->model());

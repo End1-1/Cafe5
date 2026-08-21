@@ -1,12 +1,13 @@
 #include "rworkstationconfigwidget.h"
+#include <QLabel>
+#include <QVBoxLayout>
+#include "c5message.h"
+#include "c5user.h"
+#include "dict_workstation.h"
+#include "ninterface.h"
 #include "rworkstationconfigcommon.h"
 #include "rworkstationconfigshop.h"
 #include "rworkstationconfigwaiter.h"
-#include "dict_workstation.h"
-#include "c5message.h"
-#include "ninterface.h"
-#include <QLabel>
-#include <QVBoxLayout>
 
 RWorkstationConfigWidget::RWorkstationConfigWidget(QWidget *parent)
     : RAbstractSpecialWidget(parent)

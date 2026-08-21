@@ -51,6 +51,7 @@ qt_add_resources(QT_RESOURCES
 set(APP_SOURCES
     ${QT_RESOURCES}
     main.cpp
+    ../Cafe5/c5uilanguage.cpp
     res.rc
     rc.h
     version.h
@@ -115,6 +116,8 @@ set(APP_SOURCES
     ../Forms/c5srofinventory.ui
     ../Forms/c5storebarcode.ui
     ../Forms/c5storebarcodelist.ui
+    ../Forms/dlgprintbarcodelabels.ui
+    ../Forms/dlgbarcodelabeltemplate.ui
 
     ../Forms/c5storedocselectprinttemplate.ui
     c5storeinventory.ui
@@ -215,6 +218,8 @@ set(APP_SOURCES
     ../StructModel/c5structtableview.ui
     c5discountredeem.ui
     c5storedecompilation.ui
+    c5storemovement.ui
+    c5storecomplectation.ui
     dlgemarks.ui
     dwaiterworkstationconfig.ui
     rabstracteditordialog.ui
@@ -239,6 +244,7 @@ set(APP_SOURCES
     ../Classes/c5servername.h
     ../Classes/c5tableview.h
     ../dictionaries/dict_payment_type.h
+    ../dictionaries/dict_goods_types.h
     ../Classes/ean8generator.h
     ../NTable/nhandler.h
     ../NTable/nsearchdlg.h
@@ -334,6 +340,8 @@ set(APP_SOURCES
     ../Forms/c5srofinventory.h
     ../Forms/c5storebarcode.h
     ../Forms/c5storebarcodelist.h
+    ../Forms/dlgprintbarcodelabels.h
+    ../Forms/dlgbarcodelabeltemplate.h
 
     ../Forms/c5storedocselectprinttemplate.h
     c5storeinventory.h
@@ -534,8 +542,11 @@ set(APP_SOURCES
     ../StructModel/c5structtableview.h
     c5discountredeem.h
     c5officedialog.h
+    ../Cafe5/c5uilanguage.h
     c5officewidget.h
     c5storedecompilation.h
+    c5storemovement.h
+    c5storecomplectation.h
     dlgemarks.h
     dwaiterworkstationconfig.h
     rabstracteditordialog.h
@@ -564,6 +575,7 @@ set(APP_SOURCES
     ../Classes/c5servername.cpp
     ../Classes/c5tableview.cpp
     ../dictionaries/dict_payment_type.cpp
+    ../dictionaries/dict_goods_types.cpp
     ../Classes/ean8generator.cpp
     ../NTable/nhandler.cpp
     ../NTable/nsearchdlg.cpp
@@ -651,6 +663,8 @@ set(APP_SOURCES
     ../Forms/c5srofinventory.cpp
     ../Forms/c5storebarcode.cpp
     ../Forms/c5storebarcodelist.cpp
+    ../Forms/dlgprintbarcodelabels.cpp
+    ../Forms/dlgbarcodelabeltemplate.cpp
 
     ../Forms/c5storedocselectprinttemplate.cpp
     c5storeinventory.cpp
@@ -843,6 +857,8 @@ set(APP_SOURCES
     c5officedialog.cpp
     c5officewidget.cpp
     c5storedecompilation.cpp
+    c5storemovement.cpp
+    c5storecomplectation.cpp
     dlgemarks.cpp
     dwaiterworkstationconfig.cpp
     rabstracteditordialog.cpp
@@ -891,15 +907,24 @@ add_executable(OfficeN ${APP_SOURCES}
     ../Service5/worker/struct_cashbox.h
     ../Service5/worker/struct_payment_type.h
     rcashmovement.h rcashmovement.cpp
+    rconsumedgoods.h rconsumedgoods.cpp
     rdebts.h rdebts.cpp
     dlgdebtsredeem.h dlgdebtsredeem.cpp dlgdebtsredeem.ui
     storeinputxmlimport.h storeinputxmlimport.cpp
     dlgstoreinputxmlinvoicepick.h dlgstoreinputxmlinvoicepick.cpp dlgstoreinputxmlinvoicepick.ui
+    dlgstoreinputxmlinvoicepreview.h dlgstoreinputxmlinvoicepreview.cpp dlgstoreinputxmlinvoicepreview.ui
+    dlgstoreinputxmlimportoptions.h dlgstoreinputxmlimportoptions.cpp dlgstoreinputxmlimportoptions.ui
     dlgstoreinputxmlpartnerupdate.h dlgstoreinputxmlpartnerupdate.cpp dlgstoreinputxmlpartnerupdate.ui
     dlgstoreinputxmlgoodsmatch.h dlgstoreinputxmlgoodsmatch.cpp dlgstoreinputxmlgoodsmatch.ui
+    dlgstoreinputpayment.h dlgstoreinputpayment.cpp dlgstoreinputpayment.ui
+    dlgstoreinputpricewarn.h dlgstoreinputpricewarn.cpp dlgstoreinputpricewarn.ui
     rorderinprogress.h rorderinprogress.cpp
     rtotalreviewreport.h rtotalreviewreport.cpp
     rmenureviewreport.h rmenureviewreport.cpp
+    dlginventoryblankchooser.h dlginventoryblankchooser.cpp dlginventoryblankchooser.ui
+    dlginventoryblankeditor.h dlginventoryblankeditor.cpp dlginventoryblankeditor.ui
+    dlginventoryblankdiff.h dlginventoryblankdiff.cpp dlginventoryblankdiff.ui
+    dlginventoryblankstorepick.h dlginventoryblankstorepick.cpp dlginventoryblankstorepick.ui
     rworkstationsreport.h rworkstationsreport.cpp
     dlgservicevalue.h dlgservicevalue.cpp
     dlgsalarydishsales.h dlgsalarydishsales.cpp
@@ -1006,6 +1031,17 @@ if(TARGET ZKFingerprint)
             COMMENT "Copy ${_zkfp_runtime_name} next to OfficeN"
         )
     endforeach()
+
+    if(ZKFP_SENSORS_DIR)
+        add_custom_command(TARGET OfficeN POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E make_directory
+                    "$<TARGET_FILE_DIR:OfficeN>/ZKFPSensors"
+            COMMAND ${CMAKE_COMMAND} -E copy_directory
+                    "${ZKFP_SENSORS_DIR}"
+                    "$<TARGET_FILE_DIR:OfficeN>/ZKFPSensors"
+            COMMENT "Copy ZKFPSensors next to OfficeN"
+        )
+    endif()
 endif()
 
 # -----------------------
@@ -1042,3 +1078,12 @@ if (WIN32)
         WIN32_EXECUTABLE TRUE
     )
 endif()
+
+add_custom_command(TARGET OfficeN POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E make_directory
+            "$<TARGET_FILE_DIR:OfficeN>/templates"
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+            "${CMAKE_CURRENT_SOURCE_DIR}/templates/inventory_blank_a4.html"
+            "$<TARGET_FILE_DIR:OfficeN>/templates/inventory_blank_a4.html"
+    COMMENT "Copy inventory blank print template"
+)

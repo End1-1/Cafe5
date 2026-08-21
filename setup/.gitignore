@@ -1,3 +1,6 @@
 staging/
 output/
 version.iss
+versions.json
+component_defines.iss
+redist/*.exe

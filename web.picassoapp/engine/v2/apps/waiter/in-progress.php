@@ -52,6 +52,8 @@ class InProgress extends Auth
                     'f_guest_name' => $r['f_guest_name'],
                     'f_guest_phone' => $r['f_guest_phone'],
                     'f_guest_address' => $r['f_guest_address'],
+                    'f_started_at' => '',
+                    'f_estimated_end' => '',
                     'lines' => [],
                 ];
             }
@@ -63,10 +65,60 @@ class InProgress extends Auth
                 'f_status' => (int) $r['f_status'],
                 'f_comment' => $r['f_comment'],
                 'f_ready_at' => $r['f_ready_at'] ?? '',
+                'f_cooking_time' => (int)($r['f_cooking_time'] ?? 0),
+                'f_line_started_at' => $r['f_line_started_at'] ?? '',
             ];
         }
 
+        foreach ($map as &$order) {
+            $start = $this->resolveOrderStart($order);
+            $order['f_started_at'] = $start;
+            $order['f_estimated_end'] = $this->resolveOrderEstimatedEnd($order, $start);
+        }
+        unset($order);
+
         return array_values($map);
+    }
+
+    /** @param array<string,mixed> $order */
+    private function resolveOrderStart(array $order): string
+    {
+        $date = trim((string)($order['f_date_open'] ?? ''));
+        $time = trim((string)($order['f_time_open'] ?? ''));
+        if ($date !== '' && $time !== '') {
+            return trim($date . ' ' . $time);
+        }
+        if ($date !== '') {
+            return $date;
+        }
+        $earliest = '';
+        foreach ($order['lines'] as $line) {
+            $ls = trim((string)($line['f_line_started_at'] ?? ''));
+            if ($ls === '') {
+                continue;
+            }
+            if ($earliest === '' || strcmp($ls, $earliest) < 0) {
+                $earliest = $ls;
+            }
+        }
+        return $earliest;
+    }
+
+    /** @param array<string,mixed> $order */
+    private function resolveOrderEstimatedEnd(array $order, string $start): string
+    {
+        $maxMin = 0;
+        foreach ($order['lines'] as $line) {
+            $maxMin = max($maxMin, (int)($line['f_cooking_time'] ?? 0));
+        }
+        if ($start === '' || $maxMin <= 0) {
+            return '';
+        }
+        $ts = strtotime($start);
+        if ($ts === false) {
+            return '';
+        }
+        return date('Y-m-d H:i:s', $ts + ($maxMin * 60));
     }
 
     public function get($params)
@@ -99,6 +151,16 @@ class InProgress extends Auth
             COALESCE(json_value(oh.f_data, '$.f_guest.f_guest_name'), '') AS f_guest_name,
             COALESCE(json_value(oh.f_data, '$.f_guest.f_guest_phone'), '') AS f_guest_phone,
             COALESCE(json_value(oh.f_data, '$.f_guest.f_guest_address'), '') AS f_guest_address,
+            COALESCE(
+                CAST(JSON_UNQUOTE(JSON_EXTRACT(og.f_data, '$.f_cooking_time')) AS UNSIGNED),
+                CAST(JSON_UNQUOTE(JSON_EXTRACT(cg.f_data, '$.f_cooking_time')) AS UNSIGNED),
+                0
+            ) AS f_cooking_time,
+            COALESCE(
+                NULLIF(JSON_UNQUOTE(JSON_EXTRACT(ogp.f_data, '$.f_status_1_1_time')), ''),
+                NULLIF(JSON_UNQUOTE(JSON_EXTRACT(og.f_data, '$.f_append_time')), ''),
+                ''
+            ) AS f_line_started_at,
             COALESCE(
                 NULLIF(JSON_UNQUOTE(JSON_EXTRACT(ogp.f_data, '$.f_status_3_1_time')), ''),
                 NULLIF(JSON_UNQUOTE(JSON_EXTRACT(ogp.f_data, '$.f_status_3_2_time')), ''),

@@ -116,6 +116,9 @@ public:
 
     void refreshId(const QString &whereField, int id);
 
+    /** Load a missing row from DB (stale cache after manual import). No-op if id=0, already present, or cache has no id-where. */
+    void ensureId(int id);
+
     static C5Cache* cache(int cacheId);
 
     static QMap<QString, C5Cache*> fCacheList;
@@ -140,6 +143,8 @@ protected:
 
 private:
     static QMap<int, QString> fCacheQuery;
+
+    static QMap<int, QString> fCacheIdWhere;
 
     static QMap<QString, int> fTableCache;
 

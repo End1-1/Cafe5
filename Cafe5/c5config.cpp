@@ -174,20 +174,34 @@ void C5Config::initParamsFromDb()
 {
     C5Database db(fDBHost, fDBPath, fDBUser, fDBPassword);
     fSettings.clear();
-    db[":f_name"] = fSettingsName;
-    db.exec("select f_id from s_settings_names where f_name=:f_name");
 
-    if(db.nextRow()) {
-        fSettingsId = db.getInt(0);
-        db[":f_settings"] = db.getInt(0);
+    // Prefer settings id (user f_config / last saved profile). Fallback to name from connection dialog.
+    if(fSettingsId <= 0 && !fSettingsName.isEmpty()) {
+        db[":f_name"] = fSettingsName;
+        db.exec("select f_id from s_settings_names where f_name=:f_name");
+
+        if(db.nextRow()) {
+            fSettingsId = db.getInt(0);
+        }
+    }
+
+    if(fSettingsId > 0) {
+        db[":f_settings"] = fSettingsId;
         db.exec("select f_key, f_value from s_settings_values where f_settings=:f_settings");
 
         while(db.nextRow()) {
             fSettings[db.getInt(0)] = db.getString(1);
         }
+
+        db[":f_id"] = fSettingsId;
+        db.exec("select f_name from s_settings_names where f_id=:f_id");
+
+        if(db.nextRow()) {
+            fSettingsName = db.getString(0);
+        }
     }
 
-    db[":f_id"] = __c5config.fSettingsId;
+    db[":f_id"] = fSettingsId;
     db.exec("select * from sys_json_config where f_id=:f_id");
 
     if(db.nextRow()) {

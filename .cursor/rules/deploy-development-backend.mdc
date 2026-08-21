@@ -1,0 +1,17 @@
+---
+description: Notify when web.picassoapp backend must be uploaded to development.picassocloud.com
+alwaysApply: true
+---
+
+# Remote backend deploy reminder
+
+Ararix / cafe5 PHP API for development is hosted at **development.picassocloud.com**.
+
+Whenever you change files under `web.picassoapp/` (especially `engine/v2/`, `engine/db/`, `engine/cnf.php`), at the end of the reply include a short block:
+
+**Deploy to development.picassocloud.com**
+- list changed relative paths
+- note if DB migration / SQL must be run (`engine/db/*.sql`, `run_update.php`)
+- note if `cnf.php` credentials differ on remote (do not overwrite remote secrets blindly)
+
+Do this even for small PHP fixes. Flutter-only changes in `ararix/` do not need this block unless the API contract changed and backend was updated too.

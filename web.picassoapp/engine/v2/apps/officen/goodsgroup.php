@@ -19,6 +19,7 @@ class Goodsgroup extends Auth
         "f_image" => "nullable|string|max:36",
         "f_image_data" => "nullable|string",
         "f_remove_image" => "integer|nullable",
+        "f_online_sale" => "integer|nullable",
     ];
 
     private function rowById(int $id): ?array
@@ -35,6 +36,7 @@ class Goodsgroup extends Auth
             gr.f_order,
             gr.f_color,
             gr.f_image,
+            CAST(COALESCE(JSON_VALUE(gr.f_data, '$.f_online_sale'), '0') AS UNSIGNED) AS f_online_sale,
             p.f_name AS f_parent_name
         FROM c_groups gr
         LEFT JOIN c_groups p ON p.f_id = gr.f_parent
@@ -155,6 +157,9 @@ class Goodsgroup extends Auth
         } else {
             $this->update("c_groups", $record, $id);
         }
+
+        $onlineSale = !empty($data->f_online_sale) ? 1 : 0;
+        $this->updateJsonField("c_groups", $id, "f_data", "f_online_sale", $onlineSale);
 
         $row = $this->rowById($id);
         $this->result["group"] = $row;

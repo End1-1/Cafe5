@@ -7,10 +7,10 @@
 #include <QSslSocket>
 #include <QStandardPaths>
 #include <QStyleFactory>
-#include <QTranslator>
 #include "c5config.h"
 #include "c5connectiondialog.h"
 #include "c5login.h"
+#include "c5uilanguage.h"
 #include "c5mainwindow.h"
 #include "c5message.h"
 #include "c5officewidget.h"
@@ -51,12 +51,6 @@ int main(int argc, char* argv[])
 
     QDir().mkpath(tempDir);
 
-    QTranslator t;
-
-    if(t.load(":/lang/FrontDesk.qm")) {
-        a.installTranslator(&t);
-    }
-
     for (const QString &s : a.arguments()) {
         if (s.startsWith("/monitor")) {
             QList<QScreen *> screens = a.screens();
@@ -78,6 +72,10 @@ int main(int argc, char* argv[])
             }
         }
     }
+
+    C5UiLanguage::configure(QStringLiteral(":/lang/FrontDesk.qm"),
+                            QStringLiteral(":/lang/FrontDesk_ru.qm"));
+    C5UiLanguage::loadSaved();
 
     LogWriter::write(LogWriterLevel::verbose, "Support SSL", QSslSocket::supportsSsl() ? "true" : "false");
     LogWriter::write(LogWriterLevel::verbose, "Support SSL version", QSslSocket::sslLibraryBuildVersionString());
@@ -122,7 +120,21 @@ int main(int argc, char* argv[])
     C5Login l(nullptr);
 
     if(l.exec() == QDialog::Accepted) {
-        C5Config::fSettingsName = __c5config.getRegValue("ss_settings").toString();
+        // Login already filled __c5config from the user's f_config.
+        // Prefer that id — reloading only by registry ss_settings name often points
+        // to another profile, so values like CAS path (param 80) look "missing".
+        int cfgId = 0;
+
+        if(C5OfficeWidget::mUser) {
+            cfgId = C5OfficeWidget::mUser->fUserData.value("f_config").toInt();
+        }
+
+        if(cfgId > 0) {
+            C5Config::fSettingsId = cfgId;
+        } else {
+            C5Config::fSettingsName = __c5config.getRegValue("ss_settings").toString();
+        }
+
         C5Config::initParamsFromDb();
     } else {
         return 0;

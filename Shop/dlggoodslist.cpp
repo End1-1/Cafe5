@@ -1,5 +1,11 @@
 #include "dlggoodslist.h"
+#include <QJsonArray>
+#include <QJsonObject>
 #include <QKeyEvent>
+#include <QTimer>
+#include "c5user.h"
+#include "ninterface.h"
+#include "struct_workstationitem.h"
 #include "ui_dlggoodslist.h"
 
 DlgGoodsList::DlgGoodsList(C5User *user)
@@ -8,67 +14,19 @@ DlgGoodsList::DlgGoodsList(C5User *user)
 {
     ui->setupUi(this);
     setWindowState(windowState() | Qt::WindowMaximized);
-    // TODO db;
-    // db[":f_store"] = __c5config.defaultStore();
-    // db[":f_currency"] = currency;
-    // db.exec("select ss.f_goods, "
-    //         "gg.f_name as f_groupname, "
-    //         "g.f_scancode, "
-    //         "g.f_name, "
-    //         "sum(ss.f_qty * ss.f_type) as f_qty, "
-    //         "if (coalesce(gp.f_price1disc, 0)>0, gp.f_price1disc, gp.f_price1) as f_price1, "
-    //         "gp.f_price2, "
-    //         "ods.f_draftqty, "
-    //         "rs.f_qty as f_reserve "
-    //         "from a_store ss "
-    //         "left join c_goods g on g.f_id=ss.f_goods "
-    //         "left join c_groups gg on gg.f_id=g.f_group "
-    //         "left join c_goods_prices gp on gp.f_goods=ss.f_goods "
-    //         "left join (select b.f_goods, sum(f_qty) as f_draftqty "
-    //         "   from o_draft_sale_body b "
-    //         "   left join o_draft_sale s on s.f_id=b.f_header "
-    //         "   where s.f_state=1 and b.f_state=1 group by 1) ods on ods.f_goods=ss.f_goods "
-    //         "left join (select f_goods, sum(f_qty) as f_qty "
-    //         " from a_store_reserve "
-    //         " where f_store=:f_store and f_state=1 "
-    //         " group by 1) rs on rs.f_goods=ss.f_goods "
-    //         "where g.f_enabled=1 and ss.f_store=:f_store and gp.f_currency=:f_currency "
-    //         "group by 1 "
-    //         "having sum(ss.f_qty * ss.f_type)>0 "
-    //         "union "
-    //         "select g.f_id, gg.f_name as f_groupname, g.f_scancode, g.f_name, "
-    //         "0, if (coalesce(gpr.f_price1disc, 0)>0, gpr.f_price1disc, gpr.f_price1) as f_price1, "
-    //         "gpr.f_price2, 0, 0 "
-    //         "from c_goods g "
-    //         "left join c_groups gg on gg.f_id=g.f_group "
-    //         "left join c_goods_prices gpr on gpr.f_goods=g.f_id "
-    //         "left join c_goods_prices gp on gp.f_goods=g.f_id "
-    //         "where g.f_service=1 and g.f_enabled=1  and gp.f_currency=:f_currency ");
-    // ui->tbl->setRowCount(db.rowCount());
-    // int row = 0;
-    // double totalRetail = 0, totalWholesale = 0;
-
-    // while(db.nextRow()) {
-    //     ui->tbl->setData(row, 0, db.getInt("f_goods"));
-    //     ui->tbl->setData(row, 1, db.getString("f_groupname"));
-    //     ui->tbl->setData(row, 2, db.getString("f_scancode"));
-    //     ui->tbl->setData(row, 3, db.getString("f_name"));
-    //     ui->tbl->setData(row, 4, db.getDouble("f_qty"));
-    //     ui->tbl->setData(row, 5, db.getDouble("f_price1"));
-    //     ui->tbl->setData(row, 6, db.getDouble("f_price2"));
-    //     ui->tbl->setData(row, 7, db.getDouble("f_draftqty"));
-    //     ui->tbl->setData(row, 8, db.getDouble("f_reserve"));
-    //     totalRetail += db.getDouble("f_price1") * db.getDouble("f_qty");
-    //     totalWholesale += db.getDouble("f_price2") * db.getDouble("f_qty");
-    //     row++;
-    // }
-
-    //ui->leTotalRetail->setDouble(totalRetail);
-    // ui->leTotalRetail->setVisible(__c5config.getValue(param_shop_hide_store_qty).toInt() == 1);
-    // ui->lbTotalRetail->setVisible(ui->leTotalRetail->isVisible());
-    //ui->tbl->setColumnHidden(6, !__c5config.fMainJson["show_whosale_price"].toBool());
     ui->leSearch->installEventFilter(this);
-    ui->tbl->resizeColumnsToContents();
+    ui->tbl->installEventFilter(this);
+    ui->tbl->setRowCount(0);
+    ui->leTotalRetail->setDouble(0);
+
+    mSearchTimer = new QTimer(this);
+    mSearchTimer->setSingleShot(true);
+    mSearchTimer->setInterval(400);
+    connect(mSearchTimer, &QTimer::timeout, this, &DlgGoodsList::runSearch);
+    connect(ui->chName, &QCheckBox::toggled, this, &DlgGoodsList::onSearchCheckboxChanged);
+    connect(ui->chScancode, &QCheckBox::toggled, this, &DlgGoodsList::onSearchCheckboxChanged);
+
+    ui->leSearch->setFocus();
 }
 
 DlgGoodsList::~DlgGoodsList()
@@ -76,99 +34,183 @@ DlgGoodsList::~DlgGoodsList()
     delete ui;
 }
 
-bool DlgGoodsList::event(QEvent *event)
+void DlgGoodsList::clearResults()
 {
-    if(event->type() == QEvent::KeyRelease) {
-        QKeyEvent *ke = static_cast<QKeyEvent*>(event);
+    ui->tbl->setRowCount(0);
+    ui->leTotalRetail->setDouble(0);
+}
 
-        switch(ke->key()) {
-        case Qt::Key_Up: {
-            int r = ui->tbl->currentRow() - 1;
+void DlgGoodsList::fillResults(const QJsonObject &jo)
+{
+    const QJsonArray rows = jo.value(QStringLiteral("rows")).toArray();
+    ui->tbl->setRowCount(rows.size());
+    int row = 0;
+    double totalRetail = 0;
 
-            do {
-                if(ui->tbl->isRowHidden(r)) {
-                    r--;
-                } else {
-                    break;
-                }
-            } while(r > -1);
-
-            if(r < 0) {
-                for(int i = 0; i < ui->tbl->rowCount(); i++) {
-                    if(!ui->tbl->isRowHidden(i)) {
-                        r = i;
-                        break;
-                    }
-                }
-            }
-
-            ui->tbl->setCurrentCell(r, 0);
-            break;
-        }
-
-        case Qt::Key_Down: {
-            int r = ui->tbl->currentRow() + 1;
-
-            do {
-                if(ui->tbl->isRowHidden(r)) {
-                    r++;
-                } else {
-                    break;
-                }
-            } while(r < ui->tbl->rowCount());
-
-            if(r > ui->tbl->rowCount() - 1) {
-                r = ui->tbl->rowCount() - 1;
-            }
-
-            ui->tbl->setCurrentCell(r, 0);
-            break;
-        }
-
-        case Qt::Key_Enter:
-        case Qt::Key_Return: {
-            int r = ui->tbl->currentRow();
-
-            if(r > -1) {
-                fGoodsId = ui->tbl->getInteger(r, 0);
-                emit getGoods(fGoodsId, ui->tbl->getDouble(r, 4) - ui->tbl->getDouble(r, 7) - - ui->tbl->getDouble(r, 8),
-                              ui->tbl->getDouble(r, 5), ui->tbl->getDouble(r, 6));
-                accept();
-            }
-
-            break;
-        }
-        }
+    for(const QJsonValue &jv : rows) {
+        const QJsonObject o = jv.toObject();
+        const double qty = o.value(QStringLiteral("f_qty")).toDouble();
+        const double price1 = o.value(QStringLiteral("f_price1")).toDouble();
+        const double price2 = o.value(QStringLiteral("f_price2")).toDouble();
+        ui->tbl->setData(row, 0, o.value(QStringLiteral("f_goods")).toInt());
+        ui->tbl->setData(row, 1, o.value(QStringLiteral("f_groupname")).toString());
+        ui->tbl->setData(row, 2, o.value(QStringLiteral("f_scancode")).toString());
+        ui->tbl->setData(row, 3, o.value(QStringLiteral("f_name")).toString());
+        ui->tbl->setData(row, 4, qty);
+        ui->tbl->setData(row, 5, price1);
+        ui->tbl->setData(row, 6, price2);
+        ui->tbl->setData(row, 7, o.value(QStringLiteral("f_draftqty")).toDouble());
+        ui->tbl->setData(row, 8, o.value(QStringLiteral("f_reserve")).toDouble());
+        totalRetail += price1 * qty;
+        ++row;
     }
 
-    return QDialog::event(event);
+    ui->leTotalRetail->setDouble(totalRetail);
+    ui->tbl->resizeColumnsToContents();
+    if(ui->tbl->rowCount() > 0) {
+        ui->tbl->setCurrentCell(0, 0);
+    }
+}
+
+void DlgGoodsList::runSearch()
+{
+    const QString q = ui->leSearch->text().trimmed();
+    if(q.length() <= 1) {
+        clearResults();
+        return;
+    }
+    if(!ui->chName->isChecked() && !ui->chScancode->isChecked()) {
+        clearResults();
+        return;
+    }
+
+    const int gen = ++mSearchGen;
+    NInterface::query1(QStringLiteral("/engine/v2/shop/goods-list/get"),
+                       mUser->mSessionKey,
+                       this,
+                       {{QStringLiteral("store"), mWorkStation.defaultStoreId()},
+                        {QStringLiteral("currency"), 1},
+                        {QStringLiteral("q"), q},
+                        {QStringLiteral("search_name"), ui->chName->isChecked()},
+                        {QStringLiteral("search_scancode"), ui->chScancode->isChecked()}},
+                       [this, gen](const QJsonObject &jo) {
+                           if(gen != mSearchGen) {
+                               return;
+                           }
+                           fillResults(jo);
+                       });
+}
+
+void DlgGoodsList::loadAllStock()
+{
+    mSearchTimer->stop();
+    const int gen = ++mSearchGen;
+    NInterface::query1(QStringLiteral("/engine/v2/shop/goods-list/get"),
+                       mUser->mSessionKey,
+                       this,
+                       {{QStringLiteral("store"), mWorkStation.defaultStoreId()},
+                        {QStringLiteral("currency"), 1},
+                        {QStringLiteral("all"), true}},
+                       [this, gen](const QJsonObject &jo) {
+                           if(gen != mSearchGen) {
+                               return;
+                           }
+                           fillResults(jo);
+                       });
+}
+
+void DlgGoodsList::onSearchCheckboxChanged()
+{
+    if(ui->leSearch->text().trimmed().length() > 1) {
+        mSearchTimer->start();
+    }
+}
+
+void DlgGoodsList::acceptCurrentRow()
+{
+    int r = ui->tbl->currentRow();
+    if(r < 0 && ui->tbl->rowCount() > 0) {
+        r = 0;
+        ui->tbl->setCurrentCell(0, 0);
+    }
+    if(r < 0) {
+        return;
+    }
+
+    fGoodsId = ui->tbl->getInteger(r, 0);
+    const QString scancode = ui->tbl->getString(r, 2);
+    const double stockQty = ui->tbl->getDouble(r, 4);
+    emit getGoods(fGoodsId, scancode, stockQty);
+    accept();
+}
+
+bool DlgGoodsList::handleNavigationKey(int key)
+{
+    switch(key) {
+    case Qt::Key_F5:
+        loadAllStock();
+        return true;
+    case Qt::Key_Up: {
+        int r = ui->tbl->currentRow() - 1;
+        if(r < 0) {
+            r = 0;
+        }
+        if(ui->tbl->rowCount() > 0) {
+            ui->tbl->setCurrentCell(r, 0);
+        }
+        return true;
+    }
+    case Qt::Key_Down: {
+        int r = ui->tbl->currentRow() + 1;
+        if(r < 0) {
+            r = 0;
+        }
+        if(r > ui->tbl->rowCount() - 1) {
+            r = ui->tbl->rowCount() - 1;
+        }
+        if(ui->tbl->rowCount() > 0) {
+            ui->tbl->setCurrentCell(r, 0);
+        }
+        return true;
+    }
+    case Qt::Key_Enter:
+    case Qt::Key_Return:
+        acceptCurrentRow();
+        return true;
+    default:
+        return false;
+    }
+}
+
+bool DlgGoodsList::eventFilter(QObject *watched, QEvent *event)
+{
+    if((watched == ui->leSearch || watched == ui->tbl)
+       && event->type() == QEvent::KeyPress) {
+        auto *ke = static_cast<QKeyEvent*>(event);
+        if(handleNavigationKey(ke->key())) {
+            return true;
+        }
+    }
+    return C5ShopDialog::eventFilter(watched, event);
+}
+
+void DlgGoodsList::keyPressEvent(QKeyEvent *event)
+{
+    if(handleNavigationKey(event->key())) {
+        return;
+    }
+    C5ShopDialog::keyPressEvent(event);
 }
 
 void DlgGoodsList::on_leSearch_textChanged(const QString &arg1)
 {
-    ui->tbl->selectionModel()->clear();
-    QList<int> cols;
-
-    if(ui->chName->isChecked()) {
-        cols.append(3);
+    ++mSearchGen;
+    if(arg1.trimmed().length() <= 1) {
+        mSearchTimer->stop();
+        clearResults();
+        return;
     }
-
-    if(ui->chScancode->isChecked()) {
-        cols.append(2);
-    }
-
-    for(int r = 0; r < ui->tbl->rowCount(); r++) {
-        bool hidden = true && !arg1.isEmpty();
-
-        for(int c : cols) {
-            if(ui->tbl->getString(r, c).contains(arg1, Qt::CaseInsensitive)) {
-                hidden = false;
-                break;
-            }
-        }
-
-        ui->tbl->setRowHidden(r, hidden);
-    }
+    mSearchTimer->start();
 }
 
 void DlgGoodsList::on_btnExit_clicked()

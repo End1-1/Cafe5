@@ -1,4 +1,6 @@
 #include "waitertablestyle.h"
+#include "waitergoodsgroupstyle.h"
+#include "waitergoodsdishstyle.h"
 
 #include "tablecelldelegate.h"
 
@@ -267,6 +269,8 @@ bool WaiterTblTablesStyle::loadAtStartup(QString *error)
 
     gCachedTblStyle = WaiterTblTablesStyle();
     parseCssContent(css, &gCachedTblStyle);
+    WaiterGoodsGroupStyle::updateCacheFromCss(css);
+    WaiterGoodsDishStyle::updateCacheFromCss(css);
     return true;
 }
 

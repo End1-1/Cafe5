@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>580</width>
-    <height>432</height>
+    <height>547</height>
    </rect>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
@@ -81,54 +81,54 @@
         </property>
        </widget>
       </item>
-      <item row="9" column="0">
+      <item row="10" column="0">
        <widget class="QLabel" name="labelNoTable">
         <property name="text">
          <string>Receipt without table</string>
         </property>
        </widget>
       </item>
-      <item row="9" column="1">
+      <item row="10" column="1">
        <widget class="QCheckBox" name="chReceiptNoTable"/>
       </item>
-      <item row="10" column="0">
+      <item row="11" column="0">
        <widget class="QLabel" name="labelNoService">
         <property name="text">
          <string>Receipt without service hint</string>
         </property>
        </widget>
       </item>
-      <item row="10" column="1">
+      <item row="11" column="1">
        <widget class="QCheckBox" name="chReceiptNoServiceHint"/>
       </item>
-      <item row="11" column="0">
+      <item row="12" column="0">
        <widget class="QLabel" name="labelNoDiscount">
         <property name="text">
          <string>Receipt without discount hint</string>
         </property>
        </widget>
       </item>
-      <item row="11" column="1">
+      <item row="12" column="1">
        <widget class="QCheckBox" name="chReceiptNoDiscountHint"/>
       </item>
-      <item row="12" column="0">
+      <item row="14" column="0">
        <widget class="QLabel" name="labelSearchH">
         <property name="text">
          <string>Search menu horizontal section</string>
         </property>
        </widget>
       </item>
-      <item row="12" column="1">
+      <item row="14" column="1">
        <widget class="QLineEdit" name="leSearchMenuH"/>
       </item>
-      <item row="13" column="0">
+      <item row="15" column="0">
        <widget class="QLabel" name="labelSearchV">
         <property name="text">
          <string>Search menu vertical section</string>
         </property>
        </widget>
       </item>
-      <item row="13" column="1">
+      <item row="15" column="1">
        <widget class="QLineEdit" name="leSearchMenuV"/>
       </item>
       <item row="8" column="0">
@@ -141,15 +141,45 @@
       <item row="8" column="1">
        <widget class="QCheckBox" name="chCostDependOnServiceAndDiscount"/>
       </item>
-      <item row="14" column="0">
+      <item row="16" column="0">
        <widget class="QLabel" name="labelDoNotPrintCustomer">
         <property name="text">
          <string>Precheck: phone and address only (no customer name)</string>
         </property>
        </widget>
       </item>
-      <item row="14" column="1">
+      <item row="16" column="1">
        <widget class="QCheckBox" name="chDoNotPrintCustomerOnReceipt"/>
+      </item>
+      <item row="17" column="0">
+       <widget class="QLabel" name="labelRecentDishesMinutes">
+        <property name="text">
+         <string>Recent dishes window (minutes)</string>
+        </property>
+       </widget>
+      </item>
+      <item row="17" column="1">
+       <widget class="QLineEdit" name="leRecentDishesMinutes"/>
+      </item>
+      <item row="9" column="0">
+       <widget class="QLabel" name="labelNoTable_3">
+        <property name="text">
+         <string>Costumer notifications</string>
+        </property>
+       </widget>
+      </item>
+      <item row="9" column="1">
+       <widget class="QCheckBox" name="leCostumerNotification"/>
+      </item>
+      <item row="13" column="0">
+       <widget class="QLabel" name="labelNoDiscount_2">
+        <property name="text">
+         <string>Precheck printer name</string>
+        </property>
+       </widget>
+      </item>
+      <item row="13" column="1">
+       <widget class="QLineEdit" name="lePrecheckPrinter"/>
       </item>
      </layout>
     </widget>

@@ -31,6 +31,7 @@ void RWorkstationConfigCommon::applyConfig(const QJsonObject &config)
     ui->chInputCashboxBeforeClose->setChecked(config.value(QStringLiteral("input_cashbox_amount_before_close")).toBool(true));
     ui->chBistro->setChecked(config.value(QStringLiteral("bistro")).toBool());
     ui->chAutoFiscal->setChecked(config.value(QStringLiteral("f_auto_fiscal")).toBool());
+    ui->chDontAllowNegativeRemains->setChecked(config.value(QStringLiteral("dont_allow_negative_remains")).toBool(false));
 }
 
 QJsonObject RWorkstationConfigCommon::collectConfig() const
@@ -46,5 +47,6 @@ QJsonObject RWorkstationConfigCommon::collectConfig() const
     jo.insert(QStringLiteral("input_cashbox_amount_before_close"), ui->chInputCashboxBeforeClose->isChecked());
     jo.insert(QStringLiteral("bistro"), ui->chBistro->isChecked());
     jo.insert(QStringLiteral("f_auto_fiscal"), ui->chAutoFiscal->isChecked());
+    jo.insert(QStringLiteral("dont_allow_negative_remains"), ui->chDontAllowNegativeRemains->isChecked());
     return jo;
 }

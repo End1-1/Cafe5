@@ -244,7 +244,7 @@ void C5StoreOutput::nextChild()
     }
 }
 
-bool C5StoreOutput::buildDoc()
+bool C5StoreOutput::buildDoc(bool requireValidQty)
 {
     QString err;
     if (ui->tblGoods->rowCount() == 0) {
@@ -277,7 +277,8 @@ bool C5StoreOutput::buildDoc()
         st.comment = ui->tblGoods->lineEdit(i, col_comment)->text();
         st.row = i;
         mDocData.items.append(st);
-        if (st.qty < 0.001) {
+        // 4 decimal places: 0.0005 is valid; only reject true zeros when posting
+        if (requireValidQty && st.qty < 0.0001) {
             err += tr("Quantity not valid on row #") + QString::number(i + 1) + "<br>";
         }
     }
@@ -523,7 +524,7 @@ QString C5StoreOutput::makeComplectationInputHtml(const C5LineEdit *code,
 
 void C5StoreOutput::saveDocument()
 {
-    if (!buildDoc()) {
+    if (!buildDoc(true)) {
         return;
     }
     mDocData.status = STORE_DOC_STATUS_POSTED;
@@ -537,7 +538,7 @@ void C5StoreOutput::saveDocument()
 
 void C5StoreOutput::draftDocument()
 {
-    if (!buildDoc()) {
+    if (!buildDoc(false)) {
         return;
     }
     mDocData.status = STORE_DOC_STATUS_DRAFT;
@@ -639,7 +640,7 @@ void C5StoreOutput::tblTotalChanged(const QString &arg1)
     C5LineEdit *lprice = ui->tblGoods->lineEdit(row, col_price);
     C5LineEdit *ltotal = ui->tblGoods->lineEdit(row, col_total);
 
-    if (lqty->getDouble() > 0.001) {
+    if (lqty->getDouble() > 0.0001) {
         lprice->setDouble(ltotal->getDouble() / lqty->getDouble());
     }
 

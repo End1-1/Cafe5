@@ -54,6 +54,8 @@ private slots:
 
     void on_btnAttendance_clicked();
 
+    void on_btnLast40Min_clicked();
+
 protected:
     virtual void showEvent(QShowEvent *e) override;
 

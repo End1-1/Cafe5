@@ -501,6 +501,9 @@ class Cashbox extends Auth
         if ($amount <= 0.00001) {
             dieWithCode(Translator::t("Amount must be greater than zero"));
         }
+        if (!in_array($paymentTypeId, [PAYMENT_TYPE_CASH, PAYMENT_TYPE_CARD, PAYMENT_TYPE_BANK], true)) {
+            dieWithCode(Translator::t("Invalid payment type"));
+        }
 
         $uuid = uuid_v4();
         $debtRow = [
