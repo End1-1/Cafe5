@@ -21,6 +21,7 @@ BEGIN
     DECLARE paid_amount decimal(14, 2) DEFAULT 0;
     DECLARE debt_amount decimal(14, 2) DEFAULT 0;
 
+    DECLARE p_user_item_id INT;
     DECLARE p_item_id INT;
     DECLARE p_qty_arrived DECIMAL(14, 4);
     DECLARE p_price DECIMAL(14, 2);
@@ -28,8 +29,9 @@ BEGIN
     DECLARE p_expire_date DATETIME;
     DECLARE done_items INT DEFAULT FALSE;
 
+    -- Resolve f_storeid inside the loop (JOIN inside CURSOR is unreliable on some MariaDB builds)
     DECLARE cur_input CURSOR FOR
-        SELECT item_id, qty, price, row_uuid, expire_date
+        SELECT jt.item_id, jt.qty, jt.price, jt.row_uuid, jt.expire_date
         FROM JSON_TABLE(params, '$.items[*]'
                         COLUMNS (
                             row_uuid CHAR(36) PATH '$.id',
@@ -134,8 +136,17 @@ BEGIN
         OPEN cur_input;
         input_loop:
         LOOP
-            FETCH cur_input INTO p_item_id, p_qty_arrived, p_price, p_row_uuid, p_expire_date;
+            FETCH cur_input INTO p_user_item_id, p_qty_arrived, p_price, p_row_uuid, p_expire_date;
             IF done_items THEN LEAVE input_loop; END IF;
+
+            SELECT IFNULL(NULLIF(f_storeid, 0), f_id)
+            INTO p_item_id
+            FROM c_goods
+            WHERE f_id = p_user_item_id;
+            IF (IFNULL(p_item_id, 0) = 0) THEN
+                SET p_item_id = p_user_item_id;
+            END IF;
+            SET done_items = FALSE;
 
             block_neg:
             BEGIN
@@ -194,10 +205,15 @@ BEGIN
         CLOSE cur_input;
     END IF;
 
-    UPDATE c_goods g JOIN JSON_TABLE(params, '$.items[*]'
-                                     COLUMNS (item_id INT PATH '$.item_id', price DECIMAL(14, 2) PATH '$.price')) AS jt ON g.f_id = jt.item_id
-    SET g.f_lastinputprice = jt.price
-    WHERE jt.price > 0;
+    UPDATE c_goods g
+        JOIN (SELECT IFNULL(NULLIF(gg.f_storeid, 0), jt.item_id) AS stock_item_id,
+                     jt.price
+              FROM JSON_TABLE(params, '$.items[*]'
+                              COLUMNS (item_id INT PATH '$.item_id', price DECIMAL(14, 2) PATH '$.price')) AS jt
+                       LEFT JOIN c_goods gg ON gg.f_id = jt.item_id) AS x
+        ON g.f_id = x.stock_item_id
+    SET g.f_lastinputprice = x.price
+    WHERE x.price > 0;
 
     RETURN JSON_OBJECT('status', 0, 'version', IFNULL(current_version, 0) + 1, 'paid_amount', paid_amount);
 END$$

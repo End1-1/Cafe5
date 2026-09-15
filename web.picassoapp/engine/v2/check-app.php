@@ -1,5 +1,5 @@
 <?php
-# Ãƒâ€šÃ‚Â© 2026 , Kudryashov Vasili
+# © 2026 , Kudryashov Vasili
 # Created: 2026-02-06 02:43:02
 # Last Modified: 2026-03-29 02:48:00
 
@@ -7,8 +7,8 @@ $version_check = true;
 
 $apps = [
     "waiter" => "2.5.14",
-    "officen" => "2.14.57",
-    "shop" => "1.8.46",
+    "officen" => "2.15.58",
+    "shop" => "1.9.47",
     "webapi" => "1.1.2",
     "picasso.store" => "1.1.5",
     "picasso.waiter" => "1.0.4",

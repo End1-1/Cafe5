@@ -184,18 +184,49 @@ bool downloadWithWinHttp(const QString &urlStr,
 }
 #endif
 
+QString setupPackageName(const QString &appName)
+{
+    if (appName.compare(QStringLiteral("officen"), Qt::CaseInsensitive) == 0
+        || appName.compare(QStringLiteral("frontdesk"), Qt::CaseInsensitive) == 0) {
+        return QStringLiteral("frontdesk");
+    }
+    return appName.toLower();
+}
+
 } // namespace
 
 UpdateManager::UpdateManager(const QString &setupUrl,
                              const QString &setupFileName,
+                             const QString &appModule,
+                             const QString &moduleInstallDir,
                              QObject *parent)
     : QObject(parent)
     , m_setupUrl(setupUrl)
     , m_setupFileName(setupFileName)
+    , m_appModule(appModule)
+    , m_moduleInstallDir(QDir::fromNativeSeparators(moduleInstallDir))
 {
     m_downloadDir = QDir(QStandardPaths::writableLocation(QStandardPaths::TempLocation))
                         .filePath(QStringLiteral("PicassoUpdate"));
     connect(this, &UpdateManager::progress, this, &UpdateManager::setProgress);
+}
+
+QStringList UpdateManager::processesToKill() const
+{
+    const QString module = setupPackageName(m_appModule);
+    if (module == QStringLiteral("frontdesk")) {
+        return {QStringLiteral("OfficeN.exe")};
+    }
+    if (module == QStringLiteral("shop")) {
+        return {QStringLiteral("Shop_net.exe")};
+    }
+    if (module == QStringLiteral("waiter")) {
+        return {QStringLiteral("Waiter.exe"), QStringLiteral("WaiterDesigner.exe")};
+    }
+    if (module == QStringLiteral("cookingprogress")) {
+        return {QStringLiteral("CookingProgress.exe")};
+    }
+    return {};
 }
 
 void UpdateManager::start()
@@ -273,17 +304,19 @@ void UpdateManager::launchSetup(const QString &setupPath)
 
     const QString workDir = QFileInfo(setupPath).absolutePath();
     const QString logPath = QDir(workDir).filePath(QStringLiteral("picasso_setup.log"));
-    /* No /SUPPRESSMSGBOXES: with it, Files-in-use Abort-Retry becomes Abort → exit 5.
-     * Still /SILENT so no wizard; Inno CloseApplications + our pre-kill free locks. */
+    QString installDirArg;
+    if (!m_moduleInstallDir.isEmpty()) {
+        installDirArg = QStringLiteral(" /DIR=\"%1\"")
+                            .arg(QDir::toNativeSeparators(m_moduleInstallDir));
+    }
     const QString argsWithLog =
         QStringLiteral("/SILENT /NORESTART /CLOSEAPPLICATIONS "
-                       "/FORCECLOSEAPPLICATIONS /LOG=\"%1\"")
-            .arg(QDir::toNativeSeparators(logPath));
+                       "/FORCECLOSEAPPLICATIONS /LOG=\"%1\"%2")
+            .arg(QDir::toNativeSeparators(logPath), installDirArg);
 
     // Let Qt apply window flags before UAC appears.
     QTimer::singleShot(400, this, [this, setupPath, argsWithLog, workDir, logPath]() {
         auto *thread = QThread::create([this, setupPath, argsWithLog, workDir, logPath]() {
-            /* Unlock {app}: stop Breeze and kill desktop apps before Inno copies files. */
             auto killIm = [](const wchar_t *im) {
                 SHELLEXECUTEINFOW k{};
                 k.cbSize = sizeof(k);
@@ -298,26 +331,9 @@ void UpdateManager::launchSetup(const QString &setupPath)
                     CloseHandle(k.hProcess);
                 }
             };
-            {
-                SHELLEXECUTEINFOW sc{};
-                sc.cbSize = sizeof(sc);
-                sc.fMask = SEE_MASK_NOCLOSEPROCESS | SEE_MASK_NOASYNC;
-                sc.lpFile = L"sc.exe";
-                sc.lpParameters = L"stop Breeze";
-                sc.nShow = SW_HIDE;
-                if (ShellExecuteExW(&sc) && sc.hProcess) {
-                    WaitForSingleObject(sc.hProcess, 20000);
-                    CloseHandle(sc.hProcess);
-                }
+            for (const QString &procName : processesToKill()) {
+                killIm(reinterpret_cast<const wchar_t *>(procName.utf16()));
             }
-            killIm(L"OfficeN.exe");
-            killIm(L"Shop_net.exe");
-            killIm(L"Waiter.exe");
-            killIm(L"WaiterDesigner.exe");
-            killIm(L"CookingProgress.exe");
-            killIm(L"service5.exe");
-            killIm(L"Service5.exe");
-            killIm(L"Updater.exe");
             Sleep(800);
 
             BOOL elevated = FALSE;

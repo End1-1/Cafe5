@@ -114,6 +114,93 @@ class Cashbox extends Auth
         return $this->GetOpenedCashboxSessionId($cashbox_id);
     }
 
+    /**
+     * One open session per calendar day for a cashbox.
+     * No session → open; open but f_date_open before today → close (no cash count) and open new.
+     *
+     * @return array{f_id:int|string,f_cashbox_id:int}|null
+     */
+    public function ensureDailyOpenSession(int $cashbox_id, int $user_id, float $amount_open = 0): ?array
+    {
+        if ($cashbox_id <= 0) {
+            return null;
+        }
+        $open = $this->GetOpenedCashboxSessionId($cashbox_id);
+        if ($open) {
+            $raw = $this->GetRawCashboxSession((int)$open["f_id"]);
+            $openedAt = $raw["f_date_open"] ?? null;
+            $openDay = $openedAt ? date("Y-m-d", strtotime((string)$openedAt)) : null;
+            $today = date("Y-m-d");
+            if ($openDay !== null && $openDay < $today) {
+                $this->closeSessionInternal((object)[
+                    "cashbox_id" => $cashbox_id,
+                    "cash_counted" => false,
+                    "amount_fact" => 0,
+                    "currency_id" => 1,
+                ], $user_id);
+                $open = null;
+            }
+        }
+        if (!$open) {
+            return $this->ensureOpenSession($cashbox_id, $user_id, $amount_open);
+        }
+        return $open;
+    }
+
+    /**
+     * Close open session without HTTP echo. Same rules as Close().
+     */
+    public function closeSessionInternal(object $params, ?int $user_id = null): array
+    {
+        $userId = $user_id ?? (int)$this->userid;
+        $cashboxId = (int)($params->cashbox_id ?? 0);
+        $cash_session = $this->GetOpenedCashboxSessionId($cashboxId);
+        if (!$cash_session) {
+            dieWithCode(Translator::t("No active session"));
+        }
+        $cashbox = $this->GetRawCashboxSession($cash_session["f_id"]);
+        if (!$cashbox) {
+            dieWithCode("Do you want to hack close function of cashbox?");
+        }
+        $cashCounted = !empty($params->cash_counted);
+        $amountFact = (float)($params->amount_cash ?? ($params->amount_fact ?? 0));
+        $currencyId = (int)($params->currency_id ?? 1);
+        if ($currencyId <= 0) {
+            $currencyId = 1;
+        }
+        $funds = $this->cashboxFundsByCashbox((int)$cash_session["f_cashbox_id"], $currencyId);
+        $expectedCash = (float)($funds[PAYMENT_TYPE_CASH] ?? 0);
+        $diff = $amountFact - $expectedCash;
+
+        if ($cashCounted && abs($diff) > 0.0001) {
+            $isSurplus = $diff > 0;
+            $this->insert("cash_operations", [
+                "f_cashbox_id" => $cash_session["f_cashbox_id"],
+                "f_session_id" => $cash_session["f_id"],
+                "f_order_id" => "",
+                "f_user" => $userId,
+                "f_operation_type" => $isSurplus ? CASH_OP_CASH_OVERAGE : CASH_OP_CASH_SHORTAGE,
+                "f_datetime" => date("Y-m-d H:i:s"),
+                "f_payment_type_id" => PAYMENT_TYPE_CASH,
+                "f_debit" => $isSurplus ? abs($diff) : 0,
+                "f_credit" => $isSurplus ? 0 : abs($diff),
+                "f_currency_id" => $currencyId,
+                "f_comment" => ($isSurplus ? Translator::t("Cashbox close surplus") : Translator::t("Cashbox close shortage"))
+                    . ": " . number_format(abs($diff), 2, ".", ""),
+            ]);
+        }
+        $cashbox["f_state"] = 2;
+        $cashbox["f_date_close"] = date("Y-m-d H:i:s");
+        $cashbox["f_user_close"] = $userId;
+        $cashbox["f_amount_fact"] = $amountFact;
+        $cashbox["f_amount_expected"] = $cashbox["f_amount_expected"];
+        $cashbox["f_amount_difference"] = $diff;
+        $this->update("cash_session", $cashbox, $cashbox["f_id"]);
+        $session = $this->GetCashboxSession($cash_session["f_id"]);
+        $session["f_amount_expected_cash"] = money_fmt($expectedCash);
+        return $session;
+    }
+
     public function CheckStatus($params)
     {
         $cashbox_id = $this->resolveCashboxId($params);
@@ -233,50 +320,7 @@ class Cashbox extends Auth
 
     public function Close($params)
     {
-        $cash_session = $this->GetOpenedCashboxSessionId($params->cashbox_id);
-        if (!$cash_session) {
-            die(Translator::t("No active session"));
-        }
-        $cashbox = $this->GetRawCashboxSession($cash_session["f_id"]);
-        if (!$cashbox) {
-            dieWithCode("Do you want to hack close function of cashbox?");
-        }
-        $cashCounted = !empty($params->cash_counted);
-        $amountFact = (float)($params->amount_cash ?? ($params->amount_fact ?? 0));
-        $currencyId = (int)($params->currency_id ?? 1);
-        if ($currencyId <= 0) {
-            $currencyId = 1;
-        }
-        $funds = $this->cashboxFundsByCashbox((int)$cash_session["f_cashbox_id"], $currencyId);
-        $expectedCash = (float)($funds[PAYMENT_TYPE_CASH] ?? 0);
-        $diff = $amountFact - $expectedCash;
-
-        if ($cashCounted && abs($diff) > 0.0001) {
-            $isSurplus = $diff > 0;
-            $this->insert("cash_operations", [
-                "f_cashbox_id" => $cash_session["f_cashbox_id"],
-                "f_session_id" => $cash_session["f_id"],
-                "f_order_id" => "",
-                "f_user" => $this->userid,
-                "f_operation_type" => $isSurplus ? CASH_OP_CASH_OVERAGE : CASH_OP_CASH_SHORTAGE,
-                "f_datetime" => date("Y-m-d H:i:s"),
-                "f_payment_type_id" => PAYMENT_TYPE_CASH,
-                "f_debit" => $isSurplus ? abs($diff) : 0,
-                "f_credit" => $isSurplus ? 0 : abs($diff),
-                "f_currency_id" => (int)($params->currency_id ?? 1),
-                "f_comment" => ($isSurplus ? Translator::t("Cashbox close surplus") : Translator::t("Cashbox close shortage"))
-                    . ": " . number_format(abs($diff), 2, ".", ""),
-            ]);
-        }
-        $cashbox["f_state"] = 2;
-        $cashbox["f_date_close"] = date("Y-m-d H:i:s");
-        $cashbox["f_user_close"] = $this->userid;
-        $cashbox["f_amount_fact"] = $amountFact;
-        $cashbox["f_amount_expected"] = $cashbox["f_amount_expected"];
-        $cashbox["f_amount_difference"] = $diff;
-        $this->update("cash_session", $cashbox, $cashbox["f_id"]);
-        $session = $this->GetCashboxSession($cash_session["f_id"]);
-        $session["f_amount_expected_cash"] = money_fmt($expectedCash);
+        $session = $this->closeSessionInternal($params);
         $this->result["cashbox"] = $session;
         $this->echoResult();
     }
@@ -506,12 +550,19 @@ class Cashbox extends Auth
         }
 
         $uuid = uuid_v4();
+        $opComment = $comment !== ""
+            ? $comment
+            : ($docType === 1
+                ? Translator::t("Debt redeem supplier")
+                : Translator::t("Debt redeem customer"));
+
         $debtRow = [
             "f_date" => $txnDate,
             "f_partner" => $partnerId,
             "f_doc_type" => $docType,
             "f_doc_uuid" => $uuid,
             "f_currency_id" => $currencyId,
+            "f_comment" => $opComment,
         ];
         if ($docType === 1) {
             $debtRow["f_credit"] = 0;
@@ -522,7 +573,7 @@ class Cashbox extends Auth
         }
 
         $this->beginTransaction();
-        $this->insert("cash_debts", $debtRow);
+        $debtId = (int)$this->insert("cash_debts", $debtRow);
 
         if ($cashboxId > 0) {
             $cashSession = $this->GetOpenedCashboxSessionId($cashboxId);
@@ -530,17 +581,12 @@ class Cashbox extends Auth
                 $this->rollback();
                 dieWithCode(Translator::t("No active session"));
             }
-            $opComment = $comment !== ""
-                ? $comment
-                : ($docType === 1
-                    ? Translator::t("Debt redeem supplier")
-                    : Translator::t("Debt redeem customer"));
 
             if ($docType === 1) {
                 $this->insert("cash_operations", [
                     "f_cashbox_id" => (int)$cashSession["f_cashbox_id"],
                     "f_session_id" => (int)$cashSession["f_id"],
-                    "f_order_id" => "",
+                    "f_order_id" => $uuid,
                     "f_user" => $this->userid,
                     "f_operation_type" => CASH_OP_DEBT_REPAYMENT,
                     "f_payment_type_id" => $paymentTypeId,
@@ -560,7 +606,7 @@ class Cashbox extends Auth
                 $this->insert("cash_operations", [
                     "f_cashbox_id" => (int)$cashSession["f_cashbox_id"],
                     "f_session_id" => (int)$cashSession["f_id"],
-                    "f_order_id" => "",
+                    "f_order_id" => $uuid,
                     "f_user" => $this->userid,
                     "f_operation_type" => CASH_OP_DEBT_RECOVERY,
                     "f_payment_type_id" => $paymentTypeId,
@@ -580,7 +626,311 @@ class Cashbox extends Auth
         }
 
         $this->commit();
+        $this->result["debt_id"] = $debtId;
+        $this->result["doc_uuid"] = $uuid;
         $this->echoResult();
+    }
+
+    /**
+     * Load redeem (manual debt payment) for edit. Only rows not linked to store/order docs.
+     */
+    public function GetRedeemDebt($params)
+    {
+        $debtId = (int)($params->debt_id ?? 0);
+        if ($debtId <= 0) {
+            dieWithCode(Translator::t("id not specified"));
+        }
+        $debt = $this->loadDebtRow($debtId);
+        if (!$debt) {
+            die(Translator::t("Not found"));
+        }
+        $uuid = (string)$debt["f_doc_uuid"];
+        if ($this->isLinkedDebtDocument($uuid)) {
+            die(Translator::t("Only debt payments can be edited"));
+        }
+
+        $partner = $this->select(
+            "SELECT f_id, TRIM(CONCAT(COALESCE(f_taxname,''), ' ', COALESCE(f_name,''))) AS f_name
+             FROM c_partners WHERE f_id=?",
+            "i",
+            [(int)$debt["f_partner"]]
+        )->fetch_assoc();
+
+        $op = $this->findRedeemCashOperation($debt);
+        // Heal legacy rows that were saved with empty f_order_id.
+        if ($op && trim((string)($op["f_order_id"] ?? "")) === "") {
+            $this->select(
+                "UPDATE cash_operations SET f_order_id=? WHERE f_id=?",
+                "si",
+                [$uuid, (int)$op["f_id"]],
+                true
+            );
+            $op["f_order_id"] = $uuid;
+        }
+
+        $cashboxName = "";
+        if ($op && (int)$op["f_cashbox_id"] > 0) {
+            $cb = $this->select("SELECT f_name FROM cash_box WHERE f_id=?", "i", [(int)$op["f_cashbox_id"]])->fetch_assoc();
+            $cashboxName = (string)($cb["f_name"] ?? "");
+        }
+
+        $docType = (int)$debt["f_doc_type"];
+        $amount = $docType === 1 ? (float)$debt["f_debit"] : (float)$debt["f_credit"];
+        $comment = (string)($debt["f_comment"] ?? "");
+        if ($comment === "" && $op) {
+            $comment = (string)($op["f_comment"] ?? "");
+        }
+        $this->result["redeem"] = [
+            "debt_id" => (int)$debt["f_id"],
+            "doc_uuid" => $uuid,
+            "doc_type" => $docType,
+            "partner_id" => (int)$debt["f_partner"],
+            "partner_name" => trim((string)($partner["f_name"] ?? "")),
+            "currency_id" => (int)$debt["f_currency_id"],
+            "date" => (string)$debt["f_date"],
+            "amount" => $amount,
+            "comment" => $comment,
+            "cash_op_id" => $op ? (int)$op["f_id"] : 0,
+            "cashbox_id" => $op ? (int)$op["f_cashbox_id"] : 0,
+            "cashbox_name" => $cashboxName,
+            "payment_type_id" => $op ? (int)$op["f_payment_type_id"] : PAYMENT_TYPE_CASH,
+        ];
+        $this->echoResult();
+    }
+
+    public function UpdateRedeemDebt($params)
+    {
+        $debtId = (int)($params->debt_id ?? 0);
+        if ($debtId <= 0) {
+            dieWithCode(Translator::t("id not specified"));
+        }
+
+        $amount = (float)($params->amount ?? 0);
+        $paymentTypeId = (int)($params->payment_type_id ?? PAYMENT_TYPE_CASH);
+        $comment = trim((string)($params->comment ?? ""));
+
+        $dateStr = trim((string)($params->date ?? ""));
+        if ($dateStr === "") {
+            dieWithCode(Translator::t("Invalid date"));
+        }
+        $ts = strtotime($dateStr);
+        if ($ts === false) {
+            dieWithCode(Translator::t("Invalid date"));
+        }
+        $txnDate = date("Y-m-d", $ts);
+        $opDateTime = $txnDate . " " . date("H:i:s");
+
+        if ($amount <= 0.00001) {
+            dieWithCode(Translator::t("Amount must be greater than zero"));
+        }
+        if (!in_array($paymentTypeId, [PAYMENT_TYPE_CASH, PAYMENT_TYPE_CARD, PAYMENT_TYPE_BANK], true)) {
+            dieWithCode(Translator::t("Invalid payment type"));
+        }
+
+        $debt = $this->loadDebtRow($debtId);
+        if (!$debt) {
+            die(Translator::t("Not found"));
+        }
+        $uuid = (string)$debt["f_doc_uuid"];
+        if ($this->isLinkedDebtDocument($uuid)) {
+            die(Translator::t("Only debt payments can be edited"));
+        }
+
+        $docType = (int)$debt["f_doc_type"];
+        $oldAmount = $docType === 1 ? (float)$debt["f_debit"] : (float)$debt["f_credit"];
+        $opComment = $comment !== ""
+            ? $comment
+            : ($docType === 1
+                ? Translator::t("Debt redeem supplier")
+                : Translator::t("Debt redeem customer"));
+
+        $debtUpdate = [
+            "f_date" => $txnDate,
+            "f_comment" => $opComment,
+        ];
+        if ($docType === 1) {
+            $debtUpdate["f_credit"] = 0;
+            $debtUpdate["f_debit"] = $amount;
+        } else {
+            $debtUpdate["f_credit"] = $amount;
+            $debtUpdate["f_debit"] = 0;
+        }
+
+        $this->beginTransaction();
+        $this->updateDebtRow($debtId, $debtUpdate);
+
+        $op = $this->findRedeemCashOperation($debt);
+        if ($op) {
+            $opUpdate = [
+                "f_order_id" => $uuid,
+                "f_payment_type_id" => $paymentTypeId,
+                "f_datetime" => $opDateTime,
+                "f_comment" => $opComment,
+            ];
+            if ($docType === 1) {
+                $opUpdate["f_debit"] = 0;
+                $opUpdate["f_credit"] = $amount;
+            } else {
+                $opUpdate["f_debit"] = $amount;
+                $opUpdate["f_credit"] = 0;
+            }
+            $this->update("cash_operations", $opUpdate, (int)$op["f_id"]);
+
+            $delta = $amount - $oldAmount;
+            if (abs($delta) > 0.00001 && (int)$op["f_session_id"] > 0) {
+                if ($docType === 1) {
+                    $this->select(
+                        "UPDATE cash_session SET f_amount_expected=f_amount_expected-? WHERE f_id=?",
+                        "di",
+                        [$delta, (int)$op["f_session_id"]],
+                        true
+                    );
+                } else {
+                    $this->select(
+                        "UPDATE cash_session SET f_amount_expected=f_amount_expected+? WHERE f_id=?",
+                        "di",
+                        [$delta, (int)$op["f_session_id"]],
+                        true
+                    );
+                }
+            }
+        }
+
+        $this->commit();
+        $this->echoResult();
+    }
+
+    public function DeleteRedeemDebt($params)
+    {
+        $debtId = (int)($params->debt_id ?? 0);
+        if ($debtId <= 0) {
+            dieWithCode(Translator::t("id not specified"));
+        }
+
+        $debt = $this->loadDebtRow($debtId);
+        if (!$debt) {
+            die(Translator::t("Not found"));
+        }
+        $uuid = (string)$debt["f_doc_uuid"];
+        if ($this->isLinkedDebtDocument($uuid)) {
+            die(Translator::t("Only debt payments can be deleted"));
+        }
+
+        $docType = (int)$debt["f_doc_type"];
+        $amount = $docType === 1 ? (float)$debt["f_debit"] : (float)$debt["f_credit"];
+
+        $this->beginTransaction();
+        $op = $this->findRedeemCashOperation($debt);
+        if ($op) {
+            if ((int)$op["f_session_id"] > 0 && $amount > 0.00001) {
+                if ($docType === 1) {
+                    $this->select(
+                        "UPDATE cash_session SET f_amount_expected=f_amount_expected+? WHERE f_id=?",
+                        "di",
+                        [$amount, (int)$op["f_session_id"]],
+                        true
+                    );
+                } else {
+                    $this->select(
+                        "UPDATE cash_session SET f_amount_expected=f_amount_expected-? WHERE f_id=?",
+                        "di",
+                        [$amount, (int)$op["f_session_id"]],
+                        true
+                    );
+                }
+            }
+            $this->select("DELETE FROM cash_operations WHERE f_id=?", "i", [(int)$op["f_id"]], true);
+            $this->select("DELETE FROM cash_operations WHERE f_order_id=?", "s", [$uuid], true);
+        }
+        $this->select("DELETE FROM cash_debts WHERE f_id=?", "i", [$debtId], true);
+        $this->commit();
+        $this->echoResult();
+    }
+
+    private function loadDebtRow(int $debtId): ?array
+    {
+        $row = $this->select(
+            "SELECT f_id, f_date, f_partner, f_doc_type, f_doc_uuid, f_credit, f_debit, f_currency_id,
+                    COALESCE(f_comment, '') AS f_comment
+             FROM cash_debts WHERE f_id=?",
+            "i",
+            [$debtId]
+        )->fetch_assoc();
+        return $row ?: null;
+    }
+
+    private function updateDebtRow(int $debtId, array $fields): void
+    {
+        $this->update("cash_debts", $fields, $debtId);
+    }
+
+    /**
+     * @param array<string,mixed> $debt
+     * @return array<string,mixed>|null
+     */
+    private function findRedeemCashOperation(array $debt): ?array
+    {
+        $uuid = (string)($debt["f_doc_uuid"] ?? "");
+        if ($uuid !== "") {
+            $op = $this->select(
+                "SELECT f_id, f_cashbox_id, f_session_id, f_order_id, f_payment_type_id, f_datetime, f_debit, f_credit, f_comment
+                 FROM cash_operations WHERE f_order_id=? LIMIT 1",
+                "s",
+                [$uuid]
+            )->fetch_assoc();
+            if ($op) {
+                return $op;
+            }
+        }
+
+        $docType = (int)($debt["f_doc_type"] ?? 0);
+        $amount = $docType === 1 ? (float)$debt["f_debit"] : (float)$debt["f_credit"];
+        $date = (string)($debt["f_date"] ?? "");
+        if ($amount <= 0.00001 || $date === "") {
+            return null;
+        }
+        $opType = $docType === 1 ? CASH_OP_DEBT_REPAYMENT : CASH_OP_DEBT_RECOVERY;
+        if ($docType === 1) {
+            $op = $this->select(
+                "SELECT f_id, f_cashbox_id, f_session_id, f_order_id, f_payment_type_id, f_datetime, f_debit, f_credit, f_comment
+                 FROM cash_operations
+                 WHERE (f_order_id IS NULL OR f_order_id='')
+                   AND f_operation_type=?
+                   AND DATE(f_datetime)=?
+                   AND ABS(f_credit-?) < 0.009
+                 ORDER BY f_id DESC
+                 LIMIT 1",
+                "isd",
+                [$opType, $date, $amount]
+            )->fetch_assoc();
+        } else {
+            $op = $this->select(
+                "SELECT f_id, f_cashbox_id, f_session_id, f_order_id, f_payment_type_id, f_datetime, f_debit, f_credit, f_comment
+                 FROM cash_operations
+                 WHERE (f_order_id IS NULL OR f_order_id='')
+                   AND f_operation_type=?
+                   AND DATE(f_datetime)=?
+                   AND ABS(f_debit-?) < 0.009
+                 ORDER BY f_id DESC
+                 LIMIT 1",
+                "isd",
+                [$opType, $date, $amount]
+            )->fetch_assoc();
+        }
+        return $op ?: null;
+    }
+
+    private function isLinkedDebtDocument(string $uuid): bool
+    {
+        if ($uuid === "") {
+            return true;
+        }
+        $store = $this->select("SELECT f_id FROM store_document WHERE f_id=? LIMIT 1", "s", [$uuid])->fetch_assoc();
+        if ($store) {
+            return true;
+        }
+        $order = $this->select("SELECT f_id FROM o_header WHERE f_id=? LIMIT 1", "s", [$uuid])->fetch_assoc();
+        return (bool)$order;
     }
 
     /**

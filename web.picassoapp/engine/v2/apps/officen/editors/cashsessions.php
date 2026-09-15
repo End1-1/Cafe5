@@ -68,7 +68,9 @@ class CashSessions
     concat(date_fmt(JSON_VALUE(oh.f_data, '$.f_date_close')), ' ', JSON_VALUE(oh.f_data, '$.f_time_close')) AS f_datetime_close,
     CONCAT(u1.f_last, ' ', LEFT(u1.f_first, 1), '.') AS f_staff,
     CONCAT(u2.f_last, ' ', LEFT(u2.f_first, 1), '.') AS f_cashier,
-    money_fmt(oh.f_amounttotal), $other_payments,
+    money_fmt(oh.f_amounttotal),
+    COALESCE(JSON_VALUE(oh.f_data, '$.f_fiscal.rseq'), '') AS f_fiscal_rseq,
+    $other_payments,
     money_fmt(CAST(JSON_VALUE(oh.f_data, '$.f_service_amount') AS DECIMAL(14,2))) AS f_service_amount,
     COALESCE(JSON_VALUE(oh.f_data, '$.f_guest.f_guest_name'), '') AS f_guest_name,
     COALESCE(JSON_VALUE(oh.f_data, '$.f_guest.f_guest_phone'), '') AS f_guest_phone,
@@ -95,6 +97,7 @@ class CashSessions
             Translator::t("Staff"),
             Translator::t("Cashier"),
             Translator::t("Total"),
+            Translator::t("Receipt number"),
         ];
 
         foreach ($payConfig["names"] as $name) {
@@ -110,7 +113,7 @@ class CashSessions
             "toolbar" => ["delete" => true, "reload" => true, "filter" => true],
             "headers" => $headers,
             "hidden_columns" => [0],
-            "sum" => [9, 10, 11, 12, 13, 14, 15],
+            "sum" => [9, 11, 12, 13, 14, 15, 16],
             "filter" => [
                 ["type" => "combobox", "name" => "datemode", "label" => Translator::t("Filter by date type"), "default" => 1, "values" => [
                     ["label" => Translator::t("Order closing date"), "value" => 1],

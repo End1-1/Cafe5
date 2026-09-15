@@ -167,6 +167,7 @@ FORMS += \
     rabstracteditorreport.ui \
     rworkstationsreport.ui \
     dlgservicevalue.ui \
+    dlgfiscalmachine.ui \
     c5salaryeditor.ui \
     c5salarypaymenteditor.ui \
     c5revenuecashop.ui \
@@ -515,7 +516,9 @@ HEADERS += \
         rabstracteditorreport.h \
         rworkstationsreport.h \
         dlgservicevalue.h \
+        dlgfiscalmachine.h \
         rservicevaluesreport.h \
+        rfiscalmachinesreport.h \
         c5salaryeditor.h \
         c5salarypaymenteditor.h \
         c5revenuecashop.h \
@@ -846,7 +849,9 @@ SOURCES += \
         rabstracteditorreport.cpp \
         rworkstationsreport.cpp \
         dlgservicevalue.cpp \
+        dlgfiscalmachine.cpp \
         rservicevaluesreport.cpp \
+        rfiscalmachinesreport.cpp \
         c5salaryeditor.cpp \
         c5salarypaymenteditor.cpp \
         c5revenuecashop.cpp \

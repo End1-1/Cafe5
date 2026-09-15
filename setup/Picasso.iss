@@ -57,40 +57,79 @@ Name: "desktop_waiter_designer"; Description: "Desktop icon: WaiterDesigner"; Gr
 Name: "desktop_cookingprogress"; Description: "Desktop icon: CookingProgress"; GroupDescription: "Desktop icons:"; Components: cookingprogress; Flags: unchecked
 
 [Files]
-; --- Application binaries ---
-Source: "{#StagingDir}\OfficeN.exe"; DestDir: "{app}"; Components: frontdesk; Flags: ignoreversion
-Source: "{#StagingDir}\Shop_net.exe"; DestDir: "{app}"; Components: shop; Flags: ignoreversion
-Source: "{#StagingDir}\Waiter.exe"; DestDir: "{app}"; Components: waiter; Flags: ignoreversion
-Source: "{#StagingDir}\WaiterDesigner.exe"; DestDir: "{app}"; Components: waiter; Flags: ignoreversion skipifsourcedoesntexist
-Source: "{#StagingDir}\CookingProgress.exe"; DestDir: "{app}"; Components: cookingprogress; Flags: ignoreversion
+; --- Application binaries (each module in its own subfolder) ---
+Source: "{#StagingDir}\OfficeN.exe"; DestDir: "{app}\frontdesk"; Components: frontdesk; Flags: ignoreversion
+Source: "{#StagingDir}\Shop_net.exe"; DestDir: "{app}\shop"; Components: shop; Flags: ignoreversion
+Source: "{#StagingDir}\Waiter.exe"; DestDir: "{app}\waiter"; Components: waiter; Flags: ignoreversion
+Source: "{#StagingDir}\WaiterDesigner.exe"; DestDir: "{app}\waiter"; Components: waiter; Flags: ignoreversion skipifsourcedoesntexist
+Source: "{#StagingDir}\CookingProgress.exe"; DestDir: "{app}\cookingprogress"; Components: cookingprogress; Flags: ignoreversion
 Source: "{#StagingDir}\service5.exe"; DestDir: "{app}"; Components: service5; Flags: ignoreversion; BeforeInstall: BeforeServiceInstall
-Source: "{#StagingDir}\Updater.exe"; DestDir: "{app}"; Components: frontdesk shop waiter cookingprogress; Flags: ignoreversion
+Source: "{#StagingDir}\Updater.exe"; DestDir: "{app}\updater"; Flags: ignoreversion
+Source: "{#StagingDir}\Qt6*.dll"; DestDir: "{app}\updater"; Flags: ignoreversion
+Source: "{#StagingDir}\platforms\*"; DestDir: "{app}\updater\platforms"; Flags: ignoreversion recursesubdirs createallsubdirs
 
 ; --- Styles / assets ---
-Source: "{#StagingDir}\officestyle.css"; DestDir: "{app}"; Components: frontdesk; Flags: ignoreversion
-Source: "{#StagingDir}\shop.css"; DestDir: "{app}"; Components: shop; Flags: ignoreversion
-Source: "{#StagingDir}\waiter.css"; DestDir: "{app}"; Components: waiter; Flags: ignoreversion
-Source: "{#StagingDir}\ahuni.ttf"; DestDir: "{app}"; Check: NeedSharedRuntime; Flags: ignoreversion
-Source: "{#StagingDir}\templates\*"; DestDir: "{app}\templates"; Check: NeedSharedRuntime; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "{#StagingDir}\officestyle.css"; DestDir: "{app}\frontdesk"; Components: frontdesk; Flags: ignoreversion
+Source: "{#StagingDir}\shop.css"; DestDir: "{app}\shop"; Components: shop; Flags: ignoreversion
+Source: "{#StagingDir}\waiter.css"; DestDir: "{app}\waiter"; Components: waiter; Flags: ignoreversion
+Source: "{#StagingDir}\ahuni.ttf"; DestDir: "{app}\frontdesk"; Components: frontdesk; Flags: ignoreversion
+Source: "{#StagingDir}\ahuni.ttf"; DestDir: "{app}\shop"; Components: shop; Flags: ignoreversion
+Source: "{#StagingDir}\ahuni.ttf"; DestDir: "{app}\waiter"; Components: waiter; Flags: ignoreversion
+Source: "{#StagingDir}\ahuni.ttf"; DestDir: "{app}\cookingprogress"; Components: cookingprogress; Flags: ignoreversion
+Source: "{#StagingDir}\templates\*"; DestDir: "{app}\frontdesk\templates"; Components: frontdesk; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "{#StagingDir}\templates\*"; DestDir: "{app}\shop\templates"; Components: shop; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "{#StagingDir}\templates\*"; DestDir: "{app}\waiter\templates"; Components: waiter; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "{#StagingDir}\templates\*"; DestDir: "{app}\cookingprogress\templates"; Components: cookingprogress; Flags: ignoreversion recursesubdirs createallsubdirs
 
-; --- Qt / OpenSSL / MariaDB ---
-Source: "{#StagingDir}\Qt6*.dll"; DestDir: "{app}"; Check: NeedSharedRuntime; Flags: ignoreversion
-Source: "{#StagingDir}\libcrypto-3-x64.dll"; DestDir: "{app}"; Check: NeedSharedRuntime; Flags: ignoreversion
-Source: "{#StagingDir}\libssl-3-x64.dll"; DestDir: "{app}"; Check: NeedSharedRuntime; Flags: ignoreversion
-Source: "{#StagingDir}\libmariadb.dll"; DestDir: "{app}"; Check: NeedSharedRuntime; Flags: ignoreversion
-Source: "{#StagingDir}\libzkfp.dll"; DestDir: "{app}"; Check: NeedZkfpDll; Flags: ignoreversion
-Source: "{#StagingDir}\ZKFPCap.dll"; DestDir: "{app}"; Check: NeedZkfpDll; Flags: ignoreversion
-Source: "{#StagingDir}\fpslib.dll"; DestDir: "{app}"; Check: NeedZkfpDll; Flags: ignoreversion
-Source: "{#StagingDir}\libzksensorcore.dll"; DestDir: "{app}"; Check: NeedZkfpDll; Flags: ignoreversion
-Source: "{#StagingDir}\libusb0.dll"; DestDir: "{app}"; Check: NeedZkfpDll; Flags: ignoreversion
-Source: "{#StagingDir}\zkfpslibLow.dll"; DestDir: "{app}"; Check: NeedZkfpDll; Flags: ignoreversion
-Source: "{#StagingDir}\ZKFPSensors\*"; DestDir: "{app}\ZKFPSensors"; Check: NeedZkfpDll; Flags: ignoreversion recursesubdirs createallsubdirs
+; --- Qt / OpenSSL / MariaDB (per module) ---
+Source: "{#StagingDir}\Qt6*.dll"; DestDir: "{app}\frontdesk"; Components: frontdesk; Flags: ignoreversion
+Source: "{#StagingDir}\Qt6*.dll"; DestDir: "{app}\shop"; Components: shop; Flags: ignoreversion
+Source: "{#StagingDir}\Qt6*.dll"; DestDir: "{app}\waiter"; Components: waiter; Flags: ignoreversion
+Source: "{#StagingDir}\Qt6*.dll"; DestDir: "{app}\cookingprogress"; Components: cookingprogress; Flags: ignoreversion
+Source: "{#StagingDir}\libcrypto-3-x64.dll"; DestDir: "{app}\frontdesk"; Components: frontdesk; Flags: ignoreversion
+Source: "{#StagingDir}\libcrypto-3-x64.dll"; DestDir: "{app}\shop"; Components: shop; Flags: ignoreversion
+Source: "{#StagingDir}\libcrypto-3-x64.dll"; DestDir: "{app}\waiter"; Components: waiter; Flags: ignoreversion
+Source: "{#StagingDir}\libcrypto-3-x64.dll"; DestDir: "{app}\cookingprogress"; Components: cookingprogress; Flags: ignoreversion
+Source: "{#StagingDir}\libssl-3-x64.dll"; DestDir: "{app}\frontdesk"; Components: frontdesk; Flags: ignoreversion
+Source: "{#StagingDir}\libssl-3-x64.dll"; DestDir: "{app}\shop"; Components: shop; Flags: ignoreversion
+Source: "{#StagingDir}\libssl-3-x64.dll"; DestDir: "{app}\waiter"; Components: waiter; Flags: ignoreversion
+Source: "{#StagingDir}\libssl-3-x64.dll"; DestDir: "{app}\cookingprogress"; Components: cookingprogress; Flags: ignoreversion
+Source: "{#StagingDir}\libmariadb.dll"; DestDir: "{app}\frontdesk"; Components: frontdesk; Flags: ignoreversion
+Source: "{#StagingDir}\libmariadb.dll"; DestDir: "{app}\shop"; Components: shop; Flags: ignoreversion
+Source: "{#StagingDir}\libmariadb.dll"; DestDir: "{app}\waiter"; Components: waiter; Flags: ignoreversion
+Source: "{#StagingDir}\libmariadb.dll"; DestDir: "{app}\cookingprogress"; Components: cookingprogress; Flags: ignoreversion
+Source: "{#StagingDir}\libzkfp.dll"; DestDir: "{app}\frontdesk"; Components: frontdesk; Flags: ignoreversion
+Source: "{#StagingDir}\libzkfp.dll"; DestDir: "{app}\waiter"; Components: waiter; Flags: ignoreversion
+Source: "{#StagingDir}\ZKFPCap.dll"; DestDir: "{app}\frontdesk"; Components: frontdesk; Flags: ignoreversion
+Source: "{#StagingDir}\ZKFPCap.dll"; DestDir: "{app}\waiter"; Components: waiter; Flags: ignoreversion
+Source: "{#StagingDir}\fpslib.dll"; DestDir: "{app}\frontdesk"; Components: frontdesk; Flags: ignoreversion
+Source: "{#StagingDir}\fpslib.dll"; DestDir: "{app}\waiter"; Components: waiter; Flags: ignoreversion
+Source: "{#StagingDir}\libzksensorcore.dll"; DestDir: "{app}\frontdesk"; Components: frontdesk; Flags: ignoreversion
+Source: "{#StagingDir}\libzksensorcore.dll"; DestDir: "{app}\waiter"; Components: waiter; Flags: ignoreversion
+Source: "{#StagingDir}\libusb0.dll"; DestDir: "{app}\frontdesk"; Components: frontdesk; Flags: ignoreversion
+Source: "{#StagingDir}\libusb0.dll"; DestDir: "{app}\waiter"; Components: waiter; Flags: ignoreversion
+Source: "{#StagingDir}\zkfpslibLow.dll"; DestDir: "{app}\frontdesk"; Components: frontdesk; Flags: ignoreversion
+Source: "{#StagingDir}\zkfpslibLow.dll"; DestDir: "{app}\waiter"; Components: waiter; Flags: ignoreversion
+Source: "{#StagingDir}\ZKFPSensors\*"; DestDir: "{app}\frontdesk\ZKFPSensors"; Components: frontdesk; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "{#StagingDir}\ZKFPSensors\*"; DestDir: "{app}\waiter\ZKFPSensors"; Components: waiter; Flags: ignoreversion recursesubdirs createallsubdirs
 
-; --- Qt plugins ---
-Source: "{#StagingDir}\platforms\*"; DestDir: "{app}\platforms"; Check: NeedSharedRuntime; Flags: ignoreversion recursesubdirs createallsubdirs
-Source: "{#StagingDir}\sqldrivers\*"; DestDir: "{app}\sqldrivers"; Check: NeedSharedRuntime; Flags: ignoreversion recursesubdirs createallsubdirs
-Source: "{#StagingDir}\imageformats\*"; DestDir: "{app}\imageformats"; Check: NeedSharedRuntime; Flags: ignoreversion recursesubdirs createallsubdirs
-Source: "{#StagingDir}\plugins\*"; DestDir: "{app}\plugins"; Check: NeedSharedRuntime; Flags: ignoreversion recursesubdirs createallsubdirs
+; --- Qt plugins (per module) ---
+Source: "{#StagingDir}\platforms\*"; DestDir: "{app}\frontdesk\platforms"; Components: frontdesk; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "{#StagingDir}\platforms\*"; DestDir: "{app}\shop\platforms"; Components: shop; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "{#StagingDir}\platforms\*"; DestDir: "{app}\waiter\platforms"; Components: waiter; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "{#StagingDir}\platforms\*"; DestDir: "{app}\cookingprogress\platforms"; Components: cookingprogress; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "{#StagingDir}\sqldrivers\*"; DestDir: "{app}\frontdesk\sqldrivers"; Components: frontdesk; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "{#StagingDir}\sqldrivers\*"; DestDir: "{app}\shop\sqldrivers"; Components: shop; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "{#StagingDir}\sqldrivers\*"; DestDir: "{app}\waiter\sqldrivers"; Components: waiter; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "{#StagingDir}\sqldrivers\*"; DestDir: "{app}\cookingprogress\sqldrivers"; Components: cookingprogress; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "{#StagingDir}\imageformats\*"; DestDir: "{app}\frontdesk\imageformats"; Components: frontdesk; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "{#StagingDir}\imageformats\*"; DestDir: "{app}\shop\imageformats"; Components: shop; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "{#StagingDir}\imageformats\*"; DestDir: "{app}\waiter\imageformats"; Components: waiter; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "{#StagingDir}\imageformats\*"; DestDir: "{app}\cookingprogress\imageformats"; Components: cookingprogress; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "{#StagingDir}\plugins\*"; DestDir: "{app}\frontdesk\plugins"; Components: frontdesk; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "{#StagingDir}\plugins\*"; DestDir: "{app}\shop\plugins"; Components: shop; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "{#StagingDir}\plugins\*"; DestDir: "{app}\waiter\plugins"; Components: waiter; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "{#StagingDir}\plugins\*"; DestDir: "{app}\cookingprogress\plugins"; Components: cookingprogress; Flags: ignoreversion recursesubdirs createallsubdirs
 
 ; --- VC++ Redistributable (MSVC 2015-2022 x64); extracted in PrepareToInstall when needed ---
 Source: "{#StagingDir}\vc_redist.x64.exe"; Flags: dontcopy
@@ -98,21 +137,27 @@ Source: "{#StagingDir}\vc_redist.x64.exe"; Flags: dontcopy
 [Icons]
 ; Start menu: on upgrade do not recreate shortcuts for already installed apps (preserves user edits).
 ; Desktop icons: always honor the task checkbox (even on upgrade).
-Name: "{group}\FrontDesk"; Filename: "{app}\OfficeN.exe"; Components: frontdesk; Check: ShouldCreateAppIcon('frontdesk')
-Name: "{group}\Shop"; Filename: "{app}\Shop_net.exe"; Components: shop; Check: ShouldCreateAppIcon('shop')
-Name: "{group}\Waiter"; Filename: "{app}\Waiter.exe"; Components: waiter; Check: ShouldCreateAppIcon('waiter')
-Name: "{group}\WaiterDesigner"; Filename: "{app}\WaiterDesigner.exe"; Components: waiter
-Name: "{group}\CookingProgress"; Filename: "{app}\CookingProgress.exe"; Components: cookingprogress; Check: ShouldCreateAppIcon('cookingprogress')
+Name: "{group}\FrontDesk"; Filename: "{app}\frontdesk\OfficeN.exe"; Components: frontdesk; Check: ShouldCreateAppIcon('frontdesk')
+Name: "{group}\Shop"; Filename: "{app}\shop\Shop_net.exe"; Components: shop; Check: ShouldCreateAppIcon('shop')
+Name: "{group}\Waiter"; Filename: "{app}\waiter\Waiter.exe"; Components: waiter; Check: ShouldCreateAppIcon('waiter')
+Name: "{group}\WaiterDesigner"; Filename: "{app}\waiter\WaiterDesigner.exe"; Components: waiter
+Name: "{group}\CookingProgress"; Filename: "{app}\cookingprogress\CookingProgress.exe"; Components: cookingprogress; Check: ShouldCreateAppIcon('cookingprogress')
 Name: "{group}\Service5 Monitor"; Filename: "{app}\service5.exe"; Parameters: "--gui"; Components: service5; Check: ShouldCreateAppIcon('service5')
 Name: "{group}\{cm:UninstallProgram,{#MyAppName}}"; Filename: "{uninstallexe}"
-Name: "{autodesktop}\FrontDesk"; Filename: "{app}\OfficeN.exe"; Tasks: desktop_frontdesk
-Name: "{autodesktop}\Shop"; Filename: "{app}\Shop_net.exe"; Tasks: desktop_shop
-Name: "{autodesktop}\Waiter"; Filename: "{app}\Waiter.exe"; Tasks: desktop_waiter
-Name: "{autodesktop}\WaiterDesigner"; Filename: "{app}\WaiterDesigner.exe"; Components: waiter; Tasks: desktop_waiter_designer
-Name: "{autodesktop}\CookingProgress"; Filename: "{app}\CookingProgress.exe"; Tasks: desktop_cookingprogress
+Name: "{autodesktop}\FrontDesk"; Filename: "{app}\frontdesk\OfficeN.exe"; Tasks: desktop_frontdesk
+Name: "{autodesktop}\Shop"; Filename: "{app}\shop\Shop_net.exe"; Tasks: desktop_shop
+Name: "{autodesktop}\Waiter"; Filename: "{app}\waiter\Waiter.exe"; Tasks: desktop_waiter
+Name: "{autodesktop}\WaiterDesigner"; Filename: "{app}\waiter\WaiterDesigner.exe"; Components: waiter; Tasks: desktop_waiter_designer
+Name: "{autodesktop}\CookingProgress"; Filename: "{app}\cookingprogress\CookingProgress.exe"; Tasks: desktop_cookingprogress
 
 [Registry]
 Root: HKLM; Subkey: "Software\{#MyAppName}"; ValueType: string; ValueName: "InstallPath"; ValueData: "{app}"; Flags: uninsdeletekey
+Root: HKLM; Subkey: "Software\{#MyAppName}\updater"; ValueType: string; ValueName: "InstallPath"; ValueData: "{app}\updater"; Flags: uninsdeletekey
+Root: HKLM; Subkey: "Software\{#MyAppName}\frontdesk"; ValueType: string; ValueName: "InstallPath"; ValueData: "{app}\frontdesk"; Components: frontdesk; Flags: uninsdeletekey
+Root: HKLM; Subkey: "Software\{#MyAppName}\shop"; ValueType: string; ValueName: "InstallPath"; ValueData: "{app}\shop"; Components: shop; Flags: uninsdeletekey
+Root: HKLM; Subkey: "Software\{#MyAppName}\waiter"; ValueType: string; ValueName: "InstallPath"; ValueData: "{app}\waiter"; Components: waiter; Flags: uninsdeletekey
+Root: HKLM; Subkey: "Software\{#MyAppName}\cookingprogress"; ValueType: string; ValueName: "InstallPath"; ValueData: "{app}\cookingprogress"; Components: cookingprogress; Flags: uninsdeletekey
+Root: HKLM; Subkey: "Software\{#MyAppName}\service5"; ValueType: string; ValueName: "InstallPath"; ValueData: "{app}"; Components: service5; Flags: uninsdeletekey
 Root: HKLM; Subkey: "Software\{#MyAppName}"; ValueType: dword; ValueName: "Service5Installed"; ValueData: "1"; Components: service5; Flags: uninsdeletekey
 
 ; Demo connection defaults (only if not already set)
@@ -138,7 +183,7 @@ Root: HKCU; Subkey: "Software\BreezeDevs\CookingProgress\CookingProgress"; Value
 Root: HKCU; Subkey: "Software\BreezeDevs\CookingProgress\CookingProgress"; ValueType: string; ValueName: "ss_server_key"; ValueData: "9931cfc3-f75e-11f0-ad11-020462cc89"; Components: cookingprogress; Flags: createvalueifdoesntexist
 Root: HKCU; Subkey: "Software\BreezeDevs\CookingProgress\CookingProgress"; ValueType: string; ValueName: "ss_server_username"; ValueData: "0001"; Components: cookingprogress; Flags: createvalueifdoesntexist
 Root: HKCU; Subkey: "Software\BreezeDevs\CookingProgress\CookingProgress"; ValueType: string; ValueName: "ss_server_password"; ValueData: "0001"; Components: cookingprogress; Flags: createvalueifdoesntexist
-Root: HKLM; Subkey: "Software\Microsoft\Windows\CurrentVersion\Run"; ValueType: string; ValueName: "CookingProgress"; ValueData: """{app}\CookingProgress.exe"""; Components: cookingprogress; Flags: uninsdeletevalue
+Root: HKLM; Subkey: "Software\Microsoft\Windows\CurrentVersion\Run"; ValueType: string; ValueName: "CookingProgress"; ValueData: """{app}\cookingprogress\CookingProgress.exe"""; Components: cookingprogress; Flags: uninsdeletevalue
 
 [Code]
 var
@@ -284,10 +329,14 @@ begin
   if InstallPath[Length(InstallPath)] <> '\' then
     InstallPath := InstallPath + '\';
 
-  PrevHadFrontDesk := FileExists(InstallPath + 'OfficeN.exe');
-  PrevHadShop := FileExists(InstallPath + 'Shop_net.exe');
-  PrevHadWaiter := FileExists(InstallPath + 'Waiter.exe');
-  PrevHadCookingProgress := FileExists(InstallPath + 'CookingProgress.exe');
+  PrevHadFrontDesk := FileExists(InstallPath + 'frontdesk\OfficeN.exe') or
+                      FileExists(InstallPath + 'OfficeN.exe');
+  PrevHadShop := FileExists(InstallPath + 'shop\Shop_net.exe') or
+                 FileExists(InstallPath + 'Shop_net.exe');
+  PrevHadWaiter := FileExists(InstallPath + 'waiter\Waiter.exe') or
+                   FileExists(InstallPath + 'Waiter.exe');
+  PrevHadCookingProgress := FileExists(InstallPath + 'cookingprogress\CookingProgress.exe') or
+                            FileExists(InstallPath + 'CookingProgress.exe');
   PrevHadService5 := FileExists(InstallPath + 'service5.exe') or
                      FileExists(InstallPath + 'Service5.exe');
   Result := True;

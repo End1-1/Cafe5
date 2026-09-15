@@ -97,10 +97,7 @@ void WaiterDishWidget::updateDish(WaiterDish value)
         ui->lbComplimentary->setVisible(mOrderItem.complimentary());
         ui->lbQty1->setText(float_str(mOrderItem.qty, 3));
         {
-            const double lineTotal = mBistroMode
-                                         ? mOrderItem.lineAmount(mIsPreorder, true,
-                                                                 mOrderServiceFactor, mOrderDiscountFactor)
-                                         : mOrderItem.total(mIsPreorder);
+            const double lineTotal = mOrderItem.lineSubtotal(mIsPreorder, mBistroMode);
             ui->lbTotal->setText(float_str(lineTotal, 2));
         }
         ui->lbComment->setVisible(!mOrderItem.comment().isEmpty() || !mOrderItem.removeReason().isEmpty());

@@ -10,8 +10,9 @@ Ararix / cafe5 PHP API for development is hosted at **development.picassocloud.c
 Whenever you change files under `web.picassoapp/` (especially `engine/v2/`, `engine/db/`, `engine/cnf.php`), at the end of the reply include a short block:
 
 **Deploy to development.picassocloud.com**
-- list changed relative paths
+- list only the changed relative paths under `web.picassoapp/`
 - note if DB migration / SQL must be run (`engine/db/*.sql`, `run_update.php`)
-- note if `cnf.php` credentials differ on remote (do not overwrite remote secrets blindly)
+- mention `cnf.php` **only if this change actually edited it** — warn not to overwrite remote secrets; otherwise omit it entirely
 
 Do this even for small PHP fixes. Flutter-only changes in `ararix/` do not need this block unless the API contract changed and backend was updated too.
+Do not pad the block with files that were not changed.

@@ -388,6 +388,7 @@ CE5Goods::CE5Goods(QWidget *parent) :
     ui->leLowLevel->setValidator(new QDoubleValidator(0, 100000, 4));
     ui->tblGoods->setColumnWidths(7, 0, 0, 400, 80, 80, 80, 80);
     ui->leStoreId->setSelector(ui->leStoreIdName, cache_goods, 1, 3);
+    ui->leStoreOverrideId->setSelector(ui->leStoreOverrideIdName, cache_goods_store);
     ui->wGoodsType->selectorCallback = goodsTypeItemSelector;
     ui->wArarixGroup->setSelectorName(tr("Ararix group"));
     ui->wArarixGroup->selectorCallback = ararixGroupItemSelector;
@@ -676,6 +677,7 @@ void CE5Goods::clear()
     ui->chHalalKosher->setChecked(false);
     ui->wArarixGroup->setCodeAndName(0, QString());
     ui->wDishCountry->setCodeAndName(0, QString());
+    ui->leStoreOverrideId->setValue(0);
 
     ui->leBjuKcal->clear();
     ui->leBjuProtein->clear();
@@ -788,6 +790,7 @@ QJsonObject CE5Goods::makeJsonObject()
     jdata[QStringLiteral("f_related_other")] = relatedItemsFromTable(ui->tblRelatedOther);
     jdata[QStringLiteral("f_ararix_group")] = ui->wArarixGroup->value();
     jdata[QStringLiteral("f_ararix_country")] = ui->wDishCountry->value();
+    jdata[QStringLiteral("f_store_override")] = ui->leStoreOverrideId->getInteger();
 
     QJsonObject j;
     j["f_id"] = ui->leCode->getInteger();
@@ -1238,6 +1241,12 @@ void CE5Goods::openResponse(const QJsonObject &jdoc)
             }
         }
         ui->wDishCountry->setCodeAndName(countryId, countryName);
+
+        const int storeOverride = jdata.value(QStringLiteral("f_store_override")).toInt();
+        if (storeOverride > 0) {
+            C5Cache::cache(cache_goods_store)->ensureId(storeOverride);
+        }
+        ui->leStoreOverrideId->setValue(storeOverride);
     }
 
     const QJsonObject bjuObj = jdata.value(QStringLiteral("f_bju")).toObject();

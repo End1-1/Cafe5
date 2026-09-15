@@ -15,44 +15,44 @@ if (-not (Test-Path $versionsPath)) {
 }
 $versions = Get-Content $versionsPath -Raw | ConvertFrom-Json
 
-# Shared CloseApplicationsFilter: all Picasso apps share {app} Qt DLLs, so any
-# component update must be allowed to close siblings (and Service5 / Breeze).
-$PicassoCloseFilter = "OfficeN.exe,Shop_net.exe,Waiter.exe,WaiterDesigner.exe,CookingProgress.exe,service5.exe,Service5.exe,Updater.exe,PicassoUpdateHost.exe"
+# Per-module close filter: only the module being installed/updated.
+# Service5 keeps the legacy shared-folder behaviour (Breeze + all apps).
+$PicassoCloseFilterAll = "OfficeN.exe,Shop_net.exe,Waiter.exe,WaiterDesigner.exe,CookingProgress.exe,service5.exe,Service5.exe,Updater.exe,PicassoUpdateHost.exe"
 
 $allComponents = @(
     @{
         Key = "frontdesk"
         DisplayName = "FrontDesk"
         AppId = "{{A3F8C2E1-9B4D-4F6A-8C7E-1D2E3F4AFD01}"
-        CloseFilter = $PicassoCloseFilter
+        CloseFilter = "OfficeN.exe"
         Version = $versions.frontdesk
     }
     @{
         Key = "shop"
         DisplayName = "Shop"
         AppId = "{{A3F8C2E1-9B4D-4F6A-8C7E-1D2E3F4A5B01}"
-        CloseFilter = $PicassoCloseFilter
+        CloseFilter = "Shop_net.exe"
         Version = $versions.shop
     }
     @{
         Key = "waiter"
         DisplayName = "Waiter"
         AppId = "{{A3F8C2E1-9B4D-4F6A-8C7E-1D2E3F4A5C01}"
-        CloseFilter = $PicassoCloseFilter
+        CloseFilter = "Waiter.exe,WaiterDesigner.exe"
         Version = $versions.waiter
     }
     @{
         Key = "cookingprogress"
         DisplayName = "CookingProgress"
         AppId = "{{A3F8C2E1-9B4D-4F6A-8C7E-1D2E3F4A5E01}"
-        CloseFilter = $PicassoCloseFilter
+        CloseFilter = "CookingProgress.exe"
         Version = $versions.cookingprogress
     }
     @{
         Key = "service5"
         DisplayName = "Service5"
         AppId = "{{A3F8C2E1-9B4D-4F6A-8C7E-1D2E3F4A5D01}"
-        CloseFilter = $PicassoCloseFilter
+        CloseFilter = $PicassoCloseFilterAll
         Version = $versions.service5
     }
 )

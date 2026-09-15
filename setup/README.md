@@ -105,14 +105,30 @@ When the server returns HTTP 426 (version mismatch in `check-app.php`):
 
 1. The app shows **one** question: update is required to continue (Yes / No).
 2. **No** — application exits.
-3. **Yes** — starts `{app}\Updater.exe`, then exits.
-4. **Updater self-update / unlock:** `Updater.exe` copies itself to `%TEMP%\PicassoUpdateHost.exe` and relaunches from TEMP. Qt DLLs are copied to `%TEMP%\PicassoUpdateRt\` (not loaded from `{app}`), so Inno can overwrite `{app}\Qt6*.dll` while the host is still running.
-5. Host stops Breeze, kills Picasso desktop apps, downloads `{component}_setup_X.Y.Z.exe` from `https://picasso.am/files/` using **WinHTTP**, and runs it with `/SILENT /NORESTART /CLOSEAPPLICATIONS /FORCECLOSEAPPLICATIONS`. Windows UAC may still appear because installers require admin.
-6. The component installer always ships a fresh `Updater.exe` next to FrontDesk / Shop / Waiter / CookingProgress — so the next update uses the new updater.
+3. **Yes** — starts shared `{autopf}\Picasso\updater\Updater.exe` with `--module-dir=<app folder>`, then exits.
+4. **Updater self-update / unlock:** `Updater.exe` copies itself **and Qt DLLs** to `%TEMP%` as `PicassoUpdateHost.exe` (DLLs beside the host — Windows needs them before `main()`), then relaunches from TEMP.
+5. Host kills **only the updating module** (e.g. Shop → `Shop_net.exe` only), downloads `{component}_setup_X.Y.Z.exe`, runs Inno `/SILENT` with `/DIR=<module folder>`.
+6. Every module installer (FrontDesk / Shop / Waiter / CookingProgress / Service5) ships a **fresh** `Updater.exe` + Qt into `Picasso\updater\` (`ignoreversion`, closes `Updater.exe` so the file can be replaced).
 
-**Compatibility rule:** keep Updater CLI (`--app`, `--version`) and the URL pattern `https://picasso.am/files/{component}_setup_{version}.exe` stable (or backward-compatible). An old updater on the machine must still be able to download and run the new setup.
+**Layout (desktop modules):**
 
-**Breeze service:** all component packages (FrontDesk / Shop / Waiter / CookingProgress / Service5) and the full suite installer stop Windows service **Breeze** when it is present (shared Qt DLLs in `{app}`). After a successful install they start it again. Only the **Service5** package and the full suite (when the service5 component is selected) create/register the service.
+```
+C:\Program Files\Picasso\
+  updater\Updater.exe          ← shared
+  frontdesk\OfficeN.exe + Qt…
+  shop\Shop_net.exe + Qt…
+  waiter\Waiter.exe + Qt…
+  cookingprogress\CookingProgress.exe + Qt…
+  service5.exe                 ← flat root (unchanged)
+```
+
+**Migration:** the next component update moves that module from flat `Picasso\` into `Picasso\<module>\`. Old files in the root are left in place.
+
+**Process check:** component installer closes only its own exe(s). Service5 installer still stops Breeze (legacy behaviour).
+
+**Compatibility rule:** keep Updater CLI (`--app`, `--version`, `--module-dir`) and URL pattern stable.
+
+**Breeze service:** only the **Service5** package stops/starts Breeze. Updating Shop/Waiter/FrontDesk does not touch the service.
 
 ### stage.ps1 parameters
 
@@ -138,16 +154,15 @@ If they are missing there, `stage.ps1` falls back to `C:\Windows\System32\` (aft
 Note: USB filter driver (`libusb0.sys`) still comes from the ZKTeco device driver install; shipping `libusb0.dll` alone is not a substitute for the driver.
 ## Install defaults
 
-- Default directory: `C:\Program Files\Picasso` (`{autopf}\Picasso`), user can change it
-- Components: FrontDesk, Shop, Waiter, CookingProgress, Service5
-- Upgrade: same `AppId`, keeps install path, overwrites binaries (`ignoreversion`)
-- Shortcuts (Start Menu / desktop): created on fresh install or only for a **newly added** component; existing shortcuts are not overwritten on update
-- Before install: warning if OfficeN / Shop / Waiter / CookingProgress / service5 processes are running; Inno Restart Manager closes them after confirmation
-- VC++ 2015–2022 x64: if registry `VisualStudio\14.0\VC\Runtimes\x64` is missing or older than 14.30 (VS 2022), runs `vc_redist.x64.exe /install /quiet /norestart` before copying app files
-- Service5: after all files are installed, creates/starts Windows service **Breeze** via `service5.exe --install` (fallback: `sc create`), writes default `config.ini` if missing
-  - Path: `"<app>\service5.exe"` (config: `"<app>\config.ini"`)
-- No extra handler DLLs from `Service5/dlls/`
-- `libzkfp.dll`, `ZKFPCap.dll`, `fpslib.dll`, `libzksensorcore.dll`, `libusb0.dll`, `zkfpslibLow.dll`, `ZKFPSensors\*` (ZKTeco fingerprint) — installed with FrontDesk or Waiter
+- Default root: `C:\Program Files\Picasso` (`{autopf}\Picasso`)
+- Desktop modules install into subfolders: `frontdesk\`, `shop\`, `waiter\`, `cookingprogress\`
+- Shared updater: `updater\Updater.exe`
+- Service5: flat in root `{app}\service5.exe` (unchanged)
+- Upgrade: same `AppId`, overwrites binaries in the module subfolder (`ignoreversion`)
+- Shortcuts point to subfolder exes (e.g. `{app}\shop\Shop_net.exe`)
+- Before install: warning only for processes of the module being installed (component installers)
+- VC++ 2015–2022 x64: installed when registry check fails (14.30+ required)
+- Service5: creates/starts Windows service **Breeze** via `service5.exe --install`
 
 ## Uninstall
 

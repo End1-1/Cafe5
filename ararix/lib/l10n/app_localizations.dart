@@ -445,7 +445,7 @@ abstract class AppLocalizations {
   /// No description provided for @searchRestaurant.
   ///
   /// In en, this message translates to:
-  /// **'Search for a restaurant'**
+  /// **'Type to search'**
   String get searchRestaurant;
 
   /// No description provided for @delivery.
@@ -489,6 +489,150 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Retry'**
   String get retry;
+
+  /// No description provided for @addons.
+  ///
+  /// In en, this message translates to:
+  /// **'Addons'**
+  String get addons;
+
+  /// No description provided for @fats.
+  ///
+  /// In en, this message translates to:
+  /// **'Fats'**
+  String get fats;
+
+  /// No description provided for @carbs.
+  ///
+  /// In en, this message translates to:
+  /// **'Carbs'**
+  String get carbs;
+
+  /// No description provided for @protein.
+  ///
+  /// In en, this message translates to:
+  /// **'Protein'**
+  String get protein;
+
+  /// No description provided for @calories.
+  ///
+  /// In en, this message translates to:
+  /// **'Calories'**
+  String get calories;
+
+  /// No description provided for @next.
+  ///
+  /// In en, this message translates to:
+  /// **'Next'**
+  String get next;
+
+  /// No description provided for @minShort.
+  ///
+  /// In en, this message translates to:
+  /// **'Min'**
+  String get minShort;
+
+  /// No description provided for @yourOrder.
+  ///
+  /// In en, this message translates to:
+  /// **'Your order'**
+  String get yourOrder;
+
+  /// No description provided for @emptyCart.
+  ///
+  /// In en, this message translates to:
+  /// **'Your cart is empty'**
+  String get emptyCart;
+
+  /// No description provided for @total.
+  ///
+  /// In en, this message translates to:
+  /// **'Total'**
+  String get total;
+
+  /// No description provided for @noDishesInGroup.
+  ///
+  /// In en, this message translates to:
+  /// **'No dishes in this group'**
+  String get noDishesInGroup;
+
+  /// No description provided for @checkoutSoon.
+  ///
+  /// In en, this message translates to:
+  /// **'Checkout will be available soon'**
+  String get checkoutSoon;
+
+  /// No description provided for @addNFor.
+  ///
+  /// In en, this message translates to:
+  /// **'Add {qty} For {price}'**
+  String addNFor(int qty, String price);
+
+  /// No description provided for @personalize.
+  ///
+  /// In en, this message translates to:
+  /// **'Personalize'**
+  String get personalize;
+
+  /// No description provided for @drinkStep.
+  ///
+  /// In en, this message translates to:
+  /// **'Drink'**
+  String get drinkStep;
+
+  /// No description provided for @extraStep.
+  ///
+  /// In en, this message translates to:
+  /// **'Extra'**
+  String get extraStep;
+
+  /// No description provided for @chooseDrink.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose a drink'**
+  String get chooseDrink;
+
+  /// No description provided for @addExtra.
+  ///
+  /// In en, this message translates to:
+  /// **'Add extra'**
+  String get addExtra;
+
+  /// No description provided for @attrType.
+  ///
+  /// In en, this message translates to:
+  /// **'Type'**
+  String get attrType;
+
+  /// No description provided for @attrSize.
+  ///
+  /// In en, this message translates to:
+  /// **'Size'**
+  String get attrSize;
+
+  /// No description provided for @comboUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'This combination is not available. Please change your selection.'**
+  String get comboUnavailable;
+
+  /// No description provided for @packageNoOptions.
+  ///
+  /// In en, this message translates to:
+  /// **'This package has no configured options.'**
+  String get packageNoOptions;
+
+  /// No description provided for @customizePackage.
+  ///
+  /// In en, this message translates to:
+  /// **'Customize your {name}'**
+  String customizePackage(String name);
+
+  /// No description provided for @back.
+  ///
+  /// In en, this message translates to:
+  /// **'Back'**
+  String get back;
 }
 
 class _AppLocalizationsDelegate

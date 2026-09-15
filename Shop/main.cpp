@@ -70,16 +70,14 @@ int main(int argc, char* argv[])
 
     for(const QString &s : a.arguments()) {
         if(s.startsWith("/monitor")) {
-            QList<QScreen*> screens = a.screens();
-            int monitor = 0;
-            QStringList mon = s.split("=");
-
-            if(mon.length() == 2) {
-                monitor = mon.at(1).toInt();
-            }
-
-            if(screens.count() > monitor - 1) {
-                C5Dialog::mScreen = monitor;
+            // /monitor=N is 1-based (1 = primary). Convert to 0-based screen index.
+            const QList<QScreen *> screens = a.screens();
+            const QStringList mon = s.split(QLatin1Char('='));
+            if (mon.length() == 2) {
+                const int index = mon.at(1).toInt() - 1;
+                if (index >= 0 && index < screens.count()) {
+                    C5Dialog::mScreen = index;
+                }
             }
         }
 

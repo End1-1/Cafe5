@@ -1,9 +1,6 @@
-DROP FUNCTION IF EXISTS sf_store2_complect_delete;
 DROP FUNCTION IF EXISTS sf_store2_complect;
 DELIMITER $$
 
--- Complectation: one store_document (f_doc_type=4).
--- Materials FIFO write-off from store_out + finished goods input to store_in (stores may be equal).
 CREATE FUNCTION sf_store2_complect(params longtext)
     RETURNS longtext
 BEGIN
@@ -15,11 +12,13 @@ BEGIN
     DECLARE doc_date datetime DEFAULT JSON_VALUE(params, '$.doc_date');
     DECLARE new_status int DEFAULT CAST(JSON_VALUE(params, '$.doc_status') AS UNSIGNED);
     DECLARE complect_goods int DEFAULT CAST(JSON_VALUE(params, '$.complect_goods') AS UNSIGNED);
+    DECLARE complect_stock_id int DEFAULT 0;
     DECLARE complect_qty decimal(14, 4) DEFAULT CAST(JSON_VALUE(params, '$.complect_qty') AS DECIMAL(14, 4));
     DECLARE complect_row_id char(36) COLLATE latin1_general_ci DEFAULT JSON_VALUE(params, '$.complect_row_id');
     DECLARE doc_user_id char(8) DEFAULT JSON_VALUE(params, '$.doc_user_id');
 
     DECLARE curr_item_id INT;
+    DECLARE curr_user_item_id INT;
     DECLARE curr_qty_needed DECIMAL(14, 4);
     DECLARE curr_row_id CHAR(36);
     DECLARE done INT DEFAULT FALSE;
@@ -29,8 +28,9 @@ BEGIN
     DECLARE unit_price DECIMAL(14, 2) DEFAULT 0;
     DECLARE p_qty_arrived DECIMAL(14, 4);
 
+    -- Resolve f_storeid inside the loop (JOIN inside CURSOR is unreliable on some MariaDB builds)
     DECLARE item_cursor CURSOR FOR
-        SELECT item_id, qty, row_id
+        SELECT jt.item_id, jt.qty, jt.row_id
         FROM JSON_TABLE(params, '$.items[*]'
                         COLUMNS (
                             item_id INT PATH '$.item_id',
@@ -55,6 +55,14 @@ BEGIN
 
     IF (IFNULL(complect_row_id, '') = '') THEN
         SET complect_row_id = UUID();
+    END IF;
+
+    SELECT IFNULL(NULLIF(f_storeid, 0), f_id)
+    INTO complect_stock_id
+    FROM c_goods
+    WHERE f_id = complect_goods;
+    IF (IFNULL(complect_stock_id, 0) = 0) THEN
+        SET complect_stock_id = complect_goods;
     END IF;
 
     -- ===== REVERSE previous posting (product first, then materials) =====
@@ -217,10 +225,19 @@ BEGIN
         OPEN item_cursor;
         item_loop:
         LOOP
-            FETCH item_cursor INTO curr_item_id, curr_qty_needed, curr_row_id;
+            FETCH item_cursor INTO curr_user_item_id, curr_qty_needed, curr_row_id;
             IF done THEN
                 LEAVE item_loop;
             END IF;
+
+            SELECT IFNULL(NULLIF(f_storeid, 0), f_id)
+            INTO curr_item_id
+            FROM c_goods
+            WHERE f_id = curr_user_item_id;
+            IF (IFNULL(curr_item_id, 0) = 0) THEN
+                SET curr_item_id = curr_user_item_id;
+            END IF;
+            SET done = FALSE;
 
             fifo_block:
             BEGIN
@@ -267,7 +284,7 @@ BEGIN
                 RETURN JSON_COMPACT(JSON_OBJECT(
                         'status', 6,
                         'msg', 'insufficient_stock',
-                        'item_id', curr_item_id,
+                        'item_id', curr_user_item_id,
                         'shortage', curr_qty_needed
                                     ));
             END IF;
@@ -288,7 +305,7 @@ BEGIN
         SET unit_price = CASE WHEN complect_qty > 0 THEN total_cost / complect_qty ELSE 0 END;
         SET p_qty_arrived = complect_qty;
 
-        -- Close negatives of finished goods on store_in
+        -- Close negatives of finished goods on store_in (stock goods via f_storeid)
         neg_block:
         BEGIN
             DECLARE done_neg INT DEFAULT FALSE;
@@ -296,7 +313,7 @@ BEGIN
             DECLARE neg_qty_abs DECIMAL(14, 4);
             DECLARE cur_neg CURSOR FOR SELECT f_id, ABS(f_qty_left)
                                        FROM store_stock
-                                       WHERE f_item_id = complect_goods
+                                       WHERE f_item_id = complect_stock_id
                                          AND f_store_id = store_in
                                          AND f_qty_left < 0
                                        ORDER BY f_batch_date ASC;
@@ -312,7 +329,7 @@ BEGIN
 
                 INSERT INTO store_moves (f_id, f_doc, f_doc_row_id, f_batch_id, f_store_id, f_item_id, f_qty_in,
                                          f_price, f_total)
-                VALUES (UUID(), doc_uuid, complect_row_id, neg_id, store_in, complect_goods, neg_qty_abs, unit_price,
+                VALUES (UUID(), doc_uuid, complect_row_id, neg_id, store_in, complect_stock_id, neg_qty_abs, unit_price,
                         neg_qty_abs * unit_price);
 
                 UPDATE store_stock
@@ -332,17 +349,17 @@ BEGIN
         IF p_qty_arrived > 0 THEN
             INSERT INTO store_moves (f_id, f_doc, f_doc_row_id, f_batch_id, f_store_id, f_item_id, f_qty_in, f_price,
                                      f_total)
-            VALUES (UUID(), doc_uuid, complect_row_id, complect_row_id, store_in, complect_goods, p_qty_arrived,
+            VALUES (UUID(), doc_uuid, complect_row_id, complect_row_id, store_in, complect_stock_id, p_qty_arrived,
                     unit_price, p_qty_arrived * unit_price);
 
             INSERT INTO store_stock (f_id, f_doc, f_doc_row_id, f_batch_date, f_store_id, f_item_id, f_qty_in,
                                      f_qty_left, f_price)
-            VALUES (complect_row_id, doc_uuid, complect_row_id, doc_date, store_in, complect_goods, p_qty_arrived,
+            VALUES (complect_row_id, doc_uuid, complect_row_id, doc_date, store_in, complect_stock_id, p_qty_arrived,
                     p_qty_arrived, unit_price);
         END IF;
 
         IF unit_price > 0 THEN
-            UPDATE c_goods SET f_lastinputprice = unit_price WHERE f_id = complect_goods;
+            UPDATE c_goods SET f_lastinputprice = unit_price WHERE f_id = complect_stock_id;
         END IF;
     END IF;
 
@@ -355,153 +372,5 @@ BEGIN
             'complect_row_id', complect_row_id,
             'version', IFNULL(current_version, 0) + 1
                         ));
-END$$
-
-CREATE FUNCTION sf_store2_complect_delete(p_doc_uuid CHAR(36))
-    RETURNS longtext
-BEGIN
-    DECLARE v_status INT;
-    SELECT f_status INTO v_status FROM store_document WHERE f_id = p_doc_uuid FOR UPDATE;
-    IF v_status IS NULL THEN
-        RETURN JSON_COMPACT(JSON_OBJECT('status', 1, 'msg', 'document_not_found'));
-    END IF;
-
-    IF v_status = 1 THEN
-        SET sql_safe_updates = 0;
-
-        IF EXISTS (SELECT 1
-                   FROM store_moves sm
-                            JOIN store_stock ss ON sm.f_batch_id = ss.f_id
-                   WHERE ss.f_doc = p_doc_uuid
-                     AND ss.f_qty_in > 0
-                     AND sm.f_doc <> p_doc_uuid) THEN
-            RETURN JSON_COMPACT(JSON_OBJECT('status', 2, 'msg', 'already_sold_cannot_delete'));
-        END IF;
-
-        -- Reverse product input
-        UPDATE store_stock ss
-            JOIN store_moves sm ON sm.f_batch_id = ss.f_id AND sm.f_doc = p_doc_uuid AND sm.f_qty_in > 0
-                AND sm.f_doc_row_id <> sm.f_batch_id
-        SET ss.f_qty_left   = -sm.f_qty_in,
-            ss.f_qty_in     = 0,
-            ss.f_price      = 0,
-            ss.f_doc        = NULL,
-            ss.f_doc_row_id = NULL
-        WHERE ss.f_qty_in > 0
-          AND ss.f_qty_left = 0;
-
-        DELETE FROM store_stock WHERE f_doc = p_doc_uuid AND f_qty_in > 0;
-        DELETE FROM store_moves WHERE f_doc = p_doc_uuid AND f_qty_in > 0;
-
-        -- Reverse materials output
-        UPDATE store_moves sm_main
-            INNER JOIN (SELECT b.rid, SUM(b.qmerge) AS qmerge
-                        FROM (SELECT am.f_doc_row_id                                     AS rid,
-                                     LEAST(o.qty_out, ss.f_qty_in, am.abs_q)             AS qmerge
-                              FROM store_stock ss
-                                  JOIN (SELECT f_batch_id, SUM(f_qty_out) AS qty_out
-                                        FROM store_moves
-                                        WHERE f_doc = p_doc_uuid
-                                        GROUP BY f_batch_id) o ON o.f_batch_id = ss.f_id
-                                  JOIN (SELECT DISTINCT sm_in.f_batch_id
-                                        FROM store_moves sm_in
-                                        WHERE sm_in.f_qty_in > 0
-                                          AND sm_in.f_doc_row_id <> sm_in.f_batch_id) hx ON hx.f_batch_id = ss.f_id
-                                  JOIN (SELECT f_batch_id, f_doc_row_id, SUM(f_qty_in) AS abs_q
-                                        FROM store_moves
-                                        WHERE f_qty_in > 0
-                                          AND f_doc_row_id <> f_batch_id
-                                        GROUP BY f_batch_id, f_doc_row_id) am ON am.f_batch_id = ss.f_id
-                              WHERE ss.f_qty_left = 0
-                                AND ss.f_qty_in > 0) b
-                        GROUP BY b.rid) x ON sm_main.f_batch_id = x.rid AND sm_main.f_doc_row_id = x.rid
-        SET sm_main.f_qty_in = sm_main.f_qty_in + x.qmerge,
-            sm_main.f_total  = (sm_main.f_qty_in + x.qmerge) * sm_main.f_price;
-
-        UPDATE store_stock sr
-            INNER JOIN (SELECT b.rid, SUM(b.qmerge) AS qmerge
-                        FROM (SELECT am.f_doc_row_id                                     AS rid,
-                                     LEAST(o.qty_out, ss.f_qty_in, am.abs_q)             AS qmerge
-                              FROM store_stock ss
-                                  JOIN (SELECT f_batch_id, SUM(f_qty_out) AS qty_out
-                                        FROM store_moves
-                                        WHERE f_doc = p_doc_uuid
-                                        GROUP BY f_batch_id) o ON o.f_batch_id = ss.f_id
-                                  JOIN (SELECT DISTINCT sm_in.f_batch_id
-                                        FROM store_moves sm_in
-                                        WHERE sm_in.f_qty_in > 0
-                                          AND sm_in.f_doc_row_id <> sm_in.f_batch_id) hx ON hx.f_batch_id = ss.f_id
-                                  JOIN (SELECT f_batch_id, f_doc_row_id, SUM(f_qty_in) AS abs_q
-                                        FROM store_moves
-                                        WHERE f_qty_in > 0
-                                          AND f_doc_row_id <> f_batch_id
-                                        GROUP BY f_batch_id, f_doc_row_id) am ON am.f_batch_id = ss.f_id
-                              WHERE ss.f_qty_left = 0
-                                AND ss.f_qty_in > 0) b
-                        GROUP BY b.rid) x ON sr.f_id = x.rid
-        SET sr.f_qty_in = sr.f_qty_in + x.qmerge,
-            sr.f_qty_left = sr.f_qty_left + x.qmerge;
-
-        UPDATE store_stock ss
-            INNER JOIN (SELECT am.f_batch_id                                       AS nid,
-                               SUM(LEAST(o.qty_out, ss.f_qty_in, am.abs_q))          AS qmerge
-                        FROM store_stock ss
-                            JOIN (SELECT f_batch_id, SUM(f_qty_out) AS qty_out
-                                  FROM store_moves
-                                  WHERE f_doc = p_doc_uuid
-                                  GROUP BY f_batch_id) o ON o.f_batch_id = ss.f_id
-                            JOIN (SELECT DISTINCT sm_in.f_batch_id
-                                  FROM store_moves sm_in
-                                  WHERE sm_in.f_qty_in > 0
-                                    AND sm_in.f_doc_row_id <> sm_in.f_batch_id) hx ON hx.f_batch_id = ss.f_id
-                            JOIN (SELECT f_batch_id, f_doc_row_id, SUM(f_qty_in) AS abs_q
-                                  FROM store_moves
-                                  WHERE f_qty_in > 0
-                                    AND f_doc_row_id <> f_batch_id
-                                  GROUP BY f_batch_id, f_doc_row_id) am ON am.f_batch_id = ss.f_id
-                        WHERE ss.f_qty_left = 0
-                          AND ss.f_qty_in > 0
-                        GROUP BY am.f_batch_id) d ON ss.f_id = d.nid
-        SET ss.f_qty_in = ss.f_qty_in - d.qmerge,
-            ss.f_qty_left = 0;
-
-        UPDATE store_stock ss
-            JOIN (SELECT f_batch_id, SUM(f_qty_out) AS qty_out
-                  FROM store_moves
-                  WHERE f_doc = p_doc_uuid
-                  GROUP BY f_batch_id) sm ON sm.f_batch_id = ss.f_id
-            LEFT JOIN (SELECT DISTINCT sm_in.f_batch_id
-                       FROM store_moves sm_in
-                       WHERE sm_in.f_qty_in > 0
-                         AND sm_in.f_doc_row_id <> sm_in.f_batch_id) hx ON hx.f_batch_id = ss.f_id
-        SET ss.f_qty_left = ss.f_qty_left + sm.qty_out
-        WHERE hx.f_batch_id IS NULL;
-
-        DELETE sm_abs
-        FROM store_moves sm_abs
-            INNER JOIN (SELECT DISTINCT f_batch_id AS bid
-                        FROM store_moves
-                        WHERE f_doc = p_doc_uuid) om ON om.bid = sm_abs.f_batch_id
-        WHERE sm_abs.f_qty_in > 0
-          AND sm_abs.f_doc_row_id <> sm_abs.f_batch_id;
-
-        DELETE ss
-        FROM store_stock ss
-        WHERE ss.f_doc = p_doc_uuid
-          AND ss.f_qty_in = 0
-          AND NOT EXISTS (SELECT 1 FROM store_moves WHERE f_batch_id = ss.f_id AND f_doc <> p_doc_uuid);
-
-        DELETE FROM store_moves WHERE f_doc = p_doc_uuid;
-
-        DELETE ss
-        FROM store_stock ss
-        WHERE ss.f_qty_in = 0
-          AND ss.f_qty_left = 0
-          AND NOT EXISTS (SELECT 1 FROM store_moves sm WHERE sm.f_batch_id = ss.f_id);
-    END IF;
-
-    DELETE FROM store_user WHERE f_doc = p_doc_uuid;
-    DELETE FROM store_document WHERE f_id = p_doc_uuid;
-    RETURN JSON_COMPACT(JSON_OBJECT('status', 0, 'msg', 'ok'));
 END$$
 DELIMITER ;

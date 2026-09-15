@@ -84,8 +84,8 @@
     <name>C5Message</name>
     <message>
         <location filename="../Cafe5/c5message.cpp" line="158"/>
-        <source>Updater not found. Please download the update from the link.</source>
-        <translation>Модуль обновления не найден. Скачайте обновление по ссылке.</translation>
+        <source>Could not start the updater. Reinstall the application or run the setup from picasso.am.</source>
+        <translation>Не удалось запустить обновление. Переустановите программу или запустите setup с picasso.am.</translation>
     </message>
 </context>
 <context>

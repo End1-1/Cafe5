@@ -226,6 +226,8 @@ set(APP_SOURCES
     rabstracteditorreport.ui
     rworkstationsreport.ui
     dlgservicevalue.ui
+    dlgaxrestaurant.ui
+    dlgfiscalmachine.ui
     dlgsalarydishsales.ui
     c5revenuecashop.ui
     wdashboardsettings.ui
@@ -927,8 +929,12 @@ add_executable(OfficeN ${APP_SOURCES}
     dlginventoryblankstorepick.h dlginventoryblankstorepick.cpp dlginventoryblankstorepick.ui
     rworkstationsreport.h rworkstationsreport.cpp
     dlgservicevalue.h dlgservicevalue.cpp
+    dlgaxrestaurant.h dlgaxrestaurant.cpp
     dlgsalarydishsales.h dlgsalarydishsales.cpp
-    rservicevaluesreport.h rservicevaluesreport.cpp)
+    rservicevaluesreport.h rservicevaluesreport.cpp
+    raxrestaurantsreport.h raxrestaurantsreport.cpp
+    rfiscalmachinesreport.h rfiscalmachinesreport.cpp
+    dlgfiscalmachine.h dlgfiscalmachine.cpp)
 
 set_target_properties(OfficeN PROPERTIES
     UNITY_BUILD ON

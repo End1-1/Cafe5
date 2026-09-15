@@ -924,8 +924,8 @@
     </message>
     <message>
         <location filename="../Cafe5/c5dialog.cpp" line="162"/>
-        <source>Updater not found. Reinstall the application.</source>
-        <translation>Модуль обновления не найден. Переустановите приложение.</translation>
+        <source>Could not start the updater. Reinstall the application or run the setup from picasso.am.</source>
+        <translation>Не удалось запустить обновление. Переустановите программу или запустите setup с picasso.am.</translation>
     </message>
 </context>
 <context>
@@ -3450,9 +3450,9 @@
         <translation>Копировать</translation>
     </message>
     <message>
-        <location filename="../Cafe5/c5message.cpp" line="158"/>
-        <source>Updater not found. Please download the update from the link.</source>
-        <translation>Модуль обновления не найден. Скачайте обновление по ссылке.</translation>
+        <location filename="../Cafe5/c5message.cpp" line="163"/>
+        <source>Could not start the updater. Reinstall the application or run the setup from picasso.am.</source>
+        <translation>Не удалось запустить обновление. Переустановите программу или запустите setup с picasso.am.</translation>
     </message>
     <message>
         <location filename="../Reports/cr5goods.cpp" line="321"/>
@@ -7116,8 +7116,8 @@ MS Excel</translation>
     </message>
     <message>
         <location filename="../Classes/c5widget.cpp" line="192"/>
-        <source>Updater not found. Reinstall the application.</source>
-        <translation>Модуль обновления не найден. Переустановите приложение.</translation>
+        <source>Could not start the updater. Reinstall the application or run the setup from picasso.am.</source>
+        <translation>Не удалось запустить обновление. Переустановите программу или запустите setup с picasso.am.</translation>
     </message>
 </context>
 <context>
@@ -8137,7 +8137,7 @@ MS Excel</translation>
     </message>
     <message>
         <location filename="../Editors/ce5goods.ui" line="645"/>
-        <location filename="../Editors/ce5goods.ui" line="1711"/>
+        <location filename="../Editors/ce5goods.ui" line="1741"/>
         <source>Code</source>
         <translation>Код</translation>
     </message>
@@ -8545,160 +8545,165 @@ MS Excel</translation>
         <translation>Кол-во</translation>
     </message>
     <message>
-        <location filename="../Editors/ce5goods.ui" line="1751"/>
+        <location filename="../Editors/ce5goods.ui" line="1693"/>
+        <source>Store override</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../Editors/ce5goods.ui" line="1781"/>
         <source>Attributes</source>
         <translation>Атрибуты</translation>
     </message>
     <message>
-        <location filename="../Editors/ce5goods.ui" line="1757"/>
+        <location filename="../Editors/ce5goods.ui" line="1787"/>
         <source>Dietary / Allergen Badges</source>
         <translation>Диета / аллергены</translation>
     </message>
     <message>
-        <location filename="../Editors/ce5goods.ui" line="1763"/>
+        <location filename="../Editors/ce5goods.ui" line="1793"/>
         <source>Gluten-free</source>
         <translation>Без глютена</translation>
     </message>
     <message>
-        <location filename="../Editors/ce5goods.ui" line="1780"/>
+        <location filename="../Editors/ce5goods.ui" line="1810"/>
         <source>Vegetarian</source>
         <translation>Вегетарианское</translation>
     </message>
     <message>
-        <location filename="../Editors/ce5goods.ui" line="1797"/>
+        <location filename="../Editors/ce5goods.ui" line="1827"/>
         <source>Vegan</source>
         <translation>Веганское</translation>
     </message>
     <message>
-        <location filename="../Editors/ce5goods.ui" line="1814"/>
+        <location filename="../Editors/ce5goods.ui" line="1844"/>
         <source>No GMO</source>
         <translation>Без ГМО</translation>
     </message>
     <message>
-        <location filename="../Editors/ce5goods.ui" line="1831"/>
+        <location filename="../Editors/ce5goods.ui" line="1861"/>
         <source>Lactose-free</source>
         <translation>Без лактозы</translation>
     </message>
     <message>
-        <location filename="../Editors/ce5goods.ui" line="1848"/>
+        <location filename="../Editors/ce5goods.ui" line="1878"/>
         <source>Sugar-free</source>
         <translation>Без сахара</translation>
     </message>
     <message>
-        <location filename="../Editors/ce5goods.ui" line="1865"/>
+        <location filename="../Editors/ce5goods.ui" line="1895"/>
         <source>Contains nuts</source>
         <translation>Содержит орехи</translation>
     </message>
     <message>
-        <location filename="../Editors/ce5goods.ui" line="1882"/>
+        <location filename="../Editors/ce5goods.ui" line="1912"/>
         <source>Halal / Kosher</source>
         <translation>Халяль / Кошер</translation>
     </message>
     <message>
-        <location filename="../Editors/ce5goods.ui" line="1902"/>
+        <location filename="../Editors/ce5goods.ui" line="1932"/>
         <source>Additional attributes</source>
         <translation>Дополнительные атрибуты</translation>
     </message>
     <message>
-        <location filename="../Editors/ce5goods.ui" line="1908"/>
-        <location filename="../Editors/ce5goods.ui" line="1933"/>
-        <location filename="../Editors/ce5goods.cpp" line="394"/>
+        <location filename="../Editors/ce5goods.ui" line="1938"/>
+        <location filename="../Editors/ce5goods.ui" line="1963"/>
+        <location filename="../Editors/ce5goods.cpp" line="395"/>
         <source>Country</source>
         <translation>Страна</translation>
     </message>
     <message>
-        <location filename="../Editors/ce5goods.ui" line="1940"/>
-        <location filename="../Editors/ce5goods.ui" line="1965"/>
-        <location filename="../Editors/ce5goods.cpp" line="392"/>
+        <location filename="../Editors/ce5goods.ui" line="1970"/>
+        <location filename="../Editors/ce5goods.ui" line="1995"/>
+        <location filename="../Editors/ce5goods.cpp" line="393"/>
         <source>Ararix group</source>
         <translation>Группа Ararix</translation>
     </message>
     <message>
-        <location filename="../Editors/ce5goods.ui" line="1975"/>
+        <location filename="../Editors/ce5goods.ui" line="2005"/>
         <source>Macros / Nutrition (per 100 g)</source>
         <translation>БЖУ / пищевая ценность (на 100 г)</translation>
     </message>
     <message>
-        <location filename="../Editors/ce5goods.ui" line="1981"/>
+        <location filename="../Editors/ce5goods.ui" line="2011"/>
         <source>Calories, kcal</source>
         <translation>Калории, ккал</translation>
     </message>
     <message>
-        <location filename="../Editors/ce5goods.ui" line="1998"/>
+        <location filename="../Editors/ce5goods.ui" line="2028"/>
         <source>Protein, g</source>
         <translation>Белки, г</translation>
     </message>
     <message>
-        <location filename="../Editors/ce5goods.ui" line="2015"/>
+        <location filename="../Editors/ce5goods.ui" line="2045"/>
         <source>Fat, g</source>
         <translation>Жиры, г</translation>
     </message>
     <message>
-        <location filename="../Editors/ce5goods.ui" line="2032"/>
+        <location filename="../Editors/ce5goods.ui" line="2062"/>
         <source>Carbs, g</source>
         <translation>Углеводы, г</translation>
     </message>
     <message>
-        <location filename="../Editors/ce5goods.ui" line="2055"/>
+        <location filename="../Editors/ce5goods.ui" line="2085"/>
         <source>Dynamic attributes</source>
         <translation>Динамические атрибуты</translation>
     </message>
     <message>
-        <location filename="../Editors/ce5goods.ui" line="2065"/>
+        <location filename="../Editors/ce5goods.ui" line="2095"/>
         <source>Attribute</source>
         <translation>Атрибут</translation>
     </message>
     <message>
-        <location filename="../Editors/ce5goods.ui" line="2070"/>
+        <location filename="../Editors/ce5goods.ui" line="2100"/>
         <source>Value</source>
         <translation>Значение</translation>
     </message>
     <message>
-        <location filename="../Editors/ce5goods.ui" line="2075"/>
+        <location filename="../Editors/ce5goods.ui" line="2105"/>
         <source>Measurement</source>
         <translation>Измерение</translation>
     </message>
     <message>
-        <location filename="../Editors/ce5goods.ui" line="2091"/>
+        <location filename="../Editors/ce5goods.ui" line="2121"/>
         <source>Modificators</source>
         <translation>Модификаторы</translation>
     </message>
     <message>
-        <location filename="../Editors/ce5goods.ui" line="2168"/>
+        <location filename="../Editors/ce5goods.ui" line="2198"/>
         <source>Modificator name</source>
         <translation>Название модификатора</translation>
     </message>
     <message>
-        <location filename="../Editors/ce5goods.ui" line="2178"/>
+        <location filename="../Editors/ce5goods.ui" line="2208"/>
         <source>Required</source>
         <translation>Обязательно</translation>
     </message>
     <message>
-        <location filename="../Editors/ce5goods.ui" line="2206"/>
+        <location filename="../Editors/ce5goods.ui" line="2236"/>
         <source>Relations</source>
         <translation>Связи</translation>
     </message>
     <message>
-        <location filename="../Editors/ce5goods.ui" line="2212"/>
+        <location filename="../Editors/ce5goods.ui" line="2242"/>
         <source>Drinks</source>
         <translation>Напитки</translation>
     </message>
     <message>
-        <location filename="../Editors/ce5goods.ui" line="2274"/>
-        <location filename="../Editors/ce5goods.ui" line="2347"/>
+        <location filename="../Editors/ce5goods.ui" line="2304"/>
+        <location filename="../Editors/ce5goods.ui" line="2377"/>
         <source>Dish name</source>
         <translation>Название блюда</translation>
     </message>
     <message>
-        <location filename="../Editors/ce5goods.ui" line="2285"/>
+        <location filename="../Editors/ce5goods.ui" line="2315"/>
         <source>Others</source>
         <translation>Прочее</translation>
     </message>
     <message>
         <location filename="../Editors/ce5goods.ui" line="820"/>
         <location filename="../Editors/ce5goods.ui" line="1370"/>
-        <location filename="../Editors/ce5goods.ui" line="2080"/>
-        <location filename="../Editors/ce5goods.ui" line="2173"/>
+        <location filename="../Editors/ce5goods.ui" line="2110"/>
+        <location filename="../Editors/ce5goods.ui" line="2203"/>
         <source>Price</source>
         <translation>Цена</translation>
     </message>
@@ -8726,10 +8731,10 @@ MS Excel</translation>
     <message>
         <location filename="../Editors/ce5goods.ui" line="1477"/>
         <location filename="../Editors/ce5goods.ui" line="1492"/>
-        <location filename="../Editors/ce5goods.cpp" line="625"/>
-        <location filename="../Editors/ce5goods.cpp" line="972"/>
-        <location filename="../Editors/ce5goods.cpp" line="1533"/>
-        <location filename="../Editors/ce5goods.cpp" line="1580"/>
+        <location filename="../Editors/ce5goods.cpp" line="626"/>
+        <location filename="../Editors/ce5goods.cpp" line="975"/>
+        <location filename="../Editors/ce5goods.cpp" line="1542"/>
+        <location filename="../Editors/ce5goods.cpp" line="1589"/>
         <source>Image</source>
         <translation>Изображение</translation>
     </message>
@@ -8739,251 +8744,251 @@ MS Excel</translation>
         <translation>Параметры</translation>
     </message>
     <message>
-        <location filename="../Editors/ce5goods.ui" line="1515"/>
+        <location filename="../Editors/ce5goods.ui" line="1653"/>
         <source>Same store id</source>
         <translation>Тот же ID склада</translation>
     </message>
     <message>
-        <location filename="../Editors/ce5goods.ui" line="1601"/>
+        <location filename="../Editors/ce5goods.ui" line="1633"/>
         <source>Web link</source>
         <translation>Веб-ссылка</translation>
     </message>
     <message>
-        <location filename="../Editors/ce5goods.ui" line="1720"/>
-        <location filename="../Editors/ce5goods.ui" line="1737"/>
+        <location filename="../Editors/ce5goods.ui" line="1750"/>
+        <location filename="../Editors/ce5goods.ui" line="1767"/>
         <source>Barcode</source>
         <translation>Штрихкод</translation>
     </message>
     <message>
-        <location filename="../Editors/ce5goods.ui" line="1729"/>
+        <location filename="../Editors/ce5goods.ui" line="1759"/>
         <source>Gen barcode EAN8</source>
         <translation>Сгенерировать штрихкод EAN8</translation>
     </message>
     <message>
         <location filename="../Editors/ce5goods.ui" line="840"/>
-        <location filename="../Editors/ce5goods.ui" line="1742"/>
+        <location filename="../Editors/ce5goods.ui" line="1772"/>
         <source>X</source>
         <translation>X</translation>
     </message>
     <message>
-        <location filename="../Editors/ce5goods.ui" line="1673"/>
+        <location filename="../Editors/ce5goods.ui" line="1521"/>
         <source>f_weblink</source>
         <translation>f_weblink</translation>
     </message>
     <message>
-        <location filename="../Editors/ce5goods.ui" line="1628"/>
+        <location filename="../Editors/ce5goods.ui" line="1541"/>
         <source>Queue in list</source>
         <translation>Очередь в списке</translation>
     </message>
     <message>
-        <location filename="../Editors/ce5goods.ui" line="1657"/>
+        <location filename="../Editors/ce5goods.ui" line="1676"/>
         <source>f_queue</source>
         <translation>f_queue</translation>
     </message>
     <message>
-        <location filename="../Editors/ce5goods.ui" line="1562"/>
+        <location filename="../Editors/ce5goods.ui" line="1548"/>
         <source>Salary</source>
         <translation>Зарплата</translation>
     </message>
     <message>
-        <location filename="../Editors/ce5goods.ui" line="1568"/>
+        <location filename="../Editors/ce5goods.ui" line="1554"/>
         <source>Department</source>
         <translation>Отдел</translation>
     </message>
     <message>
-        <location filename="../Editors/ce5goods.ui" line="1575"/>
+        <location filename="../Editors/ce5goods.ui" line="1561"/>
         <source>Fixed value</source>
         <translation>Фиксированное значение</translation>
     </message>
     <message>
-        <location filename="../Editors/ce5goods.ui" line="1582"/>
+        <location filename="../Editors/ce5goods.ui" line="1568"/>
         <source>Percent value</source>
         <translation>Процентное значение</translation>
     </message>
     <message>
-        <location filename="../Editors/ce5goods.ui" line="1694"/>
+        <location filename="../Editors/ce5goods.ui" line="1724"/>
         <source>ArmSoft</source>
         <translation>ArmSoft</translation>
     </message>
     <message>
-        <location filename="../Editors/ce5goods.ui" line="1701"/>
-        <location filename="../Editors/ce5goods.ui" line="2163"/>
-        <location filename="../Editors/ce5goods.ui" line="2269"/>
-        <location filename="../Editors/ce5goods.ui" line="2342"/>
+        <location filename="../Editors/ce5goods.ui" line="1731"/>
+        <location filename="../Editors/ce5goods.ui" line="2193"/>
+        <location filename="../Editors/ce5goods.ui" line="2299"/>
+        <location filename="../Editors/ce5goods.ui" line="2372"/>
         <source>ID</source>
         <translation>ID</translation>
     </message>
     <message>
-        <location filename="../Editors/ce5goods.ui" line="1706"/>
+        <location filename="../Editors/ce5goods.ui" line="1736"/>
         <source>Database</source>
         <translation>База данных</translation>
     </message>
     <message>
-        <location filename="../Editors/ce5goods.ui" line="1542"/>
+        <location filename="../Editors/ce5goods.ui" line="1593"/>
         <source>f_storeid</source>
         <translation>f_storeid</translation>
     </message>
     <message>
-        <location filename="../Editors/ce5goods.ui" line="1522"/>
+        <location filename="../Editors/ce5goods.ui" line="1619"/>
         <source>Store output goods</source>
         <translation>Товары расхода склада</translation>
     </message>
     <message>
-        <location filename="../Editors/ce5goods.ui" line="1529"/>
+        <location filename="../Editors/ce5goods.ui" line="1686"/>
         <source>Only whole number</source>
         <translation>Только целое число</translation>
     </message>
     <message>
-        <location filename="../Editors/ce5goods.ui" line="1618"/>
+        <location filename="../Editors/ce5goods.ui" line="1643"/>
         <source>f_wholenumber</source>
         <translation>f_wholenumber</translation>
     </message>
     <message>
-        <location filename="../Editors/ce5goods.cpp" line="415"/>
+        <location filename="../Editors/ce5goods.cpp" line="416"/>
         <source>Sale price</source>
         <translation>Цена продажи</translation>
     </message>
     <message>
-        <location filename="../Editors/ce5goods.cpp" line="416"/>
+        <location filename="../Editors/ce5goods.cpp" line="417"/>
         <source>Whosale</source>
         <translation>Опт</translation>
     </message>
     <message>
-        <location filename="../Editors/ce5goods.cpp" line="417"/>
+        <location filename="../Editors/ce5goods.cpp" line="418"/>
         <source>Retail disc</source>
         <translation>Скидка розница</translation>
     </message>
     <message>
-        <location filename="../Editors/ce5goods.cpp" line="418"/>
+        <location filename="../Editors/ce5goods.cpp" line="419"/>
         <source>Whosale disc</source>
         <translation>Скидка опт</translation>
     </message>
     <message>
-        <location filename="../Editors/ce5goods.cpp" line="550"/>
+        <location filename="../Editors/ce5goods.cpp" line="551"/>
         <source>Goods</source>
         <translation>Товары</translation>
     </message>
     <message>
-        <location filename="../Editors/ce5goods.cpp" line="561"/>
+        <location filename="../Editors/ce5goods.cpp" line="562"/>
         <source>Duplicate scancode</source>
         <translation>Дубликат штрихкода</translation>
     </message>
     <message>
-        <location filename="../Editors/ce5goods.cpp" line="581"/>
+        <location filename="../Editors/ce5goods.cpp" line="582"/>
         <source>Goods code for store output cannot be undefined</source>
         <translation>Код товара для расхода не может быть пустым</translation>
     </message>
     <message>
-        <location filename="../Editors/ce5goods.cpp" line="586"/>
+        <location filename="../Editors/ce5goods.cpp" line="587"/>
         <source>Goods type must be selected</source>
         <translation>Выберите тип товара</translation>
     </message>
     <message>
-        <location filename="../Editors/ce5goods.cpp" line="714"/>
+        <location filename="../Editors/ce5goods.cpp" line="716"/>
         <source>Background color</source>
         <translation>Цвет фона</translation>
     </message>
     <message>
-        <location filename="../Editors/ce5goods.cpp" line="725"/>
+        <location filename="../Editors/ce5goods.cpp" line="727"/>
         <source>Print card</source>
         <translation>Печать карточки</translation>
     </message>
     <message>
-        <location filename="../Editors/ce5goods.cpp" line="1390"/>
+        <location filename="../Editors/ce5goods.cpp" line="1399"/>
         <source>Template not found</source>
         <translation>Шаблон не найден</translation>
     </message>
     <message>
-        <location filename="../Editors/ce5goods.cpp" line="1397"/>
+        <location filename="../Editors/ce5goods.cpp" line="1406"/>
         <source>Printed</source>
         <translation>Напечатано</translation>
     </message>
     <message>
-        <location filename="../Editors/ce5goods.cpp" line="1400"/>
+        <location filename="../Editors/ce5goods.cpp" line="1409"/>
         <source>Goods card</source>
         <translation>Карточка товара</translation>
     </message>
     <message>
-        <location filename="../Editors/ce5goods.cpp" line="1404"/>
+        <location filename="../Editors/ce5goods.cpp" line="1413"/>
         <source>Goods group</source>
         <translation>Группа товаров</translation>
     </message>
     <message>
-        <location filename="../Editors/ce5goods.cpp" line="1406"/>
+        <location filename="../Editors/ce5goods.cpp" line="1415"/>
         <source>Internal code</source>
         <translation>Внутренний код</translation>
     </message>
     <message>
-        <location filename="../Editors/ce5goods.cpp" line="1407"/>
+        <location filename="../Editors/ce5goods.cpp" line="1416"/>
         <source>Price type</source>
         <translation>Тип цены</translation>
     </message>
     <message>
-        <location filename="../Editors/ce5goods.cpp" line="1408"/>
+        <location filename="../Editors/ce5goods.cpp" line="1417"/>
         <source>Retail price</source>
         <translation>Розничная цена</translation>
     </message>
     <message>
-        <location filename="../Editors/ce5goods.cpp" line="1409"/>
+        <location filename="../Editors/ce5goods.cpp" line="1418"/>
         <source>Wholesale price</source>
         <translation>Оптовая цена</translation>
     </message>
     <message>
-        <location filename="../Editors/ce5goods.cpp" line="1418"/>
+        <location filename="../Editors/ce5goods.cpp" line="1427"/>
         <source>Complectation cost</source>
         <translation>Себестоимость комплектации</translation>
     </message>
     <message>
-        <location filename="../Editors/ce5goods.cpp" line="1542"/>
+        <location filename="../Editors/ce5goods.cpp" line="1551"/>
         <source>Could not load image</source>
         <translation>Не удалось загрузить изображение</translation>
     </message>
     <message>
-        <location filename="../Editors/ce5goods.cpp" line="1564"/>
+        <location filename="../Editors/ce5goods.cpp" line="1573"/>
         <source>Could not encode image</source>
         <translation>Не удалось закодировать изображение</translation>
     </message>
     <message>
-        <location filename="../Editors/ce5goods.cpp" line="1574"/>
-        <location filename="../Editors/ce5goods.cpp" line="1815"/>
+        <location filename="../Editors/ce5goods.cpp" line="1583"/>
+        <location filename="../Editors/ce5goods.cpp" line="1824"/>
         <source>Remove image</source>
         <translation>Удалить изображение</translation>
     </message>
     <message>
-        <location filename="../Editors/ce5goods.cpp" line="1586"/>
+        <location filename="../Editors/ce5goods.cpp" line="1595"/>
         <source>Scancode field must be empty</source>
         <translation>Поле штрихкода должно быть пустым</translation>
     </message>
     <message>
-        <location filename="../Editors/ce5goods.cpp" line="1814"/>
+        <location filename="../Editors/ce5goods.cpp" line="1823"/>
         <source>Upload image</source>
         <translation>Загрузить изображение</translation>
     </message>
     <message>
-        <location filename="../Editors/ce5goods.cpp" line="1889"/>
+        <location filename="../Editors/ce5goods.cpp" line="1898"/>
         <source>No barcode defined.</source>
         <translation>Штрихкод не задан.</translation>
     </message>
     <message>
-        <location filename="../Editors/ce5goods.cpp" line="1974"/>
+        <location filename="../Editors/ce5goods.cpp" line="1983"/>
         <source>Clear current data</source>
         <translation>Очистить текущие данные</translation>
     </message>
     <message>
-        <location filename="../Editors/ce5goods.cpp" line="2062"/>
+        <location filename="../Editors/ce5goods.cpp" line="2071"/>
         <source>This modificator is already added</source>
         <translation>Этот модификатор уже добавлен</translation>
     </message>
     <message>
-        <location filename="../Editors/ce5goods.cpp" line="2139"/>
+        <location filename="../Editors/ce5goods.cpp" line="2148"/>
         <source>This dish is already added</source>
         <translation>Это блюдо уже добавлено</translation>
     </message>
     <message>
-        <location filename="../Editors/ce5goods.cpp" line="1650"/>
-        <location filename="../Editors/ce5goods.cpp" line="2081"/>
-        <location filename="../Editors/ce5goods.cpp" line="2162"/>
-        <location filename="../Editors/ce5goods.cpp" line="2181"/>
+        <location filename="../Editors/ce5goods.cpp" line="1659"/>
+        <location filename="../Editors/ce5goods.cpp" line="2090"/>
+        <location filename="../Editors/ce5goods.cpp" line="2171"/>
+        <location filename="../Editors/ce5goods.cpp" line="2190"/>
         <source>Confirm to remove</source>
         <translation>Подтвердите удаление</translation>
     </message>
@@ -11289,7 +11294,7 @@ datetime</source>
     <message>
         <location filename="../Reports/cr5commonsalesfilter.ui" line="259"/>
         <source>Staff</source>
-        <translation>Сотрудник</translation>
+        <translation>Персонал</translation>
     </message>
     <message>
         <location filename="../Reports/cr5commonsalesfilter.ui" line="367"/>
@@ -15740,17 +15745,17 @@ settings</source>
     <message>
         <location filename="../Reports/cr5tables.cpp" line="59"/>
         <source>Cannot delete default table</source>
-        <translation>Нельзя удалить таблицу по умолчанию</translation>
+        <translation>Нельзя удалить стол по умолчанию</translation>
     </message>
     <message>
         <location filename="../Reports/cr5tables.cpp" line="63"/>
         <source>Delete selected table?</source>
-        <translation>Удалить выбранную таблицу?</translation>
+        <translation>Удалить выбранный стол?</translation>
     </message>
     <message>
         <location filename="../Reports/cr5tables.cpp" line="79"/>
         <source>Deleted</source>
-        <translation>Удалено</translation>
+        <translation>Удалён</translation>
     </message>
 </context>
 <context>
@@ -16213,6 +16218,106 @@ permissions</source>
     </message>
 </context>
 <context>
+    <name>DlgAxRestaurant</name>
+    <message>
+        <location filename="dlgaxrestaurant.ui" line="6"/>
+        <source>Restaurant</source>
+        <translation>Ресторан</translation>
+    </message>
+    <message>
+        <location filename="dlgaxrestaurant.ui" line="20"/>
+        <source>Name</source>
+        <translation>Наименование</translation>
+    </message>
+    <message>
+        <location filename="dlgaxrestaurant.ui" line="34"/>
+        <source>Score</source>
+        <translation>Оценка</translation>
+    </message>
+    <message>
+        <location filename="dlgaxrestaurant.ui" line="44"/>
+        <source>Category</source>
+        <translation>Категория</translation>
+    </message>
+    <message>
+        <location filename="dlgaxrestaurant.ui" line="58"/>
+        <location filename="dlgaxrestaurant.cpp" line="102"/>
+        <source>Image</source>
+        <translation>Изображение</translation>
+    </message>
+    <message>
+        <location filename="dlgaxrestaurant.ui" line="88"/>
+        <location filename="dlgaxrestaurant.cpp" line="73"/>
+        <source>No image</source>
+        <translation>Нет изображения</translation>
+    </message>
+    <message>
+        <location filename="dlgaxrestaurant.ui" line="97"/>
+        <source>Browse…</source>
+        <translation>Обзор…</translation>
+    </message>
+    <message>
+        <location filename="dlgaxrestaurant.ui" line="104"/>
+        <source>Clear</source>
+        <translation>Очистить</translation>
+    </message>
+    <message>
+        <location filename="dlgaxrestaurant.ui" line="126"/>
+        <source>Or paste image URL</source>
+        <translation>Или вставьте URL изображения</translation>
+    </message>
+    <message>
+        <location filename="dlgaxrestaurant.ui" line="138"/>
+        <source>Latitude</source>
+        <translation>Широта</translation>
+    </message>
+    <message>
+        <location filename="dlgaxrestaurant.ui" line="148"/>
+        <source>Longitude</source>
+        <translation>Долгота</translation>
+    </message>
+    <message>
+        <location filename="dlgaxrestaurant.ui" line="170"/>
+        <source>Delete</source>
+        <translation>Удалить</translation>
+    </message>
+    <message>
+        <location filename="dlgaxrestaurant.cpp" line="44"/>
+        <source>Edit restaurant</source>
+        <translation>Редактирование ресторана</translation>
+    </message>
+    <message>
+        <location filename="dlgaxrestaurant.cpp" line="44"/>
+        <source>New restaurant</source>
+        <translation>Новый ресторан</translation>
+    </message>
+    <message>
+        <location filename="dlgaxrestaurant.cpp" line="111"/>
+        <source>Could not load image</source>
+        <translation>Не удалось загрузить изображение</translation>
+    </message>
+    <message>
+        <location filename="dlgaxrestaurant.cpp" line="117"/>
+        <source>Could not encode image</source>
+        <translation>Не удалось закодировать изображение</translation>
+    </message>
+    <message>
+        <location filename="dlgaxrestaurant.cpp" line="182"/>
+        <source>Name is required</source>
+        <translation>Укажите название</translation>
+    </message>
+    <message>
+        <location filename="dlgaxrestaurant.cpp" line="189"/>
+        <source>Latitude and longitude must be set together</source>
+        <translation>Широта и долгота должны быть указаны вместе</translation>
+    </message>
+    <message>
+        <location filename="dlgaxrestaurant.cpp" line="231"/>
+        <source>Delete selected restaurant?</source>
+        <translation>Удалить выбранный ресторан?</translation>
+    </message>
+</context>
+<context>
     <name>DlgBarcodeLabelTemplate</name>
     <message>
         <location filename="../Forms/dlgbarcodelabeltemplate.ui" line="14"/>
@@ -16508,7 +16613,7 @@ permissions</source>
     </message>
     <message>
         <location filename="dlgdebtsredeem.ui" line="50"/>
-        <location filename="dlgdebtsredeem.cpp" line="34"/>
+        <location filename="dlgdebtsredeem.cpp" line="35"/>
         <source>Partner</source>
         <translation>Контрагент</translation>
     </message>
@@ -16524,7 +16629,7 @@ permissions</source>
     </message>
     <message>
         <location filename="dlgdebtsredeem.ui" line="145"/>
-        <location filename="dlgdebtsredeem.cpp" line="36"/>
+        <location filename="dlgdebtsredeem.cpp" line="37"/>
         <source>Cashbox</source>
         <translation>Касса</translation>
     </message>
@@ -16539,36 +16644,56 @@ permissions</source>
         <translation>Комментарий</translation>
     </message>
     <message>
-        <location filename="dlgdebtsredeem.cpp" line="28"/>
+        <location filename="dlgdebtsredeem.cpp" line="29"/>
         <source>Supplier debt (we owe)</source>
         <translation>Долг поставщику (мы должны)</translation>
     </message>
     <message>
-        <location filename="dlgdebtsredeem.cpp" line="29"/>
+        <location filename="dlgdebtsredeem.cpp" line="30"/>
         <source>Customer debt (they owe us)</source>
         <translation>Долг клиента (нам должны)</translation>
     </message>
     <message>
-        <location filename="dlgdebtsredeem.cpp" line="30"/>
+        <location filename="dlgdebtsredeem.cpp" line="31"/>
         <source>%1
 %2: %3</source>
         <translation>%1
 %2: %3</translation>
     </message>
     <message>
-        <location filename="dlgdebtsredeem.cpp" line="32"/>
+        <location filename="dlgdebtsredeem.cpp" line="33"/>
         <source>Currency id</source>
         <translation>ID валюты</translation>
     </message>
     <message>
-        <location filename="dlgdebtsredeem.cpp" line="92"/>
+        <location filename="dlgdebtsredeem.cpp" line="142"/>
         <source>Select partner</source>
         <translation>Выберите контрагента</translation>
     </message>
     <message>
-        <location filename="dlgdebtsredeem.cpp" line="96"/>
+        <location filename="dlgdebtsredeem.cpp" line="150"/>
         <source>Payment type not specified</source>
         <translation>Тип оплаты не указан</translation>
+    </message>
+    <message>
+        <location filename="dlgdebtsredeem.cpp" line="66"/>
+        <source>Edit debt payment</source>
+        <translation>Редактирование оплаты долга</translation>
+    </message>
+    <message>
+        <location filename="dlgdebtsredeem.cpp" line="146"/>
+        <source>Amount must be greater than zero</source>
+        <translation>Сумма должна быть больше нуля</translation>
+    </message>
+    <message>
+        <location filename="dlgdebtsredeem.cpp" line="161"/>
+        <source>Delete this debt payment?</source>
+        <translation>Удалить эту оплату долга?</translation>
+    </message>
+    <message>
+        <location filename="dlgdebtsredeem.ui" line="232"/>
+        <source>Delete</source>
+        <translation>Удалить</translation>
     </message>
 </context>
 <context>
@@ -16762,6 +16887,79 @@ permissions</source>
         <location filename="../Forms/dlgexportsaletoasoptions.ui" line="194"/>
         <source>Simple  item</source>
         <translation>Простая позиция</translation>
+    </message>
+</context>
+<context>
+    <name>DlgFiscalMachine</name>
+    <message>
+        <location filename="dlgfiscalmachine.ui" line="6"/>
+        <source>Fiscal machine</source>
+        <translation>Фискальный аппарат</translation>
+    </message>
+    <message>
+        <location filename="dlgfiscalmachine.ui" line="20"/>
+        <source>Name</source>
+        <translation>Наименование</translation>
+    </message>
+    <message>
+        <location filename="dlgfiscalmachine.ui" line="34"/>
+        <source>IP</source>
+        <translation>IP</translation>
+    </message>
+    <message>
+        <location filename="dlgfiscalmachine.ui" line="48"/>
+        <source>Port</source>
+        <translation>Порт</translation>
+    </message>
+    <message>
+        <location filename="dlgfiscalmachine.ui" line="62"/>
+        <source>Password</source>
+        <translation>Пароль</translation>
+    </message>
+    <message>
+        <location filename="dlgfiscalmachine.ui" line="79"/>
+        <source>Operator PIN</source>
+        <translation>PIN оператора</translation>
+    </message>
+    <message>
+        <location filename="dlgfiscalmachine.ui" line="93"/>
+        <source>Operator password</source>
+        <translation>Пароль оператора</translation>
+    </message>
+    <message>
+        <location filename="dlgfiscalmachine.ui" line="110"/>
+        <source>Default department</source>
+        <translation>Отдел по умолчанию</translation>
+    </message>
+    <message>
+        <location filename="dlgfiscalmachine.ui" line="130"/>
+        <source>External POS</source>
+        <translation>Внешний POS</translation>
+    </message>
+    <message>
+        <location filename="dlgfiscalmachine.ui" line="152"/>
+        <source>Delete</source>
+        <translation>Удалить</translation>
+    </message>
+    <message>
+        <location filename="dlgfiscalmachine.cpp" line="16"/>
+        <source>Edit fiscal machine</source>
+        <translation>Изменить фискальный аппарат</translation>
+    </message>
+    <message>
+        <location filename="dlgfiscalmachine.cpp" line="16"/>
+        <source>New fiscal machine</source>
+        <translation>Новый фискальный аппарат</translation>
+    </message>
+    <message>
+        <location filename="dlgfiscalmachine.cpp" line="67"/>
+        <source>Name is required</source>
+        <translation>Укажите наименование</translation>
+    </message>
+    <message>
+        <location filename="dlgfiscalmachine.cpp" line="100"/>
+        <source>Delete selected fiscal machine?</source>
+        <translation>Удалить выбранный фискальный аппарат?</translation>
     </message>
 </context>
 <context>
@@ -18403,12 +18601,12 @@ Lines: %6</source>
     <message>
         <location filename="../dictionaries/dict_goods_types.cpp" line="12"/>
         <source>Goods</source>
-        <translation>Товар</translation>
+        <translation>Товары</translation>
     </message>
     <message>
         <location filename="../dictionaries/dict_goods_types.cpp" line="13"/>
         <source>Dish</source>
-        <translation>Блюдо</translation>
+        <translation>Товар</translation>
     </message>
     <message>
         <location filename="../dictionaries/dict_goods_types.cpp" line="14"/>
@@ -18530,13 +18728,13 @@ Lines: %6</source>
 <context>
     <name>NInterface</name>
     <message>
-        <location filename="../NTable/ninterface.cpp" line="283"/>
-        <location filename="../NTable/ninterface.cpp" line="305"/>
+        <location filename="../NTable/ninterface.cpp" line="311"/>
+        <location filename="../NTable/ninterface.cpp" line="347"/>
         <source>Query</source>
         <translation>Запрос</translation>
     </message>
     <message>
-        <location filename="../NTable/ninterface.cpp" line="331"/>
+        <location filename="../NTable/ninterface.cpp" line="385"/>
         <source>Unauthorized</source>
         <translation>Нет авторизации</translation>
     </message>
@@ -18890,8 +19088,8 @@ Lines: %6</source>
         <translation>Цена</translation>
     </message>
     <message>
-        <location filename="../Editors/ce5goods.cpp" line="1309"/>
-        <location filename="../Editors/ce5goods.cpp" line="1356"/>
+        <location filename="../Editors/ce5goods.cpp" line="1318"/>
+        <location filename="../Editors/ce5goods.cpp" line="1365"/>
         <source>Complectation</source>
         <translation>Комплектация</translation>
     </message>
@@ -19075,165 +19273,173 @@ Lines: %6</source>
         <translation>Новая строка</translation>
     </message>
     <message>
-        <location filename="rabstracteditorreport.cpp" line="192"/>
+        <location filename="rabstracteditorreport.cpp" line="205"/>
         <source>New</source>
         <translation>Новый</translation>
     </message>
     <message>
-        <location filename="rabstracteditorreport.cpp" line="194"/>
+        <location filename="rabstracteditorreport.cpp" line="207"/>
         <source>Reload</source>
         <translation>Перезагрузить</translation>
     </message>
     <message>
-        <location filename="rabstracteditorreport.cpp" line="198"/>
+        <location filename="rabstracteditorreport.cpp" line="211"/>
         <source>Delete</source>
         <translation>Удалить</translation>
     </message>
     <message>
-        <location filename="rabstracteditorreport.cpp" line="200"/>
+        <location filename="rabstracteditorreport.cpp" line="213"/>
         <source>Parameters</source>
         <translation>Параметры</translation>
     </message>
     <message>
-        <location filename="rabstracteditorreport.cpp" line="204"/>
-        <location filename="rabstracteditorreport.cpp" line="500"/>
+        <location filename="rabstracteditorreport.cpp" line="217"/>
+        <location filename="rabstracteditorreport.cpp" line="524"/>
         <source>Columns</source>
         <translation>Столбцы</translation>
     </message>
     <message>
-        <location filename="rabstracteditorreport.cpp" line="206"/>
+        <location filename="rabstracteditorreport.cpp" line="219"/>
         <source>Export
 to Excel</source>
         <translation>Экспорт
 в Excel</translation>
     </message>
     <message>
-        <location filename="rabstracteditorreport.cpp" line="210"/>
+        <location filename="rabstracteditorreport.cpp" line="223"/>
         <source>Print blank</source>
         <translation>Печать бланка</translation>
     </message>
     <message>
-        <location filename="rabstracteditorreport.cpp" line="969"/>
+        <location filename="rabstracteditorreport.cpp" line="993"/>
         <source>Storage</source>
         <translation>Склад</translation>
     </message>
     <message>
-        <location filename="rabstracteditorreport.cpp" line="986"/>
+        <location filename="rabstracteditorreport.cpp" line="1010"/>
         <source>Inventory blank</source>
         <translation>Бланк инвентаризации</translation>
     </message>
     <message>
-        <location filename="rabstracteditorreport.cpp" line="326"/>
+        <location filename="rabstracteditorreport.cpp" line="339"/>
         <source>Store movement</source>
         <translation>Перемещение</translation>
     </message>
     <message>
-        <location filename="rabstracteditorreport.cpp" line="332"/>
+        <location filename="rabstracteditorreport.cpp" line="345"/>
         <source>Store complectation</source>
         <translation>Комплектация</translation>
     </message>
     <message>
-        <location filename="rabstracteditorreport.cpp" line="338"/>
-        <location filename="rabstracteditorreport.cpp" line="378"/>
+        <location filename="rabstracteditorreport.cpp" line="351"/>
+        <location filename="rabstracteditorreport.cpp" line="391"/>
         <source>Store input</source>
         <translation>Приход на склад</translation>
     </message>
     <message>
-        <location filename="rabstracteditorreport.cpp" line="344"/>
+        <location filename="rabstracteditorreport.cpp" line="357"/>
         <source>Store output</source>
         <translation>Расход со склада</translation>
     </message>
     <message>
-        <location filename="rabstracteditorreport.cpp" line="350"/>
+        <location filename="rabstracteditorreport.cpp" line="363"/>
         <source>Unsupported document type</source>
         <translation>Неподдерживаемый тип документа</translation>
     </message>
     <message>
-        <location filename="rabstracteditorreport.cpp" line="362"/>
+        <location filename="rabstracteditorreport.cpp" line="375"/>
         <source>Order</source>
         <translation>Заказ</translation>
     </message>
     <message>
-        <location filename="rabstracteditorreport.cpp" line="798"/>
+        <location filename="rabstracteditorreport.cpp" line="822"/>
         <source>Do you want to delete the selected document?</source>
         <translation>Удалить выбранный документ?</translation>
     </message>
     <message>
-        <location filename="rabstracteditorreport.cpp" line="825"/>
+        <location filename="rabstracteditorreport.cpp" line="849"/>
         <source>Select document type</source>
         <translation>Выберите тип документа</translation>
     </message>
     <message>
-        <location filename="rabstracteditorreport.cpp" line="826"/>
+        <location filename="rabstracteditorreport.cpp" line="850"/>
         <source>Accrual</source>
         <translation>Начисление</translation>
     </message>
     <message>
-        <location filename="rabstracteditorreport.cpp" line="827"/>
+        <location filename="rabstracteditorreport.cpp" line="851"/>
         <source>Cancel</source>
         <translation>Отмена</translation>
     </message>
     <message>
-        <location filename="rabstracteditorreport.cpp" line="828"/>
+        <location filename="rabstracteditorreport.cpp" line="852"/>
         <source>Payment</source>
         <translation>Оплата</translation>
     </message>
     <message>
-        <location filename="rabstracteditorreport.cpp" line="850"/>
+        <location filename="rabstracteditorreport.cpp" line="874"/>
         <source>No data to filter.</source>
         <translation>Нет данных для фильтра.</translation>
     </message>
     <message>
-        <location filename="rabstracteditorreport.cpp" line="864"/>
+        <location filename="rabstracteditorreport.cpp" line="888"/>
         <source>Filter: %1</source>
         <translation>Фильтр: %1</translation>
     </message>
     <message>
-        <location filename="rabstracteditorreport.cpp" line="872"/>
+        <location filename="rabstracteditorreport.cpp" line="896"/>
         <source>(empty)</source>
         <translation>(пусто)</translation>
     </message>
     <message>
-        <location filename="rabstracteditorreport.cpp" line="520"/>
-        <location filename="rabstracteditorreport.cpp" line="883"/>
+        <location filename="rabstracteditorreport.cpp" line="544"/>
+        <location filename="rabstracteditorreport.cpp" line="907"/>
         <source>All</source>
         <translation>Все</translation>
     </message>
     <message>
-        <location filename="rabstracteditorreport.cpp" line="521"/>
-        <location filename="rabstracteditorreport.cpp" line="884"/>
+        <location filename="rabstracteditorreport.cpp" line="545"/>
+        <location filename="rabstracteditorreport.cpp" line="908"/>
         <source>None</source>
         <translation>Нет</translation>
     </message>
     <message>
-        <location filename="rabstracteditorreport.cpp" line="522"/>
-        <location filename="rabstracteditorreport.cpp" line="885"/>
+        <location filename="rabstracteditorreport.cpp" line="546"/>
+        <location filename="rabstracteditorreport.cpp" line="909"/>
         <source>Reset</source>
         <translation>Сброс</translation>
     </message>
     <message>
-        <location filename="rabstracteditorreport.cpp" line="938"/>
-        <location filename="rabstracteditorreport.cpp" line="973"/>
-        <location filename="rabstracteditorreport.cpp" line="1003"/>
-        <location filename="rabstracteditorreport.cpp" line="1016"/>
-        <location filename="rabstracteditorreport.cpp" line="1021"/>
+        <location filename="rabstracteditorreport.cpp" line="962"/>
+        <location filename="rabstracteditorreport.cpp" line="997"/>
+        <location filename="rabstracteditorreport.cpp" line="1027"/>
+        <location filename="rabstracteditorreport.cpp" line="1040"/>
+        <location filename="rabstracteditorreport.cpp" line="1045"/>
         <source>Empty report!</source>
         <translation>Пустой отчёт!</translation>
     </message>
     <message>
-        <location filename="rabstracteditorreport.cpp" line="1086"/>
+        <location filename="rabstracteditorreport.cpp" line="1110"/>
         <source>Save Excel</source>
         <translation>Сохранить Excel</translation>
     </message>
     <message>
-        <location filename="rabstracteditorreport.cpp" line="1086"/>
+        <location filename="rabstracteditorreport.cpp" line="1110"/>
         <source>Excel (*.xlsx)</source>
         <translation>Excel (*.xlsx)</translation>
     </message>
     <message>
-        <location filename="rabstracteditorreport.cpp" line="1097"/>
+        <location filename="rabstracteditorreport.cpp" line="1121"/>
         <source>Could not save file</source>
         <translation>Не удалось сохранить файл</translation>
+    </message>
+</context>
+<context>
+    <name>RAxRestaurantsReport</name>
+    <message>
+        <location filename="raxrestaurantsreport.cpp" line="41"/>
+        <source>Delete selected restaurant?</source>
+        <translation>Удалить выбранный ресторан?</translation>
     </message>
 </context>
 <context>
@@ -19323,19 +19529,35 @@ Existing write-offs will be removed and sales will be posted again.</source>
 <context>
     <name>RDebts</name>
     <message>
-        <location filename="rdebts.cpp" line="26"/>
+        <location filename="rdebts.cpp" line="32"/>
         <source>Redeem debt</source>
         <translation>Погасить долг</translation>
     </message>
     <message>
-        <location filename="rdebts.cpp" line="47"/>
+        <location filename="rdebts.cpp" line="80"/>
+        <location filename="rdebts.cpp" line="94"/>
         <source>Select currency in parameters.</source>
         <translation>Выберите валюту в параметрах.</translation>
     </message>
     <message>
-        <location filename="rdebts.cpp" line="77"/>
+        <location filename="rdebts.cpp" line="124"/>
         <source>Redemption recorded.</source>
         <translation>Погашение записано.</translation>
+    </message>
+    <message>
+        <location filename="rdebts.cpp" line="146"/>
+        <source>Not found</source>
+        <translation>Не найдено</translation>
+    </message>
+    <message>
+        <location filename="rdebts.cpp" line="165"/>
+        <source>Debt payment deleted.</source>
+        <translation>Оплата долга удалена.</translation>
+    </message>
+    <message>
+        <location filename="rdebts.cpp" line="182"/>
+        <source>Debt payment updated.</source>
+        <translation>Оплата долга обновлена.</translation>
     </message>
 </context>
 <context>
@@ -19354,6 +19576,14 @@ Existing write-offs will be removed and sales will be posted again.</source>
         <location filename="rfilterdialog.ui" line="87"/>
         <source>Cancel</source>
         <translation>Отмена</translation>
+    </message>
+</context>
+<context>
+    <name>RFiscalMachinesReport</name>
+    <message>
+        <location filename="rfiscalmachinesreport.cpp" line="42"/>
+        <source>Delete selected fiscal machine?</source>
+        <translation>Удалить выбранный фискальный аппарат?</translation>
     </message>
 </context>
 <context>
@@ -19732,7 +19962,7 @@ Existing write-offs will be removed and sales will be posted again.</source>
     <message>
         <location filename="rwaiterorder.cpp" line="18"/>
         <source>Staff</source>
-        <translation>Сотрудник</translation>
+        <translation>Персонал</translation>
     </message>
 </context>
 <context>
@@ -19811,77 +20041,83 @@ Existing write-offs will be removed and sales will be posted again.</source>
 <context>
     <name>RWorkstationConfigShop</name>
     <message>
-        <location filename="rworkstationconfigshop.ui" line="67"/>
+        <location filename="rworkstationconfigshop.ui" line="70"/>
         <source>Cashbox id</source>
         <translation>ID кассы</translation>
     </message>
     <message>
-        <location filename="rworkstationconfigshop.ui" line="17"/>
+        <location filename="rworkstationconfigshop.ui" line="156"/>
         <source>Default hall id</source>
         <translation>ID зала по умолчанию</translation>
     </message>
     <message>
-        <location filename="rworkstationconfigshop.ui" line="54"/>
+        <location filename="rworkstationconfigshop.ui" line="30"/>
         <source>Receipt printer</source>
         <translation>Принтер чеков</translation>
     </message>
     <message>
-        <location filename="rworkstationconfigshop.ui" line="111"/>
-        <source>Fiscal machine id</source>
-        <translation>ID фискального аппарата</translation>
+        <location filename="rworkstationconfigshop.ui" line="23"/>
+        <source>Fiscal machine</source>
+        <oldsource>Fiscal machine id</oldsource>
+        <translation>Фискальный аппарат</translation>
     </message>
     <message>
-        <location filename="rworkstationconfigshop.ui" line="124"/>
+        <location filename="rworkstationconfigshop.ui" line="83"/>
         <source>Arcus server IP address</source>
         <translation>IP-адрес сервера Arcus</translation>
     </message>
     <message>
-        <location filename="rworkstationconfigshop.ui" line="160"/>
+        <location filename="rworkstationconfigshop.ui" line="119"/>
         <source>Assign Sale to Associate</source>
         <translation>Назначать продажу продавцу</translation>
     </message>
     <message>
-        <location filename="rworkstationconfigshop.ui" line="90"/>
+        <location filename="rworkstationconfigshop.ui" line="163"/>
         <source>Default store id</source>
         <translation>ID склада по умолчанию</translation>
     </message>
     <message>
-        <location filename="rworkstationconfigshop.ui" line="104"/>
+        <location filename="rworkstationconfigshop.ui" line="170"/>
+        <source>Receipt printer left and right margins</source>
+        <translation>Левый и правый отступы принтера чека</translation>
+    </message>
+    <message>
+        <location filename="rworkstationconfigshop.ui" line="149"/>
         <source>Card payment via arkus</source>
         <translation>Оплата картой через Arcus</translation>
     </message>
     <message>
-        <location filename="rworkstationconfigshop.ui" line="83"/>
+        <location filename="rworkstationconfigshop.ui" line="60"/>
         <source>Port</source>
         <translation>Порт</translation>
     </message>
     <message>
-        <location filename="rworkstationconfigshop.ui" line="153"/>
+        <location filename="rworkstationconfigshop.ui" line="47"/>
         <source>Arcus authorization</source>
         <translation>Авторизация Arcus</translation>
     </message>
     <message>
-        <location filename="rworkstationconfigshop.ui" line="33"/>
+        <location filename="rworkstationconfigshop.ui" line="142"/>
         <source>API key</source>
         <translation>API-ключ</translation>
     </message>
     <message>
-        <location filename="rworkstationconfigshop.ui" line="47"/>
+        <location filename="rworkstationconfigshop.ui" line="102"/>
         <source>Receipt phone</source>
         <translation>Телефон на чеке</translation>
     </message>
     <message>
-        <location filename="rworkstationconfigshop.ui" line="40"/>
+        <location filename="rworkstationconfigshop.ui" line="126"/>
         <source>Receipt without table</source>
         <translation>Чек без стола</translation>
     </message>
     <message>
-        <location filename="rworkstationconfigshop.ui" line="97"/>
+        <location filename="rworkstationconfigshop.ui" line="112"/>
         <source>Receipt without service hint</source>
         <translation>Чек без подсказки сервиса</translation>
     </message>
     <message>
-        <location filename="rworkstationconfigshop.ui" line="143"/>
+        <location filename="rworkstationconfigshop.ui" line="40"/>
         <source>Receipt without discount hint</source>
         <translation>Чек без подсказки скидки</translation>
     </message>
@@ -19900,8 +20136,9 @@ Existing write-offs will be removed and sales will be posted again.</source>
     </message>
     <message>
         <location filename="rworkstationconfigwaiter.ui" line="40"/>
-        <source>Fiscal machine id</source>
-        <translation>ID фискального аппарата</translation>
+        <source>Fiscal machine</source>
+        <oldsource>Fiscal machine id</oldsource>
+        <translation>Фискальный аппарат</translation>
     </message>
     <message>
         <location filename="rworkstationconfigwaiter.ui" line="50"/>
@@ -19964,7 +20201,12 @@ Existing write-offs will be removed and sales will be posted again.</source>
         <translation>Уведомления клиентов</translation>
     </message>
     <message>
-        <location filename="rworkstationconfigwaiter.ui" line="180"/>
+        <location filename="rworkstationconfigwaiter.ui" line="177"/>
+        <source>Precheck printer name</source>
+        <translation>Имя принтера пречека</translation>
+    </message>
+    <message>
+        <location filename="rworkstationconfigwaiter.ui" line="190"/>
         <source>Setup buttons (disable when checked)</source>
         <translation>Кнопки настройки (отключить при отметке)</translation>
     </message>
@@ -19977,12 +20219,23 @@ Existing write-offs will be removed and sales will be posted again.</source>
 <context>
     <name>RWorkstationConfigWidget</name>
     <message>
-        <location filename="rworkstationconfigwidget.cpp" line="42"/>
+        <location filename="rworkstationconfigwidget.cpp" line="43"/>
         <source>Station account</source>
         <translation>Учётная запись станции</translation>
     </message>
     <message>
-        <location filename="rworkstationconfigwidget.cpp" line="68"/>
+        <location filename="rworkstationconfigwidget.cpp" line="67"/>
+        <source>Not selected</source>
+        <translation>Не выбран</translation>
+    </message>
+    <message>
+        <location filename="rworkstationconfigwidget.cpp" line="85"/>
+        <location filename="rworkstationconfigwidget.cpp" line="97"/>
+        <source>Unknown (%1)</source>
+        <translation>Неизвестный (%1)</translation>
+    </message>
+    <message>
+        <location filename="rworkstationconfigwidget.cpp" line="124"/>
         <source>Saved</source>
         <translation>Сохранено</translation>
     </message>
@@ -19990,7 +20243,7 @@ Existing write-offs will be removed and sales will be posted again.</source>
 <context>
     <name>RWorkstationsListReport</name>
     <message>
-        <location filename="rworkstationsreport.cpp" line="55"/>
+        <location filename="rworkstationsreport.cpp" line="56"/>
         <source>Settings editor is not available for workstation type %1</source>
         <translation>Редактор настроек недоступен для типа рабочей станции %1</translation>
     </message>
@@ -20003,13 +20256,19 @@ Existing write-offs will be removed and sales will be posted again.</source>
         <translation>Форма</translation>
     </message>
     <message>
-        <location filename="rworkstationsreport.cpp" line="83"/>
+        <location filename="rworkstationsreport.cpp" line="84"/>
         <source>Workstations</source>
         <translation>Рабочие станции</translation>
     </message>
     <message>
-        <location filename="rworkstationsreport.cpp" line="85"/>
         <location filename="rworkstationsreport.cpp" line="86"/>
+        <location filename="rworkstationsreport.cpp" line="88"/>
+        <source>Fiscal machines</source>
+        <translation>Фискальные аппараты</translation>
+    </message>
+    <message>
+        <location filename="rworkstationsreport.cpp" line="90"/>
+        <location filename="rworkstationsreport.cpp" line="91"/>
         <source>Service values</source>
         <translation>Сервисные сборы</translation>
     </message>
@@ -20397,7 +20656,7 @@ Existing write-offs will be removed and sales will be posted again.</source>
     </message>
     <message>
         <location filename="wdashboard.ui" line="1044"/>
-        <location filename="wdashboard.cpp" line="142"/>
+        <location filename="wdashboard.cpp" line="143"/>
         <source>Workstations</source>
         <translation>Рабочие станции</translation>
     </message>
@@ -20423,8 +20682,8 @@ Existing write-offs will be removed and sales will be posted again.</source>
     </message>
     <message>
         <location filename="wdashboard.ui" line="720"/>
-        <location filename="wdashboard.cpp" line="146"/>
-        <location filename="wdashboard.cpp" line="150"/>
+        <location filename="wdashboard.cpp" line="147"/>
+        <location filename="wdashboard.cpp" line="151"/>
         <source>Cash sessions</source>
         <translation>Кассовые смены</translation>
     </message>
@@ -20436,7 +20695,7 @@ Existing write-offs will be removed and sales will be posted again.</source>
     </message>
     <message>
         <location filename="wdashboard.ui" line="743"/>
-        <location filename="wdashboard.cpp" line="204"/>
+        <location filename="wdashboard.cpp" line="205"/>
         <source>Sold items</source>
         <translation>Проданные позиции</translation>
     </message>
@@ -20447,7 +20706,7 @@ Existing write-offs will be removed and sales will be posted again.</source>
     </message>
     <message>
         <location filename="wdashboard.ui" line="766"/>
-        <location filename="wdashboard.cpp" line="208"/>
+        <location filename="wdashboard.cpp" line="209"/>
         <source>Consumed goods</source>
         <translation>Израсходованные товары</translation>
     </message>
@@ -20524,7 +20783,7 @@ Existing write-offs will be removed and sales will be posted again.</source>
     </message>
     <message>
         <location filename="wdashboard.ui" line="289"/>
-        <location filename="wdashboard.cpp" line="178"/>
+        <location filename="wdashboard.cpp" line="179"/>
         <source>Store moves</source>
         <translation>Перемещения склада</translation>
     </message>
@@ -20535,7 +20794,7 @@ Existing write-offs will be removed and sales will be posted again.</source>
     </message>
     <message>
         <location filename="wdashboard.ui" line="312"/>
-        <location filename="wdashboard.cpp" line="182"/>
+        <location filename="wdashboard.cpp" line="183"/>
         <source>Stock</source>
         <translation>Остаток</translation>
     </message>
@@ -20570,7 +20829,7 @@ Existing write-offs will be removed and sales will be posted again.</source>
         <translation>Касса</translation>
     </message>
     <message>
-        <location filename="wdashboard.cpp" line="212"/>
+        <location filename="wdashboard.cpp" line="213"/>
         <source>Revenue</source>
         <translation>Выручка</translation>
     </message>
@@ -20582,7 +20841,7 @@ Existing write-offs will be removed and sales will be posted again.</source>
     </message>
     <message>
         <location filename="wdashboard.ui" line="521"/>
-        <location filename="wdashboard.cpp" line="174"/>
+        <location filename="wdashboard.cpp" line="175"/>
         <source>Salary</source>
         <translation>Зарплата</translation>
     </message>
@@ -20593,13 +20852,13 @@ Existing write-offs will be removed and sales will be posted again.</source>
     </message>
     <message>
         <location filename="wdashboard.ui" line="544"/>
-        <location filename="wdashboard.cpp" line="266"/>
+        <location filename="wdashboard.cpp" line="267"/>
         <source>City ledger</source>
         <translation>Городской журнал</translation>
     </message>
     <message>
         <location filename="wdashboard.ui" line="567"/>
-        <location filename="wdashboard.cpp" line="276"/>
+        <location filename="wdashboard.cpp" line="277"/>
         <source>Summary</source>
         <translation>Итог</translation>
     </message>
@@ -20610,7 +20869,7 @@ Existing write-offs will be removed and sales will be posted again.</source>
     </message>
     <message>
         <location filename="wdashboard.ui" line="789"/>
-        <location filename="wdashboard.cpp" line="280"/>
+        <location filename="wdashboard.cpp" line="281"/>
         <source>Order in progress</source>
         <translation>Заказ в работе</translation>
     </message>
@@ -20622,7 +20881,7 @@ Existing write-offs will be removed and sales will be posted again.</source>
     <message>
         <location filename="wdashboard.ui" line="929"/>
         <source>Staff</source>
-        <translation>Сотрудник</translation>
+        <translation>Персонал</translation>
     </message>
     <message>
         <location filename="wdashboard.ui" line="936"/>
@@ -20670,94 +20929,105 @@ Existing write-offs will be removed and sales will be posted again.</source>
         <translation>form_tables</translation>
     </message>
     <message>
-        <location filename="wdashboard.ui" line="1165"/>
-        <location filename="wdashboard.ui" line="1184"/>
+        <location filename="wdashboard.ui" line="1067"/>
+        <location filename="wdashboard.cpp" line="285"/>
+        <source>AX Restaurants</source>
+        <translation>Рестораны Ararix</translation>
+    </message>
+    <message>
+        <location filename="wdashboard.ui" line="1074"/>
+        <source>form_ax_restaurants</source>
+        <translation>form_ax_restaurants</translation>
+    </message>
+    <message>
+        <location filename="wdashboard.ui" line="1188"/>
+        <location filename="wdashboard.ui" line="1207"/>
         <source>Goods</source>
         <translation>Товары</translation>
     </message>
     <message>
-        <location filename="wdashboard.ui" line="1191"/>
+        <location filename="wdashboard.ui" line="1214"/>
         <source>form_goods</source>
         <translation>form_goods</translation>
     </message>
     <message>
-        <location filename="wdashboard.ui" line="1207"/>
+        <location filename="wdashboard.ui" line="1230"/>
         <source>Menu</source>
         <translation>Меню</translation>
     </message>
     <message>
-        <location filename="wdashboard.ui" line="1214"/>
+        <location filename="wdashboard.ui" line="1237"/>
         <source>form_menu</source>
         <translation>form_menu</translation>
     </message>
     <message>
-        <location filename="wdashboard.ui" line="1230"/>
+        <location filename="wdashboard.ui" line="1253"/>
         <source>Group of goods</source>
         <translation>Группа товаров</translation>
     </message>
     <message>
-        <location filename="wdashboard.ui" line="1237"/>
+        <location filename="wdashboard.ui" line="1260"/>
         <source>form_groups_of_goods</source>
         <translation>form_groups_of_goods</translation>
     </message>
     <message>
-        <location filename="wdashboard.ui" line="1253"/>
+        <location filename="wdashboard.ui" line="1276"/>
         <source>Unit</source>
         <translation>Ед. изм.</translation>
     </message>
     <message>
-        <location filename="wdashboard.ui" line="1260"/>
+        <location filename="wdashboard.ui" line="1283"/>
         <source>form_goods_units</source>
         <translation>form_goods_units</translation>
     </message>
     <message>
-        <location filename="wdashboard.cpp" line="39"/>
+        <location filename="wdashboard.cpp" line="40"/>
         <source>Dashboard</source>
         <translation>Панель управления</translation>
     </message>
     <message>
-        <location filename="wdashboard.cpp" line="62"/>
+        <location filename="wdashboard.cpp" line="63"/>
         <source>Settings</source>
         <translation>Настройки</translation>
     </message>
     <message>
-        <location filename="wdashboard.cpp" line="154"/>
+        <location filename="wdashboard.cpp" line="155"/>
         <source>Store input</source>
         <translation>Приход на склад</translation>
     </message>
     <message>
-        <location filename="wdashboard.cpp" line="158"/>
+        <location filename="wdashboard.cpp" line="159"/>
         <source>Store output</source>
         <translation>Расход со склада</translation>
     </message>
     <message>
-        <location filename="wdashboard.cpp" line="162"/>
+        <location filename="wdashboard.cpp" line="163"/>
         <source>Store movement</source>
         <translation>Перемещение</translation>
     </message>
     <message>
-        <location filename="wdashboard.cpp" line="166"/>
+        <location filename="wdashboard.cpp" line="167"/>
         <source>Store complectation</source>
         <translation>Комплектация</translation>
     </message>
     <message>
-        <location filename="wdashboard.cpp" line="170"/>
+        <location filename="wdashboard.cpp" line="171"/>
         <source>Store documents</source>
         <translation>Складские документы</translation>
     </message>
     <message>
-        <location filename="wdashboard.cpp" line="186"/>
+        <location filename="wdashboard.cpp" line="187"/>
         <source>Store inventory</source>
         <translation>Инвентаризация</translation>
     </message>
     <message>
-        <location filename="wdashboard.cpp" line="196"/>
-        <location filename="wdashboard.cpp" line="200"/>
+        <location filename="wdashboard.cpp" line="197"/>
+        <location filename="wdashboard.cpp" line="201"/>
         <source>Inventory</source>
         <translation>Инвентаризация</translation>
     </message>
     <message>
-        <location filename="wdashboard.cpp" line="216"/>
+        <location filename="wdashboard.cpp" line="217"/>
         <source>Menu review</source>
         <translation>Обзор меню</translation>
     </message>
@@ -20916,7 +21186,7 @@ Existing write-offs will be removed and sales will be posted again.</source>
     <message>
         <location filename="worderinspector.ui" line="186"/>
         <source>Staff</source>
-        <translation>Сотрудник</translation>
+        <translation>Персонал</translation>
     </message>
     <message>
         <location filename="worderinspector.ui" line="200"/>
@@ -20962,7 +21232,7 @@ Existing write-offs will be removed and sales will be posted again.</source>
     <message>
         <location filename="worderinspector.ui" line="300"/>
         <location filename="worderinspector.ui" line="390"/>
-        <location filename="worderinspector.cpp" line="452"/>
+        <location filename="worderinspector.cpp" line="509"/>
         <source>Total</source>
         <translation>Итого</translation>
     </message>
@@ -21067,66 +21337,100 @@ Existing write-offs will be removed and sales will be posted again.</source>
         <translation>Сырой заказ</translation>
     </message>
     <message>
-        <location filename="worderinspector.cpp" line="249"/>
+        <location filename="worderinspector.cpp" line="306"/>
         <source>Open</source>
         <translation>Открыть</translation>
     </message>
     <message>
-        <location filename="worderinspector.cpp" line="81"/>
-        <location filename="worderinspector.cpp" line="251"/>
+        <location filename="worderinspector.cpp" line="87"/>
+        <location filename="worderinspector.cpp" line="308"/>
         <source>Closed</source>
         <translation>Закрыта</translation>
     </message>
     <message>
-        <location filename="worderinspector.cpp" line="27"/>
+        <location filename="worderinspector.cpp" line="33"/>
         <source>Accepted</source>
         <translation>Принято</translation>
     </message>
     <message>
-        <location filename="worderinspector.cpp" line="29"/>
+        <location filename="worderinspector.cpp" line="35"/>
         <source>Cooking</source>
         <translation>Готовится</translation>
     </message>
     <message>
-        <location filename="worderinspector.cpp" line="31"/>
+        <location filename="worderinspector.cpp" line="37"/>
         <source>Ready</source>
         <translation>Готово</translation>
     </message>
     <message>
-        <location filename="worderinspector.cpp" line="33"/>
+        <location filename="worderinspector.cpp" line="39"/>
         <source>Served</source>
         <translation>Отдано</translation>
     </message>
     <message>
-        <location filename="worderinspector.cpp" line="74"/>
-        <location filename="worderinspector.cpp" line="110"/>
+        <location filename="worderinspector.cpp" line="80"/>
+        <location filename="worderinspector.cpp" line="116"/>
         <source>—</source>
         <translation>—</translation>
     </message>
     <message>
-        <location filename="worderinspector.cpp" line="253"/>
+        <location filename="worderinspector.cpp" line="310"/>
         <source>Empty</source>
         <translation>Пусто</translation>
     </message>
     <message>
-        <location filename="worderinspector.cpp" line="255"/>
+        <location filename="worderinspector.cpp" line="312"/>
         <source>Moved</source>
         <translation>Перемещено</translation>
     </message>
     <message>
-        <location filename="worderinspector.cpp" line="257"/>
+        <location filename="worderinspector.cpp" line="314"/>
         <source>Preorder</source>
         <translation>Предзаказ</translation>
     </message>
     <message>
-        <location filename="worderinspector.cpp" line="259"/>
+        <location filename="worderinspector.cpp" line="316"/>
         <source>State %1</source>
         <translation>Состояние %1</translation>
     </message>
     <message>
-        <location filename="worderinspector.cpp" line="303"/>
+        <location filename="worderinspector.cpp" line="360"/>
         <source>Yes</source>
         <translation>Да</translation>
+    </message>
+    <message>
+        <location filename="worderinspector.cpp" line="158"/>
+        <source>Delete sale
+permanently</source>
+        <translation>Удалить продажу
+навсегда</translation>
+    </message>
+    <message>
+        <location filename="worderinspector.cpp" line="169"/>
+        <source>Access denied</source>
+        <translation>Доступ запрещён</translation>
+    </message>
+    <message>
+        <location filename="worderinspector.cpp" line="174"/>
+        <source>Order id is required</source>
+        <translation>Требуется id заказа</translation>
+    </message>
+    <message>
+        <location filename="worderinspector.cpp" line="178"/>
+        <source>Permanently delete this sale and all related data from the database?
+This cannot be undone.</source>
+        <translation>Навсегда удалить эту продажу и все связанные данные из базы?
+Это действие нельзя отменить.</translation>
+    </message>
+    <message>
+        <location filename="worderinspector.cpp" line="182"/>
+        <source>Confirm permanent deletion of sale %1?</source>
+        <translation>Подтвердить безвозвратное удаление продажи %1?</translation>
+    </message>
+    <message>
+        <location filename="worderinspector.cpp" line="196"/>
+        <source>Sale permanently deleted.</source>
+        <translation>Продажа безвозвратно удалена.</translation>
     </message>
 </context>
 <context>

@@ -124,28 +124,6 @@ bool isCustomerDisplayDishType(int type)
     }
 }
 
-double customerDisplayLineAmount(const WaiterDish &dish, int orderState)
-{
-    const bool isPreorder = (orderState == ORDER_STATE_PREORDER);
-
-    if(isPreorder || dish.isPrinted()) {
-        return dish.total(isPreorder);
-    }
-
-    double base = dish.qty * dish.price;
-    double delta = 0;
-
-    if(dish.countService()) {
-        delta += dish.serviceFactor();
-    }
-
-    if(dish.countDiscount()) {
-        delta -= qAbs(dish.discountFactor());
-    }
-
-    return base * (1.0 + delta);
-}
-
 FiscalMachine fiscalMachineForWorkstation(const WorkstationItem &ws)
 {
     return getFiscalMachine(ws.fiscalMachineId());
@@ -1048,7 +1026,7 @@ void DlgOrder::printPrecheck(const QString &currentStaff)
         p.ltext(name, sideMarginMm, nameWidthMm);
         p.ltext(float_str(dish.qty, 2), 33, 8);
         p.ltext(float_str(dish.price, 2), 41, 12);
-        p.rtext(float_str(dish.total(mOrder.state == ORDER_STATE_PREORDER), 2));
+        p.rtext(float_str(dish.lineSubtotal(mOrder.state == ORDER_STATE_PREORDER), 2));
         p.br();
         p.br(2);
         p.line();
@@ -1081,10 +1059,12 @@ void DlgOrder::printPrecheck(const QString &currentStaff)
     p.rtext(float_str(mOrder.subTotal(), 2));
     p.br();
 
-    if (mOrder.serviceFactor() > 0) {
+    if (mOrder.serviceFactor() > 0 || mOrder.serviceAmount() > 0.0001) {
         const QString serviceComment = mOrder.data.value(QStringLiteral("f_service_comment")).toString().trimmed();
         p.ltext(serviceComment.isEmpty() ? tr("Service") : serviceComment, sideMarginMm);
-        p.rtext("+" + float_str(mOrder.serviceFactor() * 100, 2) + "%");
+        p.rtext(QString("+%1%  %2")
+                    .arg(float_str(mOrder.serviceFactor() * 100, 2),
+                         float_str(mOrder.serviceAmount(), 2)));
         p.br();
     }
 
@@ -3325,10 +3305,17 @@ void DlgOrder::parseOrder(const QJsonObject & jdoc)
 
     ui->lbSubtotal->setText(QString("%1 %2").arg(float_str(mOrder.subTotal(), 2), CURRENCY_SHORT));
     ui->lbServiceFeeName->setText(QString("%1 %2%").arg(tr("Service fee"), float_str(mOrder.serviceFactor() * 100, 2)));
-    ui->lbServiceFee->setText(QString("%1 %2").arg(float_str(mOrder.serviceAmount(), 2), CURRENCY_SHORT));
-    ui->lbDiscountFeeName->setText(QString("%1 %2%").arg(tr("Discount fee"), float_str(mOrder.discountFactor() * 100, 2)));
-    ui->lbDiscount->setText(QString("%1 %2").arg(float_str(mOrder.discountAmount(), 2), CURRENCY_SHORT));
-    ui->lbTotalDue->setText(QString("%1 %2").arg(float_str(orderDisplayTotalDue(), 2), CURRENCY_SHORT));
+    {
+        const bool bistro = isBistroMode();
+        const WaiterOrderCalculatedAmounts calc = bistro ? mOrder.calculatedAmounts(true)
+                                                         : WaiterOrderCalculatedAmounts{};
+        const double serviceAmt = bistro ? calc.serviceAmount : mOrder.serviceAmount();
+        const double discountAmt = bistro ? calc.discountAmount : mOrder.discountAmount();
+        ui->lbServiceFee->setText(QString("%1 %2").arg(float_str(serviceAmt, 2), CURRENCY_SHORT));
+        ui->lbDiscountFeeName->setText(QString("%1 %2%").arg(tr("Discount fee"), float_str(mOrder.discountFactor() * 100, 2)));
+        ui->lbDiscount->setText(QString("%1 %2").arg(float_str(discountAmt, 2), CURRENCY_SHORT));
+        ui->lbTotalDue->setText(QString("%1 %2").arg(float_str(orderDisplayTotalDue(), 2), CURRENCY_SHORT));
+    }
     QDateTime startQuery = QDateTime::fromString(jdoc["query_start"].toString(), "yyyy-MM-dd HH:mm:ss.zzz");
     QJsonObject jtax = mOrder.fiscal();
 
@@ -4459,8 +4446,6 @@ void DlgOrder::updateCustomerDisplay()
 
     const bool bistro = isBistroMode();
     const bool isPreorder = (mOrder.state == ORDER_STATE_PREORDER);
-    const double orderServiceFactor = mOrder.serviceFactor();
-    const double orderDiscountFactor = qAbs(mOrder.discountFactor());
     const WaiterOrderCalculatedAmounts bistroAmounts = bistro ? mOrder.calculatedAmounts(true)
                                                               : WaiterOrderCalculatedAmounts{};
 
@@ -4471,9 +4456,7 @@ void DlgOrder::updateCustomerDisplay()
             continue;
         }
 
-        const double lineAmount = bistro
-                                      ? dish.lineAmount(isPreorder, true, orderServiceFactor, orderDiscountFactor)
-                                      : customerDisplayLineAmount(dish, mOrder.state);
+        const double lineAmount = dish.lineSubtotal(isPreorder, bistro);
 
         CustDisplayLine line;
         line.name = dish.dishName.trimmed().isEmpty() ? dish.translated() : dish.dishName;

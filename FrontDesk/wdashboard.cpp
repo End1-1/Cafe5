@@ -27,6 +27,7 @@
 #include "rorderinprogress.h"
 #include "rtotalreviewreport.h"
 #include "rworkstationsreport.h"
+#include "raxrestaurantsreport.h"
 #include "ui_wdashboard.h"
 #include "wdashboardsettings.h"
 
@@ -278,6 +279,10 @@ QWidget* WDashboard::createForm(const QString &name, QIcon icon)
 
     if (name == "form_order_in_progress") {
         return new ROrderInProgress(tr("Order in progress"), icon, name);
+    }
+
+    if (name == "form_ax_restaurants") {
+        return new RAxRestaurantsReport(tr("AX Restaurants"), icon, name);
     }
 
     Q_ASSERT_X(false, "check name", QString("NO WIDGET NAMED %1 ").arg(name).toLatin1());

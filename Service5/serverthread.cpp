@@ -389,6 +389,42 @@ QString ServerThread::updateHotelCache(const QJsonObject &jdoc)
     return QJsonDocument(QJsonObject{{"errorCode", 0}}).toJson(QJsonDocument::Compact);
 }
 
+QString ServerThread::broadcastSiteSalePrint(const QJsonObject &jdoc)
+{
+    QJsonObject payload = jdoc;
+    payload.insert(QStringLiteral("command"), QStringLiteral("site_sale_print"));
+    const QString out = QString::fromUtf8(QJsonDocument(payload).toJson(QJsonDocument::Compact));
+    const QString database = jdoc.value(QStringLiteral("database")).toString();
+
+    QList<QPointer<QWebSocket>> targets;
+    {
+        QMutexLocker ml(&mSocketMutex);
+        for (const SocketStruct &ss : qAsConst(fSockets)) {
+            if (!ss.socket || ss.tenantId.isEmpty()) {
+                continue;
+            }
+            if (!database.isEmpty()
+                && ss.databaseName.compare(database, Qt::CaseInsensitive) != 0) {
+                continue;
+            }
+            targets.append(QPointer<QWebSocket>(ss.socket));
+        }
+    }
+
+    for (const QPointer<QWebSocket> &ws : targets) {
+        if (!ws) {
+            continue;
+        }
+        QMetaObject::invokeMethod(ws, [ws, out]() {
+            if (ws) {
+                ws->sendTextMessage(out);
+            }
+        }, Qt::QueuedConnection);
+    }
+
+    return QJsonDocument(QJsonObject{{"errorCode", 0}}).toJson(QJsonDocument::Compact);
+}
+
 QString ServerThread::armsoft(const QJsonObject &jdoc)
 {
     ArmSoft as(jdoc["params"].toObject());
@@ -591,6 +627,8 @@ void ServerThread::handleCommand(SocketStruct ws, const QJsonObject &jdoc, QStri
             repMsg = getConnection(jdoc);
         } else if (command == "hotel_cache_update") {
             repMsg = updateHotelCache(jdoc);
+        } else if (command == "site_sale_print") {
+            repMsg = broadcastSiteSalePrint(jdoc);
         } else if (command == "search_engine_reload") {
             for (auto it = mDatabases.constBegin(); it != mDatabases.constEnd(); ++it) {
                 C5SearchEngine::init(it.value(), it.key());

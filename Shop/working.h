@@ -3,6 +3,8 @@
 
 #include <QJsonObject>
 #include <QPixmap>
+#include <QSet>
+#include <QStringList>
 #include <functional>
 #include "c5shopdialog.h"
 
@@ -92,6 +94,9 @@ public slots:
     void getGoods(int id, const QString &scancode, double stockQty = -1);
 
 private slots:
+    void on_btnServiceCheck_clicked();
+
+private slots:
     void on_btnProgressWindow_clicked();
 
 private slots:
@@ -138,11 +143,23 @@ private:
 
     void printDifferenceAct(const QJsonObject &cashbox);
 
+    /** Site sales: print receipt duplicate + service check, then mark f_state=2. */
+    void enqueueSiteSalePrint(const QString &orderId);
+    void fetchPendingSitePrints();
+    void processSitePrintQueue();
+    void printSiteSale(const QString &orderId);
+    void printSiteServiceCheck(const QJsonObject &jdoc);
+    void finishSiteSalePrint(const QString &orderId);
+
     int mCashSessionId = 0;
 
     QJsonObject mCashboxSessionData;
 
     QList<int> mShopTableIds;
+
+    QStringList mSitePrintQueue;
+    QSet<QString> mSitePrintInProgress;
+    bool mSitePrintBusy = false;
 
     void loadShopTables(std::function<void()> next);
 
@@ -150,6 +167,8 @@ private slots:
     void orderSaved(QWidget* w);
 
     void timeout();
+
+    void onWsTextMessage(const QString &message);
 
     void onCtrlI();
 

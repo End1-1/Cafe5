@@ -7,44 +7,20 @@
     <x>0</x>
     <y>0</y>
     <width>439</width>
-    <height>302</height>
+    <height>324</height>
    </rect>
   </property>
   <layout class="QGridLayout" name="gridLayout">
-   <item row="1" column="0">
-    <widget class="QLabel" name="labelHall">
+   <item row="4" column="1" colspan="2">
+    <widget class="QLineEdit" name="leReceiptPhone"/>
+   </item>
+   <item row="10" column="1">
+    <widget class="QCheckBox" name="chReceiptNoDiscountHint"/>
+   </item>
+   <item row="2" column="0">
+    <widget class="QLabel" name="labelFiscal">
      <property name="text">
-      <string>Default hall id</string>
-     </property>
-    </widget>
-   </item>
-   <item row="7" column="1">
-    <widget class="QCheckBox" name="chReceiptNoTable"/>
-   </item>
-   <item row="11" column="1" colspan="2">
-    <widget class="QLineEdit" name="leArcusKey">
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-       <horstretch>1</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
-     </property>
-     <property name="placeholderText">
-      <string>API key</string>
-     </property>
-    </widget>
-   </item>
-   <item row="7" column="0">
-    <widget class="QLabel" name="labelNoTable">
-     <property name="text">
-      <string>Receipt without table</string>
-     </property>
-    </widget>
-   </item>
-   <item row="4" column="0">
-    <widget class="QLabel" name="labelPhone">
-     <property name="text">
-      <string>Receipt phone</string>
+      <string>Fiscal machine</string>
      </property>
     </widget>
    </item>
@@ -55,23 +31,24 @@
      </property>
     </widget>
    </item>
-   <item row="5" column="1" colspan="2">
-    <widget class="QLineEdit" name="leReceiptPrinter"/>
-   </item>
-   <item row="8" column="1">
-    <widget class="QCheckBox" name="chReceiptNoServiceHint"/>
-   </item>
-   <item row="0" column="0">
-    <widget class="QLabel" name="labelCashbox">
-     <property name="text">
-      <string>Cashbox id</string>
-     </property>
-    </widget>
-   </item>
    <item row="1" column="1" colspan="2">
     <widget class="QLineEdit" name="leHallId"/>
    </item>
-   <item row="10" column="2">
+   <item row="10" column="0">
+    <widget class="QLabel" name="labelNoDiscount">
+     <property name="text">
+      <string>Receipt without discount hint</string>
+     </property>
+    </widget>
+   </item>
+   <item row="12" column="0">
+    <widget class="QLabel" name="labelNoDiscount_3">
+     <property name="text">
+      <string>Arcus authorization</string>
+     </property>
+    </widget>
+   </item>
+   <item row="11" column="2">
     <widget class="QLineEdit" name="leArcusPort">
      <property name="maximumSize">
       <size>
@@ -84,35 +61,17 @@
      </property>
     </widget>
    </item>
-   <item row="3" column="0">
-    <widget class="QLabel" name="labelStore">
+   <item row="0" column="1" colspan="2">
+    <widget class="QLineEdit" name="leCashboxId"/>
+   </item>
+   <item row="0" column="0">
+    <widget class="QLabel" name="labelCashbox">
      <property name="text">
-      <string>Default store id</string>
+      <string>Cashbox id</string>
      </property>
     </widget>
    </item>
-   <item row="8" column="0">
-    <widget class="QLabel" name="labelNoService">
-     <property name="text">
-      <string>Receipt without service hint</string>
-     </property>
-    </widget>
-   </item>
-   <item row="10" column="0">
-    <widget class="QLabel" name="labelNoDiscount_2">
-     <property name="text">
-      <string>Card payment via arkus</string>
-     </property>
-    </widget>
-   </item>
-   <item row="2" column="0">
-    <widget class="QLabel" name="labelFiscal">
-     <property name="text">
-      <string>Fiscal machine id</string>
-     </property>
-    </widget>
-   </item>
-   <item row="10" column="1">
+   <item row="11" column="1">
     <widget class="QLineEdit" name="leArcustAddress">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
@@ -125,44 +84,95 @@
      </property>
     </widget>
    </item>
-   <item row="9" column="1">
-    <widget class="QCheckBox" name="chReceiptNoDiscountHint"/>
+   <item row="8" column="1">
+    <widget class="QCheckBox" name="chReceiptNoTable"/>
    </item>
-   <item row="2" column="1" colspan="2">
-    <widget class="QLineEdit" name="leFiscalId"/>
+   <item row="5" column="1" colspan="2">
+    <widget class="QLineEdit" name="leReceiptPrinter"/>
    </item>
    <item row="3" column="1" colspan="2">
     <widget class="QLineEdit" name="leStoreId"/>
    </item>
-   <item row="0" column="1" colspan="2">
-    <widget class="QLineEdit" name="leCashboxId"/>
+   <item row="2" column="1" colspan="2">
+    <widget class="QComboBox" name="cbFiscalMachine"/>
+   </item>
+   <item row="4" column="0">
+    <widget class="QLabel" name="labelPhone">
+     <property name="text">
+      <string>Receipt phone</string>
+     </property>
+    </widget>
+   </item>
+   <item row="7" column="1">
+    <widget class="QCheckBox" name="chAssignSaleToAssociate"/>
    </item>
    <item row="9" column="0">
-    <widget class="QLabel" name="labelNoDiscount">
+    <widget class="QLabel" name="labelNoService">
      <property name="text">
-      <string>Receipt without discount hint</string>
+      <string>Receipt without service hint</string>
      </property>
     </widget>
    </item>
-   <item row="4" column="1" colspan="2">
-    <widget class="QLineEdit" name="leReceiptPhone"/>
-   </item>
-   <item row="11" column="0">
-    <widget class="QLabel" name="labelNoDiscount_3">
-     <property name="text">
-      <string>Arcus authorization</string>
-     </property>
-    </widget>
-   </item>
-   <item row="6" column="0">
+   <item row="7" column="0">
     <widget class="QLabel" name="labelPhone_3">
      <property name="text">
       <string>Assign Sale to Associate</string>
      </property>
     </widget>
    </item>
-   <item row="6" column="1">
-    <widget class="QCheckBox" name="chAssignSaleToAssociate"/>
+   <item row="8" column="0">
+    <widget class="QLabel" name="labelNoTable">
+     <property name="text">
+      <string>Receipt without table</string>
+     </property>
+    </widget>
+   </item>
+   <item row="9" column="1">
+    <widget class="QCheckBox" name="chReceiptNoServiceHint"/>
+   </item>
+   <item row="12" column="1" colspan="2">
+    <widget class="QLineEdit" name="leArcusKey">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+       <horstretch>1</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="placeholderText">
+      <string>API key</string>
+     </property>
+    </widget>
+   </item>
+   <item row="11" column="0">
+    <widget class="QLabel" name="labelNoDiscount_2">
+     <property name="text">
+      <string>Card payment via arkus</string>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="0">
+    <widget class="QLabel" name="labelHall">
+     <property name="text">
+      <string>Default hall id</string>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="0">
+    <widget class="QLabel" name="labelStore">
+     <property name="text">
+      <string>Default store id</string>
+     </property>
+    </widget>
+   </item>
+   <item row="6" column="0">
+    <widget class="QLabel" name="labelPhone_4">
+     <property name="text">
+      <string>Receipt printer left and right margins</string>
+     </property>
+    </widget>
+   </item>
+   <item row="6" column="1" colspan="2">
+    <widget class="QLineEdit" name="leReceiptPrinterLeftRightMargins"/>
    </item>
   </layout>
  </widget>

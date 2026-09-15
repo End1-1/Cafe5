@@ -72,6 +72,9 @@ public:
 
     void printPrecheck();
 
+    /** Kitchen/service slip before sale close (marks lines printed on server). */
+    void printServiceCheckBeforeSave();
+
     void printServiceCheck(const QJsonObject &jdoc);
 
     /** True if any OK line has kitchen printer (f_print1/f_print2). */

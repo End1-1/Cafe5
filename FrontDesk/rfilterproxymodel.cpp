@@ -184,4 +184,12 @@ void RFilterProxyModel::recalcSums()
             it.value() += v;
         }
     }
+
+    for(int col : columnLast) {
+        double v = 0.0;
+        if(rows > 0) {
+            v = str_money_mysql_format(data(index(rows - 1, col)).toString());
+        }
+        columnSums[col] = v;
+    }
 }

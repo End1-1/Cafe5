@@ -32,7 +32,8 @@ class Salary extends Auth
     }
 
     /**
-     * Staff with registered fingerprint who worked on the given day (s_attendance).
+     * Staff who checked out on the given calendar day (DATE(f_out) = day).
+     * Still-open shifts (f_out IS NULL) are not included.
      */
     public function AutofillAccrual($params)
     {
@@ -41,9 +42,7 @@ class Salary extends Auth
             dieWithCode("Salary date is required");
         }
 
-        $dayStart = strtotime($date . ' 00:00:00');
-        $dayEnd = strtotime($date . ' 23:59:59');
-        if ($dayStart === false || $dayEnd === false) {
+        if (strtotime($date . ' 00:00:00') === false) {
             dieWithCode("Invalid salary date");
         }
 
@@ -55,18 +54,13 @@ class Salary extends Auth
             gr.f_name AS f_position_name
         FROM s_attendance a
         INNER JOIN s_user u ON u.f_id = a.f_worker
-        INNER JOIN s_user_fingerprint fp ON fp.f_user = u.f_id AND COALESCE(fp.f_size, 0) > 0
         LEFT JOIN s_user_group gr ON gr.f_id = COALESCE(NULLIF(a.f_position, 0), u.f_group)
-        WHERE a.f_in <= ?
-          AND IFNULL(a.f_out, ?) >= ?
-        ORDER BY a.f_worker, a.f_in DESC
+        WHERE a.f_out IS NOT NULL
+          AND DATE(a.f_out) = ?
+        ORDER BY a.f_worker, a.f_out DESC
         SQL;
 
-        $rows = $this->select(
-            $sql,
-            'sss',
-            [date('Y-m-d H:i:s', $dayEnd), date('Y-m-d H:i:s', $dayEnd), date('Y-m-d H:i:s', $dayStart)]
-        )->fetch_all(MYSQLI_ASSOC);
+        $rows = $this->select($sql, 's', [$date])->fetch_all(MYSQLI_ASSOC);
 
         $seen = [];
         $items = [];

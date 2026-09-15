@@ -21,6 +21,8 @@ protected:
 
     QJsonObject collectConfig() const override;
 
+    void applyLookups(const QJsonObject &jdoc) override;
+
 private:
     void buildSetupButtons();
 

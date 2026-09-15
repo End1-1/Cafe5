@@ -23,6 +23,8 @@ public:
     void recalcSums();
     double sumForColumn(int col) const;
     QHash<int, double> columnSums;
+    /// Columns whose footer shows the last visible row value (e.g. running balance), not a sum.
+    QList<int> columnLast;
     QList<int> numericCols;
 
 signals:

@@ -17,7 +17,11 @@ AppVersion={#MyAppVersionShort}
 AppVerName={#ComponentDisplayName} {#MyAppVersionShort}
 AppPublisher={#MyAppPublisher}
 AppPublisherURL={#MyAppURL}
+#if ComponentKey == "service5"
 DefaultDirName={autopf}\{#MyAppName}
+#else
+DefaultDirName={code:ComponentTargetInstallDir}
+#endif
 DefaultGroupName={#MyAppName}
 DisableProgramGroupPage=yes
 OutputDir={#ComponentOutputDir}
@@ -28,9 +32,9 @@ WizardStyle=modern
 ArchitecturesAllowed=x64compatible
 ArchitecturesInstallIn64BitMode=x64compatible
 PrivilegesRequired=admin
-UsePreviousAppDir=yes
+UsePreviousAppDir=no
 CloseApplications=force
-CloseApplicationsFilter={#ComponentCloseFilter},PicassoUpdateHost.exe
+CloseApplicationsFilter={#ComponentCloseFilter},Updater.exe,PicassoUpdateHost.exe
 RestartApplications=no
 ShowLanguageDialog=auto
 
@@ -64,12 +68,10 @@ Source: "{#StagingDir}\libzksensorcore.dll"; DestDir: "{app}"; Flags: ignorevers
 Source: "{#StagingDir}\libusb0.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "{#StagingDir}\zkfpslibLow.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "{#StagingDir}\ZKFPSensors\*"; DestDir: "{app}\ZKFPSensors"; Flags: ignoreversion recursesubdirs createallsubdirs
-Source: "{#StagingDir}\Updater.exe"; DestDir: "{app}"; Flags: ignoreversion
 #endif
 #if ComponentKey == "shop"
 Source: "{#StagingDir}\Shop_net.exe"; DestDir: "{app}"; Flags: ignoreversion
 Source: "{#StagingDir}\shop.css"; DestDir: "{app}"; Flags: ignoreversion
-Source: "{#StagingDir}\Updater.exe"; DestDir: "{app}"; Flags: ignoreversion
 #endif
 #if ComponentKey == "waiter"
 Source: "{#StagingDir}\Waiter.exe"; DestDir: "{app}"; Flags: ignoreversion
@@ -82,12 +84,14 @@ Source: "{#StagingDir}\libzksensorcore.dll"; DestDir: "{app}"; Flags: ignorevers
 Source: "{#StagingDir}\libusb0.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "{#StagingDir}\zkfpslibLow.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "{#StagingDir}\ZKFPSensors\*"; DestDir: "{app}\ZKFPSensors"; Flags: ignoreversion recursesubdirs createallsubdirs
-Source: "{#StagingDir}\Updater.exe"; DestDir: "{app}"; Flags: ignoreversion
 #endif
 #if ComponentKey == "cookingprogress"
 Source: "{#StagingDir}\CookingProgress.exe"; DestDir: "{app}"; Flags: ignoreversion
-Source: "{#StagingDir}\Updater.exe"; DestDir: "{app}"; Flags: ignoreversion
 #endif
+; Fresh shared updater in every module installer (overwrite on each update).
+Source: "{#StagingDir}\Updater.exe"; DestDir: "{code:PicassoUpdaterInstallDir}"; Flags: ignoreversion
+Source: "{#StagingDir}\Qt6*.dll"; DestDir: "{code:PicassoUpdaterInstallDir}"; Flags: ignoreversion
+Source: "{#StagingDir}\platforms\*"; DestDir: "{code:PicassoUpdaterInstallDir}\platforms"; Flags: ignoreversion recursesubdirs createallsubdirs
 #if ComponentKey == "service5"
 Source: "{#StagingDir}\service5.exe"; DestDir: "{app}"; Flags: ignoreversion; BeforeInstall: BeforeServiceInstall
 #endif
@@ -130,6 +134,8 @@ Name: "{group}\Service5 Monitor"; Filename: "{app}\service5.exe"; Parameters: "-
 Name: "{group}\{cm:UninstallProgram,{#ComponentDisplayName}}"; Filename: "{uninstallexe}"
 
 [Registry]
+Root: HKLM; Subkey: "Software\{#MyAppName}"; ValueType: string; ValueName: "InstallPath"; ValueData: "{autopf}\{#MyAppName}"; Flags: uninsdeletevalue
+Root: HKLM; Subkey: "Software\{#MyAppName}\updater"; ValueType: string; ValueName: "InstallPath"; ValueData: "{code:PicassoUpdaterInstallDir}"; Flags: uninsdeletekey
 Root: HKLM; Subkey: "Software\{#MyAppName}\{#ComponentKey}"; ValueType: string; ValueName: "InstallPath"; ValueData: "{app}"; Flags: uninsdeletekey
 Root: HKLM; Subkey: "Software\{#MyAppName}\{#ComponentKey}"; ValueType: string; ValueName: "Version"; ValueData: "{#MyAppVersionShort}"; Flags: uninsdeletekey
 #if ComponentKey == "service5"
@@ -386,112 +392,106 @@ begin
                  ewWaitUntilTerminated, ResultCode);
 end;
 
-{ Resolve install dir without app constant (not ready in InitializeSetup). }
-function PicassoInstallDir: string;
-var
-  Candidate: string;
+{ Resolve Picasso root (C:\Program Files\Picasso). }
+function PicassoRootDir: string;
 begin
-  Result := '';
-  Candidate := '';
-  if RegQueryStringValue(HKLM, 'Software\{#MyAppName}\{#ComponentKey}', 'InstallPath', Candidate) and
-     (Candidate <> '') and DirExists(Candidate) then
-    Result := Candidate
-  else if RegQueryStringValue(HKLM, 'Software\{#MyAppName}', 'InstallPath', Candidate) and
-          (Candidate <> '') and DirExists(Candidate) then
-    Result := Candidate
-  else if RegQueryStringValue(HKLM, 'Software\{#MyAppName}\frontdesk', 'InstallPath', Candidate) and
-          (Candidate <> '') and DirExists(Candidate) then
-    Result := Candidate
-  else if RegQueryStringValue(HKLM, 'Software\{#MyAppName}\shop', 'InstallPath', Candidate) and
-          (Candidate <> '') and DirExists(Candidate) then
-    Result := Candidate
-  else if RegQueryStringValue(HKLM, 'Software\{#MyAppName}\waiter', 'InstallPath', Candidate) and
-          (Candidate <> '') and DirExists(Candidate) then
-    Result := Candidate
-  else if RegQueryStringValue(HKLM, 'Software\{#MyAppName}\cookingprogress', 'InstallPath', Candidate) and
-          (Candidate <> '') and DirExists(Candidate) then
-    Result := Candidate
-  else if RegQueryStringValue(HKLM, 'Software\{#MyAppName}\service5', 'InstallPath', Candidate) and
-          (Candidate <> '') and DirExists(Candidate) then
-    Result := Candidate
-  else
-  begin
-    Candidate := ExpandConstant('{autopf}\{#MyAppName}');
-    if DirExists(Candidate) then
-      Result := Candidate;
-  end;
-
-  if Result = '' then
-    Exit;
-  if Result[Length(Result)] <> '\' then
-    Result := Result + '\';
+  Result := ExpandConstant('{autopf}\{#MyAppName}');
 end;
 
-{ Sibling products in the same install folder (shared Qt DLLs). }
-function CollectInstalledSiblings: string;
-var
-  Dir: string;
-  SelfKey: string;
+function PicassoUpdaterInstallDir(Param: String): String;
 begin
-  Result := '';
-  Dir := PicassoInstallDir;
-  if Dir = '' then
-    Exit;
-  SelfKey := '{#ComponentKey}';
+  Result := PicassoRootDir + '\updater';
+end;
 
-  if (SelfKey <> 'frontdesk') and FileExists(Dir + 'OfficeN.exe') then
-    Result := Result + '  - FrontDesk (OfficeN.exe)' + #13#10;
-  if (SelfKey <> 'shop') and FileExists(Dir + 'Shop_net.exe') then
-    Result := Result + '  - Shop (Shop_net.exe)' + #13#10;
-  if (SelfKey <> 'waiter') and FileExists(Dir + 'Waiter.exe') then
-    Result := Result + '  - Waiter (Waiter.exe)' + #13#10;
-  if (SelfKey <> 'cookingprogress') and FileExists(Dir + 'CookingProgress.exe') then
-    Result := Result + '  - CookingProgress (CookingProgress.exe)' + #13#10;
-  if (SelfKey <> 'service5') and
-     (FileExists(Dir + 'service5.exe') or FileExists(Dir + 'Service5.exe') or ServiceExists) then
-    Result := Result + '  - Service5 / Breeze service' + #13#10;
+function ComponentMarkerExe: string;
+begin
+#if ComponentKey == "frontdesk"
+  Result := 'OfficeN.exe';
+#elif ComponentKey == "shop"
+  Result := 'Shop_net.exe';
+#elif ComponentKey == "waiter"
+  Result := 'Waiter.exe';
+#elif ComponentKey == "cookingprogress"
+  Result := 'CookingProgress.exe';
+#else
+  Result := '';
+#endif
+end;
+
+{ Target folder for this module. Next update migrates flat legacy install into a subfolder. }
+function ComponentTargetInstallDir(Param: String): String;
+var
+  RegPath, Root, Marker, SubDir: string;
+begin
+#if ComponentKey == "service5"
+  Result := PicassoRootDir;
+#else
+  SubDir := '{#ComponentKey}';
+  Marker := ComponentMarkerExe;
+  Root := PicassoRootDir;
+
+  if RegQueryStringValue(HKLM, 'Software\{#MyAppName}\{#ComponentKey}', 'InstallPath', RegPath) and
+     (RegPath <> '') and DirExists(RegPath) then
+  begin
+    if (CompareText(ExtractFileName(RegPath), SubDir) = 0) or
+       (not FileExists(RegPath + '\' + Marker)) then
+    begin
+      Result := RegPath;
+      Exit;
+    end;
+    Result := RegPath + '\' + SubDir;
+    Exit;
+  end;
+
+  if RegQueryStringValue(HKLM, 'Software\{#MyAppName}', 'InstallPath', RegPath) and
+     (RegPath <> '') and DirExists(RegPath) then
+    Root := RegPath;
+
+  if Root[Length(Root)] = '\' then
+    Delete(Root, Length(Root), 1);
+
+  if FileExists(Root + '\' + Marker) then
+    Result := Root + '\' + SubDir
+  else
+    Result := Root + '\' + SubDir;
+#endif
 end;
 
 function CollectRunningApps: string;
-var
-  Names: array[0..5] of string;
-  Labels: array[0..5] of string;
-  I: Integer;
 begin
-  Names[0] := 'OfficeN.exe';
-  Names[1] := 'Shop_net.exe';
-  Names[2] := 'Waiter.exe';
-  Names[3] := 'WaiterDesigner.exe';
-  Names[4] := 'CookingProgress.exe';
-  Names[5] := 'service5.exe';
-  Labels[0] := 'FrontDesk (OfficeN.exe)';
-  Labels[1] := 'Shop (Shop_net.exe)';
-  Labels[2] := 'Waiter (Waiter.exe)';
-  Labels[3] := 'WaiterDesigner (WaiterDesigner.exe)';
-  Labels[4] := 'CookingProgress (CookingProgress.exe)';
-  Labels[5] := 'Service5 (service5.exe)';
-
   Result := '';
-  for I := 0 to 5 do
-  begin
-    if IsProcessRunning(Names[I]) then
-    begin
-      if Result <> '' then
-        Result := Result + #13#10;
-      Result := Result + '  - ' + Labels[I];
-    end;
-  end;
+#if ComponentKey == "service5"
+  if IsProcessRunning('service5.exe') or IsProcessRunning('Service5.exe') then
+    Result := '  - Service5 (service5.exe)';
   if ServiceExists and (Pos('Service5', Result) = 0) then
   begin
     if Result <> '' then
       Result := Result + #13#10;
     Result := Result + '  - служба Windows «Breeze» (Service5)';
   end;
+#elif ComponentKey == "frontdesk"
+  if IsProcessRunning('OfficeN.exe') then
+    Result := '  - FrontDesk (OfficeN.exe)';
+#elif ComponentKey == "shop"
+  if IsProcessRunning('Shop_net.exe') then
+    Result := '  - Shop (Shop_net.exe)';
+#elif ComponentKey == "waiter"
+  if IsProcessRunning('Waiter.exe') then
+    Result := '  - Waiter (Waiter.exe)';
+  if IsProcessRunning('WaiterDesigner.exe') then
+  begin
+    if Result <> '' then
+      Result := Result + #13#10;
+    Result := Result + '  - WaiterDesigner (WaiterDesigner.exe)';
+  end;
+#elif ComponentKey == "cookingprogress"
+  if IsProcessRunning('CookingProgress.exe') then
+    Result := '  - CookingProgress (CookingProgress.exe)';
+#endif
 end;
 
 procedure StopBreezeIfPresent;
 begin
-  { Always stop Breeze when present — shared Qt DLLs cannot be replaced otherwise. }
   if ServiceExists then
   begin
     BreezeStoppedForUpdate := True;
@@ -509,16 +509,22 @@ end;
 
 procedure CloseComponentApps;
 begin
+#if ComponentKey == "service5"
   StopBreezeIfPresent;
   Sleep(300);
-  KillProcess('OfficeN.exe');
-  KillProcess('Shop_net.exe');
-  KillProcess('Waiter.exe');
-  KillProcess('WaiterDesigner.exe');
-  KillProcess('CookingProgress.exe');
   KillProcess('service5.exe');
   KillProcess('Service5.exe');
   Sleep(500);
+#elif ComponentKey == "frontdesk"
+  KillProcess('OfficeN.exe');
+#elif ComponentKey == "shop"
+  KillProcess('Shop_net.exe');
+#elif ComponentKey == "waiter"
+  KillProcess('Waiter.exe');
+  KillProcess('WaiterDesigner.exe');
+#elif ComponentKey == "cookingprogress"
+  KillProcess('CookingProgress.exe');
+#endif
 end;
 
 procedure BeforeServiceInstall;
@@ -550,35 +556,22 @@ begin
              mbInformation, MB_OK);
   end;
 #else
-  { Waiter/Shop/FrontDesk update stopped Breeze so DLLs could be replaced — start it again. }
-  if BreezeStoppedForUpdate and ServiceExists then
-  begin
-    if not StartBreezeService then
-    begin
-      if not WizardSilent then
-        MsgBox('Служба «Breeze» (Service5) была остановлена для обновления,' + #13#10 +
-               'но не запустилась снова. Запустите её вручную в services.msc.',
-               mbInformation, MB_OK);
-    end;
-  end;
+  { Desktop modules are isolated — do not stop Breeze. }
 #endif
 end;
 
 function InitializeSetup: Boolean;
 var
   Running: string;
-  Installed: string;
   Msg: string;
 begin
   UpgradeMode := RegKeyExists(HKLM, 'Software\{#MyAppName}\{#ComponentKey}');
   BreezeStoppedForUpdate := False;
 
   Running := CollectRunningApps;
-  Installed := CollectInstalledSiblings;
 
-  if (Running <> '') or (Installed <> '') then
+  if Running <> '' then
   begin
-    { Auto-update (/SILENT): close without asking — user already confirmed in the app }
     if not WizardSilent then
     begin
       if UpgradeMode then
@@ -586,18 +579,12 @@ begin
       else
         Msg := 'Установка {#ComponentDisplayName}.' + #13#10#13#10;
 
-      if Installed <> '' then
-        Msg := Msg + 'На этом ПК уже установлены другие приложения Picasso' + #13#10 +
-               '(общая папка и Qt DLL):' + #13#10 + Installed + #13#10;
-
-      if Running <> '' then
-        Msg := Msg + 'Сейчас запущено:' + #13#10 + Running + #13#10#13#10
-      else
-        Msg := Msg + #13#10;
-
-      Msg := Msg + 'Перед продолжением нужно закрыть запущенные приложения.' + #13#10;
+      Msg := Msg + 'Сейчас запущено:' + #13#10 + Running + #13#10#13#10;
+#if ComponentKey == "service5"
       if ServiceExists then
         Msg := Msg + 'Служба Breeze (Service5) будет остановлена и после установки запущена снова.' + #13#10;
+#endif
+      Msg := Msg + 'Перед продолжением нужно закрыть указанные процессы.' + #13#10;
       Msg := Msg + #13#10 + 'Продолжить?';
 
       if MsgBox(Msg, mbConfirmation, MB_YESNO or MB_DEFBUTTON2) = IDNO then

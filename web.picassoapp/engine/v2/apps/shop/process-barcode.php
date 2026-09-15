@@ -52,11 +52,6 @@ class ProcessBarCode extends Auth
     {
         $storeId = (int)($this->params->store ?? 0);
         $goodsId = (int)($goods["f_dish"] ?? 0);
-        $qty = 0.0;
-
-        if ((int)($goods["f_is_service"] ?? 0) === 0) {
-            $qty = $this->stockQty($storeId, $goodsId);
-        }
 
         $fdata = $goods["f_data"] ?? "{}";
         if (is_string($fdata)) {
@@ -66,6 +61,17 @@ class ProcessBarCode extends Auth
             $goods["f_data"] = (array)$fdata;
         } elseif (!is_array($fdata)) {
             $goods["f_data"] = [];
+        }
+
+        $storeOverride = (int)($goods["f_data"]["f_store_override"] ?? 0);
+        if ($storeOverride > 0) {
+            $storeId = $storeOverride;
+        }
+        $goods["f_store_override"] = $storeOverride;
+
+        $qty = 0.0;
+        if ((int)($goods["f_is_service"] ?? 0) === 0) {
+            $qty = $this->stockQty($storeId, $goodsId);
         }
 
         $goods["f_qty"] = $qty;

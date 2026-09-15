@@ -189,7 +189,7 @@ void C5Widget::updateRequired(const QString &msg, const QString &appName, const 
         return;
     }
     if (!C5Message::tryStartUpdater(appName, newVersion)) {
-        C5Message::info(tr("Updater not found. Reinstall the application."));
+        C5Message::info(tr("Could not start the updater. Reinstall the application or run the setup from picasso.am."));
     }
     qApp->exit(0);
 }

@@ -69,17 +69,18 @@ void PrintReceiptGroup::printOrder(const QJsonObject &jo)
     C5Printing p;
     QPrinter printer(pi.isNull() ? QPrinterInfo() : pi);
     if (!pi.isNull()) {
-        printer.setPageSize(QPageSize::Custom);
-        printer.setFullPage(false);
-        QRectF pr = printer.pageRect(QPrinter::DevicePixel);
-        constexpr qreal SAFE_RIGHT_MM = 4.0;
-        const qreal safePx = SAFE_RIGHT_MM * printer.logicalDpiX() / 25.4;
-        p.setSceneParams(pr.width() - safePx, pr.height(), printer.logicalDpiX());
+        p.setSceneFromPrinter(printer);
     } else {
         p.setSceneParams(650, 2800, 96);
     }
     p.setFont(font);
     p.setFontSize(bs);
+
+    const int marginMm = mWorkStation.receiptMarginsMm();
+    p.setRightMarginMm(marginMm);
+    const int colQty = 33 + marginMm;
+    const int colPrice = 41 + marginMm;
+    const int nameWidthMm = qMax(10, 35 - 2 * marginMm);
 
     const QString logoFile = qApp->applicationDirPath() + QStringLiteral("/logo_receipt.png");
     if (QFile::exists(logoFile)) {
@@ -95,26 +96,26 @@ void PrintReceiptGroup::printOrder(const QJsonObject &jo)
 
     const QJsonObject jtax = header.value(QStringLiteral("f_fiscal")).toObject();
     if (jtax.value(QStringLiteral("rseq")).toInt() > 0) {
-        p.ltext(jtax.value(QStringLiteral("taxpayer")).toString(), 0);
+        p.ltext(jtax.value(QStringLiteral("taxpayer")).toString(), marginMm);
         p.br();
-        p.ltext(jtax.value(QStringLiteral("address")).toString(), 0);
+        p.ltext(jtax.value(QStringLiteral("address")).toString(), marginMm);
         p.br();
-        p.ltext(QObject::tr("TIN"), 0);
+        p.ltext(QObject::tr("TIN"), marginMm);
         p.rtext(jtax.value(QStringLiteral("tin")).toString());
         p.br();
-        p.ltext(QObject::tr("Device number"), 0);
+        p.ltext(QObject::tr("Device number"), marginMm);
         p.rtext(jtax.value(QStringLiteral("crn")).toString());
         p.br();
-        p.ltext(QObject::tr("Serial"), 0);
+        p.ltext(QObject::tr("Serial"), marginMm);
         p.rtext(jtax.value(QStringLiteral("sn")).toString());
         p.br();
-        p.ltext(QObject::tr("Fiscal"), 0);
+        p.ltext(QObject::tr("Fiscal"), marginMm);
         p.rtext(jtax.value(QStringLiteral("fiscal")).toString());
         p.br();
-        p.ltext(QObject::tr("Receipt number"), 0);
+        p.ltext(QObject::tr("Receipt number"), marginMm);
         p.rtext(QString::number(jtax.value(QStringLiteral("rseq")).toInt()));
         p.br();
-        p.ltext(QObject::tr("Date"), 0);
+        p.ltext(QObject::tr("Date"), marginMm);
         if (jtax.contains(QStringLiteral("time"))) {
             p.rtext(QDateTime::fromMSecsSinceEpoch(jtax.value(QStringLiteral("time")).toVariant().toLongLong())
                         .toString(FORMAT_DATETIME_TO_STR));
@@ -124,15 +125,15 @@ void PrintReceiptGroup::printOrder(const QJsonObject &jo)
             p.rtext(QStringLiteral("%1 %2").arg(dateCash, timeClose));
         }
         p.br();
-        p.ltext(QObject::tr("(F)"), 0);
+        p.ltext(QObject::tr("(F)"), marginMm);
         p.br();
     }
 
     const QString buyer = header.value(QStringLiteral("f_buyer")).toString().trimmed();
     if (!buyer.isEmpty()) {
-        p.ltext(QObject::tr("Partner"), 0);
+        p.ltext(QObject::tr("Partner"), marginMm);
         p.br();
-        p.ltext(buyer, 0);
+        p.ltext(buyer, marginMm);
         p.br();
     }
 
@@ -142,9 +143,9 @@ void PrintReceiptGroup::printOrder(const QJsonObject &jo)
     p.setFontBold(false);
 
     p.setFontSize(bs - 2);
-    p.ltext(QObject::tr("Name"), 0);
-    p.ltext(QObject::tr("Qty"), 33);
-    p.ltext(QObject::tr("Price"), 41);
+    p.ltext(QObject::tr("Name"), marginMm);
+    p.ltext(QObject::tr("Qty"), colQty);
+    p.ltext(QObject::tr("Price"), colPrice);
     p.rtext(QObject::tr("Amount"));
     p.br();
     p.line(2);
@@ -163,9 +164,9 @@ void PrintReceiptGroup::printOrder(const QJsonObject &jo)
         if (!scancode.isEmpty()) {
             name = QStringLiteral("%1 %2").arg(name, scancode);
         }
-        p.ltext(name, 0, 35);
-        p.ltext(float_str(qty, 3), 33, 8);
-        p.ltext(float_str(price, 2), 41, 12);
+        p.ltext(name, marginMm, nameWidthMm);
+        p.ltext(float_str(qty, 3), colQty, 8);
+        p.ltext(float_str(price, 2), colPrice, 12);
         p.rtext(float_str(total, 2));
         p.br();
         p.line();
@@ -173,16 +174,16 @@ void PrintReceiptGroup::printOrder(const QJsonObject &jo)
     }
 
     p.setFontBold(true);
-    p.ltext(QObject::tr("Need to pay"), 0);
+    p.ltext(QObject::tr("Need to pay"), marginMm);
     p.rtext(float_str(amountTotal != 0 ? amountTotal : linesTotal, 2));
     p.br();
     p.setFontBold(false);
     p.line();
     p.br();
 
-    auto printPay = [&p](const QString &title, double amount) {
+    auto printPay = [&p, marginMm](const QString &title, double amount) {
         if (qAbs(amount) > 0.001) {
-            p.ltext(title, 0);
+            p.ltext(title, marginMm);
             p.rtext(float_str(amount, 2));
             p.br();
         }
@@ -198,14 +199,14 @@ void PrintReceiptGroup::printOrder(const QJsonObject &jo)
     const QString comment = header.value(QStringLiteral("f_comment")).toString().trimmed();
     if (!comment.isEmpty()) {
         p.br();
-        p.ltext(comment, 0);
+        p.ltext(comment, marginMm);
         p.br();
     }
 
     p.br();
     p.ctext(QObject::tr("Thank you for visit!"));
     p.br();
-    p.ltext(QObject::tr("Printed"), 0);
+    p.ltext(QObject::tr("Printed"), marginMm);
     p.rtext(QDateTime::currentDateTime().toString(FORMAT_DATETIME_TO_STR));
     p.br();
 

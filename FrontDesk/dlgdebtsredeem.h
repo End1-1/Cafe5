@@ -1,6 +1,7 @@
 #pragma once
 
 #include <QDialog>
+#include <QJsonObject>
 
 namespace Ui
 {
@@ -16,16 +17,24 @@ public:
 
     ~DlgDebtsRedeem() override;
 
+    void loadRedeem(const QJsonObject &redeem);
+
+    int debtId() const;
     int partnerId() const;
     double amount() const;
     int cashboxId() const;
     int paymentTypeId() const;
     QString comment() const;
     QString redeemDateMysql() const;
+    bool isEditMode() const;
+    bool deleteRequested() const;
 
 private slots:
     void tryAccept();
+    void onDeleteClicked();
 
 private:
     Ui::DlgDebtsRedeem *ui;
+    int mDebtId = 0;
+    bool mDeleteRequested = false;
 };

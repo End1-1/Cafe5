@@ -8,6 +8,7 @@ C5Printing::C5Printing()
 {
     fLogicalDpiX = 96;
     fNormalWidth = 500;
+    fLeftMarginMm = 0;
     fRightMarginMm = 0;
     reset();
 }
@@ -22,6 +23,7 @@ void C5Printing::reset()
 {
     fTop = 0;
     fTempTop = 0;
+    fLeftMarginMm = 0;
     fRightMarginMm = 0;
     fJsonData = QJsonArray();
     setSceneParams(fNormalWidth, 20000, fLogicalDpiX);
@@ -32,6 +34,7 @@ void C5Printing::reset()
 
 void C5Printing::setSceneParams(qreal width, qreal height, qreal logicalDpiX)
 {
+    Q_UNUSED(logicalDpiX);
     // Устанавливаем 203 или 300 для плотности, близкой к физической головке принтера
     fLogicalDpiX = 203;
     fMM = fLogicalDpiX / 25.4;
@@ -54,9 +57,25 @@ void C5Printing::setSceneParams(qreal width, qreal height, qreal logicalDpiX)
     fPainter.setRenderHint(QPainter::SmoothPixmapTransform, true);
 }
 
+void C5Printing::setSceneFromPrinter(QPrinter &printer)
+{
+    const QRectF pr = printer.pageRect(QPrinter::DevicePixel);
+    const qreal dpiX = qMax(1, printer.logicalDpiX());
+    const qreal dpiY = qMax(1, printer.logicalDpiY());
+    // setSceneParams expects width/height in 96dpi units, then scales canvas to 203dpi
+    setSceneParams(pr.width() * 96.0 / dpiX, pr.height() * 96.0 / dpiY, 96.0);
+}
+
 void C5Printing::setRightMarginMm(qreal mm)
 {
-    fRightMarginMm = qMax<qreal>(0.0, mm);
+    const qreal v = qMax<qreal>(0.0, mm);
+    fLeftMarginMm = v;
+    fRightMarginMm = v;
+}
+
+int C5Printing::leftMarginPx() const
+{
+    return qRound(fLeftMarginMm * fMM);
 }
 
 int C5Printing::rightMarginPx() const
@@ -132,8 +151,9 @@ void C5Printing::ltext(const QString &text, qreal x, qreal textWidth)
 void C5Printing::ctext(const QString &text)
 {
     fPainter.setFont(fFont);
+    const int leftPad = leftMarginPx();
     const int rightPad = rightMarginPx();
-    QRect rect(0, fTop, qMax(1, fNormalWidth - rightPad), 10000);
+    QRect rect(leftPad, fTop, qMax(1, fNormalWidth - leftPad - rightPad), 10000);
     QRect bound = fPainter.boundingRect(rect, Qt::AlignHCenter | Qt::AlignTop | Qt::TextWordWrap, text);
     fPainter.drawText(rect, Qt::AlignHCenter | Qt::AlignTop | Qt::TextWordWrap, text);
 
@@ -170,7 +190,7 @@ void C5Printing::line(int lineWidth)
 {
     fLinePen.setWidth(lineWidth);
     fPainter.setPen(fLinePen);
-    fPainter.drawLine(0, fTop, qMax(0, fNormalWidth - rightMarginPx()), fTop);
+    fPainter.drawLine(leftMarginPx(), fTop, qMax(leftMarginPx(), fNormalWidth - rightMarginPx()), fTop);
 
     if (lineWidth > 1) {
         addToJson("line2", {{"width", lineWidth}});
@@ -199,23 +219,23 @@ void C5Printing::image(const QPixmap &img, Qt::Alignment align)
     // Просто берем локальную копию без изменения цветов
     QPixmap p = img;
 
-    // 2. МАСШТАБИРОВАНИЕ
-    // Если картинка шире холста fNormalWidth, пропорционально уменьшаем её
-    if (p.width() > fNormalWidth) {
-        p = p.scaledToWidth(fNormalWidth, Qt::SmoothTransformation);
+    // 2. МАСШТАБИРОВАНИЕ внутри боковых отступов
+    const int leftPad = leftMarginPx();
+    const int contentW = qMax(1, fNormalWidth - leftPad - rightMarginPx());
+    if (p.width() > contentW) {
+        p = p.scaledToWidth(contentW, Qt::SmoothTransformation);
     }
 
     // 3. РАСЧЕТ КООРДИНАТЫ X
-    // Центрируем или прижимаем к краю, следя, чтобы X не стал отрицательным
-    int posX = 0;
+    int posX = leftPad;
     if (align & Qt::AlignHCenter) {
-        posX = (fNormalWidth - p.width()) / 2;
+        posX = leftPad + (contentW - p.width()) / 2;
     } else if (align & Qt::AlignRight) {
-        posX = fNormalWidth - p.width();
+        posX = leftPad + contentW - p.width();
     }
 
-    if (posX < 0) {
-        posX = 0;
+    if (posX < leftPad) {
+        posX = leftPad;
     }
 
     // 4. ОТРИСОВКА

@@ -15,8 +15,13 @@ public:
 
     void reloadDebts();
 
+protected slots:
+    void on_tbl_doubleClicked(const QModelIndex &index) override;
+
 private:
     void redeemDebt();
+    void editRedeemDebt(int debtId, int docType, int currencyId);
+    void handleDebtsDoubleClick(const QModelIndex &index);
 
     bool mDebtRedeemActionInserted = false;
 };

@@ -3,6 +3,7 @@
 #include <QObject>
 #include <QProgressBar>
 #include <QString>
+#include <QStringList>
 #include <QWidget>
 
 class UpdateManager : public QObject
@@ -11,6 +12,8 @@ class UpdateManager : public QObject
 public:
     explicit UpdateManager(const QString &setupUrl,
                            const QString &setupFileName,
+                           const QString &appModule,
+                           const QString &moduleInstallDir,
                            QObject *parent = nullptr);
 
     void setProgressBar(QProgressBar *pb) { m_pb = pb; }
@@ -31,9 +34,12 @@ private:
     void launchSetup(const QString &setupPath);
     void setProgress(qint64 done, qint64 total);
     void setBusyProgress();
+    QStringList processesToKill() const;
 
     QString m_setupUrl;
     QString m_setupFileName;
+    QString m_appModule;
+    QString m_moduleInstallDir;
     QString m_downloadDir;
     QProgressBar *m_pb = nullptr;
     QWidget *m_hostWindow = nullptr;

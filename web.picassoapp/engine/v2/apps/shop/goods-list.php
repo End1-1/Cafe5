@@ -67,11 +67,15 @@ class GoodsList extends Auth
             LEFT JOIN c_groups gg ON gg.f_id = g.f_group
             LEFT JOIN c_goods_prices gp ON gp.f_goods = g.f_id AND gp.f_currency = ?
             LEFT JOIN (
-                SELECT f_item_id, SUM(f_qty_left) AS f_qty
+                SELECT f_item_id, f_store_id, SUM(f_qty_left) AS f_qty
                 FROM store_stock
-                WHERE f_store_id = ?
-                GROUP BY f_item_id
+                GROUP BY f_item_id, f_store_id
             ) ss ON ss.f_item_id = g.f_id
+              AND ss.f_store_id = IF(
+                    CAST(COALESCE(JSON_VALUE(g.f_data, '$.f_store_override'), '0') AS UNSIGNED) > 0,
+                    CAST(JSON_VALUE(g.f_data, '$.f_store_override') AS UNSIGNED),
+                    ?
+              )
             WHERE g.f_enabled = 1
               AND (
                     COALESCE(g.f_service, 0) = 1

@@ -3,6 +3,7 @@
 #include <QStringList>
 #include <QJsonDocument>
 #include <QJsonParseError>
+#include <cmath>
 #include "c5jsonparser.h"
 #include "c5utils.h"
 #include "dict_dish_state.h"
@@ -198,6 +199,25 @@ struct WaiterOrder {
 
             amounts.totalDue += d.lineAmount(isPreorder, includeUnprinted,
                                              orderServiceFactor, orderDiscountFactor);
+        }
+
+        /* Same ROUND BILL as waiter order.php CountAmounts */
+        amounts.totalDue = qRound(amounts.totalDue * 100.0) / 100.0;
+        amounts.serviceAmount = qRound(amounts.serviceAmount * 100.0) / 100.0;
+        const bool hasService = (orderServiceFactor > 0.0001) || (amounts.serviceAmount > 0.0001);
+        if (hasService) {
+            const double base100 = std::floor(amounts.totalDue / 100.0) * 100.0;
+            const double remainder = qRound((amounts.totalDue - base100) * 100.0) / 100.0;
+            if (remainder >= 0.01 && qAbs(remainder - 50.0) >= 0.01) {
+                if (remainder < 50.0 && (amounts.serviceAmount + 0.0001 >= remainder)) {
+                    amounts.serviceAmount = qRound((amounts.serviceAmount - remainder) * 100.0) / 100.0;
+                    amounts.totalDue = qRound((amounts.totalDue - remainder) * 100.0) / 100.0;
+                } else {
+                    const double add = qRound((100.0 - remainder) * 100.0) / 100.0;
+                    amounts.serviceAmount = qRound((amounts.serviceAmount + add) * 100.0) / 100.0;
+                    amounts.totalDue = qRound((amounts.totalDue + add) * 100.0) / 100.0;
+                }
+            }
         }
 
         return amounts;

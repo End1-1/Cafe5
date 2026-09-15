@@ -12,6 +12,7 @@ BEGIN
     DECLARE new_status int DEFAULT CAST(JSON_VALUE(params, '$.doc_status') AS UNSIGNED);
 
     DECLARE curr_item_id INT;
+    DECLARE curr_user_item_id INT;
     DECLARE curr_qty_needed DECIMAL(14, 4);
     DECLARE curr_row_id CHAR(36);
     DECLARE done INT DEFAULT FALSE;
@@ -21,9 +22,9 @@ BEGIN
     DECLARE total_cost DECIMAL(14, 2) DEFAULT 0;
     DECLARE last_input_price DECIMAL(14, 2);
 
-    -- Основной курсор по товарам в JSON
+    -- Resolve f_storeid inside the loop (JOIN inside CURSOR is unreliable on some MariaDB builds)
     DECLARE item_cursor CURSOR FOR
-        SELECT item_id, qty, row_id
+        SELECT jt.item_id, jt.qty, jt.row_id
         FROM JSON_TABLE(params, '$.items[*]'
                         COLUMNS (
                             item_id INT PATH '$.item_id',
@@ -179,10 +180,19 @@ BEGIN
 
         item_loop:
         LOOP
-            FETCH item_cursor INTO curr_item_id, curr_qty_needed, curr_row_id;
+            FETCH item_cursor INTO curr_user_item_id, curr_qty_needed, curr_row_id;
             IF done THEN
                 LEAVE item_loop;
             END IF;
+
+            SELECT IFNULL(NULLIF(f_storeid, 0), f_id)
+            INTO curr_item_id
+            FROM c_goods
+            WHERE f_id = curr_user_item_id;
+            IF (IFNULL(curr_item_id, 0) = 0) THEN
+                SET curr_item_id = curr_user_item_id;
+            END IF;
+            SET done = FALSE;
 
             fifo_block:
             BEGIN

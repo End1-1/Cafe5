@@ -194,4 +194,40 @@ abstract class ArarixAuth extends Db
 
         return $this->select("SELECT * FROM ararix_clients WHERE f_id = ?", "i", [$id])->fetch_assoc();
     }
+
+    protected function absoluteMediaUrl(?string $url): ?string
+    {
+        $url = trim((string)$url);
+        if ($url === '') {
+            return null;
+        }
+        if (preg_match('#^https?://#i', $url)) {
+            return $url;
+        }
+        $scheme = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
+        $host = (string)($_SERVER['HTTP_HOST'] ?? '');
+        if ($host === '') {
+            return $url;
+        }
+        return $scheme . '://' . $host . (str_starts_with($url, '/') ? $url : '/' . $url);
+    }
+
+    protected function haversineMeters(float $lat1, float $lng1, float $lat2, float $lng2): float
+    {
+        $earth = 6371000.0;
+        $dLat = deg2rad($lat2 - $lat1);
+        $dLng = deg2rad($lng2 - $lng1);
+        $a = sin($dLat / 2) ** 2
+            + cos(deg2rad($lat1)) * cos(deg2rad($lat2)) * sin($dLng / 2) ** 2;
+        return 2 * $earth * asin(min(1.0, sqrt($a)));
+    }
+
+    protected function clientAddressStub(): array
+    {
+        return [
+            "label" => "Komitas Avenue, 8",
+            "lat" => 40.1872,
+            "lng" => 44.5121,
+        ];
+    }
 }

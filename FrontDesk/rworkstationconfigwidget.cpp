@@ -1,4 +1,5 @@
 #include "rworkstationconfigwidget.h"
+#include <QComboBox>
 #include <QLabel>
 #include <QVBoxLayout>
 #include "c5message.h"
@@ -46,7 +47,62 @@ void RWorkstationConfigWidget::setup(const QJsonObject &jdoc)
 {
     RAbstractSpecialWidget::setup(jdoc);
     setHeaderInfo(jdoc);
+    applyLookups(jdoc);
     applyConfig(jdoc.value(QStringLiteral("config")).toObject());
+}
+
+void RWorkstationConfigWidget::applyLookups(const QJsonObject &jdoc)
+{
+    Q_UNUSED(jdoc);
+}
+
+void RWorkstationConfigWidget::fillFiscalMachineCombo(QComboBox *combo, const QJsonArray &machines) const
+{
+    if (!combo) {
+        return;
+    }
+
+    const int previousId = combo->currentData().toInt();
+    combo->clear();
+    combo->addItem(tr("Not selected"), 0);
+
+    for (const QJsonValue &value : machines) {
+        const QJsonObject row = value.toObject();
+        const int id = row.value(QStringLiteral("f_id")).toInt();
+        const QString name = row.value(QStringLiteral("f_name")).toString().trimmed();
+        const QString ip = row.value(QStringLiteral("f_ip")).toString().trimmed();
+        const int port = row.value(QStringLiteral("f_port")).toInt();
+        QString label = name.isEmpty()
+                            ? QStringLiteral("%1").arg(id)
+                            : QStringLiteral("%1 — %2").arg(id).arg(name);
+        if (!ip.isEmpty()) {
+            label += QStringLiteral(" (%1:%2)").arg(ip).arg(port);
+        }
+        combo->addItem(label, id);
+    }
+
+    if (previousId > 0 && combo->findData(previousId) < 0) {
+        combo->addItem(tr("Unknown (%1)").arg(previousId), previousId);
+    }
+}
+
+void RWorkstationConfigWidget::selectFiscalMachineCombo(QComboBox *combo, int id) const
+{
+    if (!combo) {
+        return;
+    }
+
+    int index = combo->findData(id);
+    if (index < 0 && id > 0) {
+        combo->addItem(tr("Unknown (%1)").arg(id), id);
+        index = combo->findData(id);
+    }
+    combo->setCurrentIndex(index >= 0 ? index : 0);
+}
+
+int RWorkstationConfigWidget::selectedFiscalMachineId(const QComboBox *combo) const
+{
+    return combo ? combo->currentData().toInt() : 0;
 }
 
 void RWorkstationConfigWidget::save()

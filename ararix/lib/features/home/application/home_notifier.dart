@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/network/api_exception.dart';
@@ -14,6 +16,8 @@ class HomeState {
     this.serviceMode = ServiceMode.delivery,
     this.searchQuery = '',
     this.selectedCountryId,
+    this.searchResults,
+    this.searching = false,
   });
 
   final HomeFeed? feed;
@@ -22,12 +26,18 @@ class HomeState {
   final ServiceMode serviceMode;
   final String searchQuery;
   final int? selectedCountryId;
+  /// When non-null, UI shows API search/filter results instead of top list.
+  final List<HomeRestaurant>? searchResults;
+  final bool searching;
+
+  bool get hasActiveFilter =>
+      searchQuery.trim().isNotEmpty || selectedCountryId != null;
 
   List<HomeRestaurant> get filteredRestaurants {
-    final list = feed?.topRestaurants ?? const [];
-    final q = searchQuery.trim().toLowerCase();
-    if (q.isEmpty) return list;
-    return list.where((r) => r.name.toLowerCase().contains(q)).toList();
+    if (hasActiveFilter) {
+      return searchResults ?? const [];
+    }
+    return feed?.topRestaurants ?? const [];
   }
 
   HomeState copyWith({
@@ -37,8 +47,11 @@ class HomeState {
     ServiceMode? serviceMode,
     String? searchQuery,
     int? selectedCountryId,
+    List<HomeRestaurant>? searchResults,
+    bool? searching,
     bool clearError = false,
     bool clearCountry = false,
+    bool clearSearchResults = false,
   }) {
     return HomeState(
       feed: feed ?? this.feed,
@@ -48,6 +61,9 @@ class HomeState {
       searchQuery: searchQuery ?? this.searchQuery,
       selectedCountryId:
           clearCountry ? null : (selectedCountryId ?? this.selectedCountryId),
+      searchResults:
+          clearSearchResults ? null : (searchResults ?? this.searchResults),
+      searching: searching ?? this.searching,
     );
   }
 }
@@ -55,8 +71,12 @@ class HomeState {
 final homeProvider = NotifierProvider<HomeNotifier, HomeState>(HomeNotifier.new);
 
 class HomeNotifier extends Notifier<HomeState> {
+  Timer? _debounce;
+  int _searchToken = 0;
+
   @override
   HomeState build() {
+    ref.onDispose(() => _debounce?.cancel());
     Future.microtask(load);
     return const HomeState(loading: true);
   }
@@ -66,6 +86,9 @@ class HomeNotifier extends Notifier<HomeState> {
     try {
       final feed = await ref.read(homeRepositoryProvider).getHome();
       state = state.copyWith(feed: feed, loading: false);
+      if (state.hasActiveFilter) {
+        await _runSearch();
+      }
     } on ApiException catch (e) {
       state = state.copyWith(loading: false, error: e.message);
     } catch (_) {
@@ -79,6 +102,8 @@ class HomeNotifier extends Notifier<HomeState> {
 
   void setSearchQuery(String value) {
     state = state.copyWith(searchQuery: value);
+    _debounce?.cancel();
+    _debounce = Timer(const Duration(milliseconds: 350), _runSearch);
   }
 
   void setCountry(int? id) {
@@ -86,6 +111,32 @@ class HomeNotifier extends Notifier<HomeState> {
       state = state.copyWith(clearCountry: true);
     } else {
       state = state.copyWith(selectedCountryId: id);
+    }
+    _debounce?.cancel();
+    _runSearch();
+  }
+
+  Future<void> _runSearch() async {
+    if (!state.hasActiveFilter) {
+      state = state.copyWith(clearSearchResults: true, searching: false);
+      return;
+    }
+
+    final token = ++_searchToken;
+    state = state.copyWith(searching: true);
+    try {
+      final rows = await ref.read(homeRepositoryProvider).searchRestaurants(
+            query: state.searchQuery,
+            nationalityId: state.selectedCountryId,
+          );
+      if (token != _searchToken) return;
+      state = state.copyWith(searchResults: rows, searching: false);
+    } on ApiException {
+      if (token != _searchToken) return;
+      state = state.copyWith(searchResults: const [], searching: false);
+    } catch (_) {
+      if (token != _searchToken) return;
+      state = state.copyWith(searchResults: const [], searching: false);
     }
   }
 }

@@ -84,8 +84,8 @@
     <name>C5Message</name>
     <message>
         <location filename="../Cafe5/c5message.cpp" line="158"/>
-        <source>Updater not found. Please download the update from the link.</source>
-        <translation>Թարմացնողը չի գտնվել՝ Ներբեռնեք թարմացումը հղումից՝</translation>
+        <source>Could not start the updater. Reinstall the application or run the setup from picasso.am.</source>
+        <translation>Չհաջողվեց գործարկել թարմացնողը։ Վերատեղադրեք ծրագիրը կամ գործարկեք setup-ը picasso.am-ից։</translation>
     </message>
 </context>
 <context>

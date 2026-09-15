@@ -9,6 +9,10 @@ import '../../features/auth/presentation/welcome_screen.dart';
 import '../../features/faq/presentation/faq_screen.dart';
 import '../../features/home/presentation/home_screen.dart';
 import '../../features/language/presentation/language_screen.dart';
+import '../../features/order/presentation/cart_screen.dart';
+import '../../features/order/presentation/dish_detail_screen.dart';
+import '../../features/order/presentation/package_pick_screen.dart';
+import '../../features/order/presentation/restaurant_screen.dart';
 import '../../features/payments/presentation/payments_screen.dart';
 import '../../features/profile/presentation/account_screen.dart';
 import '../../features/profile/presentation/change_phone_screen.dart';
@@ -59,6 +63,37 @@ final appRouterProvider = Provider<GoRouter>((ref) {
             channel: extra['channel'] as String? ?? 'whatsapp',
           );
         },
+      ),
+      GoRoute(
+        path: '/restaurant/:id',
+        builder: (context, state) {
+          final id = int.tryParse(state.pathParameters['id'] ?? '') ?? 0;
+          return RestaurantScreen(restaurantId: id);
+        },
+        routes: [
+          GoRoute(
+            path: 'dish/:dishId',
+            builder: (context, state) {
+              final id = int.tryParse(state.pathParameters['id'] ?? '') ?? 0;
+              final dishId =
+                  int.tryParse(state.pathParameters['dishId'] ?? '') ?? 0;
+              return DishDetailScreen(restaurantId: id, dishId: dishId);
+            },
+          ),
+          GoRoute(
+            path: 'package/:dishId',
+            builder: (context, state) {
+              final id = int.tryParse(state.pathParameters['id'] ?? '') ?? 0;
+              final dishId =
+                  int.tryParse(state.pathParameters['dishId'] ?? '') ?? 0;
+              return PackagePickScreen(restaurantId: id, dishId: dishId);
+            },
+          ),
+        ],
+      ),
+      GoRoute(
+        path: '/cart',
+        builder: (context, state) => const CartScreen(),
       ),
       StatefulShellRoute.indexedStack(
         builder: (context, state, navigationShell) {

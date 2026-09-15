@@ -34,6 +34,7 @@ powershell -NoProfile -ExecutionPolicy Bypass -File "%SCRIPT_DIR%stage.ps1" -Com
 if errorlevel 1 exit /b 1
 
 if not exist "%SCRIPT_DIR%versions.json" goto :no_staging
+if not exist "%SCRIPT_DIR%staging\Updater.exe" goto :no_staging
 
 if /I "%COMPONENT%"=="all" (
   if not exist "%SCRIPT_DIR%staging\OfficeN.exe" goto :no_staging

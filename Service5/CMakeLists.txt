@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.20)
-project(service5 VERSION 1.6.11.60 LANGUAGES CXX)
+project(service5 VERSION 1.7.12.63 LANGUAGES CXX)
 
 # Используем C++20
 set(CMAKE_CXX_STANDARD 20)
@@ -45,6 +45,7 @@ set(HEADERS
     firebase.h
     handlers/httpheader.h
     rc.h
+    version.h
     serverthread.h
     utils/sqlqueries.h
 
@@ -61,11 +62,13 @@ set(HEADERS
 # Основной исполняемый файл
 if(WIN32)
     list(APPEND SOURCES main.cpp)
+    set(WIN_RC res.rc)
 elseif(UNIX)
     list(APPEND SOURCES main_linux.cpp)
+    set(WIN_RC "")
 endif()
 
-add_executable(${PROJECT_NAME} ${SOURCES} ${HEADERS} ${UI_HEADERS} ${MOC_HEADERS}
+add_executable(${PROJECT_NAME} ${SOURCES} ${HEADERS} ${UI_HEADERS} ${MOC_HEADERS} ${WIN_RC}
     worker/struct_currency.h )
 
 # Добавляем include пути

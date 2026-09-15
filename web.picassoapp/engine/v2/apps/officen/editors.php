@@ -23,6 +23,8 @@ class Editors extends Auth
         "form_groups_of_goods" => "GoodsGroup",
         "form_service_values" => "ServiceValues",
         "form_tables" => "Tables",
+        "form_ax_restaurants" => "AxRestaurants",
+        "form_fiscal_machines" => "FiscalMachines",
     ];
 
     private function validate($params)

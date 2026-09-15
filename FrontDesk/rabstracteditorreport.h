@@ -2,6 +2,7 @@
 
 #include "c5widget.h"
 #include <QJsonArray>
+#include <QJsonObject>
 #include <QModelIndex>
 #include <QSet>
 #include <QVariant>
@@ -84,6 +85,8 @@ private:
     RFilterProxyModel* mProxyModel;
 
     QSet<int> mReportDefaultHiddenColumns;
+
+    QJsonObject mFooterValues;
 
     QButtonGroup *mViewModeGroup = nullptr;
 

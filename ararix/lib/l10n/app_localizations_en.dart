@@ -187,7 +187,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get armenianNative => 'Հայերեն';
 
   @override
-  String get searchRestaurant => 'Search for a restaurant';
+  String get searchRestaurant => 'Type to search';
 
   @override
   String get delivery => 'Delivery';
@@ -209,4 +209,81 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get retry => 'Retry';
+
+  @override
+  String get addons => 'Addons';
+
+  @override
+  String get fats => 'Fats';
+
+  @override
+  String get carbs => 'Carbs';
+
+  @override
+  String get protein => 'Protein';
+
+  @override
+  String get calories => 'Calories';
+
+  @override
+  String get next => 'Next';
+
+  @override
+  String get minShort => 'Min';
+
+  @override
+  String get yourOrder => 'Your order';
+
+  @override
+  String get emptyCart => 'Your cart is empty';
+
+  @override
+  String get total => 'Total';
+
+  @override
+  String get noDishesInGroup => 'No dishes in this group';
+
+  @override
+  String get checkoutSoon => 'Checkout will be available soon';
+
+  @override
+  String addNFor(int qty, String price) {
+    return 'Add $qty For $price';
+  }
+
+  @override
+  String get personalize => 'Personalize';
+
+  @override
+  String get drinkStep => 'Drink';
+
+  @override
+  String get extraStep => 'Extra';
+
+  @override
+  String get chooseDrink => 'Choose a drink';
+
+  @override
+  String get addExtra => 'Add extra';
+
+  @override
+  String get attrType => 'Type';
+
+  @override
+  String get attrSize => 'Size';
+
+  @override
+  String get comboUnavailable =>
+      'This combination is not available. Please change your selection.';
+
+  @override
+  String get packageNoOptions => 'This package has no configured options.';
+
+  @override
+  String customizePackage(String name) {
+    return 'Customize your $name';
+  }
+
+  @override
+  String get back => 'Back';
 }

@@ -1,8 +1,10 @@
 #pragma once
 
 #include "rabstractspecialwidget.h"
+#include <QJsonArray>
 #include <QJsonObject>
 
+class QComboBox;
 class QLabel;
 
 class RWorkstationConfigWidget : public RAbstractSpecialWidget
@@ -25,6 +27,14 @@ protected:
     virtual void applyConfig(const QJsonObject &config) = 0;
 
     virtual QJsonObject collectConfig() const = 0;
+
+    virtual void applyLookups(const QJsonObject &jdoc);
+
+    void fillFiscalMachineCombo(QComboBox *combo, const QJsonArray &machines) const;
+
+    void selectFiscalMachineCombo(QComboBox *combo, int id) const;
+
+    int selectedFiscalMachineId(const QComboBox *combo) const;
 
     void setHeaderInfo(const QJsonObject &jdoc);
 

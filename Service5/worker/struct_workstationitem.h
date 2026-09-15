@@ -110,6 +110,18 @@ struct WorkstationItem : public ParentItem {
         return url;
     }
     int printPaperWidthMm() const { return data.value(QStringLiteral("print_paper_width")).toInt(); }
+    /** Shop receipt / precheck left+right margins in mm (RWorkstationConfigShop::leReceiptPrinterLeftRightMargins). */
+    int receiptMarginsMm() const
+    {
+        const QJsonValue v = data.value(QStringLiteral("f_precheck_margins"));
+        int n = 0;
+        if (v.isString()) {
+            n = v.toString().trimmed().toInt();
+        } else {
+            n = v.toVariant().toInt();
+        }
+        return n > 0 ? n : 0;
+    }
 
     bool isArcusConfigured() const
     {

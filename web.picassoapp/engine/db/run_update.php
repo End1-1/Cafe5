@@ -628,7 +628,10 @@ create table if not exists ararix_restaurants (
     f_score int not null default 0,
     f_location point null,
     f_image_url varchar(255) null,
-    f_category varchar(128) null
+    f_logo_url varchar(255) null,
+    f_category varchar(128) null,
+    f_eta_min int not null default 55,
+    f_db varchar(64) null
 );
 
 create table if not exists ararix_goods_groups (
@@ -669,6 +672,91 @@ from dual where not exists (select 1 from ararix_restaurants where f_name = 'Piz
 
 EOD;
 
+$v = 239;
+$sql[$v] = <<<EOD
+update s_app set f_version = '$v' where lower(f_app)='db';
+alter table cash_debts add column if not exists f_comment varchar(255) not null default '';
+
+EOD;
+
+$v = 240;
+$sql[$v] = <<<EOD
+update s_app set f_version = '$v' where lower(f_app)='db';
+alter table ararix_restaurants add column if not exists f_logo_url varchar(255) null after f_image_url;
+alter table ararix_restaurants add column if not exists f_eta_min int not null default 55 after f_category;
+alter table ararix_restaurants add column if not exists f_db varchar(64) null after f_eta_min;
+
+EOD;
+
+$v = 241;
+$sql[$v] = <<<EOD
+update s_app set f_version = '$v' where lower(f_app)='db';
+CREATE TABLE IF NOT EXISTS ararix_restaurant_nationality (
+    f_id INT PRIMARY KEY AUTO_INCREMENT,
+    f_name VARCHAR(128) NOT NULL,
+    f_sort INT NOT NULL DEFAULT 0
+);
+INSERT IGNORE INTO ararix_restaurant_nationality (f_id, f_name, f_sort) VALUES
+    (1, 'Չինական', 1),
+    (2, 'Ճապոնական', 2),
+    (3, 'Հնդկական', 3),
+    (4, 'Եվրոպական', 4),
+    (5, 'Իտալական', 5),
+    (6, 'Հայկական', 6),
+    (7, 'Վրացական', 7),
+    (8, 'Լիբանանյան', 8),
+    (9, 'Արաբական', 9),
+    (10, 'Թուրքական', 10),
+    (11, 'Պարսկական', 11),
+    (12, 'Միջերկրածովյան', 12),
+    (13, 'Ամերիկյան', 13),
+    (14, 'Մեքսիկական', 14);
+ALTER TABLE ararix_restaurants ADD COLUMN IF NOT EXISTS f_nationality_id INT NULL AFTER f_category;
+CREATE INDEX IF NOT EXISTS idx_ararix_restaurants_nationality ON ararix_restaurants (f_nationality_id);
+
+CREATE TABLE IF NOT EXISTS ararix_restaurant_groups (
+    f_restaurant_id INT NOT NULL,
+    f_group_id INT NOT NULL,
+    f_sort INT NOT NULL DEFAULT 0,
+    PRIMARY KEY (f_restaurant_id, f_group_id),
+    INDEX idx_ararix_rg_group (f_group_id)
+);
+
+CREATE TABLE IF NOT EXISTS ararix_menu (
+    f_id INT PRIMARY KEY AUTO_INCREMENT,
+    f_restaurant_id INT NOT NULL,
+    f_group_id INT NOT NULL,
+    f_name VARCHAR(128) NOT NULL,
+    f_description TEXT NULL,
+    f_price DECIMAL(12,2) NOT NULL DEFAULT 0,
+    f_image_url VARCHAR(255) NULL,
+    f_state TINYINT NOT NULL DEFAULT 1,
+    f_sort INT NOT NULL DEFAULT 0,
+    f_source_goods_id INT NULL,
+    f_source_db VARCHAR(64) NULL,
+    f_data JSON NULL,
+    INDEX idx_ararix_menu_rest_state (f_restaurant_id, f_state),
+    INDEX idx_ararix_menu_group (f_group_id)
+);
+
+INSERT INTO ararix_goods_groups (f_id, f_name, f_sort) VALUES
+    (1, 'Բուրգեր', 1),
+    (2, 'Պիցցա', 2),
+    (3, 'Սուշի', 3),
+    (4, 'Սթեյք', 4),
+    (5, 'BBQ', 5),
+    (6, 'Ծովամթերք', 6),
+    (7, 'Ֆասթֆուդ', 7),
+    (8, 'Street Food', 8),
+    (9, 'Վեգան', 9),
+    (10, 'Վեգետարիանական', 10),
+    (11, 'Առողջ սնունդ', 11),
+    (12, 'Դեսերտներ / Հացաբուլկեղեն', 12),
+    (13, 'Սրճարան / Coffee & Dessert', 13)
+ON DUPLICATE KEY UPDATE f_name = VALUES(f_name), f_sort = VALUES(f_sort);
+
+EOD;
+
 $update_verision = intval(stmtall("select * from s_app where lower(f_app)='db'")->fetch_assoc()["f_version"]);
 for ($i = $update_verision + 1; $i <= $v; $i++) {
     if (isset($sql[$i])) {
@@ -684,6 +772,25 @@ for ($i = $update_verision + 1; $i <= $v; $i++) {
     } else {
         $skippedFiles[] = "Update version $i skipped, no SQL found.<br>";
     }
+}
+
+// Idempotent menu seed (safe if v241 already applied earlier).
+$seedFile = __DIR__ . '/seed_ararix_menu.sql';
+if (is_file($seedFile)) {
+    $seedSql = file_get_contents($seedFile);
+    foreach (explode(';', $seedSql) as $sss) {
+        $sss = preg_replace('/^\s*--.*$/m', '', $sss);
+        $sss = trim($sss);
+        if ($sss === '') {
+            continue;
+        }
+        try {
+            stmtall($sss);
+        } catch (Exception $e) {
+            $errorFiles[] = "Error in seed_ararix_menu.sql: " . $e->getMessage() . "<br>";
+        }
+    }
+    $executedFiles[] = "seed_ararix_menu.sql checked.<br>";
 }
 
 echo json_encode([

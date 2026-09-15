@@ -1,0 +1,12 @@
+---
+description: Keep appending DB migrations to run_update.php version 241 until user says otherwise
+alwaysApply: true
+---
+
+# Database migration version lock
+
+While this rule is active, **all new SQL schema/data changes** go into **`$v = 241`** in `web.picassoapp/engine/db/run_update.php`.
+
+- Do **not** create `$v = 242` (or higher) unless the user explicitly says to switch version.
+- Append new statements to the existing v241 `$sql[$v]` block (and mirror in `ararix.sql` / other SQL sources as needed).
+- When the user says to switch version, bump to the next `$v` and update or remove this rule accordingly.

@@ -19,6 +19,9 @@ public:
     virtual ~C5Printing();
 
     void setSceneParams(qreal width, qreal height, qreal logicalDpiX);
+    /** Set scene from printer pageRect; converts device px → 96dpi units expected by setSceneParams. */
+    void setSceneFromPrinter(QPrinter &printer);
+    /** Left + right side margins in mm (ltext x is still absolute from left edge). */
     void setRightMarginMm(qreal mm);
     void reset();
 
@@ -53,10 +56,12 @@ private:
 
     int fTempTop;
     int fNormalWidth;
+    int leftMarginPx() const;
     int rightMarginPx() const;
 
     qreal fMM;
     qreal fLogicalDpiX;
+    qreal fLeftMarginMm = 0;
     qreal fRightMarginMm = 0;
 
     QFont fFont;

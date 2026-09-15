@@ -19,6 +19,8 @@ protected:
 
     QJsonObject collectConfig() const override;
 
+    void applyLookups(const QJsonObject &jdoc) override;
+
 private:
     Ui::RWorkstationConfigShop *ui = nullptr;
 

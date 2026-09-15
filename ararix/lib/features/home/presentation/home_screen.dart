@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../core/theme/app_theme.dart';
 import '../../../l10n/app_localizations.dart';
@@ -330,41 +331,46 @@ class _RestaurantAvatar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      width: 78,
-      child: Column(
-        children: [
-          Container(
-            width: 68,
-            height: 68,
-            decoration: BoxDecoration(
-              color: const Color(0xFFF3F3F3),
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: AppColors.border),
-            ),
-            clipBehavior: Clip.antiAlias,
-            child: restaurant.imageUrl != null && restaurant.imageUrl!.isNotEmpty
-                ? Image.network(restaurant.imageUrl!, fit: BoxFit.cover)
-                : Center(
-                    child: Text(
-                      restaurant.name.isNotEmpty
-                          ? restaurant.name[0].toUpperCase()
-                          : '?',
-                      style: const TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.w800,
+    return InkWell(
+      onTap: () => context.push('/restaurant/${restaurant.id}'),
+      borderRadius: BorderRadius.circular(16),
+      child: SizedBox(
+        width: 78,
+        child: Column(
+          children: [
+            Container(
+              width: 68,
+              height: 68,
+              decoration: BoxDecoration(
+                color: const Color(0xFFF3F3F3),
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(color: AppColors.border),
+              ),
+              clipBehavior: Clip.antiAlias,
+              child: restaurant.imageUrl != null &&
+                      restaurant.imageUrl!.isNotEmpty
+                  ? Image.network(restaurant.imageUrl!, fit: BoxFit.cover)
+                  : Center(
+                      child: Text(
+                        restaurant.name.isNotEmpty
+                            ? restaurant.name[0].toUpperCase()
+                            : '?',
+                        style: const TextStyle(
+                          fontSize: 24,
+                          fontWeight: FontWeight.w800,
+                        ),
                       ),
                     ),
-                  ),
-          ),
-          const SizedBox(height: 6),
-          Text(
-            restaurant.name,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            style: const TextStyle(fontSize: 11),
-          ),
-        ],
+            ),
+            const SizedBox(height: 6),
+            Text(
+              restaurant.name,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: const TextStyle(fontSize: 11),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -482,7 +488,12 @@ class _TopOfferCard extends StatelessWidget {
             ? '${(offer.distanceM! / 1000).toStringAsFixed(1)} km'
             : '${offer.distanceM}m');
 
-    return Column(
+    return InkWell(
+      onTap: offer.restaurantId == null
+          ? null
+          : () => context.push('/restaurant/${offer.restaurantId}'),
+      borderRadius: BorderRadius.circular(18),
+      child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Stack(
@@ -583,6 +594,7 @@ class _TopOfferCard extends StatelessWidget {
           ),
         ],
       ],
+      ),
     );
   }
 }

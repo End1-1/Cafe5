@@ -18,3 +18,5 @@ $otp_url = "https://sendsms.nikita.am/broker-api/send";
 $otp_login = "homefood";
 $otp_pass = "Gu5K%NL2";
 $otp_ordinator = "HomeFood.am";
+
+$webapi_config_id=6;

@@ -67,7 +67,28 @@ abstract class WorkstationConfigBase
             'f_station_account' => $row['f_station_account'] ?? '',
             'config' => $loaded['config'],
             'config_kind' => $this->configKind(),
+            'fiscal_machines' => $this->fiscalMachinesList(),
         ];
+    }
+
+    /** @return list<array{f_id:int,f_name:string,f_ip:string,f_port:int}> */
+    protected function fiscalMachinesList(): array
+    {
+        $rows = $this->db->select(
+            'SELECT f_id, COALESCE(f_name, \'\') AS f_name, COALESCE(f_ip, \'\') AS f_ip, COALESCE(f_port, 0) AS f_port
+             FROM fiscal_machine
+             ORDER BY f_name, f_id'
+        )->fetch_all(MYSQLI_ASSOC);
+
+        foreach ($rows as &$row) {
+            $row['f_id'] = (int)$row['f_id'];
+            $row['f_port'] = (int)$row['f_port'];
+            $row['f_name'] = (string)$row['f_name'];
+            $row['f_ip'] = (string)$row['f_ip'];
+        }
+        unset($row);
+
+        return $rows;
     }
 
     protected function configKind(): string

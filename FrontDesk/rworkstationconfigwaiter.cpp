@@ -92,11 +92,16 @@ void RWorkstationConfigWaiter::buildSetupButtons()
     boxLayout->addWidget(scroll);
 }
 
+void RWorkstationConfigWaiter::applyLookups(const QJsonObject &jdoc)
+{
+    fillFiscalMachineCombo(ui->cbFiscalMachine, jdoc.value(QStringLiteral("fiscal_machines")).toArray());
+}
+
 void RWorkstationConfigWaiter::applyConfig(const QJsonObject &config)
 {
     ui->leCashboxId->setText(QString::number(config.value(QStringLiteral("f_cashbox_id")).toInt()));
     ui->leHallId->setText(QString::number(config.value(QStringLiteral("f_default_hall_id")).toInt()));
-    ui->leFiscalId->setText(QString::number(config.value(QStringLiteral("f_fiscal_machine_id")).toInt()));
+    selectFiscalMachineCombo(ui->cbFiscalMachine, config.value(QStringLiteral("f_fiscal_machine_id")).toInt());
     ui->leStoreId->setText(QString::number(config.value(QStringLiteral("f_default_store_id")).toInt()));
     ui->leReceiptPhone->setText(config.value(QStringLiteral("receipt_phone")).toString());
     ui->lePrecheckPrinter->setText(config.value(QStringLiteral("precheck_printer")).toString());
@@ -125,7 +130,7 @@ QJsonObject RWorkstationConfigWaiter::collectConfig() const
     jo.insert(QStringLiteral("customer_notification"), ui->leCostumerNotification->isChecked());
     jo.insert(QStringLiteral("f_cashbox_id"), ui->leCashboxId->text().trimmed().toInt());
     jo.insert(QStringLiteral("f_default_hall_id"), ui->leHallId->text().trimmed().toInt());
-    jo.insert(QStringLiteral("f_fiscal_machine_id"), ui->leFiscalId->text().trimmed().toInt());
+    jo.insert(QStringLiteral("f_fiscal_machine_id"), selectedFiscalMachineId(ui->cbFiscalMachine));
     jo.insert(QStringLiteral("f_default_store_id"), ui->leStoreId->text().trimmed().toInt());
     jo.insert(QStringLiteral("receipt_phone"), ui->leReceiptPhone->text().trimmed());
     jo.insert(QStringLiteral("precheck_printer"), ui->lePrecheckPrinter->text().trimmed());

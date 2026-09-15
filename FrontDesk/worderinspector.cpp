@@ -6,11 +6,17 @@
 #include <QColor>
 #include <QCoreApplication>
 #include <QDateTime>
+#include <QDialog>
 #include <QHeaderView>
 #include <QJsonDocument>
+#include <QJsonObject>
 #include <QMouseEvent>
+#include <QPointer>
 #include <QTableWidgetItem>
+#include <QToolBar>
 #include <QToolButton>
+#include "c5mainwindow.h"
+#include "c5message.h"
 #include "c5user.h"
 #include "c5utils.h"
 #include "dict_dish_state.h"
@@ -141,6 +147,57 @@ WOrderInspector::WOrderInspector(C5User *user, const QString &title, QIcon icon,
 WOrderInspector::~WOrderInspector()
 {
     delete ui;
+}
+
+QToolBar *WOrderInspector::toolBar()
+{
+    if(!fToolBar) {
+        fToolBar = createStandartToolbar(QList<ToolBarButtons>());
+        if(mUser && mUser->group() == 1) {
+            fToolBar->addAction(QIcon(QStringLiteral(":/delete.png")),
+                                tr("Delete sale\npermanently"),
+                                this,
+                                &WOrderInspector::purgeOrderPermanently);
+        }
+    }
+    return fToolBar;
+}
+
+void WOrderInspector::purgeOrderPermanently()
+{
+    if(!mUser || mUser->group() != 1) {
+        C5Message::error(tr("Access denied"));
+        return;
+    }
+    const QString orderId = mOrder.id.trimmed();
+    if(orderId.isEmpty()) {
+        C5Message::error(tr("Order id is required"));
+        return;
+    }
+
+    if(C5Message::question(tr("Permanently delete this sale and all related data from the database?\nThis cannot be undone."))
+       != QDialog::Accepted) {
+        return;
+    }
+    if(C5Message::question(tr("Confirm permanent deletion of sale %1?").arg(mOrder.receiptNumber.isEmpty() ? orderId : mOrder.receiptNumber))
+       != QDialog::Accepted) {
+        return;
+    }
+
+    QPointer<WOrderInspector> self(this);
+    NInterface::query1(QStringLiteral("/engine/v2/waiter/order/purge-order"),
+                       mUser->mSessionKey,
+                       this,
+                       {{QStringLiteral("id"), orderId}},
+                       [self](const QJsonObject &) {
+                           if(!self) {
+                               return;
+                           }
+                           C5Message::info(WOrderInspector::tr("Sale permanently deleted."));
+                           if(__mainWindow) {
+                               __mainWindow->removeTab(self);
+                           }
+                       });
 }
 
 void WOrderInspector::setOrderFromJson(const QJsonObject &jo)

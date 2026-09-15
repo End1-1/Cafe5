@@ -1,5 +1,6 @@
 #include "rworkstationsreport.h"
 #include "ui_rworkstationsreport.h"
+#include "rfiscalmachinesreport.h"
 #include "rservicevaluesreport.h"
 #include "dict_workstation.h"
 #include "rabstracteditordialog.h"
@@ -81,6 +82,10 @@ void RWorkstationsReport::setupTabs()
 {
     mWorkstationsListReport = new RWorkstationsListReport(fLabel, fIcon, mEditorName, this);
     ui->tabWidget->addTab(mWorkstationsListReport, tr("Workstations"));
+
+    mFiscalMachinesReport = new RFiscalMachinesReport(tr("Fiscal machines"), fIcon,
+                                                      QStringLiteral("form_fiscal_machines"), this);
+    ui->tabWidget->addTab(mFiscalMachinesReport, tr("Fiscal machines"));
 
     mServiceValuesReport = new RServiceValuesReport(tr("Service values"), fIcon, QStringLiteral("form_service_values"), this);
     ui->tabWidget->addTab(mServiceValuesReport, tr("Service values"));

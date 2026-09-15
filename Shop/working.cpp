@@ -2,6 +2,8 @@
 #include <QFile>
 #include <QInputDialog>
 #include <QJsonArray>
+#include <QJsonDocument>
+#include <QJsonObject>
 #include <QKeyEvent>
 #include <QMessageBox>
 #include <QMovie>
@@ -14,6 +16,8 @@
 #include <QSettings>
 #include <QShortcut>
 #include <QTimer>
+#include <QDate>
+#include <QTime>
 #include <QtMath>
 #include "appwebsocket.h"
 #include "c5cleartablewidget.h"
@@ -32,6 +36,7 @@
 #include "dlgregistercard.h"
 #include "dlgshowcolumns.h"
 #include "dqty.h"
+#include "format_date.h"
 #include "ndataprovider.h"
 #include "ninterface.h"
 #include "printreceiptgroup.h"
@@ -61,7 +66,13 @@ Working::Working(C5User *user, QWidget *parent) :
         connect(AppWebSocket::instance, &AppWebSocket::socketConnecting, this, &Working::updateWsStatus);
         connect(AppWebSocket::instance, &AppWebSocket::socketConnected, this, &Working::updateWsStatus);
         connect(AppWebSocket::instance, &AppWebSocket::socketDisconnected, this, &Working::updateWsStatus);
+        connect(AppWebSocket::instance, &AppWebSocket::messageReceived, this, &Working::onWsTextMessage);
+        connect(AppWebSocket::instance, &AppWebSocket::socketConnected, this, [this]() {
+            QTimer::singleShot(300, this, &Working::fetchPendingSitePrints);
+        });
     }
+    // Site pending prints (f_state=1) — independent of cashbox session.
+    QTimer::singleShot(800, this, &Working::fetchPendingSitePrints);
     QString ip;
     fCustomerDisplay = nullptr;
     QString username;
@@ -345,7 +356,10 @@ void Working::checkCashboxSession()
 
                            if (session.value(QStringLiteral("f_id")).toInt() > 0) {
                                applyCashboxSession(session);
-                               loadShopTables([this]() { newSale(1); });
+                               loadShopTables([this]() {
+                                   newSale(1);
+                                   fetchPendingSitePrints();
+                               });
                            } else {
                                showSessionWidget();
                            }
@@ -434,6 +448,237 @@ void Working::updateWsStatus()
     }
 }
 
+void Working::onWsTextMessage(const QString &message)
+{
+    QJsonParseError err;
+    const QJsonDocument doc = QJsonDocument::fromJson(message.toUtf8(), &err);
+    if (err.error != QJsonParseError::NoError || !doc.isObject()) {
+        return;
+    }
+    const QJsonObject jo = doc.object();
+    if (jo.value(QStringLiteral("command")).toString() != QStringLiteral("site_sale_print")) {
+        return;
+    }
+    const int hallId = jo.value(QStringLiteral("hall_id")).toInt();
+    if (hallId > 0 && hallId != mWorkStation.defaultHallId()) {
+        return;
+    }
+    const QString orderId = jo.value(QStringLiteral("order_id")).toString();
+    enqueueSiteSalePrint(orderId);
+}
+
+void Working::fetchPendingSitePrints()
+{
+    // Does not require an open cashbox session — only hall + auth.
+    if (!mUser || mWorkStation.defaultHallId() <= 0) {
+        return;
+    }
+    NInterface::query(QStringLiteral("/engine/v2/shop/view-order/pending-site-prints"),
+                      mUser->mSessionKey,
+                      this,
+                      {{QStringLiteral("hall_id"), mWorkStation.defaultHallId()}},
+                      [this](const QJsonObject &jo) {
+                          const QJsonArray orders = jo.value(QStringLiteral("orders")).toArray();
+                          for (const QJsonValue &v : orders) {
+                              enqueueSiteSalePrint(v.toObject().value(QStringLiteral("f_id")).toString());
+                          }
+                      },
+                      [](const QJsonObject &) { return true; },
+                      false);
+}
+
+void Working::enqueueSiteSalePrint(const QString &orderId)
+{
+    if (orderId.isEmpty()) {
+        return;
+    }
+    if (mSitePrintInProgress.contains(orderId) || mSitePrintQueue.contains(orderId)) {
+        return;
+    }
+    mSitePrintQueue.append(orderId);
+    processSitePrintQueue();
+}
+
+void Working::processSitePrintQueue()
+{
+    if (mSitePrintBusy || mSitePrintQueue.isEmpty()) {
+        return;
+    }
+    mSitePrintBusy = true;
+    const QString id = mSitePrintQueue.takeFirst();
+    mSitePrintInProgress.insert(id);
+    printSiteSale(id);
+}
+
+void Working::finishSiteSalePrint(const QString &orderId)
+{
+    mSitePrintInProgress.remove(orderId);
+    mSitePrintBusy = false;
+    processSitePrintQueue();
+}
+
+void Working::printSiteSale(const QString &orderId)
+{
+    auto fail = [this, orderId](const QJsonObject &) {
+        finishSiteSalePrint(orderId);
+        return true;
+    };
+
+    NInterface::query(QStringLiteral("/engine/v2/shop/view-order/get"),
+                      mUser->mSessionKey,
+                      this,
+                      {{QStringLiteral("id"), orderId}},
+                      [this, orderId](const QJsonObject &jo) {
+                          const QJsonObject header = jo.value(QStringLiteral("header")).toObject();
+                          if (header.isEmpty()) {
+                              finishSiteSalePrint(orderId);
+                              return;
+                          }
+                          const bool sitePending = header.value(QStringLiteral("f_site_print_pending")).toBool()
+                                                   || header.value(QStringLiteral("f_site_print_pending")).toInt() == 1;
+                          const int state = header.value(QStringLiteral("f_state")).toInt();
+                          if (state != 1 && !sitePending) {
+                              finishSiteSalePrint(orderId);
+                              return;
+                          }
+                          const int hallId = header.value(QStringLiteral("f_hall")).toInt();
+                          if (hallId > 0 && hallId != mWorkStation.defaultHallId()) {
+                              finishSiteSalePrint(orderId);
+                              return;
+                          }
+
+                          PrintReceiptGroup::printOrder(jo);
+
+                          bool needService = false;
+                          const QJsonArray goods = jo.value(QStringLiteral("goods")).toArray();
+                          for (const QJsonValue &gv : goods) {
+                              const QJsonObject g = gv.toObject();
+                              if (!g.value(QStringLiteral("f_print1")).toString().trimmed().isEmpty()
+                                  || !g.value(QStringLiteral("f_print2")).toString().trimmed().isEmpty()) {
+                                  needService = true;
+                                  break;
+                              }
+                          }
+
+                          auto markPrinted = [this, orderId]() {
+                              NInterface::query(QStringLiteral("/engine/v2/shop/view-order/mark-site-printed"),
+                                                mUser->mSessionKey,
+                                                this,
+                                                {{QStringLiteral("id"), orderId}},
+                                                [this, orderId](const QJsonObject &) {
+                                                    finishSiteSalePrint(orderId);
+                                                },
+                                                [this, orderId](const QJsonObject &) {
+                                                    finishSiteSalePrint(orderId);
+                                                    return true;
+                                                },
+                                                false);
+                          };
+
+                          if (needService) {
+                              NInterface::query(QStringLiteral("/engine/v2/waiter/order/print-service-check"),
+                                                mUser->mSessionKey,
+                                                this,
+                                                {{QStringLiteral("header_id"), orderId},
+                                                 {QStringLiteral("reprint"), true}},
+                                                [this, markPrinted](const QJsonObject &ps) {
+                                                    printSiteServiceCheck(ps);
+                                                    markPrinted();
+                                                },
+                                                [this, orderId, markPrinted](const QJsonObject &) {
+                                                    // Still mark printed so we do not loop forever.
+                                                    markPrinted();
+                                                    return true;
+                                                },
+                                                false);
+                          } else {
+                              markPrinted();
+                          }
+                      },
+                      fail,
+                      false);
+}
+
+void Working::printSiteServiceCheck(const QJsonObject &jdoc)
+{
+    QJsonObject printData = jdoc.value(QStringLiteral("print_data")).toObject();
+    const QStringList printers = printData.keys();
+    QJsonObject jh = jdoc.value(QStringLiteral("header")).toObject();
+    if (printers.isEmpty()) {
+        return;
+    }
+
+    for (const QString &printerName : printers) {
+        QJsonObject jo = printData.value(printerName).toObject();
+        QFont font(qApp->font());
+        const int bs = 22;
+        font.setPointSize(bs);
+        C5Printing p;
+        QPrinterInfo pi = QPrinterInfo::printerInfo(printerName);
+        QPrinter printer(pi);
+        p.setSceneFromPrinter(printer);
+        p.setFont(font);
+        p.setFontBold(true);
+        p.setFontSize(bs);
+        const int sideMarginMm = mWorkStation.receiptMarginsMm();
+        p.setRightMarginMm(sideMarginMm);
+        const int nameWidthMm = qMax(8, 65 - 2 * sideMarginMm);
+
+        p.ctext(tr("New order").toUpper());
+        p.br();
+        p.br();
+        p.setFontBold(false);
+        p.ltext(tr("Order no"), sideMarginMm);
+        p.rtext(jh.value(QStringLiteral("f_prefix")).toString());
+        p.br();
+        p.ltext(tr("Date"), sideMarginMm);
+        p.rtext(QDate::currentDate().toString(FORMAT_DATE_TO_STR));
+        p.br();
+        p.ltext(tr("Time"), sideMarginMm);
+        p.rtext(QTime::currentTime().toString(FORMAT_TIME_TO_STR));
+        p.br();
+        if (mUser) {
+            p.ltext(tr("Staff"), sideMarginMm);
+            p.rtext(mUser->shortFullName());
+            p.br();
+        }
+        p.line();
+        p.br(2);
+
+        for (const auto &jdv : jo.value(QStringLiteral("dishes")).toArray()) {
+            p.setFontSize(bs + 2);
+            p.setFontBold(false);
+            QJsonObject jd = jdv.toObject();
+            p.ltext(jd.value(QStringLiteral("f_dish_name")).toString(), sideMarginMm, nameWidthMm);
+            p.setFontBold(true);
+            p.rtext(float_str(jd.value(QStringLiteral("f_qty")).toDouble(), 2));
+            if (!jd.value(QStringLiteral("f_comment")).toString().isEmpty()) {
+                p.br();
+                p.setFontSize(bs - 4);
+                p.setFontBold(true);
+                p.ltext(jd.value(QStringLiteral("f_comment")).toString(), sideMarginMm, 650);
+                p.br();
+                p.setFontSize(bs + 2);
+            }
+            p.br();
+            p.line();
+            p.br(1);
+        }
+
+        p.line();
+        p.br(1);
+        p.setFontSize(bs - 6);
+        p.ltext(QString("%1 %2").arg(tr("Printer: "), printerName), sideMarginMm);
+        p.setFontBold(true);
+        p.rtext(jo.value(QStringLiteral("side")).toString());
+        p.br();
+
+        if (!pi.isNull()) {
+            p.print(printer);
+        }
+    }
+}
+
 void Working::showSessionWidget()
 {
     clearCashboxSession();
@@ -465,7 +710,10 @@ void Working::onSessionOpened(const QJsonObject &session)
 
     ui->tab->setTabsClosable(true);
     applyCashboxSession(session);
-    loadShopTables([this]() { newSale(1); });
+    loadShopTables([this]() {
+        newSale(1);
+        fetchPendingSitePrints();
+    });
 }
 
 void Working::setSaleControlsEnabled(bool enabled)
@@ -806,19 +1054,14 @@ void Working::orderSaved(QWidget *w)
 void Working::timeout()
 {
 #ifdef QT_DEBUG
-    int div = 10;
+    const int pendingDiv = 10;
 #else
-    int div = 30;
+    const int pendingDiv = 15;
 #endif
     fTimerCounter++;
-    //TODO
-    // if(fTimerCounter % div == 0) {
-    //     QJsonObject jo;
-    //     jo["action"] = MSG_GET_UNREAD;
-    //     jo["userfrom"] = mWorkStation.defaultStoreId();
-    //     fHttp->createHttpQuery("/engine/shop/create-reserve.php", jo, SLOT(checkMessageResponse(QJsonObject)), QVariant(),
-    //                            false);
-    // }
+    if (fTimerCounter % pendingDiv == 0) {
+        fetchPendingSitePrints();
+    }
 }
 
 void Working::onCtrlI()
@@ -1400,4 +1643,13 @@ void Working::on_btnAttendance_clicked()
 void Working::on_btnProgressWindow_clicked()
 {
     DlgCookingProgress(mUser, this).exec();
+}
+
+void Working::on_btnServiceCheck_clicked()
+{
+    WOrder *w = worder();
+    if (!w) {
+        return;
+    }
+    w->printServiceCheckBeforeSave();
 }

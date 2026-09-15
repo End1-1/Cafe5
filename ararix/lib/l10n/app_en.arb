@@ -72,12 +72,47 @@
   "englishNative": "English",
   "russianNative": "Русский",
   "armenianNative": "Հայերեն",
-  "searchRestaurant": "Search for a restaurant",
+  "searchRestaurant": "Type to search",
   "delivery": "Delivery",
   "takeaway": "Takeaway",
   "dineIn": "Dine-In",
   "topRestaurants": "Top Restaurants",
   "dishes": "Dishes",
   "topOffer": "Top offer",
-  "retry": "Retry"
+  "retry": "Retry",
+  "addons": "Addons",
+  "fats": "Fats",
+  "carbs": "Carbs",
+  "protein": "Protein",
+  "calories": "Calories",
+  "next": "Next",
+  "minShort": "Min",
+  "yourOrder": "Your order",
+  "emptyCart": "Your cart is empty",
+  "total": "Total",
+  "noDishesInGroup": "No dishes in this group",
+  "checkoutSoon": "Checkout will be available soon",
+  "addNFor": "Add {qty} For {price}",
+  "@addNFor": {
+    "placeholders": {
+      "qty": {"type": "int"},
+      "price": {"type": "String"}
+    }
+  },
+  "personalize": "Personalize",
+  "drinkStep": "Drink",
+  "extraStep": "Extra",
+  "chooseDrink": "Choose a drink",
+  "addExtra": "Add extra",
+  "attrType": "Type",
+  "attrSize": "Size",
+  "comboUnavailable": "This combination is not available. Please change your selection.",
+  "packageNoOptions": "This package has no configured options.",
+  "customizePackage": "Customize your {name}",
+  "@customizePackage": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+  "back": "Back"
 }

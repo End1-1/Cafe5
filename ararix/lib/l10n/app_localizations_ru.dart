@@ -187,7 +187,7 @@ class AppLocalizationsRu extends AppLocalizations {
   String get armenianNative => 'Հայերեն';
 
   @override
-  String get searchRestaurant => 'Поиск ресторана';
+  String get searchRestaurant => 'Введите для поиска';
 
   @override
   String get delivery => 'Доставка';
@@ -209,4 +209,80 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get retry => 'Повторить';
+
+  @override
+  String get addons => 'Добавки';
+
+  @override
+  String get fats => 'Жиры';
+
+  @override
+  String get carbs => 'Углеводы';
+
+  @override
+  String get protein => 'Белки';
+
+  @override
+  String get calories => 'Калории';
+
+  @override
+  String get next => 'Далее';
+
+  @override
+  String get minShort => 'Мин';
+
+  @override
+  String get yourOrder => 'Ваш заказ';
+
+  @override
+  String get emptyCart => 'Корзина пуста';
+
+  @override
+  String get total => 'Итого';
+
+  @override
+  String get noDishesInGroup => 'В этой группе нет блюд';
+
+  @override
+  String get checkoutSoon => 'Оформление заказа скоро будет доступно';
+
+  @override
+  String addNFor(int qty, String price) {
+    return 'Добавить $qty за $price';
+  }
+
+  @override
+  String get personalize => 'Настроить';
+
+  @override
+  String get drinkStep => 'Напиток';
+
+  @override
+  String get extraStep => 'Дополнительно';
+
+  @override
+  String get chooseDrink => 'Выберите напиток';
+
+  @override
+  String get addExtra => 'Добавить ещё';
+
+  @override
+  String get attrType => 'Тип';
+
+  @override
+  String get attrSize => 'Размер';
+
+  @override
+  String get comboUnavailable => 'Такая комбинация недоступна. Измените выбор.';
+
+  @override
+  String get packageNoOptions => 'У этого набора нет настроенных опций.';
+
+  @override
+  String customizePackage(String name) {
+    return 'Настройте $name';
+  }
+
+  @override
+  String get back => 'Назад';
 }

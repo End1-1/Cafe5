@@ -1,14 +1,44 @@
 <?php
 # © 2025 , Kudryashov Vasili
 # Created: 2025-11-27 09:51:33
-# Last Modified: 2026-08-21
+# Last Modified: 2026-08-25
 require_once __DIR__ . "/index.php";
+require_once __DIR__ . "/../waiter/order.php";
+require_once __DIR__ . "/../waiter/cashbox.php";
+require_once __DIR__ . "/../shop/view-order.php";
 
 class Api extends Auth
 {
+    /**
+     * Workstation for site sales: SELECT * FROM workstations WHERE f_id = $webapi_config_id
+     * @return array{row: array, config: array}
+     */
+    private function loadWebApiWorkstation(): array
+    {
+        global $webapi_config_id;
+        $id = (int)($webapi_config_id ?? 0);
+        if ($id <= 0) {
+            dieWithCode("webapi_config_id is not set in cnf.php");
+        }
+        $row = $this->select("SELECT * FROM workstations WHERE f_id=?", "i", [$id])->fetch_assoc();
+        if (!$row) {
+            dieWithCode("Workstation not found: " . $id);
+        }
+        $cfg = json_decode($row["f_config"] ?? "{}", true);
+        if (!is_array($cfg)) {
+            $cfg = [];
+        }
+        if ((int)($cfg["f_cashbox_id"] ?? 0) <= 0) {
+            dieWithCode("f_cashbox_id is not set in workstation config " . $id);
+        }
+        return ["row" => $row, "config" => $cfg];
+    }
+
     public function stock($params)
     {
-        $storeIds = [1];
+        $ws = $this->loadWebApiWorkstation();
+        $defaultStore = (int)($ws["config"]["f_default_store_id"] ?? 1);
+        $storeIds = [$defaultStore > 0 ? $defaultStore : 1];
         $storePlaceholders = implode(",", array_fill(0, count($storeIds), "?"));
         $types = str_repeat("i", count($storeIds));
         $binds = $storeIds;
@@ -43,6 +73,7 @@ class Api extends Auth
             INNER JOIN c_groups gr ON gr.f_id = g.f_group
             WHERE st.f_store_id IN ($storePlaceholders)
               AND CAST(COALESCE(JSON_VALUE(gr.f_data, '$.f_online_sale'), '0') AS UNSIGNED) = 1
+              AND CAST(COALESCE(JSON_VALUE(g.f_data, '$.f_online_sale'), '0') AS UNSIGNED) = 1
               {$skuFilter}
             GROUP BY g.f_id, g.f_scancode, st.f_store_id, cp.f_price1, cp.f_price1disc, g.f_name, gr.f_name
             HAVING SUM(st.f_qty_left) > 0
@@ -64,149 +95,114 @@ class Api extends Auth
 
     public function PurchaseCreate($params)
     {
-        $allow_store = [0, 2, 3, 5, 24];
-        $session = uuid_v4();
-
-        $total = 0;
-        $goodsRows = [];
+        $allow_store = [0, 1, 2, 3, 5, 24];
+        $ws = $this->loadWebApiWorkstation();
+        $cfg = $ws["config"];
+        $defaultStore = (int)($cfg["f_default_store_id"] ?? 1);
+        if ($defaultStore <= 0) {
+            $defaultStore = 1;
+        }
 
         if (empty($params->items)) {
             dieWithCode("Empty list of goods");
         }
 
-        $order_id = $params->{"query-id"} ?? "";
-        if ($order_id == "auto") {
-            $order_id = uuid_v4();
+        $order_id = (string)($params->{"query-id"} ?? "");
+        if ($order_id === "" || $order_id === "auto") {
+            $order_id = "auto";
         }
 
-        foreach ($params->items as $i => $item) {
-            if ((int)$item->store == 0) {
-                $item->store = 2;
+        $items = [];
+        foreach ($params->items as $item) {
+            $item = is_array($item) ? (object)$item : $item;
+            $store = (int)($item->store ?? 0);
+            if ($store === 0) {
+                $store = $defaultStore;
             }
-            if (!in_array((int)$item->store, $allow_store, true)) {
-                dieWithCode("Store not allowed: " . $item->store);
+            if (!in_array($store, $allow_store, true)) {
+                dieWithCode("Store not allowed: " . $store);
             }
-            $res = $this->select(
-                "select f_id from c_goods where f_scancode=? limit 1",
+
+            $row = $this->select(
+                "SELECT g.f_id, g.f_name, g.f_scancode,
+                        CAST(COALESCE(JSON_VALUE(gr.f_data, '$.f_online_sale'), '0') AS UNSIGNED) AS f_group_online,
+                        CAST(COALESCE(JSON_VALUE(g.f_data, '$.f_online_sale'), '0') AS UNSIGNED) AS f_goods_online
+                 FROM c_goods g
+                 INNER JOIN c_groups gr ON gr.f_id = g.f_group
+                 WHERE g.f_scancode=? LIMIT 1",
                 "s",
                 [$item->sku]
-            );
-
-            $row = $res->fetch_assoc();
+            )->fetch_assoc();
             if (!$row) {
                 dieWithCode("Goods not found: " . $item->sku);
             }
+            if ((int)$row["f_group_online"] !== 1) {
+                dieWithCode("Goods group is not available for online sale: " . $item->sku);
+            }
+            if ((int)$row["f_goods_online"] !== 1) {
+                dieWithCode("Goods not available for online sale: " . $item->sku);
+            }
 
-            $goodsId = $row['f_id'];
-
-            $rowTotal = $item->qty * $item->price;
-            $total += $rowTotal;
-
-            $goodsRows[] = [
-                "f_id" => uuid_v4(),
-                "f_header" => $order_id,
-                "f_store" => $item->store,
-                "f_goods" => $goodsId,
-                "f_qty" => $item->qty,
-                "f_price" => $item->price,
-                "f_total" => $rowTotal,
-                "f_tax" => 0,
-                "f_sign" => 1,
-                "f_taxdebt" => 0,
-                "f_row" => $i,
-                "f_discountfactor" => 0,
-                "f_discountmode" => 0,
-                "f_discountamount" => 0,
-                "f_return" => 0,
-                "f_isservice" => 0,
-                "f_amountaccumulate" => 0,
-                "f_emarks" => ""
+            $items[] = (object)[
+                "goods_id" => (int)$row["f_id"],
+                "dish" => (int)$row["f_id"],
+                "name" => $row["f_name"],
+                "store" => $store,
+                "qty" => (float)$item->qty,
+                "price" => (float)$item->price,
             ];
         }
 
-        // ----------------------------------
-        // распределяем оплату
-        // ----------------------------------
-        $amountCash = 0;
-        $amountCard = 0;
-        $amountIdram = 0;
-        $amountTelcell = 0;
+        $table = (int)($params->table ?? $cfg["f_default_table_id"] ?? 0);
+        if ($table <= 0) {
+            $hallId = (int)($cfg["f_default_hall_id"] ?? 0);
+            if ($hallId > 0) {
+                $trow = $this->select(
+                    "SELECT f_id FROM c_tables WHERE f_hall=? ORDER BY f_id LIMIT 1",
+                    "i",
+                    [$hallId]
+                )->fetch_assoc();
+                if ($trow) {
+                    $table = (int)$trow["f_id"];
+                }
+            }
+            if ($table <= 0) {
+                $table = 1;
+            }
+        }
+        $cashboxId = (int)($params->cashbox_id ?? $cfg["f_cashbox_id"] ?? 0);
+        $staffId = (int)($params->staff_id ?? 0);
 
-        switch ($params->{"payment-method"}) {
-            case 1:
-                $amountCash = $total;
-                break;
-            case 2:
-                $amountCard = $total;
-                break;
-            case 4:
-                $amountIdram = $total;
-                break;
-            case 7:
-                $amountTelcell = $total;
-                break;
+        $ord = new Order();
+        if (!$ord->auth()) {
+            dieWithCode("Unauthorized");
         }
 
-        // ----------------------------------
-        // header
-        // ----------------------------------
-        $header = [
-            "f_id" => $order_id,
-            "f_state" => 2,
-            "f_cashier" => 1,
-            "f_staff" => 1,
-            "f_source" => 2,
-            "f_saletype" => 1,
-            "f_currency" => 1,
-            "f_dateopen" => date("Y-m-d"),
-            "f_dateclose" => date("Y-m-d"),
-            "f_datecash" => date("Y-m-d"),
-            "f_timeopen" => date("H:i:s"),
-            "f_timeclose" => date("H:i:s"),
-            "f_amounttotal" => $total,
-            "f_amountcash" => $amountCash,
-            "f_amountcard" => $amountCard,
-            "f_amountidram" => $amountIdram,
-            "f_amounttelcell" => $amountTelcell,
-            "f_cash" => $total,
-            "f_change" => 0
-        ];
-
-        $jdoc = [
-            "session" => $session,
-            "header" => $header,
-            "goods" => $goodsRows,
-            "flags" => [
-                "f_1" => 0,
-                "f_2" => 0,
-                "f_3" => 0,
-                "f_4" => 0,
-                "f_5" => 0
-            ]
-        ];
-
-        $json = json_encode($jdoc, JSON_UNESCAPED_UNICODE);
-
-        // ----------------------------------
-        // вызов процедуры
-        // ----------------------------------
-        $this->callJsonProcedure("sf_create_shop_order", $json, true);
-
-        // ----------------------------------
-        // читаем результат
-        // ----------------------------------
-        $res = $this->select(
-            "select f_result from a_result where f_session=?",
-            "s",
-            [$session]
-        );
-
-        $row = $res->fetch_assoc();
-        if (!$row) {
-            dieWithCode("Session result not found");
+        $cc = new Cashbox();
+        if (!$cc->auth()) {
+            dieWithCode("Unauthorized");
+        }
+        $session = $cc->ensureDailyOpenSession($cashboxId, (int)$this->userid, 0);
+        if (!$session || empty($session["f_id"])) {
+            dieWithCode(Translator::t("No active cashbox session"));
         }
 
-        $this->result["result"] = $row['f_result'];
+        $saleParams = (object)[
+            "table" => $table,
+            "cashbox_id" => $cashboxId,
+            "cash_session_id" => (int)$session["f_id"],
+            "staff_id" => $staffId,
+            "order_id" => $order_id,
+            "items" => $items,
+            "payment_method" => (int)($params->{"payment-method"} ?? $params->payment_method ?? 0),
+            "service_factor" => 0,
+            "discount_factor" => 0,
+            "costumer" => $params->costumer ?? $params->customer ?? null,
+        ];
+
+        $order = $ord->createClosedSaleFromItems($saleParams);
+
+        $this->result["f_id"] = (string)($order["f_id"] ?? "");
         $this->echoResult();
     }
 
@@ -218,6 +214,133 @@ class Api extends Auth
     public function get($params)
     {
         $this->result["data"] = $this->select("select * from c_goods where f_id=?", "i", [$params->f_id])->fetch_assoc();
+        $this->echoResult();
+    }
+
+    public function cancelPurchase($params)
+    {
+        $orderId = (string)($params->{"query-id"} ?? $params->f_id ?? $params->order_id ?? $params->id ?? "");
+        if ($orderId === "") {
+            dieWithCode("Missing order id");
+        }
+
+        $ws = $this->loadWebApiWorkstation();
+        $cfg = $ws["config"];
+        $defaultStore = (int)($cfg["f_default_store_id"] ?? 1);
+        if ($defaultStore <= 0) {
+            $defaultStore = 1;
+        }
+        $cashboxId = (int)($params->cashbox_id ?? $cfg["f_cashbox_id"] ?? 0);
+
+        $src = $this->select("SELECT * FROM o_header WHERE f_id=?", "s", [$orderId])->fetch_assoc();
+        if (!$src) {
+            dieWithCode(Translator::t("Document is not exists"));
+        }
+        if ((int)$src["f_state"] !== 2 && (int)$src["f_state"] !== 1) {
+            dieWithCode(Translator::t("Order is not closed"));
+        }
+        if ((int)($src["f_saletype"] ?? 0) === 4) {
+            dieWithCode(Translator::t("You cannot return this item"));
+        }
+
+        $odata = json_decode($src["f_data"] ?? "{}", true) ?: [];
+        if (($odata["f_source"] ?? "") !== "site") {
+            dieWithCode("Not a site purchase");
+        }
+
+        $partialReturn = $this->select(
+            "SELECT f_id FROM o_goods WHERE f_header=? AND COALESCE(f_returnedqty, 0) > 0 LIMIT 1",
+            "s",
+            [$orderId]
+        )->fetch_assoc();
+        if ($partialReturn) {
+            dieWithCode("Purchase was already partially returned");
+        }
+
+        $returnDoc = $this->select(
+            "SELECT f_id FROM o_header
+             WHERE f_saletype=4 AND JSON_UNQUOTE(JSON_EXTRACT(f_data, '$.f_return_from'))=?
+             LIMIT 1",
+            "s",
+            [$orderId]
+        )->fetch_assoc();
+        if ($returnDoc) {
+            dieWithCode("Purchase was already cancelled");
+        }
+
+        $goodsRows = $this->select(
+            "SELECT f_id, f_qty, COALESCE(f_returnedqty, 0) AS f_returnedqty, f_price, f_store
+             FROM o_goods
+             WHERE f_header=? AND f_state=1",
+            "s",
+            [$orderId]
+        )->fetch_all(MYSQLI_ASSOC);
+
+        $items = [];
+        $storeId = $defaultStore;
+        foreach ($goodsRows as $row) {
+            $available = (float)$row["f_qty"] - (float)$row["f_returnedqty"];
+            if ($available < 0.0001 || (float)$row["f_price"] < 0) {
+                continue;
+            }
+            $lineStore = (int)($row["f_store"] ?? 0);
+            if ($lineStore > 0) {
+                $storeId = $lineStore;
+            }
+            $items[] = (object)[
+                "id" => (string)$row["f_id"],
+                "qty" => $available,
+            ];
+        }
+        if (empty($items)) {
+            dieWithCode(Translator::t("Nothing to return"));
+        }
+
+        $vo = new ViewOrder();
+        if (!$vo->auth()) {
+            dieWithCode("Unauthorized");
+        }
+
+        $cc = new Cashbox();
+        if (!$cc->auth()) {
+            dieWithCode("Unauthorized");
+        }
+        $session = $cc->ensureDailyOpenSession($cashboxId, (int)$this->userid, 0);
+        if (!$session || empty($session["f_id"])) {
+            dieWithCode(Translator::t("No active cashbox session"));
+        }
+
+        $result = $vo->performCreateReturn((object)[
+            "id" => $orderId,
+            "reason_id" => 0,
+            "reason" => trim((string)($params->reason ?? "")),
+            "items" => $items,
+            "cash_session_id" => (int)$session["f_id"],
+            "cashbox_id" => $cashboxId,
+            "store_id" => $storeId,
+        ]);
+
+        // Pending site print uses f_state=1; after cancel mark closed so Shop won't print.
+        if ((int)$src["f_state"] === 1) {
+            $odata = json_decode($src["f_data"] ?? "{}", true) ?: [];
+            unset($odata["f_site_print_pending"]);
+            $this->select(
+                "UPDATE o_header SET f_state=2, f_data=? WHERE f_id=? AND f_state=1",
+                "ss",
+                [json_encode($odata, JSON_UNESCAPED_UNICODE), $orderId],
+                true
+            );
+        } elseif (!empty(json_decode($src["f_data"] ?? "{}", true)["f_site_print_pending"])) {
+            $odata = json_decode($src["f_data"] ?? "{}", true) ?: [];
+            unset($odata["f_site_print_pending"]);
+            $this->update(
+                "o_header",
+                ["f_data" => json_encode($odata, JSON_UNESCAPED_UNICODE)],
+                $orderId
+            );
+        }
+
+        $this->result["f_id"] = (string)($result["return_order_id"] ?? "");
         $this->echoResult();
     }
 }

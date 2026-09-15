@@ -29,11 +29,13 @@ C5Dialog::C5Dialog(C5User *user, QWidget *parent)
 #endif
 
     if (mScreen > -1) {
-        QScreen *screen = qApp->screens().at(mScreen);
-        this->create();
-
-        if (windowHandle()) {
-            windowHandle()->setScreen(screen);
+        const QList<QScreen *> screens = qApp->screens();
+        if (mScreen < screens.count()) {
+            QScreen *screen = screens.at(mScreen);
+            this->create();
+            if (windowHandle()) {
+                windowHandle()->setScreen(screen);
+            }
         }
     }
 
@@ -49,11 +51,13 @@ C5Dialog::C5Dialog(C5User *user)
 #endif
 
     if (mScreen > -1) {
-        QScreen *screen = qApp->screens().at(mScreen);
-        this->create();
-
-        if(windowHandle()) {
-            windowHandle()->setScreen(screen);
+        const QList<QScreen *> screens = qApp->screens();
+        if (mScreen < screens.count()) {
+            QScreen *screen = screens.at(mScreen);
+            this->create();
+            if (windowHandle()) {
+                windowHandle()->setScreen(screen);
+            }
         }
     }
 
@@ -159,7 +163,7 @@ void C5Dialog::updateRequired(const QString &msg, const QString &appName, const 
         return;
     }
     if (!C5Message::tryStartUpdater(appName, newVersion)) {
-        C5Message::info(tr("Updater not found. Reinstall the application."));
+        C5Message::info(tr("Could not start the updater. Reinstall the application or run the setup from picasso.am."));
     }
     qApp->exit(0);
 }
@@ -237,10 +241,14 @@ void C5Dialog::showEvent(QShowEvent *e)
     QTimer::singleShot(0, this, &C5Dialog::updateBackgroundCache);
 
     if (!e->spontaneous()) {
-        QScreen *screen = qApp->screens().first();
-
-        if (mScreen > -1) {
-            screen = qApp->screens().at(mScreen);
+        const QList<QScreen *> screens = qApp->screens();
+        QScreen *screen = screens.isEmpty() ? nullptr : screens.first();
+        if (mScreen > -1 && mScreen < screens.count()) {
+            screen = screens.at(mScreen);
+        }
+        if (!screen) {
+            QWidget::showEvent(e);
+            return;
         }
 
         QRect geo = screen->availableGeometry();

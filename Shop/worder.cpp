@@ -634,12 +634,48 @@ bool WOrder::needsServicePrint() const
     return false;
 }
 
+void WOrder::printServiceCheckBeforeSave()
+{
+    if (mOrder.isEmpty()) {
+        C5Message::error(tr("Empty order"));
+        return;
+    }
+    if (mOrder.id.isEmpty()) {
+        C5Message::error(tr("Empty order"));
+        return;
+    }
+    if (!needsServicePrint()) {
+        C5Message::info(tr("No service printers configured for these items"));
+        return;
+    }
+
+    QPointer<WOrder> self(this);
+    NInterface::query1(QStringLiteral("/engine/v2/waiter/order/print-service-check"),
+                       fUser->mSessionKey,
+                       this,
+                       {{QStringLiteral("header_id"), mOrder.id},
+                        {QStringLiteral("reprint"), true}},
+                       [self](const QJsonObject &jdoc) {
+                           if (!self) {
+                               return;
+                           }
+                           self->parseOrder(jdoc);
+                           const QJsonObject printData = jdoc.value(QStringLiteral("print_data")).toObject();
+                           if (printData.isEmpty()) {
+                               C5Message::info(tr("No service printers configured for these items"));
+                               return;
+                           }
+                           self->printServiceCheck(jdoc);
+                       });
+}
+
 void WOrder::printServiceCheck(const QJsonObject &jdoc)
 {
     QJsonObject printData = jdoc.value(QStringLiteral("print_data")).toObject();
     const QStringList printers = printData.keys();
     QJsonObject jh = jdoc.value(QStringLiteral("header")).toObject();
     if (printers.isEmpty()) {
+        C5Message::info(tr("No service printers configured for these items"));
         return;
     }
 
@@ -651,12 +687,11 @@ void WOrder::printServiceCheck(const QJsonObject &jdoc)
         C5Printing p;
         QPrinterInfo pi = QPrinterInfo::printerInfo(printerName);
         QPrinter printer(pi);
-        QRectF pr = printer.pageRect(QPrinter::DevicePixel);
-        p.setSceneParams(pr.width(), pr.height(), 96.0);
+        p.setSceneFromPrinter(printer);
         p.setFont(font);
         p.setFontBold(true);
         p.setFontSize(bs);
-        constexpr int sideMarginMm = 5;
+        const int sideMarginMm = mWorkStation.receiptMarginsMm();
         p.setRightMarginMm(sideMarginMm);
         const int nameWidthMm = qMax(8, 65 - 2 * sideMarginMm);
 
@@ -731,31 +766,27 @@ void WOrder::printPrecheck()
     const QString printerName = mWorkStation.receiptPrinter();
     C5Printing p;
 
-    // Layout metrics: receipt_printer when set; for print_server-only fall back to fixed width.
+    // Same page metrics as printServiceCheck: paper width in real mm + f_precheck_margins.
     QPrinter *printer = nullptr;
     QPrinterInfo pi;
     if (mWorkStation.hasReceiptPrinter()) {
         pi = QPrinterInfo::printerInfo(printerName);
     }
-    QPrinter localPrinter(pi.isNull() ? QPrinterInfo() : pi);
+    QPrinter localPrinter(pi);
     if (!pi.isNull()) {
         printer = &localPrinter;
-        localPrinter.setPageSize(QPageSize::Custom);
-        localPrinter.setFullPage(false);
-        QRectF pr = localPrinter.pageRect(QPrinter::DevicePixel);
-        constexpr qreal SAFE_RIGHT_MM = 4.0;
-        qreal safePx = SAFE_RIGHT_MM * localPrinter.logicalDpiX() / 25.4;
-        p.setSceneParams(pr.width() - safePx, pr.height(), localPrinter.logicalDpiX());
+        p.setSceneFromPrinter(localPrinter);
     } else {
+        // print_server-only (or unknown printer): fixed canvas for layout / HTTP payload
         p.setSceneParams(650, 2800, 96);
     }
     p.setFont(font);
     p.setFontSize(bs);
-    const int marginMm = qMax(0, mWorkStation.data.value(QStringLiteral("f_precheck_margins")).toInt());
+    const int marginMm = mWorkStation.receiptMarginsMm();
     p.setRightMarginMm(marginMm);
     const int colQty = 33 + marginMm;
     const int colPrice = 41 + marginMm;
-    const int nameWidthMm = qMax(10, 35 - marginMm);
+    const int nameWidthMm = qMax(10, 35 - 2 * marginMm);
     QString logoFile = qApp->applicationDirPath() + "/logo_receipt.png";
 
     if (QFile::exists(logoFile)) {
@@ -811,7 +842,7 @@ void WOrder::printPrecheck()
     }
 
     p.br(1);
-    p.ltext(tr("Table"), marginMm);
+    p.ltext(tr("Cashbox"), marginMm);
     p.rtext(QString("%1/%2").arg(mOrder.hallName, mOrder.tableName));
     p.br();
     p.line(2);
@@ -1393,6 +1424,12 @@ void WOrder::checkGoodsId(int goodsId, const QString &scancode, std::function<vo
         if (!allowStockForDish(dishId, isService, stockQty, addQty)) {
             return;
         }
+        int saleStore = mWorkStation.defaultStoreId();
+        const int storeOverride = data.value(QStringLiteral("f_store_override")).toInt(
+            jdish.value(QStringLiteral("f_store_override")).toInt());
+        if (storeOverride > 0) {
+            saleStore = storeOverride;
+        }
         NInterface::query1("/engine/v2/waiter/order/add-dish",
                            fUser->mSessionKey,
                            this,
@@ -1407,7 +1444,7 @@ void WOrder::checkGoodsId(int goodsId, const QString &scancode, std::function<vo
                             {"count_service", 0},
                             {"count_discount", 0},
                             {"f_data", data},
-                            {"store", mWorkStation.defaultStoreId()},
+                            {"store", saleStore},
                             {"print1", servicePrint},
                             {"print2", ""},
                             {"create_process", !servicePrint.isEmpty()},
@@ -1599,7 +1636,9 @@ void WOrder::printFiscal(std::function<void(const QJsonObject &)> nextStep)
             if (!g.emarks().isEmpty())
                 pt->fEmarks.append(g.emarks());
 
-            pt->addGoods(1,
+            // dep = c_groups.f_taxdept (loaded as f_fiscal_department on GetDishes)
+            const int dep = g.fiscalDepartment() > 0 ? g.fiscalDepartment() : 1;
+            pt->addGoods(dep,
                          g.adgt(),
                          QString::number(g.dishId),
                          g.fiscalName().isEmpty() ? g.dishName : g.fiscalName(),

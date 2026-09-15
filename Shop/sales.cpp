@@ -483,18 +483,16 @@ void Sales::printDailyByPayment(const QJsonObject &jdoc)
     C5Printing p;
     QPrinter printer(pi.isNull() ? QPrinterInfo() : pi);
     if (!pi.isNull()) {
-        printer.setPageSize(QPageSize::Custom);
-        printer.setFullPage(false);
-        QRectF pr = printer.pageRect(QPrinter::DevicePixel);
-        constexpr qreal SAFE_RIGHT_MM = 4.0;
-        const qreal safePx = SAFE_RIGHT_MM * printer.logicalDpiX() / 25.4;
-        p.setSceneParams(pr.width() - safePx, pr.height(), printer.logicalDpiX());
+        p.setSceneFromPrinter(printer);
     } else {
         p.setSceneParams(650, 2800, 96);
     }
     p.setFont(font);
     p.setFontSize(bs);
     p.setFontBold(true);
+
+    const int marginMm = mWorkStation.receiptMarginsMm();
+    p.setRightMarginMm(marginMm);
 
     const QString logoFile = qApp->applicationDirPath() + QStringLiteral("/logo_receipt.png");
     if (QFile::exists(logoFile)) {
@@ -513,20 +511,20 @@ void Sales::printDailyByPayment(const QJsonObject &jdoc)
     p.setFontBold(false);
     p.br();
 
-    p.ltext(tr("Orders count"), 0);
+    p.ltext(tr("Orders count"), marginMm);
     p.rtext(QString::number(jdoc.value(QStringLiteral("f_count_id")).toInt()));
     p.br();
     p.setFontBold(true);
-    p.ltext(tr("Total"), 0);
+    p.ltext(tr("Total"), marginMm);
     p.rtext(float_str(jdoc.value(QStringLiteral("f_amount_total")).toDouble(), 2));
     p.br();
     p.setFontBold(false);
     p.line();
     p.br();
 
-    auto printPay = [&p](const QString &title, double amount) {
+    auto printPay = [&p, marginMm](const QString &title, double amount) {
         if (qAbs(amount) > 0.009) {
-            p.ltext(title, 0);
+            p.ltext(title, marginMm);
             p.rtext(float_str(amount, 2));
             p.br();
         }
@@ -545,7 +543,7 @@ void Sales::printDailyByPayment(const QJsonObject &jdoc)
     p.br();
     p.br();
     p.setFontSize(bs - 4);
-    p.ltext(tr("Printed"), 0);
+    p.ltext(tr("Printed"), marginMm);
     p.rtext(QDateTime::currentDateTime().toString(FORMAT_DATETIME_TO_STR));
     p.br();
 

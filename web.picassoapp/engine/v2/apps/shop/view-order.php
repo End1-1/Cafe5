@@ -92,6 +92,7 @@ class ViewOrder extends Auth
         $header["f_fiscal_taxback_at"] = $odata["f_fiscal_taxback_at"] ?? "";
         $header["f_time_close"] = $odata["f_time_close"] ?? ($header["f_timeclose"] ?? "");
         $header["f_number"] = trim((string)($header["f_prefix"] ?? "") . (string)($header["f_hallid"] ?? ""));
+        $header["f_site_print_pending"] = !empty($odata["f_site_print_pending"]);
         unset($header["f_data"]);
 
         $dm = $this->select(
@@ -148,6 +149,8 @@ class ViewOrder extends Auth
                 "f_service" => (int)$row["f_service"],
                 "f_type" => (int)$row["f_type"],
                 "f_is_service" => !empty($gdata["f_is_service"]) || ((int)$row["f_service"] !== 0),
+                "f_print1" => (string)($gdata["f_print1"] ?? $gdata["f_service_print"] ?? ""),
+                "f_print2" => (string)($gdata["f_print2"] ?? ""),
             ];
         }
 
@@ -170,6 +173,19 @@ class ViewOrder extends Auth
 
     public function CreateReturn($params)
     {
+        if ((int)($params->reason_id ?? 0) <= 0) {
+            dieWithCode(Translator::t("The return reason must be specified."));
+        }
+        $result = $this->performCreateReturn($params);
+        foreach ($result as $k => $v) {
+            $this->result[$k] = $v;
+        }
+        $this->echoResult();
+    }
+
+    /** @return array{return_order_id:string,return_total:float,order:array} */
+    public function performCreateReturn($params): array
+    {
         $orderId = (string)($params->id ?? "");
         $reasonId = (int)($params->reason_id ?? 0);
         $itemsIn = $params->items ?? [];
@@ -179,9 +195,6 @@ class ViewOrder extends Auth
 
         if ($orderId === "") {
             dieWithCode(Translator::t("Missing id"));
-        }
-        if ($reasonId <= 0) {
-            dieWithCode(Translator::t("The return reason must be specified."));
         }
         if (empty($itemsIn) || !is_array($itemsIn)) {
             dieWithCode(Translator::t("Nothing to return"));
@@ -202,7 +215,12 @@ class ViewOrder extends Auth
             dieWithCode(Translator::t("Document is not exists"));
         }
         if ((int)$src["f_state"] !== self::ORDER_STATE_CLOSE) {
-            dieWithCode(Translator::t("Order is not closed"));
+            $odataEarly = json_decode($src["f_data"] ?? "{}", true) ?: [];
+            $sitePending = ((int)$src["f_state"] === 1)
+                && (($odataEarly["f_source"] ?? "") === "site");
+            if (!$sitePending) {
+                dieWithCode(Translator::t("Order is not closed"));
+            }
         }
         if ((int)($src["f_saletype"] ?? 0) === self::SALE_RETURN) {
             dieWithCode(Translator::t("You cannot return this item"));
@@ -296,6 +314,10 @@ class ViewOrder extends Auth
         $newId = uuid_v4();
         $saleNumber = trim((string)($src["f_prefix"] ?? "") . (string)($src["f_hallid"] ?? ""));
         $comment = Translator::t("Return from") . " " . $saleNumber;
+        $reasonText = trim((string)($params->reason ?? ""));
+        if ($reasonText !== "") {
+            $comment .= ". " . $reasonText;
+        }
 
         $newData = [
             "f_date_open" => date("Y-m-d"),
@@ -366,18 +388,27 @@ class ViewOrder extends Auth
                 "f_price" => (float)$srcLine["f_price"],
                 "f_total" => $line["total"],
                 "f_row" => $rowNo,
-                "f_return" => $reasonId,
+                "f_return" => $reasonId > 0 ? $reasonId : null,
                 "f_returnfrom" => $srcLine["f_id"],
                 "f_returnedqty" => 0,
                 "f_data" => json_encode($gdata, JSON_UNESCAPED_UNICODE),
             ]);
 
-            $this->select(
-                "UPDATE o_goods SET f_return=?, f_returnedqty=COALESCE(f_returnedqty,0)+? WHERE f_id=?",
-                "ids",
-                [$reasonId, $qty, $srcLine["f_id"]],
-                true
-            );
+            if ($reasonId > 0) {
+                $this->select(
+                    "UPDATE o_goods SET f_return=?, f_returnedqty=COALESCE(f_returnedqty,0)+? WHERE f_id=?",
+                    "ids",
+                    [$reasonId, $qty, $srcLine["f_id"]],
+                    true
+                );
+            } else {
+                $this->select(
+                    "UPDATE o_goods SET f_returnedqty=COALESCE(f_returnedqty,0)+? WHERE f_id=?",
+                    "ds",
+                    [$qty, $srcLine["f_id"]],
+                    true
+                );
+            }
 
             $isService = ((int)$srcLine["f_service"] !== 0) || !empty($gdata["f_is_service"]);
             if (!$isService) {
@@ -422,10 +453,15 @@ class ViewOrder extends Auth
 
         $this->commit();
 
-        $this->result["return_order_id"] = $newId;
-        $this->result["return_total"] = $returnTotal;
-        $this->result["order"] = $this->select("SELECT f_id, f_prefix, f_hallid, f_amounttotal FROM o_header WHERE f_id=?", "s", [$newId])->fetch_assoc();
-        $this->echoResult();
+        return [
+            "return_order_id" => $newId,
+            "return_total" => $returnTotal,
+            "order" => $this->select(
+                "SELECT f_id, f_prefix, f_hallid, f_amounttotal FROM o_header WHERE f_id=?",
+                "s",
+                [$newId]
+            )->fetch_assoc(),
+        ];
     }
 
     /** @param array $odata @param array $payment @return array<string,float> */
@@ -760,6 +796,81 @@ class ViewOrder extends Auth
 
         $this->result["order"] = $order;
         $this->result["table_id"] = (int)($order["f_table"] ?? $preferredTable);
+        $this->echoResult();
+    }
+
+    /**
+     * Site sales waiting for Shop print (f_state=1, f_source=site) for this hall.
+     */
+    public function PendingSitePrints($params)
+    {
+        $hallId = (int)($params->hall_id ?? $params->hall ?? 0);
+        if ($hallId <= 0) {
+            dieWithCode(Translator::t("Default hall is not set for this workstation (f_default_hall_id)"));
+        }
+        $sql = <<<SQL
+            SELECT f_id, f_hall, f_prefix, f_amounttotal, f_datecash, f_timeclose
+            FROM o_header
+            WHERE f_hall = ?
+              AND JSON_UNQUOTE(JSON_EXTRACT(f_data, '$.f_source')) = 'site'
+              AND (
+                f_state = 1
+                OR CAST(COALESCE(JSON_VALUE(f_data, '$.f_site_print_pending'), '0') AS UNSIGNED) = 1
+              )
+            ORDER BY f_datecash, f_timeclose, f_prefix
+        SQL;
+        $this->result["orders"] = $this->select($sql, "i", [$hallId])->fetch_all(MYSQLI_ASSOC);
+        $this->echoResult();
+    }
+
+    /**
+     * After receipt + service check printed: f_state 1 → 2.
+     */
+    public function MarkSitePrinted($params)
+    {
+        $orderId = (string)($params->id ?? $params->order_id ?? "");
+        if ($orderId === "") {
+            dieWithCode(Translator::t("Missing id"));
+        }
+        $src = $this->select("SELECT f_id, f_state, f_data FROM o_header WHERE f_id=?", "s", [$orderId])->fetch_assoc();
+        if (!$src) {
+            dieWithCode(Translator::t("Document is not exists"));
+        }
+        $odata = json_decode($src["f_data"] ?? "{}", true) ?: [];
+        if (($odata["f_source"] ?? "") !== "site") {
+            dieWithCode("Not a site purchase");
+        }
+        if ((int)$src["f_state"] === self::ORDER_STATE_CLOSE) {
+            if (empty($odata["f_site_print_pending"])) {
+                $this->result["f_id"] = $orderId;
+                $this->result["f_state"] = self::ORDER_STATE_CLOSE;
+                $this->result["already"] = 1;
+                $this->echoResult();
+                return;
+            }
+            unset($odata["f_site_print_pending"]);
+            $this->update(
+                "o_header",
+                ["f_data" => json_encode($odata, JSON_UNESCAPED_UNICODE)],
+                $orderId
+            );
+            $this->result["f_id"] = $orderId;
+            $this->result["f_state"] = self::ORDER_STATE_CLOSE;
+            $this->echoResult();
+            return;
+        }
+        if ((int)$src["f_state"] !== 1) {
+            dieWithCode(Translator::t("Order is not closed"));
+        }
+        unset($odata["f_site_print_pending"]);
+        $this->select(
+            "UPDATE o_header SET f_state=?, f_data=? WHERE f_id=? AND f_state=1",
+            "iss",
+            [self::ORDER_STATE_CLOSE, json_encode($odata, JSON_UNESCAPED_UNICODE), $orderId],
+            true
+        );
+        $this->result["f_id"] = $orderId;
+        $this->result["f_state"] = self::ORDER_STATE_CLOSE;
         $this->echoResult();
     }
 }

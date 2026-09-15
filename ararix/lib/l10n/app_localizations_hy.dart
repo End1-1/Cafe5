@@ -187,7 +187,7 @@ class AppLocalizationsHy extends AppLocalizations {
   String get armenianNative => 'Հայերեն';
 
   @override
-  String get searchRestaurant => 'Որոնել ռեստորան';
+  String get searchRestaurant => 'Մուտքագրեք որոնման համար';
 
   @override
   String get delivery => 'Առաքում';
@@ -209,4 +209,81 @@ class AppLocalizationsHy extends AppLocalizations {
 
   @override
   String get retry => 'Կրկնել';
+
+  @override
+  String get addons => 'Հավելումներ';
+
+  @override
+  String get fats => 'Ճարպեր';
+
+  @override
+  String get carbs => 'Ածխաջրեր';
+
+  @override
+  String get protein => 'Սպիտակուցներ';
+
+  @override
+  String get calories => 'Կալորիաներ';
+
+  @override
+  String get next => 'Հաջորդ';
+
+  @override
+  String get minShort => 'Րոպե';
+
+  @override
+  String get yourOrder => 'Ձեր պատվերը';
+
+  @override
+  String get emptyCart => 'Զամբյուղը դատարկ է';
+
+  @override
+  String get total => 'Ընդամենը';
+
+  @override
+  String get noDishesInGroup => 'Այս խմբում ուտեստներ չկան';
+
+  @override
+  String get checkoutSoon => 'Պատվերի ձևակերպումը շուտով հասանելի կլինի';
+
+  @override
+  String addNFor(int qty, String price) {
+    return 'Ավելացնել $qty՝ $price';
+  }
+
+  @override
+  String get personalize => 'Կարգավորել';
+
+  @override
+  String get drinkStep => 'Խմիչք';
+
+  @override
+  String get extraStep => 'Լրացուցիչ';
+
+  @override
+  String get chooseDrink => 'Ընտրեք խմիչք';
+
+  @override
+  String get addExtra => 'Ավելացնել լրացուցիչ';
+
+  @override
+  String get attrType => 'Տեսակ';
+
+  @override
+  String get attrSize => 'Չափս';
+
+  @override
+  String get comboUnavailable =>
+      'Այս համադրությունը հասանելի չէ։ Փոխեք ընտրությունը։';
+
+  @override
+  String get packageNoOptions => 'Այս փաթեթը կարգավորված տարբերակներ չունի։';
+
+  @override
+  String customizePackage(String name) {
+    return 'Կարգավորեք $name';
+  }
+
+  @override
+  String get back => 'Հետ';
 }

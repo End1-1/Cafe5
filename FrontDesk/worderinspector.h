@@ -4,6 +4,8 @@
 #include "c5officewidget.h"
 #include "struct_waiter_order.h"
 
+class QToolBar;
+
 namespace Ui
 {
 class WOrderInspector;
@@ -17,6 +19,8 @@ public:
 
     ~WOrderInspector() override;
 
+    QToolBar *toolBar() override;
+
     void setOrder(const WaiterOrder &order);
 
     void setOrderFromJson(const QJsonObject &jo);
@@ -29,6 +33,8 @@ private slots:
     void calcQueueCellChanged(int row, int column);
 
     void dishCellDoubleClicked(int row, int column);
+
+    void purgeOrderPermanently();
 
 protected:
     bool eventFilter(QObject *watched, QEvent *event) override;

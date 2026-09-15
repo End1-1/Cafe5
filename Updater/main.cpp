@@ -9,6 +9,7 @@
 #include <QProcess>
 #include <QProcessEnvironment>
 #include <QProgressBar>
+#include <QSettings>
 #include <QStandardPaths>
 #include <QTimer>
 #include <QVBoxLayout>
@@ -42,6 +43,85 @@ QString setupFileName(const QString &appName, const QString &version)
     return QStringLiteral("%1_setup_%2.exe").arg(setupPackageName(appName), version);
 }
 
+QString defaultPicassoRoot()
+{
+#ifdef Q_OS_WIN
+    const QString programFiles = qEnvironmentVariable("ProgramFiles");
+    if (!programFiles.isEmpty()) {
+        return QDir(programFiles).filePath(QStringLiteral("Picasso"));
+    }
+#endif
+    return QStringLiteral("C:/Program Files/Picasso");
+}
+
+QString registryString(const QString &subkey, const QString &valueName)
+{
+    const QString path = subkey.isEmpty()
+                             ? QStringLiteral("HKEY_LOCAL_MACHINE\\Software\\Picasso")
+                             : QStringLiteral("HKEY_LOCAL_MACHINE\\Software\\Picasso\\") + subkey;
+    QSettings settings(path, QSettings::NativeFormat);
+    return settings.value(valueName).toString().trimmed();
+}
+
+QString markerExeForModule(const QString &packageName)
+{
+    if (packageName == QStringLiteral("frontdesk")) {
+        return QStringLiteral("OfficeN.exe");
+    }
+    if (packageName == QStringLiteral("shop")) {
+        return QStringLiteral("Shop_net.exe");
+    }
+    if (packageName == QStringLiteral("waiter")) {
+        return QStringLiteral("Waiter.exe");
+    }
+    if (packageName == QStringLiteral("cookingprogress")) {
+        return QStringLiteral("CookingProgress.exe");
+    }
+    return QString();
+}
+
+QString resolveModuleInstallDir(const QString &appModule, const QString &moduleDirOverride)
+{
+    if (!moduleDirOverride.isEmpty()) {
+        return QDir::fromNativeSeparators(moduleDirOverride);
+    }
+
+    const QString packageName = setupPackageName(appModule);
+    const QString marker = markerExeForModule(packageName);
+    const QString subDirPath = QDir(defaultPicassoRoot()).filePath(packageName);
+
+    const QString regPath = registryString(packageName, QStringLiteral("InstallPath"));
+    if (!regPath.isEmpty() && QDir(regPath).exists()) {
+        if (marker.isEmpty() || !QFile::exists(QDir(regPath).filePath(marker))) {
+            return QDir::fromNativeSeparators(regPath);
+        }
+        if (QFileInfo(regPath).fileName().compare(packageName, Qt::CaseInsensitive) == 0) {
+            return QDir::fromNativeSeparators(regPath);
+        }
+        return subDirPath;
+    }
+
+    QString root = registryString(QString(), QStringLiteral("InstallPath"));
+    if (root.isEmpty()) {
+        root = defaultPicassoRoot();
+    }
+    if (!marker.isEmpty() && QFile::exists(QDir(root).filePath(marker))) {
+        return subDirPath;
+    }
+    return subDirPath;
+}
+
+QString moduleDirFromArgs(int argc, char *argv[])
+{
+    for (int i = 1; i < argc; ++i) {
+        const QString arg = QString::fromLocal8Bit(argv[i]);
+        if (arg.startsWith(QStringLiteral("--module-dir="), Qt::CaseInsensitive)) {
+            return QDir::fromNativeSeparators(arg.mid(13));
+        }
+    }
+    return QString();
+}
+
 bool copyFileOverwrite(const QString &src, const QString &dst)
 {
     if (!QFile::exists(src)) {
@@ -51,19 +131,30 @@ bool copyFileOverwrite(const QString &src, const QString &dst)
     return QFile::copy(src, dst);
 }
 
-/**
- * Copy Qt runtime out of {app} into TEMP so Inno can replace {app}\Qt6*.dll
- * while PicassoUpdateHost.exe is still running.
- */
-QString prepareQtRuntimeAwayFromApp(const QString &appDir)
+QString firstDirWithQtWidgets(const QStringList &dirs)
 {
-    if (appDir.isEmpty()) {
+    for (const QString &dir : dirs) {
+        if (dir.isEmpty()) {
+            continue;
+        }
+        if (QFile::exists(QDir(dir).filePath(QStringLiteral("Qt6Widgets.dll")))) {
+            return dir;
+        }
+    }
+    return QString();
+}
+
+/**
+ * Copy Qt runtime next to PicassoUpdateHost.exe.
+ * The Windows loader resolves Qt6Widgets.dll at process start — before main() —
+ * so DLLs must already sit beside the host (PATH / SetDllDirectory are too late).
+ */
+QString copyQtRuntimeBesideHost(const QString &srcDir, const QString &dstDir)
+{
+    if (srcDir.isEmpty() || dstDir.isEmpty()) {
         return QString();
     }
-
-    const QString tempRoot = QStandardPaths::writableLocation(QStandardPaths::TempLocation);
-    const QString rtDir = QDir(tempRoot).filePath(QStringLiteral("PicassoUpdateRt"));
-    const QString platformsDir = QDir(rtDir).filePath(QStringLiteral("platforms"));
+    const QString platformsDir = QDir(dstDir).filePath(QStringLiteral("platforms"));
     QDir().mkpath(platformsDir);
 
     const QStringList rootDlls = {
@@ -71,29 +162,42 @@ QString prepareQtRuntimeAwayFromApp(const QString &appDir)
         QStringLiteral("Qt6Gui.dll"),
         QStringLiteral("Qt6Widgets.dll"),
         QStringLiteral("Qt6Network.dll"),
+        QStringLiteral("Qt6Svg.dll"),
+        QStringLiteral("vcruntime140.dll"),
+        QStringLiteral("vcruntime140_1.dll"),
+        QStringLiteral("msvcp140.dll"),
+        QStringLiteral("msvcp140_1.dll"),
+        QStringLiteral("msvcp140_2.dll"),
     };
     for (const QString &name : rootDlls) {
-        copyFileOverwrite(QDir(appDir).filePath(name), QDir(rtDir).filePath(name));
+        copyFileOverwrite(QDir(srcDir).filePath(name), QDir(dstDir).filePath(name));
     }
-    copyFileOverwrite(QDir(appDir).filePath(QStringLiteral("platforms/qwindows.dll")),
+    copyFileOverwrite(QDir(srcDir).filePath(QStringLiteral("platforms/qwindows.dll")),
                       QDir(platformsDir).filePath(QStringLiteral("qwindows.dll")));
-    copyFileOverwrite(QDir(appDir).filePath(QStringLiteral("platforms/qminimal.dll")),
+    copyFileOverwrite(QDir(srcDir).filePath(QStringLiteral("platforms/qminimal.dll")),
                       QDir(platformsDir).filePath(QStringLiteral("qminimal.dll")));
+    return dstDir;
+}
 
+void applyQtRuntimeEnv(const QString &rtDir)
+{
+    if (rtDir.isEmpty()) {
+        return;
+    }
+    const QString platformsDir = QDir(rtDir).filePath(QStringLiteral("platforms"));
 #ifdef Q_OS_WIN
     SetDllDirectoryW(reinterpret_cast<LPCWSTR>(rtDir.utf16()));
 #endif
     qputenv("PATH", QFile::encodeName(rtDir) + ';' + qgetenv("PATH"));
     qputenv("QT_PLUGIN_PATH", QFile::encodeName(rtDir));
     qputenv("QT_QPA_PLATFORM_PLUGIN_PATH", QFile::encodeName(platformsDir));
-    return rtDir;
 }
 
 /**
  * Self-update strategy:
- * 1. App starts {app}\Updater.exe
- * 2. Updater copies itself to %TEMP%\PicassoUpdateHost.exe and relaunches from there
- * 3. Host uses Qt DLLs copied to %TEMP%\PicassoUpdateRt (NOT {app}) so setup can overwrite {app}
+ * 1. App starts {app}\Updater.exe (Qt already loaded from updater\ or PATH)
+ * 2. Updater copies itself + Qt DLLs to %TEMP% and relaunches PicassoUpdateHost.exe
+ * 3. Host loads Qt from %TEMP% so Inno can overwrite {app}\Qt6*.dll
  * 4. Host downloads setup via WinHTTP and runs Inno /SILENT
  */
 bool ensureRunningFromTemp(int argc, char *argv[])
@@ -102,21 +206,29 @@ bool ensureRunningFromTemp(int argc, char *argv[])
     const QString appDir = QFileInfo(self).absolutePath();
     const QString tempDir = QStandardPaths::writableLocation(QStandardPaths::TempLocation);
     const QString tempExe = QDir(tempDir).filePath(QStringLiteral("PicassoUpdateHost.exe"));
+    const QString moduleDirArg = moduleDirFromArgs(argc, argv);
+    const QString moduleDirEnv = QString::fromLocal8Bit(qgetenv("PICASSO_MODULE_DIR"));
+    const QString moduleDir = !moduleDirArg.isEmpty()
+                                  ? moduleDirArg
+                                  : (!moduleDirEnv.isEmpty()
+                                         ? QDir::fromNativeSeparators(moduleDirEnv)
+                                         : QString());
+    const QString qtSrc = firstDirWithQtWidgets({appDir, moduleDir});
 
     const QString selfNative = QDir::toNativeSeparators(self);
     const QString tempNative = QDir::toNativeSeparators(tempExe);
     if (selfNative.compare(tempNative, Qt::CaseInsensitive) == 0) {
-        const QByteArray envDir = qgetenv("PICASSO_APP_DIR");
-        const QString sourceAppDir = envDir.isEmpty() ? appDir : QString::fromLocal8Bit(envDir);
-        prepareQtRuntimeAwayFromApp(sourceAppDir);
+        applyQtRuntimeEnv(tempDir);
         return true;
     }
 
     QFile::remove(tempExe);
     if (!QFile::copy(self, tempExe)) {
-        prepareQtRuntimeAwayFromApp(appDir);
+        applyQtRuntimeEnv(qtSrc.isEmpty() ? appDir : qtSrc);
         return true;
     }
+
+    copyQtRuntimeBesideHost(qtSrc.isEmpty() ? appDir : qtSrc, tempDir);
 
     QStringList args;
     for (int i = 1; i < argc; ++i) {
@@ -130,10 +242,20 @@ bool ensureRunningFromTemp(int argc, char *argv[])
 
     QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
     env.insert(QStringLiteral("PICASSO_APP_DIR"), appDir);
+    if (!moduleDir.isEmpty()) {
+        env.insert(QStringLiteral("PICASSO_MODULE_DIR"), QDir::toNativeSeparators(moduleDir));
+    }
+    const QString pathPrefix = QDir::toNativeSeparators(tempDir)
+        + QLatin1Char(';')
+        + QDir::toNativeSeparators(qtSrc.isEmpty() ? appDir : qtSrc);
+    env.insert(QStringLiteral("PATH"), pathPrefix + QLatin1Char(';') + env.value(QStringLiteral("PATH")));
+    env.insert(QStringLiteral("QT_PLUGIN_PATH"), QDir::toNativeSeparators(tempDir));
+    env.insert(QStringLiteral("QT_QPA_PLATFORM_PLUGIN_PATH"),
+               QDir::toNativeSeparators(QDir(tempDir).filePath(QStringLiteral("platforms"))));
     proc.setProcessEnvironment(env);
 
     if (!proc.startDetached()) {
-        prepareQtRuntimeAwayFromApp(appDir);
+        applyQtRuntimeEnv(qtSrc.isEmpty() ? appDir : qtSrc);
         return true;
     }
     return false;
@@ -153,12 +275,18 @@ int main(int argc, char *argv[])
     parser.addHelpOption();
     QCommandLineOption appOpt(QStringLiteral("app"), QStringLiteral("Application module name"), QStringLiteral("module"));
     QCommandLineOption verOpt(QStringLiteral("version"), QStringLiteral("Version to update to"), QStringLiteral("version"));
+    QCommandLineOption moduleDirOpt(QStringLiteral("module-dir"),
+                                    QStringLiteral("Module install directory"),
+                                    QStringLiteral("path"));
     parser.addOption(appOpt);
     parser.addOption(verOpt);
+    parser.addOption(moduleDirOpt);
     parser.process(a);
 
     const QString module = parser.value(appOpt).trimmed();
     const QString version = parser.value(verOpt).trimmed();
+    const QString moduleInstallDir =
+        resolveModuleInstallDir(module, parser.value(moduleDirOpt).trimmed());
     if (module.isEmpty() || version.isEmpty()) {
         QMessageBox::critical(nullptr, QStringLiteral("Updater"),
                               QStringLiteral("Missing required arguments.\nUsage: Updater --app=<officen|shop|waiter|cookingprogress> --version=<X.Y.Z>"));
@@ -182,7 +310,10 @@ int main(int argc, char *argv[])
     w.raise();
     w.activateWindow();
 
-    UpdateManager um(setupDownloadUrl(module, version), setupFileName(module, version));
+    UpdateManager um(setupDownloadUrl(module, version),
+                     setupFileName(module, version),
+                     module,
+                     moduleInstallDir);
     um.setProgressBar(pb);
     um.setHostWindow(&w);
     QObject::connect(&um, &UpdateManager::statusChanged, label, &QLabel::setText);

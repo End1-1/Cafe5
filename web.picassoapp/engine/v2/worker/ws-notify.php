@@ -56,6 +56,27 @@ $ws_worker = new class {
         $ws->close();
         return $ack && (int)($ack["errorCode"] ?? 1) === 0;
     }
+
+    /** Notify Shop clients: site sale needs receipt + service check print. */
+    public function notifySiteSalePrint(string $orderId, int $hallId): bool
+    {
+        if ($orderId === "") {
+            return false;
+        }
+        $ws = $this->getWS();
+        if (!$ws) {
+            return false;
+        }
+        $ws->sendJson([
+            "command" => "site_sale_print",
+            "order_id" => $orderId,
+            "hall_id" => $hallId,
+            "ts" => time(),
+        ]);
+        $ack = $ws->receiveJson();
+        $ws->close();
+        return $ack && (int)($ack["errorCode"] ?? 1) === 0;
+    }
 };
 
 // Возвращаем объект, чтобы можно было вызывать методы

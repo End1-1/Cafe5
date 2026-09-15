@@ -5,14 +5,51 @@ require_once __DIR__ . "/index.php";
 
 class Home extends ArarixAuth
 {
+    private function mapRestaurants(array $restaurants, float $clientLat, float $clientLng): array
+    {
+        foreach ($restaurants as &$r) {
+            $r["id"] = (int)$r["id"];
+            $r["score"] = (int)$r["score"];
+            $natId = isset($r["nationality_id"]) ? (int)$r["nationality_id"] : 0;
+            $r["nationality_id"] = $natId > 0 ? $natId : null;
+            $lat = isset($r["lat"]) ? (float)$r["lat"] : null;
+            $lng = isset($r["lng"]) ? (float)$r["lng"] : null;
+            $r["lat"] = $lat;
+            $r["lng"] = $lng;
+            $r["distance_m"] = ($lat !== null && $lng !== null)
+                ? (int)round($this->haversineMeters($clientLat, $clientLng, $lat, $lng))
+                : null;
+            $r["image_url"] = $this->absoluteMediaUrl($r["image_url"] ?? null);
+            $r["logo_url"] = $this->absoluteMediaUrl($r["logo_url"] ?? null);
+            $r["eta_min"] = (int)($r["eta_min"] ?? 55);
+        }
+        unset($r);
+        return $restaurants;
+    }
+
+    private function restaurantSelectSql(string $where = ""): string
+    {
+        return "SELECT r.f_id AS id,
+                       r.f_name AS name,
+                       r.f_score AS score,
+                       r.f_image_url AS image_url,
+                       r.f_logo_url AS logo_url,
+                       r.f_category AS category,
+                       r.f_nationality_id AS nationality_id,
+                       n.f_name AS nationality,
+                       r.f_eta_min AS eta_min,
+                       IF(r.f_location IS NULL, NULL, ST_Y(r.f_location)) AS lat,
+                       IF(r.f_location IS NULL, NULL, ST_X(r.f_location)) AS lng
+                FROM ararix_restaurants r
+                LEFT JOIN ararix_restaurant_nationality n ON n.f_id = r.f_nationality_id
+                $where
+                ORDER BY r.f_score DESC, r.f_name";
+    }
+
     public function Get($params)
     {
         // Address: stub until client addresses are stored.
-        $this->result["address"] = [
-            "label" => "Komitas Avenue, 8",
-            "lat" => 40.1872,
-            "lng" => 44.5121,
-        ];
+        $this->result["address"] = $this->clientAddressStub();
 
         $this->result["promo"] = [
             "title" => "Order Salmon Steak Today",
@@ -21,32 +58,12 @@ class Home extends ArarixAuth
         ];
 
         $restaurants = $this->select(
-            "SELECT f_id AS id,
-                    f_name AS name,
-                    f_score AS score,
-                    f_image_url AS image_url,
-                    f_category AS category,
-                    IF(f_location IS NULL, NULL, ST_Y(f_location)) AS lat,
-                    IF(f_location IS NULL, NULL, ST_X(f_location)) AS lng
-             FROM ararix_restaurants
-             ORDER BY f_score DESC, f_name
-             LIMIT 30"
+            $this->restaurantSelectSql() . " LIMIT 30"
         )->fetch_all(MYSQLI_ASSOC);
 
         $clientLat = (float)($this->result["address"]["lat"] ?? 0);
         $clientLng = (float)($this->result["address"]["lng"] ?? 0);
-        foreach ($restaurants as &$r) {
-            $r["id"] = (int)$r["id"];
-            $r["score"] = (int)$r["score"];
-            $lat = isset($r["lat"]) ? (float)$r["lat"] : null;
-            $lng = isset($r["lng"]) ? (float)$r["lng"] : null;
-            $r["lat"] = $lat;
-            $r["lng"] = $lng;
-            $r["distance_m"] = ($lat !== null && $lng !== null)
-                ? (int)round($this->haversineMeters($clientLat, $clientLng, $lat, $lng))
-                : null;
-        }
-        unset($r);
+        $restaurants = $this->mapRestaurants($restaurants, $clientLat, $clientLng);
         $this->result["top_restaurants"] = $restaurants;
 
         $this->result["goods_groups"] = $this->select(
@@ -57,12 +74,14 @@ class Home extends ArarixAuth
 
         foreach ($this->result["goods_groups"] as &$g) {
             $g["id"] = (int)$g["id"];
+            $g["image_url"] = $this->absoluteMediaUrl($g["image_url"] ?? null);
         }
         unset($g);
 
+        // Cuisine / nationality chips for home quick filter.
         $this->result["countries"] = $this->select(
             "SELECT f_id AS id, f_name AS name
-             FROM ararix_goods_country
+             FROM ararix_restaurant_nationality
              ORDER BY f_sort, f_name"
         )->fetch_all(MYSQLI_ASSOC);
 
@@ -88,13 +107,41 @@ class Home extends ArarixAuth
         $this->echoResult();
     }
 
-    private function haversineMeters(float $lat1, float $lng1, float $lat2, float $lng2): float
+    public function Search($params)
     {
-        $earth = 6371000.0;
-        $dLat = deg2rad($lat2 - $lat1);
-        $dLng = deg2rad($lng2 - $lng1);
-        $a = sin($dLat / 2) ** 2
-            + cos(deg2rad($lat1)) * cos(deg2rad($lat2)) * sin($dLng / 2) ** 2;
-        return 2 * $earth * asin(min(1.0, sqrt($a)));
+        $q = trim((string)($params->q ?? $params->query ?? ''));
+        $nationalityId = (int)($params->nationality_id ?? 0);
+
+        $where = [];
+        $types = '';
+        $binds = [];
+
+        if ($q !== '') {
+            $where[] = 'r.f_name LIKE ?';
+            $types .= 's';
+            $binds[] = '%' . $q . '%';
+        }
+        if ($nationalityId > 0) {
+            $where[] = 'r.f_nationality_id = ?';
+            $types .= 'i';
+            $binds[] = $nationalityId;
+        }
+
+        if ($where === []) {
+            $this->result["restaurants"] = [];
+            $this->echoResult();
+            return;
+        }
+
+        $sql = $this->restaurantSelectSql('WHERE ' . implode(' AND ', $where)) . ' LIMIT 100';
+        $rows = $this->select($sql, $types, $binds)->fetch_all(MYSQLI_ASSOC);
+
+        $addr = $this->clientAddressStub();
+        $this->result["restaurants"] = $this->mapRestaurants(
+            $rows,
+            (float)($addr["lat"] ?? 0),
+            (float)($addr["lng"] ?? 0)
+        );
+        $this->echoResult();
     }
 }

@@ -64,6 +64,18 @@ struct WaiterDish {
         return total;
     }
 
+    /** Line subtotal (qty × price) without service/discount. */
+    double lineSubtotal(bool isPreorder, bool includeUnprinted = false) const
+    {
+        if (data.value(QStringLiteral("f_complimentary")).toBool()) {
+            return 0;
+        }
+        if (!isPreorder && !includeUnprinted && !isPrinted()) {
+            return 0;
+        }
+        return qty * price;
+    }
+
     /** Line amount for display / client totals (order-level service/discount factors). */
     double lineAmount(bool isPreorder, bool includeUnprinted,
                       double orderServiceFactor, double orderDiscountFactor) const

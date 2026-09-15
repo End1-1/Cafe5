@@ -342,16 +342,14 @@ if (Component-Selected "waiter") {
     Write-Host "  WaiterDesigner.exe <- $designerSrc"
 }
 
-$needUpdater = (Component-Selected "frontdesk") -or (Component-Selected "shop") -or (Component-Selected "waiter") -or (Component-Selected "cookingprogress")
-if ($needUpdater) {
-    $updaterSrc = $ReleasePaths["Updater"]
-    $updaterDst = Join-Path $StagingDir "Updater.exe"
-    if (-not (Test-Path $updaterSrc)) {
-        throw "Missing required build output for Updater: $updaterSrc"
-    }
-    Copy-Item $updaterSrc $updaterDst -Force
-    Write-Host "  Updater.exe <- $updaterSrc"
+# Every module installer ships a fresh shared updater.
+$updaterSrc = $ReleasePaths["Updater"]
+$updaterDst = Join-Path $StagingDir "Updater.exe"
+if (-not (Test-Path $updaterSrc)) {
+    throw "Missing required build output for Updater: $updaterSrc"
 }
+Copy-Item $updaterSrc $updaterDst -Force
+Write-Host "  Updater.exe <- $updaterSrc"
 
 Write-Host "Copying application styles"
 $StyleFiles = @{
@@ -500,7 +498,7 @@ if ($windeployqt) {
     }
     if (Component-Selected "cookingprogress") { $exes += "CookingProgress.exe" }
     if (Component-Selected "service5") { $exes += "service5.exe" }
-    if ($needUpdater) { $exes += "Updater.exe" }
+    $exes += "Updater.exe"
     foreach ($exe in $exes) {
         $full = Join-Path $StagingDir $exe
         if (Test-Path $full) {

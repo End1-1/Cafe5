@@ -45,6 +45,8 @@ class HomeRestaurant {
     required this.score,
     this.imageUrl,
     this.category,
+    this.nationalityId,
+    this.nationality,
     this.distanceM,
   });
 
@@ -53,6 +55,8 @@ class HomeRestaurant {
   final int score;
   final String? imageUrl;
   final String? category;
+  final int? nationalityId;
+  final String? nationality;
   final int? distanceM;
 
   factory HomeRestaurant.fromJson(Map<String, dynamic> json) {
@@ -62,6 +66,8 @@ class HomeRestaurant {
       score: (json['score'] as num?)?.toInt() ?? 0,
       imageUrl: json['image_url']?.toString(),
       category: json['category']?.toString(),
+      nationalityId: (json['nationality_id'] as num?)?.toInt(),
+      nationality: json['nationality']?.toString(),
       distanceM: (json['distance_m'] as num?)?.toInt(),
     );
   }
@@ -109,6 +115,7 @@ class HomeTopOffer {
     required this.title,
     required this.dishName,
     required this.restaurantName,
+    this.restaurantId,
     this.category,
     this.rating,
     this.distanceM,
@@ -119,6 +126,7 @@ class HomeTopOffer {
   final String title;
   final String dishName;
   final String restaurantName;
+  final int? restaurantId;
   final String? category;
   final double? rating;
   final int? distanceM;
@@ -130,6 +138,7 @@ class HomeTopOffer {
       title: json['title']?.toString() ?? '',
       dishName: json['dish_name']?.toString() ?? '',
       restaurantName: json['restaurant_name']?.toString() ?? '',
+      restaurantId: (json['restaurant_id'] as num?)?.toInt(),
       category: json['category']?.toString(),
       rating: (json['rating'] as num?)?.toDouble(),
       distanceM: (json['distance_m'] as num?)?.toInt(),

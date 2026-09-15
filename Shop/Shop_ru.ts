@@ -778,8 +778,8 @@
     </message>
     <message>
         <location filename="../Cafe5/c5dialog.cpp" line="162"/>
-        <source>Updater not found. Reinstall the application.</source>
-        <translation>Программа обновления не найдена. Переустановите приложение.</translation>
+        <source>Could not start the updater. Reinstall the application or run the setup from picasso.am.</source>
+        <translation>Не удалось запустить обновление. Переустановите программу или запустите setup с picasso.am.</translation>
     </message>
 </context>
 <context>
@@ -2680,8 +2680,8 @@
     </message>
     <message>
         <location filename="../Cafe5/c5message.cpp" line="145"/>
-        <source>Updater not found. Please download the update from the link.</source>
-        <translation>Программа обновления не найдена. Скачайте обновление по ссылке.</translation>
+        <source>Could not start the updater. Reinstall the application or run the setup from picasso.am.</source>
+        <translation>Не удалось запустить обновление. Переустановите программу или запустите setup с picasso.am.</translation>
     </message>
 </context>
 <context>
@@ -3395,8 +3395,8 @@ MS Excel</translation>
     </message>
     <message>
         <location filename="../Classes/c5widget.cpp" line="192"/>
-        <source>Updater not found. Reinstall the application.</source>
-        <translation>Программа обновления не найдена. Переустановите приложение.</translation>
+        <source>Could not start the updater. Reinstall the application or run the setup from picasso.am.</source>
+        <translation>Не удалось запустить обновление. Переустановите программу или запустите setup с picasso.am.</translation>
     </message>
 </context>
 <context>

@@ -25,7 +25,7 @@ public:
     static int question(const QString &questionStr, const QString &yes = QObject::tr("Yes"),
                         const QString &no = QObject::tr("No"), const QString &a3 = "");
 
-    /// Starts {appDir}/updater.exe --app=... --version=... . Returns false if missing/failed.
+    /// Starts shared Picasso\\updater\\Updater.exe (or sibling). Returns false if missing/failed.
     static bool tryStartUpdater(const QString &appName, const QString &version);
 
 private slots:

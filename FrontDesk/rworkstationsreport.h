@@ -39,6 +39,7 @@ private:
     Ui::RWorkstationsReport *ui = nullptr;
     QString mEditorName;
     RAbstractEditorReport *mWorkstationsListReport = nullptr;
+    RAbstractEditorReport *mFiscalMachinesReport = nullptr;
     RAbstractEditorReport *mServiceValuesReport = nullptr;
     QSet<int> mLoadedTabIndexes;
 };

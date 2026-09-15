@@ -120,10 +120,23 @@ RAbstractEditorReport::RAbstractEditorReport(const QString &title, QIcon icon, c
         ui->tblTotal->setColumnCount(mProxyModel->columnCount());
         ui->tblTotal->setVerticalHeaderLabels({ QString::number(mProxyModel->rowCount()) });
 
+        for(int c = 0; c < ui->tblTotal->columnCount(); ++c) {
+            ui->tblTotal->setString(0, c, QString());
+        }
+
         for(auto it = values.constBegin(); it != values.constEnd(); ++it) {
             int col = it.key();
             double v = it.value();
             ui->tblTotal->setString(0, col, float_str(v, 2));
+        }
+
+        for(auto it = mFooterValues.constBegin(); it != mFooterValues.constEnd(); ++it) {
+            bool ok = false;
+            const int col = it.key().toInt(&ok);
+            if(!ok || col < 0 || col >= ui->tblTotal->columnCount()) {
+                continue;
+            }
+            ui->tblTotal->setString(0, col, it.value().toString());
         }
     });
     //connect(ui->tbl->horizontalHeader(), SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(tableViewHeaderContextMenuRequested(QPoint)));
@@ -415,11 +428,22 @@ void RAbstractEditorReport::getData()
     [this](const QJsonObject & jdoc) {
         mFilterWidget = jdoc["filter"].toArray();
         mProxyModel->columnSums.clear();
+        mProxyModel->columnLast.clear();
+        mFooterValues = QJsonObject();
         QJsonArray jsums = jdoc["sum"].toArray();
 
         for(int i = 0; i < jsums.size(); i++) {
             mProxyModel->columnSums[jsums.at(i).toInt()] = 0;
         }
+
+        QJsonArray jsumLast = jdoc.value(QStringLiteral("sum_last")).toArray();
+        for(int i = 0; i < jsumLast.size(); i++) {
+            const int col = jsumLast.at(i).toInt();
+            mProxyModel->columnLast.append(col);
+            mProxyModel->columnSums[col] = 0;
+        }
+
+        mFooterValues = jdoc.value(QStringLiteral("footer_values")).toObject();
 
         mProxyModel->numericCols = mProxyModel->columnSums.keys();
         mModel->setJson(jdoc);

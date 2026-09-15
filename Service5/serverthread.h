@@ -34,6 +34,7 @@ private:
     void registerSocket(const QJsonObject &jdoc, QWebSocket *ws);
     void unregisterSocket(const QJsonObject &jdoc, QWebSocket *ws);
     QString updateHotelCache(const QJsonObject &jdoc);
+    QString broadcastSiteSalePrint(const QJsonObject &jdoc);
     QString armsoft(const QJsonObject &jdoc);
     void handleCommand(SocketStruct ws, const QJsonObject &jdoc, QString &repMsg);
 
