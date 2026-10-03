@@ -60,6 +60,9 @@ class Goods extends PClass
         $printers = stmtall("select f_name from d_printers")->fetch_all(MYSQLI_ASSOC);
         $this->result["printers"] = $printers;
 
+        require_once __DIR__ . "/../v2/worker/locale.php";
+        $this->result["translations"] = load_entity_translations(null, "c_goods_tr", "f_goods_id", (int)$this->id);
+
         $this->echoResult();
     }
 
@@ -131,8 +134,8 @@ class Goods extends PClass
         )->fetch_assoc();
         $isnewImage = empty($imageRow);
 
-        $imagePayload = $this->params->image ?? "";
-        $imageSize = empty($imagePayload) ? 0 : strlen($imagePayload);
+        $imagePayload = is_string($this->params->image ?? null) ? $this->params->image : "";
+        $imageSize = $imagePayload === "" ? 0 : strlen($imagePayload);
         $vImg = [
             "f_id" => $this->params->goods->f_id,
             "f_image" => $imagePayload,
@@ -142,9 +145,10 @@ class Goods extends PClass
             $vImg["f_bigimagesize"] = 0;
             $vImg["f_bigimage"] = null;
         }
-        if (!empty($this->params->bigimage)) {
-            $vImg["f_bigimage"] = $this->params->bigimage;
-            $vImg["f_bigimagesize"] = strlen($this->params->bigimage);
+        $bigImagePayload = is_string($this->params->bigimage ?? null) ? $this->params->bigimage : "";
+        if ($bigImagePayload !== "") {
+            $vImg["f_bigimage"] = $bigImagePayload;
+            $vImg["f_bigimagesize"] = strlen($bigImagePayload);
         }
         $this->sinsertupdate("c_goods_images", $vImg, $this->params->goods->f_id, $isnewImage);
 
@@ -188,12 +192,38 @@ class Goods extends PClass
             $this->sinsert("c_menu", $m);
         }
 
+        require_once __DIR__ . "/../v2/worker/locale.php";
+        $translations = [];
+        if (!empty($this->params->translations)) {
+            if (is_array($this->params->translations)) {
+                $translations = $this->params->translations;
+            } elseif (is_object($this->params->translations)) {
+                foreach ((array)$this->params->translations as $lang => $row) {
+                    if (is_object($row)) {
+                        $row = (array)$row;
+                    }
+                    if (!is_array($row)) {
+                        continue;
+                    }
+                    $row["f_lang"] = is_string($lang) ? $lang : ($row["f_lang"] ?? "");
+                    $translations[] = $row;
+                }
+            }
+        }
+        // Also accept list form: [{f_lang,f_name,f_description}, ...]
+        save_entity_translations(null, "c_goods_tr", "f_goods_id", (int)$this->params->goods->f_id, $translations, true);
+        sync_ararix_menu_tr_from_goods(null, (int)$this->params->goods->f_id, $translations);
+
         $this->result["f_id"] = $this->params->goods->f_id;
         $this->result["isnew"] = $isnew;
+        $this->result["translations"] = load_entity_translations(null, "c_goods_tr", "f_goods_id", (int)$this->params->goods->f_id);
         $this->db->commit();
 
-        $notify = require_once __DIR__ . "/../v2/worker/ws-notify.php";
-        $notify->notify("goods", $this->params->goods->f_id, $isnew);
+        // require (not require_once): require_once returns true on 2nd include, not the worker object.
+        $notify = require __DIR__ . "/../v2/worker/ws-notify.php";
+        if (is_object($notify) && method_exists($notify, "notify")) {
+            $notify->notify("goods", (int)$this->params->goods->f_id, (bool)$isnew);
+        }
         $this->echoResult();
     }
 }

@@ -2,6 +2,7 @@
 # © 2026 , Kudryashov Vasili
 
 require_once __DIR__ . "/index.php";
+require_once __DIR__ . "/../../worker/locale.php";
 
 class Restaurant extends ArarixAuth
 {
@@ -33,9 +34,12 @@ class Restaurant extends ArarixAuth
             dieWithCode("Restaurant not found", 404);
         }
 
+        $locale = resolve_menu_locale($params, strtolower((string)($this->client["f_locale"] ?? "en")));
+
         $this->result["restaurant"] = $this->formatRestaurant($restaurant);
-        $this->result["groups"] = $this->loadArarixMenuGroups($id);
-        $this->result["dishes"] = $this->loadArarixMenuDishes($id);
+        $this->result["groups"] = $this->loadArarixMenuGroups($id, $locale);
+        $this->result["dishes"] = $this->loadArarixMenuDishes($id, $locale);
+        $this->result["locale"] = $locale;
         $this->echoResult();
     }
 
@@ -49,12 +53,15 @@ class Restaurant extends ArarixAuth
         return !empty($row);
     }
 
-    private function loadArarixMenuGroups(int $restaurantId): array
+    private function loadArarixMenuGroups(int $restaurantId, string $locale = 'en'): array
     {
         $rows = $this->select(
-            "SELECT g.f_id, g.f_name, COALESCE(g.f_image_url, '') AS f_image
+            "SELECT g.f_id,
+                    COALESCE(NULLIF(TRIM(tr.f_name), ''), g.f_name) AS f_name,
+                    COALESCE(g.f_image_url, '') AS f_image
              FROM ararix_restaurant_groups rg
              INNER JOIN ararix_goods_groups g ON g.f_id = rg.f_group_id
+             LEFT JOIN ararix_goods_groups_tr tr ON tr.f_group_id = g.f_id AND tr.f_lang = ?
              WHERE rg.f_restaurant_id = ?
                AND EXISTS (
                    SELECT 1 FROM ararix_menu m
@@ -62,9 +69,9 @@ class Restaurant extends ArarixAuth
                      AND m.f_group_id = rg.f_group_id
                      AND m.f_state = 1
                )
-             ORDER BY rg.f_sort, g.f_sort, g.f_name",
-            'i',
-            [$restaurantId]
+             ORDER BY rg.f_sort, g.f_sort, f_name",
+            'si',
+            [$locale, $restaurantId]
         )->fetch_all(MYSQLI_ASSOC);
 
         $out = [];
@@ -79,17 +86,22 @@ class Restaurant extends ArarixAuth
         return $out;
     }
 
-    private function loadArarixMenuDishes(int $restaurantId): array
+    private function loadArarixMenuDishes(int $restaurantId, string $locale = 'en'): array
     {
         $rows = $this->select(
-            "SELECT m.f_id, m.f_group_id, m.f_name, m.f_description, m.f_price,
-                    m.f_image_url, m.f_sort, m.f_data, g.f_name AS f_group_name
+            "SELECT m.f_id, m.f_group_id,
+                    COALESCE(NULLIF(TRIM(mtr.f_name), ''), m.f_name) AS f_name,
+                    COALESCE(NULLIF(TRIM(mtr.f_description), ''), m.f_description) AS f_description,
+                    m.f_price, m.f_image_url, m.f_sort, m.f_data,
+                    COALESCE(NULLIF(TRIM(gtr.f_name), ''), g.f_name) AS f_group_name
              FROM ararix_menu m
              INNER JOIN ararix_goods_groups g ON g.f_id = m.f_group_id
+             LEFT JOIN ararix_menu_tr mtr ON mtr.f_menu_id = m.f_id AND mtr.f_lang = ?
+             LEFT JOIN ararix_goods_groups_tr gtr ON gtr.f_group_id = g.f_id AND gtr.f_lang = ?
              WHERE m.f_restaurant_id = ? AND m.f_state = 1
-             ORDER BY m.f_sort, m.f_name, m.f_id",
-            'i',
-            [$restaurantId]
+             ORDER BY m.f_sort, f_name, m.f_id",
+            'ssi',
+            [$locale, $locale, $restaurantId]
         )->fetch_all(MYSQLI_ASSOC);
 
         $out = [];
@@ -145,14 +157,14 @@ class Restaurant extends ArarixAuth
 
     private function formatRestaurant(array $r): array
     {
-        $addr = $this->clientAddressStub();
+        $addr = $this->clientActiveAddress();
         $lat = isset($r["lat"]) ? (float)$r["lat"] : null;
         $lng = isset($r["lng"]) ? (float)$r["lng"] : null;
         $distance = null;
         if ($lat !== null && $lng !== null) {
             $distance = (int)round($this->haversineMeters(
-                (float)$addr["lat"],
-                (float)$addr["lng"],
+                (float)($addr["lat"] ?? $this->defaultMapCenter()["lat"]),
+                (float)($addr["lng"] ?? $this->defaultMapCenter()["lng"]),
                 $lat,
                 $lng
             ));

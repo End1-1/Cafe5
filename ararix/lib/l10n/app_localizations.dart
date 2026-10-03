@@ -199,13 +199,13 @@ abstract class AppLocalizations {
   /// No description provided for @insertCodeWhatsapp.
   ///
   /// In en, this message translates to:
-  /// **'Insert the 4-digit code that we sent via WhatsApp to {phone}'**
+  /// **'Insert the 5-digit code that we sent via WhatsApp to {phone}'**
   String insertCodeWhatsapp(String phone);
 
   /// No description provided for @insertCodeSms.
   ///
   /// In en, this message translates to:
-  /// **'Insert the 4-digit code that we sent via SMS to {phone}'**
+  /// **'Insert the 5-digit code that we sent via SMS to {phone}'**
   String insertCodeSms(String phone);
 
   /// No description provided for @resendIn.
@@ -379,7 +379,7 @@ abstract class AppLocalizations {
   /// No description provided for @invalidOtp.
   ///
   /// In en, this message translates to:
-  /// **'Enter the 4-digit code'**
+  /// **'Enter the 5-digit code'**
   String get invalidOtp;
 
   /// No description provided for @errorGeneric.
@@ -633,6 +633,216 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Back'**
   String get back;
+
+  /// No description provided for @addAddress.
+  ///
+  /// In en, this message translates to:
+  /// **'Add address'**
+  String get addAddress;
+
+  /// No description provided for @myAddresses.
+  ///
+  /// In en, this message translates to:
+  /// **'My addresses'**
+  String get myAddresses;
+
+  /// No description provided for @noSavedAddresses.
+  ///
+  /// In en, this message translates to:
+  /// **'No saved addresses'**
+  String get noSavedAddresses;
+
+  /// No description provided for @deleteAddress.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete address'**
+  String get deleteAddress;
+
+  /// No description provided for @deleteAddressQuestion.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete this address?'**
+  String get deleteAddressQuestion;
+
+  /// No description provided for @whereDeliver.
+  ///
+  /// In en, this message translates to:
+  /// **'Where should we deliver?'**
+  String get whereDeliver;
+
+  /// No description provided for @currentLocation.
+  ///
+  /// In en, this message translates to:
+  /// **'Current location'**
+  String get currentLocation;
+
+  /// No description provided for @addNewAddress.
+  ///
+  /// In en, this message translates to:
+  /// **'Add new'**
+  String get addNewAddress;
+
+  /// No description provided for @locateMe.
+  ///
+  /// In en, this message translates to:
+  /// **'Locate me'**
+  String get locateMe;
+
+  /// No description provided for @searchAddressTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Search'**
+  String get searchAddressTitle;
+
+  /// No description provided for @enterStreetBuilding.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter street, building number…'**
+  String get enterStreetBuilding;
+
+  /// No description provided for @confirmAddress.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm address'**
+  String get confirmAddress;
+
+  /// No description provided for @adjustPin.
+  ///
+  /// In en, this message translates to:
+  /// **'Adjust pin'**
+  String get adjustPin;
+
+  /// No description provided for @droppedPin.
+  ///
+  /// In en, this message translates to:
+  /// **'Dropped pin'**
+  String get droppedPin;
+
+  /// No description provided for @buildingTypeTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Building type'**
+  String get buildingTypeTitle;
+
+  /// No description provided for @buildingHouse.
+  ///
+  /// In en, this message translates to:
+  /// **'House'**
+  String get buildingHouse;
+
+  /// No description provided for @buildingApartment.
+  ///
+  /// In en, this message translates to:
+  /// **'Apartment'**
+  String get buildingApartment;
+
+  /// No description provided for @buildingOffice.
+  ///
+  /// In en, this message translates to:
+  /// **'Office'**
+  String get buildingOffice;
+
+  /// No description provided for @buildingOther.
+  ///
+  /// In en, this message translates to:
+  /// **'Other'**
+  String get buildingOther;
+
+  /// No description provided for @addressDetailsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Address details'**
+  String get addressDetailsTitle;
+
+  /// No description provided for @floor.
+  ///
+  /// In en, this message translates to:
+  /// **'Floor'**
+  String get floor;
+
+  /// No description provided for @door.
+  ///
+  /// In en, this message translates to:
+  /// **'Door'**
+  String get door;
+
+  /// No description provided for @additionalInfo.
+  ///
+  /// In en, this message translates to:
+  /// **'Additional info'**
+  String get additionalInfo;
+
+  /// No description provided for @markEntrance.
+  ///
+  /// In en, this message translates to:
+  /// **'Mark your entrance'**
+  String get markEntrance;
+
+  /// No description provided for @entrance.
+  ///
+  /// In en, this message translates to:
+  /// **'Entrance'**
+  String get entrance;
+
+  /// No description provided for @addressLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Label'**
+  String get addressLabel;
+
+  /// No description provided for @labelHome.
+  ///
+  /// In en, this message translates to:
+  /// **'Home'**
+  String get labelHome;
+
+  /// No description provided for @labelWork.
+  ///
+  /// In en, this message translates to:
+  /// **'Work'**
+  String get labelWork;
+
+  /// No description provided for @labelOther.
+  ///
+  /// In en, this message translates to:
+  /// **'Other'**
+  String get labelOther;
+
+  /// No description provided for @customLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Custom label'**
+  String get customLabel;
+
+  /// No description provided for @saveAddress.
+  ///
+  /// In en, this message translates to:
+  /// **'Save address'**
+  String get saveAddress;
+
+  /// No description provided for @orderStatusTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Order status'**
+  String get orderStatusTitle;
+
+  /// No description provided for @orderNumber.
+  ///
+  /// In en, this message translates to:
+  /// **'Order number'**
+  String get orderNumber;
+
+  /// No description provided for @status.
+  ///
+  /// In en, this message translates to:
+  /// **'Status'**
+  String get status;
+
+  /// No description provided for @items.
+  ///
+  /// In en, this message translates to:
+  /// **'Items'**
+  String get items;
 }
 
 class _AppLocalizationsDelegate

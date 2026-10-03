@@ -44,6 +44,10 @@ BEGIN
     SET sql_safe_updates = 0;
     SET current_status = -1;
 
+    -- Materialize the header first: locking a missing PK value would take a gap lock and
+    -- deadlock against a parallel document inserting into the same gap.
+    INSERT IGNORE INTO store_document (f_id, f_status, f_version) VALUES (doc_uuid, -1, 0);
+
     SELECT f_version, f_status
     INTO current_version, current_status
     FROM store_document
@@ -78,16 +82,20 @@ BEGIN
         END IF;
 
         -- Restore negatives closed by product input
+        -- Снимаем ровно то, что погасил этот документ: минус мог быть закрыт частично
+        -- или несколькими приходами, поэтому обнулять партию нельзя.
         UPDATE store_stock ss
-            JOIN store_moves sm ON sm.f_batch_id = ss.f_id AND sm.f_doc = doc_uuid AND sm.f_qty_in > 0
-                AND sm.f_doc_row_id <> sm.f_batch_id
-        SET ss.f_qty_left   = -sm.f_qty_in,
-            ss.f_qty_in     = 0,
-            ss.f_price      = 0,
-            ss.f_doc        = NULL,
-            ss.f_doc_row_id = NULL
-        WHERE ss.f_qty_in > 0
-          AND ss.f_qty_left = 0;
+            JOIN (SELECT sm.f_batch_id, SUM(sm.f_qty_in) AS healed
+                  FROM store_moves sm
+                  WHERE sm.f_doc = doc_uuid
+                    AND sm.f_qty_in > 0
+                    AND sm.f_doc_row_id <> sm.f_batch_id
+                  GROUP BY sm.f_batch_id) h ON h.f_batch_id = ss.f_id
+        SET ss.f_qty_in     = ss.f_qty_in - h.healed,
+            ss.f_qty_left   = ss.f_qty_left - h.healed,
+            ss.f_price      = IF(ss.f_qty_in > 0, ss.f_price, 0),
+            ss.f_doc        = IF(ss.f_qty_in > 0 AND ss.f_doc <> doc_uuid, ss.f_doc, NULL),
+            ss.f_doc_row_id = IF(ss.f_doc IS NOT NULL, ss.f_doc_row_id, NULL);
 
         -- Remove product stock batches of this document
         DELETE FROM store_stock WHERE f_doc = doc_uuid AND f_qty_in > 0;
@@ -106,11 +114,13 @@ BEGIN
                                   JOIN (SELECT DISTINCT sm_in.f_batch_id
                                         FROM store_moves sm_in
                                         WHERE sm_in.f_qty_in > 0
-                                          AND sm_in.f_doc_row_id <> sm_in.f_batch_id) hx ON hx.f_batch_id = ss.f_id
+                                          AND sm_in.f_doc_row_id <> sm_in.f_batch_id
+                                          AND sm_in.f_batch_id IN (SELECT dm.f_batch_id FROM store_moves dm WHERE dm.f_doc = doc_uuid)) hx ON hx.f_batch_id = ss.f_id
                                   JOIN (SELECT f_batch_id, f_doc_row_id, SUM(f_qty_in) AS abs_q
                                         FROM store_moves
                                         WHERE f_qty_in > 0
                                           AND f_doc_row_id <> f_batch_id
+                                          AND f_batch_id IN (SELECT dm.f_batch_id FROM store_moves dm WHERE dm.f_doc = doc_uuid)
                                         GROUP BY f_batch_id, f_doc_row_id) am ON am.f_batch_id = ss.f_id
                               WHERE ss.f_qty_left = 0
                                 AND ss.f_qty_in > 0) b
@@ -130,11 +140,13 @@ BEGIN
                                   JOIN (SELECT DISTINCT sm_in.f_batch_id
                                         FROM store_moves sm_in
                                         WHERE sm_in.f_qty_in > 0
-                                          AND sm_in.f_doc_row_id <> sm_in.f_batch_id) hx ON hx.f_batch_id = ss.f_id
+                                          AND sm_in.f_doc_row_id <> sm_in.f_batch_id
+                                          AND sm_in.f_batch_id IN (SELECT dm.f_batch_id FROM store_moves dm WHERE dm.f_doc = doc_uuid)) hx ON hx.f_batch_id = ss.f_id
                                   JOIN (SELECT f_batch_id, f_doc_row_id, SUM(f_qty_in) AS abs_q
                                         FROM store_moves
                                         WHERE f_qty_in > 0
                                           AND f_doc_row_id <> f_batch_id
+                                          AND f_batch_id IN (SELECT dm.f_batch_id FROM store_moves dm WHERE dm.f_doc = doc_uuid)
                                         GROUP BY f_batch_id, f_doc_row_id) am ON am.f_batch_id = ss.f_id
                               WHERE ss.f_qty_left = 0
                                 AND ss.f_qty_in > 0) b
@@ -153,11 +165,13 @@ BEGIN
                             JOIN (SELECT DISTINCT sm_in.f_batch_id
                                   FROM store_moves sm_in
                                   WHERE sm_in.f_qty_in > 0
-                                    AND sm_in.f_doc_row_id <> sm_in.f_batch_id) hx ON hx.f_batch_id = ss.f_id
+                                    AND sm_in.f_doc_row_id <> sm_in.f_batch_id
+                                          AND sm_in.f_batch_id IN (SELECT dm.f_batch_id FROM store_moves dm WHERE dm.f_doc = doc_uuid)) hx ON hx.f_batch_id = ss.f_id
                             JOIN (SELECT f_batch_id, f_doc_row_id, SUM(f_qty_in) AS abs_q
                                   FROM store_moves
                                   WHERE f_qty_in > 0
                                     AND f_doc_row_id <> f_batch_id
+                                          AND f_batch_id IN (SELECT dm.f_batch_id FROM store_moves dm WHERE dm.f_doc = doc_uuid)
                                   GROUP BY f_batch_id, f_doc_row_id) am ON am.f_batch_id = ss.f_id
                         WHERE ss.f_qty_left = 0
                           AND ss.f_qty_in > 0
@@ -173,7 +187,8 @@ BEGIN
             LEFT JOIN (SELECT DISTINCT sm_in.f_batch_id
                        FROM store_moves sm_in
                        WHERE sm_in.f_qty_in > 0
-                         AND sm_in.f_doc_row_id <> sm_in.f_batch_id) hx ON hx.f_batch_id = ss.f_id
+                         AND sm_in.f_doc_row_id <> sm_in.f_batch_id
+                                          AND sm_in.f_batch_id IN (SELECT dm.f_batch_id FROM store_moves dm WHERE dm.f_doc = doc_uuid)) hx ON hx.f_batch_id = ss.f_id
         SET ss.f_qty_left = ss.f_qty_left + sm.qty_out
         WHERE hx.f_batch_id IS NULL;
 
@@ -186,16 +201,19 @@ BEGIN
           AND sm_abs.f_doc_row_id <> sm_abs.f_batch_id;
     END IF;
 
-    DELETE FROM store_moves WHERE f_doc = doc_uuid;
-    DELETE FROM store_stock WHERE f_doc = doc_uuid AND f_qty_in = 0 AND f_qty_left < 0;
-
+    -- Emptied batches are dropped while this document's moves still exist: joining them keeps
+    -- the statement on idx_moves_doc instead of scanning and locking the whole store_stock.
     IF (current_status = 1) THEN
         DELETE ss
         FROM store_stock ss
+            JOIN (SELECT DISTINCT f_batch_id AS bid FROM store_moves WHERE f_doc = doc_uuid) b ON b.bid = ss.f_id
         WHERE ss.f_qty_in = 0
           AND ss.f_qty_left = 0
-          AND NOT EXISTS (SELECT 1 FROM store_moves sm WHERE sm.f_batch_id = ss.f_id);
+          AND NOT EXISTS (SELECT 1 FROM store_moves sm WHERE sm.f_batch_id = ss.f_id AND sm.f_doc <> doc_uuid);
     END IF;
+
+    DELETE FROM store_moves WHERE f_doc = doc_uuid;
+    DELETE FROM store_stock WHERE f_doc = doc_uuid AND f_qty_in = 0 AND f_qty_left < 0;
 
     -- ===== Header =====
     INSERT INTO store_document (f_id, f_status, f_doc_type, f_doc_date, f_store_out, f_store_in, f_user_id, f_version,
@@ -203,6 +221,7 @@ BEGIN
     VALUES (doc_uuid, new_status, 4, doc_date, store_out, store_in, doc_user_id, 1, 0,
             JSON_EXTRACT(params, '$.doc_data'))
     ON DUPLICATE KEY UPDATE f_status    = VALUES(f_status),
+                            f_doc_type  = VALUES(f_doc_type),
                             f_doc_date  = VALUES(f_doc_date),
                             f_store_out = VALUES(f_store_out),
                             f_store_in  = VALUES(f_store_in),
@@ -332,9 +351,10 @@ BEGIN
                 VALUES (UUID(), doc_uuid, complect_row_id, neg_id, store_in, complect_stock_id, neg_qty_abs, unit_price,
                         neg_qty_abs * unit_price);
 
+                -- Прибавляем, а не присваиваем: непокрытая часть минуса должна остаться.
                 UPDATE store_stock
-                SET f_qty_in     = neg_qty_abs,
-                    f_qty_left   = 0,
+                SET f_qty_in     = f_qty_in + neg_qty_abs,
+                    f_qty_left   = f_qty_left + neg_qty_abs,
                     f_price      = unit_price,
                     f_doc        = doc_uuid,
                     f_doc_row_id = complect_row_id
@@ -358,9 +378,7 @@ BEGIN
                     p_qty_arrived, unit_price);
         END IF;
 
-        IF unit_price > 0 THEN
-            UPDATE c_goods SET f_lastinputprice = unit_price WHERE f_id = complect_stock_id;
-        END IF;
+        -- c_goods.f_lastinputprice is refreshed by the caller after COMMIT (see sf_store2_input).
     END IF;
 
     UPDATE store_document SET f_sum = total_cost WHERE f_id = doc_uuid;

@@ -2506,6 +2506,21 @@ amount</source>
         <translation>Սխակ EMARK</translation>
     </message>
     <message>
+        <location filename="dlgorder.cpp" line="762"/>
+        <source>Invalid emarks format: %1 (%2 characters)</source>
+        <translation>EMARK կոդի ֆորմատի սխալ՝ %1 (%2 նշան)</translation>
+    </message>
+    <message>
+        <location filename="dlgorder.cpp"/>
+        <source>Duplicate emarks</source>
+        <translation>Այս EMARK արդեն օգտագործվել է</translation>
+    </message>
+    <message>
+        <location filename="dlgorder.cpp" line="866"/>
+        <source>Goods with barcode %1 not found</source>
+        <translation>%1 շտրիխկոդով ապրանք չի գտնվել</translation>
+    </message>
+    <message>
         <location filename="dlgorder.cpp" line="863"/>
         <source>Order No</source>
         <translation>Պատվեր №</translation>

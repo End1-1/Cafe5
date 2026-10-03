@@ -1,6 +1,7 @@
 #pragma once
 
 #include "ce5editor.h"
+#include <QMap>
 
 namespace Ui
 {
@@ -43,8 +44,16 @@ private slots:
 
     void on_lbImg_customContextMenuRequested(const QPoint &pos);
 
+    void onLangButtonClicked();
+
 private:
     void applyGroup(const QJsonObject &group, const QString &imageBase64);
+
+    void applyTranslations(const QJsonObject &translations);
+
+    void stashCurrentLangFields();
+
+    void showLangFields(const QString &lang);
 
     QJsonObject makeSaveJson() const;
 
@@ -55,4 +64,9 @@ private:
     bool fImageChanged = false;
 
     bool fRemoveImage = false;
+
+    QString mEditLang = QStringLiteral("hy");
+
+    /** lang -> name (hy is canonical shown in lineEdit_2 when active) */
+    QMap<QString, QString> mNamesByLang;
 };

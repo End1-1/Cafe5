@@ -18,6 +18,10 @@ DlgFiscalMachine::DlgFiscalMachine(C5User *user, int id, QWidget *parent)
     connect(ui->buttonBox, &QDialogButtonBox::accepted, this, &DlgFiscalMachine::trySave);
     connect(ui->buttonBox, &QDialogButtonBox::rejected, this, &QDialog::reject);
     connect(ui->btnDelete, &QPushButton::clicked, this, &DlgFiscalMachine::tryDelete);
+    connect(ui->chSimpleHdm, &QCheckBox::toggled, this, [this](bool on) {
+        ui->labelDept->setEnabled(on);
+        ui->sbDefaultDept->setEnabled(on);
+    });
 
     loadData();
 }
@@ -37,7 +41,11 @@ void DlgFiscalMachine::applyRow(const QJsonObject &row)
     ui->leOpPin->setText(row.value(QStringLiteral("f_op_pin")).toString());
     ui->leOpPass->setText(row.value(QStringLiteral("f_op_pass")).toString());
     ui->chExternalPos->setChecked(row.value(QStringLiteral("f_external_pos")).toInt() == 1);
+    ui->chIdramExternalPos->setChecked(row.value(QStringLiteral("f_idram_ext_pos")).toInt() == 1);
+    ui->chSimpleHdm->setChecked(row.value(QStringLiteral("f_simple_fiscal")).toInt() == 1);
     ui->sbDefaultDept->setValue(row.value(QStringLiteral("f_default_dept")).toInt(1));
+    ui->labelDept->setEnabled(ui->chSimpleHdm->isChecked());
+    ui->sbDefaultDept->setEnabled(ui->chSimpleHdm->isChecked());
 }
 
 void DlgFiscalMachine::loadData()
@@ -46,6 +54,7 @@ void DlgFiscalMachine::loadData()
         applyRow(QJsonObject{
             {QStringLiteral("f_id"), 0},
             {QStringLiteral("f_default_dept"), 1},
+            {QStringLiteral("f_simple_fiscal"), 0},
         });
         return;
     }
@@ -68,6 +77,11 @@ void DlgFiscalMachine::trySave()
         return;
     }
 
+    if (ui->chSimpleHdm->isChecked() && ui->sbDefaultDept->value() <= 0) {
+        C5Message::error(tr("Բաժին (dep) must be greater than zero"));
+        return;
+    }
+
     NInterface::query(QStringLiteral("/engine/v2/officen/editors/save"),
                       mUser->mSessionKey,
                       this,
@@ -81,7 +95,9 @@ void DlgFiscalMachine::trySave()
                           {QStringLiteral("f_op_pin"), ui->leOpPin->text().trimmed()},
                           {QStringLiteral("f_op_pass"), ui->leOpPass->text()},
                           {QStringLiteral("f_external_pos"), ui->chExternalPos->isChecked() ? 1 : 0},
+                          {QStringLiteral("f_idram_ext_pos"), ui->chIdramExternalPos->isChecked() ? 1 : 0},
                           {QStringLiteral("f_default_dept"), ui->sbDefaultDept->value()},
+                          {QStringLiteral("f_simple_fiscal"), ui->chSimpleHdm->isChecked() ? 1 : 0},
                       },
                       [this](const QJsonObject &jdoc) {
                           mId = jdoc.value(QStringLiteral("f_id")).toInt(mId);

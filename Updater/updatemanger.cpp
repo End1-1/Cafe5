@@ -226,6 +226,9 @@ QStringList UpdateManager::processesToKill() const
     if (module == QStringLiteral("cookingprogress")) {
         return {QStringLiteral("CookingProgress.exe")};
     }
+    if (module == QStringLiteral("selfboard")) {
+        return {QStringLiteral("SelfBoard.exe")};
+    }
     return {};
 }
 

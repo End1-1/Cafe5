@@ -459,7 +459,7 @@ bool C5StoreInput::saveBlocking(int status)
                           return true;
                       },
                       true,
-                      60000,
+                      NDataProvider::kDefaultTransferTimeoutMs,
                       false);
 
     loop.exec();
@@ -688,8 +688,8 @@ bool C5StoreInput::buildDoc()
 void C5StoreInput::setState()
 {
     if (mActionSave) {
-        mActionSave->setEnabled(mDocData.status == STORE_DOC_STATUS_DRAFT);
-        ui->wtoolbar->setEnabled(mActionSave->isEnabled());
+    mActionSave->setEnabled(mDocData.status == STORE_DOC_STATUS_DRAFT);
+    ui->wtoolbar->setEnabled(mActionSave->isEnabled());
     }
     updatePaidAmountEditableState();
 }
@@ -942,7 +942,7 @@ void C5StoreInput::saveDocument()
         return;
     }
     if (!buildDoc()) {
-        return;
+            return;
     }
     mDocData.status = STORE_DOC_STATUS_POSTED;
     QJsonObject jdoc = mDocData.toJson();

@@ -5,6 +5,7 @@
 
 require_once __DIR__ . "/index.php";
 require_once __DIR__ . "/../../worker/uuid.php";
+require_once __DIR__ . "/../../worker/helper.php";
 require_once __DIR__ . "/../worker/dict-cash-operation-type.php";
 
 const ORDER_STATE_OPEN = 1;
@@ -91,33 +92,9 @@ class Order extends Auth
 
         $this->beginTransaction();
 
-        // Reverse cash drawer expected balances for every session touched by this order.
-        $sessionRows = $this->select(
-            "SELECT f_session_id,
-                    COALESCE(SUM(f_debit), 0) AS debit_sum,
-                    COALESCE(SUM(f_credit), 0) AS credit_sum
-             FROM cash_operations
-             WHERE f_order_id=? AND f_session_id > 0
-             GROUP BY f_session_id",
-            "s",
-            [$orderId]
-        )->fetch_all(MYSQLI_ASSOC);
-        foreach ($sessionRows as $sr) {
-            $sid = (int)($sr["f_session_id"] ?? 0);
-            if ($sid <= 0) {
-                continue;
-            }
-            // Debits raised expected; credits lowered it — reverse both.
-            $delta = (float)$sr["credit_sum"] - (float)$sr["debit_sum"];
-            if (abs($delta) > 0.00001) {
-                $this->select(
-                    "UPDATE cash_session SET f_amount_expected=f_amount_expected+? WHERE f_id=?",
-                    "di",
-                    [$delta, $sid],
-                    true
-                );
-            }
-        }
+        // Reverse cash drawer expected balances for every session touched by this order (cash float only).
+        require_once __DIR__ . "/../worker/cash-ops-helper.php";
+        cash_ops_reverse_order_float($this, $orderId);
         $this->select("DELETE FROM cash_operations WHERE f_order_id=?", "s", [$orderId], true);
         $this->select("DELETE FROM cash_debts WHERE f_doc_uuid=?", "s", [$orderId], true);
 
@@ -223,7 +200,8 @@ class Order extends Auth
         $rollbackAmount = 0;
         if (!empty($header["f_cash_session_id"])) {
             $sumRow = $this->select(
-                "select coalesce(sum(f_debit), 0) as f_amount from cash_operations where f_order_id=? and f_session_id=? and f_operation_type=?",
+                "select coalesce(sum(f_debit), 0) as f_amount from cash_operations
+                 where f_order_id=? and f_session_id=? and f_operation_type=? and f_affects_float=1",
                 "sii",
                 [$orderId, (int)$header["f_cash_session_id"], CASH_OP_SALES_REVENUE]
             )->fetch_assoc();
@@ -244,7 +222,8 @@ class Order extends Auth
             );
 
             $deliveryRow = $this->select(
-                "select coalesce(sum(f_credit), 0) as f_amount from cash_operations where f_order_id=? and f_session_id=? and f_operation_type=?",
+                "select coalesce(sum(f_credit), 0) as f_amount from cash_operations
+                 where f_order_id=? and f_session_id=? and f_operation_type=? and f_affects_float=1",
                 "sii",
                 [$orderId, (int)$header["f_cash_session_id"], CASH_OP_DELIVERY_FEE]
             )->fetch_assoc();
@@ -385,6 +364,10 @@ class Order extends Auth
             }
         }
 
+        /* New line after precheck must unlock the order (QR / site / waiter). */
+        $this->cancelPrecheckDueToOrderChange($oheader["f_id"], "add dish after precheck");
+        $oheader = $this->GetHeader($oheader["f_id"]);
+
         $data = [
             "f_count_service" => $params->count_service ?? 0,
             "f_count_discount" => $params->count_discount ?? 0,
@@ -396,6 +379,25 @@ class Order extends Auth
             "f_print2" => $params->print2,
         ];
         $data = array_merge($data, (array)($params->f_data ?? []));
+        $emarks = normalize_emarks((string)($data["f_emarks"] ?? $params->emarks ?? ""));
+        if ($emarks !== "") {
+            // Only active lines block reuse; after void/remove f_emarks is cleared.
+            $dup = $this->select(
+                "SELECT og.f_id
+                 FROM o_goods og
+                 WHERE og.f_state = 1
+                   AND og.f_emarks = ?
+                 LIMIT 1",
+                "s",
+                [$emarks]
+            )->fetch_assoc();
+            if ($dup) {
+                dieWithCode(Translator::t("Duplicate emarks"));
+            }
+            $data["f_emarks"] = $emarks;
+        } else {
+            unset($data["f_emarks"]);
+        }
         $this->result["focused_dish"] = uuid_v4();
         $v["f_id"] = $this->result["focused_dish"];
         $v["f_header"] = $oheader["f_id"];
@@ -412,6 +414,7 @@ class Order extends Auth
         $v["f_qty"] = $params->qty;
         $v["f_price"] = $params->price;
         $v["f_total"] = $params->price * $params->qty;
+        $v["f_emarks"] = $emarks !== "" ? $emarks : null;
         $v["f_data"] = json_encode($data, JSON_UNESCAPED_UNICODE);
         $insertRow = (int) $params->row;
         if (!empty($params->parent)) {
@@ -465,7 +468,14 @@ class Order extends Auth
             $insertRow = max((int) $params->row, $mxGlobal + 100);
         }
         $v["f_row"] = $insertRow;
-        $this->insert("o_goods", $v);
+        try {
+            $this->insert("o_goods", $v);
+        } catch (mysqli_sql_exception $e) {
+            if ((int)$e->getCode() === 1062 && $emarks !== "") {
+                dieWithCode(Translator::t("Duplicate emarks"));
+            }
+            throw $e;
+        }
         if (!empty($params->shift_rows)) {
             $this->select("update o_goods set f_row=f_row+100 where f_row>=? and f_header=?", "is", [$insertRow, $oheader["f_id"]], true);
         }
@@ -553,10 +563,11 @@ class Order extends Auth
         $v = [];
         $v["f_qty"] = $params->new_qty;
         $v["f_state"] = $params->new_state;
-        $v["f_data"] = json_encode($data, JSON_UNESCAPED_UNICODE);
-        if ($params->remove_emarks ?? false) {
+        if (!empty($params->remove_emarks) || (int)$params->new_state !== 1) {
+            unset($data["f_emarks"]);
             $v["f_emarks"] = null;
         }
+        $v["f_data"] = json_encode($data, JSON_UNESCAPED_UNICODE);
         $oldQty = (float)$row["f_qty"];
         $oldState = (int)$row["f_state"];
         $oldDataJson = $row["f_data"] ?? "{}";
@@ -735,10 +746,11 @@ EOD;
             $v = [];
             $v["f_qty"] = $lineQty;
             $v["f_state"] = $newState;
-            $v["f_data"] = json_encode($data, JSON_UNESCAPED_UNICODE);
-            if ($removeEmarks) {
+            if ($removeEmarks || $newState !== DISH_STATE_NORMAL) {
+                unset($data["f_emarks"]);
                 $v["f_emarks"] = null;
             }
+            $v["f_data"] = json_encode($data, JSON_UNESCAPED_UNICODE);
             $this->update("o_goods", $v, $ch["f_id"]);
         }
 
@@ -774,10 +786,11 @@ EOD;
         $v = [];
         $v["f_qty"] = $pkgLineQty;
         $v["f_state"] = $newState;
-        $v["f_data"] = json_encode($pkgData, JSON_UNESCAPED_UNICODE);
-        if ($removeEmarks) {
+        if ($removeEmarks || $newState !== DISH_STATE_NORMAL) {
+            unset($pkgData["f_emarks"]);
             $v["f_emarks"] = null;
         }
+        $v["f_data"] = json_encode($pkgData, JSON_UNESCAPED_UNICODE);
         $this->update("o_goods", $v, $packageId);
 
         $this->commit();
@@ -1382,6 +1395,7 @@ EOD;
     {
         $sql = <<<EOD
         select oh.f_id, oh.f_state, oh.f_prefix, oh.f_table, oh.f_hall, oh.f_amounttotal, oh.f_data,
+        oh.f_public_token,
         h.f_name as f_hall_name, t.f_name as f_table_name, oh.f_cash_session_id,
         oh.f_staff, concat(u1.f_last, ' ', left(u1.f_first, 1) , '.') as f_staff_name,
         oh.f_cashier, concat(u2.f_last, ' ', left(u2.f_first, 1), '.') as f_cashier_name,
@@ -1399,6 +1413,7 @@ EOD;
 
     public function GetOrder($id)
     {
+        $this->cancelPrecheckIfHasUnprintedDishes($id);
         $oheader = $this->GetHeader($id);
         $oheader["dishes"] = $this->GetDishes($oheader["f_id"]);
         return $oheader;
@@ -1406,10 +1421,8 @@ EOD;
 
     public function QueryOrder($params)
     {
-        $oheader = $this->GetHeader($params->id);
-        $oheader["dishes"] = $this->GetDishes($oheader["f_id"]);
-        $oheader["calc_queue"] = $this->GetCalcQueue($oheader["f_id"]);
-        $this->result["order"] = $oheader;
+        $this->result["order"] = $this->GetOrder($params->id);
+        $this->result["order"]["calc_queue"] = $this->GetCalcQueue($params->id);
         $this->echoResult();
     }
 
@@ -1750,14 +1763,18 @@ EOD;
             $v["f_taxname"] = $params->data->f_guest->f_guest_name;
             $v["f_contact"] = $params->data->f_guest->f_guest_name;
             $guest = $this->select("select * from c_partners where f_phone=?", "s", [$params->data->f_guest->f_guest_phone])->fetch_assoc();
-            $notify = require_once __DIR__ . "/../../worker/ws-notify.php";
+            $notify = require __DIR__ . "/../../worker/ws-notify.php";
             if ($guest) {
                 $params->data->f_guest->f_guest_id =  $guest["f_id"];
                 $this->update("c_partners", $v, $guest["f_id"]);
-                $notify->notify("partners", $params->data->f_guest->f_guest_id, false);
+                if (is_object($notify) && method_exists($notify, "notify")) {
+                    $notify->notify("partners", $params->data->f_guest->f_guest_id, false);
+                }
             } else {
                 $params->data->f_guest->f_guest_id = $this->insert("c_partners", $v);
-                $notify->notify("partners", $params->data->f_guest->f_guest_id, true);
+                if (is_object($notify) && method_exists($notify, "notify")) {
+                    $notify->notify("partners", $params->data->f_guest->f_guest_id, true);
+                }
             }
         }
         $row = $this->select("select f_data from o_header where f_id=?", "s", [$params->id])->fetch_assoc();
@@ -1775,17 +1792,19 @@ EOD;
      */
     private function applyDeliveryCashout($orderId, $cashSessionId, $cashboxId, array $odata, string $prefix)
     {
+        require_once __DIR__ . "/../worker/cash-ops-helper.php";
         $cashSessionId = (int)$cashSessionId;
         $deliveryAmount = (float)($odata["f_delivery_amount"] ?? 0);
 
         $prev = $this->select(
-            "select coalesce(sum(f_credit), 0) as f_amount from cash_operations where f_order_id=? and f_operation_type=?",
+            "select coalesce(sum(f_credit), 0) as f_amount from cash_operations
+             where f_order_id=? and f_operation_type=? and f_affects_float=1",
             "si",
             [$orderId, CASH_OP_DELIVERY_FEE]
         )->fetch_assoc();
         $prevAmount = (float)($prev["f_amount"] ?? 0);
         if ($prevAmount > 0.00001) {
-            $this->select("update cash_session set f_amount_expected=f_amount_expected+? where f_id=?", "di", [$prevAmount, $cashSessionId], true);
+            cash_ops_adjust_session_float($this, $cashSessionId, $prevAmount);
         }
         $this->select("delete from cash_operations where f_order_id=? and f_operation_type=?", "si", [$orderId, CASH_OP_DELIVERY_FEE], true);
 
@@ -1793,7 +1812,7 @@ EOD;
             return;
         }
 
-        $this->insert("cash_operations", [
+        cash_ops_insert($this, [
             "f_cashbox_id" => $cashboxId,
             "f_session_id" => $cashSessionId,
             "f_order_id" => $orderId,
@@ -1804,7 +1823,7 @@ EOD;
             "f_credit" => $deliveryAmount,
             "f_comment" => str_replace("%ordernumber", $prefix, Translator::t("Delivery for %ordernumber")),
         ]);
-        $this->select("update cash_session set f_amount_expected=f_amount_expected-? where f_id=?", "di", [$deliveryAmount, $cashSessionId], true);
+        cash_ops_adjust_session_float($this, $cashSessionId, -$deliveryAmount);
     }
 
     public function CloseOrder($params)
@@ -1855,7 +1874,6 @@ EOD;
         $this->applyDepositPrepaidAndRecalcTotals($odata, $totalDue);
         $paymentDebits = $this->cashboxPaymentDebits($odata);
 
-        $total = 0;
         $partnerId = $odata["f_guest"]["f_guest_id"] ?? null;
         $debtField = $payment["fields"][PAYMENT_DEBT];
         $debtAmount = (float)($odata[$debtField] ?? 0);
@@ -1899,29 +1917,26 @@ EOD;
                     ]);
                 }
             }
-            $pcash = $payment["cashbox"][$pt];
-            if (!$pcash) {
-                continue;
-            }
-            $debit = (float)($paymentDebits[$pn] ?? 0);
-            if ($debit > 0.00001) {
-                $total += $debit;
-                $this->insert("cash_operations", [
-                    "f_cashbox_id" => $params->cashbox_id ?? $cashboxId,
-                    "f_session_id" => $cash_session_id,
-                    "f_order_id" => $params->id,
-                    "f_user" => $this->userid,
-                    "f_operation_type" => CASH_OP_SALES_REVENUE,
-                    "f_payment_type_id" => $pt,
-                    "f_datetime" => date("Y-m-d H:i:s"),
-                    "f_debit" => $debit,
-                    "f_comment" => $row["f_prefix"]
-                ]);
-            }
         }
 
-        $this->select("update cash_session set f_amount_expected=f_amount_expected+? where f_id=?", "di", [$total, $cash_session_id], true);
-        $this->applyDeliveryCashout($params->id, $cash_session_id, $params->cashbox_id ?? $cashboxId, $odata, (string)$row["f_prefix"]);
+        require_once __DIR__ . "/../worker/cash-ops-helper.php";
+        $registerId = (int)($params->cashbox_id ?? $cashboxId);
+        $debitsByPt = [];
+        foreach ($payment["types"] as $pt) {
+            $pn = $payment["fields"][$pt];
+            $debitsByPt[(int)$pt] = (float)($paymentDebits[$pn] ?? 0);
+        }
+        cash_ops_post_sale_payments(
+            $this,
+            $registerId,
+            $cash_session_id,
+            (string)$params->id,
+            (int)$this->userid,
+            $debitsByPt,
+            (string)$row["f_prefix"],
+            (int)($odata["f_currency_id"] ?? 1)
+        );
+        $this->applyDeliveryCashout($params->id, $cash_session_id, $registerId, $odata, (string)$row["f_prefix"]);
         $this->writeLoyaltyOps($params->id, $params->loyalty ?? null);
         $odata["f_date_close"] = date("Y-m-d");
         $odata["f_time_close"] = date("H:i:s");
@@ -1939,6 +1954,11 @@ EOD;
         if ($staffId <= 0) {
             $staffId = (int)$this->userid;
         }
+        // Unguessable public token for QR / guest order-status links.
+        $publicToken = trim((string)($row["f_public_token"] ?? ""));
+        if ($publicToken === "") {
+            $publicToken = bin2hex(random_bytes(24));
+        }
         // Site sales stay f_state=1 until Shop prints receipt + service check, then → 2.
         $v["f_state"] = !empty($params->pending_print) ? ORDER_STATE_OPEN : ORDER_STATE_CLOSED;
         $v["f_datecash"] = date("Y-m-d");
@@ -1948,10 +1968,12 @@ EOD;
         $v["f_staff"] = $staffId;
         $v["f_cash_session_id"] = $cash_session_id;
         $v["f_partner"] = $partnerId;
+        $v["f_public_token"] = $publicToken;
         $this->update("o_header", $v, $params->id);
         $this->CalculationOutput($params->id, $this->resolveCostDependOnServiceAndDiscount($params));
         $this->result["order"] = $this->GetOrder($params->id);
         $this->result["order"]["precheck_dishes"] = $this->GetPrecheckDishes($params->id);
+        $this->result["order"]["f_public_token"] = $publicToken;
         return $this->result["order"];
     }
 
@@ -2318,31 +2340,36 @@ EOD;
         $this->applyDepositPrepaidAndRecalcTotals($odata, $totalDue);
         $paymentDebits = $this->cashboxPaymentDebits($odata);
 
-        $total = 0;
+        require_once __DIR__ . "/../worker/cash-ops-helper.php";
+        // Re-post payments for this order on the open session (float-aware).
+        $oldFloat = $this->select(
+            "select coalesce(sum(f_debit),0)-coalesce(sum(f_credit),0) as f_net from cash_operations
+             where f_order_id=? and f_operation_type=? and f_affects_float=1",
+            "si",
+            [$params->id, CASH_OP_SALES_REVENUE]
+        )->fetch_assoc();
+        cash_ops_adjust_session_float($this, (int)$cash_session["f_id"], -((float)($oldFloat["f_net"] ?? 0)));
+        $this->select(
+            "delete from cash_operations where f_order_id=? and f_operation_type=?",
+            "si",
+            [$params->id, CASH_OP_SALES_REVENUE],
+            true
+        );
+        $debitsByPt = [];
         foreach ($payment["types"] as $pt) {
             $pn = $payment["fields"][$pt];
-            $pcash = $payment["cashbox"][$pt];
-            if (!$pcash) {
-                continue;
-            }
-            $debit = (float)($paymentDebits[$pn] ?? 0);
-            if ($debit > 0.00001) {
-                $total += $debit;
-                $this->insert("cash_operations", [
-                    "f_cashbox_id" => $cash_session["f_cashbox_id"],
-                    "f_session_id" => $cash_session["f_id"],
-                    "f_order_id" => $params->id,
-                    "f_user" => $this->userid,
-                    "f_operation_type" => CASH_OP_SALES_REVENUE,
-                    "f_payment_type_id" => $pt,
-                    "f_datetime" => date("Y-m-d H:i:s"),
-                    "f_debit" => $debit,
-                    "f_comment" => $prefix
-                ]);
-            }
+            $debitsByPt[(int)$pt] = (float)($paymentDebits[$pn] ?? 0);
         }
-
-        $this->select("update cash_session set f_amount_expected=f_amount_expected+? where f_id=?", "di", [$total, $cash_session["f_id"]], true);
+        cash_ops_post_sale_payments(
+            $this,
+            (int)$cash_session["f_cashbox_id"],
+            (int)$cash_session["f_id"],
+            (string)$params->id,
+            (int)$this->userid,
+            $debitsByPt,
+            (string)$prefix,
+            (int)($odata["f_currency_id"] ?? 1)
+        );
 
         $odata["f_date_close"] = date("Y-m-d");
         $odata["f_time_close"] = date("H:i:s");
@@ -2621,30 +2648,26 @@ SQL;
 
         if (!empty($results)) {
             foreach ($results as $row) {
-                $params = $row['params'];
+                $docParams = $row['params'];
+                $storeId = (int)($row['f_store_id'] ?? 0);
+                $docUuid = json_decode($docParams, true)['doc_uuid'] ?? null;
 
-                // 3. Вызываем функцию. select возвращает mysqli_result.
-                $func_res_obj = $this->select("SELECT sf_store2_output(?) as result", "s", [$params]);
-
-                // Достаем одну строку
-                $func_row = $func_res_obj->fetch_assoc();
-                $json_res = json_decode($func_row['result'] ?? '', true);
-
-                if (isset($json_res['status']) && $json_res['status'] == 0) {
-                    $paramsDecoded = json_decode($params, true);
-                    $docUuid = $paramsDecoded['doc_uuid'] ?? null;
-
+                // Posting and its queue bookkeeping share one serialized transaction per storage.
+                $this->runStoreOperation([$storeId], function () use ($docParams, $docUuid, $id, $storeId) {
+                    $json_res = $this->callStoreFunction("sf_store2_output", $docParams);
+                    if ((int)($json_res['status'] ?? 1) !== 0) {
+                        $msg = $json_res['msg'] ?? 'Unknown error';
+                        error_log("Discharge error for store {$storeId}: {$msg}");
+                        dieWithCode(Translator::t("Insufficient stock") . " (" . $msg . ")");
+                    }
                     $this->select(
                         "update store_calc_queue set f_status=1, f_doc_store_out_id=? WHERE f_doc_sale_id = ? AND f_store_id = ?",
-                        "sss",
-                        [$docUuid, $id, $row['f_store_id']],
+                        "ssi",
+                        [$docUuid, $id, $storeId],
                         true
                     );
-                } else {
-                    $msg = $json_res['msg'] ?? 'Unknown error';
-                    error_log("Discharge error for store " . ($row['f_store_id'] ?? 'unknown') . ": " . $msg);
-                    dieWithCode(Translator::t("Insufficient stock") . " (" . $msg . ")");
-                }
+                    return $json_res;
+                });
             }
         }
     }
@@ -2721,13 +2744,18 @@ SQL;
                 continue;
             }
 
-            $res = $this->select("SELECT sf_store2_output_delete(?) AS result", "s", [$docId]);
-            $row = $res->fetch_assoc();
-            $result = json_decode($row["result"] ?? "", true);
-            if (($result["status"] ?? 1) > 0) {
-                $this->rollback();
-                dieWithCode($result["msg"] ?? Translator::t("Store rollback failed"));
-            }
+            $storeRow = $this->select(
+                "SELECT f_store_out FROM store_document WHERE f_id=?",
+                "s",
+                [$docId]
+            )->fetch_assoc();
+            $this->runStoreOperation([(int)($storeRow["f_store_out"] ?? 0)], function () use ($docId) {
+                $result = $this->callStoreFunction("sf_store2_output_delete", $docId);
+                if (($result["status"] ?? 1) > 0) {
+                    dieWithCode($result["msg"] ?? Translator::t("Store rollback failed"));
+                }
+                return $result;
+            });
             $rolledBack++;
         }
 
@@ -3333,6 +3361,79 @@ SQL;
         $this->echoResult();
     }
 
+    /**
+     * After precheck, any new/unprinted kitchen line must unlock the order UI
+     * (service print / delete). Same effect as CancelPrecheck.
+     */
+    private function cancelPrecheckDueToOrderChange(string $orderId, string $reason): bool
+    {
+        $row = $this->select(
+            "SELECT f_data, f_state FROM o_header WHERE f_id=?",
+            "s",
+            [$orderId]
+        )->fetch_assoc();
+        if (!$row) {
+            return false;
+        }
+        if ((int)($row["f_state"] ?? 0) === ORDER_STATE_PREORDER) {
+            return false;
+        }
+        $data = json_decode($row["f_data"] ?? "{}", true) ?: [];
+        if ((int)($data["f_precheck"] ?? 0) <= 0) {
+            return false;
+        }
+
+        $data["f_precheck"] = -abs((int)$data["f_precheck"]);
+        $data["f_amount_cash"] = 0;
+        $data["f_amount_card"] = 0;
+        $data["f_amount_bank"] = 0;
+        $data["f_amount_idram"] = 0;
+        $data["f_amount_complimentary"] = 0;
+        $data["f_amount_other"] = 0;
+        $data["f_amount_telcell"] = 0;
+        $data["f_amount_debt"] = 0;
+        $data["f_amount_prepaid"] = 0;
+        $data["f_amount_paid"] = 0;
+        $data["f_amount_change"] = 0;
+        $this->AppendLog($reason, $data);
+        $this->update("o_header", ["f_data" => json_encode($data, JSON_UNESCAPED_UNICODE)], $orderId);
+        return true;
+    }
+
+    /** Heal stuck orders: precheck flag set but kitchen has unprinted lines. */
+    private function cancelPrecheckIfHasUnprintedDishes(string $orderId): bool
+    {
+        $row = $this->select(
+            "SELECT f_data, f_state FROM o_header WHERE f_id=?",
+            "s",
+            [$orderId]
+        )->fetch_assoc();
+        if (!$row) {
+            return false;
+        }
+        if ((int)($row["f_state"] ?? 0) === ORDER_STATE_PREORDER) {
+            return false;
+        }
+        $data = json_decode($row["f_data"] ?? "{}", true) ?: [];
+        if ((int)($data["f_precheck"] ?? 0) <= 0) {
+            return false;
+        }
+
+        $dishes = $this->select(
+            "SELECT f_type, f_data FROM o_goods WHERE f_header=? AND f_state=1 AND f_type IN (1, 2, 5)",
+            "s",
+            [$orderId]
+        )->fetch_all(MYSQLI_ASSOC);
+
+        foreach ($dishes as $d) {
+            $ddata = json_decode($d["f_data"] ?? "{}", true) ?: [];
+            if (empty($ddata["f_printed"])) {
+                return $this->cancelPrecheckDueToOrderChange($orderId, "auto cancel precheck: unprinted dish");
+            }
+        }
+        return false;
+    }
+
     private function LogRecord($action, array $extra = [])
     {
         $record = array_merge(["ts" => date("Y-m-d H:i:s"), "host" => $this->remote_host, "action" => $action, "user" => $this->fullName()], $extra);
@@ -3481,8 +3582,9 @@ SQL;
             $v = [];
             $v["f_qty"] = $d->f_qty;
             $v["f_state"] = $d->f_state;
-            $v["f_data"] = json_encode($data, JSON_UNESCAPED_UNICODE);
+            unset($data["f_emarks"]);
             $v["f_emarks"] = null;
+            $v["f_data"] = json_encode($data, JSON_UNESCAPED_UNICODE);
             $dishes[] = $v;
             $this->update("o_goods", $v, $d->f_id);
             $d->f_data = json_encode((array)$data, JSON_UNESCAPED_UNICODE);

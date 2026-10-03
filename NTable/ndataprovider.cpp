@@ -48,7 +48,7 @@ NDataProvider::NDataProvider(QObject *parent)
     : QObject(parent)
 {
     mNetworkAccessManager = new QNetworkAccessManager(this);
-    mNetworkAccessManager->setTransferTimeout(60000);
+    mNetworkAccessManager->setTransferTimeout(kDefaultTransferTimeoutMs);
     connect(mNetworkAccessManager, &QNetworkAccessManager::finished, this, &NDataProvider::queryFinished);
     mTimer = new QElapsedTimer();
     mConnectionProtocol = mProtocol;

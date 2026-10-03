@@ -65,7 +65,7 @@ abstract class ArarixAuth extends Db
 
     protected function createOtp(string $countryCode, string $phone, string $channel, string $purpose = "login"): string
     {
-        $code = str_pad((string)random_int(0, 9999), 4, "0", STR_PAD_LEFT);
+        $code = str_pad((string)random_int(0, 99999), 5, "0", STR_PAD_LEFT);
         $this->select(
             "UPDATE ararix_otp SET f_used = 1 WHERE f_country_code = ? AND f_phone = ? AND f_purpose = ? AND f_used = 0",
             "sss",
@@ -222,12 +222,101 @@ abstract class ArarixAuth extends Db
         return 2 * $earth * asin(min(1.0, sqrt($a)));
     }
 
-    protected function clientAddressStub(): array
+    /** Default map center (Yerevan) when the client has no saved address. */
+    protected function defaultMapCenter(): array
     {
         return [
-            "label" => "Komitas Avenue, 8",
             "lat" => 40.1872,
             "lng" => 44.5121,
+        ];
+    }
+
+    protected function formatClientAddress(array $row): array
+    {
+        $label = trim((string)($row["f_label"] ?? ""));
+        $street = trim((string)($row["f_street"] ?? ""));
+        return [
+            "id" => (int)$row["f_id"],
+            "label" => $label !== "" ? $label : $street,
+            "street" => $street,
+            "lat" => isset($row["f_lat"]) ? (float)$row["f_lat"] : null,
+            "lng" => isset($row["f_lng"]) ? (float)$row["f_lng"] : null,
+            "entrance_lat" => isset($row["f_entrance_lat"]) && $row["f_entrance_lat"] !== null
+                ? (float)$row["f_entrance_lat"] : null,
+            "entrance_lng" => isset($row["f_entrance_lng"]) && $row["f_entrance_lng"] !== null
+                ? (float)$row["f_entrance_lng"] : null,
+            "building_type" => (string)($row["f_building_type"] ?? "house"),
+            "floor" => $row["f_floor"] !== null && $row["f_floor"] !== ""
+                ? (string)$row["f_floor"] : null,
+            "door" => $row["f_door"] !== null && $row["f_door"] !== ""
+                ? (string)$row["f_door"] : null,
+            "comment" => $row["f_comment"] !== null && $row["f_comment"] !== ""
+                ? (string)$row["f_comment"] : null,
+            "is_active" => (int)($row["f_is_active"] ?? 0) === 1,
+        ];
+    }
+
+    /**
+     * Active delivery address for home chip / distance.
+     * Falls back to empty label + default Yerevan coords when none saved.
+     */
+    protected function clientActiveAddress(): array
+    {
+        if (empty($this->clientId)) {
+            $center = $this->defaultMapCenter();
+            return [
+                "id" => null,
+                "label" => "",
+                "street" => "",
+                "lat" => $center["lat"],
+                "lng" => $center["lng"],
+                "entrance_lat" => null,
+                "entrance_lng" => null,
+                "building_type" => "house",
+                "floor" => null,
+                "door" => null,
+                "comment" => null,
+                "is_active" => false,
+            ];
+        }
+
+        $row = $this->select(
+            "SELECT * FROM ararix_client_addresses
+             WHERE f_client_id = ? AND f_is_active = 1
+             ORDER BY f_id DESC LIMIT 1",
+            "i",
+            [$this->clientId]
+        )->fetch_assoc();
+
+        if (!empty($row)) {
+            return $this->formatClientAddress($row);
+        }
+
+        $center = $this->defaultMapCenter();
+        return [
+            "id" => null,
+            "label" => "",
+            "street" => "",
+            "lat" => $center["lat"],
+            "lng" => $center["lng"],
+            "entrance_lat" => null,
+            "entrance_lng" => null,
+            "building_type" => "house",
+            "floor" => null,
+            "door" => null,
+            "comment" => null,
+            "is_active" => false,
+        ];
+    }
+
+    /** @deprecated use clientActiveAddress() */
+    protected function clientAddressStub(): array
+    {
+        $a = $this->clientActiveAddress();
+        return [
+            "label" => $a["label"] !== "" ? $a["label"] : "Komitas Avenue, 8",
+            "lat" => $a["lat"] ?? 40.1872,
+            "lng" => $a["lng"] ?? 44.5121,
         ];
     }
 }

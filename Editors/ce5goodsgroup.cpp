@@ -9,7 +9,9 @@
 #include <QBuffer>
 #include <QColorDialog>
 #include <QFileDialog>
+#include <QJsonArray>
 #include <QMenu>
+#include <QSignalBlocker>
 
 CE5GoodsGroup::CE5GoodsGroup(QWidget *parent) :
     CE5Editor(parent),
@@ -19,6 +21,11 @@ CE5GoodsGroup::CE5GoodsGroup(QWidget *parent) :
     ui->leParentGroup->setSelector(ui->leParentGroupName, cache_goods_group);
     connect(ui->leColor, &C5LineEditWithSelector::doubleClicked, this, &CE5GoodsGroup::setColor);
     connect(ui->lbImg, &QLabel::customContextMenuRequested, this, &CE5GoodsGroup::on_lbImg_customContextMenuRequested);
+    connect(ui->btnLangHy, &QToolButton::clicked, this, &CE5GoodsGroup::onLangButtonClicked);
+    connect(ui->btnLangRu, &QToolButton::clicked, this, &CE5GoodsGroup::onLangButtonClicked);
+    connect(ui->btnLangEn, &QToolButton::clicked, this, &CE5GoodsGroup::onLangButtonClicked);
+    mEditLang = QStringLiteral("hy");
+    ui->btnLangHy->setChecked(true);
 }
 
 CE5GoodsGroup::~CE5GoodsGroup()
@@ -43,8 +50,10 @@ void CE5GoodsGroup::setId(int id)
 
 bool CE5GoodsGroup::checkData(QString &err)
 {
+    stashCurrentLangFields();
     CE5Editor::checkData(err);
-    if (ui->lineEdit_2->text().trimmed().isEmpty()) {
+    if (mNamesByLang.value(QStringLiteral("hy")).trimmed().isEmpty()
+            && ui->lineEdit_2->text().trimmed().isEmpty()) {
         err += tr("Name") + " " + tr("cannot be empty") + "\r\n";
     }
     return err.isEmpty();
@@ -83,6 +92,16 @@ void CE5GoodsGroup::clear()
     ui->lbImg->setPixmap(QPixmap());
     ui->lbImg->setText(tr("Right click to select image"));
     ui->leImageUUID->setText(C5Database::uuid());
+    mNamesByLang.clear();
+    mEditLang = QStringLiteral("hy");
+    {
+        QSignalBlocker b1(ui->btnLangHy);
+        QSignalBlocker b2(ui->btnLangRu);
+        QSignalBlocker b3(ui->btnLangEn);
+        ui->btnLangHy->setChecked(true);
+        ui->btnLangRu->setChecked(false);
+        ui->btnLangEn->setChecked(false);
+    }
 }
 
 void CE5GoodsGroup::setColor()
@@ -91,6 +110,50 @@ void CE5GoodsGroup::setColor()
     int color = QColorDialog::getColor(initColor, this, tr("Background color")).rgb();
     ui->leColor->setColor(color);
     ui->leColor->setInteger(color);
+}
+
+void CE5GoodsGroup::applyTranslations(const QJsonObject &translations)
+{
+    mNamesByLang.clear();
+    mNamesByLang.insert(QStringLiteral("hy"), ui->lineEdit_2->text());
+    for (auto it = translations.begin(); it != translations.end(); ++it) {
+        const QString lang = it.key().toLower();
+        if (lang.isEmpty() || lang == QLatin1String("hy")) {
+            continue;
+        }
+        const QJsonObject row = it.value().toObject();
+        mNamesByLang.insert(lang, row.value(QStringLiteral("f_name")).toString());
+    }
+}
+
+void CE5GoodsGroup::stashCurrentLangFields()
+{
+    mNamesByLang.insert(mEditLang, ui->lineEdit_2->text());
+}
+
+void CE5GoodsGroup::showLangFields(const QString &lang)
+{
+    ui->lineEdit_2->setText(mNamesByLang.value(lang));
+}
+
+void CE5GoodsGroup::onLangButtonClicked()
+{
+    auto *btn = qobject_cast<QToolButton *>(sender());
+    if (!btn) {
+        return;
+    }
+    QString next = QStringLiteral("hy");
+    if (btn == ui->btnLangRu) {
+        next = QStringLiteral("ru");
+    } else if (btn == ui->btnLangEn) {
+        next = QStringLiteral("en");
+    }
+    if (next == mEditLang) {
+        return;
+    }
+    stashCurrentLangFields();
+    mEditLang = next;
+    showLangFields(mEditLang);
 }
 
 void CE5GoodsGroup::applyGroup(const QJsonObject &group, const QString &imageBase64)
@@ -133,6 +196,16 @@ void CE5GoodsGroup::applyGroup(const QJsonObject &group, const QString &imageBas
     } else {
         ui->lbImg->setText(tr("Right click to select image"));
     }
+
+    mEditLang = QStringLiteral("hy");
+    {
+        QSignalBlocker b1(ui->btnLangHy);
+        QSignalBlocker b2(ui->btnLangRu);
+        QSignalBlocker b3(ui->btnLangEn);
+        ui->btnLangHy->setChecked(true);
+        ui->btnLangRu->setChecked(false);
+        ui->btnLangEn->setChecked(false);
+    }
 }
 
 void CE5GoodsGroup::openResponse(const QJsonObject &jdoc)
@@ -143,6 +216,8 @@ void CE5GoodsGroup::openResponse(const QJsonObject &jdoc)
         return;
     }
     applyGroup(jdoc.value(QStringLiteral("group")).toObject(), jdoc.value(QStringLiteral("image")).toString());
+    applyTranslations(jdoc.value(QStringLiteral("translations")).toObject());
+    mNamesByLang.insert(QStringLiteral("hy"), ui->lineEdit_2->text());
 }
 
 void CE5GoodsGroup::saveResponse(const QJsonObject &jdoc)
@@ -155,6 +230,8 @@ void CE5GoodsGroup::saveResponse(const QJsonObject &jdoc)
 
     const QJsonObject group = jdoc.value(QStringLiteral("group")).toObject();
     applyGroup(group, jdoc.value(QStringLiteral("image")).toString());
+    applyTranslations(jdoc.value(QStringLiteral("translations")).toObject());
+    mNamesByLang.insert(QStringLiteral("hy"), ui->lineEdit_2->text());
     C5Cache::cache(cache_goods_group)->refresh();
 
     if(C5Editor *editor = qobject_cast<C5Editor *>(fEditor)) {
@@ -183,7 +260,32 @@ QJsonObject CE5GoodsGroup::makeSaveJson() const
     jo.insert(QStringLiteral("f_class"), ui->leClass->getInteger());
     const int color = ui->leColor->getInteger();
     jo.insert(QStringLiteral("f_color"), color < 0 ? QJsonValue(QJsonValue::Null) : QJsonValue(color));
-    jo.insert(QStringLiteral("f_name"), ui->lineEdit_2->text().trimmed());
+
+    QMap<QString, QString> names = mNamesByLang;
+    names.insert(mEditLang, ui->lineEdit_2->text());
+    const QString hyName = names.value(QStringLiteral("hy")).trimmed().isEmpty()
+            ? ui->lineEdit_2->text().trimmed()
+            : names.value(QStringLiteral("hy")).trimmed();
+    jo.insert(QStringLiteral("f_name"), hyName);
+
+    QJsonObject translations;
+    for (auto it = names.constBegin(); it != names.constEnd(); ++it) {
+        if (it.key() == QLatin1String("hy")) {
+            continue;
+        }
+        QJsonObject row;
+        row.insert(QStringLiteral("f_name"), it.value().trimmed());
+        translations.insert(it.key(), row);
+    }
+    // Always send ru/en keys so empty clears DB row
+    if (!translations.contains(QStringLiteral("ru"))) {
+        translations.insert(QStringLiteral("ru"), QJsonObject{{QStringLiteral("f_name"), QString()}});
+    }
+    if (!translations.contains(QStringLiteral("en"))) {
+        translations.insert(QStringLiteral("en"), QJsonObject{{QStringLiteral("f_name"), QString()}});
+    }
+    jo.insert(QStringLiteral("translations"), translations);
+
     jo.insert(QStringLiteral("f_taxdept"), ui->lineEdit_3->getInteger());
     jo.insert(QStringLiteral("f_adgcode"), ui->lineEdit_4->text());
     jo.insert(QStringLiteral("f_chargevalue"), ui->lineEdit_5->getDouble());
@@ -245,7 +347,6 @@ void CE5GoodsGroup::uploadImage()
         if (hasAlpha) {
             previewImg.save(&buff, "PNG");
         } else {
-            // For smaller payloads: JPEG is enough when there's no alpha channel.
             previewImg.save(&buff, "JPG", 85);
         }
     } while (ba.size() > 100000 && previewImg.width() > 10 && previewImg.height() > 10);

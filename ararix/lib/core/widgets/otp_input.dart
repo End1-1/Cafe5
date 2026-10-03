@@ -7,7 +7,7 @@ class OtpInput extends StatefulWidget {
   const OtpInput({
     super.key,
     required this.onCompleted,
-    this.length = 4,
+    this.length = 5,
   });
 
   final ValueChanged<String> onCompleted;
@@ -61,29 +61,33 @@ class _OtpInputState extends State<OtpInput> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: List.generate(widget.length, (index) {
-        return SizedBox(
-          width: 64,
-          height: 64,
-          child: TextField(
-            controller: _controllers[index],
-            focusNode: _nodes[index],
-            textAlign: TextAlign.center,
-            keyboardType: TextInputType.number,
-            style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w600),
-            inputFormatters: [
-              FilteringTextInputFormatter.digitsOnly,
-              LengthLimitingTextInputFormatter(widget.length),
-            ],
-            decoration: InputDecoration(
-              filled: true,
-              fillColor: Colors.white,
-              contentPadding: EdgeInsets.zero,
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-                borderSide: const BorderSide(color: AppColors.border),
+        return Expanded(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 4),
+            child: SizedBox(
+              height: 56,
+              child: TextField(
+                controller: _controllers[index],
+                focusNode: _nodes[index],
+                textAlign: TextAlign.center,
+                keyboardType: TextInputType.number,
+                style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w600),
+                inputFormatters: [
+                  FilteringTextInputFormatter.digitsOnly,
+                  LengthLimitingTextInputFormatter(widget.length),
+                ],
+                decoration: InputDecoration(
+                  filled: true,
+                  fillColor: Colors.white,
+                  contentPadding: EdgeInsets.zero,
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: const BorderSide(color: AppColors.border),
+                  ),
+                ),
+                onChanged: (v) => _onChanged(index, v),
               ),
             ),
-            onChanged: (v) => _onChanged(index, v),
           ),
         );
       }),

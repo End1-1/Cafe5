@@ -3,7 +3,7 @@ param(
     [Parameter(Mandatory = $true)]
     [string]$Iscc,
 
-    # frontdesk | shop | waiter | cookingprogress | service5 | all (default)
+    # frontdesk | shop | waiter | cookingprogress | selfboard | service5 | all (default)
     [string]$Component = "all"
 )
 
@@ -17,7 +17,7 @@ $versions = Get-Content $versionsPath -Raw | ConvertFrom-Json
 
 # Per-module close filter: only the module being installed/updated.
 # Service5 keeps the legacy shared-folder behaviour (Breeze + all apps).
-$PicassoCloseFilterAll = "OfficeN.exe,Shop_net.exe,Waiter.exe,WaiterDesigner.exe,CookingProgress.exe,service5.exe,Service5.exe,Updater.exe,PicassoUpdateHost.exe"
+$PicassoCloseFilterAll = "OfficeN.exe,Shop_net.exe,Waiter.exe,WaiterDesigner.exe,CookingProgress.exe,SelfBoard.exe,service5.exe,Service5.exe,Updater.exe,PicassoUpdateHost.exe"
 
 $allComponents = @(
     @{
@@ -49,6 +49,13 @@ $allComponents = @(
         Version = $versions.cookingprogress
     }
     @{
+        Key = "selfboard"
+        DisplayName = "SelfBoard"
+        AppId = "{{A3F8C2E1-9B4D-4F6A-8C7E-1D2E3F4A5F01}"
+        CloseFilter = "SelfBoard.exe"
+        Version = $versions.selfboard
+    }
+    @{
         Key = "service5"
         DisplayName = "Service5"
         AppId = "{{A3F8C2E1-9B4D-4F6A-8C7E-1D2E3F4A5D01}"
@@ -65,7 +72,7 @@ $components = if ($Component -eq "all") {
 } else {
     $hit = $allComponents | Where-Object { $_.Key -eq $Component }
     if (-not $hit) {
-        throw "Unknown component '$Component'. Use: frontdesk, shop, waiter, cookingprogress, service5, all"
+        throw "Unknown component '$Component'. Use: frontdesk, shop, waiter, cookingprogress, selfboard, service5, all"
     }
     @($hit)
 }

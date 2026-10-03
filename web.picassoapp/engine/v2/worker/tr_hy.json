@@ -290,6 +290,7 @@
     "Status date from": "need_translate Status date from",
     "Status date to": "need_translate Status date to",
     "Duplicate barcode": "Կրկնվող բարկոդ",
+    "Duplicate emarks": "Այս EMARK արդեն օգտագործվել է",
     "The return reason must be specified.": "need_translate The return reason must be specified.",
     "Score": "need_translate Score",
     "Category": "need_translate Category",
@@ -303,6 +304,7 @@
     "Port": "Պորտ",
     "Default department": "Լռելյայն բաժին",
     "External POS": "Արտաքին POS",
+    "Idram external POS": "Idram արտաքին POS",
     "Fiscal machine": "Ֆիսկալ սարք",
     "Name is required": "Անվանումը պարտադիր է",
     "Name is too long": "Անվանումը չափազանց երկար է",
@@ -311,5 +313,7 @@
     "Fiscal machine is used by workstation": "Ֆիսկալ սարքն օգտագործվում է կայանի կողմից",
     "Fiscal machines": "Ֆիսկալ սարքեր",
     "Record not found": "Գրառումը չի գտնվել",
-    "Id is required": "id-ն պարտադիր է"
+    "Id is required": "id-ն պարտադիր է",
+    "Բաժին (dep)": "need_translate Բաժին (dep)",
+    "Պարզ ՀԴՄ": "need_translate Պարզ ՀԴՄ"
 }

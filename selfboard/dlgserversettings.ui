@@ -117,6 +117,20 @@
         </property>
        </widget>
       </item>
+      <item row="4" column="0">
+       <widget class="QLabel" name="labelOrderStatusUrl">
+        <property name="text">
+         <string>Order status URL</string>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="1">
+       <widget class="QLineEdit" name="leOrderStatusUrl">
+        <property name="placeholderText">
+         <string>https://www.ararix.com/get-order-status/</string>
+        </property>
+       </widget>
+      </item>
      </layout>
     </widget>
    </item>

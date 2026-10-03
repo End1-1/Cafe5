@@ -141,8 +141,10 @@ class Goods extends Auth
             ]);
         }
 
-        $notify = require_once __DIR__ . "/../../worker/ws-notify.php";
-        $notify->notify("goods", $goodsId, true);
+        $notify = require __DIR__ . "/../../worker/ws-notify.php";
+        if (is_object($notify) && method_exists($notify, "notify")) {
+            $notify->notify("goods", $goodsId, true);
+        }
 
         $row = $this->loadGoodsRow($goodsId);
         if (!$row) {
@@ -167,8 +169,10 @@ class Goods extends Auth
             dieWithCode("Goods not found");
         }
         $this->update("c_goods", ["f_name" => $name], $id);
-        $notify = require_once __DIR__ . "/../../worker/ws-notify.php";
-        $notify->notify("goods", $id, false);
+        $notify = require __DIR__ . "/../../worker/ws-notify.php";
+        if (is_object($notify) && method_exists($notify, "notify")) {
+            $notify->notify("goods", $id, false);
+        }
         $this->result["f_id"] = $id;
         $this->echoResult();
     }

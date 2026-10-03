@@ -59,12 +59,12 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String insertCodeWhatsapp(String phone) {
-    return 'Введите 4-значный код, отправленный в WhatsApp на $phone';
+    return 'Введите 5-значный код, отправленный в WhatsApp на $phone';
   }
 
   @override
   String insertCodeSms(String phone) {
-    return 'Введите 4-значный код, отправленный по SMS на $phone';
+    return 'Введите 5-значный код, отправленный по SMS на $phone';
   }
 
   @override
@@ -154,7 +154,7 @@ class AppLocalizationsRu extends AppLocalizations {
   String get invalidPhone => 'Введите корректный номер';
 
   @override
-  String get invalidOtp => 'Введите 4-значный код';
+  String get invalidOtp => 'Введите 5-значный код';
 
   @override
   String get errorGeneric => 'Что-то пошло не так';
@@ -285,4 +285,109 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get back => 'Назад';
+
+  @override
+  String get addAddress => 'Добавить адрес';
+
+  @override
+  String get myAddresses => 'Мои адреса';
+
+  @override
+  String get noSavedAddresses => 'Нет сохранённых адресов';
+
+  @override
+  String get deleteAddress => 'Удалить адрес';
+
+  @override
+  String get deleteAddressQuestion => 'Удалить этот адрес?';
+
+  @override
+  String get whereDeliver => 'Куда доставить?';
+
+  @override
+  String get currentLocation => 'Текущее местоположение';
+
+  @override
+  String get addNewAddress => 'Добавить новый';
+
+  @override
+  String get locateMe => 'Найти меня';
+
+  @override
+  String get searchAddressTitle => 'Поиск';
+
+  @override
+  String get enterStreetBuilding => 'Улица, номер дома…';
+
+  @override
+  String get confirmAddress => 'Подтвердить адрес';
+
+  @override
+  String get adjustPin => 'Сдвинуть метку';
+
+  @override
+  String get droppedPin => 'Метка на карте';
+
+  @override
+  String get buildingTypeTitle => 'Тип здания';
+
+  @override
+  String get buildingHouse => 'Дом';
+
+  @override
+  String get buildingApartment => 'Квартира';
+
+  @override
+  String get buildingOffice => 'Офис';
+
+  @override
+  String get buildingOther => 'Другое';
+
+  @override
+  String get addressDetailsTitle => 'Детали адреса';
+
+  @override
+  String get floor => 'Этаж';
+
+  @override
+  String get door => 'Дверь';
+
+  @override
+  String get additionalInfo => 'Дополнительно';
+
+  @override
+  String get markEntrance => 'Отметить вход';
+
+  @override
+  String get entrance => 'Вход';
+
+  @override
+  String get addressLabel => 'Метка';
+
+  @override
+  String get labelHome => 'Дом';
+
+  @override
+  String get labelWork => 'Работа';
+
+  @override
+  String get labelOther => 'Другое';
+
+  @override
+  String get customLabel => 'Своя метка';
+
+  @override
+  String get saveAddress => 'Сохранить адрес';
+
+  @override
+  String get orderStatusTitle => 'Статус заказа';
+
+  @override
+  String get orderNumber => 'Номер заказа';
+
+  @override
+  String get status => 'Статус';
+
+  @override
+  String get items => 'Позиции';
 }

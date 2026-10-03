@@ -68,6 +68,11 @@ struct WorkstationItem : public ParentItem {
         return usePrintServer() || hasReceiptPrinter();
     }
     const QString scalePattern() const { return data.value("f_scale_pattern").toString(); }
+    /** Common WS: folder for CAS/scale goods export (export.xml). */
+    QString scaleDir() const
+    {
+        return data.value(QStringLiteral("f_scale_dir")).toString().trimmed();
+    }
     const QString presentCardPattern() const
     {
         return data.value("f_present_card_pattern").toString();
@@ -147,11 +152,11 @@ struct JsonParser<WorkstationItem> {
         hi.parseData(jo, "f_config");
         hi.validate();
 
-        QJsonArray jfm = jo.value("fiscal").toArray();
+        fiscalMachines.clear();
+        const QJsonArray jfm = jo.value("fiscal").toArray();
         for (int i = 0; i < jfm.size(); i++) {
             const QJsonObject &jf = jfm.at(i).toObject();
-            FiscalMachine fm = JsonParser<FiscalMachine>::fromJson(jf);
-            fiscalMachines.append(fm);
+            fiscalMachines.append(JsonParser<FiscalMachine>::fromJson(jf));
         }
         return hi;
     }

@@ -9,33 +9,14 @@ class StoreMove extends Auth
 {
     public function input($params)
     {
-        $this->beginTransaction();
-        $res = $this->select("select sf_store2_input(?) as result", "s", [json_encode($params->doc, JSON_UNESCAPED_UNICODE)]);
-        $row = $res->fetch_assoc();
-
-        if (!$row || !isset($row['result'])) {
-            $this->rollback();
-            dieWithCode("Database function returned nothing");
-        }
-        $result = json_decode($row["result"], true);
-        if ($result["status"] > 0) {
-            $this->rollback();
-            $msg = (string)($result["msg"] ?? "");
-            if ($msg === "paid_exceeds_sum") {
-                dieWithCode(Translator::t("Paid amount cannot exceed document total"));
+        $json = json_encode($params->doc, JSON_UNESCAPED_UNICODE);
+        $result = $this->runStoreOperation([(int)($params->doc->doc_store_in ?? 0)], function () use ($json) {
+            $res = $this->callStoreFunction("sf_store2_input", $json);
+            if (($res["status"] ?? 1) > 0) {
+                dieWithCode($this->inputErrorMessage($res));
             }
-            if ($msg === "cashbox_required_for_paid") {
-                dieWithCode(Translator::t("Payment type not specified"));
-            }
-            if ($msg === "partner_required_for_debt") {
-                dieWithCode(Translator::t("Partner not selected"));
-            }
-            if ($msg === "version_conflict") {
-                dieWithCode(Translator::t("Document was changed by another user"));
-            }
-            dieWithCode("Exit with {$result["status"]}" . ($msg !== "" ? ": {$msg}" : ""));
-        }
-        $this->commit();
+            return $res;
+        });
 
         $items = [];
         foreach ($params->doc->items ?? [] as $item) {
@@ -47,12 +28,52 @@ class StoreMove extends Auth
             }
         }
         if (!empty($items)) {
+            $this->updateLastInputPrices($items);
             $worker = require __DIR__ . "/../../worker/ws-notify.php";
             $worker->updatePrices($items);
         }
         $this->result["version"] = (int)($result["version"] ?? 0);
         $this->result["paid_amount"] = (float)($result["paid_amount"] ?? 0);
         $this->echoResult();
+    }
+
+    private function inputErrorMessage(array $result): string
+    {
+        $msg = (string)($result["msg"] ?? "");
+        if ($msg === "paid_exceeds_sum") {
+            return Translator::t("Paid amount cannot exceed document total");
+        }
+        if ($msg === "cashbox_required_for_paid") {
+            return Translator::t("Payment type not specified");
+        }
+        if ($msg === "partner_required_for_debt") {
+            return Translator::t("Partner not selected");
+        }
+        if ($msg === "version_conflict") {
+            return Translator::t("Document was changed by another user");
+        }
+        return "Exit with {$result["status"]}" . ($msg !== "" ? ": {$msg}" : "");
+    }
+
+    /**
+     * Catalog price is refreshed outside the posting transaction: c_goods is shared with the
+     * menu editors, and holding it inside the stock transaction coupled their locks.
+     */
+    private function updateLastInputPrices(array $items): void
+    {
+        foreach ($items as $item) {
+            $itemId = (int)($item["item_id"] ?? 0);
+            $price = (float)($item["price"] ?? 0);
+            if ($itemId <= 0 || $price <= 0) {
+                continue;
+            }
+            $this->select(
+                "update c_goods set f_lastinputprice=? where f_id=coalesce(nullif((select f_storeid from (select f_storeid from c_goods where f_id=?) g), 0), ?)",
+                "dii",
+                [$price, $itemId, $itemId],
+                true
+            );
+        }
     }
 
     /**
@@ -90,33 +111,18 @@ class StoreMove extends Auth
             dieWithCode(Translator::t("Paid amount is not valid"));
         }
 
-        $this->beginTransaction();
-        $res = $this->select("select sf_store2_input_set_paid(?) as result", "s",
-            [json_encode($payload, JSON_UNESCAPED_UNICODE)]);
-        $row = $res->fetch_assoc();
-        if (!$row || !isset($row["result"])) {
-            $this->rollback();
-            dieWithCode("Database function returned nothing");
-        }
-        $result = json_decode($row["result"], true);
-        if (($result["status"] ?? 1) > 0) {
-            $this->rollback();
-            $msg = (string)($result["msg"] ?? "error");
-            if ($msg === "paid_exceeds_sum") {
-                dieWithCode(Translator::t("Paid amount cannot exceed document total"));
+        $json = json_encode($payload, JSON_UNESCAPED_UNICODE);
+        $result = $this->runStoreOperation($this->documentStores($payload["doc_uuid"]), function () use ($json) {
+            $res = $this->callStoreFunction("sf_store2_input_set_paid", $json);
+            if (($res["status"] ?? 1) > 0) {
+                $msg = (string)($res["msg"] ?? "error");
+                if ($msg === "document_not_posted") {
+                    dieWithCode(Translator::t("Document is not saved"));
+                }
+                dieWithCode($this->inputErrorMessage($res));
             }
-            if ($msg === "cashbox_required_for_paid") {
-                dieWithCode(Translator::t("Payment type not specified"));
-            }
-            if ($msg === "version_conflict") {
-                dieWithCode(Translator::t("Document was changed by another user"));
-            }
-            if ($msg === "document_not_posted") {
-                dieWithCode(Translator::t("Document is not saved"));
-            }
-            dieWithCode("Exit with {$result["status"]}: {$msg}");
-        }
-        $this->commit();
+            return $res;
+        });
         $this->result["version"] = (int)($result["version"] ?? 0);
         $this->result["paid_amount"] = (float)($result["paid_amount"] ?? 0);
         $this->echoResult();
@@ -124,20 +130,14 @@ class StoreMove extends Auth
 
     public function output($params)
     {
-        $this->beginTransaction();
-        $res = $this->select("select sf_store2_output(?) as result", "s", [json_encode($params->doc, JSON_UNESCAPED_UNICODE)]);
-        $row = $res->fetch_assoc();
-
-        if (!$row || !isset($row['result'])) {
-            $this->rollback();
-            dieWithCode("Database function returned nothing");
-        }
-        $result = json_decode($row["result"], true);
-        if ($result["status"] > 0) {
-            $this->rollback();
-            dieWithCode("Exit with {$result["status"]}");
-        }
-        $this->commit();
+        $json = json_encode($params->doc, JSON_UNESCAPED_UNICODE);
+        $this->runStoreOperation([(int)($params->doc->doc_store_out ?? 0)], function () use ($json) {
+            $res = $this->callStoreFunction("sf_store2_output", $json);
+            if (($res["status"] ?? 1) > 0) {
+                dieWithCode($this->store2ErrorMessage($res));
+            }
+            return $res;
+        });
         $this->echoResult();
     }
 
@@ -216,13 +216,13 @@ class StoreMove extends Auth
             "items" => $items,
         ];
 
-        $this->beginTransaction();
-        $result = $this->callStore2("sf_store2_move", $payload);
-        if (($result["status"] ?? 1) > 0) {
-            $this->rollback();
-            dieWithCode($this->store2ErrorMessage($result));
-        }
-        $this->commit();
+        $result = $this->runStoreOperation([$storeOut, $storeIn], function () use ($payload) {
+            $res = $this->callStore2("sf_store2_move", $payload);
+            if (($res["status"] ?? 1) > 0) {
+                dieWithCode($this->store2ErrorMessage($res));
+            }
+            return $res;
+        });
 
         $this->result["id"] = $docUuid;
         $this->result["cost"] = (float)($result["cost"] ?? 0);
@@ -343,16 +343,17 @@ class StoreMove extends Auth
             "items" => $items,
         ];
 
-        $this->beginTransaction();
-        $result = $this->callStore2("sf_store2_complect", $payload);
-        if (($result["status"] ?? 1) > 0) {
-            $this->rollback();
-            dieWithCode($this->store2ErrorMessage($result));
-        }
-        $this->commit();
+        $result = $this->runStoreOperation([$storeOut, $storeIn], function () use ($payload) {
+            $res = $this->callStore2("sf_store2_complect", $payload);
+            if (($res["status"] ?? 1) > 0) {
+                dieWithCode($this->store2ErrorMessage($res));
+            }
+            return $res;
+        });
 
         $unitPrice = (float)($result["unit_price"] ?? 0);
         if ($unitPrice > 0) {
+            $this->updateLastInputPrices([["item_id" => $complectGoods, "price" => $unitPrice]]);
             $worker = require __DIR__ . "/../../worker/ws-notify.php";
             $worker->updatePrices([["item_id" => $complectGoods, "price" => $unitPrice]]);
         }
@@ -431,9 +432,6 @@ class StoreMove extends Auth
         }
         if (!empty($doc["f_cashbox_id"]) && $doc["f_cashbox_name"] === "") {
             $cb = $this->select("select f_name from cash_box where f_id=?", "i", [$doc["f_cashbox_id"]])->fetch_assoc();
-            if (!$cb) {
-                $cb = $this->select("select f_name from e_cash_names where f_id=?", "i", [$doc["f_cashbox_id"]])->fetch_assoc();
-            }
             $doc["f_cashbox_name"] = (string)($cb["f_name"] ?? "");
         }
 
@@ -536,11 +534,12 @@ class StoreMove extends Auth
 
     public function remove($params)
     {
-        $this->beginTransaction();
-
-        $doc = $this->select("select f_id, f_doc_type from store_document where f_id=?", "s", [$params->id])->fetch_assoc();
+        $doc = $this->select(
+            "select f_id, f_doc_type, f_store_in, f_store_out from store_document where f_id=?",
+            "s",
+            [$params->id]
+        )->fetch_assoc();
         if (empty($doc)) {
-            $this->rollback();
             dieWithCode(Translator::t("Document not found"));
         }
 
@@ -559,38 +558,38 @@ class StoreMove extends Auth
                 $fn = "sf_store2_complect_delete";
                 break;
             default:
-                $this->rollback();
                 dieWithCode(Translator::t("Unknown document type") . " (" . $docType . ")");
         }
 
-        $res = $this->select("select {$fn}(?) as result", "s", [$params->id]);
-        $row = $res->fetch_assoc();
-        if (!$row || !isset($row['result'])) {
-            $this->rollback();
-            dieWithCode("Database function returned nothing");
-        }
-        $result = json_decode($row["result"], true);
-        if (!is_array($result) || ($result["status"] ?? 1) > 0) {
-            $this->rollback();
-            dieWithCode($this->store2ErrorMessage(is_array($result) ? $result : ["status" => 1, "msg" => ""]));
-        }
-
-        $this->commit();
+        $stores = [(int)($doc["f_store_in"] ?? 0), (int)($doc["f_store_out"] ?? 0)];
+        $docId = (string)$params->id;
+        $this->runStoreOperation($stores, function () use ($fn, $docId) {
+            $res = $this->callStoreFunction($fn, $docId);
+            if (($res["status"] ?? 1) > 0) {
+                dieWithCode($this->store2ErrorMessage($res));
+            }
+            return $res;
+        });
         $this->echoResult();
+    }
+
+    /** Storages a saved document touches — used to pick the right serialization locks. */
+    private function documentStores(string $docId): array
+    {
+        $row = $this->select(
+            "select f_store_in, f_store_out from store_document where f_id=?",
+            "s",
+            [$docId]
+        )->fetch_assoc();
+        if (empty($row)) {
+            return [];
+        }
+        return [(int)($row["f_store_in"] ?? 0), (int)($row["f_store_out"] ?? 0)];
     }
 
     private function callStore2(string $fn, array $doc): array
     {
-        $res = $this->select("select {$fn}(?) as result", "s", [json_encode($doc, JSON_UNESCAPED_UNICODE)]);
-        $row = $res->fetch_assoc();
-        if (!$row || !isset($row["result"])) {
-            return ["status" => 1, "msg" => "Database function returned nothing"];
-        }
-        $result = json_decode($row["result"], true);
-        if (!is_array($result)) {
-            return ["status" => 1, "msg" => "Invalid function result"];
-        }
-        return $result;
+        return $this->callStoreFunction($fn, json_encode($doc, JSON_UNESCAPED_UNICODE));
     }
 
     private function store2ErrorMessage(array $result): string

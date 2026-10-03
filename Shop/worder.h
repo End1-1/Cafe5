@@ -148,7 +148,7 @@ private:
 
     bool getDiscountValue(int discountType, double &v);
 
-    void setPartner(PartnerItem pi);
+    void setPartner(PartnerItem pi, std::function<void()> nextStep = nullptr);
 
     void persistGuestToOrder(std::function<void()> nextStep = nullptr);
 

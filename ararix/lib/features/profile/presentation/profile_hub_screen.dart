@@ -98,6 +98,11 @@ class ProfileHubScreen extends ConsumerWidget {
                 onTap: () => context.push('/profile/account'),
               ),
               SettingsTile(
+                icon: Icons.location_on_outlined,
+                title: l10n.myAddresses,
+                onTap: () => context.push('/profile/addresses'),
+              ),
+              SettingsTile(
                 icon: Icons.history,
                 title: l10n.orderHistory,
                 onTap: () => ScaffoldMessenger.of(context).showSnackBar(

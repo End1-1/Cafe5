@@ -4,6 +4,7 @@
 # Last modified - 2026-07-22
 require_once __DIR__ . "/index.php";
 require_once __DIR__ . "/../../worker/uuid.php";
+require_once __DIR__ . "/../../worker/helper.php";
 
 class ProcessBarCode extends Auth
 {
@@ -211,7 +212,17 @@ class ProcessBarCode extends Auth
 
         $this->code = (string)($params->barcode ?? "");
         if (strlen($this->code) >= 29) {
-            $this->qrcode = $this->code;
+            $this->qrcode = normalize_emarks($this->code);
+            if ($this->qrcode !== "") {
+                $dup = $this->select(
+                    "SELECT f_id FROM o_goods WHERE f_emarks=? AND f_state=1 LIMIT 1",
+                    "s",
+                    [$this->qrcode]
+                )->fetch_assoc();
+                if (!empty($dup)) {
+                    dieWithCode(Translator::t("Duplicate emarks"));
+                }
+            }
             if (substr($this->code, 0, 3) == "010") {
                 $this->code = (string) intval(substr($this->code, 3, 13));
             } else if (substr($this->code, 0, 6) == "000000") {

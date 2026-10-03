@@ -782,6 +782,7 @@
 "IV": "IV",
 "Id": "Id",
 "Idram": "Idram",
+"Idram external POS": "Внешний POS для Idram",
 "Idram ID": "ID Idram",
 "Idram name": "Имя Idram",
 "Idram phone": "Телефон Idram",

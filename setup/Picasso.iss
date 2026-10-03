@@ -30,7 +30,7 @@ PrivilegesRequired=admin
 UsePreviousAppDir=yes
 UsePreviousTasks=yes
 CloseApplications=force
-CloseApplicationsFilter=OfficeN.exe,Shop_net.exe,Waiter.exe,WaiterDesigner.exe,CookingProgress.exe,service5.exe,Service5.exe,Updater.exe,PicassoUpdateHost.exe
+CloseApplicationsFilter=OfficeN.exe,Shop_net.exe,Waiter.exe,WaiterDesigner.exe,CookingProgress.exe,SelfBoard.exe,service5.exe,Service5.exe,Updater.exe,PicassoUpdateHost.exe
 RestartApplications=no
 ShowLanguageDialog=auto
 
@@ -47,6 +47,7 @@ Name: "frontdesk"; Description: "FrontDesk (OfficeN)"; Types: full custom
 Name: "shop"; Description: "Shop"; Types: full custom
 Name: "waiter"; Description: "Waiter"; Types: full custom
 Name: "cookingprogress"; Description: "CookingProgress"; Types: full custom
+Name: "selfboard"; Description: "SelfBoard"; Types: full custom
 Name: "service5"; Description: "Service5 (Windows service Breeze)"; Types: full custom
 
 [Tasks]
@@ -55,6 +56,7 @@ Name: "desktop_shop"; Description: "Desktop icon: Shop"; GroupDescription: "Desk
 Name: "desktop_waiter"; Description: "Desktop icon: Waiter"; GroupDescription: "Desktop icons:"; Components: waiter; Flags: unchecked
 Name: "desktop_waiter_designer"; Description: "Desktop icon: WaiterDesigner"; GroupDescription: "Desktop icons:"; Components: waiter
 Name: "desktop_cookingprogress"; Description: "Desktop icon: CookingProgress"; GroupDescription: "Desktop icons:"; Components: cookingprogress; Flags: unchecked
+Name: "desktop_selfboard"; Description: "Desktop icon: SelfBoard"; GroupDescription: "Desktop icons:"; Components: selfboard; Flags: unchecked
 
 [Files]
 ; --- Application binaries (each module in its own subfolder) ---
@@ -63,6 +65,9 @@ Source: "{#StagingDir}\Shop_net.exe"; DestDir: "{app}\shop"; Components: shop; F
 Source: "{#StagingDir}\Waiter.exe"; DestDir: "{app}\waiter"; Components: waiter; Flags: ignoreversion
 Source: "{#StagingDir}\WaiterDesigner.exe"; DestDir: "{app}\waiter"; Components: waiter; Flags: ignoreversion skipifsourcedoesntexist
 Source: "{#StagingDir}\CookingProgress.exe"; DestDir: "{app}\cookingprogress"; Components: cookingprogress; Flags: ignoreversion
+Source: "{#StagingDir}\SelfBoard.exe"; DestDir: "{app}\selfboard"; Components: selfboard; Flags: ignoreversion
+Source: "{#StagingDir}\SelfBoard.ini"; DestDir: "{app}\selfboard"; Components: selfboard; Flags: ignoreversion
+Source: "{#StagingDir}\SelfBoard.ini"; DestDir: "{tmp}"; DestName: "SelfBoard.demo.ini"; Components: selfboard; Flags: deleteafterinstall
 Source: "{#StagingDir}\service5.exe"; DestDir: "{app}"; Components: service5; Flags: ignoreversion; BeforeInstall: BeforeServiceInstall
 Source: "{#StagingDir}\Updater.exe"; DestDir: "{app}\updater"; Flags: ignoreversion
 Source: "{#StagingDir}\Qt6*.dll"; DestDir: "{app}\updater"; Flags: ignoreversion
@@ -76,28 +81,34 @@ Source: "{#StagingDir}\ahuni.ttf"; DestDir: "{app}\frontdesk"; Components: front
 Source: "{#StagingDir}\ahuni.ttf"; DestDir: "{app}\shop"; Components: shop; Flags: ignoreversion
 Source: "{#StagingDir}\ahuni.ttf"; DestDir: "{app}\waiter"; Components: waiter; Flags: ignoreversion
 Source: "{#StagingDir}\ahuni.ttf"; DestDir: "{app}\cookingprogress"; Components: cookingprogress; Flags: ignoreversion
+Source: "{#StagingDir}\ahuni.ttf"; DestDir: "{app}\selfboard"; Components: selfboard; Flags: ignoreversion
 Source: "{#StagingDir}\templates\*"; DestDir: "{app}\frontdesk\templates"; Components: frontdesk; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "{#StagingDir}\templates\*"; DestDir: "{app}\shop\templates"; Components: shop; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "{#StagingDir}\templates\*"; DestDir: "{app}\waiter\templates"; Components: waiter; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "{#StagingDir}\templates\*"; DestDir: "{app}\cookingprogress\templates"; Components: cookingprogress; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "{#StagingDir}\templates\*"; DestDir: "{app}\selfboard\templates"; Components: selfboard; Flags: ignoreversion recursesubdirs createallsubdirs
 
 ; --- Qt / OpenSSL / MariaDB (per module) ---
 Source: "{#StagingDir}\Qt6*.dll"; DestDir: "{app}\frontdesk"; Components: frontdesk; Flags: ignoreversion
 Source: "{#StagingDir}\Qt6*.dll"; DestDir: "{app}\shop"; Components: shop; Flags: ignoreversion
 Source: "{#StagingDir}\Qt6*.dll"; DestDir: "{app}\waiter"; Components: waiter; Flags: ignoreversion
 Source: "{#StagingDir}\Qt6*.dll"; DestDir: "{app}\cookingprogress"; Components: cookingprogress; Flags: ignoreversion
+Source: "{#StagingDir}\Qt6*.dll"; DestDir: "{app}\selfboard"; Components: selfboard; Flags: ignoreversion
 Source: "{#StagingDir}\libcrypto-3-x64.dll"; DestDir: "{app}\frontdesk"; Components: frontdesk; Flags: ignoreversion
 Source: "{#StagingDir}\libcrypto-3-x64.dll"; DestDir: "{app}\shop"; Components: shop; Flags: ignoreversion
 Source: "{#StagingDir}\libcrypto-3-x64.dll"; DestDir: "{app}\waiter"; Components: waiter; Flags: ignoreversion
 Source: "{#StagingDir}\libcrypto-3-x64.dll"; DestDir: "{app}\cookingprogress"; Components: cookingprogress; Flags: ignoreversion
+Source: "{#StagingDir}\libcrypto-3-x64.dll"; DestDir: "{app}\selfboard"; Components: selfboard; Flags: ignoreversion
 Source: "{#StagingDir}\libssl-3-x64.dll"; DestDir: "{app}\frontdesk"; Components: frontdesk; Flags: ignoreversion
 Source: "{#StagingDir}\libssl-3-x64.dll"; DestDir: "{app}\shop"; Components: shop; Flags: ignoreversion
 Source: "{#StagingDir}\libssl-3-x64.dll"; DestDir: "{app}\waiter"; Components: waiter; Flags: ignoreversion
 Source: "{#StagingDir}\libssl-3-x64.dll"; DestDir: "{app}\cookingprogress"; Components: cookingprogress; Flags: ignoreversion
+Source: "{#StagingDir}\libssl-3-x64.dll"; DestDir: "{app}\selfboard"; Components: selfboard; Flags: ignoreversion
 Source: "{#StagingDir}\libmariadb.dll"; DestDir: "{app}\frontdesk"; Components: frontdesk; Flags: ignoreversion
 Source: "{#StagingDir}\libmariadb.dll"; DestDir: "{app}\shop"; Components: shop; Flags: ignoreversion
 Source: "{#StagingDir}\libmariadb.dll"; DestDir: "{app}\waiter"; Components: waiter; Flags: ignoreversion
 Source: "{#StagingDir}\libmariadb.dll"; DestDir: "{app}\cookingprogress"; Components: cookingprogress; Flags: ignoreversion
+Source: "{#StagingDir}\libmariadb.dll"; DestDir: "{app}\selfboard"; Components: selfboard; Flags: ignoreversion
 Source: "{#StagingDir}\libzkfp.dll"; DestDir: "{app}\frontdesk"; Components: frontdesk; Flags: ignoreversion
 Source: "{#StagingDir}\libzkfp.dll"; DestDir: "{app}\waiter"; Components: waiter; Flags: ignoreversion
 Source: "{#StagingDir}\ZKFPCap.dll"; DestDir: "{app}\frontdesk"; Components: frontdesk; Flags: ignoreversion
@@ -118,18 +129,22 @@ Source: "{#StagingDir}\platforms\*"; DestDir: "{app}\frontdesk\platforms"; Compo
 Source: "{#StagingDir}\platforms\*"; DestDir: "{app}\shop\platforms"; Components: shop; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "{#StagingDir}\platforms\*"; DestDir: "{app}\waiter\platforms"; Components: waiter; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "{#StagingDir}\platforms\*"; DestDir: "{app}\cookingprogress\platforms"; Components: cookingprogress; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "{#StagingDir}\platforms\*"; DestDir: "{app}\selfboard\platforms"; Components: selfboard; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "{#StagingDir}\sqldrivers\*"; DestDir: "{app}\frontdesk\sqldrivers"; Components: frontdesk; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "{#StagingDir}\sqldrivers\*"; DestDir: "{app}\shop\sqldrivers"; Components: shop; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "{#StagingDir}\sqldrivers\*"; DestDir: "{app}\waiter\sqldrivers"; Components: waiter; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "{#StagingDir}\sqldrivers\*"; DestDir: "{app}\cookingprogress\sqldrivers"; Components: cookingprogress; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "{#StagingDir}\sqldrivers\*"; DestDir: "{app}\selfboard\sqldrivers"; Components: selfboard; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "{#StagingDir}\imageformats\*"; DestDir: "{app}\frontdesk\imageformats"; Components: frontdesk; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "{#StagingDir}\imageformats\*"; DestDir: "{app}\shop\imageformats"; Components: shop; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "{#StagingDir}\imageformats\*"; DestDir: "{app}\waiter\imageformats"; Components: waiter; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "{#StagingDir}\imageformats\*"; DestDir: "{app}\cookingprogress\imageformats"; Components: cookingprogress; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "{#StagingDir}\imageformats\*"; DestDir: "{app}\selfboard\imageformats"; Components: selfboard; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "{#StagingDir}\plugins\*"; DestDir: "{app}\frontdesk\plugins"; Components: frontdesk; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "{#StagingDir}\plugins\*"; DestDir: "{app}\shop\plugins"; Components: shop; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "{#StagingDir}\plugins\*"; DestDir: "{app}\waiter\plugins"; Components: waiter; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "{#StagingDir}\plugins\*"; DestDir: "{app}\cookingprogress\plugins"; Components: cookingprogress; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "{#StagingDir}\plugins\*"; DestDir: "{app}\selfboard\plugins"; Components: selfboard; Flags: ignoreversion recursesubdirs createallsubdirs
 
 ; --- VC++ Redistributable (MSVC 2015-2022 x64); extracted in PrepareToInstall when needed ---
 Source: "{#StagingDir}\vc_redist.x64.exe"; Flags: dontcopy
@@ -142,6 +157,7 @@ Name: "{group}\Shop"; Filename: "{app}\shop\Shop_net.exe"; Components: shop; Che
 Name: "{group}\Waiter"; Filename: "{app}\waiter\Waiter.exe"; Components: waiter; Check: ShouldCreateAppIcon('waiter')
 Name: "{group}\WaiterDesigner"; Filename: "{app}\waiter\WaiterDesigner.exe"; Components: waiter
 Name: "{group}\CookingProgress"; Filename: "{app}\cookingprogress\CookingProgress.exe"; Components: cookingprogress; Check: ShouldCreateAppIcon('cookingprogress')
+Name: "{group}\SelfBoard"; Filename: "{app}\selfboard\SelfBoard.exe"; Components: selfboard; Check: ShouldCreateAppIcon('selfboard')
 Name: "{group}\Service5 Monitor"; Filename: "{app}\service5.exe"; Parameters: "--gui"; Components: service5; Check: ShouldCreateAppIcon('service5')
 Name: "{group}\{cm:UninstallProgram,{#MyAppName}}"; Filename: "{uninstallexe}"
 Name: "{autodesktop}\FrontDesk"; Filename: "{app}\frontdesk\OfficeN.exe"; Tasks: desktop_frontdesk
@@ -149,6 +165,7 @@ Name: "{autodesktop}\Shop"; Filename: "{app}\shop\Shop_net.exe"; Tasks: desktop_
 Name: "{autodesktop}\Waiter"; Filename: "{app}\waiter\Waiter.exe"; Tasks: desktop_waiter
 Name: "{autodesktop}\WaiterDesigner"; Filename: "{app}\waiter\WaiterDesigner.exe"; Components: waiter; Tasks: desktop_waiter_designer
 Name: "{autodesktop}\CookingProgress"; Filename: "{app}\cookingprogress\CookingProgress.exe"; Tasks: desktop_cookingprogress
+Name: "{autodesktop}\SelfBoard"; Filename: "{app}\selfboard\SelfBoard.exe"; Tasks: desktop_selfboard
 
 [Registry]
 Root: HKLM; Subkey: "Software\{#MyAppName}"; ValueType: string; ValueName: "InstallPath"; ValueData: "{app}"; Flags: uninsdeletekey
@@ -157,6 +174,7 @@ Root: HKLM; Subkey: "Software\{#MyAppName}\frontdesk"; ValueType: string; ValueN
 Root: HKLM; Subkey: "Software\{#MyAppName}\shop"; ValueType: string; ValueName: "InstallPath"; ValueData: "{app}\shop"; Components: shop; Flags: uninsdeletekey
 Root: HKLM; Subkey: "Software\{#MyAppName}\waiter"; ValueType: string; ValueName: "InstallPath"; ValueData: "{app}\waiter"; Components: waiter; Flags: uninsdeletekey
 Root: HKLM; Subkey: "Software\{#MyAppName}\cookingprogress"; ValueType: string; ValueName: "InstallPath"; ValueData: "{app}\cookingprogress"; Components: cookingprogress; Flags: uninsdeletekey
+Root: HKLM; Subkey: "Software\{#MyAppName}\selfboard"; ValueType: string; ValueName: "InstallPath"; ValueData: "{app}\selfboard"; Components: selfboard; Flags: uninsdeletekey
 Root: HKLM; Subkey: "Software\{#MyAppName}\service5"; ValueType: string; ValueName: "InstallPath"; ValueData: "{app}"; Components: service5; Flags: uninsdeletekey
 Root: HKLM; Subkey: "Software\{#MyAppName}"; ValueType: dword; ValueName: "Service5Installed"; ValueData: "1"; Components: service5; Flags: uninsdeletekey
 
@@ -185,6 +203,10 @@ Root: HKCU; Subkey: "Software\BreezeDevs\CookingProgress\CookingProgress"; Value
 Root: HKCU; Subkey: "Software\BreezeDevs\CookingProgress\CookingProgress"; ValueType: string; ValueName: "ss_server_password"; ValueData: "0001"; Components: cookingprogress; Flags: createvalueifdoesntexist
 Root: HKLM; Subkey: "Software\Microsoft\Windows\CurrentVersion\Run"; ValueType: string; ValueName: "CookingProgress"; ValueData: """{app}\cookingprogress\CookingProgress.exe"""; Components: cookingprogress; Flags: uninsdeletevalue
 
+; SelfBoard demo seed as original user (admin {localappdata} would hit the elevated profile).
+[Run]
+Filename: "{cmd}"; Parameters: "/C if not exist ""%LOCALAPPDATA%\Jazzve"" mkdir ""%LOCALAPPDATA%\Jazzve"" & if not exist ""%LOCALAPPDATA%\Jazzve\SelfBoard.ini"" copy /Y ""{tmp}\SelfBoard.demo.ini"" ""%LOCALAPPDATA%\Jazzve\SelfBoard.ini"""; StatusMsg: "SelfBoard demo settings..."; Components: selfboard; Flags: runhidden waituntilterminated runasoriginaluser
+
 [Code]
 var
   UpgradeMode: Boolean;
@@ -192,6 +214,7 @@ var
   PrevHadShop: Boolean;
   PrevHadWaiter: Boolean;
   PrevHadCookingProgress: Boolean;
+  PrevHadSelfBoard: Boolean;
   PrevHadService5: Boolean;
   BreezeStoppedForUpdate: Boolean;
 
@@ -201,6 +224,7 @@ begin
             WizardIsComponentSelected('shop') or
             WizardIsComponentSelected('waiter') or
             WizardIsComponentSelected('cookingprogress') or
+            WizardIsComponentSelected('selfboard') or
             WizardIsComponentSelected('service5');
 end;
 
@@ -298,6 +322,8 @@ begin
     Result := not PrevHadWaiter
   else if CompName = 'cookingprogress' then
     Result := not PrevHadCookingProgress
+  else if CompName = 'selfboard' then
+    Result := not PrevHadSelfBoard
   else if CompName = 'service5' then
     Result := not PrevHadService5
   else
@@ -312,6 +338,7 @@ begin
   PrevHadShop := False;
   PrevHadWaiter := False;
   PrevHadCookingProgress := False;
+  PrevHadSelfBoard := False;
   PrevHadService5 := False;
 
   InstallPath := '';
@@ -337,6 +364,8 @@ begin
                    FileExists(InstallPath + 'Waiter.exe');
   PrevHadCookingProgress := FileExists(InstallPath + 'cookingprogress\CookingProgress.exe') or
                             FileExists(InstallPath + 'CookingProgress.exe');
+  PrevHadSelfBoard := FileExists(InstallPath + 'selfboard\SelfBoard.exe') or
+                      FileExists(InstallPath + 'SelfBoard.exe');
   PrevHadService5 := FileExists(InstallPath + 'service5.exe') or
                      FileExists(InstallPath + 'Service5.exe');
   Result := True;
@@ -491,30 +520,33 @@ begin
       if not RegQueryStringValue(HKLM, 'Software\{#MyAppName}\shop', 'InstallPath', InstallPath) then
         if not RegQueryStringValue(HKLM, 'Software\{#MyAppName}\waiter', 'InstallPath', InstallPath) then
           if not RegQueryStringValue(HKLM, 'Software\{#MyAppName}\cookingprogress', 'InstallPath', InstallPath) then
-            if not RegQueryStringValue(HKLM, 'Software\{#MyAppName}\service5', 'InstallPath', InstallPath) then
-              InstallPath := ExpandConstant('{autopf}\{#MyAppName}');
+            if not RegQueryStringValue(HKLM, 'Software\{#MyAppName}\selfboard', 'InstallPath', InstallPath) then
+              if not RegQueryStringValue(HKLM, 'Software\{#MyAppName}\service5', 'InstallPath', InstallPath) then
+                InstallPath := ExpandConstant('{autopf}\{#MyAppName}');
   end;
   if (InstallPath = '') or (not DirExists(InstallPath)) then
     Exit;
   if InstallPath[Length(InstallPath)] <> '\' then
     InstallPath := InstallPath + '\';
 
-  if FileExists(InstallPath + 'OfficeN.exe') then
+  if FileExists(InstallPath + 'OfficeN.exe') or FileExists(InstallPath + 'frontdesk\OfficeN.exe') then
     Result := Result + '  - FrontDesk' + #13#10;
-  if FileExists(InstallPath + 'Shop_net.exe') then
+  if FileExists(InstallPath + 'Shop_net.exe') or FileExists(InstallPath + 'shop\Shop_net.exe') then
     Result := Result + '  - Shop' + #13#10;
-  if FileExists(InstallPath + 'Waiter.exe') then
+  if FileExists(InstallPath + 'Waiter.exe') or FileExists(InstallPath + 'waiter\Waiter.exe') then
     Result := Result + '  - Waiter' + #13#10;
-  if FileExists(InstallPath + 'CookingProgress.exe') then
+  if FileExists(InstallPath + 'CookingProgress.exe') or FileExists(InstallPath + 'cookingprogress\CookingProgress.exe') then
     Result := Result + '  - CookingProgress' + #13#10;
+  if FileExists(InstallPath + 'SelfBoard.exe') or FileExists(InstallPath + 'selfboard\SelfBoard.exe') then
+    Result := Result + '  - SelfBoard' + #13#10;
   if FileExists(InstallPath + 'service5.exe') or FileExists(InstallPath + 'Service5.exe') or ServiceExists then
     Result := Result + '  - Service5 / Breeze service' + #13#10;
 end;
 
 function CollectRunningApps: string;
 var
-  Names: array[0..5] of string;
-  Labels: array[0..5] of string;
+  Names: array[0..6] of string;
+  Labels: array[0..6] of string;
   I: Integer;
 begin
   Names[0] := 'OfficeN.exe';
@@ -522,16 +554,18 @@ begin
   Names[2] := 'Waiter.exe';
   Names[3] := 'WaiterDesigner.exe';
   Names[4] := 'CookingProgress.exe';
-  Names[5] := 'service5.exe';
+  Names[5] := 'SelfBoard.exe';
+  Names[6] := 'service5.exe';
   Labels[0] := 'FrontDesk (OfficeN.exe)';
   Labels[1] := 'Shop (Shop_net.exe)';
   Labels[2] := 'Waiter (Waiter.exe)';
   Labels[3] := 'WaiterDesigner (WaiterDesigner.exe)';
   Labels[4] := 'CookingProgress (CookingProgress.exe)';
-  Labels[5] := 'Service5 (service5.exe)';
+  Labels[5] := 'SelfBoard (SelfBoard.exe)';
+  Labels[6] := 'Service5 (service5.exe)';
 
   Result := '';
-  for I := 0 to 5 do
+  for I := 0 to 6 do
   begin
     if IsProcessRunning(Names[I]) then
     begin
@@ -574,6 +608,7 @@ begin
   KillProcess('Waiter.exe');
   KillProcess('WaiterDesigner.exe');
   KillProcess('CookingProgress.exe');
+  KillProcess('SelfBoard.exe');
   KillProcess('service5.exe');
   KillProcess('Service5.exe');
   Sleep(500);

@@ -21,6 +21,21 @@ QString apiErrorMessage(const QJsonObject &jdoc)
     return msg;
 }
 
+QString buildStatusUrl(const QString &publicToken)
+{
+    if (publicToken.isEmpty()) {
+        return {};
+    }
+    QString base = AppSettings::orderStatusUrlBase().trimmed();
+    if (base.isEmpty()) {
+        base = QStringLiteral("https://www.ararix.com/get-order-status/");
+    }
+    if (!base.endsWith(QLatin1Char('/'))) {
+        base.append(QLatin1Char('/'));
+    }
+    return base + publicToken;
+}
+
 QJsonObject dishDataJson(const MenuDish &dish)
 {
     QJsonObject fData;
@@ -90,7 +105,10 @@ void SelfBoardOrderSubmit::submit(OrderCart *cart,
                                   FinishedCallback finished)
 {
     if (!cart || cart->isEmpty()) {
-        finished(false, QString(), QCoreApplication::translate("SelfBoardOrderSubmit", "Cart is empty"));
+        SelfBoardSubmitResult r;
+        r.ok = false;
+        r.error = QCoreApplication::translate("SelfBoardOrderSubmit", "Cart is empty");
+        finished(r);
         return;
     }
 
@@ -102,11 +120,17 @@ void SelfBoardOrderSubmit::submit(OrderCart *cart,
     const double serviceFactor = AppSettings::serviceFactor();
 
     if (tableId <= 0) {
-        finished(false, QString(), QCoreApplication::translate("SelfBoardOrderSubmit", "Configure table id in settings"));
+        SelfBoardSubmitResult r;
+        r.ok = false;
+        r.error = QCoreApplication::translate("SelfBoardOrderSubmit", "Configure table id in settings");
+        finished(r);
         return;
     }
     if (cashboxId <= 0) {
-        finished(false, QString(), QCoreApplication::translate("SelfBoardOrderSubmit", "Configure cashbox id in settings"));
+        SelfBoardSubmitResult r;
+        r.ok = false;
+        r.error = QCoreApplication::translate("SelfBoardOrderSubmit", "Configure cashbox id in settings");
+        finished(r);
         return;
     }
 
@@ -137,7 +161,10 @@ void SelfBoardOrderSubmit::submit(OrderCart *cart,
 
     const auto fail = [state](const QString &error) {
         if (state->finished) {
-            state->finished(false, QString(), error);
+            SelfBoardSubmitResult r;
+            r.ok = false;
+            r.error = error;
+            state->finished(r);
         }
     };
 
@@ -146,7 +173,7 @@ void SelfBoardOrderSubmit::submit(OrderCart *cart,
     const auto setCardPayment = std::make_shared<std::function<void()>>();
     const auto closeOrder = std::make_shared<std::function<void()>>();
 
-    *closeOrder = [state, fail, closeOrder]() {
+    *closeOrder = [state, fail]() {
         if (state->cashSessionId <= 0) {
             fail(QCoreApplication::translate("SelfBoardOrderSubmit", "Cashbox session is not open"));
             return;
@@ -169,9 +196,13 @@ void SelfBoardOrderSubmit::submit(OrderCart *cart,
                     return;
                 }
                 const QJsonObject order = jdoc.value(QStringLiteral("order")).toObject();
-                const QString orderNumber = order.value(QStringLiteral("f_prefix")).toString();
+                SelfBoardSubmitResult r;
+                r.ok = true;
+                r.orderNumber = order.value(QStringLiteral("f_prefix")).toString();
+                r.publicToken = order.value(QStringLiteral("f_public_token")).toString();
+                r.statusUrl = buildStatusUrl(r.publicToken);
                 if (state->finished) {
-                    state->finished(true, orderNumber, QString());
+                    state->finished(r);
                 }
             },
             [fail](const QJsonObject &jerr) -> bool {
@@ -183,7 +214,7 @@ void SelfBoardOrderSubmit::submit(OrderCart *cart,
             true);
     };
 
-    *setCardPayment = [state, fail, setCardPayment, closeOrder]() {
+    *setCardPayment = [state, fail, closeOrder]() {
         NInterface::query(
             QStringLiteral("/engine/v2/waiter/order/set-amount"),
             state->sessionKey,
@@ -193,7 +224,7 @@ void SelfBoardOrderSubmit::submit(OrderCart *cart,
                 {QStringLiteral("payment_field"), QStringLiteral("f_amount_card")},
                 {QStringLiteral("amount"), state->totalAmount},
             },
-            [state, fail, closeOrder](const QJsonObject &jdoc) {
+            [fail, closeOrder](const QJsonObject &jdoc) {
                 if (jdoc.value(QStringLiteral("status")).toInt() != 1) {
                     fail(apiErrorMessage(jdoc));
                     return;
@@ -209,7 +240,7 @@ void SelfBoardOrderSubmit::submit(OrderCart *cart,
             true);
     };
 
-    *printService = [state, fail, printService, setCardPayment]() {
+    *printService = [state, fail, setCardPayment]() {
         NInterface::query(
             QStringLiteral("/engine/v2/waiter/order/print-service-check"),
             state->sessionKey,

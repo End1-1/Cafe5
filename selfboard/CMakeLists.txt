@@ -21,6 +21,7 @@ set(SOURCES
     main.cpp
     dlgstart.cpp
     dlgserversettings.cpp
+    dlgupdaterequired.cpp
     serverconfig.cpp
     appsettings.cpp
     selfboardsettings.cpp
@@ -50,11 +51,13 @@ set(SOURCES
     ../Cafe5/c5uilanguage.cpp
     ../Classes/logwriter.cpp
     ../Classes/QProgressIndicator.cpp
+    ../Classes/QRCodeGenerator.cpp
 )
 
 set(HEADERS
     dlgstart.h
     dlgserversettings.h
+    dlgupdaterequired.h
     serverconfig.h
     appsettings.h
     selfboardsettings.h
@@ -80,15 +83,19 @@ set(HEADERS
     dishcardanimhost.h
     ordercart.h
     selfboarddisplay.h
+    selfboardupdate.h
     version.h
     ../Cafe5/c5registrysettings.h
     ../Cafe5/c5uilanguage.h
     ../Classes/format_bytes.h
+    ../Classes/QRCodeGenerator.h
+    ../Classes/c5updaterlauncher.h
 )
 
 set(FORMS
     dlgstart.ui
     dlgserversettings.ui
+    dlgupdaterequired.ui
     dlgmenu.ui
     dlgcart.ui
     dlgpayment.ui

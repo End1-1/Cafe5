@@ -16,13 +16,13 @@
   "armenia": "Armenia",
   "phoneValidation": "Phone number validation",
   "enterTheCode": "Enter the code",
-  "insertCodeWhatsapp": "Insert the 4-digit code that we sent via WhatsApp to {phone}",
+  "insertCodeWhatsapp": "Insert the 5-digit code that we sent via WhatsApp to {phone}",
   "@insertCodeWhatsapp": {
     "placeholders": {
       "phone": {"type": "String"}
     }
   },
-  "insertCodeSms": "Insert the 4-digit code that we sent via SMS to {phone}",
+  "insertCodeSms": "Insert the 5-digit code that we sent via SMS to {phone}",
   "@insertCodeSms": {
     "placeholders": {
       "phone": {"type": "String"}
@@ -61,7 +61,7 @@
   "comingSoon": "Coming soon",
   "socialLoginSoon": "Social login will be available later",
   "invalidPhone": "Enter a valid phone number",
-  "invalidOtp": "Enter the 4-digit code",
+  "invalidOtp": "Enter the 5-digit code",
   "errorGeneric": "Something went wrong",
   "save": "Save",
   "name": "Name",
@@ -114,5 +114,40 @@
       "name": {"type": "String"}
     }
   },
-  "back": "Back"
+  "back": "Back",
+  "addAddress": "Add address",
+  "myAddresses": "My addresses",
+  "noSavedAddresses": "No saved addresses",
+  "deleteAddress": "Delete address",
+  "deleteAddressQuestion": "Delete this address?",
+  "whereDeliver": "Where should we deliver?",
+  "currentLocation": "Current location",
+  "addNewAddress": "Add new",
+  "locateMe": "Locate me",
+  "searchAddressTitle": "Search",
+  "enterStreetBuilding": "Enter street, building number…",
+  "confirmAddress": "Confirm address",
+  "adjustPin": "Adjust pin",
+  "droppedPin": "Dropped pin",
+  "buildingTypeTitle": "Building type",
+  "buildingHouse": "House",
+  "buildingApartment": "Apartment",
+  "buildingOffice": "Office",
+  "buildingOther": "Other",
+  "addressDetailsTitle": "Address details",
+  "floor": "Floor",
+  "door": "Door",
+  "additionalInfo": "Additional info",
+  "markEntrance": "Mark your entrance",
+  "entrance": "Entrance",
+  "addressLabel": "Label",
+  "labelHome": "Home",
+  "labelWork": "Work",
+  "labelOther": "Other",
+  "customLabel": "Custom label",
+  "saveAddress": "Save address",
+  "orderStatusTitle": "Order status",
+  "orderNumber": "Order number",
+  "status": "Status",
+  "items": "Items"
 }

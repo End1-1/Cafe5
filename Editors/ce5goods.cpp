@@ -16,7 +16,9 @@
 #include <QPixmap>
 #include <QColorDialog>
 #include <QPushButton>
+#include <QSignalBlocker>
 #include <QStringListModel>
+#include <QToolButton>
 #include "barcode.h"
 #include "c5cache.h"
 #include "c5codenameselectorfunctions.h"
@@ -539,6 +541,12 @@ CE5Goods::CE5Goods(QWidget *parent) :
             fillServicePrintCombo(printers);
         });
     }
+
+    connect(ui->btnLangHy, &QToolButton::clicked, this, &CE5Goods::onLangButtonClicked);
+    connect(ui->btnLangRu, &QToolButton::clicked, this, &CE5Goods::onLangButtonClicked);
+    connect(ui->btnLangEn, &QToolButton::clicked, this, &CE5Goods::onLangButtonClicked);
+    mEditLang = QStringLiteral("hy");
+    ui->btnLangHy->setChecked(true);
 }
 
 CE5Goods::~CE5Goods()
@@ -608,6 +616,17 @@ void CE5Goods::clear()
     int scancode = ui->leScanCode->getInteger();
     fImage.clear();
     fBigImage.clear();
+    mNamesByLang.clear();
+    mDescriptionsByLang.clear();
+    mEditLang = QStringLiteral("hy");
+    {
+        QSignalBlocker b1(ui->btnLangHy);
+        QSignalBlocker b2(ui->btnLangRu);
+        QSignalBlocker b3(ui->btnLangEn);
+        ui->btnLangHy->setChecked(true);
+        ui->btnLangRu->setChecked(false);
+        ui->btnLangEn->setChecked(false);
+    }
     ui->tblBarcodes->setRowCount(0);
     ui->tblGoods->clearContents();
     ui->tblGoods->setRowCount(0);
@@ -722,6 +741,55 @@ void CE5Goods::setColor()
     ui->leColor->setInteger(color);
 }
 
+void CE5Goods::applyGoodsTranslations(const QJsonObject &translations)
+{
+    mNamesByLang.clear();
+    mDescriptionsByLang.clear();
+    mNamesByLang.insert(QStringLiteral("hy"), ui->leName->text());
+    mDescriptionsByLang.insert(QStringLiteral("hy"), ui->plainTextEdit->toPlainText());
+    for (auto it = translations.begin(); it != translations.end(); ++it) {
+        const QString lang = it.key().toLower();
+        if (lang.isEmpty() || lang == QLatin1String("hy")) {
+            continue;
+        }
+        const QJsonObject row = it.value().toObject();
+        mNamesByLang.insert(lang, row.value(QStringLiteral("f_name")).toString());
+        mDescriptionsByLang.insert(lang, row.value(QStringLiteral("f_description")).toString());
+    }
+}
+
+void CE5Goods::stashCurrentGoodsLangFields()
+{
+    mNamesByLang.insert(mEditLang, ui->leName->text());
+    mDescriptionsByLang.insert(mEditLang, ui->plainTextEdit->toPlainText());
+}
+
+void CE5Goods::showGoodsLangFields(const QString &lang)
+{
+    ui->leName->setText(mNamesByLang.value(lang));
+    ui->plainTextEdit->setPlainText(mDescriptionsByLang.value(lang));
+}
+
+void CE5Goods::onLangButtonClicked()
+{
+    auto *btn = qobject_cast<QToolButton *>(sender());
+    if (!btn) {
+        return;
+    }
+    QString next = QStringLiteral("hy");
+    if (btn == ui->btnLangRu) {
+        next = QStringLiteral("ru");
+    } else if (btn == ui->btnLangEn) {
+        next = QStringLiteral("en");
+    }
+    if (next == mEditLang) {
+        return;
+    }
+    stashCurrentGoodsLangFields();
+    mEditLang = next;
+    showGoodsLangFields(mEditLang);
+}
+
 QPushButton* CE5Goods::b1()
 {
     QPushButton *btn = new QPushButton(tr("Print card"));
@@ -794,7 +862,26 @@ QJsonObject CE5Goods::makeJsonObject()
 
     QJsonObject j;
     j["f_id"] = ui->leCode->getInteger();
-    j["f_name"] = ui->leName->text();
+
+    QMap<QString, QString> names = mNamesByLang;
+    QMap<QString, QString> descriptions = mDescriptionsByLang;
+    names.insert(mEditLang, ui->leName->text());
+    descriptions.insert(mEditLang, ui->plainTextEdit->toPlainText());
+    const QString hyName = names.value(QStringLiteral("hy")).trimmed().isEmpty()
+            ? ui->leName->text().trimmed()
+            : names.value(QStringLiteral("hy")).trimmed();
+    j["f_name"] = hyName;
+    j["f_description"] = descriptions.value(QStringLiteral("hy"), ui->plainTextEdit->toPlainText());
+
+    QJsonObject translations;
+    for (const QString &lang : {QStringLiteral("ru"), QStringLiteral("en")}) {
+        QJsonObject row;
+        row.insert(QStringLiteral("f_name"), names.value(lang).trimmed());
+        row.insert(QStringLiteral("f_description"), descriptions.value(lang));
+        translations.insert(lang, row);
+    }
+    fJsonData["translations"] = translations;
+
     j["f_supplier"] = ui->leSupplier->getInteger();
     j["f_group"] =  ui->leGroup->getInteger();
     j["f_unit"] = ui->leUnit->getInteger();
@@ -821,7 +908,6 @@ QJsonObject CE5Goods::makeJsonObject()
     j["f_component_exit"] = ui->chComponentExit->isChecked() ? 1 : 0;
     j["f_weblink"] = ui->leWebLink->text();
     j["f_queue"] = ui->leQueue->getInteger();
-    j["f_description"] = ui->plainTextEdit->toPlainText();
     j["f_acc"] = ui->leAcc->text();
     j["f_autodiscount"] = ui->leAutodiscount->text();
     {
@@ -980,6 +1066,19 @@ void CE5Goods::openResponse(const QJsonObject &jdoc)
         loadGoodsImageToLabel(ui->leCode->getInteger(), ui->lbImage, &fImage);
     }
     ui->leName->setText(j["f_name"].toString());
+    ui->plainTextEdit->setPlainText(j["f_description"].toString());
+    applyGoodsTranslations(jdoc.value(QStringLiteral("translations")).toObject());
+    mNamesByLang.insert(QStringLiteral("hy"), ui->leName->text());
+    mDescriptionsByLang.insert(QStringLiteral("hy"), ui->plainTextEdit->toPlainText());
+    mEditLang = QStringLiteral("hy");
+    {
+        QSignalBlocker b1(ui->btnLangHy);
+        QSignalBlocker b2(ui->btnLangRu);
+        QSignalBlocker b3(ui->btnLangEn);
+        ui->btnLangHy->setChecked(true);
+        ui->btnLangRu->setChecked(false);
+        ui->btnLangEn->setChecked(false);
+    }
     ui->leGroup->setValue(j["f_group"].toVariant().toInt());
     ui->leSupplier->setValue(j["f_supplier"].toVariant().toInt());
     ui->leUnit->setValue(j["f_unit"].toVariant().toInt());
@@ -1698,21 +1797,18 @@ void CE5Goods::countTotal()
     ui->leTotal->setDouble(total);
     setComplectFlag();
 
-    if(ui->wGoodsType->value() == GOODS_TYPE_DISH
-            || ui->wGoodsType->value() == GOODS_TYPE_GOODS) {
-        double costPrice = total;
+    // Автосебестоимость только из рецепта. Без строк комплектации не трогаем
+    // leCostPrice — иначе при open/save ручное f_lastinputprice затирается в 0.
+    if((ui->wGoodsType->value() == GOODS_TYPE_DISH
+            || ui->wGoodsType->value() == GOODS_TYPE_GOODS)
+            && ui->tblGoods->rowCount() > 0) {
+        double outputQty = ui->leComplectOutputQty->getDouble();
 
-        if(ui->tblGoods->rowCount() > 0) {
-            double outputQty = ui->leComplectOutputQty->getDouble();
-
-            if(outputQty < 0.001) {
-                outputQty = 1;
-            }
-
-            costPrice = total / outputQty;
+        if(outputQty < 0.001) {
+            outputQty = 1;
         }
 
-        ui->leCostPrice->setDouble(costPrice);
+        ui->leCostPrice->setDouble(total / outputQty);
     }
 }
 

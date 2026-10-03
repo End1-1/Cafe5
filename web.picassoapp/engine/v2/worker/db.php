@@ -3,11 +3,18 @@
 # Created: 2025-05-25 13:31:11
 # Last Modified: 2026-02-06 17:27:55
 
+/** Raised when a store operation hit a deadlock (1213) or lock wait timeout (1205). */
+class StoreLockConflict extends RuntimeException {}
+
 class Db
 {
     protected $remote_host;
     protected $dbconnection;
     protected $result = [];
+    private $storeLocksHeld = [];
+    private $storeSessionReady = false;
+    private $transactionOpen = false;
+    private $storeRetries = 0;
 
     public function __construct()
     {
@@ -32,17 +39,157 @@ class Db
 
     public function beginTransaction()
     {
+        $this->transactionOpen = true;
         return  $this->dbconnection->begin_transaction();
     }
 
     public function commit()
     {
+        $this->transactionOpen = false;
         return $this->dbconnection->commit();
     }
 
     public function rollback()
     {
+        $this->transactionOpen = false;
         return $this->dbconnection->rollback();
+    }
+
+    /**
+     * Warehouse postings run one at a time per storage: every caller takes the same named
+     * locks in the same order, so documents queue up instead of deadlocking each other.
+     *
+     * @param int[] $storeIds storages touched by the document (in/out)
+     * @param callable $op runs inside the transaction; must not commit
+     */
+    public function runStoreOperation(array $storeIds, callable $op, int $attempts = 3)
+    {
+        $this->prepareStoreSession();
+        $names = $this->storeLockNames($storeIds);
+        $delayMs = 150;
+
+        // Called inside a bigger transaction (e.g. a shop return): only serialize, because
+        // starting a nested transaction here would silently commit the caller's work.
+        if ($this->transactionOpen) {
+            $this->acquireStoreLocks($names);
+            try {
+                return $op();
+            } finally {
+                $this->releaseStoreLocks();
+            }
+        }
+
+        for ($attempt = 1; ; $attempt++) {
+            $this->acquireStoreLocks($names);
+            $this->beginTransaction();
+            try {
+                $res = $op();
+                $this->commit();
+                $this->releaseStoreLocks();
+                return $res;
+            } catch (Throwable $e) {
+                $this->rollback();
+                $this->releaseStoreLocks();
+                $retryable = $e instanceof StoreLockConflict
+                    || ($e instanceof mysqli_sql_exception && in_array((int)$e->getCode(), [1205, 1213], true));
+                if (!$retryable || $attempt >= $attempts) {
+                    throw $e;
+                }
+                $this->storeRetries++;
+                error_log("store operation retry {$attempt}/{$attempts}: " . $e->getMessage());
+                usleep($delayMs * 1000);
+                $delayMs *= 2;
+            }
+        }
+    }
+
+    /** How many times a store operation had to be replayed after a lock conflict. */
+    public function storeRetryCount(): int
+    {
+        return $this->storeRetries;
+    }
+
+    /**
+     * Calls a store2 function and decodes its JSON result. Lock conflicts are converted to
+     * StoreLockConflict so runStoreOperation can replay the whole document.
+     */
+    public function callStoreFunction(string $fn, string $jsonParams): array
+    {
+        try {
+            $row = $this->select("select {$fn}(?) as result", "s", [$jsonParams])->fetch_assoc();
+        } catch (mysqli_sql_exception $e) {
+            if (in_array((int)$e->getCode(), [1205, 1213], true)) {
+                throw new StoreLockConflict($e->getMessage(), (int)$e->getCode(), $e);
+            }
+            throw $e;
+        }
+        if (!$row || !isset($row["result"])) {
+            return ["status" => 1, "msg" => "Database function returned nothing"];
+        }
+        $result = json_decode($row["result"], true);
+        if (!is_array($result)) {
+            return ["status" => 1, "msg" => "Invalid function result"];
+        }
+        return $result;
+    }
+
+    /**
+     * READ COMMITTED drops the gap/next-key locks that row-by-row FIFO postings would
+     * otherwise take on whole tables; the longer timeout lets a queued document wait.
+     */
+    private function prepareStoreSession(): void
+    {
+        if ($this->storeSessionReady) {
+            return;
+        }
+        $this->storeSessionReady = true;
+        $this->dbconnection->query("set session innodb_lock_wait_timeout=120");
+        $row = $this->dbconnection
+            ->query("select @@global.log_bin as log_bin, @@session.binlog_format as fmt")
+            ->fetch_assoc();
+        $statementBinlog = (int)($row["log_bin"] ?? 0) === 1
+            && strtoupper((string)($row["fmt"] ?? "")) === "STATEMENT";
+        if (!$statementBinlog) {
+            $this->dbconnection->query("set session transaction isolation level read committed");
+        }
+    }
+
+    private function storeLockNames(array $storeIds): array
+    {
+        global $dbname;
+        $ids = [];
+        foreach ($storeIds as $id) {
+            $id = (int)$id;
+            if ($id > 0) {
+                $ids[$id] = $id;
+            }
+        }
+        if (empty($ids)) {
+            $ids[0] = 0;
+        }
+        sort($ids, SORT_NUMERIC);
+        return array_map(fn($id) => "store_post:{$dbname}:{$id}", $ids);
+    }
+
+    private function acquireStoreLocks(array $names, int $timeout = 120): void
+    {
+        foreach ($names as $name) {
+            $escaped = $this->dbconnection->real_escape_string($name);
+            $row = $this->dbconnection->query("select get_lock('{$escaped}', {$timeout}) as l")->fetch_assoc();
+            if ((int)($row["l"] ?? 0) !== 1) {
+                $this->releaseStoreLocks();
+                dieWithCode(Translator::t("Warehouse is busy, please repeat the operation"));
+            }
+            $this->storeLocksHeld[] = $name;
+        }
+    }
+
+    private function releaseStoreLocks(): void
+    {
+        while ($name = array_pop($this->storeLocksHeld)) {
+            $escaped = $this->dbconnection->real_escape_string($name);
+            $this->dbconnection->query("select release_lock('{$escaped}')");
+        }
     }
 
     public function select($query, $types = "", $params = [], $noreturn = false)

@@ -77,6 +77,9 @@ QString markerExeForModule(const QString &packageName)
     if (packageName == QStringLiteral("cookingprogress")) {
         return QStringLiteral("CookingProgress.exe");
     }
+    if (packageName == QStringLiteral("selfboard")) {
+        return QStringLiteral("SelfBoard.exe");
+    }
     return QString();
 }
 
@@ -289,7 +292,7 @@ int main(int argc, char *argv[])
         resolveModuleInstallDir(module, parser.value(moduleDirOpt).trimmed());
     if (module.isEmpty() || version.isEmpty()) {
         QMessageBox::critical(nullptr, QStringLiteral("Updater"),
-                              QStringLiteral("Missing required arguments.\nUsage: Updater --app=<officen|shop|waiter|cookingprogress> --version=<X.Y.Z>"));
+                              QStringLiteral("Missing required arguments.\nUsage: Updater --app=<officen|shop|waiter|cookingprogress|selfboard> --version=<X.Y.Z>"));
         return 1;
     }
 

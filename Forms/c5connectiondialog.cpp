@@ -19,6 +19,9 @@ C5ConnectionDialog::~C5ConnectionDialog() { delete ui; }
 
 void C5ConnectionDialog::reloadFromRegistry()
 {
+    if (C5RegistrySettings::settingsSubPath.isEmpty() && !mSettingsPath.isEmpty()) {
+        C5RegistrySettings::settingsSubPath = mSettingsPath;
+    }
     QSettings s(_ORGANIZATION_, C5RegistrySettings::registryPath());
     ui->leAddress->setText(s.value("ss_server_address").toString());
     ui->leServerKey->setText(s.value("ss_server_key").toString());
@@ -95,6 +98,9 @@ int C5ConnectionDialog::connectionType()
 
 void C5ConnectionDialog::on_btnSave_clicked()
 {
+    if (C5RegistrySettings::settingsSubPath.isEmpty() && !mSettingsPath.isEmpty()) {
+        C5RegistrySettings::settingsSubPath = mSettingsPath;
+    }
     QSettings s(_ORGANIZATION_, C5RegistrySettings::registryPath());
     s.setValue("ss_server_address", ui->leAddress->text());
     s.setValue("ss_server_key", ui->leServerKey->text());

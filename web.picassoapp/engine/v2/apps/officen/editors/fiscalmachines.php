@@ -18,7 +18,9 @@ class FiscalMachines
                COALESCE(f_ip, '') AS f_ip,
                COALESCE(f_port, 0) AS f_port,
                COALESCE(f_default_dept, 1) AS f_default_dept,
-               COALESCE(f_external_pos, 0) AS f_external_pos
+               COALESCE(f_external_pos, 0) AS f_external_pos,
+               COALESCE(f_idram_ext_pos, 0) AS f_idram_ext_pos,
+               COALESCE(f_simple_fiscal, 0) AS f_simple_fiscal
         FROM fiscal_machine
         ORDER BY f_name, f_id
         SQL;
@@ -31,8 +33,10 @@ class FiscalMachines
                 Translator::t('Name'),
                 Translator::t('IP'),
                 Translator::t('Port'),
-                Translator::t('Default department'),
+                Translator::t('Բաժին (dep)'),
                 Translator::t('External POS'),
+                Translator::t('Idram external POS'),
+                Translator::t('Պարզ ՀԴՄ'),
             ],
         ];
     }
@@ -81,6 +85,12 @@ class FiscalMachines
             dieWithCode(Translator::t('Password is too long'));
         }
 
+        $simpleFiscal = ((int)($params->f_simple_fiscal ?? 0)) === 1;
+        $defaultDept = (int)($params->f_default_dept ?? 1);
+        if ($simpleFiscal && $defaultDept <= 0) {
+            dieWithCode(Translator::t('Պարզ ՀԴՄ: բաժին (dep) must be greater than zero'));
+        }
+
         $record = [
             'f_name' => $name,
             'f_ip' => $ip,
@@ -89,7 +99,9 @@ class FiscalMachines
             'f_op_pin' => $opPin,
             'f_op_pass' => $opPass,
             'f_external_pos' => ((int)($params->f_external_pos ?? 0)) === 1 ? 1 : 0,
-            'f_default_dept' => (int)($params->f_default_dept ?? 1),
+            'f_idram_ext_pos' => ((int)($params->f_idram_ext_pos ?? 0)) === 1 ? 1 : 0,
+            'f_default_dept' => $defaultDept,
+            'f_simple_fiscal' => $simpleFiscal ? 1 : 0,
         ];
 
         if ($id <= 0) {
@@ -149,14 +161,16 @@ class FiscalMachines
             'f_op_pin' => '',
             'f_op_pass' => '',
             'f_external_pos' => 0,
+            'f_idram_ext_pos' => 0,
             'f_default_dept' => 1,
+            'f_simple_fiscal' => 0,
         ];
     }
 
     private function rowById(int $id): ?array
     {
         $row = $this->db->select(
-            'SELECT f_id, f_name, f_ip, f_port, f_password, f_op_pin, f_op_pass, f_external_pos, f_default_dept
+            'SELECT f_id, f_name, f_ip, f_port, f_password, f_op_pin, f_op_pass, f_external_pos, f_idram_ext_pos, f_default_dept, f_simple_fiscal
              FROM fiscal_machine WHERE f_id = ?',
             'i',
             [$id]
@@ -169,7 +183,9 @@ class FiscalMachines
         $row['f_id'] = (int)$row['f_id'];
         $row['f_port'] = (int)$row['f_port'];
         $row['f_external_pos'] = (int)$row['f_external_pos'];
+        $row['f_idram_ext_pos'] = (int)$row['f_idram_ext_pos'];
         $row['f_default_dept'] = (int)$row['f_default_dept'];
+        $row['f_simple_fiscal'] = (int)($row['f_simple_fiscal'] ?? 0);
         $row['f_name'] = (string)($row['f_name'] ?? '');
         $row['f_ip'] = (string)($row['f_ip'] ?? '');
         $row['f_password'] = (string)($row['f_password'] ?? '');

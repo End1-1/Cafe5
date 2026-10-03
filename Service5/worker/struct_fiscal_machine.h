@@ -13,8 +13,11 @@ struct FiscalMachine : public ParentItem
     int defaultDept = 0;
     QString opPin;
     QString opPassword;
-    bool externalPos;
+    bool externalPos = false;
+    bool idramExternalPos = false;
+    bool simpleFiscal = false;
     QString externalPosString() const { return externalPos ? "true" : "false"; }
+    QString idramExternalPosString() const { return idramExternalPos ? "true" : "false"; }
 };
 
 template<>
@@ -31,7 +34,23 @@ struct JsonParser<FiscalMachine>
         fm.defaultDept = jo.value("f_default_dept").toInt();
         fm.opPin = jo.value("f_op_pin").toString();
         fm.opPassword = jo.value("f_op_pass").toString();
-        fm.externalPos = jo.value("f_external_pos").toInt() == 1;
+        auto flagOn = [](const QJsonValue &v) {
+            if (v.isNull() || v.isUndefined()) {
+                return false;
+            }
+            if (v.isBool()) {
+                return v.toBool();
+            }
+            if (v.isDouble()) {
+                return qRound(v.toDouble()) == 1;
+            }
+            const QString s = v.toString().trimmed();
+            return v.toInt() == 1 || s == QLatin1String("1")
+                || s.compare(QLatin1String("true"), Qt::CaseInsensitive) == 0;
+        };
+        fm.externalPos = flagOn(jo.value("f_external_pos"));
+        fm.idramExternalPos = flagOn(jo.value("f_idram_ext_pos"));
+        fm.simpleFiscal = flagOn(jo.value("f_simple_fiscal"));
         return fm;
     }
 };

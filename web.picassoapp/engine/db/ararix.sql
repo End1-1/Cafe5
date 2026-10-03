@@ -57,6 +57,27 @@ CREATE TABLE IF NOT EXISTS ararix_payment_cards (
     CONSTRAINT fk_ararix_cards_client FOREIGN KEY (f_client_id) REFERENCES ararix_clients(f_id) ON DELETE CASCADE
 );
 
+CREATE TABLE IF NOT EXISTS ararix_client_addresses (
+    f_id INT PRIMARY KEY AUTO_INCREMENT,
+    f_client_id INT NOT NULL,
+    f_label VARCHAR(128) NOT NULL DEFAULT '',
+    f_street VARCHAR(255) NOT NULL DEFAULT '',
+    f_lat DOUBLE NOT NULL,
+    f_lng DOUBLE NOT NULL,
+    f_entrance_lat DOUBLE NULL,
+    f_entrance_lng DOUBLE NULL,
+    f_building_type VARCHAR(32) NOT NULL DEFAULT 'house',
+    f_floor VARCHAR(32) NULL,
+    f_door VARCHAR(32) NULL,
+    f_comment VARCHAR(512) NULL,
+    f_is_active TINYINT NOT NULL DEFAULT 0,
+    f_created DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    f_updated DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    KEY idx_ararix_addr_client (f_client_id),
+    KEY idx_ararix_addr_active (f_client_id, f_is_active),
+    CONSTRAINT fk_ararix_addr_client FOREIGN KEY (f_client_id) REFERENCES ararix_clients(f_id) ON DELETE CASCADE
+);
+
 CREATE TABLE IF NOT EXISTS ararix_faq (
     f_id INT PRIMARY KEY AUTO_INCREMENT,
     f_sort INT NOT NULL DEFAULT 0,
@@ -113,6 +134,14 @@ CREATE TABLE IF NOT EXISTS ararix_goods_groups (
     f_sort INT NOT NULL DEFAULT 0
 );
 
+CREATE TABLE IF NOT EXISTS ararix_goods_groups_tr (
+    f_group_id INT NOT NULL,
+    f_lang VARCHAR(8) NOT NULL,
+    f_name VARCHAR(255) NOT NULL,
+    PRIMARY KEY (f_group_id, f_lang),
+    KEY idx_ararix_goods_groups_tr_lang (f_lang)
+);
+
 CREATE TABLE IF NOT EXISTS ararix_goods_country (
     f_id INT PRIMARY KEY AUTO_INCREMENT,
     f_name VARCHAR(128) NOT NULL,
@@ -142,6 +171,53 @@ CREATE TABLE IF NOT EXISTS ararix_menu (
     f_data JSON NULL,
     INDEX idx_ararix_menu_rest_state (f_restaurant_id, f_state),
     INDEX idx_ararix_menu_group (f_group_id)
+);
+
+CREATE TABLE IF NOT EXISTS ararix_menu_tr (
+    f_menu_id INT NOT NULL,
+    f_lang VARCHAR(8) NOT NULL,
+    f_name VARCHAR(255) NOT NULL,
+    f_description TEXT NULL,
+    PRIMARY KEY (f_menu_id, f_lang),
+    KEY idx_ararix_menu_tr_lang (f_lang)
+);
+
+CREATE TABLE IF NOT EXISTS s_languages (
+    f_id INT PRIMARY KEY AUTO_INCREMENT,
+    f_code VARCHAR(8) NOT NULL,
+    f_name VARCHAR(64) NOT NULL,
+    f_enabled TINYINT NOT NULL DEFAULT 1,
+    f_sort INT NOT NULL DEFAULT 0,
+    UNIQUE KEY uq_s_languages_code (f_code)
+);
+
+INSERT INTO s_languages (f_code, f_name, f_enabled, f_sort) VALUES
+    ('hy', 'Հայերեն', 1, 1),
+    ('ru', 'Русский', 1, 2),
+    ('en', 'English', 1, 3)
+ON DUPLICATE KEY UPDATE f_name = VALUES(f_name), f_enabled = VALUES(f_enabled), f_sort = VALUES(f_sort);
+
+CREATE TABLE IF NOT EXISTS c_goods_tr (
+    f_goods_id INT NOT NULL,
+    f_lang VARCHAR(8) NOT NULL,
+    f_name VARCHAR(255) NOT NULL,
+    f_description TEXT NULL,
+    PRIMARY KEY (f_goods_id, f_lang),
+    KEY idx_c_goods_tr_lang (f_lang)
+);
+CREATE TABLE IF NOT EXISTS c_groups_tr (
+    f_group_id INT NOT NULL,
+    f_lang VARCHAR(8) NOT NULL,
+    f_name VARCHAR(255) NOT NULL,
+    PRIMARY KEY (f_group_id, f_lang),
+    KEY idx_c_groups_tr_lang (f_lang)
+);
+CREATE TABLE IF NOT EXISTS c_menu_names_tr (
+    f_menu_id INT NOT NULL,
+    f_lang VARCHAR(8) NOT NULL,
+    f_name VARCHAR(255) NOT NULL,
+    PRIMARY KEY (f_menu_id, f_lang),
+    KEY idx_c_menu_names_tr_lang (f_lang)
 );
 
 INSERT INTO ararix_goods_groups (f_id, f_name, f_sort) VALUES

@@ -60,6 +60,15 @@ NLoadingDlg *NInterface::currentLoadingDialog()
     return sCurrentLoading.data();
 }
 
+void NInterface::forceCloseCurrentLoading()
+{
+    // sCurrentLoading is already a QPointer — only hide, do not delete or wrap again.
+    if (sCurrentLoading) {
+        sCurrentLoading->hide();
+    }
+    sCurrentLoading.clear();
+}
+
 NInterface::NInterface(QObject *parent)
     : QObject{parent},
       fErrorSlot(nullptr),
@@ -70,7 +79,11 @@ NInterface::NInterface(QObject *parent)
 NInterface::~NInterface()
 {
     if(fLoadingDlg) {
+        if (sCurrentLoading == fLoadingDlg) {
+            sCurrentLoading.clear();
+        }
         fLoadingDlg->deleteLater();
+        fLoadingDlg = nullptr;
     }
 }
 
@@ -109,24 +122,43 @@ void NInterface::createHttpQueryLambda(const QString &route, const QJsonObject &
     auto *np = new NDataProvider();
     np->changeTimeout(timeout);
     connect(np, &NDataProvider::started, this, &NInterface::httpQueryStarted);
-    connect(np,
-            SIGNAL(updateRequired(QString, QString, QString)),
-            this->parent(),
-            SLOT(updateRequired(QString, QString, QString)),
-            Qt::QueuedConnection);
+    // Context must be `this`, not parent(): authorize often uses NInterface() without parent,
+    // and connecting done/error to nullptr leaves the loading dialog spinning forever.
+    if (parent() && parent()->metaObject()->indexOfSlot("updateRequired(QString,QString,QString)") >= 0) {
+        connect(np,
+                SIGNAL(updateRequired(QString, QString, QString)),
+                parent(),
+                SLOT(updateRequired(QString, QString, QString)),
+                Qt::QueuedConnection);
+    }
     auto finish = [this]() {
         if (fProgress || fLoadingDlg) {
             if (fLoadingDlg) {
+                if (sCurrentLoading == fLoadingDlg) {
+                    sCurrentLoading.clear();
+                }
                 fLoadingDlg->hide();
             }
         }
     };
-    connect(np, &NDataProvider::updateRequired, this, [this, np, finish](const QString &a, const QString &b, const QString &c) {
+    connect(np, &NDataProvider::updateRequired, this, [this, np, errCallback, finish](const QString &a, const QString &b, const QString &c) {
         finish();
+        const bool hasUpdateSlot =
+            parent() && parent()->metaObject()->indexOfSlot("updateRequired(QString,QString,QString)") >= 0;
+        if (!hasUpdateSlot) {
+            const QString msg = a.isEmpty()
+                ? tr("Application update required")
+                : a;
+            if (errCallback) {
+                errCallback({{"status", 1}, {"errorMessage", msg}, {"appName", b}, {"newVersion", c}});
+            } else if (fProgress) {
+                ninterfaceShowError(msg);
+            }
+        }
         np->deleteLater();
         deleteLater();
     });
-    connect(np, &NDataProvider::error, this->parent(), [this, np, errCallback, finish](const QString &msg) {
+    connect(np, &NDataProvider::error, this, [this, np, errCallback, finish](const QString &msg) {
         finish();
         if(fProgress) {
             ninterfaceShowError(msg);
@@ -135,7 +167,7 @@ void NInterface::createHttpQueryLambda(const QString &route, const QJsonObject &
         errCallback({{"status", 1}, {"errorMessage", msg}});
         np->deleteLater();
     });
-    connect(np, &NDataProvider::done, this->parent(), [this, np, callback, finish](const QJsonObject &data) {
+    connect(np, &NDataProvider::done, this, [this, np, callback, finish](const QJsonObject &data) {
         finish();
         callback(data);
         np->deleteLater();
@@ -156,8 +188,30 @@ void NInterface::createHttpQueryLambda2(const QString &route, const QJsonObject 
     auto *np = new NDataProvider();
     np->changeTimeout(timeout);
     connect(np, &NDataProvider::started, this, &NInterface::httpQueryStarted);
-    connect(np, SIGNAL(updateRequired(QString, QString, QString)), this->parent(), SLOT(updateRequired(QString, QString, QString)));
-    connect(np, &NDataProvider::error, this->parent(), [this, np, errCallback](const QString & msg) {
+    if (parent() && parent()->metaObject()->indexOfSlot("updateRequired(QString,QString,QString)") >= 0) {
+        connect(np, SIGNAL(updateRequired(QString, QString, QString)), parent(), SLOT(updateRequired(QString, QString, QString)));
+    }
+    connect(np, &NDataProvider::updateRequired, this, [this, np, errCallback](const QString &a, const QString &b, const QString &c) {
+        if (fProgress || fLoadingDlg) {
+            if (fLoadingDlg) {
+                fLoadingDlg->hide();
+            }
+        }
+        const bool hasUpdateSlot =
+            parent() && parent()->metaObject()->indexOfSlot("updateRequired(QString,QString,QString)") >= 0;
+        if (!hasUpdateSlot) {
+            const QString msg = a.isEmpty()
+                ? tr("Application update required")
+                : a;
+            if (!errCallback || !errCallback({{"status", 1}, {"errorMessage", msg}, {"appName", b}, {"newVersion", c}})) {
+                if (fProgress) {
+                    ninterfaceShowError(msg);
+                }
+            }
+        }
+        np->deleteLater();
+    });
+    connect(np, &NDataProvider::error, this, [this, np, errCallback](const QString & msg) {
         if(fProgress || fLoadingDlg) {
             if(fLoadingDlg) {
                 fLoadingDlg->hide();
@@ -171,7 +225,7 @@ void NInterface::createHttpQueryLambda2(const QString &route, const QJsonObject 
         }
         np->deleteLater();
     });
-    connect(np, &NDataProvider::done, this->parent(), [this, np, callback](const QJsonObject & data) {
+    connect(np, &NDataProvider::done, this, [this, np, callback](const QJsonObject & data) {
         callback(data);
 
         if(fProgress || fLoadingDlg) {
@@ -227,11 +281,25 @@ void NInterface::query(const QString &route, const QString &bearer, QObject *con
         np,
         &NDataProvider::updateRequired,
         i,
-        [iface, np, finish](const QString &a, const QString &b, const QString &c) {
+        [iface, np, finish, errCallback, context](const QString &a, const QString &b, const QString &c) {
             if (!iface) {
                 return;
             }
             finish();
+            // C5Widget/C5Dialog already show the updater UI via their slot.
+            // SelfBoard and other hosts without that slot must not hang forever.
+            const bool hasUpdateSlot =
+                context && context->metaObject()->indexOfSlot("updateRequired(QString,QString,QString)") >= 0;
+            if (!hasUpdateSlot) {
+                const QString msg = a.isEmpty()
+                    ? QObject::tr("Application update required")
+                    : a;
+                if (errCallback) {
+                    errCallback({{"status", 1}, {"errorMessage", msg}, {"appName", b}, {"newVersion", c}});
+                } else if (iface->fProgress) {
+                    ninterfaceShowError(msg);
+                }
+            }
             np->deleteLater();
             iface->deleteLater();
         },
@@ -274,11 +342,15 @@ void NInterface::query(const QString &route, const QString &bearer, QObject *con
         np->deleteLater();
         iface->deleteLater();
     });
-    connect(np, SIGNAL(updateRequired(QString, QString, QString)), context, SLOT(updateRequired(QString, QString, QString)));
+    // Only wire updateRequired UI slot when the context actually has it (C5Widget etc.).
+    if (context->metaObject()->indexOfSlot("updateRequired(QString,QString,QString)") >= 0) {
+        connect(np, SIGNAL(updateRequired(QString, QString, QString)), context, SLOT(updateRequired(QString, QString, QString)));
+    }
     np->getData(route, params);
 }
 
-void NInterface::query1(const QString &route, const QString &bearer, QObject *context, const QJsonObject &params, std::function<void (const QJsonObject&)> callback)
+void NInterface::query1(const QString &route, const QString &bearer, QObject *context, const QJsonObject &params,
+                        std::function<void (const QJsonObject&)> callback, int timeout)
 {
     query(
         route,
@@ -291,7 +363,7 @@ void NInterface::query1(const QString &route, const QString &bearer, QObject *co
             return false;
         },
         true,
-        60000,
+        timeout,
         false);
 }
 

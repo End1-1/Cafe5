@@ -24,6 +24,7 @@ bool C5NetworkDB::query()
     QEventLoop loop;
     QNetworkAccessManager m;
     QNetworkRequest rq((QUrl(fHost)));
+    m.setTransferTimeout(1200000);
     rq.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
 
 //    m.setProxy(QNetworkProxy::NoProxy);

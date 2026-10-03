@@ -7,7 +7,10 @@ C5CashName::C5CashName(QWidget *parent) :
     ui(new Ui::C5CashName)
 {
     ui->setupUi(this);
-    ui->leCurr->setSelector(ui->leCurrName, cache_currency);
+    // cash_box has no per-cashbox currency; hide legacy e_cash_names fields.
+    ui->label_3->setVisible(false);
+    ui->leCurr->setVisible(false);
+    ui->leCurrName->setVisible(false);
 }
 
 C5CashName::~C5CashName()
@@ -17,10 +20,10 @@ C5CashName::~C5CashName()
 
 QString C5CashName::title()
 {
-    return tr("Cash name");
+    return tr("Cashbox");
 }
 
 QString C5CashName::table()
 {
-    return "e_cash_names";
+    return "cash_box";
 }

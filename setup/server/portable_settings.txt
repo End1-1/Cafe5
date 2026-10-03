@@ -1,0 +1,17 @@
+Servers\Picasso\SessionCreated<|||>1<|||>2026-09-23 21:00:00
+Servers\Picasso\Host<|||>1<|||>127.0.0.1
+Servers\Picasso\WindowsAuth<|||>3<|||>0
+Servers\Picasso\CleartextPluginEnabled<|||>3<|||>0
+Servers\Picasso\User<|||>1<|||>root
+Servers\Picasso\Password<|||>1<|||>777474793A5
+Servers\Picasso\LoginPrompt<|||>3<|||>0
+Servers\Picasso\Port<|||>1<|||>3306
+Servers\Picasso\NetType<|||>3<|||>0
+Servers\Picasso\Compressed<|||>3<|||>0
+Servers\Picasso\LocalTimeZone<|||>3<|||>0
+Servers\Picasso\QueryTimeout<|||>3<|||>30
+Servers\Picasso\KeepAlive<|||>3<|||>20
+Servers\Picasso\FullTableStatus<|||>3<|||>1
+Servers\Picasso\Databases<|||>1<|||>picasso
+Servers\Picasso\Library<|||>1<|||>libmariadb.dll
+Servers\Picasso\Comment<|||>1<|||>

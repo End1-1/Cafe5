@@ -12,6 +12,7 @@ HttpLite::HttpLite(QObject *parent)
 void HttpLite::post(const QString &url, const QJsonObject &obj)
 {
     static QNetworkAccessManager *manager = new QNetworkAccessManager();
+    manager->setTransferTimeout(1200000);
 
     QNetworkRequest request((QUrl(url)));
     request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");

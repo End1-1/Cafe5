@@ -1,17 +1,33 @@
 class HomeAddress {
   const HomeAddress({
     required this.label,
+    this.id,
+    this.street,
     this.lat,
     this.lng,
   });
 
+  final int? id;
   final String label;
+  final String? street;
   final double? lat;
   final double? lng;
 
+  bool get hasAddress =>
+      id != null || label.trim().isNotEmpty || (street?.trim().isNotEmpty ?? false);
+
+  String get displayLabel {
+    final l = label.trim();
+    if (l.isNotEmpty) return l;
+    final s = street?.trim() ?? '';
+    return s;
+  }
+
   factory HomeAddress.fromJson(Map<String, dynamic> json) {
     return HomeAddress(
+      id: (json['id'] as num?)?.toInt(),
       label: json['label']?.toString() ?? '',
+      street: json['street']?.toString(),
       lat: (json['lat'] as num?)?.toDouble(),
       lng: (json['lng'] as num?)?.toDouble(),
     );
@@ -69,6 +85,44 @@ class HomeRestaurant {
       nationalityId: (json['nationality_id'] as num?)?.toInt(),
       nationality: json['nationality']?.toString(),
       distanceM: (json['distance_m'] as num?)?.toInt(),
+    );
+  }
+}
+
+enum HomeSuggestType { restaurant, dish }
+
+class HomeSuggestItem {
+  const HomeSuggestItem({
+    required this.type,
+    required this.id,
+    required this.name,
+    required this.restaurantId,
+    this.subtitle,
+    this.imageUrl,
+    this.restaurantName,
+    this.price,
+  });
+
+  final HomeSuggestType type;
+  final int id;
+  final String name;
+  final int restaurantId;
+  final String? subtitle;
+  final String? imageUrl;
+  final String? restaurantName;
+  final double? price;
+
+  factory HomeSuggestItem.fromJson(Map<String, dynamic> json) {
+    final typeRaw = json['type']?.toString() ?? 'restaurant';
+    return HomeSuggestItem(
+      type: typeRaw == 'dish' ? HomeSuggestType.dish : HomeSuggestType.restaurant,
+      id: (json['id'] as num?)?.toInt() ?? 0,
+      name: json['name']?.toString() ?? '',
+      restaurantId: (json['restaurant_id'] as num?)?.toInt() ?? 0,
+      subtitle: json['subtitle']?.toString(),
+      imageUrl: json['image_url']?.toString(),
+      restaurantName: json['restaurant_name']?.toString(),
+      price: (json['price'] as num?)?.toDouble(),
     );
   }
 }

@@ -31,8 +31,9 @@
 #include "c5user.h"
 #include "c5widget.h"
 #include "cr5breezeservice.h"
-#include "cr5cashmovement.h"
 #include "cr5cashnames.h"
+#include "rabstracteditorreport.h"
+#include "rcashmovement.h"
 #include "cr5complectations.h"
 #include "cr5consuptionreason.h"
 #include "cr5creditcards.h"
@@ -782,11 +783,11 @@ void C5MainWindow::on_listWidgetItemClicked(const QModelIndex &index)
         break;
 
     case cp_t8_cash_movement:
-        createTab<CR5CashMovement>();
+        addWidget(new RCashMovement(tr("Revenue"), QIcon(":/cash.png"), QStringLiteral("form_revenue")));
         break;
 
     case cp_t8_shifts:
-        createNTab("/engine/cash/shifts.php", ":/cash.png");
+        addWidget(new RAbstractEditorReport(tr("Cash sessions"), QIcon(":/cash.png"), QStringLiteral("form_cashsessions")));
         break;
 
     case cp_t8_currency:
@@ -1009,11 +1010,9 @@ void C5MainWindow::setDB()
 
     if(addMainLevel(db.at(1), cp_t8_cash, tr("Cash"), ":/reports.png", l)) {
         l->setProperty("reportlevel", 3);
-        addTreeL3Item(l, cp_t8_cash_doc, tr("New cash document"), ":/cash.png");
-        addTreeL3Item(l, cp_t8_cash_detailed_report, tr("Cash detailed report"), ":/cash.png");
-        addTreeL3Item(l, cp_t8_cash_movement, tr("Movement in the cash"), ":/cash.png");
-        addTreeL3Item(l, cp_t8_shifts, tr("Cash shifts"), ":/cash.png");
-        addTreeL3Item(l, cp_t8_cash_names, tr("Cash names"), ":/cash.png");
+        addTreeL3Item(l, cp_t8_cash_movement, tr("Revenue"), ":/cash.png");
+        addTreeL3Item(l, cp_t8_shifts, tr("Cash sessions"), ":/cash.png");
+        addTreeL3Item(l, cp_t8_cash_names, tr("Cashboxes"), ":/cash.png");
         addTreeL3Item(l, cp_t8_currency, tr("Currency"), ":/cash.png");
         addTreeL3Item(l, cp_t8_edit_currency, tr("Currency rates"), ":/cash.png");
         addTreeL3Item(l, cp_t8_currency_cross_rate, tr("Currency cross rates"), ":/cash.png");

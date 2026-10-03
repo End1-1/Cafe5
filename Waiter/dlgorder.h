@@ -7,6 +7,7 @@
 #include "struct_waiter_order.h"
 #include "struct_hall.h"
 #include "struct_table.h"
+#include <QElapsedTimer>
 #include <QTableWidgetItem>
 #include <QTimer>
 #include <QStack>
@@ -87,6 +88,8 @@ private:
 
     QString mStringBuffer;
 
+    QElapsedTimer mScanTimer;
+
     QString mSelectedPackage;
     bool mCreateAsPreorder = false;
 
@@ -110,6 +113,9 @@ private:
     void makeDishes(int group, int favorite);
 
     void confirmStringBuffer();
+
+    /** True while characters arrive at scanner speed: mark serials may contain +/- which must not act as shortcuts. */
+    bool inScanMode() const;
 
     void disableForCheckall(bool v);
 
@@ -186,7 +192,7 @@ private:
 
     void setDishQty(std::function<double (WaiterDish)> getQty);
 
-    void addDishToOrder(DishAItem *g, QDishButton *btn);
+    void addDishToOrder(DishAItem *g, QDishButton *btn, bool scanned = false);
 
     void syncPackageParentButtons();
 

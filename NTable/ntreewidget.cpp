@@ -84,7 +84,6 @@ void NTreeWidget::query()
         }
     }
 
-    nd->changeTimeout(180000);
     nd->getData(mRoute, jf);
 }
 

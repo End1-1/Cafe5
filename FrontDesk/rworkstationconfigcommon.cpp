@@ -21,6 +21,7 @@ void RWorkstationConfigCommon::applyConfig(const QJsonObject &config)
     ui->leDiscountCard->setText(config.value(QStringLiteral("f_discount_card_pattern")).toString());
     ui->leAccumulateCard->setText(config.value(QStringLiteral("f_accumulate_card_pattern")).toString());
     ui->leScalePattern->setText(config.value(QStringLiteral("f_scale_pattern")).toString());
+    ui->leScaleDir->setText(config.value(QStringLiteral("f_scale_dir")).toString());
     ui->leQuickDebtPartner->setText(QString::number(config.value(QStringLiteral("f_quick_debt_partner_id")).toInt()));
     QString printServer = config.value(QStringLiteral("print_server")).toString();
     if(printServer.isEmpty()) {
@@ -41,6 +42,7 @@ QJsonObject RWorkstationConfigCommon::collectConfig() const
     jo.insert(QStringLiteral("f_discount_card_pattern"), ui->leDiscountCard->text().trimmed());
     jo.insert(QStringLiteral("f_accumulate_card_pattern"), ui->leAccumulateCard->text().trimmed());
     jo.insert(QStringLiteral("f_scale_pattern"), ui->leScalePattern->text().trimmed());
+    jo.insert(QStringLiteral("f_scale_dir"), ui->leScaleDir->text().trimmed());
     jo.insert(QStringLiteral("f_quick_debt_partner_id"), ui->leQuickDebtPartner->text().trimmed().toInt());
     jo.insert(QStringLiteral("print_server"), ui->lePrintServer->text().trimmed());
     jo.insert(QStringLiteral("print_paper_width"), ui->lePrintPaperWidth->getInteger());

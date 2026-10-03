@@ -628,12 +628,15 @@ class ViewOrder extends Auth
                 "doc_data" => ["comment" => $comment, "return_order" => $returnOrderId],
                 "items" => $payloadItems,
             ];
-            $res = $this->select("SELECT sf_store2_input(?) AS result", "s", [json_encode($doc, JSON_UNESCAPED_UNICODE)])->fetch_assoc();
-            $decoded = json_decode($res["result"] ?? "{}", true);
-            if (!is_array($decoded) || (int)($decoded["status"] ?? 1) !== 0) {
-                $this->rollback();
-                dieWithCode(Translator::t("Store input failed") . ": " . ($decoded["msg"] ?? json_encode($decoded)));
-            }
+            $json = json_encode($doc, JSON_UNESCAPED_UNICODE);
+            $this->runStoreOperation([(int)$storeId], function () use ($json) {
+                $decoded = $this->callStoreFunction("sf_store2_input", $json);
+                if ((int)($decoded["status"] ?? 1) !== 0) {
+                    $this->rollback();
+                    dieWithCode(Translator::t("Store input failed") . ": " . ($decoded["msg"] ?? json_encode($decoded)));
+                }
+                return $decoded;
+            });
             // sf_store2_input may write empty cash_debts when cashbox=0 and doc_sum=0
             $this->select(
                 "DELETE FROM cash_debts WHERE f_doc_uuid=? AND ABS(COALESCE(f_credit,0))+ABS(COALESCE(f_debit,0)) < 0.00001",
@@ -675,6 +678,7 @@ class ViewOrder extends Auth
             PAYMENT_TELCELL,
             PAYMENT_PREPAID,
         ];
+        require_once __DIR__ . "/../worker/cash-ops-helper.php";
         $sessionDelta = 0.0;
         foreach ($cashOutTypes as $pt) {
             $fn = $payment["fields"][$pt];
@@ -682,7 +686,10 @@ class ViewOrder extends Auth
             if ($amount < 0.00001) {
                 continue;
             }
-            $this->insert("cash_operations", [
+            if (!cash_ops_records_payment($pt)) {
+                continue;
+            }
+            cash_ops_insert($this, [
                 "f_cashbox_id" => $cashboxId,
                 "f_session_id" => $cashSessionId,
                 "f_order_id" => $returnOrderId,
@@ -695,15 +702,12 @@ class ViewOrder extends Auth
                 "f_currency_id" => $currencyId,
                 "f_comment" => $comment,
             ]);
-            $sessionDelta += $amount;
+            if (cash_ops_affects_float($pt)) {
+                $sessionDelta += $amount;
+            }
         }
         if ($sessionDelta > 0.00001) {
-            $this->select(
-                "UPDATE cash_session SET f_amount_expected=f_amount_expected-? WHERE f_id=?",
-                "di",
-                [$sessionDelta, $cashSessionId],
-                true
-            );
+            cash_ops_adjust_session_float($this, $cashSessionId, -$sessionDelta);
         }
     }
 

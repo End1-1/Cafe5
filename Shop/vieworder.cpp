@@ -352,26 +352,29 @@ void ViewOrder::printCheckWithTax(const QString &id, std::function<void(const QS
         const double telcell = fHeader.value(QStringLiteral("f_amount_telcell")).toDouble();
         const double prepaid = fHeader.value(QStringLiteral("f_amount_prepaid")).toDouble();
         const double nonCash = card + idram + telcell;
+        FiscalMachine fm = getFiscalMachine(mWorkStation.fiscalMachineId());
+        QString extPos = fm.externalPosString();
+        QString extPosOverride;
         int paymentSystem = -1;
-        bool forceInternalPos = false;
         if (card >= idram && card >= telcell && card > 0.001) {
             paymentSystem = 1;
         } else if (idram >= telcell && idram > 0.001) {
             paymentSystem = 13;
-            forceInternalPos = true;
+            extPos = fm.idramExternalPosString();
+            extPosOverride = extPos;
         } else if (telcell > 0.001) {
             paymentSystem = 10;
-            forceInternalPos = true;
+            extPos = QStringLiteral("false");
+            extPosOverride = extPos;
         }
 
-        FiscalMachine fm = getFiscalMachine(mWorkStation.fiscalMachineId());
         QString partnerTIN = jpartner.value("f_taxcode").toString();
 
         PrintTaxN *pt = new PrintTaxN(
-            fm.ip, fm.port, fm.machinePassword, fm.externalPosString(), fm.opPin, fm.opPassword, this);
+            fm.ip, fm.port, fm.machinePassword, extPos, fm.opPin, fm.opPassword, this);
         pt->setPaymentSystem(paymentSystem);
-        if (forceInternalPos) {
-            pt->setUseExtPosOverride(QStringLiteral("false"));
+        if (!extPosOverride.isEmpty()) {
+            pt->setUseExtPosOverride(extPosOverride);
         }
 
         if (partnerTIN.length() == 8 && ui->btnPrintPartnerTIN->isChecked()) {

@@ -59,12 +59,12 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String insertCodeWhatsapp(String phone) {
-    return 'Insert the 4-digit code that we sent via WhatsApp to $phone';
+    return 'Insert the 5-digit code that we sent via WhatsApp to $phone';
   }
 
   @override
   String insertCodeSms(String phone) {
-    return 'Insert the 4-digit code that we sent via SMS to $phone';
+    return 'Insert the 5-digit code that we sent via SMS to $phone';
   }
 
   @override
@@ -154,7 +154,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get invalidPhone => 'Enter a valid phone number';
 
   @override
-  String get invalidOtp => 'Enter the 4-digit code';
+  String get invalidOtp => 'Enter the 5-digit code';
 
   @override
   String get errorGeneric => 'Something went wrong';
@@ -286,4 +286,109 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get back => 'Back';
+
+  @override
+  String get addAddress => 'Add address';
+
+  @override
+  String get myAddresses => 'My addresses';
+
+  @override
+  String get noSavedAddresses => 'No saved addresses';
+
+  @override
+  String get deleteAddress => 'Delete address';
+
+  @override
+  String get deleteAddressQuestion => 'Delete this address?';
+
+  @override
+  String get whereDeliver => 'Where should we deliver?';
+
+  @override
+  String get currentLocation => 'Current location';
+
+  @override
+  String get addNewAddress => 'Add new';
+
+  @override
+  String get locateMe => 'Locate me';
+
+  @override
+  String get searchAddressTitle => 'Search';
+
+  @override
+  String get enterStreetBuilding => 'Enter street, building number…';
+
+  @override
+  String get confirmAddress => 'Confirm address';
+
+  @override
+  String get adjustPin => 'Adjust pin';
+
+  @override
+  String get droppedPin => 'Dropped pin';
+
+  @override
+  String get buildingTypeTitle => 'Building type';
+
+  @override
+  String get buildingHouse => 'House';
+
+  @override
+  String get buildingApartment => 'Apartment';
+
+  @override
+  String get buildingOffice => 'Office';
+
+  @override
+  String get buildingOther => 'Other';
+
+  @override
+  String get addressDetailsTitle => 'Address details';
+
+  @override
+  String get floor => 'Floor';
+
+  @override
+  String get door => 'Door';
+
+  @override
+  String get additionalInfo => 'Additional info';
+
+  @override
+  String get markEntrance => 'Mark your entrance';
+
+  @override
+  String get entrance => 'Entrance';
+
+  @override
+  String get addressLabel => 'Label';
+
+  @override
+  String get labelHome => 'Home';
+
+  @override
+  String get labelWork => 'Work';
+
+  @override
+  String get labelOther => 'Other';
+
+  @override
+  String get customLabel => 'Custom label';
+
+  @override
+  String get saveAddress => 'Save address';
+
+  @override
+  String get orderStatusTitle => 'Order status';
+
+  @override
+  String get orderNumber => 'Order number';
+
+  @override
+  String get status => 'Status';
+
+  @override
+  String get items => 'Items';
 }

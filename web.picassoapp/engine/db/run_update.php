@@ -755,6 +755,168 @@ INSERT INTO ararix_goods_groups (f_id, f_name, f_sort) VALUES
     (13, 'Սրճարան / Coffee & Dessert', 13)
 ON DUPLICATE KEY UPDATE f_name = VALUES(f_name), f_sort = VALUES(f_sort);
 
+CREATE TABLE IF NOT EXISTS b_discount_ops (
+    f_id CHAR(36) PRIMARY KEY COLLATE latin1_general_ci,
+    f_order_id CHAR(36) COLLATE latin1_general_ci,
+    f_card_id INT NULL,
+    f_partner_id INT NULL,
+    f_type INT,
+    f_factor FLOAT,
+    f_amount DECIMAL(14,2),
+    f_date DATETIME DEFAULT CURRENT_TIMESTAMP,
+    f_comment VARCHAR(255),
+    INDEX idx_discount_ops_order (f_order_id),
+    INDEX idx_discount_ops_card (f_card_id)
+);
+CREATE TABLE IF NOT EXISTS b_gift_card_ops (
+    f_id CHAR(36) PRIMARY KEY COLLATE latin1_general_ci,
+    f_card_id INT,
+    f_order_id CHAR(36) COLLATE latin1_general_ci NULL,
+    f_amount DECIMAL(14,2),
+    f_op_type VARCHAR(16),
+    f_date DATETIME DEFAULT CURRENT_TIMESTAMP,
+    f_comment VARCHAR(255),
+    INDEX idx_gift_card_ops_card (f_card_id),
+    INDEX idx_gift_card_ops_order (f_order_id)
+);
+CREATE TABLE IF NOT EXISTS b_accumulate_ops (
+    f_id CHAR(36) PRIMARY KEY COLLATE latin1_general_ci,
+    f_card_id INT,
+    f_order_id CHAR(36) COLLATE latin1_general_ci NULL,
+    f_amount DECIMAL(14,2),
+    f_op_type VARCHAR(16),
+    f_percent FLOAT,
+    f_date DATETIME DEFAULT CURRENT_TIMESTAMP,
+    f_comment VARCHAR(255),
+    INDEX idx_accumulate_ops_card (f_card_id),
+    INDEX idx_accumulate_ops_order (f_order_id)
+);
+
+EOD;
+
+$v = 242;
+$sql[$v] = <<<EOD
+update s_app set f_version = '$v' where lower(f_app)='db';
+CREATE TABLE IF NOT EXISTS s_languages (
+    f_id INT PRIMARY KEY AUTO_INCREMENT,
+    f_code VARCHAR(8) NOT NULL,
+    f_name VARCHAR(64) NOT NULL,
+    f_enabled TINYINT NOT NULL DEFAULT 1,
+    f_sort INT NOT NULL DEFAULT 0,
+    UNIQUE KEY uq_s_languages_code (f_code)
+);
+INSERT INTO s_languages (f_code, f_name, f_enabled, f_sort) VALUES
+    ('hy', 'Հայերեն', 1, 1),
+    ('ru', 'Русский', 1, 2),
+    ('en', 'English', 1, 3)
+ON DUPLICATE KEY UPDATE f_name = VALUES(f_name), f_enabled = VALUES(f_enabled), f_sort = VALUES(f_sort);
+
+CREATE TABLE IF NOT EXISTS c_goods_tr (
+    f_goods_id INT NOT NULL,
+    f_lang VARCHAR(8) NOT NULL,
+    f_name VARCHAR(255) NOT NULL,
+    f_description TEXT NULL,
+    PRIMARY KEY (f_goods_id, f_lang),
+    KEY idx_c_goods_tr_lang (f_lang)
+);
+CREATE TABLE IF NOT EXISTS c_groups_tr (
+    f_group_id INT NOT NULL,
+    f_lang VARCHAR(8) NOT NULL,
+    f_name VARCHAR(255) NOT NULL,
+    PRIMARY KEY (f_group_id, f_lang),
+    KEY idx_c_groups_tr_lang (f_lang)
+);
+CREATE TABLE IF NOT EXISTS c_menu_names_tr (
+    f_menu_id INT NOT NULL,
+    f_lang VARCHAR(8) NOT NULL,
+    f_name VARCHAR(255) NOT NULL,
+    PRIMARY KEY (f_menu_id, f_lang),
+    KEY idx_c_menu_names_tr_lang (f_lang)
+);
+
+CREATE TABLE IF NOT EXISTS ararix_goods_groups_tr (
+    f_group_id INT NOT NULL,
+    f_lang VARCHAR(8) NOT NULL,
+    f_name VARCHAR(255) NOT NULL,
+    PRIMARY KEY (f_group_id, f_lang),
+    KEY idx_ararix_goods_groups_tr_lang (f_lang)
+);
+CREATE TABLE IF NOT EXISTS ararix_menu_tr (
+    f_menu_id INT NOT NULL,
+    f_lang VARCHAR(8) NOT NULL,
+    f_name VARCHAR(255) NOT NULL,
+    f_description TEXT NULL,
+    PRIMARY KEY (f_menu_id, f_lang),
+    KEY idx_ararix_menu_tr_lang (f_lang)
+);
+
+EOD;
+
+$v = 243;
+$sql[$v] = <<<EOD
+    update s_app set f_version = '$v' where lower(f_app)='db';
+    create index if not exists idx_stock_doc on store_stock (f_doc);
+    create index if not exists idx_stock_item_date on store_stock (f_store_id, f_item_id, f_batch_date);
+    create index if not exists idx_moves_doc on store_moves (f_doc);
+    create index if not exists idx_moves_doc_batch on store_moves (f_doc, f_batch_id);
+    create index if not exists idx_cash_ops_order on cash_operations (f_order_id);
+    create index if not exists idx_cash_debts_doc on cash_debts (f_doc_uuid);
+    create index if not exists idx_clients_debts_storedoc on b_clients_debts (f_storedoc);
+    create index if not exists idx_clients_debts_order on b_clients_debts (f_order);
+EOD;
+
+$v = 244;
+$sql[$v] = <<<EOD
+    update s_app set f_version = '$v' where lower(f_app)='db';
+    UPDATE o_goods SET f_emarks = NULL WHERE f_emarks IS NOT NULL AND TRIM(f_emarks) = '';
+    UPDATE o_goods a
+        INNER JOIN (
+            SELECT f_emarks, MIN(f_id) AS keep_id
+            FROM o_goods
+            WHERE f_emarks IS NOT NULL AND TRIM(f_emarks) <> ''
+            GROUP BY f_emarks
+            HAVING COUNT(*) > 1
+        ) d ON a.f_emarks = d.f_emarks AND a.f_id <> d.keep_id
+    SET a.f_emarks = NULL;
+    ALTER TABLE o_goods MODIFY COLUMN f_emarks VARCHAR(255) NULL DEFAULT NULL;
+    CREATE UNIQUE INDEX IF NOT EXISTS uq_o_goods_emarks ON o_goods (f_emarks);
+    CREATE TABLE IF NOT EXISTS ararix_client_addresses (
+        f_id INT PRIMARY KEY AUTO_INCREMENT,
+        f_client_id INT NOT NULL,
+        f_label VARCHAR(128) NOT NULL DEFAULT '',
+        f_street VARCHAR(255) NOT NULL DEFAULT '',
+        f_lat DOUBLE NOT NULL,
+        f_lng DOUBLE NOT NULL,
+        f_entrance_lat DOUBLE NULL,
+        f_entrance_lng DOUBLE NULL,
+        f_building_type VARCHAR(32) NOT NULL DEFAULT 'house',
+        f_floor VARCHAR(32) NULL,
+        f_door VARCHAR(32) NULL,
+        f_comment VARCHAR(512) NULL,
+        f_is_active TINYINT NOT NULL DEFAULT 0,
+        f_created DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        f_updated DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        KEY idx_ararix_addr_client (f_client_id),
+        KEY idx_ararix_addr_active (f_client_id, f_is_active),
+        CONSTRAINT fk_ararix_addr_client FOREIGN KEY (f_client_id) REFERENCES ararix_clients(f_id) ON DELETE CASCADE
+    );
+    
+EOD;
+
+$v = 245;
+$sql[$v] = <<<EOD
+update s_app set f_version = '$v' where lower(f_app)='db';
+ALTER TABLE fiscal_machine ADD COLUMN IF NOT EXISTS f_idram_ext_pos INT NOT NULL DEFAULT 0;
+EOD;
+
+$v = 246;
+$sql[$v] = <<<EOD
+update s_app set f_version = '$v' where lower(f_app)='db';
+ALTER TABLE fiscal_machine ADD COLUMN IF NOT EXISTS f_simple_fiscal TINYINT NOT NULL DEFAULT 0;
+ALTER TABLE cash_operations ADD COLUMN IF NOT EXISTS f_affects_float TINYINT NOT NULL DEFAULT 0;
+UPDATE cash_operations SET f_affects_float = 1 WHERE f_payment_type_id = 1;
+ALTER TABLE o_header ADD COLUMN IF NOT EXISTS f_public_token CHAR(48) NULL;
+CREATE UNIQUE INDEX IF NOT EXISTS uq_o_header_public_token ON o_header (f_public_token);
 EOD;
 
 $update_verision = intval(stmtall("select * from s_app where lower(f_app)='db'")->fetch_assoc()["f_version"]);
@@ -791,6 +953,128 @@ if (is_file($seedFile)) {
         }
     }
     $executedFiles[] = "seed_ararix_menu.sql checked.<br>";
+}
+
+// Loyalty ops journals (v231) — ensure on DBs that skipped/partially applied that version.
+$loyaltyOpsDdl = [
+    <<<SQL
+CREATE TABLE IF NOT EXISTS b_discount_ops (
+    f_id CHAR(36) PRIMARY KEY COLLATE latin1_general_ci,
+    f_order_id CHAR(36) COLLATE latin1_general_ci,
+    f_card_id INT NULL,
+    f_partner_id INT NULL,
+    f_type INT,
+    f_factor FLOAT,
+    f_amount DECIMAL(14,2),
+    f_date DATETIME DEFAULT CURRENT_TIMESTAMP,
+    f_comment VARCHAR(255),
+    INDEX idx_discount_ops_order (f_order_id),
+    INDEX idx_discount_ops_card (f_card_id)
+)
+SQL,
+    <<<SQL
+CREATE TABLE IF NOT EXISTS b_gift_card_ops (
+    f_id CHAR(36) PRIMARY KEY COLLATE latin1_general_ci,
+    f_card_id INT,
+    f_order_id CHAR(36) COLLATE latin1_general_ci NULL,
+    f_amount DECIMAL(14,2),
+    f_op_type VARCHAR(16),
+    f_date DATETIME DEFAULT CURRENT_TIMESTAMP,
+    f_comment VARCHAR(255),
+    INDEX idx_gift_card_ops_card (f_card_id),
+    INDEX idx_gift_card_ops_order (f_order_id)
+)
+SQL,
+    <<<SQL
+CREATE TABLE IF NOT EXISTS b_accumulate_ops (
+    f_id CHAR(36) PRIMARY KEY COLLATE latin1_general_ci,
+    f_card_id INT,
+    f_order_id CHAR(36) COLLATE latin1_general_ci NULL,
+    f_amount DECIMAL(14,2),
+    f_op_type VARCHAR(16),
+    f_percent FLOAT,
+    f_date DATETIME DEFAULT CURRENT_TIMESTAMP,
+    f_comment VARCHAR(255),
+    INDEX idx_accumulate_ops_card (f_card_id),
+    INDEX idx_accumulate_ops_order (f_order_id)
+)
+SQL,
+];
+foreach ($loyaltyOpsDdl as $ddl) {
+    try {
+        stmtall($ddl);
+    } catch (Exception $e) {
+        $errorFiles[] = "Error ensuring loyalty ops table: " . $e->getMessage() . "<br>";
+    }
+}
+$executedFiles[] = "loyalty ops tables checked.<br>";
+
+// e-Mark policy C (v244): unique spent marks — ensure on DBs that skipped the index (empty-string clash).
+try {
+    stmtall("UPDATE o_goods SET f_emarks = NULL WHERE f_emarks IS NOT NULL AND TRIM(f_emarks) = ''");
+    stmtall("CREATE UNIQUE INDEX IF NOT EXISTS uq_o_goods_emarks ON o_goods (f_emarks)");
+    $executedFiles[] = "uq_o_goods_emarks checked.<br>";
+} catch (Exception $e) {
+    $errorFiles[] = "Error ensuring uq_o_goods_emarks: " . $e->getMessage() . "<br>";
+}
+
+// Ararix client addresses (v244) — ensure if version already applied before this DDL landed.
+try {
+    stmtall(<<<SQL
+CREATE TABLE IF NOT EXISTS ararix_client_addresses (
+    f_id INT PRIMARY KEY AUTO_INCREMENT,
+    f_client_id INT NOT NULL,
+    f_label VARCHAR(128) NOT NULL DEFAULT '',
+    f_street VARCHAR(255) NOT NULL DEFAULT '',
+    f_lat DOUBLE NOT NULL,
+    f_lng DOUBLE NOT NULL,
+    f_entrance_lat DOUBLE NULL,
+    f_entrance_lng DOUBLE NULL,
+    f_building_type VARCHAR(32) NOT NULL DEFAULT 'house',
+    f_floor VARCHAR(32) NULL,
+    f_door VARCHAR(32) NULL,
+    f_comment VARCHAR(512) NULL,
+    f_is_active TINYINT NOT NULL DEFAULT 0,
+    f_created DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    f_updated DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    KEY idx_ararix_addr_client (f_client_id),
+    KEY idx_ararix_addr_active (f_client_id, f_is_active),
+    CONSTRAINT fk_ararix_addr_client FOREIGN KEY (f_client_id) REFERENCES ararix_clients(f_id) ON DELETE CASCADE
+)
+SQL);
+    $executedFiles[] = "ararix_client_addresses checked.<br>";
+} catch (Exception $e) {
+    $errorFiles[] = "Error ensuring ararix_client_addresses: " . $e->getMessage() . "<br>";
+}
+
+try {
+    stmtall("ALTER TABLE fiscal_machine ADD COLUMN IF NOT EXISTS f_idram_ext_pos INT NOT NULL DEFAULT 0");
+    $executedFiles[] = "fiscal_machine.f_idram_ext_pos checked.<br>";
+} catch (Exception $e) {
+    $errorFiles[] = "Error ensuring fiscal_machine.f_idram_ext_pos: " . $e->getMessage() . "<br>";
+}
+
+try {
+    stmtall("ALTER TABLE fiscal_machine ADD COLUMN IF NOT EXISTS f_simple_fiscal TINYINT NOT NULL DEFAULT 0");
+    $executedFiles[] = "fiscal_machine.f_simple_fiscal checked.<br>";
+} catch (Exception $e) {
+    $errorFiles[] = "Error ensuring fiscal_machine.f_simple_fiscal: " . $e->getMessage() . "<br>";
+}
+
+try {
+    stmtall("ALTER TABLE cash_operations ADD COLUMN IF NOT EXISTS f_affects_float TINYINT NOT NULL DEFAULT 0");
+    stmtall("UPDATE cash_operations SET f_affects_float = 1 WHERE f_payment_type_id = 1 AND f_affects_float = 0");
+    $executedFiles[] = "cash_operations.f_affects_float checked.<br>";
+} catch (Exception $e) {
+    $errorFiles[] = "Error ensuring cash_operations.f_affects_float: " . $e->getMessage() . "<br>";
+}
+
+try {
+    stmtall("ALTER TABLE o_header ADD COLUMN IF NOT EXISTS f_public_token CHAR(48) NULL");
+    stmtall("CREATE UNIQUE INDEX IF NOT EXISTS uq_o_header_public_token ON o_header (f_public_token)");
+    $executedFiles[] = "o_header.f_public_token checked.<br>";
+} catch (Exception $e) {
+    $errorFiles[] = "Error ensuring o_header.f_public_token: " . $e->getMessage() . "<br>";
 }
 
 echo json_encode([

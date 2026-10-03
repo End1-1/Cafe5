@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../core/theme/app_theme.dart';
 import '../../../l10n/app_localizations.dart';
+import '../../address/presentation/address_flow.dart';
 import '../application/home_notifier.dart';
 import '../data/home_models.dart';
 
@@ -15,6 +16,9 @@ class HomeScreen extends ConsumerWidget {
     final l10n = AppLocalizations.of(context);
     final state = ref.watch(homeProvider);
     final feed = state.feed;
+    final addressLabel = feed?.address.displayLabel.trim().isNotEmpty == true
+        ? feed!.address.displayLabel
+        : l10n.addAddress;
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -25,7 +29,15 @@ class HomeScreen extends ConsumerWidget {
             physics: const AlwaysScrollableScrollPhysics(),
             slivers: [
               SliverPad(
-                child: _AddressRow(label: feed?.address.label ?? '…'),
+                child: _AddressRow(
+                  label: addressLabel,
+                  onTap: () async {
+                    final changed = await showAddressPicker(context, ref);
+                    if (changed) {
+                      await ref.read(homeProvider.notifier).load();
+                    }
+                  },
+                ),
               ),
               if (state.loading && feed == null)
                 const SliverFillRemaining(
@@ -56,8 +68,22 @@ class HomeScreen extends ConsumerWidget {
                   top: 16,
                   child: _SearchField(
                     hint: l10n.searchRestaurant,
+                    suggestions: state.suggestions,
+                    showingSuggestions: state.showSuggestions,
                     onChanged: (v) =>
                         ref.read(homeProvider.notifier).setSearchQuery(v),
+                    onSuggestionTap: (item) {
+                      ref.read(homeProvider.notifier).clearSuggestions();
+                      if (item.type == HomeSuggestType.restaurant) {
+                        context.push('/restaurant/${item.restaurantId}');
+                      } else if (item.restaurantId > 0 && item.id > 0) {
+                        context.push(
+                          '/restaurant/${item.restaurantId}/dish/${item.id}',
+                        );
+                      } else if (item.restaurantId > 0) {
+                        context.push('/restaurant/${item.restaurantId}');
+                      }
+                    },
                   ),
                 ),
                 SliverPad(
@@ -106,7 +132,13 @@ class HomeScreen extends ConsumerWidget {
                       itemCount: feed.goodsGroups.length,
                       separatorBuilder: (_, __) => const SizedBox(width: 16),
                       itemBuilder: (context, i) {
-                        return _DishGroupItem(group: feed.goodsGroups[i]);
+                        final group = feed.goodsGroups[i];
+                        return _DishGroupItem(
+                          group: group,
+                          selected: state.selectedGroupId == group.id,
+                          onTap: () =>
+                              ref.read(homeProvider.notifier).toggleGroup(group.id),
+                        );
                       },
                     ),
                   ),
@@ -116,9 +148,10 @@ class HomeScreen extends ConsumerWidget {
                   bottom: 8,
                   child: _CuisineRow(
                     countries: feed.countries,
-                    selectedId: state.selectedCountryId,
-                    onSelect: (id) =>
-                        ref.read(homeProvider.notifier).setCountry(id),
+                    selectedIds: state.selectedCountryIds,
+                    onToggle: (id) =>
+                        ref.read(homeProvider.notifier).toggleCountry(id),
+                    onClear: () => ref.read(homeProvider.notifier).clearFilters(),
                   ),
                 ),
                 SliverPad(
@@ -171,13 +204,14 @@ class SliverBox extends StatelessWidget {
 }
 
 class _AddressRow extends StatelessWidget {
-  const _AddressRow({required this.label});
+  const _AddressRow({required this.label, required this.onTap});
   final String label;
+  final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
     return InkWell(
-      onTap: () {},
+      onTap: onTap,
       borderRadius: BorderRadius.circular(12),
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 8),
@@ -238,25 +272,111 @@ class _PromoBanner extends StatelessWidget {
 }
 
 class _SearchField extends StatelessWidget {
-  const _SearchField({required this.hint, required this.onChanged});
+  const _SearchField({
+    required this.hint,
+    required this.onChanged,
+    required this.suggestions,
+    required this.showingSuggestions,
+    required this.onSuggestionTap,
+  });
+
   final String hint;
   final ValueChanged<String> onChanged;
+  final List<HomeSuggestItem> suggestions;
+  final bool showingSuggestions;
+  final ValueChanged<HomeSuggestItem> onSuggestionTap;
 
   @override
   Widget build(BuildContext context) {
-    return TextField(
-      onChanged: onChanged,
-      decoration: InputDecoration(
-        hintText: hint,
-        prefixIcon: const Icon(Icons.search),
-        filled: true,
-        fillColor: const Color(0xFFF2F2F2),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(28),
-          borderSide: BorderSide.none,
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        TextField(
+          onChanged: onChanged,
+          decoration: InputDecoration(
+            hintText: hint,
+            prefixIcon: const Icon(Icons.search),
+            filled: true,
+            fillColor: const Color(0xFFF2F2F2),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(28),
+              borderSide: BorderSide.none,
+            ),
+            contentPadding:
+                const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          ),
         ),
-        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      ),
+        if (showingSuggestions) ...[
+          const SizedBox(height: 8),
+          Material(
+            color: Colors.white,
+            elevation: 2,
+            borderRadius: BorderRadius.circular(16),
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxHeight: 280),
+              child: ListView.separated(
+                shrinkWrap: true,
+                padding: const EdgeInsets.symmetric(vertical: 6),
+                itemCount: suggestions.length,
+                separatorBuilder: (_, __) => const Divider(height: 1),
+                itemBuilder: (context, i) {
+                  final item = suggestions[i];
+                  final isRestaurant = item.type == HomeSuggestType.restaurant;
+                  final subtitle = isRestaurant
+                      ? (item.subtitle?.isNotEmpty == true
+                          ? item.subtitle!
+                          : '')
+                      : (item.restaurantName?.isNotEmpty == true
+                          ? item.restaurantName!
+                          : (item.subtitle ?? ''));
+                  return ListTile(
+                    dense: true,
+                    leading: CircleAvatar(
+                      radius: 18,
+                      backgroundColor: const Color(0xFFF2F2F2),
+                      backgroundImage: item.imageUrl != null &&
+                              item.imageUrl!.isNotEmpty
+                          ? NetworkImage(item.imageUrl!)
+                          : null,
+                      child: item.imageUrl == null || item.imageUrl!.isEmpty
+                          ? Icon(
+                              isRestaurant
+                                  ? Icons.storefront_outlined
+                                  : Icons.restaurant_menu_outlined,
+                              size: 18,
+                              color: Colors.black54,
+                            )
+                          : null,
+                    ),
+                    title: Text(
+                      item.name,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(fontWeight: FontWeight.w600),
+                    ),
+                    subtitle: subtitle.isEmpty
+                        ? null
+                        : Text(
+                            subtitle,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(fontSize: 12),
+                          ),
+                    trailing: Icon(
+                      isRestaurant
+                          ? Icons.chevron_right
+                          : Icons.lunch_dining_outlined,
+                      size: 18,
+                      color: Colors.black45,
+                    ),
+                    onTap: () => onSuggestionTap(item),
+                  );
+                },
+              ),
+            ),
+          ),
+        ],
+      ],
     );
   }
 }
@@ -377,43 +497,61 @@ class _RestaurantAvatar extends StatelessWidget {
 }
 
 class _DishGroupItem extends StatelessWidget {
-  const _DishGroupItem({required this.group});
+  const _DishGroupItem({
+    required this.group,
+    required this.selected,
+    required this.onTap,
+  });
+
   final HomeGoodsGroup group;
+  final bool selected;
+  final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      width: 88,
-      child: Column(
-        children: [
-          Container(
-            width: 72,
-            height: 72,
-            decoration: BoxDecoration(
-              color: const Color(0xFFFFF3E0),
-              borderRadius: BorderRadius.circular(18),
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(18),
+      child: SizedBox(
+        width: 88,
+        child: Column(
+          children: [
+            Container(
+              width: 72,
+              height: 72,
+              decoration: BoxDecoration(
+                color: selected
+                    ? AppColors.accent.withValues(alpha: 0.25)
+                    : const Color(0xFFFFF3E0),
+                borderRadius: BorderRadius.circular(18),
+                border: selected
+                    ? Border.all(color: AppColors.accent, width: 2)
+                    : null,
+              ),
+              child: group.imageUrl != null && group.imageUrl!.isNotEmpty
+                  ? ClipRRect(
+                      borderRadius: BorderRadius.circular(16),
+                      child: Image.network(group.imageUrl!, fit: BoxFit.cover),
+                    )
+                  : Icon(
+                      group.name.toLowerCase().contains('pizza')
+                          ? Icons.local_pizza_outlined
+                          : Icons.lunch_dining_outlined,
+                      size: 36,
+                      color: Colors.brown,
+                    ),
             ),
-            child: group.imageUrl != null && group.imageUrl!.isNotEmpty
-                ? ClipRRect(
-                    borderRadius: BorderRadius.circular(18),
-                    child: Image.network(group.imageUrl!, fit: BoxFit.cover),
-                  )
-                : Icon(
-                    group.name.toLowerCase().contains('pizza')
-                        ? Icons.local_pizza_outlined
-                        : Icons.lunch_dining_outlined,
-                    size: 36,
-                    color: Colors.brown,
-                  ),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            group.name,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            style: const TextStyle(fontWeight: FontWeight.w600),
-          ),
-        ],
+            const SizedBox(height: 8),
+            Text(
+              group.name,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                fontWeight: selected ? FontWeight.w800 : FontWeight.w600,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -422,16 +560,19 @@ class _DishGroupItem extends StatelessWidget {
 class _CuisineRow extends StatelessWidget {
   const _CuisineRow({
     required this.countries,
-    required this.selectedId,
-    required this.onSelect,
+    required this.selectedIds,
+    required this.onToggle,
+    required this.onClear,
   });
 
   final List<HomeCountry> countries;
-  final int? selectedId;
-  final ValueChanged<int?> onSelect;
+  final Set<int> selectedIds;
+  final ValueChanged<int> onToggle;
+  final VoidCallback onClear;
 
   @override
   Widget build(BuildContext context) {
+    final hasSelection = selectedIds.isNotEmpty;
     return SizedBox(
       height: 40,
       child: ListView.separated(
@@ -440,20 +581,30 @@ class _CuisineRow extends StatelessWidget {
         separatorBuilder: (_, __) => const SizedBox(width: 8),
         itemBuilder: (context, i) {
           if (i == 0) {
-            return Container(
-              width: 40,
-              height: 40,
-              decoration: BoxDecoration(
-                color: const Color(0xFFF2F2F2),
-                borderRadius: BorderRadius.circular(12),
+            return InkWell(
+              onTap: hasSelection ? onClear : null,
+              borderRadius: BorderRadius.circular(12),
+              child: Container(
+                width: 40,
+                height: 40,
+                decoration: BoxDecoration(
+                  color: hasSelection
+                      ? AppColors.accent.withValues(alpha: 0.2)
+                      : const Color(0xFFF2F2F2),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Icon(
+                  Icons.tune,
+                  size: 20,
+                  color: hasSelection ? AppColors.accent : null,
+                ),
               ),
-              child: const Icon(Icons.tune, size: 20),
             );
           }
           final c = countries[i - 1];
-          final selected = selectedId == c.id;
+          final selected = selectedIds.contains(c.id);
           return InkWell(
-            onTap: () => onSelect(selected ? null : c.id),
+            onTap: () => onToggle(c.id),
             borderRadius: BorderRadius.circular(20),
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 14),

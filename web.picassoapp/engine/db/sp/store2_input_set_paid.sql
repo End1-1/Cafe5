@@ -20,6 +20,9 @@ BEGIN
     DECLARE doc_date datetime;
     DECLARE debt_amount decimal(14, 2) DEFAULT 0;
     DECLARE doc_data longtext;
+    DECLARE session_id int DEFAULT 0;
+    DECLARE old_session_id int DEFAULT 0;
+    DECLARE old_float_credit decimal(14, 2) DEFAULT 0;
 
     SET sql_safe_updates = 0;
 
@@ -55,14 +58,48 @@ BEGIN
         RETURN JSON_OBJECT('status', 1, 'msg', 'partner_required_for_debt');
     END IF;
 
+    -- Reverse prior cash-float impact before replacing purchase payment lines.
+    BEGIN
+        DECLARE done_rev INT DEFAULT FALSE;
+        DECLARE cur_rev CURSOR FOR
+            SELECT f_session_id, COALESCE(SUM(f_credit), 0)
+            FROM cash_operations
+            WHERE f_order_id = doc_uuid
+              AND f_session_id > 0
+              AND f_affects_float = 1
+            GROUP BY f_session_id;
+        DECLARE CONTINUE HANDLER FOR NOT FOUND SET done_rev = TRUE;
+        OPEN cur_rev;
+        rev_loop:
+        LOOP
+            FETCH cur_rev INTO old_session_id, old_float_credit;
+            IF done_rev THEN LEAVE rev_loop; END IF;
+            UPDATE cash_session
+            SET f_amount_expected = f_amount_expected + old_float_credit
+            WHERE f_id = old_session_id;
+        END LOOP;
+        CLOSE cur_rev;
+    END;
+
     DELETE FROM cash_operations WHERE f_order_id = doc_uuid;
     DELETE FROM cash_debts WHERE f_doc_uuid = doc_uuid;
 
     IF (paid_amount > 0) THEN
-        INSERT INTO cash_operations (f_cashbox_id, f_order_id, f_user, f_operation_type, f_payment_type_id,
-                                     f_datetime, f_credit, f_currency_id)
-        VALUES (cashbox_id, doc_uuid, create_user, 3, payment_type_id, doc_date, paid_amount,
-                IFNULL(currency_id, 1));
+        SET session_id = IFNULL((SELECT f_id
+                                 FROM cash_session
+                                 WHERE f_state = 1
+                                   AND f_cashbox_id = cashbox_id
+                                 ORDER BY f_id DESC
+                                 LIMIT 1), 0);
+        INSERT INTO cash_operations (f_cashbox_id, f_session_id, f_order_id, f_user, f_operation_type,
+                                     f_payment_type_id, f_datetime, f_credit, f_currency_id, f_affects_float)
+        VALUES (cashbox_id, NULLIF(session_id, 0), doc_uuid, create_user, 3, payment_type_id, doc_date,
+                paid_amount, IFNULL(currency_id, 1), IF(payment_type_id = 1, 1, 0));
+        IF (payment_type_id = 1 AND IFNULL(session_id, 0) > 0) THEN
+            UPDATE cash_session
+            SET f_amount_expected = f_amount_expected - paid_amount
+            WHERE f_id = session_id;
+        END IF;
     END IF;
     IF (debt_amount > 0) THEN
         INSERT INTO cash_debts (f_date, f_partner, f_doc_type, f_doc_uuid, f_credit, f_debit, f_currency_id)

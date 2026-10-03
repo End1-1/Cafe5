@@ -1,9 +1,18 @@
+import java.util.Properties
+
 plugins {
     id("com.android.application")
     id("kotlin-android")
     // The Flutter Gradle Plugin must be applied after the Android and Kotlin Gradle plugins.
     id("dev.flutter.flutter-gradle-plugin")
 }
+
+val mapsSecrets = Properties()
+val mapsSecretsFile = rootProject.file("../secrets.properties")
+if (mapsSecretsFile.exists()) {
+    mapsSecretsFile.inputStream().use { mapsSecrets.load(it) }
+}
+val googleMapsApiKey = mapsSecrets.getProperty("GOOGLE_MAPS_API_KEY") ?: ""
 
 android {
     namespace = "am.ararix.ararix"
@@ -28,6 +37,7 @@ android {
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
         versionName = flutter.versionName
+        manifestPlaceholders["GOOGLE_MAPS_API_KEY"] = googleMapsApiKey
     }
 
     buildTypes {

@@ -59,12 +59,12 @@ class AppLocalizationsHy extends AppLocalizations {
 
   @override
   String insertCodeWhatsapp(String phone) {
-    return 'Մուտքագրեք 4-նիշանոց կոդը, որը ուղարկել ենք WhatsApp-ով $phone';
+    return 'Մուտքագրեք 5-նիշանոց կոդը, որը ուղարկել ենք WhatsApp-ով $phone';
   }
 
   @override
   String insertCodeSms(String phone) {
-    return 'Մուտքագրեք 4-նիշանոց կոդը, որը ուղարկել ենք SMS-ով $phone';
+    return 'Մուտքագրեք 5-նիշանոց կոդը, որը ուղարկել ենք SMS-ով $phone';
   }
 
   @override
@@ -154,7 +154,7 @@ class AppLocalizationsHy extends AppLocalizations {
   String get invalidPhone => 'Մուտքագրեք վավեր համարը';
 
   @override
-  String get invalidOtp => 'Մուտքագրեք 4-նիշանոց կոդը';
+  String get invalidOtp => 'Մուտքագրեք 5-նիշանոց կոդը';
 
   @override
   String get errorGeneric => 'Ինչ-որ սխալ տեղի ունեցավ';
@@ -286,4 +286,109 @@ class AppLocalizationsHy extends AppLocalizations {
 
   @override
   String get back => 'Հետ';
+
+  @override
+  String get addAddress => 'Ավելացնել հասցե';
+
+  @override
+  String get myAddresses => 'Իմ հասցեները';
+
+  @override
+  String get noSavedAddresses => 'Պահված հասցեներ չկան';
+
+  @override
+  String get deleteAddress => 'Ջնջել հասցեն';
+
+  @override
+  String get deleteAddressQuestion => 'Ջնջե՞լ այս հասցեն';
+
+  @override
+  String get whereDeliver => 'Որտե՞ղ առաքել';
+
+  @override
+  String get currentLocation => 'Ընթացիկ տեղադրություն';
+
+  @override
+  String get addNewAddress => 'Ավելացնել նոր';
+
+  @override
+  String get locateMe => 'Գտնել ինձ';
+
+  @override
+  String get searchAddressTitle => 'Որոնում';
+
+  @override
+  String get enterStreetBuilding => 'Փողոց, շենքի համար…';
+
+  @override
+  String get confirmAddress => 'Հաստատել հասցեն';
+
+  @override
+  String get adjustPin => 'Տեղափոխել նշիչը';
+
+  @override
+  String get droppedPin => 'Նշիչ քարտեզի վրա';
+
+  @override
+  String get buildingTypeTitle => 'Շենքի տեսակ';
+
+  @override
+  String get buildingHouse => 'Տուն';
+
+  @override
+  String get buildingApartment => 'Բնակարան';
+
+  @override
+  String get buildingOffice => 'Գրասենյակ';
+
+  @override
+  String get buildingOther => 'Այլ';
+
+  @override
+  String get addressDetailsTitle => 'Հասցեի մանրամասներ';
+
+  @override
+  String get floor => 'Հարկ';
+
+  @override
+  String get door => 'Դուռ';
+
+  @override
+  String get additionalInfo => 'Լրացուցիչ';
+
+  @override
+  String get markEntrance => 'Նշել մուտքը';
+
+  @override
+  String get entrance => 'Մուտք';
+
+  @override
+  String get addressLabel => 'Պիտակ';
+
+  @override
+  String get labelHome => 'Տուն';
+
+  @override
+  String get labelWork => 'Աշխատանք';
+
+  @override
+  String get labelOther => 'Այլ';
+
+  @override
+  String get customLabel => 'Սեփական պիտակ';
+
+  @override
+  String get saveAddress => 'Պահպանել հասցեն';
+
+  @override
+  String get orderStatusTitle => 'Պատվերի կարգավիճակ';
+
+  @override
+  String get orderNumber => 'Պատվերի համար';
+
+  @override
+  String get status => 'Կարգավիճակ';
+
+  @override
+  String get items => 'Ապրանքներ';
 }

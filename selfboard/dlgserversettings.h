@@ -20,6 +20,7 @@ public:
 private slots:
     void on_btnSave_clicked();
     void on_btnCancel_clicked();
+    void updateRequired(const QString &msg, const QString &appName, const QString &newVersion);
 
 private:
     void loadFields();

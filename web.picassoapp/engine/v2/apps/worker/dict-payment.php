@@ -64,5 +64,18 @@ return [
         PAYMENT_TELCELL => true,
         PAYMENT_DEBT => false,
         PAYMENT_PREPAID => false
-    ]
+    ],
+
+    // Physical drawer float: only cash. Card/Idram/Telcell are shift turnover.
+    "affects_float" => [
+        PAYMENT_TYPE_CASH => true,
+        PAYMENT_TYPE_CARD => false,
+        PAYMENT_TYPE_BANK => false,
+        PAYMENT_TYPE_IDRAM => false,
+        PAYMENT_TYPE_COMPLIMENTARY => false,
+        PAYMENT_OTHER => false,
+        PAYMENT_TELCELL => false,
+        PAYMENT_DEBT => false,
+        PAYMENT_PREPAID => false,
+    ],
 ];

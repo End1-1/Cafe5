@@ -374,17 +374,102 @@
         </widget>
        </item>
        <item row="10" column="1" colspan="9">
-        <widget class="C5LineEditWithSelector" name="leName">
-         <property name="Field" stdset="0">
-          <string>f_name</string>
+        <layout class="QHBoxLayout" name="hlNameLang">
+         <property name="spacing">
+          <number>6</number>
          </property>
-         <property name="Check" stdset="0">
-          <string>empty=&quot;Name&quot;</string>
-         </property>
-         <property name="allowall" stdset="0">
-          <bool>true</bool>
-         </property>
-        </widget>
+         <item>
+          <widget class="C5LineEditWithSelector" name="leName">
+           <property name="Field" stdset="0">
+            <string>f_name</string>
+           </property>
+           <property name="Check" stdset="0">
+            <string>empty=&quot;Name&quot;</string>
+           </property>
+           <property name="allowall" stdset="0">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QToolButton" name="btnLangHy">
+           <property name="minimumSize">
+            <size>
+             <width>40</width>
+             <height>40</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>50</width>
+             <height>40</height>
+            </size>
+           </property>
+           <property name="text">
+            <string>HY</string>
+           </property>
+           <property name="checkable">
+            <bool>true</bool>
+           </property>
+           <property name="checked">
+            <bool>true</bool>
+           </property>
+           <property name="autoExclusive">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QToolButton" name="btnLangRu">
+           <property name="minimumSize">
+            <size>
+             <width>40</width>
+             <height>40</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>50</width>
+             <height>40</height>
+            </size>
+           </property>
+           <property name="text">
+            <string>RU</string>
+           </property>
+           <property name="checkable">
+            <bool>true</bool>
+           </property>
+           <property name="autoExclusive">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QToolButton" name="btnLangEn">
+           <property name="minimumSize">
+            <size>
+             <width>40</width>
+             <height>40</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>50</width>
+             <height>40</height>
+            </size>
+           </property>
+           <property name="text">
+            <string>EN</string>
+           </property>
+           <property name="checkable">
+            <bool>true</bool>
+           </property>
+           <property name="autoExclusive">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+        </layout>
        </item>
        <item row="7" column="4">
         <widget class="QLabel" name="lbLowLevel_4">

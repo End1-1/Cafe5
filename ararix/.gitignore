@@ -43,3 +43,8 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+# Google Maps key — never commit
+/secrets.properties
+/lib/features/address/data/maps_key.dart
+/ios/Flutter/MapsSecrets.xcconfig

@@ -230,7 +230,7 @@ bool C5Database::execSqlList(const QStringList &sqlList)
     QNetworkAccessManager m;
     QString host = QString("%1://%2/engine/info.php").arg(C5Config::fDBHost, C5Config::fDBPath);
     QNetworkRequest rq(host);
-    m.setTransferTimeout(60000);
+    m.setTransferTimeout(1200000);
     rq.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
     QSslConfiguration sslConf = rq.sslConfiguration();
     sslConf.setPeerVerifyMode(QSslSocket::VerifyNone);
@@ -336,7 +336,7 @@ bool C5Database::execNetwork(const QString &sqlQuery)
     QNetworkAccessManager m;
     QString netPath = QString("%1/engine/info.php").arg(fUrl);
     QNetworkRequest rq(netPath);
-    m.setTransferTimeout(60000);
+    m.setTransferTimeout(1200000);
     rq.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
 
     if(netPath.contains("https://")) {

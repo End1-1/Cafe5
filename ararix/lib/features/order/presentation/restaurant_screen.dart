@@ -23,7 +23,13 @@ class RestaurantScreen extends ConsumerWidget {
     final order = ref.watch(restaurantOrderProvider(restaurantId));
     final cart = ref.watch(cartProvider);
     final serviceMode = ref.watch(homeProvider.select((s) => s.serviceMode));
+    final homeAddress = ref.watch(
+      homeProvider.select((s) => s.feed?.address.displayLabel ?? ''),
+    );
     final restaurant = order.menu?.restaurant;
+    final addressLabel = homeAddress.trim().isNotEmpty
+        ? homeAddress
+        : l10n.addAddress;
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -57,7 +63,7 @@ class RestaurantScreen extends ConsumerWidget {
                           SliverToBoxAdapter(
                             child: _HeroHeader(
                               restaurant: restaurant,
-                              addressLabel: 'Komitas Avenue, 8',
+                              addressLabel: addressLabel,
                               onBack: () => context.pop(),
                             ),
                           ),

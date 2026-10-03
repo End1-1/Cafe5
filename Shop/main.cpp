@@ -69,14 +69,15 @@ int main(int argc, char* argv[])
     bool multicopy = false;
 
     for(const QString &s : a.arguments()) {
-        if(s.startsWith("/monitor")) {
-            // /monitor=N is 1-based (1 = primary). Convert to 0-based screen index.
+        if(s.startsWith(QStringLiteral("/monitor"), Qt::CaseInsensitive)) {
+            // Same as Waiter/FrontDesk: /monitor=N is a 0-based Qt screen index
+            // (historical shortcuts use /monitor=1 for the second display).
             const QList<QScreen *> screens = a.screens();
             const QStringList mon = s.split(QLatin1Char('='));
             if (mon.length() == 2) {
-                const int index = mon.at(1).toInt() - 1;
-                if (index >= 0 && index < screens.count()) {
-                    C5Dialog::mScreen = index;
+                const int monitor = mon.at(1).trimmed().toInt();
+                if (monitor >= 0 && monitor < screens.count()) {
+                    C5Dialog::mScreen = monitor;
                 }
             }
         }
@@ -105,11 +106,19 @@ int main(int argc, char* argv[])
             const int eq = s.indexOf(QLatin1Char('='));
             if (eq > 0) {
                 const QString subPath = s.mid(eq + 1).trimmed();
-                //C5Config::fSettingsSubPath = subPath;
-                C5ConnectionDialog::mSettingsPath = subPath;
-                C5RegistrySettings::settingsSubPath = subPath;
+                if (!subPath.isEmpty()) {
+                    C5ConnectionDialog::mSettingsPath = subPath;
+                    C5RegistrySettings::settingsSubPath = subPath;
+                }
             }
         }
+    }
+
+    // Keep registry path and legacy mSettingsPath in sync if only one was set.
+    if (C5RegistrySettings::settingsSubPath.isEmpty() && !C5ConnectionDialog::mSettingsPath.isEmpty()) {
+        C5RegistrySettings::settingsSubPath = C5ConnectionDialog::mSettingsPath;
+    } else if (C5ConnectionDialog::mSettingsPath.isEmpty() && !C5RegistrySettings::settingsSubPath.isEmpty()) {
+        C5ConnectionDialog::mSettingsPath = C5RegistrySettings::settingsSubPath;
     }
 
     C5UiLanguage::configure(QStringLiteral(":/lang/Shop.qm"),
@@ -175,6 +184,9 @@ int main(int argc, char* argv[])
         }
         dlgsplash->hide();
         dlgsplash->deleteLater();
+        if (C5Dialog::mScreen >= 0 && C5Dialog::mScreen < qApp->screens().count()) {
+            w->setGeometry(qApp->screens().at(C5Dialog::mScreen)->availableGeometry());
+        }
         w->showMaximized();
     };
     dlgsplash->show();

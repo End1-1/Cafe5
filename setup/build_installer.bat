@@ -20,10 +20,11 @@ if /I "%~1"=="shop" set "COMPONENT=shop" & shift & goto :parse_args
 if /I "%~1"=="waiter" set "COMPONENT=waiter" & shift & goto :parse_args
 if /I "%~1"=="cookingprogress" set "COMPONENT=cookingprogress" & shift & goto :parse_args
 if /I "%~1"=="cooking" set "COMPONENT=cookingprogress" & shift & goto :parse_args
+if /I "%~1"=="selfboard" set "COMPONENT=selfboard" & shift & goto :parse_args
 if /I "%~1"=="service5" set "COMPONENT=service5" & shift & goto :parse_args
 if /I "%~1"=="service" set "COMPONENT=service5" & shift & goto :parse_args
 echo Unknown argument: %~1
-echo Usage: build_installer.bat [frontdesk^|shop^|waiter^|cookingprogress^|service5^|all] [bump]
+echo Usage: build_installer.bat [frontdesk^|shop^|waiter^|cookingprogress^|selfboard^|service5^|all] [bump]
 exit /b 1
 
 :args_done
@@ -53,6 +54,7 @@ if /I "%COMPONENT%"=="all" (
   echo   %SCRIPT_DIR%output\shop\
   echo   %SCRIPT_DIR%output\waiter\
   echo   %SCRIPT_DIR%output\cookingprogress\
+  echo   %SCRIPT_DIR%output\selfboard\
   echo   %SCRIPT_DIR%output\service5\
 ) else (
   if /I "%COMPONENT%"=="frontdesk" if not exist "%SCRIPT_DIR%staging\OfficeN.exe" goto :no_staging
@@ -60,6 +62,7 @@ if /I "%COMPONENT%"=="all" (
   if /I "%COMPONENT%"=="waiter" if not exist "%SCRIPT_DIR%staging\Waiter.exe" goto :no_staging
   if /I "%COMPONENT%"=="waiter" if not exist "%SCRIPT_DIR%staging\WaiterDesigner.exe" goto :no_staging
   if /I "%COMPONENT%"=="cookingprogress" if not exist "%SCRIPT_DIR%staging\CookingProgress.exe" goto :no_staging
+  if /I "%COMPONENT%"=="selfboard" if not exist "%SCRIPT_DIR%staging\SelfBoard.exe" goto :no_staging
   if /I "%COMPONENT%"=="service5" if not exist "%SCRIPT_DIR%staging\service5.exe" goto :no_staging
 
   echo.

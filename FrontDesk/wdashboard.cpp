@@ -13,6 +13,7 @@
 #include "cr5goods.h"
 #include "cr5goodsgroup.h"
 #include "cr5goodspartners.h"
+#include "cr5discountsystem.h"
 #include "cr5goodsunit.h"
 #include "cr5hall.h"
 #include "cr5tables.h"
@@ -271,6 +272,12 @@ QWidget* WDashboard::createForm(const QString &name, QIcon icon)
         auto *partners = new CR5GoodsPartners();
         partners->postProcess();
         return partners;
+    }
+
+    if (name == "form_discount_system") {
+        auto *discount = new CR5DiscountSystem();
+        discount->postProcess();
+        return discount;
     }
 
     if (name == "form_summary") {

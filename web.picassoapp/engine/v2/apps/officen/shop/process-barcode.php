@@ -4,6 +4,7 @@
 # Last Modified: 2025-12-21 10:41:22
 require_once __DIR__ . "/index.php";
 require_once __DIR__ . "/../../worker/uuid.php";
+require_once __DIR__ . "/../../../worker/helper.php";
 
 class ProcessBarcode extends Auth
 {
@@ -84,7 +85,22 @@ class ProcessBarcode extends Auth
         }
 
         if (!empty($this->qrcode)) {
-            $duplicate = $this->select("select * from o_draft_sale_body where f_emarks=? and f_state=1", "s", [$this->qrcode])->fetch_assoc();
+            $emarks = normalize_emarks((string)$this->qrcode);
+            $this->qrcode = $emarks;
+            // Active sale lines only; deleted/voided free the mark.
+            $duplicate = $this->select(
+                "SELECT f_id FROM o_goods WHERE f_emarks=? AND f_state=1 LIMIT 1",
+                "s",
+                [$emarks]
+            )->fetch_assoc();
+            if (!empty($duplicate)) {
+                dieWithCode(Translator::t("Duplicate emarks"));
+            }
+            $duplicate = $this->select(
+                "SELECT f_id FROM o_draft_sale_body WHERE f_emarks=? AND f_state=1 LIMIT 1",
+                "s",
+                [$emarks]
+            )->fetch_assoc();
             if (!empty($duplicate)) {
                 dieWithCode(Translator::t("Duplicate emarks"));
             }

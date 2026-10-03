@@ -34,6 +34,7 @@ private slots:
     void onTakeAwayClicked();
     void onDineInClicked();
     void openMenu(DlgMenu::ServiceMode mode);
+    void updateRequired(const QString &msg, const QString &appName, const QString &newVersion);
 
     void startMenuPreload();
 

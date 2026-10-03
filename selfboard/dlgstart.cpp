@@ -6,6 +6,7 @@
 #include "dlgserversettings.h"
 #include "menucache.h"
 #include "selfboarddisplay.h"
+#include "selfboardupdate.h"
 #include "serverconfig.h"
 
 #include <QApplication>
@@ -313,6 +314,12 @@ void DlgStart::startMenuPreload()
         }
         setMenuLoadingUi(false);
     });
+}
+
+void DlgStart::updateRequired(const QString &msg, const QString &appName, const QString &newVersion)
+{
+    setMenuLoadingUi(false);
+    SelfBoardUpdate::offerAndRun(this, msg, appName, newVersion);
 }
 
 void DlgStart::onTakeAwayClicked()

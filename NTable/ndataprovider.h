@@ -12,6 +12,9 @@ class NDataProvider : public QObject
 {
     Q_OBJECT
 public:
+    /** Match Apache/PHP max execution (1200 s). Used by Waiter / Shop / FrontDesk HTTP. */
+    static constexpr int kDefaultTransferTimeoutMs = 1200000;
+
     explicit NDataProvider(QObject *parent = nullptr);
 
     ~NDataProvider();

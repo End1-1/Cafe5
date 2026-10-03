@@ -9,7 +9,11 @@ class DiscountSystem extends Auth
 
     public function GetInfo($params)
     {
-        $card = $this->select("select * from b_discount_cards where f_code=?", "s", [$params->code])->fetch_assoc();
+        $code = trim((string)($params->code ?? ""));
+        if ($code === "") {
+            dieWithCode(Translator::t("Card with the specified code not found"));
+        }
+        $card = $this->select("select * from b_discount_cards where f_code=?", "s", [$code])->fetch_assoc();
         if (empty($card)) {
             dieWithCode(Translator::t("Card with the specified code not found"));
         }

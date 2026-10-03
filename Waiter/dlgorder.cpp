@@ -21,6 +21,7 @@
 #include <QPainter>
 #include <QPointer>
 #include <QPrinterInfo>
+#include <QRegularExpression>
 #include <QScreen>
 #include <QScrollBar>
 #include <QSet>
@@ -179,15 +180,170 @@ void applyFiscalPayments(PrintTaxN *pt, const FiscalPaymentPayload &pay)
     }
 }
 
-QStringList collectFiscalEmarks(const WaiterOrder &order)
+static QString fiscalUseExtPosForPrint(const FiscalMachine &fm, const FiscalPaymentPayload &pay)
+{
+    if (pay.forceInternalPos) {
+        return QStringLiteral("false");
+    }
+    if (pay.paymentSystem == 13) {
+        return fm.idramExternalPosString();
+    }
+    return fm.externalPosString();
+}
+
+static void finalizeFiscalReceiptPrint(PrintTaxN *pt, const FiscalMachine &fm, const FiscalPaymentPayload &pay)
+{
+    if (fm.simpleFiscal) {
+        const int dep = fm.defaultDept > 0 ? fm.defaultDept : 1;
+        // mode=1 needs total before card/prepaid split (makeJsonAndPrintSimple subtracts them)
+        pt->fJsonHeader[QStringLiteral("paidAmount")] = pay.cash + pay.nonCash + pay.prepaid;
+        pt->makeJsonAndPrintSimple(dep, pay.nonCash, pay.prepaid, fiscalUseExtPosForPrint(fm, pay));
+    } else {
+        pt->makeJsonAndPrint(pay.cash, pay.nonCash, pay.prepaid);
+    }
+}
+
+/** GS separators are not accepted by the fiscal device, it expects the plain 01+GTIN 21+serial 93+crypto string. */
+QString normalizeEmark(const QString &code)
+{
+    QString result = code;
+    result.remove(QChar(0x1D));
+    return result.trimmed();
+}
+
+/** ADAT / e-Mark wire string before parsing (see e-mark.am GS1 Data Matrix rules). */
+QString normalizeEmarkInput(QString code)
+{
+    code = code.trimmed();
+    code.replace(QRegularExpression(QStringLiteral("<GS>"), QRegularExpression::CaseInsensitiveOption),
+                 QChar(0x1D));
+    code.replace(QRegularExpression(QStringLiteral("\\[GS\\]"), QRegularExpression::CaseInsensitiveOption),
+                 QChar(0x1D));
+    if (code.contains(QLatin1String("\\x1"), Qt::CaseInsensitive)) {
+        code.replace(QRegularExpression(QStringLiteral("\\\\x1[dD]")), QChar(0x1D));
+        code.replace(QRegularExpression(QStringLiteral("\\\\u001[dD]")), QChar(0x1D));
+    }
+    if (!code.isEmpty() && code.at(0).unicode() == 232) {
+        code.remove(0, 1);
+    }
+    code.replace(QRegularExpression(QStringLiteral("\\((\\d{2})\\)")), QStringLiteral("\\1"));
+    return code;
+}
+
+struct EmarkCode {
+    QString gtin;   /**< AI 01, 14 digits */
+    QString serial; /**< AI 21, variable length */
+    QString tail;   /**< AI 93 or 91+92 crypto block (ADAT verification code) */
+    bool valid = false;
+};
+
+static bool emarkCryptoTailValid(const QString &tail)
+{
+    if (tail.startsWith(QLatin1String("93")) && tail.length() > 2) {
+        return true;
+    }
+    if (!tail.startsWith(QLatin1String("91")) || tail.length() < 8) {
+        return false;
+    }
+    QString rest = tail.mid(2);
+    while (!rest.isEmpty() && rest.at(0) == QChar(0x1D)) {
+        rest.remove(0, 1);
+    }
+    if (rest.length() < 6) {
+        return false;
+    }
+    rest = rest.mid(4);
+    while (!rest.isEmpty() && rest.at(0) == QChar(0x1D)) {
+        rest.remove(0, 1);
+    }
+    return rest.startsWith(QLatin1String("92")) && rest.length() > 2;
+}
+
+static void splitEmarkSerialAndCrypto(QString rest, QString *serial, QString *tail)
+{
+    const QChar gs(0x1D);
+    const int separator = rest.indexOf(gs);
+    if (separator >= 0) {
+        *serial = rest.left(separator);
+        *tail = rest.mid(separator + 1);
+        tail->remove(gs);
+        return;
+    }
+    const int group93 = rest.lastIndexOf(QStringLiteral("93"));
+    if (group93 > 0 && group93 + 2 < rest.length()) {
+        *serial = rest.left(group93);
+        *tail = rest.mid(group93);
+        return;
+    }
+    static const QRegularExpression re91Tail(QStringLiteral("^(.*)91(.{4})92(.+)$"));
+    const QRegularExpressionMatch m91 = re91Tail.match(rest);
+    if (m91.hasMatch()) {
+        *serial = m91.captured(1);
+        *tail = QStringLiteral("91") + m91.captured(2) + QStringLiteral("92") + m91.captured(3);
+        return;
+    }
+    *serial = rest;
+    *tail = QString();
+}
+
+/** GS1 Data Matrix (ADAT): 01+GTIN, 21+serial (variable), then 93 or 91+92 crypto; GS after serial when present. */
+EmarkCode parseEmark(const QString &code)
+{
+    EmarkCode parsed;
+    QString rest = normalizeEmarkInput(code);
+    const QChar gs(0x1D);
+    while (rest.startsWith(gs)) {
+        rest.remove(0, 1);
+    }
+
+    static const QRegularExpression head(QStringLiteral("^01(\\d{14})21(.+)$"));
+    const QRegularExpressionMatch m = head.match(rest);
+    if (!m.hasMatch()) {
+        return parsed;
+    }
+    parsed.gtin = m.captured(1);
+    splitEmarkSerialAndCrypto(m.captured(2), &parsed.serial, &parsed.tail);
+
+    parsed.valid = parsed.gtin.contains(QRegularExpression(QStringLiteral("^\\d{14}$")))
+                   && !parsed.serial.isEmpty()
+                   && parsed.serial.length() <= 20
+                   && emarkCryptoTailValid(parsed.tail);
+    return parsed;
+}
+
+bool isValidEmark(const QString &code)
+{
+    return parseEmark(code).valid;
+}
+
+/** Goods cards keep the barcode as GTIN-14, EAN-13 or EAN-8 — try every form of the scanned GTIN. */
+QStringList barcodesFromGtin(const QString &gtin)
+{
+    QStringList list{gtin};
+    if (gtin.startsWith(QLatin1Char('0'))) {
+        list << gtin.mid(1);
+    }
+    if (gtin.startsWith(QLatin1String("000000"))) {
+        list << gtin.mid(6);
+    }
+    return list;
+}
+
+QStringList collectFiscalEmarks(const WaiterOrder &order, QStringList *invalid = nullptr)
 {
     QStringList result;
-    auto appendUnique = [&result](const QString &code) {
-        const QString trimmed = code.trimmed();
-        if (trimmed.isEmpty() || result.contains(trimmed)) {
+    auto appendUnique = [&result, invalid](const QString &code) {
+        const QString normalized = normalizeEmark(code);
+        if (normalized.isEmpty() || result.contains(normalized)) {
             return;
         }
-        result.append(trimmed);
+        if (!isValidEmark(code)) {
+            if (invalid && !invalid->contains(normalized)) {
+                invalid->append(normalized);
+            }
+            return;
+        }
+        result.append(normalized);
     };
 
     const QJsonValue datamatrix = order.data.value(QStringLiteral("f_datamatrix"));
@@ -437,8 +593,15 @@ bool DlgOrder::eventFilter(QObject *o, QEvent *e)
         updateScrollButtonPositions();
     }
 
+    // QShortcut runs before this filter, so mid-scan keys must be taken away from it.
+    if(e->type() == QEvent::ShortcutOverride && inScanMode()) {
+        e->accept();
+        return true;
+    }
+
     if(e->type() == QEvent::KeyPress) {
         auto *k = static_cast<QKeyEvent*>(e);
+        const bool scanning = inScanMode();
 
         if(k->key() == Qt::Key_Return || k->key() == Qt::Key_Enter) {
             confirmStringBuffer();
@@ -453,22 +616,35 @@ bool DlgOrder::eventFilter(QObject *o, QEvent *e)
         // Numpad / keyboard +/- → same as btnPlus1 / btnMinus1
         // Match by key and by text: some layouts/numpads deliver text without Key_Minus.
         const QString t = k->text();
-        if(k->key() == Qt::Key_Plus || t == QLatin1String("+")) {
-            on_btnPlus1_clicked();
-            return true;
-        }
-        if(k->key() == Qt::Key_Minus || t == QLatin1String("-") || t == QString(QChar(0x2212))) {
-            on_btnMinus1_clicked();
-            return true;
+        if(!scanning) {
+            if(k->key() == Qt::Key_Plus || t == QLatin1String("+")) {
+                on_btnPlus1_clicked();
+                return true;
+            }
+            if(k->key() == Qt::Key_Minus || t == QLatin1String("-") || t == QString(QChar(0x2212))) {
+                on_btnMinus1_clicked();
+                return true;
+            }
         }
 
         if(!t.isEmpty()) {
+            // A long pause means the previous input was never finished by Enter: drop it.
+            if(!mStringBuffer.isEmpty() && mScanTimer.isValid() && mScanTimer.elapsed() > 3000) {
+                mStringBuffer.clear();
+            }
+
             mStringBuffer += t;
+            mScanTimer.restart();
             return true;
         }
     }
 
     return C5WaiterDialog::eventFilter(o, e);
+}
+
+bool DlgOrder::inScanMode() const
+{
+    return !mStringBuffer.isEmpty() && mScanTimer.isValid() && mScanTimer.elapsed() < 150;
 }
 
 void DlgOrder::showEvent(QShowEvent *e)
@@ -677,12 +853,12 @@ void DlgOrder::confirmStringBuffer()
 #ifdef QT_DEBUG
     //mStringBuffer = "0104850001011187211mIpTe<Q:m_dj93b2zi";
     //mStringBuffer = "0104850001011187211MAmKY;Y'KhvJ93htBY";
-    mStringBuffer = "0104850001011187211Xwde\"LOm!w!O93YrOz";
+    //mStringBuffer = "0104850001011187211Xwde\"LOm!w!O93YrOz";
     // mStringBuffer = "0104850001011187211amYts/>Vjuhl93wbM6";
     // mStringBuffer = "0104850001011187211MAmKY;Y'KhvJ93htBY";
 #endif
 
-    mStringBuffer = mStringBuffer.trimmed();
+    qDebug() << "Scan buffer" << mStringBuffer.length() << mStringBuffer << mStringBuffer.toUtf8().toHex(' ');
     QString hya("էթփձջւևրչճԷԹՓՁՋՒևՐՉՃ");
     QString num("12345678901234567890");
     QString newcode;
@@ -701,42 +877,79 @@ void DlgOrder::confirmStringBuffer()
     }
 
     QString emarks;
-    QString barcode;
-    if (newcode.length() >= 29) {
-        if (newcode.mid(0, 6) == "000000") {
-            barcode = newcode.mid(6, 8);
-        } else if (newcode.mid(0, 8) == "01000000") {
-            barcode = newcode.mid(8, 8);
-        } else if (newcode.mid(0, 3) == "010") {
-            barcode = newcode.mid(3, 13);
-        } else {
-            barcode = newcode.mid(1, 8);
-            if (barcode.isEmpty()) {
-                barcode = newcode.mid(1, 13);
-            }
-        }
+    QStringList barcodes;
+    const EmarkCode emark = parseEmark(newcode);
 
-        emarks = newcode;
-
-        if (barcode.isEmpty()) {
-            C5Message::error(tr("Invalid emarks"));
+    if (!emark.gtin.isEmpty()) {
+        if (!emark.valid) {
+            const QString plain = normalizeEmark(newcode);
+            C5Message::error(tr("Invalid emarks format: %1 (%2 characters)")
+                             .arg(plain)
+                             .arg(plain.length()));
             return;
         }
-    } else if (newcode.length() == 13 || newcode.length() == 8) {
-        barcode = newcode;
+
+        emarks = normalizeEmark(newcode);
+        barcodes = barcodesFromGtin(emark.gtin);
+    } else {
+        const QString plain = normalizeEmark(newcode);
+
+        if (plain.length() >= 29) {
+            // Codes without AI prefixes: the barcode sits at a fixed offset.
+            if (plain.startsWith(QLatin1String("000000"))) {
+                barcodes << plain.mid(6, 8);
+            } else {
+                barcodes << plain.mid(1, 8) << plain.mid(1, 13);
+            }
+
+            emarks = plain;
+        } else if (plain.length() == 13 || plain.length() == 8) {
+            barcodes << plain;
+        }
     }
 
-    if (barcode.isEmpty()) {
+    barcodes.removeAll(QString());
+    if (barcodes.isEmpty()) {
         return;
     }
 
-    for (auto *g : *mDishes) {
-        if (g->barcodes.contains(barcode)) {
-            QJsonObject od = g->data;
-            g->data["f_emarks"] = emarks;
-            addDishToOrder(g, nullptr);
-            g->data = od;
+    if (!emarks.isEmpty()) {
+        for (const WaiterDish &d : mOrder.dishes) {
+            if (d.state != DISH_STATE_OK) {
+                continue;
+            }
+            if (normalizeEmark(d.emarks()) == emarks) {
+                C5Message::error(tr("Duplicate emarks"));
+                return;
+            }
         }
+    }
+
+    bool found = false;
+
+    for (auto *g : *mDishes) {
+        bool match = false;
+
+        for (const QString &barcode : barcodes) {
+            if (g->barcodes.contains(barcode)) {
+                match = true;
+                break;
+            }
+        }
+
+        if (!match) {
+            continue;
+        }
+
+        found = true;
+        QJsonObject od = g->data;
+        g->data["f_emarks"] = emarks;
+        addDishToOrder(g, nullptr, true);
+        g->data = od;
+    }
+
+    if (!found) {
+        C5Message::error(tr("Goods with barcode %1 not found").arg(barcodes.first()));
     }
 }
 
@@ -845,7 +1058,6 @@ void DlgOrder::printPrecheck(const QString &currentStaff)
     font.setPointSize(bs);
     const QString printerTarget = mWorkStation.precheckPrinter();
     if (printerTarget.isEmpty()) {
-        C5Message::error(tr("Precheck printer is not configured"));
         return;
     }
     const bool viaPrintServer = WorkstationItem::isPrintServerTarget(printerTarget);
@@ -1461,7 +1673,9 @@ void DlgOrder::printRemovedDish(const QJsonObject &jdoc)
 
 void DlgOrder::setDishQty(std::function<double(WaiterDish)> getQty)
 {
-    const bool lockByPrecheck = mOrder.isPrecheckPrinted() && mOrder.state != ORDER_STATE_PREORDER;
+    const bool lockByPrecheck = mOrder.isPrecheckPrinted()
+                                && mOrder.isReadyForPrecheck()
+                                && mOrder.state != ORDER_STATE_PREORDER;
     if(lockByPrecheck) {
         C5Message::error(tr("Order is not editable"));
         return;
@@ -1613,9 +1827,9 @@ void DlgOrder::setDishQty(std::function<double(WaiterDish)> getQty)
     }, [](const QJsonObject & jerr) {});
 }
 
-void DlgOrder::addDishToOrder(DishAItem *g, QDishButton *btn)
+void DlgOrder::addDishToOrder(DishAItem *g, QDishButton *btn, bool scanned)
 {
-    if(g->emarkRequired) {
+    if(g->emarkRequired && !scanned) {
         C5Message::error(tr("Append only by QR code"));
         return;
     }
@@ -1818,7 +2032,9 @@ void DlgOrder::on_btnVoid_clicked()
         return;
     }
 
-    const bool lockByPrecheck = mOrder.isPrecheckPrinted() && mOrder.state != ORDER_STATE_PREORDER;
+    const bool lockByPrecheck = mOrder.isPrecheckPrinted()
+                                && mOrder.isReadyForPrecheck()
+                                && mOrder.state != ORDER_STATE_PREORDER;
     if(lockByPrecheck) {
         C5Message::error(tr("Order is not editable"));
         return;
@@ -2334,8 +2550,10 @@ void DlgOrder::on_btnTotal_clicked()
         const QString route = self->mOrder.state == ORDER_STATE_PREORDER
                                   ? "/engine/v2/waiter/order/print-precheck-of-preorder"
                                   : "/engine/v2/waiter/order/print-precheck";
-        NInterface::prepareLoadingTitle(
-            QObject::tr("Printer: %1").arg(mWorkStation.precheckPrinter()));
+        if (!mWorkStation.precheckPrinter().isEmpty()) {
+            NInterface::prepareLoadingTitle(
+                QObject::tr("Printer: %1").arg(mWorkStation.precheckPrinter()));
+        }
         self->fHttp->query(route,
                            bearer, self,
         {{"id", self->mOrder.id}},
@@ -2994,7 +3212,9 @@ void DlgOrder::parseOrder(const QJsonObject & jdoc)
     QString selectedId;
     mOrder = JsonParser<WaiterOrder>::fromJson(jdoc["order"].toObject());
     fillPackageNominalDeltas(mOrder.dishes);
-    const bool lockByPrecheck = mOrder.isPrecheckPrinted() && mOrder.state != ORDER_STATE_PREORDER;
+    const bool lockByPrecheck = mOrder.isPrecheckPrinted()
+                                && mOrder.isReadyForPrecheck()
+                                && mOrder.state != ORDER_STATE_PREORDER;
     // Empty/new table can come with state=0 and no id; keep menu editable for first dish append.
     const bool editableState = mOrder.id.isEmpty()
                                || mOrder.state == ORDER_STATE_OPEN
@@ -3462,8 +3682,10 @@ void DlgOrder::on_btnCloseOrder_clicked()
             return;
         }
 
-        NInterface::prepareLoadingTitle(
-            QObject::tr("Printer: %1").arg(mWorkStation.precheckPrinter()));
+        if (!mWorkStation.precheckPrinter().isEmpty()) {
+            NInterface::prepareLoadingTitle(
+                QObject::tr("Printer: %1").arg(mWorkStation.precheckPrinter()));
+        }
         NInterface::query(
             "/engine/v2/waiter/order/close-order",
             self->mUser->mSessionKey,
@@ -3495,6 +3717,21 @@ void DlgOrder::on_btnCloseOrder_clicked()
             return;
         }
 
+        if(fm.simpleFiscal && fm.defaultDept <= 0) {
+            C5Message::error(tr("Պարզ ՀԴՄ: բաժին (dep) is not set on the fiscal machine"));
+            return;
+        }
+
+        QStringList invalidEmarks;
+        const QStringList emarks = collectFiscalEmarks(mOrder, &invalidEmarks);
+
+        if(!invalidEmarks.isEmpty()) {
+            C5Message::error(tr("Invalid emarks format: %1 (%2 characters)")
+                             .arg(invalidEmarks.first())
+                             .arg(invalidEmarks.first().length()));
+            return;
+        }
+
         auto *loading = new NLoadingDlg(tr("Printing fiscal check"), this);
         QPointer<NLoadingDlg> loadingPtr(loading);
         auto *thread = new QThread();
@@ -3507,27 +3744,29 @@ void DlgOrder::on_btnCloseOrder_clicked()
 
         connect(pt, &PrintTaxN::finished, pt, &QObject::deleteLater);
         connect(pt, &PrintTaxN::finished, thread, &QThread::quit);
-        connect(thread, &QThread::started, pt, [pt, order, serviceFactor]() {
-            for(const WaiterDish &dish : order.dishes) {
-                if(dish.state != DISH_STATE_OK) {
-                    continue;
-                }
+        connect(thread, &QThread::started, pt, [pt, order, serviceFactor, emarks, fm]() {
+            if (!fm.simpleFiscal) {
+                for(const WaiterDish &dish : order.dishes) {
+                    if(dish.state != DISH_STATE_OK) {
+                        continue;
+                    }
 
-                WaiterDish d = dish;
-                d.data["f_service_factor"] = serviceFactor;
-                pt->addGoods(d.fiscalDepartment(),
-                             d.adgtCode(),
-                             QString::number(d.dishId),
-                             d.dishName,
-                             d.total(false) / d.qty,
-                             d.qty,
-                             d.discountFactor() * 100);
+                    WaiterDish d = dish;
+                    d.data["f_service_factor"] = serviceFactor;
+                    pt->addGoods(d.fiscalDepartment(),
+                                 d.adgtCode(),
+                                 QString::number(d.dishId),
+                                 d.dishName,
+                                 d.total(false) / d.qty,
+                                 d.qty,
+                                 d.discountFactor() * 100);
+                }
             }
 
             const FiscalPaymentPayload pay = fiscalPaymentsFromOrder(order);
             applyFiscalPayments(pt, pay);
-            pt->fEmarks = collectFiscalEmarks(order);
-            pt->makeJsonAndPrint(pay.cash, pay.nonCash, pay.prepaid);
+            pt->fEmarks = emarks;
+            finalizeFiscalReceiptPrint(pt, fm, pay);
         });
         connect(pt, &PrintTaxN::started, loading, &QDialog::show, Qt::QueuedConnection);
         connect(pt, &PrintTaxN::finished, self, [self, loadingPtr, closeOrderFunc, sessionKey, fiscalHandled](
@@ -4205,6 +4444,21 @@ void DlgOrder::on_btnPrintClosedFiscal_clicked()
         return;
     }
 
+    if(fm.simpleFiscal && fm.defaultDept <= 0) {
+        C5Message::error(tr("Պարզ ՀԴՄ: բաժին (dep) is not set on the fiscal machine"));
+        return;
+    }
+
+    QStringList invalidEmarks;
+    const QStringList emarks = collectFiscalEmarks(mOrder, &invalidEmarks);
+
+    if(!invalidEmarks.isEmpty()) {
+        C5Message::error(tr("Invalid emarks format: %1 (%2 characters)")
+                         .arg(invalidEmarks.first())
+                         .arg(invalidEmarks.first().length()));
+        return;
+    }
+
     QPointer<DlgOrder> self(this);
     auto *loading = new NLoadingDlg(tr("Printing fiscal check"), this);
     QPointer<NLoadingDlg> loadingPtr(loading);
@@ -4217,26 +4471,28 @@ void DlgOrder::on_btnPrintClosedFiscal_clicked()
 
     connect(pt, &PrintTaxN::finished, pt, &QObject::deleteLater);
     connect(pt, &PrintTaxN::finished, thread, &QThread::quit);
-    connect(thread, &QThread::started, pt, [pt, order]() {
-        for(const WaiterDish &src : order.dishes) {
-            if(src.state != DISH_STATE_OK) {
-                continue;
-            }
+    connect(thread, &QThread::started, pt, [pt, order, emarks, fm]() {
+        if (!fm.simpleFiscal) {
+            for(const WaiterDish &src : order.dishes) {
+                if(src.state != DISH_STATE_OK) {
+                    continue;
+                }
 
-            WaiterDish dish = src;
-            pt->addGoods(dish.fiscalDepartment(),
-                         dish.adgtCode(),
-                         QString::number(dish.dishId),
-                         dish.dishName,
-                         dish.price,
-                         dish.qty,
-                         dish.discountFactor() * 100);
+                WaiterDish dish = src;
+                pt->addGoods(dish.fiscalDepartment(),
+                             dish.adgtCode(),
+                             QString::number(dish.dishId),
+                             dish.dishName,
+                             dish.price,
+                             dish.qty,
+                             dish.discountFactor() * 100);
+            }
         }
 
         const FiscalPaymentPayload pay = fiscalPaymentsFromOrder(order);
         applyFiscalPayments(pt, pay);
-        pt->fEmarks = collectFiscalEmarks(order);
-        pt->makeJsonAndPrint(pay.cash, pay.nonCash, pay.prepaid);
+        pt->fEmarks = emarks;
+        finalizeFiscalReceiptPrint(pt, fm, pay);
     });
     connect(pt, &PrintTaxN::started, loading, &QDialog::show, Qt::QueuedConnection);
     connect(pt, &PrintTaxN::finished, self, [self, loadingPtr, sessionKey, orderId](
@@ -4257,8 +4513,10 @@ void DlgOrder::on_btnPrintClosedFiscal_clicked()
                                                      {"error", err},
                                                      {"result", result},
                                                      {"f_fiscal_machine_id", mWorkStation.fiscalMachineId()}}}};
-            NInterface::prepareLoadingTitle(
-                QObject::tr("Printer: %1").arg(mWorkStation.precheckPrinter()));
+            if (!mWorkStation.precheckPrinter().isEmpty()) {
+                NInterface::prepareLoadingTitle(
+                    QObject::tr("Printer: %1").arg(mWorkStation.precheckPrinter()));
+            }
             NInterface::query("/engine/v2/waiter/order/fiscal-printed", sessionKey, self, reply,
                               [self](const QJsonObject &jdoc) {
                                   if(!self) {

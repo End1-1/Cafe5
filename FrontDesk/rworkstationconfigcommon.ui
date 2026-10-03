@@ -52,73 +52,83 @@
     <widget class="QLineEdit" name="leScalePattern"/>
    </item>
    <item row="4" column="0">
+    <widget class="QLabel" name="labelScaleDir">
+     <property name="text">
+      <string>Scale export path</string>
+     </property>
+    </widget>
+   </item>
+   <item row="4" column="1">
+    <widget class="QLineEdit" name="leScaleDir"/>
+   </item>
+   <item row="5" column="0">
     <widget class="QLabel" name="labelPartner">
      <property name="text">
       <string>Quick debt partner id</string>
      </property>
     </widget>
    </item>
-   <item row="4" column="1">
+   <item row="5" column="1">
     <widget class="QLineEdit" name="leQuickDebtPartner"/>
    </item>
-   <item row="5" column="0">
+   <item row="6" column="0">
     <widget class="QLabel" name="labelPrint">
      <property name="text">
       <string>Print server URL</string>
      </property>
     </widget>
    </item>
-   <item row="5" column="1">
+   <item row="6" column="1">
     <widget class="QLineEdit" name="lePrintServer"/>
    </item>
-   <item row="6" column="0">
+   <item row="7" column="0">
     <widget class="QLabel" name="labelPrint_2">
      <property name="text">
       <string>Print side margin (mm)</string>
      </property>
     </widget>
    </item>
-   <item row="6" column="1">
+   <item row="7" column="1">
     <widget class="C5LineEdit" name="lePrintPaperWidth"/>
    </item>
-   <item row="7" column="0">
+   <item row="8" column="0">
     <widget class="QLabel" name="labelCashboxClose">
      <property name="text">
       <string>Input cashbox amount before close</string>
      </property>
     </widget>
    </item>
-   <item row="7" column="1">
+   <item row="8" column="1">
     <widget class="QCheckBox" name="chInputCashboxBeforeClose"/>
    </item>
-   <item row="8" column="0">
+   <item row="9" column="0">
     <widget class="QLabel" name="labelBistro">
      <property name="text">
       <string>Bistro mode</string>
      </property>
     </widget>
    </item>
-   <item row="8" column="1">
+   <item row="9" column="1">
     <widget class="QCheckBox" name="chBistro"/>
    </item>
-   <item row="9" column="0">
+   <item row="10" column="0">
     <widget class="QLabel" name="labelBistro_2">
      <property name="text">
       <string>Auto fiscal</string>
      </property>
     </widget>
    </item>
-   <item row="9" column="1">
+   <item row="10" column="1">
     <widget class="QCheckBox" name="chAutoFiscal"/>
    </item>
-   <item row="10" column="0">
+   <item row="11" column="0">
     <widget class="QLabel" name="labelBistro_3">
      <property name="text">
       <string>Dont allow negative remains</string>
      </property>
     </widget>
    </item>
-   <item row="10" column="1">
+   <item row="11" column="1">
     <widget class="QCheckBox" name="chDontAllowNegativeRemains"/>
    </item>
   </layout>

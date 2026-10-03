@@ -19,6 +19,10 @@ void AppSettings::loadFromSettings()
     cfg.m_tableDineIn = s.value(QStringLiteral("tableDineIn"), 0).toInt();
     cfg.m_cashboxId = s.value(QStringLiteral("cashboxId"), 0).toInt();
     cfg.m_serviceFactor = s.value(QStringLiteral("serviceFactor"), 0.0).toDouble();
+    cfg.m_orderStatusUrlBase = s.value(
+                                    QStringLiteral("orderStatusUrlBase"),
+                                    QStringLiteral("https://www.ararix.com/get-order-status/"))
+                                   .toString();
 }
 
 void AppSettings::saveToSettings()
@@ -30,6 +34,7 @@ void AppSettings::saveToSettings()
     s.setValue(QStringLiteral("tableDineIn"), cfg.m_tableDineIn);
     s.setValue(QStringLiteral("cashboxId"), cfg.m_cashboxId);
     s.setValue(QStringLiteral("serviceFactor"), cfg.m_serviceFactor);
+    s.setValue(QStringLiteral("orderStatusUrlBase"), cfg.m_orderStatusUrlBase);
     SelfBoardSettings::flush();
 }
 
@@ -81,4 +86,14 @@ double AppSettings::serviceFactor()
 void AppSettings::setServiceFactor(double factor)
 {
     instance().m_serviceFactor = factor;
+}
+
+QString AppSettings::orderStatusUrlBase()
+{
+    return instance().m_orderStatusUrlBase;
+}
+
+void AppSettings::setOrderStatusUrlBase(const QString &url)
+{
+    instance().m_orderStatusUrlBase = url.trimmed();
 }

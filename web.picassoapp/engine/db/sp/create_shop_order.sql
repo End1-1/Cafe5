@@ -1,5 +1,5 @@
-DELIMITER $$
 DROP PROCEDURE IF EXISTS sf_create_shop_order;
+DELIMITER $$
 CREATE PROCEDURE sf_create_shop_order(params JSON)
 sp:
 BEGIN
@@ -385,3 +385,4 @@ BEGIN
 
 
 END$$
+DELIMITER ;

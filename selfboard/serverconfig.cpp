@@ -152,7 +152,7 @@ void ServerConfig::login(QObject *context, std::function<void(bool, const QStrin
             finished(false, msg.isEmpty() ? QObject::tr("Login failed") : msg);
             return true;
         },
-        true,
+        false,
         60000,
         true);
 }

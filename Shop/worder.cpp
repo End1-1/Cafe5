@@ -1008,7 +1008,7 @@ bool WOrder::getDiscountValue(int discountType, double &v)
     return ok;
 }
 
-void WOrder::setPartner(PartnerItem pi)
+void WOrder::setPartner(PartnerItem pi, std::function<void()> nextStep)
 {
     ui->leTIN->setText(pi.tin);
     mPartnerId = pi.id;
@@ -1029,7 +1029,7 @@ void WOrder::setPartner(PartnerItem pi)
 
     // ИИН не обязателен: для долга/банка нужен только f_guest_id на заказе.
     // Если заказ ещё не создан — сохраним партнёра при первом parseOrder с id.
-    persistGuestToOrder();
+    persistGuestToOrder(nextStep);
 }
 
 void WOrder::persistGuestToOrder(std::function<void()> nextStep)
@@ -1157,7 +1157,8 @@ void WOrder::on_leCode_returnPressed()
             }
         }
     }
-    C5ReplaceCharacter::replace(code);
+    code = C5ReplaceCharacter::replace(code);
+    code = code.trimmed();
 
     if (code.isEmpty()) {
         return;
@@ -1327,6 +1328,8 @@ void WOrder::processCode(const QString &code, int permission, std::function<void
     auto proceed = [user, code, permission, func]() {
         if (permission == -1 || user->check(permission)) {
             func(code);
+        } else {
+            C5Message::error(QObject::tr("Access denied"));
         }
 
         user->deleteLater();
@@ -1345,11 +1348,14 @@ void WOrder::processCode(const QString &code, int permission, std::function<void
         return;
     }
 
-    auto http = new NInterface();
+    auto *http = new NInterface(this);
     user->authorize(
         password,
         http,
-        [proceed, http](const QJsonObject &) { proceed(); },
+        [proceed, http](const QJsonObject &) {
+            proceed();
+            http->deleteLater();
+        },
         [user, http]() {
             user->deleteLater();
             http->deleteLater();
@@ -1376,16 +1382,39 @@ void WOrder::checkDiscountCardCode(const QString &code)
                            ui->lbDisc_2->setText(QString("%1: %2%").arg(tr("Discount"), float_str(value, 2)));
                            ui->wDiscount->setVisible(true);
 
+                           // Только UI партнёра — без set-data-value (иначе второй модальный
+                           // NLoadingDlg и зависание). Guest уйдёт на заказ при оплате /
+                           // persistGuestToOrder.
                            PartnerItem pi = JsonParser<PartnerItem>::fromJson(partner);
-                           setPartner(pi);
+                           ui->leTIN->setText(pi.tin);
+                           mPartnerId = pi.id;
+                           QStringList parts;
+                           if (!pi.taxName.isEmpty()) {
+                               parts.append(pi.taxName);
+                           }
+                           if (!pi.contactName.isEmpty()) {
+                               parts.append(pi.contactName);
+                           }
+                           if (!pi.phone.isEmpty()) {
+                               parts.append(pi.phone);
+                           }
+                           ui->leCustomer->setText(parts.join(", "));
+                           ui->btnF5->setVisible(mPartnerId > 0);
+                           ui->btnF5->setChecked(mWorkStation.quickDebtPartnerId() == pi.id);
 
-                           // Применяем скидку к заказу на сервере и обновляем итоги.
+                           if (mOrder.id.isEmpty()) {
+                               return;
+                           }
+
+                           // f_value в карте — проценты (10 = 10%), на сервер — доля.
+                           const double factor = value > 1.0 + 1e-9 ? value / 100.0 : value;
                            NInterface::query1("/engine/v2/waiter/order/change-discount-value",
                                               fUser->mSessionKey,
                                               this,
                                               {{"id", mOrder.id},
-                                               {"value", value / 100.0},
-                                               {"comment", QString("card %1").arg(mLoyalty.discountCardId)}},
+                                               {"value", factor},
+                                               {"comment",
+                                                QString("card %1").arg(mLoyalty.discountCardId)}},
                                               [this](const QJsonObject &jo) { parseOrder(jo); });
                        });
 }
@@ -1569,10 +1598,9 @@ void WOrder::printFiscal(std::function<void(const QJsonObject &)> nextStep)
     // 3. Подготовка данных (Deep Copy для потока)
     struct FiscalJobData
     {
-        QString ip, password, cashier, pin, extPos, partnerTin;
+        QString ip, password, cashier, pin, extPos, extPosOverride, partnerTin;
         int saleType, port, taxDept, paymentSystem;
         double amountNonCash, amountPrepaid, amountCash;
-        bool forceInternalPos;
         bool simpleFiscal;
         QList<WaiterDish> goods;
     };
@@ -1594,21 +1622,28 @@ void WOrder::printFiscal(std::function<void(const QJsonObject &)> nextStep)
     job.amountPrepaid = mOrder.payment(payment_fields[PAYMENT_TYPE_PREPAID]);
     job.amountCash = mOrder.payment(payment_fields[PAYMENT_TYPE_CASH]);
     job.paymentSystem = -1;
-    job.forceInternalPos = false;
     // HDM v0.7.3 PaymentSystem: bank card=1, Telcell=10, Idram=13.
     // Only one PaymentSystem can be sent, so use the dominant non-cash payment.
+    // Idram useExtPOS is f_idram_ext_pos, not the card flag f_external_pos.
     if (card >= idram && card >= telcell && card > 0.001) {
         job.paymentSystem = 1;
     } else if (idram >= telcell && idram > 0.001) {
         job.paymentSystem = 13;
-        job.forceInternalPos = true;
+        job.extPos = fm.idramExternalPosString();
+        job.extPosOverride = job.extPos;
     } else if (telcell > 0.001) {
         job.paymentSystem = 10;
-        job.forceInternalPos = true;
+        job.extPos = QStringLiteral("false");
+        job.extPosOverride = job.extPos;
     }
-    job.simpleFiscal = false; //todo(__c5config.getValue(param_simple_fiscal).toInt() == 1);
-    job.taxDept = 1;          // todo__c5config.fMainJson["tax_dept"].toString().toInt();
+    job.simpleFiscal = fm.simpleFiscal;
+    job.taxDept = fm.defaultDept > 0 ? fm.defaultDept : 1;
     job.goods = mOrder.dishes;
+
+    if (job.simpleFiscal && fm.defaultDept <= 0) {
+        C5Message::error(tr("Պարզ ՀԴՄ: բաժին (dep) is not set on the fiscal machine"));
+        return;
+    }
 
     // Блокируем интерфейс
     this->setEnabled(false);
@@ -1623,19 +1658,20 @@ void WOrder::printFiscal(std::function<void(const QJsonObject &)> nextStep)
     connect(thread, &QThread::started, pt, [=]() mutable {
         pt->fPartnerTin = job.partnerTin;
         pt->setPaymentSystem(job.paymentSystem);
-        if (job.forceInternalPos) {
-            pt->setUseExtPosOverride(QStringLiteral("false"));
+        if (!job.extPosOverride.isEmpty()) {
+            pt->setUseExtPosOverride(job.extPosOverride);
         }
-
-        // Если это обычная продажа (не возврат и т.д.)
 
         for (auto const &g : job.goods) {
             if (g.state != 1) {
                 continue;
             }
-            if (!g.emarks().isEmpty())
+            if (!g.emarks().isEmpty()) {
                 pt->fEmarks.append(g.emarks());
-
+            }
+            if (job.simpleFiscal) {
+                continue;
+            }
             // dep = c_groups.f_taxdept (loaded as f_fiscal_department on GetDishes)
             const int dep = g.fiscalDepartment() > 0 ? g.fiscalDepartment() : 1;
             pt->addGoods(dep,
@@ -1648,7 +1684,11 @@ void WOrder::printFiscal(std::function<void(const QJsonObject &)> nextStep)
         }
 
         if (job.simpleFiscal) {
-            pt->makeJsonAndPrintSimple(job.taxDept, job.amountNonCash, job.amountPrepaid, "false");
+            // mode=1: items=null, dep from fiscal machine; paidAmount before card/prepaid split
+            pt->fJsonHeader[QStringLiteral("paidAmount")] =
+                job.amountCash + job.amountNonCash + job.amountPrepaid;
+            const QString useExtPos = job.extPosOverride.isEmpty() ? job.extPos : job.extPosOverride;
+            pt->makeJsonAndPrintSimple(job.taxDept, job.amountNonCash, job.amountPrepaid, useExtPos);
         } else {
             pt->makeJsonAndPrint(job.amountCash, job.amountNonCash, job.amountPrepaid);
         }

@@ -56,6 +56,9 @@ Name: "desktopicon_designer"; Description: "Desktop icon: WaiterDesigner"; Group
 #if ComponentKey == "cookingprogress"
 Name: "desktopicon"; Description: "Desktop icon: CookingProgress"; GroupDescription: "Desktop icons:"; Flags: unchecked
 #endif
+#if ComponentKey == "selfboard"
+Name: "desktopicon"; Description: "Desktop icon: SelfBoard"; GroupDescription: "Desktop icons:"; Flags: unchecked
+#endif
 
 [Files]
 #if ComponentKey == "frontdesk"
@@ -87,6 +90,11 @@ Source: "{#StagingDir}\ZKFPSensors\*"; DestDir: "{app}\ZKFPSensors"; Flags: igno
 #endif
 #if ComponentKey == "cookingprogress"
 Source: "{#StagingDir}\CookingProgress.exe"; DestDir: "{app}"; Flags: ignoreversion
+#endif
+#if ComponentKey == "selfboard"
+Source: "{#StagingDir}\SelfBoard.exe"; DestDir: "{app}"; Flags: ignoreversion
+Source: "{#StagingDir}\SelfBoard.ini"; DestDir: "{app}"; Flags: ignoreversion
+Source: "{#StagingDir}\SelfBoard.ini"; DestDir: "{tmp}"; DestName: "SelfBoard.demo.ini"; Flags: deleteafterinstall
 #endif
 ; Fresh shared updater in every module installer (overwrite on each update).
 Source: "{#StagingDir}\Updater.exe"; DestDir: "{code:PicassoUpdaterInstallDir}"; Flags: ignoreversion
@@ -127,6 +135,10 @@ Name: "{autodesktop}\WaiterDesigner"; Filename: "{app}\WaiterDesigner.exe"; Task
 #if ComponentKey == "cookingprogress"
 Name: "{group}\CookingProgress"; Filename: "{app}\CookingProgress.exe"; Check: ShouldCreateShortcut
 Name: "{autodesktop}\CookingProgress"; Filename: "{app}\CookingProgress.exe"; Tasks: desktopicon
+#endif
+#if ComponentKey == "selfboard"
+Name: "{group}\SelfBoard"; Filename: "{app}\SelfBoard.exe"; Check: ShouldCreateShortcut
+Name: "{autodesktop}\SelfBoard"; Filename: "{app}\SelfBoard.exe"; Tasks: desktopicon
 #endif
 #if ComponentKey == "service5"
 Name: "{group}\Service5 Monitor"; Filename: "{app}\service5.exe"; Parameters: "--gui"; Check: ShouldCreateShortcut
@@ -169,6 +181,12 @@ Root: HKCU; Subkey: "Software\BreezeDevs\CookingProgress\CookingProgress"; Value
 Root: HKCU; Subkey: "Software\BreezeDevs\CookingProgress\CookingProgress"; ValueType: string; ValueName: "ss_server_username"; ValueData: "0001"; Flags: createvalueifdoesntexist
 Root: HKCU; Subkey: "Software\BreezeDevs\CookingProgress\CookingProgress"; ValueType: string; ValueName: "ss_server_password"; ValueData: "0001"; Flags: createvalueifdoesntexist
 Root: HKLM; Subkey: "Software\Microsoft\Windows\CurrentVersion\Run"; ValueType: string; ValueName: "CookingProgress"; ValueData: """{app}\CookingProgress.exe"""; Flags: uninsdeletevalue
+#endif
+
+#if ComponentKey == "selfboard"
+; Seed demo config into the real user's LocalAppData (admin install would otherwise write to elevated profile).
+[Run]
+Filename: "{cmd}"; Parameters: "/C if not exist ""%LOCALAPPDATA%\Jazzve"" mkdir ""%LOCALAPPDATA%\Jazzve"" & if not exist ""%LOCALAPPDATA%\Jazzve\SelfBoard.ini"" copy /Y ""{tmp}\SelfBoard.demo.ini"" ""%LOCALAPPDATA%\Jazzve\SelfBoard.ini"""; StatusMsg: "SelfBoard demo settings..."; Flags: runhidden waituntilterminated runasoriginaluser
 #endif
 
 [Code]
@@ -413,6 +431,8 @@ begin
   Result := 'Waiter.exe';
 #elif ComponentKey == "cookingprogress"
   Result := 'CookingProgress.exe';
+#elif ComponentKey == "selfboard"
+  Result := 'SelfBoard.exe';
 #else
   Result := '';
 #endif
@@ -487,6 +507,9 @@ begin
 #elif ComponentKey == "cookingprogress"
   if IsProcessRunning('CookingProgress.exe') then
     Result := '  - CookingProgress (CookingProgress.exe)';
+#elif ComponentKey == "selfboard"
+  if IsProcessRunning('SelfBoard.exe') then
+    Result := '  - SelfBoard (SelfBoard.exe)';
 #endif
 end;
 
@@ -524,6 +547,8 @@ begin
   KillProcess('WaiterDesigner.exe');
 #elif ComponentKey == "cookingprogress"
   KillProcess('CookingProgress.exe');
+#elif ComponentKey == "selfboard"
+  KillProcess('SelfBoard.exe');
 #endif
 end;
 
@@ -628,6 +653,9 @@ begin
 #endif
 #if ComponentKey == "cookingprogress"
     KillProcess('CookingProgress.exe');
+#endif
+#if ComponentKey == "selfboard"
+    KillProcess('SelfBoard.exe');
 #endif
 #endif
   end;

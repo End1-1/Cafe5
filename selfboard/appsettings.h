@@ -1,6 +1,8 @@
 #ifndef APPSETTINGS_H
 #define APPSETTINGS_H
 
+#include <QString>
+
 class AppSettings
 {
 public:
@@ -22,6 +24,10 @@ public:
     static double serviceFactor();
     static void setServiceFactor(double factor);
 
+    /** Base URL for guest order-status QR, e.g. https://www.ararix.com/get-order-status/ */
+    static QString orderStatusUrlBase();
+    static void setOrderStatusUrlBase(const QString &url);
+
 private:
     static AppSettings &instance();
 
@@ -30,6 +36,7 @@ private:
     int m_tableDineIn = 0;
     int m_cashboxId = 0;
     double m_serviceFactor = 0.0;
+    QString m_orderStatusUrlBase = QStringLiteral("https://www.ararix.com/get-order-status/");
 };
 
 #endif // APPSETTINGS_H

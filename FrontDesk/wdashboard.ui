@@ -984,6 +984,29 @@
        </widget>
       </item>
       <item>
+       <widget class="QCommandLinkButton" name="commandLinkButton_8">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="cursor">
+         <cursorShape>PointingHandCursor</cursorShape>
+        </property>
+        <property name="text">
+         <string>Discount and bonuses</string>
+        </property>
+        <property name="icon">
+         <iconset resource="../resources/res.qrc">
+          <normaloff>:/workstation.png</normaloff>:/workstation.png</iconset>
+        </property>
+        <property name="form" stdset="0">
+         <string>form_discount_system</string>
+        </property>
+       </widget>
+      </item>
+      <item>
        <widget class="QCommandLinkButton" name="commandLinkButton_5">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Preferred" vsizetype="Preferred">

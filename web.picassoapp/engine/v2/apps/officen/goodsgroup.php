@@ -3,6 +3,7 @@
 
 require_once __DIR__ . "/index.php";
 require_once __DIR__ . "/../../worker/uuid.php";
+require_once __DIR__ . "/../../worker/locale.php";
 
 class Goodsgroup extends Auth
 {
@@ -20,6 +21,7 @@ class Goodsgroup extends Auth
         "f_image_data" => "nullable|string",
         "f_remove_image" => "integer|nullable",
         "f_online_sale" => "integer|nullable",
+        "translations" => "nullable|array",
     ];
 
     private function rowById(int $id): ?array
@@ -78,6 +80,45 @@ class Goodsgroup extends Auth
         return $uuid;
     }
 
+    private function normalizeTranslations($raw): array
+    {
+        $translations = [];
+        if (empty($raw)) {
+            return $translations;
+        }
+        if (is_array($raw)) {
+            // list or map by lang
+            $isList = array_keys($raw) === range(0, count($raw) - 1);
+            if ($isList) {
+                return $raw;
+            }
+            foreach ($raw as $lang => $row) {
+                if (is_object($row)) {
+                    $row = (array)$row;
+                }
+                if (!is_array($row)) {
+                    continue;
+                }
+                $row["f_lang"] = $lang;
+                $translations[] = $row;
+            }
+            return $translations;
+        }
+        if (is_object($raw)) {
+            foreach ((array)$raw as $lang => $row) {
+                if (is_object($row)) {
+                    $row = (array)$row;
+                }
+                if (!is_array($row)) {
+                    continue;
+                }
+                $row["f_lang"] = $lang;
+                $translations[] = $row;
+            }
+        }
+        return $translations;
+    }
+
     public function List($params)
     {
         $sql = <<<SQL
@@ -119,6 +160,7 @@ class Goodsgroup extends Auth
 
         $this->result["group"] = $row;
         $this->result["image"] = $this->imageBase64($row["f_image"] ?? null);
+        $this->result["translations"] = load_entity_translations($this, "c_groups_tr", "f_group_id", $id);
         $this->echoResult();
     }
 
@@ -161,9 +203,13 @@ class Goodsgroup extends Auth
         $onlineSale = !empty($data->f_online_sale) ? 1 : 0;
         $this->updateJsonField("c_groups", $id, "f_data", "f_online_sale", $onlineSale);
 
+        $translations = $this->normalizeTranslations($data->translations ?? ($params->translations ?? null));
+        save_entity_translations($this, "c_groups_tr", "f_group_id", $id, $translations, false);
+
         $row = $this->rowById($id);
         $this->result["group"] = $row;
         $this->result["image"] = $this->imageBase64($row["f_image"] ?? null);
+        $this->result["translations"] = load_entity_translations($this, "c_groups_tr", "f_group_id", $id);
         $this->result["f_id"] = $id;
         $this->echoResult();
     }

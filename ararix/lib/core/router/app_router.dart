@@ -9,12 +9,15 @@ import '../../features/auth/presentation/welcome_screen.dart';
 import '../../features/faq/presentation/faq_screen.dart';
 import '../../features/home/presentation/home_screen.dart';
 import '../../features/language/presentation/language_screen.dart';
+import '../../features/menu/presentation/menu_screen.dart';
 import '../../features/order/presentation/cart_screen.dart';
 import '../../features/order/presentation/dish_detail_screen.dart';
+import '../../features/order/presentation/guest_order_status_screen.dart';
 import '../../features/order/presentation/package_pick_screen.dart';
 import '../../features/order/presentation/restaurant_screen.dart';
 import '../../features/payments/presentation/payments_screen.dart';
 import '../../features/profile/presentation/account_screen.dart';
+import '../../features/profile/presentation/my_addresses_screen.dart';
 import '../../features/profile/presentation/change_phone_screen.dart';
 import '../../features/profile/presentation/profile_hub_screen.dart';
 import '../../features/shell/presentation/main_shell.dart';
@@ -33,18 +36,29 @@ final appRouterProvider = Provider<GoRouter>((ref) {
     redirect: (context, state) {
       final session = ref.read(sessionProvider);
       if (!session.ready) return null;
-      final loggingIn = state.matchedLocation == '/welcome' ||
-          state.matchedLocation == '/country' ||
-          state.matchedLocation == '/otp';
+      final loc = state.matchedLocation;
+      final isGuestOrderStatus = loc.startsWith('/get-order-status/');
+      final loggingIn = loc == '/welcome' ||
+          loc == '/country' ||
+          loc == '/otp' ||
+          isGuestOrderStatus;
       if (!session.isAuthenticated && !loggingIn) {
         return '/welcome';
       }
-      if (session.isAuthenticated && loggingIn) {
+      if (session.isAuthenticated &&
+          (loc == '/welcome' || loc == '/country' || loc == '/otp')) {
         return '/home';
       }
       return null;
     },
     routes: [
+      GoRoute(
+        path: '/get-order-status/:token',
+        builder: (context, state) {
+          final token = state.pathParameters['token'] ?? '';
+          return GuestOrderStatusScreen(token: token);
+        },
+      ),
       GoRoute(
         path: '/welcome',
         builder: (context, state) => const WelcomeScreen(),
@@ -112,10 +126,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
             routes: [
               GoRoute(
                 path: '/menu',
-                builder: (context, state) {
-                  final l10n = AppLocalizations.of(context);
-                  return PlaceholderTab(title: l10n.menu);
-                },
+                builder: (context, state) => const MenuScreen(),
               ),
             ],
           ),
@@ -139,6 +150,10 @@ final appRouterProvider = Provider<GoRouter>((ref) {
                   GoRoute(
                     path: 'account',
                     builder: (context, state) => const AccountScreen(),
+                  ),
+                  GoRoute(
+                    path: 'addresses',
+                    builder: (context, state) => const MyAddressesScreen(),
                   ),
                   GoRoute(
                     path: 'change-phone',

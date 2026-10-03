@@ -43,6 +43,12 @@ $ws_worker = new class {
         return $ack && (int)($ack["errorCode"] ?? 1) === 0;
     }
 
+    /** Backward compatible: some call sites used $notify('goods', $id, $isnew). */
+    public function __invoke(string $dict, int $id, bool $isnew)
+    {
+        return $this->notify($dict, $id, $isnew);
+    }
+
     public function updatePrices($items)
     {
         $ws = $this->getWS();

@@ -951,11 +951,11 @@ void DlgMenu::closeOrderDone()
     repaint();
 }
 
-void DlgMenu::showOrderDone(const QString &orderNumber)
+void DlgMenu::showOrderDone(const QString &orderNumber, const QString &statusUrl)
 {
     closeOrderDone();
 
-    m_orderDoneOverlay = new DlgOrderDone(orderNumber, this);
+    m_orderDoneOverlay = new DlgOrderDone(orderNumber, statusUrl, this);
     m_orderDoneOverlay->setGeometry(QRect(QPoint(0, 0), size()));
     connect(m_orderDoneOverlay, &DlgOrderDone::acknowledged, this, [this]() {
         closeOrderDone();
@@ -979,19 +979,19 @@ void DlgMenu::submitPaidOrder()
         &m_cart,
         serviceMode,
         this,
-        [this](bool ok, const QString &orderNumber, const QString &error) {
+        [this](const SelfBoardSubmitResult &result) {
             m_orderSubmitInProgress = false;
-            if (!ok) {
+            if (!result.ok) {
                 QMessageBox::critical(
                     nullptr,
                     tr("Order"),
-                    error.isEmpty() ? tr("Failed to create order") : error);
+                    result.error.isEmpty() ? tr("Failed to create order") : result.error);
                 return;
             }
 
             m_cart.clear();
             updateCartSummary();
-            showOrderDone(orderNumber);
+            showOrderDone(result.orderNumber, result.statusUrl);
         });
 }
 

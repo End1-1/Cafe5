@@ -3,16 +3,35 @@
 # Created: 2025-05-25 13:31:11
 # Last Modified: 2026-03-28 11:47:17
 
-$allowedOrigins = ['http://localhost:5173'];
+$allowedOrigins = [
+    'http://localhost:5173',
+    'http://localhost:3000',
+    'https://www.ararix.com',
+    'https://ararix.com',
+];
 
 $origin = $_SERVER['HTTP_ORIGIN'] ?? '';
-if (in_array($origin, $allowedOrigins)) {
+$isPublicOrderStatus = (bool)preg_match('#/ararix/order-status/#i', $_SERVER['REQUEST_URI'] ?? '');
+
+if ($isPublicOrderStatus) {
+    // Guest QR landing sites call this API from the browser.
+    if ($origin !== '') {
+        header('Access-Control-Allow-Origin: ' . $origin);
+    } else {
+        header('Access-Control-Allow-Origin: *');
+    }
+    header('Access-Control-Allow-Methods: GET, POST, OPTIONS');
+    header('Access-Control-Allow-Headers: Content-Type, Authorization, X-Application-Name, X-Application-Version, Accept-Language');
+    header('Access-Control-Max-Age: 86400');
+    if (($_SERVER['REQUEST_METHOD'] ?? '') === 'OPTIONS') {
+        http_response_code(204);
+        exit;
+    }
+} elseif (in_array($origin, $allowedOrigins, true)) {
     header('Access-Control-Allow-Origin: ' . $origin);
     header('Access-Control-Allow-Credentials: true');
     header('Access-Control-Allow-Methods: GET, POST, OPTIONS');
     header('Access-Control-Allow-Headers: Content-Type, Authorization');
-} else {
-    //  die("ORIGIN '$origin' NOT ALLOWED!!!");
 }
 
 const DEBUG = true;
@@ -25,7 +44,9 @@ date_default_timezone_set("Asia/Yerevan");
 setlocale(LC_NUMERIC, 'C');
 setlocale(LC_CTYPE, 'C.UTF-8');
 
-require_once __DIR__ . "/check-app.php";
+if (!$isPublicOrderStatus) {
+    require_once __DIR__ . "/check-app.php";
+}
 require_once __DIR__ . "/../cnf.php";
 require_once __DIR__ . "/worker/die-with-code.php";
 require_once __DIR__ . "/worker/validate.php";
@@ -99,6 +120,10 @@ if (!class_exists($controllerName)) {
 
 $controller = new $controllerName();
 $methodName = toPascalCase($pathArray[2]);
+// Db::delete() is a SQL helper. Action "delete" is Remove() on the controller.
+if ($methodName === "Delete" && method_exists($controller, "Remove")) {
+    $methodName = "Remove";
+}
 if (!method_exists($controller, $methodName)) {
     print_r($pathArray);
     dieWithCode("Method not found: {$methodName}");
@@ -109,7 +134,7 @@ if ($actionMethod->getDeclaringClass()->getName() === Db::class) {
     dieWithCode("Method not found: {$methodName}");
 }
 
-$publicMethods = ["Login", "CheckOtp", "PinLogin", "HashLogin", "Catalog"];
+$publicMethods = ["Login", "CheckOtp", "PinLogin", "HashLogin", "Catalog", "ByToken"];
 if (!in_array($methodName, $publicMethods, true)) {
     if (!$controller->auth()) {
         dieWithCode("Unauthorized", 401);
@@ -127,12 +152,16 @@ if (!empty($_FILES) || isset($_POST['data'])) {
 
     $jsonParams->_files = $_FILES;
 } else {
-
     $requestString = file_get_contents("php://input");
-    $jsonParams = json_decode($requestString);
+    if (($requestString === false || trim((string)$requestString) === '') && $isPublicOrderStatus) {
+        // Public guest status: allow GET/POST without body, token in query.
+        $jsonParams = (object)$_REQUEST;
+    } else {
+        $jsonParams = json_decode($requestString);
 
-    if (json_last_error() !== JSON_ERROR_NONE) {
-        dieWithCode("Invalid JSON in request body $requestString", 400);
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            dieWithCode("Invalid JSON in request body $requestString", 400);
+        }
     }
 }
 

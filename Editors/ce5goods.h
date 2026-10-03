@@ -2,6 +2,8 @@
 #define CE5GOODS_H
 
 #include "ce5editor.h"
+#include <QMap>
+#include <QSet>
 
 namespace Ui
 {
@@ -127,6 +129,8 @@ private slots:
 
     void setColor();
 
+    void onLangButtonClicked();
+
 private:
     Ui::CE5Goods* ui;
 
@@ -144,6 +148,12 @@ private:
 
     void countTotal();
 
+    void applyGoodsTranslations(const QJsonObject &translations);
+
+    void stashCurrentGoodsLangFields();
+
+    void showGoodsLangFields(const QString &lang);
+
     QSet<QString> fStrings;
 
     QString fBigImage;
@@ -155,6 +165,12 @@ private:
     Barcode* fBarcode;
 
     QMap<QString, double> fCrossRate;
+
+    QString mEditLang = QStringLiteral("hy");
+
+    QMap<QString, QString> mNamesByLang;
+
+    QMap<QString, QString> mDescriptionsByLang;
 
     void setComplectFlag();
 

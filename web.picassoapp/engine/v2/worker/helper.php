@@ -24,6 +24,38 @@ function translate_template(string $key, array $replacements = []): string
     return $text;
 }
 
+/**
+ * Canonical e-Mark / ADAT string for storage.
+ * Keeps GS (ASCII 29) and printable ASCII 33–126. HDM rejects a code without GS (error 195).
+ */
+function normalize_emarks(?string $code): string
+{
+    if ($code === null) {
+        return '';
+    }
+    $code = trim($code);
+    if ($code === '') {
+        return '';
+    }
+    $code = preg_replace('/<GS>/i', "\x1D", $code) ?? $code;
+    $code = preg_replace('/\[GS\]/i', "\x1D", $code) ?? $code;
+    $code = preg_replace('/\\\\x1[dD]/', "\x1D", $code) ?? $code;
+    $code = preg_replace('/\\\\u001[dD]/', "\x1D", $code) ?? $code;
+    if ($code !== '' && ord($code[0]) === 232) {
+        $code = substr($code, 1);
+    }
+    $code = preg_replace('/\((\d{2})\)/', '$1', $code) ?? $code;
+    $out = '';
+    $len = strlen($code);
+    for ($i = 0; $i < $len; $i++) {
+        $o = ord($code[$i]);
+        if ($o === 29 || ($o >= 33 && $o <= 126)) {
+            $out .= $code[$i];
+        }
+    }
+    return $out;
+}
+
 /** Normalize legacy/auto-generated transfer comments for display. */
 function translate_cash_operation_comment(string $comment): string
 {

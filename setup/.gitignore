@@ -1,4 +1,5 @@
 staging/
+staging-server/
 output/
 version.iss
 versions.json

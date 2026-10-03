@@ -58,8 +58,10 @@ class Cashbox extends Auth
 
     public function GetCashboxSession($cashbox_session_id)
     {
+        require_once __DIR__ . "/../worker/cash-ops-helper.php";
         $sql = <<<EOD
-        SELECT c.f_id, datetime_fmt(c.f_date_open, 0) as f_date_open, datetime_fmt(c.f_date_close, 0) as f_date_close, 
+        SELECT c.f_id, c.f_cashbox_id, c.f_state, c.f_amount_open,
+        datetime_fmt(c.f_date_open, 0) as f_date_open, datetime_fmt(c.f_date_close, 0) as f_date_close, 
         money_fmt(c.f_amount_expected) as f_amount_expected,
         money_fmt(c.f_amount_fact) as f_amount_fact,
         money_fmt(c.f_amount_difference) as f_amount_difference,
@@ -75,7 +77,17 @@ class Cashbox extends Auth
         limit 1
         EOD;
 
-        return $this->select($sql, "ii", [CASH_OP_SALES_REVENUE, $cashbox_session_id])->fetch_assoc();
+        $session = $this->select($sql, "ii", [CASH_OP_SALES_REVENUE, $cashbox_session_id])->fetch_assoc();
+        if (!$session) {
+            return null;
+        }
+        $raw = $this->GetRawCashboxSession((int)$cashbox_session_id);
+        $amountOpen = (float)($raw["f_amount_open"] ?? 0);
+        $expectedCash = cash_ops_session_expected_cash($this, (int)$cashbox_session_id, $amountOpen);
+        $session["f_amount_expected_cash"] = money_fmt($expectedCash);
+        $session["f_amount_expected_cash_raw"] = $expectedCash;
+        $session["tender_breakdown"] = cash_ops_session_tender_breakdown($this, (int)$cashbox_session_id, $amountOpen);
+        return $session;
     }
 
     public function GetOpenCashboxSession($cashbox_id)
@@ -152,6 +164,7 @@ class Cashbox extends Auth
      */
     public function closeSessionInternal(object $params, ?int $user_id = null): array
     {
+        require_once __DIR__ . "/../worker/cash-ops-helper.php";
         $userId = $user_id ?? (int)$this->userid;
         $cashboxId = (int)($params->cashbox_id ?? 0);
         $cash_session = $this->GetOpenedCashboxSessionId($cashboxId);
@@ -168,13 +181,13 @@ class Cashbox extends Auth
         if ($currencyId <= 0) {
             $currencyId = 1;
         }
-        $funds = $this->cashboxFundsByCashbox((int)$cash_session["f_cashbox_id"], $currencyId);
-        $expectedCash = (float)($funds[PAYMENT_TYPE_CASH] ?? 0);
+        $amountOpen = (float)($cashbox["f_amount_open"] ?? 0);
+        $expectedCash = cash_ops_session_expected_cash($this, (int)$cash_session["f_id"], $amountOpen);
         $diff = $amountFact - $expectedCash;
 
         if ($cashCounted && abs($diff) > 0.0001) {
             $isSurplus = $diff > 0;
-            $this->insert("cash_operations", [
+            cash_ops_insert($this, [
                 "f_cashbox_id" => $cash_session["f_cashbox_id"],
                 "f_session_id" => $cash_session["f_id"],
                 "f_order_id" => "",
@@ -193,11 +206,10 @@ class Cashbox extends Auth
         $cashbox["f_date_close"] = date("Y-m-d H:i:s");
         $cashbox["f_user_close"] = $userId;
         $cashbox["f_amount_fact"] = $amountFact;
-        $cashbox["f_amount_expected"] = $cashbox["f_amount_expected"];
+        $cashbox["f_amount_expected"] = $expectedCash;
         $cashbox["f_amount_difference"] = $diff;
         $this->update("cash_session", $cashbox, $cashbox["f_id"]);
         $session = $this->GetCashboxSession($cash_session["f_id"]);
-        $session["f_amount_expected_cash"] = money_fmt($expectedCash);
         return $session;
     }
 
@@ -216,6 +228,7 @@ class Cashbox extends Auth
 
     public function MoveMoney($params)
     {
+        require_once __DIR__ . "/../worker/cash-ops-helper.php";
         $cash_session = $this->GetOpenCashboxSession($params->cashbox_id);
         if (!$cash_session) {
             die(Translator::t("No active session"));
@@ -237,7 +250,12 @@ class Cashbox extends Auth
         $v["f_credit"] = $params->f_credit;
         $v["f_currency_id"] = $params->f_currency_id;
         $v["f_comment"]  = $params->f_comment;
-        $this->insert("cash_operations", $v);
+        cash_ops_insert($this, $v);
+        $pt = (int)$v["f_payment_type_id"];
+        if (cash_ops_affects_float($pt)) {
+            $delta = (float)$v["f_debit"] - (float)$v["f_credit"];
+            cash_ops_adjust_session_float($this, (int)$cash_session["f_id"], $delta);
+        }
         $this->echoResult();
     }
 
@@ -475,8 +493,9 @@ class Cashbox extends Auth
             $inComment .= ": " . $userComment;
         }
 
+        require_once __DIR__ . "/../worker/cash-ops-helper.php";
         foreach ($transfers as $t) {
-            $this->insert("cash_operations", [
+            cash_ops_insert($this, [
                 "f_cashbox_id" => $sourceId,
                 "f_session_id" => 0,
                 "f_order_id" => "",
@@ -490,7 +509,7 @@ class Cashbox extends Auth
                 "f_comment" => $outComment,
             ]);
 
-            $this->insert("cash_operations", [
+            cash_ops_insert($this, [
                 "f_cashbox_id" => $destId,
                 "f_session_id" => 0,
                 "f_order_id" => "",
@@ -583,7 +602,8 @@ class Cashbox extends Auth
             }
 
             if ($docType === 1) {
-                $this->insert("cash_operations", [
+                require_once __DIR__ . "/../worker/cash-ops-helper.php";
+                cash_ops_insert($this, [
                     "f_cashbox_id" => (int)$cashSession["f_cashbox_id"],
                     "f_session_id" => (int)$cashSession["f_id"],
                     "f_order_id" => $uuid,
@@ -596,14 +616,12 @@ class Cashbox extends Auth
                     "f_currency_id" => $currencyId,
                     "f_comment" => $opComment,
                 ]);
-                $this->select(
-                    "UPDATE cash_session SET f_amount_expected=f_amount_expected-? WHERE f_id=?",
-                    "di",
-                    [$amount, (int)$cashSession["f_id"]],
-                    true
-                );
+                if (cash_ops_affects_float($paymentTypeId)) {
+                    cash_ops_adjust_session_float($this, (int)$cashSession["f_id"], -$amount);
+                }
             } else {
-                $this->insert("cash_operations", [
+                require_once __DIR__ . "/../worker/cash-ops-helper.php";
+                cash_ops_insert($this, [
                     "f_cashbox_id" => (int)$cashSession["f_cashbox_id"],
                     "f_session_id" => (int)$cashSession["f_id"],
                     "f_order_id" => $uuid,
@@ -616,12 +634,9 @@ class Cashbox extends Auth
                     "f_currency_id" => $currencyId,
                     "f_comment" => $opComment,
                 ]);
-                $this->select(
-                    "UPDATE cash_session SET f_amount_expected=f_amount_expected+? WHERE f_id=?",
-                    "di",
-                    [$amount, (int)$cashSession["f_id"]],
-                    true
-                );
+                if (cash_ops_affects_float($paymentTypeId)) {
+                    cash_ops_adjust_session_float($this, (int)$cashSession["f_id"], $amount);
+                }
             }
         }
 
@@ -777,21 +792,12 @@ class Cashbox extends Auth
             $this->update("cash_operations", $opUpdate, (int)$op["f_id"]);
 
             $delta = $amount - $oldAmount;
-            if (abs($delta) > 0.00001 && (int)$op["f_session_id"] > 0) {
+            require_once __DIR__ . "/../worker/cash-ops-helper.php";
+            if (abs($delta) > 0.00001 && (int)$op["f_session_id"] > 0 && cash_ops_affects_float($paymentTypeId)) {
                 if ($docType === 1) {
-                    $this->select(
-                        "UPDATE cash_session SET f_amount_expected=f_amount_expected-? WHERE f_id=?",
-                        "di",
-                        [$delta, (int)$op["f_session_id"]],
-                        true
-                    );
+                    cash_ops_adjust_session_float($this, (int)$op["f_session_id"], -$delta);
                 } else {
-                    $this->select(
-                        "UPDATE cash_session SET f_amount_expected=f_amount_expected+? WHERE f_id=?",
-                        "di",
-                        [$delta, (int)$op["f_session_id"]],
-                        true
-                    );
+                    cash_ops_adjust_session_float($this, (int)$op["f_session_id"], $delta);
                 }
             }
         }
@@ -822,21 +828,13 @@ class Cashbox extends Auth
         $this->beginTransaction();
         $op = $this->findRedeemCashOperation($debt);
         if ($op) {
-            if ((int)$op["f_session_id"] > 0 && $amount > 0.00001) {
+            require_once __DIR__ . "/../worker/cash-ops-helper.php";
+            $opPt = (int)($op["f_payment_type_id"] ?? PAYMENT_TYPE_CASH);
+            if ((int)$op["f_session_id"] > 0 && $amount > 0.00001 && cash_ops_affects_float($opPt)) {
                 if ($docType === 1) {
-                    $this->select(
-                        "UPDATE cash_session SET f_amount_expected=f_amount_expected+? WHERE f_id=?",
-                        "di",
-                        [$amount, (int)$op["f_session_id"]],
-                        true
-                    );
+                    cash_ops_adjust_session_float($this, (int)$op["f_session_id"], $amount);
                 } else {
-                    $this->select(
-                        "UPDATE cash_session SET f_amount_expected=f_amount_expected-? WHERE f_id=?",
-                        "di",
-                        [$amount, (int)$op["f_session_id"]],
-                        true
-                    );
+                    cash_ops_adjust_session_float($this, (int)$op["f_session_id"], -$amount);
                 }
             }
             $this->select("DELETE FROM cash_operations WHERE f_id=?", "i", [(int)$op["f_id"]], true);

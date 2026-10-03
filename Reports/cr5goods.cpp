@@ -17,11 +17,16 @@
 #include "c5config.h"
 #include "c5utils.h"
 #include "ndataprovider.h"
+#include "ninterface.h"
+#include "struct_workstationitem.h"
+#include "dict_workstation.h"
 #include "appwebsocket.h"
 #include <math.h>
+#include <QDir>
 #include <QFile>
 #include <QJsonDocument>
 #include <QJsonObject>
+#include <QPointer>
 
 QMap <QString, QString> l;
 
@@ -340,46 +345,78 @@ void CR5Goods::exportToScales()
 
     db.exec(sql);
 
-    QString scaleDir = __c5config.getValue(param_frontdesk_scale_dir).trimmed();
-
-    if(scaleDir.isEmpty() && __c5config.fSettingsId > 0) {
-        C5Database dbCfg;
-        dbCfg[":f_settings"] = __c5config.fSettingsId;
-        dbCfg[":f_key"] = param_frontdesk_scale_dir;
-        dbCfg.exec("select f_value from s_settings_values where f_settings=:f_settings and f_key=:f_key");
-
-        if(dbCfg.nextRow()) {
-            scaleDir = dbCfg.getString(0).trimmed();
-        }
+    struct ScaleRow {
+        QString code;
+        QString name;
+        double price = 0;
+        int wholeNumber = 0;
+        int unit = 0;
+    };
+    QList<ScaleRow> rows;
+    while (db.nextRow()) {
+        ScaleRow r;
+        r.code = db.getString(0);
+        r.name = db.getString(1);
+        r.price = db.getDouble(2);
+        r.wholeNumber = db.getInt("f_wholenumber");
+        r.unit = db.getInt("f_unit");
+        rows.append(r);
     }
 
-    if(scaleDir.isEmpty() == false) {
+    auto writeExport = [rows](const QString &scaleDir) {
+        if (scaleDir.isEmpty()) {
+            C5Message::error(tr("Scale path not configured"));
+            return;
+        }
+        QDir().mkpath(scaleDir);
         QFile f(scaleDir + "/export.xml");
-        if (f.open(QIODevice::WriteOnly)) {
-            f.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n");
-            f.write("<NewDataSet>\r\n");
-
-            while (db.nextRow()) {
-                f.write("<Report>\r\n");
-                f.write(QString("<CodeSort>%1</CodeSort>").arg(db.getString(0)).toUtf8());
-                f.write(QString("<Code>%1</Code>").arg(db.getString(0)).toUtf8());
-                f.write(QString("<GoodName>%1</GoodName>").arg(db.getString(1)).toUtf8());
-                f.write(QString("<PriceOut2>%1</PriceOut2>").arg(db.getDouble(2)).toUtf8());
-
-                if (db.getInt("f_wholenumber") > 0 || db.getInt("f_unit") == 1) {
-                    f.write(QString("<IsPiece>1</IsPiece>").toUtf8());
-                }
-
-                f.write("</Report>\r\n");
-            }
-
-            f.write("</NewDataSet>");
-            f.close();
+        if (!f.open(QIODevice::WriteOnly)) {
+            C5Message::error(tr("Cannot write") + ": " + scaleDir + "/export.xml");
+            return;
         }
+        f.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n");
+        f.write("<NewDataSet>\r\n");
+        for (const ScaleRow &r : rows) {
+            f.write("<Report>\r\n");
+            f.write(QString("<CodeSort>%1</CodeSort>").arg(r.code).toUtf8());
+            f.write(QString("<Code>%1</Code>").arg(r.code).toUtf8());
+            f.write(QString("<GoodName>%1</GoodName>").arg(r.name).toUtf8());
+            f.write(QString("<PriceOut2>%1</PriceOut2>").arg(r.price).toUtf8());
+            if (r.wholeNumber > 0 || r.unit == 1) {
+                f.write(QString("<IsPiece>1</IsPiece>").toUtf8());
+            }
+            f.write("</Report>\r\n");
+        }
+        f.write("</NewDataSet>");
+        f.close();
         C5Message::info(tr("Done"));
-    } else {
-        C5Message::error(tr("Scale path not configured"));
+    };
+
+    const QString cached = mWorkStation.scaleDir();
+    if (!cached.isEmpty()) {
+        writeExport(cached);
+        return;
     }
+
+    if (!mUser || mUser->mSessionKey.isEmpty()) {
+        C5Message::error(tr("Scale path not configured"));
+        return;
+    }
+
+    QPointer<CR5Goods> self(this);
+    NInterface::query1(QStringLiteral("/engine/v2/common/workstation/get-config"),
+                       mUser->mSessionKey,
+                       this,
+                       {{QStringLiteral("type"), WORKSTATION_COMMON},
+                        {QStringLiteral("station_account"), hostusername()},
+                        {QStringLiteral("workstation"), hostinfo}},
+                       [self, writeExport](const QJsonObject &jdoc) {
+                           if (!self) {
+                               return;
+                           }
+                           mWorkStation = JsonParser<WorkstationItem>::fromJson(jdoc);
+                           writeExport(mWorkStation.scaleDir());
+                       });
 }
 
 void CR5Goods::deleteGoods()

@@ -57,6 +57,8 @@ void NLoadingDlg::setTitle(const QString &title)
 
 void NLoadingDlg::hide()
 {
+    // Do not touch setWindowModality here — calling it on a dialog that is
+    // already tearing down (deleteLater / ~NInterface) crashes in QWidget::data.
     QWidget::hide();
     mSecond = 0;
 }

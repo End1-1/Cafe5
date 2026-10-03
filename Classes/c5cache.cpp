@@ -96,10 +96,9 @@ C5Cache::C5Cache()
         fCacheQuery[cache_order_state] = QString("select f_id as `%1`, f_name as `%2` from o_state")
                                          .arg(tr("Code"))
                                          .arg(tr("Name"));
-        fCacheQuery[cache_cash_names] = QString("select f_id as `%1`, f_name as `%2`, f_currency as `%3` from e_cash_names")
+        fCacheQuery[cache_cash_names] = QString("select f_id as `%1`, f_name as `%2` from cash_box")
                                         .arg(tr("Code"))
-                                        .arg(tr("Name"))
-                                        .arg(tr("Currency code"));
+                                        .arg(tr("Name"));
         fCacheQuery[cache_store_reason] = QString("select f_id as `%1`, f_name as `%2` from a_reason")
                                           .arg(tr("Code"))
                                           .arg(tr("Name"));
@@ -210,6 +209,8 @@ LEFT JOIN m_goal_product_status ms ON ms.f_id=gp.f_status
         fTableCache["s_settings_names"] = cache_settings_names;
         fTableCache["h_halls"] = cache_hall_list;
         fTableCache["b_cards_discount"] = cache_discount_cards;
+        fTableCache["b_discount_cards"] = cache_discount_cards;
+        fTableCache["b_accumulate_cards"] = cache_discount_cards;
         fTableCache["d_dish_comment"] = cache_dish_comments;
         fTableCache["s_db"] = cache_s_db;
         fTableCache["d_menu_names"] = cache_menu_names;
@@ -217,6 +218,7 @@ LEFT JOIN m_goal_product_status ms ON ms.f_id=gp.f_status
         fTableCache["h_tables"] = cache_tables;
         fTableCache["o_body_state"] = cache_dish_state;
         fTableCache["o_state"] = cache_order_state;
+        fTableCache["cash_box"] = cache_cash_names;
         fTableCache["e_cash_names"] = cache_cash_names;
         fTableCache["a_reason"] = cache_store_reason;
         fTableCache["b_card_types"] = cache_discount_type;

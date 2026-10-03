@@ -5,6 +5,7 @@
 #include <QJsonObject>
 #include <QPointer>
 #include <QString>
+#include "ndataprovider.h"
 
 class NLoadingDlg;
 
@@ -21,25 +22,30 @@ public:
     QObject* fErrorObject;
 
     void createHttpQuery(const QString &route, const QJsonObject &params, const char* slotResponse,
-                         const QVariant &marks = QVariant(), bool progress = true, int timeout = 60000);
+                         const QVariant &marks = QVariant(), bool progress = true,
+                         int timeout = NDataProvider::kDefaultTransferTimeoutMs);
 
     void createHttpQueryLambda(const QString &route, const QJsonObject &params,
                                std::function<void(const QJsonObject&)> callback,
                                std::function<void (const QJsonObject&)> errCallback,
-                               const QVariant &marks = QVariant(), bool progress = true, int timeout = 60000);
+                               const QVariant &marks = QVariant(), bool progress = true,
+                               int timeout = NDataProvider::kDefaultTransferTimeoutMs);
 
     void createHttpQueryLambda2(const QString &route, const QJsonObject &params,
                                 std::function<void(const QJsonObject&)> callback,
                                 std::function<bool (const QJsonObject&)> errCallback,
-                                const QVariant &marks = QVariant(), bool progress = true, int timeout = 60000);
+                                const QVariant &marks = QVariant(), bool progress = true,
+                                int timeout = NDataProvider::kDefaultTransferTimeoutMs);
 
     static void query(const QString &route, const QString &bearer, QObject *context, const QJsonObject &params,
                       std::function<void(const QJsonObject&)> callback,
                       std::function<bool (const QJsonObject&)> errCallback,
-                      bool progress = true, int timeout = 60000, bool destroyLoadingAtEnd = true);
+                      bool progress = true, int timeout = NDataProvider::kDefaultTransferTimeoutMs,
+                      bool destroyLoadingAtEnd = true);
 
     static void query1(const QString &route, const QString &bearer, QObject *context, const QJsonObject &params,
-                       std::function<void(const QJsonObject&)> callback);
+                       std::function<void(const QJsonObject&)> callback,
+                       int timeout = NDataProvider::kDefaultTransferTimeoutMs);
 
     /** Nested: while active, loading dialogs from query()/createHttpQuery* are not shown. */
     static void pushSuppressProgress();
@@ -51,6 +57,8 @@ public:
     /** Title for the next loading dialog created by query()/createHttpQuery* (any NInterface). */
     static void prepareLoadingTitle(const QString &title);
     static NLoadingDlg *currentLoadingDialog();
+    /** Hide the current loading dialog if any (no destroy — owned by NInterface). */
+    static void forceCloseCurrentLoading();
 
 public slots:
     void httpQueryStarted();

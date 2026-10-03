@@ -22,6 +22,53 @@
 #define OPENSSL_SUPPRESS_DEPRECATED
 #include <openssl/des.h>
 
+static QString normalizeEmarkForJson(QString s)
+{
+    const QChar gs(0x1d);
+    const auto cs = QRegularExpression::CaseInsensitiveOption;
+    s.replace(QRegularExpression(QStringLiteral(R"(\\\\u001[dD])"), cs), gs);
+    s.replace(QRegularExpression(QStringLiteral(R"(\\u001[dD])"), cs), gs);
+    s.replace(QRegularExpression(QStringLiteral(R"(u001[dD](?=9[123]))"), cs), gs);
+    QString out;
+    out.reserve(s.size() + 2);
+    for (const QChar c : s) {
+        const uint u = c.unicode();
+        if (u == 0x1d || (u >= 33 && u <= 126)) {
+            out.append(c);
+        }
+    }
+    if (!out.contains(gs)) {
+        static const QRegularExpression re(QStringLiteral(
+            R"(^01(\d{14})21([\x21-\x7E]{1,20})91([\x21-\x7E]{4})92([\x21-\x7E]{44})$)"));
+        const QRegularExpressionMatch m = re.match(out);
+        if (m.hasMatch()) {
+            out = QStringLiteral("01") + m.captured(1) + QStringLiteral("21") + m.captured(2) + gs
+                  + QStringLiteral("91") + m.captured(3) + gs + QStringLiteral("92") + m.captured(4);
+        }
+    }
+    return out;
+}
+
+static QString emarkJsonString(QString e)
+{
+    e = normalizeEmarkForJson(e);
+    QString out;
+    out.append(QLatin1Char('"'));
+    for (const QChar c : e) {
+        if (c.unicode() == 0x1d) {
+            out.append(QLatin1String("\\u001d"));
+        } else if (c == QLatin1Char('\\')) {
+            out.append(QLatin1String("\\\\"));
+        } else if (c == QLatin1Char('"')) {
+            out.append(QLatin1String("\\\""));
+        } else {
+            out.append(c);
+        }
+    }
+    out.append(QLatin1Char('"'));
+    return out;
+}
+
 static quint8 firstdata[] = {213, 128, 212, 180, 213, 132, 0, 5, 2, 0, 0, 0};
 QMap<int, QString> PrintTaxNO::fErrors;
 int PrintTaxNO::mDebugRseq = 0;
@@ -487,10 +534,7 @@ int PrintTaxNO::makeJsonAndPrint(double card, double prepaid, QString &outInJson
             emarks += ",";
         }
 
-        //e.replace("'", "\\\\'");
-        e.replace("\\", "\\\\");
-        e.replace("\"", "\\\"");
-        emarks += QString("\"%1\"").arg(e);
+        emarks += emarkJsonString(e);
     }
 
     fJsonHeader["paidAmountCard"] = card;
@@ -576,10 +620,7 @@ int PrintTaxNO::makeJsonAndPrint(double cash, double card, double prepaid, QStri
             emarks += ",";
         }
 
-        //e.replace("'", "\\\\'");
-        e.replace("\\", "\\\\");
-        e.replace("\"", "\\\"");
-        emarks += QString("\"%1\"").arg(e);
+        emarks += emarkJsonString(e);
     }
 
     fJsonHeader["paidAmountCard"] = card;
@@ -664,10 +705,7 @@ int PrintTaxNO::makeJsonAndPrintSimple(
             emarks += ",";
         }
 
-        //e.replace("'", "\\\\'");
-        e.replace("\\", "\\\\");
-        e.replace("\"", "\\\"");
-        emarks += QString("\"%1\"").arg(e);
+        emarks += emarkJsonString(e);
     }
 
     fJsonHeader["paidAmountCard"] = card;
@@ -761,13 +799,10 @@ int PrintTaxNO::printTaxback(int number, const QString &crn, QString &outInJson,
             emarksStr += ",";
         }
 
-        //e.replace("'", "\\\\'");
-        e.replace("\\", "\\\\");
-        e.replace("\"", "\\\"");
-        emarksStr += QString("\"%1\"").arg(e);
+        emarksStr += emarkJsonString(e);
     }
 
-    emarksStr = ", \"emarks\": [ " + emarksStr + " ]";
+    emarksStr = ",\"eMarks\":[" + emarksStr + "]";
     outInJson = QString("{\"crn\":\"%1\",\"returnTicketId\":\"%2\",\"seq\":1 %3 %4 %5}")
                     .arg(crn, QString::number(number))
                     .arg(fReturnItemList.isEmpty() ? ""

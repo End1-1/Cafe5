@@ -83,7 +83,7 @@ private:
     void onCartOverlayFinished(int result);
     void onPaymentOverlayFinished(int result);
     void submitPaidOrder();
-    void showOrderDone(const QString &orderNumber);
+    void showOrderDone(const QString &orderNumber, const QString &statusUrl = QString());
     void closeOrderDone();
 
     Ui::DlgMenu *ui;

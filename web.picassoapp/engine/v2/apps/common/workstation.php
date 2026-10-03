@@ -16,6 +16,50 @@ class Workstation extends Auth
         $handler = $this->configHandlerForType($type);
         $initialConfig = $handler ? $handler->defaultConfigJson() : '{}';
 
+        $fiscal = $this->select("select * from fiscal_machine")->fetch_all(MYSQLI_ASSOC);
+        foreach ($fiscal as &$fiscalRow) {
+            foreach (['f_id', 'f_port', 'f_default_dept', 'f_external_pos', 'f_idram_ext_pos', 'f_simple_fiscal'] as $key) {
+                if (array_key_exists($key, $fiscalRow)) {
+                    $fiscalRow[$key] = (int)$fiscalRow[$key];
+                }
+            }
+        }
+        unset($fiscalRow);
+
+        // Shared common settings (type 5): one row for all hosts — do not create per-PC blanks
+        // that would json_merge_patch-overwrite f_scale_dir / print_server with empty defaults.
+        if ($type === 5) {
+            $config = $this->select(
+                "select f_id, f_type, f_station_account, f_name, ifnull(f_config, '{}') as f_config
+                 from workstations where f_type = 5 order by f_id asc limit 1"
+            )->fetch_assoc();
+            if (!$config) {
+                $this->select(
+                    "insert into workstations (f_type, f_station_account, f_name, f_config) values (5, ?, ?, ?)",
+                    "sss",
+                    [(string)($params->station_account ?? ''), (string)($params->workstation ?? 'common'), $initialConfig],
+                    true
+                );
+                $config = $this->select(
+                    "select f_id, f_type, f_station_account, f_name, ifnull(f_config, '{}') as f_config
+                     from workstations where f_type = 5 order by f_id asc limit 1"
+                )->fetch_assoc();
+            }
+            if ($config) {
+                $cfg = json_decode($config['f_config'] ?? '{}', true);
+                if (!is_array($cfg)) {
+                    $cfg = [];
+                }
+                $commonHandler = new WorkstationConfigCommon($this);
+                $cfg = $commonHandler->withDefaults($cfg);
+                $cfg = $this->enrichConfigNames($cfg);
+                $config['f_config'] = json_encode($cfg, JSON_UNESCAPED_UNICODE);
+                $this->result = array_merge($this->result, $config, ["fiscal" => $fiscal]);
+            }
+            $this->echoResult();
+            return;
+        }
+
         // 1. Проверяем, есть ли уже такая настройка
         $check = $this->select(
             "select f_id from workstations where f_name = ? and f_station_account = ? and f_type = ? limit 1",
@@ -54,8 +98,6 @@ class Workstation extends Auth
         limit 1
     EOD;
 
-        $fiscal = $this->select("select * from fiscal_machine")->fetch_all(MYSQLI_ASSOC);
-
         $config = $this->select(
             $sqlconf,
             "ssi",
@@ -73,12 +115,8 @@ class Workstation extends Auth
             if ($handler) {
                 $commonHandler = new WorkstationConfigCommon($this);
                 $commonCfg = $commonHandler->withDefaults($cfg);
-                if ($type === 5) {
-                    $cfg = $commonCfg;
-                } else {
-                    $typeCfg = $handler->withDefaults($cfg);
-                    $cfg = array_merge($commonCfg, $typeCfg);
-                }
+                $typeCfg = $handler->withDefaults($cfg);
+                $cfg = array_merge($commonCfg, $typeCfg);
             }
             $cfg = $this->enrichConfigNames($cfg);
             $config['f_config'] = json_encode($cfg, JSON_UNESCAPED_UNICODE);

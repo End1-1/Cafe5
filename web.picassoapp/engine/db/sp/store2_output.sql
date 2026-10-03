@@ -38,6 +38,11 @@ BEGIN
 
     -- 1. Получаем текущее состояние документа
     SET current_status = -1;
+
+    -- Materialize the header first: locking a missing PK value would take a gap lock and
+    -- deadlock against a parallel document inserting into the same gap.
+    INSERT IGNORE INTO store_document (f_id, f_status, f_version) VALUES (doc_uuid, -1, 0);
+
     SELECT f_version, f_status
     INTO current_version, current_status
     FROM store_document
@@ -63,11 +68,13 @@ BEGIN
                                   JOIN (SELECT DISTINCT sm_in.f_batch_id
                                         FROM store_moves sm_in
                                         WHERE sm_in.f_qty_in > 0
-                                          AND sm_in.f_doc_row_id <> sm_in.f_batch_id) hx ON hx.f_batch_id = ss.f_id
+                                          AND sm_in.f_doc_row_id <> sm_in.f_batch_id
+                                          AND sm_in.f_batch_id IN (SELECT dm.f_batch_id FROM store_moves dm WHERE dm.f_doc = doc_uuid)) hx ON hx.f_batch_id = ss.f_id
                                   JOIN (SELECT f_batch_id, f_doc_row_id, SUM(f_qty_in) AS abs_q
                                         FROM store_moves
                                         WHERE f_qty_in > 0
                                           AND f_doc_row_id <> f_batch_id
+                                          AND f_batch_id IN (SELECT dm.f_batch_id FROM store_moves dm WHERE dm.f_doc = doc_uuid)
                                         GROUP BY f_batch_id, f_doc_row_id) am ON am.f_batch_id = ss.f_id
                               WHERE ss.f_qty_left = 0
                                 AND ss.f_qty_in > 0) b
@@ -87,11 +94,13 @@ BEGIN
                                   JOIN (SELECT DISTINCT sm_in.f_batch_id
                                         FROM store_moves sm_in
                                         WHERE sm_in.f_qty_in > 0
-                                          AND sm_in.f_doc_row_id <> sm_in.f_batch_id) hx ON hx.f_batch_id = ss.f_id
+                                          AND sm_in.f_doc_row_id <> sm_in.f_batch_id
+                                          AND sm_in.f_batch_id IN (SELECT dm.f_batch_id FROM store_moves dm WHERE dm.f_doc = doc_uuid)) hx ON hx.f_batch_id = ss.f_id
                                   JOIN (SELECT f_batch_id, f_doc_row_id, SUM(f_qty_in) AS abs_q
                                         FROM store_moves
                                         WHERE f_qty_in > 0
                                           AND f_doc_row_id <> f_batch_id
+                                          AND f_batch_id IN (SELECT dm.f_batch_id FROM store_moves dm WHERE dm.f_doc = doc_uuid)
                                         GROUP BY f_batch_id, f_doc_row_id) am ON am.f_batch_id = ss.f_id
                               WHERE ss.f_qty_left = 0
                                 AND ss.f_qty_in > 0) b
@@ -110,11 +119,13 @@ BEGIN
                             JOIN (SELECT DISTINCT sm_in.f_batch_id
                                   FROM store_moves sm_in
                                   WHERE sm_in.f_qty_in > 0
-                                    AND sm_in.f_doc_row_id <> sm_in.f_batch_id) hx ON hx.f_batch_id = ss.f_id
+                                    AND sm_in.f_doc_row_id <> sm_in.f_batch_id
+                                          AND sm_in.f_batch_id IN (SELECT dm.f_batch_id FROM store_moves dm WHERE dm.f_doc = doc_uuid)) hx ON hx.f_batch_id = ss.f_id
                             JOIN (SELECT f_batch_id, f_doc_row_id, SUM(f_qty_in) AS abs_q
                                   FROM store_moves
                                   WHERE f_qty_in > 0
                                     AND f_doc_row_id <> f_batch_id
+                                          AND f_batch_id IN (SELECT dm.f_batch_id FROM store_moves dm WHERE dm.f_doc = doc_uuid)
                                   GROUP BY f_batch_id, f_doc_row_id) am ON am.f_batch_id = ss.f_id
                         WHERE ss.f_qty_left = 0
                           AND ss.f_qty_in > 0
@@ -130,7 +141,8 @@ BEGIN
             LEFT JOIN (SELECT DISTINCT sm_in.f_batch_id
                        FROM store_moves sm_in
                        WHERE sm_in.f_qty_in > 0
-                         AND sm_in.f_doc_row_id <> sm_in.f_batch_id) hx ON hx.f_batch_id = ss.f_id
+                         AND sm_in.f_doc_row_id <> sm_in.f_batch_id
+                                          AND sm_in.f_batch_id IN (SELECT dm.f_batch_id FROM store_moves dm WHERE dm.f_doc = doc_uuid)) hx ON hx.f_batch_id = ss.f_id
         SET ss.f_qty_left = ss.f_qty_left + sm.qty_out
         WHERE hx.f_batch_id IS NULL;
 
@@ -143,24 +155,30 @@ BEGIN
           AND sm_abs.f_doc_row_id <> sm_abs.f_batch_id;
     END IF;
 
-    DELETE FROM store_moves WHERE f_doc = doc_uuid;
-    DELETE FROM store_stock WHERE f_doc = doc_uuid AND f_qty_in = 0 AND f_qty_left < 0;
-
+    -- Emptied batches are dropped while this document's moves still exist: joining them keeps
+    -- the statement on idx_moves_doc instead of scanning and locking the whole store_stock.
     IF (current_status = 1) THEN
         DELETE ss
         FROM store_stock ss
+            JOIN (SELECT DISTINCT f_batch_id AS bid FROM store_moves WHERE f_doc = doc_uuid) b ON b.bid = ss.f_id
         WHERE ss.f_qty_in = 0
           AND ss.f_qty_left = 0
-          AND NOT EXISTS (SELECT 1 FROM store_moves sm WHERE sm.f_batch_id = ss.f_id);
+          AND NOT EXISTS (SELECT 1 FROM store_moves sm WHERE sm.f_batch_id = ss.f_id AND sm.f_doc <> doc_uuid);
     END IF;
+
+    DELETE FROM store_moves WHERE f_doc = doc_uuid;
+    DELETE FROM store_stock WHERE f_doc = doc_uuid AND f_qty_in = 0 AND f_qty_left < 0;
 
     -- 3. Сохраняем/Обновляем заголовок
     INSERT INTO store_document (f_id, f_status, f_doc_type, f_doc_date, f_store_out, f_user_id, f_version, f_data)
     VALUES (doc_uuid, new_status, 2, doc_date, store_id, JSON_VALUE(params, '$.doc_user_id'), 1,
             JSON_EXTRACT(params, '$.doc_data'))
     ON DUPLICATE KEY UPDATE f_status    = VALUES(f_status),
+                            f_doc_type  = VALUES(f_doc_type),
                             f_doc_date  = VALUES(f_doc_date),
                             f_store_out = VALUES(f_store_out),
+                            f_user_id   = VALUES(f_user_id),
+                            f_data      = VALUES(f_data),
                             f_version   = f_version + 1;
 
     -- 4. Заполняем пользовательские строки

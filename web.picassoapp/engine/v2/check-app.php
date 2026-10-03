@@ -6,15 +6,15 @@
 $version_check = true;
 
 $apps = [
-    "waiter" => "2.5.14",
+    "waiter" => "2.5.15",
     "officen" => "2.15.58",
-    "shop" => "1.9.47",
+    "shop" => "1.9.49",
     "webapi" => "1.1.2",
     "picasso.store" => "1.1.5",
     "picasso.waiter" => "1.0.4",
     "smart" => "1.9.12",
     "carwash" => "1.0.2",
-    "selfboard" => "0.1.0",
+    "selfboard" => "1.1.2",
     "ararix" => "1.0.0",
     "cookingprogress" => "1.0.0",
 ];

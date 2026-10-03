@@ -21,6 +21,104 @@
      </property>
     </widget>
    </item>
+   <item row="5" column="2" colspan="2">
+    <layout class="QHBoxLayout" name="hlNameLangGroup">
+     <property name="spacing">
+      <number>6</number>
+     </property>
+     <item>
+      <widget class="C5LineEditWithSelector" name="lineEdit_2">
+       <property name="Field" stdset="0">
+        <string>f_name</string>
+       </property>
+       <property name="First" stdset="0">
+        <bool>true</bool>
+       </property>
+       <property name="allowall" stdset="0">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QToolButton" name="btnLangHy">
+       <property name="minimumSize">
+        <size>
+         <width>40</width>
+         <height>40</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>60</width>
+         <height>40</height>
+        </size>
+       </property>
+       <property name="text">
+        <string>HY</string>
+       </property>
+       <property name="checkable">
+        <bool>true</bool>
+       </property>
+       <property name="checked">
+        <bool>true</bool>
+       </property>
+       <property name="autoExclusive">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QToolButton" name="btnLangRu">
+       <property name="minimumSize">
+        <size>
+         <width>40</width>
+         <height>40</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>60</width>
+         <height>40</height>
+        </size>
+       </property>
+       <property name="text">
+        <string>RU</string>
+       </property>
+       <property name="checkable">
+        <bool>true</bool>
+       </property>
+       <property name="autoExclusive">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QToolButton" name="btnLangEn">
+       <property name="minimumSize">
+        <size>
+         <width>40</width>
+         <height>40</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>60</width>
+         <height>40</height>
+        </size>
+       </property>
+       <property name="text">
+        <string>EN</string>
+       </property>
+       <property name="checkable">
+        <bool>true</bool>
+       </property>
+       <property name="autoExclusive">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
    <item row="3" column="2">
     <widget class="C5LineEditWithSelector" name="leParentGroup">
      <property name="maximumSize">
@@ -113,19 +211,6 @@
     <widget class="QLabel" name="label_7">
      <property name="text">
       <string>Class</string>
-     </property>
-    </widget>
-   </item>
-   <item row="5" column="2" colspan="2">
-    <widget class="C5LineEditWithSelector" name="lineEdit_2">
-     <property name="Field" stdset="0">
-      <string>f_name</string>
-     </property>
-     <property name="First" stdset="0">
-      <bool>true</bool>
-     </property>
-     <property name="allowall" stdset="0">
-      <bool>true</bool>
      </property>
     </widget>
    </item>

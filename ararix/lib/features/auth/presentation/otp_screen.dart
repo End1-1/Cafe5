@@ -62,7 +62,7 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
 
   Future<void> _verify(String code) async {
     final l10n = AppLocalizations.of(context);
-    if (code.length != 4) {
+    if (code.length != 5) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(l10n.invalidOtp)),
       );

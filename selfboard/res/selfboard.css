@@ -1402,6 +1402,18 @@
     max-width: 720px;
 }
 
+#orderDoneQrHint {
+    color: #c5db00;
+    font-size: 24px;
+    font-weight: 600;
+}
+
+#orderDoneQr {
+    background: #ffffff;
+    border-radius: 16px;
+    padding: 12px;
+}
+
 #orderDoneOk {
     background-color: #c5db00;
     border: none;

@@ -2,6 +2,7 @@
 #include "ui_dlgserversettings.h"
 
 #include "appsettings.h"
+#include "selfboardupdate.h"
 #include "serverconfig.h"
 
 #include <QCheckBox>
@@ -37,6 +38,7 @@ void DlgServerSettings::loadFields()
     ui->sbTableDineIn->setValue(AppSettings::tableDineIn());
     ui->sbCashboxId->setValue(AppSettings::cashboxId());
     ui->sbServiceFactor->setValue(AppSettings::serviceFactor());
+    ui->leOrderStatusUrl->setText(AppSettings::orderStatusUrlBase());
     ui->leServerHost->setText(ServerConfig::host());
     ui->cbUseHttps->setChecked(ServerConfig::useHttps());
     ui->leUsername->setText(ServerConfig::username());
@@ -50,6 +52,7 @@ void DlgServerSettings::applyFields()
     AppSettings::setTableDineIn(ui->sbTableDineIn->value());
     AppSettings::setCashboxId(ui->sbCashboxId->value());
     AppSettings::setServiceFactor(ui->sbServiceFactor->value());
+    AppSettings::setOrderStatusUrlBase(ui->leOrderStatusUrl->text());
     AppSettings::saveToSettings();
     ServerConfig::setHost(ui->leServerHost->text());
     ServerConfig::setUseHttps(ui->cbUseHttps->isChecked());
@@ -88,4 +91,12 @@ void DlgServerSettings::on_btnSave_clicked()
         self->m_sessionOk = true;
         self->accept();
     });
+}
+
+void DlgServerSettings::updateRequired(const QString &msg, const QString &appName, const QString &newVersion)
+{
+    ui->btnSave->setEnabled(true);
+    ui->btnCancel->setEnabled(true);
+    ui->lblStatus->clear();
+    SelfBoardUpdate::offerAndRun(this, msg, appName, newVersion);
 }

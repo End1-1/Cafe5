@@ -2,10 +2,11 @@
 QList<FiscalMachine> fiscalMachines;
 FiscalMachine getFiscalMachine(int id)
 {
+    FiscalMachine found;
     for (auto const &fm : fiscalMachines) {
         if (fm.id == id) {
-            return fm;
+            found = fm; // last match wins (reload may briefly leave duplicates)
         }
     }
-    return FiscalMachine();
+    return found;
 }

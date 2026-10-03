@@ -1,6 +1,6 @@
 # Picasso installer (Inno Setup)
 
-Unified Windows installer for **FrontDesk**, **Shop**, **Waiter**, **CookingProgress**, and **Service5** (Windows service **Breeze**).
+Unified Windows installer for **FrontDesk**, **Shop**, **Waiter**, **CookingProgress**, **SelfBoard**, and **Service5** (Windows service **Breeze**).
 
 ## Requirements
 
@@ -20,6 +20,7 @@ Unified Windows installer for **FrontDesk**, **Shop**, **Waiter**, **CookingProg
 | Waiter | `D:\build.6.10.2\waiter\release\Waiter.exe` |
 | WaiterDesigner (with Waiter) | `D:\build.6.10.2\WaiterDesigner\release\WaiterDesigner.exe` |
 | CookingProgress | `D:\build.6.10.2\cafe5.cookingprogress\release\CookingProgress.exe` |
+| SelfBoard | `D:\build.6.10.2\cafe5.selfboard\release\SelfBoard.exe` |
 | Service5 | `D:\build.6.10.2\service5\release\service5.exe` |
 
 Style files (`officestyle.css`, `shop.css`, `waiter.css`) are taken from **debug** build folders first, then release, repo, deploy.
@@ -33,6 +34,7 @@ setup\build_shop.bat
 setup\build_frontdesk.bat
 setup\build_waiter.bat
 setup\build_cookingprogress.bat
+setup\build_selfboard.bat
 setup\build_service5.bat
 ```
 
@@ -43,6 +45,7 @@ setup\build_installer.bat shop
 setup\build_installer.bat frontdesk
 setup\build_installer.bat waiter
 setup\build_installer.bat cookingprogress
+setup\build_installer.bat selfboard
 setup\build_installer.bat service5
 ```
 
@@ -86,6 +89,32 @@ setup\stage.ps1
 powershell -File setup\build_components.ps1 -Iscc "C:\Program Files (x86)\Inno Setup 6\ISCC.exe"
 ```
 
+### Web server (Apache, PHP, MariaDB, site, Service5)
+
+```bat
+setup\build_server.bat
+```
+
+Needs a Release `service5.exe` (same path as the desktop installer), local XAMPP at `C:\Development\xampp` (Apache + PHP), MariaDB 10.11 at `C:\Program Files\MariaDB 10.11` (binaries only, the data directory is not packed), and a running local MariaDB with `picassodev` and `service5`.
+
+Each `build_server` dumps the current `picassodev` from `web.picassoapp/engine/cnf.php` into a temporary database `picasso_installer_build`, clears that copy the same way as `cleardb.php` mode `all` (`setup/server/clear-for-installer.sql`), then loads the cafe menu, halls and tables from `setup/server/menu-seed.sql` (dishes, groups, storages, one menu, three halls, 33 tables). The live `picassodev` is not modified. The packed business database is `sql/picasso.sql`. `sql/service5.sql` is only the Service5 database list: one `dblist` row, database `picasso` on `127.0.0.1`, key taken from the local `picassodev` row. Remote hosts from the developer's `dblist` are not packed. The client import creates both databases. Root password is `root5`, because Service5 opens MariaDB as `root` / `root5`.
+
+Installs to `C:\Picasso\web`:
+
+| Folder | Content |
+|--------|---------|
+| `apache` | Apache from XAMPP, one host `picassoapp.local` |
+| `php` | PHP 8 |
+| `mysql` | MariaDB server, empty data dir created on the client |
+| `www` | `web.picassoapp` |
+| `sql` | Cleared `picasso` dump and Service5 `dblist` |
+| `service5` | Service5, Windows service **Breeze**, port 10002 |
+| `heidisql` | HeidiSQL, session Picasso on `127.0.0.1` |
+
+Services: `Apache2.4`, `PicassoMariaDB`, `Breeze`. Local database `picasso`, user `root`, password `root5` (`www\engine\cnf.php`). Site: `http://picassoapp.local/`.
+
+Output: `setup\output\PicassoWeb_Setup_x64_N.exe`. `N` is the build number from `setup\server_build.txt`; each `build_server` increases it by one.
+
 ### Output
 
 | Installer | Path |
@@ -95,6 +124,7 @@ powershell -File setup\build_components.ps1 -Iscc "C:\Program Files (x86)\Inno S
 | Shop | `setup\output\shop\shop_setup_X.Y.Z.exe` |
 | Waiter | `setup\output\waiter\waiter_setup_X.Y.Z.exe` |
 | CookingProgress | `setup\output\cookingprogress\cookingprogress_setup_X.Y.Z.exe` |
+| SelfBoard | `setup\output\selfboard\selfboard_setup_X.Y.Z.exe` |
 | Service5 | `setup\output\service5\service5_setup_X.Y.Z.exe` |
 
 Publish component installers to `https://picasso.am/files/` (same filenames).
@@ -108,7 +138,7 @@ When the server returns HTTP 426 (version mismatch in `check-app.php`):
 3. **Yes** — starts shared `{autopf}\Picasso\updater\Updater.exe` with `--module-dir=<app folder>`, then exits.
 4. **Updater self-update / unlock:** `Updater.exe` copies itself **and Qt DLLs** to `%TEMP%` as `PicassoUpdateHost.exe` (DLLs beside the host — Windows needs them before `main()`), then relaunches from TEMP.
 5. Host kills **only the updating module** (e.g. Shop → `Shop_net.exe` only), downloads `{component}_setup_X.Y.Z.exe`, runs Inno `/SILENT` with `/DIR=<module folder>`.
-6. Every module installer (FrontDesk / Shop / Waiter / CookingProgress / Service5) ships a **fresh** `Updater.exe` + Qt into `Picasso\updater\` (`ignoreversion`, closes `Updater.exe` so the file can be replaced).
+6. Every module installer (FrontDesk / Shop / Waiter / CookingProgress / SelfBoard / Service5) ships a **fresh** `Updater.exe` + Qt into `Picasso\updater\` (`ignoreversion`, closes `Updater.exe` so the file can be replaced).
 
 **Layout (desktop modules):**
 
@@ -119,6 +149,7 @@ C:\Program Files\Picasso\
   shop\Shop_net.exe + Qt…
   waiter\Waiter.exe + Qt…
   cookingprogress\CookingProgress.exe + Qt…
+  selfboard\SelfBoard.exe + Qt…
   service5.exe                 ← flat root (unchanged)
 ```
 
@@ -155,7 +186,7 @@ Note: USB filter driver (`libusb0.sys`) still comes from the ZKTeco device drive
 ## Install defaults
 
 - Default root: `C:\Program Files\Picasso` (`{autopf}\Picasso`)
-- Desktop modules install into subfolders: `frontdesk\`, `shop\`, `waiter\`, `cookingprogress\`
+- Desktop modules install into subfolders: `frontdesk\`, `shop\`, `waiter\`, `cookingprogress\`, `selfboard\`
 - Shared updater: `updater\Updater.exe`
 - Service5: flat in root `{app}\service5.exe` (unchanged)
 - Upgrade: same `AppId`, overwrites binaries in the module subfolder (`ignoreversion`)
@@ -166,7 +197,7 @@ Note: USB filter driver (`libusb0.sys`) still comes from the ZKTeco device drive
 
 ## Uninstall
 
-- Warns if OfficeN / Shop / Waiter / CookingProgress / service5 are running; closes them after confirmation
+- Warns if OfficeN / Shop / Waiter / CookingProgress / SelfBoard / service5 are running; closes them after confirmation
 - Stops and deletes Windows service **Breeze** if Service5 was installed
 - Removes HKCU connection settings (`Jazzve\Cafe5\FRONTDESK`, `Jazzve\Cafe5\waiter`, `BreezeDevs\Shop\Shop`, `BreezeDevs\CookingProgress\CookingProgress`) and HKLM `Software\Picasso`
 - Deletes the install directory (`{app}`, e.g. `C:\Program Files\Picasso`) including leftovers (`config.ini`, logs, untracked DLLs)
