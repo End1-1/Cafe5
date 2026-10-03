@@ -94,8 +94,14 @@ SELECT
     g.f_id, 
     g.f_group AS f_group_id, 
     gr.f_name AS f_group_name,
-    g.f_name, 
-    GROUP_CONCAT(gm.f_id SEPARATOR ', ') AS f_barcode,
+    g.f_name,
+    g.f_scancode,
+    TRIM(BOTH ', ' FROM CONCAT_WS(', ',
+        NULLIF(g.f_scancode, ''),
+        NULLIF(GROUP_CONCAT(DISTINCT CASE
+            WHEN gm.f_id IS NOT NULL AND gm.f_id <> IFNULL(g.f_scancode, '') THEN gm.f_id
+        END SEPARATOR ', '), '')
+    )) AS f_barcode,
     u.f_name AS f_unit_name,
     gp.f_price1, 
     gp.f_price1disc, 
@@ -508,7 +514,7 @@ void C5SearchEngine::init(const QString &databaseName, const QString &serverKey)
     tmp2.reserve(4096);
     if (execOrLog("goods", QString(mSqlGoods).replace("%where%", " where g.f_enabled=1 "))) {
         while (db.next()) {
-            QString name = db.string("f_group_name") + " " + db.string("f_name") + " " + db.string("f_scancode");
+            QString name = db.string("f_group_name") + " " + db.string("f_name") + " " + db.string("f_barcode");
             GoodsItem g;
             g.id = db.integer("f_id");
             g.groupId = db.integer("f_group_id");
@@ -824,7 +830,7 @@ QString C5SearchEngine::reloadDictionary(const QJsonObject &jo, const SocketStru
         tmp.reserve(4096);
         db.exec(QString(mSqlGoods).replace("%where%", " where g.f_enabled=1 "));
         while (db.next()) {
-            QString name = db.string("f_group_name") + " " + db.string("f_name") + " " + db.string("f_scancode");
+            QString name = db.string("f_group_name") + " " + db.string("f_name") + " " + db.string("f_barcode");
             GoodsItem g;
             g.id = db.integer("f_id");
             g.groupId = db.integer("f_group_id");
@@ -1642,12 +1648,12 @@ QString C5SearchEngine::updateDictionary(const QJsonObject &jo, const SocketStru
         GoodsItem gi;
 
         if (db.next()) {
-            QString name = db.string("f_group_name") + " " + db.string("f_name") + " " + db.string("f_scancode");
+            QString name = db.string("f_group_name") + " " + db.string("f_name") + " " + db.string("f_barcode");
             gi.id = db.integer("f_id");
             gi.groupId = db.integer("f_group_id");
             gi.groupName = db.string("f_group_name");
             gi.name = db.string("f_name");
-            gi.barcode = db.string("f_scancode");
+            gi.barcode = db.string("f_barcode");
             gi.unitName = db.string("f_unit_name");
             gi.lastInputPrice = db.doubleValue("f_lastinput");
             gi.price1 = db.doubleValue("f_price1");

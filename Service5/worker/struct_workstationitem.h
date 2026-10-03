@@ -51,6 +51,15 @@ struct WorkstationItem : public ParentItem {
     {
         return data.value(QStringLiteral("precheck_printer")).toString().trimmed();
     }
+    /** Waiter reports / shift close: same printer as precheck, else default/receipt. */
+    QString waiterReportPrinter() const
+    {
+        const QString precheck = precheckPrinter();
+        if (!precheck.isEmpty() && !isPrintServerTarget(precheck)) {
+            return precheck;
+        }
+        return defaultPrinter();
+    }
     static bool isPrintServerTarget(const QString &target)
     {
         return target.startsWith(QStringLiteral("http://"), Qt::CaseInsensitive)

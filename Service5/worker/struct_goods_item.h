@@ -1,6 +1,7 @@
 #pragma once
 #include "c5jsonparser.h"
 #include "c5structtraits.h"
+#include <QCoreApplication>
 #include <QStringList>
 
 struct GoodsItem {
@@ -75,7 +76,7 @@ struct StructTraits<GoodsItem> {
 
     static constexpr ColumnDef<GoodsItem> columns[] = {
         {"ID", &id },
-        {"Group name", &groupName},
+        {"Group", &groupName},
         {"Name", &name},
         {"Unit", &unitName},
         {"Barcode", &barcode}
@@ -93,6 +94,6 @@ struct StructTraits<GoodsItem> {
 
     static QVariant header(int col)
     {
-        return columns[col].header;
+        return QCoreApplication::translate("GoodsItem", columns[col].header);
     }
 };
