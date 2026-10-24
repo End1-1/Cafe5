@@ -6,10 +6,12 @@
 #include <QNetworkAccessManager>
 #include <QNetworkRequest>
 #include <QNetworkReply>
+#include <QPointer>
 #include <QSslConfiguration>
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QElapsedTimer>
+#include <QTimer>
 
 namespace {
 
@@ -72,7 +74,15 @@ void NDataProvider::getData(const QString &route, const QJsonObject &data)
     if (route.startsWith("http", Qt::CaseInsensitive)) {
         url = route;
     } else {
-        url = QString("%1://%2/%3").arg(mConnectionProtocol, mConnectionHost, route);
+        QString path = route;
+        while (path.startsWith(QLatin1Char('/'))) {
+            path.remove(0, 1);
+        }
+        QString host = mConnectionHost;
+        while (host.endsWith(QLatin1Char('/'))) {
+            host.chop(1);
+        }
+        url = QStringLiteral("%1://%2/%3").arg(mConnectionProtocol, host, path);
     }
     QNetworkRequest rq(url);
     rq.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
@@ -147,11 +157,20 @@ void NDataProvider::queryFinished(QNetworkReply *r)
     if(httpCode == 426) {
         QJsonObject jmsg = QJsonDocument::fromJson(ba).object();
         const QString newVersion = jmsg.value("new_version").toString();
-        QString msg = QString("%1<br>%2 → %3")
-                      .arg(tr("Application update required"),
-                           jmsg.value("old_version").toString(),
-                           newVersion);
-        emit updateRequired(msg, mAppName, newVersion);
+        const QString msg = QString("%1<br>%2 → %3")
+                                .arg(tr("Application update required"),
+                                     jmsg.value("old_version").toString(),
+                                     newVersion);
+        const QString appName = mAppName;
+        // Modal UI inside NAM::finished runs a nested loop that deletes this reply
+        // before QNetworkAccessManagerPrivate::_q_replyFinished copies request().
+        QPointer<NDataProvider> self(this);
+        QTimer::singleShot(0, this, [self, msg, appName, newVersion] {
+            if (!self) {
+                return;
+            }
+            emit self->updateRequired(msg, appName, newVersion);
+        });
         return;
     }
 

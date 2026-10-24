@@ -23,7 +23,15 @@ DlgUpdateRequired::DlgUpdateRequired(QWidget *parent)
 
 DlgUpdateRequired::~DlgUpdateRequired()
 {
+    prepareForClose();
     delete ui;
+}
+
+void DlgUpdateRequired::prepareForClose()
+{
+    setAttribute(Qt::WA_TranslucentBackground, false);
+    setWindowOpacity(1.0);
+    hide();
 }
 
 void DlgUpdateRequired::setUpdateInfo(const QString &message, const QString &oldVersion, const QString &newVersion)
@@ -102,10 +110,12 @@ void DlgUpdateRequired::mouseReleaseEvent(QMouseEvent *event)
 
 void DlgUpdateRequired::on_btnYes_clicked()
 {
+    prepareForClose();
     accept();
 }
 
 void DlgUpdateRequired::on_btnNo_clicked()
 {
+    prepareForClose();
     reject();
 }

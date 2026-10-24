@@ -25,8 +25,7 @@
 #include <algorithm>
 #include <limits>
 
-namespace
-{
+namespace {
 
 static bool pickKitchenHistoryDate(QWidget *parent, QDate &outDate)
 {

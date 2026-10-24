@@ -4,6 +4,7 @@
 
 require_once __DIR__ . "/index.php";
 require_once __DIR__ . "/../../worker/helper.php";
+require_once __DIR__ . "/../worker/cash-ops-helper.php";
 
 class Reports extends Auth
 {
@@ -93,7 +94,7 @@ class Reports extends Auth
     private function PrintDailyRevenue($params)
     {
         $cashbox = $this->select("select cb.f_name from cash_box cb left join cash_session cs on cs.f_cashbox_id=cb.f_id where cs.f_id=?", "i", [$params->params->session_id])->fetch_assoc();
-        $dict = require_once __DIR__ . "/../worker/dict-payment.php";
+        $dict = require __DIR__ . "/../worker/dict-payment.php";
 
         $paymentParts = [];
 
@@ -156,7 +157,7 @@ class Reports extends Auth
             if ((float)$amount == 0) {
                 continue;
             }
-            $output[] = ["cmd" => "lrtext", "left" => Translator::t($dict["names"][$type]), "right" => $amount];
+            $output[] = ["cmd" => "lrtext", "left" => payment_type_name($this, (int)$type), "right" => $amount];
             $output[] = ["cmd" => "br"];
         }
         $output[] = ["cmd" => "lrtext", "left" => Translator::t("Amount of service"), "right" => $oh["f_service_amount"]];
@@ -177,7 +178,7 @@ class Reports extends Auth
     private function PrintDailyRevenueByWaiters($params)
     {
         $cashbox = $this->select("select cb.f_name from cash_box cb left join cash_session cs on cs.f_cashbox_id=cb.f_id where cs.f_id=?", "i", [$params->params->session_id])->fetch_assoc();
-        $dict = require_once __DIR__ . "/../worker/dict-payment.php";
+        $dict = require __DIR__ . "/../worker/dict-payment.php";
 
         $paymentParts = [];
 
@@ -252,7 +253,7 @@ class Reports extends Auth
                 if ((float)$amount == 0) {
                     continue;
                 }
-                $output[] = ["cmd" => "lrtext", "left" => Translator::t($dict["names"][$type]), "right" => $amount];
+                $output[] = ["cmd" => "lrtext", "left" => payment_type_name($this, (int)$type), "right" => $amount];
                 $output[] = ["cmd" => "br"];
             }
             $output[] = ["cmd" => "lrtext", "left" => Translator::t("Amount of service"), "right" => $h["f_service_amount"]];
@@ -274,7 +275,7 @@ class Reports extends Auth
             if ((float)$amount == 0) {
                 continue;
             }
-            $output[] = ["cmd" => "lrtext", "left" => Translator::t($dict["names"][$type]), "right" => $amount];
+            $output[] = ["cmd" => "lrtext", "left" => payment_type_name($this, (int)$type), "right" => $amount];
             $output[] = ["cmd" => "br"];
         }
         $output[] = ["cmd" => "line"];
@@ -456,12 +457,13 @@ class Reports extends Auth
         // --- 2. ЧТО ДОЛЖНО БЫТЬ В КАССЕ ВААААБЩЕ ---
         $sqlTotalInBox = <<<EOD
         SELECT 
-            d.f_dict_id as f_payment_type_id,
-            d.f_value as f_pay_type,
+            co.f_payment_type_id,
+            COALESCE(MAX(NULLIF(cpt.f_name, '')), MAX(d.f_value)) as f_pay_type,
             SUM(co.f_debit - co.f_credit) as f_balance_raw
         FROM cash_operations co
         LEFT JOIN l_dictionary d ON d.f_dict_id = co.f_payment_type_id 
             AND d.f_dict='cash_payment_types' AND d.f_lang='hy'
+        LEFT JOIN cash_payment_types cpt ON cpt.f_id = co.f_payment_type_id
         WHERE co.f_cashbox_id = ?
         GROUP BY co.f_payment_type_id
 EOD;
@@ -471,13 +473,14 @@ EOD;
         $sqlSummary = <<<EOD
         SELECT 
             co.f_payment_type_id,
-            d.f_value as f_pay_type,
+            COALESCE(MAX(NULLIF(cpt.f_name, '')), MAX(d.f_value)) as f_pay_type,
             SUM(co.f_debit) as f_total_debit,
             SUM(co.f_credit) as f_total_credit,
             SUM(co.f_debit - co.f_credit) as f_net_diff
         FROM cash_operations co
         LEFT JOIN l_dictionary d ON d.f_dict_id = co.f_payment_type_id 
             AND d.f_dict='cash_payment_types' AND d.f_lang='hy'
+        LEFT JOIN cash_payment_types cpt ON cpt.f_id = co.f_payment_type_id
         WHERE co.f_session_id = ?
         GROUP BY co.f_payment_type_id
 EOD;
@@ -548,14 +551,21 @@ EOD;
         // --- 4. ДЕТАЛЬНОЕ ДВИЖЕНИЕ ---
         $sqlOps = <<<EOD
         SELECT 
+            co.f_datetime as f_datetime_raw,
             datetime_fmt(co.f_datetime, 0) as f_datetime,
             co.f_comment,
-            d.f_value as f_pay_type,
+            co.f_operation_type,
+            COALESCE(NULLIF(cpt.f_name, ''), d.f_value) as f_pay_type,
             co.f_debit,
-            co.f_credit
+            co.f_credit,
+            COALESCE(NULLIF(TRIM(p.f_taxname), ''), NULLIF(TRIM(p.f_name), ''), '') AS partner_name,
+            JSON_UNQUOTE(JSON_EXTRACT(sd.f_data, '$.create_date')) AS store_create_date
         FROM cash_operations co
         LEFT JOIN l_dictionary d ON d.f_dict_id = co.f_payment_type_id 
             AND d.f_dict='cash_payment_types' AND d.f_lang='hy'
+        LEFT JOIN cash_payment_types cpt ON cpt.f_id = co.f_payment_type_id
+        LEFT JOIN store_document sd ON sd.f_id = co.f_order_id AND sd.f_doc_type = 1
+        LEFT JOIN c_partners p ON p.f_id = sd.f_partner
         WHERE co.f_session_id = ?
         ORDER BY co.f_id ASC
 EOD;
@@ -565,10 +575,26 @@ EOD;
         $output[] = ["cmd" => "br"];
 
         foreach ($operations as $op) {
-            $output[] = ["cmd" => "ltext", "text" => $op['f_datetime']];
+            $dtRaw = (string)($op['f_datetime_raw'] ?? '');
+            $dtShow = (string)($op['f_datetime'] ?? '');
+            if (strlen($dtRaw) >= 19 && substr($dtRaw, 11, 8) === '00:00:00') {
+                $create = trim((string)($op['store_create_date'] ?? ''));
+                $parsed = $create !== ''
+                    ? (\DateTime::createFromFormat('d/m/Y H:i:s', $create)
+                        ?: \DateTime::createFromFormat('Y-m-d H:i:s', $create))
+                    : false;
+                if ($parsed) {
+                    $dtShow = substr($dtRaw, 0, 10) . ' ' . $parsed->format('H:i:s');
+                }
+            }
+            $output[] = ["cmd" => "ltext", "text" => $dtShow];
             $output[] = ["cmd" => "br"];
 
             $label = $op['f_comment'] . ($op['f_pay_type'] ? " ({$op['f_pay_type']})" : "");
+            $partner = trim((string)($op['partner_name'] ?? ''));
+            if ($partner !== '' && ((int)$op['f_operation_type'] === 3 || (float)$op['f_credit'] > 0)) {
+                $label .= " — " . $partner;
+            }
             $valStr = ((float)$op['f_debit'] > 0) ? "+" . money_fmt_php($op['f_debit']) : "-" . money_fmt_php($op['f_credit']);
 
             $output[] = ["cmd" => "lrtext", "left" => $label, "right" => $valStr];

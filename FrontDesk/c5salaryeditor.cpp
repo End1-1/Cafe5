@@ -56,7 +56,7 @@ C5SalaryEditor::C5SalaryEditor(QWidget *parent)
     recalcTotal();
 
     connect(ui->tblSalary, &QTableWidget::cellChanged, this, [this](int row, int column) {
-        if (column == colFixed || column == colCalculated || column == colBonus) {
+        if (column == colFixed || column == colCalculated || column == colBonus || column == colFine) {
             updateRowTotal(row);
         } else if (column == colTotal) {
             recalcTotal();
@@ -158,108 +158,81 @@ void C5SalaryEditor::showEvent(QShowEvent *e)
                            const QJsonArray items = jo.value(QStringLiteral("items")).toArray();
                            ui->tblSalary->setRowCount(0);
 
-                           int row = 0;
                            for (const auto &v : items) {
                                const QJsonObject it = v.toObject();
-
-                               const double fixed = it.value(QStringLiteral("f_fixed")).toString().toDouble();
-                               const double calculated = it.value(QStringLiteral("f_calculated")).toString().toDouble();
-                               const double bonus = it.value(QStringLiteral("f_bonus")).toString().toDouble();
-                               const double total = fixed + calculated + bonus;
-
+                               const int row = ui->tblSalary->rowCount();
                                ui->tblSalary->insertRow(row);
-
-                               auto *itDbId = new QTableWidgetItem(QString::number(it.value(QStringLiteral("f_id")).toInt()));
-                               auto *itPositionId = new QTableWidgetItem(QString::number(it.value(QStringLiteral("f_position")).toInt()));
-                               auto *itStaffId = new QTableWidgetItem(QString::number(it.value(QStringLiteral("f_staff")).toInt()));
-                               auto *itNum = new QTableWidgetItem(QString::number(row + 1));
-                               auto *itPos = new QTableWidgetItem(it.value(QStringLiteral("f_position_name")).toString());
-                               auto *itName = new QTableWidgetItem(it.value(QStringLiteral("f_staff_name")).toString());
-                               auto *itFixed = new QTableWidgetItem(QString::number(fixed, 'f', 2));
-                               auto *itDishBase = new QTableWidgetItem(QStringLiteral("0.00"));
-                               auto *itCalculated = new QTableWidgetItem(QString::number(calculated, 'f', 2));
-                               auto *itBonus = new QTableWidgetItem(QString::number(bonus, 'f', 2));
-                               auto *itTotal = new QTableWidgetItem(QString::number(total, 'f', 2));
-
-                               itDbId->setFlags(itDbId->flags() & ~Qt::ItemIsEditable);
-                               itPositionId->setFlags(itPositionId->flags() & ~Qt::ItemIsEditable);
-                               itStaffId->setFlags(itStaffId->flags() & ~Qt::ItemIsEditable);
-                               itNum->setFlags(itNum->flags() & ~Qt::ItemIsEditable);
-                               itPos->setFlags(itPos->flags() & ~Qt::ItemIsEditable);
-                               itName->setFlags(itName->flags() & ~Qt::ItemIsEditable);
-                               itTotal->setFlags(itTotal->flags() & ~Qt::ItemIsEditable);
-
-                               itNum->setTextAlignment(Qt::AlignCenter);
-                               itFixed->setTextAlignment(Qt::AlignRight | Qt::AlignVCenter);
-                               itDishBase->setTextAlignment(Qt::AlignRight | Qt::AlignVCenter);
-                               itDishBase->setFlags(itDishBase->flags() & ~Qt::ItemIsEditable);
-                               itCalculated->setTextAlignment(Qt::AlignRight | Qt::AlignVCenter);
-                               itBonus->setTextAlignment(Qt::AlignRight | Qt::AlignVCenter);
-                               itTotal->setTextAlignment(Qt::AlignRight | Qt::AlignVCenter);
-
-                               ui->tblSalary->setItem(row, colDbId, itDbId);
-                               ui->tblSalary->setItem(row, colPositionId, itPositionId);
-                               ui->tblSalary->setItem(row, colStaffId, itStaffId);
-                               ui->tblSalary->setItem(row, colNum, itNum);
-                               ui->tblSalary->setItem(row, colPosition, itPos);
-                               ui->tblSalary->setItem(row, colName, itName);
-                               ui->tblSalary->setItem(row, colFixed, itFixed);
-                               ui->tblSalary->setItem(row, colDishBase, itDishBase);
-                               ui->tblSalary->setItem(row, colCalculated, itCalculated);
-                               ui->tblSalary->setItem(row, colBonus, itBonus);
-                               ui->tblSalary->setItem(row, colTotal, itTotal);
-
-                               ++row;
+                               fillRow(row,
+                                       it.value(QStringLiteral("f_id")).toVariant().toInt(),
+                                       it.value(QStringLiteral("f_staff")).toVariant().toInt(),
+                                       it.value(QStringLiteral("f_staff_name")).toString(),
+                                       it.value(QStringLiteral("f_position")).toVariant().toInt(),
+                                       it.value(QStringLiteral("f_position_name")).toString(),
+                                       it.value(QStringLiteral("f_time_in")).toString(),
+                                       it.value(QStringLiteral("f_time_out")).toString(),
+                                       it.value(QStringLiteral("f_fixed")).toVariant().toDouble(),
+                                       it.value(QStringLiteral("f_calculated")).toVariant().toDouble(),
+                                       it.value(QStringLiteral("f_bonus")).toVariant().toDouble(),
+                                       it.value(QStringLiteral("f_fine")).toVariant().toDouble());
                            }
 
                            recalcTotal();
                        });
 }
 
-void C5SalaryEditor::appendStaffRow(int staffId, const QString &staffName, int positionId, const QString &positionName)
+void C5SalaryEditor::fillRow(int row, int dbId, int staffId, const QString &staffName, int positionId,
+                             const QString &positionName, const QString &timeIn, const QString &timeOut, double fixed,
+                             double calculated, double bonus, double fine)
+{
+    auto readOnly = [this, row](int col, const QString &text) {
+        auto *it = new QTableWidgetItem(text);
+        it->setFlags(it->flags() & ~Qt::ItemIsEditable);
+        ui->tblSalary->setItem(row, col, it);
+        return it;
+    };
+
+    readOnly(colDbId, QString::number(dbId));
+    readOnly(colPositionId, QString::number(positionId));
+    readOnly(colStaffId, QString::number(staffId));
+    readOnly(colNum, QString::number(row + 1))->setTextAlignment(Qt::AlignCenter);
+    readOnly(colPosition, positionName);
+    readOnly(colName, staffName);
+    setTimeCell(row, colTimeIn, timeIn);
+    setTimeCell(row, colTimeOut, timeOut);
+    setMoneyCell(ui->tblSalary, row, colFixed, fixed);
+    setMoneyCell(ui->tblSalary, row, colDishBase, 0, false);
+    setMoneyCell(ui->tblSalary, row, colCalculated, calculated);
+    setMoneyCell(ui->tblSalary, row, colBonus, bonus);
+    setMoneyCell(ui->tblSalary, row, colFine, fine);
+    setMoneyCell(ui->tblSalary, row, colTotal, rowTotal(row), false);
+}
+
+void C5SalaryEditor::setTimeCell(int row, int col, const QString &value)
+{
+    auto *it = ui->tblSalary->item(row, col);
+    if (!it) {
+        it = new QTableWidgetItem();
+        it->setFlags(it->flags() & ~Qt::ItemIsEditable);
+        it->setTextAlignment(Qt::AlignCenter);
+        ui->tblSalary->setItem(row, col, it);
+    }
+    it->setText(value);
+}
+
+double C5SalaryEditor::rowTotal(int row) const
+{
+    const double gross = qAbs(cellAmount(ui->tblSalary, row, colFixed))
+                         + qAbs(cellAmount(ui->tblSalary, row, colCalculated))
+                         + qAbs(cellAmount(ui->tblSalary, row, colBonus));
+    return qMax(0.0, gross - qAbs(cellAmount(ui->tblSalary, row, colFine)));
+}
+
+void C5SalaryEditor::appendStaffRow(int staffId, const QString &staffName, int positionId, const QString &positionName,
+                                    const QString &timeIn, const QString &timeOut)
 {
     const int row = ui->tblSalary->rowCount();
     ui->tblSalary->insertRow(row);
-
-    auto *itDbId = new QTableWidgetItem(QStringLiteral("0"));
-    auto *itPositionId = new QTableWidgetItem(QString::number(positionId));
-    auto *itStaffId = new QTableWidgetItem(QString::number(staffId));
-    auto *itNum = new QTableWidgetItem(QString::number(row + 1));
-    auto *itPos = new QTableWidgetItem(positionName);
-    auto *itName = new QTableWidgetItem(staffName);
-    auto *itFixed = new QTableWidgetItem(QStringLiteral("0.00"));
-    auto *itDishBase = new QTableWidgetItem(QStringLiteral("0.00"));
-    auto *itCalculated = new QTableWidgetItem(QStringLiteral("0.00"));
-    auto *itBonus = new QTableWidgetItem(QStringLiteral("0.00"));
-    auto *itTotal = new QTableWidgetItem(QStringLiteral("0.00"));
-
-    itDbId->setFlags(itDbId->flags() & ~Qt::ItemIsEditable);
-    itPositionId->setFlags(itPositionId->flags() & ~Qt::ItemIsEditable);
-    itStaffId->setFlags(itStaffId->flags() & ~Qt::ItemIsEditable);
-    itNum->setFlags(itNum->flags() & ~Qt::ItemIsEditable);
-    itPos->setFlags(itPos->flags() & ~Qt::ItemIsEditable);
-    itName->setFlags(itName->flags() & ~Qt::ItemIsEditable);
-    itTotal->setFlags(itTotal->flags() & ~Qt::ItemIsEditable);
-
-    itNum->setTextAlignment(Qt::AlignCenter);
-    itFixed->setTextAlignment(Qt::AlignRight | Qt::AlignVCenter);
-    itDishBase->setTextAlignment(Qt::AlignRight | Qt::AlignVCenter);
-    itDishBase->setFlags(itDishBase->flags() & ~Qt::ItemIsEditable);
-    itCalculated->setTextAlignment(Qt::AlignRight | Qt::AlignVCenter);
-    itBonus->setTextAlignment(Qt::AlignRight | Qt::AlignVCenter);
-    itTotal->setTextAlignment(Qt::AlignRight | Qt::AlignVCenter);
-
-    ui->tblSalary->setItem(row, colDbId, itDbId);
-    ui->tblSalary->setItem(row, colPositionId, itPositionId);
-    ui->tblSalary->setItem(row, colStaffId, itStaffId);
-    ui->tblSalary->setItem(row, colNum, itNum);
-    ui->tblSalary->setItem(row, colPosition, itPos);
-    ui->tblSalary->setItem(row, colName, itName);
-    ui->tblSalary->setItem(row, colFixed, itFixed);
-    ui->tblSalary->setItem(row, colDishBase, itDishBase);
-    ui->tblSalary->setItem(row, colCalculated, itCalculated);
-    ui->tblSalary->setItem(row, colBonus, itBonus);
-    ui->tblSalary->setItem(row, colTotal, itTotal);
+    fillRow(row, 0, staffId, staffName, positionId, positionName, timeIn, timeOut, 0, 0, 0, 0);
     ui->tblSalary->setCurrentCell(row, colFixed);
 }
 
@@ -384,16 +357,21 @@ void C5SalaryEditor::autofillDocument()
 
                            for (const QJsonValue &v : items) {
                                const QJsonObject it = v.toObject();
-                               const int staffId = it.value(QStringLiteral("f_staff")).toInt();
+                               const int staffId = it.value(QStringLiteral("f_staff")).toVariant().toInt();
                                if (staffId <= 0) {
                                    continue;
                                }
 
                                QString staffName = it.value(QStringLiteral("f_staff_name")).toString().trimmed();
-                               int positionId = it.value(QStringLiteral("f_position")).toInt();
+                               int positionId = it.value(QStringLiteral("f_position")).toVariant().toInt();
                                QString positionName = it.value(QStringLiteral("f_position_name")).toString().trimmed();
 
-                               appendStaffRow(staffId, staffName, positionId, positionName);
+                               appendStaffRow(staffId,
+                                              staffName,
+                                              positionId,
+                                              positionName,
+                                              it.value(QStringLiteral("f_time_in")).toString(),
+                                              it.value(QStringLiteral("f_time_out")).toString());
                            }
 
                            if (items.isEmpty()) {
@@ -404,11 +382,12 @@ void C5SalaryEditor::autofillDocument()
                        });
 }
 
-void C5SalaryEditor::applyCalculatedRow(int row, double fixed, double dishBase, double calculated, double total)
+void C5SalaryEditor::applyCalculatedRow(int row, double fixed, double dishBase, double calculated, double fine, double total)
 {
     setMoneyCell(ui->tblSalary, row, colFixed, fixed, true);
     setMoneyCell(ui->tblSalary, row, colDishBase, dishBase, false);
     setMoneyCell(ui->tblSalary, row, colCalculated, calculated, true);
+    setMoneyCell(ui->tblSalary, row, colFine, fine, true);
     setMoneyCell(ui->tblSalary, row, colTotal, total, false);
 }
 
@@ -510,10 +489,19 @@ void C5SalaryEditor::calculateDocument()
                            for (int i = 0; i < n; ++i) {
                                const QJsonObject it = items.at(i).toObject();
                                applyCalculatedRow(i,
-                                                  it.value(QStringLiteral("f_fixed")).toDouble(),
-                                                  it.value(QStringLiteral("f_dish_taxable_base")).toDouble(),
-                                                  it.value(QStringLiteral("f_calculated")).toDouble(),
-                                                  it.value(QStringLiteral("f_total")).toDouble());
+                                                  it.value(QStringLiteral("f_fixed")).toVariant().toDouble(),
+                                                  it.value(QStringLiteral("f_dish_taxable_base")).toVariant().toDouble(),
+                                                  it.value(QStringLiteral("f_calculated")).toVariant().toDouble(),
+                                                  it.value(QStringLiteral("f_fine")).toVariant().toDouble(),
+                                                  it.value(QStringLiteral("f_total")).toVariant().toDouble());
+                               setTimeCell(i, colTimeIn, it.value(QStringLiteral("f_time_in")).toString());
+                               setTimeCell(i, colTimeOut, it.value(QStringLiteral("f_time_out")).toString());
+
+                               const int lateMinutes = it.value(QStringLiteral("f_late_minutes")).toVariant().toInt();
+                               if (auto *itFine = ui->tblSalary->item(i, colFine)) {
+                                   itFine->setToolTip(lateMinutes > 0 ? tr("Late %1 min").arg(lateMinutes) : QString());
+                                   itFine->setForeground(lateMinutes > 0 ? QBrush(Qt::red) : QBrush());
+                               }
                            }
                            recalcTotal();
                        });
@@ -537,13 +525,14 @@ void C5SalaryEditor::saveDocument()
         const double fixed = qAbs(cellAmount(ui->tblSalary, row, colFixed));
         const double calculated = qAbs(cellAmount(ui->tblSalary, row, colCalculated));
         const double bonus = qAbs(cellAmount(ui->tblSalary, row, colBonus));
-        const double credit = fixed + calculated + bonus;
+        const double fine = qAbs(cellAmount(ui->tblSalary, row, colFine));
+        const double credit = qMax(0.0, fixed + calculated + bonus - fine);
 
         if (staffId <= 0) {
             ++rowsNoStaff;
             continue;
         }
-        if (credit <= 0.001) {
+        if (fixed + calculated + bonus <= 0.001) {
             ++rowsNoAmount;
             continue;
         }
@@ -554,6 +543,7 @@ void C5SalaryEditor::saveDocument()
         jitem[QStringLiteral("f_fixed")] = fixed;
         jitem[QStringLiteral("f_calculated")] = calculated;
         jitem[QStringLiteral("f_bonus")] = bonus;
+        jitem[QStringLiteral("f_fine")] = fine;
         jitem[QStringLiteral("f_amount_credit")] = credit;
         items.push_back(jitem);
     }
@@ -609,7 +599,7 @@ void C5SalaryEditor::print()
 void C5SalaryEditor::initTable()
 {
     ui->tblSalary->setRowCount(0);
-    ui->tblSalary->setColumnCount(11);
+    ui->tblSalary->setColumnCount(colCount);
     ui->tblSalary->setHorizontalHeaderLabels({
         QStringLiteral("DbId"),
         QStringLiteral("PositionId"),
@@ -617,10 +607,13 @@ void C5SalaryEditor::initTable()
         QStringLiteral("#"),
         tr("Position"),
         tr("Name"),
+        tr("Arrival"),
+        tr("Leave"),
         tr("Fixed"),
         tr("Dish sales base"),
         tr("Calculated"),
         tr("Bonus"),
+        tr("Fine"),
         tr("Total"),
     });
     ui->tblSalary->setColumnHidden(colDbId, true);
@@ -629,7 +622,10 @@ void C5SalaryEditor::initTable()
     ui->tblSalary->horizontalHeader()->setSectionResizeMode(colNum, QHeaderView::ResizeToContents);
     ui->tblSalary->horizontalHeader()->setSectionResizeMode(colPosition, QHeaderView::Stretch);
     ui->tblSalary->horizontalHeader()->setSectionResizeMode(colName, QHeaderView::Stretch);
+    ui->tblSalary->horizontalHeader()->setSectionResizeMode(colTimeIn, QHeaderView::ResizeToContents);
+    ui->tblSalary->horizontalHeader()->setSectionResizeMode(colTimeOut, QHeaderView::ResizeToContents);
     ui->tblSalary->horizontalHeader()->setSectionResizeMode(colFixed, QHeaderView::ResizeToContents);
+    ui->tblSalary->horizontalHeader()->setSectionResizeMode(colFine, QHeaderView::ResizeToContents);
     ui->tblSalary->horizontalHeader()->setSectionResizeMode(colDishBase, QHeaderView::ResizeToContents);
     ui->tblSalary->horizontalHeader()->setSectionResizeMode(colCalculated, QHeaderView::ResizeToContents);
     ui->tblSalary->horizontalHeader()->setSectionResizeMode(colBonus, QHeaderView::ResizeToContents);
@@ -640,9 +636,7 @@ void C5SalaryEditor::initTable()
 
 void C5SalaryEditor::updateRowTotal(int row)
 {
-    const double total = qAbs(cellAmount(ui->tblSalary, row, colFixed))
-                         + qAbs(cellAmount(ui->tblSalary, row, colCalculated))
-                         + qAbs(cellAmount(ui->tblSalary, row, colBonus));
+    const double total = rowTotal(row);
 
     QSignalBlocker sb(ui->tblSalary);
     auto *itTotal = ui->tblSalary->item(row, colTotal);
@@ -682,10 +676,13 @@ QString C5SalaryEditor::buildPrintHtml() const
             + QStringLiteral("</p>");
     html += QStringLiteral("<table><thead><tr>"
                            "<th>#</th><th>") + tr("Position").toHtmlEscaped() + QStringLiteral("</th><th>")
-            + tr("Name").toHtmlEscaped() + QStringLiteral("</th><th>") + tr("Fixed").toHtmlEscaped()
+            + tr("Name").toHtmlEscaped() + QStringLiteral("</th><th>") + tr("Arrival").toHtmlEscaped()
+            + QStringLiteral("</th><th>") + tr("Leave").toHtmlEscaped()
+            + QStringLiteral("</th><th>") + tr("Fixed").toHtmlEscaped()
             + QStringLiteral("</th><th>") + tr("Dish sales base").toHtmlEscaped()
             + QStringLiteral("</th><th>") + tr("Calculated").toHtmlEscaped() + QStringLiteral("</th><th>")
-            + tr("Bonus").toHtmlEscaped() + QStringLiteral("</th><th>") + tr("Total").toHtmlEscaped()
+            + tr("Bonus").toHtmlEscaped() + QStringLiteral("</th><th>") + tr("Fine").toHtmlEscaped()
+            + QStringLiteral("</th><th>") + tr("Total").toHtmlEscaped()
             + QStringLiteral("</th></tr></thead><tbody>");
 
     for (int i = 0; i < ui->tblSalary->rowCount(); ++i) {
@@ -693,10 +690,13 @@ QString C5SalaryEditor::buildPrintHtml() const
         html += QStringLiteral("<td class='num'>") + QString::number(i + 1).toHtmlEscaped() + QStringLiteral("</td>");
         html += QStringLiteral("<td>") + (ui->tblSalary->item(i, colPosition) ? ui->tblSalary->item(i, colPosition)->text().toHtmlEscaped() : QString()) + QStringLiteral("</td>");
         html += QStringLiteral("<td>") + (ui->tblSalary->item(i, colName) ? ui->tblSalary->item(i, colName)->text().toHtmlEscaped() : QString()) + QStringLiteral("</td>");
+        html += QStringLiteral("<td class='num'>") + (ui->tblSalary->item(i, colTimeIn) ? ui->tblSalary->item(i, colTimeIn)->text().toHtmlEscaped() : QString()) + QStringLiteral("</td>");
+        html += QStringLiteral("<td class='num'>") + (ui->tblSalary->item(i, colTimeOut) ? ui->tblSalary->item(i, colTimeOut)->text().toHtmlEscaped() : QString()) + QStringLiteral("</td>");
         html += QStringLiteral("<td class='money'>") + (ui->tblSalary->item(i, colFixed) ? ui->tblSalary->item(i, colFixed)->text().toHtmlEscaped() : QStringLiteral("0.00")) + QStringLiteral("</td>");
         html += QStringLiteral("<td class='money'>") + (ui->tblSalary->item(i, colDishBase) ? ui->tblSalary->item(i, colDishBase)->text().toHtmlEscaped() : QStringLiteral("0.00")) + QStringLiteral("</td>");
         html += QStringLiteral("<td class='money'>") + (ui->tblSalary->item(i, colCalculated) ? ui->tblSalary->item(i, colCalculated)->text().toHtmlEscaped() : QStringLiteral("0.00")) + QStringLiteral("</td>");
         html += QStringLiteral("<td class='money'>") + (ui->tblSalary->item(i, colBonus) ? ui->tblSalary->item(i, colBonus)->text().toHtmlEscaped() : QStringLiteral("0.00")) + QStringLiteral("</td>");
+        html += QStringLiteral("<td class='money'>") + (ui->tblSalary->item(i, colFine) ? ui->tblSalary->item(i, colFine)->text().toHtmlEscaped() : QStringLiteral("0.00")) + QStringLiteral("</td>");
         html += QStringLiteral("<td class='money'>") + (ui->tblSalary->item(i, colTotal) ? ui->tblSalary->item(i, colTotal)->text().toHtmlEscaped() : QStringLiteral("0.00")) + QStringLiteral("</td>");
         html += QStringLiteral("</tr>");
     }

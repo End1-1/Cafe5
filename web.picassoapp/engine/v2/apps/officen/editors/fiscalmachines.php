@@ -20,6 +20,7 @@ class FiscalMachines
                COALESCE(f_default_dept, 1) AS f_default_dept,
                COALESCE(f_external_pos, 0) AS f_external_pos,
                COALESCE(f_idram_ext_pos, 0) AS f_idram_ext_pos,
+               COALESCE(f_auto_fiscal, 0) AS f_auto_fiscal,
                COALESCE(f_simple_fiscal, 0) AS f_simple_fiscal
         FROM fiscal_machine
         ORDER BY f_name, f_id
@@ -36,6 +37,7 @@ class FiscalMachines
                 Translator::t('Բաժին (dep)'),
                 Translator::t('External POS'),
                 Translator::t('Idram external POS'),
+                Translator::t('Mandatory fiscal print'),
                 Translator::t('Պարզ ՀԴՄ'),
             ],
         ];
@@ -100,6 +102,7 @@ class FiscalMachines
             'f_op_pass' => $opPass,
             'f_external_pos' => ((int)($params->f_external_pos ?? 0)) === 1 ? 1 : 0,
             'f_idram_ext_pos' => ((int)($params->f_idram_ext_pos ?? 0)) === 1 ? 1 : 0,
+            'f_auto_fiscal' => ((int)($params->f_auto_fiscal ?? 0)) === 1 ? 1 : 0,
             'f_default_dept' => $defaultDept,
             'f_simple_fiscal' => $simpleFiscal ? 1 : 0,
         ];
@@ -162,6 +165,7 @@ class FiscalMachines
             'f_op_pass' => '',
             'f_external_pos' => 0,
             'f_idram_ext_pos' => 0,
+            'f_auto_fiscal' => 0,
             'f_default_dept' => 1,
             'f_simple_fiscal' => 0,
         ];
@@ -170,7 +174,7 @@ class FiscalMachines
     private function rowById(int $id): ?array
     {
         $row = $this->db->select(
-            'SELECT f_id, f_name, f_ip, f_port, f_password, f_op_pin, f_op_pass, f_external_pos, f_idram_ext_pos, f_default_dept, f_simple_fiscal
+            'SELECT f_id, f_name, f_ip, f_port, f_password, f_op_pin, f_op_pass, f_external_pos, f_idram_ext_pos, f_auto_fiscal, f_default_dept, f_simple_fiscal
              FROM fiscal_machine WHERE f_id = ?',
             'i',
             [$id]
@@ -184,6 +188,7 @@ class FiscalMachines
         $row['f_port'] = (int)$row['f_port'];
         $row['f_external_pos'] = (int)$row['f_external_pos'];
         $row['f_idram_ext_pos'] = (int)$row['f_idram_ext_pos'];
+        $row['f_auto_fiscal'] = (int)($row['f_auto_fiscal'] ?? 0);
         $row['f_default_dept'] = (int)$row['f_default_dept'];
         $row['f_simple_fiscal'] = (int)($row['f_simple_fiscal'] ?? 0);
         $row['f_name'] = (string)($row['f_name'] ?? '');

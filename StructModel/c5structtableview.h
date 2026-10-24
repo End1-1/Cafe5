@@ -9,6 +9,7 @@
 #include <QJsonArray>
 #include <QHash>
 #include <QMap>
+#include <functional>
 
 namespace Ui
 {
@@ -22,8 +23,11 @@ public:
     explicit C5StructTableView(C5User *user = nullptr);
     ~C5StructTableView();
 
+    using RowFilter = std::function<bool(const QJsonObject &)>;
+
     template<typename T>
-    static QVector<T> get(const QString &searchEngine, bool getAllListFirst, bool multiSelect, QPoint point);;
+    static QVector<T> get(const QString &searchEngine, bool getAllListFirst, bool multiSelect, QPoint point,
+                          RowFilter filter = {});
 
     static void updateGoodsLastInputPrices(const QHash<int, double> &prices);
 
@@ -32,7 +36,7 @@ public:
     template<typename T>
     void handleSearchResult(const QJsonArray &jarr, C5StructModel<T>* model)
     {
-        QVector<T> data = parseJsonArray<T>(jarr);
+        QVector<T> data = parseJsonArray<T>(filtered(jarr));
         model->setData(std::move(data));
     }
 private slots:
@@ -55,6 +59,10 @@ private:
 
     QString mSearchEngine;
 
+    RowFilter mRowFilter;
+
+    QJsonArray filtered(const QJsonArray &jarr) const;
+
     QTimer* mSearchTimer = nullptr;
 
     int mSearchDelay = 400;
@@ -72,18 +80,20 @@ private:
 };
 
 template<typename T>
-inline QVector<T> C5StructTableView::get(const QString &searchEngine, bool getAllListFirst, bool multiSelect, QPoint point)
+inline QVector<T> C5StructTableView::get(const QString &searchEngine, bool getAllListFirst, bool multiSelect, QPoint point,
+                                         RowFilter filter)
 {
     C5StructTableView tv;
     tv.mInitialPos = point;
     tv.setWindowTitle(tv.selectorTitles().value(searchEngine));
     tv.mSearchEngine = searchEngine;
     tv.mEmptySearch = getAllListFirst;
+    tv.mRowFilter = std::move(filter);
     auto *model = new C5StructModel<T>(&tv);
     tv.tableView()->setModel(model);
 
     if(sLastResultsByEngine.contains(searchEngine)) {
-        model->setData(parseJsonArray<T>(sLastResultsByEngine.value(searchEngine)));
+        model->setData(parseJsonArray<T>(tv.filtered(sLastResultsByEngine.value(searchEngine))));
         tv.tableView()->resizeColumnsToContents();
     }
 

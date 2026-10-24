@@ -34,6 +34,9 @@ public:
     /** When true, data is not fetched in showEvent (use reloadReport / tab activation). */
     void setDeferredLoad(bool deferred);
 
+    /** Overrides filter values (e.g. drill-down dates) regardless of the date pin. */
+    void overrideFilterValues(const QJsonArray &values);
+
     QString mEditorName;
 
 protected:
@@ -62,6 +65,18 @@ protected:
     RAbstractEditorDialog* createEditorDialog(const QString &editorName);
 
     void getData();
+
+    void setFilterValue(const QString &name, const QJsonValue &value);
+
+    void setViewModeFilterValue(int value);
+
+    void checkViewModeButton(int value);
+
+    void switchToViewMode(int mode);
+
+    void persistCurrentFilters();
+
+    QString filterWidgetPrefix() const;
 
     Ui::RAbstractEditorReport *ui = nullptr;
 
@@ -108,11 +123,11 @@ private:
 
     void clearViewModeButtons();
 
-    void setViewModeFilterValue(int value);
-
     void updateViewModeScrollButtons();
 
     void syncViewModeScrollRange();
 
     void scrollViewModeBy(int delta);
+
+    int viewModeValue() const;
 };

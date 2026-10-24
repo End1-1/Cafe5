@@ -939,6 +939,27 @@ void WOrder::printPrecheck()
         p.br();
     }
 
+    const bool hasDebtOrBank = mOrder.payment(payment_fields[PAYMENT_TYPE_DEBT]) > 0.001
+                               || mOrder.payment(payment_fields[PAYMENT_TYPE_BANK]) > 0.001;
+    if (hasDebtOrBank) {
+        p.br();
+        p.br();
+        p.br();
+        p.br();
+        p.line(2);
+        p.br();
+        p.ctext(tr("Signature"));
+        p.br();
+        const QString partnerName = mOrder.data.value(QStringLiteral("f_guest_name")).toString().trimmed();
+        if (!partnerName.isEmpty()) {
+            p.ctext(partnerName);
+            p.br();
+        } else if (!ui->leCustomer->text().trimmed().isEmpty()) {
+            p.ctext(ui->leCustomer->text().trimmed());
+            p.br();
+        }
+    }
+
     p.br();
     p.setFontSize(bs - 2);
     p.ltext(tr("Thank you for visit!"), marginMm);
@@ -1187,30 +1208,16 @@ void WOrder::on_leCode_returnPressed()
         }
     }
 
-    // Scale label EAN: [2-digit flag][5-digit PLU][6-digit weight*10000]
-    // Example 2301001002405 → flag 23, scancode 01001 → 1001, weight 002405 → 0.2405 kg
-    // Match configured pattern, or any EAN-13 in the 20–29 weighted range (except 24 = piece labels above).
-    // Config often has 22 while labels use 23.
+    // Scale label: [configured prefix][5-digit PLU][6-digit weight*10000]
+    // Example prefix 23: 2301001002405 → scancode 01001 → 1001, weight 002405 → 0.2405 kg
+    // Only the prefix from common settings (f_scale_pattern). No 20–29 fallback.
     {
         const QString pattern = mWorkStation.scalePattern().trimmed();
-        int prefixLen = 0;
-        bool isScale = false;
-
         if (!pattern.isEmpty()
             && pattern != QLatin1String("24")
             && code.startsWith(pattern)
             && code.length() >= pattern.length() + 11) {
-            prefixLen = pattern.length();
-            isScale = true;
-        } else if (code.length() == 13
-                   && code.at(0) == QLatin1Char('2')
-                   && code.at(1).isDigit()
-                   && !code.startsWith(QStringLiteral("24"))) {
-            prefixLen = 2;
-            isScale = true;
-        }
-
-        if (isScale) {
+            const int prefixLen = pattern.length();
             const QString pluRaw = code.mid(prefixLen, 5);
             QString barcode = QString::number(pluRaw.toInt());
             if (barcode == QLatin1String("0") && pluRaw == QLatin1String("00000")) {

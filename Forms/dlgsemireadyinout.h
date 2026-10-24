@@ -15,6 +15,7 @@ public:
     explicit DlgSemireadyInOut(C5User *user = nullptr);
     ~DlgSemireadyInOut();
     int dishId();
+    QString dishName();
     double dishQty();
     int rowCount();
     int goodsId(int r);

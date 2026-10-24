@@ -28,6 +28,8 @@ class HttpQuery {
     inData['config'] = prefs.string('config');
     inData['cashbox_id'] = prefs.cashboxId();
     inData['workingday'] = prefs.dateMySqlText(prefs.workingDay());
+    // UI am → API hy, same as desktop NDataProvider.
+    inData['locale'] = 'hy';
     inData['language'] = 'am';
     inData['debug'] = false && kDebugMode;
 
@@ -42,6 +44,9 @@ class HttpQuery {
     }
     try {
       Uri uri = prefs.getBool('https') ?? false ? Uri.https(prefs.string("serveraddress"), route) : Uri.http(prefs.string("serveraddress"), route);
+      // useProgramToken / useWaiterToken write the active bearer into `token`.
+      final selected = prefs.string('token');
+      final bearer = selected.isNotEmpty ? selected : prefs.bearerToken();
       var response = await http
           .post(
               uri,
@@ -49,7 +54,7 @@ class HttpQuery {
                 'Content-Type': 'application/json',
                 'X-Application-Name': 'picasso.waiter',
                 'X-Application-Version': prefs.getString('appversion') ?? '',
-                'Authorization': 'Bearer ${prefs.bearerToken()}',
+                'Authorization': 'Bearer $bearer',
               },
               body: utf8.encode(strBody))
           .timeout(Duration(seconds: timeout), onTimeout: () {
@@ -77,12 +82,22 @@ class HttpQuery {
             final hasDataList = _hasDataListPayload(outData) ||
                 (data is Map && _hasDataListPayload(data)) ||
                 data is List;
-            outData['status'] =
-                (hasOrder || hasV2Hall || hasV2Menu || hasDataList) ? 1 : 0;
+            final hasSession = outData.containsKey('token') ||
+                outData.containsKey('userdata') ||
+                (outData['data'] is Map &&
+                    (outData['data'] as Map).containsKey('sessionkey'));
+            outData['status'] = (hasOrder ||
+                    hasV2Hall ||
+                    hasV2Menu ||
+                    hasDataList ||
+                    hasSession)
+                ? 1
+                : 0;
             if (!hasOrder &&
                 !hasV2Hall &&
                 !hasV2Menu &&
                 !hasDataList &&
+                !hasSession &&
                 !outData.containsKey('data')) {
               outData['data'] = jsonEncode(outData);
             }
@@ -94,20 +109,9 @@ class HttpQuery {
       } else {
         outData['status'] = 0;
         outData['error'] = response.statusCode;
-        outData['data'] = strResponse;
-        if (response.statusCode == 401) {
-          prefs.setString('sessionkey', '');
-          prefs.setString('waiter_token', '');
-          prefs.setString('program_token', '');
-          prefs.setString('token', '');
-          prefs.setBool('program_ready', false);
-          final nav = Prefs.navigatorKey.currentState;
-          if (nav != null) {
-            nav.pushAndRemoveUntil(
-              MaterialPageRoute(builder: (_) => const App()),
-              (_) => false,
-            );
-          }
+        outData['data'] = _errorText(strResponse);
+        if (response.statusCode == 401 && !_isAuthRoute(route)) {
+          _dropRejectedSession(bearer);
         }
       }
     } catch (e) {
@@ -122,5 +126,57 @@ class HttpQuery {
       }
     }
     return outData;
+  }
+}
+
+bool _isAuthRoute(String route) {
+  return route.contains('user-login/') || route.endsWith('engine/login.php');
+}
+
+String _errorText(String raw) {
+  final t = raw.trim();
+  if (t.isEmpty) return 'Request failed';
+  try {
+    final decoded = jsonDecode(t);
+    if (decoded is Map) {
+      final err = decoded['error'] ?? decoded['errorMessage'] ?? decoded['data'];
+      if (err is String && err.isNotEmpty) return err;
+      if (decoded['new_version'] != null) {
+        return 'Application update required '
+            '(${decoded['old_version']} → ${decoded['new_version']})';
+      }
+    }
+  } catch (_) {}
+  return t;
+}
+
+/// 401 on an already authenticated call. Wrong PIN stays on the auth routes
+/// and must not wipe the program session. During program startup the flag
+/// is still false — the caller handles that error and keeps the new token.
+void _dropRejectedSession(String bearer) {
+  if (!(prefs.getBool('program_ready') ?? false)) {
+    return;
+  }
+  final program = prefs.string('program_token');
+  final waiter = prefs.string('waiter_token');
+  if (waiter.isNotEmpty && bearer == waiter && program.isNotEmpty) {
+    prefs.remove('waiter_token');
+    prefs.setInt('userid', 0);
+    prefs.remove('permissions');
+    prefs.remove('staff_name');
+    prefs.setString('token', program);
+  } else {
+    prefs.setString('sessionkey', '');
+    prefs.setString('waiter_token', '');
+    prefs.setString('program_token', '');
+    prefs.setString('token', '');
+    prefs.setBool('program_ready', false);
+  }
+  final nav = Prefs.navigatorKey.currentState;
+  if (nav != null) {
+    nav.pushAndRemoveUntil(
+      MaterialPageRoute(builder: (_) => const App()),
+      (_) => false,
+    );
   }
 }

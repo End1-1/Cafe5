@@ -22,6 +22,7 @@ private:
     void redeemDebt();
     void editRedeemDebt(int debtId, int docType, int currencyId);
     void handleDebtsDoubleClick(const QModelIndex &index);
+    void openPartnerMonthDetail(const QModelIndex &srcIndex, int viewMode);
 
     bool mDebtRedeemActionInserted = false;
 };

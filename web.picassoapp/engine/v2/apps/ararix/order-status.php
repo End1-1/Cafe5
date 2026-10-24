@@ -100,6 +100,7 @@ class OrderStatus extends Db
                 "token" => (string)$header["f_public_token"],
                 "number" => (string)($header["f_prefix"] ?? ""),
                 "state" => $orderState,
+                "state_code" => $this->orderStateCode($orderState),
                 "state_name" => $this->orderStateName($orderState),
                 "amount_total" => (float)($header["f_amounttotal"] ?? 0),
                 "hall_name" => (string)($header["f_hall_name"] ?? ""),
@@ -113,8 +114,26 @@ class OrderStatus extends Db
                 "kitchen_status_name" => $this->kitchenStatusName($kitchenStatus),
                 "items" => $items,
             ],
+            "polling_hint_sec" => 4,
+            "webhook" => false,
         ];
         $this->echoResult();
+    }
+
+    private function orderStateCode(int $state): string
+    {
+        switch ($state) {
+            case 1:
+                return "in_progress";
+            case 2:
+                return "closed";
+            case 3:
+                return "cancelled";
+            case 5:
+                return "preorder";
+            default:
+                return "unknown";
+        }
     }
 
     private function orderStateName(int $state): string

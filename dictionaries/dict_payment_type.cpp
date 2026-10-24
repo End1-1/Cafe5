@@ -28,7 +28,9 @@ const QMap<int, const char *> payment_names = {{PAYMENT_TYPE_CASH, QT_TRANSLATE_
                                                {PAYMENT_TYPE_OTHER, QT_TRANSLATE_NOOP("PaymentType", "Other")},
                                                {PAYMENT_TYPE_TELCELL, QT_TRANSLATE_NOOP("PaymentType", "TelCell")},
                                                {PAYMENT_TYPE_DEBT, QT_TRANSLATE_NOOP("PaymentType", "Debt")},
-                                               {PAYMENT_TYPE_PREPAID, QT_TRANSLATE_NOOP("PaymentType", "Prepaid")}};
+                                               {PAYMENT_TYPE_PREPAID, QT_TRANSLATE_NOOP("PaymentType", "Prepaid")},
+                                               {PAYMENT_TYPE_BANK2, QT_TRANSLATE_NOOP("PaymentType", "Bank 2")},
+                                               {PAYMENT_TYPE_BANK3, QT_TRANSLATE_NOOP("PaymentType", "Bank 3")}};
 
 const QMap<int, bool> payment_special = {
     {PAYMENT_TYPE_CASH, false},

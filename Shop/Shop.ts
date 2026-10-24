@@ -1388,6 +1388,13 @@
     </message>
 </context>
 <context>
+    <name>C5TableView</name>
+    <message>
+        <source>Copy</source>
+        <translation>Պատճենել</translation>
+    </message>
+</context>
+<context>
     <name>C5Grid</name>
     <message>
         <location filename="../Classes/c5grid.ui" line="14"/>
@@ -1418,8 +1425,8 @@
     </message>
     <message>
         <location filename="../Classes/c5grid.cpp" line="501"/>
-        <source>Copy selection</source>
-        <translation>Պատճենել ընտրությունը</translation>
+        <source>Copy</source>
+        <translation>Պատճենել</translation>
     </message>
     <message>
         <location filename="../Classes/c5grid.cpp" line="502"/>
@@ -7516,7 +7523,12 @@ reservation</source>
     <message>
         <location filename="working.cpp" line="517"/>
         <source>Shift total</source>
-        <translation>Սպասվող ընդամենը</translation>
+        <translation>Հերթափոխի ընդամենը</translation>
+    </message>
+    <message>
+        <location filename="working.cpp" line="790"/>
+        <source>By payment type</source>
+        <translation>Ըստ վճարման տեսակի</translation>
     </message>
     <message>
         <location filename="working.cpp" line="524"/>

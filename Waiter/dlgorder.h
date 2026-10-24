@@ -12,10 +12,7 @@
 #include <QTimer>
 #include <QStack>
 
-namespace Ui
-{
-class DlgOrder;
-}
+struct OrderUi;
 
 class C5User;
 class C5OrderDriver;
@@ -23,6 +20,7 @@ class WOrder;
 class C5LineEdit;
 class WaiterOrderItemWidget;
 class QDishButton;
+class QLabel;
 class DlgCustDisplay;
 
 class DlgOrder : public C5WaiterDialog
@@ -55,8 +53,10 @@ protected:
 
     virtual void showEvent(QShowEvent *e) override;
 
+    virtual void resizeEvent(QResizeEvent *e) override;
+
 private:
-    Ui::DlgOrder* ui;
+    OrderUi *ui = nullptr;
 
     WaiterOrder mOrder;
 
@@ -93,6 +93,9 @@ private:
     QString mSelectedPackage;
     bool mCreateAsPreorder = false;
 
+    /** -1 unknown, 0 cash optional, 1 forced on, 2 forced off — keep cash fiscal toggle across refresh. */
+    int mFiscalUiMode = -1;
+
     /** Opening existing header by UUID (preorders list / reports): skip open-table — it only resolves state=1 and would clear f_id. */
     bool mSkipOpenTableOnShow = false;
 
@@ -103,6 +106,38 @@ private:
     int fTimerCounter;
 
     bool fStoplistMode;
+
+    bool mNewLook = false;
+
+    int mNewLookGuest = 1;
+
+    int mNewLookDishGroup = 0;
+
+    int mNewLookDishFavorite = 0;
+
+    int mNewLookDishAreaWidth = -1;
+
+    bool mNewLookRelayout = false;
+
+    QWidget *mGuestBar = nullptr;
+
+    QLabel *mGuestSection = nullptr;
+
+    QWidget *mNewLookParts = nullptr;
+
+    QList<QToolButton *> mNewLookPartButtons;
+
+    void applyNewLook();
+
+    void openNewLookMore();
+
+    void buildNewLookParts();
+
+    void refreshNewLookGuests();
+
+    void markNewLookDept(int dept);
+
+    void relayoutNewLookDishes();
 
     DlgCustDisplay *mCustomerDisplay = nullptr;
 
@@ -190,6 +225,8 @@ private:
 
     void syncQtyPanelButtonsEnabled(bool enabled);
 
+    QJsonObject withBillRound(QJsonObject o) const;
+
     void setDishQty(std::function<double (WaiterDish)> getQty);
 
     void addDishToOrder(DishAItem *g, QDishButton *btn, bool scanned = false);
@@ -205,6 +242,8 @@ private:
     void updateCashTenderButtons();
 
     void configCashTenderButtons();
+
+    void updateDebtHolderUi();
 
     void funcWithAuth(int permission, const QString &title, std::function<void(C5User*)> function);
 
@@ -312,6 +351,8 @@ private slots:
     void on_btnCopyUUID_clicked();
 
     void on_btnGuest_clicked();
+
+    void on_btnDebtHolderClear_clicked();
 
     void on_btnPreorderDateTime_clicked();
 

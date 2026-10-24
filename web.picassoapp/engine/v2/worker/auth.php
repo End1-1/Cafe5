@@ -38,6 +38,11 @@ abstract class Auth extends Db
         return true;
     }
 
+    public function currentUserId(): int
+    {
+        return (int)$this->userid;
+    }
+
     public function get_client_ip()
     {
         if (array_key_exists('HTTP_X_FORWARDED_FOR', $_SERVER)) {

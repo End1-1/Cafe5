@@ -959,22 +959,28 @@
        <string>Additional</string>
       </attribute>
       <layout class="QGridLayout" name="gridLayout_4">
-       <item row="9" column="0">
-        <widget class="QLabel" name="lbLowLevel_7">
+       <item row="4" column="0">
+        <widget class="QLabel" name="lbLastinputprice_4">
          <property name="text">
-          <string>Hourly payment</string>
+          <string>Color</string>
          </property>
         </widget>
        </item>
-       <item row="5" column="0">
-        <widget class="QLabel" name="lbLowLevel_6">
-         <property name="text">
-          <string>Count discount</string>
+       <item row="3" column="3">
+        <spacer name="horizontalSpacer_6">
+         <property name="orientation">
+          <enum>Qt::Orientation::Horizontal</enum>
          </property>
-        </widget>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>40</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
        </item>
-       <item row="3" column="2">
-        <widget class="C5LineEditWithSelector" name="leAcc">
+       <item row="0" column="2" rowspan="2">
+        <widget class="C5LineEditWithSelector" name="leLowLevel_2">
          <property name="minimumSize">
           <size>
            <width>100</width>
@@ -988,14 +994,45 @@
           </size>
          </property>
          <property name="Field" stdset="0">
-          <string>f_acc</string>
+          <string>f_weight</string>
          </property>
          <property name="Type" stdset="0">
-          <string>0</string>
+          <number>2</number>
          </property>
         </widget>
        </item>
-       <item row="9" column="3">
+       <item row="10" column="0">
+        <widget class="QLabel" name="lbLowLevel_7">
+         <property name="text">
+          <string>Hourly payment</string>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="0">
+        <widget class="QLabel" name="lbLastinputprice_3">
+         <property name="text">
+          <string>Account</string>
+         </property>
+        </widget>
+       </item>
+       <item row="9" column="0">
+        <widget class="QLabel" name="lbLowLevel_8">
+         <property name="text">
+          <string>Show in store document</string>
+         </property>
+        </widget>
+       </item>
+       <item row="11" column="0" colspan="2">
+        <widget class="QLabel" name="label">
+         <property name="text">
+          <string>Description</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignmentFlag::AlignLeading|Qt::AlignmentFlag::AlignLeft|Qt::AlignmentFlag::AlignTop</set>
+         </property>
+        </widget>
+       </item>
+       <item row="10" column="3">
         <widget class="C5LineEditWithSelector" name="leHourlyRole">
          <property name="minimumSize">
           <size>
@@ -1014,6 +1051,13 @@
          </property>
          <property name="Type" stdset="0">
           <string>0</string>
+         </property>
+        </widget>
+       </item>
+       <item row="10" column="2">
+        <widget class="QCheckBox" name="chHourlyPayment">
+         <property name="text">
+          <string/>
          </property>
         </widget>
        </item>
@@ -1045,37 +1089,83 @@
          </property>
         </widget>
        </item>
-       <item row="3" column="3">
-        <spacer name="horizontalSpacer_6">
+       <item row="5" column="0">
+        <widget class="QLabel" name="lbLowLevel_6">
+         <property name="text">
+          <string>Count discount</string>
+         </property>
+        </widget>
+       </item>
+       <item row="12" column="2">
+        <spacer name="verticalSpacer_2">
          <property name="orientation">
-          <enum>Qt::Orientation::Horizontal</enum>
+          <enum>Qt::Orientation::Vertical</enum>
          </property>
          <property name="sizeHint" stdset="0">
           <size>
-           <width>40</width>
-           <height>20</height>
+           <width>20</width>
+           <height>40</height>
           </size>
          </property>
         </spacer>
        </item>
-       <item row="9" column="2">
-        <widget class="QCheckBox" name="chHourlyPayment">
+       <item row="8" column="2">
+        <widget class="QCheckBox" name="chCountService">
          <property name="text">
           <string/>
          </property>
+         <property name="checked">
+          <bool>true</bool>
+         </property>
         </widget>
        </item>
-       <item row="10" column="0" colspan="2">
-        <widget class="QLabel" name="label">
+       <item row="5" column="2">
+        <widget class="QCheckBox" name="chCountDiscount">
          <property name="text">
-          <string>Description</string>
+          <string/>
          </property>
-         <property name="alignment">
-          <set>Qt::AlignmentFlag::AlignLeading|Qt::AlignmentFlag::AlignLeft|Qt::AlignmentFlag::AlignTop</set>
+         <property name="checked">
+          <bool>true</bool>
          </property>
         </widget>
        </item>
-       <item row="10" column="2" colspan="2">
+       <item row="0" column="0" rowspan="2" colspan="2">
+        <widget class="QLabel" name="lbLowLevel_2">
+         <property name="text">
+          <string>Weight</string>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="2">
+        <widget class="C5LineEditWithSelector" name="leAcc">
+         <property name="minimumSize">
+          <size>
+           <width>100</width>
+           <height>0</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>100</width>
+           <height>16777215</height>
+          </size>
+         </property>
+         <property name="Field" stdset="0">
+          <string>f_acc</string>
+         </property>
+         <property name="Type" stdset="0">
+          <string>0</string>
+         </property>
+        </widget>
+       </item>
+       <item row="8" column="0">
+        <widget class="QLabel" name="lbLowLevel_5">
+         <property name="text">
+          <string>Count service</string>
+         </property>
+        </widget>
+       </item>
+       <item row="11" column="2" colspan="2">
         <widget class="QPlainTextEdit" name="plainTextEdit">
          <property name="minimumSize">
           <size>
@@ -1100,44 +1190,8 @@
          </property>
         </widget>
        </item>
-       <item row="3" column="0">
-        <widget class="QLabel" name="lbLastinputprice_3">
-         <property name="text">
-          <string>Account</string>
-         </property>
-        </widget>
-       </item>
-       <item row="0" column="2" rowspan="2">
-        <widget class="C5LineEditWithSelector" name="leLowLevel_2">
-         <property name="minimumSize">
-          <size>
-           <width>100</width>
-           <height>0</height>
-          </size>
-         </property>
-         <property name="maximumSize">
-          <size>
-           <width>100</width>
-           <height>16777215</height>
-          </size>
-         </property>
-         <property name="Field" stdset="0">
-          <string>f_weight</string>
-         </property>
-         <property name="Type" stdset="0">
-          <number>2</number>
-         </property>
-        </widget>
-       </item>
-       <item row="8" column="0">
-        <widget class="QLabel" name="lbLowLevel_5">
-         <property name="text">
-          <string>Count service</string>
-         </property>
-        </widget>
-       </item>
-       <item row="5" column="2">
-        <widget class="QCheckBox" name="chCountDiscount">
+       <item row="9" column="2">
+        <widget class="QCheckBox" name="chShowInStoreDocument">
          <property name="text">
           <string/>
          </property>
@@ -1145,43 +1199,6 @@
           <bool>true</bool>
          </property>
         </widget>
-       </item>
-       <item row="8" column="2">
-        <widget class="QCheckBox" name="chCountService">
-         <property name="text">
-          <string/>
-         </property>
-         <property name="checked">
-          <bool>true</bool>
-         </property>
-        </widget>
-       </item>
-       <item row="4" column="0">
-        <widget class="QLabel" name="lbLastinputprice_4">
-         <property name="text">
-          <string>Color</string>
-         </property>
-        </widget>
-       </item>
-       <item row="0" column="0" rowspan="2" colspan="2">
-        <widget class="QLabel" name="lbLowLevel_2">
-         <property name="text">
-          <string>Weight</string>
-         </property>
-        </widget>
-       </item>
-       <item row="11" column="2">
-        <spacer name="verticalSpacer_2">
-         <property name="orientation">
-          <enum>Qt::Orientation::Vertical</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>20</width>
-           <height>40</height>
-          </size>
-         </property>
-        </spacer>
        </item>
       </layout>
      </widget>
@@ -2507,15 +2524,15 @@
   </customwidget>
  </customwidgets>
  <tabstops>
-  <tabstop>chOnlyWholeNumber</tabstop>
-  <tabstop>chSameStoreId</tabstop>
-  <tabstop>leStoreId</tabstop>
-  <tabstop>leStoreOverrideId</tabstop>
-  <tabstop>leQueue</tabstop>
-  <tabstop>leSalaryDepartment</tabstop>
-  <tabstop>leSalaryFixedValue</tabstop>
-  <tabstop>leSalaryPercentValue</tabstop>
-  <tabstop>leScanCode</tabstop>
+  <tabstop>leLowLevel_2</tabstop>
+  <tabstop>leAcc</tabstop>
+  <tabstop>leColor</tabstop>
+  <tabstop>chCountDiscount</tabstop>
+  <tabstop>chCountService</tabstop>
+  <tabstop>chShowInStoreDocument</tabstop>
+  <tabstop>chHourlyPayment</tabstop>
+  <tabstop>plainTextEdit</tabstop>
+  <tabstop>leHourlyRole</tabstop>
   <tabstop>leCostPrice</tabstop>
   <tabstop>leMargin</tabstop>
   <tabstop>cbCurrency</tabstop>
@@ -2524,14 +2541,14 @@
   <tabstop>leAutodiscount</tabstop>
   <tabstop>tblPricing</tabstop>
   <tabstop>tblMenu</tabstop>
-  <tabstop>leLowLevel_2</tabstop>
-  <tabstop>leAcc</tabstop>
-  <tabstop>leColor</tabstop>
-  <tabstop>chCountDiscount</tabstop>
-  <tabstop>chCountService</tabstop>
-  <tabstop>chHourlyPayment</tabstop>
-  <tabstop>plainTextEdit</tabstop>
-  <tabstop>leHourlyRole</tabstop>
+  <tabstop>chOnlyWholeNumber</tabstop>
+  <tabstop>chSameStoreId</tabstop>
+  <tabstop>leStoreId</tabstop>
+  <tabstop>leStoreOverrideId</tabstop>
+  <tabstop>leQueue</tabstop>
+  <tabstop>leSalaryFixedValue</tabstop>
+  <tabstop>leSalaryPercentValue</tabstop>
+  <tabstop>leScanCode</tabstop>
   <tabstop>leCode</tabstop>
   <tabstop>leSupplier</tabstop>
   <tabstop>leGroup</tabstop>
@@ -2565,6 +2582,71 @@
   <tabstop>rbGenEAN8</tabstop>
   <tabstop>cbServicePrint</tabstop>
   <tabstop>leUnit</tabstop>
+  <tabstop>btnLangHy</tabstop>
+  <tabstop>btnLangRu</tabstop>
+  <tabstop>btnLangEn</tabstop>
+  <tabstop>leGroup_2</tabstop>
+  <tabstop>leQtyBox_2</tabstop>
+  <tabstop>leCostPrice_2</tabstop>
+  <tabstop>leAdg_2</tabstop>
+  <tabstop>leName_2</tabstop>
+  <tabstop>btnLangHy_2</tabstop>
+  <tabstop>btnLangRu_2</tabstop>
+  <tabstop>btnLangEn_2</tabstop>
+  <tabstop>leMargin2_2</tabstop>
+  <tabstop>leUnit_2</tabstop>
+  <tabstop>cbCurrency_2</tabstop>
+  <tabstop>leSupplier_2</tabstop>
+  <tabstop>leFiscalName_2</tabstop>
+  <tabstop>leCode_2</tabstop>
+  <tabstop>leLowLevel_3</tabstop>
+  <tabstop>leMargin_2</tabstop>
+  <tabstop>leAutodiscount_2</tabstop>
+  <tabstop>leScanCode_2</tabstop>
+  <tabstop>tblPricing_2</tabstop>
+  <tabstop>tblMenu_2</tabstop>
+  <tabstop>cbServicePrint_2</tabstop>
+  <tabstop>leLowLevel_4</tabstop>
+  <tabstop>leHourlyRole_2</tabstop>
+  <tabstop>chHourlyPayment_2</tabstop>
+  <tabstop>leColor_2</tabstop>
+  <tabstop>chCountService_2</tabstop>
+  <tabstop>chCountDiscount_2</tabstop>
+  <tabstop>leAcc_2</tabstop>
+  <tabstop>plainTextEdit_2</tabstop>
+  <tabstop>leComplectOutputQty_2</tabstop>
+  <tabstop>leIsComplect_2</tabstop>
+  <tabstop>chComponentExit_2</tabstop>
+  <tabstop>leCookingTime_2</tabstop>
+  <tabstop>leSalaryDepartment_2</tabstop>
+  <tabstop>leSalaryFixedValue_2</tabstop>
+  <tabstop>leSalaryPercentValue_2</tabstop>
+  <tabstop>leStoreId_2</tabstop>
+  <tabstop>chSameStoreId_2</tabstop>
+  <tabstop>chOnlyWholeNumber_2</tabstop>
+  <tabstop>leQueue_2</tabstop>
+  <tabstop>leStoreOverrideId_2</tabstop>
+  <tabstop>tblAs_2</tabstop>
+  <tabstop>leBarcode_2</tabstop>
+  <tabstop>rbGenEAN8_2</tabstop>
+  <tabstop>tblBarcodes_2</tabstop>
+  <tabstop>chGlutenFree_2</tabstop>
+  <tabstop>chVegetarian_2</tabstop>
+  <tabstop>chVegan_2</tabstop>
+  <tabstop>chNoGmo_2</tabstop>
+  <tabstop>chNoLactose_2</tabstop>
+  <tabstop>chNoSugar_2</tabstop>
+  <tabstop>chContainsNuts_2</tabstop>
+  <tabstop>chHalalKosher_2</tabstop>
+  <tabstop>leBjuKcal_2</tabstop>
+  <tabstop>leBjuProtein_2</tabstop>
+  <tabstop>leBjuFat_2</tabstop>
+  <tabstop>leBjuCarbs_2</tabstop>
+  <tabstop>tblDynamicAttributes_2</tabstop>
+  <tabstop>tblModificators_2</tabstop>
+  <tabstop>tblRelatedDrinks_2</tabstop>
+  <tabstop>tblRelatedOther_2</tabstop>
+  <tabstop>leSalaryDepartment</tabstop>
  </tabstops>
  <resources>
   <include location="../resources/res.qrc"/>

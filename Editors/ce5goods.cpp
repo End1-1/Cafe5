@@ -391,7 +391,12 @@ CE5Goods::CE5Goods(QWidget *parent) :
     ui->tblGoods->setColumnWidths(7, 0, 0, 400, 80, 80, 80, 80);
     ui->leStoreId->setSelector(ui->leStoreIdName, cache_goods, 1, 3);
     ui->leStoreOverrideId->setSelector(ui->leStoreOverrideIdName, cache_goods_store);
-    ui->wGoodsType->selectorCallback = goodsTypeItemSelector;
+    ui->wGoodsType->selectorCallback = [this](C5CodeNameSelector *s) {
+        goodsTypeItemSelector(s);
+        if (ui->leCode->getInteger() == 0) {
+            ui->chShowInStoreDocument->setChecked(s->value() == GOODS_TYPE_GOODS);
+        }
+    };
     ui->wArarixGroup->setSelectorName(tr("Ararix group"));
     ui->wArarixGroup->selectorCallback = ararixGroupItemSelector;
     ui->wDishCountry->setSelectorName(tr("Country"));
@@ -681,6 +686,7 @@ void CE5Goods::clear()
 
     ui->chCountDiscount->setChecked(true);
     ui->chCountService->setChecked(true);
+    ui->chShowInStoreDocument->setChecked(ui->wGoodsType->value() == 0 || ui->wGoodsType->value() == GOODS_TYPE_GOODS);
     if(ui->cbServicePrint->count() > 0) {
         ui->cbServicePrint->setCurrentIndex(0);
     }
@@ -902,6 +908,7 @@ QJsonObject CE5Goods::makeJsonObject()
     j["f_service"] = ui->wGoodsType->value() == 3 ? 1 : 0;
     j["f_type"] = ui->wGoodsType->value();
     j["f_enabled"] = ui->chEnabled->isChecked() ? 1 : 0;
+    j["f_store_doc"] = ui->chShowInStoreDocument->isChecked() ? 1 : 0;
     j["f_production"] = ui->chProduction->isChecked() ? 1  : 0;
     j["f_wholenumber"] = ui->chOnlyWholeNumber->isChecked() ? 1 : 0;
     j["f_complectout"] = ui->leComplectOutputQty->getDouble();
@@ -1112,6 +1119,12 @@ void CE5Goods::openResponse(const QJsonObject &jdoc)
     ui->leStoreId->setEnabled(!sameStore);
     ui->leStoreIdName->setEnabled(!sameStore);
     ui->chEnabled->setChecked(j["f_enabled"].toInt() > 0);
+    {
+        const QJsonValue storeDoc = j.value(QStringLiteral("f_store_doc"));
+        ui->chShowInStoreDocument->setChecked(storeDoc.isNull() || storeDoc.isUndefined()
+                                              ? j.value("f_type").toVariant().toInt() == GOODS_TYPE_GOODS
+                                              : storeDoc.toVariant().toInt() > 0);
+    }
     ui->chOnlyWholeNumber->setChecked(j["f_wholenumber"].toInt() > 0);
     {
         const int typeId = j.value("f_type").toInt();

@@ -34,6 +34,10 @@ find_package(Qt6 REQUIRED COMPONENTS
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
+set(CMAKE_AUTOUIC_SEARCH_PATHS
+    ${CMAKE_CURRENT_SOURCE_DIR}
+    ${CMAKE_CURRENT_SOURCE_DIR}/../Forms
+)
 
 # Конфигурационные дефайны
 add_definitions(
@@ -57,6 +61,8 @@ include_directories(
     "c:/Development/projects/cafe5/Controls"
     "c:/Development/projects/cafe5/Service"
     "c:/Development/projects/cafe5/TableRecord"
+    "${CMAKE_CURRENT_SOURCE_DIR}/TableRecord"
+    "c:/Development/projects/cafe5/dictionaries"
     "c:/Development/projects/cafe5/service5working/utils"
     "c:/Development/projects/cafe5/DbData"
     "c:/Development/projects/cafe5/Forms"
@@ -77,7 +83,7 @@ set(HEADERS
     ../Classes/c5logtoserverthread.h
     ../Classes/scopeguarde.h
     ../Forms/c5connectiondialog.h
-    ../Forms/dlgpin.h
+    dlgpin.h
     ../NTable/ndataprovider.h
     ../NTable/ninterface.h
     ../NTable/nloadingdlg.h
@@ -87,7 +93,7 @@ set(HEADERS
     registercustomer.h
     version.h
     ../Classes/c5servername.h
-    ../Classes/dict_dish_state.h
+    ../dictionaries/dict_dish_state.h
     ../Forms/dlgsplashscreen.h
     ../Cafe5/c5double.h
     ../Cafe5/c5systempreference.h
@@ -98,19 +104,16 @@ set(HEADERS
     ../Classes/c5cache.h
     ../Classes/c5combodelegate.h
     ../Classes/c5datedelegate.h
-    ../Classes/c5jsondb.h
     ../Classes/c5menu.h
     ../Classes/c5permissions.h
     ../Classes/c5printing.h
     ../Classes/c5printjson.h
     ../Classes/c5random.h
-    ../Classes/c5storedraftwriter.h
     ../Classes/c5tablemodel.h
     ../Classes/c5tablerec.h
     ../Classes/c5tableview.h
     ../Classes/c5textdelegate.h
     ../Classes/c5threadobject.h
-    ../Classes/c5waiterorderdoc.h
     ../Classes/c5widget.h
     ../Classes/c5witerconf.h
     ../Classes/calculator.h
@@ -127,21 +130,19 @@ set(HEADERS
     ../Forms/change.h
     ../Forms/customerinfo.h
     ../Forms/dlgcashinout.h
-    ../Forms/dlgcashop.h
+    dlgcashop.h
     ../Forms/dlglistofdishcomments.h
     ../Forms/dlgqty.h
     ../Forms/touchdlgphonenumber.h
     ../Forms/touchentertaxreceiptnumber.h
     ../Forms/touchselecttaxreport.h
 
-    ../TableRecord/aheader.h
-    ../TableRecord/bclientdebts.h
-    ../TableRecord/bhistory.h
-    ../TableRecord/c5dbrecord.h
-    ../TableRecord/cpartners.h
-    ../TableRecord/ecash.h
-    ../TableRecord/ogoods.h
-    ../TableRecord/oheader.h
+    TableRecord/aheader.h
+    TableRecord/bclientdebts.h
+    TableRecord/bhistory.h
+    TableRecord/c5dbrecord.h
+    TableRecord/cpartners.h
+    TableRecord/ecash.h
     dish.h
     dishpackage.h
     dlgmemoryread.h
@@ -154,6 +155,7 @@ set(HEADERS
     supplier.h
     wcustomerdisplay.h
     workspace.h
+    smartprint.h
     ../Cafe5/c5config.h
     ../Cafe5/c5database.h
     ../Cafe5/c5dialog.h
@@ -173,7 +175,7 @@ set(SOURCES
     ../Classes/appwebsocket.cpp
     ../Classes/scopeguarde.cpp
     ../Forms/c5connectiondialog.cpp
-    ../Forms/dlgpin.cpp
+    dlgpin.cpp
     ../NTable/ndataprovider.cpp
     ../NTable/ninterface.cpp
     ../NTable/nloadingdlg.cpp
@@ -192,20 +194,17 @@ set(SOURCES
     ../Classes/c5cache.cpp
     ../Classes/c5combodelegate.cpp
     ../Classes/c5datedelegate.cpp
-    ../Classes/c5jsondb.cpp
     ../Classes/c5logtoserverthread.cpp
     ../Classes/c5menu.cpp
     ../Classes/c5permissions.cpp
     ../Classes/c5printing.cpp
     ../Classes/c5printjson.cpp
     ../Classes/c5random.cpp
-    ../Classes/c5storedraftwriter.cpp
     ../Classes/c5tablemodel.cpp
     ../Classes/c5tablerec.cpp
     ../Classes/c5tableview.cpp
     ../Classes/c5textdelegate.cpp
     ../Classes/c5threadobject.cpp
-    ../Classes/c5waiterorderdoc.cpp
     ../Classes/c5widget.cpp
     ../Classes/c5witerconf.cpp
     ../Classes/calculator.cpp
@@ -221,21 +220,19 @@ set(SOURCES
     ../Controls/c5guicontrols.cpp
     ../Forms/change.cpp
     ../Forms/customerinfo.cpp
-    ../Forms/dlgcashinout.cpp
-    ../Forms/dlgcashop.cpp
+    dlgcashinout.cpp
+    dlgcashop.cpp
     ../Forms/dlglistofdishcomments.cpp
     ../Forms/dlgqty.cpp
     ../Forms/touchdlgphonenumber.cpp
     ../Forms/touchentertaxreceiptnumber.cpp
     ../Forms/touchselecttaxreport.cpp
-    ../TableRecord/aheader.cpp
-    ../TableRecord/bclientdebts.cpp
-    ../TableRecord/bhistory.cpp
-    ../TableRecord/c5dbrecord.cpp
-    ../TableRecord/cpartners.cpp
-    ../TableRecord/ecash.cpp
-    ../TableRecord/ogoods.cpp
-    ../TableRecord/oheader.cpp
+    TableRecord/aheader.cpp
+    TableRecord/bclientdebts.cpp
+    TableRecord/bhistory.cpp
+    TableRecord/c5dbrecord.cpp
+    TableRecord/cpartners.cpp
+    TableRecord/ecash.cpp
     dishpackage.cpp
     dlgmemoryread.cpp
     dlgsmartreports.cpp
@@ -260,7 +257,7 @@ set(SOURCES
 # UI формы
 set(FORMS
     ../Forms/c5connectiondialog.ui
-    ../Forms/dlgpin.ui
+    dlgpin.ui
     ../NTable/nloadingdlg.ui
     dlgservicevalues.ui
     dlgvisit.ui
@@ -274,7 +271,7 @@ set(FORMS
     ../Forms/change.ui
     ../Forms/customerinfo.ui
     ../Forms/dlgcashinout.ui
-    ../Forms/dlgcashop.ui
+    dlgcashop.ui
     ../Forms/dlglistofdishcomments.ui
     ../Forms/dlgqty.ui
     ../Forms/touchdlgphonenumber.ui
@@ -340,14 +337,3 @@ target_link_libraries(Smart PRIVATE
     Qt6::Widgets
     Version.lib Ws2_32.lib libssl.lib libcrypto.lib Gdi32.lib User32.lib
 )
-
-# Обработка версии (PowerShell скрипт)
-if(WIN32)
-    add_custom_command(
-        TARGET Smart
-        PRE_BUILD
-        COMMAND powershell -NoProfile -ExecutionPolicy Bypass -File "${CMAKE_CURRENT_SOURCE_DIR}/increase_version.ps1"
-        WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
-        COMMENT "Increasing version via PowerShell..."
-    )
-endif()

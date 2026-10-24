@@ -16,6 +16,7 @@
 #include <QPainter>
 #include <QPrintPreviewDialog>
 #include <QPrinter>
+#include <QShowEvent>
 #include <QTextDocument>
 #include <QToolBar>
 #include <QTreeView>
@@ -172,7 +173,15 @@ RMenuReviewReport::RMenuReviewReport(C5User *user, const QString &title, QIcon i
     mHost = __c5config.dbParams().at(1);
     applyMenuReviewTableStyle(this);
     initParams({});
-    query();
+}
+
+void RMenuReviewReport::showEvent(QShowEvent *event)
+{
+    NTreeWidget::showEvent(event);
+    if(!mInitialQueryDone) {
+        mInitialQueryDone = true;
+        query();
+    }
 }
 
 QToolBar *RMenuReviewReport::toolBar()

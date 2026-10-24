@@ -114,6 +114,7 @@ class Sales extends Auth
             WHERE oh.f_datecash BETWEEN ? AND ?
               AND oh.f_state = {$state}
               AND oh.f_hall = ?
+              AND og.f_state = 1
             ORDER BY oh.f_datecash DESC,
                      COALESCE(
                          NULLIF(CAST(oh.f_timeclose AS CHAR), ''),

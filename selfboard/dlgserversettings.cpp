@@ -39,6 +39,9 @@ void DlgServerSettings::loadFields()
     ui->sbCashboxId->setValue(AppSettings::cashboxId());
     ui->sbServiceFactor->setValue(AppSettings::serviceFactor());
     ui->leOrderStatusUrl->setText(AppSettings::orderStatusUrlBase());
+    ui->leQrnetoRestaurantId->setText(AppSettings::trackingRestaurantId());
+    ui->leQrnetoLocationId->setText(AppSettings::trackingLocationId());
+    ui->sbTrackingEta->setValue(AppSettings::trackingEtaMinutes());
     ui->leServerHost->setText(ServerConfig::host());
     ui->cbUseHttps->setChecked(ServerConfig::useHttps());
     ui->leUsername->setText(ServerConfig::username());
@@ -53,6 +56,9 @@ void DlgServerSettings::applyFields()
     AppSettings::setCashboxId(ui->sbCashboxId->value());
     AppSettings::setServiceFactor(ui->sbServiceFactor->value());
     AppSettings::setOrderStatusUrlBase(ui->leOrderStatusUrl->text());
+    AppSettings::setTrackingRestaurantId(ui->leQrnetoRestaurantId->text());
+    AppSettings::setTrackingLocationId(ui->leQrnetoLocationId->text());
+    AppSettings::setTrackingEtaMinutes(ui->sbTrackingEta->value());
     AppSettings::saveToSettings();
     ServerConfig::setHost(ui->leServerHost->text());
     ServerConfig::setUseHttps(ui->cbUseHttps->isChecked());

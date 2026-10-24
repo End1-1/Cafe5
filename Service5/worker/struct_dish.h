@@ -24,6 +24,7 @@ struct DishAItem {
     QStringList barcodes;
     QString nameLower;
     QStringList words;
+    QString image;
     bool countService()
     {
         return data["f_count_service"].toBool();
@@ -58,6 +59,7 @@ struct JsonParser<DishAItem> {
         di.data = QJsonDocument::fromJson(jo.value("f_data").toString().toUtf8()).object();
         di.barcodes = jo.value("f_scancode").toString().split(",", Qt::SkipEmptyParts);
         di.nameLower = di.name.toLower();
+        di.image = jo.value(QStringLiteral("f_image")).toString();
 
         return di;
     }

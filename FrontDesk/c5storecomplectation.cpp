@@ -338,7 +338,7 @@ void C5StoreComplectation::on_btnSelectComplect_clicked()
 
 void C5StoreComplectation::on_btnAddGoods_clicked()
 {
-    const auto r = selectItem<GoodsItem>(false, false);
+    const auto r = selectStoreDocGoods();
     if (r.isEmpty()) {
         return;
     }

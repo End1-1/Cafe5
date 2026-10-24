@@ -12,7 +12,7 @@
 #include <QTcpSocket>
 #include <winsock2.h>
 
-#define DEBUG_RESULT 0;
+#define DEBUG_RESULT 0
 
 //#define ___LOG_FISCAL___
 #ifdef ___LOG_FISCAL___
@@ -21,6 +21,21 @@
 
 #define OPENSSL_SUPPRESS_DEPRECATED
 #include <openssl/des.h>
+
+#ifdef QT_DEBUG
+/** No fiscal device in debug — always succeed with a plausible HDM response. */
+static void applyDebugFiscalOk(QString &outOutJson, QString &err, int &result)
+{
+    outOutJson =
+        QStringLiteral(
+            "{\"address\":\"ԿԵՆՏՐՈՆ ԹԱՂԱՄԱՍ Ամիրյան 4/3 \",\"change\":0.0,\"crn\":\"53235782\","
+            "\"fiscal\":\"54704153\",\"lottery\":\"\",\"prize\":0,\"rseq\":%1,\"sn\":\"00022154380\","
+            "\"taxpayer\":\"«ՊԼԱԶԱ ՍԻՍՏԵՄՍ»\",\"time\":1709630105632,\"tin\":\"02596277\",\"total\":93600.0}")
+            .arg(PrintTaxNO::mDebugRseq++);
+    err.clear();
+    result = DEBUG_RESULT;
+}
+#endif
 
 static QString normalizeEmarkForJson(QString s)
 {
@@ -589,17 +604,11 @@ int PrintTaxNO::makeJsonAndPrint(double card, double prepaid, QString &outInJson
     outInJson = json;
     outOutJson = jdata;
 
-    if(result != 0) {
 #ifdef QT_DEBUG
-        outOutJson =
-            QString("{\"rseq\":%1,\"crn\":\"63219817\",\"sn\":\"V98745506068\",\"tin\":\"01588771\",\"taxpayer\":\"«Ռոգա էնդ կոպիտա ՍՊԸ»\",\"address\":\"Արշակունյանց 34\",\"time\":1676794194840,\"fiscal\":\"98198105\",\"lottery\":\"00000000\",\"prize\":0,\"total\":1540.0,\"change\":0.0}")
-            .arg(mDebugRseq);
-        outOutJson =
-            QString("{\"address\":\"ԿԵՆՏՐՈՆ ԹԱՂԱՄԱՍ Ամիրյան 4/3 \",\"change\":0.0,\"crn\":\"53235782\",\"fiscal\":\"54704153\",\"lottery\":\"\",\"prize\":0,\"rseq\":%1,\"sn\":\"00022154380\",\"taxpayer\":\"«ՊԼԱԶԱ ՍԻՍՏԵՄՍ»\",\"time\":1709630105632,\"tin\":\"02596277\",\"total\":93600.0}")
-            .arg(mDebugRseq);
-        result = DEBUG_RESULT;
-#endif
+    if (result != 0) {
+        applyDebugFiscalOk(outOutJson, err, result);
     }
+#endif
 
     if(result == 0) {
         while(outOutJson.length() > 0 && outOutJson.at(outOutJson.length() - 1) != "}") {
@@ -674,17 +683,11 @@ int PrintTaxNO::makeJsonAndPrint(double cash, double card, double prepaid, QStri
     outInJson = json;
     outOutJson = jdata;
 
-    if(result != 0) {
 #ifdef QT_DEBUG
-        outOutJson =
-            QString("{\"rseq\":%1,\"crn\":\"63219817\",\"sn\":\"V98745506068\",\"tin\":\"01588771\",\"taxpayer\":\"«Ռոգա էնդ կոպիտա ՍՊԸ»\",\"address\":\"Արշակունյանց 34\",\"time\":1676794194840,\"fiscal\":\"98198105\",\"lottery\":\"00000000\",\"prize\":0,\"total\":1540.0,\"change\":0.0}")
-            .arg(mDebugRseq);
-        outOutJson =
-            QString("{\"address\":\"ԿԵՆՏՐՈՆ ԹԱՂԱՄԱՍ Ամիրյան 4/3 \",\"change\":0.0,\"crn\":\"53235782\",\"fiscal\":\"54704153\",\"lottery\":\"\",\"prize\":0,\"rseq\":%1,\"sn\":\"00022154380\",\"taxpayer\":\"«ՊԼԱԶԱ ՍԻՍՏԵՄՍ»\",\"time\":1709630105632,\"tin\":\"02596277\",\"total\":93600.0}")
-            .arg(mDebugRseq++);
-        result = DEBUG_RESULT;
-#endif
+    if (result != 0) {
+        applyDebugFiscalOk(outOutJson, err, result);
     }
+#endif
 
     if(result == 0) {
         while(outOutJson.length() > 0 && outOutJson.at(outOutJson.length() - 1) != "}") {
@@ -728,21 +731,11 @@ int PrintTaxNO::makeJsonAndPrintSimple(
     outInJson = json;
     outOutJson = jdata;
 
-    if (result != 0) {
 #ifdef QT_DEBUG
-        outOutJson = QString("{\"rseq\":%1,\"crn\":\"63219817\",\"sn\":\"V98745506068\",\"tin\":\"01588771\",\"taxpayer\":\"«Ռոգա էնդ "
-                             "կոպիտա ՍՊԸ»\",\"address\":\"Արշակունյանց "
-                             "34\",\"time\":1676794194840,\"fiscal\":\"98198105\",\"lottery\":\"00000000\",\"prize\":0,\"total\":1540.0,"
-                             "\"change\":0.0}")
-                         .arg(mDebugRseq);
-        outOutJson = QString("{\"address\":\"ԿԵՆՏՐՈՆ ԹԱՂԱՄԱՍ Ամիրյան 4/3 "
-                             "\",\"change\":0.0,\"crn\":\"53235782\",\"fiscal\":\"54704153\",\"lottery\":\"\",\"prize\":0,\"rseq\":%1,"
-                             "\"sn\":\"00022154380\",\"taxpayer\":\"«ՊԼԱԶԱ "
-                             "ՍԻՍՏԵՄՍ»\",\"time\":1709630105632,\"tin\":\"02596277\",\"total\":93600.0}")
-                         .arg(mDebugRseq);
-        result = DEBUG_RESULT;
-#endif
+    if (result != 0) {
+        applyDebugFiscalOk(outOutJson, err, result);
     }
+#endif
 
     if (result == 0) {
         while (outOutJson.length() > 0 && outOutJson.at(outOutJson.length() - 1) != "}") {
@@ -766,19 +759,11 @@ int PrintTaxNO::printAdvanceJson(double advanceCash, double advanceCard, QString
     int result = printJSON(jdata, err, opcode_print_receipt);
 
     outOutJson = jdata;
+
 #ifdef QT_DEBUG
-    outOutJson
-        = QString(
-              "{\"rseq\":%1,\"crn\":\"63219817\",\"sn\":\"V98745506068\",\"tin\":\"01588771\",\"taxpayer\":\"«Ռոգա էնդ կոպիտա "
-              "ՍՊԸ»\",\"address\":\"Արշակունյանց "
-              "34\",\"time\":1676794194840,\"fiscal\":\"98198105\",\"lottery\":\"00000000\",\"prize\":0,\"total\":1540.0,\"change\":0.0}")
-              .arg(mDebugRseq);
-    outOutJson = QString("{\"address\":\"ԿԵՆՏՐՈՆ ԹԱՂԱՄԱՍ Ամիրյան 4/3 "
-                         "\",\"change\":0.0,\"crn\":\"53235782\",\"fiscal\":\"54704153\",\"lottery\":\"\",\"prize\":0,\"rseq\":%1,\"sn\":"
-                         "\"00022154380\",\"taxpayer\":\"«ՊԼԱԶԱ "
-                         "ՍԻՍՏԵՄՍ»\",\"time\":1709630105632,\"tin\":\"02596277\",\"total\":93600.0}")
-                     .arg(mDebugRseq);
-    result = DEBUG_RESULT;
+    if (result != 0) {
+        applyDebugFiscalOk(outOutJson, err, result);
+    }
 #endif
 
     if (result == 0) {
@@ -816,10 +801,12 @@ int PrintTaxNO::printTaxback(int number, const QString &crn, QString &outInJson,
                     .arg(fEmarks.isEmpty() ? "" : emarksStr);
     QByteArray jdata = outInJson.toUtf8();
     int result = printJSON(jdata, err, opcode_taxback);
-#ifdef QT_DEBUG
-    result = DEBUG_RESULT;
-#endif
     outOutJson = jdata;
+#ifdef QT_DEBUG
+    if (result != 0) {
+        applyDebugFiscalOk(outOutJson, err, result);
+    }
+#endif
     return result;
 }
 

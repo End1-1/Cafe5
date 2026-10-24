@@ -70,7 +70,7 @@ void DlgRealReports::on_lst_itemClicked(QListWidgetItem *item)
 void DlgRealReports::on_btnPrint_clicked()
 {
     C5Printing p;
-    QPrinterInfo pi = QPrinterInfo::printerInfo(mWorkStation.defaultPrinter());
+    QPrinterInfo pi = QPrinterInfo::printerInfo(mWorkStation.waiterReportPrinter());
     QPrinter printer(pi);
     printer.setPageSize(QPageSize::Custom);
     printer.setFullPage(false);

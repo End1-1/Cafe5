@@ -23,6 +23,12 @@ void AppSettings::loadFromSettings()
                                     QStringLiteral("orderStatusUrlBase"),
                                     QStringLiteral("https://www.ararix.com/get-order-status/"))
                                    .toString();
+    cfg.m_trackingRestaurantId = s.value(QStringLiteral("trackingRestaurantId")).toString();
+    cfg.m_trackingLocationId = s.value(QStringLiteral("trackingLocationId")).toString();
+    cfg.m_trackingEtaMinutes = s.value(QStringLiteral("trackingEtaMinutes"), 15).toInt();
+    if (cfg.m_trackingEtaMinutes < 0) {
+        cfg.m_trackingEtaMinutes = 0;
+    }
 }
 
 void AppSettings::saveToSettings()
@@ -35,6 +41,9 @@ void AppSettings::saveToSettings()
     s.setValue(QStringLiteral("cashboxId"), cfg.m_cashboxId);
     s.setValue(QStringLiteral("serviceFactor"), cfg.m_serviceFactor);
     s.setValue(QStringLiteral("orderStatusUrlBase"), cfg.m_orderStatusUrlBase);
+    s.setValue(QStringLiteral("trackingRestaurantId"), cfg.m_trackingRestaurantId);
+    s.setValue(QStringLiteral("trackingLocationId"), cfg.m_trackingLocationId);
+    s.setValue(QStringLiteral("trackingEtaMinutes"), cfg.m_trackingEtaMinutes);
     SelfBoardSettings::flush();
 }
 
@@ -96,4 +105,34 @@ QString AppSettings::orderStatusUrlBase()
 void AppSettings::setOrderStatusUrlBase(const QString &url)
 {
     instance().m_orderStatusUrlBase = url.trimmed();
+}
+
+QString AppSettings::trackingRestaurantId()
+{
+    return instance().m_trackingRestaurantId;
+}
+
+void AppSettings::setTrackingRestaurantId(const QString &id)
+{
+    instance().m_trackingRestaurantId = id.trimmed();
+}
+
+QString AppSettings::trackingLocationId()
+{
+    return instance().m_trackingLocationId;
+}
+
+void AppSettings::setTrackingLocationId(const QString &id)
+{
+    instance().m_trackingLocationId = id.trimmed();
+}
+
+int AppSettings::trackingEtaMinutes()
+{
+    return instance().m_trackingEtaMinutes;
+}
+
+void AppSettings::setTrackingEtaMinutes(int minutes)
+{
+    instance().m_trackingEtaMinutes = minutes < 0 ? 0 : minutes;
 }

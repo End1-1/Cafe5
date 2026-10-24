@@ -2,7 +2,9 @@
 #define C5STOREINVENTORY_H
 
 #include "c5officewidget.h"
+#include "semiready_batch.h"
 #include "store_inventory_document.h"
+#include <QVector>
 
 namespace Ui
 {
@@ -48,10 +50,18 @@ private slots:
 
     void userQtyTextChanged(const QString &arg1);
 
+    void on_btnAddSemiready_clicked();
+
+    void on_btnSemireadyList_clicked();
+
+    void removeDocument();
+
 private:
     Ui::C5StoreInventory* ui;
 
     QString fInternalID;
+
+    QVector<SemireadyBatch> mSemireadyBatches;
 
     int addGoodsRow();
 
@@ -60,6 +70,18 @@ private:
     bool docCheck(QString &err);
 
     QString makeInventoryTable(C5TableWidget *tbl);
+
+    int findGoodsRow(int goodsId) const;
+
+    double lockedQty(int row) const;
+
+    void setLockedQty(int row, double qty);
+
+    void refreshRowDiff(int row);
+
+    void applySemireadyBatch(const SemireadyBatch &batch);
+
+    void removeSemireadyBatch(const QString &batchId);
 };
 
 #endif // C5STOREINVENTORY_H

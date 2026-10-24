@@ -5,11 +5,10 @@
 #include <QDateTime>
 #include <QtGlobal>
 #include "format_date.h"
+#include "c5cache.h"
 #include "c5cashoperationtypes.h"
-#include "c5codenameselectorfunctions.h"
 #include "c5message.h"
 #include "dict_payment_type.h"
-#include "format_date.h"
 #include "ninterface.h"
 
 namespace {
@@ -40,13 +39,7 @@ C5RevenueCashOp::C5RevenueCashOp(C5User *user, QWidget *parent)
     ui->cbOperation->addItem(tr("Income"), 1);
     ui->cbOperation->addItem(tr("Outcome"), 2);
     ui->cbOperation->setCurrentIndex(0);
-    for(int pt : payment_types) {
-        ui->cbPaymentType->addItem(QCoreApplication::translate("PaymentType", payment_names[pt]), pt);
-    }
-    const int cashIdx = ui->cbPaymentType->findData(PAYMENT_TYPE_CASH);
-    if(cashIdx >= 0) {
-        ui->cbPaymentType->setCurrentIndex(cashIdx);
-    }
+    fillPaymentCombo();
     ui->dsAmount->setDecimals(2);
     ui->dsAmount->setMinimum(0.00);
     ui->dsAmount->setMaximum(999999999.00);
@@ -95,6 +88,79 @@ void C5RevenueCashOp::syncOperationFromExpenseType()
     }
 }
 
+void C5RevenueCashOp::fillPaymentCombo()
+{
+    ui->cbPayment->clear();
+    C5Cache *cache = C5Cache::cache(cache_cash_names);
+    if(cache) {
+        for(int r = 0; r < cache->rowCount(); ++r) {
+            const int id = cache->getInt(r, 0);
+            const QString name = cache->getString(r, 1).trimmed();
+            if(id <= 0 || name.isEmpty()) {
+                continue;
+            }
+            const int idx = ui->cbPayment->count();
+            ui->cbPayment->addItem(name);
+            ui->cbPayment->setItemData(idx, PAYMENT_TYPE_CASH, Qt::UserRole);
+            ui->cbPayment->setItemData(idx, id, Qt::UserRole + 1);
+        }
+    }
+    for(int pt : payment_types) {
+        if(pt == PAYMENT_TYPE_CASH) {
+            continue;
+        }
+        const char *nm = payment_names.value(pt);
+        const QString title = nm
+            ? QCoreApplication::translate("PaymentType", nm)
+            : QString::number(pt);
+        const int idx = ui->cbPayment->count();
+        ui->cbPayment->addItem(title);
+        ui->cbPayment->setItemData(idx, pt, Qt::UserRole);
+        ui->cbPayment->setItemData(idx, 0, Qt::UserRole + 1);
+    }
+}
+
+void C5RevenueCashOp::selectPayment(int paymentTypeId, int cashboxId)
+{
+    const int wantType = paymentTypeId > 0 ? paymentTypeId : PAYMENT_TYPE_CASH;
+    for(int i = 0; i < ui->cbPayment->count(); ++i) {
+        const int pt = ui->cbPayment->itemData(i, Qt::UserRole).toInt();
+        const int cb = ui->cbPayment->itemData(i, Qt::UserRole + 1).toInt();
+        if(wantType == PAYMENT_TYPE_CASH) {
+            if(pt == PAYMENT_TYPE_CASH && cb == cashboxId) {
+                ui->cbPayment->setCurrentIndex(i);
+                return;
+            }
+        } else if(pt == wantType) {
+            ui->cbPayment->setCurrentIndex(i);
+            return;
+        }
+    }
+}
+
+int C5RevenueCashOp::selectedPaymentType() const
+{
+    const int idx = ui->cbPayment->currentIndex();
+    if(idx < 0) {
+        return 0;
+    }
+    return ui->cbPayment->itemData(idx, Qt::UserRole).toInt();
+}
+
+int C5RevenueCashOp::selectedCashboxId() const
+{
+    const int idx = ui->cbPayment->currentIndex();
+    if(idx < 0) {
+        return mCashboxId;
+    }
+    const int pt = ui->cbPayment->itemData(idx, Qt::UserRole).toInt();
+    const int cb = ui->cbPayment->itemData(idx, Qt::UserRole + 1).toInt();
+    if(pt == PAYMENT_TYPE_CASH && cb > 0) {
+        return cb;
+    }
+    return mCashboxId;
+}
+
 int C5RevenueCashOp::selectedOperationType() const
 {
     const int idx = ui->cbExpenseType->currentIndex();
@@ -114,8 +180,7 @@ void C5RevenueCashOp::setCashboxAndCurrency(int cashboxId, int currencyId)
     mCashboxId = cashboxId;
     mCurrencyId = currencyId > 0 ? currencyId : 1;
     mOperationId = 0;
-    ui->leCashbox->setText(mCashboxId > 0 ? QString::number(mCashboxId) : QString());
-    ui->btnCashbox->setEnabled(true);
+    selectPayment(PAYMENT_TYPE_CASH, mCashboxId);
 }
 
 void C5RevenueCashOp::applyOperationForEdit(const QJsonObject &operation)
@@ -126,10 +191,7 @@ void C5RevenueCashOp::applyOperationForEdit(const QJsonObject &operation)
     if(mCurrencyId <= 0) {
         mCurrencyId = 1;
     }
-    ui->leCashbox->setText(mCashboxId > 0 ? QString::number(mCashboxId) : QString());
-    ui->btnCashbox->setEnabled(false);
-
-    const int opType = operation.value(QStringLiteral("f_operation_type")).toInt();
+    const int opType = operation.value(QStringLiteral("f_operation_type")).toVariant().toInt();
     const bool income = isCashOperationIncome(opType);
     const int wantData = income ? 1 : 2;
     for(int i = 0; i < ui->cbOperation->count(); i++) {
@@ -145,11 +207,8 @@ void C5RevenueCashOp::applyOperationForEdit(const QJsonObject &operation)
         ui->cbExpenseType->setCurrentIndex(typeIdx);
     }
 
-    const int paymentTypeId = operation.value(QStringLiteral("f_payment_type_id")).toInt();
-    const int ptIdx = ui->cbPaymentType->findData(paymentTypeId);
-    if(ptIdx >= 0) {
-        ui->cbPaymentType->setCurrentIndex(ptIdx);
-    }
+    const int paymentTypeId = operation.value(QStringLiteral("f_payment_type_id")).toVariant().toInt();
+    selectPayment(paymentTypeId, mCashboxId);
 
     const double debit = operation.value(QStringLiteral("f_debit")).toVariant().toDouble();
     const double credit = operation.value(QStringLiteral("f_credit")).toVariant().toDouble();
@@ -168,10 +227,13 @@ void C5RevenueCashOp::applyOperationForEdit(const QJsonObject &operation)
 
 void C5RevenueCashOp::on_btnSave_clicked()
 {
-    if(mCashboxId <= 0) {
+    const int paymentTypeId = selectedPaymentType();
+    const int cashboxId = selectedCashboxId();
+    if(paymentTypeId <= 0 || cashboxId <= 0) {
         C5Message::error(tr("Cashbox must be selected in filter"));
         return;
     }
+    mCashboxId = cashboxId;
 
     const double amount = ui->dsAmount->value();
     if(amount <= 0.009) {
@@ -187,7 +249,6 @@ void C5RevenueCashOp::on_btnSave_clicked()
 
     const int operationType = selectedOperationType();
     const bool income = isCashOperationIncome(operationType);
-    const int paymentTypeId = ui->cbPaymentType->currentData().toInt();
     const double debit = income ? amount : 0.0;
     const double credit = income ? 0.0 : amount;
 
@@ -198,6 +259,7 @@ void C5RevenueCashOp::on_btnSave_clicked()
                            {
                                {"id", mOperationId},
                                {"f_operation_type", operationType},
+                               {"f_cashbox_id", mCashboxId},
                                {"f_payment_type_id", paymentTypeId},
                                {"f_debit", debit},
                                {"f_credit", credit},
@@ -215,7 +277,7 @@ void C5RevenueCashOp::on_btnSave_clicked()
                        mUser->mSessionKey,
                        this,
                        {
-                           {"cashbox_id", mCashboxId},
+                           {"cashbox_id", cashboxId},
                            {"f_order_id", ""},
                            {"f_operation_type", operationType},
                            {"f_payment_type_id", paymentTypeId},
@@ -233,16 +295,5 @@ void C5RevenueCashOp::on_btnSave_clicked()
 void C5RevenueCashOp::on_btnCancel_clicked()
 {
     reject();
-}
-
-void C5RevenueCashOp::on_btnCashbox_clicked()
-{
-    const auto r = selectItem<StructCashbox>(true, false, ui->btnCashbox->mapToGlobal(QPoint(0, ui->btnCashbox->height())));
-    if(r.isEmpty()) {
-        return;
-    }
-    const auto &cb = r.first();
-    mCashboxId = cb.id;
-    ui->leCashbox->setText(cb.name);
 }
 

@@ -108,8 +108,33 @@ void AppWebSocket::reconnect(const QString &host, const QString &key, const QStr
 
     instance->mHost = host;
     instance->mServerKey = key;
+    instance->mUserId = 0;
     instance->mUsername = username;
     instance->mPassword = password;
+    instance->connectToServer();
+}
+
+void AppWebSocket::reconnect(const QString &host, const QString &key, int userId)
+{
+    if(!instance) {
+        initInstance();
+    }
+
+    instance->stopReconnect();
+    instance->mReconnectAttempt = 0;
+
+    if(instance->mSocket->state() != QAbstractSocket::UnconnectedState) {
+        instance->mSuppressReconnect = true;
+        instance->mSocket->abort();
+        instance->mSuppressReconnect = false;
+    }
+
+    instance->mConnectionState = disconnected;
+    instance->mHost = host;
+    instance->mServerKey = key;
+    instance->mUserId = userId;
+    instance->mUsername.clear();
+    instance->mPassword.clear();
     instance->connectToServer();
 }
 
@@ -254,10 +279,16 @@ void AppWebSocket::connectedToServer()
     if(!mServerKey.isEmpty()) {
         QJsonObject jo = {
             {"command", "register_socket"},
-            {"key", mServerKey},
-            {"username", mUsername},
-            {"password", mPassword}
+            {"key", mServerKey}
         };
+
+        if(mUserId > 0) {
+            jo["userid"] = mUserId;
+        } else {
+            jo["username"] = mUsername;
+            jo["password"] = mPassword;
+        }
+
         sendMessage(jo);
     }
 }

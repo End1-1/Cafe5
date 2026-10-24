@@ -18,6 +18,7 @@ struct GoodsItem {
     double price2 = 0;
     double price2disc = 0;
     double qty = 0;
+    bool storeDoc = true;
     QString nameLower;
     QStringList words;
 
@@ -35,7 +36,8 @@ struct GoodsItem {
                            {"f_price2", price2},
                            {"f_price2disc", price2disc},
                            {"f_qty", qty},
-                           {"f_adgt", adgt}};
+                           {"f_adgt", adgt},
+                           {"f_store_doc", storeDoc}};
     }
 };
 
@@ -61,6 +63,7 @@ struct JsonParser<GoodsItem> {
         g.price2disc = jo.value("f_price2disc").toDouble();
         g.qty = jo.value("f_qty").toDouble();
         g.adgt = jo.value("f_adgt").toString();
+        g.storeDoc = jo.value("f_store_doc").toBool(true);
         return g;
     }
 };

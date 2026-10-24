@@ -8,6 +8,7 @@
 #include "c5utils.h"
 #include "c5message.h"
 #include "dlgtables.h"
+#include "struct_workstationitem.h"
 #include <QScrollBar>
 #include <QPointer>
 #include <QTimer>
@@ -321,6 +322,7 @@ void DlgSplitOrder::on_btnSave_clicked()
         {"id2", mOrder2.id},
         {"source_table_name", mOrder1.tableName},
         {"destination_table_name", mOrder2.tableName},
+        {"bill_round_to", mWorkStation.data.value(QStringLiteral("bill_round_to")).toInt(100)},
     },
     [this](const QJsonObject & jdoc) {
         Q_UNUSED(jdoc);

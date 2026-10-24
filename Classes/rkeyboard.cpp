@@ -128,6 +128,11 @@ QString RKeyboard::text() const
     return ui->leResult->text();
 }
 
+QLineEdit *RKeyboard::editor() const
+{
+    return ui->leResult;
+}
+
 bool RKeyboard::eventFilter(QObject *o, QEvent *e)
 {
     if(o == ui->leResult) {
@@ -338,5 +343,6 @@ void RKeyboard::on_btnClear_clicked()
 
 void RKeyboard::on_leResult_textEdited(const QString &arg1)
 {
+    fText = arg1;
     emit textChanged(arg1);
 }

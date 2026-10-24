@@ -12,11 +12,43 @@
 #include "c5message.h"
 #include "c5systempreference.h"
 #include "dlgpin.h"
+#include "c5servername.h"
 #include "fileversion.h"
 #include "logwriter.h"
 #include "ndataprovider.h"
 #include "printtaxno.h"
 #include "workspace.h"
+#include <QJsonArray>
+#include <QJsonObject>
+
+namespace {
+
+QJsonObject serverByConfig(const QString &configName)
+{
+    const QJsonArray servers = C5ServerName::mServers;
+
+    if(!configName.isEmpty()) {
+        for(const QJsonValue &v : servers) {
+            const QJsonObject row = v.toObject();
+
+            if(row.value(QStringLiteral("name")).toString().compare(configName, Qt::CaseInsensitive) == 0
+                    || row.value(QStringLiteral("settings")).toString().compare(configName, Qt::CaseInsensitive) == 0
+                    || row.value(QStringLiteral("db")).toString().compare(configName, Qt::CaseInsensitive) == 0) {
+                return row;
+            }
+        }
+
+        return {};
+    }
+
+    if(servers.isEmpty()) {
+        return {};
+    }
+
+    return servers.at(0).toObject();
+}
+
+}
 
 int main(int argc, char* argv[])
 {
@@ -90,6 +122,57 @@ int main(int argc, char* argv[])
     PrintTaxNO::mDebugRseq = build;
     NDataProvider::mAppName = "smart";
     NDataProvider::mFileVersion = fileVersion;
+    QString serverName;
+    QString configName;
+
+    for(const QString &s : std::as_const(args)) {
+        if(s.startsWith(QStringLiteral("/servername="), Qt::CaseInsensitive)) {
+            serverName = s.mid(s.indexOf(QLatin1Char('=')) + 1).trimmed();
+        } else if(s.startsWith(QStringLiteral("/config="), Qt::CaseInsensitive)) {
+            configName = s.mid(s.indexOf(QLatin1Char('=')) + 1).trimmed();
+        }
+    }
+
+    if(!serverName.isEmpty()) {
+        C5ServerName serverList(serverName);
+
+        if(!serverList.getServers()) {
+            C5Message::error(serverList.mErrorString);
+            return 1;
+        }
+
+        QJsonObject row = serverByConfig(configName);
+
+        if(row.isEmpty() && !configName.isEmpty() && !C5ServerName::mServers.isEmpty()) {
+            row = C5ServerName::mServers.at(0).toObject();
+        }
+
+        if(row.isEmpty()) {
+            C5Message::error(QObject::tr("Connection name not found"));
+            return 1;
+        }
+
+        QString wsUrl = serverName;
+
+        if(!wsUrl.endsWith(QStringLiteral("/ws"))) {
+            wsUrl += QStringLiteral("/ws");
+        }
+
+        const QString key = row.value(QStringLiteral("key")).toString();
+        const QString db = row.value(QStringLiteral("db")).toString();
+        const QString serverKey = (!key.isEmpty() && !db.isEmpty())
+                                  ? key + QLatin1Char('.') + db
+                                  : row.value(QStringLiteral("key")).toString();
+        DlgPin::setConnection(row.value(QStringLiteral("settings")).toString(),
+                              row.value(QStringLiteral("database")).toString(),
+                              wsUrl,
+                              serverKey);
+
+        if(!configName.isEmpty()) {
+            C5Config::fSettingsName = configName;
+        }
+    }
+
     auto *dlgPin = new DlgPin();
 
     if(dlgPin->exec() == QDialog::Rejected) {

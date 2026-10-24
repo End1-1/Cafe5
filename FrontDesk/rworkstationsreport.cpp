@@ -2,6 +2,15 @@
 #include "ui_rworkstationsreport.h"
 #include "rfiscalmachinesreport.h"
 #include "rservicevaluesreport.h"
+#include "rcashboxesreport.h"
+#include "rpaymenttypesreport.h"
+#include "rapikeysreport.h"
+#include "rprintersreport.h"
+#include "rprintaliasesreport.h"
+#include "cr5hall.h"
+#include "cr5tables.h"
+#include "cr5discountsystem.h"
+#include "c5grid.h"
 #include "dict_workstation.h"
 #include "rabstracteditordialog.h"
 #include "rabstracteditorreport.h"
@@ -90,6 +99,30 @@ void RWorkstationsReport::setupTabs()
     mServiceValuesReport = new RServiceValuesReport(tr("Service values"), fIcon, QStringLiteral("form_service_values"), this);
     ui->tabWidget->addTab(mServiceValuesReport, tr("Service values"));
 
+    mCashboxesReport = new RCashboxesReport(tr("Cashboxes"), fIcon, QStringLiteral("form_cashboxes"), this);
+    ui->tabWidget->addTab(mCashboxesReport, tr("Cashboxes"));
+
+    mPaymentTypesReport = new RPaymentTypesReport(tr("Payment types"), fIcon, QStringLiteral("form_payment_types"), this);
+    ui->tabWidget->addTab(mPaymentTypesReport, tr("Payment types"));
+
+    mApiKeysReport = new RApiKeysReport(tr("API keys"), fIcon, QStringLiteral("form_api_keys"), this);
+    ui->tabWidget->addTab(mApiKeysReport, tr("API keys"));
+
+    mPrintersReport = new RPrintersReport(tr("Printers"), fIcon, QStringLiteral("form_printers"), this);
+    ui->tabWidget->addTab(mPrintersReport, tr("Printers"));
+
+    mPrintAliasesReport = new RPrintAliasesReport(tr("Print aliases"), fIcon, QStringLiteral("form_print_aliases"), this);
+    ui->tabWidget->addTab(mPrintAliasesReport, tr("Print aliases"));
+
+    mDiscountReport = new CR5DiscountSystem(this);
+    ui->tabWidget->addTab(mDiscountReport, tr("Discount and bonuses"));
+
+    mHallsReport = new CR5Hall(this);
+    ui->tabWidget->addTab(mHallsReport, tr("Halls"));
+
+    mTablesReport = new CR5Tables(this);
+    ui->tabWidget->addTab(mTablesReport, tr("Tables"));
+
     propagateUserToReports();
 }
 
@@ -101,6 +134,11 @@ void RWorkstationsReport::propagateUserToReports()
             child->mUser = mUser;
         }
     }
+}
+
+C5Widget *RWorkstationsReport::activeChildWidget() const
+{
+    return qobject_cast<C5Widget *>(ui->tabWidget->currentWidget());
 }
 
 RAbstractEditorReport *RWorkstationsReport::activeReport() const
@@ -116,12 +154,15 @@ void RWorkstationsReport::ensureTabLoaded(int index)
 
     propagateUserToReports();
 
-    auto *report = qobject_cast<RAbstractEditorReport *>(ui->tabWidget->widget(index));
-    if(!report) {
+    QWidget *w = ui->tabWidget->widget(index);
+    if(auto *report = qobject_cast<RAbstractEditorReport *>(w)) {
+        report->reloadReport();
+    } else if(auto *grid = qobject_cast<C5Grid *>(w)) {
+        grid->postProcess();
+    } else {
         return;
     }
 
-    report->reloadReport();
     mLoadedTabIndexes.insert(index);
 }
 
@@ -157,12 +198,16 @@ void RWorkstationsReport::syncToolbarFromActiveReport()
 
     fToolBar->clear();
 
-    RAbstractEditorReport *report = activeReport();
-    if(!report) {
+    C5Widget *child = activeChildWidget();
+    if(!child) {
         return;
     }
 
-    QToolBar *innerToolbar = report->toolBar();
+    QToolBar *innerToolbar = child->toolBar();
+    if(!innerToolbar) {
+        return;
+    }
+
     for(QAction *src : innerToolbar->actions()) {
         QAction *action = fToolBar->addAction(src->icon(), src->text());
         action->setToolTip(src->toolTip());

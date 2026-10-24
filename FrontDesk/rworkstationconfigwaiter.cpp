@@ -112,9 +112,12 @@ void RWorkstationConfigWaiter::applyConfig(const QJsonObject &config)
     ui->leSearchMenuH->setText(QString::number(config.value(QStringLiteral("dlgsearchmenu_hsection_size")).toInt(240)));
     ui->leSearchMenuV->setText(QString::number(config.value(QStringLiteral("dlgsearchmenu_vsection_size")).toInt(100)));
     ui->chCostDependOnServiceAndDiscount->setChecked(config.value(u"cost_depend_on_service_and_discount").toBool(false));
+    ui->leBillRoundTo->setText(QString::number(config.value(QStringLiteral("bill_round_to")).toInt(100)));
     ui->chDoNotPrintCustomerOnReceipt->setChecked(config.value(u"do_not_print_customer_on_receipt").toBool(false));
     ui->leCostumerNotification->setChecked(config.value(QStringLiteral("customer_notification")).toBool(false));
+    ui->chAllowMixAllPayments->setChecked(config.value(QStringLiteral("allow_mix_all_payments")).toBool(false));
     ui->leRecentDishesMinutes->setText(QString::number(config.value(QStringLiteral("recent_dishes_minutes")).toInt(40)));
+    ui->chNewLook->setChecked(config.value(QStringLiteral("newlook")).toBool(false));
 
     const QJsonObject buttons = config.value(QStringLiteral("setup_buttons")).toObject();
     for(auto it = mSetupButtons.begin(); it != mSetupButtons.end(); ++it) {
@@ -126,8 +129,17 @@ QJsonObject RWorkstationConfigWaiter::collectConfig() const
 {
     QJsonObject jo;
     jo.insert(u"cost_depend_on_service_and_discount", ui->chCostDependOnServiceAndDiscount->isChecked());
+    {
+        bool ok = false;
+        int billRoundTo = ui->leBillRoundTo->text().trimmed().toInt(&ok);
+        if (!ok || billRoundTo < 0) {
+            billRoundTo = 100;
+        }
+        jo.insert(QStringLiteral("bill_round_to"), billRoundTo);
+    }
     jo.insert(u"do_not_print_customer_on_receipt", ui->chDoNotPrintCustomerOnReceipt->isChecked());
     jo.insert(QStringLiteral("customer_notification"), ui->leCostumerNotification->isChecked());
+    jo.insert(QStringLiteral("allow_mix_all_payments"), ui->chAllowMixAllPayments->isChecked());
     jo.insert(QStringLiteral("f_cashbox_id"), ui->leCashboxId->text().trimmed().toInt());
     jo.insert(QStringLiteral("f_default_hall_id"), ui->leHallId->text().trimmed().toInt());
     jo.insert(QStringLiteral("f_fiscal_machine_id"), selectedFiscalMachineId(ui->cbFiscalMachine));
@@ -145,6 +157,7 @@ QJsonObject RWorkstationConfigWaiter::collectConfig() const
         recentMinutes = 40;
     }
     jo.insert(QStringLiteral("recent_dishes_minutes"), recentMinutes);
+    jo.insert(QStringLiteral("newlook"), ui->chNewLook->isChecked());
 
     QJsonObject buttons;
     for(auto it = mSetupButtons.begin(); it != mSetupButtons.end(); ++it) {

@@ -70,23 +70,37 @@ class WaiterAuth {
 
   /// Stage 2: waiter PIN — replaces active bearer, does not touch workstation [config].
   static Future<String?> pinLogin(String pin) async {
-    if (!isProgramReady) {
-      return 'Program session is not ready';
-    }
     if (pin.isEmpty) {
       return 'PIN is empty';
+    }
+    if (!isProgramReady) {
+      final boot = await startupProgramSession();
+      if (boot != null && boot.isNotEmpty) return boot;
     }
 
     useProgramToken();
 
-    final r = await HttpQuery(routePinLogin).request({
+    var r = await HttpQuery(routePinLogin).request({
       'pin': pin,
       'nootp': true,
     });
-    if (r['status'] == 0) {
-      final d = r['data'];
-      if (d is String && d.isNotEmpty) return d;
-      return 'Access denied';
+    if (!_loginPayloadOk(r)) {
+      final msg = _failText(r);
+      // Wrong PIN is the same on both endpoints. A missing/old route is not.
+      if (msg.isNotEmpty && _looksLikeBadPin(msg)) {
+        return msg;
+      }
+      useProgramToken();
+      final legacy = await HttpQuery(routeLegacyLogin).request({
+        'method': 2,
+        'pin': pin,
+      });
+      if (_loginPayloadOk(legacy)) {
+        r = legacy;
+      } else {
+        final legacyMsg = _failText(legacy);
+        return legacyMsg.isNotEmpty ? legacyMsg : (msg.isNotEmpty ? msg : 'Access denied');
+      }
     }
 
     final err = applyWaiterLoginPayload(r);
@@ -98,6 +112,28 @@ class WaiterAuth {
     }
 
     return null;
+  }
+
+  static bool _loginPayloadOk(Map<String, dynamic> r) {
+    if ('${r['token'] ?? ''}'.isNotEmpty) return true;
+    final data = r['data'];
+    if (data is Map && '${data['sessionkey'] ?? ''}'.isNotEmpty) return true;
+    return false;
+  }
+
+  static String _failText(Map<String, dynamic> r) {
+    final d = r['data'];
+    if (d is String && d.isNotEmpty) return d;
+    if (d is Map) {
+      final err = d['error'] ?? d['errorMessage'];
+      if (err is String && err.isNotEmpty) return err;
+    }
+    return '';
+  }
+
+  static bool _looksLikeBadPin(String msg) {
+    final m = msg.toLowerCase();
+    return m.contains('access denied') || m.contains('доступ');
   }
 
   /// Restore waiter after app restart (stage 1 must already be done).
@@ -176,13 +212,26 @@ class WaiterAuth {
 
   static String? applyWaiterLoginPayload(Map<String, dynamic> d) {
     try {
-      final token = '${d['token'] ?? ''}';
+      final nested = d['data'];
+      if (nested is Map) {
+        final row = Map<String, dynamic>.from(nested);
+        d = {
+          ...d,
+          if (row['sessionkey'] != null) 'token': row['sessionkey'],
+          if (row['user'] != null) 'userdata': row['user'],
+          if (row['permissions'] != null) 'permissions': row['permissions'],
+          if (row['settings'] != null) 'settings': row['settings'],
+        };
+      }
+
+      final token = '${d['token'] ?? d['sessionkey'] ?? ''}';
       if (token.isNotEmpty) {
         prefs.setString('waiter_token', token);
         useWaiterToken();
       }
 
-      final userdata = d['user'] ?? d['userdata'];
+      // v2 puts the full row in userdata; user is often only {f_id}.
+      final userdata = d['userdata'] ?? d['user'];
       if (userdata is Map) {
         final uid = userdata['f_id'] ?? userdata['f_user'];
         if (uid != null) {

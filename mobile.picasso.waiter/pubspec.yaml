@@ -2,7 +2,7 @@ name: picassowaiter
 description: ""
 publish_to: 'none'
 
-version: 1.0.6+83
+version: 1.0.6+84
 environment:
   sdk: ^3.8.1
 

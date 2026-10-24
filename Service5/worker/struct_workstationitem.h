@@ -1,5 +1,6 @@
 #pragma once
 
+#include <QHash>
 #include <QStringList>
 #include "c5jsonparser.h"
 #include "struct_fiscal_machine.h"
@@ -11,6 +12,8 @@ struct WorkstationItem : public ParentItem {
     QString stationAccount;
     QString name;
     QString nameLower;
+    /** d_print_aliases: station/alias name → Windows printer name */
+    QHash<QString, QString> printAliases;
 
     virtual void validate() override
     {
@@ -118,12 +121,36 @@ struct WorkstationItem : public ParentItem {
     {
         return data.value(QStringLiteral("customer_notification")).toBool(false);
     }
+    /** Waiter: incompatible payment types may be combined. Fiscal print is then blocked. */
+    bool allowMixAllPayments() const
+    {
+        return data.value(QStringLiteral("allow_mix_all_payments")).toBool(false);
+    }
     const QString printServer() const
     {
         QString url = data.value(QStringLiteral("print_server")).toString().trimmed();
         return url;
     }
     int printPaperWidthMm() const { return data.value(QStringLiteral("print_paper_width")).toInt(); }
+
+    /** Resolve menu print station / alias to Windows printer. Unknown alias → name as-is. */
+    QString resolvePrintAlias(const QString &stationOrAlias) const
+    {
+        const QString key = stationOrAlias.trimmed();
+        if(key.isEmpty()) {
+            return key;
+        }
+        QString mapped = printAliases.value(key).trimmed();
+        if(mapped.isEmpty()) {
+            for(auto it = printAliases.constBegin(); it != printAliases.constEnd(); ++it) {
+                if(QString::compare(it.key(), key, Qt::CaseInsensitive) == 0) {
+                    mapped = it.value().trimmed();
+                    break;
+                }
+            }
+        }
+        return mapped.isEmpty() ? key : mapped;
+    }
     /** Shop receipt / precheck left+right margins in mm (RWorkstationConfigShop::leReceiptPrinterLeftRightMargins). */
     int receiptMarginsMm() const
     {
@@ -147,6 +174,19 @@ struct WorkstationItem : public ParentItem {
     QString arcusAddress() const { return data.value(QStringLiteral("arcus_address")).toString(); }
 
     QString arcusKey() const { return data.value(QStringLiteral("arcus_key")).toString(); }
+
+    bool newLook() const
+    {
+        const QJsonValue v = data.value(QStringLiteral("newlook"));
+        if (v.isBool()) {
+            return v.toBool();
+        }
+        if (v.isDouble()) {
+            return v.toInt() != 0;
+        }
+        const QString s = v.toString().trimmed().toLower();
+        return s == QLatin1String("1") || s == QLatin1String("true");
+    }
 };
 
 template<>
@@ -166,6 +206,17 @@ struct JsonParser<WorkstationItem> {
         for (int i = 0; i < jfm.size(); i++) {
             const QJsonObject &jf = jfm.at(i).toObject();
             fiscalMachines.append(JsonParser<FiscalMachine>::fromJson(jf));
+        }
+
+        hi.printAliases.clear();
+        const QJsonArray jta = jo.value(QStringLiteral("printaliases")).toArray();
+        for(int i = 0; i < jta.size(); i++) {
+            const QJsonObject a = jta.at(i).toObject();
+            const QString alias = a.value(QStringLiteral("f_alias")).toString().trimmed();
+            const QString printer = a.value(QStringLiteral("f_printer")).toString().trimmed();
+            if(!alias.isEmpty() && !printer.isEmpty()) {
+                hi.printAliases.insert(alias, printer);
+            }
         }
         return hi;
     }

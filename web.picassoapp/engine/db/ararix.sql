@@ -74,9 +74,8 @@ CREATE TABLE IF NOT EXISTS ararix_client_addresses (
     f_created DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     f_updated DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     KEY idx_ararix_addr_client (f_client_id),
-    KEY idx_ararix_addr_active (f_client_id, f_is_active),
-    CONSTRAINT fk_ararix_addr_client FOREIGN KEY (f_client_id) REFERENCES ararix_clients(f_id) ON DELETE CASCADE
-);
+    KEY idx_ararix_addr_active (f_client_id, f_is_active)
+) ENGINE=InnoDB;
 
 CREATE TABLE IF NOT EXISTS ararix_faq (
     f_id INT PRIMARY KEY AUTO_INCREMENT,

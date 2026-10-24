@@ -1422,3 +1422,18 @@
     font-size: 24px;
     font-weight: 700;
 }
+
+#DlgOrderError #lblMessage {
+    color: #ffffff;
+    font-size: 28px;
+    font-weight: 600;
+}
+
+#DlgOrderError #btnOk {
+    background-color: #c5db00;
+    border: none;
+    border-radius: 16px;
+    color: #1a1a1a;
+    font-size: 24px;
+    font-weight: 700;
+}

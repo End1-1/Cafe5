@@ -1,6 +1,7 @@
 #include "dlgsmartreports.h"
 #include "ui_dlgsmartreports.h"
 #include "c5printing.h"
+#include "smartprint.h"
 #include "sessionorders.h"
 #include "c5config.h"
 #include "c5database.h"
@@ -85,19 +86,13 @@ void DlgSmartReports::on_list_itemClicked(QListWidgetItem *item)
 void DlgSmartReports::reportCommonDishes()
 {
     accept();
-    QFont font(qApp->font());
-    font.setPointSize(28);
+    QFont font(smartPrintFontFamily());
+    const int bs = smartPrintPointSize();
+    font.setPointSize(bs);
     C5Printing p;
     QPrinterInfo pi = QPrinterInfo::printerInfo(C5Config::localReceiptPrinter());
     QPrinter printer(pi);
-    printer.setPageSize(QPageSize::Custom);
-    printer.setFullPage(false);
-    QRectF pr = printer.pageRect(QPrinter::DevicePixel);
-    constexpr qreal SAFE_RIGHT_MM = 2.0;
-    qreal safePx = SAFE_RIGHT_MM * printer.logicalDpiX() / 25.4;
-    p.setSceneParams(pr.width() - safePx, pr.height(), printer.logicalDpiX());
-    const int bs = 14;
-    font.setPointSize(bs);
+    setupSmartReportScene(p, printer);
     p.setFont(font);
 
     if(QFile::exists("./logo_receipt.png")) {
@@ -167,25 +162,19 @@ void DlgSmartReports::reportCommonDishes()
     p.ltext(tr("Printed"), 0);
     p.rtext(QDateTime::currentDateTime().toString(FORMAT_DATETIME_TO_STR));
     p.br();
-    p.print(printer);
+    smartPrint(p, printer);
 }
 
 void DlgSmartReports::reportCommonDishesWithTime()
 {
     accept();
-    QFont font(qApp->font());
-    font.setPointSize(28);
+    QFont font(smartPrintFontFamily());
+    const int bs = smartPrintPointSize();
+    font.setPointSize(bs);
     C5Printing p;
     QPrinterInfo pi = QPrinterInfo::printerInfo(C5Config::localReceiptPrinter());
     QPrinter printer(pi);
-    printer.setPageSize(QPageSize::Custom);
-    printer.setFullPage(false);
-    QRectF pr = printer.pageRect(QPrinter::DevicePixel);
-    constexpr qreal SAFE_RIGHT_MM = 2.0;
-    qreal safePx = SAFE_RIGHT_MM * printer.logicalDpiX() / 25.4;
-    p.setSceneParams(pr.width() - safePx, pr.height(), printer.logicalDpiX());
-    const int bs = 14;
-    font.setPointSize(bs);
+    setupSmartReportScene(p, printer);
     p.setFont(font);
 
     if(QFile::exists("./logo_receipt.png")) {
@@ -223,7 +212,7 @@ void DlgSmartReports::reportCommonDishesWithTime()
             "and cast(concat(h.f_dateclose, ' ', h.f_timeclose) as datetime) between :f_date1 and :f_date2 "
             "group by 1, 3 ");
     p.setFontBold(false);
-    p.setFontSize(22);
+    p.setFontSize(bs);
 
     while(dd.nextRow()) {
         total += dd.getDouble("f_total");
@@ -239,7 +228,7 @@ void DlgSmartReports::reportCommonDishesWithTime()
     p.line(4);
     p.br(3);
     p.setFontBold(true);
-    p.setFontSize(28);
+    p.setFontSize(bs);
     p.br();
     p.br();
     p.ltext(tr("Quantity of orders"), 0);
@@ -256,25 +245,19 @@ void DlgSmartReports::reportCommonDishesWithTime()
     p.ltext(tr("Printed"), 0);
     p.rtext(QDateTime::currentDateTime().toString(FORMAT_DATETIME_TO_STR));
     p.br();
-    p.print(printer);
+    smartPrint(p, printer);
 }
 
 void DlgSmartReports::printDeliveryReport()
 {
     accept();
-    QFont font(qApp->font());
-    font.setPointSize(28);
+    QFont font(smartPrintFontFamily());
+    const int bs = smartPrintPointSize();
+    font.setPointSize(bs);
     C5Printing p;
     QPrinterInfo pi = QPrinterInfo::printerInfo(C5Config::localReceiptPrinter());
     QPrinter printer(pi);
-    printer.setPageSize(QPageSize::Custom);
-    printer.setFullPage(false);
-    QRectF pr = printer.pageRect(QPrinter::DevicePixel);
-    constexpr qreal SAFE_RIGHT_MM = 2.0;
-    qreal safePx = SAFE_RIGHT_MM * printer.logicalDpiX() / 25.4;
-    p.setSceneParams(pr.width() - safePx, pr.height(), printer.logicalDpiX());
-    const int bs = 14;
-    font.setPointSize(bs);
+    setupSmartReportScene(p, printer);
     p.setFont(font);
 
     if(QFile::exists("./logo_receipt.png")) {
@@ -309,7 +292,7 @@ void DlgSmartReports::printDeliveryReport()
     }
 
     p.setFontBold(false);
-    p.setFontSize(22);
+    p.setFontSize(bs);
     p.ltext(tr("Delivery total count"), 0);
     p.rtext(QString::number(count));
     p.br();
@@ -323,23 +306,19 @@ void DlgSmartReports::printDeliveryReport()
     p.ltext(tr("Printed"), 0);
     p.rtext(QDateTime::currentDateTime().toString(FORMAT_DATETIME_TO_STR));
     p.br();
-    p.print(printer);
+    smartPrint(p, printer);
 }
 
 void DlgSmartReports::printTotalReport()
 {
     accept();
-    QFont font(qApp->font());
-    font.setPointSize(28);
+    QFont font(smartPrintFontFamily());
+    const int bs = smartPrintPointSize();
+    font.setPointSize(bs);
     C5Printing p;
     QPrinterInfo pi = QPrinterInfo::printerInfo(C5Config::localReceiptPrinter());
     QPrinter printer(pi);
-    printer.setPageSize(QPageSize::Custom);
-    printer.setFullPage(false);
-    QRectF pr = printer.pageRect(QPrinter::DevicePixel);
-    constexpr qreal SAFE_RIGHT_MM = 2.0;
-    qreal safePx = SAFE_RIGHT_MM * printer.logicalDpiX() / 25.4;
-    p.setSceneParams(pr.width() - safePx, pr.height(), printer.logicalDpiX());
+    setupSmartReportScene(p, printer);
     p.setFont(font);
 
     if(QFile::exists("./logo_receipt.png")) {
@@ -369,7 +348,7 @@ void DlgSmartReports::printTotalReport()
 
     while(db.nextRow()) {
         p.setFontBold(false);
-        p.setFontSize(22);
+        p.setFontSize(bs);
         p.ctext(db.getDate("f_datecash").toString(FORMAT_DATE_TO_STR));
         p.br();
         p.ltext(tr("Total"), 0);
@@ -388,11 +367,11 @@ void DlgSmartReports::printTotalReport()
     p.br();
     p.line();
     p.br();
-    p.setFontSize(18);
+    p.setFontSize(bs - 2);
     p.ltext(tr("Printed"), 0);
     p.rtext(QDateTime::currentDateTime().toString(FORMAT_DATETIME_TO_STR));
     p.br();
-    p.print(printer);
+    smartPrint(p, printer);
 }
 
 void DlgSmartReports::on_btnStartBack_clicked()

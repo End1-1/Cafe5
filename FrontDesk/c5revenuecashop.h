@@ -23,11 +23,14 @@ public:
 private slots:
     void on_btnSave_clicked();
     void on_btnCancel_clicked();
-    void on_btnCashbox_clicked();
 private:
     void refillCashOperationTypeCombo();
+    void fillPaymentCombo();
+    void selectPayment(int paymentTypeId, int cashboxId);
     void syncOperationFromExpenseType();
     int selectedOperationType() const;
+    int selectedPaymentType() const;
+    int selectedCashboxId() const;
     Ui::C5RevenueCashOp *ui;
     int mCashboxId = 0;
     int mCurrencyId = 1;

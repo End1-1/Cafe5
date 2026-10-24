@@ -72,6 +72,7 @@ class CashSessions
     COALESCE(JSON_VALUE(oh.f_data, '$.f_fiscal.rseq'), '') AS f_fiscal_rseq,
     $other_payments,
     money_fmt(CAST(JSON_VALUE(oh.f_data, '$.f_service_amount') AS DECIMAL(14,2))) AS f_service_amount,
+    money_fmt(CAST(COALESCE(JSON_VALUE(oh.f_data, '$.f_delivery_amount'), '0') AS DECIMAL(14,2))) AS f_delivery_amount,
     COALESCE(JSON_VALUE(oh.f_data, '$.f_guest.f_guest_name'), '') AS f_guest_name,
     COALESCE(JSON_VALUE(oh.f_data, '$.f_guest.f_guest_phone'), '') AS f_guest_phone,
     COALESCE(JSON_VALUE(oh.f_data, '$.f_guest.f_guest_address'), '') AS f_guest_address
@@ -100,20 +101,31 @@ class CashSessions
             Translator::t("Receipt number"),
         ];
 
-        foreach ($payConfig["names"] as $name) {
-            $headers[] = Translator::t($name);
+        require_once __DIR__ . "/../../worker/cash-ops-helper.php";
+        foreach (array_keys($payConfig["fields"]) as $type) {
+            $headers[] = payment_type_name($this->db, (int)$type);
         }
         $headers[] = Translator::t("Service amount");
+        $headers[] = Translator::t("Courier from cash");
         $headers[] = Translator::t("Guest");
         $headers[] = Translator::t("Phone");
         $headers[] = Translator::t("Address");
+
+        // 9 = Total; 11.. = payment columns; then Service amount
+        $payCount = count($payConfig["fields"]);
+        $sumColumns = [9];
+        for ($i = 0; $i < $payCount; $i++) {
+            $sumColumns[] = 11 + $i;
+        }
+        $sumColumns[] = 11 + $payCount; // Service amount
+        $sumColumns[] = 12 + $payCount; // Courier from cash
 
         return [
             "rows" => $this->db->select($sql)->fetch_all(MYSQLI_NUM),
             "toolbar" => ["delete" => true, "reload" => true, "filter" => true],
             "headers" => $headers,
             "hidden_columns" => [0],
-            "sum" => [9, 11, 12, 13, 14, 15, 16],
+            "sum" => $sumColumns,
             "filter" => [
                 ["type" => "combobox", "name" => "datemode", "label" => Translator::t("Filter by date type"), "default" => 1, "values" => [
                     ["label" => Translator::t("Order closing date"), "value" => 1],

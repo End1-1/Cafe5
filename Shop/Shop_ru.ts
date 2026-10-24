@@ -1388,6 +1388,13 @@
     </message>
 </context>
 <context>
+    <name>C5TableView</name>
+    <message>
+        <source>Copy</source>
+        <translation>Копировать</translation>
+    </message>
+</context>
+<context>
     <name>C5Grid</name>
     <message>
         <location filename="../Classes/c5grid.ui" line="14"/>
@@ -1418,8 +1425,8 @@
     </message>
     <message>
         <location filename="../Classes/c5grid.cpp" line="501"/>
-        <source>Copy selection</source>
-        <translation>Копировать выделение</translation>
+        <source>Copy</source>
+        <translation>Копировать</translation>
     </message>
     <message>
         <location filename="../Classes/c5grid.cpp" line="502"/>
@@ -7517,6 +7524,11 @@ reservation</source>
         <location filename="working.cpp" line="517"/>
         <source>Shift total</source>
         <translation>Итого смены</translation>
+    </message>
+    <message>
+        <location filename="working.cpp" line="790"/>
+        <source>By payment type</source>
+        <translation>По видам оплаты</translation>
     </message>
     <message>
         <location filename="working.cpp" line="524"/>

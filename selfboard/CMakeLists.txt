@@ -33,6 +33,7 @@ set(SOURCES
     dlgpayment.cpp
     dlgpaymentstub.cpp
     dlgorderdone.cpp
+    dlgordererror.cpp
     selfboardordersubmit.cpp
     dlgdishdetails.cpp
     dlgpackagepick.cpp
@@ -69,6 +70,7 @@ set(HEADERS
     dlgpayment.h
     dlgpaymentstub.h
     dlgorderdone.h
+    dlgordererror.h
     selfboardordersubmit.h
     paymentstubtypes.h
     dlgdishdetails.h

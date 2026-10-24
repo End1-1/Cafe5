@@ -68,9 +68,12 @@ class WorkstationConfigWaiter extends WorkstationConfigBase
             'dlgsearchmenu_hsection_size',
             'dlgsearchmenu_vsection_size',
             'cost_depend_on_service_and_discount',
+            'bill_round_to',
             'do_not_print_customer_on_receipt',
             'customer_notification',
+            'allow_mix_all_payments',
             'recent_dishes_minutes',
+            'newlook',
             'setup_buttons',
         ];
     }
@@ -91,9 +94,12 @@ class WorkstationConfigWaiter extends WorkstationConfigBase
             'dlgsearchmenu_hsection_size' => 240,
             'dlgsearchmenu_vsection_size' => 100,
             'cost_depend_on_service_and_discount' => false,
+            'bill_round_to' => 100,
             'do_not_print_customer_on_receipt' => false,
             'customer_notification' => false,
+            'allow_mix_all_payments' => false,
             'recent_dishes_minutes' => 40,
+            'newlook' => false,
             'setup_buttons' => self::defaultSetupButtons(),
         ];
     }

@@ -12,6 +12,9 @@
 #define PAYMENT_TYPE_TELCELL 7
 #define PAYMENT_TYPE_DEBT 8
 #define PAYMENT_TYPE_PREPAID 9
+/** Extra bank transfer accounts: purchases, debts and cash operations only (not sale tenders). */
+#define PAYMENT_TYPE_BANK2 10
+#define PAYMENT_TYPE_BANK3 11
 
 extern const QVector<int> payment_types;
 extern const QMap<int, const char*> payment_names;

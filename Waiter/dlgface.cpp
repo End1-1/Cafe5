@@ -13,6 +13,7 @@
 #include "dlgrecentdishes.h"
 #include "dlgtext.h"
 #include "format_date.h"
+#include "newlook.h"
 #include "ninterface.h"
 #include "struct_workstationitem.h"
 #include "tablewidget.h"
@@ -305,6 +306,13 @@ void DlgFace::initData()
             } else if(groupMap.contains(g->parentId)) {
                 groupMap[g->parentId]->children << g;
             }
+        }
+
+        WaiterUi::menuParts().clear();
+        const QJsonArray jparts = jdoc["parts"].toArray();
+        for (const QJsonValue &v : jparts) {
+            const QJsonObject jp = v.toObject();
+            WaiterUi::menuParts().append({jp.value("f_id").toVariant().toInt(), jp.value("f_name").toString()});
         }
 
         ja = jdoc["dishes"].toArray();

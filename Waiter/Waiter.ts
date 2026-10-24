@@ -668,104 +668,103 @@
     <message>
         <location filename="dlgattendanceauth.ui" line="14"/>
         <source>Attendance</source>
-        <translation type="unfinished">Հաճախումների
-մատյան</translation>
+        <translation>Ներկայություն</translation>
     </message>
     <message>
         <location filename="dlgattendanceauth.ui" line="28"/>
         <source>Confirm with PIN or fingerprint</source>
-        <translation type="unfinished"></translation>
+        <translation>Հաստատեք PIN-ով կամ մատնահետքով</translation>
     </message>
     <message>
         <location filename="dlgattendanceauth.ui" line="86"/>
         <source>1</source>
-        <translation type="unfinished"></translation>
+        <translation>1</translation>
     </message>
     <message>
         <location filename="dlgattendanceauth.ui" line="108"/>
         <source>2</source>
-        <translation type="unfinished"></translation>
+        <translation>2</translation>
     </message>
     <message>
         <location filename="dlgattendanceauth.ui" line="130"/>
         <source>3</source>
-        <translation type="unfinished"></translation>
+        <translation>3</translation>
     </message>
     <message>
         <location filename="dlgattendanceauth.ui" line="152"/>
         <source>4</source>
-        <translation type="unfinished"></translation>
+        <translation>4</translation>
     </message>
     <message>
         <location filename="dlgattendanceauth.ui" line="174"/>
         <source>5</source>
-        <translation type="unfinished"></translation>
+        <translation>5</translation>
     </message>
     <message>
         <location filename="dlgattendanceauth.ui" line="196"/>
         <source>6</source>
-        <translation type="unfinished"></translation>
+        <translation>6</translation>
     </message>
     <message>
         <location filename="dlgattendanceauth.ui" line="218"/>
         <source>7</source>
-        <translation type="unfinished"></translation>
+        <translation>7</translation>
     </message>
     <message>
         <location filename="dlgattendanceauth.ui" line="240"/>
         <source>8</source>
-        <translation type="unfinished"></translation>
+        <translation>8</translation>
     </message>
     <message>
         <location filename="dlgattendanceauth.ui" line="262"/>
         <source>9</source>
-        <translation type="unfinished"></translation>
+        <translation>9</translation>
     </message>
     <message>
         <location filename="dlgattendanceauth.ui" line="316"/>
         <source>0</source>
-        <translation type="unfinished"></translation>
+        <translation>0</translation>
     </message>
     <message>
         <location filename="dlgattendanceauth.cpp" line="20"/>
         <source>PIN or fingerprint</source>
-        <translation type="unfinished"></translation>
+        <translation>PIN կամ մատնահետք</translation>
     </message>
     <message>
         <location filename="dlgattendanceauth.cpp" line="48"/>
         <source>Confirm checkout for %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Հաստատեք %1-ի աշխատանքի ավարտը</translation>
     </message>
     <message>
         <location filename="dlgattendanceauth.cpp" line="49"/>
         <source>Confirm checkin for %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Հաստատեք %1-ի աշխատանքի սկիզբը</translation>
     </message>
     <message>
         <location filename="dlgattendanceauth.cpp" line="64"/>
         <source>Checkout completed</source>
-        <translation type="unfinished">Ելքը կատարված է</translation>
+        <translation>Աշխատանքի ավարտը գրանցված է</translation>
     </message>
     <message>
         <location filename="dlgattendanceauth.cpp" line="66"/>
         <source>Checkin completed</source>
-        <translation type="unfinished">Մուտքը կատարված է</translation>
+        <translation>Աշխատանքի սկիզբը գրանցված է</translation>
     </message>
     <message>
         <location filename="dlgattendanceauth.cpp" line="211"/>
         <source>Fingerprint not recognized</source>
-        <translation type="unfinished">Անհայտ մատ</translation>
+        <translation>Մատնահետքը չի ճանաչվել</translation>
     </message>
     <message>
         <location filename="dlgattendanceauth.cpp" line="219"/>
         <location filename="dlgattendanceauth.cpp" line="249"/>
         <source>Verified</source>
-        <translation type="unfinished"></translation>
+        <translation>Հաստատված է</translation>
     </message>
     <message>
         <location filename="dlgattendanceauth.cpp" line="239"/>
         <source>Enter PIN</source>
-        <translation type="unfinished"></translation>
+        <translation>Մուտքագրեք PIN</translation>
     </message>
 </context>
 <context>
@@ -789,6 +788,10 @@
         <location filename="dlgcl.ui" line="40"/>
         <source>Phone</source>
         <translation>Հեռախոս</translation>
+    </message>
+    <message>
+        <source>Debt partner</source>
+        <translation>Պարտքի գործընկեր</translation>
     </message>
 </context>
 <context>
@@ -1099,13 +1102,18 @@
     <message>
         <location filename="dlgdashboard.cpp" line="191"/>
         <source>Shift total</source>
-        <translation>Սպասվող ընդամենը</translation>
+        <translation>Հերթափոխի ընդամենը</translation>
     </message>
     <message>
         <location filename="dlgdashboard.cpp" line="196"/>
         <location filename="dlgdashboard.cpp" line="258"/>
         <source>Expected cash</source>
         <translation>Սպասվող կանխիկ</translation>
+    </message>
+    <message>
+        <location filename="dlgdashboard.cpp" line="210"/>
+        <source>By payment type</source>
+        <translation>Ըստ վճարման տեսակի</translation>
     </message>
     <message>
         <location filename="dlgdashboard.cpp" line="205"/>
@@ -1166,6 +1174,50 @@
         <location filename="dlgdashboard.cpp" line="361"/>
         <source>No active cashbox session</source>
         <translation>Չկա ակտիվ հերթափոխ</translation>
+    </message>
+    <message>
+        <source>Please select a cashbox</source>
+        <translation>Ընտրեք դրամարկղ</translation>
+    </message>
+    <message>
+        <source>Cash collection</source>
+        <translation>Ինկասացիա</translation>
+    </message>
+    <message>
+        <source>Confirm cash collection of %1</source>
+        <translation>Հաստատեք %1 գումարի ինկասացիան</translation>
+    </message>
+    <message>
+        <source>Cash collection completed, moved to cashbox %1</source>
+        <translation>Ինկասացիան կատարված է, տեղափոխված է դրամարկղ %1</translation>
+    </message>
+    <message>
+        <source>Cash collection completed</source>
+        <translation>Ինկասացիան կատարված է</translation>
+    </message>
+    <message>
+        <source>Date</source>
+        <translation>Ամսաթիվ</translation>
+    </message>
+    <message>
+        <source>Cashbox</source>
+        <translation>Դրամարկղ</translation>
+    </message>
+    <message>
+        <source>Moved to cashbox</source>
+        <translation>Տեղափոխված է դրամարկղ</translation>
+    </message>
+    <message>
+        <source>Staff</source>
+        <translation>Աշխատակից</translation>
+    </message>
+    <message>
+        <source>Handed over</source>
+        <translation>Հանձնեց</translation>
+    </message>
+    <message>
+        <source>Received</source>
+        <translation>Ընդունեց</translation>
     </message>
 </context>
 <context>
@@ -1342,7 +1394,7 @@
     <message>
         <location filename="dlgface.ui" line="474"/>
         <source>Staffname</source>
-        <translation></translation>
+        <translation>Աշխատող</translation>
     </message>
     <message>
         <location filename="dlgface.ui" line="438"/>
@@ -1496,7 +1548,7 @@
     <message>
         <location filename="dlgkitcheninprogress.ui" line="303"/>
         <source>Id</source>
-        <translation></translation>
+        <translation>Id</translation>
     </message>
     <message>
         <location filename="dlgkitcheninprogress.ui" line="308"/>
@@ -1632,12 +1684,12 @@
     <message>
         <location filename="dlgkitcheninprogress.cpp" line="1372"/>
         <source>Cannot open order</source>
-        <translation></translation>
+        <translation>Հնարավոր չէ բացել պատվերը</translation>
     </message>
     <message>
         <location filename="dlgkitcheninprogress.cpp" line="1395"/>
         <source>Cannot resolve hall/table</source>
-        <translation></translation>
+        <translation>Հնարավոր չէ որոշել սրահը/սեղանը</translation>
     </message>
 </context>
 <context>
@@ -1645,132 +1697,132 @@
     <message>
         <location filename="dlgkitcheninprogressfine.ui" line="14"/>
         <source>In progress</source>
-        <translation type="unfinished"></translation>
+        <translation>Ընթացքում</translation>
     </message>
     <message>
         <location filename="dlgkitcheninprogressfine.ui" line="59"/>
         <source>Current orders</source>
-        <translation type="unfinished">Ընդացիկ պատվերներ</translation>
+        <translation>Ընթացիկ պատվերներ</translation>
     </message>
     <message>
         <location filename="dlgkitcheninprogressfine.ui" line="84"/>
         <source>0</source>
-        <translation type="unfinished"></translation>
+        <translation>0</translation>
     </message>
     <message>
         <location filename="dlgkitcheninprogressfine.ui" line="100"/>
         <source>Order history</source>
-        <translation type="unfinished"></translation>
+        <translation>Պատվերների պատմություն</translation>
     </message>
     <message>
         <location filename="dlgkitcheninprogressfine.ui" line="123"/>
         <source>00:00</source>
-        <translation type="unfinished"></translation>
+        <translation>00:00</translation>
     </message>
     <message>
         <location filename="dlgkitcheninprogressfine.ui" line="177"/>
         <source>Lock</source>
-        <translation type="unfinished">Փակել</translation>
+        <translation>Կողպել</translation>
     </message>
     <message>
         <location filename="dlgkitcheninprogressfine.cpp" line="34"/>
         <source>Archive date</source>
         <comment>kitchen_history_mode</comment>
-        <translation type="unfinished">Ամսաթիվ</translation>
+        <translation>Արխիվի ամսաթիվ</translation>
     </message>
     <message>
         <location filename="dlgkitcheninprogressfine.cpp" line="212"/>
         <source>Current orders</source>
         <comment>kitchen_fine_tab_live</comment>
-        <translation type="unfinished">Ընդացիկ պատվերներ</translation>
+        <translation>Ընթացիկ պատվերներ</translation>
     </message>
     <message>
         <location filename="dlgkitcheninprogressfine.cpp" line="213"/>
         <source>Order history</source>
         <comment>kitchen_fine_tab_history</comment>
-        <translation type="unfinished"></translation>
+        <translation>Պատվերների պատմություն</translation>
     </message>
     <message>
         <location filename="dlgkitcheninprogressfine.cpp" line="256"/>
         <source>Accepted</source>
         <comment>kitchen_line_status</comment>
-        <translation type="unfinished">Ընդունված</translation>
+        <translation>Ընդունված է</translation>
     </message>
     <message>
         <location filename="dlgkitcheninprogressfine.cpp" line="258"/>
         <source>Cooking</source>
         <comment>kitchen_line_status</comment>
-        <translation type="unfinished">Պատրաստվող</translation>
+        <translation>Պատրաստվում է</translation>
     </message>
     <message>
         <location filename="dlgkitcheninprogressfine.cpp" line="260"/>
         <source>Ready</source>
         <comment>kitchen_line_status</comment>
-        <translation type="unfinished">Պատրաստ</translation>
+        <translation>Պատրաստ է</translation>
     </message>
     <message>
         <location filename="dlgkitcheninprogressfine.cpp" line="262"/>
         <source>Served</source>
         <comment>kitchen_line_status</comment>
-        <translation type="unfinished">Հանձնված</translation>
+        <translation>Մատուցված է</translation>
     </message>
     <message>
         <location filename="dlgkitcheninprogressfine.cpp" line="272"/>
         <source>In progress</source>
         <comment>kitchen_fine_status_button</comment>
-        <translation type="unfinished"></translation>
+        <translation>Ընթացքում</translation>
     </message>
     <message>
         <location filename="dlgkitcheninprogressfine.cpp" line="274"/>
         <source>Ready</source>
         <comment>kitchen_fine_status_button</comment>
-        <translation type="unfinished">Պատրաստ</translation>
+        <translation>Պատրաստ է</translation>
     </message>
     <message>
         <location filename="dlgkitcheninprogressfine.cpp" line="276"/>
         <source>Pick up order!</source>
         <comment>kitchen_fine_overdue_button</comment>
-        <translation type="unfinished"></translation>
+        <translation>Վերցրեք պատվերը։</translation>
     </message>
     <message>
         <location filename="dlgkitcheninprogressfine.cpp" line="279"/>
         <source>Accepted</source>
         <comment>kitchen_fine_status_button</comment>
-        <translation type="unfinished">Ընդունված</translation>
+        <translation>Ընդունված է</translation>
     </message>
     <message>
         <location filename="dlgkitcheninprogressfine.cpp" line="673"/>
         <source>%1 — %2 (history)</source>
         <comment>kitchen_in_progress_title</comment>
-        <translation type="unfinished">%1 — %2 (պատմություն)</translation>
+        <translation>%1 — %2 (պատմություն)</translation>
     </message>
     <message>
         <location filename="dlgkitcheninprogressfine.cpp" line="703"/>
         <source>Mark as served to the guest? The line will disappear from the kitchen list.</source>
         <comment>kitchen_confirm_served</comment>
-        <translation type="unfinished">Հաստատեք հանձնելը</translation>
+        <translation>Նշե՞լ որպես հյուրին մատուցված։ Տողը կանհետանա խոհանոցի ցանկից։</translation>
     </message>
     <message>
         <location filename="dlgkitcheninprogressfine.cpp" line="705"/>
         <source>Mark all selected lines as served to the guest? They will disappear from the kitchen list.</source>
         <comment>kitchen_confirm_served_all</comment>
-        <translation type="unfinished">Հաստատեք հանձնելը</translation>
+        <translation>Նշե՞լ բոլոր ընտրված տողերը որպես հյուրին մատուցված։ Դրանք կանհետանան խոհանոցի ցանկից։</translation>
     </message>
     <message>
         <location filename="dlgkitcheninprogressfine.cpp" line="787"/>
         <source>All</source>
         <comment>kitchen_pick_line</comment>
-        <translation type="unfinished">Բոլորը</translation>
+        <translation>Բոլորը</translation>
     </message>
     <message>
         <location filename="dlgkitcheninprogressfine.cpp" line="833"/>
         <source>Cannot open order</source>
-        <translation type="unfinished"></translation>
+        <translation>Հնարավոր չէ բացել պատվերը</translation>
     </message>
     <message>
         <location filename="dlgkitcheninprogressfine.cpp" line="856"/>
         <source>Cannot resolve hall/table</source>
-        <translation type="unfinished"></translation>
+        <translation>Հնարավոր չէ որոշել սրահը/սեղանը</translation>
     </message>
 </context>
 <context>
@@ -1779,32 +1831,32 @@
         <location filename="dlgkitchensettings.ui" line="14"/>
         <location filename="dlgkitchensettings.ui" line="35"/>
         <source>Column settings</source>
-        <translation></translation>
+        <translation>Սյունակների կարգավորումներ</translation>
     </message>
     <message>
         <location filename="dlgkitchensettings.ui" line="45"/>
         <source>Toggle visibility and adjust column widths.</source>
-        <translation></translation>
+        <translation>Միացրեք տեսանելիությունը և կարգավորեք սյունակների լայնությունը։</translation>
     </message>
     <message>
         <location filename="dlgkitchensettings.ui" line="77"/>
         <source>Show</source>
-        <translation></translation>
+        <translation>Ցույց տալ</translation>
     </message>
     <message>
         <location filename="dlgkitchensettings.ui" line="82"/>
         <source>Column</source>
-        <translation></translation>
+        <translation>Սյունակ</translation>
     </message>
     <message>
         <location filename="dlgkitchensettings.ui" line="87"/>
         <source>Width</source>
-        <translation></translation>
+        <translation>Լայնություն</translation>
     </message>
     <message>
         <location filename="dlgkitchensettings.ui" line="112"/>
         <source>Reset to defaults</source>
-        <translation></translation>
+        <translation>Վերականգնել սկզբնական կարգավորումները</translation>
     </message>
     <message>
         <location filename="dlgkitchensettings.ui" line="144"/>
@@ -1822,7 +1874,7 @@
     <message>
         <location filename="dlglist.ui" line="14"/>
         <source>List</source>
-        <translation></translation>
+        <translation>Ցանկ</translation>
     </message>
 </context>
 <context>
@@ -1909,6 +1961,46 @@
         <source>Amount is not valid</source>
         <translation>Սխալ գումար</translation>
     </message>
+    <message>
+        <source>Operation type</source>
+        <translation>Գործողություն</translation>
+    </message>
+    <message>
+        <source>Cashbox</source>
+        <translation>Դրամարկղ</translation>
+    </message>
+    <message>
+        <source>Total Expenses</source>
+        <translation>Ընդհանուր ծախսեր</translation>
+    </message>
+    <message>
+        <source>Purchasing Costs</source>
+        <translation>Գնումներ</translation>
+    </message>
+    <message>
+        <source>Salaries and Wages</source>
+        <translation>Աշխատավարձ</translation>
+    </message>
+    <message>
+        <source>Debt Repayment</source>
+        <translation>Գործընկերոջ պարտքի մարում</translation>
+    </message>
+    <message>
+        <source>Utilities</source>
+        <translation>Կոմունալ</translation>
+    </message>
+    <message>
+        <source>Cash Shortage</source>
+        <translation>Կանխիկի պակասնորդ</translation>
+    </message>
+    <message>
+        <source>Comment is required</source>
+        <translation>Նշեք նպատակը</translation>
+    </message>
+    <message>
+        <source>Cash collection</source>
+        <translation>Ինկասացիա</translation>
+    </message>
 </context>
 <context>
     <name>DlgNewCL</name>
@@ -1931,6 +2023,10 @@
 </context>
 <context>
     <name>DlgOrder</name>
+    <message>
+        <source>Part %1</source>
+        <translation>Բաժին %1</translation>
+    </message>
     <message>
         <location filename="dlgorder.ui" line="20"/>
         <source>Cafe5</source>
@@ -1979,7 +2075,7 @@ info</source>
     <message>
         <location filename="dlgorder.ui" line="848"/>
         <source>My dear</source>
-        <translation></translation>
+        <translation>Հյուր</translation>
     </message>
     <message>
         <location filename="dlgorder.ui" line="299"/>
@@ -1992,13 +2088,15 @@ atetime</source>
         <location filename="dlgorder.ui" line="1781"/>
         <source>Service fee
 10%</source>
-        <translation></translation>
+        <translation>Սպասարկում
+10%</translation>
     </message>
     <message>
         <location filename="dlgorder.ui" line="1816"/>
         <source>Discount
 10%</source>
-        <translation></translation>
+        <translation>Զեղչ
+10%</translation>
     </message>
     <message>
         <location filename="dlgorder.ui" line="2980"/>
@@ -2014,7 +2112,7 @@ atetime</source>
         <location filename="dlgorder.ui" line="3001"/>
         <location filename="dlgorder.ui" line="3008"/>
         <source>0 AMD</source>
-        <translation></translation>
+        <translation>0 դր․</translation>
     </message>
     <message>
         <location filename="dlgorder.ui" line="2966"/>
@@ -2317,7 +2415,7 @@ amount</source>
     <message>
         <location filename="dlgorder.cpp" line="871"/>
         <source>Error in state</source>
-        <translation></translation>
+        <translation>Սխալ վիճակ</translation>
     </message>
     <message>
         <location filename="dlgorder.cpp" line="886"/>
@@ -2555,7 +2653,7 @@ amount</source>
     <message>
         <location filename="dlgorder.cpp" line="1224"/>
         <source>Print error</source>
-        <translation></translation>
+        <translation>Տպման սխալ</translation>
     </message>
     <message>
         <location filename="dlgorder.cpp" line="1415"/>
@@ -2642,7 +2740,7 @@ amount</source>
     <message>
         <location filename="dlgorder.cpp" line="3297"/>
         <source>Cashbox session is not assigned to order</source>
-        <translation type="unfinished"></translation>
+        <translation>Դրամարկղի հերթափոխը կցված չէ պատվերին</translation>
     </message>
     <message>
         <location filename="dlgorder.cpp" line="3334"/>
@@ -2659,7 +2757,7 @@ amount</source>
         <location filename="dlgorder.cpp" line="4222"/>
         <source>A second display is not connected. Connect a customer display and try again.</source>
         <comment>customer_display_no_second_screen</comment>
-        <translation></translation>
+        <translation>Երկրորդ էկրանը միացված չէ։ Միացրեք հաճախորդի էկրանը և փորձեք կրկին։</translation>
     </message>
     <message>
         <location filename="dlgorder.cpp" line="1654"/>
@@ -2743,6 +2841,62 @@ amount</source>
         <location filename="dlgorder.cpp" line="3566"/>
         <source>Use removal tool</source>
         <translation>Օգտագործեք հեռացման կոճակը</translation>
+    </message>
+    <message>
+        <source>Printer: %1</source>
+        <translation>Տպիչ՝ %1</translation>
+    </message>
+    <message>
+        <source>Printer not found</source>
+        <translation>Տպիչը չի գտնվել</translation>
+    </message>
+    <message>
+        <source>Print failed</source>
+        <translation>Տպումը ձախողվեց</translation>
+    </message>
+    <message>
+        <source>Print precheck</source>
+        <translation>Տպել նախահաշիվը</translation>
+    </message>
+    <message>
+        <source>Order is incomplete</source>
+        <translation>Պատվերն ամբողջական չէ</translation>
+    </message>
+    <message>
+        <source>Bonus system alreay exists for this order</source>
+        <translation>Այս պատվերի համար բոնուսային համակարգն արդեն կիրառված է</translation>
+    </message>
+    <message>
+        <source>Cannot find card</source>
+        <translation>Քարտը չի գտնվել</translation>
+    </message>
+    <message>
+        <source>Partner not selected</source>
+        <translation>Գործընկերն ընտրված չէ</translation>
+    </message>
+    <message>
+        <source>Simple fiscal: department (dep) is not set on the fiscal machine</source>
+        <translation>Պարզ ՀԴՄ. բաժինը (dep) նշված չէ ՀԴՄ-ի կարգավորումներում</translation>
+    </message>
+    <message>
+        <source>Add guest</source>
+        <translation>Ավելացնել հյուր</translation>
+    </message>
+    <message>
+        <source>Guest %1</source>
+        <translation>Հյուր %1</translation>
+    </message>
+    <message>
+        <source>Food</source>
+        <translation>Սնունդ</translation>
+    </message>
+    <message>
+        <source>Coke</source>
+        <translation>Կոլա</translation>
+    </message>
+    <message>
+        <source>Bar</source>
+        <translation>Բար</translation>
     </message>
 </context>
 <context>
@@ -2888,7 +3042,7 @@ STOPLIST-ից</translation>
     <message>
         <location filename="dlgpreorderslist.ui" line="21"/>
         <source>Id</source>
-        <translation></translation>
+        <translation>Id</translation>
     </message>
     <message>
         <location filename="dlgpreorderslist.ui" line="26"/>
@@ -2974,12 +3128,12 @@ STOPLIST-ից</translation>
     <message>
         <location filename="dlgpreorderslist.cpp" line="162"/>
         <source>Data source is empty</source>
-        <translation></translation>
+        <translation>Տվյալներ չկան</translation>
     </message>
     <message>
         <location filename="dlgpreorderslist.cpp" line="189"/>
         <source>Cannot resolve hall/table for selected row</source>
-        <translation></translation>
+        <translation>Հնարավոր չէ որոշել ընտրված տողի սրահը/սեղանը</translation>
     </message>
 </context>
 <context>
@@ -3013,12 +3167,12 @@ STOPLIST-ից</translation>
     <message>
         <location filename="dlgrealreports.ui" line="52"/>
         <source>Report name</source>
-        <translation></translation>
+        <translation>Հաշվետվության անվանում</translation>
     </message>
     <message>
         <location filename="dlgrealreports.ui" line="142"/>
         <source>Preview</source>
-        <translation></translation>
+        <translation>Նախադիտում</translation>
     </message>
     <message>
         <location filename="dlgrealreports.ui" line="192"/>
@@ -3084,7 +3238,7 @@ STOPLIST-ից</translation>
     <message>
         <location filename="dlgreportparams.ui" line="53"/>
         <source>Report name</source>
-        <translation></translation>
+        <translation>Հաշվետվության անվանում</translation>
     </message>
     <message>
         <location filename="dlgreportparams.ui" line="146"/>
@@ -3107,7 +3261,7 @@ STOPLIST-ից</translation>
     <message>
         <location filename="dlgreports.ui" line="268"/>
         <source>Unique id</source>
-        <translation></translation>
+        <translation>Եզակի կոդ</translation>
     </message>
     <message>
         <location filename="dlgreports.ui" line="273"/>
@@ -3162,7 +3316,7 @@ STOPLIST-ից</translation>
     <message>
         <location filename="dlgreports.ui" line="241"/>
         <source>New Row</source>
-        <translation></translation>
+        <translation>Նոր տող</translation>
     </message>
     <message>
         <location filename="dlgreports.ui" line="107"/>
@@ -3209,17 +3363,17 @@ STOPLIST-ից</translation>
     <message>
         <location filename="dlgreports.cpp" line="423"/>
         <source>Menu is not loaded yet. Please wait and try again.</source>
-        <translation type="unfinished"></translation>
+        <translation>Մենյուն դեռ բեռնված չէ։ Սպասեք և փորձեք կրկին։</translation>
     </message>
     <message>
         <location filename="dlgreports.cpp" line="435"/>
         <source>Cannot resolve hall/table for selected order</source>
-        <translation type="unfinished"></translation>
+        <translation>Հնարավոր չէ որոշել ընտրված պատվերի սրահը/սեղանը</translation>
     </message>
     <message>
         <location filename="dlgreports.cpp" line="439"/>
         <source>Do you want to reopen order?</source>
-        <translation type="unfinished">Դուք ցանկանում եք վերաբացել պատվերը՞</translation>
+        <translation>Վերաբացե՞լ պատվերը</translation>
     </message>
 </context>
 <context>
@@ -3623,12 +3777,12 @@ STOPLIST-ից</translation>
     <message>
         <location filename="dlgtables.ui" line="122"/>
         <source>New Row</source>
-        <translation></translation>
+        <translation>Նոր տող</translation>
     </message>
     <message>
         <location filename="dlgtables.ui" line="127"/>
         <source>New Column</source>
-        <translation></translation>
+        <translation>Նոր սյունակ</translation>
     </message>
     <message>
         <location filename="dlgtables.ui" line="168"/>
@@ -3641,7 +3795,7 @@ STOPLIST-ից</translation>
     <message>
         <location filename="dlgtext.ui" line="14"/>
         <source>Text</source>
-        <translation></translation>
+        <translation>Տեքստ</translation>
     </message>
 </context>
 <context>
@@ -3707,7 +3861,7 @@ STOPLIST-ից</translation>
     <message>
         <location filename="dlgviewstoplist.ui" line="42"/>
         <source>New Row</source>
-        <translation></translation>
+        <translation>Նոր տող</translation>
     </message>
     <message>
         <location filename="dlgviewstoplist.ui" line="77"/>
@@ -3901,6 +4055,14 @@ STOPLIST-ից</translation>
         <source>Prepaid</source>
         <translation>Կանխավճար</translation>
     </message>
+    <message>
+        <source>Bank 2</source>
+        <translation>Փոխանցում 2</translation>
+    </message>
+    <message>
+        <source>Bank 3</source>
+        <translation>Փոխանցում 3</translation>
+    </message>
 </context>
 <context>
     <name>QObject</name>
@@ -3920,7 +4082,7 @@ STOPLIST-ից</translation>
     <message>
         <location filename="main.cpp" line="53"/>
         <source>Cannot create lock file: %1</source>
-        <translation></translation>
+        <translation>Հնարավոր չէ ստեղծել կողպման ֆայլ՝ %1</translation>
     </message>
     <message>
         <location filename="main.cpp" line="124"/>
@@ -4024,12 +4186,12 @@ STOPLIST-ից</translation>
     <message>
         <location filename="waiterdishwidget.ui" line="113"/>
         <source>Comment of the dish</source>
-        <translation></translation>
+        <translation>Մեկնաբանություն</translation>
     </message>
     <message>
         <location filename="waiterdishwidget.ui" line="366"/>
         <source>THE NAME OF THE DISH</source>
-        <translation></translation>
+        <translation>ՈՒՏԵՍՏԻ ԱՆՎԱՆՈՒՄ</translation>
     </message>
     <message>
         <location filename="waiterdishwidget.ui" line="406"/>
@@ -4052,6 +4214,36 @@ STOPLIST-ից</translation>
         <location filename="waiterdishwidget.ui" line="431"/>
         <source>150,000</source>
         <translation></translation>
+    </message>
+</context>
+<context>
+    <name>DlgRecentDishes</name>
+    <message>
+        <source>Dish</source>
+        <translation>Ուտեստ</translation>
+    </message>
+    <message>
+        <source>Qty</source>
+        <translation>Քանակ</translation>
+    </message>
+    <message>
+        <source>Recent dishes (%1 min)</source>
+        <translation>Վերջին ուտեստները (%1 րոպե)</translation>
+    </message>
+</context>
+<context>
+    <name>DlgOrderMore</name>
+    <message>
+        <source>Menu</source>
+        <translation>Մենյու</translation>
+    </message>
+    <message>
+        <source>Service</source>
+        <translation>Սպասարկում</translation>
+    </message>
+    <message>
+        <source>Discount</source>
+        <translation>Զեղչ</translation>
     </message>
 </context>
 </TS>

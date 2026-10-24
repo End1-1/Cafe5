@@ -13,10 +13,7 @@
 #include "cr5goods.h"
 #include "cr5goodsgroup.h"
 #include "cr5goodspartners.h"
-#include "cr5discountsystem.h"
 #include "cr5goodsunit.h"
-#include "cr5hall.h"
-#include "cr5tables.h"
 #include "cr5users.h"
 #include "cr5usersgroups.h"
 #include "ntablewidget.h"
@@ -242,19 +239,6 @@ QWidget* WDashboard::createForm(const QString &name, QIcon icon)
         return users;
     }
 
-    if (name == "form_halls") {
-        auto *halls = new CR5Hall();
-
-        halls->postProcess();
-        return halls;
-    }
-
-    if (name == "form_tables") {
-        auto *tables = new CR5Tables();
-        tables->postProcess();
-        return tables;
-    }
-
     if (name == "form_city_ledger") {
         auto *t = new NTableWidget(mUser, "/engine/reports/customer-debts.php");
         t->mMainWindow = __mainWindow;
@@ -272,12 +256,6 @@ QWidget* WDashboard::createForm(const QString &name, QIcon icon)
         auto *partners = new CR5GoodsPartners();
         partners->postProcess();
         return partners;
-    }
-
-    if (name == "form_discount_system") {
-        auto *discount = new CR5DiscountSystem();
-        discount->postProcess();
-        return discount;
     }
 
     if (name == "form_summary") {

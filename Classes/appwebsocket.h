@@ -27,6 +27,8 @@ public:
 
     static void reconnect(const QString &host, const QString &key, const QString &username, const QString &password);
 
+    static void reconnect(const QString &host, const QString &key, int userId);
+
     bool isConnected() const;
 
     /// Returns false if not connected or the socket failed to send.
@@ -51,6 +53,8 @@ private:
     QString mUsername;
 
     QString mPassword;
+
+    int mUserId = 0;
 
     int mReconnectAttempt = 0;
 

@@ -14,6 +14,8 @@
 #include "dlgreportsfilter.h"
 #include "format_date.h"
 #include "ninterface.h"
+#include "paymenttypenames.h"
+#include "struct_workstationitem.h"
 #include "ui_dlgreports.h"
 
 class GridDelegate : public QStyledItemDelegate
@@ -328,7 +330,7 @@ void DlgReports::on_btnReports_clicked()
         QFont font(qApp->font());
         font.setPointSize(bs);
         C5Printing p;
-        QPrinterInfo pi = QPrinterInfo::printerInfo(mUser->fConfig["receipt_printer"].toString());
+        QPrinterInfo pi = QPrinterInfo::printerInfo(mWorkStation.waiterReportPrinter());
         QPrinter printer(pi);
         printer.setPageSize(QPageSize::Custom);
         printer.setFullPage(false);
@@ -364,7 +366,7 @@ void DlgReports::on_btnReports_clicked()
         if(jdoc["f_amount_cash"].toDouble() > 0.01) {
             p.line();
             p.br();
-            p.ltext(tr("Cash"));
+            p.ltext(PaymentTypeNames::title(PAYMENT_TYPE_CASH));
             p.rtext(float_str(jdoc["f_amount_cash"].toDouble(), 2));
             p.br();
         }
@@ -372,7 +374,7 @@ void DlgReports::on_btnReports_clicked()
         if(jdoc["f_amount_card"].toDouble() > 0.01) {
             p.line();
             p.br();
-            p.ltext(tr("Card"));
+            p.ltext(PaymentTypeNames::title(PAYMENT_TYPE_CARD));
             p.rtext(float_str(jdoc["f_amount_card"].toDouble(), 2));
             p.br();
         }

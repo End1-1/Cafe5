@@ -97,6 +97,7 @@ qt_add_executable(Waiter WIN32
     ../Classes/c5threadobject.cpp
     ../Classes/calculator.cpp
     ../dictionaries/dict_payment_type.cpp
+    ../FrontDesk/paymenttypenames.cpp
     ../Classes/dlgpassword.cpp
     ../Classes/idram.cpp
     ../Classes/logwriter.cpp
@@ -174,6 +175,9 @@ qt_add_executable(Waiter WIN32
     ../Cafe5/c5registrysettings.cpp
     ../Cafe5/c5uilanguage.cpp
     dlgorder.cpp
+    dlgordermore.cpp
+    dlgordermore.h
+    dlgordermore.ui
     ../Classes/c5user.cpp
     ../Classes/c5menu.cpp
     ../Classes/c5witerconf.cpp
@@ -376,6 +380,7 @@ qt_add_executable(Waiter WIN32
     dlglist.ui
     dlglistdishspecial.ui
     dlgorder.ui
+    dlgorder_new.ui
     dlgprecheckoptions.ui
     dlgrealreports.ui
     dlgreportparams.ui

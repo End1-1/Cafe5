@@ -11,6 +11,7 @@
 #include "c5utils.h"
 #include "struct_workstationitem.h"
 #include "dlgdashboard.h"
+#include "paymenttypenames.h"
 #include "zkfingerprintreader.h"
 #include <QCloseEvent>
 #include <QJsonArray>
@@ -228,6 +229,8 @@ void DlgScreen::onFingerprintProbe(const QByteArray &probe)
 
 void DlgScreen::completeLogin(C5User *user)
 {
+    PaymentTypeNames::load(user->mSessionKey, this);
+
     if(!user->check(cp_t5_waiter_edit_order)) {
         DlgDashboard(QJsonObject(), user).exec();
         user->deleteLater();

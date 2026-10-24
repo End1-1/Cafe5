@@ -17,6 +17,8 @@ public:
 
     void setUpdateInfo(const QString &message, const QString &oldVersion, const QString &newVersion);
 
+    void prepareForClose();
+
 protected:
     void mousePressEvent(QMouseEvent *event) override;
     void mouseMoveEvent(QMouseEvent *event) override;

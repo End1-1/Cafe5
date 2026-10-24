@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Dialog</string>
+   <string>Semiready</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
@@ -53,7 +53,7 @@
       <item>
        <widget class="QLabel" name="lbMeas">
         <property name="text">
-         <string>kb</string>
+         <string/>
         </property>
        </widget>
       </item>
@@ -77,17 +77,17 @@
     <widget class="C5ClearTableWidget" name="tbl">
      <column>
       <property name="text">
-       <string>Goods id</string>
+       <string>Code</string>
       </property>
      </column>
      <column>
       <property name="text">
-       <string>Goods name</string>
+       <string>Name</string>
       </property>
      </column>
      <column>
       <property name="text">
-       <string>Qty</string>
+       <string>Quantity</string>
       </property>
      </column>
     </widget>

@@ -1,7 +1,9 @@
 #pragma once
 
 #include "c5widget.h"
+#include "semiready_batch.h"
 #include "struct_doc_store_input.h"
+#include <QVector>
 
 namespace Ui
 {
@@ -31,6 +33,7 @@ private:
 
     Ui::C5StoreMovement *ui;
     StoreInputDocument mDocData;
+    QVector<SemireadyBatch> mSemireadyBatches;
     QAction *mActionSave = nullptr;
     QAction *mActionDraft = nullptr;
 
@@ -40,6 +43,13 @@ private:
     int addGoodsRow();
     int addGoods(int goods, const QString &name, double qty, const QString &unit, double price);
 
+    int findGoodsRow(int goodsId) const;
+    double lockedQty(int row) const;
+    void setLockedQty(int row, double qty);
+    void applySemireadyBatch(const SemireadyBatch &batch);
+    void removeSemireadyBatch(const QString &batchId);
+    void refreshRowTotal(int row);
+
 private slots:
     void saveDocument();
     void draftDocument();
@@ -48,4 +58,6 @@ private slots:
     void tblPriceChanged(const QString &arg1);
     void on_btnAddGoods_clicked();
     void on_btnRemoveGoods_clicked();
+    void on_btnAddSemiready_clicked();
+    void on_btnSemireadyList_clicked();
 };

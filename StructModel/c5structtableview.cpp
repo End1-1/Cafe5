@@ -51,6 +51,20 @@ QJsonArray C5StructTableView::cachedResults(const QString &searchEngine)
     return sLastResultsByEngine.value(searchEngine);
 }
 
+QJsonArray C5StructTableView::filtered(const QJsonArray &jarr) const
+{
+    if (!mRowFilter) {
+        return jarr;
+    }
+    QJsonArray out;
+    for (const QJsonValue &v : jarr) {
+        if (mRowFilter(v.toObject())) {
+            out.append(v);
+        }
+    }
+    return out;
+}
+
 C5StructTableView::C5StructTableView(C5User *user)
     : C5Dialog(user), ui(new Ui::C5StructTableView)
 {

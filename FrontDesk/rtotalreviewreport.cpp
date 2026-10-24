@@ -23,6 +23,7 @@ void openDrillDownReport(const QString &editorName,
         report = new RAbstractEditorReport(title, icon, editorName);
     }
 
+    report->overrideFilterValues(filterValues);
     __c5config.setRegValue(key, prevFilter);
     __mainWindow->addWidget(report);
 }

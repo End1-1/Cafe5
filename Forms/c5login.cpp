@@ -25,8 +25,8 @@ C5Login::C5Login(C5User *user) :
     ui->setupUi(this);
     ui->leVersion->setText(FileVersion::getVersionString(qApp->applicationFilePath()));
 #ifndef QT_DEBUG
-    ui->leVersion->setText(FileVersion::getVersionString(qApp->applicationFilePath()));
     ui->leVersion->setVisible(false);
+    ui->btnCurrentVersion->setVisible(false);
 #endif
     readServers();
     updateLangButton();
@@ -197,4 +197,9 @@ void C5Login::on_btnLang_clicked()
 
     C5UiLanguage::apply(lang);
     updateLangButton();
+}
+
+void C5Login::on_btnCurrentVersion_clicked()
+{
+    ui->leVersion->setText(FileVersion::getVersionString(qApp->applicationFilePath()));
 }

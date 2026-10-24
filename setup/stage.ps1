@@ -262,20 +262,28 @@ if ($Bump -and (Component-Selected "selfboard")) {
     $sbParts = Read-AppVersionParts (Join-Path $RepoRoot "selfboard\version.h")
 }
 
-$service5VerFile = Join-Path $SetupDir "service5_version.txt"
-if (-not (Test-Path $service5VerFile)) {
-    Set-Content -Path $service5VerFile -Value "1.0.0" -Encoding ASCII
-}
-$service5Short = (Get-Content $service5VerFile -Raw).Trim()
+# Service5 uses Service5\version.h (same as desktop apps). Keep CMake project() in sync on bump.
+$service5VersionHeader = Join-Path $RepoRoot "Service5\version.h"
 if ($Bump -and (Component-Selected "service5")) {
-    if ($service5Short -match '^(\d+)\.(\d+)\.(\d+)$') {
-        $sMajor = [int]$Matches[1]; $sMinor = [int]$Matches[2]; $sPatch = [int]$Matches[3] + 1
-        $service5Short = "$sMajor.$sMinor.$sPatch"
-    } else {
-        $service5Short = "1.0.1"
+    $service5Parts = Bump-VersionHeader $service5VersionHeader -BumpPatch
+    $service5Full = Format-AppVersion $service5Parts
+    $cmakeLists = Join-Path $RepoRoot "Service5\CMakeLists.txt"
+    if (Test-Path $cmakeLists) {
+        $cmakeText = Get-Content $cmakeLists -Raw
+        $cmakeText = [regex]::Replace(
+            $cmakeText,
+            'project\(\s*service5\s+VERSION\s+[\d.]+',
+            "project(service5 VERSION $service5Full"
+        )
+        $utf8 = New-Object System.Text.UTF8Encoding $false
+        [System.IO.File]::WriteAllText($cmakeLists, $cmakeText, $utf8)
     }
-    Set-Content -Path $service5VerFile -Value $service5Short -Encoding ASCII
+    # Legacy mirror for any old scripts still reading this file
+    Set-Content -Path (Join-Path $SetupDir "service5_version.txt") -Value (Format-AppVersionShort $service5Parts) -Encoding ASCII
+} else {
+    $service5Parts = Read-AppVersionParts $service5VersionHeader
 }
+$service5Short = Format-AppVersionShort $service5Parts
 
 $fdShort = Format-AppVersionShort $fdParts
 $shopShort = Format-AppVersionShort $shopParts

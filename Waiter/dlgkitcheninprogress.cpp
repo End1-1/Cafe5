@@ -27,6 +27,7 @@
 #include "c5utils.h"
 #include "dict_currency.h"
 #include "dict_payment_type.h"
+#include "paymenttypenames.h"
 #include "dlgkitchensettings.h"
 #include "dlgorder.h"
 #include "dlgsimleoptions.h"
@@ -428,11 +429,7 @@ QString DlgKitchenInProgress::paymentColumnText(const QJsonObject &order) const
 
         if(amt > 1e-9) {
             paidTotal += amt;
-            const char *const nm = payment_names.value(pt);
-
-            if(nm) {
-                typeParts << QCoreApplication::translate("PaymentType", nm);
-            }
+            typeParts << PaymentTypeNames::title(pt);
         }
     }
 

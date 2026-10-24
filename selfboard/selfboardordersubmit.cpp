@@ -21,6 +21,16 @@ QString apiErrorMessage(const QJsonObject &jdoc)
     return msg;
 }
 
+int jsonInt(const QJsonValue &value)
+{
+    if (value.isDouble()) {
+        return value.toInt();
+    }
+    bool ok = false;
+    const int parsed = value.toString().trimmed().toInt(&ok);
+    return ok ? parsed : 0;
+}
+
 QString buildStatusUrl(const QString &publicToken)
 {
     if (publicToken.isEmpty()) {
@@ -29,6 +39,22 @@ QString buildStatusUrl(const QString &publicToken)
     QString base = AppSettings::orderStatusUrlBase().trimmed();
     if (base.isEmpty()) {
         base = QStringLiteral("https://www.ararix.com/get-order-status/");
+    }
+    // Query form: https://resto.qrneto.com/?option=...&token=
+    if (base.contains(QLatin1Char('?'))) {
+        const int tokenPos = base.indexOf(QLatin1String("token="), 0, Qt::CaseInsensitive);
+        if (tokenPos < 0) {
+            if (!base.endsWith(QLatin1Char('&')) && !base.endsWith(QLatin1Char('?'))) {
+                base.append(QLatin1Char('&'));
+            }
+            return base + QStringLiteral("token=") + publicToken;
+        }
+        const int valueStart = tokenPos + int(QStringLiteral("token=").size());
+        const int amp = base.indexOf(QLatin1Char('&'), valueStart);
+        if (amp < 0) {
+            return base.left(valueStart) + publicToken;
+        }
+        return base.left(valueStart) + publicToken + base.mid(amp);
     }
     if (!base.endsWith(QLatin1Char('/'))) {
         base.append(QLatin1Char('/'));
@@ -89,6 +115,8 @@ QJsonObject buildAddDishParams(const CartLine &line,
         {QStringLiteral("count_discount"), dish.countDiscount ? 1 : 0},
         {QStringLiteral("empty_order"), emptyOrder},
         {QStringLiteral("service_factor"), serviceFactor},
+        {QStringLiteral("create_process"), true},
+        {QStringLiteral("order_source"), QStringLiteral("kiosk")},
         {QStringLiteral("f_data"), dishDataJson(dish)},
     };
     if (!orderId.isEmpty()) {
@@ -174,11 +202,6 @@ void SelfBoardOrderSubmit::submit(OrderCart *cart,
     const auto closeOrder = std::make_shared<std::function<void()>>();
 
     *closeOrder = [state, fail]() {
-        if (state->cashSessionId <= 0) {
-            fail(QCoreApplication::translate("SelfBoardOrderSubmit", "Cashbox session is not open"));
-            return;
-        }
-
         NInterface::query(
             QStringLiteral("/engine/v2/waiter/order/close-order"),
             state->sessionKey,
@@ -189,6 +212,13 @@ void SelfBoardOrderSubmit::submit(OrderCart *cart,
                 {QStringLiteral("cashbox_id"), state->cashboxId},
                 {QStringLiteral("cost_depend_on_service_and_discount"), false},
                 {QStringLiteral("cash_session_id"), state->cashSessionId},
+                {QStringLiteral("tracking"),
+                 QJsonObject{
+                     {QStringLiteral("source"), QStringLiteral("kiosk")},
+                     {QStringLiteral("restaurant_id"), AppSettings::trackingRestaurantId()},
+                     {QStringLiteral("location_id"), AppSettings::trackingLocationId()},
+                     {QStringLiteral("eta_minutes"), AppSettings::trackingEtaMinutes()},
+                 }},
             },
             [state, fail](const QJsonObject &jdoc) {
                 if (jdoc.value(QStringLiteral("status")).toInt() != 1) {
@@ -300,12 +330,10 @@ void SelfBoardOrderSubmit::submit(OrderCart *cart,
                     fail(QCoreApplication::translate("SelfBoardOrderSubmit", "Order id is missing in server response"));
                     return;
                 }
-                const int cashSessionId = order.value(QStringLiteral("f_cash_session_id")).toInt();
-                if (cashSessionId <= 0) {
-                    fail(QCoreApplication::translate("SelfBoardOrderSubmit", "Cashbox session is not open"));
-                    return;
+                const int cashSessionId = jsonInt(order.value(QStringLiteral("f_cash_session_id")));
+                if (cashSessionId > 0) {
+                    state->cashSessionId = cashSessionId;
                 }
-                state->cashSessionId = cashSessionId;
                 state->orderId = orderId;
                 ++state->nextIndex;
                 (*addNextDish)();

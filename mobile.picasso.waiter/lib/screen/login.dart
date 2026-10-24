@@ -39,14 +39,17 @@ class _WMLoginState extends State<WMLogin> {
     _clearPin();
     if (pin.isEmpty) return;
 
-    if (!WaiterAuth.isProgramReady) {
-      BlocProvider.of<AppBloc>(context).add(
-        AppEventError('Program session is not ready. Retry from settings.'),
-      );
-      return;
-    }
-
     context.read<AppLoadingCubit>().change(AppLoadingState.loading);
+
+    if (!WaiterAuth.isProgramReady) {
+      final boot = await WaiterAuth.startupProgramSession();
+      if (!mounted) return;
+      if (boot != null && boot.isNotEmpty) {
+        context.read<AppLoadingCubit>().change(AppLoadingState.idle);
+        BlocProvider.of<AppBloc>(context).add(AppEventError(boot));
+        return;
+      }
+    }
 
     final pinErr = await WaiterAuth.pinLogin(pin);
     if (!mounted) return;

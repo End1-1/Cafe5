@@ -39,6 +39,11 @@ class SoldItems
         $group_id = (int)($filter["group_id"] ?? 0);
         $group_filter = ($group_id > 0) ? " and g.f_group = $group_id " : "";
 
+        $fiscalOnly = (int)($filter["fiscal_receipt"] ?? 0) === 1;
+        $fiscal_filter = $fiscalOnly
+            ? " and CAST(COALESCE(NULLIF(JSON_VALUE(oh.f_data, '$.f_fiscal.rseq'), ''), '0') AS UNSIGNED) > 0 "
+            : "";
+
         $guest_fields = "
             COALESCE(JSON_VALUE(oh.f_data, '$.f_guest.f_guest_name'), '') AS f_guest_name,
             COALESCE(JSON_VALUE(oh.f_data, '$.f_guest.f_guest_phone'), '') AS f_guest_phone,
@@ -101,6 +106,7 @@ class SoldItems
     WHERE oh.f_state=2 AND og.f_state=1 
     $date_filter 
     $group_filter
+    $fiscal_filter
     $group_by
     $order_by
     EOD;
@@ -138,6 +144,7 @@ class SoldItems
                 ["type" => "date", "name" => "date2", "label" => Translator::t("Date end")],
                 ["type" => "number", "name" => "session_id", "label" => Translator::t("Session id")],
                 ["type" => "keyvalue", "name" => "group_id", "label" => Translator::t("Group"), "function" => "goods_group"],
+                ["type" => "checkbox", "name" => "fiscal_receipt", "label" => Translator::t("Sold with fiscal receipt"), "default" => 0],
             ]
         ];
     }

@@ -144,9 +144,37 @@
       </widget>
      </item>
      <item>
+      <widget class="QPushButton" name="btnAddSemiready">
+       <property name="toolTip">
+        <string>Add semiready</string>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+       <property name="icon">
+        <iconset resource="../resources/res.qrc">
+         <normaloff>:/vegetable.png</normaloff>:/vegetable.png</iconset>
+       </property>
+      </widget>
+     </item>
+     <item>
       <widget class="QPushButton" name="btnRemoveGoods">
        <property name="text">
         <string>Remove</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="btnSemireadyList">
+       <property name="toolTip">
+        <string>Added semiready</string>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+       <property name="icon">
+        <iconset resource="../resources/res.qrc">
+         <normaloff>:/foodlist.png</normaloff>:/foodlist.png</iconset>
        </property>
       </widget>
      </item>
@@ -240,6 +268,8 @@
    <header>c5codenameselector.h</header>
   </customwidget>
  </customwidgets>
- <resources/>
+ <resources>
+  <include location="../resources/res.qrc"/>
+ </resources>
  <connections/>
 </ui>

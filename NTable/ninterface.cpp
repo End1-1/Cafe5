@@ -445,7 +445,9 @@ void NInterface::httpQueryFinished(QObject *sender)
         fLoadingDlg->hide();
     }
 
-    sender->deleteLater();
+    if (sender) {
+        sender->deleteLater();
+    }
 }
 
 void NInterface::httpQueryError(const QString &err)

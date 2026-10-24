@@ -16,13 +16,13 @@ class WSClient
 
     public function connect()
     {
-        $this->socket = fsockopen($this->host, $this->port, $errno, $errstr, 30);
-        stream_set_timeout($this->socket, 10);
-        stream_set_blocking($this->socket, true);
+        $this->socket = @fsockopen($this->host, $this->port, $errno, $errstr, 5);
         if (!$this->socket) {
-            echo "Ошибка соединения: $errstr ($errno)\n";
+            $this->socket = null;
             return false;
         }
+        stream_set_timeout($this->socket, 10);
+        stream_set_blocking($this->socket, true);
         return true;
     }
 
@@ -69,7 +69,14 @@ class WSClient
 
     public function sendMessage($message)
     {
-        fwrite($this->socket, $this->frameMessage($message));
+        if (!$this->isOpen()) {
+            return;
+        }
+        try {
+            @fwrite($this->socket, $this->frameMessage($message));
+        } catch (Throwable $e) {
+            $this->dropSocket();
+        }
     }
 
     public function sendJson($arr)
@@ -97,9 +104,9 @@ class WSClient
             return null;
         }
 
-        // CLOSE
+        // CLOSE — peer already shutting down; just drop local handle.
         if ($opcode == 0x8) {
-            $this->close();
+            $this->dropSocket();
             return null;
         }
 
@@ -146,18 +153,49 @@ class WSClient
 
     public function ping()
     {
-        fwrite($this->socket, chr(0x89) . chr(0x00));
+        if (!$this->isOpen()) {
+            return;
+        }
+        try {
+            @fwrite($this->socket, chr(0x89) . chr(0x00));
+        } catch (Throwable $e) {
+            $this->dropSocket();
+        }
     }
 
     public function close()
     {
-        if (is_resource($this->socket)) {
-            // Отправляем фрейм закрытия (Opcode 0x8)
-            @fwrite($this->socket, "\x88\x00");
-            // Закрываем дескриптор
-            fclose($this->socket);
+        if (!$this->isOpen()) {
+            $this->socket = null;
+            return;
         }
+        try {
+            // Opcode 0x8 close frame — may fail if peer already closed.
+            @fwrite($this->socket, "\x88\x00");
+        } catch (Throwable $e) {
+            // ignore broken pipe / invalid stream
+        }
+        $this->dropSocket();
+    }
 
+    private function isOpen(): bool
+    {
+        if ($this->socket === null) {
+            return false;
+        }
+        // PHP 8: closed streams are still typed but is_resource() becomes false
+        return is_resource($this->socket);
+    }
+
+    private function dropSocket(): void
+    {
+        if ($this->socket !== null && is_resource($this->socket)) {
+            try {
+                @fclose($this->socket);
+            } catch (Throwable $e) {
+                // ignore
+            }
+        }
         $this->socket = null;
     }
 

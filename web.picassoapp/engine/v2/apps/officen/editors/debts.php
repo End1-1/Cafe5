@@ -73,10 +73,13 @@ class Debts
 
         $balExpr = $this->openDebtExpr((int)$docType);
 
+        // Many suppliers only have f_taxname filled; empty f_name made the Partner column blank
+        // so unpaid store purchases looked like they never created a debt.
+        $partnerLabel = "NULLIF(TRIM(CONCAT(COALESCE(p.f_taxname, ''), ' ', COALESCE(p.f_name, ''))), '')";
         $sql = <<<EOD
     SELECT
         d.f_partner,
-        p.f_name AS partner_name, p.f_phone, p.f_taxcode, p.f_taxname, c.f_name AS currency_name,
+        $partnerLabel AS partner_name, p.f_phone, p.f_taxcode, p.f_taxname, c.f_name AS currency_name,
         money_fmt($balExpr) AS balance
     FROM cash_debts d
     LEFT JOIN c_partners p ON p.f_id = d.f_partner
@@ -84,7 +87,7 @@ class Debts
     WHERE d.f_doc_type=? AND d.f_currency_id=? $filterExtra
     GROUP BY d.f_partner, d.f_currency_id, p.f_name, p.f_phone, p.f_taxcode, p.f_taxname, c.f_name
     HAVING ($balExpr) <> 0
-    ORDER BY p.f_name
+    ORDER BY partner_name
     EOD;
 
         return [
@@ -259,11 +262,16 @@ class Debts
                     $openDebit = number_format(abs($openingRaw), 2, ".", "");
                 }
             }
+            $openDate = $dateStart;
+            $openTs = strtotime((string)$dateStart);
+            if ($openTs !== false) {
+                $openDate = date("d/m/Y", $openTs);
+            }
             $rows[] = [
                 "", // uuid
                 "0", // cash_debts id
                 "opening", // row kind
-                $dateStart,
+                $openDate,
                 $meta["name"],
                 $meta["phone"],
                 Translator::t("OPENING BALANCE"),

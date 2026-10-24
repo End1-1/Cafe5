@@ -2,6 +2,8 @@
 
 #include "ntreewidget.h"
 
+class QShowEvent;
+
 class RMenuReviewReport : public NTreeWidget
 {
     Q_OBJECT
@@ -10,6 +12,9 @@ public:
     explicit RMenuReviewReport(C5User *user, const QString &title, QIcon icon, QWidget *parent = nullptr);
 
     QToolBar *toolBar() override;
+
+protected:
+    void showEvent(QShowEvent *event) override;
 
 protected slots:
     void queryFinished(const QJsonObject &ba) override;
@@ -21,4 +26,5 @@ private slots:
 
 private:
     bool mInventoryBlankActionInserted = false;
+    bool mInitialQueryDone = false;
 };

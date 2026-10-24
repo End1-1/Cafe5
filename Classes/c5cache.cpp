@@ -49,8 +49,8 @@ C5Cache::C5Cache()
         fCacheQuery[cache_goods_store] = QString("select f_id as `%1`, f_name as `%2` from c_storages")
                                          .arg(tr("Code"), tr("Name"));
         fCacheQuery[cache_goods_partners] =
-            QString("select f_id as `%1`, f_name as `%2`, f_address as `%3`, f_taxname as `%4`, f_contact as `%5`, \
-                                                    f_info as `%4`, f_phone `%5`, f_email as `%6`, f_taxcode as `%7` from c_partners ")
+            QString("select f_id as `%1`, f_name as `%2`, f_address as `%3`, f_taxname as `%4`, f_contact as `%5`, "
+                    "f_info as `%6`, f_phone as `%7`, f_email as `%8`, f_taxcode as `%9` from c_partners")
             .arg(tr("Code"))
             .arg(tr("Name"))
             .arg(tr("Address"))
@@ -69,8 +69,14 @@ C5Cache::C5Cache()
         fCacheQuery[cache_users] =
             QString("select f_id as `%1`, concat(f_last, ' ', f_first) as `%2`, f_teamlead from s_user where f_state=1")
             .arg(tr("Code"), tr("Name"), tr("Teamlead"));
-        fCacheQuery[cache_waiter_printers] = QString("select f_id as `%1`, f_name as `%2` from d_printers")
-                                             .arg(tr("Code"), tr("Name"));
+        // Logical stations = d_printers ∪ d_print_aliases.f_alias (separate checks → f_printer).
+        fCacheQuery[cache_waiter_printers] = QString(
+            "select f_id as `%1`, f_name as `%2` from d_printers "
+            "union "
+            "select 100000 + f_id as `%1`, f_alias as `%2` from d_print_aliases "
+            "where length(trim(ifnull(f_alias,''))) > 0 "
+            "and f_alias not in (select f_name from d_printers where f_name is not null)")
+            .arg(tr("Code"), tr("Name"));
         fCacheQuery[cache_credit_card] = QString("select f_id as `%1`, f_name as `%2` from o_credit_card")
                                          .arg(tr("Code"), tr("Name"));
         fCacheQuery[cache_dish_remove_reason] = QString("select f_id as `%1`, f_name as `%2` from o_dish_remove_reason")

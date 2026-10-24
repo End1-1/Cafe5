@@ -16,6 +16,8 @@ struct FiscalMachine : public ParentItem
     bool externalPos = false;
     bool idramExternalPos = false;
     bool simpleFiscal = false;
+    /** Cash payment: fiscal receipt is required and the waiter cannot switch it off. */
+    bool autoFiscal = false;
     QString externalPosString() const { return externalPos ? "true" : "false"; }
     QString idramExternalPosString() const { return idramExternalPos ? "true" : "false"; }
 };
@@ -51,6 +53,7 @@ struct JsonParser<FiscalMachine>
         fm.externalPos = flagOn(jo.value("f_external_pos"));
         fm.idramExternalPos = flagOn(jo.value("f_idram_ext_pos"));
         fm.simpleFiscal = flagOn(jo.value("f_simple_fiscal"));
+        fm.autoFiscal = flagOn(jo.value("f_auto_fiscal"));
         return fm;
     }
 };

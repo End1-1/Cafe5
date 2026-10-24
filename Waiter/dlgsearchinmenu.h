@@ -25,6 +25,8 @@ public:
 protected:
     virtual void showEvent(QShowEvent *e) override;
 
+    bool eventFilter(QObject *o, QEvent *e) override;
+
 private:
     Ui::DlgSearchInMenu* ui;
 

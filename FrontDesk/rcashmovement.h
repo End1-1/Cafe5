@@ -18,6 +18,8 @@ protected:
 private:
     void openCashTransfer();
 
+    void openCashDiscrepancy(const QModelIndex &index);
+
 protected slots:
     void on_tbl_doubleClicked(const QModelIndex &index) override;
 };

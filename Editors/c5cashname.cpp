@@ -7,10 +7,7 @@ C5CashName::C5CashName(QWidget *parent) :
     ui(new Ui::C5CashName)
 {
     ui->setupUi(this);
-    // cash_box has no per-cashbox currency; hide legacy e_cash_names fields.
-    ui->label_3->setVisible(false);
-    ui->leCurr->setVisible(false);
-    ui->leCurrName->setVisible(false);
+    ui->leCurr->setSelector(ui->leCurrName, cache_currency);
 }
 
 C5CashName::~C5CashName()

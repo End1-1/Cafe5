@@ -1,4 +1,5 @@
 #include "menudialog.h"
+#include "smartprint.h"
 #include <QFile>
 #include <QPrinterInfo>
 #include <QScreen>
@@ -160,18 +161,12 @@ void MenuDialog::on_btnReportByOrder_clicked()
             "left join o_tax t on t.f_id=oh.f_id  "
             "where oh.f_state=:f_state and oh.f_datecash between :f_datecash1 and :f_datecash2 "
             "order by oh.f_dateopen, oh.f_timeopen ");
-    QFont font(qApp->font());
-    font.setPointSize(28);
+    QFont font(smartPrintFontFamily());
     C5Printing p;
     QPrinterInfo pi = QPrinterInfo::printerInfo(C5Config::localReceiptPrinter());
     QPrinter printer(pi);
-    printer.setPageSize(QPageSize::Custom);
-    printer.setFullPage(false);
-    QRectF pr = printer.pageRect(QPrinter::DevicePixel);
-    constexpr qreal SAFE_RIGHT_MM = 2.0;
-    qreal safePx = SAFE_RIGHT_MM * printer.logicalDpiX() / 25.4;
-    p.setSceneParams(pr.width() - safePx, pr.height(), printer.logicalDpiX());
-    const int bs = 14;
+    setupSmartReportScene(p, printer);
+    const int bs = smartPrintPointSize();
     font.setPointSize(bs);
     p.setFont(font);
 
@@ -267,7 +262,7 @@ void MenuDialog::on_btnReportByOrder_clicked()
     p.ltext(tr("Printed"), 0);
     p.rtext(QDateTime::currentDateTime().toString(FORMAT_DATETIME_TO_STR));
     p.br();
-    p.print(printer);
+    smartPrint(p, printer);
 }
 
 void MenuDialog::on_btnBack_clicked()

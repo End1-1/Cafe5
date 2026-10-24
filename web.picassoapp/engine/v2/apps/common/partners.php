@@ -11,20 +11,35 @@ class Partners extends Auth
     private $validator;
     public function __construct()
     {
-        $this->validator = require_once __DIR__ . "/dict-validators.php";
+        // require (not require_once): require_once returns true if file was already loaded.
+        $this->validator = require __DIR__ . "/dict-validators.php";
         return parent::__construct();
     }
 
     public function GetPartnerData($id)
     {
-        $sql = $this->validator["select"]["c_partners"]["sql"];
+        $partnerId = (int)$id;
+        if ($partnerId <= 0 || !is_array($this->validator)) {
+            return null;
+        }
+        $sql = $this->validator["select"]["c_partners"]["sql"] ?? "";
+        if ($sql === "") {
+            return null;
+        }
         $sql = str_replace("1=1", "p.f_id=?", $sql);
-        return $this->select($sql, "ssi", [Translator::$locale, Translator::$locale, $id])->fetch_assoc();
+        $locale = Translator::$locale ?? "hy";
+        return $this->select($sql, "ssi", [$locale, $locale, $partnerId])->fetch_assoc() ?: null;
     }
 
     public function Get($params)
     {
-        $this->result["partner"] = $this->GetPartnerData($params);
+        $id = (int)($params->f_id ?? $params->id ?? 0);
+        $partner = $this->GetPartnerData($id);
+        if (!$partner) {
+            dieWithCode("Partner not found");
+        }
+        $this->result["status"] = 1;
+        $this->result["partner"] = $partner;
         $this->echoResult();
     }
 
@@ -49,6 +64,9 @@ class Partners extends Auth
     public function Save($params)
     {
 
+        if (!is_array($this->validator) || !isset($this->validator["save"]["c_partners"])) {
+            dieWithCode("Partner validators not loaded");
+        }
         $data = $this->ValidateParams($params, $this->validator["save"]["c_partners"]);
         $this->ensurePartnerCategory((int)($data->f_category ?? 0));
         $this->ensurePartnerGroup((int)($data->f_group ?? 0));
@@ -59,21 +77,31 @@ class Partners extends Auth
             $this->update("c_partners", $data, $data->f_id);
         }
         $partner = $this->GetPartnerData($data->f_id);
+        if (!$partner) {
+            dieWithCode("Partner saved but could not be reloaded");
+        }
+        $this->result["status"] = 1;
         $this->result["partner"] = $partner;
 
-        $notify = require __DIR__ . "/../../worker/ws-notify.php";
-        $notify->notify("partners", (int)$data->f_id, $isNew);
+        try {
+            $notify = require __DIR__ . "/../../worker/ws-notify.php";
+            if (is_object($notify) && method_exists($notify, "notify")) {
+                $notify->notify("partners", (int)$data->f_id, $isNew);
+            }
+        } catch (Throwable $e) {
+            // WS notify must not fail partner save
+        }
 
         $this->echoResult();
     }
 
-    /** Ensure FK target exists (shop may send buyer category=2 / group=3). */
+    /** Ensure FK target exists. Categories match c_partners_category: 1 main, 2 supplier, 3 customer. */
     private function ensurePartnerCategory(int $id): void
     {
         $defaults = [
             1 => "General",
-            2 => "Buyer",
-            3 => "Supplier",
+            2 => "Supplier",
+            3 => "Customer",
         ];
         $this->ensureLookupRow("c_partners_category", $id, $defaults, "f_category");
     }

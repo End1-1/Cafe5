@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>DlgCashDiscrepancy</class>
+ <widget class="QDialog" name="DlgCashDiscrepancy">
+  <property name="windowTitle">
+   <string>Shortage / overage</string>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>460</width>
+    <height>0</height>
+   </size>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <layout class="QFormLayout" name="formLayout">
+     <item row="0" column="0">
+      <widget class="QLabel" name="labelDate">
+       <property name="text">
+        <string>Date</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="1">
+      <widget class="QLabel" name="lbDate"/>
+     </item>
+     <item row="1" column="0">
+      <widget class="QLabel" name="labelCashbox">
+       <property name="text">
+        <string>Cashbox</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="1">
+      <widget class="QLabel" name="lbCashbox"/>
+     </item>
+     <item row="2" column="0">
+      <widget class="QLabel" name="labelEvent">
+       <property name="text">
+        <string>Event</string>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="1">
+      <widget class="QLabel" name="lbEvent"/>
+     </item>
+     <item row="3" column="0">
+      <widget class="QLabel" name="labelType">
+       <property name="text">
+        <string>Type</string>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="1">
+      <widget class="QLabel" name="lbType"/>
+     </item>
+     <item row="4" column="0">
+      <widget class="QLabel" name="labelAmount">
+       <property name="text">
+        <string>Amount</string>
+       </property>
+      </widget>
+     </item>
+     <item row="4" column="1">
+      <widget class="QLabel" name="lbAmount">
+       <property name="styleSheet">
+        <string notr="true">font-weight: bold;</string>
+       </property>
+      </widget>
+     </item>
+     <item row="5" column="0">
+      <widget class="QLabel" name="labelShift">
+       <property name="text">
+        <string>Shift</string>
+       </property>
+      </widget>
+     </item>
+     <item row="5" column="1">
+      <widget class="QLabel" name="lbShift"/>
+     </item>
+     <item row="6" column="0">
+      <widget class="QLabel" name="labelShiftStaff">
+       <property name="text">
+        <string>Shift staff</string>
+       </property>
+      </widget>
+     </item>
+     <item row="6" column="1">
+      <widget class="QLabel" name="lbShiftStaff"/>
+     </item>
+     <item row="7" column="0">
+      <widget class="QLabel" name="labelCountedBy">
+       <property name="text">
+        <string>Counted by</string>
+       </property>
+      </widget>
+     </item>
+     <item row="7" column="1">
+      <widget class="QLabel" name="lbCountedBy"/>
+     </item>
+     <item row="8" column="0" colspan="2">
+      <widget class="QCheckBox" name="chkResolved">
+       <property name="text">
+        <string>Resolved</string>
+       </property>
+      </widget>
+     </item>
+     <item row="9" column="0" colspan="2">
+      <widget class="QLabel" name="lbResolvedInfo">
+       <property name="styleSheet">
+        <string notr="true">color: gray;</string>
+       </property>
+      </widget>
+     </item>
+     <item row="10" column="0" colspan="2">
+      <widget class="QLabel" name="labelComment">
+       <property name="text">
+        <string>Comment</string>
+       </property>
+      </widget>
+     </item>
+     <item row="11" column="0" colspan="2">
+      <widget class="QPlainTextEdit" name="teComment">
+       <property name="minimumSize">
+        <size>
+         <width>0</width>
+         <height>90</height>
+        </size>
+       </property>
+       <property name="placeholderText">
+        <string>How the difference was resolved</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <widget class="QDialogButtonBox" name="buttonBox">
+     <property name="orientation">
+      <enum>Qt::Orientation::Horizontal</enum>
+     </property>
+     <property name="standardButtons">
+      <set>QDialogButtonBox::StandardButton::Cancel|QDialogButtonBox::StandardButton::Save</set>
+     </property>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

@@ -282,5 +282,7 @@
         <file>dietary/kosher.png</file>
         <file>dietary/fish-seafood.png</file>
         <file>fingerprint.png</file>
+        <file>vegetable.png</file>
+        <file>foodlist.png</file>
     </qresource>
 </RCC>

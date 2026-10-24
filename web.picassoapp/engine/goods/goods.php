@@ -58,6 +58,28 @@ class Goods extends PClass
         $storages = stmtall("select f_id, f_name from c_storages where f_state=1")->fetch_all(MYSQLI_ASSOC);
         $this->result["storages"] = $storages;
         $printers = stmtall("select f_name from d_printers")->fetch_all(MYSQLI_ASSOC);
+        try {
+            $aliases = stmtall(
+                "SELECT DISTINCT TRIM(f_alias) AS f_name FROM d_print_aliases
+                 WHERE LENGTH(TRIM(IFNULL(f_alias, ''))) > 0"
+            )->fetch_all(MYSQLI_ASSOC);
+            $seen = [];
+            foreach ($printers as $p) {
+                $n = trim((string)($p["f_name"] ?? ""));
+                if ($n !== "") {
+                    $seen[mb_strtolower($n)] = true;
+                }
+            }
+            foreach ($aliases as $a) {
+                $n = trim((string)($a["f_name"] ?? ""));
+                if ($n === "" || isset($seen[mb_strtolower($n)])) {
+                    continue;
+                }
+                $seen[mb_strtolower($n)] = true;
+                $printers[] = ["f_name" => $n];
+            }
+        } catch (Exception $e) {
+        }
         $this->result["printers"] = $printers;
 
         require_once __DIR__ . "/../v2/worker/locale.php";

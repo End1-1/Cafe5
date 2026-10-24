@@ -108,7 +108,8 @@ SELECT
     gp.f_price2, 
     gp.f_price2disc,
     g.f_lastinputprice AS f_lastinput,
-    IF(LENGTH(g.f_adg) > 0, g.f_adg, gr.f_adgcode) AS f_adgt
+    IF(LENGTH(g.f_adg) > 0, g.f_adg, gr.f_adgcode) AS f_adgt,
+    COALESCE(g.f_store_doc, 1) AS f_store_doc
 FROM c_goods g
 LEFT JOIN c_goods_multiscancode gm ON gm.f_goods = g.f_id
 LEFT JOIN c_groups gr ON gr.f_id = g.f_group
@@ -528,6 +529,7 @@ void C5SearchEngine::init(const QString &databaseName, const QString &serverKey)
             g.price2 = db.doubleValue("f_price2");
             g.price2disc = db.doubleValue("f_price2disc");
             g.adgt = db.string("f_adgt");
+            g.storeDoc = db.integer("f_store_doc") != 0;
             g.nameLower = name;
             g.words = name.toLower().split(" ", Qt::SkipEmptyParts);
             tmp2.append(g);
@@ -844,6 +846,7 @@ QString C5SearchEngine::reloadDictionary(const QJsonObject &jo, const SocketStru
             g.price2 = db.doubleValue("f_price2");
             g.price2disc = db.doubleValue("f_price2disc");
             g.adgt = db.string("f_adgt");
+            g.storeDoc = db.integer("f_store_doc") != 0;
             g.nameLower = name;
             g.words = name.toLower().split(" ", Qt::SkipEmptyParts);
             tmp.append(g);
@@ -1661,6 +1664,7 @@ QString C5SearchEngine::updateDictionary(const QJsonObject &jo, const SocketStru
             gi.price2 = db.doubleValue("f_price2");
             gi.price2disc = db.doubleValue("f_price2disc");
             gi.adgt = db.string("f_adgt");
+            gi.storeDoc = db.integer("f_store_doc") != 0;
             gi.nameLower = name.toLower();
             gi.words = name.toLower().split(" ", Qt::SkipEmptyParts);
         } else {

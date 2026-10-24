@@ -6,6 +6,7 @@
 #include "c5config.h"
 #include "c5mainwindow.h"
 #include "c5revenuecashop.h"
+#include "dlgcashdiscrepancy.h"
 #include "c5user.h"
 #include "ninterface.h"
 
@@ -38,8 +39,12 @@ void RCashMovement::openCashTransfer()
     if(!cashboxObj.isEmpty()) {
         const int cashboxId = cashboxObj.value(QStringLiteral("cashbox")).toInt();
         if(cashboxId > 0) {
-            const QString cashboxName = __c5config.getRegValue(
-                QStringLiteral("rfilter_%1_cashbox_name").arg(mEditorName)).toString();
+            QString cashboxName = __c5config.getRegValue(
+                QStringLiteral("rfilter_%1_cashbox_name").arg(filterWidgetPrefix())).toString();
+            if(cashboxName.isEmpty()) {
+                cashboxName = __c5config.getRegValue(
+                    QStringLiteral("rfilter_%1_cashbox_name").arg(mEditorName)).toString();
+            }
             dlg->setSourceCashbox(cashboxId,
                                   cashboxName.isEmpty() ? QString::number(cashboxId) : cashboxName);
         }
@@ -54,7 +59,12 @@ void RCashMovement::openCashTransfer()
 void RCashMovement::on_tbl_doubleClicked(const QModelIndex &index)
 {
     const QJsonObject viewModeObj = filterObject(QStringLiteral("viewmode"));
-    if(viewModeObj.isEmpty() || viewModeObj.value(QStringLiteral("viewmode")).toInt() != 2) {
+    const int viewMode = viewModeObj.value(QStringLiteral("viewmode")).toVariant().toInt();
+    if(viewMode == 5) {
+        openCashDiscrepancy(index);
+        return;
+    }
+    if(viewModeObj.isEmpty() || (viewMode != 2 && viewMode != 3)) {
         RAbstractEditorReport::on_tbl_doubleClicked(index);
         return;
     }
@@ -95,6 +105,25 @@ void RCashMovement::on_tbl_doubleClicked(const QModelIndex &index)
                              }
                              dlg->deleteLater();
                          });
+}
+
+void RCashMovement::openCashDiscrepancy(const QModelIndex &index)
+{
+    if(!index.isValid()) {
+        return;
+    }
+    const QModelIndex srcIndex = reportMapViewIndexToSource(index);
+    if(!srcIndex.isValid()) {
+        return;
+    }
+    const int id = reportSourceCellData(srcIndex.row(), 0).toInt();
+    if(id <= 0) {
+        return;
+    }
+    DlgCashDiscrepancy dlg(mUser, id, this);
+    if(dlg.exec() == QDialog::Accepted) {
+        getData();
+    }
 }
 
 void RCashMovement::newData()

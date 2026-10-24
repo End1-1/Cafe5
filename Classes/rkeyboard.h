@@ -2,6 +2,7 @@
 #define RKEYBOARD_H
 
 #include <QWidget>
+#include <QLineEdit>
 #include <QList>
 #include <QToolButton>
 
@@ -22,6 +23,8 @@ public:
     void setText(const QString &text);
 
     QString text() const;
+
+    QLineEdit *editor() const;
 
     virtual bool eventFilter(QObject *o, QEvent *e) override;
 

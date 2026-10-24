@@ -1,9 +1,12 @@
 #include "rfilterdialog.h"
+#include <QCheckBox>
 #include <QComboBox>
 #include <QIntValidator>
 #include <QJsonObject>
 #include <QLabel>
+#include <QRegularExpression>
 #include <QShowEvent>
+#include <QToolButton>
 #include "c5codenameselector.h"
 #include "c5codenameselectorfunctions.h"
 #include "c5config.h"
@@ -50,26 +53,117 @@ QVariant RFilterDialog::valueByName(const QString &name) const
         if(auto *cb = qobject_cast<QComboBox *>(w)) {
             return cb->currentData().toInt();
         }
+
+        if(auto *ch = qobject_cast<QCheckBox *>(w)) {
+            return ch->isChecked() ? 1 : 0;
+        }
     }
 
     return {};
 }
 
-void RFilterDialog::buildWidget(const QString &settingsPrefix, const QJsonArray &ja)
+bool RFilterDialog::datesPinned(const QString &pinKey)
+{
+    if(pinKey.isEmpty()) {
+        return true;
+    }
+
+    return __c5config.getRegValue(QStringLiteral("rfilter_pin_dates_") + pinKey, false).toBool();
+}
+
+void RFilterDialog::setDatesPinned(const QString &pinKey, bool pinned)
+{
+    if(pinKey.isEmpty()) {
+        return;
+    }
+
+    __c5config.setRegValue(QStringLiteral("rfilter_pin_dates_") + pinKey, pinned);
+}
+
+void RFilterDialog::resetDatesToToday(QJsonArray &values)
+{
+    static const QRegularExpression reDate(QStringLiteral("^\\d{4}-\\d{2}-\\d{2}$"));
+    const QString today = QDate::currentDate().toString(FORMAT_DATE_TO_STR_MYSQL);
+
+    for(int i = 0; i < values.size(); i++) {
+        QJsonObject obj = values.at(i).toObject();
+        bool changed = false;
+
+        for(auto it = obj.begin(); it != obj.end(); ++it) {
+            if(it.value().isString() && reDate.match(it.value().toString()).hasMatch()) {
+                it.value() = today;
+                changed = true;
+            }
+        }
+
+        if(changed) {
+            values.replace(i, obj);
+        }
+    }
+}
+
+void RFilterDialog::setPinButtonsChecked(bool pinned)
+{
+    for(QToolButton *btn : std::as_const(mPinButtons)) {
+        const QSignalBlocker blocker(btn);
+        btn->setChecked(pinned);
+        btn->setToolTip(pinned
+                        ? tr("Dates are pinned: the last selected dates are restored when the report opens")
+                        : tr("Dates are not pinned: the report opens with today's date"));
+    }
+}
+
+void RFilterDialog::buildWidget(const QString &settingsPrefix, const QJsonArray &ja,
+                                const QString &pinKey, const QJsonArray &currentValues)
 {
     mSettingsPrefix = settingsPrefix;
+    mPinKey = pinKey;
+    const bool pinned = datesPinned(mPinKey);
     int row = 0;
+
+    auto currentValue = [&currentValues](const QString & name) -> QJsonValue {
+        for(int ci = 0; ci < currentValues.size(); ci++) {
+            const QJsonObject obj = currentValues.at(ci).toObject();
+
+            if(obj.contains(name)) {
+                return obj.value(name);
+            }
+        }
+
+        return QJsonValue();
+    };
 
     for(int i = 0; i < ja.size(); i++) {
         auto const &jo = ja.at(i).toObject();
 
         if(jo.value("type").toString() == "date") {
+            const QString name = jo.value("name").toString();
             ui->gl->addWidget(new QLabel(jo.value("label").toString()), row, 0);
             auto  *ed = new C5DateEdit();
-            QDate defaultDate = __c5config.getRegValue(QString("rfilter_%1_%2").arg(mSettingsPrefix, jo.value("name").toString()), QDate::currentDate()).toDate();
+            QDate defaultDate = QDate::fromString(currentValue(name).toString(), FORMAT_DATE_TO_STR_MYSQL);
+
+            if(!defaultDate.isValid()) {
+                defaultDate = pinned
+                              ? __c5config.getRegValue(QString("rfilter_%1_%2").arg(mSettingsPrefix, name), QDate::currentDate()).toDate()
+                              : QDate::currentDate();
+            }
+
             ed->setDate(defaultDate);
-            ui->gl->addWidget(ed, row, 1, 1, 3);
-            ed->setProperty("name", jo.value("name").toString());
+            ui->gl->addWidget(ed, row, 1, 1, 2);
+            ed->setProperty("name", name);
+
+            if(!mPinKey.isEmpty()) {
+                auto *btnPin = new QToolButton();
+                btnPin->setIcon(QIcon(QStringLiteral(":/pushpin.png")));
+                btnPin->setCheckable(true);
+                btnPin->setAutoRaise(true);
+                connect(btnPin, &QToolButton::toggled, this, [this](bool checked) {
+                    setDatesPinned(mPinKey, checked);
+                    setPinButtonsChecked(checked);
+                });
+                mPinButtons.append(btnPin);
+                ui->gl->addWidget(btnPin, row, 3);
+            }
         }
 
         if(jo.value("type").toString() == "number") {
@@ -145,9 +239,26 @@ void RFilterDialog::buildWidget(const QString &settingsPrefix, const QJsonArray 
             ui->gl->addWidget(cb, row, 1);
         }
 
+        if(jo.value("type").toString() == "checkbox") {
+            const QString name = jo.value("name").toString();
+            auto *ch = new QCheckBox(jo.value("label").toString());
+            ch->setProperty("name", name);
+            bool checked = false;
+            const QJsonValue current = currentValue(name);
+            if(!current.isUndefined() && !current.isNull()) {
+                checked = current.toVariant().toInt() != 0;
+            } else {
+                checked = __c5config.getRegValue(
+                              QString("rfilter_%1_%2").arg(mSettingsPrefix, name), 0).toInt() != 0;
+            }
+            ch->setChecked(checked);
+            ui->gl->addWidget(ch, row, 0, 1, 3);
+        }
+
         row++;
     }
 
+    setPinButtonsChecked(pinned);
     ui->gl->setRowStretch(row, 1);
     ui->gl->setSpacing(6);
     ui->gl->setColumnMinimumWidth(0, 200);
@@ -205,6 +316,15 @@ QJsonArray RFilterDialog::filterValues()
                                         cb->currentData().toInt());
                 __c5config.setRegValue(QString("rfilter_%1_%2_name").arg(mSettingsPrefix, w->property("name").toString()),
                                         cb->currentText());
+                continue;
+            }
+
+            auto *ch = qobject_cast<QCheckBox *>(w);
+            if(ch) {
+                const int checked = ch->isChecked() ? 1 : 0;
+                addparam(w->property("name").toString(), checked);
+                __c5config.setRegValue(QString("rfilter_%1_%2").arg(mSettingsPrefix, w->property("name").toString()),
+                                        checked);
                 continue;
             }
         }

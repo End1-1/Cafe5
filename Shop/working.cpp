@@ -415,9 +415,13 @@ void Working::updateSessionUi()
     }
 
     ui->lbShift->setVisible(true);
+    QString revenue = mCashboxSessionData.value(QStringLiteral("f_amount_revenue")).toString();
+    if (revenue.isEmpty()) {
+        revenue = mCashboxSessionData.value(QStringLiteral("f_amount_expected")).toString();
+    }
     ui->lbShiftInfo->setText(QStringLiteral("#%1 | %2 | %3 %4")
                                  .arg(mCashSessionId)
-                                 .arg(mCashboxSessionData.value(QStringLiteral("f_amount_expected")).toString())
+                                 .arg(revenue)
                                  .arg(mCashboxSessionData.value(QStringLiteral("f_orders_count")).toInt())
                                  .arg(tr("ops")));
 }
@@ -769,8 +773,40 @@ void Working::printCloseSessionReport(const QJsonObject &cashbox, bool cashCount
     p.br();
     p.lrtext(tr("Operations"), QString::number(cashbox.value(QStringLiteral("f_orders_count")).toInt()));
     p.br();
-    p.lrtext(tr("Shift total"), cashbox.value(QStringLiteral("f_amount_expected")).toString());
+    {
+        QString shiftTotal = cashbox.value(QStringLiteral("f_amount_revenue")).toString();
+        if (shiftTotal.isEmpty()) {
+            shiftTotal = cashbox.value(QStringLiteral("f_amount_expected")).toString();
+        }
+        p.lrtext(tr("Shift total"), shiftTotal);
+    }
     p.br();
+
+    {
+        const QJsonArray salesByPay = cashbox.value(QStringLiteral("sales_by_payment")).toArray();
+        if (!salesByPay.isEmpty()) {
+            p.line();
+            p.br();
+            p.ltext(tr("By payment type"), 0);
+            p.br();
+            for (const QJsonValue &v : salesByPay) {
+                const QJsonObject row = v.toObject();
+                const double net = row.value(QStringLiteral("f_net")).toDouble();
+                if (qAbs(net) < 0.009) {
+                    continue;
+                }
+                QString name = row.value(QStringLiteral("f_name")).toString();
+                QString amount = row.value(QStringLiteral("f_net_fmt")).toString();
+                if (amount.isEmpty()) {
+                    amount = float_str(net, 2);
+                }
+                p.lrtext(name, amount);
+                p.br();
+            }
+            p.line();
+            p.br();
+        }
+    }
 
     if (cashCounted) {
         const QString expectedCash = cashbox.value(QStringLiteral("f_amount_expected_cash")).toString();

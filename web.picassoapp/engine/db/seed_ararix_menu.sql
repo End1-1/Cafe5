@@ -26,6 +26,9 @@ CREATE TABLE IF NOT EXISTS ararix_menu (
     INDEX idx_ararix_menu_group (f_group_id)
 );
 
+ALTER TABLE ararix_goods_groups ADD COLUMN IF NOT EXISTS f_image_url VARCHAR(255) NULL;
+ALTER TABLE ararix_goods_groups ADD COLUMN IF NOT EXISTS f_sort INT NOT NULL DEFAULT 0;
+
 INSERT INTO ararix_goods_groups (f_id, f_name, f_sort) VALUES
     (1, 'Բուրգեր', 1),
     (2, 'Պիցցա', 2),

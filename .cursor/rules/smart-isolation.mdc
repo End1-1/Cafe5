@@ -1,0 +1,21 @@
+---
+description: Do not change shared/working files for Smart fixes
+alwaysApply: true
+---
+
+# Smart is isolated — do not touch working code for it
+
+Smart is legacy / maintenance-only. Do **not** develop it by changing shared production paths.
+
+When fixing or adjusting Smart:
+
+- **Allowed**: `Smart/**`, `web.picassoapp/engine/smart/**`, `web.picassoapp/engine/v2/apps/smart/**`
+- **Forbidden** (unless the user explicitly asks): shared Forms/Classes, Waiter, Shop, FrontDesk, Service5 worker structs, `v2/apps/waiter/**`, `v2/apps/officen/**`, and other apps’ working endpoints
+
+If Smart needs an API that exists only under waiter/officen:
+
+1. Add a thin copy or dedicated handler under `engine/v2/apps/smart/`
+2. Point Smart client code at that path
+3. Do **not** refactor shared dialogs (e.g. `Forms/dlglistofdishcomments.*`) or waiter menu.php to unblock Smart
+
+Exception: user explicitly says to change a shared file.

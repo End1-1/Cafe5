@@ -7,6 +7,7 @@
 #include "dlgorder.h"
 #include "format_date.h"
 #include "ninterface.h"
+#include "struct_workstationitem.h"
 #include "ui_dlgstoplistoption.h"
 
 DlgStopListOption::DlgStopListOption(DlgOrder *o, C5User *u) :
@@ -53,7 +54,7 @@ void DlgStopListOption::printStopListResponse(const QJsonObject &jdoc)
         QFont font(qApp->font());
         font.setPointSize(20);
         C5Printing p;
-        QPrinterInfo pinfo = QPrinterInfo::printerInfo(mUser->fConfig["receipt_printer"].toString());
+        QPrinterInfo pinfo = QPrinterInfo::printerInfo(mWorkStation.waiterReportPrinter());
         QPrinter printer(pinfo);
         QRectF pr = printer.pageRect(QPrinter::DevicePixel);
         p.setSceneParams(pr.width(), pr.height(), printer.logicalDpiX());

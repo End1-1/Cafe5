@@ -77,5 +77,14 @@ function translate_cash_operation_comment(string $comment): string
         return translate_template($templateKey, ['%cashbox' => $m[1]]) . ($m[2] ?? '');
     }
 
+    // Salary: English key, or legacy rows saved with broken "????" translations.
+    if (preg_match('/^Salary payment\s+(\d{2}\.\d{2}\.\d{4})\s*:?\s*(.+)$/u', $comment, $m)
+        || preg_match('/^\?+(?:\s+\?+)?\s+(\d{2}\.\d{2}\.\d{4})\s*:?\s*(.+)$/u', $comment, $m)) {
+        return translate_template('Salary payment %date: %staff', [
+            '%date' => $m[1],
+            '%staff' => $m[2],
+        ]);
+    }
+
     return $comment;
 }

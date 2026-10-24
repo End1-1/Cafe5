@@ -12,9 +12,12 @@ $allowedOrigins = [
 
 $origin = $_SERVER['HTTP_ORIGIN'] ?? '';
 $isPublicOrderStatus = (bool)preg_match('#/ararix/order-status/#i', $_SERVER['REQUEST_URI'] ?? '');
+$isPartnerOrderTracking = (bool)preg_match('#/ararix/order-tracking/#i', $_SERVER['REQUEST_URI'] ?? '');
+$isPartnerMenu = (bool)preg_match('#/ararix/menu/#i', $_SERVER['REQUEST_URI'] ?? '');
+$isPartnerGuestOrder = (bool)preg_match('#/ararix/order/#i', $_SERVER['REQUEST_URI'] ?? '');
 
-if ($isPublicOrderStatus) {
-    // Guest QR landing sites call this API from the browser.
+if ($isPublicOrderStatus || $isPartnerMenu || $isPartnerGuestOrder) {
+    // Guest pages call this API from the browser. The booklet key is the gate.
     if ($origin !== '') {
         header('Access-Control-Allow-Origin: ' . $origin);
     } else {
@@ -44,7 +47,7 @@ date_default_timezone_set("Asia/Yerevan");
 setlocale(LC_NUMERIC, 'C');
 setlocale(LC_CTYPE, 'C.UTF-8');
 
-if (!$isPublicOrderStatus) {
+if (!$isPublicOrderStatus && !$isPartnerOrderTracking && !$isPartnerMenu && !$isPartnerGuestOrder) {
     require_once __DIR__ . "/check-app.php";
 }
 require_once __DIR__ . "/../cnf.php";
@@ -93,7 +96,11 @@ function toPascalCase($str)
     return str_replace(' ', '', ucwords(str_replace(['-', '_'], ' ', $str)));
 }
 
-$requestUri = $_SERVER['REQUEST_URI'];
+$requestUri = parse_url($_SERVER['REQUEST_URI'] ?? '', PHP_URL_PATH);
+if (!is_string($requestUri) || $requestUri === '') {
+    $requestUri = '/';
+}
+$requestUri = preg_replace('#/+#', '/', $requestUri);
 $scriptName = $_SERVER['SCRIPT_NAME'];
 $basePath = dirname($scriptName);
 $path = substr($requestUri, strlen($basePath));
@@ -113,6 +120,10 @@ if (!file_exists($includeFileName)) {
 $remote_host = $_SERVER['HTTP_X_APPLICATION_HOST'] ?? "host-undefined";
 require_once $includeFileName;
 $controllerName = toPascalCase($pathArray[1]);
+if (($pathArray[0] ?? "") === "ararix" && ($pathArray[1] ?? "") === "order") {
+    // waiter/order.php already owns class Order
+    $controllerName = "GuestOrder";
+}
 
 if (!class_exists($controllerName)) {
     dieWithCode("Class not found: {$controllerName}");
@@ -125,7 +136,6 @@ if ($methodName === "Delete" && method_exists($controller, "Remove")) {
     $methodName = "Remove";
 }
 if (!method_exists($controller, $methodName)) {
-    print_r($pathArray);
     dieWithCode("Method not found: {$methodName}");
 }
 
@@ -133,14 +143,6 @@ $actionMethod = new ReflectionMethod($controller, $methodName);
 if ($actionMethod->getDeclaringClass()->getName() === Db::class) {
     dieWithCode("Method not found: {$methodName}");
 }
-
-$publicMethods = ["Login", "CheckOtp", "PinLogin", "HashLogin", "Catalog", "ByToken"];
-if (!in_array($methodName, $publicMethods, true)) {
-    if (!$controller->auth()) {
-        dieWithCode("Unauthorized", 401);
-    }
-}
-
 
 if (!empty($_FILES) || isset($_POST['data'])) {
     $jsonString = $_POST['data'] ?? '{}';
@@ -153,7 +155,7 @@ if (!empty($_FILES) || isset($_POST['data'])) {
     $jsonParams->_files = $_FILES;
 } else {
     $requestString = file_get_contents("php://input");
-    if (($requestString === false || trim((string)$requestString) === '') && $isPublicOrderStatus) {
+    if (($requestString === false || trim((string)$requestString) === '') && ($isPublicOrderStatus || $isPartnerOrderTracking || $isPartnerMenu || $isPartnerGuestOrder)) {
         // Public guest status: allow GET/POST without body, token in query.
         $jsonParams = (object)$_REQUEST;
     } else {
@@ -162,6 +164,13 @@ if (!empty($_FILES) || isset($_POST['data'])) {
         if (json_last_error() !== JSON_ERROR_NONE) {
             dieWithCode("Invalid JSON in request body $requestString", 400);
         }
+    }
+}
+
+$publicMethods = ["Login", "CheckOtp", "PinLogin", "HashLogin", "Catalog", "ByToken"];
+if (!in_array($methodName, $publicMethods, true)) {
+    if (!$controller->auth()) {
+        dieWithCode("Unauthorized", 401);
     }
 }
 

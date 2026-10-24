@@ -228,6 +228,13 @@ set(APP_SOURCES
     dlgservicevalue.ui
     dlgaxrestaurant.ui
     dlgfiscalmachine.ui
+    dlgcashbox.ui
+    dlgpaymenttype.ui
+    dlgprinter.ui
+    dlgprintalias.ui
+    dlgapikey.ui
+    dlgcashdiscrepancy.ui
+    dlginventorysemireadylist.ui
     dlgsalarydishsales.ui
     c5revenuecashop.ui
     wdashboardsettings.ui
@@ -934,7 +941,20 @@ add_executable(OfficeN ${APP_SOURCES}
     rservicevaluesreport.h rservicevaluesreport.cpp
     raxrestaurantsreport.h raxrestaurantsreport.cpp
     rfiscalmachinesreport.h rfiscalmachinesreport.cpp
-    dlgfiscalmachine.h dlgfiscalmachine.cpp)
+    dlgfiscalmachine.h dlgfiscalmachine.cpp
+    rcashboxesreport.h rcashboxesreport.cpp
+    dlgcashbox.h dlgcashbox.cpp
+    rpaymenttypesreport.h rpaymenttypesreport.cpp
+    rapikeysreport.h rapikeysreport.cpp
+    dlgapikey.h dlgapikey.cpp
+    dlgpaymenttype.h dlgpaymenttype.cpp
+    rprintersreport.h rprintersreport.cpp
+    dlgprinter.h dlgprinter.cpp
+    rprintaliasesreport.h rprintaliasesreport.cpp
+    dlgprintalias.h dlgprintalias.cpp
+    dlgcashdiscrepancy.h dlgcashdiscrepancy.cpp
+    paymenttypenames.h paymenttypenames.cpp
+    dlginventorysemireadylist.h dlginventorysemireadylist.cpp)
 
 set_target_properties(OfficeN PROPERTIES
     UNITY_BUILD ON

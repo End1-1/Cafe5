@@ -13,6 +13,8 @@ if (!defined("PAYMENT_TYPE_CASH")) {
     define("PAYMENT_TELCELL", 7);
     define("PAYMENT_DEBT", 8);
     define("PAYMENT_PREPAID", 9);
+    define("PAYMENT_TYPE_BANK2", 10);
+    define("PAYMENT_TYPE_BANK3", 11);
 }
 
 return [
@@ -49,21 +51,48 @@ return [
         PAYMENT_OTHER => "Other",
         PAYMENT_TELCELL => "Telcell",
         PAYMENT_DEBT => "Debt",
-        PAYMENT_PREPAID => "Prepaid"
+        PAYMENT_PREPAID => "Prepaid",
+        PAYMENT_TYPE_BANK2 => "Bank 2",
+        PAYMENT_TYPE_BANK3 => "Bank 3",
+    ],
+
+    // Payment types listed in the payment types editor (display name editable, code fixed).
+    // Bank 2 / Bank 3 are for purchases, debts and cash operations; sales keep "types" above.
+    "editable" => [
+        PAYMENT_TYPE_CASH,
+        PAYMENT_TYPE_CARD,
+        PAYMENT_TYPE_BANK,
+        PAYMENT_TYPE_BANK2,
+        PAYMENT_TYPE_BANK3,
+        PAYMENT_TYPE_IDRAM,
+        PAYMENT_TELCELL,
+        PAYMENT_OTHER,
+        PAYMENT_TYPE_COMPLIMENTARY,
+        PAYMENT_DEBT,
+        PAYMENT_PREPAID,
     ],
 
     "cashbox" => [
         PAYMENT_TYPE_CASH => true,
         PAYMENT_TYPE_CARD => true,
-        // Bank transfer is a deferred settlement (money comes later).
-        // Track it via cash_debts instead of cash_operations.
-        PAYMENT_TYPE_BANK => false,
+        // Bank/debt also go to cash_debts for AR; still record on the shift for reports.
+        PAYMENT_TYPE_BANK => true,
         PAYMENT_TYPE_IDRAM => true,
-        PAYMENT_TYPE_COMPLIMENTARY => false,
-        PAYMENT_OTHER => false,
+        PAYMENT_TYPE_COMPLIMENTARY => true,
+        PAYMENT_OTHER => true,
         PAYMENT_TELCELL => true,
-        PAYMENT_DEBT => false,
-        PAYMENT_PREPAID => false
+        PAYMENT_DEBT => true,
+        PAYMENT_PREPAID => true,
+        PAYMENT_TYPE_BANK2 => true,
+        PAYMENT_TYPE_BANK3 => true,
+    ],
+
+    // Transferable / drawable funds between cashboxes (real money only).
+    "funds" => [
+        PAYMENT_TYPE_CASH => true,
+        PAYMENT_TYPE_CARD => true,
+        PAYMENT_TYPE_IDRAM => true,
+        PAYMENT_TELCELL => true,
     ],
 
     // Physical drawer float: only cash. Card/Idram/Telcell are shift turnover.
@@ -77,5 +106,7 @@ return [
         PAYMENT_TELCELL => false,
         PAYMENT_DEBT => false,
         PAYMENT_PREPAID => false,
+        PAYMENT_TYPE_BANK2 => false,
+        PAYMENT_TYPE_BANK3 => false,
     ],
 ];

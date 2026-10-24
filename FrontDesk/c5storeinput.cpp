@@ -22,10 +22,12 @@
 #include <QSqlQuery>
 #include <QTemporaryFile>
 #include <QTextStream>
+#include <QTime>
 #include <QTimer>
 #include <QUrl>
 #include <memory>
 #include "appwebsocket.h"
+#include "c5cache.h"
 #include "c5codenameselector.h"
 #include "c5codenameselectorfunctions.h"
 #include "c5config.h"
@@ -41,6 +43,7 @@
 #include "dlgprintbarcodelabels.h"
 #include "calculator.h"
 #include "dict_payment_type.h"
+#include "paymenttypenames.h"
 #include "store_document_status.h"
 #include "ce5goods.h"
 #include "ce5partner.h"
@@ -57,11 +60,59 @@
 #include "storeinputxmlimport.h"
 #include "struct_goods_item.h"
 #include "ui_c5storeinput.h"
+#include "dlginventorysemireadylist.h"
+#include "dlgsemireadyinout.h"
 #include <QDialog>
 #include <QEvent>
 #include <QEventLoop>
 #include <QMouseEvent>
 #include <xlsxdocument.h>
+
+namespace {
+
+QString normalizeStoreBarcode(QString code)
+{
+    code = code.trimmed();
+    if (code.startsWith(QLatin1Char(';'))) {
+        code.remove(0, 1);
+    }
+    if (code.endsWith(QLatin1Char('?'))) {
+        code.chop(1);
+    }
+    return code.trimmed();
+}
+
+bool lookupStoreGoodsByBarcode(const QString &barcode, GoodsItem &g)
+{
+    if (barcode.isEmpty()) {
+        return false;
+    }
+
+    C5Database db;
+    db[":barcode"] = barcode;
+    db.exec("select g.f_id, g.f_name, u.f_name as f_unit_name, g.f_lastinputprice, "
+            "if(length(coalesce(g.f_adg, '')) > 0, g.f_adg, gr.f_adgcode) as f_adgt "
+            "from c_goods g "
+            "left join c_units u on u.f_id = g.f_unit "
+            "left join c_groups gr on gr.f_id = g.f_group "
+            "left join c_goods_multiscancode m on m.f_goods = g.f_id "
+            "where g.f_scancode = :barcode or m.f_id = :barcode "
+            "limit 1");
+    if (!db.nextRow()) {
+        return false;
+    }
+
+    g = GoodsItem();
+    g.id = db.getInt("f_id");
+    g.name = db.getString("f_name");
+    g.unitName = db.getString("f_unit_name");
+    g.lastInputPrice = db.getDouble("f_lastinputprice");
+    g.adgt = db.getString("f_adgt");
+    g.barcode = barcode;
+    return g.id > 0;
+}
+
+} // namespace
 
 C5StoreInput::C5StoreInput(C5User *user, const QString &title, QIcon icon, QWidget *parent)
     : C5Widget(parent)
@@ -136,14 +187,17 @@ C5StoreInput::C5StoreInput(C5User *user, const QString &title, QIcon icon, QWidg
             return;
 
         QJsonArray arr = jdoc.value("result").toArray();
-        if (arr.size() > 0) {
-            auto const &jo = arr.at(0).toObject();
-            GoodsItem g = JsonParser<GoodsItem>::fromJson(jo);
-            int row = addGoods(g.id, g.name, 0, g.unitName, 0, 0, "", g.adgt);
-
-            ui->tblGoods->lineEdit(row, col_price)->setPlaceholderText(float_str(g.lastInputPrice, 2));
-            ui->tblGoods->lineEdit(row, col_goods_qty)->setFocus();
+        GoodsItem g;
+        if (!arr.isEmpty()) {
+            g = JsonParser<GoodsItem>::fromJson(arr.at(0).toObject());
+        } else if (!lookupStoreGoodsByBarcode(mScanBarcode, g)) {
+            if (!mScanBarcode.isEmpty()) {
+                C5Message::error(tr("Goods not found") + ": " + mScanBarcode);
+            }
+            return;
         }
+
+        appendScannedGoods(g);
     });
     captureInitialState();
 }
@@ -156,6 +210,7 @@ C5StoreInput::~C5StoreInput()
 
 void C5StoreInput::setDocument(StoreInputDocument doc)
 {
+    mSemireadyBatches.clear();
     mDocData = doc;
     mDocumentPersisted = !doc.uuid.isEmpty();
     ui->deDate->setDate(QDateTime::fromString(doc.date, FORMAT_DATETIME_TO_STR_MYSQL).date());
@@ -168,8 +223,7 @@ void C5StoreInput::setDocument(StoreInputDocument doc)
         p.cashboxId = doc.cashbox_id;
         p.cashboxName = doc.cashbox_name;
         p.paymentTypeId = doc.payment_type_id;
-        const char *const nm = payment_names.value(doc.payment_type_id);
-        p.paymentTypeName = nm ? QCoreApplication::translate("PaymentType", nm) : doc.payment_type_id_name;
+        p.paymentTypeName = PaymentTypeNames::title(doc.payment_type_id);
         p.currencyId = doc.currency_id > 0 ? doc.currency_id : 1;
         p.currencyName = doc.currency_name.isEmpty() ? tr("Armenian dram") : doc.currency_name;
         addOrSelectPaymentPreset(p);
@@ -625,7 +679,10 @@ bool C5StoreInput::buildDoc()
         mDocData.uuid = QUuid::createUuid().toString(QUuid::WithoutBraces).toUtf8();
     }
     mDocData.user_id = ui->leDocNum->text();
-    mDocData.date = ui->deDate->toMySQLDate(false);
+    // Date from UI + current time (date-only → cash report showed 00:00).
+    mDocData.date = ui->deDate->date().toString(QStringLiteral("yyyy-MM-dd"))
+                    + QChar(' ')
+                    + QTime::currentTime().toString(QStringLiteral("HH:mm:ss"));
     mDocData.type = DOC_TYPE_STORE_INPUT;
     mDocData.create_user = mUser->id();
     mDocData.cashbox_id = mCurrentPayment.cashboxId;
@@ -656,7 +713,7 @@ bool C5StoreInput::buildDoc()
                      {"cashbox_id", mCurrentPayment.cashboxId},
                      {"cashbox_name", mCurrentPayment.cashboxName},
                      {"payment_type_id", mCurrentPayment.paymentTypeId},
-                     {"payment_type_name", mCurrentPayment.paymentTypeName},
+                     {"payment_type_name", PaymentTypeNames::title(mCurrentPayment.paymentTypeId)},
                      {"currency_id", mCurrentPayment.currencyId},
                      {"currency_name", mCurrentPayment.currencyName}};
     mDocData.items.clear();
@@ -1038,7 +1095,7 @@ void C5StoreInput::slotCheckQtyResponse(const QJsonObject &jdoc)
 
 void C5StoreInput::getInput()
 {
-    const auto r = selectItem<GoodsItem>(false, false);
+    const auto r = selectStoreDocGoods();
     if (r.isEmpty()) {
         return;
     }
@@ -1176,32 +1233,54 @@ void C5StoreInput::on_btnNewGoods_clicked()
     delete e;
 }
 
-void C5StoreInput::on_leScancode_returnPressed()
+void C5StoreInput::appendScannedGoods(const GoodsItem &g)
 {
-    QString qty = ui->chLeaveFocusOnBarcode->isChecked() ? "1" : "";
-    if (ui->chLeaveFocusOnBarcode->isChecked()) {
-        ui->leScancode->setFocus();
+    if (g.id <= 0) {
+        return;
     }
 
-    QString text = ui->leScancode->text().trimmed();
-    mWebSocketRequestId = QUuid::createUuid().toString(QUuid::WithoutBraces);
+    int row = addGoods(g.id, g.name, mScanQty, g.unitName, 0, 0, "", g.adgt);
+    ui->tblGoods->lineEdit(row, col_price)->setPlaceholderText(float_str(g.lastInputPrice, 2));
+    if (mScanQty > 0.0001) {
+        ui->leScancode->setFocus();
+    } else {
+        ui->tblGoods->lineEdit(row, col_goods_qty)->setFocus();
+    }
+}
+
+void C5StoreInput::on_leScancode_returnPressed()
+{
+    const QString text = normalizeStoreBarcode(ui->leScancode->text());
     ui->leScancode->clear();
+    if (text.isEmpty()) {
+        return;
+    }
+
+    mScanBarcode = text;
+    mScanQty = ui->chLeaveFocusOnBarcode->isChecked() ? 1.0 : 0.0;
+
+    auto addFromDb = [this]() {
+        GoodsItem g;
+        if (!lookupStoreGoodsByBarcode(mScanBarcode, g)) {
+            C5Message::error(tr("Goods not found") + ": " + mScanBarcode);
+            return;
+        }
+        appendScannedGoods(g);
+    };
+
+    if (!AppWebSocket::instance || !AppWebSocket::instance->isConnected()) {
+        addFromDb();
+        return;
+    }
+
+    mWebSocketRequestId = QUuid::createUuid().toString(QUuid::WithoutBraces);
     QJsonObject jo;
     jo["command"] = SelectorName<GoodsItem>::value;
     jo["lower_name"] = "";
     jo["barcode"] = text;
     jo["requestId"] = mWebSocketRequestId;
-    qDebug() << "Sending request" << jo;
-    if(!AppWebSocket::instance) {
-        C5Message::error(tr("WebSocket is not initialized. Restart the application."));
-        return;
-    }
-    if(!AppWebSocket::instance->isConnected()) {
-        C5Message::error(tr("No connection to the server. Check the network and try again."));
-        return;
-    }
-    if(!AppWebSocket::instance->sendBinaryMessage(QJsonDocument(jo).toJson())) {
-        C5Message::error(tr("Failed to send the barcode request. Check the connection to the server."));
+    if (!AppWebSocket::instance->sendBinaryMessage(QJsonDocument(jo).toJson())) {
+        addFromDb();
     }
 }
 
@@ -1321,11 +1400,20 @@ void C5StoreInput::on_btnSaveComment_clicked() {}
 void C5StoreInput::on_btnRemoveGoods_clicked()
 {
     int r = ui->tblGoods->currentRow();
+    if (r < 0) {
+        return;
+    }
+    if (lockedQty(r) > 0.0001) {
+        C5Message::error(tr("Remove this quantity via the semiready list"));
+        return;
+    }
     ui->tblGoods->removeRow(r);
+    countTotal();
 }
 
 void C5StoreInput::fillFromInventory(const QList<InventoryDiff> &surpluses)
 {
+    mSemireadyBatches.clear();
     // Очищаем таблицу перед импортом
     ui->tblGoods->setRowCount(0);
 
@@ -1973,28 +2061,75 @@ bool C5StoreInput::importInvoiceData(const StoreInputXmlInvoice &invoice,
 
 void C5StoreInput::initPaymentCombo()
 {
-    mPaymentPresets.clear();
+    mPaymentOptions.load();
+    rebuildPaymentOptionsPresets();
     setPaymentUnpaid();
+    PaymentTypeNames::load(mUser->mSessionKey, this, [this]() {
+        rebuildPaymentOptionsPresets();
+        rebuildPaymentCombo();
+    });
+}
+
+QVector<QPair<int, QString>> C5StoreInput::loadCashboxList() const
+{
+    QVector<QPair<int, QString>> out;
+    C5Cache *cache = C5Cache::cache(cache_cash_names);
+    if (!cache) {
+        return out;
+    }
+    for (int r = 0; r < cache->rowCount(); ++r) {
+        const int id = cache->getInt(r, 0);
+        const QString name = cache->getString(r, 1);
+        if (id > 0) {
+            out.append({id, name});
+        }
+    }
+    return out;
+}
+
+void C5StoreInput::rebuildPaymentOptionsPresets()
+{
+    mPaymentPresets = mPaymentOptions.buildPresets(loadCashboxList());
 }
 
 void C5StoreInput::rebuildPaymentCombo()
 {
     const QSignalBlocker blocker(ui->cbPayment);
     ui->cbPayment->clear();
-    ui->cbPayment->addItem(tr("Не оплачено"));
+    const bool showUnpaid = mPaymentOptions.unpaidEnabled;
+    if (showUnpaid) {
+        ui->cbPayment->addItem(tr("Unpaid"));
+    }
     for (const StorePaymentPreset &p : mPaymentPresets) {
         ui->cbPayment->addItem(p.label());
     }
-    int idx = 0;
-    if (!mCurrentPayment.isUnpaid()) {
+
+    int idx = -1;
+    if (mCurrentPayment.isUnpaid()) {
+        if (showUnpaid) {
+            idx = 0;
+        } else if (!mPaymentPresets.isEmpty()) {
+            mCurrentPayment = mPaymentPresets.first();
+            idx = 0;
+            syncPaidAmountWithPayment();
+        }
+    } else {
         for (int i = 0; i < mPaymentPresets.size(); ++i) {
             if (mPaymentPresets.at(i).matches(mCurrentPayment)) {
-                idx = i + 1;
+                idx = i + (showUnpaid ? 1 : 0);
                 break;
             }
         }
+        if (idx < 0) {
+            // Keep document payment visible even if disabled in options.
+            mPaymentPresets.append(mCurrentPayment);
+            ui->cbPayment->addItem(mCurrentPayment.label());
+            idx = ui->cbPayment->count() - 1;
+        }
     }
-    ui->cbPayment->setCurrentIndex(idx);
+    if (idx >= 0) {
+        ui->cbPayment->setCurrentIndex(idx);
+    }
 }
 
 void C5StoreInput::setPaymentUnpaid()
@@ -2023,6 +2158,7 @@ int C5StoreInput::addOrSelectPaymentPreset(const StorePaymentPreset &preset)
         setPaymentUnpaid();
         return 0;
     }
+    rebuildPaymentOptionsPresets();
     int found = -1;
     for (int i = 0; i < mPaymentPresets.size(); ++i) {
         if (mPaymentPresets.at(i).matches(preset)) {
@@ -2032,12 +2168,13 @@ int C5StoreInput::addOrSelectPaymentPreset(const StorePaymentPreset &preset)
         }
     }
     if (found < 0) {
+        // Keep document's payment even if not currently enabled in options.
         mPaymentPresets.append(preset);
         found = mPaymentPresets.size() - 1;
     }
     applyPaymentPreset(mPaymentPresets.at(found));
     rebuildPaymentCombo();
-    return found + 1;
+    return found + (mPaymentOptions.unpaidEnabled ? 1 : 0);
 }
 
 StorePaymentPreset C5StoreInput::currentPaymentPreset() const
@@ -2047,26 +2184,43 @@ StorePaymentPreset C5StoreInput::currentPaymentPreset() const
 
 void C5StoreInput::on_btnPaymentConfig_clicked()
 {
-    StorePaymentPreset draft = mCurrentPayment;
-    if (draft.currencyId <= 0) {
-        draft.currencyId = 1;
-        draft.currencyName = tr("Armenian dram");
-    }
-    QVector<StorePaymentPreset> presets = mPaymentPresets;
-    if (!DlgStoreInputPayment::edit(presets, draft, this)) {
+    if (!DlgStoreInputPayment::configure(mPaymentOptions, loadCashboxList(), this)) {
         return;
     }
-    mPaymentPresets = presets;
-    if (draft.isUnpaid()) {
-        setPaymentUnpaid();
-        return;
+    rebuildPaymentOptionsPresets();
+    if (!mCurrentPayment.isUnpaid()) {
+        bool stillAvailable = false;
+        for (const StorePaymentPreset &p : mPaymentPresets) {
+            if (p.matches(mCurrentPayment)) {
+                stillAvailable = true;
+                mCurrentPayment = p;
+                break;
+            }
+        }
+        if (!stillAvailable) {
+            if (mPaymentOptions.unpaidEnabled) {
+                setPaymentUnpaid();
+            } else if (!mPaymentPresets.isEmpty()) {
+                applyPaymentPreset(mPaymentPresets.first());
+                rebuildPaymentCombo();
+            } else {
+                setPaymentUnpaid();
+            }
+            return;
+        }
+    } else if (!mPaymentOptions.unpaidEnabled && !mPaymentPresets.isEmpty()) {
+        applyPaymentPreset(mPaymentPresets.first());
     }
-    addOrSelectPaymentPreset(draft);
+    rebuildPaymentCombo();
 }
 
 void C5StoreInput::on_cbPayment_currentIndexChanged(int index)
 {
-    if (index <= 0) {
+    if (index < 0) {
+        return;
+    }
+    const bool showUnpaid = mPaymentOptions.unpaidEnabled;
+    if (showUnpaid && index == 0) {
         mCurrentPayment = StorePaymentPreset();
         mCurrentPayment.currencyId = 1;
         mCurrentPayment.currencyName = tr("Armenian dram");
@@ -2074,8 +2228,9 @@ void C5StoreInput::on_cbPayment_currentIndexChanged(int index)
         setPaidAmountUi(0, false);
         return;
     }
-    const int presetIndex = index - 1;
+    const int presetIndex = index - (showUnpaid ? 1 : 0);
     if (presetIndex < 0 || presetIndex >= mPaymentPresets.size()) {
+        // Temporary item for document payment not in options — keep mCurrentPayment.
         return;
     }
     applyPaymentPreset(mPaymentPresets.at(presetIndex));
@@ -2141,20 +2296,8 @@ void C5StoreInput::editPostedPaidAmount()
     }
     if (value > 0.001) {
         if (mCurrentPayment.cashboxId <= 0 || mCurrentPayment.paymentTypeId <= 0) {
-            StorePaymentPreset draft = mCurrentPayment;
-            if (draft.currencyId <= 0) {
-                draft.currencyId = 1;
-                draft.currencyName = tr("Armenian dram");
-            }
-            QVector<StorePaymentPreset> presets = mPaymentPresets;
-            if (!DlgStoreInputPayment::edit(presets, draft, this)) {
-                return;
-            }
-            mPaymentPresets = presets;
-            if (draft.isUnpaid()) {
-                return;
-            }
-            addOrSelectPaymentPreset(draft);
+            C5Message::error(tr("Select payment method first"));
+            return;
         }
     }
 
@@ -2310,4 +2453,152 @@ void C5StoreInput::lineEditKeyPressed(const QChar &key)
     default:
         break;
     }
+}
+
+int C5StoreInput::findGoodsRow(int goodsId) const
+{
+    for (int i = 0; i < ui->tblGoods->rowCount(); ++i) {
+        if (ui->tblGoods->getInteger(i, col_goods_id) == goodsId) {
+            return i;
+        }
+    }
+    return -1;
+}
+
+double C5StoreInput::lockedQty(int row) const
+{
+    QTableWidgetItem *item = ui->tblGoods->item(row, col_goods_id);
+    if (!item) {
+        return 0;
+    }
+    return item->data(Qt::UserRole).toDouble();
+}
+
+void C5StoreInput::setLockedQty(int row, double qty)
+{
+    QTableWidgetItem *item = ui->tblGoods->item(row, col_goods_id);
+    if (!item) {
+        item = new QTableWidgetItem();
+        ui->tblGoods->setItem(row, col_goods_id, item);
+    }
+    item->setData(Qt::UserRole, qty);
+}
+
+void C5StoreInput::refreshRowTotal(int row)
+{
+    C5LineEdit *lqty = ui->tblGoods->lineEdit(row, col_goods_qty);
+    C5LineEdit *lprice = ui->tblGoods->lineEdit(row, col_price);
+    C5LineEdit *ltotal = ui->tblGoods->lineEdit(row, col_total);
+    if (!lqty || !lprice || !ltotal) {
+        return;
+    }
+    ltotal->setDouble(lqty->getDouble() * lprice->getDouble());
+}
+
+void C5StoreInput::applySemireadyBatch(const SemireadyBatch &batch)
+{
+    for (const SemireadyComponent &c : batch.components) {
+        if (c.goodsId <= 0 || c.qty <= 0.0000001) {
+            continue;
+        }
+
+        int row = findGoodsRow(c.goodsId);
+        if (row < 0) {
+            row = addGoods(c.goodsId, c.goodsName, c.qty, QString(), 0, 0, QString(), QString());
+            setLockedQty(row, c.qty);
+        } else {
+            C5LineEdit *le = ui->tblGoods->lineEdit(row, col_goods_qty);
+            if (!le) {
+                continue;
+            }
+            le->setDouble(le->getDouble() + c.qty);
+            setLockedQty(row, lockedQty(row) + c.qty);
+            refreshRowTotal(row);
+        }
+    }
+
+    mSemireadyBatches.append(batch);
+    countTotal();
+}
+
+void C5StoreInput::removeSemireadyBatch(const QString &batchId)
+{
+    int batchIndex = -1;
+    for (int i = 0; i < mSemireadyBatches.size(); ++i) {
+        if (mSemireadyBatches.at(i).id == batchId) {
+            batchIndex = i;
+            break;
+        }
+    }
+    if (batchIndex < 0) {
+        return;
+    }
+
+    const SemireadyBatch batch = mSemireadyBatches.takeAt(batchIndex);
+    for (const SemireadyComponent &c : batch.components) {
+        int row = findGoodsRow(c.goodsId);
+        if (row < 0) {
+            continue;
+        }
+
+        C5LineEdit *le = ui->tblGoods->lineEdit(row, col_goods_qty);
+        const double newQty = le->getDouble() - c.qty;
+        const double newLocked = lockedQty(row) - c.qty;
+        if (newQty <= 0.0001 && newLocked <= 0.0001) {
+            ui->tblGoods->removeRow(row);
+            continue;
+        }
+
+        le->setDouble(newQty > 0 ? newQty : 0);
+        setLockedQty(row, newLocked > 0 ? newLocked : 0);
+        refreshRowTotal(row);
+    }
+
+    countTotal();
+}
+
+void C5StoreInput::on_btnAddSemiready_clicked()
+{
+    DlgSemireadyInOut dlg(mUser);
+    if (dlg.exec() != QDialog::Accepted) {
+        return;
+    }
+
+    if (dlg.dishId() <= 0 || dlg.dishQty() <= 0.0000001 || dlg.rowCount() <= 0) {
+        return;
+    }
+
+    SemireadyBatch batch;
+    batch.id = QUuid::createUuid().toString(QUuid::WithoutBraces);
+    batch.dishId = dlg.dishId();
+    batch.dishName = dlg.dishName();
+    batch.dishQty = dlg.dishQty();
+
+    for (int i = 0; i < dlg.rowCount(); ++i) {
+        SemireadyComponent c;
+        c.goodsId = dlg.goodsId(i);
+        c.goodsName = dlg.goodsName(i);
+        c.qty = dlg.goodsQty(i);
+        if (c.goodsId <= 0 || c.qty <= 0.0000001) {
+            continue;
+        }
+        batch.components.append(c);
+    }
+
+    if (batch.components.isEmpty()) {
+        return;
+    }
+
+    applySemireadyBatch(batch);
+}
+
+void C5StoreInput::on_btnSemireadyList_clicked()
+{
+    DlgInventorySemireadyList dlg(this);
+    dlg.setBatches(mSemireadyBatches);
+    connect(&dlg, &DlgInventorySemireadyList::removeBatchRequested, this, [this, &dlg](const QString &batchId) {
+        removeSemireadyBatch(batchId);
+        dlg.setBatches(mSemireadyBatches);
+    });
+    dlg.exec();
 }

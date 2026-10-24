@@ -1,4 +1,19 @@
 #include "workspace.h"
+
+namespace {
+
+QString smartConfigId()
+{
+    const QString fromArgs = C5Config::fSettingsName.trimmed();
+
+    if(!fromArgs.isEmpty()) {
+        return fromArgs;
+    }
+
+    return __c5config.getRegValue(QStringLiteral("ss_settings")).toString().trimmed();
+}
+
+}
 #include <QColor>
 #include <QFile>
 #include <QInputDialog>
@@ -35,6 +50,7 @@
 #include "nloadingdlg.h"
 #include "printtaxno.h"
 #include "scopeguarde.h"
+#include "smartprint.h"
 #include "ui_workspace.h"
 #include "wcustomerdisplay.h"
 
@@ -108,7 +124,7 @@ Workspace::Workspace(C5User *user) :
     ui->tblOrder->setColumnWidth(2, 70);
     ui->tblOrder->setColumnWidth(3, 70);
     ui->tblOrder->setColumnWidth(4, 30);
-    ui->btnSetCardExternal->setVisible(__c5config.getValue(param_choose_external_pos).toInt() == 1);
+    ui->btnSetCardExternal->setVisible(true);
     fWorkspace = this;
     fCustomerDisplay = nullptr;
     QSettings d(qApp->applicationDirPath() + "/discount.conf", QSettings::IniFormat);
@@ -128,7 +144,7 @@ Workspace::Workspace(C5User *user) :
     ui->tblTables->setVisible(__c5config.getRegValue("tables").toBool());
     mRejectEnabled = true;
     createHttpRequest("/engine/smart/init.php",
-    QJsonObject{{"config_id", "Sale"}},
+    QJsonObject{{"config_id", smartConfigId()}},
     SLOT(initResponse(QJsonObject)), "init");
 }
 
@@ -500,6 +516,8 @@ void Workspace::resetOrder()
         ui->btnFiscal->setChecked(false);
     }
 
+    configFiscalButton();
+
     setCustomerPhoneNumber("");
     ui->tblTables->viewport()->update();
     ui->leReadCode->setFocus();
@@ -570,7 +588,7 @@ void Workspace::createHttpRequest(const QString &route, QJsonObject params, cons
 {
     params["sessionkey"] = __c5config.getRegValue("sessionkey").toString();
     params["host"] = hostinfo;
-    params["config_id"] = "Sale";
+    params["config_id"] = smartConfigId();
     params["user_session"] = __c5config.getRegValue("session").toString();
     params["sessionid"] = __c5config.getRegValue("cashsession").toInt();
     auto np = new NDataProvider(this);
@@ -1223,6 +1241,7 @@ void Workspace::on_btnSetOther_clicked()
     ui->btnSetCardExternal->setChecked(false);
     ui->leCard->clear();
     ui->btnFiscal->setChecked(false);
+    configFiscalButton();
 }
 
 void Workspace::on_btnReceived_clicked()
@@ -1342,15 +1361,10 @@ int Workspace::printTax(double cardAmount, double idramAmount)
             "left join d_dish d on d.f_id=b.f_dish "
             "left join d_part2 p2 on p2.f_id=d.f_part "
             "where b.f_header=:f_header and b.f_state=:f_state");
-    QString useExtPos = "false";
+    const QString useExtPos = QStringLiteral("true");
 
     if(idramAmount > 0.01) {
         cardAmount = idramAmount;
-        useExtPos = "true";
-    }
-
-    if(ui->btnSetCardExternal->isChecked()) {
-        useExtPos = "true";
     }
 
     QTableWidgetItem *citem = ui->tblTables->currentItem();
@@ -1460,24 +1474,96 @@ int Workspace::printTax(double cardAmount, double idramAmount)
     return -1;
 }
 
+namespace {
+
+QPrinterInfo matchInstalledPrinter(const QString &name)
+{
+    const QString needle = name.trimmed();
+
+    if(needle.isEmpty()) {
+        return QPrinterInfo();
+    }
+
+    const QPrinterInfo exact = QPrinterInfo::printerInfo(needle);
+
+    if(!exact.isNull()) {
+        return exact;
+    }
+
+    const QList<QPrinterInfo> installed = QPrinterInfo::availablePrinters();
+
+    for(const QPrinterInfo &pi : installed) {
+        if(pi.printerName().trimmed().compare(needle, Qt::CaseInsensitive) == 0) {
+            return pi;
+        }
+    }
+
+    for(const QPrinterInfo &pi : installed) {
+        const QString have = pi.printerName().trimmed();
+
+        if(have.contains(needle, Qt::CaseInsensitive) || needle.contains(have, Qt::CaseInsensitive)) {
+            return pi;
+        }
+    }
+
+    return QPrinterInfo();
+}
+
+QPrinterInfo smartPrinterInfo(const QString &name, const QHash<QString, QString> &aliases)
+{
+    const QString requested = name.trimmed();
+    QString resolved = requested;
+
+    if(aliases.contains(resolved)) {
+        const QString mapped = aliases.value(resolved).trimmed();
+        const QPrinterInfo aliased = matchInstalledPrinter(mapped);
+
+        if(!aliased.isNull()) {
+            return aliased;
+        }
+    }
+
+    const QPrinterInfo named = matchInstalledPrinter(resolved);
+
+    if(!named.isNull()) {
+        return named;
+    }
+
+    const QPrinterInfo def = QPrinterInfo::defaultPrinter();
+
+    if(!def.isNull()) {
+        return def;
+    }
+
+    const QList<QPrinterInfo> installed = QPrinterInfo::availablePrinters();
+
+    if(!installed.isEmpty()) {
+        return installed.first();
+    }
+
+    return QPrinterInfo();
+}
+
+}
+
 bool Workspace::printReceipt(const QString &id, bool printSecond, bool precheck)
 {
     C5Database db;
-    QFont font(qApp->font());
-    font.setFamily(__c5config.getValue(param_receipt_print_font_family));
-    int basefont = __c5config.getValue(param_receipt_print_font_size).toInt();
-    basefont = 10;
+    QFont font(smartPrintFontFamily());
+    const int basefont = smartPrintPointSize();
     font.setPointSize(basefont);
     font.setBold(true);
     C5Printing p;
-    QPrinterInfo pi = QPrinterInfo::printerInfo(C5Config::localReceiptPrinter());
+    const QPrinterInfo pi = smartPrinterInfo(C5Config::localReceiptPrinter(), fPrinterAliases);
+
+    if(pi.isNull()) {
+        C5Message::error(tr("Printer not found") + ": " + C5Config::localReceiptPrinter());
+        return false;
+    }
+
+    const QString receiptPrinter = pi.printerName();
     QPrinter printer(pi);
-    printer.setPageSize(QPageSize::Custom);
-    printer.setFullPage(false);
-    QRectF pr = printer.pageRect(QPrinter::DevicePixel);
-    constexpr qreal SAFE_RIGHT_MM = 2.0;
-    qreal safePx = SAFE_RIGHT_MM * printer.logicalDpiX() / 25.4;
-    p.setSceneParams(pr.width() - safePx, pr.height(), printer.logicalDpiX());
+    setupSmartPrintScene(p, printer);
     p.setFont(font);
     QMap<int, QMap<QString, QVariant> > packages;
     QJsonObject jtax, jin;
@@ -1759,7 +1845,12 @@ bool Workspace::printReceipt(const QString &id, bool printSecond, bool precheck)
     p.ltext(QString("%1: %2").arg(tr("Sample")).arg(db.getInt("f_print") + 1), 0);
     p.br();
     p.ltext(".", 0);
-    p.print(printer);
+
+    if(!smartPrint(p, printer)) {
+        C5Message::error(tr("Print failed") + ": " + receiptPrinter);
+        return false;
+    }
+
     db[":f_print"] = db.getInt("f_print") + 1;
     db.update("o_header", "f_id", id);
 
@@ -1770,39 +1861,42 @@ bool Workspace::printReceipt(const QString &id, bool printSecond, bool precheck)
     return true;
 }
 
-void Workspace::printService(const QString &printerName, const QJsonObject &h, const QJsonArray &d,
+bool Workspace::printService(const QString &printerName, const QJsonObject &h, const QJsonArray &d,
                              const QJsonObject &jf, int side)
 {
     Q_UNUSED(jf);
-    QFont font(qApp->font());
-    font.setFamily(__c5config.getValue(param_service_print_font_family));
-    int bs = __c5config.getValue(param_service_print_font_size).toInt();
-    font.setPointSize(bs);
-    QString finalPrinter = printerName;
 
-    if(fPrinterAliases.contains(printerName)) {
-        finalPrinter = fPrinterAliases[printerName];
+    if(printerName.trimmed().isEmpty()) {
+        return false;
     }
 
+    QFont font(smartPrintFontFamily());
+    const int bs = smartPrintPointSize();
+    font.setPointSize(bs);
+    const QPrinterInfo pi = smartPrinterInfo(printerName, fPrinterAliases);
+
+    if(pi.isNull()) {
+        C5Message::error(tr("Printer not found") + ": " + printerName);
+        return false;
+    }
+
+    const QString finalPrinter = pi.printerName();
     C5Printing p;
-    QPrinterInfo pi = QPrinterInfo::printerInfo(finalPrinter);
     QPrinter printer(pi);
-    printer.setPageSize(QPageSize::Custom);
-    printer.setFullPage(false);
-    QRectF pr = printer.pageRect(QPrinter::DevicePixel);
-    constexpr qreal SAFE_RIGHT_MM = 2.0;
-    qreal safePx = SAFE_RIGHT_MM * printer.logicalDpiX() / 25.4;
-    p.setSceneParams(pr.width() - safePx, pr.height(), printer.logicalDpiX());
+    setupSmartPrintScene(p, printer);
     p.setFont(font);
     p.setFontBold(true);
-    p.ctext(tr("Receipt #") + QString("%1%2").arg(h["f_prefix"].toString(), QString::number(h["f_hallid"].toInt())));
+    p.ctext(tr("Receipt #") + QString("%1%2").arg(h["f_prefix"].toString(),
+            QString::number(h["f_hallid"].toVariant().toInt())));
     p.br();
     p.lrtext(tr("Cashier"), h["f_staff"].toString());
+    p.br();
+    p.lrtext(tr("Table"), h["f_tablename"].toString());
     p.br();
     p.ctext(printerName);
     p.br();
 
-    if(h["f_partner"].toInt() > 0) {
+    if(h["f_partner"].toVariant().toInt() > 0) {
         p.ctext(QString("*%1*").arg(tr("Delivery")));
         p.br();
     }
@@ -1812,7 +1906,7 @@ void Workspace::printService(const QString &printerName, const QJsonObject &h, c
         p.br();
     }
 
-    if(jf["f_3"].toInt() > 0) {
+    if(jf["f_3"].toVariant().toInt() > 0) {
         p.setFontSize(bs + 2);
         p.setFontBold(true);
         p.ctext(tr("TAKE AWAY"));
@@ -1830,7 +1924,7 @@ void Workspace::printService(const QString &printerName, const QJsonObject &h, c
         p.setFontSize(bs);
         p.ltext(j["f_name"].toString(), 0);
         p.setFontBold(true);
-        p.rtext(float_str(j["f_qty1"].toDouble(), 2));
+        p.rtext(float_str(j["f_qty1"].toVariant().toDouble(), 2));
         p.br();
 
         if(j["f_comment"].toString().isEmpty() == false) {
@@ -1851,7 +1945,13 @@ void Workspace::printService(const QString &printerName, const QJsonObject &h, c
     p.br();
     p.ltext("_", 0);
     p.br();
-    p.print(printer);
+
+    if(!smartPrint(p, printer)) {
+        C5Message::error(tr("Print failed") + ": " + finalPrinter);
+        return false;
+    }
+
+    return true;
 }
 
 void Workspace::showCustomerDisplay()
@@ -1915,11 +2015,20 @@ void Workspace::initResponse(const QJsonObject &jdoc)
     }
 
     QJsonObject jo = jdoc["data"].toObject();
-    QJsonArray jta = jo["printeraliases"].toArray();
+    QJsonArray jta = jo["printaliases"].toArray();
+
+    if(jta.isEmpty()) {
+        jta = jo["printeraliases"].toArray();
+    }
 
     for(int i = 0; i  < jta.size(); i++) {
         QJsonObject j = jta.at(i).toObject();
-        fPrinterAliases[j["f_alias"].toString()] = j["f_printer"].toString();
+        const QString alias = j["f_alias"].toString().trimmed();
+        const QString printer = j["f_printer"].toString().trimmed();
+
+        if(!alias.isEmpty() && !printer.isEmpty()) {
+            fPrinterAliases[alias] = printer;
+        }
     }
 
     LogWriter::write(LogWriterLevel::verbose, "init", "part2");
@@ -2119,13 +2228,22 @@ void Workspace::printServiceResponse(const QJsonObject &jdoc)
     QJsonObject jflags = jo["flags"].toObject();
     QJsonArray jdishes1 = jo["dishes1"].toArray();
     QJsonArray jdishes2 = jo["dishes2"].toArray();
+    bool printed = true;
 
     if(!jdishes1.isEmpty()) {
         QSet<QString> prn;
 
         for(int i = 0; i < jdishes1.size(); i++) {
-            const QJsonObject &j = jdishes1.at(i).toObject();
-            prn.insert(j["f_print1"].toString());
+            const QString name = jdishes1.at(i).toObject()["f_print1"].toString().trimmed();
+
+            if(!name.isEmpty()) {
+                prn.insert(name);
+            }
+        }
+
+        if(prn.isEmpty()) {
+            printed = false;
+            C5Message::error(tr("Printer not found"));
         }
 
         for(const QString &p : prn) {
@@ -2134,44 +2252,69 @@ void Workspace::printServiceResponse(const QJsonObject &jdoc)
             for(int i = 0; i < jdishes1.size(); i++) {
                 const QJsonObject &j = jdishes1.at(i).toObject();
 
-                if(j["f_print1"].toString() == p) {
+                if(j["f_print1"].toString().trimmed() == p) {
                     ja.append(j);
                 }
             }
 
-            printService(p, jheader, ja, jflags, 1);
+            if(!printService(p, jheader, ja, jflags, 1)) {
+                printed = false;
+            }
         }
     }
 
     if(!jdishes2.isEmpty()) {
         QSet<QString> prn;
 
-        for(int i = 0; i < jdishes1.size(); i++) {
-            const QJsonObject &j = jdishes1.at(i).toObject();
-            prn.insert(j["f_print2"].toString());
+        for(int i = 0; i < jdishes2.size(); i++) {
+            const QString name = jdishes2.at(i).toObject()["f_print2"].toString().trimmed();
+
+            if(!name.isEmpty()) {
+                prn.insert(name);
+            }
+        }
+
+        if(prn.isEmpty()) {
+            printed = false;
+            C5Message::error(tr("Printer not found"));
         }
 
         for(const QString &p : prn) {
             QJsonArray ja;
 
-            for(int i = 0; i < jdishes1.size(); i++) {
-                const QJsonObject &j = jdishes1.at(i).toObject();
+            for(int i = 0; i < jdishes2.size(); i++) {
+                const QJsonObject &j = jdishes2.at(i).toObject();
 
-                if(j["f_print2"].toString() == p) {
+                if(j["f_print2"].toString().trimmed() == p) {
                     ja.append(j);
                 }
             }
 
-            printService(p, jheader, ja, jflags, 2);
+            if(!printService(p, jheader, ja, jflags, 2)) {
+                printed = false;
+            }
         }
     }
 
     jo = sender()->property("marks").toJsonObject();
     jo["opentable"] = true;
     httpStop(sender());
-    createHttpRequest("/engine/smart/printservice.php", QJsonObject{{"header", jheader["f_id"].toString()}, {"mode", 2}},
-    SLOT(
-        voidResponse(QJsonObject)), jo);
+
+    if(printed) {
+        createHttpRequest("/engine/smart/printservice.php", QJsonObject{{"header", jheader["f_id"].toString()}, {"mode", 2}},
+        SLOT(
+            voidResponse(QJsonObject)), jo);
+        return;
+    }
+
+    if(jo["printreceipt"].toBool()) {
+        printReceipt(jo["header"].toString(), false, false);
+    }
+
+    if(jo["opentable"].toBool()) {
+        createHttpRequest("/engine/smart/opentable.php", QJsonObject{{"table", fTable}}, SLOT(
+            openTableResponse(QJsonObject)));
+    }
 }
 
 void Workspace::receiptResponse(const QJsonObject &jdoc)
@@ -2218,16 +2361,18 @@ void Workspace::removeDishResponse(const QJsonObject &jdoc)
 
 void Workspace::openTableResponse(const QJsonObject &jdoc)
 {
-    resetOrder();
     QJsonObject jo = jdoc["data"].toObject();
-    fTable = jo["table"].toInt();
 
     if(!jo["locked"].toString().isEmpty()) {
         httpStop(sender());
         fTable = 0;
+        configFiscalButton();
         C5Message::error(tr("Table locked by") + "<br>" + jo["locked"].toString());
         return;
     }
+
+    fTable = jo["table"].toInt();
+    resetOrder();
 
     QTableWidgetItem *currentItem = nullptr;
 
@@ -2293,6 +2438,7 @@ void Workspace::openTableResponse(const QJsonObject &jdoc)
     }
 
     httpStop(sender());
+    configFiscalButton();
 
     if(ui->tblOrder->rowCount() == 1) {
         Dish d = ui->tblOrder->item(0, 0)->data(Qt::UserRole).value<Dish>();
@@ -2531,7 +2677,9 @@ void Workspace::on_btnComment_clicked()
 
     QString comment;
 
-    if(DlgListOfDishComments::getComment(d.name, comment)) {
+    if(DlgListOfDishComments::getText(tr("Comment for") + " " + d.name,
+                                       QStringLiteral("/engine/v2/smart/menu/GetComments"),
+                                       comment)) {
         createHttpRequest("/engine/smart/update-dish.php", QJsonObject{
             {"obodyid", d.obodyId},
             {"row", row},
@@ -2713,6 +2861,11 @@ void Workspace::on_printOrder_clicked()
 
 void Workspace::on_btnFiscal_clicked(bool checked)
 {
+    if(tableRequiresFiscal()) {
+        ui->btnFiscal->setChecked(true);
+        return;
+    }
+
     if(checked) {
         if(ui->btnSetOther->isChecked()) {
             ui->btnFiscal->setChecked(false);
@@ -2720,12 +2873,33 @@ void Workspace::on_btnFiscal_clicked(bool checked)
     }
 }
 
+bool Workspace::tableRequiresFiscal() const
+{
+    for(int i = 0; i < ui->tblTables->columnCount(); i++) {
+        auto *item = ui->tblTables->item(0, i);
+
+        if(!item) {
+            continue;
+        }
+
+        if(item->data(Qt::UserRole).toInt() == fTable
+                && item->text().contains(QStringLiteral("CIG"), Qt::CaseInsensitive)) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
 void Workspace::configFiscalButton()
 {
-    if(__c5config.getValue(param_tax_print_always_offer).toInt() != 0) {
+    if(tableRequiresFiscal() || __c5config.getValue(param_tax_print_always_offer).toInt() != 0) {
         ui->btnFiscal->setEnabled(false);
         ui->btnFiscal->setChecked(true);
+        return;
     }
+
+    ui->btnFiscal->setEnabled(true);
 }
 
 void Workspace::createAddDishRequest(const Dish &dish)

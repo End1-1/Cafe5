@@ -30,7 +30,7 @@
       </size>
      </property>
      <property name="Field" stdset="0">
-      <string>f_currency</string>
+      <string>f_currency_id</string>
      </property>
     </widget>
    </item>

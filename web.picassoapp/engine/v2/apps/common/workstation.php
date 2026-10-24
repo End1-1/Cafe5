@@ -18,7 +18,7 @@ class Workstation extends Auth
 
         $fiscal = $this->select("select * from fiscal_machine")->fetch_all(MYSQLI_ASSOC);
         foreach ($fiscal as &$fiscalRow) {
-            foreach (['f_id', 'f_port', 'f_default_dept', 'f_external_pos', 'f_idram_ext_pos', 'f_simple_fiscal'] as $key) {
+            foreach (['f_id', 'f_port', 'f_default_dept', 'f_external_pos', 'f_idram_ext_pos', 'f_simple_fiscal', 'f_auto_fiscal'] as $key) {
                 if (array_key_exists($key, $fiscalRow)) {
                     $fiscalRow[$key] = (int)$fiscalRow[$key];
                 }
@@ -84,6 +84,7 @@ class Workstation extends Auth
             w.f_type,
             w.f_station_account,
             w.f_name,
+            ifnull(w.f_config, '{}') as f_station_config,
             json_detailed(json_merge_patch(
                 ifnull(d.f_config, json_object()),
                 ifnull(w.f_config, json_object())
@@ -118,9 +119,30 @@ class Workstation extends Auth
                 $typeCfg = $handler->withDefaults($cfg);
                 $cfg = array_merge($commonCfg, $typeCfg);
             }
+            if ($type === 1) {
+                $stationCfg = json_decode($config['f_station_config'] ?? '{}', true);
+                if (!is_array($stationCfg)) {
+                    $stationCfg = [];
+                }
+                $cfg['newlook'] = (bool)($stationCfg['newlook'] ?? false);
+            }
+            unset($config['f_station_config']);
             $cfg = $this->enrichConfigNames($cfg);
             $config['f_config'] = json_encode($cfg, JSON_UNESCAPED_UNICODE);
-            $this->result = array_merge($this->result, $config, ["fiscal" => $fiscal]);
+            $printAliases = [];
+            try {
+                $printAliases = $this->select(
+                    "SELECT f_alias, f_printer FROM d_print_aliases
+                     WHERE LENGTH(TRIM(IFNULL(f_alias, ''))) > 0
+                       AND LENGTH(TRIM(IFNULL(f_printer, ''))) > 0"
+                )->fetch_all(MYSQLI_ASSOC);
+            } catch (Exception $e) {
+                $printAliases = [];
+            }
+            $this->result = array_merge($this->result, $config, [
+                "fiscal" => $fiscal,
+                "printaliases" => $printAliases,
+            ]);
         }
 
         $this->echoResult();

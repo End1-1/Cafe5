@@ -8,6 +8,7 @@
 #include "dlgdishdetails.h"
 #include "dlgpackagepick.h"
 #include "dlgorderdone.h"
+#include "dlgordererror.h"
 #include "dlgpayment.h"
 #include "selfboardordersubmit.h"
 #include "dishcardwidget.h"
@@ -42,7 +43,6 @@
 #include "selfboardsettings.h"
 
 #include <QSettings>
-#include <QMessageBox>
 
 namespace {
 
@@ -744,6 +744,9 @@ void DlgMenu::resizeEvent(QResizeEvent *event)
     if (m_orderDoneOverlay && m_orderDoneOverlay->isVisible()) {
         m_orderDoneOverlay->setGeometry(QRect(QPoint(0, 0), size()));
     }
+    if (m_orderErrorOverlay && m_orderErrorOverlay->isVisible()) {
+        m_orderErrorOverlay->setGeometry(QRect(QPoint(0, 0), size()));
+    }
 }
 
 void DlgMenu::closePackagePicker()
@@ -965,6 +968,33 @@ void DlgMenu::showOrderDone(const QString &orderNumber, const QString &statusUrl
     m_orderDoneOverlay->show();
 }
 
+void DlgMenu::closeOrderError()
+{
+    if (!m_orderErrorOverlay) {
+        return;
+    }
+    DlgOrderError *overlay = m_orderErrorOverlay;
+    m_orderErrorOverlay = nullptr;
+    overlay->hide();
+    overlay->deleteLater();
+    update();
+    repaint();
+}
+
+void DlgMenu::showOrderError(const QString &message)
+{
+    closeOrderError();
+
+    const QString text = message.isEmpty() ? tr("Failed to create order") : message;
+    m_orderErrorOverlay = new DlgOrderError(text, this);
+    m_orderErrorOverlay->setGeometry(QRect(QPoint(0, 0), size()));
+    connect(m_orderErrorOverlay, &DlgOrderError::acknowledged, this, [this]() {
+        closeOrderError();
+    });
+    m_orderErrorOverlay->raise();
+    m_orderErrorOverlay->show();
+}
+
 void DlgMenu::submitPaidOrder()
 {
     if (m_orderSubmitInProgress || m_cart.isEmpty()) {
@@ -982,10 +1012,7 @@ void DlgMenu::submitPaidOrder()
         [this](const SelfBoardSubmitResult &result) {
             m_orderSubmitInProgress = false;
             if (!result.ok) {
-                QMessageBox::critical(
-                    nullptr,
-                    tr("Order"),
-                    result.error.isEmpty() ? tr("Failed to create order") : result.error);
+                showOrderError(result.error);
                 return;
             }
 

@@ -11,5 +11,9 @@ constexpr int CASH_OP_DEBT_REPAYMENT = 6;
 constexpr int CASH_OP_UTILITIES = 7;
 constexpr int CASH_OP_CASH_SHORTAGE = 8;
 constexpr int CASH_OP_CASH_OVERAGE = 9;
+constexpr int CASH_OP_DELIVERY_FEE = 10;
+constexpr int CASH_OP_TRANSFER_OUT = 11;
+constexpr int CASH_OP_TRANSFER_IN = 12;
+constexpr int CASH_OP_CASH_COLLECTION = 13;
 
 #endif

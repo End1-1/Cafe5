@@ -23,6 +23,7 @@
 #include <QScrollArea>
 #include <QScrollBar>
 #include <QSet>
+#include <QSignalBlocker>
 #include <QSizePolicy>
 #include <QSortFilterProxyModel>
 #include <QTimer>
@@ -47,6 +48,8 @@
 #include "ce5goods.h"
 #include "rabstracteditordialog.h"
 #include "rfilterdialog.h"
+#include "format_date.h"
+#include <QDate>
 #include "rfilterproxymodel.h"
 #include "struct_doc_store_input.h"
 #include "struct_waiter_order.h"
@@ -175,8 +178,7 @@ RAbstractEditorReport::RAbstractEditorReport(const QString &title, QIcon icon, c
         if(!current.isEmpty() && current.value(mViewModeFilterName).toInt() == value) {
             return;
         }
-        setViewModeFilterValue(value);
-        __c5config.setRegValue("filter_values_" + mEditorName, QJsonDocument(mFilterValues).toJson(QJsonDocument::Compact));
+        switchToViewMode(value);
         getData();
     });
     connect(ui->btnViewModeLeft, &QToolButton::clicked, this, [this] { scrollViewModeBy(-120); });
@@ -191,6 +193,9 @@ RAbstractEditorReport::RAbstractEditorReport(const QString &title, QIcon icon, c
     ui->scrollViewMode->installEventFilter(this);
     ui->scrollViewMode->viewport()->installEventFilter(this);
     mFilterValues =  QJsonDocument::fromJson(__c5config.getRegValue("filter_values_" + mEditorName, "").toString().toUtf8()).array();
+    if(!RFilterDialog::datesPinned(mEditorName)) {
+        RFilterDialog::resetDatesToToday(mFilterValues);
+    }
 }
 
 RAbstractEditorReport::~RAbstractEditorReport()
@@ -625,7 +630,7 @@ int RAbstractEditorReport::reportColumnFromEnd(int offsetFromEnd) const
 void RAbstractEditorReport::applyFilter()
 {
     RFilterDialog df(mUser);
-    df.buildWidget(mEditorName, mFilterWidget);
+    df.buildWidget(filterWidgetPrefix(), mFilterWidget, mEditorName, mFilterValues);
 
     if(df.exec() == QDialog::Accepted) {
         const QJsonObject preservedViewMode = mViewModeFilterName.isEmpty()
@@ -635,8 +640,8 @@ void RAbstractEditorReport::applyFilter()
         if(!preservedViewMode.isEmpty()) {
             mFilterValues.append(preservedViewMode);
         }
+        persistCurrentFilters();
         getData();
-        __c5config.setRegValue("filter_values_" + mEditorName, QJsonDocument(mFilterValues).toJson(QJsonDocument::Compact));
     }
 }
 
@@ -657,22 +662,128 @@ void RAbstractEditorReport::clearViewModeButtons()
     }
 }
 
-void RAbstractEditorReport::setViewModeFilterValue(int value)
+void RAbstractEditorReport::setFilterValue(const QString &name, const QJsonValue &value)
 {
-    if(mViewModeFilterName.isEmpty()) {
-        return;
-    }
     for(int i = 0; i < mFilterValues.size(); ++i) {
         QJsonObject obj = mFilterValues.at(i).toObject();
-        if(obj.contains(mViewModeFilterName)) {
-            obj.insert(mViewModeFilterName, value);
+        if(obj.contains(name)) {
+            obj.insert(name, value);
             mFilterValues.replace(i, obj);
             return;
         }
     }
     QJsonObject obj;
-    obj.insert(mViewModeFilterName, value);
+    obj.insert(name, value);
     mFilterValues.append(obj);
+}
+
+void RAbstractEditorReport::overrideFilterValues(const QJsonArray &values)
+{
+    for(const QJsonValue &v : values) {
+        const QJsonObject obj = v.toObject();
+        for(auto it = obj.constBegin(); it != obj.constEnd(); ++it) {
+            setFilterValue(it.key(), it.value());
+        }
+    }
+}
+
+void RAbstractEditorReport::setViewModeFilterValue(int value)
+{
+    if(mViewModeFilterName.isEmpty()) {
+        return;
+    }
+    setFilterValue(mViewModeFilterName, value);
+}
+
+void RAbstractEditorReport::checkViewModeButton(int value)
+{
+    if(!mViewModeGroup) {
+        return;
+    }
+    const QSignalBlocker blocker(mViewModeGroup);
+    const QList<QAbstractButton *> buttons = mViewModeGroup->buttons();
+    for(QAbstractButton *btn : buttons) {
+        if(btn->property("value").toInt() == value) {
+            btn->setChecked(true);
+            break;
+        }
+    }
+}
+
+int RAbstractEditorReport::viewModeValue() const
+{
+    if(mViewModeFilterName.isEmpty()) {
+        return -1;
+    }
+    const QJsonObject current = filterObject(mViewModeFilterName);
+    if(current.isEmpty()) {
+        return -1;
+    }
+    return current.value(mViewModeFilterName).toInt(-1);
+}
+
+QString RAbstractEditorReport::filterWidgetPrefix() const
+{
+    const int mode = viewModeValue();
+    if(mode < 0) {
+        return mEditorName;
+    }
+    return QStringLiteral("%1_%2").arg(mEditorName).arg(mode);
+}
+
+void RAbstractEditorReport::persistCurrentFilters()
+{
+    const QByteArray json = QJsonDocument(mFilterValues).toJson(QJsonDocument::Compact);
+    __c5config.setRegValue(QStringLiteral("filter_values_") + mEditorName, QString::fromUtf8(json));
+    const int mode = viewModeValue();
+    if(mode >= 0) {
+        __c5config.setRegValue(QStringLiteral("filter_values_%1_%2").arg(mEditorName).arg(mode),
+                               QString::fromUtf8(json));
+    }
+}
+
+void RAbstractEditorReport::switchToViewMode(int mode)
+{
+    const int oldMode = viewModeValue();
+    if(oldMode == mode) {
+        return;
+    }
+    if(oldMode >= 0) {
+        const QByteArray json = QJsonDocument(mFilterValues).toJson(QJsonDocument::Compact);
+        __c5config.setRegValue(QStringLiteral("filter_values_%1_%2").arg(mEditorName).arg(oldMode),
+                               QString::fromUtf8(json));
+    }
+    const QString stored = __c5config.getRegValue(
+        QStringLiteral("filter_values_%1_%2").arg(mEditorName).arg(mode), QString()).toString();
+    if(stored.isEmpty()) {
+        mFilterValues = QJsonArray();
+    } else {
+        const QJsonArray sessionValues = mFilterValues;
+        mFilterValues = QJsonDocument::fromJson(stored.toUtf8()).array();
+        if(!RFilterDialog::datesPinned(mEditorName)) {
+            RFilterDialog::resetDatesToToday(mFilterValues);
+            for(int i = 0; i < mFilterValues.size(); ++i) {
+                const QJsonObject obj = mFilterValues.at(i).toObject();
+                for(auto it = obj.constBegin(); it != obj.constEnd(); ++it) {
+                    const QJsonValue sessionValue = [&sessionValues](const QString &name) {
+                        for(const QJsonValue &v : sessionValues) {
+                            if(v.toObject().contains(name)) {
+                                return v.toObject().value(name);
+                            }
+                        }
+                        return QJsonValue();
+                    }(it.key());
+                    if(sessionValue.isString() && it.value().isString()
+                            && QDate::fromString(it.value().toString(), FORMAT_DATE_TO_STR_MYSQL).isValid()
+                            && QDate::fromString(sessionValue.toString(), FORMAT_DATE_TO_STR_MYSQL).isValid()) {
+                        setFilterValue(it.key(), sessionValue);
+                    }
+                }
+            }
+        }
+    }
+    setViewModeFilterValue(mode);
+    persistCurrentFilters();
 }
 
 void RAbstractEditorReport::setupViewModeBar()
@@ -706,8 +817,8 @@ void RAbstractEditorReport::setupViewModeBar()
     int currentValue = currentObj.isEmpty() ? defaultValue : currentObj.value(mViewModeFilterName).toInt(defaultValue);
     if(currentObj.isEmpty()) {
         setViewModeFilterValue(currentValue);
-        __c5config.setRegValue("filter_values_" + mEditorName, QJsonDocument(mFilterValues).toJson(QJsonDocument::Compact));
     }
+    persistCurrentFilters();
 
     clearViewModeButtons();
     auto *layout = ui->horizontalLayoutViewModeButtons;
@@ -822,12 +933,24 @@ void RAbstractEditorReport::removeAction()
     if (C5Message::question(tr("Do you want to delete the selected document?")) != QDialog::Accepted) {
         return;
     }
+    const QString id = mModel->data(mModel->index(srcIndex.row(), 0), Qt::DisplayRole).toString();
+    if (id.isEmpty()) {
+        return;
+    }
     if (mEditorName == "form_store_documents" || mEditorName == "form_store_moves") {
         NInterface::query1("/engine/v2/common/store-move/remove",
                            mUser->mSessionKey,
                            this,
-                           {{"id", mModel->data(mModel->index(srcIndex.row(), 0), Qt::DisplayRole).toString()}},
-                           [this, srcIndex](const QJsonObject &jo) { mModel->removeRow(srcIndex.row()); });
+                           {{"id", id}},
+                           [this, srcIndex](const QJsonObject &) { mModel->removeRow(srcIndex.row()); });
+        return;
+    }
+    if (mEditorName == "form_inventory_documents") {
+        NInterface::query1("/engine/v2/common/stock/remove-inventory",
+                           mUser->mSessionKey,
+                           this,
+                           {{"id", id}},
+                           [this, srcIndex](const QJsonObject &) { mModel->removeRow(srcIndex.row()); });
         return;
     }
 }

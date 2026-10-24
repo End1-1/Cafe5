@@ -8,9 +8,21 @@ class Hall extends Auth
 {
     public function get($params)
     {
+        // f_receipt_footer may be absent until run_update; do not break halls/tables for Waiter.
+        $receiptFooterSql = "'' AS f_receipt_footer";
+        try {
+            if ($this->select("SHOW COLUMNS FROM h_halls LIKE 'f_receipt_footer'")->num_rows > 0) {
+                $receiptFooterSql = "COALESCE(h.f_receipt_footer, '') AS f_receipt_footer";
+            }
+        } catch (Exception $e) {
+            $receiptFooterSql = "'' AS f_receipt_footer";
+        }
+
         // 1. Получаем список залов
         $sqlHalls = <<<EOD
-        SELECT h.f_id, h.f_name, h.f_settings, s.f_config AS f_data
+        SELECT h.f_id, h.f_name, h.f_settings,
+               {$receiptFooterSql},
+               s.f_config AS f_data
         FROM h_halls h 
         LEFT JOIN sys_json_config s ON s.f_id = h.f_settings
         EOD;

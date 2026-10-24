@@ -31,7 +31,7 @@ public:
 
     bool printReceipt(const QString &id, bool printSecond, bool precheck);
 
-    void printService(const QString &printerName, const QJsonObject &h, const QJsonArray &d, const QJsonObject &jf,
+    bool printService(const QString &printerName, const QJsonObject &h, const QJsonArray &d, const QJsonObject &jf,
                       int side);
 
     void showCustomerDisplay();
@@ -211,6 +211,8 @@ private:
     void initMenu();
 
     void configFiscalButton();
+
+    bool tableRequiresFiscal() const;
 
     void createAddDishRequest(const Dish &dish);
 

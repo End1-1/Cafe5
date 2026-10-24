@@ -35,6 +35,8 @@ private slots:
 
     void on_btnLang_clicked();
 
+    void on_btnCurrentVersion_clicked();
+
 private:
     Ui::C5Login* ui;
 

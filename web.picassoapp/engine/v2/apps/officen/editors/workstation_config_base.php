@@ -170,11 +170,15 @@ abstract class WorkstationConfigBase
             'f_fiscal_machine_id',
             'f_default_store_id',
             'f_quick_debt_partner_id',
+            'f_collection_cashbox_id',
             'dlgsearchmenu_hsection_size',
             'dlgsearchmenu_vsection_size',
             'print_paper_width',
             'arcus_port',
             'recent_dishes_minutes',
+            'bill_round_to',
+            'f_precheck_font_size',
+            'f_precheck_margins',
         ], true)) {
             return (int)$value;
         }
@@ -183,6 +187,7 @@ abstract class WorkstationConfigBase
             'cost_depend_on_service_and_discount',
             'do_not_print_customer_on_receipt',
             'customer_notification',
+            'allow_mix_all_payments',
             'receipt_no_table',
             'receipt_no_service_hint',
             'receipt_no_discount_hint',
@@ -190,6 +195,8 @@ abstract class WorkstationConfigBase
             'bistro',
             'f_auto_fiscal',
             'dont_allow_negative_remains',
+            'newlook',
+            'assign_sale_to_associate',
         ], true)) {
             return (bool)$value;
         }

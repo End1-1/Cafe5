@@ -3,17 +3,37 @@
 #include "c5codenameselectorfunctions.h"
 #include "c5message.h"
 #include "dict_payment_type.h"
+#include "paymenttypenames.h"
+#include <QCheckBox>
 #include <QCoreApplication>
 #include <QDialogButtonBox>
 #include <QListWidgetItem>
-#include <QSignalBlocker>
+#include <QSettings>
+#include <QSet>
+
+namespace {
+
+QString paymentTypeTitle(int pt)
+{
+    return PaymentTypeNames::title(pt);
+}
+
+QString settingsPath(const QString &group)
+{
+    return QStringLiteral("%1\\%2").arg(QLatin1String(_APPLICATION_), group);
+}
+
+} // namespace
 
 QString StorePaymentPreset::label() const
 {
     if (isUnpaid()) {
-        return QString();
+        return QCoreApplication::translate("C5StoreInput", "Unpaid");
     }
-    return QStringLiteral("%1 / %2 / %3").arg(cashboxName, paymentTypeName, currencyName);
+    if (paymentTypeId == PAYMENT_TYPE_CASH) {
+        return cashboxName.isEmpty() ? paymentTypeTitle(PAYMENT_TYPE_CASH) : cashboxName;
+    }
+    return paymentTypeTitle(paymentTypeId);
 }
 
 bool StorePaymentPreset::matches(const StorePaymentPreset &o) const
@@ -23,34 +43,152 @@ bool StorePaymentPreset::matches(const StorePaymentPreset &o) const
            && currencyId == o.currencyId;
 }
 
+void StorePaymentOptions::load()
+{
+    QSettings s(_ORGANIZATION_, settingsPath(settingsGroup));
+    unpaidEnabled = s.value(QStringLiteral("unpaid"), true).toBool();
+    cardEnabled = s.value(QStringLiteral("card"), false).toBool();
+    bankEnabled = s.value(QStringLiteral("bank"), false).toBool();
+    cardCashboxId = s.value(QStringLiteral("cardCashboxId"), 0).toInt();
+    cardCashboxName = s.value(QStringLiteral("cardCashboxName")).toString();
+    bankCashboxId = s.value(QStringLiteral("bankCashboxId"), 0).toInt();
+    bankCashboxName = s.value(QStringLiteral("bankCashboxName")).toString();
+    bank2Enabled = s.value(QStringLiteral("bank2"), false).toBool();
+    bank2CashboxId = s.value(QStringLiteral("bank2CashboxId"), 0).toInt();
+    bank2CashboxName = s.value(QStringLiteral("bank2CashboxName")).toString();
+    bank3Enabled = s.value(QStringLiteral("bank3"), false).toBool();
+    bank3CashboxId = s.value(QStringLiteral("bank3CashboxId"), 0).toInt();
+    bank3CashboxName = s.value(QStringLiteral("bank3CashboxName")).toString();
+    cashboxesConfigured = s.contains(QStringLiteral("cashboxIds"));
+    enabledCashboxIds.clear();
+    const QVariantList ids = s.value(QStringLiteral("cashboxIds")).toList();
+    for (const QVariant &v : ids) {
+        const int id = v.toInt();
+        if (id > 0) {
+            enabledCashboxIds.append(id);
+        }
+    }
+    if (!cashboxesConfigured && s.value(QStringLiteral("cash"), true).toBool()) {
+        cashboxesConfigured = false;
+    } else if (!cashboxesConfigured && !s.value(QStringLiteral("cash"), true).toBool()) {
+        cashboxesConfigured = true;
+        enabledCashboxIds.clear();
+    }
+}
+
+void StorePaymentOptions::save() const
+{
+    QSettings s(_ORGANIZATION_, settingsPath(settingsGroup));
+    s.setValue(QStringLiteral("unpaid"), unpaidEnabled);
+    s.setValue(QStringLiteral("card"), cardEnabled);
+    s.setValue(QStringLiteral("bank"), bankEnabled);
+    s.setValue(QStringLiteral("cardCashboxId"), cardCashboxId);
+    s.setValue(QStringLiteral("cardCashboxName"), cardCashboxName);
+    s.setValue(QStringLiteral("bankCashboxId"), bankCashboxId);
+    s.setValue(QStringLiteral("bankCashboxName"), bankCashboxName);
+    s.setValue(QStringLiteral("bank2"), bank2Enabled);
+    s.setValue(QStringLiteral("bank2CashboxId"), bank2CashboxId);
+    s.setValue(QStringLiteral("bank2CashboxName"), bank2CashboxName);
+    s.setValue(QStringLiteral("bank3"), bank3Enabled);
+    s.setValue(QStringLiteral("bank3CashboxId"), bank3CashboxId);
+    s.setValue(QStringLiteral("bank3CashboxName"), bank3CashboxName);
+    QVariantList ids;
+    for (int id : enabledCashboxIds) {
+        if (id > 0) {
+            ids.append(id);
+        }
+    }
+    s.setValue(QStringLiteral("cashboxIds"), ids);
+    s.setValue(QStringLiteral("cash"), !ids.isEmpty());
+}
+
+QVector<StorePaymentPreset> StorePaymentOptions::buildPresets(const QVector<QPair<int, QString>> &cashboxes) const
+{
+    QVector<StorePaymentPreset> out;
+    // Currency is chosen elsewhere later; keep AMD as backend default for now.
+    constexpr int curId = 1;
+
+    QSet<int> allowed;
+    if (!cashboxesConfigured) {
+        for (const auto &cb : cashboxes) {
+            if (cb.first > 0) {
+                allowed.insert(cb.first);
+            }
+        }
+    } else {
+        for (int id : enabledCashboxIds) {
+            if (id > 0) {
+                allowed.insert(id);
+            }
+        }
+    }
+
+    for (const auto &cb : cashboxes) {
+        if (cb.first <= 0 || !allowed.contains(cb.first)) {
+            continue;
+        }
+        StorePaymentPreset p;
+        p.cashboxId = cb.first;
+        p.cashboxName = cb.second;
+        p.paymentTypeId = PAYMENT_TYPE_CASH;
+        p.paymentTypeName = paymentTypeTitle(PAYMENT_TYPE_CASH);
+        p.currencyId = curId;
+        out.append(p);
+    }
+    if (cardEnabled && cardCashboxId > 0) {
+        StorePaymentPreset p;
+        p.cashboxId = cardCashboxId;
+        p.cashboxName = cardCashboxName;
+        p.paymentTypeId = PAYMENT_TYPE_CARD;
+        p.paymentTypeName = paymentTypeTitle(PAYMENT_TYPE_CARD);
+        p.currencyId = curId;
+        out.append(p);
+    }
+    const struct {
+        bool enabled;
+        int cashboxId;
+        const QString &cashboxName;
+        int paymentTypeId;
+    } banks[] = {
+        {bankEnabled, bankCashboxId, bankCashboxName, PAYMENT_TYPE_BANK},
+        {bank2Enabled, bank2CashboxId, bank2CashboxName, PAYMENT_TYPE_BANK2},
+        {bank3Enabled, bank3CashboxId, bank3CashboxName, PAYMENT_TYPE_BANK3},
+    };
+    for (const auto &b : banks) {
+        if (!b.enabled || b.cashboxId <= 0) {
+            continue;
+        }
+        StorePaymentPreset p;
+        p.cashboxId = b.cashboxId;
+        p.cashboxName = b.cashboxName;
+        p.paymentTypeId = b.paymentTypeId;
+        p.paymentTypeName = paymentTypeTitle(b.paymentTypeId);
+        p.currencyId = curId;
+        out.append(p);
+    }
+    return out;
+}
+
 DlgStoreInputPayment::DlgStoreInputPayment(QWidget *parent)
     : QDialog(parent)
     , ui(new Ui::DlgStoreInputPayment)
 {
     ui->setupUi(this);
-    ui->wCashbox->selectorCallback = cashboxItemSelector;
-    ui->wCurrency->selectorCallback = currencyItemSelector;
-    ui->wCurrency->setCodeAndName(1, tr("Armenian dram"));
-
-    for (int pt : payment_types) {
-        const char *nm = payment_names.value(pt);
-        if (!nm) {
-            continue;
-        }
-        ui->cbPaymentType->addItem(QCoreApplication::translate("PaymentType", nm), pt);
-    }
-    const int cashIdx = ui->cbPaymentType->findData(PAYMENT_TYPE_CASH);
-    if (cashIdx >= 0) {
-        ui->cbPaymentType->setCurrentIndex(cashIdx);
-    }
+    ui->wCardCashbox->selectorCallback = cashboxItemSelector;
+    ui->wBankCashbox->selectorCallback = cashboxItemSelector;
+    ui->wBank2Cashbox->selectorCallback = cashboxItemSelector;
+    ui->wBank3Cashbox->selectorCallback = cashboxItemSelector;
+    ui->chkCard->setText(paymentTypeTitle(PAYMENT_TYPE_CARD));
+    ui->chkBank->setText(paymentTypeTitle(PAYMENT_TYPE_BANK));
+    ui->chkBank2->setText(paymentTypeTitle(PAYMENT_TYPE_BANK2));
+    ui->chkBank3->setText(paymentTypeTitle(PAYMENT_TYPE_BANK3));
 
     connect(ui->buttonBox, &QDialogButtonBox::accepted, this, &DlgStoreInputPayment::tryAccept);
-    connect(ui->btnAddPreset, &QPushButton::clicked, this, &DlgStoreInputPayment::onAddPreset);
-    connect(ui->btnDeletePreset, &QPushButton::clicked, this, &DlgStoreInputPayment::onDeletePreset);
-    connect(ui->lwPresets, &QListWidget::currentRowChanged, this, &DlgStoreInputPayment::onPresetSelectionChanged);
-    connect(ui->lwPresets, &QListWidget::itemDoubleClicked, this, [this](QListWidgetItem *) {
-        tryAccept();
-    });
+    connect(ui->chkCard, &QCheckBox::toggled, this, &DlgStoreInputPayment::syncCashboxEnabled);
+    connect(ui->chkBank, &QCheckBox::toggled, this, &DlgStoreInputPayment::syncCashboxEnabled);
+    connect(ui->chkBank2, &QCheckBox::toggled, this, &DlgStoreInputPayment::syncCashboxEnabled);
+    connect(ui->chkBank3, &QCheckBox::toggled, this, &DlgStoreInputPayment::syncCashboxEnabled);
+    syncCashboxEnabled();
 }
 
 DlgStoreInputPayment::~DlgStoreInputPayment()
@@ -58,205 +196,145 @@ DlgStoreInputPayment::~DlgStoreInputPayment()
     delete ui;
 }
 
-void DlgStoreInputPayment::setPresets(const QVector<StorePaymentPreset> &presets, const StorePaymentPreset &selected)
+void DlgStoreInputPayment::setCashboxes(const QVector<QPair<int, QString>> &cashboxes)
 {
-    mPresets = presets;
-    int idx = findPresetIndex(selected);
-    if (idx < 0 && !selected.isUnpaid()) {
-        mPresets.append(selected);
-        idx = mPresets.size() - 1;
+    fillCashboxList(cashboxes, {}, true);
+}
+
+void DlgStoreInputPayment::fillCashboxList(const QVector<QPair<int, QString>> &cashboxes,
+                                          const QVector<int> &checkedIds,
+                                          bool checkAllIfEmpty)
+{
+    ui->lwCashboxes->clear();
+    const QSet<int> checked(checkedIds.begin(), checkedIds.end());
+    const bool selectAll = checkAllIfEmpty && checkedIds.isEmpty();
+    for (const auto &cb : cashboxes) {
+        if (cb.first <= 0) {
+            continue;
+        }
+        auto *item = new QListWidgetItem(cb.second, ui->lwCashboxes);
+        item->setData(Qt::UserRole, cb.first);
+        item->setFlags(item->flags() | Qt::ItemIsUserCheckable);
+        const bool on = selectAll || checked.contains(cb.first);
+        item->setCheckState(on ? Qt::Checked : Qt::Unchecked);
     }
-    rebuildList(idx);
-    if (idx >= 0) {
-        writeForm(mPresets.at(idx));
-    } else if (!selected.isUnpaid()) {
-        writeForm(selected);
-    } else if (!mPresets.isEmpty()) {
-        writeForm(mPresets.first());
+}
+
+void DlgStoreInputPayment::setOptions(const StorePaymentOptions &options)
+{
+    ui->chkUnpaid->setChecked(options.unpaidEnabled);
+    ui->chkCard->setChecked(options.cardEnabled);
+    ui->chkBank->setChecked(options.bankEnabled);
+    if (options.cardCashboxId > 0) {
+        ui->wCardCashbox->setCodeAndName(options.cardCashboxId, options.cardCashboxName);
     } else {
-        writeForm(StorePaymentPreset());
-        ui->wCurrency->setCodeAndName(1, tr("Armenian dram"));
-        const int cashIdx = ui->cbPaymentType->findData(PAYMENT_TYPE_CASH);
-        if (cashIdx >= 0) {
-            ui->cbPaymentType->setCurrentIndex(cashIdx);
+        ui->wCardCashbox->setCodeAndName(0, QString());
+    }
+    if (options.bankCashboxId > 0) {
+        ui->wBankCashbox->setCodeAndName(options.bankCashboxId, options.bankCashboxName);
+    } else {
+        ui->wBankCashbox->setCodeAndName(0, QString());
+    }
+    ui->chkBank2->setChecked(options.bank2Enabled);
+    ui->wBank2Cashbox->setCodeAndName(options.bank2CashboxId > 0 ? options.bank2CashboxId : 0,
+                                      options.bank2CashboxId > 0 ? options.bank2CashboxName : QString());
+    ui->chkBank3->setChecked(options.bank3Enabled);
+    ui->wBank3Cashbox->setCodeAndName(options.bank3CashboxId > 0 ? options.bank3CashboxId : 0,
+                                      options.bank3CashboxId > 0 ? options.bank3CashboxName : QString());
+
+    QVector<QPair<int, QString>> existing;
+    for (int i = 0; i < ui->lwCashboxes->count(); ++i) {
+        QListWidgetItem *item = ui->lwCashboxes->item(i);
+        existing.append({item->data(Qt::UserRole).toInt(), item->text()});
+    }
+    fillCashboxList(existing,
+                    options.enabledCashboxIds,
+                    !options.cashboxesConfigured);
+    syncCashboxEnabled();
+}
+
+StorePaymentOptions DlgStoreInputPayment::options() const
+{
+    StorePaymentOptions o;
+    o.unpaidEnabled = ui->chkUnpaid->isChecked();
+    o.cardEnabled = ui->chkCard->isChecked();
+    o.bankEnabled = ui->chkBank->isChecked();
+    o.cardCashboxId = ui->wCardCashbox->value();
+    o.cardCashboxName = ui->wCardCashbox->name();
+    o.bankCashboxId = ui->wBankCashbox->value();
+    o.bankCashboxName = ui->wBankCashbox->name();
+    o.bank2Enabled = ui->chkBank2->isChecked();
+    o.bank2CashboxId = ui->wBank2Cashbox->value();
+    o.bank2CashboxName = ui->wBank2Cashbox->name();
+    o.bank3Enabled = ui->chkBank3->isChecked();
+    o.bank3CashboxId = ui->wBank3Cashbox->value();
+    o.bank3CashboxName = ui->wBank3Cashbox->name();
+    o.cashboxesConfigured = true;
+    for (int i = 0; i < ui->lwCashboxes->count(); ++i) {
+        QListWidgetItem *item = ui->lwCashboxes->item(i);
+        if (item->checkState() == Qt::Checked) {
+            o.enabledCashboxIds.append(item->data(Qt::UserRole).toInt());
         }
     }
+    return o;
 }
 
-QVector<StorePaymentPreset> DlgStoreInputPayment::presets() const
-{
-    return mPresets;
-}
-
-StorePaymentPreset DlgStoreInputPayment::selectedPreset() const
-{
-    StorePaymentPreset p;
-    if (!readForm(&p, false)) {
-        const int row = ui->lwPresets->currentRow();
-        if (row >= 0 && row < mPresets.size()) {
-            return mPresets.at(row);
-        }
-        return StorePaymentPreset();
-    }
-    return p;
-}
-
-bool DlgStoreInputPayment::edit(QVector<StorePaymentPreset> &presets, StorePaymentPreset &selected, QWidget *parent)
+bool DlgStoreInputPayment::configure(StorePaymentOptions &options,
+                                     const QVector<QPair<int, QString>> &cashboxes,
+                                     QWidget *parent,
+                                     const QString &unpaidText,
+                                     const QString &hintText)
 {
     DlgStoreInputPayment dlg(parent);
-    dlg.setPresets(presets, selected);
+    if (!unpaidText.isEmpty()) {
+        dlg.ui->chkUnpaid->setText(unpaidText);
+    }
+    if (!hintText.isEmpty()) {
+        dlg.ui->lbHint->setText(hintText);
+    }
+    dlg.setCashboxes(cashboxes);
+    dlg.setOptions(options);
     if (dlg.exec() != QDialog::Accepted) {
         return false;
     }
-    presets = dlg.presets();
-    selected = dlg.selectedPreset();
+    const QString group = options.settingsGroup;
+    options = dlg.options();
+    options.settingsGroup = group;
+    options.save();
     return true;
 }
 
-bool DlgStoreInputPayment::readForm(StorePaymentPreset *out, bool showErrors) const
+void DlgStoreInputPayment::syncCashboxEnabled()
 {
-    StorePaymentPreset p;
-    p.cashboxId = ui->wCashbox->value();
-    p.cashboxName = ui->wCashbox->name();
-    p.currencyId = ui->wCurrency->value();
-    p.currencyName = ui->wCurrency->name();
-    p.paymentTypeId = ui->cbPaymentType->currentData().toInt();
-    p.paymentTypeName = ui->cbPaymentType->currentText();
-
-    if (p.cashboxId <= 0) {
-        if (showErrors) {
-            C5Message::error(tr("Cashbox not selected"));
-        }
-        return false;
-    }
-    if (p.paymentTypeId <= 0) {
-        if (showErrors) {
-            C5Message::error(tr("Payment type not specified"));
-        }
-        return false;
-    }
-    if (p.currencyId <= 0) {
-        if (showErrors) {
-            C5Message::error(tr("Currency not selected"));
-        }
-        return false;
-    }
-    if (out) {
-        *out = p;
-    }
-    return true;
-}
-
-void DlgStoreInputPayment::writeForm(const StorePaymentPreset &preset)
-{
-    if (preset.cashboxId > 0) {
-        ui->wCashbox->setCodeAndName(preset.cashboxId, preset.cashboxName);
-    } else {
-        ui->wCashbox->setCodeAndName(0, QString());
-    }
-    if (preset.currencyId > 0) {
-        ui->wCurrency->setCodeAndName(preset.currencyId, preset.currencyName);
-    } else {
-        ui->wCurrency->setCodeAndName(1, tr("Armenian dram"));
-    }
-    if (preset.paymentTypeId > 0) {
-        const int idx = ui->cbPaymentType->findData(preset.paymentTypeId);
-        if (idx >= 0) {
-            ui->cbPaymentType->setCurrentIndex(idx);
-        }
-    }
-}
-
-void DlgStoreInputPayment::rebuildList(int selectIndex)
-{
-    const QSignalBlocker blocker(ui->lwPresets);
-    ui->lwPresets->clear();
-    for (const StorePaymentPreset &p : mPresets) {
-        ui->lwPresets->addItem(p.label());
-    }
-    if (selectIndex >= 0 && selectIndex < mPresets.size()) {
-        ui->lwPresets->setCurrentRow(selectIndex);
-    } else if (!mPresets.isEmpty()) {
-        ui->lwPresets->setCurrentRow(0);
-    }
-    ui->btnDeletePreset->setEnabled(ui->lwPresets->currentRow() >= 0);
-}
-
-int DlgStoreInputPayment::findPresetIndex(const StorePaymentPreset &preset) const
-{
-    if (preset.isUnpaid()) {
-        return -1;
-    }
-    for (int i = 0; i < mPresets.size(); ++i) {
-        if (mPresets.at(i).matches(preset)) {
-            return i;
-        }
-    }
-    return -1;
-}
-
-void DlgStoreInputPayment::onAddPreset()
-{
-    StorePaymentPreset p;
-    if (!readForm(&p, true)) {
-        return;
-    }
-    const int existing = findPresetIndex(p);
-    if (existing >= 0) {
-        mPresets[existing] = p;
-        rebuildList(existing);
-        return;
-    }
-    mPresets.append(p);
-    rebuildList(mPresets.size() - 1);
-}
-
-void DlgStoreInputPayment::onDeletePreset()
-{
-    const int row = ui->lwPresets->currentRow();
-    if (row < 0 || row >= mPresets.size()) {
-        return;
-    }
-    if (C5Message::question(tr("Delete selected payment variant?")) != QDialog::Accepted) {
-        return;
-    }
-    mPresets.removeAt(row);
-    int next = row;
-    if (next >= mPresets.size()) {
-        next = mPresets.size() - 1;
-    }
-    rebuildList(next);
-    if (next >= 0) {
-        writeForm(mPresets.at(next));
-    } else {
-        writeForm(StorePaymentPreset());
-        ui->wCurrency->setCodeAndName(1, tr("Armenian dram"));
-    }
-}
-
-void DlgStoreInputPayment::onPresetSelectionChanged()
-{
-    const int row = ui->lwPresets->currentRow();
-    ui->btnDeletePreset->setEnabled(row >= 0);
-    if (row < 0 || row >= mPresets.size()) {
-        return;
-    }
-    writeForm(mPresets.at(row));
+    ui->wCardCashbox->setEnabled(ui->chkCard->isChecked());
+    ui->wBankCashbox->setEnabled(ui->chkBank->isChecked());
+    ui->wBank2Cashbox->setEnabled(ui->chkBank2->isChecked());
+    ui->wBank3Cashbox->setEnabled(ui->chkBank3->isChecked());
 }
 
 void DlgStoreInputPayment::tryAccept()
 {
-    StorePaymentPreset p;
-    if (!readForm(&p, true)) {
+    int checkedCash = 0;
+    for (int i = 0; i < ui->lwCashboxes->count(); ++i) {
+        if (ui->lwCashboxes->item(i)->checkState() == Qt::Checked) {
+            ++checkedCash;
+        }
+    }
+    if (!ui->chkUnpaid->isChecked()
+        && checkedCash == 0
+        && !ui->chkCard->isChecked()
+        && !ui->chkBank->isChecked()
+        && !ui->chkBank2->isChecked()
+        && !ui->chkBank3->isChecked()) {
+        C5Message::error(tr("Enable at least one payment method"));
         return;
     }
-    const int existing = findPresetIndex(p);
-    if (existing >= 0) {
-        mPresets[existing] = p;
-        rebuildList(existing);
-    } else {
-        mPresets.append(p);
-        rebuildList(mPresets.size() - 1);
+    if ((ui->chkCard->isChecked() && ui->wCardCashbox->value() <= 0)
+        || (ui->chkBank->isChecked() && ui->wBankCashbox->value() <= 0)
+        || (ui->chkBank2->isChecked() && ui->wBank2Cashbox->value() <= 0)
+        || (ui->chkBank3->isChecked() && ui->wBank3Cashbox->value() <= 0)) {
+        C5Message::error(tr("Cashbox not selected"));
+        return;
     }
     accept();
 }

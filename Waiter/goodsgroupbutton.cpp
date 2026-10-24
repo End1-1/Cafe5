@@ -1,4 +1,5 @@
 #include "goodsgroupbutton.h"
+#include "newlook.h"
 #include "../WaiterDesigner/waitergoodsgroupstyle.h"
 #include <QLabel>
 #include <QFontMetrics>
@@ -113,6 +114,25 @@ void GoodsGroupButton::setColor(int c)
                                      .arg(QLatin1String(WaiterGoodsGroupStyle::borderColorCss))
                                : QStringLiteral("border:none;");
     QColor color = QColor::fromRgb(c);
+    if (WaiterUi::newLook()) {
+        setStyleSheet(QStringLiteral(
+                          "QFrame#goodsGroupFrame {"
+                          "background:%1;"
+                          "border:none;"
+                          "border-radius:10px;"
+                          "}"
+                          "QFrame#goodsGroupFrame:hover {"
+                          "background:%2;"
+                          "border:none;"
+                          "border-radius:10px;"
+                          "}")
+                          .arg(color.name(), color.lighter(112).name()));
+        if (mLabel) {
+            mLabel->setStyleSheet(QStringLiteral(
+                "QLabel#goodsGroupName { color: white; background: transparent; font-weight: 600; }"));
+        }
+        return;
+    }
     setStyleSheet(QStringLiteral(
                       "QFrame#goodsGroupFrame {"
                       "background:%1;"

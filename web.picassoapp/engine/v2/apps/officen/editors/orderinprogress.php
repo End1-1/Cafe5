@@ -211,6 +211,7 @@ class OrderInProgress
      */
     private function paymentBreakdown(array $order): array
     {
+        require_once __DIR__ . '/../../worker/cash-ops-helper.php';
         $payment = $this->paymentConfig();
         $types = [];
         $paidTotal = 0.0;
@@ -223,7 +224,7 @@ class OrderInProgress
             $amt = (float)($order[$field] ?? 0);
             if ($amt > 1e-9) {
                 $paidTotal += $amt;
-                $types[] = Translator::t($payment['names'][$pt] ?? (string)$pt);
+                $types[] = payment_type_name($this->db, (int)$pt);
             }
         }
 

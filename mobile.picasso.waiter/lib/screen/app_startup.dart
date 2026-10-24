@@ -26,7 +26,7 @@ class _AppStartupState extends State<AppStartup> {
       listener: (context, state) {
         if (_restoreStarted) return;
         if (state is! InitAppStateFinished) return;
-        if (!state.programReady) return;
+        if (!state.programReady || !WaiterAuth.isProgramReady) return;
         if (!(prefs.getBool('stayloggedin') ?? false)) return;
         if (prefs.string('waiter_token').isEmpty) return;
 
@@ -54,7 +54,7 @@ class _AppStartupState extends State<AppStartup> {
               onRetry: () => context.read<InitAppBloc>().add(InitAppEvent()),
             );
           }
-          if (!state.programReady) {
+          if (!state.programReady || !WaiterAuth.isProgramReady) {
             return _StartupError(
               model: widget.model,
               context: context,

@@ -682,9 +682,11 @@ EOD;
 $v = 240;
 $sql[$v] = <<<EOD
 update s_app set f_version = '$v' where lower(f_app)='db';
-alter table ararix_restaurants add column if not exists f_logo_url varchar(255) null after f_image_url;
-alter table ararix_restaurants add column if not exists f_eta_min int not null default 55 after f_category;
-alter table ararix_restaurants add column if not exists f_db varchar(64) null after f_eta_min;
+alter table ararix_restaurants add column if not exists f_image_url varchar(255) null;
+alter table ararix_restaurants add column if not exists f_logo_url varchar(255) null;
+alter table ararix_restaurants add column if not exists f_category varchar(128) null;
+alter table ararix_restaurants add column if not exists f_eta_min int not null default 55;
+alter table ararix_restaurants add column if not exists f_db varchar(64) null;
 
 EOD;
 
@@ -711,7 +713,7 @@ INSERT IGNORE INTO ararix_restaurant_nationality (f_id, f_name, f_sort) VALUES
     (12, 'Միջերկրածովյան', 12),
     (13, 'Ամերիկյան', 13),
     (14, 'Մեքսիկական', 14);
-ALTER TABLE ararix_restaurants ADD COLUMN IF NOT EXISTS f_nationality_id INT NULL AFTER f_category;
+ALTER TABLE ararix_restaurants ADD COLUMN IF NOT EXISTS f_nationality_id INT NULL;
 CREATE INDEX IF NOT EXISTS idx_ararix_restaurants_nationality ON ararix_restaurants (f_nationality_id);
 
 CREATE TABLE IF NOT EXISTS ararix_restaurant_groups (
@@ -738,6 +740,15 @@ CREATE TABLE IF NOT EXISTS ararix_menu (
     INDEX idx_ararix_menu_rest_state (f_restaurant_id, f_state),
     INDEX idx_ararix_menu_group (f_group_id)
 );
+
+CREATE TABLE IF NOT EXISTS ararix_goods_groups (
+    f_id INT PRIMARY KEY AUTO_INCREMENT,
+    f_name VARCHAR(128) NOT NULL,
+    f_image_url VARCHAR(255) NULL,
+    f_sort INT NOT NULL DEFAULT 0
+);
+ALTER TABLE ararix_goods_groups ADD COLUMN IF NOT EXISTS f_image_url VARCHAR(255) NULL;
+ALTER TABLE ararix_goods_groups ADD COLUMN IF NOT EXISTS f_sort INT NOT NULL DEFAULT 0;
 
 INSERT INTO ararix_goods_groups (f_id, f_name, f_sort) VALUES
     (1, 'Բուրգեր', 1),
@@ -880,6 +891,20 @@ $sql[$v] = <<<EOD
     SET a.f_emarks = NULL;
     ALTER TABLE o_goods MODIFY COLUMN f_emarks VARCHAR(255) NULL DEFAULT NULL;
     CREATE UNIQUE INDEX IF NOT EXISTS uq_o_goods_emarks ON o_goods (f_emarks);
+    CREATE TABLE IF NOT EXISTS ararix_clients (
+        f_id INT PRIMARY KEY AUTO_INCREMENT,
+        f_country_code VARCHAR(8) NOT NULL DEFAULT '+374',
+        f_phone VARCHAR(32) NOT NULL,
+        f_name VARCHAR(128) NULL,
+        f_email VARCHAR(128) NULL,
+        f_password_hash VARCHAR(255) NULL,
+        f_locale VARCHAR(8) NOT NULL DEFAULT 'en',
+        f_status INT NOT NULL DEFAULT 1,
+        f_avatar_url VARCHAR(255) NULL,
+        f_created DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        f_updated DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        UNIQUE KEY uq_ararix_clients_phone (f_country_code, f_phone)
+    ) ENGINE=InnoDB;
     CREATE TABLE IF NOT EXISTS ararix_client_addresses (
         f_id INT PRIMARY KEY AUTO_INCREMENT,
         f_client_id INT NOT NULL,
@@ -897,9 +922,8 @@ $sql[$v] = <<<EOD
         f_created DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
         f_updated DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
         KEY idx_ararix_addr_client (f_client_id),
-        KEY idx_ararix_addr_active (f_client_id, f_is_active),
-        CONSTRAINT fk_ararix_addr_client FOREIGN KEY (f_client_id) REFERENCES ararix_clients(f_id) ON DELETE CASCADE
-    );
+        KEY idx_ararix_addr_active (f_client_id, f_is_active)
+    ) ENGINE=InnoDB;
     
 EOD;
 
@@ -917,6 +941,125 @@ ALTER TABLE cash_operations ADD COLUMN IF NOT EXISTS f_affects_float TINYINT NOT
 UPDATE cash_operations SET f_affects_float = 1 WHERE f_payment_type_id = 1;
 ALTER TABLE o_header ADD COLUMN IF NOT EXISTS f_public_token CHAR(48) NULL;
 CREATE UNIQUE INDEX IF NOT EXISTS uq_o_header_public_token ON o_header (f_public_token);
+EOD;
+
+$v = 247;
+$sql[$v] = <<<EOD
+update s_app set f_version = '$v' where lower(f_app)='db';
+ALTER TABLE cash_box ADD COLUMN IF NOT EXISTS f_currency_id INT NOT NULL DEFAULT 1;
+ALTER TABLE ararix_restaurants ADD COLUMN IF NOT EXISTS f_image_url VARCHAR(255) NULL;
+ALTER TABLE ararix_restaurants ADD COLUMN IF NOT EXISTS f_logo_url VARCHAR(255) NULL;
+ALTER TABLE ararix_restaurants ADD COLUMN IF NOT EXISTS f_category VARCHAR(128) NULL;
+ALTER TABLE ararix_restaurants ADD COLUMN IF NOT EXISTS f_eta_min INT NOT NULL DEFAULT 55;
+ALTER TABLE ararix_restaurants ADD COLUMN IF NOT EXISTS f_db VARCHAR(64) NULL;
+ALTER TABLE ararix_goods_groups ADD COLUMN IF NOT EXISTS f_image_url VARCHAR(255) NULL;
+ALTER TABLE ararix_goods_groups ADD COLUMN IF NOT EXISTS f_sort INT NOT NULL DEFAULT 0;
+ALTER TABLE fiscal_machine ADD COLUMN IF NOT EXISTS f_auto_fiscal TINYINT NOT NULL DEFAULT 0;
+EOD;
+
+$v = 248;
+$sql[$v] = <<<EOD
+ALTER TABLE fiscal_machine ADD COLUMN IF NOT EXISTS f_auto_fiscal TINYINT NOT NULL DEFAULT 0;
+EOD;
+
+$v = 249;
+$sql[$v] = <<<EOD
+update s_app set f_version = '$v' where lower(f_app)='db';
+CREATE TABLE IF NOT EXISTS external_api_key (
+    f_id INT PRIMARY KEY AUTO_INCREMENT,
+    f_partner VARCHAR(64) NOT NULL,
+    f_token_hash CHAR(64) NOT NULL,
+    f_enabled TINYINT NOT NULL DEFAULT 1,
+    f_created DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE KEY uq_external_api_partner (f_partner)
+) ENGINE=InnoDB;
+CREATE TABLE IF NOT EXISTS order_tracking_poll (
+    f_token CHAR(48) NOT NULL PRIMARY KEY,
+    f_last_poll DATETIME NOT NULL
+) ENGINE=InnoDB;
+ALTER TABLE cash_session ADD COLUMN IF NOT EXISTS f_cash_counted TINYINT NOT NULL DEFAULT 0;
+UPDATE cash_session cs
+SET f_cash_counted = 1
+WHERE f_state = 2
+  AND f_cash_counted = 0
+  AND (
+    ABS(COALESCE(cs.f_amount_difference, 0)) > 0.009
+    OR EXISTS (
+      SELECT 1 FROM cash_operations op
+      WHERE op.f_session_id = cs.f_id
+        AND op.f_operation_type IN (8, 9)
+    )
+  );
+EOD;
+
+
+
+$v = 250;
+$sql[$v] = <<<EOD
+update s_app set f_version = '$v' where lower(f_app)='db';
+ALTER TABLE s_salary ADD COLUMN IF NOT EXISTS f_fine DECIMAL(14,2) NOT NULL DEFAULT 0 AFTER f_bonus;
+ALTER TABLE cash_session ADD COLUMN IF NOT EXISTS f_open_counted TINYINT NOT NULL DEFAULT 0;
+ALTER TABLE cash_payment_types ADD COLUMN IF NOT EXISTS f_name VARCHAR(64) NULL;
+INSERT IGNORE INTO cash_payment_types (f_id) VALUES (1),(2),(3),(4),(5),(6),(7),(8),(9),(10),(11);
+INSERT INTO l_dictionary (f_dict, f_dict_id, f_lang, f_value) VALUES
+    ('cash_payment_types', 10, 'hy', 'Փոխանցում 2'),
+    ('cash_payment_types', 11, 'hy', 'Փոխանցում 3'),
+    ('cash_payment_types', 10, 'ru', 'Перевод 2'),
+    ('cash_payment_types', 11, 'ru', 'Перевод 3')
+    ON DUPLICATE KEY UPDATE f_value = VALUES(f_value);
+INSERT INTO cash_operations_types (f_id, f_comment) VALUES (13, 'Cash Collection')
+    ON DUPLICATE KEY UPDATE f_comment = VALUES(f_comment);
+INSERT INTO l_dictionary (f_dict, f_dict_id, f_lang, f_value) VALUES
+    ('cash_operations_types', 13, 'hy', 'Ինկասացիա'),
+    ('cash_operations_types', 13, 'ru', 'Инкассация')
+    ON DUPLICATE KEY UPDATE f_value = VALUES(f_value);
+CREATE TABLE IF NOT EXISTS cash_discrepancy (
+    f_id INT PRIMARY KEY AUTO_INCREMENT,
+    f_date DATETIME NOT NULL,
+    f_type TINYINT NOT NULL,
+    f_stage TINYINT NOT NULL,
+    f_amount DECIMAL(14,2) NOT NULL DEFAULT 0,
+    f_currency_id INT NOT NULL DEFAULT 1,
+    f_cashbox_id INT NOT NULL DEFAULT 0,
+    f_session_id INT NOT NULL DEFAULT 0,
+    f_user INT NULL,
+    f_user_counted INT NULL,
+    f_resolved TINYINT NOT NULL DEFAULT 0,
+    f_resolved_user INT NULL,
+    f_resolved_date DATETIME NULL,
+    f_comment VARCHAR(1024) NULL,
+    KEY idx_cash_discrepancy_date (f_date),
+    KEY idx_cash_discrepancy_resolved (f_resolved)
+) ENGINE=InnoDB;
+CREATE TABLE IF NOT EXISTS s_salary_payment_doc (
+    f_date DATE NOT NULL PRIMARY KEY,
+    f_uuid CHAR(36) NOT NULL,
+    f_cashbox_id INT NOT NULL DEFAULT 0,
+    f_payment_type_id INT NOT NULL DEFAULT 1,
+    f_currency_id INT NOT NULL DEFAULT 1,
+    f_user INT NULL,
+    f_updated DATETIME NULL
+) ENGINE=InnoDB;
+ALTER TABLE c_goods ADD COLUMN IF NOT EXISTS f_store_doc TINYINT NOT NULL DEFAULT 1;
+UPDATE c_goods SET f_store_doc = IF(COALESCE(f_type, 0) = 1, 1, 0);
+ALTER TABLE external_api_key ADD COLUMN IF NOT EXISTS f_token VARCHAR(64) NULL;
+EOD;
+
+$v = 251;
+$sql[$v] = <<<EOD
+update s_app set f_version = '$v' where lower(f_app)='db';
+ALTER TABLE external_api_key ADD COLUMN IF NOT EXISTS f_table_id INT NOT NULL DEFAULT 0;
+ALTER TABLE external_api_key DROP INDEX IF EXISTS uq_external_api_partner;
+CREATE UNIQUE INDEX IF NOT EXISTS uq_external_api_partner_table ON external_api_key (f_partner, f_table_id);
+CREATE TABLE IF NOT EXISTS guest_order_idempotency (
+    f_key_hash CHAR(64) NOT NULL PRIMARY KEY,
+    f_order_id CHAR(36) NOT NULL,
+    f_table_id INT NOT NULL DEFAULT 0,
+    f_api_key_id INT NULL,
+    f_created DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    KEY idx_guest_idem_order (f_order_id)
+) ENGINE=InnoDB;
+ALTER TABLE h_halls ADD COLUMN IF NOT EXISTS f_receipt_footer TEXT NULL;
 EOD;
 
 $update_verision = intval(stmtall("select * from s_app where lower(f_app)='db'")->fetch_assoc()["f_version"]);
@@ -1021,6 +1164,22 @@ try {
 // Ararix client addresses (v244) — ensure if version already applied before this DDL landed.
 try {
     stmtall(<<<SQL
+CREATE TABLE IF NOT EXISTS ararix_clients (
+    f_id INT PRIMARY KEY AUTO_INCREMENT,
+    f_country_code VARCHAR(8) NOT NULL DEFAULT '+374',
+    f_phone VARCHAR(32) NOT NULL,
+    f_name VARCHAR(128) NULL,
+    f_email VARCHAR(128) NULL,
+    f_password_hash VARCHAR(255) NULL,
+    f_locale VARCHAR(8) NOT NULL DEFAULT 'en',
+    f_status INT NOT NULL DEFAULT 1,
+    f_avatar_url VARCHAR(255) NULL,
+    f_created DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    f_updated DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    UNIQUE KEY uq_ararix_clients_phone (f_country_code, f_phone)
+) ENGINE=InnoDB
+SQL);
+    stmtall(<<<SQL
 CREATE TABLE IF NOT EXISTS ararix_client_addresses (
     f_id INT PRIMARY KEY AUTO_INCREMENT,
     f_client_id INT NOT NULL,
@@ -1038,9 +1197,8 @@ CREATE TABLE IF NOT EXISTS ararix_client_addresses (
     f_created DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     f_updated DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     KEY idx_ararix_addr_client (f_client_id),
-    KEY idx_ararix_addr_active (f_client_id, f_is_active),
-    CONSTRAINT fk_ararix_addr_client FOREIGN KEY (f_client_id) REFERENCES ararix_clients(f_id) ON DELETE CASCADE
-)
+    KEY idx_ararix_addr_active (f_client_id, f_is_active)
+) ENGINE=InnoDB
 SQL);
     $executedFiles[] = "ararix_client_addresses checked.<br>";
 } catch (Exception $e) {
@@ -1062,6 +1220,108 @@ try {
 }
 
 try {
+    stmtall("ALTER TABLE fiscal_machine ADD COLUMN IF NOT EXISTS f_auto_fiscal TINYINT NOT NULL DEFAULT 0");
+    $executedFiles[] = "fiscal_machine.f_auto_fiscal checked.<br>";
+} catch (Exception $e) {
+    $errorFiles[] = "Error ensuring fiscal_machine.f_auto_fiscal: " . $e->getMessage() . "<br>";
+}
+
+try {
+    stmtall("ALTER TABLE cash_session ADD COLUMN IF NOT EXISTS f_cash_counted TINYINT NOT NULL DEFAULT 0");
+    stmtall("UPDATE cash_session cs
+        SET f_cash_counted = 1
+        WHERE f_state = 2
+          AND f_cash_counted = 0
+          AND (
+            ABS(COALESCE(cs.f_amount_difference, 0)) > 0.009
+            OR EXISTS (
+              SELECT 1 FROM cash_operations op
+              WHERE op.f_session_id = cs.f_id
+                AND op.f_operation_type IN (8, 9)
+            )
+          )");
+    $executedFiles[] = "cash_session.f_cash_counted checked.<br>";
+} catch (Exception $e) {
+    $errorFiles[] = "Error ensuring cash_session.f_cash_counted: " . $e->getMessage() . "<br>";
+}
+
+try {
+    stmtall("ALTER TABLE s_salary ADD COLUMN IF NOT EXISTS f_fine DECIMAL(14,2) NOT NULL DEFAULT 0 AFTER f_bonus");
+    stmtall("ALTER TABLE cash_session ADD COLUMN IF NOT EXISTS f_open_counted TINYINT NOT NULL DEFAULT 0");
+    $executedFiles[] = "s_salary.f_fine, cash_session.f_open_counted checked.<br>";
+} catch (Exception $e) {
+    $errorFiles[] = "Error ensuring s_salary.f_fine: " . $e->getMessage() . "<br>";
+}
+
+try {
+    stmtall("INSERT INTO cash_operations_types (f_id, f_comment) VALUES (13, 'Cash Collection')
+        ON DUPLICATE KEY UPDATE f_comment = VALUES(f_comment)");
+    stmtall("INSERT INTO l_dictionary (f_dict, f_dict_id, f_lang, f_value) VALUES
+        ('cash_operations_types', 13, 'hy', 'Ինկասացիա'),
+        ('cash_operations_types', 13, 'ru', 'Инкассация')
+        ON DUPLICATE KEY UPDATE f_value = VALUES(f_value)");
+    $executedFiles[] = "cash_operations_types 13 (Cash Collection) checked.<br>";
+    stmtall("ALTER TABLE cash_payment_types ADD COLUMN IF NOT EXISTS f_name VARCHAR(64) NULL");
+    stmtall("INSERT IGNORE INTO cash_payment_types (f_id) VALUES (1),(2),(3),(4),(5),(6),(7),(8),(9),(10),(11)");
+    stmtall("INSERT INTO l_dictionary (f_dict, f_dict_id, f_lang, f_value) VALUES
+        ('cash_payment_types', 10, 'hy', 'Փոխանցում 2'),
+        ('cash_payment_types', 11, 'hy', 'Փոխանցում 3'),
+        ('cash_payment_types', 10, 'ru', 'Перевод 2'),
+        ('cash_payment_types', 11, 'ru', 'Перевод 3')
+        ON DUPLICATE KEY UPDATE f_value = VALUES(f_value)");
+    $executedFiles[] = "cash_payment_types f_name, Bank 2/3 checked.<br>";
+} catch (Exception $e) {
+    $errorFiles[] = "Error ensuring cash operation type 13: " . $e->getMessage() . "<br>";
+}
+
+try {
+    stmtall(<<<SQL
+CREATE TABLE IF NOT EXISTS cash_discrepancy (
+    f_id INT PRIMARY KEY AUTO_INCREMENT,
+    f_date DATETIME NOT NULL,
+    f_type TINYINT NOT NULL,
+    f_stage TINYINT NOT NULL,
+    f_amount DECIMAL(14,2) NOT NULL DEFAULT 0,
+    f_currency_id INT NOT NULL DEFAULT 1,
+    f_cashbox_id INT NOT NULL DEFAULT 0,
+    f_session_id INT NOT NULL DEFAULT 0,
+    f_user INT NULL,
+    f_user_counted INT NULL,
+    f_resolved TINYINT NOT NULL DEFAULT 0,
+    f_resolved_user INT NULL,
+    f_resolved_date DATETIME NULL,
+    f_comment VARCHAR(1024) NULL,
+    KEY idx_cash_discrepancy_date (f_date),
+    KEY idx_cash_discrepancy_resolved (f_resolved)
+) ENGINE=InnoDB
+SQL);
+    stmtall(<<<SQL
+CREATE TABLE IF NOT EXISTS s_salary_payment_doc (
+    f_date DATE NOT NULL PRIMARY KEY,
+    f_uuid CHAR(36) NOT NULL,
+    f_cashbox_id INT NOT NULL DEFAULT 0,
+    f_payment_type_id INT NOT NULL DEFAULT 1,
+    f_currency_id INT NOT NULL DEFAULT 1,
+    f_user INT NULL,
+    f_updated DATETIME NULL
+) ENGINE=InnoDB
+SQL);
+    $executedFiles[] = "cash_discrepancy, s_salary_payment_doc checked.<br>";
+} catch (Exception $e) {
+    $errorFiles[] = "Error ensuring cash_discrepancy: " . $e->getMessage() . "<br>";
+}
+
+try {
+    if (stmtall("SHOW COLUMNS FROM c_goods LIKE 'f_store_doc'")->num_rows == 0) {
+        stmtall("ALTER TABLE c_goods ADD COLUMN f_store_doc TINYINT NOT NULL DEFAULT 1");
+        stmtall("UPDATE c_goods SET f_store_doc = IF(COALESCE(f_type, 0) = 1, 1, 0)");
+    }
+    $executedFiles[] = "c_goods.f_store_doc checked.<br>";
+} catch (Exception $e) {
+    $errorFiles[] = "Error ensuring c_goods.f_store_doc: " . $e->getMessage() . "<br>";
+}
+
+try {
     stmtall("ALTER TABLE cash_operations ADD COLUMN IF NOT EXISTS f_affects_float TINYINT NOT NULL DEFAULT 0");
     stmtall("UPDATE cash_operations SET f_affects_float = 1 WHERE f_payment_type_id = 1 AND f_affects_float = 0");
     $executedFiles[] = "cash_operations.f_affects_float checked.<br>";
@@ -1075,6 +1335,80 @@ try {
     $executedFiles[] = "o_header.f_public_token checked.<br>";
 } catch (Exception $e) {
     $errorFiles[] = "Error ensuring o_header.f_public_token: " . $e->getMessage() . "<br>";
+}
+
+try {
+    // Purchase cash ops were saved with date-only doc_date → 00:00:00. Restore time from store create_date.
+    stmtall(<<<SQL
+UPDATE cash_operations op
+INNER JOIN store_document sd ON sd.f_id = op.f_order_id AND sd.f_doc_type = 1
+SET op.f_datetime = TIMESTAMP(
+        DATE(op.f_datetime),
+        TIME(COALESCE(
+            STR_TO_DATE(JSON_UNQUOTE(JSON_EXTRACT(sd.f_data, '$.create_date')), '%d/%m/%Y %H:%i:%s'),
+            STR_TO_DATE(JSON_UNQUOTE(JSON_EXTRACT(sd.f_data, '$.create_date')), '%Y-%m-%d %H:%i:%s'),
+            op.f_datetime
+        ))
+    )
+WHERE op.f_operation_type = 3
+  AND TIME(op.f_datetime) = '00:00:00'
+  AND JSON_EXTRACT(sd.f_data, '$.create_date') IS NOT NULL
+  AND JSON_UNQUOTE(JSON_EXTRACT(sd.f_data, '$.create_date')) <> ''
+SQL);
+    $executedFiles[] = "cash_operations purchase times from store create_date checked.<br>";
+} catch (Exception $e) {
+    $errorFiles[] = "Error fixing purchase cash_operations times: " . $e->getMessage() . "<br>";
+}
+
+try {
+    if (stmtall("SHOW COLUMNS FROM h_halls LIKE 'f_receipt_footer'")->num_rows == 0) {
+        stmtall("ALTER TABLE h_halls ADD COLUMN f_receipt_footer TEXT NULL");
+        $executedFiles[] = "h_halls.f_receipt_footer added.<br>";
+    } else {
+        $executedFiles[] = "h_halls.f_receipt_footer checked.<br>";
+    }
+} catch (Exception $e) {
+    $errorFiles[] = "Error ensuring h_halls.f_receipt_footer: " . $e->getMessage() . "<br>";
+}
+
+try {
+    stmtall(<<<SQL
+CREATE TABLE IF NOT EXISTS external_api_key (
+    f_id INT PRIMARY KEY AUTO_INCREMENT,
+    f_partner VARCHAR(64) NOT NULL,
+    f_token_hash CHAR(64) NOT NULL,
+    f_enabled TINYINT NOT NULL DEFAULT 1,
+    f_created DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE KEY uq_external_api_partner (f_partner)
+) ENGINE=InnoDB
+SQL);
+    stmtall(<<<SQL
+CREATE TABLE IF NOT EXISTS order_tracking_poll (
+    f_token CHAR(48) NOT NULL PRIMARY KEY,
+    f_last_poll DATETIME NOT NULL
+) ENGINE=InnoDB
+SQL);
+    stmtall("ALTER TABLE external_api_key ADD COLUMN IF NOT EXISTS f_token VARCHAR(64) NULL");
+    stmtall("ALTER TABLE external_api_key ADD COLUMN IF NOT EXISTS f_table_id INT NOT NULL DEFAULT 0");
+    try {
+        stmtall("ALTER TABLE external_api_key DROP INDEX uq_external_api_partner");
+    } catch (Exception $eDrop) {
+        // index may already be gone
+    }
+    stmtall("CREATE UNIQUE INDEX IF NOT EXISTS uq_external_api_partner_table ON external_api_key (f_partner, f_table_id)");
+    stmtall(<<<SQL
+CREATE TABLE IF NOT EXISTS guest_order_idempotency (
+    f_key_hash CHAR(64) NOT NULL PRIMARY KEY,
+    f_order_id CHAR(36) NOT NULL,
+    f_table_id INT NOT NULL DEFAULT 0,
+    f_api_key_id INT NULL,
+    f_created DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    KEY idx_guest_idem_order (f_order_id)
+) ENGINE=InnoDB
+SQL);
+    $executedFiles[] = "order tracking tables checked.<br>";
+} catch (Exception $e) {
+    $errorFiles[] = "Error ensuring order tracking tables: " . $e->getMessage() . "<br>";
 }
 
 echo json_encode([

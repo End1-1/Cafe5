@@ -25,6 +25,12 @@ class Editors extends Auth
         "form_tables" => "Tables",
         "form_ax_restaurants" => "AxRestaurants",
         "form_fiscal_machines" => "FiscalMachines",
+        "form_cashboxes" => "CashBoxes",
+        "form_payment_types" => "PaymentTypes",
+        "form_api_keys" => "ApiKeys",
+        "form_cash_discrepancies" => "CashDiscrepancies",
+        "form_printers" => "Printers",
+        "form_print_aliases" => "PrintAliases",
     ];
 
     private function validate($params)

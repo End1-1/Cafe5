@@ -11,12 +11,15 @@
 #include "nhandler.h"
 #include "c5user.h"
 #include "c5message.h"
+#include "c5tableview.h"
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QJsonArray>
 #include <QScrollBar>
 #include <QHeaderView>
 #include <QMenu>
+#include <QShortcut>
+#include <QKeySequence>
 #include <QFileDialog>
 #include <QDesktopServices>
 #include <xlsxdocument.h>
@@ -36,6 +39,22 @@ NTableWidget::NTableWidget(C5User *user, const QString &route, QWidget *parent) 
 {
     ui->setupUi(this);
     ui->mTableView->setModel(new NTableModel());
+    ui->mTableView->setContextMenuPolicy(Qt::CustomContextMenu);
+    connect(ui->mTableView, &QWidget::customContextMenuRequested, this, [this](const QPoint &pos) {
+        if (!ui->mTableView->selectionModel() || ui->mTableView->selectionModel()->selectedIndexes().isEmpty()) {
+            return;
+        }
+        QMenu menu(this);
+        menu.addAction(tr("Copy"), this, [this] {
+            C5TableView::copySelectionFrom(ui->mTableView);
+        });
+        menu.exec(ui->mTableView->viewport()->mapToGlobal(pos));
+    });
+    auto *copyShortcut = new QShortcut(QKeySequence::Copy, ui->mTableView);
+    copyShortcut->setContext(Qt::WidgetWithChildrenShortcut);
+    connect(copyShortcut, &QShortcut::activated, this, [this] {
+        C5TableView::copySelectionFrom(ui->mTableView);
+    });
     ui->mTableView->horizontalHeader()->setContextMenuPolicy(Qt::CustomContextMenu);
     connect(ui->mTableView->horizontalHeader(), &QHeaderView::customContextMenuRequested, this,
             &NTableWidget::tableViewHeaderContextMenuRequested);

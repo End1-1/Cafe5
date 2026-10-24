@@ -4,6 +4,7 @@
 #include <QFileDialog>
 #include <QHash>
 #include <QInputDialog>
+#include <QJsonArray>
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QJsonParseError>
@@ -12,7 +13,9 @@
 #include <QPrinter>
 #include <QShortcut>
 #include <QSqlQuery>
+#include "appwebsocket.h"
 #include "c5codenameselector.h"
+#include "c5database.h"
 #include "c5codenameselectorfunctions.h"
 #include "c5config.h"
 #include "c5dateedit.h"
@@ -28,7 +31,56 @@
 #include "ce5goods.h"
 #include "format_date.h"
 #include "ui_c5storeoutput.h"
+#include "dlginventorysemireadylist.h"
+#include "dlgsemireadyinout.h"
+#include <QUuid>
 #include <xlsxdocument.h>
+
+namespace {
+
+QString normalizeStoreBarcode(QString code)
+{
+    code = code.trimmed();
+    if (code.startsWith(QLatin1Char(';'))) {
+        code.remove(0, 1);
+    }
+    if (code.endsWith(QLatin1Char('?'))) {
+        code.chop(1);
+    }
+    return code.trimmed();
+}
+
+bool lookupStoreGoodsByBarcode(const QString &barcode, GoodsItem &g)
+{
+    if (barcode.isEmpty()) {
+        return false;
+    }
+
+    C5Database db;
+    db[":barcode"] = barcode;
+    db.exec("select g.f_id, g.f_name, u.f_name as f_unit_name, g.f_lastinputprice, "
+            "if(length(coalesce(g.f_adg, '')) > 0, g.f_adg, gr.f_adgcode) as f_adgt "
+            "from c_goods g "
+            "left join c_units u on u.f_id = g.f_unit "
+            "left join c_groups gr on gr.f_id = g.f_group "
+            "left join c_goods_multiscancode m on m.f_goods = g.f_id "
+            "where g.f_scancode = :barcode or m.f_id = :barcode "
+            "limit 1");
+    if (!db.nextRow()) {
+        return false;
+    }
+
+    g = GoodsItem();
+    g.id = db.getInt("f_id");
+    g.name = db.getString("f_name");
+    g.unitName = db.getString("f_unit_name");
+    g.lastInputPrice = db.getDouble("f_lastinputprice");
+    g.adgt = db.getString("f_adgt");
+    g.barcode = barcode;
+    return g.id > 0;
+}
+
+} // namespace
 
 C5StoreOutput::C5StoreOutput(C5User *user, const QString &title, QIcon icon, QWidget *parent)
     : C5Widget(parent)
@@ -70,6 +122,28 @@ C5StoreOutput::C5StoreOutput(C5User *user, const QString &title, QIcon icon, QWi
     }
 
     adjustSize();
+
+    connect(AppWebSocket::instance, &AppWebSocket::bMessageReceived, this, [this](const QJsonObject &jdoc) {
+        if (jdoc.value("requestId").toString() != mWebSocketRequestId) {
+            return;
+        }
+        if (!jdoc.contains("result")) {
+            return;
+        }
+
+        QJsonArray arr = jdoc.value("result").toArray();
+        GoodsItem g;
+        if (!arr.isEmpty()) {
+            g = JsonParser<GoodsItem>::fromJson(arr.at(0).toObject());
+        } else if (!lookupStoreGoodsByBarcode(mScanBarcode, g)) {
+            if (!mScanBarcode.isEmpty()) {
+                C5Message::error(tr("Goods not found") + ": " + mScanBarcode);
+            }
+            return;
+        }
+
+        appendScannedGoods(g);
+    });
 }
 
 C5StoreOutput::~C5StoreOutput()
@@ -80,6 +154,7 @@ C5StoreOutput::~C5StoreOutput()
 
 void C5StoreOutput::setDocument(StoreInputDocument doc)
 {
+    mSemireadyBatches.clear();
     mDocData = doc;
     ui->deDate->setDate(QDateTime::fromString(doc.date, FORMAT_DATETIME_TO_STR_MYSQL).date());
     ui->leDocNum->setText(doc.user_id);
@@ -144,71 +219,56 @@ bool C5StoreOutput::allowChangeDatabase()
     return false;
 }
 
+void C5StoreOutput::appendScannedGoods(const GoodsItem &g)
+{
+    if (g.id <= 0) {
+        return;
+    }
+
+    int row = addGoods(g.id, g.name, mScanQty, g.unitName, 0, 0, "", g.adgt);
+    ui->tblGoods->lineEdit(row, col_price)->setPlaceholderText(float_str(g.lastInputPrice, 2));
+    if (mScanQty > 0.0001) {
+        ui->leScancode->setFocus();
+    } else {
+        ui->tblGoods->lineEdit(row, col_goods_qty)->setFocus();
+    }
+}
+
 void C5StoreOutput::addByScancode(const QString &code, const QString &qty, QString price)
 {
-    //       int row = addGoodsRow();
-    //       ui->tblGoods->setInteger(row, col_goods_id, db.getInt("f_id"));
-    //       ui->tblGoods->setString(row, col_goods_name, db.getString("f_name"));
-    //       ui->tblGoods->setString(row, col_goods_unit, db.getString("f_unitname"));
-    //       ui->tblGoods->item(row, col_goods_name)->setSelected(true);
-    //       fCanChangeFocus = false;
-    //       ui->tblGoods->lineEdit(row, col_goods_qty)->setText(qty);
-    //       ui->tblGoods->lineEdit(row, col_goods_qty)->setFocus();
-    //       ui->tblGoods->lineEdit(row, col_price)->setText(price);
-    //       ui->tblGoods->lineEdit(row, col_price)->setPlaceholderText(float_str(db.getDouble("f_lastinputprice"), 2));
+    Q_UNUSED(price);
+    const QString barcode = normalizeStoreBarcode(code);
+    ui->leScancode->clear();
+    if (barcode.isEmpty()) {
+        return;
+    }
 
-    //       if(__c5config.getValue(param_input_doc_fix_price).toInt() > 0) {
-    //           if(price.toDouble() < 0.001) {
-    //               if(db.getDouble("f_lastinputprice") > 0.001) {
-    //                   ui->tblGoods->lineEdit(row, col_price)->setDouble(db.getDouble("f_lastinputprice"));
-    //                   price = db.getString("f_lastinputprice");
-    //               }
-    //           }
-    //       }
+    mScanBarcode = barcode;
+    mScanQty = str_float(qty);
 
-    //       emit ui->tblGoods->lineEdit(row, col_price)->textEdited(price);
+    auto addFromDb = [this]() {
+        GoodsItem g;
+        if (!lookupStoreGoodsByBarcode(mScanBarcode, g)) {
+            C5Message::error(tr("Goods not found") + ": " + mScanBarcode);
+            return;
+        }
+        appendScannedGoods(g);
+    };
 
-    //       if(fDocType == DOC_TYPE_STORE_INPUT) {
-    //           fHttp->createHttpQuery("/engine/worker/check-qty.php", QJsonObject{
-    //               {"method", "checkStore"}, {"goodsid", ui->tblGoods->getInteger(row, col_goods_id)}
-    //           }, SLOT(slotCheckQtyResponse(QJsonObject)), QVariant(), false);
-    //       }
-    //   } else {
-    //       db[":f_scancode"] = code;
-    //       db.exec("select gg.f_scancode, gg.f_id, concat(gg.f_name, ' ', gg.f_scancode) as f_name, gu.f_name as f_unitname, gg.f_saleprice, "
-    //               "gr.f_taxdept, gr.f_adgcode, gg.f_lastinputprice "
-    //               "from c_goods gg  "
-    //               "left join c_groups gr on gr.f_id=gg.f_group "
-    //               "left join c_units gu on gu.f_id=gg.f_unit "
-    //               "where gg.f_id in (select f_goods from c_goods_multiscancode where f_id=:f_scancode)");
+    if (!AppWebSocket::instance || !AppWebSocket::instance->isConnected()) {
+        addFromDb();
+        return;
+    }
 
-    //       if(db.nextRow()) {
-    //           int row = addGoodsRow();
-    //           ui->tblGoods->setInteger(row, col_goods_id, db.getInt("f_id"));
-    //           ui->tblGoods->setString(row, col_goods_name, db.getString("f_name"));
-    //           ui->tblGoods->setString(row, col_goods_unit, db.getString("f_unitname"));
-    //           ui->tblGoods->item(row, col_goods_name)->setSelected(true);
-    //           fCanChangeFocus = false;
-    //           ui->tblGoods->lineEdit(row, col_goods_qty)->setText(qty);
-    //           ui->tblGoods->lineEdit(row, col_goods_qty)->setFocus();
-    //           ui->tblGoods->lineEdit(row, col_price)->setText(price);
-    //           ui->tblGoods->lineEdit(row, col_price)->setPlaceholderText(float_str(db.getDouble("f_lastinputprice"), 2));
-
-    //           if(__c5config.getValue(param_input_doc_fix_price).toInt() > 0) {
-    //               if(price.toDouble() < 0.001) {
-    //                   if(db.getDouble("f_lastinputprice") > 0.001) {
-    //                       ui->tblGoods->lineEdit(row, col_price)->setDouble(db.getDouble("f_lastinputprice"));
-    //                       price = db.getString("f_lastinputprice");
-    //                   }
-    //               }
-    //           }
-
-    //           emit ui->tblGoods->lineEdit(row, col_price)->textEdited(price);
-
-    //               fHttp->createHttpQuery("/engine/worker/check-qty.php", QJsonObject{
-    //                   {"method", "checkStore"}, {"goodsid", ui->tblGoods->getInteger(row, col_goods_id)}
-    //               }, SLOT(slotCheckQtyResponse(QJsonObject)), QVariant(), false);
-    //           }
+    mWebSocketRequestId = QUuid::createUuid().toString(QUuid::WithoutBraces);
+    QJsonObject jo;
+    jo["command"] = SelectorName<GoodsItem>::value;
+    jo["lower_name"] = "";
+    jo["barcode"] = barcode;
+    jo["requestId"] = mWebSocketRequestId;
+    if (!AppWebSocket::instance->sendBinaryMessage(QJsonDocument(jo).toJson())) {
+        addFromDb();
+    }
 }
 
 double C5StoreOutput::total()
@@ -399,6 +459,7 @@ int C5StoreOutput::addGoods(int goods,
 
 void C5StoreOutput::fillFromInventory(const QList<InventoryDiff> &surpluses)
 {
+    mSemireadyBatches.clear();
     ui->tblGoods->setRowCount(0);
 
     for (const auto &s : surpluses) {
@@ -573,7 +634,7 @@ void C5StoreOutput::slotCheckQtyResponse(const QJsonObject &jdoc)
 
 void C5StoreOutput::getInput()
 {
-    const auto r = selectItem<GoodsItem>(false, false);
+    const auto r = selectStoreDocGoods();
     if (r.isEmpty()) {
         return;
     }
@@ -585,7 +646,26 @@ void C5StoreOutput::getInput()
     ui->tblGoods->lineEdit(row, col_goods_qty)->setFocus();
 }
 
-void C5StoreOutput::removeDocument() {}
+void C5StoreOutput::removeDocument()
+{
+    if (C5Message::question(tr("Confirm to remove document")) != QDialog::Accepted) {
+        return;
+    }
+
+    if (mDocData.uuid.isEmpty()) {
+        __mainWindow->removeTab(this);
+        return;
+    }
+
+    NInterface::query1("/engine/v2/common/store-move/remove",
+                       mUser->mSessionKey,
+                       this,
+                       {{"id", mDocData.uuid}},
+                       [this](const QJsonObject &) {
+                           C5Message::info(tr("Deleted"));
+                           __mainWindow->removeTab(this);
+                       });
+}
 
 void C5StoreOutput::tblAddChanged(const QString &arg1)
 {
@@ -769,5 +849,161 @@ void C5StoreOutput::on_btnSaveComment_clicked() {}
 void C5StoreOutput::on_btnRemoveGoods_clicked()
 {
     int r = ui->tblGoods->currentRow();
+    if (r < 0) {
+        return;
+    }
+    if (lockedQty(r) > 0.0001) {
+        C5Message::error(tr("Remove this quantity via the semiready list"));
+        return;
+    }
     ui->tblGoods->removeRow(r);
+    countTotal();
+}
+
+int C5StoreOutput::findGoodsRow(int goodsId) const
+{
+    for (int i = 0; i < ui->tblGoods->rowCount(); ++i) {
+        if (ui->tblGoods->getInteger(i, col_goods_id) == goodsId) {
+            return i;
+        }
+    }
+    return -1;
+}
+
+double C5StoreOutput::lockedQty(int row) const
+{
+    QTableWidgetItem *item = ui->tblGoods->item(row, col_goods_id);
+    if (!item) {
+        return 0;
+    }
+    return item->data(Qt::UserRole).toDouble();
+}
+
+void C5StoreOutput::setLockedQty(int row, double qty)
+{
+    QTableWidgetItem *item = ui->tblGoods->item(row, col_goods_id);
+    if (!item) {
+        item = new QTableWidgetItem();
+        ui->tblGoods->setItem(row, col_goods_id, item);
+    }
+    item->setData(Qt::UserRole, qty);
+}
+
+void C5StoreOutput::refreshRowTotal(int row)
+{
+    C5LineEdit *lqty = ui->tblGoods->lineEdit(row, col_goods_qty);
+    C5LineEdit *lprice = ui->tblGoods->lineEdit(row, col_price);
+    C5LineEdit *ltotal = ui->tblGoods->lineEdit(row, col_total);
+    if (!lqty || !lprice || !ltotal) {
+        return;
+    }
+    ltotal->setDouble(lqty->getDouble() * lprice->getDouble());
+}
+
+void C5StoreOutput::applySemireadyBatch(const SemireadyBatch &batch)
+{
+    for (const SemireadyComponent &c : batch.components) {
+        if (c.goodsId <= 0 || c.qty <= 0.0000001) {
+            continue;
+        }
+
+        int row = findGoodsRow(c.goodsId);
+        if (row < 0) {
+            row = addGoods(c.goodsId, c.goodsName, c.qty, QString(), 0, 0, QString(), QString());
+            setLockedQty(row, c.qty);
+        } else {
+            C5LineEdit *le = ui->tblGoods->lineEdit(row, col_goods_qty);
+            if (!le) {
+                continue;
+            }
+            le->setDouble(le->getDouble() + c.qty);
+            setLockedQty(row, lockedQty(row) + c.qty);
+            refreshRowTotal(row);
+        }
+    }
+
+    mSemireadyBatches.append(batch);
+    countTotal();
+}
+
+void C5StoreOutput::removeSemireadyBatch(const QString &batchId)
+{
+    int batchIndex = -1;
+    for (int i = 0; i < mSemireadyBatches.size(); ++i) {
+        if (mSemireadyBatches.at(i).id == batchId) {
+            batchIndex = i;
+            break;
+        }
+    }
+    if (batchIndex < 0) {
+        return;
+    }
+
+    const SemireadyBatch batch = mSemireadyBatches.takeAt(batchIndex);
+    for (const SemireadyComponent &c : batch.components) {
+        int row = findGoodsRow(c.goodsId);
+        if (row < 0) {
+            continue;
+        }
+
+        C5LineEdit *le = ui->tblGoods->lineEdit(row, col_goods_qty);
+        const double newQty = le->getDouble() - c.qty;
+        const double newLocked = lockedQty(row) - c.qty;
+        if (newQty <= 0.0001 && newLocked <= 0.0001) {
+            ui->tblGoods->removeRow(row);
+            continue;
+        }
+
+        le->setDouble(newQty > 0 ? newQty : 0);
+        setLockedQty(row, newLocked > 0 ? newLocked : 0);
+        refreshRowTotal(row);
+    }
+
+    countTotal();
+}
+
+void C5StoreOutput::on_btnAddSemiready_clicked()
+{
+    DlgSemireadyInOut dlg(mUser);
+    if (dlg.exec() != QDialog::Accepted) {
+        return;
+    }
+
+    if (dlg.dishId() <= 0 || dlg.dishQty() <= 0.0000001 || dlg.rowCount() <= 0) {
+        return;
+    }
+
+    SemireadyBatch batch;
+    batch.id = QUuid::createUuid().toString(QUuid::WithoutBraces);
+    batch.dishId = dlg.dishId();
+    batch.dishName = dlg.dishName();
+    batch.dishQty = dlg.dishQty();
+
+    for (int i = 0; i < dlg.rowCount(); ++i) {
+        SemireadyComponent c;
+        c.goodsId = dlg.goodsId(i);
+        c.goodsName = dlg.goodsName(i);
+        c.qty = dlg.goodsQty(i);
+        if (c.goodsId <= 0 || c.qty <= 0.0000001) {
+            continue;
+        }
+        batch.components.append(c);
+    }
+
+    if (batch.components.isEmpty()) {
+        return;
+    }
+
+    applySemireadyBatch(batch);
+}
+
+void C5StoreOutput::on_btnSemireadyList_clicked()
+{
+    DlgInventorySemireadyList dlg(this);
+    dlg.setBatches(mSemireadyBatches);
+    connect(&dlg, &DlgInventorySemireadyList::removeBatchRequested, this, [this, &dlg](const QString &batchId) {
+        removeSemireadyBatch(batchId);
+        dlg.setBatches(mSemireadyBatches);
+    });
+    dlg.exec();
 }

@@ -15,6 +15,7 @@ if (!defined('CASH_OP_SALES_REVENUE')) {
     define('CASH_OP_DELIVERY_FEE', 10);
     define('CASH_OP_TRANSFER_OUT', 11);
     define('CASH_OP_TRANSFER_IN', 12);
+    define('CASH_OP_CASH_COLLECTION', 13);
 }
 
 /** @deprecated use CASH_OP_SALES_REVENUE */
@@ -36,5 +37,6 @@ return [
         CASH_OP_DELIVERY_FEE => Translator::t('Delivery Fee'),
         CASH_OP_TRANSFER_OUT => Translator::t('Transfer Out'),
         CASH_OP_TRANSFER_IN => Translator::t('Transfer In'),
+        CASH_OP_CASH_COLLECTION => Translator::t('Cash Collection'),
     ],
 ];

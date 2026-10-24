@@ -38,11 +38,15 @@ private:
         colNum,
         colPosition,
         colName,
+        colTimeIn,
+        colTimeOut,
         colFixed,
         colDishBase,
         colCalculated,
         colBonus,
-        colTotal
+        colFine,
+        colTotal,
+        colCount
     };
 
     Ui::C5SalaryEditor *ui;
@@ -50,8 +54,13 @@ private:
     void initTable();
     void recalcTotal();
     void updateRowTotal(int row);
-    void appendStaffRow(int staffId, const QString &staffName, int positionId, const QString &positionName);
-    void applyCalculatedRow(int row, double fixed, double dishBase, double calculated, double total);
+    void appendStaffRow(int staffId, const QString &staffName, int positionId, const QString &positionName,
+                        const QString &timeIn = QString(), const QString &timeOut = QString());
+    void fillRow(int row, int dbId, int staffId, const QString &staffName, int positionId, const QString &positionName,
+                 const QString &timeIn, const QString &timeOut, double fixed, double calculated, double bonus, double fine);
+    void setTimeCell(int row, int col, const QString &value);
+    double rowTotal(int row) const;
+    void applyCalculatedRow(int row, double fixed, double dishBase, double calculated, double fine, double total);
     void showDishSalesDetail(int row);
     int countSamePositionRows(int positionId) const;
     QString buildPrintHtml() const;

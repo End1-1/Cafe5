@@ -153,17 +153,29 @@ void CE5Partner::savePartner(bool closeEditor)
 
 void CE5Partner::saveResponse(const QJsonObject &jdoc)
 {
-    fHttp->httpQueryFinished(sender());
-    if (jdoc.value(QStringLiteral("status")).toInt() != 1) {
-        C5Message::error(jdoc.value(QStringLiteral("message")).toString());
+    const QJsonObject partner = jdoc.value(QStringLiteral("partner")).toObject();
+    const int id = partner.value(QStringLiteral("f_id")).toVariant().toInt();
+    // v2 may omit status; treat present partner id as success
+    const int status = jdoc.contains(QStringLiteral("status"))
+                           ? jdoc.value(QStringLiteral("status")).toVariant().toInt()
+                           : (id > 0 ? 1 : 0);
+    if (status != 1 || id <= 0) {
+        QString msg = jdoc.value(QStringLiteral("message")).toString();
+        if (msg.isEmpty()) {
+            msg = jdoc.value(QStringLiteral("errorMessage")).toString();
+        }
+        if (msg.isEmpty()) {
+            msg = tr("Could not save partner");
+        }
+        C5Message::error(msg);
         return;
     }
 
-    const QJsonObject partner = jdoc.value(QStringLiteral("partner")).toObject();
-    const int id = partner.value(QStringLiteral("f_id")).toInt();
     ui->leCode->setInteger(id);
     ui->leCode->setEnabled(false);
-    C5Cache::cache(cache_goods_partners)->refresh();
+    if (C5Cache *cache = C5Cache::cache(cache_goods_partners)) {
+        cache->refresh();
+    }
 
     if (C5Editor *editor = qobject_cast<C5Editor *>(fEditor)) {
         editor->appendResultRow(makeResultRow(id));

@@ -131,6 +131,20 @@
    <item row="11" column="1">
     <widget class="QCheckBox" name="chDontAllowNegativeRemains"/>
    </item>
+   <item row="12" column="0">
+    <widget class="QLabel" name="labelCollectionCashbox">
+     <property name="text">
+      <string>Cash collection cashbox id</string>
+     </property>
+    </widget>
+   </item>
+   <item row="12" column="1">
+    <widget class="QLineEdit" name="leCollectionCashbox">
+     <property name="toolTip">
+      <string>Cash collected from the Waiter dashboard is moved to this cashbox. Leave 0 to only register the cash out.</string>
+     </property>
+    </widget>
+   </item>
   </layout>
  </widget>
  <customwidgets>

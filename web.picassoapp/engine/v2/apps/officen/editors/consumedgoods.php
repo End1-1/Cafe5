@@ -36,8 +36,9 @@ class ConsumedGoods
         }
 
         $group_id = (int)($filter["group_id"] ?? 0);
+        $goods_id = (int)($filter["goods_id"] ?? 0);
 
-        $filterSql = $this->buildSaleFilters($date1, $date2, $group_id, $summarize);
+        $filterSql = $this->buildSaleFilters($date1, $date2, $group_id, $goods_id, $summarize);
 
         if ($summarize === 2) {
             return $this->getOnlyConsumed($filterSql);
@@ -49,9 +50,9 @@ class ConsumedGoods
     }
 
     /**
-     * @return array{date_filter:string,group_filter_dish:string,group_filter_cons:string,bindtypes:string,bindvalues:array}
+     * @return array{date_filter:string,group_filter_dish:string,group_filter_cons:string,goods_filter_dish:string,goods_filter_cons:string,bindtypes:string,bindvalues:array}
      */
-    private function buildSaleFilters(string $date1, string $date2, int $group_id, int $summarize): array
+    private function buildSaleFilters(string $date1, string $date2, int $group_id, int $goods_id, int $summarize): array
     {
         $bindtypes = "ss";
         $bindvalues = [$date1, $date2];
@@ -69,10 +70,28 @@ class ConsumedGoods
             $bindvalues[] = $group_id;
         }
 
+        $goods_filter_dish = "";
+        $goods_filter_cons = "";
+        if ($goods_id > 0) {
+            if ($summarize === 2) {
+                $goods_filter_cons = " AND g2.f_id = ? ";
+                $bindtypes .= "i";
+                $bindvalues[] = $goods_id;
+            } else {
+                $goods_filter_dish = " AND (g.f_id = ? OR EXISTS (SELECT 1 FROM store_calc_queue qg WHERE qg.f_row_sale_id = og.f_id AND qg.f_item_id = ?)) ";
+                $goods_filter_cons = " AND (g.f_id = ? OR g2.f_id = ?) ";
+                $bindtypes .= "ii";
+                $bindvalues[] = $goods_id;
+                $bindvalues[] = $goods_id;
+            }
+        }
+
         return [
             "date_filter" => $date_filter,
             "group_filter_dish" => $group_filter_dish,
             "group_filter_cons" => $group_filter_cons,
+            "goods_filter_dish" => $goods_filter_dish,
+            "goods_filter_cons" => $goods_filter_cons,
             "bindtypes" => $bindtypes,
             "bindvalues" => $bindvalues,
         ];
@@ -95,6 +114,7 @@ class ConsumedGoods
                 ["type" => "date", "name" => "date1", "label" => Translator::t("Date start")],
                 ["type" => "date", "name" => "date2", "label" => Translator::t("Date end")],
                 ["type" => "keyvalue", "name" => "group_id", "label" => Translator::t("Group"), "function" => "goods_group"],
+                ["type" => "keyvalue", "name" => "goods_id", "label" => Translator::t("Goods"), "function" => "goods"],
             ],
         ];
     }
@@ -132,6 +152,7 @@ class ConsumedGoods
         WHERE oh.f_state = 2 AND og.f_state = 1
         {$f["date_filter"]}
         {$f["group_filter_cons"]}
+        {$f["goods_filter_cons"]}
         GROUP BY st.f_name, gr2.f_name, g2.f_name
         ORDER BY st.f_name, gr2.f_name, g2.f_name
         EOD;
@@ -170,6 +191,7 @@ class ConsumedGoods
           )
         {$f["date_filter"]}
         {$f["group_filter_dish"]}
+        {$f["goods_filter_dish"]}
         GROUP BY g.f_id, gr.f_name, g.f_name
         ORDER BY gr.f_name, g.f_name
         EOD;
@@ -193,6 +215,7 @@ class ConsumedGoods
         WHERE oh.f_state = 2 AND og.f_state = 1
         {$f["date_filter"]}
         {$f["group_filter_dish"]}
+        {$f["goods_filter_cons"]}
         GROUP BY g.f_id, st.f_name, gr.f_name, g.f_name, g2.f_name
         ORDER BY gr.f_name, g.f_name, st.f_name, g2.f_name
         EOD;
@@ -258,6 +281,7 @@ class ConsumedGoods
           )
         {$f["date_filter"]}
         {$f["group_filter_dish"]}
+        {$f["goods_filter_dish"]}
         ORDER BY gr.f_name, g.f_name, og.f_id
         EOD;
 
@@ -280,6 +304,7 @@ class ConsumedGoods
         WHERE oh.f_state = 2 AND og.f_state = 1
         {$f["date_filter"]}
         {$f["group_filter_dish"]}
+        {$f["goods_filter_cons"]}
         ORDER BY gr.f_name, g.f_name, ogc.f_row_sale_id, st.f_name, g2.f_name
         EOD;
 

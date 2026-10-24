@@ -498,7 +498,7 @@ QMenu* C5Grid::buildTableViewContextMenu(const QPoint &point)
                      SLOT(filterByStringAndIndex()));
     }
 
-    m->addAction(QIcon(":/copy.png"), tr("Copy selection"), this, SLOT(copySelection()));
+    m->addAction(QIcon(":/copy.png"), tr("Copy"), this, SLOT(copySelection()));
     m->addAction(QIcon(":/copy.png"), tr("Copy all"), this, SLOT(copyAll()));
     return m;
 }
@@ -600,38 +600,7 @@ void C5Grid::selectionChanged(const QItemSelection &selected, const QItemSelecti
 
 void C5Grid::copySelection()
 {
-    QModelIndexList sel = fTableView->selectionModel()->selectedIndexes();
-
-    if(sel.count() == 0) {
-        return;
-    }
-
-    QString data;
-    int currCol = -1;
-    bool first = true;
-
-    foreach(QModelIndex m, sel) {
-        if(currCol < 0) {
-            currCol = m.row();
-        }
-
-        if(currCol != m.row()) {
-            currCol = m.row();
-            first = true;
-            data += "\r\n";
-        }
-
-        if(first) {
-            first = false;
-        } else {
-            data += "\t";
-        }
-
-        data += m.data(Qt::DisplayRole).toString();
-    }
-
-    QClipboard *c = qApp->clipboard();
-    c->setText(data);
+    fTableView->copySelection();
 }
 
 void C5Grid::copyAll()

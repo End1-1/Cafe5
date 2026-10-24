@@ -19,6 +19,16 @@ const FORMAT_TIME_TO_STR = "H:i";
 
 class Order extends Auth
 {
+    /** Bill rounding step from workstation; 0 = off. Default 100 (legacy). */
+    protected $billRoundTo = 100;
+
+    protected function takeBillRound($params): void
+    {
+        if (is_object($params) && isset($params->bill_round_to) && $params->bill_round_to !== '' && $params->bill_round_to !== null) {
+            $this->billRoundTo = max(0, (int)$params->bill_round_to);
+        }
+    }
+
     public function GetPreorders($params)
     {
         $sql = <<<EOD
@@ -329,6 +339,7 @@ class Order extends Auth
 
     public function AddDish($params)
     {
+        $this->takeBillRound($params);
         //first , check stoplist
         $stoplistTouched = false;
         $this->beginTransaction();
@@ -367,6 +378,17 @@ class Order extends Auth
         /* New line after precheck must unlock the order (QR / site / waiter). */
         $this->cancelPrecheckDueToOrderChange($oheader["f_id"], "add dish after precheck");
         $oheader = $this->GetHeader($oheader["f_id"]);
+        $orderSource = trim((string)($params->order_source ?? ""));
+        if ($orderSource !== "") {
+            $headerData = json_decode($oheader["f_data"] ?? "{}", true) ?: [];
+            if (($headerData["f_order_source"] ?? "") !== $orderSource) {
+                $headerData["f_order_source"] = $orderSource;
+                $this->update("o_header", [
+                    "f_data" => json_encode($headerData, JSON_UNESCAPED_UNICODE),
+                ], $oheader["f_id"]);
+                $oheader = $this->GetHeader($oheader["f_id"]);
+            }
+        }
 
         $data = [
             "f_count_service" => $params->count_service ?? 0,
@@ -509,11 +531,30 @@ class Order extends Auth
             }
         }
         $this->result["order"] = $this->GetOrder($oheader["f_id"]);
-        $this->echoResult();
+        if (empty($params->silent)) {
+            $this->echoResult();
+        }
+    }
+
+    /** Staff identity for a call that is not a waiter session (guest booklet order). */
+    public function bindSessionUser(int $userId): void
+    {
+        $user = $this->select("SELECT * FROM s_user WHERE f_id=?", "i", [$userId])->fetch_assoc();
+        if (!$user) {
+            dieWithCode(Translator::t("User not found"));
+        }
+        $this->user = $user;
+        $this->userid = (int)$user["f_id"];
+    }
+
+    public function printServiceCheckSilent($params): void
+    {
+        $this->printServiceCheckCore($params, true, false);
     }
 
     public function SetDishQty($params)
     {
+        $this->takeBillRound($params);
         $dish_states = require_once __DIR__ . "/../worker/dict-dish-state.php";
         $sql = <<<EOD
         select g.f_name as f_dish_name, og.* 
@@ -599,6 +640,7 @@ class Order extends Auth
 
     public function SetDishPrice($params)
     {
+        $this->takeBillRound($params);
         $sql = <<<EOD
         select g.f_name as f_dish_name, og.*
         from o_goods og
@@ -655,6 +697,7 @@ class Order extends Auth
      */
     public function RemovePackageWithChildren($params)
     {
+        $this->takeBillRound($params);
         $dish_states = require_once __DIR__ . "/../worker/dict-dish-state.php";
         $orderId = (string)($params->order_id ?? "");
         $packageId = (string)($params->id ?? "");
@@ -940,6 +983,7 @@ EOD;
     /** Дублирование напечатанного пакета со всем составом (после сервисной печати, кнопка + на официанте). */
     public function DuplicatePrintedPackage($params)
     {
+        $this->takeBillRound($params);
         $headerId = (string)($params->header_id ?? $params->order_id ?? '');
         $packageId = (string)($params->package_id ?? '');
         $copies = (int)($params->copies ?? 1);
@@ -1018,6 +1062,7 @@ EOD;
 
     public function StopPlay($params)
     {
+        $this->takeBillRound($params);
         $dish = $this->select("select * from o_goods where f_id=?", "s", [$params->id])->fetch_assoc();
         if (!$dish) {
             dieWithCode("Do you wanna hack stop play? ");
@@ -1032,6 +1077,7 @@ EOD;
 
     public function SetEndDatetime($params)
     {
+        $this->takeBillRound($params);
         $dish = $this->select("select f_id, f_header, f_data from o_goods where f_id=?", "s", [$params->id])->fetch_assoc();
         if (!$dish) {
             dieWithCode("Do you wanna hack stop play?");
@@ -1176,6 +1222,7 @@ EOD;
 
     public function UpdateAmounts($params)
     {
+        $this->takeBillRound($params);
         $this->CountAmounts($params->id);
         $this->result["order"] = $this->GetOrder($params->id);
         $this->echoResult();
@@ -1290,26 +1337,28 @@ EOD;
             ], $d["f_id"]);
         }
 
-        /* ROUND BILL: nearest 100; keep exact *50; adjust via service only */
+        /* ROUND BILL: nearest bill_round_to; keep exact half-step; adjust via service only */
         $totaldue = round((float)$totaldue, 2);
         $serviceCounted = round((float)$serviceCounted, 2);
         $hasService = ((float)($odata["f_service_factor"] ?? 0) > 0.0001) || ($serviceCounted > 0.0001);
-        if ($hasService) {
-            $base100 = floor($totaldue / 100) * 100;
-            $remainder = round($totaldue - $base100, 2);
-            if ($remainder >= 0.01 && abs($remainder - 50) >= 0.01) {
-                if ($remainder < 50 && ($serviceCounted + 0.0001 >= $remainder)) {
-                    // 1230 -> 1200 (service covers the cut)
+        $roundTo = (int)$this->billRoundTo;
+        if ($hasService && $roundTo > 0) {
+            $half = $roundTo / 2;
+            $base = floor($totaldue / $roundTo) * $roundTo;
+            $remainder = round($totaldue - $base, 2);
+            if ($remainder >= 0.01 && abs($remainder - $half) >= 0.01) {
+                if ($remainder < $half && ($serviceCounted + 0.0001 >= $remainder)) {
+                    // e.g. 1230 -> 1200 (service covers the cut)
                     $serviceCounted = round($serviceCounted - $remainder, 2);
                     $totaldue = round($totaldue - $remainder, 2);
                 } else {
-                    // rem>=50 (1260->1300) OR rem<50 but service too small (440->500)
-                    $add = round(100 - $remainder, 2);
+                    // rem>=half (1260->1300) OR rem<half but service too small (440->500)
+                    $add = round($roundTo - $remainder, 2);
                     $serviceCounted = round($serviceCounted + $add, 2);
                     $totaldue = round($totaldue + $add, 2);
                 }
             }
-            // 1250 stays 1250; xx00 stays
+            // exact half or multiple of roundTo stays
         }
 
 
@@ -1348,6 +1397,29 @@ EOD;
         $oheader = $this->GetHeader($params->id);
         $odata = json_decode($oheader["f_data"] ?? "{}", true);
         $odata[$params->payment_field] = $params->amount;
+
+        $payment = $this->paymentDict();
+        $debtField = $payment["fields"][PAYMENT_DEBT];
+        $bankField = $payment["fields"][PAYMENT_TYPE_BANK];
+
+        if (property_exists($params, "debt_holder")) {
+            $dh = $params->debt_holder;
+            if (empty($dh) || (int)($dh->f_id ?? 0) <= 0) {
+                unset($odata["f_debt_holder"]);
+            } else {
+                $odata["f_debt_holder"] = [
+                    "f_id" => (int)$dh->f_id,
+                    "f_name" => trim((string)($dh->f_name ?? "")),
+                ];
+            }
+        }
+
+        $debtAmt = (float)($odata[$debtField] ?? 0);
+        $bankAmt = (float)($odata[$bankField] ?? 0);
+        if ($debtAmt < 0.00001 && $bankAmt < 0.00001) {
+            unset($odata["f_debt_holder"]);
+        }
+
         $this->applyDepositPrepaidAndRecalcTotals($odata, (float)($oheader["f_amounttotal"] ?? 0));
         $this->update("o_header", ["f_data" => json_encode($odata, JSON_UNESCAPED_UNICODE)], $params->id);
         $this->result["order"] = $this->GetOrder($params->id);
@@ -1408,13 +1480,28 @@ EOD;
         where oh.f_id=?
         EOD;
         $oheader = $this->select($sql, "s", [$id])->fetch_assoc();
+        if ($oheader) {
+            $oheader["f_cash_session_id"] = (int)($oheader["f_cash_session_id"] ?? 0);
+            $oheader["f_table"] = (int)($oheader["f_table"] ?? 0);
+            $oheader["f_hall"] = (int)($oheader["f_hall"] ?? 0);
+            $oheader["f_staff"] = (int)($oheader["f_staff"] ?? 0);
+            $oheader["f_cashier"] = (int)($oheader["f_cashier"] ?? 0);
+            $oheader["f_state"] = (int)($oheader["f_state"] ?? 0);
+        }
         return $oheader;
     }
 
     public function GetOrder($id)
     {
+        $id = trim((string)($id ?? ""));
+        if ($id === "") {
+            return null;
+        }
         $this->cancelPrecheckIfHasUnprintedDishes($id);
         $oheader = $this->GetHeader($id);
+        if (!$oheader) {
+            return null;
+        }
         $oheader["dishes"] = $this->GetDishes($oheader["f_id"]);
         return $oheader;
     }
@@ -1627,6 +1714,10 @@ EOD;
 
     public function GetDishes($header)
     {
+        $header = trim((string)($header ?? ""));
+        if ($header === "") {
+            return [];
+        }
         $this->ensureGoodsProcessRows($header);
         $sql = <<<EOD
         select og.f_id, og.f_state, og.f_type, og.f_parent, og.f_emarks, og.f_data,
@@ -1874,16 +1965,15 @@ EOD;
         $this->applyDepositPrepaidAndRecalcTotals($odata, $totalDue);
         $paymentDebits = $this->cashboxPaymentDebits($odata);
 
-        $partnerId = $odata["f_guest"]["f_guest_id"] ?? null;
+        $partnerId = (int)($odata["f_debt_holder"]["f_id"] ?? 0);
         $debtField = $payment["fields"][PAYMENT_DEBT];
         $debtAmount = (float)($odata[$debtField] ?? 0);
 
         $bankField = $payment["fields"][PAYMENT_TYPE_BANK];
         $bankAmount = (float)($odata[$bankField] ?? 0);
 
-        // Both "Debt" and "Bank transfer" are deferred customer settlements,
-        // so we must know the partner to put the record into cash_debts.
-        if (($debtAmount > 0 || $bankAmount > 0) && empty($partnerId)) {
+        // Debt / bank need a dedicated debt-holder partner (not guest info).
+        if (($debtAmount > 0 || $bankAmount > 0) && $partnerId <= 0) {
             dieWithCode(Translator::t("A partner must be selected for deferred payments"));
         }
         foreach ($payment["types"] as $pt) {
@@ -1959,6 +2049,25 @@ EOD;
         if ($publicToken === "") {
             $publicToken = bin2hex(random_bytes(24));
         }
+        if (isset($params->tracking) && is_object($params->tracking)) {
+            $track = $params->tracking;
+            $source = trim((string)($track->source ?? ""));
+            if ($source !== "") {
+                $odata["f_order_source"] = $source;
+            }
+            $restaurantId = trim((string)($track->restaurant_id ?? ""));
+            if ($restaurantId !== "") {
+                $odata["f_qrneto_restaurant_id"] = $restaurantId;
+            }
+            $locationId = trim((string)($track->location_id ?? ""));
+            if ($locationId !== "") {
+                $odata["f_qrneto_location_id"] = $locationId;
+            }
+            $etaMinutes = (int)($track->eta_minutes ?? 0);
+            if ($etaMinutes > 0) {
+                $odata["f_eta_minutes"] = $etaMinutes;
+            }
+        }
         // Site sales stay f_state=1 until Shop prints receipt + service check, then → 2.
         $v["f_state"] = !empty($params->pending_print) ? ORDER_STATE_OPEN : ORDER_STATE_CLOSED;
         $v["f_datecash"] = date("Y-m-d");
@@ -1971,6 +2080,9 @@ EOD;
         $v["f_public_token"] = $publicToken;
         $this->update("o_header", $v, $params->id);
         $this->CalculationOutput($params->id, $this->resolveCostDependOnServiceAndDiscount($params));
+        if (trim((string)($odata["f_order_source"] ?? "")) === "kiosk") {
+            $this->ensureGoodsProcessRows((string)$params->id);
+        }
         $this->result["order"] = $this->GetOrder($params->id);
         $this->result["order"]["precheck_dishes"] = $this->GetPrecheckDishes($params->id);
         $this->result["order"]["f_public_token"] = $publicToken;
@@ -1988,6 +2100,7 @@ EOD;
      */
     public function createClosedSaleFromItems(object $params): array
     {
+        $this->takeBillRound($params);
         require_once __DIR__ . "/../worker/dict-payment.php";
         $items = $params->items ?? [];
         if (empty($items) || (!is_array($items) && !($items instanceof \Traversable))) {
@@ -2874,26 +2987,74 @@ SQL;
     }
 
     /**
-     * @param array<string,mixed> $row
-     * @param array<int,mixed>    $log
+     * Lowercased alias → ['alias' => original, 'printer' => windows name].
+     * @return array<string,array{alias:string,printer:string}>
+     */
+    private function servicePrintAliasMap(): array
+    {
+        static $map = null;
+        if ($map !== null) {
+            return $map;
+        }
+        $map = [];
+        try {
+            $rows = $this->select(
+                "SELECT f_alias, f_printer FROM d_print_aliases
+                 WHERE LENGTH(TRIM(IFNULL(f_alias, ''))) > 0
+                   AND LENGTH(TRIM(IFNULL(f_printer, ''))) > 0"
+            )->fetch_all(MYSQLI_ASSOC);
+            foreach ($rows as $r) {
+                $alias = trim((string)($r["f_alias"] ?? ""));
+                $printer = trim((string)($r["f_printer"] ?? ""));
+                if ($alias !== "" && $printer !== "") {
+                    $map[mb_strtolower($alias)] = [
+                        "alias" => $alias,
+                        "printer" => $printer,
+                    ];
+                }
+            }
+        } catch (Exception $e) {
+            $map = [];
+        }
+        return $map;
+    }
+
+    /**
+     * Separate service checks by station/alias name (f_print1/2).
+     * Physical device = d_print_aliases.f_printer when name matches f_alias.
+     *
+     * @param array<string,array<string,mixed>> $result keyed by mb_strtolower(station)
+     * @param array<string,mixed>               $row
+     * @param array<int,mixed>                  $log
      */
     private function appendServicePrintDish(array &$result, ?string $printerId, string $sideLabel, array $row, array &$log): void
     {
         if ($printerId === null || $printerId === '') {
             return;
         }
-        if (empty($result[$printerId])) {
-            $result[$printerId] = [
-                'dishes' => [],
-                'printer' => $printerId,
-                'side' => $sideLabel,
+        $station = trim($printerId);
+        if ($station === '') {
+            return;
+        }
+        $key = mb_strtolower($station);
+        $map = $this->servicePrintAliasMap();
+        $isAlias = isset($map[$key]);
+        $aliasLabel = $isAlias ? $map[$key]["alias"] : $station;
+        $physical = $isAlias ? $map[$key]["printer"] : $station;
+        if (empty($result[$key])) {
+            $result[$key] = [
+                "dishes" => [],
+                "alias" => $aliasLabel,
+                "printer" => $physical,
+                "side" => $sideLabel,
             ];
         }
-        $result[$printerId]['dishes'][] = $row;
-        $qtyPart = !empty($row['f_qty_line']) ? $row['f_qty_line'] : ($row['f_qty'] ?? '');
+        $result[$key]["dishes"][] = $row;
+        $qtyPart = !empty($row["f_qty_line"]) ? $row["f_qty_line"] : ($row["f_qty"] ?? "");
         $log[] = $this->LogRecord(
-            'printed service ' . $sideLabel . ' on ' . $printerId,
-            ['comment' => ($row['f_dish_name'] ?? '') . ' (' . $qtyPart . ') ']
+            "printed service " . $sideLabel . " on " . $physical
+            . ($isAlias ? (" (alias " . $aliasLabel . ")") : ""),
+            ["comment" => ($row["f_dish_name"] ?? "") . " (" . $qtyPart . ") "]
         );
     }
 
@@ -2918,8 +3079,9 @@ SQL;
      *
      * @param object $params must include header_id
      */
-    private function printServiceCheckCore($params, bool $persistPrinted): void
+    private function printServiceCheckCore($params, bool $persistPrinted, bool $echo = true): void
     {
+        $this->takeBillRound($params);
         $header = $this->GetHeader($params->header_id);
         if (empty($header)) {
             dieWithCode(Translator::t("Order not exists"));
@@ -3059,8 +3221,11 @@ SQL;
         $this->result["reprint"] = $params->reprint ?? false;
         $this->result["header"] = $header;
         $this->result["order"] = $this->GetOrder($params->header_id);
-        $this->result["print_data"] = $result;
-        $this->echoResult();
+        // Array of groups (not object): one receipt per alias/station, printer = physical device.
+        $this->result["print_data"] = array_values($result);
+        if ($echo) {
+            $this->echoResult();
+        }
     }
 
     public function PrintServiceCheck($params)
@@ -3238,7 +3403,8 @@ SQL;
         }
 
         foreach ($payment["types"] as $pt) {
-            if (!$payment["cashbox"][$pt] || $pt === PAYMENT_TYPE_CASH) {
+            // Only real-money tenders can absorb remaining change after cash.
+            if (empty($payment["funds"][$pt]) || $pt === PAYMENT_TYPE_CASH) {
                 continue;
             }
             $pn = $payment["fields"][$pt];
@@ -3255,6 +3421,7 @@ SQL;
 
     public function PrintPrecheck($params)
     {
+        $this->takeBillRound($params);
         $this->assertOrderKitchenPrinted($params->id);
         /* THIS IS TEMPORARY UNTILL FIND BUG WITHY INCORECT COUNTING */
         $this->CountAmounts($params->id);
@@ -3310,6 +3477,7 @@ SQL;
 
     public function PrintPrecheckOfPreorder($params)
     {
+        $this->takeBillRound($params);
         // For preorder we do not mark rows as printed; allow unlimited printing.
         $this->CountAmountsOfPreorder($params->id);
 
@@ -3335,6 +3503,7 @@ SQL;
 
     public function CancelPrecheck($params)
     {
+        $this->takeBillRound($params);
         $row = $this->select("select f_data from o_header where f_id=?", "s", [$params->id])->fetch_assoc();
         if (!$row) {
             dieWithCode(Translator::t("Wrong order id"));
@@ -3487,6 +3656,7 @@ SQL;
 
     public function ChangeServiceValue($params)
     {
+        $this->takeBillRound($params);
         $id = trim((string)($params->id ?? ""));
         if ($id === "") {
             dieWithCode("Order id is required");
@@ -3525,6 +3695,7 @@ SQL;
 
     public function ChangeDiscountValue($params)
     {
+        $this->takeBillRound($params);
         $id = trim((string)($params->id ?? ""));
         if ($id === "") {
             dieWithCode("Order id is required");
@@ -3564,6 +3735,7 @@ SQL;
 
     public function RemoveArrayOfDishes($params)
     {
+        $this->takeBillRound($params);
         $dishes = [];
         foreach ($params->dishes as $d) {
             $data = (array)$d->f_data;
@@ -3598,6 +3770,7 @@ SQL;
 
     public function TransferTable($params)
     {
+        $this->takeBillRound($params);
         require_once __DIR__ . "/../worker/dict-dish-state.php";
         $this->TryLock($params->destination, $params->locksrc);
 
@@ -3710,6 +3883,7 @@ SQL;
 
     public function TransferItems($params)
     {
+        $this->takeBillRound($params);
         require_once __DIR__ . "/../worker/dict-dish-state.php";
         $logs1 = [];
         $logs2 = [];
@@ -3813,7 +3987,14 @@ SQL;
 
     public function SetDataValue($params)
     {
-        $oheader = $this->select("select f_data from o_header where f_id=?", "s", [$params->id])->fetch_assoc();
+        $id = trim((string)($params->id ?? ""));
+        if ($id === "") {
+            dieWithCode("Order not found");
+        }
+        $oheader = $this->select("select f_data from o_header where f_id=?", "s", [$id])->fetch_assoc();
+        if (empty($oheader)) {
+            dieWithCode("Order not found");
+        }
         $odata = json_decode($oheader["f_data"] ?? "{}", true) ?: [];
         $key = $params->key;
         if (property_exists($params, 'value') && $params->value === null) {
@@ -3829,13 +4010,14 @@ SQL;
             $odata[$key] = $val;
         }
         $v["f_data"] = json_encode($odata, JSON_UNESCAPED_UNICODE);
-        $this->update("o_header", $v, $params->id);
-        $this->result["order"] = $this->GetOrder($params->id);
+        $this->update("o_header", $v, $id);
+        $this->result["order"] = $this->GetOrder($id);
         $this->echoResult();
     }
 
     public function ComplimentaryItems($params)
     {
+        $this->takeBillRound($params);
         foreach ($params->items ?? [] as $i) {
             $row = $this->select("select f_data from o_goods where f_id=?", "s", [$i->f_id])->fetch_assoc();
             $data = json_decode($row["f_data"] ?? "{}", true);

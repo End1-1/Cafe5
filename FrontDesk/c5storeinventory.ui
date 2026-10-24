@@ -96,6 +96,23 @@
            </widget>
           </item>
           <item>
+           <widget class="QPushButton" name="btnAddSemiready">
+            <property name="focusPolicy">
+             <enum>Qt::FocusPolicy::NoFocus</enum>
+            </property>
+            <property name="toolTip">
+             <string>New row</string>
+            </property>
+            <property name="text">
+             <string/>
+            </property>
+            <property name="icon">
+             <iconset resource="../resources/res.qrc">
+              <normaloff>:/vegetable.png</normaloff>:/vegetable.png</iconset>
+            </property>
+           </widget>
+          </item>
+          <item>
            <widget class="QPushButton" name="btnRemoveGoods">
             <property name="focusPolicy">
              <enum>Qt::FocusPolicy::NoFocus</enum>
@@ -126,6 +143,23 @@
             </property>
             <property name="checkable">
              <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="btnSemireadyList">
+            <property name="focusPolicy">
+             <enum>Qt::FocusPolicy::NoFocus</enum>
+            </property>
+            <property name="toolTip">
+             <string>New row</string>
+            </property>
+            <property name="text">
+             <string/>
+            </property>
+            <property name="icon">
+             <iconset resource="../resources/res.qrc">
+              <normaloff>:/foodlist.png</normaloff>:/foodlist.png</iconset>
             </property>
            </widget>
           </item>

@@ -19,7 +19,13 @@ public:
 
     void setMode(int mode);
 
+    void setExpenseTypes(bool enabled);
+
+    void setCashboxName(const QString &name);
+
     double amount() const;
+
+    int operationType() const;
 
     QString comment() const;
 
@@ -34,4 +40,6 @@ private slots:
 
 private:
     Ui::DlgMoveMoney *ui;
+    bool mShowExpenseTypes = false;
+    int mMode = 0;
 };

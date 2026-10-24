@@ -1,7 +1,9 @@
 #include "qdishbutton.h"
 #include "c5utils.h"
+#include "newlook.h"
 #include "../WaiterDesigner/waitergoodsdishstyle.h"
 #include <QPainter>
+#include <QPainterPath>
 #include <QPaintEvent>
 #include <QStyleOptionButton>
 
@@ -19,10 +21,100 @@ QDishButton::QDishButton(DishAItem *dish, int minWidth, QWidget *parent) :
     f.setPointSize(qBound(7, style.fontSize, 48));
     f.setBold(style.fontBold);
     setFont(f);
+    if (WaiterUi::newLook()) {
+        setMinimumSize(QSize(minWidth, 156));
+        setMaximumHeight(156);
+    }
+}
+
+void QDishButton::paintNewLook(QPaintEvent *pe)
+{
+    Q_UNUSED(pe);
+    if (!mCardPhotoDecoded) {
+        mCardPhotoDecoded = true;
+        const QString img = mDish->image.trimmed();
+        if (!img.isEmpty()) {
+            const QByteArray bytes = QByteArray::fromBase64(img.toLatin1());
+            QPixmap px;
+            if (px.loadFromData(bytes)) {
+                mCardPhoto = px;
+            }
+        }
+    }
+
+    QPainter p(this);
+    p.setRenderHint(QPainter::Antialiasing);
+    const QRectF card = QRectF(rect()).adjusted(4, 4, -4, -4);
+    p.setPen(Qt::NoPen);
+    p.setBrush(QColor(QStringLiteral("#f7f7f7")));
+    p.drawRoundedRect(card, 12, 12);
+
+    const QRectF photo = card.adjusted(6, 6, -6, -42);
+    p.setBrush(QColor(QStringLiteral("#d5e2df")));
+    p.drawRoundedRect(photo, 8, 8);
+    if (!mCardPhoto.isNull()) {
+        QPainterPath clip;
+        clip.addRoundedRect(photo, 8, 8);
+        p.setClipPath(clip);
+        p.drawPixmap(photo.toRect(), mCardPhoto);
+        p.setClipping(false);
+    } else {
+        const QPixmap icon(QStringLiteral(":/dish.png"));
+        if (!icon.isNull()) {
+            QRect ir = photo.toRect();
+            ir.adjust(ir.width() / 4, ir.height() / 4, -ir.width() / 4, -ir.height() / 4);
+            p.drawPixmap(ir, icon);
+        }
+    }
+
+    const QString priceText = float_str(mDish->price, 2);
+    QFont pf = font();
+    pf.setBold(true);
+    pf.setPointSize(11);
+    p.setFont(pf);
+    const QFontMetrics fm(pf);
+    const int badgeW = fm.horizontalAdvance(priceText) + 16;
+    const int badgeH = fm.height() + 8;
+    const QRectF badge(photo.right() - badgeW - 6, photo.top() + 6, badgeW, badgeH);
+    p.setPen(Qt::NoPen);
+    p.setBrush(Qt::white);
+    p.drawRoundedRect(badge, 8, 8);
+    p.setPen(QColor(QStringLiteral("#1a1a1a")));
+    p.drawText(badge, Qt::AlignCenter, priceText);
+
+    QFont nf = font();
+    nf.setBold(true);
+    nf.setPointSize(10);
+    p.setFont(nf);
+    p.setPen(QColor(QStringLiteral("#1c1c1c")));
+    const QRectF nameRect(card.left() + 8, photo.bottom() + 2, card.width() - 16, 36);
+    QString name = mDish->name;
+    const bool stop = mDish->stoplist > -1;
+    bool stopreached = false;
+    if (stop) {
+        if (mDish->stoplist == 0) {
+            stopreached = true;
+        } else {
+            name = QStringLiteral("[%1] %2").arg(float_str(static_cast<double>(mDish->stoplist), 2), name);
+        }
+    }
+    p.drawText(nameRect, Qt::AlignLeft | Qt::AlignVCenter | Qt::TextWordWrap, name);
+    if (stopreached) {
+        const QPixmap px(QStringLiteral(":/stop.png"));
+        if (!px.isNull()) {
+            const QRect stopRect(photo.center().toPoint() - QPoint(24, 24), QSize(48, 48));
+            p.setOpacity(0.55);
+            p.drawPixmap(stopRect, px);
+        }
+    }
 }
 
 void QDishButton::paintEvent(QPaintEvent *pe)
 {
+    if (WaiterUi::newLook()) {
+        paintNewLook(pe);
+        return;
+    }
     QFrame::paintEvent(pe);
     const WaiterGoodsDishStyle &style = WaiterGoodsDishStyle::cachedStyle();
     bool stop = mDish->stoplist > -1;
@@ -105,7 +197,7 @@ void QDishButton::mouseReleaseEvent(QMouseEvent *e)
 {
     const int noClickZone = 50;
 
-    if(e->pos().x() < width() - noClickZone) {
+    if(WaiterUi::newLook() || e->pos().x() < width() - noClickZone) {
         emit clicked();
     }
 

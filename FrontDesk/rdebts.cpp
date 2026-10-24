@@ -1,10 +1,13 @@
 #include "rdebts.h"
 #include <QAction>
+#include <QDate>
 #include <QDialog>
+#include <QJsonDocument>
 #include <QJsonObject>
 #include <QPointer>
 #include <QTableView>
 #include <QToolBar>
+#include "c5config.h"
 #include "c5message.h"
 #include "c5user.h"
 #include "dlgdebtsredeem.h"
@@ -59,6 +62,10 @@ void RDebts::handleDebtsDoubleClick(const QModelIndex &index)
 
     const QJsonObject vm = filterObject(QStringLiteral("viewmode"));
     const int viewMode = vm.value(QStringLiteral("viewmode")).toInt(1);
+    if(viewMode == 1 || viewMode == 3) {
+        openPartnerMonthDetail(srcIndex, viewMode);
+        return;
+    }
     // Detailed modes only: columns Kind / DebtId exist there
     if(viewMode != 2 && viewMode != 4) {
         return;
@@ -83,6 +90,32 @@ void RDebts::handleDebtsDoubleClick(const QModelIndex &index)
     editRedeemDebt(debtId, docType, currencyId);
 }
 
+void RDebts::openPartnerMonthDetail(const QModelIndex &srcIndex, int viewMode)
+{
+    const int partnerId = reportSourceCellData(srcIndex.row(), 0).toInt();
+    if(partnerId <= 0) {
+        return;
+    }
+    const QString partnerName = reportSourceCellData(srcIndex.row(), 1).toString();
+    const int detailedMode = (viewMode == 1) ? 2 : 4;
+    const QDate date2 = QDate::currentDate();
+    const QDate date1 = date2.addMonths(-1);
+
+    switchToViewMode(detailedMode);
+    setFilterValue(QStringLiteral("partner"), partnerId);
+    setFilterValue(QStringLiteral("date1"), date1.toString(QStringLiteral("yyyy-MM-dd")));
+    setFilterValue(QStringLiteral("date2"), date2.toString(QStringLiteral("yyyy-MM-dd")));
+
+    const QString prefix = filterWidgetPrefix();
+    __c5config.setRegValue(QStringLiteral("rfilter_%1_partner").arg(prefix), partnerId);
+    __c5config.setRegValue(QStringLiteral("rfilter_%1_partner_name").arg(prefix), partnerName);
+    __c5config.setRegValue(QStringLiteral("rfilter_%1_date1").arg(prefix), date1);
+    __c5config.setRegValue(QStringLiteral("rfilter_%1_date2").arg(prefix), date2);
+    persistCurrentFilters();
+    checkViewModeButton(detailedMode);
+    getData();
+}
+
 void RDebts::redeemDebt()
 {
     const QJsonObject vm = filterObject(QStringLiteral("viewmode"));
@@ -95,7 +128,7 @@ void RDebts::redeemDebt()
         return;
     }
 
-    DlgDebtsRedeem dlg(this, docType, currencyId);
+    DlgDebtsRedeem dlg(mUser, this, docType, currencyId);
     if(dlg.exec() != QDialog::Accepted) {
         return;
     }
@@ -147,7 +180,7 @@ void RDebts::editRedeemDebt(int debtId, int docType, int currencyId)
                                return;
                            }
 
-                           DlgDebtsRedeem dlg(self, docType, currencyId);
+                           DlgDebtsRedeem dlg(self->mUser, self, docType, currencyId);
                            dlg.loadRedeem(redeem);
                            if(dlg.exec() != QDialog::Accepted) {
                                return;

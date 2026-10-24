@@ -3,6 +3,9 @@
 # Created: 2026-03-13 10:51:39
 
 require_once __DIR__ . "/index.php";
+require_once __DIR__ . "/../../worker/helper.php";
+require_once __DIR__ . "/../../worker/uuid.php";
+require_once __DIR__ . "/../worker/cash-ops-helper.php";
 
 class Salary extends Auth
 {
@@ -70,11 +73,14 @@ class Salary extends Auth
                 continue;
             }
             $seen[$staffId] = true;
+            $times = $this->attendanceTimesForDay($staffId, $date);
             $items[] = [
                 'f_staff' => $staffId,
                 'f_staff_name' => (string)($row['f_staff_name'] ?? ''),
                 'f_position' => (int)($row['f_position'] ?? 0),
                 'f_position_name' => (string)($row['f_position_name'] ?? ''),
+                'f_time_in' => $times['in'],
+                'f_time_out' => $times['out'],
             ];
         }
 
@@ -104,6 +110,7 @@ class Salary extends Auth
             COALESCE(s.f_fixed, 0) AS f_fixed,
             COALESCE(s.f_calculated, 0) AS f_calculated,
             COALESCE(s.f_bonus, 0) AS f_bonus,
+            COALESCE(s.f_fine, 0) AS f_fine,
             COALESCE(s.f_amount_credit, 0) AS f_amount_credit,
             COALESCE(s.f_amount_debit, 0) AS f_amount_debit,
             (SELECT COALESCE(SUM(ss.f_amount_credit) - SUM(ss.f_amount_debit), 0)
@@ -117,7 +124,165 @@ class Salary extends Auth
         SQL;
 
         $items = $this->select($sql, "si", [$date, $f_type])->fetch_all(MYSQLI_ASSOC);
+        foreach ($items as &$item) {
+            $times = $this->attendanceTimesForDay((int)($item["f_staff"] ?? 0), (string)$date);
+            $item["f_time_in"] = $times["in"];
+            $item["f_time_out"] = $times["out"];
+        }
+        unset($item);
         $this->result["items"] = $items;
+        if ($f_type === 2) {
+            $this->result["payment"] = $this->paymentSourceForDate((string)$date);
+        }
+        $this->echoResult();
+    }
+
+    /**
+     * Payment statement source (cashbox + payment type) for the date; f_cashbox_id 0 = paid outside the cashboxes.
+     *
+     * @return array<string,mixed>
+     */
+    private function paymentSourceForDate(string $date): array
+    {
+        $row = $this->paymentHeader($date);
+        if (!$row) {
+            return ["exists" => false, "f_cashbox_id" => 0, "f_cashbox_name" => "", "f_payment_type_id" => PAYMENT_TYPE_CASH];
+        }
+        $cb = $this->select("SELECT f_name FROM cash_box WHERE f_id=?", "i", [(int)$row["f_cashbox_id"]])->fetch_assoc();
+        return [
+            "exists" => true,
+            "f_cashbox_id" => (int)$row["f_cashbox_id"],
+            "f_cashbox_name" => (string)($cb["f_name"] ?? ""),
+            "f_payment_type_id" => (int)$row["f_payment_type_id"],
+        ];
+    }
+
+    private function paymentHeader(string $date): ?array
+    {
+        $exists = $this->select("SHOW TABLES LIKE 's_salary_payment_doc'")->num_rows > 0;
+        if (!$exists) {
+            return null;
+        }
+        $row = $this->select("SELECT * FROM s_salary_payment_doc WHERE f_date=?", "s", [$date])->fetch_assoc();
+        return $row ?: null;
+    }
+
+    /**
+     * Remove cash operations of a payment statement. Float is restored only on still-open shifts;
+     * closed shifts keep their stored totals.
+     */
+    private function unpostPaymentCash(string $uuid): void
+    {
+        if ($uuid === "") {
+            return;
+        }
+        $rows = $this->select(
+            "SELECT op.f_session_id,
+                    COALESCE(SUM(CASE WHEN op.f_affects_float = 1 THEN op.f_credit - op.f_debit ELSE 0 END), 0) AS f_delta
+             FROM cash_operations op
+             INNER JOIN cash_session cs ON cs.f_id = op.f_session_id AND cs.f_state = 1
+             WHERE op.f_order_id = ?
+             GROUP BY op.f_session_id",
+            "s",
+            [$uuid]
+        )->fetch_all(MYSQLI_ASSOC);
+        foreach ($rows as $r) {
+            cash_ops_adjust_session_float($this, (int)$r["f_session_id"], (float)$r["f_delta"]);
+        }
+        $this->select("DELETE FROM cash_operations WHERE f_order_id = ?", "s", [$uuid], true);
+    }
+
+    /**
+     * Balance of the cashbox for one payment type, without the operations of this statement.
+     */
+    private function cashboxBalance(int $cashboxId, int $paymentTypeId, int $currencyId, string $excludeUuid): float
+    {
+        $row = $this->select(
+            "SELECT COALESCE(SUM(f_debit), 0) - COALESCE(SUM(f_credit), 0) AS f_balance
+             FROM cash_operations
+             WHERE f_cashbox_id = ? AND COALESCE(f_payment_type_id, 1) = ? AND f_currency_id = ?
+               AND COALESCE(f_order_id, '') <> ?",
+            "iiis",
+            [$cashboxId, $paymentTypeId, $currencyId, $excludeUuid]
+        )->fetch_assoc();
+        return (float)($row["f_balance"] ?? 0);
+    }
+
+    /**
+     * One salary cash operation per employee from the chosen cashbox; attached to the open shift if any.
+     *
+     * @param list<array{staff:int,amount:float}> $payments
+     */
+    private function postPaymentCash(string $uuid, string $date, int $cashboxId, int $paymentTypeId, int $currencyId, array $payments): void
+    {
+        $session = $this->select(
+            "SELECT f_id FROM cash_session WHERE f_cashbox_id = ? AND f_state = 1 ORDER BY f_id DESC LIMIT 1",
+            "i",
+            [$cashboxId]
+        )->fetch_assoc();
+        $sessionId = (int)($session["f_id"] ?? 0);
+        $now = date("Y-m-d H:i:s");
+        $dateLabel = date("d.m.Y", strtotime($date));
+        $floatDelta = 0.0;
+
+        foreach ($payments as $p) {
+            $u = $this->select("SELECT TRIM(CONCAT(COALESCE(f_last, ''), ' ', COALESCE(f_first, ''))) AS f_name FROM s_user WHERE f_id=?",
+                "i", [$p["staff"]])->fetch_assoc();
+            // Store English template text; translate_cash_operation_comment localizes on display.
+            $comment = "Salary payment " . $dateLabel . ": " . (string)($u["f_name"] ?? $p["staff"]);
+            cash_ops_insert($this, [
+                "f_cashbox_id" => $cashboxId,
+                "f_session_id" => $sessionId,
+                "f_order_id" => $uuid,
+                "f_user" => (int)$this->userid,
+                "f_operation_type" => CASH_OP_SALARIES,
+                "f_payment_type_id" => $paymentTypeId,
+                "f_datetime" => $now,
+                "f_debit" => 0,
+                "f_credit" => $p["amount"],
+                "f_currency_id" => $currencyId,
+                "f_comment" => mb_substr($comment, 0, 255),
+            ]);
+            if (cash_ops_affects_float($paymentTypeId)) {
+                $floatDelta -= $p["amount"];
+            }
+        }
+        if ($sessionId > 0) {
+            cash_ops_adjust_session_float($this, $sessionId, $floatDelta);
+        }
+    }
+
+    /**
+     * Delete a salary document for the date; a payment statement also removes its cash operations.
+     */
+    public function RemoveDocument($params)
+    {
+        $date = (string)($params->date ?? "");
+        if ($date === "") {
+            dieWithCode("Salary date is required");
+        }
+        $f_type = (int)($params->f_type ?? $params->type ?? 1);
+        if ($f_type !== 1 && $f_type !== 2) {
+            dieWithCode("Invalid salary type");
+        }
+
+        $this->beginTransaction();
+        try {
+            if ($f_type === 2) {
+                $header = $this->paymentHeader($date);
+                if ($header) {
+                    $this->unpostPaymentCash((string)$header["f_uuid"]);
+                    $this->select("DELETE FROM s_salary_payment_doc WHERE f_date = ?", "s", [$date], true);
+                }
+            }
+            $this->select("DELETE FROM s_salary WHERE f_date = ? AND f_type = ?", "si", [$date, $f_type], true);
+            $this->commit();
+        } catch (Throwable $e) {
+            $this->rollback();
+            dieWithCode("Salary remove failed: " . $e->getMessage());
+        }
+
+        $this->result["removed"] = true;
         $this->echoResult();
     }
 
@@ -138,6 +303,42 @@ class Salary extends Auth
             dieWithCode("Salary items must be an array");
         }
 
+        $cashboxId = 0;
+        $paymentTypeId = PAYMENT_TYPE_CASH;
+        $currencyId = 1;
+        $header = null;
+        if ($f_type === 2) {
+            $cashboxId = max(0, (int)($params->cashbox_id ?? 0));
+            $paymentTypeId = (int)($params->payment_type_id ?? PAYMENT_TYPE_CASH);
+            if ($cashboxId > 0) {
+                $cb = $this->select("SELECT f_currency_id FROM cash_box WHERE f_id=?", "i", [$cashboxId])->fetch_assoc();
+                if (!$cb) {
+                    dieWithCode(Translator::t("Cashbox not found"));
+                }
+                $currencyId = max(1, (int)($cb["f_currency_id"] ?? 1));
+                if (!cash_ops_records_payment($paymentTypeId)) {
+                    dieWithCode(Translator::t("Invalid payment type"));
+                }
+            }
+            $header = $this->paymentHeader((string)$date);
+
+            if ($cashboxId > 0 && empty($params->confirm_low_balance)) {
+                $total = 0.0;
+                foreach ($itemsRaw as $it) {
+                    $total += max(0.0, (float)($it->f_amount_debit ?? $it->amount_debit ?? $it->debit ?? 0));
+                }
+                $balance = $this->cashboxBalance($cashboxId, $paymentTypeId, $currencyId, (string)($header["f_uuid"] ?? ""));
+                if ($total - $balance > 0.009) {
+                    $this->result["need_confirm"] = true;
+                    $this->result["balance"] = round($balance, 2);
+                    $this->result["total"] = round($total, 2);
+                    $this->echoResult();
+                    return;
+                }
+            }
+        }
+
+        $payments = [];
         $this->beginTransaction();
         try {
             $this->select("delete from s_salary where f_date=? and f_type=?", "si", [$date, $f_type], true);
@@ -167,10 +368,11 @@ class Salary extends Auth
                     $fixed = (float)($it->f_fixed ?? 0);
                     $calculated = (float)($it->f_calculated ?? 0);
                     $bonus = (float)($it->f_bonus ?? 0);
-                    $credit = (float)($it->f_amount_credit ?? ($fixed + $calculated + $bonus));
+                    $fine = max(0.0, (float)($it->f_fine ?? 0));
+                    $credit = max(0.0, $fixed + $calculated + $bonus - $fine);
                     $debit = 0;
 
-                    if ($credit == 0) {
+                    if ($fixed + $calculated + $bonus == 0) {
                         continue;
                     }
 
@@ -182,6 +384,7 @@ class Salary extends Auth
                         "f_fixed" => $fixed,
                         "f_calculated" => $calculated,
                         "f_bonus" => $bonus,
+                        "f_fine" => $fine,
                         "f_amount_credit" => $credit,
                         "f_amount_debit" => $debit,
                     ];
@@ -201,12 +404,34 @@ class Salary extends Auth
                         "f_fixed" => 0,
                         "f_calculated" => 0,
                         "f_bonus" => 0,
+                        "f_fine" => 0,
                         "f_amount_credit" => $credit,
                         "f_amount_debit" => $debit,
                     ];
+                    $payments[] = ["staff" => $staff, "amount" => round(abs($debit), 2)];
                 }
 
                 $this->insert("s_salary", $v);
+            }
+
+            if ($f_type === 2 && $this->select("SHOW TABLES LIKE 's_salary_payment_doc'")->num_rows > 0) {
+                $uuid = (string)($header["f_uuid"] ?? "");
+                $this->unpostPaymentCash($uuid);
+                if ($uuid === "") {
+                    $uuid = uuid_v4();
+                }
+                $this->select(
+                    "INSERT INTO s_salary_payment_doc (f_date, f_uuid, f_cashbox_id, f_payment_type_id, f_currency_id, f_user, f_updated)
+                     VALUES (?, ?, ?, ?, ?, ?, NOW())
+                     ON DUPLICATE KEY UPDATE f_cashbox_id = VALUES(f_cashbox_id), f_payment_type_id = VALUES(f_payment_type_id),
+                        f_currency_id = VALUES(f_currency_id), f_user = VALUES(f_user), f_updated = NOW()",
+                    "ssiiii",
+                    [$date, $uuid, $cashboxId, $paymentTypeId, $currencyId, (int)$this->userid],
+                    true
+                );
+                if ($cashboxId > 0 && $payments) {
+                    $this->postPaymentCash($uuid, (string)$date, $cashboxId, $paymentTypeId, $currencyId, $payments);
+                }
             }
 
             $this->commit();
@@ -307,6 +532,7 @@ class Salary extends Auth
             $lateMinutes = (int)($late["late_minutes"] ?? 0);
             $fine = (float)($late["fine"] ?? 0);
             $total = max(0.0, $fixed + $calculated + $bonus - $fine);
+            $times = $this->attendanceTimesForDay($staff, $date1);
             $items[] = [
                 "f_staff" => $staff,
                 "f_position" => $position,
@@ -317,6 +543,8 @@ class Salary extends Auth
                 "f_late_minutes" => $lateMinutes,
                 "f_fine" => round($fine, 2),
                 "f_total" => round($total, 2),
+                "f_time_in" => $times["in"],
+                "f_time_out" => $times["out"],
             ];
         }
 
@@ -438,6 +666,37 @@ class Salary extends Auth
             return sprintf('%02d:%02d', $h, $min);
         }
         return $fallback;
+    }
+
+    /**
+     * First check-in and last check-out of the day (HH:mm); empty when absent or shift still open.
+     * @return array{in: string, out: string}
+     */
+    private function attendanceTimesForDay(int $staff, string $day): array
+    {
+        $empty = ["in" => "", "out" => ""];
+        if ($staff <= 0 || $day === '') {
+            return $empty;
+        }
+
+        $row = $this->select(
+            "SELECT MIN(f_in) AS f_in, MAX(f_out) AS f_out,
+                    SUM(f_out IS NULL) AS f_open
+             FROM s_attendance
+             WHERE f_worker = ? AND DATE(f_in) = ?",
+            "is",
+            [$staff, $day]
+        )->fetch_assoc();
+
+        $fmt = static function ($raw): string {
+            $ts = strtotime((string)($raw ?? ''));
+            return $ts === false || $raw === null || $raw === '' ? '' : date('H:i', $ts);
+        };
+
+        return [
+            "in" => $fmt($row["f_in"] ?? null),
+            "out" => (int)($row["f_open"] ?? 0) > 0 ? "" : $fmt($row["f_out"] ?? null),
+        ];
     }
 
     /**

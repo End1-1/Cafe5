@@ -116,8 +116,9 @@ class Summary
         ];
 
         if ($showPayments) {
+            require_once __DIR__ . "/../../worker/cash-ops-helper.php";
             foreach ($payConfig['types'] as $pt) {
-                $headers[] = Translator::t($payConfig['names'][$pt] ?? (string)$pt);
+                $headers[] = payment_type_name($this->db, (int)$pt);
             }
         }
 

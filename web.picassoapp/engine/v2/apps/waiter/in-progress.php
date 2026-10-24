@@ -121,8 +121,47 @@ class InProgress extends Auth
         return date('Y-m-d H:i:s', $ts + ($maxMin * 60));
     }
 
+    /**
+     * Kiosk checks are paid before the kitchen sees them.
+     * Lines added without o_goods_process never show up for status changes.
+     */
+    private function ensureKioskProcessRows(): void
+    {
+        $sql = <<<EOD
+        INSERT INTO o_goods_process (f_id, f_header, f_status, f_daily_number, f_data)
+        SELECT
+            og.f_id,
+            og.f_header,
+            1,
+            COALESCE(NULLIF(JSON_UNQUOTE(JSON_EXTRACT(oh.f_data, '$.f_daily_number')), ''), '-'),
+            JSON_OBJECT(
+                'f_status_1_1_time',
+                COALESCE(
+                    NULLIF(TRIM(JSON_UNQUOTE(JSON_EXTRACT(og.f_data, '$.f_append_time'))), ''),
+                    DATE_FORMAT(NOW(), '%Y-%m-%d %H:%i:%s')
+                ),
+                'f_substatus', 1,
+                'f_cooking_start', '1981-09-05 00:01:00',
+                'f_cooking_end', DATE_FORMAT(NOW(), '%Y-%m-%d %H:%i:%s')
+            )
+        FROM o_goods og
+        INNER JOIN o_header oh ON oh.f_id = og.f_header
+        LEFT JOIN o_goods_process ogp ON ogp.f_id = og.f_id
+        WHERE oh.f_state IN (1, 2)
+          AND JSON_UNQUOTE(JSON_EXTRACT(oh.f_data, '$.f_order_source')) = 'kiosk'
+          AND og.f_state = 1
+          AND ogp.f_id IS NULL
+          AND (
+              oh.f_datecash >= DATE_SUB(CURDATE(), INTERVAL 2 DAY)
+              OR JSON_UNQUOTE(JSON_EXTRACT(oh.f_data, '$.f_date_open')) >= DATE_FORMAT(DATE_SUB(CURDATE(), INTERVAL 2 DAY), '%Y-%m-%d')
+          )
+        EOD;
+        $this->select($sql, "", [], true);
+    }
+
     public function get($params)
     {
+        $this->ensureKioskProcessRows();
         $sql = <<<EOD
         SELECT 
             oh.f_id AS f_header_id,

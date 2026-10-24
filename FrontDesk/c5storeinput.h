@@ -2,11 +2,13 @@
 
 #include <QDate>
 #include <QLabel>
+#include <QPair>
 #include <QVector>
 #include "c5widget.h"
 #include "dlgstoreinputpayment.h"
 #include "dlgstoreinputpricewarn.h"
 #include "office_structs.h"
+#include "semiready_batch.h"
 #include "struct_doc_store_input.h"
 #include "storeinputxmlimport.h"
 
@@ -18,6 +20,7 @@ class C5StoreInput;
 class QTableWidgetItem;
 class C5TableWidget;
 class C5LineEdit;
+struct GoodsItem;
 
 class C5StoreInput : public C5Widget
 {
@@ -93,6 +96,8 @@ private:
 
     StoreInputDocument mDocData;
 
+    QVector<SemireadyBatch> mSemireadyBatches;
+
     bool fCanChangeFocus;
 
     QAction *mActionSave = nullptr;
@@ -100,6 +105,10 @@ private:
     QAction *mActionDraft = nullptr;
 
     QString mWebSocketRequestId;
+
+    QString mScanBarcode;
+
+    double mScanQty = 0;
 
     QDate mInitialDate;
     int mInitialStoreId = 0;
@@ -119,6 +128,7 @@ private:
 
     QVector<StorePaymentPreset> mPaymentPresets;
     StorePaymentPreset mCurrentPayment;
+    StorePaymentOptions mPaymentOptions;
 
     int mRelatedOutputTabIndex = -1;
 
@@ -129,6 +139,10 @@ private:
     void startNewDocument();
 
     void initPaymentCombo();
+
+    void rebuildPaymentOptionsPresets();
+
+    QVector<QPair<int, QString>> loadCashboxList() const;
 
     void rebuildPaymentCombo();
 
@@ -196,11 +210,25 @@ private:
 
     int addGoodsRow();
 
+    void appendScannedGoods(const GoodsItem &g);
+
     void setDocEnabled(bool v);
 
     double additionalCost();
 
     double additionalCostForEveryGoods();
+
+    int findGoodsRow(int goodsId) const;
+
+    double lockedQty(int row) const;
+
+    void setLockedQty(int row, double qty);
+
+    void applySemireadyBatch(const SemireadyBatch &batch);
+
+    void removeSemireadyBatch(const QString &batchId);
+
+    void refreshRowTotal(int row);
 
     QString makeGoodsTableHtml(const QStringList &headers, const QList<QStringList>& rows, const QSet<int>& rightCols);
 
@@ -268,6 +296,10 @@ private slots:
     void on_btnSaveComment_clicked();
 
     void on_btnRemoveGoods_clicked();
+
+    void on_btnAddSemiready_clicked();
+
+    void on_btnSemireadyList_clicked();
 
     void on_btnPinDate_clicked(bool checked);
 

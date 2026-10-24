@@ -24,9 +24,21 @@ public:
     static double serviceFactor();
     static void setServiceFactor(double factor);
 
-    /** Base URL for guest order-status QR, e.g. https://www.ararix.com/get-order-status/ */
+    /** Base URL for guest order-status QR. Path form ends with /, query form ends with token=. */
     static QString orderStatusUrlBase();
     static void setOrderStatusUrlBase(const QString &url);
+
+    /** QRNeto business id stored on the order at close. */
+    static QString trackingRestaurantId();
+    static void setTrackingRestaurantId(const QString &id);
+
+    /** QRNeto location id stored on the order at close. */
+    static QString trackingLocationId();
+    static void setTrackingLocationId(const QString &id);
+
+    /** Minutes added to open time for estimated_ready_at. */
+    static int trackingEtaMinutes();
+    static void setTrackingEtaMinutes(int minutes);
 
 private:
     static AppSettings &instance();
@@ -37,6 +49,9 @@ private:
     int m_cashboxId = 0;
     double m_serviceFactor = 0.0;
     QString m_orderStatusUrlBase = QStringLiteral("https://www.ararix.com/get-order-status/");
+    QString m_trackingRestaurantId;
+    QString m_trackingLocationId;
+    int m_trackingEtaMinutes = 15;
 };
 
 #endif // APPSETTINGS_H

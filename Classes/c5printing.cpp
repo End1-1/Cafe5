@@ -29,7 +29,7 @@ void C5Printing::reset()
     setSceneParams(fNormalWidth, 20000, fLogicalDpiX);
 
     fFont = QFont("Arial", 10);
-    fLineHeight = QFontMetrics(fFont).height();
+    fLineHeight = QFontMetrics(fFont, &fImage).height();
 }
 
 void C5Printing::setSceneParams(qreal width, qreal height, qreal logicalDpiX)
@@ -47,6 +47,9 @@ void C5Printing::setSceneParams(qreal width, qreal height, qreal logicalDpiX)
 
     // Оставляем Format_RGB32, но холст стал в 2-3 раза плотнее
     fImage = QImage(fNormalWidth, qRound(height * (fLogicalDpiX / 96.0)), QImage::Format_RGB32);
+    // Default QImage DPI follows the screen scale (125%, 150%...), which changes printed text size per PC.
+    fImage.setDotsPerMeterX(3780);
+    fImage.setDotsPerMeterY(3780);
     fImage.fill(Qt::white);
 
     fPainter.begin(&fImage);
@@ -100,13 +103,13 @@ void C5Printing::addToJson(const QString &type, const QVariantMap &params)
 void C5Printing::setFont(const QFont &font)
 {
     fFont = font;
-    fLineHeight = QFontMetrics(fFont).height();
+    fLineHeight = QFontMetrics(fFont, &fImage).height();
 }
 
 void C5Printing::setFontSize(int size)
 {
     fFont.setPointSize(size);
-    fLineHeight = QFontMetrics(fFont).height();
+    fLineHeight = QFontMetrics(fFont, &fImage).height();
     addToJson("fontsize", {{"size", size}});
 }
 
@@ -164,9 +167,10 @@ void C5Printing::ctext(const QString &text)
 void C5Printing::rtext(const QString text)
 {
     fPainter.setFont(fFont);
-    int w = QFontMetrics(fFont).horizontalAdvance(text);
+    const QFontMetrics fm(fFont, &fImage);
+    int w = fm.horizontalAdvance(text);
     int posX = qMax(0, fNormalWidth - w - 5 - rightMarginPx());
-    fPainter.drawText(posX, fTop + QFontMetrics(fFont).ascent(), text);
+    fPainter.drawText(posX, fTop + fm.ascent(), text);
 
     fTempTop = qMax(fTempTop, fLineHeight);
     addToJson("rtext", {{"text", text}});
@@ -277,13 +281,28 @@ bool C5Printing::print(QPrinter &prn)
     if (fPainter.isActive())
         fPainter.end();
 
+    if (fImage.isNull() || fNormalWidth < 1 || fTop < 1)
+        return false;
+
     QImage finalImage = resultImage().convertToFormat(QImage::Format_Mono, Qt::ThresholdDither | Qt::AvoidDither);
+    if (finalImage.isNull())
+        return false;
+
+    // 1-bit DIBs are dropped by some Windows receipt drivers. Keep the threshold, draw as RGB.
+    finalImage = finalImage.convertToFormat(QImage::Format_RGB32);
 
     prn.setFullPage(true);
     QPainter p(&prn);
-    QRect targetPageRect = prn.pageRect(QPrinter::DevicePixel).toRect();
-    qreal scale = (qreal) targetPageRect.width() / (qreal) fNormalWidth;
+    if (!p.isActive())
+        return false;
 
+    QRect targetPageRect = prn.pageRect(QPrinter::DevicePixel).toRect();
+    if (targetPageRect.width() < 1) {
+        p.end();
+        return false;
+    }
+
+    qreal scale = (qreal) targetPageRect.width() / (qreal) fNormalWidth;
     p.drawImage(QRect(0, 0, targetPageRect.width(), qRound(finalImage.height() * scale)), finalImage);
     p.end();
     return true;

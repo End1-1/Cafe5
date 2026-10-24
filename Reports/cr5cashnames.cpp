@@ -6,9 +6,13 @@ CR5CashNames::CR5CashNames(QWidget *parent) :
 {
     fIconName = ":/cash.png";
     fLabel = tr("Cashboxes");
-    fSqlQuery = "select c.f_id, c.f_name from cash_box c";
+    fSqlQuery = "select c.f_id, c.f_name, c.f_currency_id, cur.f_name as f_currencyname "
+                "from cash_box c "
+                "left join e_currency cur on cur.f_id=c.f_currency_id";
     fTranslation["f_id"] = tr("Code");
     fTranslation["f_name"] = tr("Name");
+    fTranslation["f_currency_id"] = tr("Currency code");
+    fTranslation["f_currencyname"] = tr("Currency");
     fEditor = new C5CashName();
 }
 

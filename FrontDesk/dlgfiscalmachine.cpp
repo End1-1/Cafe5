@@ -42,6 +42,7 @@ void DlgFiscalMachine::applyRow(const QJsonObject &row)
     ui->leOpPass->setText(row.value(QStringLiteral("f_op_pass")).toString());
     ui->chExternalPos->setChecked(row.value(QStringLiteral("f_external_pos")).toInt() == 1);
     ui->chIdramExternalPos->setChecked(row.value(QStringLiteral("f_idram_ext_pos")).toInt() == 1);
+    ui->chAutoFiscal->setChecked(row.value(QStringLiteral("f_auto_fiscal")).toInt() == 1);
     ui->chSimpleHdm->setChecked(row.value(QStringLiteral("f_simple_fiscal")).toInt() == 1);
     ui->sbDefaultDept->setValue(row.value(QStringLiteral("f_default_dept")).toInt(1));
     ui->labelDept->setEnabled(ui->chSimpleHdm->isChecked());
@@ -96,6 +97,7 @@ void DlgFiscalMachine::trySave()
                           {QStringLiteral("f_op_pass"), ui->leOpPass->text()},
                           {QStringLiteral("f_external_pos"), ui->chExternalPos->isChecked() ? 1 : 0},
                           {QStringLiteral("f_idram_ext_pos"), ui->chIdramExternalPos->isChecked() ? 1 : 0},
+                          {QStringLiteral("f_auto_fiscal"), ui->chAutoFiscal->isChecked() ? 1 : 0},
                           {QStringLiteral("f_default_dept"), ui->sbDefaultDept->value()},
                           {QStringLiteral("f_simple_fiscal"), ui->chSimpleHdm->isChecked() ? 1 : 0},
                       },

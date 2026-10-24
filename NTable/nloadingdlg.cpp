@@ -8,6 +8,13 @@ NLoadingDlg::NLoadingDlg(const QString &title, QWidget *parent) :
     mSecond(0)
 {
     ui->setupUi(this);
+    setObjectName(QStringLiteral("NLoadingDlg"));
+    setAttribute(Qt::WA_StyledBackground, true);
+    setStyleSheet(QStringLiteral(
+        "QDialog#NLoadingDlg {"
+        "border: 1px solid #ffffff;"
+        "border-radius: 0px;"
+        "}"));
     ui->lbTitle->setText(title);
     auto *t = new QTimer(this);
     connect(t, &QTimer::timeout, this, &NLoadingDlg::timeout);

@@ -317,6 +317,11 @@ QDialog {
     background: #495963;
 }
 
+QDialog#NLoadingDlg {
+    border: 1px solid #ffffff;
+    border-radius: 0px;
+}
+
 QWidget#scrollAreaWidgetContents {
     background: #495963;
 }
@@ -429,6 +434,32 @@ QDialog#DlgKitchenInProgress QTableWidget#tblKitchenOrders {
 }
 
 QDialog#DlgKitchenInProgress QHeaderView::section {
+    background: #3f4e57;
+    color: #ffffff;
+    border: 1px solid #6b7a84;
+    padding: 4px;
+}
+
+/* Debt/bank partner search (DlgCL) */
+QDialog#DlgCL QTableWidget#tblGuest {
+    background: #3d4952;
+    color: #ffffff;
+    gridline-color: #6b7a84;
+    border: 1px solid #6b7a84;
+    selection-background-color: #5f7480;
+    selection-color: #ffffff;
+}
+
+QDialog#DlgCL QTableWidget#tblGuest::item {
+    color: #ffffff;
+}
+
+QDialog#DlgCL QTableWidget#tblGuest::item:selected {
+    background: #5f7480;
+    color: #ffffff;
+}
+
+QDialog#DlgCL QHeaderView::section {
     background: #3f4e57;
     color: #ffffff;
     border: 1px solid #6b7a84;

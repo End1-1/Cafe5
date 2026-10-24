@@ -10,16 +10,25 @@
 #include <QSet>
 #include <QSignalBlocker>
 #include <QTextDocument>
+#include <QVector>
 
+#include "c5cache.h"
 #include "c5codenameselectorfunctions.h"
+#include "c5config.h"
 #include "c5message.h"
 #include "c5user.h"
 #include "c5utils.h"
+#include "dict_payment_type.h"
 #include "ninterface.h"
+#include "paymenttypenames.h"
 
 namespace {
 
 constexpr int kSalaryTypePayment = 2;
+
+const QString kRegCashbox = QStringLiteral("salary_payment_cashbox");
+const QString kRegCashboxName = QStringLiteral("salary_payment_cashbox_name");
+const QString kRegPaymentType = QStringLiteral("salary_payment_type");
 
 } // namespace
 
@@ -34,6 +43,7 @@ C5SalaryPaymentEditor::C5SalaryPaymentEditor(QWidget *parent)
     mOpenDate = ui->deDate->date();
     mLoadOnShow = true;
     initTable();
+    initPaymentSource();
     recalcTotal();
 
     connect(ui->tblSalary, &QTableWidget::cellChanged, this, [this](int, int) {
@@ -111,6 +121,13 @@ void C5SalaryPaymentEditor::showEvent(QShowEvent *e)
 
     mLoadOnShow = false;
 
+    if (!mPaymentNamesLoaded) {
+        mPaymentNamesLoaded = true;
+        PaymentTypeNames::load(mUser->mSessionKey, this, [this]() {
+            rebuildPaymentCombo();
+        });
+    }
+
     const QString dateStr = mOpenDate.isValid() ? mOpenDate.toString(QStringLiteral("yyyy-MM-dd"))
                                                 : ui->deDate->date().toString(QStringLiteral("yyyy-MM-dd"));
 
@@ -127,6 +144,7 @@ void C5SalaryPaymentEditor::showEvent(QShowEvent *e)
                        [this, openDate](const QJsonObject &jo) {
                            QSignalBlocker sb2(ui->tblSalary);
 
+                           applyPaymentSource(jo.value(QStringLiteral("payment")).toObject());
                            const QJsonArray items = jo.value(QStringLiteral("items")).toArray();
                            ui->tblSalary->setRowCount(0);
 
@@ -423,16 +441,42 @@ void C5SalaryPaymentEditor::saveDocument()
         return;
     }
 
+    const int cashboxId = mCurrentPayment.isUnpaid() ? 0 : mCurrentPayment.cashboxId;
+    const int paymentTypeId = mCurrentPayment.isUnpaid() ? PAYMENT_TYPE_CASH : mCurrentPayment.paymentTypeId;
+
     QJsonObject params;
     params[QStringLiteral("date")] = ui->deDate->date().toString(QStringLiteral("yyyy-MM-dd"));
     params[QStringLiteral("f_type")] = kSalaryTypePayment;
     params[QStringLiteral("items")] = items;
+    params[QStringLiteral("cashbox_id")] = cashboxId;
+    params[QStringLiteral("payment_type_id")] = paymentTypeId;
 
+    __c5config.setRegValue(kRegCashbox, cashboxId);
+    __c5config.setRegValue(kRegCashboxName, mCurrentPayment.cashboxName);
+    __c5config.setRegValue(kRegPaymentType, paymentTypeId);
+
+    sendSave(params);
+}
+
+void C5SalaryPaymentEditor::sendSave(QJsonObject params)
+{
     NInterface::query1(QStringLiteral("/engine/v2/officen/salary/save"),
                        mUser->mSessionKey,
                        this,
                        params,
-                       [this](const QJsonObject &) {
+                       [this, params](const QJsonObject &jo) mutable {
+                           if (jo.value(QStringLiteral("need_confirm")).toBool()) {
+                               const double balance = jo.value(QStringLiteral("balance")).toVariant().toDouble();
+                               const double total = jo.value(QStringLiteral("total")).toVariant().toDouble();
+                               if (C5Message::question(tr("Not enough money in the cashbox: balance %1, payment %2. Save anyway?")
+                                                           .arg(float_str(balance, 2), float_str(total, 2)))
+                                       != QDialog::Accepted) {
+                                   return;
+                               }
+                               params[QStringLiteral("confirm_low_balance")] = 1;
+                               sendSave(params);
+                               return;
+                           }
                            C5Message::info(tr("Saved"));
                            recalcTotal();
                        });
@@ -440,8 +484,141 @@ void C5SalaryPaymentEditor::saveDocument()
 
 void C5SalaryPaymentEditor::removeDocument()
 {
-    ui->tblSalary->setRowCount(0);
-    recalcTotal();
+    const QDate date = mOpenDate.isValid() ? mOpenDate : ui->deDate->date();
+    if (C5Message::question(tr("Remove the salary payment document for %1? Its cashbox operations will be removed too.")
+                                .arg(date.toString(QStringLiteral("dd.MM.yyyy"))))
+            != QDialog::Accepted) {
+        return;
+    }
+
+    NInterface::query1(QStringLiteral("/engine/v2/officen/salary/remove-document"),
+                       mUser->mSessionKey,
+                       this,
+                       {{QStringLiteral("date"), date.toString(QStringLiteral("yyyy-MM-dd"))},
+                        {QStringLiteral("f_type"), kSalaryTypePayment}},
+                       [this](const QJsonObject &) {
+                           QSignalBlocker sb(ui->tblSalary);
+                           ui->tblSalary->setRowCount(0);
+                           recalcTotal();
+                       });
+}
+
+void C5SalaryPaymentEditor::initPaymentSource()
+{
+    mPaymentOptions.settingsGroup = QStringLiteral("SalaryPayment");
+    mPaymentOptions.load();
+    mPaymentPresets = mPaymentOptions.buildPresets(loadCashboxList());
+    applyPaymentSource(QJsonObject());
+}
+
+QVector<QPair<int, QString>> C5SalaryPaymentEditor::loadCashboxList() const
+{
+    QVector<QPair<int, QString>> out;
+    C5Cache *cache = C5Cache::cache(cache_cash_names);
+    if (!cache) {
+        return out;
+    }
+    for (int r = 0; r < cache->rowCount(); ++r) {
+        const int id = cache->getInt(r, 0);
+        if (id > 0) {
+            out.append({id, cache->getString(r, 1)});
+        }
+    }
+    return out;
+}
+
+void C5SalaryPaymentEditor::applyPaymentSource(const QJsonObject &payment)
+{
+    StorePaymentPreset preset;
+    if (payment.value(QStringLiteral("exists")).toBool()) {
+        preset.cashboxId = payment.value(QStringLiteral("f_cashbox_id")).toVariant().toInt();
+        preset.cashboxName = payment.value(QStringLiteral("f_cashbox_name")).toString();
+        preset.paymentTypeId = payment.value(QStringLiteral("f_payment_type_id")).toVariant().toInt();
+    } else {
+        preset.cashboxId = __c5config.getRegValue(kRegCashbox, 0).toInt();
+        preset.cashboxName = __c5config.getRegValue(kRegCashboxName).toString();
+        preset.paymentTypeId = __c5config.getRegValue(kRegPaymentType, PAYMENT_TYPE_CASH).toInt();
+    }
+    selectPayment(preset);
+}
+
+void C5SalaryPaymentEditor::selectPayment(const StorePaymentPreset &preset)
+{
+    mPaymentPresets = mPaymentOptions.buildPresets(loadCashboxList());
+    mCurrentPayment = StorePaymentPreset();
+    if (!preset.isUnpaid()) {
+        for (const StorePaymentPreset &p : mPaymentPresets) {
+            if (p.cashboxId == preset.cashboxId && p.paymentTypeId == preset.paymentTypeId) {
+                mCurrentPayment = p;
+                break;
+            }
+        }
+        if (mCurrentPayment.isUnpaid()) {
+            // Saved document keeps its source visible even if it is no longer in the settings.
+            mCurrentPayment = preset;
+            mCurrentPayment.paymentTypeName = PaymentTypeNames::title(preset.paymentTypeId);
+            mCurrentPayment.currencyId = 1;
+            mPaymentPresets.append(mCurrentPayment);
+        }
+    }
+    rebuildPaymentCombo();
+}
+
+void C5SalaryPaymentEditor::rebuildPaymentCombo()
+{
+    const QSignalBlocker blocker(ui->cbPayment);
+    ui->cbPayment->clear();
+    const bool showUnpaid = mPaymentOptions.unpaidEnabled;
+    if (showUnpaid) {
+        ui->cbPayment->addItem(tr("Not from cashbox"));
+    }
+    for (const StorePaymentPreset &p : mPaymentPresets) {
+        ui->cbPayment->addItem(p.label());
+    }
+
+    int idx = -1;
+    if (mCurrentPayment.isUnpaid()) {
+        if (showUnpaid) {
+            idx = 0;
+        } else if (!mPaymentPresets.isEmpty()) {
+            mCurrentPayment = mPaymentPresets.first();
+            idx = 0;
+        }
+    } else {
+        for (int i = 0; i < mPaymentPresets.size(); ++i) {
+            if (mPaymentPresets.at(i).matches(mCurrentPayment)) {
+                idx = i + (showUnpaid ? 1 : 0);
+                break;
+            }
+        }
+    }
+    if (idx >= 0) {
+        ui->cbPayment->setCurrentIndex(idx);
+    }
+}
+
+void C5SalaryPaymentEditor::on_cbPayment_currentIndexChanged(int index)
+{
+    if (index < 0) {
+        return;
+    }
+    const bool showUnpaid = mPaymentOptions.unpaidEnabled;
+    if (showUnpaid && index == 0) {
+        mCurrentPayment = StorePaymentPreset();
+        return;
+    }
+    const int presetIndex = index - (showUnpaid ? 1 : 0);
+    if (presetIndex >= 0 && presetIndex < mPaymentPresets.size()) {
+        mCurrentPayment = mPaymentPresets.at(presetIndex);
+    }
+}
+
+void C5SalaryPaymentEditor::on_btnPaymentConfig_clicked()
+{
+    if (!DlgStoreInputPayment::configure(mPaymentOptions, loadCashboxList(), this, tr("Not from cashbox"))) {
+        return;
+    }
+    selectPayment(mCurrentPayment);
 }
 
 void C5SalaryPaymentEditor::print()

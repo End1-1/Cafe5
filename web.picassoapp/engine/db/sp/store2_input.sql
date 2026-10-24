@@ -21,6 +21,7 @@ BEGIN
     DECLARE paid_amount decimal(14, 2) DEFAULT 0;
     DECLARE debt_amount decimal(14, 2) DEFAULT 0;
     DECLARE session_id int DEFAULT 0;
+    DECLARE cash_op_dt datetime DEFAULT NULL;
 
     DECLARE p_user_item_id INT;
     DECLARE p_item_id INT;
@@ -176,9 +177,13 @@ BEGIN
                                        AND f_cashbox_id = cashbox_id
                                      ORDER BY f_id DESC
                                      LIMIT 1), 0);
+            -- Date-only doc_date → 00:00:00; use current time on that date for cash log.
+            SET cash_op_dt = IF(TIME(IFNULL(doc_date, NOW())) = '00:00:00',
+                                TIMESTAMP(DATE(IFNULL(doc_date, NOW())), CURTIME()),
+                                doc_date);
             INSERT INTO cash_operations (f_cashbox_id, f_session_id, f_order_id, f_user, f_operation_type,
                                          f_payment_type_id, f_datetime, f_credit, f_currency_id, f_affects_float)
-            VALUES (cashbox_id, NULLIF(session_id, 0), doc_uuid, create_user, 3, payment_type_id, doc_date,
+            VALUES (cashbox_id, NULLIF(session_id, 0), doc_uuid, create_user, 3, payment_type_id, cash_op_dt,
                     paid_amount, IFNULL(currency_id, 1), IF(payment_type_id = 1, 1, 0));
             -- Cash purchase reduces drawer float when a shift is open on this cashbox.
             IF (payment_type_id = 1 AND IFNULL(session_id, 0) > 0) THEN

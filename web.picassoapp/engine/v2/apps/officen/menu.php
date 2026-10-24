@@ -13,6 +13,30 @@ class Menu extends Auth
         $storages = $this->select("select f_id, f_name from c_storages where f_state=1")->fetch_all(MYSQLI_ASSOC);
         $this->result["storages"] = $storages;
         $printers = $this->select("select f_name from d_printers")->fetch_all(MYSQLI_ASSOC);
+        // Aliases are logical print stations (separate checks); include them in dish print combos.
+        try {
+            $aliases = $this->select(
+                "SELECT DISTINCT TRIM(f_alias) AS f_name FROM d_print_aliases
+                 WHERE LENGTH(TRIM(IFNULL(f_alias, ''))) > 0"
+            )->fetch_all(MYSQLI_ASSOC);
+            $seen = [];
+            foreach ($printers as $p) {
+                $n = trim((string)($p["f_name"] ?? ""));
+                if ($n !== "") {
+                    $seen[mb_strtolower($n)] = true;
+                }
+            }
+            foreach ($aliases as $a) {
+                $n = trim((string)($a["f_name"] ?? ""));
+                if ($n === "" || isset($seen[mb_strtolower($n)])) {
+                    continue;
+                }
+                $seen[mb_strtolower($n)] = true;
+                $printers[] = ["f_name" => $n];
+            }
+        } catch (Exception $e) {
+            // table may be missing on old DBs
+        }
         $this->result["printers"] = $printers;
 
         $this->echoResult();

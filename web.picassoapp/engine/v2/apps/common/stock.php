@@ -181,4 +181,31 @@ class Stock extends Auth
         $this->result["status"] = 1;
         $this->echoResult();
     }
+
+    public function RemoveInventory($params)
+    {
+        $v = $this->ValidateParams($params, [
+            'id' => 'required|string'
+        ]);
+
+        $row = $this->select(
+            "SELECT f_id FROM store_inventory_document WHERE f_id=?",
+            "s",
+            [$v->id]
+        )->fetch_assoc();
+        if (!$row) {
+            dieWithCode("Document not found");
+        }
+
+        $this->beginTransaction();
+        try {
+            $this->delete("store_inventory_user", $v->id, "f_doc");
+            $this->delete("store_inventory_document", $v->id, "f_id");
+            $this->commit();
+            $this->echoResult();
+        } catch (Exception $e) {
+            $this->rollback();
+            dieWithCode($e->getMessage());
+        }
+    }
 }

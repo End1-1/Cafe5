@@ -2,6 +2,7 @@
 #define DLGCL_H
 
 #include "c5dialog.h"
+#include <QJsonArray>
 
 namespace Ui
 {
@@ -22,7 +23,10 @@ public:
 private:
     Ui::DlgCL* ui;
 
-    int fRow;
+    int fRow = -1;
+
+    void loadPartners(const QString &query);
+    void fillTable(const QJsonArray &partners);
 
 private slots:
     void kbdAccept();

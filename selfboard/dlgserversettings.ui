@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>640</width>
-    <height>620</height>
+    <height>760</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -127,7 +127,47 @@
       <item row="4" column="1">
        <widget class="QLineEdit" name="leOrderStatusUrl">
         <property name="placeholderText">
-         <string>https://www.ararix.com/get-order-status/</string>
+         <string>https://resto.qrneto.com/?option=com_qrnetorestaurant&amp;task=tracking.page&amp;tmpl=component&amp;token=</string>
+        </property>
+       </widget>
+      </item>
+      <item row="5" column="0">
+       <widget class="QLabel" name="labelQrnetoRestaurant">
+        <property name="text">
+         <string>QRNeto restaurant id</string>
+        </property>
+       </widget>
+      </item>
+      <item row="5" column="1">
+       <widget class="QLineEdit" name="leQrnetoRestaurantId"/>
+      </item>
+      <item row="6" column="0">
+       <widget class="QLabel" name="labelQrnetoLocation">
+        <property name="text">
+         <string>QRNeto location id</string>
+        </property>
+       </widget>
+      </item>
+      <item row="6" column="1">
+       <widget class="QLineEdit" name="leQrnetoLocationId"/>
+      </item>
+      <item row="7" column="0">
+       <widget class="QLabel" name="labelTrackingEta">
+        <property name="text">
+         <string>Ready in, minutes</string>
+        </property>
+       </widget>
+      </item>
+      <item row="7" column="1">
+       <widget class="QSpinBox" name="sbTrackingEta">
+        <property name="minimum">
+         <number>0</number>
+        </property>
+        <property name="maximum">
+         <number>240</number>
+        </property>
+        <property name="value">
+         <number>15</number>
         </property>
        </widget>
       </item>

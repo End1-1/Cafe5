@@ -1,8 +1,10 @@
 #pragma once
 
 #include <QLabel>
+#include <QVector>
 #include "c5widget.h"
 #include "office_structs.h"
+#include "semiready_batch.h"
 #include "struct_doc_store_input.h"
 
 namespace Ui
@@ -13,6 +15,7 @@ class C5StoreOutput;
 class QTableWidgetItem;
 class C5TableWidget;
 class C5LineEdit;
+struct GoodsItem;
 
 class C5StoreOutput : public C5Widget
 {
@@ -69,11 +72,19 @@ private:
 
     StoreInputDocument mDocData;
 
+    QVector<SemireadyBatch> mSemireadyBatches;
+
     bool fCanChangeFocus;
 
     QAction *mActionSave;
 
     QAction *mActionDraft;
+
+    QString mWebSocketRequestId;
+
+    QString mScanBarcode;
+
+    double mScanQty = 0;
 
     bool buildDoc(bool requireValidQty);
 
@@ -89,7 +100,21 @@ private:
 
     int addGoodsRow();
 
+    void appendScannedGoods(const GoodsItem &g);
+
     void setDocEnabled(bool v);
+
+    int findGoodsRow(int goodsId) const;
+
+    double lockedQty(int row) const;
+
+    void setLockedQty(int row, double qty);
+
+    void applySemireadyBatch(const SemireadyBatch &batch);
+
+    void removeSemireadyBatch(const QString &batchId);
+
+    void refreshRowTotal(int row);
 
     QString makeGoodsTableHtml(const QStringList &headers, const QList<QStringList>& rows, const QSet<int>& rightCols);
 
@@ -147,4 +172,8 @@ private slots:
     void on_btnSaveComment_clicked();
 	
     void on_btnRemoveGoods_clicked();
+
+    void on_btnAddSemiready_clicked();
+
+    void on_btnSemireadyList_clicked();
 };

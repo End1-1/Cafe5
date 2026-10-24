@@ -9,6 +9,7 @@
 #include <QMessageBox>
 #include <QRegularExpression>
 #include <QString>
+#include <QTimer>
 #include <QWidget>
 
 namespace SelfBoardUpdate {
@@ -24,24 +25,33 @@ inline void offerAndRun(QWidget *parent, const QString &msg, const QString &appN
         oldVersion = m.captured(1);
     }
 
-    DlgUpdateRequired dlg(parent);
+    // Top-level window: a translucent child of the fullscreen kiosk crashes on close (c0000005).
+    DlgUpdateRequired dlg(nullptr);
+    dlg.setWindowModality(Qt::ApplicationModal);
     dlg.setUpdateInfo(msg, oldVersion, newVersion);
     dlg.adjustSize();
-    if (parent) {
+    if (parent && parent->window()) {
         dlg.move(parent->window()->geometry().center() - dlg.rect().center());
     }
 
-    if (dlg.exec() != QDialog::Accepted) {
-        qApp->exit(0);
+    const int answer = dlg.exec();
+    dlg.prepareForClose();
+
+    const auto leave = [] {
+        QTimer::singleShot(0, qApp, [] { QCoreApplication::exit(0); });
+    };
+
+    if (answer != QDialog::Accepted) {
+        leave();
         return;
     }
     if (!C5UpdaterLauncher::tryStart(appName, newVersion)) {
         QMessageBox::information(
-            parent,
+            nullptr,
             QObject::tr("Update required"),
             QObject::tr("Could not start the updater. Reinstall the application or run the setup from picasso.am."));
     }
-    qApp->exit(0);
+    leave();
 }
 
 } // namespace SelfBoardUpdate

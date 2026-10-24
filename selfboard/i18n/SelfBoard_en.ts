@@ -130,4 +130,19 @@
         <translation>%1 ֏</translation>
     </message>
 </context>
+<context>
+    <name>DlgServerSettings</name>
+    <message>
+        <source>QRNeto restaurant id</source>
+        <translation>QRNeto restaurant id</translation>
+    </message>
+    <message>
+        <source>QRNeto location id</source>
+        <translation>QRNeto location id</translation>
+    </message>
+    <message>
+        <source>Ready in, minutes</source>
+        <translation>Ready in, minutes</translation>
+    </message>
+</context>
 </TS>

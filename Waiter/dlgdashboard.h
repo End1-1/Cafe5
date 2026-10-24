@@ -42,6 +42,8 @@ private slots:
 
     void on_btnCashOut_clicked();
 
+    void on_btnCashCollection_clicked();
+
 private:
     Ui::DlgDashboard* ui;
 
@@ -53,7 +55,9 @@ private:
 
     void refreshAttendanceStatus();
 
-    void printDifferenceAct(const QJsonObject &cashbox);
+    void printDifferenceAct(const QJsonObject &cashbox, bool opening = false);
+
+    void printCashCollection(const QString &cashboxName, double amount, int destCashboxId, const QString &comment);
 
     int mRoute = 0;
 };

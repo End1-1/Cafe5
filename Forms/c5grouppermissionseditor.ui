@@ -343,6 +343,16 @@
             </widget>
            </item>
            <item>
+            <widget class="C5CheckBox" name="checkBox_218">
+             <property name="text">
+              <string>Cash in / cash out</string>
+             </property>
+             <property name="Tag" stdset="0">
+              <number>515</number>
+             </property>
+            </widget>
+           </item>
+           <item>
             <spacer name="verticalSpacer_12">
              <property name="orientation">
               <enum>Qt::Orientation::Vertical</enum>

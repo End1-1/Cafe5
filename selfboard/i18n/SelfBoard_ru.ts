@@ -157,6 +157,18 @@
         <source>Service %</source>
         <translation>Сервис %</translation>
     </message>
+    <message>
+        <source>QRNeto restaurant id</source>
+        <translation>ID ресторана QRNeto</translation>
+    </message>
+    <message>
+        <source>QRNeto location id</source>
+        <translation>ID точки QRNeto</translation>
+    </message>
+    <message>
+        <source>Ready in, minutes</source>
+        <translation>Готовность, минут</translation>
+    </message>
 </context>
 <context>
     <name>DlgCart</name>

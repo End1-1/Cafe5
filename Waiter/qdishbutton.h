@@ -3,6 +3,7 @@
 
 #include "struct_dish.h"
 #include <QFrame>
+#include <QPixmap>
 
 class QDishButton : public QFrame
 {
@@ -17,7 +18,13 @@ protected:
     virtual void mouseReleaseEvent(QMouseEvent *e) override;
 
 private:
+    void paintNewLook(QPaintEvent *pe);
+
     DishAItem* mDish;
+
+    QPixmap mCardPhoto;
+
+    bool mCardPhotoDecoded = false;
 
 signals:
     void clicked();

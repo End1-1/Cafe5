@@ -1,7 +1,10 @@
 #include "dlgsearchinmenu.h"
+#include <QApplication>
+#include <QKeyEvent>
 #include <QPainter>
 #include <QStyledItemDelegate>
 #include <QTextLayout>
+#include <QTimer>
 #include "c5utils.h"
 #include "struct_workstationitem.h"
 #include "ui_dlgsearchinmenu.h"
@@ -163,17 +166,20 @@ DlgSearchInMenu::DlgSearchInMenu(const QVector<DishAItem*>* dishes, int menu, C5
     mMenu(menu)
 {
     ui->setupUi(this);
-    ui->tbl->configColumns({ 0, 0, 200, 350, 100});
+    ui->tbl->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+    ui->tbl->horizontalHeader()->setMinimumSectionSize(120);
     connect(ui->kb, SIGNAL(textChanged(QString)), this, SLOT(searchDish(QString)));
     connect(ui->kb, SIGNAL(accept()), this, SLOT(kbdAccept()));
     connect(ui->kb, SIGNAL(reject()), this, SLOT(reject()));
     ui->tbl->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
     ui->tbl->horizontalHeader()->setStretchLastSection(true);
     ui->tbl->setItemDelegate(new DishCellDelegate(ui->tbl));
+    qApp->installEventFilter(this);
 }
 
 DlgSearchInMenu::~DlgSearchInMenu()
 {
+    qApp->removeEventFilter(this);
     delete ui;
 }
 
@@ -181,16 +187,73 @@ void DlgSearchInMenu::showEvent(QShowEvent *e)
 {
     C5Dialog::showEvent(e);
     int hSectionSize = mWorkStation.data.value("dlgsearchmenu_hsection_size").toInt();
-    if (hSectionSize == 0) {
+    if (hSectionSize < 80) {
         hSectionSize = 160;
     }
     int vSectionSize = mWorkStation.data.value("dlgsearchmenu_vsection_size").toInt();
-    if (vSectionSize == 0) {
+    if (vSectionSize < 40) {
         vSectionSize = 64;
     }
     ui->tbl->horizontalHeader()->setDefaultSectionSize(hSectionSize);
     ui->tbl->verticalHeader()->setDefaultSectionSize(vSectionSize);
-    ui->tbl->setColumnCount(width() / ui->tbl->horizontalHeader()->defaultSectionSize());
+    const int cols = qMax(1, width() / hSectionSize);
+    ui->tbl->setColumnCount(cols);
+    ui->tbl->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+    searchDish(ui->kb->text());
+    activateWindow();
+    raise();
+    if (QLineEdit *ed = ui->kb->editor()) {
+        ed->setFocus();
+    }
+    QTimer::singleShot(0, this, [this]() {
+        activateWindow();
+        raise();
+        if (QLineEdit *ed = ui->kb->editor()) {
+            ed->setFocus();
+        }
+    });
+}
+
+bool DlgSearchInMenu::eventFilter(QObject *o, QEvent *e)
+{
+    if (e->type() != QEvent::KeyPress && e->type() != QEvent::ShortcutOverride) {
+        return false;
+    }
+
+    auto *w = qobject_cast<QWidget *>(o);
+    if (!w) {
+        return false;
+    }
+    if (w == this || isAncestorOf(w)) {
+        return false;
+    }
+
+    QWidget *modal = qobject_cast<QWidget *>(QApplication::activeModalWidget());
+    if (modal && modal != this && !isAncestorOf(modal)) {
+        return false;
+    }
+
+    if (e->type() == QEvent::ShortcutOverride) {
+        e->accept();
+        return true;
+    }
+
+    auto *k = static_cast<QKeyEvent *>(e);
+    QLineEdit *ed = ui->kb->editor();
+    if (!ed) {
+        return false;
+    }
+    auto *copy = new QKeyEvent(QEvent::KeyPress,
+                               k->key(),
+                               k->modifiers(),
+                               k->nativeScanCode(),
+                               k->nativeVirtualKey(),
+                               k->nativeModifiers(),
+                               k->text(),
+                               k->isAutoRepeat(),
+                               k->count());
+    QCoreApplication::postEvent(ed, copy);
+    return true;
 }
 
 void DlgSearchInMenu::searchDish(const QString &name)
@@ -209,8 +272,14 @@ void DlgSearchInMenu::searchDish(const QString &name)
         result.append(d);
     }
 
+    if (ui->tbl->columnCount() < 1) {
+        ui->tbl->setColumnCount(qMax(1, width() / 160));
+        ui->tbl->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+    }
+
     ui->tbl->clearContents();
-    int rowCount = (result.size() + ui->tbl->columnCount() - 1) / ui->tbl->columnCount();
+    const int cols = ui->tbl->columnCount();
+    const int rowCount = result.isEmpty() ? 0 : (result.size() + cols - 1) / cols;
     ui->tbl->setRowCount(rowCount);
     int r = 0, c = 0;
 

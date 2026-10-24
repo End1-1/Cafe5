@@ -24,6 +24,14 @@ template<typename T>
     return C5StructTableView::get<T>(SelectorName<T>::value, loadFirst, multiSelect, position);
 }
 
+[[nodiscard]] inline QVector<GoodsItem> selectStoreDocGoods(bool multiSelect = false, const QPoint &position = {-1, -1})
+{
+    return C5StructTableView::get<GoodsItem>(SelectorName<GoodsItem>::value, false, multiSelect, position,
+                                             [](const QJsonObject &jo) {
+                                                 return jo.value(QStringLiteral("f_store_doc")).toBool(true);
+                                             });
+}
+
 template<typename T>
 auto makeSelector(std::function<void(T)> callback = nullptr)
 {

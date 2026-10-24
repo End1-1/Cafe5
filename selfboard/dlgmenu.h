@@ -12,6 +12,7 @@ class SelfboardBottomChrome;
 class DlgCart;
 class DlgDishDetails;
 class DlgOrderDone;
+class DlgOrderError;
 class DlgPackagePick;
 class DlgPayment;
 class DishCardAnimHost;
@@ -85,6 +86,8 @@ private:
     void submitPaidOrder();
     void showOrderDone(const QString &orderNumber, const QString &statusUrl = QString());
     void closeOrderDone();
+    void showOrderError(const QString &message);
+    void closeOrderError();
 
     Ui::DlgMenu *ui;
     ServiceMode m_serviceMode;
@@ -104,6 +107,7 @@ private:
     DlgCart *m_cartOverlay = nullptr;
     DlgPayment *m_paymentOverlay = nullptr;
     DlgOrderDone *m_orderDoneOverlay = nullptr;
+    DlgOrderError *m_orderErrorOverlay = nullptr;
     SelfboardBottomChrome *m_bottomChrome = nullptr;
     bool m_orderSubmitInProgress = false;
 };

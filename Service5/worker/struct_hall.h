@@ -10,6 +10,7 @@ struct HallItem {
     QString name;
     QString nameLower;
     QStringList words;
+    QString receiptFooter;
     QJsonObject data;
     double serviceFactor() const
     {
@@ -23,6 +24,11 @@ struct HallItem {
     {
         return data["default_menu"].toInt();
     }
+    /** Custom precheck/receipt footer; empty → use default tr("Thank you for visit!"). */
+    QString thankYouForVisitText() const
+    {
+        return receiptFooter.trimmed();
+    }
 };
 
 template<>
@@ -33,6 +39,7 @@ struct JsonParser<HallItem> {
         hi.id = jo["f_id"].toInt();
         hi.configId = jo["f_settings"].toInt();
         hi.name = jo["f_name"].toString();
+        hi.receiptFooter = jo.value(QStringLiteral("f_receipt_footer")).toString();
 
         if(jo.contains("f_data") && jo["f_data"].isString()) {
             QJsonParseError err;

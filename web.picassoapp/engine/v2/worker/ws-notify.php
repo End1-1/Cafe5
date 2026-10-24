@@ -9,38 +9,50 @@ $ws_worker = new class {
     private function getWS()
     {
         global $websocketaddress, $websocketport, $websocketuser, $websocketpass, $websocketkey;
-        $ws = new WSClient($websocketaddress, $websocketport);
-        if (!$ws->connect()) return null;
-        $ws->handshake();
-        $ws->sendJson([
-            "command"  => "register_socket",
-            "key"      => $websocketkey,
-            "username" => $websocketuser,
-            "password" => $websocketpass
-        ]);
-        $ack = $ws->receiveJson();
-        if (!$ack || ($ack["status"] ?? 0) != 1) {
-            $ws->close();
+        try {
+            $ws = new WSClient($websocketaddress, $websocketport);
+            if (!$ws->connect()) {
+                return null;
+            }
+            $ws->handshake();
+            $ws->sendJson([
+                "command"  => "register_socket",
+                "key"      => $websocketkey,
+                "username" => $websocketuser,
+                "password" => $websocketpass
+            ]);
+            $ack = $ws->receiveJson();
+            if (!$ack || ($ack["status"] ?? 0) != 1) {
+                $ws->close();
+                return null;
+            }
+            return $ws;
+        } catch (Throwable $e) {
             return null;
         }
-        return $ws;
     }
 
     // Твоя старая функция (оставлена как есть)
     public function notify(string $dict, int $id, bool $isnew)
     {
-        $ws = $this->getWS();
-        if (!$ws) return false;
-        $ws->sendJson([
-            "command" => "dict_event",
-            "entity"  => $dict,
-            "op"      => $isnew ? "i" : "u",
-            "id"      => $id,
-            "ts"      => time()
-        ]);
-        $ack = $ws->receiveJson();
-        $ws->close();
-        return $ack && (int)($ack["errorCode"] ?? 1) === 0;
+        try {
+            $ws = $this->getWS();
+            if (!$ws) {
+                return false;
+            }
+            $ws->sendJson([
+                "command" => "dict_event",
+                "entity"  => $dict,
+                "op"      => $isnew ? "i" : "u",
+                "id"      => $id,
+                "ts"      => time()
+            ]);
+            $ack = $ws->receiveJson();
+            $ws->close();
+            return $ack && (int)($ack["errorCode"] ?? 1) === 0;
+        } catch (Throwable $e) {
+            return false;
+        }
     }
 
     /** Backward compatible: some call sites used $notify('goods', $id, $isnew). */
@@ -51,16 +63,22 @@ $ws_worker = new class {
 
     public function updatePrices($items)
     {
-        $ws = $this->getWS();
-        if (!$ws) return false;
-        $ws->sendJson([
-            "command" => "update_goods_last_input_prices",
-            "data"    => $items,
-            "ts"      => time()
-        ]);
-        $ack = $ws->receiveJson();
-        $ws->close();
-        return $ack && (int)($ack["errorCode"] ?? 1) === 0;
+        try {
+            $ws = $this->getWS();
+            if (!$ws) {
+                return false;
+            }
+            $ws->sendJson([
+                "command" => "update_goods_last_input_prices",
+                "data"    => $items,
+                "ts"      => time()
+            ]);
+            $ack = $ws->receiveJson();
+            $ws->close();
+            return $ack && (int)($ack["errorCode"] ?? 1) === 0;
+        } catch (Throwable $e) {
+            return false;
+        }
     }
 
     /** Notify Shop clients: site sale needs receipt + service check print. */
@@ -69,19 +87,23 @@ $ws_worker = new class {
         if ($orderId === "") {
             return false;
         }
-        $ws = $this->getWS();
-        if (!$ws) {
+        try {
+            $ws = $this->getWS();
+            if (!$ws) {
+                return false;
+            }
+            $ws->sendJson([
+                "command" => "site_sale_print",
+                "order_id" => $orderId,
+                "hall_id" => $hallId,
+                "ts" => time(),
+            ]);
+            $ack = $ws->receiveJson();
+            $ws->close();
+            return $ack && (int)($ack["errorCode"] ?? 1) === 0;
+        } catch (Throwable $e) {
             return false;
         }
-        $ws->sendJson([
-            "command" => "site_sale_print",
-            "order_id" => $orderId,
-            "hall_id" => $hallId,
-            "ts" => time(),
-        ]);
-        $ack = $ws->receiveJson();
-        $ws->close();
-        return $ack && (int)($ack["errorCode"] ?? 1) === 0;
     }
 };
 
