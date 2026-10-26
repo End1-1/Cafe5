@@ -20,6 +20,7 @@
 #include "rabstracteditorreport.h"
 #include "rcashmovement.h"
 #include "rconsumedgoods.h"
+#include "rsolditemsreport.h"
 #include "rdebts.h"
 #include "rmenureviewreport.h"
 #include "rorderinprogress.h"
@@ -200,7 +201,7 @@ QWidget* WDashboard::createForm(const QString &name, QIcon icon)
     }
 
     if (name == "form_sold_items") {
-        return new RAbstractEditorReport(tr("Sold items"), icon, name);
+        return new RSoldItemsReport(tr("Sold items"), icon, name);
     }
 
     if (name == "form_consumed_goods") {

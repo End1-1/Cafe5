@@ -236,6 +236,7 @@ set(APP_SOURCES
     dlgcashdiscrepancy.ui
     dlginventorysemireadylist.ui
     dlgsalarydishsales.ui
+    dlgsolditemorders.ui
     c5revenuecashop.ui
     wdashboardsettings.ui
 
@@ -917,6 +918,8 @@ add_executable(OfficeN ${APP_SOURCES}
     ../Service5/worker/struct_payment_type.h
     rcashmovement.h rcashmovement.cpp
     rconsumedgoods.h rconsumedgoods.cpp
+    rsolditemsreport.h rsolditemsreport.cpp
+    dlgsolditemorders.h dlgsolditemorders.cpp
     rdebts.h rdebts.cpp
     dlgdebtsredeem.h dlgdebtsredeem.cpp dlgdebtsredeem.ui
     storeinputxmlimport.h storeinputxmlimport.cpp

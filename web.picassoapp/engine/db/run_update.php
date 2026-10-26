@@ -1060,6 +1060,7 @@ CREATE TABLE IF NOT EXISTS guest_order_idempotency (
     KEY idx_guest_idem_order (f_order_id)
 ) ENGINE=InnoDB;
 ALTER TABLE h_halls ADD COLUMN IF NOT EXISTS f_receipt_footer TEXT NULL;
+ALTER TABLE cash_payment_types ADD COLUMN IF NOT EXISTS f_waiter TINYINT NOT NULL DEFAULT 1;
 EOD;
 
 $update_verision = intval(stmtall("select * from s_app where lower(f_app)='db'")->fetch_assoc()["f_version"]);
@@ -1262,14 +1263,18 @@ try {
         ON DUPLICATE KEY UPDATE f_value = VALUES(f_value)");
     $executedFiles[] = "cash_operations_types 13 (Cash Collection) checked.<br>";
     stmtall("ALTER TABLE cash_payment_types ADD COLUMN IF NOT EXISTS f_name VARCHAR(64) NULL");
-    stmtall("INSERT IGNORE INTO cash_payment_types (f_id) VALUES (1),(2),(3),(4),(5),(6),(7),(8),(9),(10),(11)");
+    if (stmtall("SHOW COLUMNS FROM cash_payment_types LIKE 'f_waiter'")->num_rows == 0) {
+        stmtall("ALTER TABLE cash_payment_types ADD COLUMN f_waiter TINYINT NOT NULL DEFAULT 1");
+    }
+    stmtall("INSERT IGNORE INTO cash_payment_types (f_id, f_waiter) VALUES
+        (1,1),(2,1),(3,1),(4,1),(5,1),(6,1),(7,1),(8,1),(9,1),(10,1),(11,1)");
     stmtall("INSERT INTO l_dictionary (f_dict, f_dict_id, f_lang, f_value) VALUES
         ('cash_payment_types', 10, 'hy', 'Փոխանցում 2'),
         ('cash_payment_types', 11, 'hy', 'Փոխանցում 3'),
         ('cash_payment_types', 10, 'ru', 'Перевод 2'),
         ('cash_payment_types', 11, 'ru', 'Перевод 3')
         ON DUPLICATE KEY UPDATE f_value = VALUES(f_value)");
-    $executedFiles[] = "cash_payment_types f_name, Bank 2/3 checked.<br>";
+    $executedFiles[] = "cash_payment_types f_name/f_waiter, Bank 2/3 checked.<br>";
 } catch (Exception $e) {
     $errorFiles[] = "Error ensuring cash operation type 13: " . $e->getMessage() . "<br>";
 }

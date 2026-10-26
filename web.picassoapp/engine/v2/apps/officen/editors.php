@@ -134,4 +134,19 @@ class Editors extends Auth
         $this->result = array_merge($class->recalcSale($params), $this->result);
         $this->echoResult();
     }
+
+    public function ByOrders($params)
+    {
+        $this->validate($params);
+
+        $className = $this->allowedEditors[$params->editor];
+        $class = new $className($this);
+
+        if (!method_exists($class, 'byOrders')) {
+            dieWithCode(Translator::t('By orders is not supported for this editor'));
+        }
+
+        $this->result = array_merge($class->byOrders($params), $this->result);
+        $this->echoResult();
+    }
 }

@@ -50,9 +50,9 @@ class SoldItems
             COALESCE(JSON_VALUE(oh.f_data, '$.f_guest.f_guest_address'), '') AS f_guest_address";
 
         if ($summarize === 1) {
-            // РЕЖИМ СГРУППИРОВАННОГО ОТЧЕТА (по товарам)
+            // РЕЖИМ СГРУППИРОВАННОГО ОТЧЕТА (по товарам); col0 = goods id (hidden)
             $select_fields = "
-                ' ' as f_id, 
+                g.f_id as f_goods_id,
                 ' ' as f_cash_session_id,
                 ' ' as f_prefix,
                 ' ' as f_hall_name,
@@ -67,10 +67,10 @@ class SoldItems
                 ' ' as f_guest_phone,
                 ' ' as f_guest_address
             ";
-            $group_by = "GROUP BY gr.f_name, g.f_name";
+            $group_by = "GROUP BY g.f_id, gr.f_name, g.f_name";
             $order_by = "ORDER BY gr.f_name, g.f_name";
         } else {
-            // ДЕТАЛЬНЫЙ РЕЖИМ (по чекам)
+            // ДЕТАЛЬНЫЙ РЕЖИМ (по чекам); last col = goods id (hidden)
             // sq считает себестоимость изолированно, строки o_goods не дублируются
             $select_fields = "
                 oh.f_id, 
@@ -84,7 +84,8 @@ class SoldItems
                 money_fmt(og.f_total) as f_total,
                 money_fmt(COALESCE(sq.f_cogs_row, 0)) as f_cosg,
                 money_fmt(og.f_total - COALESCE(sq.f_cogs_row, 0)) as f_profit,
-                $guest_fields
+                $guest_fields,
+                g.f_id as f_goods_id
             ";
             $group_by = ""; // В детальном режиме группировка больше не нужна благодаря подзапросу
             $order_by = "ORDER BY oh.f_id, gr.f_name, g.f_name";
@@ -127,13 +128,16 @@ class SoldItems
             Translator::t("Phone"),
             Translator::t("Address"),
         ];
+        if ($summarize !== 1) {
+            $headers[] = Translator::t("Goods id");
+        }
 
         return [
             "sql" => !(empty($params->debug)) ? $sql : "",
             "rows" => $this->db->select($sql)->fetch_all(MYSQLI_NUM),
             "toolbar" => ["delete" => true, "reload" => true, "filter" => true],
             "headers" => $headers,
-            "hidden_columns" => $summarize == 0 ? [0] : [0, 1, 2, 3, 7, 11, 12, 13],
+            "hidden_columns" => $summarize == 0 ? [0, 14] : [0, 1, 2, 3, 7, 11, 12, 13],
             "sum" => [6, 8, 9, 10],
             "filter" => [
                 ["type" => "combobox", "name" => "summarize", "label" => Translator::t("Summarize"), "default" => 1, "values" => [
@@ -146,6 +150,97 @@ class SoldItems
                 ["type" => "keyvalue", "name" => "group_id", "label" => Translator::t("Group"), "function" => "goods_group"],
                 ["type" => "checkbox", "name" => "fiscal_receipt", "label" => Translator::t("Sold with fiscal receipt"), "default" => 0],
             ]
+        ];
+    }
+
+    /**
+     * Orders that contain the given goods in the selected period (for drill-down from Sold items).
+     */
+    public function byOrders($params)
+    {
+        $goodsId = (int)($params->goods_id ?? $params->f_goods ?? 0);
+        if ($goodsId <= 0) {
+            dieWithCode(Translator::t("Goods id is required"));
+        }
+
+        $date1 = isset($params->date1) ? date('Y-m-d', strtotime((string)$params->date1)) : date('Y-m-d');
+        $date2 = isset($params->date2) ? date('Y-m-d', strtotime((string)$params->date2)) : date('Y-m-d');
+        $groupId = (int)($params->group_id ?? 0);
+        $fiscalOnly = (int)($params->fiscal_receipt ?? 0) === 1;
+
+        $bindTypes = "iss";
+        $bindValues = [$goodsId, $date1, $date2];
+        $groupFilter = "";
+        if ($groupId > 0) {
+            $groupFilter = " AND g.f_group = ? ";
+            $bindTypes .= "i";
+            $bindValues[] = $groupId;
+        }
+        $fiscalFilter = $fiscalOnly
+            ? " AND CAST(COALESCE(NULLIF(JSON_VALUE(oh.f_data, '$.f_fiscal.rseq'), ''), '0') AS UNSIGNED) > 0 "
+            : "";
+
+        $goodsName = $this->db->select(
+            "SELECT COALESCE(f_name, '') AS f_name FROM c_goods WHERE f_id = ?",
+            "i",
+            [$goodsId]
+        )->fetch_assoc();
+
+        $sql = <<<EOD
+        SELECT
+            oh.f_id,
+            oh.f_prefix,
+            oh.f_datecash,
+            COALESCE(h.f_name, '') AS f_hall_name,
+            COALESCE(t.f_name, '') AS f_table_name,
+            money_fmt(SUM(og.f_qty)) AS f_qty,
+            money_fmt(SUM(og.f_total)) AS f_total,
+            money_fmt(oh.f_amounttotal) AS f_order_total
+        FROM o_goods og
+        INNER JOIN o_header oh ON oh.f_id = og.f_header
+        LEFT JOIN c_goods g ON g.f_id = og.f_goods
+        LEFT JOIN h_tables t ON t.f_id = oh.f_table
+        LEFT JOIN h_halls h ON h.f_id = t.f_hall
+        WHERE oh.f_state = 2
+          AND og.f_state = 1
+          AND og.f_goods = ?
+          AND oh.f_datecash BETWEEN ? AND ?
+          $groupFilter
+          $fiscalFilter
+        GROUP BY oh.f_id, oh.f_prefix, oh.f_datecash, h.f_name, t.f_name, oh.f_amounttotal
+        ORDER BY oh.f_datecash, oh.f_prefix, oh.f_id
+        EOD;
+
+        $rows = $this->db->select($sql, $bindTypes, $bindValues)->fetch_all(MYSQLI_ASSOC);
+
+        return [
+            "title" => Translator::t("Orders") . ": " . ($goodsName["f_name"] ?? ("#" . $goodsId)),
+            "goods_id" => $goodsId,
+            "goods_name" => (string)($goodsName["f_name"] ?? ""),
+            "date1" => $date1,
+            "date2" => $date2,
+            "headers" => [
+                Translator::t("Id"),
+                Translator::t("Order"),
+                Translator::t("Date"),
+                Translator::t("Hall"),
+                Translator::t("Table"),
+                Translator::t("Qty"),
+                Translator::t("Item total"),
+                Translator::t("Order total"),
+            ],
+            "rows" => array_map(static function ($r) {
+                return [
+                    $r["f_id"],
+                    $r["f_prefix"],
+                    $r["f_datecash"],
+                    $r["f_hall_name"],
+                    $r["f_table_name"],
+                    $r["f_qty"],
+                    $r["f_total"],
+                    $r["f_order_total"],
+                ];
+            }, $rows),
         ];
     }
 

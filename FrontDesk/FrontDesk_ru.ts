@@ -22290,6 +22290,96 @@ This cannot be undone.</source>
         <source>Leave empty to use the default name</source>
         <translation>Оставьте пустым, чтобы использовать название по умолчанию</translation>
     </message>
+    <message>
+        <source>In Waiter</source>
+        <translation>В Waiter</translation>
+    </message>
+    <message>
+        <source>Show and allow this payment in Waiter</source>
+        <translation>Показывать и разрешать этот способ оплаты в Waiter</translation>
+    </message>
+</context>
+<context>
+    <name>DlgSoldItemOrders</name>
+    <message>
+        <source>Orders</source>
+        <translation>Заказы</translation>
+    </message>
+    <message>
+        <source>Header</source>
+        <translation>Заголовок</translation>
+    </message>
+    <message>
+        <source>Id</source>
+        <translation>Код</translation>
+    </message>
+    <message>
+        <source>Order</source>
+        <translation>Заказ</translation>
+    </message>
+    <message>
+        <source>Date</source>
+        <translation>Дата</translation>
+    </message>
+    <message>
+        <source>Hall</source>
+        <translation>Зал</translation>
+    </message>
+    <message>
+        <source>Table</source>
+        <translation>Стол</translation>
+    </message>
+    <message>
+        <source>Qty</source>
+        <translation>Кол-во</translation>
+    </message>
+    <message>
+        <source>Item total</source>
+        <translation>Сумма позиции</translation>
+    </message>
+    <message>
+        <source>Order total</source>
+        <translation>Сумма заказа</translation>
+    </message>
+    <message>
+        <source>%1 — %2 … %3</source>
+        <translation>%1 — %2 … %3</translation>
+    </message>
+    <message>
+        <source>No orders found for %1 in %2 … %3</source>
+        <translation>Нет заказов для %1 за %2 … %3</translation>
+    </message>
+    <message>
+        <source>Loading...</source>
+        <translation>Загрузка…</translation>
+    </message>
+    <message>
+        <source>Order not found</source>
+        <translation>Заказ не найден</translation>
+    </message>
+</context>
+<context>
+    <name>RSoldItemsReport</name>
+    <message>
+        <source>View by orders</source>
+        <translation>Посмотреть по заказам</translation>
+    </message>
+    <message>
+        <source>Select an item</source>
+        <translation>Выберите позицию</translation>
+    </message>
+    <message>
+        <source>Set the period in the filter</source>
+        <translation>Укажите период в фильтре</translation>
+    </message>
+    <message>
+        <source>Order not found</source>
+        <translation>Заказ не найден</translation>
+    </message>
+    <message>
+        <source>Order</source>
+        <translation>Заказ</translation>
+    </message>
 </context>
 <context>
     <name>DlgCashDiscrepancy</name>

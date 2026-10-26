@@ -218,22 +218,37 @@ class Summary
         }
 
         if ($showPayments && !empty($paymentFieldKeys)) {
-            $sumParts = [];
-            foreach ($paymentFieldKeys as $field) {
-                $sumParts[] = "SUM(COALESCE(CAST(JSON_VALUE(f_data, '\$.$field') AS DECIMAL(14,2)), 0)) AS `$field`";
+            require_once __DIR__ . '/../../worker/cash-ops-helper.php';
+            // Net tenders (minus change) so a 10000 note for a 4000 bill counts as 4000 cash.
+            $payRows = $this->db->select(
+                'SELECT CAST(f_datecash AS DATE) AS f_date, f_data
+                 FROM o_header
+                 WHERE f_datecash BETWEEN ? AND ? AND f_state=2',
+                'ss',
+                [$date1, $date2]
+            )->fetch_all(MYSQLI_ASSOC);
+            $fieldByPt = [];
+            foreach ($payConfig['types'] as $pt) {
+                $fk = $payConfig['fields'][$pt] ?? '';
+                if ($fk !== '') {
+                    $fieldByPt[(int)$pt] = $fk;
+                }
             }
-            $sqlPayments = 'SELECT CAST(f_datecash AS DATE) AS f_date, ' . implode(', ', $sumParts) . '
-                       FROM o_header
-                       WHERE f_datecash BETWEEN ? AND ? AND f_state=2
-                       GROUP BY f_date';
-            $payData = $this->db->select($sqlPayments, 'ss', [$date1, $date2])->fetch_all(MYSQLI_ASSOC);
-            foreach ($payData as $row) {
+            foreach ($payRows as $row) {
                 $date = $this->normalizeReportDate($row['f_date']);
                 if (!isset($dailyReport[$date])) {
                     $dailyReport[$date] = $this->initRow($date, $paymentFieldKeys);
                 }
-                foreach ($paymentFieldKeys as $field) {
-                    $dailyReport[$date]['payments'][$field] = (float)($row[$field] ?? 0);
+                $odata = json_decode($row['f_data'] ?? '{}', true);
+                if (!is_array($odata)) {
+                    $odata = [];
+                }
+                foreach (cash_ops_order_payment_debits($odata) as $pt => $amt) {
+                    $fk = $fieldByPt[(int)$pt] ?? '';
+                    if ($fk === '' || !isset($dailyReport[$date]['payments'][$fk])) {
+                        continue;
+                    }
+                    $dailyReport[$date]['payments'][$fk] += (float)$amt;
                 }
             }
         }

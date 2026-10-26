@@ -22314,6 +22314,96 @@ This cannot be undone.</source>
         <source>Leave empty to use the default name</source>
         <translation>Թողեք դատարկ՝ լռելյայն անվանումն օգտագործելու համար</translation>
     </message>
+    <message>
+        <source>In Waiter</source>
+        <translation>Waiter-ում</translation>
+    </message>
+    <message>
+        <source>Show and allow this payment in Waiter</source>
+        <translation>Ցուցադրել և թույլատրել այս վճարման եղանակը Waiter-ում</translation>
+    </message>
+</context>
+<context>
+    <name>DlgSoldItemOrders</name>
+    <message>
+        <source>Orders</source>
+        <translation>Պատվերներ</translation>
+    </message>
+    <message>
+        <source>Header</source>
+        <translation>Վերնագիր</translation>
+    </message>
+    <message>
+        <source>Id</source>
+        <translation>Կոդ</translation>
+    </message>
+    <message>
+        <source>Order</source>
+        <translation>Պատվեր</translation>
+    </message>
+    <message>
+        <source>Date</source>
+        <translation>Ամսաթիվ</translation>
+    </message>
+    <message>
+        <source>Hall</source>
+        <translation>Սրահ</translation>
+    </message>
+    <message>
+        <source>Table</source>
+        <translation>Սեղան</translation>
+    </message>
+    <message>
+        <source>Qty</source>
+        <translation>Քանակ</translation>
+    </message>
+    <message>
+        <source>Item total</source>
+        <translation>Տողի գումար</translation>
+    </message>
+    <message>
+        <source>Order total</source>
+        <translation>Պատվերի գումար</translation>
+    </message>
+    <message>
+        <source>%1 — %2 … %3</source>
+        <translation>%1 — %2 … %3</translation>
+    </message>
+    <message>
+        <source>No orders found for %1 in %2 … %3</source>
+        <translation>%1-ի համար պատվերներ չկան %2 … %3</translation>
+    </message>
+    <message>
+        <source>Loading...</source>
+        <translation>Բեռնվում է…</translation>
+    </message>
+    <message>
+        <source>Order not found</source>
+        <translation>Պատվերը չի գտնվել</translation>
+    </message>
+</context>
+<context>
+    <name>RSoldItemsReport</name>
+    <message>
+        <source>View by orders</source>
+        <translation>Դիտել ըստ պատվերների</translation>
+    </message>
+    <message>
+        <source>Select an item</source>
+        <translation>Ընտրեք տողը</translation>
+    </message>
+    <message>
+        <source>Set the period in the filter</source>
+        <translation>Նշեք ժամանակահատվածը ֆիլտրում</translation>
+    </message>
+    <message>
+        <source>Order not found</source>
+        <translation>Պատվերը չի գտնվել</translation>
+    </message>
+    <message>
+        <source>Order</source>
+        <translation>Պատվեր</translation>
+    </message>
 </context>
 <context>
     <name>DlgCashDiscrepancy</name>

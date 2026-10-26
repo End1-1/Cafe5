@@ -2509,6 +2509,10 @@ amount</source>
         <translation>Նշված վճարման եղանակները չի կարելի խարնել</translation>
     </message>
     <message>
+        <source>This payment type is disabled for Waiter</source>
+        <translation>Այս վճարման եղանակն անջատված է Waiter-ի համար</translation>
+    </message>
+    <message>
         <location filename="dlgorder.cpp" line="2186"/>
         <location filename="dlgorder.cpp" line="3411"/>
         <location filename="dlgorder.cpp" line="4351"/>

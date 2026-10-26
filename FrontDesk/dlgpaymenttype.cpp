@@ -28,6 +28,7 @@ void DlgPaymentType::applyRow(const QJsonObject &row)
     ui->leCode->setText(QString::number(mId));
     ui->leDefaultName->setText(row.value(QStringLiteral("f_default_name")).toString());
     ui->leName->setText(row.value(QStringLiteral("f_name")).toString());
+    ui->chWaiter->setChecked(row.value(QStringLiteral("f_waiter")).toInt(1) != 0);
 }
 
 void DlgPaymentType::loadData()
@@ -45,6 +46,7 @@ void DlgPaymentType::loadData()
 void DlgPaymentType::trySave()
 {
     const QString name = ui->leName->text().trimmed();
+    const bool waiter = ui->chWaiter->isChecked();
     NInterface::query(QStringLiteral("/engine/v2/officen/editors/save"),
                       mUser->mSessionKey,
                       this,
@@ -52,9 +54,11 @@ void DlgPaymentType::trySave()
                           {QStringLiteral("editor"), QStringLiteral("form_payment_types")},
                           {QStringLiteral("f_id"), mId},
                           {QStringLiteral("f_name"), name},
+                          {QStringLiteral("f_waiter"), waiter ? 1 : 0},
                       },
-                      [this, name](const QJsonObject &) {
+                      [this, name, waiter](const QJsonObject &) {
                           PaymentTypeNames::setCustomName(mId, name);
+                          PaymentTypeNames::setWaiterEnabled(mId, waiter);
                           accept();
                       },
                       [](const QJsonObject &) { return false; },

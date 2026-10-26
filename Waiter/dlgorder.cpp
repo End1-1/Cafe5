@@ -156,13 +156,36 @@ struct FiscalPaymentPayload {
 
 FiscalPaymentPayload fiscalPaymentsFromOrder(const WaiterOrder &order)
 {
+    // Mirror server cashboxPaymentDebits: change is taken from cash first, then other funds.
+    // Without this, a 10000 note for a 4000 bill would fiscalize paidAmount=10000.
+    double cash = order.paidCash();
+    double card = order.paidCard();
+    double idram = order.paidIdram();
+    double telcell = order.paidTelcell();
+    double prepaid = order.paidPrepaid();
+    double change = order.amountChange();
+    if (change > 0.001) {
+        const double fromCash = qMin(change, cash);
+        cash -= fromCash;
+        change -= fromCash;
+        auto take = [&change](double &bucket) {
+            if (change <= 0.001) {
+                return;
+            }
+            const double d = qMin(change, bucket);
+            bucket -= d;
+            change -= d;
+        };
+        take(card);
+        take(idram);
+        take(telcell);
+        take(prepaid);
+    }
+
     FiscalPaymentPayload p;
-    p.cash = order.paidCash();
-    const double card = order.paidCard();
-    const double idram = order.paidIdram();
-    const double telcell = order.paidTelcell();
+    p.cash = cash;
     p.nonCash = card + idram + telcell;
-    p.prepaid = order.paidPrepaid();
+    p.prepaid = prepaid;
 
     if (p.nonCash < 0.001) {
         return p;
@@ -1875,13 +1898,20 @@ void DlgOrder::printPrecheck(const QString &currentStaff)
         printPaymentFunc(pt);
     }
 
-    if(mOrder.amountPaid() - mOrder.totalDue > 0) {
+    const double changeAmount = mOrder.amountChange() > 0.001
+                                    ? mOrder.amountChange()
+                                    : qMax(0.0, mOrder.amountPaid() - mOrder.totalDue);
+    if(changeAmount > 0.001) {
+        double received = mOrder.data.value(QStringLiteral("f_amount_cash_tendered")).toDouble();
+        if(received < 0.001) {
+            received = mOrder.amountPaid() + changeAmount;
+        }
         p.br();
         p.ltext(tr("Amount paid"), sideMarginMm);
-        p.rtext(float_str(mOrder.amountPaid(), 2));
+        p.rtext(float_str(received, 2));
         p.br();
         p.ltext(tr("Change"), sideMarginMm);
-        p.rtext(float_str(mOrder.amountPaid() - mOrder.totalDue, 2));
+        p.rtext(float_str(changeAmount, 2));
         p.br();
     }
 
@@ -3022,6 +3052,10 @@ void DlgOrder::on_btnPrepaid_clicked()
     if(mOrder.id.isEmpty()) {
         return;
     }
+    if (!PaymentTypeNames::waiterEnabled(PAYMENT_TYPE_PREPAID)) {
+        C5Message::error(tr("This payment type is disabled for Waiter"));
+        return;
+    }
 
     DlgMoveMoney d(mUser);
     d.setMode(3);
@@ -3578,8 +3612,13 @@ void DlgOrder::createPaymentButtons()
         btn->setEnabled(payment_special[pt] ? mUser->check(cp_t5_waiter_special_payment_types) : true);
         const bool disabled = jo.value(QString("payment_button_%1").arg(pt)).toBool(false);
         btn->setEnabled(btn->isEnabled() && !disabled);
+        btn->setVisible(PaymentTypeNames::waiterEnabled(pt));
         connect(btn, &QToolButton::clicked, this, [self, pt]() {
             if (!self) {
+                return;
+            }
+            if (!PaymentTypeNames::waiterEnabled(pt)) {
+                C5Message::error(tr("This payment type is disabled for Waiter"));
                 return;
             }
             if (self->ui->lbAmount->property("amount").toDouble() < 0.01) {
@@ -3644,7 +3683,9 @@ void DlgOrder::createPaymentButtons()
         for (QToolButton *btn : buttons) {
             const QVariant paymentType = btn->property("paymentType");
             if (paymentType.isValid()) {
-                btn->setText(PaymentTypeNames::title(paymentType.toInt()));
+                const int pt = paymentType.toInt();
+                btn->setText(PaymentTypeNames::title(pt));
+                btn->setVisible(PaymentTypeNames::waiterEnabled(pt));
                 continue;
             }
             const QVariant method = btn->property("method");
@@ -3659,6 +3700,7 @@ void DlgOrder::createPaymentButtons()
         if (self->mOrder.prepaidAmount() <= 0.001) {
             self->ui->btnPrepaid->setText(PaymentTypeNames::title(PAYMENT_TYPE_PREPAID));
         }
+        self->ui->btnPrepaid->setVisible(PaymentTypeNames::waiterEnabled(PAYMENT_TYPE_PREPAID));
     });
 }
 

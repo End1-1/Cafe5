@@ -1,5 +1,6 @@
 #include "rtotalreviewreport.h"
 #include "rcashmovement.h"
+#include "rsolditemsreport.h"
 #include <QJsonDocument>
 #include "c5config.h"
 #include "c5mainwindow.h"
@@ -19,6 +20,8 @@ void openDrillDownReport(const QString &editorName,
     RAbstractEditorReport *report = nullptr;
     if(cashMovementReport) {
         report = new RCashMovement(title, icon, editorName);
+    } else if(editorName == QLatin1String("form_sold_items")) {
+        report = new RSoldItemsReport(title, icon, editorName);
     } else {
         report = new RAbstractEditorReport(title, icon, editorName);
     }

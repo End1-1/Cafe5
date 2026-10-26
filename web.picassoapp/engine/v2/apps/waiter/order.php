@@ -1396,7 +1396,9 @@ EOD;
         $this->assertOrderKitchenPrinted($params->id);
         $oheader = $this->GetHeader($params->id);
         $odata = json_decode($oheader["f_data"] ?? "{}", true);
-        $odata[$params->payment_field] = $params->amount;
+        $amount = (float)($params->amount ?? 0);
+        $this->assertWaiterPaymentFieldAllowed((string)$params->payment_field, $amount);
+        $odata[$params->payment_field] = $amount;
 
         $payment = $this->paymentDict();
         $debtField = $payment["fields"][PAYMENT_DEBT];
@@ -1439,7 +1441,9 @@ EOD;
 
         foreach ($payment["types"] as $pt) {
             $pn = $payment["fields"][$pt];
-            $odata[$pn] = $params->$pn ?? 0;
+            $amount = (float)($params->$pn ?? 0);
+            $this->assertWaiterPaymentFieldAllowed($pn, $amount);
+            $odata[$pn] = $amount;
         }
 
         if (!empty($params->f_pinpad_response)) {
@@ -2028,6 +2032,8 @@ EOD;
         );
         $this->applyDeliveryCashout($params->id, $cash_session_id, $registerId, $odata, (string)$row["f_prefix"]);
         $this->writeLoyaltyOps($params->id, $params->loyalty ?? null);
+        // Persist net tenders (bill − change). Tendered cash kept in f_amount_cash_tendered for receipts.
+        $this->applyNetPaymentAmountsToOrderData($odata, $paymentDebits);
         $odata["f_date_close"] = date("Y-m-d");
         $odata["f_time_close"] = date("H:i:s");
         $odata["f_fiscal"] = $params->fiscal->out ?? [];
@@ -2484,13 +2490,10 @@ EOD;
             (int)($odata["f_currency_id"] ?? 1)
         );
 
+        $this->applyNetPaymentAmountsToOrderData($odata, $paymentDebits);
         $odata["f_date_close"] = date("Y-m-d");
         $odata["f_time_close"] = date("H:i:s");
         $odata["f_fiscal"] = $params->fiscal->out ?? [];
-        $odata["f_amount_cash"] = $params->f_amount_cash ?? 0;
-        $odata["f_amount_card"] = $params->f_amount_card ?? 0;
-        $odata["f_amount_idram"] = $params->f_amount_idram ?? 0;
-        $odata["f_amount_other"] = $params->f_amount_other ?? 0;
         $this->AppendLog("order closed", $odata);
         if (!empty($params->fiscal->in)) {
             require_once __DIR__ . "/../common/fiscal.php";
@@ -3352,6 +3355,51 @@ SQL;
         return $payment;
     }
 
+    /**
+     * Block new Waiter tenders for payment types with cash_payment_types.f_waiter = 0.
+     * Clearing (amount ≈ 0) is always allowed so existing rows can be removed.
+     */
+    private function assertWaiterPaymentFieldAllowed(string $paymentField, float $amount): void
+    {
+        if ($amount < 0.00001) {
+            return;
+        }
+        $payment = $this->paymentDict();
+        $typeId = 0;
+        foreach ($payment["fields"] as $pt => $field) {
+            if ($field === $paymentField) {
+                $typeId = (int)$pt;
+                break;
+            }
+        }
+        if ($typeId <= 0) {
+            return;
+        }
+        if (!$this->isPaymentTypeEnabledForWaiter($typeId)) {
+            dieWithCode(Translator::t("This payment type is disabled for Waiter"));
+        }
+    }
+
+    private function isPaymentTypeEnabledForWaiter(int $typeId): bool
+    {
+        try {
+            if ($this->select("SHOW COLUMNS FROM cash_payment_types LIKE 'f_waiter'")->num_rows == 0) {
+                return true;
+            }
+            $row = $this->select(
+                "SELECT COALESCE(f_waiter, 1) AS f_waiter FROM cash_payment_types WHERE f_id = ?",
+                "i",
+                [$typeId]
+            )->fetch_assoc();
+            if (!$row) {
+                return true;
+            }
+            return (int)$row["f_waiter"] !== 0;
+        } catch (Exception $e) {
+            return true;
+        }
+    }
+
     /** Перенос депозита в строку оплаты предоплатой; пересчёт f_amount_paid по всем полям dict-payment. */
     private function applyDepositPrepaidAndRecalcTotals(array &$data, float $totalDue): void
     {
@@ -3417,6 +3465,37 @@ SQL;
         }
 
         return $debits;
+    }
+
+    /**
+     * Write net payment amounts onto the order (sale = due, not the bill tendered).
+     * Keeps f_amount_change and f_amount_cash_tendered for receipt reprint.
+     *
+     * @param array<string,mixed> $odata
+     * @param array<string,float> $paymentDebits field => net
+     */
+    private function applyNetPaymentAmountsToOrderData(array &$odata, array $paymentDebits): void
+    {
+        $payment = $this->paymentDict();
+        $cashField = $payment["fields"][PAYMENT_TYPE_CASH];
+        $change = (float)($odata["f_amount_change"] ?? 0);
+        $cashTendered = (float)($odata[$cashField] ?? 0);
+        if ($change > 0.00001 && $cashTendered > 0.00001) {
+            $odata["f_amount_cash_tendered"] = $cashTendered;
+        }
+
+        $paidNet = 0.0;
+        foreach ($payment["types"] as $pt) {
+            $pn = $payment["fields"][$pt];
+            $net = (float)($paymentDebits[$pn] ?? 0);
+            if ($net < 0.00001) {
+                $net = 0.0;
+            }
+            $odata[$pn] = $net;
+            $paidNet += $net;
+        }
+        $odata["f_amount_paid"] = $paidNet;
+        // Keep f_amount_change for receipts; do not clear — cashier still needs to see сдача.
     }
 
     public function PrintPrecheck($params)

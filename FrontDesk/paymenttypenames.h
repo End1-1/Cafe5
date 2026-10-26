@@ -11,6 +11,11 @@ QString title(int paymentTypeId);
 
 void setCustomName(int paymentTypeId, const QString &name);
 
-/** Fetch custom names from the server; done() runs after the names are applied. */
+/** When false, Waiter must not show or accept this payment type (default true until loaded). */
+bool waiterEnabled(int paymentTypeId);
+
+void setWaiterEnabled(int paymentTypeId, bool enabled);
+
+/** Fetch custom names / Waiter flags from the server; done() runs after they are applied. */
 void load(const QString &sessionKey, QObject *context, std::function<void()> done = {});
 }

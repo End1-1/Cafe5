@@ -38,18 +38,42 @@ class Reports extends Auth
 
     public function GetDaily($params)
     {
-        $sql = <<<EOD
-        SELECT COUNT(f_id) AS f_count_id, SUM(f_amounttotal) AS f_amount_total,
-        sum(JSON_VALUE(f_data, '$.f_amount_cash')) AS f_amount_cash,
-        SUM(JSON_VALUE(f_data, '$.f_amount_card')) AS f_amount_card,
-        SUM(JSON_VALUE(f_data, '$.f_amount_bank')) AS f_amount_bank,
-        SUM(JSON_VALUE(f_data, '$.f_amount_idram')) AS f_amount_idram,
-        SUM(coalesce(JSON_VALUE(f_data, '$.f_service_amount'), 0)) AS f_service_amount
-        FROM o_header oh
-        WHERE oh.f_datecash BETWEEN ? AND ?
-        AND oh.f_state=2
-        EOD;
-        $this->result  = array_merge($this->select($sql, "ss", [$params->date1, $params->date2])->fetch_all(MYSQLI_ASSOC)[0], $this->result);
+        // Aggregate payment fields via cash_ops_order_payment_debits so change (сдача)
+        // is not counted as cash revenue (e.g. 10000 note for 4000 bill → cash 4000).
+        $rows = $this->select(
+            "SELECT f_amounttotal, f_data,
+                    coalesce(JSON_VALUE(f_data, '$.f_service_amount'), 0) AS f_service_amount
+             FROM o_header
+             WHERE f_datecash BETWEEN ? AND ? AND f_state=2",
+            "ss",
+            [$params->date1, $params->date2]
+        )->fetch_all(MYSQLI_ASSOC);
+        $dict = require __DIR__ . "/../worker/dict-payment.php";
+        $out = [
+            "f_count_id" => count($rows),
+            "f_amount_total" => 0.0,
+            "f_service_amount" => 0.0,
+            "f_amount_cash" => 0.0,
+            "f_amount_card" => 0.0,
+            "f_amount_bank" => 0.0,
+            "f_amount_idram" => 0.0,
+        ];
+        foreach ($rows as $row) {
+            $out["f_amount_total"] += (float)($row["f_amounttotal"] ?? 0);
+            $out["f_service_amount"] += (float)($row["f_service_amount"] ?? 0);
+            $odata = json_decode($row["f_data"] ?? "{}", true);
+            if (!is_array($odata)) {
+                $odata = [];
+            }
+            $debits = cash_ops_order_payment_debits($odata);
+            foreach ($dict["fields"] as $pt => $field) {
+                if (!array_key_exists($field, $out)) {
+                    $out[$field] = 0.0;
+                }
+                $out[$field] += (float)($debits[(int)$pt] ?? 0);
+            }
+        }
+        $this->result = array_merge($out, $this->result);
         $this->echoResult();
     }
     public function GetList($params)
@@ -96,26 +120,37 @@ class Reports extends Auth
         $cashbox = $this->select("select cb.f_name from cash_box cb left join cash_session cs on cs.f_cashbox_id=cb.f_id where cs.f_id=?", "i", [$params->params->session_id])->fetch_assoc();
         $dict = require __DIR__ . "/../worker/dict-payment.php";
 
-        $paymentParts = [];
-
+        $orderRows = $this->select(
+            "SELECT oh.f_amounttotal, oh.f_data FROM o_header oh WHERE oh.f_state = 2 AND oh.f_cash_session_id=?",
+            "i",
+            [$params->params->session_id]
+        )->fetch_all(MYSQLI_ASSOC);
+        $payTotals = [];
         foreach ($dict["fields"] as $type => $field) {
-            $paymentParts[] =
-                "money_fmt(SUM(CAST(json_value(oh.f_data, '$.$field') AS DECIMAL(12,2)))) AS $field";
+            $payTotals[$field] = 0.0;
         }
-
-        $paymentSql = implode(",\n        ", $paymentParts);
-
-        $sql = <<<EOD
-        SELECT 
-            COUNT(DISTINCT(oh.f_id)) AS f_orders_count,
-            money_fmt(SUM(oh.f_amounttotal)) AS f_amount_total,
-            $paymentSql
-        FROM o_header oh
-        LEFT JOIN cash_session cs ON cs.f_id = oh.f_cash_session_id
-        WHERE oh.f_state = 2 and oh.f_cash_session_id=?
-    EOD;
-        $this->result["sql"] = $sql;
-        $totals = $this->select($sql, "i", [$params->params->session_id])->fetch_assoc();
+        $amountTotal = 0.0;
+        foreach ($orderRows as $orow) {
+            $amountTotal += (float)($orow["f_amounttotal"] ?? 0);
+            $odata = json_decode($orow["f_data"] ?? "{}", true);
+            if (!is_array($odata)) {
+                $odata = [];
+            }
+            foreach (cash_ops_order_payment_debits($odata) as $pt => $amt) {
+                $field = $dict["fields"][$pt] ?? null;
+                if ($field === null) {
+                    continue;
+                }
+                $payTotals[$field] = ($payTotals[$field] ?? 0) + (float)$amt;
+            }
+        }
+        $totals = [
+            "f_orders_count" => count($orderRows),
+            "f_amount_total" => money_fmt($amountTotal),
+        ];
+        foreach ($payTotals as $field => $amt) {
+            $totals[$field] = money_fmt($amt);
+        }
 
         $sql = <<<EOD
     select money_fmt(SUM(coalesce(JSON_VALUE(f_data, '$.f_service_amount'), 0))) AS f_service_amount,
@@ -180,45 +215,83 @@ class Reports extends Auth
         $cashbox = $this->select("select cb.f_name from cash_box cb left join cash_session cs on cs.f_cashbox_id=cb.f_id where cs.f_id=?", "i", [$params->params->session_id])->fetch_assoc();
         $dict = require __DIR__ . "/../worker/dict-payment.php";
 
-        $paymentParts = [];
+        $sessionMeta = $this->select(
+            "SELECT datetime_fmt(cs.f_date_open, 0) as f_date_open,
+                    datetime_fmt(cs.f_date_close, 0) as f_date_close
+             FROM cash_session cs WHERE cs.f_id=?",
+            "i",
+            [$params->params->session_id]
+        )->fetch_assoc();
 
-        foreach ($dict["fields"] as $type => $field) {
-            $paymentParts[] =
-                "money_fmt(SUM(CAST(json_value(oh.f_data, '$.$field') AS DECIMAL(12,2)))) AS $field";
+        $orderRows = $this->select(
+            "SELECT oh.f_amounttotal, oh.f_data, oh.f_staff,
+                    concat(u.f_last, ' ', left(u.f_first, 1), '.') as f_waiter
+             FROM o_header oh
+             LEFT JOIN s_user u ON u.f_id = oh.f_staff
+             WHERE oh.f_state = 2 AND oh.f_cash_session_id=?",
+            "i",
+            [$params->params->session_id]
+        )->fetch_all(MYSQLI_ASSOC);
+
+        $byWaiter = [];
+        $finaly = [
+            "f_orders_count" => 0,
+            "f_amount_total" => 0.0,
+            "f_service_amount" => 0.0,
+        ];
+        foreach ($dict["fields"] as $field) {
+            $finaly[$field] = 0.0;
+        }
+        foreach ($orderRows as $orow) {
+            $waiter = trim((string)($orow["f_waiter"] ?? "")) ?: ("#" . (int)($orow["f_staff"] ?? 0));
+            if (!isset($byWaiter[$waiter])) {
+                $byWaiter[$waiter] = [
+                    "f_waiter" => $waiter,
+                    "f_date_open" => $sessionMeta["f_date_open"] ?? "",
+                    "f_date_close" => $sessionMeta["f_date_close"] ?? "",
+                    "f_orders_count" => 0,
+                    "f_amount_total" => 0.0,
+                    "f_service_amount" => 0.0,
+                ];
+                foreach ($dict["fields"] as $field) {
+                    $byWaiter[$waiter][$field] = 0.0;
+                }
+            }
+            $odata = json_decode($orow["f_data"] ?? "{}", true);
+            if (!is_array($odata)) {
+                $odata = [];
+            }
+            $byWaiter[$waiter]["f_orders_count"]++;
+            $byWaiter[$waiter]["f_amount_total"] += (float)($orow["f_amounttotal"] ?? 0);
+            $byWaiter[$waiter]["f_service_amount"] += (float)($odata["f_service_amount"] ?? 0);
+            $finaly["f_orders_count"]++;
+            $finaly["f_amount_total"] += (float)($orow["f_amounttotal"] ?? 0);
+            $finaly["f_service_amount"] += (float)($odata["f_service_amount"] ?? 0);
+            foreach (cash_ops_order_payment_debits($odata) as $pt => $amt) {
+                $field = $dict["fields"][$pt] ?? null;
+                if ($field === null) {
+                    continue;
+                }
+                $byWaiter[$waiter][$field] += (float)$amt;
+                $finaly[$field] += (float)$amt;
+            }
         }
 
-        $paymentSql = implode(",\n        ", $paymentParts);
-
-        $sql = <<<EOD
-        SELECT 
-            concat(u.f_last, ' ', left(u.f_first, 1), '.') as f_waiter,
-            datetime_fmt(cs.f_date_open, 0) as f_date_open,
-            datetime_fmt(cs.f_date_close, 0) as f_date_close,
-            COUNT(DISTINCT(oh.f_id)) AS f_orders_count,
-            money_fmt(SUM(oh.f_amounttotal)) AS f_amount_total,
-            money_fmt(SUM(coalesce(JSON_VALUE(f_data, '$.f_service_amount'), 0))) AS f_service_amount,
-            $paymentSql
-        FROM o_header oh
-        LEFT JOIN cash_session cs ON cs.f_id = oh.f_cash_session_id
-        left join s_user u on u.f_id=oh.f_staff
-        WHERE oh.f_state = 2 and oh.f_cash_session_id=?
-        group by 1
-        EOD;
-        $totals = $this->select($sql, "i", [$params->params->session_id])->fetch_all(MYSQLI_ASSOC);
-
-
-        $sql = <<<EOD
-         SELECT 
-            
-            COUNT(DISTINCT(oh.f_id)) AS f_orders_count,
-            money_fmt(SUM(oh.f_amounttotal)) AS f_amount_total,
-            money_fmt(SUM(coalesce(JSON_VALUE(f_data, '$.f_service_amount'), 0))) AS f_service_amount,
-            $paymentSql
-        FROM o_header oh
-        LEFT JOIN cash_session cs ON cs.f_id = oh.f_cash_session_id
-        WHERE oh.f_state = 2 and oh.f_cash_session_id=?
-        EOD;
-        $finaly = $this->select($sql, "i", [$params->params->session_id])->fetch_assoc();
+        $totals = [];
+        foreach ($byWaiter as $h) {
+            $row = $h;
+            $row["f_amount_total"] = money_fmt($h["f_amount_total"]);
+            $row["f_service_amount"] = money_fmt($h["f_service_amount"]);
+            foreach ($dict["fields"] as $field) {
+                $row[$field] = money_fmt($h[$field] ?? 0);
+            }
+            $totals[] = $row;
+        }
+        $finaly["f_amount_total"] = money_fmt($finaly["f_amount_total"]);
+        $finaly["f_service_amount"] = money_fmt($finaly["f_service_amount"]);
+        foreach ($dict["fields"] as $field) {
+            $finaly[$field] = money_fmt($finaly[$field] ?? 0);
+        }
 
         $first = true;
         foreach ($totals as $h) {
