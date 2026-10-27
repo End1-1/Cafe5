@@ -20,6 +20,12 @@ QHash<int, bool> &waiterFlags()
     return flags;
 }
 
+QHash<int, bool> &partnerFlags()
+{
+    static QHash<int, bool> flags;
+    return flags;
+}
+
 } // namespace
 
 namespace PaymentTypeNames
@@ -55,6 +61,16 @@ void setWaiterEnabled(int paymentTypeId, bool enabled)
     waiterFlags().insert(paymentTypeId, enabled);
 }
 
+bool partnerRequired(int paymentTypeId)
+{
+    return partnerFlags().value(paymentTypeId, true);
+}
+
+void setPartnerRequired(int paymentTypeId, bool required)
+{
+    partnerFlags().insert(paymentTypeId, required);
+}
+
 void load(const QString &sessionKey, QObject *context, std::function<void()> done)
 {
     NInterface::query(QStringLiteral("/engine/v2/officen/editors/get-all"),
@@ -64,6 +80,7 @@ void load(const QString &sessionKey, QObject *context, std::function<void()> don
                       [done](const QJsonObject &jdoc) {
                           customNames().clear();
                           waiterFlags().clear();
+                          partnerFlags().clear();
                           const QJsonArray rows = jdoc.value(QStringLiteral("rows")).toArray();
                           for (const QJsonValue &v : rows) {
                               const QJsonArray r = v.toArray();
@@ -72,6 +89,10 @@ void load(const QString &sessionKey, QObject *context, std::function<void()> don
                           const QJsonObject flags = jdoc.value(QStringLiteral("waiter_by_id")).toObject();
                           for (auto it = flags.begin(); it != flags.end(); ++it) {
                               setWaiterEnabled(it.key().toInt(), it.value().toVariant().toInt() != 0);
+                          }
+                          const QJsonObject partners = jdoc.value(QStringLiteral("partner_required_by_id")).toObject();
+                          for (auto it = partners.begin(); it != partners.end(); ++it) {
+                              setPartnerRequired(it.key().toInt(), it.value().toVariant().toInt() != 0);
                           }
                           if (done) {
                               done();

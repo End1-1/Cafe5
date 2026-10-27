@@ -10,7 +10,7 @@ $sk = '5cfafe13-a886-11ee-ac3e-1078d2d2b808';
 $ct = $_SERVER["CONTENT_TYPE"] ?? $_SERVER["HTTP_CONTENT_TYPE"] ?? "";
 if (!str_contains($ct, "application/json")) {
     http_response_code(415);
-    echo json_encode(["error"=>"Wrong Content-Type","ct"=>$ct]);
+    info_out(["error" => "Wrong Content-Type", "ct" => $ct]);
     exit;
 }
 $requestStr = file_get_contents("php://input");
@@ -21,6 +21,30 @@ if ($str["sk"] != $sk) {
         exit();
 }
 $time_start = microtime(true);
+
+/**
+ * Id of the INSERT the client just sent. Returned as a string so old Smart can read it.
+ */
+function info_new_insert_id(mysqli $db): string
+{
+    $newId = (int)$db->insert_id;
+    if ($newId <= 0) {
+        $lid = $db->query("SELECT LAST_INSERT_ID()");
+        if ($lid) {
+            $row = $lid->fetch_row();
+            $newId = (int)($row[0] ?? 0);
+        }
+    }
+    return (string)$newId;
+}
+
+/** Marker so a raw response shows this file is the one on the server. */
+function info_out(array $payload): void
+{
+    $payload["rev"] = "idstr1";
+    echo json_encode($payload, JSON_UNESCAPED_UNICODE);
+}
+
 if ($str["call"] == "sql") {
         try {
                 $result = $db->query($str["sql"]);
@@ -29,8 +53,9 @@ if ($str["call"] == "sql") {
                         echo $db->error;
                         exit();
                 }
-        } catch (Exception $e) {
-                throw new Exception($e->getMessage() . "<br>" . $str["sql"]);
+        } catch (Throwable $e) {
+                echo $e->getMessage();
+                exit();
         }
         if (
                 strcasecmp(substr($str["sql"], 0, 4), "call") == 0
@@ -40,28 +65,26 @@ if ($str["call"] == "sql") {
         ) {
                 $r = "";
                 if (strcasecmp(substr($str["sql"], 0, 6), "insert") == 0) {
-                        $result = $db->query("select last_insert_id()");
-                        $row = $result->fetch_row();
-                        $r = $row[0];
+                        $r = info_new_insert_id($db);
                         $time_query = microtime(true);
-                        echo json_encode(array("status" => 1, "data" => $r, "query_time" => $time_query - $time_start));
+                        info_out(array("status" => 1, "data" => $r, "query_time" => $time_query - $time_start));
                         return;
                 } else if (strcasecmp(substr($str["sql"], 0, 4), "call") == 0) {
                         if (gettype($result) == "boolean") {
                                 $time_query = microtime(true);
-                                echo json_encode(array("status" => 1, "data" => $r, "query_time" => $time_query - $time_start));
+                                info_out(array("status" => 1, "data" => $r, "query_time" => $time_query - $time_start));
                                 return;
                         } else {
                                 $fields = $result->fetch_fields();
                                 if (count($fields) == 0) {
                                         $time_query = microtime(true);
-                                        echo json_encode(array("status" => 1, "data" => $r, "query_time" => $time_query - $time_start));
+                                        info_out(array("status" => 1, "data" => $r, "query_time" => $time_query - $time_start));
                                         return;
                                 }
                         }
                 } else {
                         $time_query = microtime(true);
-                        echo json_encode(array("status" => 1, "data" => $r, "query_time" => $time_query - $time_start));
+                        info_out(array("status" => 1, "data" => $r, "query_time" => $time_query - $time_start));
                         return;
                 }
         }
@@ -110,7 +133,7 @@ if ($str["call"] == "sql") {
                 "query_time" => $time_query - $time_start
         ];
         $out = ["status" => 1, "data" => $data];
-        echo json_encode($out, JSON_UNESCAPED_UNICODE);
+        info_out($out);
         return;
 }
 
@@ -134,8 +157,10 @@ if ($str["call"] == "sqllist") {
                                                 echo $db->error;
                                                 exit();
                                         }
-                                } catch (Exception $e) {
-                                        throw new Exception($e->getMessage() . "<br>" . $sql);
+                                } catch (Throwable $e) {
+                                        $db->rollback();
+                                        echo $e->getMessage();
+                                        exit();
                                 }
                                 if (
                                         strcasecmp(substr($sql, 0, 4), "call") == 0
@@ -145,32 +170,30 @@ if ($str["call"] == "sqllist") {
                                 ) {
                                         $r = "";
                                         if (strcasecmp(substr($sql, 0, 6), "insert") == 0) {
-                                                $result = $db->query("select last_insert_id()");
+                                                $r = info_new_insert_id($db);
                                                 $db->commit();
-                                                $row = $result->fetch_row();
-                                                $r = $row[0];
                                                 $time_query = microtime(true);
-                                                echo json_encode(array("status" => 1, "data" => $r, "query_time" => $time_query - $time_start));
+                                                info_out(array("status" => 1, "data" => $r, "query_time" => $time_query - $time_start));
                                                 return;
                                         } else if (strcasecmp(substr($sql, 0, 4), "call") == 0) {
                                                 if (gettype($result) == "boolean") {
                                                         $db->commit();
                                                         $time_query = microtime(true);
-                                                        echo json_encode(array("status" => 1, "data" => $r, "query_time" => $time_query - $time_start));
+                                                        info_out(array("status" => 1, "data" => $r, "query_time" => $time_query - $time_start));
                                                         return;
                                                 } else {
                                                         $fields = $result->fetch_fields();
                                                         if (count($fields) == 0) {
                                                                 $db->commit();
                                                                 $time_query = microtime(true);
-                                                                echo json_encode(array("status" => 1, "data" => $r, "query_time" => $time_query - $time_start));
+                                                                info_out(array("status" => 1, "data" => $r, "query_time" => $time_query - $time_start));
                                                                 return;
                                                         }
                                                 }
                                         } else {
                                                 $db->commit();
                                                 $time_query = microtime(true);
-                                                echo json_encode(array("status" => 1, "data" => $r, "query_time" => $time_query - $time_start));
+                                                info_out(array("status" => 1, "data" => $r, "query_time" => $time_query - $time_start));
                                                 return;
                                         }
                                 }
@@ -220,7 +243,7 @@ if ($str["call"] == "sqllist") {
                                         "query_time" => $time_query - $time_start
                                 ];
                                 $out = ["status" => 1, "data" => $data];
-                                echo json_encode($out, JSON_UNESCAPED_UNICODE);
+                                info_out($out);
                                 return;
                         } else {
                                 $thistime = microtime(true);
@@ -231,13 +254,15 @@ if ($str["call"] == "sqllist") {
                                 $sqlnum++;
                         }
 
-                } catch (Exception $e) {
-                        throw new Exception($e->getMessage() . "<br>" . $sql);
+                } catch (Throwable $e) {
+                        $db->rollback();
+                        echo $e->getMessage();
+                        exit();
                 }
         }
         $db->commit();
         $out = ["status" => 1, "data" => $sqltimes];
-        echo json_encode($out, JSON_UNESCAPED_UNICODE);
+        info_out($out);
         return;
 }
 

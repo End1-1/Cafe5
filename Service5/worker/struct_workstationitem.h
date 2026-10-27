@@ -54,6 +54,16 @@ struct WorkstationItem : public ParentItem {
     {
         return data.value(QStringLiteral("precheck_printer")).toString().trimmed();
     }
+    /** Waiter: print the precheck. Missing key means print (default on). */
+    bool printPrecheckEnabled() const
+    {
+        return data.value(QStringLiteral("print_precheck")).toBool(true);
+    }
+    /** Waiter: print the paper receipt when the order is closed. Missing key means print. */
+    bool printFinalReceiptEnabled() const
+    {
+        return data.value(QStringLiteral("print_final_receipt")).toBool(true);
+    }
     /** Waiter reports / shift close: same printer as precheck, else default/receipt. */
     QString waiterReportPrinter() const
     {

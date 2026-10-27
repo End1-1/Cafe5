@@ -1061,6 +1061,20 @@ CREATE TABLE IF NOT EXISTS guest_order_idempotency (
 ) ENGINE=InnoDB;
 ALTER TABLE h_halls ADD COLUMN IF NOT EXISTS f_receipt_footer TEXT NULL;
 ALTER TABLE cash_payment_types ADD COLUMN IF NOT EXISTS f_waiter TINYINT NOT NULL DEFAULT 1;
+ALTER TABLE cash_payment_types ADD COLUMN IF NOT EXISTS f_require_partner TINYINT NOT NULL DEFAULT 1;
+CREATE TABLE IF NOT EXISTS async_job (
+    f_id CHAR(36) NOT NULL PRIMARY KEY,
+    f_type VARCHAR(32) NOT NULL,
+    f_user INT NOT NULL DEFAULT 0,
+    f_status TINYINT NOT NULL DEFAULT 0,
+    f_params LONGTEXT NULL,
+    f_result LONGTEXT NULL,
+    f_error TEXT NULL,
+    f_created DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    f_started DATETIME NULL,
+    f_finished DATETIME NULL,
+    KEY idx_async_job_user (f_user, f_created)
+) ENGINE=InnoDB;
 EOD;
 
 $update_verision = intval(stmtall("select * from s_app where lower(f_app)='db'")->fetch_assoc()["f_version"]);
@@ -1265,6 +1279,9 @@ try {
     stmtall("ALTER TABLE cash_payment_types ADD COLUMN IF NOT EXISTS f_name VARCHAR(64) NULL");
     if (stmtall("SHOW COLUMNS FROM cash_payment_types LIKE 'f_waiter'")->num_rows == 0) {
         stmtall("ALTER TABLE cash_payment_types ADD COLUMN f_waiter TINYINT NOT NULL DEFAULT 1");
+    }
+    if (stmtall("SHOW COLUMNS FROM cash_payment_types LIKE 'f_require_partner'")->num_rows == 0) {
+        stmtall("ALTER TABLE cash_payment_types ADD COLUMN f_require_partner TINYINT NOT NULL DEFAULT 1");
     }
     stmtall("INSERT IGNORE INTO cash_payment_types (f_id, f_waiter) VALUES
         (1,1),(2,1),(3,1),(4,1),(5,1),(6,1),(7,1),(8,1),(9,1),(10,1),(11,1)");

@@ -1915,8 +1915,9 @@ void DlgOrder::printPrecheck(const QString &currentStaff)
         p.br();
     }
 
+    const bool bankNeedsPartner = PaymentTypeNames::partnerRequired(PAYMENT_TYPE_BANK);
     const bool hasDebtOrBank = mOrder.payment(payment_fields[PAYMENT_TYPE_DEBT]) > 0.001
-                               || mOrder.payment(payment_fields[PAYMENT_TYPE_BANK]) > 0.001;
+                               || (mOrder.payment(payment_fields[PAYMENT_TYPE_BANK]) > 0.001 && bankNeedsPartner);
     bool printSignature = hasDebtOrBank;
     p.setFontSize(bs - 2);
     QString receiptPolicy = mWorkStation.data.value("receipt_policy").toString();
@@ -3205,16 +3206,19 @@ void DlgOrder::on_btnTotal_clicked()
         const QString route = self->mOrder.state == ORDER_STATE_PREORDER
                                   ? "/engine/v2/waiter/order/print-precheck-of-preorder"
                                   : "/engine/v2/waiter/order/print-precheck";
-        if (!mWorkStation.precheckPrinter().isEmpty()) {
+        const bool printPaper = mWorkStation.printPrecheckEnabled();
+        if (printPaper && !mWorkStation.precheckPrinter().isEmpty()) {
             NInterface::prepareLoadingTitle(
                 QObject::tr("Printer: %1").arg(mWorkStation.precheckPrinter()));
         }
         self->fHttp->query(route,
                            bearer, self,
         self->withBillRound({{"id", self->mOrder.id}}),
-        [self, currentUserName](const QJsonObject & jdoc) {
+        [self, currentUserName, printPaper](const QJsonObject & jdoc) {
             self->parseOrder(jdoc);
-            self->printPrecheck(currentUserName);
+            if (printPaper) {
+                self->printPrecheck(currentUserName);
+            }
         }, [](const QJsonObject & jerr) {
             Q_UNUSED(jerr);
             return false;
@@ -3635,7 +3639,9 @@ void DlgOrder::createPaymentButtons()
                  {"payment_field", payment_fields[pt]},
                  {"amount", amount}});
 
-            if (pt == PAYMENT_TYPE_DEBT || pt == PAYMENT_TYPE_BANK) {
+            const bool askPartner = pt == PAYMENT_TYPE_DEBT
+                                     || (pt == PAYMENT_TYPE_BANK && PaymentTypeNames::partnerRequired(pt));
+            if (askPartner) {
                 QString partnerId;
                 QString partnerName;
                 if (!DlgCL::getCL(self->mUser, partnerId, partnerName)) {
@@ -4465,7 +4471,8 @@ void DlgOrder::on_btnCloseOrder_clicked()
             return;
         }
 
-        if (!mWorkStation.precheckPrinter().isEmpty()) {
+        const bool printPaper = mWorkStation.printFinalReceiptEnabled();
+        if (printPaper && !mWorkStation.precheckPrinter().isEmpty()) {
             NInterface::prepareLoadingTitle(
                 QObject::tr("Printer: %1").arg(mWorkStation.precheckPrinter()));
         }
@@ -4478,9 +4485,11 @@ void DlgOrder::on_btnCloseOrder_clicked()
              {"cashbox_id", mWorkStation.cashboxId()},
              {"cost_depend_on_service_and_discount", mWorkStation.data.value(QStringLiteral("cost_depend_on_service_and_discount")).toBool()},
              {"cash_session_id", self->mOrder.cashSessionId}}),
-            [self](const QJsonObject &jdoc) {
+            [self, printPaper](const QJsonObject &jdoc) {
                 self->parseOrder(jdoc);
-                self->printPrecheck(self->mUser->shortFullName());
+                if (printPaper) {
+                    self->printPrecheck(self->mUser->shortFullName());
+                }
 
                 if(self->isBistroMode()) {
                     self->startNewOrderOnTableAfterBistroClose();
@@ -5297,18 +5306,21 @@ void DlgOrder::on_btnPrintClosedFiscal_clicked()
                                                      {"error", err},
                                                      {"result", result},
                                                      {"f_fiscal_machine_id", mWorkStation.fiscalMachineId()}}}};
-            if (!mWorkStation.precheckPrinter().isEmpty()) {
+            const bool printPaper = mWorkStation.printFinalReceiptEnabled();
+            if (printPaper && !mWorkStation.precheckPrinter().isEmpty()) {
                 NInterface::prepareLoadingTitle(
                     QObject::tr("Printer: %1").arg(mWorkStation.precheckPrinter()));
             }
             NInterface::query("/engine/v2/waiter/order/fiscal-printed", sessionKey, self, reply,
-                              [self](const QJsonObject &jdoc) {
+                              [self, printPaper](const QJsonObject &jdoc) {
                                   if(!self) {
                                       return;
                                   }
 
                                   self->parseOrder(jdoc);
-                                  self->printPrecheck(self->mUser->shortFullName());
+                                  if (printPaper) {
+                                      self->printPrecheck(self->mUser->shortFullName());
+                                  }
                               },
                               [](const QJsonObject &) { return false; });
         } else {
@@ -5357,8 +5369,9 @@ void DlgOrder::updateDebtHolderUi()
     const QJsonObject dh = mOrder.data.value(QStringLiteral("f_debt_holder")).toObject();
     const int partnerId = dh.value(QStringLiteral("f_id")).toInt();
     const QString partnerName = dh.value(QStringLiteral("f_name")).toString().trimmed();
+    const bool bankNeedsPartner = PaymentTypeNames::partnerRequired(PAYMENT_TYPE_BANK);
     const bool hasDeferred = mOrder.payment(payment_fields[PAYMENT_TYPE_DEBT]) > 0.001
-                             || mOrder.payment(payment_fields[PAYMENT_TYPE_BANK]) > 0.001;
+                             || (mOrder.payment(payment_fields[PAYMENT_TYPE_BANK]) > 0.001 && bankNeedsPartner);
     ui->wDebtHolder->setVisible(partnerId > 0 || hasDeferred);
     if (partnerId > 0) {
         ui->lbDebtHolderName->setText(partnerName.isEmpty() ? QString::number(partnerId) : partnerName);

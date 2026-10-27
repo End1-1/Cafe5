@@ -37,6 +37,7 @@
     "Custom name": "Սեփական անվանում",
     "Display name": "Ցուցադրվող անվանում",
     "In Waiter": "Waiter-ում",
+    "Require partner": "Պահանջել գործընկեր",
     "Show and allow this payment in Waiter": "Ցուցադրել և թույլատրել այս վճարման եղանակը Waiter-ում",
     "This payment type is disabled for Waiter": "Այս վճարման եղանակն անջատված է Waiter-ի համար",
     "Partner": "Գործընկեր",
@@ -512,5 +513,9 @@
     "Guest order workstation is not configured": "Հյուրի պատվերի աշխատատեղը կարգավորված չէ",
     "User not found": "Օգտատերը չի գտնվել",
     "Courier from cash": "Առաքիչին դրամարկղից",
+    "Document is required": "Փաստաթուղթը պարտադիր է",
+    "Job id is required": "Առաջադրանքի համարը պարտադիր է",
+    "Job not found": "Առաջադրանքը չի գտնվել",
+    "Store, date and items are required": "Պահեստը, ամսաթիվը և ապրանքները պարտադիր են",
     "One key per table. Issue via POST /ararix/menu/issue-key with table_id (staff session). Do not use a shared restaurant key.": "need_translate One key per table. Issue via POST /ararix/menu/issue-key with table_id (staff session). Do not use a shared restaurant key."
 }

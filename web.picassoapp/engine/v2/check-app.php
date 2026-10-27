@@ -7,7 +7,7 @@ $version_check = true;
 
 $apps = [
     "waiter" => "2.8.25",
-    "officen" => "2.22.74",
+    "officen" => "2.22.76",
     "shop" => "1.9.49",
     "webapi" => "1.1.2",
     "picasso.store" => "1.1.5",

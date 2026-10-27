@@ -482,39 +482,36 @@ bool C5StoreInput::saveBlocking(int status)
     bool ok = false;
     QEventLoop loop;
 
-    NInterface::query("/engine/v2/common/store-move/input",
-                      mUser->mSessionKey,
-                      this,
-                      {{"doc", jdoc}},
-                      [&](const QJsonObject &jo) {
-                          mDocData.version = jo.value(QStringLiteral("version")).toInt(mDocData.version + 1);
-                          if (jo.contains(QStringLiteral("paid_amount"))) {
-                              mDocData.paid_amount = jo.value(QStringLiteral("paid_amount")).toDouble();
-                              setPaidAmountUi(mDocData.paid_amount, true);
-                          }
-                          mDocumentPersisted = true;
-                          syncGoodsSearchCachePrices();
-                          setState();
-                          ok = true;
-                          if (mRelatedOutputsLoaded) {
-                              loadRelatedOutputs();
-                          }
-                          loop.quit();
-                      },
-                      [&](const QJsonObject &jerr) {
-                          QString msg = jerr.value(QStringLiteral("message")).toString();
-                          if (msg.isEmpty()) {
-                              msg = jerr.value(QStringLiteral("errorMessage")).toString();
-                          }
-                          if (!msg.isEmpty()) {
-                              C5Message::error(msg);
-                          }
-                          loop.quit();
-                          return true;
-                      },
-                      true,
-                      NDataProvider::kDefaultTransferTimeoutMs,
-                      false);
+    NInterface::queryJob("/engine/v2/common/store-move/input-async",
+                         mUser->mSessionKey,
+                         this,
+                         {{"doc", jdoc}},
+                         [&](const QJsonObject &jo) {
+                             mDocData.version = jo.value(QStringLiteral("version")).toInt(mDocData.version + 1);
+                             if (jo.contains(QStringLiteral("paid_amount"))) {
+                                 mDocData.paid_amount = jo.value(QStringLiteral("paid_amount")).toDouble();
+                                 setPaidAmountUi(mDocData.paid_amount, true);
+                             }
+                             mDocumentPersisted = true;
+                             syncGoodsSearchCachePrices();
+                             setState();
+                             ok = true;
+                             if (mRelatedOutputsLoaded) {
+                                 loadRelatedOutputs();
+                             }
+                             loop.quit();
+                         },
+                         [&](const QJsonObject &jerr) {
+                             QString msg = jerr.value(QStringLiteral("message")).toString();
+                             if (msg.isEmpty()) {
+                                 msg = jerr.value(QStringLiteral("errorMessage")).toString();
+                             }
+                             if (!msg.isEmpty()) {
+                                 C5Message::error(msg);
+                             }
+                             loop.quit();
+                             return true;
+                         });
 
     loop.exec();
     return ok;
@@ -559,17 +556,17 @@ bool C5StoreInput::confirmTabClose()
 
     mDocData.status = STORE_DOC_STATUS_DRAFT;
     const QJsonObject jdoc = mDocData.toJson();
-    NInterface::query1("/engine/v2/common/store-move/input",
-                       mUser->mSessionKey,
-                       this,
-                       {{"doc", jdoc}},
-                       [this](const QJsonObject &) {
-                           mDocData.version++;
-                           mDocumentPersisted = true;
-                           syncGoodsSearchCachePrices();
-                           setState();
-                           __mainWindow->removeTab(this);
-                       });
+    NInterface::queryJob("/engine/v2/common/store-move/input-async",
+                         mUser->mSessionKey,
+                         this,
+                         {{"doc", jdoc}},
+                         [this](const QJsonObject &) {
+                             mDocData.version++;
+                             mDocumentPersisted = true;
+                             syncGoodsSearchCachePrices();
+                             setState();
+                             __mainWindow->removeTab(this);
+                         });
     return false;
 }
 
@@ -1003,7 +1000,7 @@ void C5StoreInput::saveDocument()
     }
     mDocData.status = STORE_DOC_STATUS_POSTED;
     QJsonObject jdoc = mDocData.toJson();
-    NInterface::query1("/engine/v2/common/store-move/input", mUser->mSessionKey, this, {{"doc", jdoc}}, [this](const QJsonObject jo) {
+    NInterface::queryJob("/engine/v2/common/store-move/input-async", mUser->mSessionKey, this, {{"doc", jdoc}}, [this](const QJsonObject jo) {
         mDocData.version = jo.value(QStringLiteral("version")).toInt(mDocData.version + 1);
         if (jo.contains(QStringLiteral("paid_amount"))) {
             mDocData.paid_amount = jo.value(QStringLiteral("paid_amount")).toDouble();
@@ -1039,7 +1036,7 @@ void C5StoreInput::draftDocument()
     }
     mDocData.status = STORE_DOC_STATUS_DRAFT;
     QJsonObject jdoc = mDocData.toJson();
-    NInterface::query1("/engine/v2/common/store-move/input", mUser->mSessionKey, this, {{"doc", jdoc}}, [this](const QJsonObject) {
+    NInterface::queryJob("/engine/v2/common/store-move/input-async", mUser->mSessionKey, this, {{"doc", jdoc}}, [this](const QJsonObject) {
         mDocData.version++;
         mDocumentPersisted = true;
         syncGoodsSearchCachePrices();

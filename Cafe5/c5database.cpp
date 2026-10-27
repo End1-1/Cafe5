@@ -384,7 +384,15 @@ bool C5Database::execNetwork(const QString &sqlQuery)
             || sql.mid(0, 6).compare("delete", Qt::CaseInsensitive) == 0
             || sql.mid(0, 6).compare("update", Qt::CaseInsensitive) == 0) {
         if(sql.mid(0, 6).compare("insert", Qt::CaseInsensitive) == 0) {
-            fCursorPos = jo["data"].toString().toInt();
+            const QJsonValue insertedId = jo.value(QStringLiteral("data"));
+            if(insertedId.isString()) {
+                fCursorPos = insertedId.toString().trimmed().toInt();
+            } else {
+                fCursorPos = insertedId.toVariant().toInt();
+            }
+            if(fCursorPos <= 0) {
+                fLastError = QString::fromUtf8(ba);
+            }
         }
 
         return true;

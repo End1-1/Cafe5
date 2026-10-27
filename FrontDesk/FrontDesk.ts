@@ -19268,6 +19268,16 @@ Lines: %6</source>
         <source>Unauthorized</source>
         <translation>Գործողությունը արգելված է</translation>
     </message>
+    <message>
+        <location filename="../NTable/ninterface.cpp" line="56"/>
+        <source>Server did not start the job</source>
+        <translation>Սերվերը չսկսեց առաջադրանքը</translation>
+    </message>
+    <message>
+        <location filename="../NTable/ninterface.cpp" line="83"/>
+        <source>Job failed</source>
+        <translation>Առաջադրանքը չկատարվեց</translation>
+    </message>
 </context>
 <context>
     <name>NLoadingDlg</name>
@@ -20787,6 +20797,14 @@ Existing write-offs will be removed and sales will be posted again.</source>
         <location filename="rworkstationconfigwaiter.ui" line="187"/>
         <source>Precheck printer name</source>
         <translation>Նախաչեկի տպիչի անուն</translation>
+    </message>
+    <message>
+        <source>Print precheck</source>
+        <translation>Տպել նախաչեկ</translation>
+    </message>
+    <message>
+        <source>Print final receipt</source>
+        <translation>Տպել վերջնական կտրոն</translation>
     </message>
     <message>
         <location filename="rworkstationconfigwaiter.ui" line="200"/>
@@ -22321,6 +22339,14 @@ This cannot be undone.</source>
     <message>
         <source>Show and allow this payment in Waiter</source>
         <translation>Ցուցադրել և թույլատրել այս վճարման եղանակը Waiter-ում</translation>
+    </message>
+    <message>
+        <source>Require partner</source>
+        <translation>Պահանջել գործընկեր</translation>
+    </message>
+    <message>
+        <source>Require a partner for this transfer</source>
+        <translation>Այս փոխանցմամբ վճարելիս պահանջել գործընկեր</translation>
     </message>
 </context>
 <context>

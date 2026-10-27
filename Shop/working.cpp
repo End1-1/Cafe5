@@ -26,6 +26,7 @@
 #include "c5printing.h"
 #include "c5user.h"
 #include "c5utils.h"
+#include "paymenttypenames.h"
 #include "chatmessage.h"
 #include "dlgcashout.h"
 #include "dlggiftcardsale.h"
@@ -78,6 +79,7 @@ Working::Working(C5User *user, QWidget *parent) :
     QString username;
     QString password;
     mUser = user;
+    PaymentTypeNames::load(mUser->mSessionKey, this);
     QShortcut *sF1 = new QShortcut(QKeySequence(Qt::Key_F1), this);
     QShortcut *sF2 = new QShortcut(QKeySequence(Qt::Key_F2), this);
     //    QShortcut *sF4 = new QShortcut(QKeySequence(Qt::Key_F4), this);

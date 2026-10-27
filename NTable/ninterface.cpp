@@ -7,6 +7,8 @@
 #include "c5message.h"
 #endif
 #include <QPointer>
+#include <QTimer>
+#include <QWidget>
 
 namespace {
 
@@ -18,6 +20,112 @@ void ninterfaceShowError(const QString &msg)
     C5Message::error(msg);
 #endif
 }
+
+/** Owned by the request context, so it disappears together with the window that asked. */
+class NJobPoller : public QObject
+{
+public:
+    NJobPoller(QObject *context, const QString &bearer, const QString &title, int intervalMs,
+               std::function<void(const QJsonObject&)> callback,
+               std::function<bool (const QJsonObject&)> errCallback)
+        : QObject(context),
+          mContext(context),
+          mBearer(bearer),
+          mCallback(std::move(callback)),
+          mErrCallback(std::move(errCallback))
+    {
+        mTimer.setSingleShot(true);
+        mTimer.setInterval(intervalMs);
+        connect(&mTimer, &QTimer::timeout, this, &NJobPoller::poll);
+        if (!NInterface::isProgressSuppressed()) {
+            QWidget *parentWidget = qobject_cast<QWidget *>(context);
+            mDlg = new NLoadingDlg(title, parentWidget);
+            if (parentWidget) {
+                mDlg->move(parentWidget->window()->geometry().center() - mDlg->rect().center());
+            }
+            mDlg->open();
+        }
+    }
+
+    void start(const QString &route, const QJsonObject &params)
+    {
+        NInterface::query(route, mBearer, mContext, params,
+                          [this](const QJsonObject &jo) {
+                              mJobId = jo.value(QStringLiteral("job_id")).toString();
+                              if (mJobId.isEmpty()) {
+                                  fail(NInterface::tr("Server did not start the job"));
+                                  return;
+                              }
+                              mTimer.start();
+                          },
+                          [this](const QJsonObject &jerr) {
+                              fail(jerr.value(QStringLiteral("errorMessage")).toString());
+                              return true;
+                          },
+                          false);
+    }
+
+private:
+    static constexpr int kMaxPollFailures = 5;
+
+    void poll()
+    {
+        NInterface::query(QStringLiteral("/engine/v2/common/jobs/status"), mBearer, mContext,
+                          {{"id", mJobId}},
+                          [this](const QJsonObject &jo) {
+                              mPollFailures = 0;
+                              if (!jo.value(QStringLiteral("done")).toBool()) {
+                                  mTimer.start();
+                                  return;
+                              }
+                              const QString err = jo.value(QStringLiteral("error")).toString();
+                              if (jo.contains(QStringLiteral("error"))) {
+                                  fail(err.isEmpty() ? NInterface::tr("Job failed") : err);
+                                  return;
+                              }
+                              closeDialog();
+                              mCallback(jo.value(QStringLiteral("result")).toObject());
+                              deleteLater();
+                          },
+                          [this](const QJsonObject &jerr) {
+                              // The job keeps running on the server; a dropped poll is not a failure yet.
+                              if (++mPollFailures < kMaxPollFailures) {
+                                  mTimer.start();
+                              } else {
+                                  fail(jerr.value(QStringLiteral("errorMessage")).toString());
+                              }
+                              return true;
+                          },
+                          false);
+    }
+
+    void fail(const QString &msg)
+    {
+        closeDialog();
+        const bool handled = mErrCallback && mErrCallback({{"status", 1}, {"errorMessage", msg}});
+        if (!handled && !msg.isEmpty()) {
+            ninterfaceShowError(msg);
+        }
+        deleteLater();
+    }
+
+    void closeDialog()
+    {
+        if (mDlg) {
+            mDlg->hide();
+            mDlg->deleteLater();
+        }
+    }
+
+    QObject *mContext;
+    QString mBearer;
+    QString mJobId;
+    QTimer mTimer;
+    int mPollFailures = 0;
+    QPointer<NLoadingDlg> mDlg;
+    std::function<void(const QJsonObject&)> mCallback;
+    std::function<bool (const QJsonObject&)> mErrCallback;
+};
 
 } // namespace
 
@@ -365,6 +473,25 @@ void NInterface::query1(const QString &route, const QString &bearer, QObject *co
         true,
         timeout,
         false);
+}
+
+void NInterface::queryJob(const QString &route, const QString &bearer, QObject *context, const QJsonObject &params,
+                          std::function<void (const QJsonObject&)> callback,
+                          std::function<bool (const QJsonObject&)> errCallback,
+                          int pollIntervalMs)
+{
+    Q_ASSERT(context);
+    if (!context) {
+        qWarning() << "NInterface::queryJob called with null context";
+        return;
+    }
+    QString title = sPendingLoadingTitle;
+    sPendingLoadingTitle.clear();
+    if (title.isEmpty()) {
+        title = tr("Query");
+    }
+    auto *poller = new NJobPoller(context, bearer, title, pollIntervalMs, std::move(callback), std::move(errCallback));
+    poller->start(route, params);
 }
 
 void NInterface::httpQueryStarted()

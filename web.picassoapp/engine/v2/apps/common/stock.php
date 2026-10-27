@@ -40,13 +40,12 @@ class Stock extends Auth
             g.f_name AS item_name,
             gr.f_name AS group_name,
             u.f_name as unit_name,
-            -- Расчет остатка: (Приходы - Расходы) до указанной даты
-            money_fmt(SUM(IFNULL(sm.f_qty_in, 0)) - SUM(IFNULL(sm.f_qty_out, 0))) AS qty_sys,
-            money_fmt(g.f_lastinputprice) AS price
+            -- Остаток: (приходы - расходы) до даты; raw number (не money_fmt — клиент парсит локаль)
+            ROUND(SUM(IFNULL(sm.f_qty_in, 0)) - SUM(IFNULL(sm.f_qty_out, 0)), 3) AS qty_sys,
+            ROUND(g.f_lastinputprice, 2) AS price
         FROM c_goods g
         join c_units u on u.f_id=g.f_unit
         JOIN c_groups gr ON g.f_group = gr.f_id
-        -- Джойним движения только до целевой даты
         LEFT JOIN store_moves sm ON sm.f_item_id = g.f_id 
             AND sm.f_store_id = ?
         JOIN store_document sd ON sm.f_doc = sd.f_id 
@@ -56,7 +55,57 @@ class Stock extends Auth
         HAVING qty_sys <> 0
          order by gr.f_name, g.f_name
     EOD;
-        $this->result["data"] = $this->select($sql, "is", [$params->store, $params->date])->fetch_all(MYSQLI_ASSOC);
+        $rows = $this->select($sql, "is", [$params->store, $params->date])->fetch_all(MYSQLI_ASSOC);
+        foreach ($rows as &$r) {
+            $r["qty_sys"] = (float)$r["qty_sys"];
+            $r["price"] = (float)$r["price"];
+            $r["item_id"] = (int)$r["item_id"];
+        }
+        unset($r);
+        $this->result["data"] = $rows;
+        $this->echoResult();
+    }
+
+    /** Balance of the given goods on one store up to a date, including negatives and zeros. */
+    public function Balances($params)
+    {
+        $store = (int)($params->store ?? 0);
+        $date = trim((string)($params->date ?? ""));
+        $ids = [];
+        foreach ($params->items ?? [] as $id) {
+            $id = (int)$id;
+            if ($id > 0) {
+                $ids[$id] = $id;
+            }
+        }
+        if ($store <= 0 || $date === "" || $ids === []) {
+            dieWithCode(Translator::t("Store, date and items are required"));
+        }
+        $in = implode(",", $ids);
+        // Movements are stored on f_storeid when the card points at another goods.
+        // Count both ids, and only documents up to the requested date (a plain LEFT JOIN
+        // would also add later documents and turn a real minus into the wrong number).
+        $sql = <<<EOD
+        SELECT g.f_id AS item_id,
+               ROUND(
+                   COALESCE(SUM(CASE WHEN sd.f_id IS NOT NULL AND sd.f_doc_date <= ? THEN sm.f_qty_in ELSE 0 END), 0)
+                   - COALESCE(SUM(CASE WHEN sd.f_id IS NOT NULL AND sd.f_doc_date <= ? THEN sm.f_qty_out ELSE 0 END), 0)
+               , 3) AS qty_sys
+        FROM c_goods g
+        LEFT JOIN store_moves sm
+            ON sm.f_store_id = ?
+           AND sm.f_item_id IN (g.f_id, IF(IFNULL(g.f_storeid, 0) = 0, g.f_id, g.f_storeid))
+        LEFT JOIN store_document sd ON sd.f_id = sm.f_doc
+        WHERE g.f_id IN ($in)
+        GROUP BY g.f_id
+        EOD;
+        $rows = $this->select($sql, "ssi", [$date, $date, $store])->fetch_all(MYSQLI_ASSOC);
+        foreach ($rows as &$r) {
+            $r["item_id"] = (int)$r["item_id"];
+            $r["qty_sys"] = (float)$r["qty_sys"];
+        }
+        unset($r);
+        $this->result["data"] = $rows;
         $this->echoResult();
     }
 
@@ -154,9 +203,9 @@ class Stock extends Auth
             g.f_name AS f_item_name,
             gr.f_name AS f_group_name,
             u.f_name AS f_unit_name,
-            money_fmt(i.f_qty_user) as f_qty_user,
-            money_fmt(i.f_qty_sys) as f_qty_sys,
-            money_fmt(i.f_qty_user - i.f_qty_sys) AS f_qty_diff,
+            i.f_qty_user,
+            i.f_qty_sys,
+            (i.f_qty_user - i.f_qty_sys) AS f_qty_diff,
             i.f_price
         FROM store_inventory_user i
         LEFT JOIN c_goods g ON g.f_id = i.f_item
@@ -166,6 +215,14 @@ class Stock extends Auth
         ORDER BY i.f_row ASC
         EOD;
         $items = $this->select($sql, "s", [$v->id])->fetch_all(MYSQLI_ASSOC);
+        foreach ($items as &$it) {
+            $it["f_qty_user"] = (float)$it["f_qty_user"];
+            $it["f_qty_sys"] = (float)$it["f_qty_sys"];
+            $it["f_qty_diff"] = (float)$it["f_qty_diff"];
+            $it["f_price"] = (float)$it["f_price"];
+            $it["f_item_id"] = (int)$it["f_item_id"];
+        }
+        unset($it);
 
         // 3. Формируем финальный ответ под структуру C++
         $result = [

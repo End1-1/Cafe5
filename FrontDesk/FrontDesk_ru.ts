@@ -19231,6 +19231,16 @@ Lines: %6</source>
         <source>Unauthorized</source>
         <translation>Нет авторизации</translation>
     </message>
+    <message>
+        <location filename="../NTable/ninterface.cpp" line="56"/>
+        <source>Server did not start the job</source>
+        <translation>Сервер не запустил задание</translation>
+    </message>
+    <message>
+        <location filename="../NTable/ninterface.cpp" line="83"/>
+        <source>Job failed</source>
+        <translation>Задание не выполнено</translation>
+    </message>
 </context>
 <context>
     <name>NLoadingDlg</name>
@@ -20765,6 +20775,14 @@ Existing write-offs will be removed and sales will be posted again.</source>
         <translation>Имя принтера пречека</translation>
     </message>
     <message>
+        <source>Print precheck</source>
+        <translation>Печатать пречек</translation>
+    </message>
+    <message>
+        <source>Print final receipt</source>
+        <translation>Печатать финальный чек</translation>
+    </message>
+    <message>
         <location filename="rworkstationconfigwaiter.ui" line="200"/>
         <source>Setup buttons (disable when checked)</source>
         <translation>Кнопки настройки (отключить при отметке)</translation>
@@ -22297,6 +22315,14 @@ This cannot be undone.</source>
     <message>
         <source>Show and allow this payment in Waiter</source>
         <translation>Показывать и разрешать этот способ оплаты в Waiter</translation>
+    </message>
+    <message>
+        <source>Require partner</source>
+        <translation>Требовать партнёра</translation>
+    </message>
+    <message>
+        <source>Require a partner for this transfer</source>
+        <translation>При оплате этим переводом требовать партнёра</translation>
     </message>
 </context>
 <context>

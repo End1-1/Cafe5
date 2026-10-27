@@ -50,6 +50,7 @@ set(APP_SOURCES
     ../Controls/c5cleartablewidget.cpp
     ../Forms/c5connectiondialog.cpp ../Forms/dlgreservgoods.cpp ../Forms/dlgsplashscreen.cpp ../Forms/previewdialog.cpp
     ../NTable/ndataprovider.cpp ../NTable/ninterface.cpp ../NTable/nloadingdlg.cpp
+    ../FrontDesk/paymenttypenames.cpp
     ../Printing/selectprinters.cpp
     ../StructModel/c5structtableview.cpp
     ../Service5/worker/struct_workstationitem.cpp ../Service5/worker/struct_fiscal_machine.cpp
@@ -108,7 +109,7 @@ set_target_properties(${PROJECT_NAME} PROPERTIES
 # Include paths
 # -------------------------
 target_include_directories(${PROJECT_NAME} PRIVATE
-    . ../Cafe5  ../TableRecord ../NTable ../Classes ../Cache
+    . ../Cafe5  ../TableRecord ../NTable ../Classes ../Cache ../FrontDesk
     ../Controls ../Forms ../Service ../Service5/worker ../StructModel
     ../Printing ../RESOURCES ../Http ../dictionaries
     C:/Development/projects/desktop.newtax/Src

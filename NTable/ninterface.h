@@ -47,6 +47,14 @@ public:
                        std::function<void(const QJsonObject&)> callback,
                        int timeout = NDataProvider::kDefaultTransferTimeoutMs);
 
+    /** For routes that answer {job_id} and keep working on the server (longer than the
+     *  Cloudflare proxy timeout). Polls common/jobs/status; callback gets the job result.
+     *  errCallback gets {"errorMessage"}; return false to also show the default error box. */
+    static void queryJob(const QString &route, const QString &bearer, QObject *context, const QJsonObject &params,
+                         std::function<void(const QJsonObject&)> callback,
+                         std::function<bool (const QJsonObject&)> errCallback = nullptr,
+                         int pollIntervalMs = 2000);
+
     /** Nested: while active, loading dialogs from query()/createHttpQuery* are not shown. */
     static void pushSuppressProgress();
     static void popSuppressProgress();

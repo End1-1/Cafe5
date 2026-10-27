@@ -29,6 +29,10 @@ inline double str_table_amount(const QString &value)
     }
     s.remove(QChar(0xA0));
     s.remove(' ');
+    // Armenian decimal-like glyphs → ASCII '.'
+    s.replace(QChar(0x2024), QLatin1Char('.')); // ․
+    s.replace(QChar(0x0589), QLatin1Char('.')); // ։
+    s.replace(QChar(0x055D), QLatin1Char('.')); // ՝
     const int lastComma = s.lastIndexOf(',');
     const int lastDot = s.lastIndexOf('.');
     if (lastComma >= 0 && lastDot >= 0) {

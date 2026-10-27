@@ -1976,8 +1976,10 @@ EOD;
         $bankField = $payment["fields"][PAYMENT_TYPE_BANK];
         $bankAmount = (float)($odata[$bankField] ?? 0);
 
-        // Debt / bank need a dedicated debt-holder partner (not guest info).
-        if (($debtAmount > 0 || $bankAmount > 0) && $partnerId <= 0) {
+        require_once __DIR__ . "/../worker/cash-ops-helper.php";
+        // Debt always needs a partner. A transfer needs one only when the payment type says so.
+        $bankNeedsPartner = $bankAmount > 0.00001 && payment_type_requires_partner($this, PAYMENT_TYPE_BANK);
+        if (($debtAmount > 0.00001 || $bankNeedsPartner) && $partnerId <= 0) {
             dieWithCode(Translator::t("A partner must be selected for deferred payments"));
         }
         foreach ($payment["types"] as $pt) {
@@ -1997,9 +1999,8 @@ EOD;
                     ]);
                 }
             } elseif ($pt == PAYMENT_TYPE_BANK) {
-                // Bank transfer is also treated as deferred settlement.
-                // Store it the same way as "Debt" in cash_debts, so it counts as customer debt.
-                if ($bankAmount > 0.00001) {
+                // Transfer counts as partner debt only when a partner is required and selected.
+                if ($bankAmount > 0.00001 && $partnerId > 0 && payment_type_requires_partner($this, PAYMENT_TYPE_BANK)) {
                     $this->insert("cash_debts", [
                         "f_date"        => date("Y-m-d"),
                         "f_partner"     => $partnerId,

@@ -66,10 +66,10 @@ struct JsonParser<StoreInventoryUser>
         sid.item_id = jo.value("f_item_id").toInt();
         sid.item_name = jo.value("f_item_name").toString();
         sid.unit_name = jo.value("f_unit_name").toString();
-        sid.qty_user = str_float(jo.value("f_qty_user").toString());
-        sid.qty_sys = str_float(jo.value("f_qty_sys").toString());
-        sid.qty_diff = str_float(jo.value("f_qty_diff").toString());
-        sid.price = str_float(jo.value("f_price").toString());
+        sid.qty_user = jo.value("f_qty_user").toDouble(str_table_amount(jo.value("f_qty_user").toString()));
+        sid.qty_sys = jo.value("f_qty_sys").toDouble(str_table_amount(jo.value("f_qty_sys").toString()));
+        sid.qty_diff = jo.value("f_qty_diff").toDouble(str_table_amount(jo.value("f_qty_diff").toString()));
+        sid.price = jo.value("f_price").toDouble(str_table_amount(jo.value("f_price").toString()));
 
         return sid;
     }

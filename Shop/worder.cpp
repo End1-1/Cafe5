@@ -22,6 +22,7 @@
 #include "c5user.h"
 #include "c5utils.h"
 #include "dict_payment_type.h"
+#include "paymenttypenames.h"
 #include "dlgpaymentchoose.h"
 #include "dlgshopcustomer.h"
 #include "dqty.h"
@@ -277,8 +278,9 @@ void WOrder::writeOrder(std::function<void()> nextStep)
         }
         self->mLoyalty.useAmount = prepaid;
 
-        // Для долга и банковского перевода нужен партнёр (ИИН не обязателен).
-        if ((debt > 0.001 || bank > 0.001) && self->mPartnerId <= 0) {
+        // Долг всегда требует партнёра. Перевод — только если это включено у типа оплаты.
+        const bool bankNeedsPartner = bank > 0.001 && PaymentTypeNames::partnerRequired(PAYMENT_TYPE_BANK);
+        if ((debt > 0.001 || bankNeedsPartner) && self->mPartnerId <= 0) {
             C5Message::error(tr("A partner must be selected for debt / bank transfer"));
             return;
         }
@@ -313,7 +315,8 @@ void WOrder::writeOrder(std::function<void()> nextStep)
                 return;
             }
             // Повторная проверка после синхронизации f_guest на сервер.
-            if ((debt > 0.001 || bank > 0.001) && self->mPartnerId <= 0) {
+            const bool bankNeedsPartner = bank > 0.001 && PaymentTypeNames::partnerRequired(PAYMENT_TYPE_BANK);
+            if ((debt > 0.001 || bankNeedsPartner) && self->mPartnerId <= 0) {
                 C5Message::error(tr("A partner must be selected for debt / bank transfer"));
                 return;
             }
@@ -939,8 +942,9 @@ void WOrder::printPrecheck()
         p.br();
     }
 
+    const bool bankNeedsPartner = PaymentTypeNames::partnerRequired(PAYMENT_TYPE_BANK);
     const bool hasDebtOrBank = mOrder.payment(payment_fields[PAYMENT_TYPE_DEBT]) > 0.001
-                               || mOrder.payment(payment_fields[PAYMENT_TYPE_BANK]) > 0.001;
+                               || (mOrder.payment(payment_fields[PAYMENT_TYPE_BANK]) > 0.001 && bankNeedsPartner);
     if (hasDebtOrBank) {
         p.br();
         p.br();

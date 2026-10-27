@@ -31,8 +31,13 @@ private slots:
 
     void on_btnOk_clicked();
 
+    void rescaleIngredients();
+
 private:
     Ui::DlgSemireadyInOut *ui;
+
+    /** Dish qty for which ingredient UserRole amounts were calculated. */
+    double mRefDishQty = 1.0;
 };
 
 #endif // DLGSEMIREADYINOUT_H

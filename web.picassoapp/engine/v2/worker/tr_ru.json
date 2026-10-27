@@ -84,6 +84,7 @@
     "Custom name": "Своё название",
     "Display name": "Отображаемое название",
     "In Waiter": "В Waiter",
+    "Require partner": "Требовать партнёра",
     "Show and allow this payment in Waiter": "Показывать и разрешать этот способ оплаты в Waiter",
     "This payment type is disabled for Waiter": "Этот способ оплаты отключён для Waiter",
     "Idram": "Idram",
@@ -511,5 +512,9 @@
     "Quantity must be greater than zero": "Количество должно быть больше нуля",
     "Guest order workstation is not configured": "Рабочее место для гостевого заказа не настроено",
     "User not found": "Пользователь не найден",
-    "Courier from cash": "Доставщику из кассы"
+    "Courier from cash": "Доставщику из кассы",
+    "Document is required": "Документ обязателен",
+    "Job id is required": "Нужен номер задания",
+    "Job not found": "Задание не найдено",
+    "Store, date and items are required": "Нужны склад, дата и товары"
 }

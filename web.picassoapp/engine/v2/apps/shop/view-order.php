@@ -304,8 +304,12 @@ class ViewOrder extends Auth
         if (($odata["f_guest"]["f_guest_id"] ?? null)) {
             $partnerId = (int)$odata["f_guest"]["f_guest_id"];
         }
-        $deferred = (float)($alloc["f_amount_debt"] ?? 0) + (float)($alloc["f_amount_bank"] ?? 0);
-        if ($deferred > 0.00001 && $partnerId <= 0) {
+        require_once __DIR__ . "/../worker/cash-ops-helper.php";
+        $debtAmt = (float)($alloc["f_amount_debt"] ?? 0);
+        $bankAmt = (float)($alloc["f_amount_bank"] ?? 0);
+        $needPartner = $debtAmt > 0.00001
+            || ($bankAmt > 0.00001 && payment_type_requires_partner($this, PAYMENT_TYPE_BANK));
+        if ($needPartner && $partnerId <= 0) {
             dieWithCode(Translator::t("A partner must be selected for deferred payments"));
         }
 
@@ -657,15 +661,20 @@ class ViewOrder extends Auth
         string $comment,
         int $currencyId
     ): void {
-        $deferredAmount = (float)($alloc["f_amount_debt"] ?? 0) + (float)($alloc["f_amount_bank"] ?? 0);
-        if ($deferredAmount > 0.00001) {
+        require_once __DIR__ . "/../worker/cash-ops-helper.php";
+        $credit = (float)($alloc["f_amount_debt"] ?? 0);
+        $bankAmt = (float)($alloc["f_amount_bank"] ?? 0);
+        if ($bankAmt > 0.00001 && $partnerId > 0 && payment_type_requires_partner($this, PAYMENT_TYPE_BANK)) {
+            $credit += $bankAmt;
+        }
+        if ($credit > 0.00001 && $partnerId > 0) {
             // Write-off customer debt (sale wrote f_debit; return writes f_credit)
             $this->insert("cash_debts", [
                 "f_date" => date("Y-m-d"),
                 "f_partner" => $partnerId,
                 "f_doc_type" => 2,
                 "f_doc_uuid" => $returnOrderId,
-                "f_credit" => $deferredAmount,
+                "f_credit" => $credit,
                 "f_debit" => 0,
                 "f_currency_id" => $currencyId,
             ]);

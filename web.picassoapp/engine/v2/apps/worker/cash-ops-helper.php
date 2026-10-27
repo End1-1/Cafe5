@@ -35,6 +35,43 @@ function payment_type_name(object $db, int $paymentTypeId): string
 }
 
 /**
+ * Transfer payments (Bank / Bank 2 / Bank 3) require a partner unless the type flag is off.
+ * Debt always requires a partner. Missing column or row means required (default on).
+ *
+ * @param object $db Auth-like with select()
+ */
+function payment_type_requires_partner(object $db, int $paymentTypeId): bool
+{
+    if ($paymentTypeId === PAYMENT_DEBT) {
+        return true;
+    }
+    if (!in_array($paymentTypeId, [PAYMENT_TYPE_BANK, PAYMENT_TYPE_BANK2, PAYMENT_TYPE_BANK3], true)) {
+        return false;
+    }
+    static $flags = null;
+    if ($flags === null) {
+        $flags = [];
+        try {
+            $has = $db->select("SHOW COLUMNS FROM cash_payment_types LIKE 'f_require_partner'")->num_rows > 0;
+            if ($has) {
+                $rows = $db->select(
+                    "SELECT f_id, COALESCE(f_require_partner, 1) AS f_require_partner FROM cash_payment_types"
+                )->fetch_all(MYSQLI_ASSOC);
+                foreach ($rows as $r) {
+                    $flags[(int)$r["f_id"]] = (int)$r["f_require_partner"] !== 0;
+                }
+            }
+        } catch (Throwable $e) {
+            $flags = [];
+        }
+    }
+    if (!array_key_exists($paymentTypeId, $flags)) {
+        return true;
+    }
+    return $flags[$paymentTypeId];
+}
+
+/**
  * Payment types that create cash_operations rows (turnover on the shift).
  */
 function cash_ops_records_payment(int $paymentTypeId): bool

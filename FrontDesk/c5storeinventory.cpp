@@ -18,6 +18,7 @@
 #include "ninterface.h"
 #include "office_structs.h"
 #include "ui_c5storeinventory.h"
+#include <QHash>
 
 C5StoreInventory::C5StoreInventory(C5User *user, const QString &title, QIcon icon, QWidget *parent)
     : C5OfficeWidget(parent)
@@ -28,7 +29,12 @@ C5StoreInventory::C5StoreInventory(C5User *user, const QString &title, QIcon ico
     fLabel = tr("Store inventory");
     ui->wStore->selectorCallback = storeItemSelector;
     ui->tblGoods->setColumnWidths(ui->tblGoods->columnCount(), 300, 0, 300, 80, 80, 80, 80, 80);
+    ui->tblGoods->setColumnDecimals(col_qty_historical, 3);
+    ui->tblGoods->setColumnDecimals(col_qty_diff, 3);
     ui->wSearch->setVisible(false);
+    connect(ui->deDate, &C5DateEdit::dateChanged, this, [this](const QDate &) {
+        refreshStockBalances();
+    });
 }
 
 C5StoreInventory::~C5StoreInventory()
@@ -53,7 +59,13 @@ QToolBar* C5StoreInventory::toolBar()
 void C5StoreInventory::setDocument(StoreInventoryDocument sd)
 {
     mSemireadyBatches.clear();
-    ui->deDate->setDate(QDateTime::fromString(sd.date, FORMAT_DATETIME_TO_STR_MYSQL).date());
+    QDate docDate = QDateTime::fromString(sd.date, FORMAT_DATETIME_TO_STR_MYSQL).date();
+    if (!docDate.isValid()) {
+        docDate = QDate::fromString(sd.date.left(10), FORMAT_DATE_TO_STR_MYSQL);
+    }
+    if (docDate.isValid()) {
+        ui->deDate->setDate(docDate);
+    }
     ui->wStore->setCodeAndName(sd.store, sd.store_name);
     ui->leComment->setText(sd.comment());
     fInternalID = sd.uuid;
@@ -63,15 +75,16 @@ void C5StoreInventory::setDocument(StoreInventoryDocument sd)
         ui->tblGoods->setString(i, col_group_name, su.group_name);
         ui->tblGoods->setInteger(i, col_goods_id, su.item_id);
         ui->tblGoods->setString(i, col_goods_name, su.item_name);
-        ui->tblGoods->setString(i, col_qty_historical, float_str(su.qty_sys, 3));
+        ui->tblGoods->setDouble(i, col_qty_historical, su.qty_sys);
         ui->tblGoods->createLineEdit(i, col_qty_user)->setDouble(su.qty_user);
-        ui->tblGoods->setString(i, col_qty_diff, float_str(su.qty_diff, 3));
-        ui->tblGoods->setString(i, col_price, float_str(su.price, 2));
+        ui->tblGoods->setDouble(i, col_qty_diff, su.qty_diff);
+        ui->tblGoods->setDouble(i, col_price, su.price);
         ui->tblGoods->setString(i, col_unit, su.unit_name);
         setLockedQty(i, 0);
 
         connect(ui->tblGoods->lineEdit(i, col_qty_user), &C5LineEdit::textChanged, this, &C5StoreInventory::userQtyTextChanged);
     }
+    refreshStockBalances();
 }
 
 void C5StoreInventory::saveDoc()
@@ -98,14 +111,11 @@ void C5StoreInventory::saveDoc()
 
         // Получаем значения из LineEdit (колонка пользователя) и обычных ячеек (система)
         double qtyUser = ui->tblGoods->lineEdit(i, col_qty_user)->getDouble();
-        double qtySys = str_float(ui->tblGoods->getString(i, col_qty_historical));
+        double qtySys = ui->tblGoods->getDouble(i, col_qty_historical);
 
         row["f_qty_sys"] = qtySys;
         row["f_qty_user"] = qtyUser;
-
-        // Если у тебя в таблице есть цена (например, скрытая или в доп. колонке)
-        // Если цены нет в таблице, сервер сам подтянет f_lastinputprice
-        row["f_price"] = str_float(ui->tblGoods->getString(i, col_price)); // Или возьми из данных, если добавил колонку цены
+        row["f_price"] = ui->tblGoods->getDouble(i, col_price);
 
         ja.append(row);
     }
@@ -226,8 +236,12 @@ void C5StoreInventory::autofillDoc()
                                    ui->tblGoods->setString(i, col_group_name, ji.value("group_name").toString());
                                    ui->tblGoods->setInteger(i, col_goods_id, ji.value("item_id").toInteger());
                                    ui->tblGoods->setString(i, col_goods_name, ji.value("item_name").toString());
-                                   ui->tblGoods->setString(i, col_qty_historical, ji.value("qty_sys").toString());
-                                   ui->tblGoods->setString(i, col_price, ji.value("price").toString());
+                                   ui->tblGoods->setDouble(i, col_qty_historical,
+                                                           ji.value("qty_sys").toDouble(
+                                                               str_table_amount(ji.value("qty_sys").toString())));
+                                   ui->tblGoods->setDouble(i, col_price,
+                                                           ji.value("price").toDouble(
+                                                               str_table_amount(ji.value("price").toString())));
                                    ui->tblGoods->setString(i, col_unit, ji.value("unit_name").toString());
                                    auto *l = ui->tblGoods->createLineEdit(i, col_qty_user);
                                    connect(l, &C5LineEdit::textChanged, this, &C5StoreInventory::userQtyTextChanged);
@@ -239,14 +253,24 @@ void C5StoreInventory::autofillDoc()
 
 void C5StoreInventory::exportDiffs()
 {
+    commit_table_edits(ui->tblGoods);
     QList<InventoryDiff> plus, minus;
     for (int i = 0; i < ui->tblGoods->rowCount(); i++) {
-        double diff = str_float(ui->tblGoods->getString(i, col_qty_diff));
+        C5LineEdit *le = ui->tblGoods->lineEdit(i, col_qty_user);
+        if (!le) {
+            continue;
+        }
+        // Корректировка = введённое − остаток на складе (в т.ч. отрицательный: 24−(−594)=618)
+        const double qtyUser = le->getDouble();
+        const double qtySys = ui->tblGoods->getDouble(i, col_qty_historical);
+        const double diff = qtyUser - qtySys;
+        ui->tblGoods->setDouble(i, col_qty_diff, diff);
+
         InventoryDiff id;
         id.goodsId = ui->tblGoods->getInteger(i, col_goods_id);
         id.goodsName = ui->tblGoods->getString(i, col_goods_name);
         id.unitName = ui->tblGoods->getString(i, col_unit);
-        id.price = str_float(ui->tblGoods->getString(i, col_price));
+        id.price = ui->tblGoods->getDouble(i, col_price);
         if (diff < -0.0001) {
             id.qty = qAbs(diff);
             minus.append(id);
@@ -271,6 +295,10 @@ void C5StoreInventory::exportDiffs()
 
 void C5StoreInventory::on_btnAddGoods_clicked()
 {
+    if (ui->wStore->value() == 0) {
+        C5Message::error(tr("Select storage"));
+        return;
+    }
     const auto r = selectStoreDocGoods();
     if (r.isEmpty()) {
         return;
@@ -282,7 +310,14 @@ void C5StoreInventory::on_btnAddGoods_clicked()
     ui->tblGoods->setString(row, col_group_name, g.groupName);
     ui->tblGoods->setInteger(row, col_goods_id, g.id);
     ui->tblGoods->setString(row, col_goods_name, g.name);
+    if (ui->tblGoods->getString(row, col_unit).isEmpty()) {
+        ui->tblGoods->setString(row, col_unit, g.unitName);
+    }
+    if (qAbs(ui->tblGoods->getDouble(row, col_price)) < 0.0000001) {
+        ui->tblGoods->setDouble(row, col_price, g.lastInputPrice);
+    }
     ui->tblGoods->lineEdit(row, col_qty_user)->setFocus();
+    refreshStockBalances();
 }
 
 int C5StoreInventory::addGoodsRow()
@@ -294,7 +329,6 @@ int C5StoreInventory::addGoodsRow()
     ui->tblGoods->setItem(row, col_goods_name, new QTableWidgetItem());
     C5LineEdit *lqty = ui->tblGoods->createLineEdit(row, col_qty_user);
     lqty->setValidator(new QDoubleValidator(0, 1000000, 3));
-    ui->tblGoods->setItem(row, 4, new QTableWidgetItem());
     connect(lqty, &QLineEdit::textChanged, this, &C5StoreInventory::userQtyTextChanged);
 
     return row;
@@ -312,7 +346,7 @@ void C5StoreInventory::countTotal()
         }
         const double qty = lqty->getDouble();
         qtySum += qty;
-        total += qty * str_float(ui->tblGoods->getString(i, col_price));
+        total += qty * ui->tblGoods->getDouble(i, col_price);
     }
 
     Q_UNUSED(total);
@@ -356,7 +390,7 @@ void C5StoreInventory::on_btnRemoveGoods_clicked()
 void C5StoreInventory::on_leSearch_textChanged(const QString &arg1)
 {
     for(int i = 0; i < ui->tblGoods->rowCount(); i++) {
-        ui->tblGoods->setRowHidden(i, !ui->tblGoods->getString(i, 2).contains(arg1));
+        ui->tblGoods->setRowHidden(i, !ui->tblGoods->getString(i, 2).contains(arg1, Qt::CaseInsensitive));
     }
 }
 
@@ -380,7 +414,10 @@ void C5StoreInventory::userQtyTextChanged(const QString &arg1)
     if (!ui->tblGoods->findWidget(qobject_cast<QWidget *>(sender()), row, col)) {
         return;
     }
-    ui->tblGoods->setDouble(row, col_qty_diff, str_float(arg1) - str_float(ui->tblGoods->getString(row, col_qty_historical)));
+    Q_UNUSED(arg1);
+    C5LineEdit *le = ui->tblGoods->lineEdit(row, col_qty_user);
+    const double qtyUser = le ? le->getDouble() : str_table_amount(arg1);
+    ui->tblGoods->setDouble(row, col_qty_diff, qtyUser - ui->tblGoods->getDouble(row, col_qty_historical));
 }
 
 int C5StoreInventory::findGoodsRow(int goodsId) const
@@ -419,7 +456,46 @@ void C5StoreInventory::refreshRowDiff(int row)
         return;
     }
     ui->tblGoods->setDouble(row, col_qty_diff,
-                            le->getDouble() - str_float(ui->tblGoods->getString(row, col_qty_historical)));
+                            le->getDouble() - ui->tblGoods->getDouble(row, col_qty_historical));
+}
+
+void C5StoreInventory::refreshStockBalances()
+{
+    if (ui->wStore->value() == 0 || ui->tblGoods->rowCount() == 0 || !ui->deDate->date().isValid()) {
+        return;
+    }
+    QJsonArray ids;
+    for (int i = 0; i < ui->tblGoods->rowCount(); ++i) {
+        const int id = ui->tblGoods->getInteger(i, col_goods_id);
+        if (id > 0) {
+            ids.append(id);
+        }
+    }
+    if (ids.isEmpty()) {
+        return;
+    }
+    const QString date = ui->deDate->date().toString(FORMAT_DATE_TO_STR_MYSQL) + QStringLiteral(" 23:59:59");
+    NInterface::query1("/engine/v2/common/stock/balances",
+                       mUser->mSessionKey,
+                       this,
+                       {{"store", ui->wStore->value()}, {"date", date}, {"items", ids}},
+                       [this](const QJsonObject &jo) {
+                           QHash<int, double> qty;
+                           const QJsonArray rows = jo.value(QStringLiteral("data")).toArray();
+                           for (const QJsonValue &v : rows) {
+                               const QJsonObject o = v.toObject();
+                               qty.insert(o.value(QStringLiteral("item_id")).toInt(),
+                                          o.value(QStringLiteral("qty_sys")).toDouble());
+                           }
+                           for (int i = 0; i < ui->tblGoods->rowCount(); ++i) {
+                               const int id = ui->tblGoods->getInteger(i, col_goods_id);
+                               if (!qty.contains(id)) {
+                                   continue;
+                               }
+                               ui->tblGoods->setDouble(i, col_qty_historical, qty.value(id));
+                               refreshRowDiff(i);
+                           }
+                       });
 }
 
 void C5StoreInventory::applySemireadyBatch(const SemireadyBatch &batch)
@@ -434,7 +510,7 @@ void C5StoreInventory::applySemireadyBatch(const SemireadyBatch &batch)
             row = addGoodsRow();
             ui->tblGoods->setInteger(row, col_goods_id, c.goodsId);
             ui->tblGoods->setString(row, col_goods_name, c.goodsName);
-            ui->tblGoods->setString(row, col_qty_historical, QStringLiteral("0"));
+            ui->tblGoods->setDouble(row, col_qty_historical, 0);
             C5LineEdit *le = ui->tblGoods->lineEdit(row, col_qty_user);
             if (!le) {
                 continue;
@@ -528,6 +604,7 @@ void C5StoreInventory::on_btnAddSemiready_clicked()
     }
 
     applySemireadyBatch(batch);
+    refreshStockBalances();
 }
 
 void C5StoreInventory::on_btnSemireadyList_clicked()

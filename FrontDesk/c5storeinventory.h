@@ -79,6 +79,9 @@ private:
 
     void refreshRowDiff(int row);
 
+    /** Fills the Stock column from warehouse movements up to the document date. */
+    void refreshStockBalances();
+
     void applySemireadyBatch(const SemireadyBatch &batch);
 
     void removeSemireadyBatch(const QString &batchId);

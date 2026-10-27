@@ -4,22 +4,54 @@
 # Last Modified: 2026-07-30
 require_once __DIR__ . "/index.php";
 require_once __DIR__ . "/../../worker/uuid.php";
+require_once __DIR__ . "/../../worker/async-job.php";
+
+class StoreInputError extends RuntimeException {}
 
 class StoreMove extends Auth
 {
     public function input($params)
     {
-        $json = json_encode($params->doc, JSON_UNESCAPED_UNICODE);
-        $result = $this->runStoreOperation([(int)($params->doc->doc_store_in ?? 0)], function () use ($json) {
+        try {
+            $res = $this->postInput($params->doc);
+        } catch (StoreInputError $e) {
+            dieWithCode($e->getMessage());
+        }
+        $this->result = array_merge($this->result, $res);
+        $this->echoResult();
+    }
+
+    /**
+     * Same as input(), but answers immediately with job_id: covering a long run of negative
+     * batches can outlast the Cloudflare proxy timeout. Poll common/jobs/status for the result.
+     */
+    public function inputAsync($params)
+    {
+        $doc = $params->doc ?? null;
+        if (!is_object($doc)) {
+            dieWithCode(Translator::t("Document is required"));
+        }
+        $jobId = async_job_create($this, "store_input", $this->currentUserId(), $doc);
+        async_job_respond_and_continue(["job_id" => $jobId]);
+        async_job_run($this, $jobId, function () use ($doc) {
+            return $this->postInput($doc);
+        });
+    }
+
+    /** @throws StoreInputError */
+    private function postInput($doc): array
+    {
+        $json = json_encode($doc, JSON_UNESCAPED_UNICODE);
+        $result = $this->runStoreOperation([(int)($doc->doc_store_in ?? 0)], function () use ($json) {
             $res = $this->callStoreFunction("sf_store2_input", $json);
             if (($res["status"] ?? 1) > 0) {
-                dieWithCode($this->inputErrorMessage($res));
+                throw new StoreInputError($this->inputErrorMessage($res));
             }
             return $res;
         });
 
         $items = [];
-        foreach ($params->doc->items ?? [] as $item) {
+        foreach ($doc->items ?? [] as $item) {
             $item = (array)$item;
             $itemId = (int)($item["item_id"] ?? 0);
             $price = (float)($item["price"] ?? $item["f_price"] ?? 0);
@@ -32,9 +64,10 @@ class StoreMove extends Auth
             $worker = require __DIR__ . "/../../worker/ws-notify.php";
             $worker->updatePrices($items);
         }
-        $this->result["version"] = (int)($result["version"] ?? 0);
-        $this->result["paid_amount"] = (float)($result["paid_amount"] ?? 0);
-        $this->echoResult();
+        return [
+            "version" => (int)($result["version"] ?? 0),
+            "paid_amount" => (float)($result["paid_amount"] ?? 0),
+        ];
     }
 
     private function inputErrorMessage(array $result): string

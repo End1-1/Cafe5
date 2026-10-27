@@ -211,6 +211,34 @@
       <item row="13" column="1">
        <widget class="QLineEdit" name="lePrecheckPrinter"/>
       </item>
+      <item row="20" column="0">
+       <widget class="QLabel" name="labelPrintPrecheck">
+        <property name="text">
+         <string>Print precheck</string>
+        </property>
+       </widget>
+      </item>
+      <item row="20" column="1">
+       <widget class="QCheckBox" name="chPrintPrecheck">
+        <property name="checked">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="21" column="0">
+       <widget class="QLabel" name="labelPrintFinalReceipt">
+        <property name="text">
+         <string>Print final receipt</string>
+        </property>
+       </widget>
+      </item>
+      <item row="21" column="1">
+       <widget class="QCheckBox" name="chPrintFinalReceipt">
+        <property name="checked">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
      </layout>
     </widget>
    </item>

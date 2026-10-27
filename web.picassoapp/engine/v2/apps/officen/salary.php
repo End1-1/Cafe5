@@ -867,6 +867,7 @@ class Salary extends Auth
 
     /**
      * Salary from sold dishes — department, fixed and percent from c_goods.f_data.
+     * Percent is taken from qty * price, without the service surcharge baked into f_total.
      * Only lines with service check printed (o_goods.f_data.f_printed = true).
      * Cash day: o_header.f_datecash; open and closed checks (f_state 1, 2).
      * Working-time clip uses o_goods.f_data.f_append_time.
@@ -905,8 +906,9 @@ class Salary extends Auth
             if ($line["sal_fixed"] > 0.0001) {
                 $fixedSum += $line["f_qty"] * $line["sal_fixed"];
             } elseif ($line["sal_pct"] > 0.0001) {
-                $percentSales += $line["f_total"];
-                $percentPay += $line["f_total"] * ($line["sal_pct"] / 100.0);
+                $salesBase = $line["f_qty"] * $line["f_price"];
+                $percentSales += $salesBase;
+                $percentPay += $salesBase * ($line["sal_pct"] / 100.0);
             }
         }
 
@@ -986,7 +988,7 @@ class Salary extends Auth
             }
 
             $agg[$goodsId]["f_qty"] += (float)$line["f_qty"];
-            $agg[$goodsId]["f_sales"] += (float)$line["f_total"];
+            $agg[$goodsId]["f_sales"] += (float)$line["f_qty"] * (float)$line["f_price"];
         }
 
         $items = [];
@@ -1034,7 +1036,7 @@ class Salary extends Auth
             cg.f_id AS goods_id,
             COALESCE(cg.f_name, '') AS goods_name,
             og.f_qty,
-            og.f_total,
+            og.f_price,
             CAST(JSON_UNQUOTE(JSON_VALUE(cg.f_data, '$.f_salary_fixed_value')) AS DECIMAL(18, 4)) AS sal_fixed,
             CAST(JSON_UNQUOTE(JSON_VALUE(cg.f_data, '$.f_salary_percent_value')) AS DECIMAL(18, 4)) AS sal_pct,
             JSON_UNQUOTE(JSON_VALUE(og.f_data, '$.f_append_time')) AS append_time
@@ -1079,7 +1081,7 @@ class Salary extends Auth
             "goods_id" => $goodsId,
             "goods_name" => $name,
             "f_qty" => (float)($row["f_qty"] ?? 0),
-            "f_total" => (float)($row["f_total"] ?? 0),
+            "f_price" => (float)($row["f_price"] ?? 0),
             "sal_fixed" => $fixed,
             "sal_pct" => $pct,
             "append_time" => (string)($row["append_time"] ?? ''),

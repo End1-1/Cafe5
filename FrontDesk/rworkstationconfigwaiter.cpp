@@ -116,6 +116,8 @@ void RWorkstationConfigWaiter::applyConfig(const QJsonObject &config)
     ui->chDoNotPrintCustomerOnReceipt->setChecked(config.value(u"do_not_print_customer_on_receipt").toBool(false));
     ui->leCostumerNotification->setChecked(config.value(QStringLiteral("customer_notification")).toBool(false));
     ui->chAllowMixAllPayments->setChecked(config.value(QStringLiteral("allow_mix_all_payments")).toBool(false));
+    ui->chPrintPrecheck->setChecked(config.value(QStringLiteral("print_precheck")).toBool(true));
+    ui->chPrintFinalReceipt->setChecked(config.value(QStringLiteral("print_final_receipt")).toBool(true));
     ui->leRecentDishesMinutes->setText(QString::number(config.value(QStringLiteral("recent_dishes_minutes")).toInt(40)));
     ui->chNewLook->setChecked(config.value(QStringLiteral("newlook")).toBool(false));
 
@@ -146,6 +148,8 @@ QJsonObject RWorkstationConfigWaiter::collectConfig() const
     jo.insert(QStringLiteral("f_default_store_id"), ui->leStoreId->text().trimmed().toInt());
     jo.insert(QStringLiteral("receipt_phone"), ui->leReceiptPhone->text().trimmed());
     jo.insert(QStringLiteral("precheck_printer"), ui->lePrecheckPrinter->text().trimmed());
+    jo.insert(QStringLiteral("print_precheck"), ui->chPrintPrecheck->isChecked());
+    jo.insert(QStringLiteral("print_final_receipt"), ui->chPrintFinalReceipt->isChecked());
     jo.insert(QStringLiteral("receipt_policy"), ui->pteReceiptPolicy->toPlainText());
     jo.insert(QStringLiteral("receipt_no_table"), ui->chReceiptNoTable->isChecked());
     jo.insert(QStringLiteral("receipt_no_service_hint"), ui->chReceiptNoServiceHint->isChecked());
