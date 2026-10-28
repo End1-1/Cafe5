@@ -16,6 +16,7 @@ $apps = [
     "carwash" => "1.0.2",
     "selfboard" => "1.1.4",
     "ararix" => "1.0.0",
+    "artadramas" => "1.0.0",
     "cookingprogress" => "1.0.0",
 ];
 

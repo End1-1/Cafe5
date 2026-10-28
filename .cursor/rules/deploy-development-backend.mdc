@@ -5,7 +5,9 @@ alwaysApply: true
 
 # Remote backend deploy reminder
 
-Ararix / cafe5 PHP API for development is hosted at **development.picassocloud.com**.
+**development.picassocloud.com** is the demo-development server: `https://development.picassocloud.com`.
+
+Use this URL as the default connection address in new clients. Do not invent another demo host. A saved custom address in an app may still override it.
 
 Whenever you change files under `web.picassoapp/` (especially `engine/v2/`, `engine/db/`, `engine/cnf.php`), at the end of the reply include a short block:
 

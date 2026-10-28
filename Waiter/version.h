@@ -1,7 +1,8 @@
 #define VER_MAJOR 2
 #define VER_MINOR 8
-#define VER_PATCH 25
-#define VER_BUILD 2749
+#define VER_PATCH 26
+#define VER_BUILD 2750
+
 
 
 

@@ -7,6 +7,7 @@
 #include <QFontDatabase>
 #include <QHeaderView>
 #include <QInputDialog>
+#include <QIntValidator>
 #include <QMenu>
 #include <QPaintEngine>
 #include <QPrintPreviewDialog>
@@ -332,6 +333,7 @@ CE5Goods::CE5Goods(QWidget *parent) :
     ui(new Ui::CE5Goods)
 {
     ui->setupUi(this);
+    ui->leArtNumber->setValidator(new QIntValidator(0, 999999, ui->leArtNumber));
 
     // Hardcoded required dynamic attributes.
     initDynamicAttributesTable(ui->tblDynamicAttributes);
@@ -703,6 +705,7 @@ void CE5Goods::clear()
     ui->wArarixGroup->setCodeAndName(0, QString());
     ui->wDishCountry->setCodeAndName(0, QString());
     ui->leStoreOverrideId->setValue(0);
+    ui->leArtNumber->setInteger(0);
 
     ui->leBjuKcal->clear();
     ui->leBjuProtein->clear();
@@ -865,6 +868,7 @@ QJsonObject CE5Goods::makeJsonObject()
     jdata[QStringLiteral("f_ararix_group")] = ui->wArarixGroup->value();
     jdata[QStringLiteral("f_ararix_country")] = ui->wDishCountry->value();
     jdata[QStringLiteral("f_store_override")] = ui->leStoreOverrideId->getInteger();
+    jdata[QStringLiteral("f_artnumber")] = ui->leArtNumber->getInteger();
 
     QJsonObject j;
     j["f_id"] = ui->leCode->getInteger();
@@ -1359,6 +1363,7 @@ void CE5Goods::openResponse(const QJsonObject &jdoc)
             C5Cache::cache(cache_goods_store)->ensureId(storeOverride);
         }
         ui->leStoreOverrideId->setValue(storeOverride);
+        ui->leArtNumber->setInteger(jdata.value(QStringLiteral("f_artnumber")).toInt());
     }
 
     const QJsonObject bjuObj = jdata.value(QStringLiteral("f_bju")).toObject();

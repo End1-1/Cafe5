@@ -68,9 +68,6 @@
        <property name="maxLength">
         <number>16</number>
        </property>
-       <property name="echoMode">
-        <enum>QLineEdit::EchoMode::Password</enum>
-       </property>
       </widget>
      </item>
      <item row="4" column="0">
@@ -98,9 +95,6 @@
       <widget class="QLineEdit" name="leOpPass">
        <property name="maxLength">
         <number>16</number>
-       </property>
-       <property name="echoMode">
-        <enum>QLineEdit::EchoMode::Password</enum>
        </property>
       </widget>
      </item>

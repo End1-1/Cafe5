@@ -8753,6 +8753,11 @@ MS Excel</translation>
         <translation>Переопределение склада</translation>
     </message>
     <message>
+        <location filename="../Editors/ce5goods.ui" line="1702"/>
+        <source>Workshop number</source>
+        <translation>Номер цеха</translation>
+    </message>
+    <message>
         <location filename="../Editors/ce5goods.ui" line="1866"/>
         <source>Attributes</source>
         <translation>Атрибуты</translation>

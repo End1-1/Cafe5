@@ -8773,6 +8773,11 @@ MS Excel</translation>
         <translation>Պահեստի վերագրում</translation>
     </message>
     <message>
+        <location filename="../Editors/ce5goods.ui" line="1702"/>
+        <source>Workshop number</source>
+        <translation>Արտադրամասի համար</translation>
+    </message>
+    <message>
         <location filename="../Editors/ce5goods.ui" line="1866"/>
         <source>Attributes</source>
         <translation>Հատկանիշներ</translation>
